@@ -1,6 +1,0 @@
-time=2025-06-13T18:13:00.896-07:00 level=INFO msg="checking for pulumi" path="/Users/soleil/Library/Application Support/sst/bin/pulumi"
-time=2025-06-13T18:13:01.314-07:00 level=INFO msg="checking for bun" path="/Users/soleil/Library/Application Support/sst/bin/bun"
-time=2025-06-13T18:13:01.324-07:00 level=INFO msg="initializing ui" isTTY=true
-time=2025-06-13T18:13:01.327-07:00 level=INFO msg="initializing ui"time=2025-06-13T18:13:25.310-07:00 level=INFO msg=interrupted
-"initialized ui"
-time=2025-06-13T18:13:25.310-07:00 level=INFO msg=interrupted

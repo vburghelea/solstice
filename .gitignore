@@ -9,12 +9,14 @@ node_modules
 .DS_Store
 .cache
 .env
+*.log
 
 .data
 .vercel
 .output
 .wrangler
 .netlify
+.sst
 dist
 /build/
 /api/

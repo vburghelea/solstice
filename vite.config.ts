@@ -30,8 +30,8 @@ export default defineConfig({
         // verboseFileRoutes: false,
       },
 
-      // https://tanstack.com/start/latest/docs/framework/react/hosting#deployment
-      // target: "node-server",
+      // Netlify deployment target
+      target: "netlify",
     }),
   ],
 });

@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "sst dev",
     "build": "vite build",
+    "deploy": "sst deploy",
     "start": "node .output/server/index.mjs",
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
@@ -32,6 +33,7 @@
     "postgres": "^3.4.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "sst": "3.17.5",
     "tailwind-merge": "^3.3.1",
     "vite": "^6.3.5"
   },

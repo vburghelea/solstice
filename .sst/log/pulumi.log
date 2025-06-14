@@ -1,0 +1,26 @@
+Updating (soleil):
+@ updating.....
+
+    pulumi:pulumi:Stack solstice-soleil  warning: Attempting to deploy or update resources with 1 pending operations from previous deployment.
+@ updating....
+    pulumi:pulumi:Stack solstice-soleil running warning: Attempting to deploy or update resources with 1 pending operations from previous deployment.
+@ updating............
+    pulumi:pulumi:Stack solstice-soleil  1 warning
+Diagnostics:
+  pulumi:pulumi:Stack (solstice-soleil):
+    warning: Attempting to deploy or update resources with 1 pending operations from previous deployment.
+      * urn:pulumi:soleil::solstice::sst:aws:Postgres$aws:rds/cluster:Cluster::SolsticeDBCluster, interrupted while creating
+    These resources are in an unknown state because the Pulumi CLI was interrupted while waiting for changes to these resources to complete. You should confirm whether or not the operations listed completed successfully by checking the state of the appropriate provider. For example, if you are using AWS, you can confirm using the AWS Console.
+    
+    Once you have confirmed the status of the interrupted operations, you can repair your stack using `pulumi refresh` which will refresh the state from the provider you are using and clear the pending operations if there are any.
+    
+    Note that `pulumi refresh` will need to be run interactively to clear pending CREATE operations.
+
+Outputs:
+    _protect: false
+
+Resources:
+    32 unchanged
+
+Duration: 11s
+

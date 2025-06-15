@@ -1,11 +1,47 @@
 [build]
   command = "pnpm build"
   publish = "dist"
+  edge_functions = "netlify/edge-functions"
+
+[build.environment]
+  NODE_ENV = "production"
+
+# Production context: Deploys from the production branch (main/master)
+[context.production]
+  command = "pnpm build"
+  
+[context.production.environment]
+  NODE_ENV = "production"
+
+# Deploy Preview context: Pull requests and preview deploys
+[context.deploy-preview]
+  command = "pnpm build"
+  
+[context.deploy-preview.environment]
+  NODE_ENV = "test"
+
+# Branch Deploy context: Deploys from branches (not main/master)
+[context.branch-deploy]
+  command = "pnpm build"
+  
+[context.branch-deploy.environment]
+  NODE_ENV = "test"
 
 [dev]
   targetPort = 5173
   publish = "dist"
   command = "pnpm dev"
+
+# Security Headers (backup for edge function)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-XSS-Protection = "1; mode=block"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
 [[redirects]]
   from = "/*"

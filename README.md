@@ -1,82 +1,111 @@
-# Sports Registration Platform
+# Solstice
 
-This is a web application built with [SST](https://sst.dev/) and [TanStack](https://tanstack.com/), deployed on AWS.
+[![CI](https://github.com/soleilheaney/solstice/actions/workflows/ci.yml/badge.svg)](https://github.com/soleilheaney/solstice/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/soleilheaney/solstice/branch/main/graph/badge.svg)](https://codecov.io/gh/soleilheaney/solstice)
+[![Deploy Preview](https://github.com/soleilheaney/solstice/actions/workflows/deploy-preview.yml/badge.svg)](https://github.com/soleilheaney/solstice/actions/workflows/deploy-preview.yml)
+
+## Sports Registration Platform
+
+Solstice is a **modern web platform for managing memberships, teams, and events**. Built with [TanStack Start](https://tanstack.com/start) and deployed on [Netlify](https://www.netlify.com/).
 
 ## Prerequisites
 
-- Node.js (v16+)
-- AWS CLI
-- AWS SSO credentials
+- Node.js (v18+ or v20+)
+- pnpm (v9+)
+- PostgreSQL database
 
-## AWS Configuration
+## Environment Variables
 
-This project uses AWS SSO for authentication. Make sure you have the AWS CLI installed and configured.
+Create a `.env` file in the project root with the following variables:
 
-### SSO Login
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/solstice
 
-1. Configure SSO:
-   ```
-   aws configure sso
-   ```
+# Application
+VITE_BASE_URL=http://localhost:3000
 
-2. Log in with SSO for development:
-
-   ```
-   aws sso login --profile soleil-dev
-   ```
-
-## Running the Project
-
-When running `npx sst dev`, pay attention to AWS credentials. The project looks for credentials in this order:
-
-1. Environment variables
-2. SST config
-3. AWS config
-4. Credential files
-
-To avoid credential issues when running locally, you can explicitly set the profile:
-
+# OAuth Providers (optional)
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
-AWS_PROFILE=soleil-dev npx sst dev
-```
-
-This ensures the right AWS profile is used, overriding any other profile that might be set in your environment variables.
 
 ## Project Structure
 
-- `/sports-reg-platform` - The main application code
-  - Built with TanStack Router and React
-  - Uses Prisma for database access
-  - Styled with Tailwind CSS
+- `src/routes/` - File-based routing (pages and API endpoints)
+- `src/lib/auth/` - Better Auth configuration and functions
+- `src/lib/db/` - Drizzle database setup and schemas
+- `src/lib/server/` - Server-side database schemas
+- `src/components/ui/` - shadcn/ui components
 
 ## Development
 
 1. Install dependencies:
-   ```
-   cd sports-reg-platform
-   npm install
+
+   ```bash
+   pnpm install
    ```
 
-2. Run the development server:
-   ```
-   AWS_PROFILE=soleil-dev npx sst dev
+2. Set up the database:
+
+   ```bash
+   pnpm db push
    ```
 
-3. In another terminal, start the frontend:
+3. Generate auth schemas:
+
+   ```bash
+   pnpm auth:generate
    ```
-   cd sports-reg-platform
-   npm run dev
+
+4. Run the development server:
+   ```bash
+   pnpm dev
    ```
+
+## Available Scripts
+
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint
+- `pnpm check-types` - Type checking with TypeScript
+- `pnpm format` - Format code with Prettier
+- `pnpm test` - Run tests
+- `pnpm test:coverage` - Run tests with coverage
+- `pnpm db` - Run Drizzle Kit database commands
+- `pnpm auth:generate` - Generate auth schema from config
 
 ## Deployment
 
-Deployments are managed through SST and target the configured AWS account.
+The application is automatically deployed to Netlify:
 
+- **Production**: Pushes to `main` branch trigger production deployments
+- **Preview**: Pull requests get automatic preview deployments
 
+## CI/CD
 
+GitHub Actions workflows handle:
 
+- **Continuous Integration**: Linting, type checking, and testing on Node.js 18 and 20
+- **Deploy Previews**: Automatic Netlify preview deployments for pull requests
+- **Code Coverage**: Test coverage reports uploaded to Codecov
 
-# Solstice
+### Required GitHub Secrets
+
+Configure these secrets in your GitHub repository settings:
+
+- `DATABASE_URL` - PostgreSQL connection string for CI tests
+- `VITE_BASE_URL` - Base URL for the application
+- `NETLIFY_AUTH_TOKEN` - Netlify authentication token
+- `NETLIFY_SITE_ID` - Netlify site ID
+- `CODECOV_TOKEN` - Codecov upload token (optional)
+- `GITHUB_CLIENT_ID` - GitHub OAuth client ID
+- `GITHUB_CLIENT_SECRET` - GitHub OAuth client secret
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 
 Solstice is a **modern web platform for managing memberships, teams, and events**. It leverages a cutting-edge tech stack to deliver fast, dynamic user experiences while being highly extensible.
 

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
+import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,

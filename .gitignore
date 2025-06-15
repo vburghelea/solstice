@@ -9,6 +9,8 @@ node_modules
 .DS_Store
 .cache
 .env
+.env.local
+.env.*.local
 *.log
 
 .data
@@ -24,3 +26,8 @@ dist
 /public/build
 
 .tanstack
+
+# Testing
+coverage
+.nyc_output
+*.lcov

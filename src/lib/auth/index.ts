@@ -3,7 +3,8 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { reactStartCookies } from "better-auth/react-start";
 
-import { db } from "~/lib/db";
+import { db } from "~/db";
+import { securityConfig } from "~/lib/security/config";
 
 const getAuthConfig = serverOnly(() =>
   betterAuth({
@@ -15,13 +16,28 @@ const getAuthConfig = serverOnly(() =>
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
     plugins: [reactStartCookies()],
 
-    // https://www.better-auth.com/docs/concepts/session-management#session-caching
-    // session: {
-    //   cookieCache: {
-    //     enabled: true,
-    //     maxAge: 5 * 60, // 5 minutes
-    //   },
-    // },
+    // Session configuration with security settings
+    session: {
+      expiresIn: securityConfig.session.maxAge,
+      updateAge: securityConfig.session.updateAge,
+      cookieCache: securityConfig.session.cookieCache,
+    },
+
+    // Secure cookie configuration
+    advanced: {
+      cookiePrefix: "solstice",
+      useSecureCookies: securityConfig.cookies.secure,
+      cookies: {
+        sessionToken: {
+          name: "session",
+          options: securityConfig.cookies,
+        },
+        csrfToken: {
+          name: "csrf",
+          options: securityConfig.cookies,
+        },
+      },
+    },
 
     // https://www.better-auth.com/docs/concepts/oauth
     socialProviders: {
@@ -38,6 +54,7 @@ const getAuthConfig = serverOnly(() =>
     // https://www.better-auth.com/docs/authentication/email-password
     emailAndPassword: {
       enabled: true,
+      requireEmailVerification: process.env.NODE_ENV === "production",
     },
   }),
 );

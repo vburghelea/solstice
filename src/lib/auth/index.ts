@@ -68,6 +68,8 @@ const getAuthConfig = serverOnly(() =>
       google: {
         clientId: env.get("GOOGLE_CLIENT_ID") || "",
         clientSecret: env.get("GOOGLE_CLIENT_SECRET") || "",
+        // Optional: Request additional scopes
+        // scope: ["openid", "email", "profile"],
       },
     },
 
@@ -75,6 +77,14 @@ const getAuthConfig = serverOnly(() =>
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: isProduction,
+    },
+
+    // Account linking configuration
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "github"], // Auto-link these providers
+      },
     },
   }),
 );

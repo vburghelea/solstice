@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 
 // Check if BETTER_AUTH_SECRET already exists in any env file
 const envFiles = [".env", ".env.local", ".env.development", ".env.production"];

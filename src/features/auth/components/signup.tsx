@@ -143,9 +143,10 @@ export default function SignupForm() {
                       setIsLoading(true);
                       setErrorMessage("");
                     },
-                    onError: (ctx) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onError: (ctx: any) => {
                       setIsLoading(false);
-                      setErrorMessage(ctx.error.message);
+                      setErrorMessage(ctx.error?.message || "OAuth signup failed");
                     },
                   },
                 )
@@ -170,9 +171,10 @@ export default function SignupForm() {
                       setIsLoading(true);
                       setErrorMessage("");
                     },
-                    onError: (ctx) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onError: (ctx: any) => {
                       setIsLoading(false);
-                      setErrorMessage(ctx.error.message);
+                      setErrorMessage(ctx.error?.message || "OAuth signup failed");
                     },
                   },
                 )

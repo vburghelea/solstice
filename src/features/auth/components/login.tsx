@@ -15,35 +15,46 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isLoading) return;
+    setIsLoading(true);
+    setErrorMessage("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    if (!email || !password) return;
 
-    setIsLoading(true);
-    setErrorMessage("");
+    if (!email || !password) {
+      setErrorMessage("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
 
-    auth.signIn.email(
-      {
-        email,
-        password,
-        callbackURL: redirectUrl,
-      },
-      {
-        onError: (ctx) => {
-          setErrorMessage(ctx.error.message);
-          setIsLoading(false);
+    try {
+      await auth.signIn.email(
+        {
+          email,
+          password,
+          callbackURL: redirectUrl,
         },
-        onSuccess: async () => {
-          await queryClient.invalidateQueries({ queryKey: ["user"] });
-          navigate({ to: redirectUrl });
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["user"] });
+            navigate({ to: redirectUrl });
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onError: (ctx: any) => {
+            setErrorMessage(ctx.error?.message || "Login failed");
+            setIsLoading(false);
+          },
         },
-      },
-    );
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setErrorMessage(error.message || "An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -112,9 +123,9 @@ export default function LoginForm() {
                       setIsLoading(true);
                       setErrorMessage("");
                     },
-                    onError: (ctx) => {
-                      setIsLoading(false);
-                      setErrorMessage(ctx.error.message);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onError: (ctx: any) => {
+                      setErrorMessage(ctx.error?.message || "OAuth login failed");
                     },
                   },
                 )
@@ -139,9 +150,9 @@ export default function LoginForm() {
                       setIsLoading(true);
                       setErrorMessage("");
                     },
-                    onError: (ctx) => {
-                      setIsLoading(false);
-                      setErrorMessage(ctx.error.message);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onError: (ctx: any) => {
+                      setErrorMessage(ctx.error?.message || "OAuth login failed");
                     },
                   },
                 )

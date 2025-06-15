@@ -42,10 +42,13 @@ export const rateLimit = serverOnly(
 
     if (record.count >= config.max) {
       // Rate limit exceeded
-      const error = Object.assign(new Error(config.message), {
-        status: 429,
-        retryAfter: Math.ceil((record.resetTime - now) / 1000),
-      });
+      const error = Object.assign(
+        new Error("Too many requests, please try again later."),
+        {
+          status: 429,
+          statusText: "Too Many Requests",
+        },
+      );
       throw error;
     }
 

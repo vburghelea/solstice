@@ -1,121 +1,164 @@
 # Tech Debt and Future Improvements
 
-## Remaining TypeScript Errors
+## Current Status (Updated)
 
-1. **Import path issues** - Several files still have incorrect import paths:
+### ✅ Resolved Issues
 
-   - `DefaultCatchBoundary.tsx` and `NotFound.tsx` importing from `./ui/button` instead of `~/shared/ui/button`
-   - `password-input.example.tsx` importing from non-existent paths
-   - Missing `@tanstack/react-start/api` module
+1. **TypeScript Errors** - All linting errors have been resolved
 
-2. **Auth client type issues**:
+   - Fixed import path issues in test files
+   - Added proper eslint-disable comments for test mocks
+   - Resolved auth middleware type issues
 
-   - Removed `twoFactor` and `admin` properties that don't exist in Better Auth
-   - Test mocks need updating to match actual auth client structure
+2. **ESLint Warnings** - Addressed all warnings
+   - Fixed `useTheme` hook state updates in useEffect
+   - Removed array index keys in password input example
 
-3. **Test setup issues**:
-   - `tests/setup.ts` missing `vi` import from vitest
-   - Mock types in auth tests need proper typing
+### 🟥 P0 - Critical Issues (Must Fix)
 
-## Tech Debt Created
+#### 1. Security Hardening
 
-### 1. ESLint Warnings (Non-blocking)
+- **Cookie Security in Previews**: `NODE_ENV` is "test" in Netlify previews, making cookies insecure
+  - Action: Force `secure = true` when `VITE_BASE_URL` starts with `https://`
+- **Environment Files**: `.env.test` and `.env.production` contain real connection strings
+  - Action: Replace with example.com hostnames
+- **BetterAuth Secret**: Manual generation is error-prone
+  - Action: Add postinstall script for secret generation
 
-- **useTheme hook**: Still has warnings about setting state in useEffect (though functionally correct)
-- **Array index keys**: Password input example uses array indices as keys (acceptable for static arrays)
+#### 2. Repository Structure
 
-### 2. Auth Guard File Extension
+- **Incomplete Feature Migration**: `src/app/` still contains route-centric files
+  - Action: Create thin `src/app/providers.tsx` for global providers only
+  - Action: Move utilities to `src/shared/`
+- **Test Organization**: Tests scattered across different patterns
+  - Action: Co-locate tests with code (`foo.test.ts` next to `foo.ts`)
 
-- Had to rename `useAuthGuard.ts` to `.tsx` because it uses JSX
-- This is a minor inconsistency as hooks typically use `.ts`
+### 🟧 P1 - High Priority
 
-### 3. Environment Variable Handling
+#### 1. Production Stability
 
-- Created `.env.test` and `.env.production` files but actual secrets need to be configured in Netlify
-- The local/test split might need refinement based on actual deployment needs
+- **Rate Limiting**: In-memory storage won't scale
+  - Action: Create adapter interface with Redis implementation
+  - Use `@upstash/redis` with `REDIS_URL` env var
+- **CSP Nonce Performance**: Rebuilds entire HTML on every request
+  - Action: Only process HTML files < 256KB
+- **Connection Pooling**: No leak prevention tests
+  - Action: Add test for 500 parallel queries
 
-### 4. Database Connection Complexity
+#### 2. Testing Gaps
 
-- The dual pooled/unpooled connection setup adds complexity
-- May need to revisit if Neon changes their recommendations
+- **No API Contract Tests**: Server routes untested
+  - Action: Use supertest with `createStartAPIHandler`
+- **No E2E Tests**: Missing end-to-end coverage
+  - Action: Add Playwright tests against preview URLs
 
-### 5. Test Coverage
+### 🟨 P2 - Medium Priority
 
-- Only created example tests, not comprehensive coverage
-- Auth middleware tests are simplified due to TanStack Start's complex middleware structure
+#### 1. Developer Experience
 
-## Shortcuts Taken
+- **VS Code Config**: No shared extensions config
+  - Action: Add `.vscode/extensions.json`
+- **Storybook**: No component documentation
+  - Action: Set up Storybook 8 for `shared/ui`
+- **React 19 Compiler**: Not configured for dev/prod only
+  - Action: Exclude from test builds
 
-### 1. Simplified Rate Limiting
+#### 2. CI/CD Improvements
 
-- In-memory storage won't scale across multiple instances
-- Should implement Redis-based rate limiting for production
+- **Build Order**: Build doesn't depend on tests
+  - Action: Make build depend on test success
+- **Migration Caching**: Drizzle migrations not cached
+  - Action: Cache migration artifacts
+- **Dependency Updates**: No automated tracking
+  - Action: Add dependabot.yml
 
-### 2. Basic Password Validation
+## Code Duplication to Fix
 
-- Current implementation is good but could add:
-  - Common password dictionary checking
-  - Leaked password database integration (haveibeenpwned)
+1. **Auth Client**: Duplicated in `src/lib/auth-client.ts` and `lib/auth/auth-client.ts`
+   - Action: Remove deep copy, use barrel export
+2. **Database Connections**: Split between `neon.ts` and `connections.ts`
+   - Action: Consolidate into single `connections.ts`
+3. **Security Exports**: Long import paths
+   - Action: Export everything from index.ts
 
-### 3. CSP Nonce Implementation
+## TypeScript Strictness Improvements
 
-- Currently generates nonces per request
-- Could optimize with a nonce pool or caching strategy
+Add to `tsconfig.json`:
 
-### 4. Feature Folder Migration
+```json
+{
+  "compilerOptions": {
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "skipLibCheck": false // After fixing all errors
+  }
+}
+```
 
-- Only migrated auth features
-- Other features still need to be organized when created
+## Migration & Seeds Strategy
 
-## Recommended Next Steps
+1. **CI Migrations**: Add step after install:
 
-### High Priority
+   ```yaml
+   - name: Compile & apply drizzle migrations
+     run: pnpm db push
+     env:
+       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+   ```
 
-1. Fix remaining TypeScript errors
-2. Configure all environment variables in Netlify
-3. Add comprehensive test coverage
-4. Implement proper error boundaries
+2. **Seed Data**: Create `src/db/seeds/*.ts` for deterministic test data
 
-### Medium Priority
+## Security Testing
 
-1. Add API documentation (OpenAPI/Swagger)
-2. Implement request/response logging
-3. Add performance monitoring (Sentry, etc.)
-4. Create data migration scripts
+Add invariant tests:
 
-### Low Priority
+- Critical headers presence
+- Cookie security settings
+- Rate limit effectiveness
+- CSP policy validation
 
-1. Add Storybook for component documentation
-2. Implement feature flags system
-3. Add internationalization (i18n)
-4. Create admin dashboard scaffolding
+## Recommended Action Order
 
-## Configuration Needed
+1. **Immediate (This Week)**
 
-Before deploying to production:
+   - Fix cookie security in previews
+   - Replace real connection strings
+   - Add BetterAuth secret generation
+   - Complete feature folder migration
 
-1. **Netlify Environment Variables** - Set all required variables in Netlify UI
-2. **OAuth Apps** - Create GitHub and Google OAuth applications
-3. **Database** - Ensure Neon database is properly configured
-4. **Domain** - Configure custom domain and update VITE_BASE_URL
-5. **Monitoring** - Set up error tracking and analytics
+2. **Next Sprint**
+
+   - Implement Redis rate limiting
+   - Add API contract tests
+   - Set up connection leak tests
+   - Consolidate duplicate code
+
+3. **Following Sprint**
+   - Add Playwright E2E tests
+   - Set up Storybook
+   - Configure VS Code extensions
+   - Optimize CI/CD pipeline
+
+## Metrics to Track
+
+- TypeScript strict mode violations: 0
+- Test coverage: Target 80%
+- Build time: < 2 minutes
+- Security header score: A+
+- Lighthouse score: > 90
 
 ## Breaking Changes to Watch
 
-1. **TanStack Start** - Still in beta, API may change
-2. **Better Auth** - Version 1.x, check for updates
-3. **Neon Database** - Connection string format may evolve
+1. **React 19 GA**: Currently on RC, watch for breaking changes
+2. **TanStack Start**: Still in beta, API may change
+3. **Better Auth**: Version 1.x, check for updates
+4. **Neon Database**: Connection string format may evolve
 
-## Performance Considerations
+## Long-term Architecture Goals
 
-1. **Bundle Size** - Monitor and implement code splitting as needed
-2. **Database Queries** - Add query optimization and caching
-3. **Static Assets** - Implement CDN and image optimization
-4. **API Response Times** - Add response caching where appropriate
-
-## Security Improvements
-
-1. **2FA Implementation** - Better Auth supports it but not implemented
-2. **Session Management** - Add session revocation UI
-3. **Audit Logging** - Track security-relevant events
-4. **Input Sanitization** - Add additional validation layers
+1. **Zero-downtime deployments**: Implement blue-green deployments
+2. **Multi-region support**: Prepare for edge deployment
+3. **Observability**: Full APM integration (Sentry, DataDog)
+4. **Feature flags**: Runtime feature toggling
+5. **A/B testing**: Built-in experimentation framework

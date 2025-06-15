@@ -1,19 +1,28 @@
 import { createAuthClient } from "better-auth/react";
 
 // Create auth client instance
-const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_BASE_URL,
+export const authClient = createAuthClient({
+  baseURL: import.meta.env["VITE_BASE_URL"],
 });
 
 // Export a facade with all auth methods
 export const auth = {
   // Authentication methods
-  signIn: authClient.signIn,
-  signUp: authClient.signUp,
+  signIn: {
+    email: authClient.signIn.email,
+    social: authClient.signIn.social,
+  },
+  signUp: {
+    email: authClient.signUp.email,
+  },
   signOut: authClient.signOut,
 
   // OAuth methods
-  signInWithOAuth: authClient.signIn.social,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  signInWithOAuth: (
+    data: Parameters<typeof authClient.signIn.social>[0],
+    ...args: any[]
+  ) => authClient.signIn.social(data, ...args),
 
   // Session methods
   getSession: authClient.getSession,

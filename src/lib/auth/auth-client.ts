@@ -1,8 +1,8 @@
 import { createAuthClient } from "better-auth/react";
 
 // Create auth client instance
-const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_BASE_URL,
+export const authClient = createAuthClient({
+  baseURL: import.meta.env["VITE_BASE_URL"],
 });
 
 // Export a facade with all auth methods

@@ -4,7 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 
 export const auth = betterAuth({
-  baseURL: process.env.VITE_BASE_URL,
+  baseURL: process.env["VITE_BASE_URL"] || "http://localhost:3000",
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
@@ -17,21 +17,35 @@ export const auth = betterAuth({
     },
   },
 
-
   // https://www.better-auth.com/docs/concepts/oauth
   socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    },
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    },
-    discord: {
-      clientId: process.env.DISCORD_CLIENT_ID!,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-    },
+    // GitHub OAuth
+    ...(process.env["GITHUB_CLIENT_ID"] && process.env["GITHUB_CLIENT_SECRET"]
+      ? {
+          github: {
+            clientId: process.env["GITHUB_CLIENT_ID"],
+            clientSecret: process.env["GITHUB_CLIENT_SECRET"],
+          },
+        }
+      : {}),
+    // Google OAuth
+    ...(process.env["GOOGLE_CLIENT_ID"] && process.env["GOOGLE_CLIENT_SECRET"]
+      ? {
+          google: {
+            clientId: process.env["GOOGLE_CLIENT_ID"],
+            clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
+          },
+        }
+      : {}),
+    // Discord OAuth
+    ...(process.env["DISCORD_CLIENT_ID"] && process.env["DISCORD_CLIENT_SECRET"]
+      ? {
+          discord: {
+            clientId: process.env["DISCORD_CLIENT_ID"],
+            clientSecret: process.env["DISCORD_CLIENT_SECRET"],
+          },
+        }
+      : {}),
   },
 
   // https://www.better-auth.com/docs/authentication/email-password

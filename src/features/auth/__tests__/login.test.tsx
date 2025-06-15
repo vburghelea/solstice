@@ -199,11 +199,18 @@ describe("LoginForm", () => {
 
   it("handles GitHub social login", async () => {
     const user = userEvent.setup();
+    const { mockUser } = createAuthMocks();
 
     vi.mocked(auth.signInWithOAuth).mockImplementationOnce((data, handlers) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handlers?.onRequest?.({} as any);
-      return Promise.resolve();
+      return Promise.resolve({
+        redirect: true,
+        token: "mock-token",
+        url: undefined,
+        user: mockUser,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
     });
 
     render(<LoginForm />);
@@ -221,11 +228,18 @@ describe("LoginForm", () => {
 
   it("handles Google social login", async () => {
     const user = userEvent.setup();
+    const { mockUser } = createAuthMocks();
 
     vi.mocked(auth.signInWithOAuth).mockImplementationOnce((data, handlers) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handlers?.onRequest?.({} as any);
-      return Promise.resolve();
+      return Promise.resolve({
+        redirect: true,
+        token: "mock-token",
+        url: undefined,
+        user: mockUser,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
     });
 
     render(<LoginForm />);

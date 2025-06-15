@@ -25,6 +25,7 @@ export interface EnvConfig {
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
   BETTER_AUTH_SECRET?: string;
+  COOKIE_DOMAIN?: string; // Optional cookie domain restriction
   VITE_ENABLE_ANALYTICS?: string;
   VITE_ENABLE_SENTRY?: string;
   VITE_POSTHOG_KEY?: string;
@@ -75,7 +76,7 @@ class EnvironmentLoader {
   private load() {
     if (this.loaded) return;
 
-    const nodeEnv = process.env.NODE_ENV || "development";
+    const nodeEnv = process.env["NODE_ENV"] || "development";
     const cwd = process.cwd();
 
     // Load in priority order (lowest to highest)

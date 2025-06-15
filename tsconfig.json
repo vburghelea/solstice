@@ -1,24 +1,27 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
     "target": "ES2022",
-    "allowJs": true,
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./src/*"]
-    },
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "noEmit": true,
-          "strictNullChecks": true,
-      "types": ["vite/client", "@tanstack/react-start"]
+    "types": ["vite/client", "@types/node"],
+    "paths": {
+      "~/*": ["./src/*"],
+      "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src", "app.config.ts", "*.config.ts", "netlify/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

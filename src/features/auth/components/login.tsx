@@ -1,9 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "~/lib/auth-client";
 import { Button } from "~/shared/ui/button";
-import { GitHubIcon, GoogleIcon, LoaderIcon, LogoIcon } from "~/shared/ui/icons";
+import { GitHubIcon, LoaderIcon, LogoIcon } from "~/shared/ui/icons";
 import { Input } from "~/shared/ui/input";
 import { Label } from "~/shared/ui/label";
 
@@ -14,6 +14,40 @@ export default function LoginForm() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [debugInfo, setDebugInfo] = useState("");
+
+  // Debug: Verify component is mounting
+  console.log("LoginForm component mounted");
+  console.log("Environment:", { baseUrl: import.meta.env["VITE_BASE_URL"] });
+
+  // Show debug info on screen
+  useEffect(() => {
+    setDebugInfo(`Component mounted. Base URL: ${import.meta.env["VITE_BASE_URL"]}`);
+
+    // Test if JavaScript is running in browser
+    const testButton = document.createElement("button");
+    testButton.textContent = "Direct DOM Test Button";
+    testButton.style.cssText =
+      "position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px;";
+    testButton.addEventListener("click", () => {
+      alert("Direct DOM button clicked!");
+      console.log("Direct DOM click worked");
+    });
+    document.body.appendChild(testButton);
+
+    // Also test inline onclick
+    const inlineButton = document.createElement("button");
+    inlineButton.textContent = "Inline onclick test";
+    inlineButton.style.cssText =
+      "position: fixed; top: 60px; right: 10px; z-index: 9999; background: green; color: white; padding: 10px;";
+    inlineButton.onclick = () => alert("Inline onclick worked!");
+    document.body.appendChild(inlineButton);
+
+    return () => {
+      testButton.remove();
+      inlineButton.remove();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,6 +135,11 @@ export default function LoginForm() {
           {errorMessage && (
             <span className="text-destructive text-center text-sm">{errorMessage}</span>
           )}
+          {debugInfo && (
+            <div className="rounded bg-yellow-100 p-2 text-center text-sm">
+              DEBUG: {debugInfo}
+            </div>
+          )}
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
               Or
@@ -112,55 +151,28 @@ export default function LoginForm() {
               className="w-full"
               type="button"
               disabled={isLoading}
-              onClick={() =>
-                auth.signInWithOAuth(
-                  {
-                    provider: "github",
-                    callbackURL: redirectUrl,
-                  },
-                  {
-                    onRequest: () => {
-                      setIsLoading(true);
-                      setErrorMessage("");
-                    },
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onError: (ctx: any) => {
-                      setErrorMessage(ctx.error?.message || "OAuth login failed");
-                    },
-                  },
-                )
-              }
+              onClick={() => {
+                console.log("GitHub OAuth button clicked");
+                console.log("Redirect URL:", redirectUrl);
+                console.log("Base URL:", import.meta.env["VITE_BASE_URL"]);
+
+                // Better Auth will handle the redirect automatically
+                auth.signInWithOAuth({
+                  provider: "github",
+                  callbackURL: redirectUrl,
+                });
+              }}
             >
               <GitHubIcon />
               Login with GitHub
             </Button>
-            <Button
-              variant="outline"
-              className="w-full"
+            <button
+              className="w-full rounded border bg-blue-500 p-2 text-white"
               type="button"
-              disabled={isLoading}
-              onClick={() =>
-                auth.signInWithOAuth(
-                  {
-                    provider: "google",
-                    callbackURL: redirectUrl,
-                  },
-                  {
-                    onRequest: () => {
-                      setIsLoading(true);
-                      setErrorMessage("");
-                    },
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onError: (ctx: any) => {
-                      setErrorMessage(ctx.error?.message || "OAuth login failed");
-                    },
-                  },
-                )
-              }
+              onClick={() => alert("TEST: Button clicked!")}
             >
-              <GoogleIcon />
-              Login with Google
-            </Button>
+              TEST: Click me
+            </button>
           </div>
         </div>
       </form>

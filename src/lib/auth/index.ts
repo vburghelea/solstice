@@ -12,6 +12,25 @@ const baseUrl = getBaseUrl();
 const isProduction = baseUrl?.startsWith("https://") ?? false;
 const cookieDomain = env.get("COOKIE_DOMAIN");
 
+// Debug OAuth configuration
+console.log("Auth config loading...");
+console.log("Base URL:", baseUrl);
+const googleClientId = env.get("GOOGLE_CLIENT_ID") || "";
+const googleClientSecret = env.get("GOOGLE_CLIENT_SECRET") || "";
+const githubClientId = env.get("GITHUB_CLIENT_ID") || "";
+const githubClientSecret = env.get("GITHUB_CLIENT_SECRET") || "";
+
+console.log(
+  "Google Client ID:",
+  googleClientId ? `Set (${googleClientId.substring(0, 10)}...)` : "Missing",
+);
+console.log("Google Client Secret:", googleClientSecret ? "Set" : "Missing");
+console.log(
+  "GitHub Client ID:",
+  githubClientId ? `Set (${githubClientId.substring(0, 10)}...)` : "Missing",
+);
+console.log("GitHub Client Secret:", githubClientSecret ? "Set" : "Missing");
+
 const getAuthConfig = serverOnly(() =>
   betterAuth({
     baseURL: baseUrl,
@@ -62,12 +81,12 @@ const getAuthConfig = serverOnly(() =>
     // https://www.better-auth.com/docs/concepts/oauth
     socialProviders: {
       github: {
-        clientId: env.get("GITHUB_CLIENT_ID") || "",
-        clientSecret: env.get("GITHUB_CLIENT_SECRET") || "",
+        clientId: githubClientId,
+        clientSecret: githubClientSecret,
       },
       google: {
-        clientId: env.get("GOOGLE_CLIENT_ID") || "",
-        clientSecret: env.get("GOOGLE_CLIENT_SECRET") || "",
+        clientId: googleClientId,
+        clientSecret: googleClientSecret,
         // Optional: Request additional scopes
         // scope: ["openid", "email", "profile"],
       },

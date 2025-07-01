@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `pnpm dev` - Start development server
+- `pnpm dev` - Start development server (Vite on port 5173)
+- `netlify dev` - Start Netlify Dev server (port 8888, proxies Vite and includes edge functions)
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
@@ -61,14 +62,34 @@ This is **Solstice**, a sports league management platform built with TanStack St
 
 - `DATABASE_URL` - PostgreSQL connection string (pooled URL for serverless)
 - `DATABASE_URL_UNPOOLED` - Direct connection URL for migrations (optional)
-- `VITE_BASE_URL` - Application base URL
-- `GITHUB_CLIENT_ID/SECRET` - GitHub OAuth
-- `GOOGLE_CLIENT_ID/SECRET` - Google OAuth
+- `VITE_BASE_URL` - Application base URL (use http://localhost:8888 for Netlify Dev, http://localhost:5173 for Vite)
+- `GITHUB_CLIENT_ID/SECRET` - GitHub OAuth (required for OAuth login)
+- `GOOGLE_CLIENT_ID/SECRET` - Google OAuth (required for OAuth login)
+- `BETTER_AUTH_SECRET` - Secret key for Better Auth sessions
 
 Netlify automatically provides:
 
 - `NETLIFY_DATABASE_URL` - Pooled Neon database URL
 - `NETLIFY_DATABASE_URL_UNPOOLED` - Direct Neon database URL
+
+### Local Development Setup
+
+1. **Environment Files**:
+
+   - `.env` - Main environment file
+   - `.env.local` - Local overrides (git-ignored)
+   - Netlify Dev will inject values from Netlify project settings
+
+2. **OAuth Setup**:
+
+   - OAuth credentials must be valid (not placeholders) for routes to work
+   - Configure redirect URLs for local development:
+     - Google: `http://localhost:8888/api/auth/callback/google`
+     - GitHub: `http://localhost:8888/api/auth/callback/github`
+
+3. **Development Servers**:
+   - `pnpm dev` - Vite dev server only (port 5173)
+   - `netlify dev` - Full Netlify environment with edge functions (port 8888, recommended)
 
 ### Database Connections
 
@@ -109,3 +130,23 @@ See `docs/database-connections.md` for detailed usage guide.
 - **Centralized Icons**: Reusable icon components in shared/ui/icons
 - **Auth Guards**: Flexible authentication protection for routes
 - **Environment Config**: Type-safe environment variable access
+
+### Authentication Flow
+
+1. **Login Methods**:
+   - Email/password via `auth.signIn.email()`
+   - OAuth via `auth.signInWithOAuth()` (Google, GitHub)
+2. **Protected Routes**:
+   - Auth guard middleware redirects unauthenticated users
+   - User state cached in React Query
+3. **API Routes**:
+   - All auth endpoints under `/api/auth/*`
+   - Handled by Better Auth via catch-all route
+
+### Common Tasks
+
+- **Add a new page**: Create file in `src/routes/`
+- **Add auth to a route**: Use auth guard in route's `beforeLoad`
+- **Access user data**: Use `useRouteContext()` to get user from context
+- **Make API calls**: Use React Query with proper error handling
+- **Add UI components**: Check `src/shared/ui/` for existing components first

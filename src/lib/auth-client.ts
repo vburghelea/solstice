@@ -5,6 +5,8 @@ export const authClient = createAuthClient({
   baseURL: import.meta.env["VITE_BASE_URL"],
 });
 
+console.log("Auth client created with baseURL:", import.meta.env["VITE_BASE_URL"]);
+
 // Export a facade with all auth methods
 export const auth = {
   // Authentication methods
@@ -18,11 +20,18 @@ export const auth = {
   signOut: authClient.signOut,
 
   // OAuth methods
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   signInWithOAuth: (
     data: Parameters<typeof authClient.signIn.social>[0],
-    ...args: any[]
-  ) => authClient.signIn.social(data, ...args),
+    ...args: Parameters<typeof authClient.signIn.social> extends [unknown, ...infer Rest]
+      ? Rest
+      : []
+  ) => {
+    console.log("signInWithOAuth called with:", data);
+    console.log("Additional args:", args);
+    const result = authClient.signIn.social(data, ...args);
+    console.log("signIn.social returned:", result);
+    return result;
+  },
 
   // Session methods
   getSession: authClient.getSession,

@@ -1,0 +1,26 @@
+# Solstice Project Rules
+
+## Dependencies
+- Use `pnpm dlx taze@latest --interactive --group` to check for dependency updates
+- Always review breaking changes before updating major versions
+- Test thoroughly after dependency updates
+
+## Environment Variables
+- All environment variables are validated using @t3-oss/env-core and zod
+- Server-side env vars are defined in `src/lib/env.server.ts`
+- Client-side env vars are defined in `src/lib/env.client.ts`
+- Always add new env vars to the appropriate schema with proper validation
+
+## Code Quality
+- Use TypeScript strictly - no `any` types
+- Follow the existing code patterns and file organization
+- Run `pnpm lint` and `pnpm check-types` before committing
+- Write tests for new features using Vitest
+
+## Tech Stack
+- TanStack Start (React meta-framework)
+- Better Auth for authentication
+- Drizzle ORM with PostgreSQL
+- Tailwind CSS v4 with shadcn/ui components
+- Vite 7+ (requires Node.js 20.19+)
+- Netlify for deployment 

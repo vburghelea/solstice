@@ -4,7 +4,7 @@ import { reactStartCookies } from "better-auth/react-start";
 
 import { db } from "~/db";
 import * as schema from "~/db/schema";
-import { getAuthSecret, getBaseUrl, serverEnv } from "~/lib/env.server";
+import { env, getAuthSecret, getBaseUrl } from "~/lib/env.server";
 
 // Create auth instance lazily to avoid module-level execution
 let authInstance: ReturnType<typeof betterAuth> | null = null;
@@ -15,13 +15,13 @@ export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
       // Initialize auth configuration when first accessed
       const baseUrl = getBaseUrl();
       const isProduction = baseUrl?.startsWith("https://") ?? false;
-      const cookieDomain = serverEnv.COOKIE_DOMAIN;
+      const cookieDomain = env.COOKIE_DOMAIN;
 
       // Debug OAuth configuration
       console.log("Auth config loading...");
       console.log("Base URL:", baseUrl);
-      const googleClientId = serverEnv.GOOGLE_CLIENT_ID || "";
-      const googleClientSecret = serverEnv.GOOGLE_CLIENT_SECRET || "";
+      const googleClientId = env.GOOGLE_CLIENT_ID || "";
+      const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
 
       console.log(
         "Google Client ID:",

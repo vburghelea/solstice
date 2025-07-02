@@ -1,12 +1,12 @@
 import { createAuthClient } from "better-auth/react";
-import { clientEnv } from "./env.client";
+import { getBaseUrl } from "./env.client";
 
 // Create a lazy-loaded auth client
 let authClientInstance: ReturnType<typeof createAuthClient> | null = null;
 
 function getAuthClient() {
   if (!authClientInstance) {
-    const baseURL = clientEnv.VITE_BASE_URL || "http://localhost:5173";
+    const baseURL = getBaseUrl();
     console.log("Auth client created with baseURL:", baseURL);
     authClientInstance = createAuthClient({ baseURL });
   }

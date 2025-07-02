@@ -3,50 +3,56 @@
  * This module should only be imported in server-side code
  */
 
-// Simple server environment access - no complex loading
-export const serverEnv = {
-  // Database
-  DATABASE_URL: process.env["DATABASE_URL"]!,
-  DATABASE_URL_UNPOOLED: process.env["DATABASE_URL_UNPOOLED"],
-  DATABASE_POOLED_URL: process.env["DATABASE_POOLED_URL"],
-  DATABASE_UNPOOLED_URL: process.env["DATABASE_UNPOOLED_URL"],
-  NETLIFY_DATABASE_URL: process.env["NETLIFY_DATABASE_URL"],
-  NETLIFY_DATABASE_URL_UNPOOLED: process.env["NETLIFY_DATABASE_URL_UNPOOLED"],
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
 
-  // Auth
-  BETTER_AUTH_SECRET:
-    process.env["BETTER_AUTH_SECRET"] || "dev-secret-change-in-production",
-  GOOGLE_CLIENT_ID: process.env["GOOGLE_CLIENT_ID"],
-  GOOGLE_CLIENT_SECRET: process.env["GOOGLE_CLIENT_SECRET"],
+export const env = createEnv({
+  server: {
+    // Database
+    DATABASE_URL: z.string().url(),
+    DATABASE_URL_UNPOOLED: z.string().url().optional(),
+    DATABASE_POOLED_URL: z.string().url().optional(),
+    DATABASE_UNPOOLED_URL: z.string().url().optional(),
+    NETLIFY_DATABASE_URL: z.string().url().optional(),
+    NETLIFY_DATABASE_URL_UNPOOLED: z.string().url().optional(),
 
-  // Other
-  COOKIE_DOMAIN: process.env["COOKIE_DOMAIN"],
-  NODE_ENV: process.env["NODE_ENV"] || "development",
-  NETLIFY: process.env["NETLIFY"],
-  VERCEL_ENV: process.env["VERCEL_ENV"],
+    // Auth
+    BETTER_AUTH_SECRET: z
+      .string()
+      .min(1, "BETTER_AUTH_SECRET must be set")
+      .default("dev-secret-change-in-production"),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
 
-  // Client vars are also available on server
-  VITE_BASE_URL: process.env["VITE_BASE_URL"]!,
-} as const;
+    // Other
+    COOKIE_DOMAIN: z.string().optional(),
+    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    NETLIFY: z.string().optional(),
+    VERCEL_ENV: z.string().optional(),
+
+    // Client vars are also available on server
+    VITE_BASE_URL: z.string().url(),
+  },
+  runtimeEnv: process.env,
+  emptyStringAsUndefined: true,
+});
 
 // Helper functions
-export const getDbUrl = () => serverEnv.DATABASE_URL;
+export const getDbUrl = () => env.DATABASE_URL;
 
 export const getPooledDbUrl = () =>
-  serverEnv.DATABASE_POOLED_URL ||
-  serverEnv.NETLIFY_DATABASE_URL ||
-  serverEnv.DATABASE_URL;
+  env.DATABASE_POOLED_URL || env.NETLIFY_DATABASE_URL || env.DATABASE_URL;
 
 export const getUnpooledDbUrl = () =>
-  serverEnv.DATABASE_UNPOOLED_URL ||
-  serverEnv.DATABASE_URL_UNPOOLED ||
-  serverEnv.NETLIFY_DATABASE_URL_UNPOOLED ||
-  serverEnv.DATABASE_URL;
+  env.DATABASE_UNPOOLED_URL ||
+  env.DATABASE_URL_UNPOOLED ||
+  env.NETLIFY_DATABASE_URL_UNPOOLED ||
+  env.DATABASE_URL;
 
-export const getBaseUrl = () => serverEnv.VITE_BASE_URL;
-export const getAuthSecret = () => serverEnv.BETTER_AUTH_SECRET;
+export const getBaseUrl = () => env.VITE_BASE_URL;
+export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
 
-export const isProduction = () => serverEnv.NODE_ENV === "production";
-export const isDevelopment = () => serverEnv.NODE_ENV === "development";
-export const isTest = () => serverEnv.NODE_ENV === "test";
-export const isServerless = () => !!(serverEnv.NETLIFY || serverEnv.VERCEL_ENV);
+export const isProduction = () => env.NODE_ENV === "production";
+export const isDevelopment = () => env.NODE_ENV === "development";
+export const isTest = () => env.NODE_ENV === "test";
+export const isServerless = () => !!(env.NETLIFY || env.VERCEL_ENV);

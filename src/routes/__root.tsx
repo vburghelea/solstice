@@ -11,18 +11,23 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import { getUser } from "~/lib/auth/functions/getUser";
+import { auth } from "~/lib/auth-client";
+import type { AuthUser } from "~/lib/auth/types";
 import appCss from "~/styles.css?url";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  user: Awaited<ReturnType<typeof getUser>>;
+  user: AuthUser;
 }>()({
   beforeLoad: async ({ context }) => {
+    // Use the client-side auth method to get the session
     const user = await context.queryClient.fetchQuery({
       queryKey: ["user"],
-      queryFn: ({ signal }) => getUser({ signal }),
-    }); // we're using react-query for caching, see router.tsx
+      queryFn: async () => {
+        const session = await auth.getSession();
+        return session.data?.user || null;
+      },
+    });
     return { user };
   },
   head: () => ({

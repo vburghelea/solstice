@@ -3,7 +3,7 @@ import { serverOnly } from "@tanstack/react-start";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { getPooledDbUrl, getUnpooledDbUrl, isServerless } from "../lib/env";
+import { getPooledDbUrl, getUnpooledDbUrl, isServerless } from "../lib/env.server";
 import * as schema from "./schema";
 
 // Configure Neon for serverless environments

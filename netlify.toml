@@ -32,6 +32,17 @@
   publish = "dist"
   command = "pnpm dev"
 
+# Proxy API requests to the Vite dev server (best practice for dev)
+[[dev.proxy]]
+  path = "/api"
+  url = "http://localhost:5173"
+
+# SPA fallback for production (handles client-side routing)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 # Security Headers (backup for edge function)
 [[headers]]
   for = "/*"
@@ -42,8 +53,3 @@
     X-XSS-Protection = "1; mode=block"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200 

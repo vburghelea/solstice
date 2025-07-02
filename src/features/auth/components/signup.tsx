@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { useState } from "react";
 import { auth } from "~/lib/auth-client";
 import { Button } from "~/shared/ui/button";
-import { GitHubIcon, GoogleIcon, LoaderIcon, LogoIcon } from "~/shared/ui/icons";
+import { GoogleIcon, LoaderIcon, LogoIcon } from "~/shared/ui/icons";
 import { Input } from "~/shared/ui/input";
 import { Label } from "~/shared/ui/label";
 
@@ -126,64 +126,34 @@ export default function SignupForm() {
               Or
             </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              type="button"
-              disabled={isLoading}
-              onClick={() =>
-                auth.signInWithOAuth(
-                  {
-                    provider: "github",
-                    callbackURL: redirectUrl,
+          <Button
+            variant="outline"
+            className="w-full"
+            type="button"
+            disabled={isLoading}
+            onClick={() =>
+              auth.signInWithOAuth(
+                {
+                  provider: "google",
+                  callbackURL: redirectUrl,
+                },
+                {
+                  onRequest: () => {
+                    setIsLoading(true);
+                    setErrorMessage("");
                   },
-                  {
-                    onRequest: () => {
-                      setIsLoading(true);
-                      setErrorMessage("");
-                    },
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onError: (ctx: any) => {
-                      setIsLoading(false);
-                      setErrorMessage(ctx.error?.message || "OAuth signup failed");
-                    },
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onError: (ctx: any) => {
+                    setIsLoading(false);
+                    setErrorMessage(ctx.error?.message || "OAuth signup failed");
                   },
-                )
-              }
-            >
-              <GitHubIcon />
-              Sign up with GitHub
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              type="button"
-              disabled={isLoading}
-              onClick={() =>
-                auth.signInWithOAuth(
-                  {
-                    provider: "google",
-                    callbackURL: redirectUrl,
-                  },
-                  {
-                    onRequest: () => {
-                      setIsLoading(true);
-                      setErrorMessage("");
-                    },
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onError: (ctx: any) => {
-                      setIsLoading(false);
-                      setErrorMessage(ctx.error?.message || "OAuth signup failed");
-                    },
-                  },
-                )
-              }
-            >
-              <GoogleIcon />
-              Sign up with Google
-            </Button>
-          </div>
+                },
+              )
+            }
+          >
+            <GoogleIcon />
+            Sign up with Google
+          </Button>
         </div>
       </form>
 

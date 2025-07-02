@@ -1,88 +1,33 @@
-# Issue: OAuth Login Buttons Not Working - No Click Events Firing
+# OAuth Buttons Not Working
 
-## Problem Description
+## Summary
 
-OAuth login buttons (Google & GitHub) on the login page do not respond to clicks. No console logs, network requests, or any JavaScript events are triggered when buttons are clicked.
+The social sign-in buttons (GitHub, Google) are not working. When a button is clicked, the application makes a `POST` request to `http://localhost:8888/api/auth/sign-in/social` but receives a `404 Not Found` response.
 
-## Environment
+## What We Know
 
-- **URL**: http://localhost:8888/login (Netlify Dev)
-- **Server**: Netlify Dev proxying Vite dev server
-- **Framework**: TanStack Start with React
-- **OAuth Library**: Better Auth
+1.  **The Failure Point is the Netlify Dev Proxy:** The browser correctly sends the request to the Netlify Dev server on port `8888`. However, this server fails to proxy the request to the Vite dev server on port `5173`, where the API route lives.
+2.  **The API Route is Live:** We have confirmed via `curl` that the Vite server on `:5173` responds to requests at `/api/auth/sign-in/social` (it returns a `400`, which is expected without a payload).
+3.  **The Client-Side URL is Correct:** The `auth-client` correctly uses the browser's origin (`http://localhost:8888`) for its requests.
 
-## Root Cause
+## What We've Ruled Out
 
-The client-side JavaScript bundle is not being loaded, preventing React hydration. The `<Scripts />` component in `__root.tsx` renders an empty `<script></script>` tag instead of loading the client bundle.
+A number of initial issues have been identified and fixed, but did not resolve the core 404 error:
 
-### Evidence
+**The Application Itself:** The application works correctly when accessed directly via the Vite dev server on `http://localhost:5173`. Social logins succeed. This confirms the issue is isolated to the Netlify Dev proxy.
 
-1. Server-side rendered HTML loads correctly
-2. Console shows "LoginForm component mounted" indicating server-side rendering works
-3. No click handlers work - even basic HTML buttons with inline onClick
-4. HTML inspection shows empty `<script></script>` tag where client bundle should be
-5. No script tags with `src` attributes are present in the HTML
+1.  **`process is not defined` Errors:** We fixed several server-crashing memory leaks caused by server-side code being evaluated on the client. This was resolved by splitting environment variables into `env.server.ts` and `env.client.ts` and using lazy initialization for auth and database modules.
+2.  **Content Security Policy (CSP) Violations:** We updated `netlify/edge-functions/security-headers.ts` to allow the necessary inline scripts (via hash) and connections to `localhost` during development.
+3.  **CORS Errors:** We fixed CORS issues by ensuring the client-side `auth-client` dynamically uses `window.location.origin` as its `baseURL`.
+4.  **TanStack Start Route Registration:** We confirmed the server routes for Better Auth are defined correctly in `src/routes/api/auth/`. We even added a more specific route file to handle the `sign-in/social` path. This seems to be a proxy issue, not a route registration issue.
+5.  **`netlify.toml` Configuration:** We have tried multiple proxy configurations (`[[redirects]]` and `[[dev.proxy]]`) according to the [Netlify docs](https://docs.netlify.com/llms.txt). The current configuration uses the recommended `[[redirects]]` block with `force = true`, but it is still not working as expected.
 
-## Technical Details
+## Documentation Referenced
 
-### What's Working
-
-- Server-side rendering (SSR) is functioning
-- OAuth credentials are loaded (verified in server logs)
-- Auth configuration is correct
-- CSP headers are properly configured with nonces
-
-### What's Not Working
-
-- Client-side hydration is not happening
-- Vite HMR/client modules are not being loaded through Netlify Dev
-- The `<Scripts />` component from TanStack Start is not injecting the client bundle
-
-### Configuration Files Checked
-
-- `/src/routes/__root.tsx` - Has `<Scripts />` component correctly placed
-- `/vite.config.ts` - Configured with `target: "netlify"`
-- `/netlify/edge-functions/security-headers.ts` - CSP allows nonce-based scripts
-- `/src/lib/auth/index.ts` - OAuth providers configured correctly
-- `/src/features/auth/components/login.tsx` - Click handlers properly defined
-
-## Attempted Solutions
-
-1. ✅ Verified OAuth credentials are loaded
-2. ✅ Updated VITE_BASE_URL to correct port (8888)
-3. ✅ Added debug logging to components
-4. ✅ Tested with simple HTML buttons
-5. ✅ Checked for TypeScript errors
-6. ✅ Verified CSP headers
-7. ❌ Client-side JavaScript still not loading
-
-## Potential Solutions to Try
-
-1. **Access via Vite directly**: Try http://localhost:5173 instead of Netlify Dev
-2. **Check Netlify Dev proxy**: Ensure it's properly forwarding Vite's module requests
-3. **Disable CSP temporarily**: Comment out edge function to test
-4. **Check for build mode issues**: Ensure Vite is in development mode
-5. **Verify TanStack Start setup**: Compare with official template
-
-## Related Code Locations
-
-- Login component: `/src/features/auth/components/login.tsx`
-- Root route: `/src/routes/__root.tsx`
-- Auth config: `/src/lib/auth/index.ts`
-- Vite config: `/vite.config.ts`
-- Edge functions: `/netlify/edge-functions/security-headers.ts`
-
-## Console Output
-
-```
-Auth client created with baseURL: http://localhost:8888
-LoginForm component mounted
-Environment: { baseUrl: 'http://localhost:8888' }
-```
+- [Netlify TanStack Start Docs](https://docs.netlify.com/frameworks/tanstack-start/)
+- [TanStack Start Hosting Docs](https://tanstack.com/start/latest/docs/framework/react/hosting)
+- [Better Auth Usage Docs](https://www.better-auth.com/llms.txt)
 
 ## Next Steps
 
-1. Test if the issue occurs when accessing Vite dev server directly (port 5173)
-2. Investigate Netlify Dev's handling of Vite module requests
-3. Check TanStack Start documentation for Netlify-specific deployment issues
-4. Consider temporarily removing the `target: "netlify"` from Vite config for local development
+The core of the problem lies in why the Netlify Dev server is not respecting the `[[redirects]]` rule in `netlify.toml` for API requests. We need to investigate the Netlify Dev server's behavior and configuration more deeply.

@@ -1,0 +1,41 @@
+---
+description: Building or using forms
+globs: 
+alwaysApply: false
+---
+
+
+1.  **Custom Form Hook (`createFormHook`):**
+    *   Define a single, project-wide custom hook (e.g., `useAppForm`) using `createFormHook`.
+    *   Configure this hook with reusable field components (`fieldComponents`) based on our Shadcn UI library (e.g., wrappers around `Input`, `Select`, `Checkbox`).
+    *   Configure form-level components (`formComponents`) like a standard `SubmitButton`.
+    *   This centralizes form setup, enhances type safety, and reduces boilerplate in individual form implementations.
+    *   Reference: [Quick Start](https://tanstack.com/form/latest/docs/framework/react/quick-start), [Philosophy](https://tanstack.com/form/latest/docs/philosophy)
+
+2.  **Type Safety via Inference:**
+    *   **Do not** use explicit generics like `useForm<MyFormData>()`.
+    *   **Do** provide strongly-typed `defaultValues` to `useAppForm`. TanStack Form will infer the types for the form state, fields, and values.
+    *   Reference: [Philosophy](https://tanstack.com/form/latest/docs/philosophy)
+
+3.  **Reusable Field Components:**
+    *   Create dedicated React components that wrap our standard UI elements (e.g., `ValidatedInput`, `ValidatedSelect`).
+    *   These components should accept a `field` prop (from TanStack Form) and handle displaying values, errors, and wiring up `onChange`, `onBlur`, etc.
+    *   Register these components in the `fieldComponents` option of `createFormHook`.
+
+4.  **Validation (Zod Recommended):**
+    *   Use a schema library like Zod for validation.
+    *   Pass the Zod schema to the `validators` option (e.g., `onChange`, `onSubmit`) in `useAppForm`. Field-level validation functions are also possible but schema-based is preferred for consistency.
+    *   Reference: [Quick Start](https://tanstack.com/form/latest/docs/framework/react/quick-start)
+
+5.  **Form Construction:**
+    *   Use the components provided by the custom hook instance (e.g., `form.AppField`, `form.AppForm`) to build forms.
+    *   `form.AppField` takes a `name` (which is type-checked against `defaultValues`) and a `children` render prop that receives the `field` API.
+    *   Pass the appropriate reusable field component within the `children` prop (e.g., `<field.ValidatedInput />`).
+    *   Reference: [Quick Start](https://tanstack.com/form/latest/docs/framework/react/quick-start)
+
+**Implementation Strategy:**
+
+We should implement the foundational pieces first:
+1.  Define the `createFormHook` setup in a shared location (e.g., `src/lib/form.ts`).
+2.  Create the necessary reusable field components that integrate with Shadcn UI and the TanStack Form `field` API.
+3.  Then, individual forms can import and use `useAppForm` and the associated components (`form.AppField`, etc.). 

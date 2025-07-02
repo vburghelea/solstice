@@ -12,7 +12,7 @@ import { ValidatedInput as ImportedValidatedInput } from "../components/form-fie
 // Forward declare component types to avoid circular dependencies
 // We will define these components in other files and import them below.
 // It's important that the types match the actual components.
-type ValidatedInputComponent = React.FC<FieldComponentProps<string>>; // Assuming Input handles string
+type ValidatedInputComponent = React.FC<FieldComponentProps>; // Assuming Input handles string
 // Add other field component types here (e.g., ValidatedSelectComponent)
 type FormSubmitButtonComponent = React.FC<FormSubmitButtonProps>;
 

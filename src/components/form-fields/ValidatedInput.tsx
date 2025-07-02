@@ -1,11 +1,11 @@
 import React from "react";
-import { Input } from "~/lib/components/ui/input";
-import { Label } from "~/lib/components/ui/label";
 import { FieldComponentProps, isFieldApi } from "~/lib/form";
-import { cn } from "~/lib/utils";
+import { cn } from "~/shared/lib/utils";
+import { Input } from "~/shared/ui/input";
+import { Label } from "~/shared/ui/label";
 
 // Type specifically for ValidatedInput, extending the base props
-interface ValidatedInputProps extends FieldComponentProps<string> {
+interface ValidatedInputProps extends FieldComponentProps {
   type?: React.HTMLInputTypeAttribute; // Allow passing input type (text, password, email, etc.)
 }
 

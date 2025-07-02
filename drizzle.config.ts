@@ -4,9 +4,9 @@ import type { Config } from "drizzle-kit";
 // Priority: DATABASE_URL_UNPOOLED > NETLIFY_DATABASE_URL_UNPOOLED > DATABASE_URL
 const getDatabaseUrl = () => {
   return (
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.NETLIFY_DATABASE_URL_UNPOOLED ||
-    (process.env.DATABASE_URL as string)
+    process.env["DATABASE_URL_UNPOOLED"] ||
+    process.env["NETLIFY_DATABASE_URL_UNPOOLED"] ||
+    (process.env["DATABASE_URL"] as string)
   );
 };
 

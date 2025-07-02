@@ -1,10 +1,10 @@
 import React from "react";
-import { Button } from "~/lib/components/ui/button"; // Use alias
 import {
   formContext, // Import the context object itself
   FormSubmitButtonProps,
 } from "~/lib/form"; // Use alias
-import { cn } from "~/lib/utils"; // Use alias
+import { cn } from "~/shared/lib/utils";
+import { Button } from "~/shared/ui/button";
 
 export const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
   children,

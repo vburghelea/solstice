@@ -3,12 +3,16 @@
  * Centralizes all security-related settings
  */
 
+import { env } from "@/lib/env.server";
+
 export const securityConfig = {
   // Cookie security settings
   cookies: {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env["NODE_ENV"] === "production",
+    // Force secure cookies when VITE_BASE_URL starts with https://
+    // This ensures secure cookies even in preview deployments where NODE_ENV might be "test"
+    secure: env.VITE_BASE_URL.startsWith("https://"),
     path: "/",
     // Optional domain restriction for production
     // Set COOKIE_DOMAIN env var to restrict cookies to specific domain

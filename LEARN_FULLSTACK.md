@@ -1,16 +1,18 @@
-# 🚀 Learn Full-Stack Development with Solstice
+# 🚀 Solstice – Full-Stack Development Guide
 
-Welcome to the Solstice project! This guide will teach you modern full-stack web development through a real-world application. By the end, you'll understand how all the pieces fit together and be ready to contribute.
+Welcome to the Solstice project! This guide teaches modern full-stack web development through a real-world application while serving as a complete technical reference.
 
 ## 📚 Table of Contents
 
 1. [What is Full-Stack Development?](#what-is-full-stack-development)
-2. [The Big Picture: How Everything Connects](#the-big-picture)
-3. [Tech Stack Deep Dive](#tech-stack-deep-dive)
-4. [Project Architecture](#project-architecture)
-5. [Understanding Every File and Folder](#understanding-every-file-and-folder)
+2. [Core Principles & Architecture](#core-principles--architecture)
+3. [Technology Stack](#technology-stack)
+4. [Project Structure Deep Dive](#project-structure-deep-dive)
+5. [Key Modules Explained](#key-modules-explained)
 6. [Development Workflow](#development-workflow)
 7. [Contributing to the Project](#contributing-to-the-project)
+8. [Practical Examples](#practical-examples)
+9. [Troubleshooting & FAQ](#troubleshooting--faq)
 
 ## 🎯 What is Full-Stack Development?
 
@@ -21,184 +23,140 @@ Full-stack development means building both the **frontend** (what users see) and
 - **Database**: The pantry and inventory system
 - **Deployment**: The actual restaurant building and location
 
-## 🏗️ The Big Picture: How Everything Connects
+## 🏗️ Core Principles & Architecture
 
-Here's how our application works from a bird's-eye view:
+### Design Principles
+
+| Principle                   | In Practice                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| **End-to-End Type Safety**  | Shared types, strict `tsconfig`, generated route & schema types                |
+| **Feature-Based Structure** | All code for a feature (UI, tests, logic) lives together                       |
+| **Server/Client Isolation** | `serverOnly()` wrapper and env modules prevent accidental bundle leaks         |
+| **Security by Default**     | Secure cookies, CSP, rate limiting, password strength checks—all on by default |
+| **Automated Confidence**    | CI runs lint, type-check, tests, build; Husky guards commits                   |
+
+### High-Level Architecture
 
 ```mermaid
 graph TB
-    subgraph "User's Browser"
-        UI[React UI<br/>TanStack Start]
-        Auth[Better Auth Client]
-    end
+  subgraph Browser["Browser (Client)"]
+    UI["React UI / TanStack Start SSR"]
+    Store["React Query (Cache)"]
+    AuthClient["Better Auth JS"]
+  end
 
-    subgraph "Netlify Edge"
-        Edge[Edge Functions<br/>Security Headers]
-    end
+  subgraph Edge["Netlify Edge"]
+    EdgeFn["Edge Functions (Security Headers)"]
+  end
 
-    subgraph "Application Server"
-        Server[TanStack Start Server]
-        AuthServer[Better Auth Server]
-        API[API Routes]
-    end
+  subgraph Server["Application Server"]
+    Router["TanStack Router"]
+    API["API Routes"]
+    AuthSrv["Better Auth Middleware"]
+  end
 
-    subgraph "Database"
-        Neon[Neon PostgreSQL<br/>Serverless Database]
-    end
+  subgraph DB["Neon PostgreSQL"]
+    Pg[(Postgres)]
+  end
 
-    UI -->|User Interactions| Server
-    Auth -->|Auth Requests| AuthServer
-    Server -->|Database Queries| Neon
-    AuthServer -->|User Data| Neon
-    Edge -->|Secure Delivery| UI
+  UI -->|HTTPS| EdgeFn
+  EdgeFn --> Router
+  Store <--> UI
+  AuthClient <--> UI
 
-    style UI fill:#e1f5fe
-    style Server fill:#fff3e0
-    style Neon fill:#e8f5e9
-    style Edge fill:#f3e5f5
+  Router --> API
+  API --> AuthSrv
+  AuthSrv --> Pg
+  Router --> Pg
+
+  AuthClient -->|OAuth| AuthSrv
 ```
 
-### The Request Flow
+_Figure 1: High-level architecture showing request flow from browser to database._
 
-1. User visits the website → Netlify serves the app
-2. React renders the UI → User interacts
-3. Requests go through TanStack Start → Server processes
-4. Data is fetched/stored in Neon → Response sent back
-5. UI updates with new data → User sees changes
+Let's understand each component in the architecture:
 
-## 🛠️ Tech Stack Deep Dive
+**Browser Layer:**
 
-Let's understand each technology and why we use it:
+- **React UI**: Your application's interface, server-side rendered by TanStack Start for fast initial loads
+- **React Query**: Manages client-side state and caches server data to minimize unnecessary requests
+- **Better Auth JS**: Handles authentication state and OAuth flows on the client side
 
-### 1. TanStack Start (The Framework)
+**Edge Layer:**
 
-**What it is**: A full-stack React framework (like Next.js but newer and more flexible)
+- **Edge Functions**: Netlify runs these at the CDN edge to add security headers before content reaches users
 
-**Why we use it**:
+**Application Server:**
 
-- Server-side rendering for fast page loads
-- File-based routing (pages map to files)
-- Built-in data fetching
-- Type-safe from frontend to backend
+- **TanStack Router**: File-based routing that maps your `src/routes/` files to URLs
+- **API Routes**: Type-safe endpoints defined in `src/routes/api/` that handle data operations
+- **Better Auth Middleware**: Protects routes and validates sessions on every request
 
-**Think of it as**: The foundation and walls of your house
+**Database:**
 
-### 2. Better Auth (Authentication)
+- **Neon PostgreSQL**: Serverless Postgres that scales automatically and provides connection pooling
 
-**What it is**: A modern authentication library that handles user login/signup
+## 🛠️ Technology Stack
 
-**Why we use it**:
+| Layer               | Library / Tool               | Why                                                          | Think of it as                              |
+| ------------------- | ---------------------------- | ------------------------------------------------------------ | ------------------------------------------- |
+| **Runtime**         | React 19, TanStack Start     | File-based routing with first-class data loaders             | The foundation and walls of your house      |
+| **Auth**            | Better Auth                  | Unified email/password + OAuth with serverless support       | The security system and door locks          |
+| **DB / ORM**        | Neon PostgreSQL, Drizzle ORM | Fully typed queries, migrations, pooled & direct connections | A smart warehouse that scales automatically |
+| **Styling**         | Tailwind CSS 4, shadcn/ui    | Utility-first CSS + accessible React primitives              | The paint and decorations                   |
+| **Build**           | Vite 7                       | Fast HMR, modern output, React compiler plugin               | The construction tools                      |
+| **Testing**         | Vitest + Testing Library     | Fast jsdom tests with rich queries                           | Quality control inspectors                  |
+| **CI / Deploy**     | GitHub Actions, Netlify      | Preview deploys, edge functions for headers                  | The land and utilities for your restaurant  |
+| **Package Manager** | pnpm                         | Workspaces, deterministic lock-file                          | The supply chain manager                    |
 
-- Secure password handling
-- OAuth support (login with Google/GitHub)
-- Session management
-- Built for edge deployments
+## 📁 Project Structure Deep Dive
 
-**Think of it as**: The security system and door locks
+### Repository Layout
 
-### 3. Neon (Database)
-
-**What it is**: A serverless PostgreSQL database
-
-**Why we use it**:
-
-- Scales automatically
-- Pay only for what you use
-- PostgreSQL compatibility
-- Works great with serverless deployments
-
-**Think of it as**: A smart warehouse that grows/shrinks based on your inventory
-
-### 4. Netlify (Hosting & Deployment)
-
-**What it is**: A platform that hosts and serves your website
-
-**Why we use it**:
-
-- Automatic deployments from GitHub
-- Preview deployments for pull requests
-- Edge functions for better performance
-- Built-in CDN for fast global access
-
-**Think of it as**: The land, utilities, and address for your restaurant
-
-### 5. Supporting Technologies
-
-```mermaid
-graph LR
-    subgraph "Styling"
-        TW[Tailwind CSS v4]
-        Shad[shadcn/ui]
-    end
-
-    subgraph "Database Tools"
-        Drizzle[Drizzle ORM]
-        Schema[Type-safe Schema]
-    end
-
-    subgraph "Development"
-        TS[TypeScript]
-        Vite[Vite]
-        Vitest[Vitest]
-    end
-
-    subgraph "Package Management"
-        PNPM[pnpm]
-    end
-
-    TW -->|Utility Classes| Shad
-    Drizzle -->|Query Builder| Schema
-    TS -->|Type Safety| Vite
-    Vite -->|Testing| Vitest
+```
+solstice/
+├── src/                    # All source code lives here
+│   ├── routes/            # File-based pages & API endpoints
+│   │   ├── index.tsx      # Home page (/)
+│   │   ├── (auth)/        # Auth pages group
+│   │   ├── dashboard/     # Protected pages
+│   │   └── api/           # API routes
+│   │
+│   ├── features/          # Self-contained vertical slices
+│   │   └── auth/          # Authentication feature
+│   │       ├── components/
+│   │       └── __tests__/
+│   │
+│   ├── components/        # Generic building blocks
+│   │   ├── auth/          # Auth-specific components
+│   │   └── form-fields/   # Form building blocks
+│   │
+│   ├── shared/            # Cross-cutting concerns
+│   │   ├── ui/            # Base UI components
+│   │   ├── hooks/         # React hooks
+│   │   └── lib/           # Utility functions
+│   │
+│   ├── lib/               # Infrastructure modules
+│   │   ├── auth/          # Auth setup & middleware
+│   │   ├── server/        # Server-only code
+│   │   ├── security/      # Security utilities
+│   │   ├── env.*.ts       # Environment validation
+│   │   └── form.ts        # Form configuration
+│   │
+│   ├── db/                # Database layer
+│   │   ├── schema/        # Table definitions
+│   │   └── connections.ts # Connection helpers
+│   │
+│   └── tests/             # Global test setup
+│       └── mocks/         # Mock data for tests
+│
+├── public/                # Static files (images, fonts)
+├── netlify/              # Edge functions (security headers)
+├── docs/                 # Additional design documents
+└── scripts/              # One-off maintenance utilities
 ```
 
-## 🏛️ Project Architecture
-
-Our project follows a modular, feature-based architecture:
-
-```mermaid
-graph TD
-    subgraph "Frontend Layer"
-        Routes[Routes/Pages]
-        Components[Reusable Components]
-        Features[Feature Modules]
-    end
-
-    subgraph "Shared Layer"
-        UI[UI Components]
-        Hooks[Custom Hooks]
-        Utils[Utilities]
-    end
-
-    subgraph "Backend Layer"
-        API[API Routes]
-        Auth[Auth Logic]
-        DB[Database Layer]
-    end
-
-    subgraph "Infrastructure"
-        Config[Configuration]
-        Types[Type Definitions]
-        Tests[Test Suite]
-    end
-
-    Routes --> Components
-    Routes --> Features
-    Components --> UI
-    Features --> Hooks
-    Features --> API
-    API --> Auth
-    API --> DB
-
-    style Routes fill:#e3f2fd
-    style API fill:#fff8e1
-    style DB fill:#e8f5e9
-    style Config fill:#fce4ec
-```
-
-## 📁 Understanding Every File and Folder
-
-Let's go through each root-level file and folder to understand their purpose:
+> **Tip:** Each directory has its own `index.ts` barrel export to keep import paths short (`@/lib`, `@/shared/ui`, etc).
 
 ### Configuration Files
 
@@ -212,770 +170,291 @@ Let's go through each root-level file and folder to understand their purpose:
 | `drizzle.config.ts`  | Database migration config          | Managing database schema changes    |
 | `netlify.toml`       | Netlify deployment settings        | Configuring deployments             |
 | `docker-compose.yml` | Local PostgreSQL setup             | Running database locally            |
-| `components.json`    | shadcn/ui configuration            | Adding new UI components            |
-| `eslint.config.js`   | Code linting rules                 | Maintaining code quality            |
-| `.editorconfig`      | Editor formatting rules            | Consistent code style               |
-| `.gitignore`         | Files Git should ignore            | Keeping secrets out of repo         |
-| `.gitattributes`     | Git file handling rules            | Ensuring consistent line endings    |
 
-### Project Structure Deep Dive
+## 🔧 Key Modules Explained
 
-```
-solstice/
-├── src/                    # All source code lives here
-│   ├── routes/            # Pages of your application
-│   │   ├── index.tsx      # Home page (/)
-│   │   ├── (auth)/        # Auth pages group
-│   │   └── dashboard/     # Protected pages
-│   │
-│   ├── components/        # Reusable UI pieces
-│   │   ├── auth/          # Auth-specific components
-│   │   └── form-fields/   # Form building blocks
-│   │
-│   ├── features/          # Feature-specific modules
-│   │   └── auth/          # Authentication feature
-│   │       ├── components/
-│   │       └── __tests__/
-│   │
-│   ├── lib/               # Core application logic
-│   │   ├── auth/          # Authentication setup
-│   │   ├── server/        # Server-only code
-│   │   └── security/      # Security utilities
-│   │
-│   ├── db/                # Database layer
-│   │   ├── schema/        # Table definitions
-│   │   └── connections.ts # Database connections
-│   │
-│   ├── shared/            # Shared across frontend/backend
-│   │   ├── ui/            # Base UI components
-│   │   ├── hooks/         # React hooks
-│   │   └── lib/           # Utility functions
-│   │
-│   └── tests/             # Test utilities
-│       └── mocks/         # Mock data for tests
-│
-├── public/                # Static files (images, fonts)
-├── netlify/              # Netlify-specific functions
-├── scripts/              # Build/utility scripts
-└── docs/                 # Documentation
-```
+### Environment Management (`src/lib/env.*.ts`)
 
-### How the Folders Work Together
+- Two Zod-backed schemas: one for server (`env.server.ts`), one for client (`env.client.ts`)
+- Validation happens **before** anything else runs; unsafe access crashes fast
+- All env vars are typed and validated
+
+### Database Layer (`src/db`)
+
+- **Schema**: All tables live in `schema/` files using Drizzle's fluent API
+- **Connections**: `connections.ts` exposes:
+  - `pooledDb()` for serverless handlers
+  - `unpooledDb()` for migrations/scripts
+  - `getDb()` which auto-selects based on environment
+
+### Authentication (`src/lib/auth`)
+
+- **Server side**: Lazy-initialized Better Auth instance with Drizzle adapter
+- **Client side**: Small facade that lazy-loads the Better Auth React client
+
+### Routing
+
+- Page routes live in `src/routes/`
+- Use `createFileRoute` (client) or `createAPIFileRoute` (API)
+- `routeTree.gen.ts` is auto-generated—**never edit by hand**
+- Use `beforeLoad` for server-side protection
+
+### Forms (`src/lib/form.ts`)
+
+- Single `useAppForm` hook wraps TanStack Form
+- Registers common field components (`ValidatedInput`, etc.)
+- Always supply typed `defaultValues`; generics are inferred
+
+### Building a Complete Feature: Todo List
 
 ```mermaid
-flowchart LR
-    subgraph "User Request Flow"
-        User[User] -->|Visits| Routes
-        Routes -->|Uses| Features
-        Features -->|Calls| Components
-        Components -->|Styled with| UI
-    end
-
-    subgraph "Data Flow"
-        Features -->|Fetches| API[API Routes]
-        API -->|Queries| DB
-        DB -->|Returns| API
-        API -->|Sends| Features
-    end
-
-    subgraph "Shared Resources"
-        Features -->|Uses| Hooks
-        Components -->|Uses| Utils[Lib/Utils]
-        API -->|Protected by| Auth
-    end
+graph LR
+  A[Define Schema<br/>src/db/schema/todos.ts] --> B[Run `pnpm db:push`]
+  B --> C[Create API Route<br/>src/routes/api/todos/$.ts]
+  C --> D[Use Types in Hook<br/>src/features/todos/useTodos.ts]
+  D --> E[Build Components<br/>src/features/todos/components/]
+  E --> F[Create Page Route<br/>src/routes/todos/index.tsx]
+  F --> G[Write Tests<br/>*.test.tsx]
+  G --> H[Manual Verification]
 ```
+
+_Figure 2: End-to-end flow for adding a new feature with type safety preserved across layers._
 
 ## 💻 Development Workflow
 
-### 1. Setting Up Your Environment
+### Setup
 
-```mermaid
-graph LR
-    A[Clone Repo] --> B[Install pnpm]
-    B --> C[Run pnpm install]
-    C --> D[Copy .env.example]
-    D --> E[Start Database]
-    E --> F[Run Migrations]
-    F --> G[Start Dev Server]
+1. **Install prerequisites**: Node 20+, pnpm, Docker
+2. `pnpm install`
+3. Copy `.env.example` → `.env` and fill values
+4. `docker-compose up -d` (local Postgres)
+5. `pnpm db:push` (creates tables)
+6. `pnpm dev` – Starts development server
 
-    style A fill:#e3f2fd
-    style G fill:#c8e6c9
-```
+### Common Commands
 
-### 2. Making Changes
+| Task                 | Command                | Description                   |
+| -------------------- | ---------------------- | ----------------------------- |
+| **Start dev server** | `pnpm dev`             | Runs app locally on port 3000 |
+| **Run tests**        | `pnpm test`            | Executes all test suites      |
+| **Type check**       | `pnpm check-types`     | Verifies TypeScript types     |
+| **Lint code**        | `pnpm lint`            | Checks code style             |
+| **Build app**        | `pnpm build`           | Creates production build      |
+| **Start database**   | `docker-compose up -d` | Runs PostgreSQL locally       |
+| **Push schema**      | `pnpm db:push`         | Updates database schema       |
 
-1. **Find the right file**:
-   - New page? → `src/routes/`
-   - New component? → `src/components/` or `src/shared/ui/`
-   - API endpoint? → `src/routes/api/`
-   - Database schema? → `src/db/schema/`
+### TypeScript Practices
 
-2. **Follow the patterns**:
-
-   ```typescript
-   // Example: Creating a new component
-   // src/components/MyComponent.tsx
-
-   import { cn } from "@/shared/lib/utils"
-
-   interface MyComponentProps {
-     className?: string
-     children: React.ReactNode
-   }
-
-   export function MyComponent({ className, children }: MyComponentProps) {
-     return (
-       <div className={cn("p-4 rounded-lg", className)}>
-         {children}
-       </div>
-     )
-   }
-   ```
-
-3. **Test your changes**:
-   ```bash
-   pnpm test           # Run tests
-   pnpm lint           # Check code style
-   pnpm check-types    # Verify TypeScript
-   ```
-
-### 3. The Git Workflow
-
-```mermaid
-gitGraph
-    commit id: "main branch"
-    branch feature/your-feature
-    checkout feature/your-feature
-    commit id: "Add new component"
-    commit id: "Add tests"
-    commit id: "Update styles"
-    checkout main
-    merge feature/your-feature
-    commit id: "Deploy to production"
-```
+| Rule                 | Example                                               |
+| -------------------- | ----------------------------------------------------- |
+| Prefer inference     | `const user = await db.select()` – no manual generics |
+| `any` is banned      | `tsconfig` sets `strict` and `noImplicitAny`          |
+| Narrow errors        | Use custom error shapes in handlers                   |
+| Keep helpers generic | `cn()` utility accepts any `ClassValue` union         |
 
 ## 🤝 Contributing to the Project
 
-### Before You Start
+### Workflow
 
-1. **Understand the problem**: Read the issue or requirement carefully
-2. **Check existing code**: Look for similar patterns in the codebase
-3. **Ask questions**: If unsure, ask in discussions or comments
+1. **Branch** from `main`: `git checkout -b feat/short-description`
+2. **Implement** following existing patterns:
+   - New feature → new folder under `src/features/`
+   - Reusable piece → `src/components/` or `src/shared/`
+3. **Add/update tests** alongside the code (`*.test.tsx`)
+4. **Run local checks**: lint, types, tests, build
+5. **Commit** (atomic, descriptive). Husky will block on errors
+6. **Push & PR**. GitHub Actions runs CI; Netlify posts preview URL
 
-### Making Your First Contribution
-
-1. **Start small**: Fix a typo, improve documentation, or tackle a "good first issue"
-2. **Follow conventions**:
-   - Use TypeScript strictly (no `any`)
-   - Write tests for new features
-   - Keep components small and focused
-   - Use meaningful variable names
-
-3. **Submit a PR**:
-
-   ```bash
-   # Create a branch
-   git checkout -b feature/your-feature-name
-
-   # Make changes and commit
-   git add .
-   git commit -m "feat: add user profile component"
-
-   # Push and create PR
-   git push origin feature/your-feature-name
-   ```
-
-### Code Review Checklist
-
-Before submitting, ensure:
+### Review Checklist
 
 - [ ] Tests pass (`pnpm test`)
+- [ ] No TypeScript errors (`pnpm check-types`)
 - [ ] No linting errors (`pnpm lint`)
-- [ ] Types are correct (`pnpm check-types`)
 - [ ] Code follows existing patterns
-- [ ] New features have tests
-- [ ] Documentation is updated
-
-## 🎓 Learning Resources
-
-### Next Steps in Your Journey
-
-1. **Frontend Deep Dive**:
-   - Learn React hooks and state management
-   - Master TypeScript for better type safety
-   - Understand server-side rendering (SSR)
-
-2. **Backend Mastery**:
-   - Study SQL and database design
-   - Learn about API design (REST/GraphQL)
-   - Understand authentication and security
-
-3. **DevOps Skills**:
-   - Learn Git branching strategies
-   - Understand CI/CD pipelines
-   - Master debugging and monitoring
-
-### Recommended Learning Path
-
-```mermaid
-graph TD
-    A[HTML/CSS/JS Basics] --> B[React Fundamentals]
-    B --> C[TypeScript]
-    C --> D[This Project!]
-    D --> E[Database Design]
-    D --> F[API Development]
-    D --> G[Testing Strategies]
-    E --> H[System Design]
-    F --> H
-    G --> H
-    H --> I[Full-Stack Expert!]
-
-    style A fill:#ffebee
-    style D fill:#e8f5e9
-    style I fill:#fff9c4
-```
-
-## 🚀 You're Ready!
-
-Congratulations on making it this far! You now understand:
-
-- ✅ How modern full-stack apps are built
-- ✅ The role of each technology in our stack
-- ✅ Where to find and modify code
-- ✅ How to contribute effectively
-
-Remember: Everyone was a beginner once. Don't be afraid to ask questions, make mistakes, and learn from them. The best way to learn is by doing!
-
-Happy coding! 🎉
-
-## 🔐 Deep Dive: Authentication Flow
-
-Understanding authentication is crucial for full-stack development. Here's how Better Auth works in our app:
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Browser
-    participant Server
-    participant BetterAuth
-    participant Database
-    participant OAuth
-
-    User->>Browser: Clicks "Sign Up"
-    Browser->>Server: POST /api/auth/signup
-    Server->>BetterAuth: Create user
-    BetterAuth->>BetterAuth: Hash password
-    BetterAuth->>Database: Store user + hashed password
-    Database-->>BetterAuth: User created
-    BetterAuth->>BetterAuth: Create session
-    BetterAuth-->>Server: Session token
-    Server-->>Browser: Set cookie + redirect
-    Browser-->>User: Dashboard access
-
-    Note over User,OAuth: OAuth Flow (Google/GitHub)
-    User->>Browser: Clicks "Sign in with Google"
-    Browser->>OAuth: Redirect to Google
-    OAuth->>User: Google login page
-    User->>OAuth: Approves
-    OAuth-->>Browser: Redirect with code
-    Browser->>Server: Exchange code
-    Server->>OAuth: Verify code
-    OAuth-->>Server: User data
-    Server->>BetterAuth: Create/find user
-    BetterAuth->>Database: Store OAuth user
-    BetterAuth-->>Server: Session token
-    Server-->>Browser: Authenticated!
-```
-
-### Session Management
-
-```mermaid
-graph LR
-    subgraph "Every Request"
-        Cookie[Session Cookie] -->|Sent with| Request[API Request]
-        Request --> Middleware[Auth Middleware]
-        Middleware -->|Validates| Session[Session Check]
-        Session -->|Valid| Allow[✅ Allow Request]
-        Session -->|Invalid| Deny[❌ Deny Request]
-    end
-```
+- [ ] Documentation updated if behavior changed
 
 ## 🛠️ Practical Examples
 
-### Example 1: Adding a New Feature (Todo List)
+### Adding a New Feature (Todo List)
 
-Let's walk through adding a todo list feature to understand the full-stack flow:
-
-```mermaid
-graph TD
-    subgraph "1. Database Schema"
-        Schema[Create todos table<br/>src/db/schema/todos.ts]
-    end
-
-    subgraph "2. API Routes"
-        API[Create CRUD endpoints<br/>src/routes/api/todos/]
-    end
-
-    subgraph "3. Frontend Components"
-        Comp[Build UI components<br/>src/features/todos/]
-    end
-
-    subgraph "4. Page Route"
-        Page[Create todos page<br/>src/routes/todos/index.tsx]
-    end
-
-    Schema --> API
-    API --> Comp
-    Comp --> Page
-
-    style Schema fill:#e8f5e9
-    style API fill:#fff3e0
-    style Comp fill:#e3f2fd
-    style Page fill:#f3e5f5
-```
+Here's how to implement a complete feature from database to UI:
 
 **Step 1: Database Schema**
 
 ```typescript
 // src/db/schema/todos.ts
 import { pgTable, text, boolean, timestamp } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const todos = pgTable("todos", {
-  id: text("id").primaryKey(),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   userId: text("user_id").notNull(),
   title: text("title").notNull(),
   completed: boolean("completed").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Auto-generate Zod schemas for validation
+export const insertTodoSchema = createInsertSchema(todos);
+export const selectTodoSchema = createSelectSchema(todos);
+export type Todo = typeof todos.$inferSelect;
+export type NewTodo = typeof todos.$inferInsert;
 ```
 
-**Step 2: API Route**
+**Step 2: Push Schema to Database**
+
+```bash
+pnpm db:push  # Creates the table in your database
+```
+
+**Step 3: API Route**
 
 ```typescript
 // src/routes/api/todos/$.ts
 import { createAPIFileRoute } from "@tanstack/start/api";
-import { db } from "@/lib/server/db";
-import { todos } from "@/db/schema/todos";
+import { z } from "zod";
+import { getDb } from "@/db/connections";
+import { todos, insertTodoSchema } from "@/db/schema/todos";
+import { requireAuth } from "@/lib/auth/middleware/auth-guard";
+import { eq } from "drizzle-orm";
 
 export const APIRoute = createAPIFileRoute("/api/todos")({
   GET: async ({ request }) => {
-    // Fetch todos
-    const userTodos = await db.select().from(todos);
+    const user = await requireAuth(request);
+    const db = getDb();
+    const userTodos = await db.select().from(todos).where(eq(todos.userId, user.id));
     return Response.json(userTodos);
   },
+
   POST: async ({ request }) => {
-    // Create todo
-    const data = await request.json();
-    const newTodo = await db.insert(todos).values(data);
+    const user = await requireAuth(request);
+    const body = await request.json();
+    const validated = insertTodoSchema.parse({
+      ...body,
+      userId: user.id,
+    });
+
+    const db = getDb();
+    const [newTodo] = await db.insert(todos).values(validated).returning();
     return Response.json(newTodo);
   },
 });
 ```
 
-### Example 2: Adding a New UI Component
-
-```mermaid
-flowchart LR
-    A[Design Component] --> B[Create Base Component]
-    B --> C[Add Styling]
-    C --> D[Add Interactivity]
-    D --> E[Write Tests]
-    E --> F[Use in Pages]
-
-    style A fill:#ffebee
-    style F fill:#c8e6c9
-```
-
-**Creating a Card Component:**
+**Step 4: Frontend Hook**
 
 ```typescript
-// src/shared/ui/card.tsx
-import { cn } from "@/shared/lib/utils"
+// src/features/todos/hooks/useTodos.ts
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Todo, NewTodo } from "@/db/schema/todos";
 
-interface CardProps {
-  title: string
-  description?: string
-  className?: string
-  children?: React.ReactNode
-}
+export function useTodos() {
+  const queryClient = useQueryClient();
 
-export function Card({ title, description, className, children }: CardProps) {
-  return (
-    <div className={cn(
-      "rounded-lg border bg-card p-6 shadow-sm",
-      className
-    )}>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      {description && (
-        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
-      )}
-      {children && <div className="mt-4">{children}</div>}
-    </div>
-  )
+  const todosQuery = useQuery({
+    queryKey: ["todos"],
+    queryFn: async () => {
+      const res = await fetch("/api/todos");
+      if (!res.ok) throw new Error("Failed to fetch todos");
+      return res.json() as Promise<Todo[]>;
+    },
+  });
+
+  const createTodo = useMutation({
+    mutationFn: async (newTodo: Omit<NewTodo, "userId">) => {
+      const res = await fetch("/api/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTodo),
+      });
+      if (!res.ok) throw new Error("Failed to create todo");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+
+  return {
+    todos: todosQuery.data ?? [],
+    isLoading: todosQuery.isLoading,
+    error: todosQuery.error,
+    createTodo: createTodo.mutate,
+  };
 }
 ```
 
-## 🐛 Troubleshooting Guide
+**Step 5: Page Component**
 
-### Common Issues and Solutions
+```typescript
+// src/routes/todos/index.tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { useTodos } from '@/features/todos/hooks/useTodos'
+import { TodoList } from '@/features/todos/components/TodoList'
+import { AddTodoForm } from '@/features/todos/components/AddTodoForm'
+
+export const Route = createFileRoute('/todos')({
+  component: TodosPage,
+})
+
+function TodosPage() {
+  const { todos, isLoading, error, createTodo } = useTodos();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">My Todos</h1>
+      <AddTodoForm onSubmit={createTodo} />
+      <TodoList todos={todos} />
+    </div>
+  );
+}
+```
+
+Notice how TypeScript types flow automatically from the database schema through the API to the frontend - no manual type definitions needed!
+
+## 🐛 Troubleshooting & FAQ
+
+### Common Issues
 
 | Problem                        | Symptoms                   | Solution                                                                                      |
 | ------------------------------ | -------------------------- | --------------------------------------------------------------------------------------------- |
 | **Database Connection Failed** | "Connection refused" error | 1. Check DATABASE_URL in .env<br>2. Ensure Docker is running<br>3. Run `docker-compose up -d` |
 | **Type Errors**                | Red squiggles in VS Code   | 1. Run `pnpm install`<br>2. Restart TypeScript server<br>3. Check imports                     |
 | **Auth Not Working**           | Can't login/signup         | 1. Check auth secrets in .env<br>2. Clear cookies<br>3. Check network tab                     |
-| **Styles Not Applied**         | Components look broken     | 1. Check Tailwind classes<br>2. Restart dev server<br>3. Clear .next cache                    |
 | **Build Fails**                | Netlify deploy errors      | 1. Check build logs<br>2. Ensure all env vars set<br>3. Test locally first                    |
 
-### Debugging Workflow
+### Quick Answers
 
-```mermaid
-graph TD
-    A[Issue Occurs] --> B{Type of Issue?}
-    B -->|Frontend| C[Open DevTools]
-    B -->|Backend| D[Check Server Logs]
-    B -->|Database| E[Check DB Connection]
+| Question                                    | Answer                                                                                 |
+| ------------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Where is the global React Query client?** | Created in `src/router.tsx`, injected via TanStack Router context                      |
+| **Can I import server code on the client?** | No. Anything importing `env.server` or `serverOnly()` will fail. Keep boundaries clear |
+| **How do I add a Netlify edge function?**   | Drop a `*.ts` file in `netlify/edge-functions/`, export `default` handler              |
+| **Which test env is used?**                 | Vitest jsdom. Global stubs are set in `tests/setup.ts`                                 |
+| **How do I debug failing tests?**           | Use `pnpm test:watch` and add `console.log` or `screen.debug()`                        |
 
-    C --> F[Console Errors?]
-    C --> G[Network Tab]
-    C --> H[React DevTools]
+### Security Best Practices
 
-    D --> I[Error Stack Trace]
-    D --> J[API Response]
+1. **Never Trust User Input**: Always validate with Zod
+2. **Use Environment Variables**: Never hardcode secrets
+3. **Implement Proper Authentication**: Use Better Auth's built-in features
+4. **Database Security**: Drizzle handles parameterized queries automatically
 
-    E --> K[Connection String]
-    E --> L[Migration Status]
+## 🚀 You're Ready!
 
-    F --> M[Fix Code]
-    G --> M
-    H --> M
-    I --> M
-    J --> M
-    K --> M
-    L --> M
+You now understand:
 
-    M --> N[Test Again]
+- ✅ How modern full-stack apps are built
+- ✅ The role of each technology in our stack
+- ✅ Where to find and modify code
+- ✅ How to contribute effectively
 
-    style A fill:#ffcdd2
-    style M fill:#c8e6c9
-    style N fill:#fff9c4
-```
+_Solstice follows the mantra "simple, typed, secure by default."_  
+_If you keep those three goals in mind, your contributions will fit right in._
 
-## 📊 Performance Considerations
-
-### Optimization Strategies
-
-```mermaid
-graph LR
-    subgraph "Frontend Optimizations"
-        A[Code Splitting]
-        B[Lazy Loading]
-        C[Image Optimization]
-        D[Memoization]
-    end
-
-    subgraph "Backend Optimizations"
-        E[Database Indexes]
-        F[Query Optimization]
-        G[Caching]
-        H[Connection Pooling]
-    end
-
-    subgraph "Infrastructure"
-        I[CDN Usage]
-        J[Edge Functions]
-        K[Static Generation]
-    end
-```
-
-### Monitoring Performance
-
-1. **Frontend Metrics**:
-   - First Contentful Paint (FCP)
-   - Time to Interactive (TTI)
-   - Core Web Vitals
-
-2. **Backend Metrics**:
-   - API response times
-   - Database query duration
-   - Memory usage
-
-3. **Tools**:
-   - Chrome DevTools Performance tab
-   - React DevTools Profiler
-   - Netlify Analytics
-
-## 🔧 Environment Setup Details
-
-### Required Software
-
-| Software | Version | Purpose            | Installation                                             |
-| -------- | ------- | ------------------ | -------------------------------------------------------- |
-| Node.js  | 20.19+  | JavaScript runtime | `brew install node` or [nodejs.org](https://nodejs.org)  |
-| pnpm     | Latest  | Package manager    | `npm install -g pnpm`                                    |
-| Docker   | Latest  | Database container | [docker.com](https://docker.com)                         |
-| Git      | Latest  | Version control    | `brew install git` or [git-scm.com](https://git-scm.com) |
-| VS Code  | Latest  | Code editor        | [code.visualstudio.com](https://code.visualstudio.com)   |
-
-### VS Code Extensions
-
-Essential extensions for this project:
-
-- **ESLint**: Linting support
-- **Prettier**: Code formatting
-- **TypeScript**: Enhanced TS support
-- **Tailwind CSS IntelliSense**: Autocomplete for classes
-- **Prisma**: Database schema highlighting
-- **GitLens**: Git insights
-
-### Environment Variables Explained
-
-```bash
-# .env.example with explanations
-
-# Database connection string
-# Format: postgresql://username:password@host:port/database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/solstice
-
-# Application base URL (used for redirects, emails, etc.)
-VITE_BASE_URL=http://localhost:3000
-
-# Authentication secret (generate with: openssl rand -base64 32)
-BETTER_AUTH_SECRET=your-super-secret-key-here
-
-# OAuth providers (from respective developer consoles)
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-```
-
-## 📚 Additional Learning Resources
-
-### Official Documentation
-
-- [TanStack Start Docs](https://tanstack.com/start/latest/docs/framework/react/overview)
-- [Better Auth Docs](https://www.better-auth.com/)
-- [Drizzle ORM Docs](https://orm.drizzle.team/)
-- [Tailwind CSS v4 Docs](https://tailwindcss.com/)
-- [Netlify Docs](https://docs.netlify.com/)
-
-### Recommended Tutorials
-
-1. **React Fundamentals**: [React.dev Tutorial](https://react.dev/learn)
-2. **TypeScript**: [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
-3. **SQL Basics**: [SQLBolt Interactive Tutorial](https://sqlbolt.com/)
-4. **Git & GitHub**: [GitHub Skills](https://skills.github.com/)
-
-### Community Resources
-
-- Join the project's Discord/Slack
-- Follow the maintainers on Twitter/X
-- Watch the GitHub repo for updates
-- Read the blog posts about the tech choices
-
-## 🔒 Security Best Practices
-
-### Security Layers in Our App
-
-```mermaid
-graph TB
-    subgraph "Input Validation"
-        A[Zod Schemas]
-        B[Form Validation]
-        C[API Validation]
-    end
-
-    subgraph "Authentication"
-        D[Password Hashing]
-        E[Session Management]
-        F[CSRF Protection]
-    end
-
-    subgraph "Database Security"
-        G[Parameterized Queries]
-        H[Connection Pooling]
-        I[SSL Connections]
-    end
-
-    subgraph "Network Security"
-        J[HTTPS Only]
-        K[Security Headers]
-        L[Rate Limiting]
-    end
-
-    A --> D
-    B --> E
-    C --> F
-    D --> G
-    E --> H
-    F --> I
-    G --> J
-    H --> K
-    I --> L
-
-    style A fill:#ffebee
-    style D fill:#e3f2fd
-    style G fill:#e8f5e9
-    style J fill:#fff3e0
-```
-
-### Key Security Principles
-
-1. **Never Trust User Input**
-
-   ```typescript
-   // Always validate with Zod
-   const userSchema = z.object({
-     email: z.string().email(),
-     password: z.string().min(8),
-   });
-
-   const validated = userSchema.parse(userInput);
-   ```
-
-2. **Use Environment Variables for Secrets**
-
-   ```typescript
-   // Good: Using env vars
-   const secret = process.env.API_SECRET;
-
-   // Bad: Hardcoding secrets
-   const secret = "my-secret-key"; // NEVER DO THIS!
-   ```
-
-3. **Implement Proper Authentication**
-   - Use Better Auth's built-in security features
-   - Never store plain text passwords
-   - Implement session timeouts
-   - Use secure cookies
-
-4. **Database Security**
-   - Always use parameterized queries (Drizzle does this)
-   - Limit database user permissions
-   - Use SSL for database connections
-   - Regular backups
-
-## 📋 Quick Reference Guide
-
-### Common Commands
-
-| Task                 | Command                | Description                          |
-| -------------------- | ---------------------- | ------------------------------------ |
-| **Start dev server** | `pnpm dev`             | Runs app locally on port 3000        |
-| **Run tests**        | `pnpm test`            | Executes all test suites             |
-| **Type check**       | `pnpm check-types`     | Verifies TypeScript types            |
-| **Lint code**        | `pnpm lint`            | Checks code style                    |
-| **Build app**        | `pnpm build`           | Creates production build             |
-| **Start database**   | `docker-compose up -d` | Runs PostgreSQL locally              |
-| **Run migrations**   | `pnpm db:migrate`      | Updates database schema              |
-| **Generate types**   | `pnpm db:generate`     | Creates TypeScript types from schema |
-
-### File Naming Conventions
-
-| Type           | Convention        | Example             |
-| -------------- | ----------------- | ------------------- |
-| **Components** | PascalCase        | `UserProfile.tsx`   |
-| **Utilities**  | camelCase         | `formatDate.ts`     |
-| **Routes**     | kebab-case        | `user-settings.tsx` |
-| **API Routes** | kebab-case with $ | `api/users/$.ts`    |
-| **Tests**      | \*.test.ts(x)     | `Button.test.tsx`   |
-| **Schemas**    | \*.schema.ts      | `user.schema.ts`    |
-
-### Import Aliases
-
-Our project uses these import aliases for cleaner imports:
-
-```typescript
-import { Button } from "@/shared/ui/button"; // Instead of "../../../shared/ui/button"
-import { auth } from "@/lib/auth"; // Instead of "../../../lib/auth"
-import { db } from "@/lib/server/db"; // Instead of "../../../lib/server/db"
-```
-
-### Common Patterns
-
-**Creating a Protected Route:**
-
-```typescript
-// src/routes/protected/route.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { useAuthGuard } from '@/features/auth/useAuthGuard'
-
-export const Route = createFileRoute('/protected')({
-  beforeLoad: async () => {
-    // Server-side auth check
-    await requireAuth()
-  },
-  component: () => {
-    // Client-side auth check
-    useAuthGuard()
-    return <Outlet />
-  }
-})
-```
-
-**Making an API Call:**
-
-```typescript
-// Using TanStack Query
-import { useQuery } from '@tanstack/react-query'
-
-function MyComponent() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['todos'],
-    queryFn: async () => {
-      const res = await fetch('/api/todos')
-      if (!res.ok) throw new Error('Failed to fetch')
-      return res.json()
-    }
-  })
-
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
-
-  return <TodoList todos={data} />
-}
-```
-
-**Creating a Form:**
-
-```typescript
-// Using our form utilities
-import { useForm } from '@/lib/form'
-import { ValidatedInput } from '@/components/form-fields/ValidatedInput'
-
-function MyForm() {
-  const form = useForm({
-    onSubmit: async (data) => {
-      // Handle submission
-    }
-  })
-
-  return (
-    <form onSubmit={form.handleSubmit}>
-      <ValidatedInput
-        name="email"
-        type="email"
-        label="Email"
-        required
-      />
-      <button type="submit">Submit</button>
-    </form>
-  )
-}
-```
-
-### Deployment Checklist
-
-Before deploying to production:
-
-- [ ] All tests pass (`pnpm test`)
-- [ ] No TypeScript errors (`pnpm check-types`)
-- [ ] No linting errors (`pnpm lint`)
-- [ ] Environment variables set in Netlify
-- [ ] Database migrations run
-- [ ] Build succeeds locally (`pnpm build`)
-- [ ] Security headers configured
-- [ ] OAuth redirect URLs updated
-- [ ] Error monitoring set up
-- [ ] Analytics configured
+Happy coding! 🎉

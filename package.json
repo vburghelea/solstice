@@ -22,7 +22,7 @@
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
     "prepare": "husky",
-    "postinstall": "node scripts/generate-auth-secret.js"
+    "preinstall": "node scripts/generate-auth-secret.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",

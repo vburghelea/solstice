@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [
     tsConfigPaths({
       projects: ["./tsconfig.json"],
-    }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any,
     tailwindcss(),
     tanstackStart({
       // https://react.dev/learn/react-compiler

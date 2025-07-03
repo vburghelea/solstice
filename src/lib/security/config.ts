@@ -34,7 +34,7 @@ export const securityConfig = {
   // CORS configuration
   cors: {
     credentials: true,
-    origin: process.env["VITE_BASE_URL"] || "http://localhost:5173",
+    origin: process.env["VITE_BASE_URL"] || "http://localhost:8888",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },

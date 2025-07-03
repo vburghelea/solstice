@@ -32,6 +32,9 @@ export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
       authInstance = betterAuth({
         baseURL: baseUrl,
         secret: getAuthSecret(),
+        trustedOrigins: isProduction
+          ? [baseUrl]
+          : ["http://localhost:5173", "http://localhost:8888"],
         database: drizzleAdapter(db(), {
           provider: "pg",
           schema: {

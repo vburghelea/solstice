@@ -10,8 +10,8 @@ export const env = createEnv({
   clientPrefix: "VITE_",
   client: {
     VITE_BASE_URL: z.string().url(),
-    VITE_ENABLE_ANALYTICS: z.boolean().default(false),
-    VITE_ENABLE_SENTRY: z.boolean().default(false),
+    VITE_ENABLE_ANALYTICS: z.coerce.boolean().default(false),
+    VITE_ENABLE_SENTRY: z.coerce.boolean().default(false),
     VITE_POSTHOG_KEY: z.string().optional(),
     VITE_SENTRY_DSN: z.string().optional(),
   },
@@ -19,7 +19,7 @@ export const env = createEnv({
   emptyStringAsUndefined: true,
   // Workaround for VITE_BASE_URL validation during SSR
   // See: https://github.com/t3-oss/t3-env/issues/110
-  skipValidation: !!process.env["SKIP_ENV_VALIDATION"],
+  skipValidation: !!import.meta.env["SKIP_ENV_VALIDATION"],
 });
 
 // Helper functions for client-side feature flags

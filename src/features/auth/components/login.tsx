@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { Link, useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import React, { useState } from "react";
 import { auth } from "~/lib/auth-client";
 import { Button } from "~/shared/ui/button";
@@ -11,6 +11,7 @@ export default function LoginForm() {
   const { redirectUrl } = useRouteContext({ from: "/(auth)/login" });
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -38,8 +39,9 @@ export default function LoginForm() {
           callbackURL: redirectUrl,
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
             queryClient.invalidateQueries({ queryKey: ["user"] });
+            await router.invalidate();
             navigate({ to: redirectUrl });
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

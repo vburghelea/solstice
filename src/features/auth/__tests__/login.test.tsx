@@ -78,8 +78,7 @@ describe("LoginForm", () => {
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Login" })).toBeInTheDocument();
 
-    // Check for social login buttons
-    expect(screen.getByRole("button", { name: "Login with GitHub" })).toBeInTheDocument();
+    // Check for social login button
     expect(screen.getByRole("button", { name: "Login with Google" })).toBeInTheDocument();
 
     // Check for signup link
@@ -192,38 +191,8 @@ describe("LoginForm", () => {
     expect(screen.getByLabelText("Email")).toHaveAttribute("readonly");
     expect(screen.getByLabelText("Password")).toHaveAttribute("readonly");
 
-    // Social login buttons should also be disabled
-    expect(screen.getByRole("button", { name: "Login with GitHub" })).toBeDisabled();
+    // Social login button should also be disabled
     expect(screen.getByRole("button", { name: "Login with Google" })).toBeDisabled();
-  });
-
-  it("handles GitHub social login", async () => {
-    const user = userEvent.setup();
-    const { mockUser } = createAuthMocks();
-
-    vi.mocked(auth.signInWithOAuth).mockImplementationOnce((data, handlers) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handlers?.onRequest?.({} as any);
-      return Promise.resolve({
-        redirect: true,
-        token: "mock-token",
-        url: undefined,
-        user: mockUser,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
-    });
-
-    render(<LoginForm />);
-
-    await user.click(screen.getByRole("button", { name: "Login with GitHub" }));
-
-    expect(auth.signInWithOAuth).toHaveBeenCalledWith(
-      {
-        provider: "github",
-        callbackURL: "/dashboard",
-      },
-      expect.any(Object),
-    );
   });
 
   it("handles Google social login", async () => {
@@ -246,13 +215,10 @@ describe("LoginForm", () => {
 
     await user.click(screen.getByRole("button", { name: "Login with Google" }));
 
-    expect(auth.signInWithOAuth).toHaveBeenCalledWith(
-      {
-        provider: "google",
-        callbackURL: "/dashboard",
-      },
-      expect.any(Object),
-    );
+    expect(auth.signInWithOAuth).toHaveBeenCalledWith({
+      provider: "google",
+      callbackURL: "/dashboard",
+    });
   });
 
   it("validates required fields", async () => {

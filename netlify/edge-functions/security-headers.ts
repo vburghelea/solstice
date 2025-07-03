@@ -18,7 +18,7 @@ export default async function handler(req: Request, context: Context) {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: blob:",
-      `connect-src 'self' ${isDevelopment ? "ws://localhost:*" : ""} https://api.github.com https://accounts.google.com https://www.googleapis.com`,
+      `connect-src 'self' ${isDevelopment ? "ws://localhost:*" : ""} https://accounts.google.com https://www.googleapis.com`,
       "frame-src 'self' https://challenges.cloudflare.com",
       "object-src 'none'",
       "base-uri 'self'",

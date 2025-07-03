@@ -1,11 +1,11 @@
-import "@testing-library/jest-dom";
-import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+// Ensure we are in React dev/test mode for tests
+process.env["NODE_ENV"] = "test";
 
-// Cleanup after each test case
-afterEach(() => {
-  cleanup();
-});
+// @ts-expect-error - This is a global variable set for React's act environment
+global.IS_REACT_ACT_ENVIRONMENT = true;
+
+import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {

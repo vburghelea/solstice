@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
         ...env,
         // Override with test-specific env vars if needed
         VITE_BASE_URL: "http://localhost:3000",
+        SKIP_ENV_VALIDATION: "true",
       },
     },
     resolve: {

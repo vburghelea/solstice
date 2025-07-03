@@ -1,5 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock the auth module to avoid server-side environment variable access
+vi.mock("~/lib/auth", () => ({
+  auth: {
+    api: {
+      getSession: vi.fn(),
+    },
+  },
+}));
+
+// Mock TanStack Start server functions
+vi.mock("@tanstack/react-start/server", () => ({
+  getWebRequest: vi.fn(() => ({ headers: new Headers() })),
+  setResponseStatus: vi.fn(),
+}));
+
 describe("authMiddleware", () => {
   // Since the authMiddleware uses TanStack Start's createMiddleware which is complex to test,
   // we'll focus on testing the authentication logic separately

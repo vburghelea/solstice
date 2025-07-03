@@ -38,7 +38,7 @@ Full-stack development means building both the **frontend** (what users see) and
 ### High-Level Architecture
 
 ```mermaid
-graph TB
+graph TB;
   subgraph Browser["Browser (Client)"]
     UI["React UI / TanStack Start SSR"]
     Store["React Query (Cache)"]
@@ -208,7 +208,7 @@ solstice/
 ### Building a Complete Feature: Todo List
 
 ```mermaid
-graph LR
+graph LR;
   A[Define Schema<br/>src/db/schema/todos.ts] --> B[Run `pnpm db:push`]
   B --> C[Create API Route<br/>src/routes/api/todos/$.ts]
   C --> D[Use Types in Hook<br/>src/features/todos/useTodos.ts]

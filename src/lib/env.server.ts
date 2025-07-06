@@ -3,6 +3,10 @@
  * This module should only be imported in server-side code
  */
 
+// Load environment variables from .env during development
+import { config as dotenvConfig } from "dotenv";
+dotenvConfig();
+
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
@@ -33,6 +37,7 @@ export const env = createEnv({
     // Client vars are also available on server
     VITE_BASE_URL: z.string().url(),
   },
+  // Use process.env since we've just loaded .env
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
 });

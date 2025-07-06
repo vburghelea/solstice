@@ -3,7 +3,7 @@
 # Test security headers
 # Usage: ./scripts/test-security-headers.sh [URL]
 
-URL="${1:-http://localhost:8888}"
+URL="${1:-http://localhost:5173}"
 
 echo "Testing security headers at: $URL"
 echo "=================================="

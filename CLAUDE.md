@@ -75,13 +75,11 @@ Netlify automatically provides:
 ### Local Development Setup
 
 1. **Environment Files**:
-
    - `.env` - Main environment file
    - `.env.local` - Local overrides (git-ignored)
    - Netlify Dev will inject values from Netlify project settings
 
 2. **OAuth Setup**:
-
    - OAuth credentials must be valid (not placeholders) for routes to work
    - Configure redirect URLs for local development:
      - Google: `http://localhost:8888/api/auth/callback/google`
@@ -150,3 +148,208 @@ See `docs/database-connections.md` for detailed usage guide.
 - **Access user data**: Use `useRouteContext()` to get user from context
 - **Make API calls**: Use React Query with proper error handling
 - **Add UI components**: Check `src/shared/ui/` for existing components first
+
+### User added context:
+
+You can see the netlify production variables via `netlify env:list`
+Which include:
+| DATABASE_URL | **********************\*\*********************** \***\* | All |
+| GOOGLE_CLIENT_ID | ********************\*\*\*\*********************** \***\* | All |
+| GOOGLE_CLIENT_SECRET | ********************\*\*\*\*********************** \***\* | All |
+| NETLIFY_DATABASE_URL | ********************\*\*\*\*********************** \***\* | All |
+| NETLIFY_DATABASE_URL_UNPOOLED | ********************\*\*\*\*********************** \***\* | All |
+| NODE_ENV | ********************\*\*\*\***********************
+\*\*\*\* | Builds, Post processing |
+
+---
+
+## 4 — Directory Cheat‑Sheet
+
+Tree as of July 6, 2025
+
+```
+
+.
+├── AGENTS.md
+├── CLAUDE.md
+├── components.json
+├── coverage
+│   ├── base.css
+│   ├── block-navigation.js
+│   ├── coverage-final.json
+│   ├── favicon.png
+│   ├── features
+│   │   └── auth
+│   │       └── components
+│   │           ├── index.html
+│   │           └── login.tsx.html
+│   ├── index.html
+│   ├── lib
+│   │   └── auth
+│   │       └── middleware
+│   │           ├── auth-guard.ts.html
+│   │           └── index.html
+│   ├── prettify.css
+│   ├── prettify.js
+│   ├── shared
+│   │   ├── lib
+│   │   │   ├── index.html
+│   │   │   └── utils.ts.html
+│   │   └── ui
+│   │       ├── button.tsx.html
+│   │       ├── icons.tsx.html
+│   │       ├── index.html
+│   │       ├── input.tsx.html
+│   │       └── label.tsx.html
+│   ├── sort-arrow-sprite.png
+│   └── sorter.js
+├── dist
+│   ├── _headers
+│   ├── _redirects
+│   ├── assets
+│   │   ├── createLucideIcon-Bcg0Vi2e.js
+│   │   ├── index-CvP1hl19.js
+│   │   ├── index-Daq_2NZw.js
+│   │   ├── label-BpBwDb9J.js
+│   │   ├── loader-circle-6MYg0gu7.js
+│   │   ├── login-CU83squS.js
+│   │   ├── main-BaDK-79R.js
+│   │   ├── profile-3i2p7dMd.js
+│   │   ├── route-CscgpPZC.js
+│   │   ├── route-CZWZ9WpA.js
+│   │   ├── signup-CuG_U93y.js
+│   │   └── styles-by26pVYo.css
+│   └── favicon.ico
+├── docker-compose.yml
+├── docs
+│   ├── code-improvements.md
+│   ├── database-connections.md
+│   ├── project-brief.md
+│   └── SECURITY.md
+├── drizzle.config.ts
+├── eslint.config.js
+├── LEARN_FULLSTACK.md
+├── LICENSE
+├── netlify
+│   └── edge-functions
+│       └── security-headers.ts
+├── netlify.toml
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── public
+│   └── favicon.ico
+├── README.md
+├── scripts
+│   ├── check-users.ts
+│   ├── generate-auth-secret.js
+│   ├── test-auth.ts
+│   ├── test-db-connection.ts
+│   └── test-security-headers.sh
+├── src
+│   ├── app
+│   │   └── providers.tsx
+│   ├── components
+│   │   ├── auth
+│   │   │   └── password-input.example.tsx
+│   │   ├── DefaultCatchBoundary.tsx
+│   │   ├── form-fields
+│   │   │   ├── FormSubmitButton.tsx
+│   │   │   └── ValidatedInput.tsx
+│   │   ├── NotFound.tsx
+│   │   └── ThemeToggle.tsx
+│   ├── db
+│   │   ├── connections.ts
+│   │   ├── index.ts
+│   │   └── schema
+│   │       ├── auth.schema.ts
+│   │       └── index.ts
+│   ├── features
+│   │   └── auth
+│   │       ├── __tests__
+│   │       │   └── login.test.tsx
+│   │       ├── components
+│   │       │   ├── login.tsx
+│   │       │   └── signup.tsx
+│   │       └── useAuthGuard.tsx
+│   ├── lib
+│   │   ├── auth
+│   │   │   ├── index.ts
+│   │   │   ├── middleware
+│   │   │   │   ├── __tests__
+│   │   │   │   └── auth-guard.ts
+│   │   │   └── types.ts
+│   │   ├── auth-client.ts
+│   │   ├── env.client.ts
+│   │   ├── env.server.ts
+│   │   ├── form.ts
+│   │   ├── schemas
+│   │   │   └── profile.ts
+│   │   ├── security
+│   │   │   ├── config.ts
+│   │   │   ├── index.ts
+│   │   │   ├── middleware
+│   │   │   │   └── rate-limit.ts
+│   │   │   └── utils
+│   │   │       └── password-validator.ts
+│   │   └── server
+│   │       └── __tests__
+│   │           └── example.test.ts
+│   ├── router.tsx
+│   ├── routes
+│   │   ├── __root.tsx
+│   │   ├── (auth)
+│   │   │   ├── login.tsx
+│   │   │   ├── route.tsx
+│   │   │   └── signup.tsx
+│   │   ├── api
+│   │   │   └── auth
+│   │   │       ├── $.ts
+│   │   │       └── $action
+│   │   ├── dashboard
+│   │   │   ├── index.tsx
+│   │   │   ├── profile.tsx
+│   │   │   └── route.tsx
+│   │   └── index.tsx
+│   ├── routeTree.gen.ts
+│   ├── shared
+│   │   ├── hooks
+│   │   │   └── useTheme.ts
+│   │   ├── lib
+│   │   │   └── utils.ts
+│   │   └── ui
+│   │       ├── __tests__
+│   │       │   └── button.test.tsx
+│   │       ├── button.tsx
+│   │       ├── icons.tsx
+│   │       ├── input.tsx
+│   │       └── label.tsx
+│   ├── styles.css
+│   └── tests
+│       ├── mocks
+│       │   └── auth.ts
+│       ├── README.md
+│       ├── setup.ts
+│       └── utils.tsx
+├── tsconfig.json
+├── vite.config.ts
+└── vitest.config.ts
+
+122 directories, 114 files
+
+
+## Tool available
+
+Always use your playwright tool to navigate to localhost:8888 to test changes before finishing
+
+## Dev server
+
+Assume the dev server is running on 8888 for every session, and check via playwright or curl
+
+## Rules
+Always read .cursor/rules/*
+
+## Docs
+Read /docs/quadball-plan/* as appropriate
+```

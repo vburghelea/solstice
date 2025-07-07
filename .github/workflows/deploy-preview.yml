@@ -26,6 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'ci-secret-for-install' }}
 
       - name: Build application
         run: pnpm build
@@ -34,6 +36,7 @@ jobs:
           VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'ci-secret-for-install' }}
 
       - name: Deploy to Netlify
         id: netlify

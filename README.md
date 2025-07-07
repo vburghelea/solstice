@@ -159,7 +159,7 @@ Configure these secrets in your GitHub repository settings:
 
 - `DATABASE_URL` - PostgreSQL connection string for CI tests
 - `VITE_BASE_URL` - Base URL for the application
-- `BETTER_AUTH_SECRET` - Auth secret key
+- `BETTER_AUTH_SECRET` - Auth secret key (generate with `pnpm auth:secret` locally)
 - `NETLIFY_AUTH_TOKEN` - Netlify authentication token
 - `NETLIFY_SITE_ID` - Netlify site ID
 - `CODECOV_TOKEN` - Codecov upload token (optional)

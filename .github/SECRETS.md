@@ -6,10 +6,11 @@ This document outlines the required secrets for GitHub Actions workflows.
 
 ### Core Application Secrets
 
-| Secret Name     | Description                  | Example                               |
-| --------------- | ---------------------------- | ------------------------------------- |
-| `DATABASE_URL`  | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` |
-| `VITE_BASE_URL` | Application base URL         | `https://solstice.example.com`        |
+| Secret Name          | Description                               | Example                                  |
+| -------------------- | ----------------------------------------- | ---------------------------------------- |
+| `DATABASE_URL`       | PostgreSQL connection string              | `postgresql://user:pass@host:5432/db`    |
+| `VITE_BASE_URL`      | Application base URL                      | `https://solstice.example.com`           |
+| `BETTER_AUTH_SECRET` | Authentication secret key for Better Auth | Generate with `pnpm auth:secret` locally |
 
 ### Netlify Deployment Secrets
 

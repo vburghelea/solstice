@@ -13,7 +13,7 @@ This document outlines the primary user flows through the Quadball Canada platfo
 
 ## Primary User Journeys
 
-### 1. New Member Onboarding
+### 1. New Member Onboarding ✅ (Implemented)
 
 **Goal**: Join Quadball Canada and get ready to play
 
@@ -21,7 +21,7 @@ This document outlines the primary user flows through the Quadball Canada platfo
 Landing Page → Sign Up → Email Verification → Complete Profile → Purchase Membership
      /              ↓                              ↓                    ↓
     /         /login or /signup            /dashboard/profile    Square Checkout
-   /
+   /                                                              (planned)
 ```
 
 **Key Steps**:
@@ -30,17 +30,17 @@ Landing Page → Sign Up → Email Verification → Complete Profile → Purchas
 2. Creates account with email/password or OAuth
 3. Verifies email address
 4. Completes profile with emergency contact
-5. Purchases membership through Square
+5. Purchases membership through Square (⏳ planned)
 
 **Routes Involved**:
 
-- `/` - Landing page with CTA
-- `/signup` - Registration form
-- `/login` - Alternative entry
-- `/dashboard/profile` - Profile completion
-- External Square checkout
+- `/` - Landing page with CTA ✅
+- `/signup` - Registration form ✅
+- `/login` - Alternative entry ✅
+- `/dashboard/profile` - Profile completion ✅
+- External Square checkout ⏳
 
-### 2. Team Registration for Event
+### 2. Team Registration for Event ⏳ (Planned)
 
 **Goal**: Register team for upcoming tournament
 
@@ -48,7 +48,7 @@ Landing Page → Sign Up → Email Verification → Complete Profile → Purchas
 Team Dashboard → Browse Events → Event Details → Team Registration → Payment
       ↓               ↓               ↓                ↓               ↓
 /dashboard/team  /events         /events/[slug]   Registration    Square/E-transfer
-                                                      Form
+   (planned)     (planned)         (planned)         Form            (planned)
 ```
 
 **Key Steps**:
@@ -61,19 +61,20 @@ Team Dashboard → Browse Events → Event Details → Team Registration → Pay
 
 **Routes Involved**:
 
-- `/dashboard` - Team overview
-- `/events` - Event listing
-- `/events/[slug]` - Event details
-- `/events/[slug]/register` - Registration flow
+- `/dashboard` - Team overview ✅
+- `/events` - Event listing ⏳
+- `/events/[slug]` - Event details ⏳
+- `/events/[slug]/register` - Registration flow ⏳
 
-### 3. Event Creation and Management
+### 3. Event Creation and Management ⏳ (Planned)
 
 **Goal**: Create and manage a tournament
 
 ```
 Admin Panel → Create Event → Configure Details → Open Registration → Manage Participants
      ↓             ↓                ↓                   ↓                  ↓
-/admin      /admin/events/new   Event Form      Publish Event      /admin/events/[id]
+   /admin    /admin/events/new   Event Form      Publish Event    /admin/events/[id]
+  (planned)      (planned)        (planned)         (planned)          (planned)
 ```
 
 **Key Steps**:
@@ -86,12 +87,12 @@ Admin Panel → Create Event → Configure Details → Open Registration → Man
 
 **Routes Involved**:
 
-- `/admin` - Admin dashboard
-- `/admin/events` - Event management
-- `/admin/events/new` - Event creation
-- `/admin/events/[id]` - Event details
+- `/admin` - Admin dashboard ⏳
+- `/admin/events` - Event management ⏳
+- `/admin/events/new` - Event creation ⏳
+- `/admin/events/[id]` - Event details ⏳
 
-### 4. Member Renewal
+### 4. Member Renewal ⏳ (Planned)
 
 **Goal**: Renew annual membership
 
@@ -99,7 +100,7 @@ Admin Panel → Create Event → Configure Details → Open Registration → Man
 Email Reminder → Login → Dashboard → Renewal Prompt → Payment → Confirmation
        ↓           ↓         ↓            ↓              ↓           ↓
    Notification  /login  /dashboard   Membership     Square      Email + UI
-                                        Page
+   (planned)      ✅         ✅        Page (planned) (planned)   (planned)
 ```
 
 **Key Steps**:
@@ -113,71 +114,76 @@ Email Reminder → Login → Dashboard → Renewal Prompt → Payment → Confir
 
 **Routes Involved**:
 
-- `/login` - Authentication
-- `/dashboard` - Member dashboard
-- `/membership` - Membership management
-- External payment flow
+- `/login` - Authentication ✅
+- `/dashboard` - Member dashboard ✅
+- `/membership` - Membership management ⏳
+- External payment flow ⏳
 
 ## Supporting Flows
 
-### Password Reset
+### Password Reset ⏳ (Planned)
 
 ```
 Login Page → Forgot Password → Email Sent → Reset Link → New Password → Login
     ↓              ↓              ↓            ↓             ↓           ↓
   /login    /forgot-password   Check Email  /reset/[token]  Success    /login
+    ✅          (planned)                      (planned)                  ✅
 ```
 
-### Team Roster Management
+### Team Roster Management ⏳ (Planned)
 
 ```
 Team Dashboard → Roster → Add Players → Send Invites → Players Join
        ↓           ↓          ↓             ↓              ↓
 /dashboard/team  /team/roster  Modal    Email sent    Accept invite
+   (planned)      (planned)  (planned)   (planned)      (planned)
 ```
 
-### Profile Updates
+### Profile Updates ✅ (Implemented)
 
 ```
 Dashboard → Profile → Edit → Save → Confirmation
     ↓         ↓       ↓      ↓         ↓
 /dashboard  /profile  Form  Server   Success
+    ✅         ✅       ✅      ✅        ✅
 ```
 
 ## Error Handling
 
 All flows include error states:
 
-1. **Authentication Errors**: Redirect to login with return URL
-2. **Permission Errors**: Show appropriate error message
-3. **Payment Errors**: Return from Square with error handling
-4. **Validation Errors**: Inline form validation
+1. **Authentication Errors**: Redirect to login with return URL ✅
+2. **Permission Errors**: Show appropriate error message ✅
+3. **Payment Errors**: Return from Square with error handling ⏳
+4. **Validation Errors**: Inline form validation ✅
 
 ## Mobile Considerations
 
 All journeys are optimized for mobile:
 
-1. **Touch-friendly**: Large tap targets
-2. **Progressive Forms**: Multi-step on mobile
-3. **Simplified Navigation**: Bottom nav on mobile
-4. **Offline Support**: Key pages cached
+1. **Touch-friendly**: Large tap targets ✅
+2. **Progressive Forms**: Multi-step on mobile ⏳
+3. **Simplified Navigation**: Bottom nav on mobile ⏳
+4. **Offline Support**: Key pages cached ⏳
 
 ## Analytics Events
 
 Key events tracked:
 
-1. **Registration Started**: User begins signup
-2. **Registration Completed**: Account created
-3. **Membership Purchased**: Payment successful
-4. **Event Registration**: Team registered
-5. **Profile Completed**: All fields filled
+1. **Registration Started**: User begins signup ⏳
+2. **Registration Completed**: Account created ⏳
+3. **Membership Purchased**: Payment successful ⏳
+4. **Event Registration**: Team registered ⏳
+5. **Profile Completed**: All fields filled ⏳
 
-## Future Enhancements
+## Implementation Status
 
-Planned improvements to user flows:
-
-1. **Onboarding Tour**: Interactive guide for new users
-2. **Quick Actions**: Dashboard shortcuts
-3. **Saved Progress**: Resume incomplete registrations
-4. **Social Features**: Team discovery and messaging
-5. **Mobile App**: Native experience for key flows
+| Feature                 | Status      | Notes                 |
+| ----------------------- | ----------- | --------------------- |
+| **Authentication Flow** | ✅ Complete | Login, signup, OAuth  |
+| **Profile Management**  | ✅ Complete | View and edit profile |
+| **Team Management**     | ⏳ Planned  | Q2 2025               |
+| **Event System**        | ⏳ Planned  | Q2 2025               |
+| **Payment Integration** | ⏳ Planned  | Q2 2025               |
+| **Email Notifications** | ⏳ Planned  | Q2 2025               |
+| **Admin Panel**         | ⏳ Planned  | Q3 2025               |

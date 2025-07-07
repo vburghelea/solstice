@@ -11,6 +11,16 @@ Server functions are wrapped with `serverOnly()` to ensure they only run on the 
 - External APIs and services
 - Server-side environment variables
 
+## When to Use What
+
+| Use Case        | Solution                           | Example             |
+| --------------- | ---------------------------------- | ------------------- |
+| Data fetching   | Server function in `.queries.ts`   | `getProfile()`      |
+| Data mutation   | Server function in `.mutations.ts` | `updateProfile()`   |
+| Auth logic      | Better Auth utilities              | `auth.getSession()` |
+| Edge middleware | Netlify Edge Functions             | Security headers    |
+| Page data       | Route loaders                      | Initial page data   |
+
 ## Creating a Server Function
 
 ### Step 1: Create a Server Function File
@@ -21,29 +31,29 @@ Server functions should be organized in feature directories with naming conventi
 - `.mutations.ts` - For data modification operations
 
 ```typescript
-// src/features/teams/teams.queries.ts
+// src/features/auth/auth.queries.ts
 import { serverOnly } from "@tanstack/start";
 import { db } from "~/db";
-import { teams } from "~/db/schema";
+import { users } from "~/db/schema";
 import { eq } from "drizzle-orm";
+import { getAuthFromHeaders } from "~/lib/auth/utils";
 
-export const getTeam = serverOnly(async (teamId: string) => {
-  const team = await db.query.teams.findFirst({
-    where: eq(teams.id, teamId),
-    with: {
-      members: {
-        with: {
-          user: true,
-        },
-      },
-    },
-  });
+export const getCurrentUser = serverOnly(async () => {
+  const { user } = await getAuthFromHeaders();
 
-  if (!team) {
-    throw new Error("Team not found");
+  if (!user) {
+    throw new Error("Not authenticated");
   }
 
-  return team;
+  const dbUser = await db.query.users.findFirst({
+    where: eq(users.id, user.id),
+  });
+
+  if (!dbUser) {
+    throw new Error("User not found");
+  }
+
+  return dbUser;
 });
 ```
 
@@ -52,22 +62,31 @@ export const getTeam = serverOnly(async (teamId: string) => {
 Use the auth context to check permissions:
 
 ```typescript
-// src/features/teams/teams.mutations.ts
+// src/features/auth/auth.mutations.ts
 import { serverOnly } from "@tanstack/start";
 import { getAuthFromHeaders } from "~/lib/auth/utils";
-import { requireRole } from "~/lib/auth/rbac";
+import { db } from "~/db";
+import { users } from "~/db/schema";
+import { eq } from "drizzle-orm";
 
-export const createTeam = serverOnly(async (data: CreateTeamInput) => {
+export const updateProfile = serverOnly(async (data: UpdateProfileInput) => {
   // Get current user
-  const auth = await getAuthFromHeaders();
-  if (!auth.user) {
+  const { user } = await getAuthFromHeaders();
+  if (!user) {
     throw new Error("Unauthorized");
   }
 
-  // Check permissions
-  await requireRole(auth.user.id, ["team_lead", "global_admin"]);
+  // Update profile
+  const [updated] = await db
+    .update(users)
+    .set({
+      name: data.name,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id))
+    .returning();
 
-  // Create team...
+  return updated;
 });
 ```
 
@@ -76,35 +95,42 @@ export const createTeam = serverOnly(async (data: CreateTeamInput) => {
 Always handle errors appropriately:
 
 ```typescript
-export const updateTeam = serverOnly(async (teamId: string, data: UpdateTeamInput) => {
+import { z } from "zod";
+
+const updateProfileSchema = z.object({
+  name: z.string().min(1).max(100),
+});
+
+export const updateProfile = serverOnly(async (data: unknown) => {
   try {
     // Validate input
-    const validated = updateTeamSchema.parse(data);
+    const validated = updateProfileSchema.parse(data);
 
-    // Check permissions
-    const auth = await getAuthFromHeaders();
-    await requireTeamRole(auth.user.id, teamId, ["coach", "manager"]);
+    // Get current user
+    const { user } = await getAuthFromHeaders();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
 
-    // Update team
-    const updated = await db
-      .update(teams)
-      .set(validated)
-      .where(eq(teams.id, teamId))
+    // Update profile
+    const [updated] = await db
+      .update(users)
+      .set({
+        name: validated.name,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id))
       .returning();
 
-    return updated[0];
+    return updated;
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error("Invalid input: " + error.message);
     }
 
-    if (error instanceof UnauthorizedError) {
-      throw new Error("Unauthorized");
-    }
-
     // Log unexpected errors
-    console.error("Update team error:", error);
-    throw new Error("Failed to update team");
+    console.error("Update profile error:", error);
+    throw new Error("Failed to update profile");
   }
 });
 ```
@@ -114,29 +140,42 @@ export const updateTeam = serverOnly(async (teamId: string, data: UpdateTeamInpu
 Use TanStack Query to call server functions:
 
 ```tsx
-// src/routes/teams/$teamId.tsx
+// src/routes/dashboard/profile.tsx
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getTeam, updateTeam } from "~/features/teams/teams.queries";
+import { getCurrentUser, updateProfile } from "~/features/auth/auth.queries";
 
-export default function TeamPage() {
-  const params = useParams({ from: "/teams/$teamId" });
-
+export default function ProfilePage() {
   // Fetch data
-  const { data: team, isLoading } = useQuery({
-    queryKey: ["team", params.teamId],
-    queryFn: () => getTeam(params.teamId),
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: getCurrentUser,
   });
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: (data: UpdateTeamInput) => updateTeam(params.teamId, data),
+    mutationFn: updateProfile,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["team", params.teamId] });
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     },
   });
 
   // Use in component...
 }
+```
+
+## Code Search Paths
+
+To find existing server functions in the codebase:
+
+```bash
+# Find all query files
+find src/features -name "*.queries.ts"
+
+# Find all mutation files
+find src/features -name "*.mutations.ts"
+
+# Search for server functions
+grep -r "serverOnly" src/features
 ```
 
 ## Best Practices
@@ -145,15 +184,9 @@ export default function TeamPage() {
 
 ```
 src/features/
-├── auth/
-│   ├── auth.queries.ts      # getUserProfile, checkSession
-│   └── auth.mutations.ts    # updateProfile, changePassword
-├── teams/
-│   ├── teams.queries.ts     # getTeam, listTeams
-│   └── teams.mutations.ts   # createTeam, updateTeam
-└── events/
-    ├── events.queries.ts    # getEvent, searchEvents
-    └── events.mutations.ts  # createEvent, registerForEvent
+└── auth/
+    ├── auth.queries.ts      # getCurrentUser, getProfile
+    └── auth.mutations.ts    # updateProfile, changePassword
 ```
 
 ### 2. Type Safety
@@ -161,27 +194,26 @@ src/features/
 Always define input and output types:
 
 ```typescript
-// src/features/teams/teams.types.ts
-export interface CreateTeamInput {
-  name: string;
-  slug: string;
-  description?: string;
+// src/features/auth/auth.types.ts
+export interface UpdateProfileInput {
+  name?: string;
+  pronouns?: string;
+  birthDate?: string;
 }
 
-export interface TeamWithMembers {
+export interface UserProfile {
   id: string;
-  name: string;
-  members: Array<{
-    userId: string;
-    role: TeamRole;
-    user: User;
-  }>;
+  email: string;
+  name: string | null;
+  createdAt: Date;
 }
 
 // Use in server function
-export const createTeam = serverOnly(async (input: CreateTeamInput): Promise<Team> => {
-  // Implementation...
-});
+export const updateProfile = serverOnly(
+  async (input: UpdateProfileInput): Promise<UserProfile> => {
+    // Implementation...
+  },
+);
 ```
 
 ### 3. Authentication Patterns
@@ -190,16 +222,11 @@ Create reusable auth utilities:
 
 ```typescript
 // src/lib/auth/utils.ts
-export async function getCurrentUser() {
-  const auth = await getAuthFromHeaders();
-  if (!auth.user) {
-    throw new UnauthorizedError();
-  }
-  return auth.user;
-}
-
 export async function requireAuth() {
-  const user = await getCurrentUser();
+  const { user } = await getAuthFromHeaders();
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
   return user;
 }
 
@@ -215,32 +242,23 @@ export const myProtectedFunction = serverOnly(async () => {
 Use transactions for multi-step operations:
 
 ```typescript
-export const transferTeamOwnership = serverOnly(
-  async (teamId: string, newOwnerId: string) => {
-    const user = await requireAuth();
+export const deleteAccount = serverOnly(async () => {
+  const user = await requireAuth();
 
-    return await db.transaction(async (tx) => {
-      // Remove old owner
-      await tx
-        .update(teamMembers)
-        .set({ role: "player" })
-        .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.role, "owner")));
+  return await db.transaction(async (tx) => {
+    // Delete user sessions
+    await tx.delete(sessions).where(eq(sessions.userId, user.id));
 
-      // Set new owner
-      await tx
-        .update(teamMembers)
-        .set({ role: "owner" })
-        .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, newOwnerId)));
+    // Delete user accounts
+    await tx.delete(accounts).where(eq(accounts.userId, user.id));
 
-      // Log the change
-      await tx.insert(auditLogs).values({
-        action: "TEAM_OWNERSHIP_TRANSFERRED",
-        userId: user.id,
-        metadata: { teamId, newOwnerId },
-      });
-    });
-  },
-);
+    // Delete user
+    await tx.delete(users).where(eq(users.id, user.id));
+
+    // Log the deletion
+    console.log(`Deleted user account: ${user.id}`);
+  });
+});
 ```
 
 ### 5. Caching Strategy
@@ -249,96 +267,65 @@ Use React Query's caching effectively:
 
 ```typescript
 // Define stable query keys
-export const teamKeys = {
-  all: ["teams"] as const,
-  lists: () => [...teamKeys.all, "list"] as const,
-  list: (filters: TeamFilters) => [...teamKeys.lists(), filters] as const,
-  details: () => [...teamKeys.all, "detail"] as const,
-  detail: (id: string) => [...teamKeys.details(), id] as const,
+export const authKeys = {
+  all: ["auth"] as const,
+  user: () => [...authKeys.all, "user"] as const,
+  session: () => [...authKeys.all, "session"] as const,
+  profile: (id: string) => [...authKeys.all, "profile", id] as const,
 };
 
 // Use in components
 const { data } = useQuery({
-  queryKey: teamKeys.detail(teamId),
-  queryFn: () => getTeam(teamId),
+  queryKey: authKeys.user(),
+  queryFn: getCurrentUser,
   staleTime: 5 * 60 * 1000, // 5 minutes
 });
 ```
 
 ## Common Patterns
 
-### Pagination
+### Authentication Check
 
 ```typescript
-export const listTeams = serverOnly(
-  async (params: { page?: number; limit?: number; search?: string }) => {
-    const page = params.page || 1;
-    const limit = params.limit || 20;
-    const offset = (page - 1) * limit;
+export const getAuthStatus = serverOnly(async () => {
+  const { user } = await getAuthFromHeaders();
 
-    const query = db.select().from(teams).limit(limit).offset(offset);
-
-    if (params.search) {
-      query.where(like(teams.name, `%${params.search}%`));
-    }
-
-    const [items, totalCount] = await Promise.all([
-      query,
-      db.select({ count: count() }).from(teams),
-    ]);
-
-    return {
-      items,
-      pagination: {
-        page,
-        limit,
-        total: totalCount[0].count,
-        totalPages: Math.ceil(totalCount[0].count / limit),
-      },
-    };
-  },
-);
-```
-
-### Bulk Operations
-
-```typescript
-export const bulkUpdatePlayers = serverOnly(async (updates: PlayerUpdate[]) => {
-  const user = await requireAuth();
-
-  const results = await Promise.allSettled(
-    updates.map(async (update) => {
-      try {
-        await updatePlayer(update.id, update.data);
-        return { id: update.id, status: "success" };
-      } catch (error) {
-        return { id: update.id, status: "error", error: error.message };
-      }
-    }),
-  );
-
-  return results.map((r) => (r.status === "fulfilled" ? r.value : r.reason));
+  return {
+    isAuthenticated: !!user,
+    user: user || null,
+  };
 });
 ```
 
-### File Uploads
+### Profile Update
 
 ```typescript
-export const uploadTeamLogo = serverOnly(async (teamId: string, file: File) => {
+export const updateUserPreferences = serverOnly(async (preferences: UserPreferences) => {
   const user = await requireAuth();
-  await requireTeamRole(user.id, teamId, ["coach", "manager"]);
 
-  // Upload to S3/Cloudinary
-  const uploadResult = await uploadFile(file, {
-    folder: `teams/${teamId}`,
-    maxSize: 5 * 1024 * 1024, // 5MB
-    allowedTypes: ["image/jpeg", "image/png"],
-  });
+  const [updated] = await db
+    .update(users)
+    .set({
+      preferences: preferences,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id))
+    .returning();
 
-  // Update team record
-  await db.update(teams).set({ logoUrl: uploadResult.url }).where(eq(teams.id, teamId));
+  return updated;
+});
+```
 
-  return uploadResult;
+### Session Management
+
+```typescript
+export const invalidateAllSessions = serverOnly(async () => {
+  const user = await requireAuth();
+
+  // Delete all sessions for user
+  await db.delete(sessions).where(eq(sessions.userId, user.id));
+
+  return { success: true };
 });
 ```
 
@@ -347,37 +334,29 @@ export const uploadTeamLogo = serverOnly(async (teamId: string, file: File) => {
 Create unit tests for server functions:
 
 ```typescript
-// src/features/teams/teams.test.ts
+// src/features/auth/__tests__/auth.queries.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
-import { createTeam } from "./teams.mutations";
+import { getCurrentUser } from "../auth.queries";
 import { mockAuth } from "~/tests/mocks/auth";
 
-describe("createTeam", () => {
+describe("getCurrentUser", () => {
   beforeEach(() => {
-    mockAuth({ userId: "user-1", roles: ["team_lead"] });
+    mockAuth({ id: "user-1", email: "test@example.com" });
   });
 
-  it("creates a team with valid input", async () => {
-    const team = await createTeam({
-      name: "Test Team",
-      slug: "test-team",
-    });
+  it("returns current user when authenticated", async () => {
+    const user = await getCurrentUser();
 
-    expect(team).toMatchObject({
-      name: "Test Team",
-      slug: "test-team",
+    expect(user).toMatchObject({
+      id: "user-1",
+      email: "test@example.com",
     });
   });
 
-  it("throws error without authentication", async () => {
+  it("throws error when not authenticated", async () => {
     mockAuth(null);
 
-    await expect(
-      createTeam({
-        name: "Test Team",
-        slug: "test-team",
-      }),
-    ).rejects.toThrow("Unauthorized");
+    await expect(getCurrentUser()).rejects.toThrow("Not authenticated");
   });
 });
 ```
@@ -386,12 +365,11 @@ describe("createTeam", () => {
 
 If migrating from REST endpoints, map them to server functions:
 
-| REST Endpoint              | Server Function        |
-| -------------------------- | ---------------------- |
-| GET /api/teams/:id         | `getTeam(id)`          |
-| POST /api/teams            | `createTeam(data)`     |
-| PUT /api/teams/:id         | `updateTeam(id, data)` |
-| DELETE /api/teams/:id      | `deleteTeam(id)`       |
-| GET /api/teams/:id/members | `getTeamMembers(id)`   |
+| REST Endpoint            | Server Function       |
+| ------------------------ | --------------------- |
+| GET /api/auth/me         | `getCurrentUser()`    |
+| PUT /api/auth/profile    | `updateProfile(data)` |
+| POST /api/auth/logout    | `logout()`            |
+| DELETE /api/auth/account | `deleteAccount()`     |
 
 The key difference is that server functions are called directly from React components with full type safety, rather than using fetch() with manual type casting.

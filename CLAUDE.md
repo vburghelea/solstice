@@ -16,6 +16,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm test:coverage` - Generate test coverage report
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
+- `pnpm docs:reference` - Generate TypeDoc API documentation
+- `pnpm docs:erd` - Generate database ERD diagrams from schema
+- `pnpm docs:all` - Run all documentation generation
 
 ## Architecture Overview
 
@@ -141,6 +144,20 @@ See `docs/database-connections.md` for detailed usage guide.
    - All auth endpoints under `/api/auth/*`
    - Handled by Better Auth via catch-all route
 
+### Documentation
+
+The project includes automated documentation generation:
+
+- **API Reference**: TypeDoc generates markdown documentation for all code in `src/lib/`
+  - Run `pnpm docs:reference` to update
+  - Output: `docs/reference/` (gitignored except ERDs)
+  - Configuration: `typedoc.json`
+- **Database ERDs**: Automatically generates diagrams from mermaid definitions
+  - Run `pnpm docs:erd` to update
+  - Source: `docs/quadball-plan/database/schema-overview.md`
+  - Output: `docs/reference/database/schema-erd.{svg,png}`
+  - Uses system Chrome via `puppeteer.config.json`
+
 ### Common Tasks
 
 - **Add a new page**: Create file in `src/routes/`
@@ -148,17 +165,18 @@ See `docs/database-connections.md` for detailed usage guide.
 - **Access user data**: Use `useRouteContext()` to get user from context
 - **Make API calls**: Use React Query with proper error handling
 - **Add UI components**: Check `src/shared/ui/` for existing components first
+- **Update documentation**: Run `pnpm docs:all` after significant changes
 
 ### User added context:
 
 You can see the netlify production variables via `netlify env:list`
 Which include:
-| DATABASE_URL | **********************\*\*********************** \***\* | All |
-| GOOGLE_CLIENT_ID | ********************\*\*\*\*********************** \***\* | All |
-| GOOGLE_CLIENT_SECRET | ********************\*\*\*\*********************** \***\* | All |
-| NETLIFY_DATABASE_URL | ********************\*\*\*\*********************** \***\* | All |
-| NETLIFY_DATABASE_URL_UNPOOLED | ********************\*\*\*\*********************** \***\* | All |
-| NODE_ENV | ********************\*\*\*\***********************
+| DATABASE_URL | **********\*\***********\*\***********\*\*********** \***\* | All |
+| GOOGLE_CLIENT_ID | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
+| GOOGLE_CLIENT_SECRET | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
+| NETLIFY_DATABASE_URL | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
+| NETLIFY_DATABASE_URL_UNPOOLED | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
+| NODE_ENV | ********\*\***********\*\*\*\***********\*\***********
 \*\*\*\* | Builds, Post processing |
 
 ---
@@ -225,6 +243,12 @@ Tree as of July 6, 2025
 │   ├── code-improvements.md
 │   ├── database-connections.md
 │   ├── project-brief.md
+│   ├── quadball-plan
+│   │   └── ... (project documentation)
+│   ├── reference
+│   │   └── database
+│   │       ├── schema-erd.png
+│   │       └── schema-erd.svg
 │   └── SECURITY.md
 ├── drizzle.config.ts
 ├── eslint.config.js
@@ -240,10 +264,12 @@ Tree as of July 6, 2025
 ├── pnpm-workspace.yaml
 ├── public
 │   └── favicon.ico
+├── puppeteer.config.json
 ├── README.md
 ├── scripts
 │   ├── check-users.ts
 │   ├── generate-auth-secret.js
+│   ├── generate-erd.js
 │   ├── test-auth.ts
 │   ├── test-db-connection.ts
 │   └── test-security-headers.sh
@@ -324,7 +350,8 @@ Tree as of July 6, 2025
 │   │       ├── button.tsx
 │   │       ├── icons.tsx
 │   │       ├── input.tsx
-│   │       └── label.tsx
+│   │       ├── label.tsx
+│   │       └── README.md
 │   ├── styles.css
 │   └── tests
 │       ├── mocks
@@ -333,10 +360,11 @@ Tree as of July 6, 2025
 │       ├── setup.ts
 │       └── utils.tsx
 ├── tsconfig.json
+├── typedoc.json
 ├── vite.config.ts
 └── vitest.config.ts
 
-122 directories, 114 files
+125 directories, 120 files
 
 
 ## Tool available
@@ -352,4 +380,7 @@ Always read .cursor/rules/*
 
 ## Docs
 Read /docs/quadball-plan/* as appropriate
+
+## Development Roadmap
+See /docs/development-backlog.md for prioritized feature implementation tickets
 ```

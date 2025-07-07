@@ -6,21 +6,11 @@ The Quadball Canada platform uses shadcn/ui components built on Radix UI primiti
 
 ## Component System
 
-### Base Components (shadcn/ui)
+We use shadcn/ui for foundational components. See `src/shared/ui/README.md` for the list of available base components.
 
-We use shadcn/ui for foundational components. These are copied into `src/shared/ui/` and can be customized:
+## Project-Specific Components
 
-- `Button` - Primary interactive element
-- `Card` - Content containers
-- `Input` - Form inputs with consistent styling
-- `Label` - Accessible form labels
-- Icons - Lucide React icons
-
-For shadcn/ui component documentation, see: https://ui.shadcn.com/docs/components
-
-### Project-Specific Components
-
-#### ValidatedInput
+### ValidatedInput
 
 Location: `src/components/form-fields/ValidatedInput.tsx`
 
@@ -37,7 +27,7 @@ A wrapper around the base Input component that adds validation feedback:
 - Accessible error announcements
 - Consistent spacing
 
-#### FormSubmitButton
+### FormSubmitButton
 
 Location: `src/components/form-fields/FormSubmitButton.tsx`
 
@@ -56,7 +46,7 @@ Smart submit button with loading states:
 - Customizable loading text
 - Prevents double-submission
 
-#### ThemeToggle
+### ThemeToggle
 
 Location: `src/components/ThemeToggle.tsx`
 
@@ -206,13 +196,13 @@ const buttonVariants = cva(
 
 ## Future Components
 
-Planned additions to the component library:
+Consider using GitHub Discussions or a project board to track planned components:
 
-1. **DataTable**: Sortable, filterable tables for rosters and results
-2. **DatePicker**: Accessible date selection for events
-3. **FileUpload**: Drag-and-drop file uploads for logos and documents
-4. **RichTextEditor**: For event descriptions and announcements
-5. **StatsCard**: Animated statistics displays
+- **DataTable**: Sortable, filterable tables
+- **DatePicker**: Accessible date selection
+- **FileUpload**: Drag-and-drop uploads
+- **RichTextEditor**: For announcements
+- **StatsCard**: Animated statistics
 
 ## Development Guidelines
 
@@ -222,18 +212,19 @@ Planned additions to the component library:
 2. **Start with shadcn/ui** - Use as foundation when possible
 3. **Follow naming conventions** - PascalCase for components
 4. **Include TypeScript types** - Full type safety required
-5. **Add Storybook story** - Document component usage
-6. **Test accessibility** - Use screen reader and keyboard
+5. **Test accessibility** - Use screen reader and keyboard
 
 ### Component File Structure
 
 ```
-src/shared/ui/
-├── button.tsx         # shadcn/ui base
-├── card.tsx          # shadcn/ui base
-└── custom/
-    ├── data-table.tsx    # Project-specific
-    └── stats-card.tsx    # Project-specific
+src/
+├── shared/ui/          # Base shadcn/ui components
+│   ├── button.tsx
+│   ├── card.tsx
+│   └── README.md       # Component list
+└── components/         # Project-specific components
+    ├── form-fields/
+    └── ThemeToggle.tsx
 ```
 
 ## Resources

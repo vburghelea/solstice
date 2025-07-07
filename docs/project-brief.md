@@ -107,3 +107,48 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 - User-friendly experience for admins, teams, and players.
 - Comprehensive functionality to streamline administrative tasks.
 - Customizable features ensuring flexibility to meet organizational needs.
+
+---
+
+## Brand Guidelines
+
+### Color Palette
+
+**Primary Colors**
+
+- **Light Red**: #C12E26 | RGB(193, 46, 38) | CMYK(17, 96, 100, 7)
+- **Medium Red**: #B21F24 | RGB(178, 31, 36) | CMYK(20, 100, 100, 13)
+- **Dark Red**: #9A231F | RGB(154, 35, 31) | CMYK(25, 97, 100, 24)
+
+**Neutral Colors**
+
+- **White**: #FFFFFF | RGB(255, 255, 255) | CMYK(0, 0, 0, 0)
+- **Grey**: #808080 | RGB(128, 128, 128) | CMYK(52, 43, 43, 0)
+- **Black**: #000000 | RGB(0, 0, 0) | CMYK(0, 0, 0, 100)
+
+### Typography
+
+**Headers and Titles**
+
+- Font: Oswald
+- Style: Black or Red, ALL CAPS
+
+**Sub-Headers**
+
+- Font: Oswald
+- Style: Grey, ALL CAPS
+
+**Alternative Sub-Headers**
+
+- Font: Montserrat
+- Style: Black, Grey, or Red, ALL CAPS
+
+**Body Text**
+
+- Font: Montserrat
+- Style: Black, Title Case
+
+**Alternative Body Text**
+
+- Font: Roboto
+- Style: Black, Title Case

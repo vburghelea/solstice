@@ -4,120 +4,100 @@
 
 The Quadball Canada platform uses PostgreSQL with Drizzle ORM for type-safe database operations. The schema is designed for extensibility, audit trails, and performance at scale.
 
+> ⚠️ **Current vs Future**: Only the Better Auth tables (users, sessions, accounts) are currently implemented. All other tables shown below are **planned future entities**.
+
 ## Entity Relationship Diagram
+
+### Currently Implemented (Better Auth)
+
+![Database ERD](../../reference/database/schema-erd.svg)
 
 ```mermaid
 erDiagram
-    %% Core User System
     users ||--o{ sessions : "authenticates"
     users ||--o{ accounts : "connects"
-    users ||--o{ user_roles : "assigned"
-    users ||--o{ user_tags : "tagged"
-    users ||--o{ memberships : "purchases"
-    users ||--o{ notifications : "receives"
 
-    %% Team System
-    users ||--o{ team_members : "joins"
-    teams ||--o{ team_members : "has"
-    teams ||--o| teams : "affiliated_with"
+    users {
+        string id PK
+        string email UK
+        string emailVerified
+        string name
+        string image
+        timestamp createdAt
+        timestamp updatedAt
+    }
 
-    %% Event System
-    users ||--o{ event_registrations : "registers"
-    teams ||--o{ event_registrations : "enters"
-    events ||--o{ event_registrations : "accepts"
-    events ||--o{ event_games : "schedules"
-    teams ||--o{ event_games : "plays_in"
+    sessions {
+        string id PK
+        string userId FK
+        timestamp expiresAt
+        string token
+        timestamp createdAt
+        timestamp updatedAt
+    }
 
-    %% Payment System
-    users ||--o{ payments : "makes"
-    payments ||--o{ payment_items : "contains"
-    memberships }o--|| payments : "paid_by"
-    event_registrations }o--|| payments : "paid_by"
-
-    %% Audit System
-    users ||--o{ audit_logs : "generates"
+    accounts {
+        string id PK
+        string userId FK
+        string providerId
+        string providerUserId
+        string accessToken
+        string refreshToken
+        timestamp createdAt
+        timestamp updatedAt
+    }
 ```
 
-## Key Concepts
+### Future Entities (Planned)
 
-### Role-Based Access Control (RBAC)
+```mermaid
+erDiagram
+    %% Future RBAC System
+    users ||--o{ user_roles : "will have"
+    users ||--o{ user_tags : "will have"
 
-The system implements hierarchical roles with scoped permissions:
+    %% Future Membership System
+    users ||--o{ memberships : "will purchase"
+    membership_types ||--o{ memberships : "will define"
 
+    %% Future Team System
+    users ||--o{ team_members : "will join"
+    teams ||--o{ team_members : "will have"
+    teams ||--o| teams : "may affiliate"
+
+    %% Future Event System
+    users ||--o{ event_registrations : "will register"
+    teams ||--o{ event_registrations : "will enter"
+    events ||--o{ event_registrations : "will accept"
+    events ||--o{ event_games : "will schedule"
+    teams ||--o{ event_games : "will play"
+
+    %% Future Payment System
+    users ||--o{ payments : "will make"
+    payments ||--o{ payment_items : "will contain"
+
+    %% Future Audit System
+    users ||--o{ audit_logs : "will generate"
+    users ||--o{ notifications : "will receive"
 ```
-global_admin         # Full system access
-├── event_coordinator # Manage all events
-├── team_lead        # Manage teams
-├── referee          # Officiate games
-└── player           # Basic member access
-```
-
-**Scoping**: Roles can be scoped to specific entities:
-
-- `team_lead:team-uuid` - Lead for specific team
-- `event_coordinator:event-uuid` - Coordinator for specific event
-
-### Membership Lifecycle
-
-```
-User Registration → Profile Completion → Membership Purchase → Active Member
-                                                ↓
-                                         Team Assignment
-                                                ↓
-                                         Event Registration
-```
-
-### Payment Flow
-
-```
-User Selects Item → Pricing Rules Applied → Square Checkout → Webhook Confirmation
-                           ↓                                         ↓
-                    Discount Calculation                    Database Transaction
-                                                                    ↓
-                                                            Email Confirmation
-```
-
-## Core Relationships
-
-### User → Membership
-
-- One-to-many: Users can have multiple memberships over time
-- Only one active membership per season
-- Historical memberships retained for records
-
-### User → Team
-
-- Many-to-many through `team_members`
-- Constraint: One active team membership at a time
-- Supports roles: player, coach, manager, owner
-
-### Team → Event
-
-- Many-to-many through `event_registrations`
-- Teams register as a unit for tournaments
-- Individual players register for other event types
-
-### Payment → Items
-
-- One-to-many: Single payment can cover multiple items
-- Examples: Membership + event fee in one transaction
-- Line items preserve pricing at time of purchase
 
 ## Schema Design Principles
+
+These principles guide both current and future development:
 
 ### 1. Extensibility via JSONB
 
 Strategic use of JSONB fields for flexibility:
 
 ```typescript
-// User privacy settings
+// Future user privacy settings
 privacySettings: {
   showEmail: boolean;
   showPhone: boolean;
   showBirthYear: boolean;
 }
 
-// Event custom fields
+// Future event custom fields
 customFields: {
   dietaryRestrictions?: string;
   accommodationNeeds?: string;
@@ -127,30 +107,21 @@ customFields: {
 
 ### 2. Audit Trail
 
-Every financial transaction and sensitive operation is logged:
+Every financial transaction and sensitive operation will be logged:
 
 ```typescript
-// Payment metadata
+// Future payment metadata
 metadata: {
   ip_address: string;
   user_agent: string;
   square_receipt_url: string;
   refund_reason?: string;
 }
-
-// Audit log entry
-{
-  action: "MEMBERSHIP_PURCHASED",
-  userId: "uuid",
-  entityType: "membership",
-  entityId: "uuid",
-  changes: { /* before/after */ }
-}
 ```
 
 ### 3. Soft Deletes
 
-Critical data is never hard deleted:
+Critical data will never be hard deleted:
 
 ```typescript
 // Status fields instead of deletion
@@ -163,7 +134,7 @@ deactivatedBy?: string;
 
 ### 4. Optimistic Concurrency
 
-Version fields prevent race conditions:
+Version fields to prevent race conditions:
 
 ```typescript
 // Version tracking
@@ -173,15 +144,21 @@ updatedAt: Date; // Last modification time
 
 ## Performance Considerations
 
-### Indexes
-
-Critical indexes for common queries:
+### Current Indexes
 
 ```sql
--- User lookups
+-- User lookups (implemented)
 users(email) -- Login
-users(id, created_at) -- Sorted lists
+users(id) -- Primary key
 
+-- Session lookups (implemented)
+sessions(userId) -- User sessions
+sessions(token) -- Token validation
+```
+
+### Future Indexes (When Tables Are Added)
+
+```sql
 -- Team queries
 team_members(team_id, status) -- Active roster
 team_members(user_id) WHERE status = 'active' -- User's team
@@ -196,20 +173,18 @@ payments(user_id, created_at) -- User history
 payments(provider_payment_id) -- Webhook lookups
 ```
 
-### Query Patterns
-
-Common access patterns optimized:
-
-1. **User Dashboard**: Single query with all active relationships
-2. **Team Roster**: Eager load members with user details
-3. **Event Registration**: Check capacity with COUNT before INSERT
-4. **Payment History**: Paginated with items included
-
 ## Data Integrity
 
-### Constraints
+### Current Constraints
 
-Database-enforced business rules:
+```sql
+-- Implemented in Better Auth schema
+UNIQUE (email) ON users
+FOREIGN KEY (userId) REFERENCES users(id) ON sessions
+FOREIGN KEY (userId) REFERENCES users(id) ON accounts
+```
+
+### Future Constraints
 
 ```sql
 -- One active team per user
@@ -224,19 +199,16 @@ CHECK (price_cents >= 0) ON membership_types
 CHECK (fee_cents >= 0) ON events
 ```
 
-### Transactions
-
-Critical operations wrapped in transactions:
-
-1. **Payment Processing**: Payment record + membership/registration + audit log
-2. **Team Transfer**: Remove from old team + add to new team + notifications
-3. **Event Cancellation**: Update event + refund payments + notify participants
-
 ## Migration Strategy
 
-### Drizzle Migrations
+### Current State
 
-All schema changes managed through Drizzle:
+- Better Auth tables created automatically
+- User authentication fully functional
+
+### Future Migrations
+
+All schema changes will be managed through Drizzle:
 
 ```typescript
 // Generate migration
@@ -246,32 +218,35 @@ pnpm db:generate
 pnpm db:push
 
 // Migration naming convention
-0001_initial_schema.sql
-0002_add_team_affiliations.sql
-0003_add_payment_items.sql
+0001_add_user_profiles.sql
+0002_add_rbac_tables.sql
+0003_add_team_tables.sql
+0004_add_event_system.sql
+0005_add_payment_tables.sql
 ```
-
-### Zero-Downtime Migrations
-
-1. **Add nullable columns** first
-2. **Backfill data** in batches
-3. **Add constraints** after backfill
-4. **Remove old columns** in next release
 
 ## Security Considerations
 
-### Sensitive Data
+### Current Implementation
+
+- Sessions expire automatically
+- Passwords hashed with bcrypt
+- OAuth tokens stored securely
+
+### Future Security Features
+
+#### Sensitive Data Encryption
 
 Fields requiring special handling:
 
-- `users.phone` - Encrypted at rest
+- `users.phone` - Will be encrypted at rest
 - `users.emergencyContact` - Encrypted JSONB
 - `payments.metadata` - Contains PII
 - `audit_logs.ipAddress` - Privacy regulations
 
-### Access Control
+#### Row-Level Security
 
-Row-level security patterns:
+Future access control patterns:
 
 ```typescript
 // Users see own data
@@ -285,22 +260,12 @@ function canViewTeam(userId: string, teamId: string) {
 }
 ```
 
-## Future Considerations
+## Next Steps
 
-### Partitioning
+1. **Profile Extension** - Add profile fields to users table
+2. **RBAC Implementation** - Create roles and permissions system
+3. **Team System** - Teams and membership tables
+4. **Event Management** - Events and registration system
+5. **Payment Processing** - Square integration tables
 
-As data grows, consider partitioning:
-
-- `audit_logs` by month
-- `notifications` by created_at
-- `payments` by year
-
-### Read Replicas
-
-For analytics and reporting:
-
-- Dedicated replica for admin dashboards
-- Async replication with minimal lag
-- Query routing in application layer
-
-The schema is designed to evolve with the platform while maintaining data integrity and performance.
+The schema is designed to evolve incrementally while maintaining data integrity and performance.

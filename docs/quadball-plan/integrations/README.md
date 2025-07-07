@@ -4,7 +4,7 @@ This document covers all external service integrations for the Quadball Canada p
 
 ## Square Payments
 
-**Status**: Implemented ✓
+**Status**: ⏳ Planned
 
 ### Configuration
 
@@ -17,19 +17,19 @@ SQUARE_LOCATION_ID=       # Default location
 SQUARE_WEBHOOK_SIGNATURE_KEY= # For webhook validation
 ```
 
-### Implementation Details
+### Planned Implementation
 
-**Core Logic**: `src/lib/payments/square.ts`
+**Core Logic**: `src/lib/payments/square.ts` (not yet created)
 
 - Client initialization
 - Checkout session creation
 - Webhook signature validation
 
-**Webhook Handler**: `src/routes/api/webhooks/square.ts`
+**Webhook Handler**: `src/routes/api/webhooks/square.ts` (not yet created)
 
-- Processes payment confirmations
-- Updates database records
-- Triggers email confirmations
+- Process payment confirmations
+- Update database records
+- Trigger email confirmations
 
 ### Key Features
 
@@ -40,7 +40,7 @@ SQUARE_WEBHOOK_SIGNATURE_KEY= # For webhook validation
 
 ## E-transfer Payments
 
-**Status**: Planned
+**Status**: ⏳ Planned
 
 ### Configuration
 
@@ -65,7 +65,7 @@ ETRANSFER_NOTIFICATION_EMAIL=admin@quadballcanada.ca # Admin notifications
 
 ## SendGrid Email
 
-**Status**: Not yet implemented
+**Status**: ⏳ Planned
 
 ### Configuration
 
@@ -78,7 +78,7 @@ SENDGRID_FROM_NAME=Quadball Canada
 
 ### Planned Implementation
 
-**Service Location**: `src/lib/email/sendgrid.ts`
+**Service Location**: `src/lib/email/sendgrid.ts` (not yet created)
 
 **Email Types**:
 
@@ -93,11 +93,11 @@ SENDGRID_FROM_NAME=Quadball Canada
    - Newsletter
    - Member updates
 
-**Templates**: Managed in SendGrid dashboard for easy updates without code changes.
+**Templates**: Will be managed in SendGrid dashboard for easy updates without code changes.
 
 ## Cloudinary Media Storage
 
-**Status**: Not yet implemented
+**Status**: ⏳ Planned
 
 ### Configuration
 
@@ -116,7 +116,7 @@ CLOUDINARY_API_SECRET=    # Secret key
 
 ## Social Media APIs
 
-**Status**: Not yet implemented
+**Status**: ⏳ Planned
 
 ### Planned Integrations
 

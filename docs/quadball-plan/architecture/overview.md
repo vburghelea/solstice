@@ -1,8 +1,10 @@
 # Architecture Overview
 
+> 🚧 **Under Construction**: Many subsystems described here are planned but not yet implemented (Teams, Events, Payments, Media Storage). Currently, only Authentication and basic Dashboard features are complete.
+
 ## System Architecture
 
-The Quadball Canada platform is built on a modern, type-safe full-stack architecture that prioritizes developer experience, performance, and scalability.
+The Quadball Canada platform is built on a modern, type-safe full-stack architecture.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -22,72 +24,29 @@ The Quadball Canada platform is built on a modern, type-safe full-stack architec
 │                                                   PostgreSQL     │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
-                                 ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                    External Services                             │
-│                                                                  │
-│  Square (Payments) • SendGrid (Email) • Cloudinary (Media)      │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Why This Architecture?
+## Technology Choices
 
-### TanStack Start (Full-Stack Framework)
+1. **[TanStack Start](https://tanstack.com/start)** - Full-stack React framework with type-safe server functions
+2. **[Better Auth](https://better-auth.com)** - Modern authentication built for edge/serverless
+3. **[Drizzle ORM](https://orm.drizzle.team)** - Type-safe SQL with excellent DX
+4. **[Neon PostgreSQL](https://neon.tech)** - Serverless Postgres with connection pooling
+5. **[React Query](https://tanstack.com/query)** - Server state management
+6. **[Tailwind CSS](https://tailwindcss.com)** + [shadcn/ui](https://ui.shadcn.com)\*\* - Styling system
 
-We chose TanStack Start as our foundation because:
-
-- **Type Safety**: End-to-end TypeScript from database to UI eliminates entire classes of bugs
-- **Server Functions**: RPC-style calls are simpler and safer than REST APIs
-- **File-Based Routing**: Intuitive organization that scales with the application
-- **SSR/Hydration**: Optimal performance for both SEO and interactivity
-
-### PostgreSQL + Drizzle ORM (Database)
-
-This combination provides:
-
-- **ACID Compliance**: Critical for financial transactions and data integrity
-- **Type-Safe Queries**: Drizzle generates TypeScript types from your schema
-- **SQL-Like Syntax**: No magic ORM abstractions, just clean SQL operations
-- **Serverless Ready**: Neon provides connection pooling perfect for edge deployments
-
-### Better Auth (Authentication)
-
-Better Auth was selected for:
-
-- **Modern Architecture**: Built specifically for serverless/edge environments
-- **Database Integration**: Works seamlessly with Drizzle ORM
-- **Extensibility**: Easy to add custom fields and authentication methods
-- **Session Management**: Secure, performant session handling out of the box
-
-### React Query (State Management)
-
-For server state synchronization:
-
-- **Intelligent Caching**: Reduces unnecessary network requests
-- **Optimistic Updates**: Instant UI feedback for better UX
-- **Background Refetching**: Keeps data fresh without user intervention
-- **Offline Support**: Works seamlessly with spotty connections
-
-## Core Architectural Principles
+## Core Principles
 
 ### 1. Feature-Based Organization
 
 ```
 src/features/
-├── auth/           # Authentication logic
-├── teams/          # Team management
-├── events/         # Event operations
-├── payments/       # Payment processing
-└── analytics/      # Reporting & insights
+├── auth/           # ✅ Implemented
+├── teams/          # 🚧 In Progress
+├── events/         # ⏳ Planned
+├── payments/       # ⏳ Planned
+└── analytics/      # ⏳ Planned
 ```
-
-Each feature is self-contained with its own:
-
-- Server functions (`.queries.ts`, `.mutations.ts`)
-- React components
-- Types and schemas
-- Tests
 
 ### 2. Type Safety Everywhere
 
@@ -95,183 +54,91 @@ From database to UI, types flow through the entire stack:
 
 ```typescript
 // Database schema (source of truth)
-export const teams = pgTable("teams", {
-  id: uuid("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 255 }).unique().notNull(),
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
 });
 
 // Automatically inferred types
-type Team = InferSelectModel<typeof teams>;
+type User = InferSelectModel<typeof users>;
 
 // Type-safe server function
-export const getTeam = serverOnly(async (id: string): Promise<Team> => {
-  // Implementation
+export const getUser = serverOnly(async (id: string): Promise<User> => {
+  return await db.query.users.findFirst({
+    where: eq(users.id, id),
+  });
 });
 
 // Type-safe client usage
-const { data: team } = useQuery({
-  queryKey: ["team", id],
-  queryFn: () => getTeam(id), // Full type inference
+const { data: user } = useQuery({
+  queryKey: ["user", id],
+  queryFn: () => getUser(id),
 });
 ```
 
 ### 3. Security First
 
-- **Authentication**: Every server function can access the current user context
-- **Authorization**: Role-based access control (RBAC) with hierarchical permissions
-- **Data Validation**: Zod schemas validate input at the edge
-- **SQL Injection Protection**: Parameterized queries via Drizzle
-- **XSS Prevention**: React's built-in protections + CSP headers
+- Authentication via Better Auth with session management
+- Server functions ensure code never runs on client
+- Environment variables validated at build time
+- CSP headers and security middleware
 
 ### 4. Performance Optimization
 
-- **Edge Deployment**: Functions run close to users via Netlify Edge
-- **Connection Pooling**: Neon's pgBouncer handles database connections efficiently
-- **Intelligent Caching**: React Query + CDN caching for static assets
-- **Code Splitting**: Route-based chunks load on demand
-- **Image Optimization**: Cloudinary handles responsive images
+- Server-side rendering for fast initial loads
+- Intelligent caching with React Query
+- Route-based code splitting
+- Edge deployment via Netlify
 
 ## Data Flow
 
-### 1. User Action
+### User Action Example
 
 ```
-User clicks "Create Team" button
-    ↓
-React component calls mutation
-    ↓
-TanStack Query invokes server function
-    ↓
-Server function validates input
-    ↓
-Drizzle ORM executes transaction
-    ↓
-PostgreSQL stores data
-    ↓
-Server function returns result
-    ↓
-React Query updates cache
-    ↓
-UI reflects new state
+User clicks "Login" → Form submission → Server function validates
+    ↓                      ↓                    ↓
+React component     TanStack Query      Better Auth verifies
+    ↓                      ↓                    ↓
+Loading state      Updates cache         Creates session
+    ↓                      ↓                    ↓
+Redirect           UI updates            Database record
 ```
 
-### 2. External Integration
-
-```
-Square webhook received
-    ↓
-Netlify Edge Function validates signature
-    ↓
-Server function processes payment
-    ↓
-Database transaction updates records
-    ↓
-Email service sends confirmation
-    ↓
-Audit log records event
-```
-
-## Deployment Architecture
+## Deployment
 
 ### Local Development
 
-- **Vite**: Fast HMR for instant feedback
-- **Netlify Dev**: Simulates edge functions locally
-- **Docker**: Optional PostgreSQL container
+- **Vite** - Fast HMR and builds
+- **Netlify Dev** - Simulates edge functions
+- **Docker** (optional) - PostgreSQL container
 
 ### Production
 
-- **Netlify**: Automatic deployments from Git
-- **Neon**: Managed PostgreSQL with automatic scaling
-- **Cloudinary**: Global CDN for media files
-- **Square**: PCI-compliant payment processing
+- **Netlify** - Automatic Git deployments
+- **Neon** - Managed PostgreSQL
+- **Environment** - Validated at build time
 
-## Technology Rationale
+## Future Architecture
 
-### Square for Payments
+### Planned Additions
 
-- Full Canadian support with competitive rates
-- Hosted checkout eliminates PCI compliance burden
-- Robust webhook system for async processing
-- E-transfer alternative for bank transfer preference
+- **Square SDK** - Payment processing (Q2 2025)
+- **SendGrid** - Email notifications (Q2 2025)
+- **Cloudinary** - Media storage (Q3 2025)
+- **WebSockets** - Real-time features (Q4 2025)
 
-### SendGrid for Email
+### Scalability Path
 
-- Industry-leading deliverability rates
-- Template system for consistent branding
-- Detailed analytics and tracking
-- Generous free tier for starting out
+1. Database connection pooling (current)
+2. Read replicas for analytics (future)
+3. Redis caching layer (if needed)
+4. GraphQL API for mobile (2026)
 
-### Netlify + Neon
+## Architecture Decision Records
 
-- Seamless integration with automatic env injection
-- Preview deployments with database branching
-- Edge functions for global low latency
-- Built-in DDoS protection
+For detailed rationale behind technology choices:
 
-### Tailwind + shadcn/ui
-
-- Utility-first CSS keeps bundle size small
-- shadcn/ui provides accessible, customizable components
-- No runtime CSS-in-JS overhead
-- Consistent design system out of the box
-
-## Scalability Considerations
-
-### Database
-
-- Connection pooling handles traffic spikes
-- Read replicas for analytics queries (future)
-- Partitioning for large tables (future)
-
-### Application
-
-- Serverless functions auto-scale
-- CDN serves static assets globally
-- React Query prevents thundering herd
-
-### Cost
-
-- Pay-per-use model scales with revenue
-- Free tiers cover initial growth
-- Predictable pricing as you scale
-
-## Monitoring & Observability
-
-### Application Health
-
-- Sentry for error tracking and performance monitoring
-- Netlify Analytics for traffic insights
-- Custom dashboards for business metrics
-
-### Business Metrics
-
-- Member growth and retention
-- Event participation rates
-- Payment success/failure rates
-- Feature adoption tracking
-
-## Future Considerations
-
-As the platform grows, we may consider:
-
-### GraphQL API
-
-- For mobile app development
-- More efficient data fetching
-- Schema introspection
-
-### Real-time Features
-
-- WebSockets for live scores
-- Push notifications
-- Collaborative editing
-
-### Advanced Analytics
-
-- Data warehouse integration
-- Machine learning for predictions
-- Advanced reporting tools
-
-The architecture is designed to evolve with the platform's needs while maintaining the core principles of type safety, performance, and developer experience.
+- **[ADR-001](../adr/001-netlify-neon.md)** - Choose Netlify + Neon (planned)
+- **[ADR-002](../adr/002-tanstack-start.md)** - Server Functions over REST (planned)
+- **[ADR-003](../adr/003-better-auth.md)** - Authentication Strategy (planned)

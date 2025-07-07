@@ -31,3 +31,10 @@ dist
 coverage
 .nyc_output
 *.lcov
+
+# Generated documentation
+docs/reference/**
+!docs/reference/database/
+docs/reference/database/*
+!docs/reference/database/schema-erd.svg
+!docs/reference/database/schema-erd.png

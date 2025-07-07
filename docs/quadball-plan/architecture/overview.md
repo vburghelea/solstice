@@ -1,242 +1,277 @@
-# Architecture Overview - Quadball Canada Platform
+# Architecture Overview
 
 ## System Architecture
 
-The Quadball Canada platform extends the Solstice foundation with a feature-driven architecture optimized for sports league management.
+The Quadball Canada platform is built on a modern, type-safe full-stack architecture that prioritizes developer experience, performance, and scalability.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Client Browser                            │
-│  ┌─────────────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │   Public Site   │  │  Member App  │  │   Admin Panel    │  │
-│  │  (SSR + Hydrate)│  │ (Protected)  │  │  (Role-based)    │  │
-│  └─────────────────┘  └──────────────┘  └──────────────────┘  │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │ HTTPS
-┌─────────────────────────────┴───────────────────────────────────┐
-│                     Netlify Edge Network                         │
-│  ┌──────────────────┐  ┌─────────────────┐  ┌───────────────┐  │
-│  │  Edge Functions  │  │  Static Assets  │  │  CDN Cache    │  │
-│  │  (Security)      │  │  (JS/CSS/IMG)   │  │               │  │
-│  └──────────────────┘  └─────────────────┘  └───────────────┘  │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │
-┌─────────────────────────────┴───────────────────────────────────┐
-│                    TanStack Start Application                    │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                    Route Handlers                          │  │
-│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────────┐ │  │
-│  │  │  Auth   │  │  Teams  │  │ Events  │  │  Payments   │ │  │
-│  │  │ Routes  │  │ Routes  │  │ Routes  │  │  Webhooks   │ │  │
-│  │  └─────────┘  └─────────┘  └─────────┘  └─────────────┘ │  │
-│  └───────────────────────────────────────────────────────────┘  │
+│                        Client Layer                              │
 │                                                                  │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                   Feature Modules                          │  │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │  │
-│  │  │   Auth   │  │ Profile  │  │  Teams   │  │  Events  │ │  │
-│  │  │ (Better  │  │ (Forms)  │  │ (Roster) │  │(Register)│ │  │
-│  │  │  Auth)   │  │          │  │          │  │          │ │  │
-│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │  │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │  │
-│  │  │ Payments │  │Messaging │  │Analytics │  │  Admin   │ │  │
-│  │  │ (Square) │  │(SendGrid)│  │ (Charts) │  │  Tools   │ │  │
-│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │  │
-│  └───────────────────────────────────────────────────────────┘  │
+│  Browser → TanStack Router → React Components → TanStack Query  │
+│                                ↓                                 │
+│                         Server Functions                         │
+│                                ↓                                 │
+└─────────────────────────────────────────────────────────────────┘
+                                 ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                        Server Layer                              │
 │                                                                  │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                    Core Services                           │  │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │  │
-│  │  │   RBAC   │  │  Email   │  │ Payment  │  │  Cache   │ │  │
-│  │  │ Service  │  │ Service  │  │ Service  │  │ Service  │ │  │
-│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │  │
-│  └───────────────────────────────────────────────────────────┘  │
-└─────────────────────────────┬───────────────────────────────────┘
-                              │
-┌─────────────────────────────┴───────────────────────────────────┐
-│                        Data Layer                                │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                    Drizzle ORM                             │  │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │  │
-│  │  │   Auth   │  │  Users   │  │  Teams   │  │  Events  │ │  │
-│  │  │  Tables  │  │ Profile  │  │ Members  │  │  Regs    │ │  │
-│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │  │
-│  └───────────────────────────────────────────────────────────┘  │
+│  TanStack Start → Better Auth → Business Logic → Drizzle ORM    │
+│                                                        ↓         │
+│                                                   PostgreSQL     │
 │                                                                  │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │              PostgreSQL (Neon Serverless)                  │  │
-│  │  ┌─────────────────┐           ┌─────────────────┐        │  │
-│  │  │  Pooled Conn    │           │  Unpooled Conn  │        │  │
-│  │  │  (API Routes)   │           │  (Migrations)   │        │  │
-│  │  └─────────────────┘           └─────────────────┘        │  │
-│  └───────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────┘
-                              │
-┌─────────────────────────────┴───────────────────────────────────┐
+└─────────────────────────────────────────────────────────────────┘
+                                 ↓
+┌─────────────────────────────────────────────────────────────────┐
 │                    External Services                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐    │
-│  │  Square  │  │ SendGrid │  │   S3/    │  │ Social APIs  │    │
-│  │ Payments │  │  Email   │  │Cloudinary│  │ (IG/FB/etc)  │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────────┘    │
-└──────────────────────────────────────────────────────────────────┘
+│                                                                  │
+│  Square (Payments) • SendGrid (Email) • Cloudinary (Media)      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+## Why This Architecture?
+
+### TanStack Start (Full-Stack Framework)
+
+We chose TanStack Start as our foundation because:
+
+- **Type Safety**: End-to-end TypeScript from database to UI eliminates entire classes of bugs
+- **Server Functions**: RPC-style calls are simpler and safer than REST APIs
+- **File-Based Routing**: Intuitive organization that scales with the application
+- **SSR/Hydration**: Optimal performance for both SEO and interactivity
+
+### PostgreSQL + Drizzle ORM (Database)
+
+This combination provides:
+
+- **ACID Compliance**: Critical for financial transactions and data integrity
+- **Type-Safe Queries**: Drizzle generates TypeScript types from your schema
+- **SQL-Like Syntax**: No magic ORM abstractions, just clean SQL operations
+- **Serverless Ready**: Neon provides connection pooling perfect for edge deployments
+
+### Better Auth (Authentication)
+
+Better Auth was selected for:
+
+- **Modern Architecture**: Built specifically for serverless/edge environments
+- **Database Integration**: Works seamlessly with Drizzle ORM
+- **Extensibility**: Easy to add custom fields and authentication methods
+- **Session Management**: Secure, performant session handling out of the box
+
+### React Query (State Management)
+
+For server state synchronization:
+
+- **Intelligent Caching**: Reduces unnecessary network requests
+- **Optimistic Updates**: Instant UI feedback for better UX
+- **Background Refetching**: Keeps data fresh without user intervention
+- **Offline Support**: Works seamlessly with spotty connections
 
 ## Core Architectural Principles
 
-### 1. Feature-Driven Development
-
-Each major capability is encapsulated in a feature module under `src/features/`:
-
-- **Isolation**: Features contain their own components, hooks, and business logic
-- **Composability**: Features expose clean APIs for cross-feature integration
-- **Testability**: Each feature can be tested in isolation
-
-### 2. Server-First Architecture
-
-Leveraging TanStack Start's SSR capabilities:
-
-- **Server Functions**: Database queries and business logic run server-side
-- **Progressive Enhancement**: Core functionality works without JavaScript
-- **Type Safety**: End-to-end type safety from database to UI
-
-### 3. Role-Based Access Control (RBAC)
-
-Hierarchical permission system:
+### 1. Feature-Based Organization
 
 ```
-global_admin
-├── event_coordinator
-│   └── team_lead
-│       └── player
-└── referee
-    └── volunteer
+src/features/
+├── auth/           # Authentication logic
+├── teams/          # Team management
+├── events/         # Event operations
+├── payments/       # Payment processing
+└── analytics/      # Reporting & insights
 ```
 
-### 4. Event-Driven Communication
+Each feature is self-contained with its own:
 
-Key actions trigger system events:
+- Server functions (`.queries.ts`, `.mutations.ts`)
+- React components
+- Types and schemas
+- Tests
 
-- Member registration → Welcome email
-- Payment completion → Confirmation + roster update
-- Event registration deadline → Reminder notifications
+### 2. Type Safety Everywhere
 
-### 5. Data Consistency & Integrity
+From database to UI, types flow through the entire stack:
 
-- **Transactions**: Critical operations (payment + registration) use DB transactions
-- **Validation**: Schema validation at API boundary AND database level
-- **Audit Trail**: All financial transactions logged with metadata
+```typescript
+// Database schema (source of truth)
+export const teams = pgTable("teams", {
+  id: uuid("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).unique().notNull(),
+});
 
-## Security Architecture
+// Automatically inferred types
+type Team = InferSelectModel<typeof teams>;
 
-### Authentication & Authorization
+// Type-safe server function
+export const getTeam = serverOnly(async (id: string): Promise<Team> => {
+  // Implementation
+});
 
-- **Better Auth**: Handles session management, OAuth flow
-- **JWT Tokens**: Stateless auth for API endpoints
-- **Role Middleware**: Route-level permission checks
+// Type-safe client usage
+const { data: team } = useQuery({
+  queryKey: ["team", id],
+  queryFn: () => getTeam(id), // Full type inference
+});
+```
 
-### Data Protection
+### 3. Security First
 
-- **Encryption**: All PII encrypted at rest
-- **HTTPS Only**: Enforced via edge functions
-- **CSP Headers**: Prevent XSS attacks
-- **Rate Limiting**: Configurable per endpoint
+- **Authentication**: Every server function can access the current user context
+- **Authorization**: Role-based access control (RBAC) with hierarchical permissions
+- **Data Validation**: Zod schemas validate input at the edge
+- **SQL Injection Protection**: Parameterized queries via Drizzle
+- **XSS Prevention**: React's built-in protections + CSP headers
 
-### Payment Security
+### 4. Performance Optimization
 
-- **PCI Compliance**: Square handles all card data
-- **Webhook Validation**: Cryptographic signature verification
-- **Idempotency**: Prevent duplicate charges
+- **Edge Deployment**: Functions run close to users via Netlify Edge
+- **Connection Pooling**: Neon's pgBouncer handles database connections efficiently
+- **Intelligent Caching**: React Query + CDN caching for static assets
+- **Code Splitting**: Route-based chunks load on demand
+- **Image Optimization**: Cloudinary handles responsive images
 
-## Performance Considerations
+## Data Flow
 
-### Caching Strategy
+### 1. User Action
 
-1. **CDN Cache**: Static assets, public pages
-2. **React Query**: Client-side data caching
-3. **Database Pooling**: Connection reuse
-4. **Edge Caching**: Frequently accessed data
+```
+User clicks "Create Team" button
+    ↓
+React component calls mutation
+    ↓
+TanStack Query invokes server function
+    ↓
+Server function validates input
+    ↓
+Drizzle ORM executes transaction
+    ↓
+PostgreSQL stores data
+    ↓
+Server function returns result
+    ↓
+React Query updates cache
+    ↓
+UI reflects new state
+```
 
-### Scalability
+### 2. External Integration
 
-- **Serverless Functions**: Auto-scale with demand
-- **Database Pooling**: Handle concurrent connections
-- **Asset Optimization**: Image resizing, lazy loading
-- **Code Splitting**: Route-based chunks
+```
+Square webhook received
+    ↓
+Netlify Edge Function validates signature
+    ↓
+Server function processes payment
+    ↓
+Database transaction updates records
+    ↓
+Email service sends confirmation
+    ↓
+Audit log records event
+```
 
-## Integration Points
-
-### Payment Processing (Square)
-
-- Hosted checkout for PCI compliance
-- Webhook handlers for async events
-- Refund API integration
-
-### Email Services (SendGrid/Resend)
-
-- Transactional emails (confirmations)
-- Bulk messaging (announcements)
-- Template management
-
-### Media Storage (S3/Cloudinary)
-
-- Event photos/videos
-- Team logos
-- User avatars
-
-### Social Media
-
-- Instagram/Facebook feed embeds
-- Event sharing
-- Team updates
-
-## Development Workflow
+## Deployment Architecture
 
 ### Local Development
 
-```bash
-# Start all services
-netlify dev
+- **Vite**: Fast HMR for instant feedback
+- **Netlify Dev**: Simulates edge functions locally
+- **Docker**: Optional PostgreSQL container
 
-# Run database migrations
-pnpm db:push
+### Production
 
-# Run tests
-pnpm test
-```
+- **Netlify**: Automatic deployments from Git
+- **Neon**: Managed PostgreSQL with automatic scaling
+- **Cloudinary**: Global CDN for media files
+- **Square**: PCI-compliant payment processing
 
-### Deployment Pipeline
+## Technology Rationale
 
-1. PR created → Preview deploy
-2. Tests pass → Merge to main
-3. Main push → Production deploy
-4. Post-deploy → Health checks
+### Square for Payments
+
+- Full Canadian support with competitive rates
+- Hosted checkout eliminates PCI compliance burden
+- Robust webhook system for async processing
+- E-transfer alternative for bank transfer preference
+
+### SendGrid for Email
+
+- Industry-leading deliverability rates
+- Template system for consistent branding
+- Detailed analytics and tracking
+- Generous free tier for starting out
+
+### Netlify + Neon
+
+- Seamless integration with automatic env injection
+- Preview deployments with database branching
+- Edge functions for global low latency
+- Built-in DDoS protection
+
+### Tailwind + shadcn/ui
+
+- Utility-first CSS keeps bundle size small
+- shadcn/ui provides accessible, customizable components
+- No runtime CSS-in-JS overhead
+- Consistent design system out of the box
+
+## Scalability Considerations
+
+### Database
+
+- Connection pooling handles traffic spikes
+- Read replicas for analytics queries (future)
+- Partitioning for large tables (future)
+
+### Application
+
+- Serverless functions auto-scale
+- CDN serves static assets globally
+- React Query prevents thundering herd
+
+### Cost
+
+- Pay-per-use model scales with revenue
+- Free tiers cover initial growth
+- Predictable pricing as you scale
 
 ## Monitoring & Observability
 
-### Application Monitoring
+### Application Health
 
-- **Error Tracking**: Sentry integration
-- **Performance**: Core Web Vitals
-- **Uptime**: Netlify monitoring
+- Sentry for error tracking and performance monitoring
+- Netlify Analytics for traffic insights
+- Custom dashboards for business metrics
 
 ### Business Metrics
 
-- Member growth rate
-- Event attendance
-- Payment success rate
-- User engagement
+- Member growth and retention
+- Event participation rates
+- Payment success/failure rates
+- Feature adoption tracking
 
-## Disaster Recovery
+## Future Considerations
 
-### Backup Strategy
+As the platform grows, we may consider:
 
-- **Database**: Daily automated backups
-- **Media Files**: S3 versioning
-- **Configuration**: Git-tracked
+### GraphQL API
 
-### Incident Response
+- For mobile app development
+- More efficient data fetching
+- Schema introspection
 
-1. Alert triggered
-2. Rollback if needed
-3. Root cause analysis
-4. Post-mortem documentation
+### Real-time Features
+
+- WebSockets for live scores
+- Push notifications
+- Collaborative editing
+
+### Advanced Analytics
+
+- Data warehouse integration
+- Machine learning for predictions
+- Advanced reporting tools
+
+The architecture is designed to evolve with the platform's needs while maintaining the core principles of type safety, performance, and developer experience.

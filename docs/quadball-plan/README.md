@@ -1,89 +1,63 @@
-# Quadball Canada Registration & Events Platform - Technical Plan
+# Quadball Canada Registration & Events Platform
 
-This directory contains the comprehensive technical planning documentation for transforming the Solstice codebase into the Quadball Canada Registration & Events platform.
+The Quadball Canada platform is a comprehensive web application for managing sports league memberships, team rosters, event registrations, and payments. Built on modern web technologies, it provides a seamless experience for players, teams, and administrators to organize and participate in Quadball activities across Canada.
 
-## Directory Structure
+## Technical Approach
+
+This project uses **TanStack Start's server functions** for type-safe client-server communication, not a traditional REST API. Server functions provide end-to-end type safety between the frontend and backend, eliminating entire classes of bugs and making development faster and more reliable.
+
+## Key Documentation
+
+### Getting Started
+
+- [Architecture Overview](./architecture/overview.md) - System design, technology choices, and architectural decisions
+- [Server Functions Guide](./api/server-functions.md) - How to create and use server functions
+- [Database Schema](./database/schema-overview.md) - Data model relationships and RBAC design
+
+### Developer Guides
+
+- [Creating New Features](./implementation/feature-development.md) - Step-by-step guide for adding functionality
+- [UI Component Guide](./ui-flows/component-guide.md) - Project-specific components and patterns
+- [Integration Guide](./integrations/README.md) - External service configurations
+
+### Project Structure
 
 ```
-quadball-plan/
-├── README.md                    # This file - overview and navigation
-├── architecture/               # System architecture and design decisions
-│   ├── overview.md            # High-level architecture overview
-│   ├── tech-stack.md          # Technology choices and rationale
-│   ├── security.md            # Security architecture and considerations
-│   └── scalability.md         # Performance and scaling strategies
-├── database/                  # Database schemas and migration plans
-│   ├── schema-overview.md     # Complete ERD and relationships
-│   ├── milestone-schemas/     # Schema definitions per milestone
-│   └── migration-strategy.md  # Approach to database migrations
-├── api/                       # API specifications
-│   ├── rest-endpoints.md      # RESTful API documentation
-│   ├── server-functions.md    # TanStack Start server functions
-│   └── webhook-specs.md       # External webhook handlers
-├── integrations/              # Third-party service integrations
-│   ├── square-payments.md     # Square payment integration
-│   ├── email-services.md      # SendGrid/Resend setup
-│   ├── social-media.md        # Social media feed integration
-│   └── cloud-storage.md       # S3/Cloudinary for media
-├── ui-flows/                  # User interface and experience
-│   ├── user-journeys.md       # Key user flows
-│   ├── component-library.md   # UI component architecture
-│   └── accessibility.md       # A11y requirements
-├── milestones/                # Detailed milestone breakdowns
-│   ├── m0-foundation.md       # Project setup
-│   ├── m1-rbac.md            # Core data model & RBAC
-│   ├── m2-membership.md       # Profile & membership flow
-│   ├── m3-teams.md           # Team management
-│   ├── m4-events.md          # Event creation & registration
-│   ├── m5-payments.md        # Advanced payments
-│   ├── m6-messaging.md       # Communications
-│   ├── m7-analytics.md       # Reporting dashboard
-│   └── m8-launch.md          # Final integrations
-└── implementation/            # Implementation guides
-    ├── timeline.md           # Development timeline
-    ├── dependencies.md       # Milestone dependencies
-    ├── testing-strategy.md   # Testing approach
-    └── deployment.md         # Deployment process
+src/
+├── features/           # Feature modules (auth, teams, events, etc.)
+├── db/                # Database schema and connections
+├── routes/            # File-based routing (TanStack Router)
+├── shared/            # Shared UI components and utilities
+└── lib/               # Core infrastructure and configuration
 ```
 
-## Quick Links
+## Core Features
 
-### Start Here
+1. **Member Management** - User registration, profiles, and membership tiers
+2. **Team Operations** - Team creation, roster management, and player assignments
+3. **Event System** - Tournament and event creation with flexible registration
+4. **Payment Processing** - Square integration for memberships and event fees
+5. **Role-Based Access** - Granular permissions for different user types
+6. **Communications** - Email notifications and in-app messaging
+7. **Analytics** - Reporting dashboards for administrators
 
-- [Architecture Overview](./architecture/overview.md) - System design and key decisions
-- [Database Schema](./database/schema-overview.md) - Complete data model
-- [Implementation Timeline](./implementation/timeline.md) - Development roadmap
+## Technology Stack
 
-### Key Features
+Built on the Solstice foundation:
 
-- [RBAC System](./milestones/m1-rbac.md) - Role-based access control
-- [Payment Integration](./integrations/square-payments.md) - Square checkout flow
-- [Event Management](./milestones/m4-events.md) - Event creation and registration
+- **TanStack Start** - Full-stack React framework with SSR
+- **Better Auth** - Authentication with email/OAuth providers
+- **Drizzle ORM** - Type-safe database operations with PostgreSQL
+- **TanStack Query** - Server state management
+- **Tailwind CSS** - Styling with shadcn/ui components
+- **Square SDK** - Payment processing
+- **Netlify** - Hosting with edge functions
 
-### Technical References
+## Development Workflow
 
-- [API Documentation](./api/rest-endpoints.md) - All endpoints
-- [Security Architecture](./architecture/security.md) - Auth and data protection
-- [Testing Strategy](./implementation/testing-strategy.md) - Quality assurance
+1. **Server Functions** - All backend logic is implemented as server functions in feature directories
+2. **Type Safety** - End-to-end type safety from database to UI
+3. **Feature-Based** - Code organized by feature for better maintainability
+4. **Database-First** - Schema defined in Drizzle, migrations managed automatically
 
-## Project Overview
-
-The Quadball Canada platform will be built on top of the existing Solstice foundation, leveraging:
-
-- **TanStack Start** for full-stack React with SSR
-- **Better Auth** for authentication with email/OAuth
-- **Drizzle ORM** with PostgreSQL
-- **Netlify** for hosting with edge functions
-- **Square** for payment processing
-
-The platform will support:
-
-1. Member registration and profiles
-2. Team management and rosters
-3. Event creation and registration
-4. Payment processing with flexible pricing
-5. Communications and notifications
-6. Analytics and reporting
-7. Social media integration
-
-Each milestone builds upon the previous, ensuring the platform remains deployable and functional throughout development.
+For detailed implementation guidance, see the [Architecture Overview](./architecture/overview.md).

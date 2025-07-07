@@ -1,664 +1,397 @@
-# TanStack Start Server Functions
+# Server Functions Guide
 
-Server functions in TanStack Start provide type-safe RPC-style communication between client and server. They run exclusively on the server and can access databases, APIs, and other server-only resources.
+Server functions in TanStack Start provide type-safe communication between client and server code. They are the primary way to implement backend logic in this project.
 
-## Core Concepts
+## Overview
 
-### Server Function Definition
+Server functions are wrapped with `serverOnly()` to ensure they only run on the server. They have full access to:
+
+- Database operations via Drizzle ORM
+- Authentication state via Better Auth
+- External APIs and services
+- Server-side environment variables
+
+## Creating a Server Function
+
+### Step 1: Create a Server Function File
+
+Server functions should be organized in feature directories with naming conventions:
+
+- `.queries.ts` - For data fetching operations
+- `.mutations.ts` - For data modification operations
 
 ```typescript
-// src/lib/server/user.queries.ts
+// src/features/teams/teams.queries.ts
 import { serverOnly } from "@tanstack/start";
 import { db } from "~/db";
+import { teams } from "~/db/schema";
+import { eq } from "drizzle-orm";
 
-export const getUserProfile = serverOnly(async (userId: string) => {
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
-    with: {
-      roles: true,
-      tags: true,
-      memberships: {
-        with: {
-          membershipType: true,
-        },
-      },
-    },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  return user;
-});
-```
-
-### Client Usage
-
-```typescript
-// src/routes/profile.tsx
-import { getUserProfile } from "~/lib/server/user.queries";
-import { createServerFn } from "@tanstack/start";
-
-export const route = createFileRoute("/profile")({
-  loader: async ({ context }) => {
-    const profile = await getUserProfile(context.user.id);
-    return { profile };
-  },
-});
-```
-
-## Authentication Server Functions
-
-### `checkSession`
-
-Verify and refresh user session
-
-```typescript
-export const checkSession = serverOnly(async () => {
-  const session = await auth.getSession();
-
-  if (!session) {
-    return null;
-  }
-
-  // Extend session if needed
-  if (shouldRefreshSession(session)) {
-    await auth.refreshSession(session.id);
-  }
-
-  return session;
-});
-```
-
-### `getUserWithRoles`
-
-Get user with all roles and permissions
-
-```typescript
-export const getUserWithRoles = serverOnly(async (userId: string) => {
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
-    with: {
-      roles: {
-        where: or(isNull(userRoles.expiresAt), gte(userRoles.expiresAt, new Date())),
-      },
-    },
-  });
-
-  return {
-    ...user,
-    permissions: calculatePermissions(user.roles),
-  };
-});
-```
-
-### `assignUserRole`
-
-Grant role to user
-
-```typescript
-export const assignUserRole = serverOnly(
-  async ({ userId, role, scope = "global", expiresAt, grantedBy }: AssignRoleParams) => {
-    await requireRole("global_admin");
-
-    const roleId = await db
-      .insert(userRoles)
-      .values({
-        userId,
-        role,
-        scope,
-        expiresAt,
-        grantedBy,
-      })
-      .returning();
-
-    await createAuditLog({
-      action: "ROLE_ASSIGNED",
-      entityType: "user_role",
-      entityId: roleId[0].id,
-      userId: grantedBy,
-    });
-
-    return roleId[0];
-  },
-);
-```
-
-## Membership Server Functions
-
-### `getPricingForUser`
-
-Calculate membership price with applicable discounts
-
-```typescript
-export const getPricingForUser = serverOnly(
-  async (userId: string, membershipTypeId: string) => {
-    const [user, membershipType, pricingRules] = await Promise.all([
-      getUserWithTags(userId),
-      getMembershipType(membershipTypeId),
-      getActivePricingRules(),
-    ]);
-
-    let price = membershipType.priceCents;
-    const appliedRules: PricingRule[] = [];
-
-    // Apply pricing rules in priority order
-    for (const rule of pricingRules) {
-      if (evaluateRule(rule, { user, membershipType })) {
-        price = applyPricingAction(price, rule);
-        appliedRules.push(rule);
-      }
-    }
-
-    return {
-      originalPrice: membershipType.priceCents,
-      finalPrice: price,
-      appliedRules,
-      savings: membershipType.priceCents - price,
-    };
-  },
-);
-```
-
-### `createMembershipCheckout`
-
-Initialize Square checkout for membership
-
-```typescript
-export const createMembershipCheckout = serverOnly(
-  async ({ userId, membershipTypeId, returnUrl }: CheckoutParams) => {
-    const pricing = await getPricingForUser(userId, membershipTypeId);
-
-    // Create payment record
-    const payment = await db
-      .insert(payments)
-      .values({
-        userId,
-        amountCents: pricing.finalPrice,
-        status: "pending",
-        providerId: "square",
-      })
-      .returning();
-
-    // Create payment items
-    await db.insert(paymentItems).values({
-      paymentId: payment[0].id,
-      itemType: "membership",
-      itemId: membershipTypeId,
-      description: `Membership: ${membershipType.name}`,
-      quantity: 1,
-      unitPriceCents: pricing.finalPrice,
-      totalPriceCents: pricing.finalPrice,
-    });
-
-    // Create Square checkout
-    const checkoutUrl = await squareClient.createCheckout({
-      orderId: payment[0].id,
-      amount: pricing.finalPrice,
-      returnUrl,
-      metadata: {
-        paymentId: payment[0].id,
-        userId,
-        membershipTypeId,
-      },
-    });
-
-    // Update payment with checkout URL
-    await db.update(payments).set({ checkoutUrl }).where(eq(payments.id, payment[0].id));
-
-    return {
-      paymentId: payment[0].id,
-      checkoutUrl,
-    };
-  },
-);
-```
-
-## Team Server Functions
-
-### `createTeam`
-
-Create new team with validation
-
-```typescript
-export const createTeam = serverOnly(async (data: CreateTeamInput) => {
-  await requireRole(["team_lead", "global_admin"]);
-
-  // Validate slug uniqueness
-  const existing = await db.query.teams.findFirst({
-    where: eq(teams.slug, data.slug),
-  });
-
-  if (existing) {
-    throw new ValidationError("Team slug already exists");
-  }
-
-  const team = await db.transaction(async (tx) => {
-    // Create team
-    const [newTeam] = await tx
-      .insert(teams)
-      .values({
-        ...data,
-        createdBy: getCurrentUserId(),
-      })
-      .returning();
-
-    // Add creator as team lead
-    await tx.insert(teamMembers).values({
-      teamId: newTeam.id,
-      userId: getCurrentUserId(),
-      role: "coach",
-      status: "active",
-    });
-
-    return newTeam;
-  });
-
-  return team;
-});
-```
-
-### `bulkInviteTeamMembers`
-
-Bulk invite via CSV upload
-
-```typescript
-export const bulkInviteTeamMembers = serverOnly(
-  async ({ teamId, csvData }: BulkInviteParams) => {
-    await requireTeamRole(teamId, ["coach", "manager"]);
-
-    const parsed = parseCSV(csvData);
-    const results = [];
-
-    for (const row of parsed) {
-      try {
-        // Check if user exists
-        let user = await db.query.users.findFirst({
-          where: eq(users.email, row.email),
-        });
-
-        if (!user) {
-          // Send invite email
-          await sendTeamInvite({
-            email: row.email,
-            teamId,
-            invitedBy: getCurrentUserId(),
-          });
-
-          results.push({
-            email: row.email,
-            status: "invited",
-          });
-        } else {
-          // Add to team
-          await addTeamMember({
-            teamId,
-            userId: user.id,
-            role: row.role || "player",
-            jerseyNumber: row.jerseyNumber,
-          });
-
-          results.push({
-            email: row.email,
-            status: "added",
-          });
-        }
-      } catch (error) {
-        results.push({
-          email: row.email,
-          status: "error",
-          error: error.message,
-        });
-      }
-    }
-
-    return results;
-  },
-);
-```
-
-## Event Server Functions
-
-### `createEventFromTemplate`
-
-Create event using template
-
-```typescript
-export const createEventFromTemplate = serverOnly(
-  async ({ templateId, overrides }: CreateFromTemplateParams) => {
-    await requireRole(["event_coordinator", "global_admin"]);
-
-    const template = await db.query.eventTemplates.findFirst({
-      where: eq(eventTemplates.id, templateId),
-    });
-
-    if (!template) {
-      throw new NotFoundError("Template not found");
-    }
-
-    // Generate unique slug
-    const slug = await generateUniqueSlug(overrides.name || template.name);
-
-    const event = await db
-      .insert(events)
-      .values({
-        ...template,
-        ...overrides,
-        id: undefined, // Don't copy ID
-        slug,
-        status: "draft",
-        createdBy: getCurrentUserId(),
-      })
-      .returning();
-
-    return event[0];
-  },
-);
-```
-
-### `generateEventBracket`
-
-Generate tournament bracket
-
-```typescript
-export const generateEventBracket = serverOnly(async (eventId: string) => {
-  await requireEventRole(eventId, ["coordinator"]);
-
-  const registrations = await db.query.eventRegistrations.findMany({
-    where: and(
-      eq(eventRegistrations.eventId, eventId),
-      eq(eventRegistrations.status, "confirmed"),
-    ),
-    with: {
-      team: true,
-    },
-  });
-
-  // Generate bracket based on team count
-  const bracket = generateDoubleElimination({
-    teams: registrations.map((r) => r.team),
-    seedingMethod: "random",
-  });
-
-  // Insert games
-  const games = [];
-  for (const round of bracket.rounds) {
-    for (const match of round.matches) {
-      const [game] = await db
-        .insert(eventGames)
-        .values({
-          eventId,
-          name: match.name,
-          gameType: match.type,
-          scheduledAt: match.scheduledAt,
-          homeTeamId: match.homeTeamId,
-          awayTeamId: match.awayTeamId,
-          metadata: {
-            round: round.number,
-            matchNumber: match.number,
-          },
-        })
-        .returning();
-
-      games.push(game);
-    }
-  }
-
-  return {
-    bracket,
-    games,
-  };
-});
-```
-
-## Analytics Server Functions
-
-### `getEventAnalytics`
-
-Get comprehensive event statistics
-
-```typescript
-export const getEventAnalytics = serverOnly(async (eventId: string) => {
-  await requireRole(["event_coordinator", "global_admin"]);
-
-  const [event, registrations, revenue, demographics] = await Promise.all([
-    getEvent(eventId),
-    getEventRegistrationStats(eventId),
-    getEventRevenue(eventId),
-    getEventDemographics(eventId),
-  ]);
-
-  return {
-    event: {
-      name: event.name,
-      startDate: event.startDate,
-      status: event.status,
-    },
-    registrations: {
-      total: registrations.total,
-      confirmed: registrations.confirmed,
-      pending: registrations.pending,
-      byTeam: registrations.byTeam,
-    },
-    revenue: {
-      total: revenue.total,
-      collected: revenue.collected,
-      pending: revenue.pending,
-      refunded: revenue.refunded,
-    },
-    demographics: {
-      ageGroups: demographics.ageGroups,
-      genderBreakdown: demographics.genderBreakdown,
-      locationHeatmap: demographics.locationHeatmap,
-    },
-  };
-});
-```
-
-### `exportEventData`
-
-Export event data to CSV/Excel
-
-```typescript
-export const exportEventData = serverOnly(
-  async ({ eventId, format = "csv", includeFields }: ExportParams) => {
-    await requireEventRole(eventId, ["coordinator"]);
-
-    const registrations = await db.query.eventRegistrations.findMany({
-      where: eq(eventRegistrations.eventId, eventId),
-      with: {
-        user: true,
-        team: true,
-        payment: true,
-      },
-    });
-
-    // Filter fields based on privacy settings
-    const exportData = registrations.map((reg) => filterExportFields(reg, includeFields));
-
-    // Generate file
-    const file = format === "csv" ? generateCSV(exportData) : generateExcel(exportData);
-
-    // Upload to temporary storage
-    const url = await uploadTempFile(file, {
-      expiresIn: "1h",
-    });
-
-    return { url, expiresAt: new Date(Date.now() + 3600000) };
-  },
-);
-```
-
-## Utility Server Functions
-
-### `sendBulkEmail`
-
-Send targeted emails
-
-```typescript
-export const sendBulkEmail = serverOnly(
-  async ({ query, template, subject, data }: BulkEmailParams) => {
-    await requireRole("global_admin");
-
-    // Build recipient list
-    const recipients = await buildRecipientList(query);
-
-    // Chunk for rate limiting
-    const chunks = chunk(recipients, 100);
-
-    for (const batch of chunks) {
-      await sendgrid.send({
-        to: batch.map((r) => ({
-          email: r.email,
-          name: r.name,
-        })),
-        templateId: template,
-        dynamicTemplateData: {
-          subject,
-          ...data,
-        },
-      });
-
-      // Rate limit delay
-      await sleep(1000);
-    }
-
-    return {
-      sent: recipients.length,
-      template,
-      timestamp: new Date(),
-    };
-  },
-);
-```
-
-### `validateWebhookSignature`
-
-Validate external webhook signatures
-
-```typescript
-export const validateWebhookSignature = serverOnly(
-  async ({ provider, headers, body }: WebhookValidationParams) => {
-    switch (provider) {
-      case "square":
-        return validateSquareWebhook(headers, body);
-      case "sendgrid":
-        return validateSendGridWebhook(headers, body);
-      default:
-        throw new Error(`Unknown provider: ${provider}`);
-    }
-  },
-);
-```
-
-## Error Handling
-
-All server functions should handle errors consistently:
-
-```typescript
-export const serverFunction = serverOnly(async (params) => {
-  try {
-    // Validate input
-    const validated = schema.parse(params);
-
-    // Check permissions
-    await requirePermission("action");
-
-    // Business logic
-    const result = await performAction(validated);
-
-    // Audit logging
-    await logAction("ACTION_PERFORMED", result);
-
-    return result;
-  } catch (error) {
-    // Log error
-    console.error("Server function error:", error);
-
-    // Transform error for client
-    if (error instanceof ValidationError) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: error.message,
-      });
-    }
-
-    if (error instanceof UnauthorizedError) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "Unauthorized",
-      });
-    }
-
-    // Generic error
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "An error occurred",
-    });
-  }
-});
-```
-
-## Performance Optimization
-
-### Caching
-
-```typescript
-export const getCachedData = serverOnly(async (key: string) => {
-  // Check cache first
-  const cached = await cache.get(key);
-  if (cached) return cached;
-
-  // Fetch fresh data
-  const data = await fetchData();
-
-  // Cache for future
-  await cache.set(key, data, { ttl: 300 });
-
-  return data;
-});
-```
-
-### Batching
-
-```typescript
-export const batchedLoader = createBatchedLoader(async (ids: string[]) => {
-  const results = await db.query.users.findMany({
-    where: inArray(users.id, ids),
-  });
-
-  // Return in same order as input
-  return ids.map((id) => results.find((r) => r.id === id));
-});
-```
-
-### Database Query Optimization
-
-```typescript
-export const getOptimizedTeamData = serverOnly(async (teamId: string) => {
-  // Single query with all needed relations
+export const getTeam = serverOnly(async (teamId: string) => {
   const team = await db.query.teams.findFirst({
     where: eq(teams.id, teamId),
     with: {
       members: {
         with: {
-          user: {
-            columns: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
+          user: true,
         },
-      },
-      games: {
-        limit: 10,
-        orderBy: desc(eventGames.scheduledAt),
       },
     },
   });
 
+  if (!team) {
+    throw new Error("Team not found");
+  }
+
   return team;
 });
 ```
+
+### Step 2: Handle Authentication & Authorization
+
+Use the auth context to check permissions:
+
+```typescript
+// src/features/teams/teams.mutations.ts
+import { serverOnly } from "@tanstack/start";
+import { getAuthFromHeaders } from "~/lib/auth/utils";
+import { requireRole } from "~/lib/auth/rbac";
+
+export const createTeam = serverOnly(async (data: CreateTeamInput) => {
+  // Get current user
+  const auth = await getAuthFromHeaders();
+  if (!auth.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Check permissions
+  await requireRole(auth.user.id, ["team_lead", "global_admin"]);
+
+  // Create team...
+});
+```
+
+### Step 3: Implement Error Handling
+
+Always handle errors appropriately:
+
+```typescript
+export const updateTeam = serverOnly(async (teamId: string, data: UpdateTeamInput) => {
+  try {
+    // Validate input
+    const validated = updateTeamSchema.parse(data);
+
+    // Check permissions
+    const auth = await getAuthFromHeaders();
+    await requireTeamRole(auth.user.id, teamId, ["coach", "manager"]);
+
+    // Update team
+    const updated = await db
+      .update(teams)
+      .set(validated)
+      .where(eq(teams.id, teamId))
+      .returning();
+
+    return updated[0];
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new Error("Invalid input: " + error.message);
+    }
+
+    if (error instanceof UnauthorizedError) {
+      throw new Error("Unauthorized");
+    }
+
+    // Log unexpected errors
+    console.error("Update team error:", error);
+    throw new Error("Failed to update team");
+  }
+});
+```
+
+### Step 4: Call from Client Components
+
+Use TanStack Query to call server functions:
+
+```tsx
+// src/routes/teams/$teamId.tsx
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getTeam, updateTeam } from "~/features/teams/teams.queries";
+
+export default function TeamPage() {
+  const params = useParams({ from: "/teams/$teamId" });
+
+  // Fetch data
+  const { data: team, isLoading } = useQuery({
+    queryKey: ["team", params.teamId],
+    queryFn: () => getTeam(params.teamId),
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: (data: UpdateTeamInput) => updateTeam(params.teamId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team", params.teamId] });
+    },
+  });
+
+  // Use in component...
+}
+```
+
+## Best Practices
+
+### 1. File Organization
+
+```
+src/features/
+├── auth/
+│   ├── auth.queries.ts      # getUserProfile, checkSession
+│   └── auth.mutations.ts    # updateProfile, changePassword
+├── teams/
+│   ├── teams.queries.ts     # getTeam, listTeams
+│   └── teams.mutations.ts   # createTeam, updateTeam
+└── events/
+    ├── events.queries.ts    # getEvent, searchEvents
+    └── events.mutations.ts  # createEvent, registerForEvent
+```
+
+### 2. Type Safety
+
+Always define input and output types:
+
+```typescript
+// src/features/teams/teams.types.ts
+export interface CreateTeamInput {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export interface TeamWithMembers {
+  id: string;
+  name: string;
+  members: Array<{
+    userId: string;
+    role: TeamRole;
+    user: User;
+  }>;
+}
+
+// Use in server function
+export const createTeam = serverOnly(async (input: CreateTeamInput): Promise<Team> => {
+  // Implementation...
+});
+```
+
+### 3. Authentication Patterns
+
+Create reusable auth utilities:
+
+```typescript
+// src/lib/auth/utils.ts
+export async function getCurrentUser() {
+  const auth = await getAuthFromHeaders();
+  if (!auth.user) {
+    throw new UnauthorizedError();
+  }
+  return auth.user;
+}
+
+export async function requireAuth() {
+  const user = await getCurrentUser();
+  return user;
+}
+
+// Use in server functions
+export const myProtectedFunction = serverOnly(async () => {
+  const user = await requireAuth();
+  // User is guaranteed to be authenticated
+});
+```
+
+### 4. Database Transactions
+
+Use transactions for multi-step operations:
+
+```typescript
+export const transferTeamOwnership = serverOnly(
+  async (teamId: string, newOwnerId: string) => {
+    const user = await requireAuth();
+
+    return await db.transaction(async (tx) => {
+      // Remove old owner
+      await tx
+        .update(teamMembers)
+        .set({ role: "player" })
+        .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.role, "owner")));
+
+      // Set new owner
+      await tx
+        .update(teamMembers)
+        .set({ role: "owner" })
+        .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, newOwnerId)));
+
+      // Log the change
+      await tx.insert(auditLogs).values({
+        action: "TEAM_OWNERSHIP_TRANSFERRED",
+        userId: user.id,
+        metadata: { teamId, newOwnerId },
+      });
+    });
+  },
+);
+```
+
+### 5. Caching Strategy
+
+Use React Query's caching effectively:
+
+```typescript
+// Define stable query keys
+export const teamKeys = {
+  all: ["teams"] as const,
+  lists: () => [...teamKeys.all, "list"] as const,
+  list: (filters: TeamFilters) => [...teamKeys.lists(), filters] as const,
+  details: () => [...teamKeys.all, "detail"] as const,
+  detail: (id: string) => [...teamKeys.details(), id] as const,
+};
+
+// Use in components
+const { data } = useQuery({
+  queryKey: teamKeys.detail(teamId),
+  queryFn: () => getTeam(teamId),
+  staleTime: 5 * 60 * 1000, // 5 minutes
+});
+```
+
+## Common Patterns
+
+### Pagination
+
+```typescript
+export const listTeams = serverOnly(
+  async (params: { page?: number; limit?: number; search?: string }) => {
+    const page = params.page || 1;
+    const limit = params.limit || 20;
+    const offset = (page - 1) * limit;
+
+    const query = db.select().from(teams).limit(limit).offset(offset);
+
+    if (params.search) {
+      query.where(like(teams.name, `%${params.search}%`));
+    }
+
+    const [items, totalCount] = await Promise.all([
+      query,
+      db.select({ count: count() }).from(teams),
+    ]);
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total: totalCount[0].count,
+        totalPages: Math.ceil(totalCount[0].count / limit),
+      },
+    };
+  },
+);
+```
+
+### Bulk Operations
+
+```typescript
+export const bulkUpdatePlayers = serverOnly(async (updates: PlayerUpdate[]) => {
+  const user = await requireAuth();
+
+  const results = await Promise.allSettled(
+    updates.map(async (update) => {
+      try {
+        await updatePlayer(update.id, update.data);
+        return { id: update.id, status: "success" };
+      } catch (error) {
+        return { id: update.id, status: "error", error: error.message };
+      }
+    }),
+  );
+
+  return results.map((r) => (r.status === "fulfilled" ? r.value : r.reason));
+});
+```
+
+### File Uploads
+
+```typescript
+export const uploadTeamLogo = serverOnly(async (teamId: string, file: File) => {
+  const user = await requireAuth();
+  await requireTeamRole(user.id, teamId, ["coach", "manager"]);
+
+  // Upload to S3/Cloudinary
+  const uploadResult = await uploadFile(file, {
+    folder: `teams/${teamId}`,
+    maxSize: 5 * 1024 * 1024, // 5MB
+    allowedTypes: ["image/jpeg", "image/png"],
+  });
+
+  // Update team record
+  await db.update(teams).set({ logoUrl: uploadResult.url }).where(eq(teams.id, teamId));
+
+  return uploadResult;
+});
+```
+
+## Testing Server Functions
+
+Create unit tests for server functions:
+
+```typescript
+// src/features/teams/teams.test.ts
+import { describe, it, expect, beforeEach } from "vitest";
+import { createTeam } from "./teams.mutations";
+import { mockAuth } from "~/tests/mocks/auth";
+
+describe("createTeam", () => {
+  beforeEach(() => {
+    mockAuth({ userId: "user-1", roles: ["team_lead"] });
+  });
+
+  it("creates a team with valid input", async () => {
+    const team = await createTeam({
+      name: "Test Team",
+      slug: "test-team",
+    });
+
+    expect(team).toMatchObject({
+      name: "Test Team",
+      slug: "test-team",
+    });
+  });
+
+  it("throws error without authentication", async () => {
+    mockAuth(null);
+
+    await expect(
+      createTeam({
+        name: "Test Team",
+        slug: "test-team",
+      }),
+    ).rejects.toThrow("Unauthorized");
+  });
+});
+```
+
+## Migration from REST
+
+If migrating from REST endpoints, map them to server functions:
+
+| REST Endpoint              | Server Function        |
+| -------------------------- | ---------------------- |
+| GET /api/teams/:id         | `getTeam(id)`          |
+| POST /api/teams            | `createTeam(data)`     |
+| PUT /api/teams/:id         | `updateTeam(id, data)` |
+| DELETE /api/teams/:id      | `deleteTeam(id)`       |
+| GET /api/teams/:id/members | `getTeamMembers(id)`   |
+
+The key difference is that server functions are called directly from React components with full type safety, rather than using fetch() with manual type casting.

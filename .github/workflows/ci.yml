@@ -72,7 +72,7 @@ jobs:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'ci-secret-for-install' }}
 
       - name: Run database migrations
-        run: pnpm db push
+        run: pnpm db push --force
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
 

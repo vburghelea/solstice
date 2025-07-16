@@ -10,7 +10,11 @@ async function testConnections() {
     const pooled = pooledDb();
     const pooledResult = await pooled.execute(sql`SELECT current_database(), version()`);
     console.log("✅ Pooled connection successful");
-    console.log("   Database:", pooledResult.rows[0]);
+    // Handle both result types
+    const rows = Array.isArray(pooledResult)
+      ? pooledResult
+      : (pooledResult as { rows: unknown[] }).rows;
+    console.log("   Database:", rows?.[0]);
   } catch (error) {
     console.error("❌ Pooled connection failed:", error);
   }
@@ -23,7 +27,11 @@ async function testConnections() {
       sql`SELECT current_database(), version()`,
     );
     console.log("✅ Unpooled connection successful");
-    console.log("   Database:", unpooledResult.rows[0]);
+    // Handle both result types
+    const rows = Array.isArray(unpooledResult)
+      ? unpooledResult
+      : (unpooledResult as { rows: unknown[] }).rows;
+    console.log("   Database:", rows?.[0]);
   } catch (error) {
     console.error("❌ Unpooled connection failed:", error);
   }
@@ -34,7 +42,11 @@ async function testConnections() {
     const db = getDb();
     const dbResult = await db.execute(sql`SELECT current_database(), version()`);
     console.log("✅ Auto-selected connection successful");
-    console.log("   Database:", dbResult.rows[0]);
+    // Handle both result types
+    const rows = Array.isArray(dbResult)
+      ? dbResult
+      : (dbResult as { rows: unknown[] }).rows;
+    console.log("   Database:", rows?.[0]);
   } catch (error) {
     console.error("❌ Auto-selected connection failed:", error);
   }
@@ -45,7 +57,9 @@ async function testConnections() {
     const db = getDb();
     const users = await db.execute(sql`SELECT COUNT(*) as count FROM "user"`);
     console.log("✅ Schema access successful");
-    console.log("   User count:", users.rows[0]);
+    // Handle both result types
+    const rows = Array.isArray(users) ? users : (users as { rows: unknown[] }).rows;
+    console.log("   User count:", rows?.[0]);
   } catch (error) {
     console.error("❌ Schema access failed:", error);
   }

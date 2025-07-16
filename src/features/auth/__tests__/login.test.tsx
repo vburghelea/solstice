@@ -37,6 +37,8 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => mockNavigate,
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouteContext: () => ({ redirectUrl: "/dashboard" }),
+  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
+  useRouter: () => ({ invalidate: vi.fn() }),
   Link: ({
     to,
     children,

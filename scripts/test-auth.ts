@@ -28,10 +28,10 @@ async function testAuth() {
   // Test auth configuration
   try {
     console.log("\n3. Testing auth configuration...");
-    // This will trigger the proxy to initialize if not already done
-    const session = auth.session;
+    // Test if auth API has getSession method
+    const hasGetSession = typeof auth.api?.getSession === "function";
     console.log("✅ Auth configuration loaded");
-    console.log("   Session management available:", typeof session === "object");
+    console.log("   Session management available:", hasGetSession);
   } catch (error) {
     console.error("❌ Auth configuration failed:", error);
   }

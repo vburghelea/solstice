@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -14,6 +14,29 @@ export const user = pgTable("user", {
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
+
+  // Profile completion tracking
+  profileComplete: boolean("profile_complete")
+    .$defaultFn(() => false)
+    .notNull(),
+
+  // Required profile fields
+  dateOfBirth: timestamp("date_of_birth"),
+  emergencyContact: text("emergency_contact"), // JSON string
+
+  // Optional profile fields
+  gender: text("gender"),
+  pronouns: text("pronouns"),
+  phone: text("phone"),
+
+  // Privacy and preferences
+  privacySettings: text("privacy_settings"), // JSON string
+
+  // Audit and versioning
+  profileVersion: integer("profile_version")
+    .$defaultFn(() => 1)
+    .notNull(),
+  profileUpdatedAt: timestamp("profile_updated_at").$defaultFn(() => new Date()),
 });
 
 export const session = pgTable("session", {

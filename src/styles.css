@@ -40,6 +40,26 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand Colors - Quadball Canada */
+  --color-brand-red: #d82929;
+  --color-brand-red-dark: #b92323;
+  --color-brand-dark: #1a1a1a;
+  --color-brand-light: #ffffff;
+
+  /* Admin Theme Colors */
+  --color-admin-primary: #0c7ff2;
+  --color-admin-secondary: #f0f2f5;
+  --color-admin-text-primary: #111418;
+  --color-admin-text-secondary: #60758a;
+  --color-admin-border: #dbe0e6;
+  --color-admin-status-active-bg: #dcfce7;
+  --color-admin-status-active-text: #166534;
+  --color-admin-status-inactive-bg: #fee2e2;
+  --color-admin-status-inactive-text: #991b1b;
+
+  /* Font Family */
+  --font-family-sans: "Plus Jakarta Sans", "Noto Sans", system-ui, sans-serif;
 }
 
 :root {
@@ -117,5 +137,51 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-family-sans);
+  }
+}
+
+@layer components {
+  /* Maple Leaf Logo */
+  .maple-leaf-logo {
+    display: inline-block;
+    background-color: var(--color-brand-red);
+    border-radius: 50%;
+  }
+
+  /* Button Variants */
+  .btn-brand-primary {
+    @apply bg-brand-red hover:bg-brand-red-dark text-white shadow-md transition;
+  }
+
+  .btn-admin-primary {
+    @apply bg-admin-primary hover:bg-admin-primary/90 text-white transition;
+  }
+
+  .btn-admin-secondary {
+    @apply bg-admin-secondary text-admin-text-primary hover:bg-admin-secondary/80 transition;
+  }
+
+  /* Status Badges */
+  .status-active {
+    @apply bg-admin-status-active-bg text-admin-status-active-text;
+  }
+
+  .status-inactive {
+    @apply bg-admin-status-inactive-bg text-admin-status-inactive-text;
+  }
+
+  /* Card Hover Effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl;
+  }
+
+  /* Admin Sidebar Navigation */
+  .nav-item {
+    @apply flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100;
+  }
+
+  .nav-item-active {
+    @apply bg-admin-secondary text-admin-primary flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-semibold;
   }
 }

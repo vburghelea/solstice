@@ -1,81 +1,83 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import ThemeToggle from "~/components/ThemeToggle";
-import { auth } from "~/lib/auth-client";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PublicLayout } from "~/features/layouts/public-layout";
 import { Button } from "~/shared/ui/button";
+import { EventCard } from "~/shared/ui/event-card";
+import { HeroSection } from "~/shared/ui/hero-section";
 
 export const Route = createFileRoute("/")({
   component: Home,
-  loader: ({ context }) => {
-    return { user: context.user };
-  },
 });
 
 function Home() {
-  // Home component for the landing page
-  const { user } = Route.useLoaderData();
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-10 p-2">
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="text-3xl font-bold sm:text-4xl">React TanStarter</h1>
-        <div className="flex items-center gap-2 max-sm:flex-col">
-          This is an unprotected page:
-          <pre className="bg-card text-card-foreground rounded-md border p-1">
-            routes/index.tsx
-          </pre>
-        </div>
-      </div>
+    <PublicLayout>
+      <HeroSection
+        title="Welcome to Quadball Canada"
+        subtitle="Your hub for all things Quadball in Canada. Stay updated on events, teams, and resources."
+        backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
+        ctaText="Explore Events"
+        ctaLink="/events"
+      />
 
-      {user ? (
-        <div className="flex flex-col items-center gap-2">
-          <p>Welcome back, {user.name}!</p>
-          <Button type="button" asChild className="mb-2 w-fit" size="lg">
-            <Link to="/dashboard">Go to Dashboard</Link>
-          </Button>
-          <div className="text-center text-xs sm:text-sm">
-            Session user:
-            <pre className="max-w-screen overflow-x-auto px-2 text-start">
-              {JSON.stringify(user, null, 2)}
-            </pre>
+      <section className="bg-gray-50 py-8 sm:py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+          <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl">
+            Upcoming Events
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+            <EventCard
+              title="National Championship"
+              description="Join us for the biggest Quadball event of the year!"
+              image="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1740"
+              link="/events/national-championship"
+            />
+            <EventCard
+              title="Regional Training Camp"
+              description="Improve your skills with top coaches in the region."
+              image="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1740"
+              link="/events/training-camp"
+            />
+            <EventCard
+              title="Community Meetup"
+              description="Connect with fellow Quadball enthusiasts in your area."
+              image="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=1674"
+              link="/events/community-meetup"
+            />
           </div>
-
-          <Button
-            onClick={async () => {
-              await auth.signOut();
-              await queryClient.invalidateQueries({ queryKey: ["user"] });
-              await router.invalidate();
-            }}
-            type="button"
-            className="w-fit"
-            variant="destructive"
-            size="lg"
-          >
-            Sign out
-          </Button>
+          <div className="mt-8 text-center sm:mt-12">
+            <Link to="/events" className="text-brand-red font-semibold hover:underline">
+              View all events →
+            </Link>
+          </div>
         </div>
-      ) : (
-        <div className="flex flex-col items-center gap-2">
-          <p>You are not signed in.</p>
-          <Button type="button" asChild className="w-fit" size="lg">
-            <Link to="/login">Log in</Link>
-          </Button>
-        </div>
-      )}
+      </section>
 
-      <div className="flex flex-col items-center gap-2">
-        <ThemeToggle />
-        <a
-          className="text-muted-foreground hover:text-foreground underline"
-          href="https://github.com/dotnize/react-tanstarter"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          dotnize/react-tanstarter
-        </a>
-      </div>
-    </div>
+      <section className="bg-white py-8 sm:py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="order-2 lg:order-1">
+              <img
+                src="https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?q=80&w=1740"
+                alt="Team celebrating"
+                className="w-full rounded-lg shadow-xl"
+              />
+            </div>
+            <div className="order-1 text-center lg:order-2 lg:text-left">
+              <h2 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">Latest News</h2>
+              <h3 className="mb-3 text-lg font-semibold sm:text-xl">
+                New Team Registration Opens
+              </h3>
+              <p className="mb-6 px-4 text-gray-600 sm:px-0">
+                Register your team for the upcoming season and compete for the
+                championship.
+              </p>
+              <Link to="/register">
+                <Button className="btn-brand-primary">Register Now →</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </PublicLayout>
   );
 }

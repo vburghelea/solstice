@@ -14,7 +14,6 @@ export const user = pgTable("user", {
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
-
   // Profile completion tracking
   profileComplete: boolean("profile_complete")
     .$defaultFn(() => false)

@@ -160,6 +160,6 @@
 
 ### Development Servers
 
-- **Vite dev**: `pnpm dev` (port 5173) - basic development
-- **Netlify dev**: `netlify dev` (port 8888) - recommended with edge functions
+- **Vite dev**: `pnpm dev` (port 5173) - basic development, the usual to use
+- **Netlify dev**: `netlify dev` (port 8888) - with edge functions
 - **OAuth setup**: Configure redirect URLs for local development environment

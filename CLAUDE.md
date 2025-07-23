@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `pnpm dev` - Start development server (Vite on port 5173)
+- `pnpm dev` - Start development server (Vite on port 5173, default to use)
 - `netlify dev` - Start Netlify Dev server (port 8888, proxies Vite and includes edge functions)
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
@@ -55,18 +55,23 @@ This is **Solstice**, a sports league management platform built with TanStack St
 - `src/app/` - Application-level code (providers, router setup)
 - `src/features/` - Feature modules organized by domain
   - `auth/` - Authentication feature (components, hooks, API, tests)
+  - `profile/` - User profile management (components, server functions, guards)
+  - `layouts/` - Admin and public layout components
   - Future features will follow the same pattern
 - `src/shared/` - Shared resources across features
-  - `ui/` - shadcn/ui components and icons
+  - `ui/` - shadcn/ui components and icons (auto-installed here via components.json)
   - `hooks/` - Shared React hooks (useTheme, etc.)
   - `lib/` - Utilities and helpers
   - `types/` - Shared TypeScript types
+- `src/components/` - Application-specific components
+  - `form-fields/` - Reusable form components (ValidatedInput, ValidatedSelect, etc.)
 - `src/db/` - Database layer
   - `schema/` - Drizzle schema definitions (single source of truth)
   - `migrations/` - Database migrations
 - `src/routes/` - Thin route files that import from features
 - `src/lib/` - Core infrastructure
   - `auth/` - Better Auth configuration
+  - `form.ts` - TanStack Form custom hook setup
   - `env.ts` - Environment variable management
   - `security/` - Security utilities and middleware
 - `src/tests/` - Test utilities and global test setup
@@ -97,13 +102,10 @@ Netlify automatically provides:
 
 2. **OAuth Setup**:
    - OAuth credentials must be valid (not placeholders) for routes to work
-   - Configure redirect URLs for local development:
-     - Google: `http://localhost:8888/api/auth/callback/google`
-     - GitHub: `http://localhost:8888/api/auth/callback/github`
 
 3. **Development Servers**:
-   - `pnpm dev` - Vite dev server only (port 5173)
-   - `netlify dev` - Full Netlify environment with edge functions (port 8888, recommended)
+   - `pnpm dev` - Vite dev server only (port 5173, what to usually use)
+   - `netlify dev` - Full Netlify environment with edge functions (port 8888)
 
 ### Database Connections
 
@@ -143,7 +145,9 @@ See `docs/database-connections.md` for detailed usage guide.
 - **Theme Hook**: Reactive theme management with system preference support
 - **Centralized Icons**: Reusable icon components in shared/ui/icons
 - **Auth Guards**: Flexible authentication protection for routes
+- **Profile Guards**: Ensure users complete profile before accessing features
 - **Environment Config**: Type-safe environment variable access
+- **Form Components**: Reusable ValidatedInput, ValidatedSelect, etc. with TanStack Form
 
 ### Authentication Flow
 
@@ -152,10 +156,15 @@ See `docs/database-connections.md` for detailed usage guide.
    - OAuth via `auth.signInWithOAuth()` (Google, GitHub)
 2. **Protected Routes**:
    - Auth guard middleware redirects unauthenticated users
+   - Profile completion guard redirects incomplete profiles to `/onboarding`
    - User state cached in React Query
 3. **API Routes**:
    - All auth endpoints under `/api/auth/*`
    - Handled by Better Auth via catch-all route
+4. **User Type**:
+   - Better Auth's `User` type doesn't include custom fields
+   - Use `ExtendedUser` type from `~/lib/auth/types` for full user data
+   - `getCurrentUser()` server function fetches complete user with custom fields
 
 ### Documentation
 
@@ -171,13 +180,45 @@ The project includes automated documentation generation:
   - Output: `docs/reference/database/schema-erd.{svg,png}`
   - Uses system Chrome via `puppeteer.config.json`
 
+### TanStack Start Server Functions
+
+Server functions are defined using `createServerFn()` and called from React components:
+
+1. **Definition Pattern**:
+
+```typescript
+export const myServerFn = createServerFn({ method: "POST" }).handler(
+  async ({ data }: { data: MyInputType }) => {
+    // Server-side implementation
+    return result;
+  },
+);
+```
+
+2. **Calling Pattern**:
+
+```typescript
+// If handler expects { data }, call with:
+const result = await myServerFn({ data: myData });
+
+// If handler expects no params, call with:
+const result = await myServerFn();
+```
+
+3. **Type Issues**:
+   - TanStack Start's type inference for server functions can be problematic
+   - If you get "Type 'X' is not assignable to type 'undefined'" errors, use `@ts-ignore`
+   - The functions work at runtime despite TypeScript complaints
+
 ### Common Tasks
 
 - **Add a new page**: Create file in `src/routes/`
 - **Add auth to a route**: Use auth guard in route's `beforeLoad`
+- **Add profile completion guard**: Use `requireCompleteProfile()` from profile feature
 - **Access user data**: Use `useRouteContext()` to get user from context
 - **Make API calls**: Use React Query with proper error handling
 - **Add UI components**: Check `src/shared/ui/` for existing components first
+- **Install shadcn components**: `npx shadcn@latest add <component>` (auto-installs to `src/shared/ui/`)
 - **Update documentation**: Run `pnpm docs:all` after significant changes
 
 ### User added context:
@@ -382,11 +423,11 @@ Tree as of July 6, 2025
 
 ## Tool available
 
-Always use your playwright tool to navigate to localhost:8888 to test changes before finishing
+Always use your playwright tool to navigate to localhost:5173 or 8888 to test changes before finishing
 
 ## Dev server
 
-Assume the dev server is running on 8888 for every session, and check via playwright or curl
+Assume the dev server is running on 5173 or 8888 for every session, and check via playwright or curl
 
 ## Rules
 Always read .cursor/rules/*

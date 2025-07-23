@@ -2,8 +2,8 @@
 
 ## Build/Lint/Test Commands
 
-- `pnpm dev` - Start Vite dev server (port 5173)
-- `netlify dev` - Start with edge functions (port 8888, recommended)
+- `pnpm dev` - Start Vite dev server (port 5173, default to use)
+- `netlify dev` - Start with edge functions (port 8888)
 - `pnpm lint` - Run ESLint
 - `pnpm check-types` - TypeScript type checking
 - `pnpm format` - Format with Prettier

@@ -103,6 +103,6 @@ export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
         },
       });
     }
-    return authInstance[prop as keyof typeof authInstance];
+    return authInstance![prop as keyof typeof authInstance];
   },
 });

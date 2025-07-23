@@ -20,6 +20,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm docs:erd` - Generate database ERD diagrams from schema
 - `pnpm docs:all` - Run all documentation generation
 
+## Pre-Commit Requirements
+
+**IMPORTANT**: Before committing any code changes, you MUST run the following commands to ensure code quality:
+
+1. `pnpm lint` - Run ESLint to check for code style issues
+2. `pnpm check-types` - Run TypeScript type checking
+3. `pnpm test` - Run all tests to ensure nothing is broken
+
+All three commands must pass successfully before committing. If any errors are found, fix them before proceeding with the commit.
+
 ## Architecture Overview
 
 This is **Solstice**, a sports league management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
@@ -171,12 +181,12 @@ The project includes automated documentation generation:
 
 You can see the netlify production variables via `netlify env:list`
 Which include:
-| DATABASE_URL | **********\*\***********\*\***********\*\*********** \***\* | All |
-| GOOGLE_CLIENT_ID | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
-| GOOGLE_CLIENT_SECRET | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
-| NETLIFY_DATABASE_URL | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
-| NETLIFY_DATABASE_URL_UNPOOLED | ********\*\***********\*\*\*\***********\*\*********** \***\* | All |
-| NODE_ENV | ********\*\***********\*\*\*\***********\*\***********
+| DATABASE_URL | ****\*\*****\*\*****\*\*****\*\*****\*\*****\*\*****\*\***** \***\* | All |
+| GOOGLE_CLIENT_ID | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
+| GOOGLE_CLIENT_SECRET | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
+| NETLIFY_DATABASE_URL | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
+| NETLIFY_DATABASE_URL_UNPOOLED | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
+| NODE_ENV | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\*****
 \*\*\*\* | Builds, Post processing |
 
 ---

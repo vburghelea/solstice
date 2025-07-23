@@ -47,5 +47,27 @@ export default defineConfig(({ mode }) => {
       // Provide NODE_ENV to client
       "process.env.NODE_ENV": JSON.stringify(mode),
     },
+    optimizeDeps: {
+      include: [
+        "react",
+        "react-dom",
+        "@tanstack/react-start",
+        "@tanstack/react-query",
+        "@tanstack/react-router",
+        "@tanstack/react-router-with-query",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-label",
+        "class-variance-authority",
+        "@tanstack/react-start/server-functions-client",
+        "@tanstack/react-query-devtools",
+        "@tanstack/react-router-devtools",
+        "clsx",
+        "tailwind-merge",
+        "better-auth/react",
+        "@t3-oss/env-core",
+        "zod",
+        "lucide-react",
+      ],
+    },
   };
 });

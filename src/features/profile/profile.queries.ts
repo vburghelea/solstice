@@ -131,11 +131,5 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
   },
 );
 
-export function isProfileComplete(profile: UserProfile): boolean {
-  return !!(
-    profile.dateOfBirth &&
-    profile.emergencyContact?.name &&
-    profile.emergencyContact?.relationship &&
-    (profile.emergencyContact?.phone || profile.emergencyContact?.email)
-  );
-}
+// Re-export utility function
+export { isProfileComplete } from "./profile.utils";

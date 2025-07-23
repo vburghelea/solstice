@@ -217,10 +217,16 @@ describe("LoginForm", () => {
 
     await user.click(screen.getByRole("button", { name: "Login with Google" }));
 
-    expect(auth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
+    expect(auth.signInWithOAuth).toHaveBeenCalledWith(
+      {
+        provider: "google",
+        callbackURL: "/dashboard",
+      },
+      expect.objectContaining({
+        onRequest: expect.any(Function),
+        onError: expect.any(Function),
+      }),
+    );
   });
 
   it("validates required fields", async () => {

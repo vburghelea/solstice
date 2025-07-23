@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isProfileComplete } from "../profile.queries";
 import type { UserProfile } from "../profile.types";
+import { isProfileComplete } from "../profile.utils";
 
 describe("Profile Queries", () => {
   describe("isProfileComplete", () => {

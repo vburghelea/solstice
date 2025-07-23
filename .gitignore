@@ -38,3 +38,6 @@ docs/reference/**
 docs/reference/database/*
 !docs/reference/database/schema-erd.svg
 !docs/reference/database/schema-erd.png
+
+# Stitch design files
+stitch/

@@ -3,16 +3,16 @@
  * Centralizes all security-related settings
  */
 
-import { env } from "@/lib/env.server";
+import { getBaseUrl, isProduction } from "@/lib/env.server";
 
 export const securityConfig = {
   // Cookie security settings
   cookies: {
     httpOnly: true,
     sameSite: "lax" as const,
-    // Force secure cookies when VITE_BASE_URL starts with https://
+    // Force secure cookies in production or when base URL starts with https://
     // This ensures secure cookies even in preview deployments where NODE_ENV might be "test"
-    secure: env.VITE_BASE_URL.startsWith("https://"),
+    secure: isProduction() || getBaseUrl().startsWith("https://"),
     path: "/",
     // Optional domain restriction for production
     // Set COOKIE_DOMAIN env var to restrict cookies to specific domain
@@ -34,7 +34,7 @@ export const securityConfig = {
   // CORS configuration
   cors: {
     credentials: true,
-    origin: process.env["VITE_BASE_URL"] || "http://localhost:5173",
+    origin: getBaseUrl(),
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },

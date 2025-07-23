@@ -75,13 +75,16 @@ This is **Solstice**, a sports league management platform built with TanStack St
 
 - `DATABASE_URL` - PostgreSQL connection string (pooled URL for serverless)
 - `DATABASE_URL_UNPOOLED` - Direct connection URL for migrations (optional)
-- `VITE_BASE_URL` - Application base URL (use http://localhost:8888 for Netlify Dev, http://localhost:5173 for Vite)
+- `VITE_BASE_URL` - Application base URL (only required in development - use http://localhost:8888 for Netlify Dev, http://localhost:5173 for Vite)
 - `GITHUB_CLIENT_ID/SECRET` - GitHub OAuth (required for OAuth login)
 - `GOOGLE_CLIENT_ID/SECRET` - Google OAuth (required for OAuth login)
 - `BETTER_AUTH_SECRET` - Secret key for Better Auth sessions
 
 Netlify automatically provides:
 
+- `URL` - The main URL of your site in production
+- `SITE_URL` - The site's primary URL
+- `DEPLOY_URL` - The specific deploy URL
 - `NETLIFY_DATABASE_URL` - Pooled Neon database URL
 - `NETLIFY_DATABASE_URL_UNPOOLED` - Direct Neon database URL
 
@@ -181,12 +184,12 @@ The project includes automated documentation generation:
 
 You can see the netlify production variables via `netlify env:list`
 Which include:
-| DATABASE_URL | ****\*\*****\*\*****\*\*****\*\*****\*\*****\*\*****\*\***** \***\* | All |
-| GOOGLE_CLIENT_ID | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
-| GOOGLE_CLIENT_SECRET | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
-| NETLIFY_DATABASE_URL | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
-| NETLIFY_DATABASE_URL_UNPOOLED | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\***** \***\* | All |
-| NODE_ENV | **\*\*****\*\*****\*\*****\*\*\*\*****\*\*****\*\*****\*\*****
+| DATABASE_URL | \***\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*** \***\* | All |
+| GOOGLE_CLIENT_ID | **\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\* \***\* | All |
+| GOOGLE_CLIENT_SECRET | **\*\*\*\***\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*** \***\* | All |
+| NETLIFY_DATABASE_URL | **\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\***\* \***\* | All |
+| NETLIFY_DATABASE_URL_UNPOOLED | **\*\*\*\***\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*** \***\* | All |
+| NODE_ENV | **\*\*\***\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\***\*\*\*\*\*\*
 \*\*\*\* | Builds, Post processing |
 
 ---

@@ -5,12 +5,12 @@ export const emergencyContactSchema = z
     name: z.string().min(1, "Emergency contact name is required"),
     relationship: z.string().min(1, "Relationship is required"),
     phone: z.string().optional(),
-    email: z.string().email().optional(),
+    email: z.string().email("Invalid emergency contact email").optional(),
   })
-  .refine(
-    (data) => data.phone || data.email,
-    "Either phone or email is required for emergency contact",
-  );
+  .refine((data) => data.phone || data.email, {
+    message: "Please provide at least one contact method (phone or email)",
+    path: ["phone"], // This will show the error on the phone field
+  });
 
 export const privacySettingsSchema = z.object({
   showEmail: z.boolean(),
@@ -27,7 +27,7 @@ export const profileInputSchema = z.object({
     },
     { message: "Age must be between 13 and 120 years" },
   ),
-  emergencyContact: emergencyContactSchema,
+  emergencyContact: emergencyContactSchema.optional(),
   gender: z.string().optional(),
   pronouns: z.string().optional(),
   phone: z.string().optional(),

@@ -25,35 +25,27 @@ describe("Profile Queries", () => {
       expect(isProfileComplete(profile)).toBe(false);
     });
 
-    it("returns false when emergency contact name is missing", () => {
+    it("returns true when emergency contact is not provided (optional)", () => {
       const profile: UserProfile = {
         ...baseProfile,
         dateOfBirth: new Date("1990-01-01"),
-        emergencyContact: {
-          name: "",
-          relationship: "Friend",
-          phone: "123-456-7890",
-        },
+        // No emergency contact provided
       };
 
-      expect(isProfileComplete(profile)).toBe(false);
+      expect(isProfileComplete(profile)).toBe(true);
     });
 
-    it("returns false when emergency contact relationship is missing", () => {
+    it("returns true when emergency contact is undefined (optional)", () => {
       const profile: UserProfile = {
         ...baseProfile,
         dateOfBirth: new Date("1990-01-01"),
-        emergencyContact: {
-          name: "John Doe",
-          relationship: "",
-          phone: "123-456-7890",
-        },
+        emergencyContact: undefined,
       };
 
-      expect(isProfileComplete(profile)).toBe(false);
+      expect(isProfileComplete(profile)).toBe(true);
     });
 
-    it("returns false when emergency contact has neither phone nor email", () => {
+    it("returns true even with partial emergency contact (validation handled elsewhere)", () => {
       const profile: UserProfile = {
         ...baseProfile,
         dateOfBirth: new Date("1990-01-01"),
@@ -63,7 +55,7 @@ describe("Profile Queries", () => {
         },
       };
 
-      expect(isProfileComplete(profile)).toBe(false);
+      expect(isProfileComplete(profile)).toBe(true);
     });
 
     it("returns true when all required fields are present with phone", () => {

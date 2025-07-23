@@ -29,7 +29,7 @@ export interface UserProfile {
 
 export interface ProfileInput {
   dateOfBirth: Date;
-  emergencyContact: EmergencyContact;
+  emergencyContact?: EmergencyContact;
   gender?: string;
   pronouns?: string;
   phone?: string;

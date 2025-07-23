@@ -71,7 +71,7 @@ describe("Profile Schemas", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toBe(
-          "Either phone or email is required for emergency contact",
+          "Please provide at least one contact method (phone or email)",
         );
       }
     });

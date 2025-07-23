@@ -7,26 +7,13 @@ import {
   ScriptOnce,
   Scripts,
 } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import { auth } from "~/lib/auth-client";
+import { getCurrentUser } from "~/features/auth/auth.queries";
 import type { AuthUser } from "~/lib/auth/types";
 import appCss from "~/styles.css?url";
-
-// Server function to get user session with proper cookie handling
-const getUser = createServerFn({ method: "GET" }).handler(async () => {
-  // This handler runs ONLY on the server
-  const { auth: serverAuth } = await import("~/lib/auth");
-  const { getWebRequest } = await import("@tanstack/react-start/server");
-  const { headers } = getWebRequest();
-  const session = await serverAuth.api.getSession({
-    headers,
-  });
-  return session?.user || null;
-});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -36,16 +23,13 @@ export const Route = createRootRouteWithContext<{
     // Check if we're on the server or client
     if (typeof window === "undefined") {
       // Server: use the server function
-      const user = await getUser();
+      const user = await getCurrentUser();
       return { user };
     } else {
-      // Client: use the client-side auth
+      // Client: fetch the full user data
       const user = await context.queryClient.fetchQuery({
         queryKey: ["user"],
-        queryFn: async () => {
-          const session = await auth.getSession();
-          return session.data?.user || null;
-        },
+        queryFn: getCurrentUser,
       });
       return { user };
     }

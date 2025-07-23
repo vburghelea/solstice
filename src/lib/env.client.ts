@@ -9,7 +9,7 @@ import { z } from "zod";
 export const env = createEnv({
   clientPrefix: "VITE_",
   client: {
-    VITE_BASE_URL: z.string().url(),
+    VITE_BASE_URL: z.string().url().optional(),
     VITE_ENABLE_ANALYTICS: z.coerce.boolean().default(false),
     VITE_ENABLE_SENTRY: z.coerce.boolean().default(false),
     VITE_POSTHOG_KEY: z.string().optional(),
@@ -32,8 +32,8 @@ const getClientBaseUrl = () => {
   if (typeof window !== "undefined") {
     return window.location.origin;
   }
-  // During SSR, fall back to the validated VITE_BASE_URL
-  return env.VITE_BASE_URL;
+  // During SSR, fall back to VITE_BASE_URL if provided, otherwise use a default
+  return env.VITE_BASE_URL || "http://localhost:5173";
 };
 
 export const getBaseUrl = () => getClientBaseUrl();

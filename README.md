@@ -33,7 +33,7 @@ Environment variables are validated at startup using Zod schemas. Create a `.env
 # Database (required)
 DATABASE_URL=postgresql://user:password@localhost:5432/solstice
 
-# Application (required)
+# Application (only required in development)
 VITE_BASE_URL=http://localhost:3000
 
 # Auth (required for production)
@@ -158,7 +158,7 @@ GitHub Actions workflows handle:
 Configure these secrets in your GitHub repository settings:
 
 - `DATABASE_URL` - PostgreSQL connection string for CI tests
-- `VITE_BASE_URL` - Base URL for the application
+- `VITE_BASE_URL` - Base URL for the application (not needed in production - Netlify provides URL automatically)
 - `BETTER_AUTH_SECRET` - Auth secret key (generate with `pnpm auth:secret` locally)
 - `NETLIFY_AUTH_TOKEN` - Netlify authentication token
 - `NETLIFY_SITE_ID` - Netlify site ID

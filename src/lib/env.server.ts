@@ -35,7 +35,14 @@ export const env = createEnv({
     VERCEL_ENV: z.string().optional(),
 
     // Client vars are also available on server
-    VITE_BASE_URL: z.string().url(),
+    // In production, Netlify provides URL env var
+    VITE_BASE_URL: z.string().url().optional(),
+
+    // Netlify automatically provides these
+    URL: z.string().url().optional(), // The main URL of the site
+    SITE_URL: z.string().url().optional(), // The site's URL
+    DEPLOY_URL: z.string().url().optional(), // The specific deploy URL
+    DEPLOY_PRIME_URL: z.string().url().optional(), // The prime URL for the deploy
   },
   // Use process.env since we've just loaded .env
   runtimeEnv: process.env,
@@ -54,7 +61,24 @@ export const getUnpooledDbUrl = () =>
   env.NETLIFY_DATABASE_URL_UNPOOLED ||
   env.DATABASE_URL;
 
-export const getBaseUrl = () => env.VITE_BASE_URL;
+export const getBaseUrl = () => {
+  // In production, use Netlify's automatically provided URLs
+  if (isProduction() || env.NETLIFY) {
+    // Priority: URL > SITE_URL > DEPLOY_PRIME_URL > DEPLOY_URL
+    return (
+      env.URL ||
+      env.SITE_URL ||
+      env.DEPLOY_PRIME_URL ||
+      env.DEPLOY_URL ||
+      "https://app.netlify.com"
+    );
+  }
+  // In development/test, require VITE_BASE_URL
+  if (!env.VITE_BASE_URL) {
+    throw new Error("VITE_BASE_URL is required in development");
+  }
+  return env.VITE_BASE_URL;
+};
 export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
 
 export const isProduction = () => env.NODE_ENV === "production";

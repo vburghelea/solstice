@@ -16,7 +16,7 @@ function Home() {
         subtitle="Your hub for all things Quadball in Canada. Stay updated on events, teams, and resources."
         backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
         ctaText="Explore Events"
-        ctaLink="/events"
+        ctaLink="/"
       />
 
       <section className="bg-gray-50 py-8 sm:py-12 lg:py-16">
@@ -29,23 +29,23 @@ function Home() {
               title="National Championship"
               description="Join us for the biggest Quadball event of the year!"
               image="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1740"
-              link="/events/national-championship"
+              link="/"
             />
             <EventCard
               title="Regional Training Camp"
               description="Improve your skills with top coaches in the region."
               image="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1740"
-              link="/events/training-camp"
+              link="/"
             />
             <EventCard
               title="Community Meetup"
               description="Connect with fellow Quadball enthusiasts in your area."
               image="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=1674"
-              link="/events/community-meetup"
+              link="/"
             />
           </div>
           <div className="mt-8 text-center sm:mt-12">
-            <Link to="/events" className="text-brand-red font-semibold hover:underline">
+            <Link to="/" className="text-brand-red font-semibold hover:underline">
               View all events →
             </Link>
           </div>
@@ -71,7 +71,7 @@ function Home() {
                 Register your team for the upcoming season and compete for the
                 championship.
               </p>
-              <Link to="/register">
+              <Link to="/signup">
                 <Button className="btn-brand-primary">Register Now →</Button>
               </Link>
             </div>

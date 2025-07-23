@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;family=Noto+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<title>Quadball Canada</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {
+            --brand-red: #D82929;
+            --brand-dark: #1A1A1A;
+            --brand-light: #FFFFFF;
+        }
+        .text-brand-red { color: var(--brand-red); }
+        .bg-brand-red { background-color: var(--brand-red); }
+        .border-brand-red { border-color: var(--brand-red); }
+        .hover\:bg-brand-red-dark:hover { background-color: #b92323; }
+        .text-brand-dark { color: var(--brand-dark); }
+        .bg-brand-dark { background-color: var(--brand-dark); }
+        .text-brand-light { color: var(--brand-light); }
+        .bg-brand-light { background-color: var(--brand-light); }
+        .maple-leaf-logo {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background-color: var(--brand-red);
+            clip-path: polygon(50% 0%, 61% 35%, 75% 35%, 75% 50%, 90% 50%, 90% 65%, 50% 100%, 10% 65%, 10% 50%, 25% 50%, 25% 35%, 39% 35%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-brand-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+<div class="relative flex min-h-screen flex-col">
+<header class="sticky top-0 z-50 bg-brand-light/80 backdrop-blur-md shadow-sm">
+<div class="container mx-auto px-6 lg:px-10">
+<div class="flex h-20 items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="maple-leaf-logo"></div>
+<h1 class="text-xl font-extrabold tracking-tight text-brand-dark">Quadball Canada</h1>
+</div>
+<nav class="hidden items-center gap-8 text-sm font-medium lg:flex">
+<a class="transition hover:text-brand-red" href="#">Events</a>
+<a class="transition hover:text-brand-red" href="#">Teams</a>
+<a class="transition hover:text-brand-red" href="#">Resources</a>
+<a class="transition hover:text-brand-red" href="#">About Us</a>
+</nav>
+<div class="flex items-center gap-3">
+<a class="hidden rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100 sm:block" href="#">Login</a>
+<a class="rounded-lg bg-brand-red px-4 py-2 text-sm font-bold text-white shadow-md transition hover:bg-brand-red-dark" href="#">Register</a>
+<button class="p-2 lg:hidden">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<section class="relative h-[60vh] min-h-[400px] bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAbUWtcawWYX0-wLC5y_OnNqD-pytg-lP6omOTjqdxG0bZ4_1IFsvyqLU0wcQcRCvd6hYwyw4bAT-b8JPQPAcMsO1dqgWkP1ATWmVZxqrS7RzFPryy3ZiB9afiOgfXP0KiC9g6E_rR0ZtYrMeVfLZDFCO449K5TrpenZ0k4RW3X6SA136lQhkVRPQFXBczrPHmUHTlCeummrF6ACMJcTnvsddDaximVzU1DHbz-LpnJ9_LYBbJiwkGwMZcW8hwLB8KdkkEluLyQdCU');">
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white">
+<div class="container mx-auto px-6 lg:px-10">
+<h1 class="text-4xl font-extrabold tracking-tight md:text-6xl">Welcome to Quadball Canada</h1>
+<p class="mt-4 max-w-2xl text-lg text-gray-200">Your hub for all things Quadball in Canada. Stay updated on events, teams, and resources.</p>
+<a class="mt-8 inline-block rounded-lg bg-brand-red px-8 py-3 text-base font-bold text-white shadow-lg transition hover:bg-brand-red-dark" href="#">Explore Events</a>
+</div>
+</div>
+</section>
+<div class="container mx-auto px-6 py-16 lg:px-10">
+<section>
+<div class="flex items-center justify-between border-b-2 border-gray-200 pb-4">
+<h2 class="text-3xl font-bold tracking-tight">Upcoming Events</h2>
+<a class="text-sm font-semibold text-brand-red transition hover:underline" href="#">View all events →</a>
+</div>
+<div class="mt-8 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+<div class="group overflow-hidden rounded-lg bg-white shadow-lg transition-shadow duration-300 hover:shadow-2xl">
+<img alt="National Championship" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWEI1bst-LWObG37dQAU2u3n7kNncbONUz4LEWOqScmgXrvSEm2KTIoo2QBpxXlKRHQDMLI4ux053To-gKHZPFd55sReP0MP6bEn8QKxLQkKjUUDx5ZWY8HRBMPAsULAhFY0IdpIayOr7vbMUe_3q1r1GAv-ZD0q2XozUY-mDozGHAVedrVlF20_ScBoUkYTv2v2boTaLagL5SVXLynv2O1Nb-QPtpLaA312ZB0X3Ka45NEaPCvOExY9E-2VKhR5N-7UTc3KoMy5U"/>
+<div class="p-6">
+<h3 class="text-xl font-bold">National Championship</h3>
+<p class="mt-2 text-sm text-gray-600">Join us for the biggest Quadball event of the year!</p>
+</div>
+</div>
+<div class="group overflow-hidden rounded-lg bg-white shadow-lg transition-shadow duration-300 hover:shadow-2xl">
+<img alt="Regional Training Camp" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCImvRaDXDccK3FTWfqzO3q468LXtCr8ZYx3T44DvfytsfLeUkjZGeqBOfZfnosjpji-5-0sU4i1P3onO1Y7Nj_odzVBCoPshHFGUgf8P5zTFoZYK2fIHCNWOvdm54968gj42dcxUFqwfKurhHJucjAMthZGDLSluU7hu91DcgQ8mCCY2qB0Mj_3tCGCPpv50cimVTlWfRSGDZIv02TQHYFtSnJU6EnjREIxJssh4SrwSOaiktjs7AygZOx3xgPAUwxXoHZMC8SR9E"/>
+<div class="p-6">
+<h3 class="text-xl font-bold">Regional Training Camp</h3>
+<p class="mt-2 text-sm text-gray-600">Improve your skills with top coaches in the region.</p>
+</div>
+</div>
+<div class="group overflow-hidden rounded-lg bg-white shadow-lg transition-shadow duration-300 hover:shadow-2xl">
+<img alt="Community Meetup" class="h-56 w-full object-cover transition-transform duration-300 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEbfR-Pj4JD9SGTbH8S4s06msutaACO_28uMgZvgrpLVJ02vbWNgkeKw9VYtajCXn2J3gVOTq00dFTNLdhIeGlLcs0Pl61V4ae71eZtPIcO13mZfa--LPPW8wgGRzo8q00jvEBw1cX8W03jxkQfKKyJRho6gcFlaRNymW0K0Gq5tnZ3og3aqVH2fOUIECrhZGW2NJZ2AQNNwZKmESqaunTqsBgy72NHZOfzUSGFuhbOlVA3SqQPHlH0rx0oDk7HpAQFSFNCOeu2GA"/>
+<div class="p-6">
+<h3 class="text-xl font-bold">Community Meetup</h3>
+<p class="mt-2 text-sm text-gray-600">Connect with fellow Quadball enthusiasts in your area.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-16">
+<h2 class="border-b-2 border-gray-200 pb-4 text-3xl font-bold tracking-tight">Latest News</h2>
+<div class="mt-8 space-y-8">
+<div class="flex flex-col items-center gap-8 rounded-lg bg-white p-6 shadow-lg md:flex-row">
+<img alt="New Team Registration" class="h-48 w-full rounded-md object-cover md:h-full md:w-1/3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ_7OChW7zwXmHYNeVKrhT2ArfZIRrBXy-1TlysYNKIEqmqII2OQulsssW8zHZ3BIquHSEYtvoQOeelFUIOMPkJ_B31B3pvSdZ8xaScrsf6LrQKug64N2NhUxvVyBW3_HfFr1snLaHE0Ty5rAe4L7_Hm3LyEDAAMg7daKoi4ZElbiPA1oHCQhb3_hUO9ZJ8l7tlmU66bhHsl3_qi_TX9YL3vuwdim5hqeZtUIS2-CHFe48IBvCTT-gRquWK7aj8Fr_JGT1YjOhLEg"/>
+<div class="flex-1">
+<h3 class="text-xl font-bold">New Team Registration Opens</h3>
+<p class="mt-2 text-gray-600">Register your team for the upcoming season and compete for the championship.</p>
+<a class="mt-4 inline-block text-sm font-semibold text-brand-red transition hover:underline" href="#">Register Now →</a>
+</div>
+</div>
+<div class="flex flex-col items-center gap-8 rounded-lg bg-white p-6 shadow-lg md:flex-row">
+<img alt="Rulebook Update" class="h-48 w-full rounded-md object-cover md:h-full md:w-1/3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwzjtxLssAK7cyXuMOBzRp1Qwl1N7eu1ij7koVNmdWHGIm8A7LX_wN7i8DvG8aSanVCg4bMwJUmdZHutm1yPC8aY-LdOgTbDeQMkVqXzwgG5ER7S2r4p19Vkl4n4WYvEnbfecDpA1kBEPZYr9b8iznATRJkPqdG6dMksc5sURl4OaGo6JHJYqerChuaiWpLUujFUvxm-Zmhm263Wlp27j7HxTftm-HbM5gVDMbNXzZ860K9g4fBS0VZKDzZ7m9BfWZRxyLqI4IrCU"/>
+<div class="flex-1">
+<h3 class="text-xl font-bold">Rulebook Update</h3>
+<p class="mt-2 text-gray-600">The latest version of the Quadball Canada rulebook is now available for download.</p>
+<a class="mt-4 inline-block text-sm font-semibold text-brand-red transition hover:underline" href="#">View Rulebook →</a>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-16">
+<h2 class="border-b-2 border-gray-200 pb-4 text-3xl font-bold tracking-tight">Quick Links</h2>
+<div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+<a class="group flex items-center gap-4 rounded-lg bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl" href="#">
+<div class="rounded-full bg-red-100 p-3 text-brand-red transition-colors group-hover:bg-brand-red group-hover:text-white">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z"></path></svg>
+</div>
+<h3 class="text-base font-bold">Events Calendar</h3>
+</a>
+<a class="group flex items-center gap-4 rounded-lg bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl" href="#">
+<div class="rounded-full bg-red-100 p-3 text-brand-red transition-colors group-hover:bg-brand-red group-hover:text-white">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M247.31,199.06a16,16,0,0,1-16,16.88h-4.25a72,72,0,0,0-64.44-48,40,40,0,1,0-49.24,0,72,72,0,0,0-64.44,48H44.69a16,16,0,0,1-16-16.88A104,104,0,0,1,128,24,104,104,0,0,1,247.31,199.06ZM128,136a48,48,0,1,1-48-48A48.05,48.05,0,0,1,128,136Z"></path></svg>
+</div>
+<h3 class="text-base font-bold">Team Directory</h3>
+</a>
+<a class="group flex items-center gap-4 rounded-lg bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl" href="#">
+<div class="rounded-full bg-red-100 p-3 text-brand-red transition-colors group-hover:bg-brand-red group-hover:text-white">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z"></path></svg>
+</div>
+<h3 class="text-base font-bold">Resource Library</h3>
+</a>
+<a class="group flex items-center gap-4 rounded-lg bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl" href="#">
+<div class="rounded-full bg-red-100 p-3 text-brand-red transition-colors group-hover:bg-brand-red group-hover:text-white">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path></svg>
+</div>
+<h3 class="text-base font-bold">FAQ</h3>
+</a>
+</div>
+</section>
+</div>
+</main>
+<footer class="bg-brand-dark text-brand-light">
+<div class="container mx-auto px-6 py-12 lg:px-10">
+<div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+<div>
+<div class="flex items-center gap-3">
+<div class="maple-leaf-logo"></div>
+<h2 class="text-lg font-bold">Quadball Canada</h2>
+</div>
+<p class="mt-4 text-sm text-gray-400">Promoting and developing the sport of Quadball across Canada.</p>
+</div>
+<div>
+<h3 class="font-bold uppercase tracking-wider text-gray-300">Quick Links</h3>
+<nav class="mt-4 space-y-2 text-sm">
+<a class="block text-gray-400 hover:text-white" href="#">Events</a>
+<a class="block text-gray-400 hover:text-white" href="#">Teams</a>
+<a class="block text-gray-400 hover:text-white" href="#">Resources</a>
+<a class="block text-gray-400 hover:text-white" href="#">About Us</a>
+<a class="block text-gray-400 hover:text-white" href="#">Contact</a>
+</nav>
+</div>
+<div>
+<h3 class="font-bold uppercase tracking-wider text-gray-300">Follow Us</h3>
+<div class="mt-4 flex space-x-4">
+<a class="text-gray-400 hover:text-white" href="#"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46,6C21.74,6.35 20.96,6.58 20.13,6.69C20.94,6.2 21.57,5.45 21.87,4.56C21.1,5.01 20.24,5.35 19.31,5.56C18.57,4.79 17.5,4.31 16.31,4.31C14.03,4.31 12.17,6.17 12.17,8.45C12.17,8.78 12.21,9.1 12.28,9.4C8.63,9.22 5.42,7.49 3.1,4.79C2.75,5.4 2.56,6.12 2.56,6.89C2.56,8.39 3.33,9.72 4.48,10.47C3.79,10.45 3.13,10.25 2.56,9.96V10C2.56,12.08 4.04,13.84 6.02,14.24C5.67,14.33 5.3,14.38 4.92,14.38C4.66,14.38 4.4,14.35 4.15,14.3C4.69,16.03 6.27,17.29 8.16,17.32C6.69,18.49 4.82,19.2 2.78,19.2C2.45,19.2 2.11,19.18 1.78,19.13C3.69,20.37 5.94,21.08 8.38,21.08C16.3,21.08 20.48,14.5 20.48,8.98C20.48,8.8 20.48,8.63 20.46,8.46C21.3,7.85 22,7 22.46,6Z"></path></svg></a>
+<a class="text-gray-400 hover:text-white" href="#"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.32 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96C18.34 21.21 22 17.06 22 12.06C22 6.53 17.5 2.04 12 2.04Z"></path></svg></a>
+<a class="text-gray-400 hover:text-white" href="#"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"></path></svg></a>
+</div>
+</div>
+</div>
+<div class="mt-12 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
+<p>© 2024 Quadball Canada. All Rights Reserved.</p>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>

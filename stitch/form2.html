@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quadball Canada - Team Management</title>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B600%3B700%3B800" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+      :root {
+        --primary-color: #0c7ff2;
+        --secondary-color: #f0f2f5;
+        --text-primary: #111418;
+        --text-secondary: #60758a;
+        --border-color: #dbe0e6;
+      }
+      .btn-primary {
+        @apply bg-[var(--primary-color)] text-white;
+      }
+      .btn-secondary {
+        @apply bg-[var(--secondary-color)] text-[var(--text-primary)];
+      }
+      .status-active {
+        @apply bg-green-100 text-green-800;
+      }
+      .status-inactive {
+        @apply bg-red-100 text-red-800;
+      }
+    </style>
+</head>
+<body class="bg-gray-50" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
+<div class="flex min-h-screen">
+<aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+<div class="p-6">
+<h1 class="text-xl font-bold text-[var(--text-primary)]">Quadball Canada</h1>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-2">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path></svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-semibold bg-[var(--secondary-color)] text-[var(--primary-color)]" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M164.47,195.63a8,8,0,0,1-6.7,12.37H10.23a8,8,0,0,1-6.7-12.37,95.83,95.83,0,0,1,47.22-37.71,60,60,0,1,1,66.5,0A95.83,95.83,0,0,1,164.47,195.63Zm87.91-.15a95.87,95.87,0,0,0-47.13-37.56A60,60,0,0,0,144.7,54.59a4,4,0,0,0-1.33,6A75.83,75.83,0,0,1,147,150.53a4,4,0,0,0,1.07,5.53,112.32,112.32,0,0,1,29.85,30.83,23.92,23.92,0,0,1,3.65,16.47,4,4,0,0,0,3.95,4.64h60.3a8,8,0,0,0,7.73-5.93A8.22,8.22,0,0,0,252.38,195.48Z"></path></svg>
+<span>Teams</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z"></path></svg>
+<span>Events</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M244.8,150.4a8,8,0,0,1-11.2-1.6A51.6,51.6,0,0,0,192,128a8,8,0,0,1-7.37-4.89,8,8,0,0,1,0-6.22A8,8,0,0,1,192,112a24,24,0,1,0-23.24-30,8,8,0,1,1-15.5-4A40,40,0,1,1,219,117.51a67.94,67.94,0,0,1,27.43,21.68A8,8,0,0,1,244.8,150.4ZM190.92,212a8,8,0,1,1-13.84,8,57,57,0,0,0-98.16,0,8,8,0,1,1-13.84-8,72.06,72.06,0,0,1,33.74-29.92,48,48,0,1,1,58.36,0A72.06,72.06,0,0,1,190.92,212ZM128,176a32,32,0,1,0-32-32A32,32,0,0,0,128,176ZM72,120a8,8,0,0,0-8-8A24,24,0,1,1,87.24,82a8,8,0,1,0,15.5-4A40,40,0,1,0,37,117.51,67.94,67.94,0,0,0,9.6,139.19a8,8,0,1,0,12.8,9.61A51.6,51.6,0,0,1,64,128,8,8,0,0,0,72,120Z"></path></svg>
+<span>Members</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176ZM104,120v24a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm32-16v40a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm32-16v56a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"></path></svg>
+<span>Reports</span>
+</a>
+</nav>
+<div class="px-4 py-4 border-t border-gray-200">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path></svg>
+<span>Profile</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100" href="#">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"></path></svg>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<header class="mb-8">
+<h1 class="text-4xl font-bold text-[var(--text-primary)]">Team Management</h1>
+<p class="text-lg text-[var(--text-secondary)] mt-1">Manage your team's roster, registrations, and details.</p>
+</header>
+<div class="border-b border-[var(--border-color)] mb-6">
+<nav class="flex space-x-8 -mb-px">
+<a class="py-4 px-1 border-b-2 border-[var(--primary-color)] text-[var(--primary-color)] font-semibold text-sm" href="#">Roster</a>
+<a class="py-4 px-1 border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-gray-300 font-semibold text-sm" href="#">Registrations</a>
+<a class="py-4 px-1 border-b-2 border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-gray-300 font-semibold text-sm" href="#">Team Details</a>
+</nav>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-[var(--border-color)]">
+<div class="p-6 flex justify-between items-center">
+<h2 class="text-xl font-bold text-[var(--text-primary)]">Team Roster</h2>
+<button class="btn-primary flex items-center gap-2 h-10 px-4 rounded-md text-sm font-bold tracking-wide">
+<svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+<span>Add Member</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left text-gray-500">
+<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+<tr>
+<th class="px-6 py-3 font-semibold" scope="col">Name</th>
+<th class="px-6 py-3 font-semibold" scope="col">Position</th>
+<th class="px-6 py-3 font-semibold" scope="col">Jersey Number</th>
+<th class="px-6 py-3 font-semibold" scope="col">Status</th>
+<th class="px-6 py-3 font-semibold text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b">
+<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Liam Carter</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">Chaser</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">12</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 text-xs font-semibold rounded-full status-active">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<a class="font-medium text-[var(--primary-color)] hover:underline" href="#">Edit</a>
+</td>
+</tr>
+<tr class="bg-white border-b">
+<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Olivia Bennett</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">Keeper</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">7</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 text-xs font-semibold rounded-full status-active">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<a class="font-medium text-[var(--primary-color)] hover:underline" href="#">Edit</a>
+</td>
+</tr>
+<tr class="bg-white border-b">
+<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Noah Thompson</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">Beater</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">23</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 text-xs font-semibold rounded-full status-active">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<a class="font-medium text-[var(--primary-color)] hover:underline" href="#">Edit</a>
+</td>
+</tr>
+<tr class="bg-white border-b">
+<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Ava Harper</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">Seeker</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">1</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 text-xs font-semibold rounded-full status-inactive">Inactive</span>
+</td>
+<td class="px-6 py-4 text-right">
+<a class="font-medium text-[var(--primary-color)] hover:underline" href="#">Edit</a>
+</td>
+</tr>
+<tr class="bg-white">
+<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Ethan Foster</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">Chaser</td>
+<td class="px-6 py-4 text-[var(--text-secondary)]">99</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 text-xs font-semibold rounded-full status-active">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<a class="font-medium text-[var(--primary-color)] hover:underline" href="#">Edit</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -62,17 +62,18 @@ export const getUnpooledDbUrl = () =>
   env.DATABASE_URL;
 
 export const getBaseUrl = () => {
-  // In production, use Netlify's automatically provided URLs
-  if (isProduction() || env.NETLIFY) {
-    // Priority: URL > SITE_URL > DEPLOY_PRIME_URL > DEPLOY_URL
-    return (
-      env.URL ||
-      env.SITE_URL ||
-      env.DEPLOY_PRIME_URL ||
-      env.DEPLOY_URL ||
-      "https://app.netlify.com"
-    );
+  // Check if we have any Netlify-provided URLs (indicates we're in Netlify environment)
+  const netlifyUrl = env.URL || env.SITE_URL || env.DEPLOY_PRIME_URL || env.DEPLOY_URL;
+
+  // Check if we're in a Netlify environment by looking for Netlify-specific env vars
+  const isNetlifyEnv = !!(env.NETLIFY || env.NETLIFY_DATABASE_URL || netlifyUrl);
+
+  // In production, Netlify environment, or when we have a URL, use it
+  if (isProduction() || isNetlifyEnv) {
+    // If we have a Netlify URL, use it; otherwise fall back to VITE_BASE_URL or a default
+    return netlifyUrl || env.VITE_BASE_URL || "https://app.netlify.com";
   }
+
   // In development/test, require VITE_BASE_URL
   if (!env.VITE_BASE_URL) {
     throw new Error("VITE_BASE_URL is required in development");

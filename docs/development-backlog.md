@@ -53,7 +53,13 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ---
 
-### ❌ P0-2: Membership tables, pricing seeds & purchase server functions
+### ✅ P0-2: Complete Profile Onboarding Flow
+
+**Status**: ✅ Complete - See "Completed Work" section above
+
+---
+
+### ❌ P0-3: Membership tables, pricing seeds & purchase server functions
 
 |                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -66,13 +72,13 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ---
 
-### ❌ P0-3: "Buy / Renew Membership" UI slice
+### ❌ P0-4: "Buy / Renew Membership" UI slice
 
 |                |                                                                                                                                                                                                                                                                                                                                                                                                                |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                                                                                                                                                 |
 | **Why now**    | Demonstrates DB ↔ payments ↔ UI flow; enables smoke tests and stakeholder demos.                                                                                                                                                                                                                                                                                                                             |
-| **Depends on** | P0-2                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Depends on** | P0-3                                                                                                                                                                                                                                                                                                                                                                                                           |
 | **Code refs**  | `docs/quadball-plan/ui-flows/user-journeys.md` (Member Renewal & Onboarding flows)                                                                                                                                                                                                                                                                                                                             |
 | **Tasks**      | <ul><li>Add page `/membership` under dashboard layout: shows active membership or list of `membership_types`.</li><li>When "Buy Now" clicked, call `createCheckoutSession` -> redirect to returned checkout URL (fake).</li><li>After redirect back (Square will call `?success=1`), fetch server function to verify & show confirmation.</li><li>Unit/integration tests (Vitest + Testing Library).</li></ul> |
 | **Thoughts**   | UI can be basic list → card per membership type, using shadcn `Card`. Add skeleton loader while fetching.                                                                                                                                                                                                                                                                                                      |

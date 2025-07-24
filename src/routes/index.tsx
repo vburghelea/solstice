@@ -105,29 +105,37 @@ function Index() {
   return (
     <PublicLayout>
       <HeroSection
-        eyebrow="Play. Compete. Grow."
-        title="Fueling the growth of Quadball across Canada"
-        subtitle="Quadball Canada connects clubs, athletes, and volunteers coast-to-coast—from grassroots programs to high-performance teams—so everyone can experience the magic of the sport."
-        backgroundImage="https://images.unsplash.com/photo-1502810190503-8303352d0dd1?auto=format&fit=crop&w=2000&q=80"
-        ctaText="Find Your Next Event"
-        ctaLink="/events"
-        secondaryCta={{
-          text: "Connect With a Team",
-          link: "/teams",
-        }}
+        title="Welcome to Roundup Games"
+        subtitle="A platform for connecting tabletop and board game enthusiasts, helping them organize game sessions, longer running campaigns, events, and administrative tasks."
+        backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
+        ctaText="Explore Games"
+        ctaLink="/"
       />
 
       <section className="bg-white py-10 sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid gap-6 rounded-2xl bg-gray-50 p-6 text-center shadow-sm sm:grid-cols-3 sm:p-8">
-            {highlights.map((item) => (
-              <div key={item.label} className="space-y-2">
-                <p className="text-brand-red text-3xl font-bold sm:text-4xl">
-                  {item.value}
-                </p>
-                <p className="text-sm font-medium text-gray-600">{item.label}</p>
-              </div>
-            ))}
+          <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl">
+            Upcoming Events
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+            <EventCard
+              title="National Championship"
+              description="Join us for the biggest event of the year!"
+              image="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1740"
+              link="/"
+            />
+            <EventCard
+              title="Regional Training Camp"
+              description="Improve your skills with top coaches in the region."
+              image="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1740"
+              link="/"
+            />
+            <EventCard
+              title="Community Meetup"
+              description="Connect with fellow enthusiasts in your area."
+              image="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=1674"
+              link="/"
+            />
           </div>
         </div>
       </section>

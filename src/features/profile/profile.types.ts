@@ -27,6 +27,15 @@ export interface UserProfile {
   image?: string;
   uploadedAvatarPath?: string;
   profileComplete: boolean;
+  gender?: string | undefined;
+  pronouns?: string | undefined;
+  phone?: string | undefined;
+  privacySettings?: PrivacySettings | undefined;
+  profileVersion: number;
+  profileUpdatedAt?: Date | undefined;
+}
+
+export interface ProfileInput {
   gender?: string;
   pronouns?: string;
   phone?: string;

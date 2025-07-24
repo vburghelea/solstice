@@ -1,25 +1,40 @@
 # Development Backlog
 
-**Last Updated**: September 21, 2025
+Below is a **prioritized ticket backlog** that will take the current codebase from an auth-only skeleton to a thin, end-to-end **Member → Dashboard** slice and lay the foundation for Teams and Events. Each ticket lists:
 
-This backlog lists the active roadmap items for Solstice. Tickets are grouped by priority (P0 is highest). Each ticket below contains the problem statement, desired outcome, implementation guidance, and links to every relevant file so the work can proceed with just this document.
-
-> **Maintainer Checklist:** When closing a ticket, update this backlog entry, refresh any impacted security docs or release notes, and confirm `pnpm lint`, `pnpm check-types`, and relevant tests have been run.
+- **Priority** (P0 = must ship next; P1 = after P0 etc.)
+- **Status** (✅ Complete, 🚧 In Progress, ❌ Not Started)
+- **Depends on** (other tickets or existing code)
+- **Key code/doc references** (files you will touch or read)
+- **Technical notes / first-implementation thoughts**
 
 ---
 
-## 🚨 P0 – Critical
+## Completed Work
 
-### EVT-1: Event Cancellation Communication & Refund Flow
+### ✅ DONE: Roundup Games Design System Integration
 
-|                          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**               | ✅ Completed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| **Priority**             | 🔴 Critical (member experience & revenue protection)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| **Problem**              | Cancelling an event only flips the event row to `cancelled`; attendee registrations remain untouched and no one is notified. Teams still appear confirmed, e-transfer instructions stay active, and Square sessions are never refunded, creating support escalations and revenue accounting gaps.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| **Desired Outcome**      | Cancelling an event must cascade: mark all related registrations as `cancelled`, persist cancellation timestamps/actors, automatically trigger refunds or follow-up tasks per payment method, and notify both registrants and administrators with clear messaging.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| **Implementation Notes** | <ul><li>Within `cancelEvent`, fetch confirmed/pending registrations for the event and transition them to a cancelled state while recording `cancelledAt`, `cancelledBy`, and reason metadata. Update any associated payment session rows in `eventPaymentSessions` and `eventRegistrations` JSON fields to reflect the cancellation.</li><li>For Square-paid registrations, call the appropriate helper in `squarePaymentService` to void or refund the payment session; ensure idempotency and handle partial failures with structured errors surfaced in the mutation result.</li><li>For e-transfer registrations, enqueue follow-up tasks (e.g., mark `paymentStatus` as `refund_required`) so finance can reconcile manual refunds.</li><li>Emit notification emails (HTML + text) to registrants and a summary to admins. If no email helper exists yet, create a server-only module (e.g., `src/lib/server/notifications/events/cancellation.ts`) that centralizes templating and Netlify mail provider integration.</li><li>Return a result payload that lists how many registrations were touched and any failures so the UI can display next steps.</li><li>Add integration/unit coverage in `src/features/events/__tests__/` validating the mutation behaviour, including Square refund stubs and e-transfer paths.</li></ul> |
-| **Linked Files**         | <ul><li>[src/features/events/events.mutations.ts](../src/features/events/events.mutations.ts)</li><li>[src/features/events/events.schemas.ts](../src/features/events/events.schemas.ts)</li><li>[src/features/events/events.types.ts](../src/features/events/events.types.ts)</li><li>[src/features/events/events.db-types.ts](../src/features/events/events.db-types.ts)</li><li>[src/features/events/**tests**/](../src/features/events/__tests__/)</li><li>[src/db/schema/events.schema.ts](../src/db/schema/events.schema.ts)</li><li>[src/db/schema/index.ts](../src/db/schema/index.ts)</li><li>[src/db/schema/teams.schema.ts](../src/db/schema/teams.schema.ts)</li><li>[src/db/schema/membership.schema.ts](../src/db/schema/membership.schema.ts)</li><li>[src/lib/payments/square.ts](../src/lib/payments/square.ts)</li><li>[src/lib/payments/square-real.ts](../src/lib/payments/square-real.ts)</li><li>[src/lib/server/auth.ts](../src/lib/server/auth.ts)</li><li>[src/lib/server/fn-utils.ts](../src/lib/server/fn-utils.ts)</li><li>[src/lib/server/errors.ts](../src/lib/server/errors.ts)</li><li>[src/lib/env.server.ts](../src/lib/env.server.ts)</li></ul>                                                                                                                                                        |
+|               |                                                                                                                                                                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **What**      | Integrated Roundup Games branding, created public/admin layouts, responsive navigation                                                                                                                                               |
+| **Code refs** | `src/features/layouts/*`, `src/shared/ui/*`, auth pages styling                                                                                                                                                                      |
+| **Delivered** | <ul><li>Public layout with header/footer</li><li>Admin dashboard layout with sidebar</li><li>Hero section, event cards</li><li>Mobile-responsive navigation</li><li>Consistent auth page styling</li><li>Dark mode support</li></ul> |
+
+### ✅ DONE: Profile Schema Extension
+
+|               |                                                                                                                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **What**      | Extended user table with profile fields needed for membership/teams                                                                                                                       |
+| **Code refs** | `src/db/schema/auth.schema.ts`, `src/features/profile/*`                                                                                                                                  |
+| **Delivered** | <ul><li>Profile columns: gender, pronouns, phone, privacy_settings</li><li>Profile feature module structure</li><li>isProfileComplete utility</li><li>Profile schemas and tests</li></ul> |
+
+### ✅ DONE: Complete Profile Onboarding Flow (P0-2)
+
+|               |                                                                                                                                                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **What**      | Multi-step profile completion form with route guards to ensure required data before membership purchase                                                                                                               |
+| **Code refs** | `src/routes/onboarding/*`, `src/features/profile/components/*`, `src/features/profile/profile-guard.ts`, `src/shared/ui/*`                                                                                            |
+| **Delivered** | <ul><li>2-step onboarding form (Personal Info, Privacy)</li><li>Route guards with `requireCompleteProfile()`</li><li>shadcn/ui components integration</li><li>Mobile-responsive UI with progress indicators</li></ul> |
 
 ---
 
@@ -191,45 +206,14 @@ export function subscribeToRouterDiagnostics(
 
 Patch `src/client.tsx`:
 
-```diff
- import { StartClient } from "@tanstack/react-start";
- import { StrictMode } from "react";
- import { hydrateRoot } from "react-dom/client";
- import { createRouter } from "./router";
-+import { subscribeToRouterDiagnostics } from "./diagnostics/routerDiagnostics";
-
- const router = createRouter();
-
--// Add debug logging
--// TODO: Fix router event types
--// router.subscribe("onNavigateStart", () => {
--//   console.log("Navigation starting...");
--// });
--//
--// router.subscribe("onNavigateEnd", () => {
--//   console.log("Navigation ended");
--// });
-+// Optional diagnostics (no-op unless VITE_ROUTER_DEBUG === "true")
-+const unsubscribeRouterDiagnostics = subscribeToRouterDiagnostics(router);
-+
-+// Make the router easy to inspect in dev tools
-+if (import.meta.env.DEV) {
-+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-+  (window as any).__ROUTER__ = router;
-+}
-+
-+// Clean up subscriptions during HMR
-+if (import.meta.hot) {
-+  import.meta.hot.dispose(() => unsubscribeRouterDiagnostics?.());
-+}
-
- hydrateRoot(
-   document,
-   <StrictMode>
-     <StartClient router={router} />
-   </StrictMode>,
- );
-```
+|                |                                                                                                                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                  |
+| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                                        |
+| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                                        |
+| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                                            |
+| **Tasks**      | <ul><li>Add PWA manifest with Roundup Games branding</li><li>Implement service worker for offline support</li><li>Add install prompt for mobile users</li><li>Optimize touch targets for mobile</li><li>Add pull-to-refresh on dashboard</li><li>Test on real devices</li></ul> |
+| **Thoughts**   | Vite has PWA plugin; focus on offline-first for event days with poor connectivity                                                                                                                                                                                               |
 
 ---
 

@@ -1,45 +1,12 @@
 import { z } from "zod";
 
-export const emergencyContactSchema = z
-  .object({
-    name: z.string().min(1, "Emergency contact name is required"),
-    relationship: z.string().min(1, "Relationship is required"),
-    phone: z.string().optional(),
-    email: z.string().email("Invalid emergency contact email").optional(),
-  })
-  .refine((data) => data.phone || data.email, {
-    message: "Please provide at least one contact method (phone or email)",
-    path: ["phone"], // This will show the error on the phone field
-  });
-
 export const privacySettingsSchema = z.object({
   showEmail: z.boolean(),
   showPhone: z.boolean(),
-  showBirthYear: z.boolean(),
   allowTeamInvitations: z.boolean(),
 });
 
 export const profileInputSchema = z.object({
-  dateOfBirth: z
-    .preprocess((arg) => {
-      if (typeof arg === "string" && !arg.includes("T")) {
-        return new Date(`${arg}T00:00:00.000Z`);
-      }
-      return typeof arg === "string" ? new Date(arg) : arg;
-    }, z.date())
-    .refine(
-      (date) => {
-        const today = new Date();
-        let age = today.getUTCFullYear() - date.getUTCFullYear();
-        const m = today.getUTCMonth() - date.getUTCMonth();
-        if (m < 0 || (m === 0 && today.getUTCDate() < date.getUTCDate())) {
-          age--;
-        }
-        return age >= 13 && age <= 120;
-      },
-      { message: "You must be between 13 and 120 years old" },
-    ),
-  emergencyContact: emergencyContactSchema.optional(),
   gender: z.string().optional(),
   pronouns: z.string().optional(),
   phone: z.string().optional(),

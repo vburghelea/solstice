@@ -198,7 +198,6 @@ Always define input and output types:
 export interface UpdateProfileInput {
   name?: string;
   pronouns?: string;
-  birthDate?: string;
 }
 
 export interface UserProfile {

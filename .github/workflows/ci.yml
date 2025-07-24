@@ -43,11 +43,11 @@ jobs:
     
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: solstice_test
+          POSTGRES_DB: platform_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -74,12 +74,12 @@ jobs:
       - name: Run database migrations
         run: pnpm db push --force
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/platform_test
 
       - name: Run tests with coverage
         run: pnpm test:coverage
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/platform_test
           VITE_BASE_URL: http://localhost:3000
           NODE_ENV: test
           BETTER_AUTH_SECRET: test-secret-for-ci
@@ -116,7 +116,7 @@ jobs:
       - name: Build application
         run: pnpm build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/solstice_test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/platform_test' }}
           VITE_BASE_URL: ${{ secrets.VITE_BASE_URL || 'http://localhost:3000' }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'build-secret-for-ci' }}
 

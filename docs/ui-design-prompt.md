@@ -1,8 +1,8 @@
-# UI Design Prompt: Quadball Canada Registration Platform
+# UI Design Prompt: Roundup Games Platform
 
 ## Project Summary
 
-Design a comprehensive registration and events management platform for Quadball Canada. The platform serves three main user types: Organization Admins, Team Logins, and Individual Players.
+Design a comprehensive registration and events management platform for Roundup Games. The platform serves three main user types: Organization Admins, Team Logins, and Individual Players.
 
 ## Core Features to Design
 
@@ -27,11 +27,10 @@ Design a comprehensive registration and events management platform for Quadball 
 - Team member management interface
 - Player registration and payment tracking
 - Team-specific reports and export functions
-- Jersey number management
 
 **Individual Player Dashboard:**
 
-- Personal profile management (pronouns, emergency contacts, demographics)
+- Personal profile management (pronouns, demographics)
 - Event registration and payment history
 - Membership status and renewal reminders
 
@@ -47,7 +46,7 @@ Design a comprehensive registration and events management platform for Quadball 
 
 - Multi-step registration process
 - Membership validation during checkout
-- Secure payment integration (Square)
+- Secure payment integration
 - Duplicate account detection and resolution
 
 ## User Experience Requirements
@@ -74,7 +73,7 @@ Design a comprehensive registration and events management platform for Quadball 
 ## Design Priorities
 
 1. **User-friendly**: Intuitive for non-technical users
-2. **Professional**: Clean, modern sports organization aesthetic
+2. **Professional**: Clean, modern organization aesthetic
 3. **Efficient**: Streamlined workflows for common tasks
 4. **Flexible**: Customizable features for different events
 5. **Secure**: Clear privacy and security indicators
@@ -91,4 +90,4 @@ Design a comprehensive registration and events management platform for Quadball 
 - Team roster displays
 - Analytics dashboards
 
-Design a modern, professional platform that makes sports event management effortless while maintaining the organization's brand identity.
+Design a modern, professional platform that makes event management effortless while maintaining the organization's brand identity.

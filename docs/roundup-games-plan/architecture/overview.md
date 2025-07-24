@@ -4,7 +4,7 @@
 
 ## System Architecture
 
-The Quadball Canada platform is built on a modern, type-safe full-stack architecture.
+The Roundup Games platform is built on a modern, type-safe full-stack architecture.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐

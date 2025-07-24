@@ -21,12 +21,12 @@ This document outlines the required secrets for GitHub Actions workflows.
 
 ### OAuth Provider Secrets
 
-| Secret Name            | Description                    | How to Obtain                                                                                                                                                                 |
-| ---------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GITHUB_CLIENT_ID`     | GitHub OAuth App client ID     | 1. Go to [GitHub Settings > Developer settings > OAuth Apps](https://github.com/settings/developers)<br>2. Click "New OAuth App" or select existing<br>3. Copy the Client ID  |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth App client secret | From the same OAuth App page, generate/copy the Client Secret                                                                                                                 |
-| `GOOGLE_CLIENT_ID`     | Google OAuth 2.0 client ID     | 1. Go to [Google Cloud Console](https://console.cloud.google.com/)<br>2. Create/select project<br>3. Go to "APIs & Services" > "Credentials"<br>4. Create OAuth 2.0 Client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth 2.0 client secret | From the same OAuth 2.0 credentials page                                                                                                                                      |
+| Secret Name             | Description                    | How to Obtain                                                                                                                                                                 |
+| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DISCORD_CLIENT_ID`     | GitHub OAuth App client ID     | 1. Go to [GitHub Settings > Developer settings > OAuth Apps](https://github.com/settings/developers)<br>2. Click "New OAuth App" or select existing<br>3. Copy the Client ID  |
+| `DISCORD_CLIENT_SECRET` | GitHub OAuth App client secret | From the same OAuth App page, generate/copy the Client Secret                                                                                                                 |
+| `GOOGLE_CLIENT_ID`      | Google OAuth 2.0 client ID     | 1. Go to [Google Cloud Console](https://console.cloud.google.com/)<br>2. Create/select project<br>3. Go to "APIs & Services" > "Credentials"<br>4. Create OAuth 2.0 Client ID |
+| `GOOGLE_CLIENT_SECRET`  | Google OAuth 2.0 client secret | From the same OAuth 2.0 credentials page                                                                                                                                      |
 
 ### Optional Secrets
 
@@ -58,8 +58,8 @@ Example `.env` file:
 ```env
 DATABASE_URL=postgresql://localhost:5432/solstice_dev
 VITE_BASE_URL=http://localhost:3000
-GITHUB_CLIENT_ID=your_dev_client_id
-GITHUB_CLIENT_SECRET=your_dev_client_secret
+DISCORD_CLIENT_ID=your_dev_client_id
+DISCORD_CLIENT_SECRET=your_dev_client_secret
 GOOGLE_CLIENT_ID=your_dev_client_id
 GOOGLE_CLIENT_SECRET=your_dev_client_secret
 ```

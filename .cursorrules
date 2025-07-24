@@ -1,4 +1,4 @@
-# Solstice Project Rules
+# Project Rules
 
 ## Dependencies
 - Use `pnpm dlx taze@latest --interactive --group` to check for dependency updates

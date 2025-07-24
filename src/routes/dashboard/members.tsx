@@ -221,8 +221,6 @@ function MembersPage() {
         ? formatDate(member.membershipEndDate)
         : "",
       "Open to Invites": member.allowTeamInvitations ? "Yes" : "No",
-      "Birth Year":
-        member.birthYearVisible && member.birthYear ? String(member.birthYear) : "Hidden",
     }));
 
     const filename = `members-directory-${new Date().toISOString().split("T")[0]}.csv`;
@@ -432,16 +430,6 @@ function MemberDetailDialog({ member, onClose }: MemberDetailDialogProps) {
                       Open to Team Invitations
                     </p>
                     <p>{member.allowTeamInvitations ? "Yes" : "No"}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                      Birth Year
-                    </p>
-                    <p>
-                      {member.birthYearVisible && member.birthYear
-                        ? member.birthYear
-                        : "Hidden (privacy settings)"}
-                    </p>
                   </div>
                 </div>
               </InfoBlock>

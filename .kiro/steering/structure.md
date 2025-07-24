@@ -128,7 +128,7 @@
 
 ### Feature Development Process
 
-1. **Read project docs** in `docs/quadball-plan/` for context
+1. **Read project docs** in `docs/roundup-games-plan/` for context
 2. **Update documentation** when implementing new features
 3. **Follow development backlog** priorities in `docs/development-backlog.md`
 4. **Run documentation automation** after significant changes:

@@ -1,8 +1,8 @@
-## Project Brief: Quadball Canada Registration and Events Website
+## Project Brief: Roundup Games Platform
 
 ### Project Overview
 
-Quadball Canada needs a comprehensive, easy-to-use platform for managing event registrations, player memberships, team profiles, and administrative tasks. This platform should simplify processes for players, teams, and admins, with customizable features and streamlined management.
+Roundup Games needs to become a comprehensive, easy-to-use platform for connecting tabletop and board game enthusiasts, helping them organize game sessions, longer running campaigns, event registrations, player memberships, team profiles, and administrative tasks. This platform should simplify processes for players, teams, and admins, with customizable features and streamlined management.
 
 ### User Roles and Privileges
 
@@ -13,8 +13,8 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 
 #### Team Logins
 
-- Team registration (annual membership).
-- View and manage team members, assign coaches and team leads.
+- Team registration.
+- View and manage team members, assign team leads.
 - Purchase memberships for players individually or allow players to register/pay independently.
 - View player history, event participation, and edit jersey numbers.
 - Generate custom reports limited to their own team members.
@@ -22,8 +22,8 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 #### Individual Logins
 
 - Create and manage personal profiles including:
-  - Pronouns, pronunciation guide for names, jersey number (editable).
-  - Gender, date of birth, emergency contact, demographic information.
+  - Pronouns, pronunciation guide for names (editable).
+  - Gender, demographic information.
 
 - Register and pay for events and memberships.
 - View registered events and payment history.
@@ -43,7 +43,7 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 - Fillable information packages (auto-populated fields).
 - Event coordinator access to rosters and payment status prior to event lock.
 - Volunteer registration options for event-specific roles.
-- Direct integration with external resources (e.g., QDrill for national team practices).
+- Direct integration with external resources.
 - Flexible pricing based on user tags (e.g., standing team free entry, others \$15).
 - Post-event surveys sent automatically.
 - Live score updates and event media uploads (photos and video links).
@@ -51,13 +51,13 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 ### Export and Reporting Features
 
 - Targeted messaging/email lists:
-  - By event, membership type, team, roles (coach, team lead), gender, age, experience level.
+  - By event, membership type, team, roles (player, team lead), gender, experience level.
 
 - Budget reports clearly separating event registration fees from memberships and other products, even if purchased together.
 - Detailed purchase reports including purchaser names and items bought.
 - Customizable reporting feature allowing admins and team leads (limited to their teams) to create tailored reports based on specific data points (e.g., referee registrations, age-specific participation).
 - Flexible export options allowing selection of specific data fields for event registration exports:
-  - Basic pre-selection includes name, birthday, gender, and emergency contact information.
+  - Basic pre-selection includes name, gender, and pronoun information.
   - Advanced pre-selection includes all available data such as transaction ID, amount paid, membership status, and team registration.
 
 ### Membership Renewal and Feedback
@@ -73,13 +73,12 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 
 ### Payment Integration
 
-- Accept payments through Square or similar third-party service.
+- Accept payments through third-party service.
 - Secure and user-friendly checkout process.
 - Payments must be completed fully at checkout—no installments or partial payments.
 
 ### Special Features
 
-- Team transfer requests managed through an approval workflow involving team leads and admins (workflow details to be defined).
 - Duplicate player registrations prompt users with existing profile details and assist with logging into their existing account, with admins having the ability to trigger a "reset password" email.
 
 ### Notifications
@@ -94,8 +93,8 @@ Quadball Canada needs a comprehensive, easy-to-use platform for managing event r
 
 ### Security and Privacy
 
-- All personal and sensitive data storage must comply strictly with Canadian privacy laws (PIPEDA or applicable provincial laws).
-- Secure handling of sensitive user information, including emergency contacts and demographics.
+- All personal and sensitive data storage must comply strictly with EU privacy laws (GDPR or applicable country laws).
+- Secure handling of sensitive user information, including demographics.
 
 ### Reporting and Analytics
 

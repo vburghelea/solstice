@@ -1,6 +1,6 @@
-# Quadball Canada Platform
+# Roundup Games Platform
 
-The Quadball Canada platform is a comprehensive sports league management system that handles member registration, team management, event coordination, and payment processing. Built on modern web technologies with type-safe, full-stack architecture.
+The Roundup Games platform is comprehensive, easy-to-use platform for connecting tabletop and board game enthusiasts, helping them organize game sessions, longer running campaigns, event registrations, player memberships, team profiles, and administrative tasks. Built on modern web technologies with type-safe, full-stack architecture.
 
 ## Current Features
 
@@ -22,7 +22,7 @@ The Quadball Canada platform is a comprehensive sports league management system 
 - **[Server Functions Guide](./api/server-functions.md)** - Backend implementation patterns
 - **[Database Schema](./database/schema-overview.md)** - Data model and relationships
 - **[Component Guide](./ui-flows/component-guide.md)** - UI patterns and components
-- **[Roadmap](https://github.com/your-org/quadball-canada/projects/1)** - Future development plans
+- **[Roadmap](https://github.com/vburghelea/roundup-games/projects/1)** - Future development plans
 
 ## Quick Start
 

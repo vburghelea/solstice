@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import type {
-  EmergencyContact,
   PrivacySettings,
   ProfileOperationResult,
   UserProfile,
@@ -20,8 +19,6 @@ function mapDbUserToProfile(dbUser: {
   name: string;
   email: string;
   profileComplete: boolean;
-  dateOfBirth: Date | null;
-  emergencyContact: string | null;
   gender: string | null;
   pronouns: string | null;
   phone: string | null;
@@ -34,8 +31,6 @@ function mapDbUserToProfile(dbUser: {
     name: dbUser.name,
     email: dbUser.email,
     profileComplete: dbUser.profileComplete,
-    dateOfBirth: dbUser.dateOfBirth ?? undefined,
-    emergencyContact: parseJsonField<EmergencyContact>(dbUser.emergencyContact),
     gender: dbUser.gender ?? undefined,
     pronouns: dbUser.pronouns ?? undefined,
     phone: dbUser.phone ?? undefined,
@@ -137,21 +132,6 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
       }
 
       const missingFields: string[] = [];
-
-      if (!dbUser.dateOfBirth) {
-        missingFields.push("dateOfBirth");
-      }
-
-      const emergencyContact = parseJsonField<EmergencyContact>(dbUser.emergencyContact);
-      if (!emergencyContact?.name) {
-        missingFields.push("emergencyContact.name");
-      }
-      if (!emergencyContact?.relationship) {
-        missingFields.push("emergencyContact.relationship");
-      }
-      if (!emergencyContact?.phone && !emergencyContact?.email) {
-        missingFields.push("emergencyContact.contact");
-      }
 
       return {
         complete: dbUser.profileComplete,

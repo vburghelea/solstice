@@ -1,11 +1,11 @@
 # Product Overview
 
-Solstice is a modern sports registration platform designed for managing memberships, teams, and events. Initially built for Quadball Canada (the national quadball governing body), it's designed to be extensible to other sports organizations.
+Roundup Games is a platform designed for connecting tabletop and board game enthusiasts in real life, with the purpose of easily organizing game sessions and campaigns.
 
 ## Core Features
 
-- **Member Registration & Management**: User accounts, profiles, waivers, and annual memberships
-- **Team Setup & Roster Management**: Team creation, player invitations, and roster management
+- **Member Registration & Management**: User accounts, profiles, and memberships
+- **Team Setup & Roster Management**: Team creation, player invitations, and roster management for campaigns
 - **Event Creation & Registration**: Tournament/league management with team/individual registration
 - **Payments & Finance**: Integration with payment platforms for membership and event fees
 - **Role-Based Access Control**: Admin, Team Lead, and Player permission layers
@@ -19,11 +19,10 @@ Solstice is a modern sports registration platform designed for managing membersh
 
 ## Key Requirements
 
-- Canadian privacy law compliance (PIPEDA)
-- Secure payment processing (Square integration)
+- European privacy law compliance (GDPR)
+- Secure payment processing (integration tbd)
 - Automated workflows and notifications
 - Comprehensive reporting and analytics
-- Multi-organization, multi-sport extensibility
 
 ## Brand Guidelines
 

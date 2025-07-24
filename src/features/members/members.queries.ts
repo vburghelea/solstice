@@ -26,7 +26,6 @@ type MemberAccumulator = {
   email: string | null;
   phone: string | null;
   pronouns: string | null;
-  dateOfBirth: Date | null;
   privacySettings: string | null;
   profileUpdatedAt: Date | null;
   teams: Set<string>;
@@ -50,7 +49,6 @@ function parsePrivacySettings(
     return {
       showEmail: parsed.showEmail ?? fallback.showEmail,
       showPhone: parsed.showPhone ?? fallback.showPhone,
-      showBirthYear: parsed.showBirthYear ?? fallback.showBirthYear,
       allowTeamInvitations: parsed.allowTeamInvitations ?? fallback.allowTeamInvitations,
     };
   } catch (error) {
@@ -156,7 +154,6 @@ export const listMembers = createServerFn({ method: "POST" })
           email: user.email,
           phone: user.phone,
           pronouns: user.pronouns,
-          dateOfBirth: user.dateOfBirth,
           privacySettings: user.privacySettings,
           profileUpdatedAt: user.profileUpdatedAt,
           teamId: teamMembers.teamId,
@@ -181,11 +178,6 @@ export const listMembers = createServerFn({ method: "POST" })
         let accumulator = memberAccumulator.get(row.id);
 
         if (!accumulator) {
-          const dateOfBirth = row.dateOfBirth
-            ? row.dateOfBirth instanceof Date
-              ? row.dateOfBirth
-              : new Date(row.dateOfBirth)
-            : null;
           const profileUpdatedAt = row.profileUpdatedAt
             ? row.profileUpdatedAt instanceof Date
               ? row.profileUpdatedAt
@@ -198,7 +190,6 @@ export const listMembers = createServerFn({ method: "POST" })
             email: row.email ?? null,
             phone: row.phone ?? null,
             pronouns: row.pronouns ?? null,
-            dateOfBirth,
             privacySettings: row.privacySettings ?? null,
             profileUpdatedAt,
             teams: new Set<string>(),
@@ -255,7 +246,6 @@ export const listMembers = createServerFn({ method: "POST" })
         const isSelf = memberId === currentUser.id;
         const showEmail = privacy.showEmail || isSelf;
         const showPhone = privacy.showPhone || isSelf;
-        const showBirthYear = privacy.showBirthYear || isSelf;
 
         const membershipList = Array.from(accumulator.memberships.values()).sort(
           (a, b) => {
@@ -299,8 +289,6 @@ export const listMembers = createServerFn({ method: "POST" })
           }),
         );
 
-        const birthDate = accumulator.dateOfBirth;
-
         members.push({
           id: accumulator.id,
           name: accumulator.name,
@@ -315,8 +303,6 @@ export const listMembers = createServerFn({ method: "POST" })
           membershipEndDate,
           hasActiveMembership: membershipStatus === "active",
           allowTeamInvitations: privacy.allowTeamInvitations,
-          birthYear: showBirthYear && birthDate ? birthDate.getUTCFullYear() : null,
-          birthYearVisible: showBirthYear && Boolean(birthDate),
           profileUpdatedAt: accumulator.profileUpdatedAt
             ? accumulator.profileUpdatedAt.toISOString()
             : null,

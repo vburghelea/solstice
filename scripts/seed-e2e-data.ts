@@ -105,15 +105,9 @@ async function seed() {
         name: "Test User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1990-01-01"),
         phone: "+1234567890",
         gender: "male",
         pronouns: "he/him",
-        emergencyContact: JSON.stringify({
-          name: "Emergency Contact",
-          phone: "+0987654321",
-          relationship: "spouse",
-        }),
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
@@ -128,15 +122,9 @@ async function seed() {
         name: "Admin User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1985-05-15"),
         phone: "+1234567891",
         gender: "female",
         pronouns: "she/her",
-        emergencyContact: JSON.stringify({
-          name: "Admin Emergency",
-          phone: "+1987654321",
-          relationship: "friend",
-        }),
         privacySettings: JSON.stringify({
           showEmail: false,
           showPhone: false,
@@ -151,15 +139,9 @@ async function seed() {
         name: "Team Creator",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1992-05-15"),
         phone: "+1234567892",
         gender: "female",
         pronouns: "she/her",
-        emergencyContact: JSON.stringify({
-          name: "Emergency Contact 3",
-          phone: "+0987654323",
-          relationship: "parent",
-        }),
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
@@ -178,15 +160,9 @@ async function seed() {
         name: "Profile Edit User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1991-03-15"),
         phone: "+1234567893",
         gender: "non-binary",
         pronouns: "they/them",
-        emergencyContact: JSON.stringify({
-          name: "Profile Emergency",
-          phone: "+0987654324",
-          relationship: "friend",
-        }),
         privacySettings: JSON.stringify({
           showEmail: false,
           showPhone: true,
@@ -201,15 +177,9 @@ async function seed() {
         name: "Membership Purchase User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1988-07-20"),
         phone: "+1234567894",
         gender: "female",
         pronouns: "she/her",
-        emergencyContact: JSON.stringify({
-          name: "Membership Emergency",
-          phone: "+0987654325",
-          relationship: "parent",
-        }),
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
@@ -224,15 +194,9 @@ async function seed() {
         name: "Team Join User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1995-11-30"),
         phone: "+1234567895",
         gender: "male",
         pronouns: "he/him",
-        emergencyContact: JSON.stringify({
-          name: "Team Emergency",
-          phone: "+0987654326",
-          relationship: "sibling",
-        }),
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: true,
@@ -247,15 +211,9 @@ async function seed() {
         name: "Team Invite Decline User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1993-02-20"),
         phone: "+1234567897",
         gender: "female",
         pronouns: "she/her",
-        emergencyContact: JSON.stringify({
-          name: "Invite Decline Emergency",
-          phone: "+1987654328",
-          relationship: "partner",
-        }),
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
@@ -270,15 +228,9 @@ async function seed() {
         name: "Square Test User",
         emailVerified: true,
         profileComplete: true,
-        dateOfBirth: new Date("1991-03-15"),
         phone: "+1234567896",
         gender: "non-binary",
         pronouns: "they/them",
-        emergencyContact: JSON.stringify({
-          name: "Square Emergency",
-          phone: "+0987654327",
-          relationship: "partner",
-        }),
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
@@ -296,17 +248,17 @@ async function seed() {
     console.log("Creating roles...");
     await db.insert(roles).values([
       {
-        id: "solstice-admin",
-        name: "Solstice Admin",
+        id: "platform-admin",
+        name: "Platform Admin",
         description: "Super admin role with full system access",
         permissions: {
           "system:all": true,
         },
       },
       {
-        id: "quadball-canada-admin",
-        name: "Quadball Canada Admin",
-        description: "Administrative access to Quadball Canada features",
+        id: "games-admin",
+        name: "Games Admin",
+        description: "Administrative access to Roundup Games features",
         permissions: {
           "teams:manage": true,
           "events:manage": true,
@@ -339,21 +291,20 @@ async function seed() {
     console.log("Creating membership types...");
     await db.insert(membershipTypes).values([
       {
-        id: "annual-player-2025",
-        name: "Annual Player Membership 2025",
+        id: "annual-gm-2025",
+        name: "Annual GM Membership 2025",
         description:
-          "Full access to all Quadball Canada events and programs for the 2025 season",
-        priceCents: 4500, // $45.00
+          "Full access to all Roundup Games events and programs for the 2025 season",
+        priceCents: 4500, // 45.00 EUR
         durationMonths: 12,
         status: "active" as const,
         metadata: {
           season: "2025",
           membershipYear: 2025,
-          currency: "CAD",
+          currency: "EUR",
           features: [
             "Access to all sanctioned tournaments",
             "Player insurance coverage",
-            "Voting rights at AGM",
             "Team registration eligibility",
             "Member newsletter and updates",
           ],
@@ -401,7 +352,7 @@ async function seed() {
       {
         id: "admin-global-role",
         userId: adminUserId,
-        roleId: "solstice-admin",
+        roleId: "platform-admin",
         assignedBy: adminUserId,
         notes: "Seeded global admin access",
       },
@@ -522,7 +473,7 @@ async function seed() {
         maxParticipants: 200,
         individualRegistrationFee: 2500,
         organizerId: adminUserId,
-        contactEmail: "events@quadballcanada.com",
+        contactEmail: "events@roundup.games",
         contactPhone: "+1 (555) 987-0001",
         isPublic: true,
         isFeatured: false,
@@ -547,7 +498,7 @@ async function seed() {
         maxTeams: 16,
         teamRegistrationFee: 6000,
         organizerId: teamCreatorUserId,
-        contactEmail: "teams@quadballcanada.com",
+        contactEmail: "teams@roundup.games",
         contactPhone: "+1 (555) 987-0002",
         isPublic: false,
         isFeatured: false,

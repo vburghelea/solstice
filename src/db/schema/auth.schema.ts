@@ -19,10 +19,6 @@ export const user = pgTable("user", {
     .$defaultFn(() => false)
     .notNull(),
 
-  // Required profile fields
-  dateOfBirth: timestamp("date_of_birth"),
-  emergencyContact: text("emergency_contact"), // JSON string
-
   // Optional profile fields
   gender: text("gender"),
   pronouns: text("pronouns"),

@@ -26,8 +26,6 @@ export interface MemberDirectoryMember {
   membershipEndDate: string | null;
   hasActiveMembership: boolean;
   allowTeamInvitations: boolean;
-  birthYear: number | null;
-  birthYearVisible: boolean;
   profileUpdatedAt: string | null;
   membershipHistory: MemberDirectoryMembershipSummary[];
 }

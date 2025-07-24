@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Quadball Canada platform uses shadcn/ui components built on Radix UI primitives, providing accessible and customizable UI components. This guide focuses on project-specific components and patterns.
+The Roundup Games platform uses shadcn/ui components built on Radix UI primitives, providing accessible and customizable UI components. This guide focuses on project-specific components and patterns.
 
 ## Component System
 

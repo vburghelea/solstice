@@ -4,7 +4,6 @@ import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
-import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import {
@@ -27,11 +26,6 @@ const STEPS = [
     description: "Basic information about you",
   },
   {
-    id: "emergency",
-    title: "Emergency Contact",
-    description: "Who should we contact in case of emergency",
-  },
-  {
     id: "privacy",
     title: "Privacy Settings",
     description: "Control what information is visible to others",
@@ -48,20 +42,12 @@ export function CompleteProfileForm() {
 
   const form = useForm({
     defaultValues: {
-      dateOfBirth: new Date(),
       gender: "",
       pronouns: "",
       phone: "",
-      emergencyContact: {
-        name: "",
-        relationship: "",
-        phone: "",
-        email: "",
-      },
       privacySettings: {
         showEmail: false,
         showPhone: false,
-        showBirthYear: false,
         allowTeamInvitations: true,
       },
     } as ProfileInputType,
@@ -76,7 +62,6 @@ export function CompleteProfileForm() {
       try {
         // Build profile input with only defined values
         const dataToSubmit: ProfileInput = {
-          dateOfBirth: value.dateOfBirth,
         };
 
         // Add optional fields only if they have values
@@ -84,27 +69,6 @@ export function CompleteProfileForm() {
         if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
         if (value.phone) dataToSubmit.phone = value.phone;
         if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
-
-        // Only include emergency contact if it has meaningful data
-        if (
-          value.emergencyContact &&
-          (value.emergencyContact.name ||
-            value.emergencyContact.relationship ||
-            value.emergencyContact.phone ||
-            value.emergencyContact.email)
-        ) {
-          // Build emergency contact with required fields
-          const emergencyContact: ProfileInput["emergencyContact"] = {
-            name: value.emergencyContact.name || "",
-            relationship: value.emergencyContact.relationship || "",
-          };
-          if (value.emergencyContact.phone)
-            emergencyContact.phone = value.emergencyContact.phone;
-          if (value.emergencyContact.email)
-            emergencyContact.email = value.emergencyContact.email;
-
-          dataToSubmit.emergencyContact = emergencyContact;
-        }
 
         const result = await completeUserProfile({ data: dataToSubmit });
 
@@ -123,15 +87,6 @@ export function CompleteProfileForm() {
   });
 
   const currentStepIndex = STEPS.findIndex((step) => step.id === currentStep);
-
-  // Check if emergency contact has any data
-  const emergencyContact = form.getFieldValue("emergencyContact");
-  const hasEmergencyContactData =
-    emergencyContact &&
-    (emergencyContact.name ||
-      emergencyContact.relationship ||
-      emergencyContact.phone ||
-      emergencyContact.email);
 
   const goToStep = (stepId: StepId) => setCurrentStep(stepId);
   const goToNextStep = () => {
@@ -210,29 +165,6 @@ export function CompleteProfileForm() {
             {/* Personal Information Step */}
             {currentStep === "personal" && (
               <>
-                <form.Field
-                  name="dateOfBirth"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (!value) return "Date of birth is required";
-                      const age = new Date().getFullYear() - value.getFullYear();
-                      if (age < 13 || age > 120) {
-                        return "Age must be between 13 and 120 years";
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <ValidatedDatePicker
-                      field={field}
-                      label="Date of Birth"
-                      minAge={13}
-                      maxAge={120}
-                    />
-                  )}
-                </form.Field>
-
                 <form.Field name="gender">
                   {(field) => (
                     <ValidatedSelect
@@ -267,68 +199,6 @@ export function CompleteProfileForm() {
               </>
             )}
 
-            {/* Emergency Contact Step */}
-            {currentStep === "emergency" && (
-              <>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Emergency contact information is optional but recommended for your
-                  safety.
-                </p>
-
-                <form.Field name="emergencyContact.name">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Emergency Contact Name (optional)"
-                      placeholder="Full name"
-                    />
-                  )}
-                </form.Field>
-
-                <form.Field name="emergencyContact.relationship">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Relationship"
-                      placeholder="e.g., Parent, Spouse, Friend"
-                      disabled={!hasEmergencyContactData}
-                    />
-                  )}
-                </form.Field>
-
-                <form.Field name="emergencyContact.phone">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Emergency Contact Phone"
-                      type="tel"
-                      placeholder="+1 (555) 000-0000"
-                      disabled={!hasEmergencyContactData}
-                    />
-                  )}
-                </form.Field>
-
-                <form.Field name="emergencyContact.email">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Emergency Contact Email"
-                      type="email"
-                      placeholder="email@example.com"
-                      disabled={!hasEmergencyContactData}
-                    />
-                  )}
-                </form.Field>
-
-                {hasEmergencyContactData && (
-                  <p className="text-muted-foreground text-sm">
-                    If providing emergency contact, please include at least one contact
-                    method (phone or email).
-                  </p>
-                )}
-              </>
-            )}
-
             {/* Privacy Settings Step */}
             {currentStep === "privacy" && (
               <>
@@ -353,15 +223,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my phone number to team members"
-                      />
-                    )}
-                  </form.Field>
-
-                  <form.Field name="privacySettings.showBirthYear">
-                    {(field) => (
-                      <ValidatedCheckbox
-                        field={field}
-                        label="Show my birth year on my profile"
                       />
                     )}
                   </form.Field>

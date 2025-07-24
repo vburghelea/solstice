@@ -29,10 +29,6 @@ export const user = pgTable("user", {
     .$defaultFn(() => false)
     .notNull(),
 
-  // Required profile fields
-  dateOfBirth: timestamp("date_of_birth"),
-  emergencyContact: text("emergency_contact"), // JSON string
-
   // Optional profile fields
   gender: text("gender"),
   pronouns: text("pronouns"),
@@ -53,8 +49,6 @@ export const user = pgTable("user", {
 
 Profile data will be validated using Zod schemas that enforce:
 
-- Date of birth format validation and reasonable age ranges
-- Emergency contact structure (name, relationship, phone/email)
 - Privacy settings structure validation
 - Optional field constraints (pronouns, gender options)
 
@@ -98,8 +92,6 @@ interface UserProfile {
   name: string;
   email: string;
   profileComplete: boolean;
-  dateOfBirth?: Date;
-  emergencyContact?: EmergencyContact;
   gender?: string;
   pronouns?: string;
   phone?: string;
@@ -108,24 +100,14 @@ interface UserProfile {
   profileUpdatedAt?: Date;
 }
 
-interface EmergencyContact {
-  name: string;
-  relationship: string;
-  phone?: string;
-  email?: string;
-}
-
 interface PrivacySettings {
   showEmail: boolean;
   showPhone: boolean;
-  showBirthYear: boolean;
   allowTeamInvitations: boolean;
 }
 
 // Input types for mutations
 interface ProfileInput {
-  dateOfBirth: Date;
-  emergencyContact: EmergencyContact;
   gender?: string;
   pronouns?: string;
   phone?: string;
@@ -141,12 +123,8 @@ The system determines profile completion based on required fields:
 
 ```typescript
 function isProfileComplete(profile: UserProfile): boolean {
-  return !!(
-    profile.dateOfBirth &&
-    profile.emergencyContact?.name &&
-    profile.emergencyContact?.relationship &&
-    (profile.emergencyContact?.phone || profile.emergencyContact?.email)
-  );
+  // placeholder for future logic
+  return true;
 }
 ```
 
@@ -158,27 +136,8 @@ Privacy settings use a structured approach with sensible defaults:
 const defaultPrivacySettings: PrivacySettings = {
   showEmail: false,
   showPhone: false,
-  showBirthYear: true,
   allowTeamInvitations: true,
 };
-```
-
-### Emergency Contact Validation
-
-Emergency contact data is stored as JSON text and validated for completeness:
-
-```typescript
-const emergencyContactSchema = z
-  .object({
-    name: z.string().min(1, "Emergency contact name is required"),
-    relationship: z.string().min(1, "Relationship is required"),
-    phone: z.string().optional(),
-    email: z.string().email().optional(),
-  })
-  .refine(
-    (data) => data.phone || data.email,
-    "Either phone or email is required for emergency contact",
-  );
 ```
 
 ## Error Handling
@@ -188,7 +147,6 @@ const emergencyContactSchema = z
 The design implements comprehensive error handling:
 
 - **Field-level validation**: Individual field constraints and format validation
-- **Cross-field validation**: Ensuring emergency contact has at least one contact method
 - **Business rule validation**: Age verification, reasonable date ranges
 - **Database constraint errors**: Handling unique constraints and foreign key violations
 
@@ -243,8 +201,6 @@ Each server function will have comprehensive unit tests covering:
 
 #### Validation Tests
 
-- Date of birth format and range validation
-- Emergency contact completeness validation
 - Privacy settings structure validation
 - Cross-field validation rules
 
@@ -276,8 +232,6 @@ The migration will be implemented as a single Drizzle migration file:
 -- Add profile fields to existing user table
 ALTER TABLE "user"
 ADD COLUMN "profile_complete" boolean DEFAULT false NOT NULL,
-ADD COLUMN "date_of_birth" timestamp,
-ADD COLUMN "emergency_contact" text,
 ADD COLUMN "gender" text,
 ADD COLUMN "pronouns" text,
 ADD COLUMN "phone" text,
@@ -287,7 +241,6 @@ ADD COLUMN "profile_updated_at" timestamp DEFAULT now();
 
 -- Create indexes for common queries
 CREATE INDEX "user_profile_complete_idx" ON "user" ("profile_complete");
-CREATE INDEX "user_date_of_birth_idx" ON "user" ("date_of_birth");
 ```
 
 ### Backward Compatibility

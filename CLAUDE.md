@@ -67,10 +67,10 @@ All checks must pass before the commit is allowed. The pre-commit hook matches w
 
 ## Architecture Overview
 
-This is **Solstice**, a sports league management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
+This is a sports league management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
 
 - **TanStack Router** for file-based routing with type safety
-- **Better Auth** for authentication (email/password + OAuth via GitHub/Google)
+- **Better Auth** for authentication (email/password + OAuth via Discord/Google)
 - **Drizzle ORM** with PostgreSQL for database operations
 - **TanStack Query** for server state management and caching
 - **Tailwind CSS** for styling with shadcn/ui components
@@ -116,7 +116,7 @@ This is **Solstice**, a sports league management platform built with TanStack St
 - `DATABASE_URL` - PostgreSQL connection string (pooled URL for serverless)
 - `DATABASE_URL_UNPOOLED` - Direct connection URL for migrations (optional)
 - `VITE_BASE_URL` - Application base URL (only required in development - use http://localhost:8888 for Netlify Dev, http://localhost:5173 for Vite)
-- `GITHUB_CLIENT_ID/SECRET` - GitHub OAuth (required for OAuth login)
+- `DISCORD_CLIENT_ID/SECRET` - Discord OAuth (required for OAuth login)
 - `GOOGLE_CLIENT_ID/SECRET` - Google OAuth (required for OAuth login)
 - `BETTER_AUTH_SECRET` - Secret key for Better Auth sessions
 
@@ -189,7 +189,7 @@ See `docs/database-connections.md` for detailed usage guide.
 
 1. **Login Methods**:
    - Email/password via `auth.signIn.email()`
-   - OAuth via `auth.signInWithOAuth()` (Google, GitHub)
+   - OAuth via `auth.signInWithOAuth()` (Google, Discord)
 2. **Protected Routes**:
    - Auth guard middleware redirects unauthenticated users
    - Profile completion guard redirects incomplete profiles to `/onboarding`
@@ -212,7 +212,7 @@ The project includes automated documentation generation:
   - Configuration: `typedoc.json`
 - **Database ERDs**: Automatically generates diagrams from mermaid definitions
   - Run `pnpm docs:erd` to update
-  - Source: `docs/quadball-plan/database/schema-overview.md`
+  - Source: `docs/roundup-games-plan/database/schema-overview.md`
   - Output: `docs/reference/database/schema-erd.{svg,png}`
   - Uses system Chrome via `puppeteer.config.json`
 
@@ -542,7 +542,7 @@ Tree as of July 6, 2025
 │   ├── code-improvements.md
 │   ├── database-connections.md
 │   ├── project-brief.md
-│   ├── quadball-plan
+│   ├── roundup-games-plan
 │   │   └── ... (project documentation)
 │   ├── reference
 │   │   └── database
@@ -687,7 +687,7 @@ Assume the dev server is running on 5173 or 8888 for every session, and check vi
 Always read .cursor/rules/*
 
 ## Docs
-Read /docs/quadball-plan/* as appropriate
+Read /docs/roundup-games-plan/* as appropriate
 
 ## Development Roadmap
 See /docs/development-backlog.md for prioritized feature implementation tickets

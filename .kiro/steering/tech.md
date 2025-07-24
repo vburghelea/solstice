@@ -114,14 +114,14 @@ Follow the centralized form pattern using TanStack Form:
 - **Strong password validation** with strength meter (8+ chars, mixed case, numbers, symbols)
 - **Secure cookies** in production (HTTPS-only, HttpOnly, SameSite=lax)
 - **CSP headers** with nonce-based script validation via Netlify Edge Functions
-- **PIPEDA compliance** for Canadian privacy laws
+- **GDPR compliance** for EU privacy laws
 
 ## Documentation Automation
 
 - **After significant `src/lib/` changes**: Run `pnpm docs:reference` to update API docs
 - **After database schema updates**: Run `pnpm docs:erd` to regenerate ERD diagrams
 - **Use `pnpm docs:all`** to update all automated documentation
-- **Update project docs** in `docs/quadball-plan/` when implementing new features
+- **Update project docs** in `docs/roundup-games-plan/` when implementing new features
 
 ## Key Resources
 

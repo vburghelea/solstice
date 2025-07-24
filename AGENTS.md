@@ -1,4 +1,4 @@
-# AGENTS.md - Coding Agent Guidelines for Solstice
+# AGENTS.md - Coding Agent Guidelines
 
 ## Build/Lint/Test Commands
 

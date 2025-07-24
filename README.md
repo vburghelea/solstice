@@ -40,8 +40,8 @@ VITE_BASE_URL=http://localhost:3000
 BETTER_AUTH_SECRET=your-secret-key
 
 # OAuth Providers (optional)
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
+DISCORD_CLIENT_ID=your_github_client_id
+DISCORD_CLIENT_SECRET=your_github_client_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
@@ -171,14 +171,14 @@ Configure these secrets in your GitHub repository settings:
 - `NETLIFY_AUTH_TOKEN` - Netlify authentication token
 - `NETLIFY_SITE_ID` - Netlify site ID
 - `CODECOV_TOKEN` - Codecov upload token (optional)
-- `GITHUB_CLIENT_ID` - GitHub OAuth client ID
-- `GITHUB_CLIENT_SECRET` - GitHub OAuth client secret
+- `DISCORD_CLIENT_ID` - GitHub OAuth client ID
+- `DISCORD_CLIENT_SECRET` - GitHub OAuth client secret
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 
 ## Overview and Purpose
 
-The Solstice platform streamlines sports league management – initially serving **Quadball Canada** (the national quadball governing body) and eventually adaptable to other sports organizations. The platform enables athletes, team leaders, and administrators to handle all essential activities in one place.
+The Solstice platform streamlines sports league management – initially serving **Roundup Games** and eventually adaptable to other organizations. The platform enables tabletop and board game enthusiasts to connect and organize game sessions and events.
 
 **Key Features:**
 
@@ -188,4 +188,3 @@ The Solstice platform streamlines sports league management – initially serving
 - **Payments & Finance:** Integration with a payment platform for membership and event fees
 - **Role-Based Access Control:** Admin, Team Lead, and Player permission layers
 - **Communication & Notifications:** Email confirmations and announcements
-- **Future Extensibility:** Multi-organization, multi-sport capability

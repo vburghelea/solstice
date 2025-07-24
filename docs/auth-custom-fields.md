@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains how custom user fields are handled in the Solstice application, which uses Better Auth for authentication with custom profile fields stored in the database.
+This document explains how custom user fields are handled in the Roundup Games platform, which uses Better Auth for authentication with custom profile fields stored in the database.
 
 ## The Challenge
 
@@ -19,8 +19,6 @@ Better Auth's session only returns a subset of user fields by default:
 However, our application requires additional custom fields for user profiles:
 
 - `profileComplete` - Track if user has completed onboarding
-- `dateOfBirth` - Required profile field
-- `emergencyContact` - Required for sports leagues (JSON)
 - `gender`, `pronouns`, `phone` - Optional profile fields
 - `privacySettings` - User privacy preferences (JSON)
 - `profileVersion`, `profileUpdatedAt` - Audit fields
@@ -43,8 +41,6 @@ export const user = pgTable("user", {
   profileComplete: boolean("profile_complete")
     .$defaultFn(() => false)
     .notNull(),
-  dateOfBirth: timestamp("date_of_birth"),
-  emergencyContact: text("emergency_contact"), // JSON string
   // ... other custom fields ...
 });
 ```
@@ -58,8 +54,6 @@ import type { User as BetterAuthUser } from "better-auth";
 
 export interface User extends BetterAuthUser {
   profileComplete: boolean;
-  dateOfBirth?: Date | null;
-  emergencyContact?: string | null;
   // ... other custom fields ...
 }
 ```

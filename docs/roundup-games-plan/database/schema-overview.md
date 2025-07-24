@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Quadball Canada platform uses PostgreSQL with Drizzle ORM for type-safe database operations. The schema is designed for extensibility, audit trails, and performance at scale.
+The Roundup Games platform uses PostgreSQL with Drizzle ORM for type-safe database operations. The schema is designed for extensibility, audit trails, and performance at scale.
 
 > ⚠️ **Current vs Future**: Only the Better Auth tables (users, sessions, accounts) are currently implemented. All other tables shown below are **planned future entities**.
 
@@ -94,7 +94,6 @@ Strategic use of JSONB fields for flexibility:
 privacySettings: {
   showEmail: boolean;
   showPhone: boolean;
-  showBirthYear: boolean;
 }
 
 // Future event custom fields
@@ -240,7 +239,6 @@ pnpm db:push
 Fields requiring special handling:
 
 - `users.phone` - Will be encrypted at rest
-- `users.emergencyContact` - Encrypted JSONB
 - `payments.metadata` - Contains PII
 - `audit_logs.ipAddress` - Privacy regulations
 
@@ -266,6 +264,6 @@ function canViewTeam(userId: string, teamId: string) {
 2. **RBAC Implementation** - Create roles and permissions system
 3. **Team System** - Teams and membership tables
 4. **Event Management** - Events and registration system
-5. **Payment Processing** - Square integration tables
+5. **Payment Processing** - 3rd party payment integration tables
 
 The schema is designed to evolve incrementally while maintaining data integrity and performance.

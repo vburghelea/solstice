@@ -1,6 +1,6 @@
 # UI Components
 
-This directory contains shadcn/ui components that have been customized for the Quadball Canada platform.
+This directory contains shadcn/ui components that have been customized for the Roundup Games platform.
 
 ## Base Components (from shadcn/ui)
 
@@ -61,4 +61,4 @@ All components use CSS variables for theming, defined in `src/styles.css`. The t
 For detailed component documentation and examples, see:
 
 - [shadcn/ui Components](https://ui.shadcn.com/docs/components)
-- [Component Guide](../../../docs/quadball-plan/ui-flows/component-guide.md)
+- [Component Guide](../../../docs/roundup-games-plan/ui-flows/component-guide.md)

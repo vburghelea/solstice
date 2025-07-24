@@ -1,14 +1,6 @@
-export interface EmergencyContact {
-  name: string;
-  relationship: string;
-  phone?: string;
-  email?: string;
-}
-
 export interface PrivacySettings {
   showEmail: boolean;
   showPhone: boolean;
-  showBirthYear: boolean;
   allowTeamInvitations: boolean;
 }
 
@@ -17,8 +9,6 @@ export interface UserProfile {
   name: string;
   email: string;
   profileComplete: boolean;
-  dateOfBirth?: Date | undefined;
-  emergencyContact?: EmergencyContact | undefined;
   gender?: string | undefined;
   pronouns?: string | undefined;
   phone?: string | undefined;
@@ -28,8 +18,6 @@ export interface UserProfile {
 }
 
 export interface ProfileInput {
-  dateOfBirth: Date;
-  emergencyContact?: EmergencyContact;
   gender?: string;
   pronouns?: string;
   phone?: string;
@@ -55,6 +43,5 @@ export interface ProfileOperationResult {
 export const defaultPrivacySettings: PrivacySettings = {
   showEmail: false,
   showPhone: false,
-  showBirthYear: true,
   allowTeamInvitations: true,
 };

@@ -37,10 +37,6 @@ export interface User extends BetterAuthUser {
   // Profile completion tracking
   profileComplete: boolean;
 
-  // Required profile fields
-  dateOfBirth?: Date | null;
-  emergencyContact?: string | null; // JSON string
-
   // Optional profile fields
   gender?: string | null;
   pronouns?: string | null;

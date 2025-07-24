@@ -2,12 +2,12 @@
 
 ## Overview
 
-This document outlines the primary user flows through the Quadball Canada platform, aligned with the actual routes implemented in the application.
+This document outlines the primary user flows through the Roundup Games platform, aligned with the actual routes implemented in the application.
 
 ## Core User Types
 
-1. **Players** - Individual members who play quadball
-2. **Team Managers** - Coaches and captains who manage teams
+1. **Players** - Individual members who play tabletop or board games
+2. **Team Managers** - Captains who manage teams
 3. **Event Coordinators** - Organizers who run tournaments
 4. **Administrators** - Platform admins with full access
 
@@ -15,7 +15,7 @@ This document outlines the primary user flows through the Quadball Canada platfo
 
 ### 1. New Member Onboarding ✅ (Implemented)
 
-**Goal**: Join Quadball Canada and get ready to play
+**Goal**: Join Roundup Games and get ready to play
 
 ```
 Landing Page → Sign Up → Email Verification → Complete Profile → Purchase Membership
@@ -29,8 +29,8 @@ Landing Page → Sign Up → Email Verification → Complete Profile → Purchas
 1. User discovers platform via social media or search
 2. Creates account with email/password or OAuth
 3. Verifies email address
-4. Completes profile with emergency contact
-5. Purchases membership through Square (⏳ planned)
+4. Completes profile with privacy settings
+5. Purchases membership through 3rd party payment platform (⏳ planned)
 
 **Routes Involved**:
 
@@ -38,7 +38,7 @@ Landing Page → Sign Up → Email Verification → Complete Profile → Purchas
 - `/signup` - Registration form ✅
 - `/login` - Alternative entry ✅
 - `/dashboard/profile` - Profile completion ✅
-- External Square checkout ⏳
+- External payment checkout ⏳
 
 ### 2. Team Registration for Event ⏳ (Planned)
 

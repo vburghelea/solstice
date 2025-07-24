@@ -1,67 +1,6 @@
 # External Integrations
 
-This document covers all external service integrations for the Quadball Canada platform.
-
-## Square Payments
-
-**Status**: ⏳ Planned
-
-### Configuration
-
-Environment variables required:
-
-```bash
-SQUARE_APPLICATION_ID=    # From Square dashboard
-SQUARE_ACCESS_TOKEN=      # API access token
-SQUARE_LOCATION_ID=       # Default location
-SQUARE_WEBHOOK_SIGNATURE_KEY= # For webhook validation
-```
-
-### Planned Implementation
-
-**Core Logic**: `src/lib/payments/square.ts` (not yet created)
-
-- Client initialization
-- Checkout session creation
-- Webhook signature validation
-
-**Webhook Handler**: `src/routes/api/webhooks/square.ts` (not yet created)
-
-- Process payment confirmations
-- Update database records
-- Trigger email confirmations
-
-### Key Features
-
-1. **Hosted Checkout**: PCI-compliant payment page
-2. **Canadian Support**: Full support for CAD payments
-3. **Webhook Security**: Cryptographic signature validation
-4. **Refunds**: API integration for processing refunds
-
-## E-transfer Payments
-
-**Status**: ⏳ Planned
-
-### Configuration
-
-```bash
-ETRANSFER_EMAIL=treasurer@quadballcanada.ca  # Receiving email
-ETRANSFER_NOTIFICATION_EMAIL=admin@quadballcanada.ca # Admin notifications
-```
-
-### Implementation Approach
-
-1. **User Flow**:
-   - User selects e-transfer at checkout
-   - System generates unique reference number
-   - Email sent with payment instructions
-   - Admin manually confirms receipt
-   - System updates payment status
-
-2. **Security**:
-   - Unique reference per transaction
-   - Manual verification required
-   - Audit trail of confirmations
+This document covers all external service integrations for the Roundup Games platform.
 
 ## SendGrid Email
 
@@ -72,8 +11,8 @@ ETRANSFER_NOTIFICATION_EMAIL=admin@quadballcanada.ca # Admin notifications
 ```bash
 SENDGRID_API_KEY=         # API key from SendGrid
 SENDGRID_WEBHOOK_KEY=     # Webhook verification
-SENDGRID_FROM_EMAIL=noreply@quadballcanada.ca
-SENDGRID_FROM_NAME=Quadball Canada
+SENDGRID_FROM_EMAIL=staff@roundup.games
+SENDGRID_FROM_NAME=Roundup Games Staff
 ```
 
 ### Planned Implementation
@@ -182,12 +121,6 @@ async function callExternalAPI() {
 ```
 
 ## Troubleshooting
-
-### Square Payments
-
-- **Webhook not received**: Check signature key configuration
-- **Payment failed**: Review Square dashboard for details
-- **Sandbox testing**: Use test card numbers from Square docs
 
 ### Email Delivery
 

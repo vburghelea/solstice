@@ -12,10 +12,10 @@ function Home() {
   return (
     <PublicLayout>
       <HeroSection
-        title="Welcome to Quadball Canada"
-        subtitle="Your hub for all things Quadball in Canada. Stay updated on events, teams, and resources."
+        title="Welcome to Roundup Games"
+        subtitle="A platform for connecting tabletop and board game enthusiasts, helping them organize game sessions, longer running campaigns, events, and administrative tasks."
         backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
-        ctaText="Explore Events"
+        ctaText="Explore Games"
         ctaLink="/"
       />
 
@@ -27,7 +27,7 @@ function Home() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
             <EventCard
               title="National Championship"
-              description="Join us for the biggest Quadball event of the year!"
+              description="Join us for the biggest event of the year!"
               image="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1740"
               link="/"
             />
@@ -39,7 +39,7 @@ function Home() {
             />
             <EventCard
               title="Community Meetup"
-              description="Connect with fellow Quadball enthusiasts in your area."
+              description="Connect with fellow enthusiasts in your area."
               image="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=1674"
               link="/"
             />

@@ -6,7 +6,6 @@ import {
   profileInputSchema,
 } from "./profile.schemas";
 import type {
-  EmergencyContact,
   PrivacySettings,
   ProfileOperationResult,
   UserProfile,
@@ -41,8 +40,6 @@ function mapDbUserToProfile(dbUser: {
     name: dbUser.name,
     email: dbUser.email,
     profileComplete: dbUser.profileComplete,
-    dateOfBirth: dbUser.dateOfBirth ?? undefined,
-    emergencyContact: parseJsonField<EmergencyContact>(dbUser.emergencyContact),
     gender: dbUser.gender ?? undefined,
     pronouns: dbUser.pronouns ?? undefined,
     phone: dbUser.phone ?? undefined,
@@ -92,16 +89,6 @@ export const updateUserProfile = createServerFn({ method: "POST" })
         profileVersion: sql`${user.profileVersion} + 1`,
       };
 
-      if (inputData.dateOfBirth !== undefined) {
-        // Convert string date to Date object if needed
-        updateData["dateOfBirth"] =
-          typeof inputData.dateOfBirth === "string"
-            ? new Date(inputData.dateOfBirth)
-            : inputData.dateOfBirth;
-      }
-      if (inputData.emergencyContact !== undefined) {
-        updateData["emergencyContact"] = JSON.stringify(inputData.emergencyContact);
-      }
       if (inputData.gender !== undefined) {
         updateData["gender"] = inputData.gender;
       }
@@ -198,8 +185,6 @@ export const completeUserProfile = createServerFn({ method: "POST" })
       const { user } = await import("~/db/schema");
 
       const updateData = {
-        dateOfBirth: data.dateOfBirth,
-        emergencyContact: JSON.stringify(data.emergencyContact),
         gender: data.gender || null,
         pronouns: data.pronouns || null,
         phone: data.phone || null,

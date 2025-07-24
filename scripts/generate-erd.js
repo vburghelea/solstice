@@ -10,7 +10,10 @@ const __dirname = dirname(__filename);
 const rootDir = join(__dirname, "..");
 
 // Read the current schema overview to extract the mermaid diagram
-const schemaDocPath = join(rootDir, "docs/quadball-plan/database/schema-overview.md");
+const schemaDocPath = join(
+  rootDir,
+  "docs/roundup-games-plan/database/schema-overview.md",
+);
 const outputDir = join(rootDir, "docs/reference/database");
 const outputPath = join(outputDir, "schema-erd.svg");
 

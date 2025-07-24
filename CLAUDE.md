@@ -22,13 +22,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Pre-Commit Requirements
 
-**IMPORTANT**: Before committing any code changes, you MUST run the following commands to ensure code quality:
+**IMPORTANT**: The pre-commit hook automatically runs the following checks to ensure code quality:
 
-1. `pnpm lint` - Run ESLint to check for code style issues
-2. `pnpm check-types` - Run TypeScript type checking
-3. `pnpm test` - Run all tests to ensure nothing is broken
+1. **Lint-staged** - Runs on staged files only:
+   - `eslint --fix` - Auto-fixes and checks ESLint rules
+   - `prettier --write` - Formats code consistently
+2. **Type checking** - `pnpm check-types` on entire codebase
+3. **Tests** - `pnpm test --run` to ensure nothing is broken
 
-All three commands must pass successfully before committing. If any errors are found, fix them before proceeding with the commit.
+All checks must pass before the commit is allowed. The pre-commit hook matches what GitHub Actions CI runs, ensuring no surprises after pushing.
 
 ## Architecture Overview
 

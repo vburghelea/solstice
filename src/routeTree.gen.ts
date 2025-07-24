@@ -17,6 +17,8 @@ import { Route as authRouteRouteImport } from "./routes/(auth)/route";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as DashboardMembershipRouteImport } from "./routes/dashboard/membership";
+import { Route as ApiHealthRouteImport } from "./routes/api/health";
 import { Route as authSignupRouteImport } from "./routes/(auth)/signup";
 import { Route as authLoginRouteImport } from "./routes/(auth)/login";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
@@ -53,6 +55,16 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
+  id: "/membership",
+  path: "/membership",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: "/api/health",
+  path: "/api/health",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const authSignupRoute = authSignupRouteImport.update({
   id: "/signup",
   path: "/signup",
@@ -81,6 +93,8 @@ export interface FileRoutesByFullPath {
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/login": typeof authLoginRoute;
   "/signup": typeof authSignupRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
 }
@@ -88,6 +102,8 @@ export interface FileRoutesByTo {
   "/": typeof authRouteRouteWithChildren;
   "/login": typeof authLoginRoute;
   "/signup": typeof authSignupRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
 }
@@ -99,6 +115,8 @@ export interface FileRoutesById {
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/(auth)/login": typeof authLoginRoute;
   "/(auth)/signup": typeof authSignupRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
 }
@@ -110,10 +128,19 @@ export interface FileRouteTypes {
     | "/onboarding"
     | "/login"
     | "/signup"
+    | "/api/health"
+    | "/dashboard/membership"
     | "/dashboard/"
     | "/onboarding/";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/login" | "/signup" | "/dashboard" | "/onboarding";
+  to:
+    | "/"
+    | "/login"
+    | "/signup"
+    | "/api/health"
+    | "/dashboard/membership"
+    | "/dashboard"
+    | "/onboarding";
   id:
     | "__root__"
     | "/"
@@ -122,6 +149,8 @@ export interface FileRouteTypes {
     | "/onboarding"
     | "/(auth)/login"
     | "/(auth)/signup"
+    | "/api/health"
+    | "/dashboard/membership"
     | "/dashboard/"
     | "/onboarding/";
   fileRoutesById: FileRoutesById;
@@ -131,6 +160,7 @@ export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  ApiHealthRoute: typeof ApiHealthRoute;
 }
 export interface FileServerRoutesByFullPath {
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
@@ -202,6 +232,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/dashboard/membership": {
+      id: "/dashboard/membership";
+      path: "/membership";
+      fullPath: "/dashboard/membership";
+      preLoaderRoute: typeof DashboardMembershipRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/api/health": {
+      id: "/api/health";
+      path: "/api/health";
+      fullPath: "/api/health";
+      preLoaderRoute: typeof ApiHealthRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/(auth)/signup": {
       id: "/(auth)/signup";
       path: "/signup";
@@ -252,10 +296,12 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
 );
 
 interface DashboardRouteRouteChildren {
+  DashboardMembershipRoute: typeof DashboardMembershipRoute;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardMembershipRoute: DashboardMembershipRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 };
 
@@ -280,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  ApiHealthRoute: ApiHealthRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

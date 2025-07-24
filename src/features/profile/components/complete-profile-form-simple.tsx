@@ -24,6 +24,11 @@ import {
 import { Separator } from "~/shared/ui/separator";
 import { completeUserProfile } from "../profile.mutations";
 import type { ProfileInputType } from "../profile.schemas";
+import type {
+  EmergencyContact,
+  ProfileInput,
+  ProfileOperationResult,
+} from "../profile.types";
 
 const STEPS = [
   {
@@ -84,20 +89,44 @@ export function CompleteProfileForm() {
     setError(null);
 
     try {
-      // Clean up emergency contact if not filled
-      const dataToSubmit = { ...formData };
+      // Build profile input with only defined values
+      const dataToSubmit: ProfileInput = {
+        dateOfBirth: formData.dateOfBirth,
+      };
+
+      // Add optional fields only if they have values
+      if (formData.gender) dataToSubmit.gender = formData.gender;
+      if (formData.pronouns) dataToSubmit.pronouns = formData.pronouns;
+      if (formData.phone) dataToSubmit.phone = formData.phone;
+      if (formData.privacySettings)
+        dataToSubmit.privacySettings = formData.privacySettings;
+
+      // Only include emergency contact if it has meaningful data
       if (
-        dataToSubmit.emergencyContact &&
-        !dataToSubmit.emergencyContact.name &&
-        !dataToSubmit.emergencyContact.relationship &&
-        !dataToSubmit.emergencyContact.phone &&
-        !dataToSubmit.emergencyContact.email
+        formData.emergencyContact &&
+        (formData.emergencyContact.name ||
+          formData.emergencyContact.relationship ||
+          formData.emergencyContact.phone ||
+          formData.emergencyContact.email)
       ) {
-        dataToSubmit.emergencyContact = undefined;
+        // Build emergency contact with required fields
+        const emergencyContact: EmergencyContact = {
+          name: formData.emergencyContact.name || "",
+          relationship: formData.emergencyContact.relationship || "",
+        };
+        if (formData.emergencyContact.phone)
+          emergencyContact.phone = formData.emergencyContact.phone;
+        if (formData.emergencyContact.email)
+          emergencyContact.email = formData.emergencyContact.email;
+
+        dataToSubmit.emergencyContact = emergencyContact;
       }
 
-      // @ts-expect-error - TanStack Start server function type inference issue
-      const result = await completeUserProfile({
+      const result = await (
+        completeUserProfile as unknown as (params: {
+          data: ProfileInput;
+        }) => Promise<ProfileOperationResult>
+      )({
         data: dataToSubmit,
       });
 

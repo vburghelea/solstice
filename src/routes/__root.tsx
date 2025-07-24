@@ -11,6 +11,7 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import { Toaster } from "sonner";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import type { AuthUser } from "~/lib/auth/types";
 import appCss from "~/styles.css?url";
@@ -81,6 +82,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 
         {children}
 
+        <Toaster richColors closeButton />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <TanStackRouterDevtools position="bottom-right" />
 

@@ -96,8 +96,7 @@ export function CompleteProfileForm() {
         dataToSubmit.emergencyContact = undefined;
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore - TanStack Start server function type inference issue
+      // @ts-expect-error - TanStack Start server function type inference issue
       const result = await completeUserProfile({
         data: dataToSubmit,
       });

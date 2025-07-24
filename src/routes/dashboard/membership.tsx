@@ -23,7 +23,7 @@ import {
 
 export const Route = createFileRoute("/dashboard/membership")({
   component: MembershipPage,
-} as const);
+});
 
 function MembershipPage() {
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -43,8 +43,14 @@ function MembershipPage() {
   const handleMockPaymentReturn = async (sessionId: string) => {
     setProcessingPayment(true);
     try {
-      // @ts-expect-error - TanStack Start type inference issue
-      const result = await confirmMembershipPurchase({
+      const result = await (
+        confirmMembershipPurchase as unknown as (params: {
+          data: { membershipTypeId: string; sessionId: string; paymentId: string };
+        }) => Promise<{
+          success: boolean;
+          errors?: Array<{ code: string; message: string }>;
+        }>
+      )({
         data: {
           membershipTypeId: new URLSearchParams(window.location.search).get("type") || "",
           sessionId,
@@ -72,7 +78,6 @@ function MembershipPage() {
   const membershipStatusQuery = useQuery({
     queryKey: ["membership-status"],
     queryFn: async () => {
-      // @ts-expect-error - TanStack Start type inference issue
       const result = await getUserMembershipStatus();
       if (!result.success) {
         throw new Error(
@@ -86,7 +91,6 @@ function MembershipPage() {
   const membershipTypesQuery = useQuery({
     queryKey: ["membership-types"],
     queryFn: async () => {
-      // @ts-expect-error - TanStack Start type inference issue
       const result = await listMembershipTypes();
       if (!result.success) {
         throw new Error(

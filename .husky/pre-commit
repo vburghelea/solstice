@@ -1,1 +1,24 @@
+
+# Run lint-staged for formatting
 npx lint-staged
+
+# Run the same checks as GitHub Actions
+echo "Running pre-commit checks..."
+
+# 1. Type checking
+echo "Checking TypeScript types..."
+pnpm check-types
+if [ $? -ne 0 ]; then
+  echo "❌ Type checking failed. Please fix type errors before committing."
+  exit 1
+fi
+
+# 2. Run tests
+echo "Running tests..."
+pnpm test --run
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Please fix failing tests before committing."
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

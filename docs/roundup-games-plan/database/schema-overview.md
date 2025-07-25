@@ -79,6 +79,63 @@ erDiagram
     %% Future Audit System
     users ||--o{ audit_logs : "will generate"
     users ||--o{ notifications : "will receive"
+
+    %% Future Game Systems
+    users ||--o{ user_game_system_preferences : "preferences"
+    gameSystem ||--o{ user_game_system_preferences : "preferred/avoided"
+    gameSystem ||--o{ gameSystem_to_category : "categorized"
+    gameSystem ||--o{ gameSystem_to_mechanics : "mechanics"
+    gameSystemCategory ||--o{ gameSystem_to_category : "categories"
+    gameSystemMechanics ||--o{ gameSystem_to_mechanics : "mechanics"
+
+    gameSystem {
+        string id PK
+        string name
+        string slug UK
+        string description
+        string[] images
+        integer minPlayers
+        integer maxPlayers
+        integer optimalPlayers
+        integer averagePlayTime
+        string ageRating
+        string complexityRating
+        integer yearReleased
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    gameSystemCategory {
+        string id PK
+        string name UK
+        string description
+    }
+
+    gameSystemMechanics {
+        string id PK
+        string name UK
+        string description
+    }
+
+    gameSystem_to_category {
+        string gameSystemId FK
+        string categoryId FK
+        PRIMARY KEY (gameSystemId, categoryId)
+    }
+
+    gameSystem_to_mechanics {
+        string gameSystemId FK
+        string mechanicsId FK
+        PRIMARY KEY (gameSystemId, mechanicsId)
+    }
+
+    user_game_system_preferences {
+        string userId FK
+        string gameSystemId FK
+        enum preferenceType { 'favorite', 'avoid' }
+        timestamp createdAt
+        PRIMARY KEY (userId, gameSystemId)
+    }
 ```
 
 ## Schema Design Principles
@@ -170,6 +227,13 @@ event_registrations(event_id, status) -- Participant lists
 -- Payment queries
 payments(user_id, created_at) -- User history
 payments(provider_payment_id) -- Webhook lookups
+
+-- Game system queries
+gameSystem(slug) -- URL lookups
+gameSystem(name) -- Search
+gameSystem_to_category(gameSystemId) -- Category lookups
+gameSystem_to_mechanics(gameSystemId) -- Mechanics lookups
+user_game_system_preferences(userId, preference_type) -- User preferences
 ```
 
 ## Data Integrity
@@ -196,6 +260,12 @@ UNIQUE (slug) ON events
 -- Valid price ranges
 CHECK (price_cents >= 0) ON membership_types
 CHECK (fee_cents >= 0) ON events
+
+-- Game system constraints
+CHECK (min_players >= 1) ON gameSystem
+CHECK (max_players >= min_players) ON gameSystem
+CHECK (optimal_players BETWEEN min_players AND max_players) ON gameSystem
+CHECK (average_play_time > 0) ON gameSystem
 ```
 
 ## Migration Strategy
@@ -222,6 +292,7 @@ pnpm db:push
 0003_add_team_tables.sql
 0004_add_event_system.sql
 0005_add_payment_tables.sql
+0006_add_game_system_tables.sql
 ```
 
 ## Security Considerations

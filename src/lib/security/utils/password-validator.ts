@@ -1,4 +1,4 @@
-import { securityConfig } from "../config";
+import { PASSWORD_CONFIG } from "../password-config";
 
 interface PasswordValidationResult {
   isValid: boolean;
@@ -7,10 +7,11 @@ interface PasswordValidationResult {
 
 /**
  * Validates a password against security requirements
+ * Works in both client and server environments
  */
 export function validatePassword(password: string): PasswordValidationResult {
   const errors: string[] = [];
-  const config = securityConfig.password;
+  const config = PASSWORD_CONFIG;
 
   // Check minimum length
   if (password.length < config.minLength) {

@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, gte, sql } from "drizzle-orm";
-import { membershipTypes, memberships } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getAuth } from "~/lib/auth/server-helpers";
 import type {
@@ -13,11 +11,15 @@ import type {
  * List all active membership types available for purchase
  */
 export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
+  // @ts-expect-error - TanStack Start type inference issue with dynamic imports
   async (): Promise<
-    MembershipOperationResult<(typeof membershipTypes.$inferSelect)[]>
+    MembershipOperationResult<import("./membership.types").MembershipType[]>
   > => {
     try {
+      // Import database dependencies inside handler
+      const { eq } = await import("drizzle-orm");
+      const { membershipTypes } = await import("~/db/schema");
+
       const db = await getDb();
       const activeTypes = await db()
         .select()
@@ -53,8 +55,12 @@ export const getMembershipType = createServerFn({ method: "GET" }).handler(
     membershipTypeId,
   }: {
     membershipTypeId: string;
-  }): Promise<MembershipOperationResult<typeof membershipTypes.$inferSelect>> => {
+  }): Promise<MembershipOperationResult<import("./membership.types").MembershipType>> => {
     try {
+      // Import database dependencies inside handler
+      const { eq } = await import("drizzle-orm");
+      const { membershipTypes } = await import("~/db/schema");
+
       const db = await getDb();
       const [membershipType] = await db()
         .select()
@@ -116,6 +122,10 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
           ],
         };
       }
+
+      // Import database dependencies inside handler
+      const { and, eq, gte, sql } = await import("drizzle-orm");
+      const { membershipTypes, memberships } = await import("~/db/schema");
 
       // Get active membership for the user
       const db = await getDb();

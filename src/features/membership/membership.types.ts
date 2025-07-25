@@ -1,4 +1,28 @@
-import type { Membership, MembershipType } from "~/db/schema";
+// Define types manually since we can't import from schema at top level
+export interface MembershipType {
+  id: string;
+  name: string;
+  description: string | null;
+  priceCents: number;
+  durationMonths: number;
+  status: "active" | "inactive";
+  metadata: Record<string, unknown> | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Membership {
+  id: string;
+  userId: string;
+  membershipTypeId: string;
+  startDate: string | Date;
+  endDate: string | Date;
+  status: "active" | "cancelled" | "expired";
+  paymentId: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface MembershipOperationResult<T = unknown> {
   success: boolean;

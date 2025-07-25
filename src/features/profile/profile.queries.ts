@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
-import { user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getAuth } from "~/lib/auth/server-helpers";
 import type {
@@ -19,7 +17,20 @@ function parseJsonField<T>(value: string | null | undefined): T | undefined {
   }
 }
 
-function mapDbUserToProfile(dbUser: typeof user.$inferSelect): UserProfile {
+function mapDbUserToProfile(dbUser: {
+  id: string;
+  name: string;
+  email: string;
+  profileComplete: boolean;
+  dateOfBirth: Date | null;
+  emergencyContact: string | null;
+  gender: string | null;
+  pronouns: string | null;
+  phone: string | null;
+  privacySettings: string | null;
+  profileVersion: number;
+  profileUpdatedAt: Date | null;
+}): UserProfile {
   return {
     id: dbUser.id,
     name: dbUser.name,
@@ -50,6 +61,9 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
           errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
         };
       }
+
+      const { eq } = await import("drizzle-orm");
+      const { user } = await import("~/db/schema");
 
       const db = await getDb();
       const [dbUser] = await db()
@@ -95,6 +109,9 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
       if (!session?.user?.id) {
         throw new Error("User not authenticated");
       }
+
+      const { eq } = await import("drizzle-orm");
+      const { user } = await import("~/db/schema");
 
       const db = await getDb();
       const [dbUser] = await db()

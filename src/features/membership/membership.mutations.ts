@@ -1,14 +1,22 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, serverOnly } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { db } from "~/db";
 import { memberships, membershipTypes } from "~/db/schema";
 import { auth } from "~/lib/auth";
-import { squarePaymentService } from "~/lib/payments/square";
 import type {
   CheckoutSessionResult,
   MembershipOperationResult,
   MembershipPurchaseInput,
 } from "./membership.types";
+
+/**
+ * Server-only helper to get Square payment service
+ * This ensures the Square module is never included in the client bundle
+ */
+const getSquarePaymentService = serverOnly(async () => {
+  const { squarePaymentService } = await import("~/lib/payments/square");
+  return squarePaymentService;
+});
 
 /**
  * Create a checkout session for membership purchase
@@ -83,6 +91,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" }).handler(
       }
 
       // Create checkout session with Square
+      const squarePaymentService = await getSquarePaymentService();
       const checkoutSession = await squarePaymentService.createCheckoutSession(
         membershipType.id,
         session.user.id,
@@ -139,6 +148,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" }).hand
       }
 
       // Verify payment with Square
+      const squarePaymentService = await getSquarePaymentService();
       const paymentResult = await squarePaymentService.verifyPayment(
         data.sessionId,
         data.paymentId,

@@ -1880,3 +1880,121 @@ export const userGameSystemPreferences = pgTable(
     }),
   ],
 );
+
+export const gameSystems = pgTable(
+  "game_systems",
+  {
+    id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    slug: varchar({ length: 255 }),
+    description: text(),
+    images: text().array(),
+    minPlayers: integer("min_players"),
+    maxPlayers: integer("max_players"),
+    optimalPlayers: integer("optimal_players"),
+    averagePlayTime: integer("average_play_time"),
+    ageRating: varchar("age_rating", { length: 50 }),
+    complexityRating: varchar("complexity_rating", { length: 50 }),
+    yearReleased: integer("year_released"),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("game_systems_name_unique").on(table.name),
+    unique("game_systems_slug_unique").on(table.slug),
+  ],
+);
+
+export const gameSystemCategories = pgTable(
+  "game_system_categories",
+  {
+    id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    description: text(),
+  },
+  (table) => [unique("game_system_categories_name_unique").on(table.name)],
+);
+
+export const gameSystemMechanics = pgTable(
+  "game_system_mechanics",
+  {
+    id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    description: text(),
+  },
+  (table) => [unique("game_system_mechanics_name_unique").on(table.name)],
+);
+
+export const gameSystemToCategory = pgTable(
+  "game_system_to_category",
+  {
+    gameSystemId: integer("game_system_id").notNull(),
+    categoryId: integer("category_id").notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "game_system_to_category_game_system_id_game_systems_id_fk",
+    }),
+    foreignKey({
+      columns: [table.categoryId],
+      foreignColumns: [gameSystemCategories.id],
+      name: "game_system_to_category_category_id_game_system_categories_id_f",
+    }),
+    primaryKey({
+      columns: [table.gameSystemId, table.categoryId],
+      name: "game_system_to_category_game_system_id_category_id_pk",
+    }),
+  ],
+);
+
+export const gameSystemToMechanics = pgTable(
+  "game_system_to_mechanics",
+  {
+    gameSystemId: integer("game_system_id").notNull(),
+    mechanicsId: integer("mechanics_id").notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "game_system_to_mechanics_game_system_id_game_systems_id_fk",
+    }),
+    foreignKey({
+      columns: [table.mechanicsId],
+      foreignColumns: [gameSystemMechanics.id],
+      name: "game_system_to_mechanics_mechanics_id_game_system_mechanics_id_",
+    }),
+    primaryKey({
+      columns: [table.gameSystemId, table.mechanicsId],
+      name: "game_system_to_mechanics_game_system_id_mechanics_id_pk",
+    }),
+  ],
+);
+
+export const userGameSystemPreferences = pgTable(
+  "user_game_system_preferences",
+  {
+    userId: text("user_id").notNull(),
+    gameSystemId: integer("game_system_id").notNull(),
+    preferenceType: text("preference_type").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "user_game_system_preferences_user_id_user_id_fk",
+    }),
+    foreignKey({
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "user_game_system_preferences_game_system_id_game_systems_id_fk",
+    }),
+    primaryKey({
+      columns: [table.userId, table.gameSystemId],
+      name: "user_game_system_preferences_user_id_game_system_id_pk",
+    }),
+  ],
+);

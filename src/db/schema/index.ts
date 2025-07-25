@@ -14,4 +14,5 @@ export * from "./roles.schema";
 export * from "./social.schema";
 export * from "./system-crawl-events.schema";
 export * from "./teams.schema";
+export * from "./game-systems.schema";
 // export your other schemas here

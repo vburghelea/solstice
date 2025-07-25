@@ -3,9 +3,14 @@
  * This module should only be imported in server-side code
  */
 
-// Load environment variables from .env during development
-import { config as dotenvConfig } from "dotenv";
-dotenvConfig();
+// This module should only be imported in server-side code
+
+// Only load dotenv in non-browser environments
+if (typeof window === "undefined") {
+  // Load environment variables from .env during development
+  const { config: dotenvConfig } = await import("dotenv");
+  dotenvConfig();
+}
 
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";

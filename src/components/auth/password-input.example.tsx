@@ -3,7 +3,7 @@ import {
   getPasswordStrength,
   getPasswordStrengthLabel,
   validatePassword,
-} from "~/lib/security";
+} from "~/lib/security/index.client";
 import { Input } from "~/shared/ui/input";
 import { Label } from "~/shared/ui/label";
 

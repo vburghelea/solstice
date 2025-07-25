@@ -6,6 +6,8 @@
 
 import { createId } from "@paralleldrive/cuid2";
 
+// This module should only be imported in server-side code
+
 export interface CheckoutSession {
   id: string;
   checkoutUrl: string;
@@ -28,11 +30,9 @@ export interface PaymentResult {
  * Returns fake checkout URLs and payment confirmations for development
  */
 export class SquarePaymentService {
-  private isLiveMode: boolean;
-
   constructor() {
     // In the future, this will check SQUARE_ENV env var
-    this.isLiveMode = process.env["SQUARE_ENV"] === "live";
+    // For now, always use mock mode
   }
 
   /**
@@ -49,7 +49,9 @@ export class SquarePaymentService {
   ): Promise<CheckoutSession> {
     // Mock implementation - returns a fake checkout URL
     const sessionId = createId();
-    const baseUrl = process.env["VITE_BASE_URL"] || "http://localhost:5173";
+    // Import the server env to get base URL
+    const { getBaseUrl } = await import("~/lib/env.server");
+    const baseUrl = getBaseUrl();
 
     // In real implementation, this would call Square's Checkout API
     const checkoutSession: CheckoutSession = {

@@ -34,7 +34,7 @@ Environment variables are validated at startup using Zod schemas. Create a `.env
 DATABASE_URL=postgresql://user:password@localhost:5432/solstice
 
 # Application (only required in development)
-VITE_BASE_URL=http://localhost:3000
+VITE_BASE_URL=http://localhost:5173
 
 # Auth (required for production)
 BETTER_AUTH_SECRET=your-secret-key

@@ -57,7 +57,7 @@ Example `.env` file:
 
 ```env
 DATABASE_URL=postgresql://localhost:5432/solstice_dev
-VITE_BASE_URL=http://localhost:3000
+VITE_BASE_URL=http://localhost:5173
 DISCORD_CLIENT_ID=your_dev_client_id
 DISCORD_CLIENT_SECRET=your_dev_client_secret
 GOOGLE_CLIENT_ID=your_dev_client_id

@@ -80,7 +80,7 @@ jobs:
         run: pnpm test:coverage
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/platform_test
-          VITE_BASE_URL: http://localhost:3000
+          VITE_BASE_URL: http://localhost:5173
           NODE_ENV: test
           BETTER_AUTH_SECRET: test-secret-for-ci
 
@@ -117,7 +117,7 @@ jobs:
         run: pnpm build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/platform_test' }}
-          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL || 'http://localhost:3000' }}
+          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL || 'http://localhost:5173' }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'build-secret-for-ci' }}
 
       - name: Upload build artifacts

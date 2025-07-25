@@ -235,7 +235,7 @@ _Figure 2: End-to-end flow for adding a new feature with type safety preserved a
 
 | Task                 | Command                | Description                   |
 | -------------------- | ---------------------- | ----------------------------- |
-| **Start dev server** | `pnpm dev`             | Runs app locally on port 3000 |
+| **Start dev server** | `pnpm dev`             | Runs app locally on port 5173 |
 | **Run tests**        | `pnpm test`            | Executes all test suites      |
 | **Type check**       | `pnpm check-types`     | Verifies TypeScript types     |
 | **Lint code**        | `pnpm lint`            | Checks code style             |

@@ -21,6 +21,10 @@ export interface ProfileInput {
   gender?: string;
   pronouns?: string;
   phone?: string;
+  gameSystemPreferences?: {
+    favorite: number[];
+    avoid: number[];
+  };
   privacySettings?: PrivacySettings;
 }
 

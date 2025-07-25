@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import { isProfileComplete } from "./profile.queries";
 import {
   partialProfileInputSchema,
@@ -207,6 +208,31 @@ export const completeUserProfile = createServerFn({ method: "POST" })
           success: false,
           errors: [{ code: "DATABASE_ERROR", message: "Failed to complete profile" }],
         };
+      }
+
+      if (data.gameSystemPreferences) {
+        const preferencesToInsert = [];
+        for (const gameSystemId of data.gameSystemPreferences.favorite) {
+          preferencesToInsert.push({
+            userId: session.user.id,
+            gameSystemId,
+            preferenceType: "favorite" as const,
+          });
+        }
+        for (const gameSystemId of data.gameSystemPreferences.avoid) {
+          preferencesToInsert.push({
+            userId: session.user.id,
+            gameSystemId,
+            preferenceType: "avoid" as const,
+          });
+        }
+
+        if (preferencesToInsert.length > 0) {
+          await db()
+            .insert(userGameSystemPreferences)
+            .values(preferencesToInsert)
+            .onConflictDoNothing();
+        }
       }
 
       return {

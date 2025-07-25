@@ -146,5 +146,28 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
   },
 );
 
+import { gameSystems } from "~/db/schema/game-systems.schema";
+
+export const getGameSystems = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const systems = await db().select().from(gameSystems);
+    return {
+      success: true,
+      data: systems,
+    };
+  } catch (error) {
+    console.error("Error fetching game systems:", error);
+    return {
+      success: false,
+      errors: [
+        {
+          code: "DATABASE_ERROR",
+          message: "Failed to fetch game systems",
+        },
+      ],
+    };
+  }
+});
+
 // Re-export utility function
 export { isProfileComplete } from "./profile.utils";

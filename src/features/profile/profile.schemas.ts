@@ -6,12 +6,20 @@ export const privacySettingsSchema = z.object({
   allowTeamInvitations: z.boolean(),
 });
 
-export const profileInputSchema = z.object({
-  gender: z.string().optional(),
-  pronouns: z.string().optional(),
-  phone: z.string().optional(),
-  privacySettings: privacySettingsSchema.optional(),
-});
+export const profileInputSchema = z
+  .object({
+    gender: z.string().optional(),
+    pronouns: z.string().optional(),
+    phone: z.string().optional(),
+    gameSystemPreferences: z
+      .object({
+        favorite: z.array(z.number()),
+        avoid: z.array(z.number()),
+      })
+      .optional(),
+    privacySettings: privacySettingsSchema.optional(),
+  })
+  .partial();
 
 export const partialProfileInputSchema = profileInputSchema.partial();
 

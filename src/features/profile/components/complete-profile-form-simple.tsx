@@ -17,7 +17,12 @@ import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
 import type { ProfileInputType } from "../profile.schemas";
-import type { ProfileInput } from "../profile.types";
+import type {
+  ProfileInput,
+  ProfileOperationResult,
+} from "../profile.types";
+
+import { GamePreferencesStep } from "./game-preferences-step";
 
 const STEPS = [
   {
@@ -29,6 +34,11 @@ const STEPS = [
     id: "privacy",
     title: "Privacy Settings",
     description: "Control what information is visible to others",
+  },
+  {
+    id: "game-preferences",
+    title: "Game Preferences",
+    description: "Select your favorite and least favorite game systems",
   },
 ] as const;
 
@@ -45,6 +55,10 @@ export function CompleteProfileForm() {
       gender: "",
       pronouns: "",
       phone: "",
+    gameSystemPreferences: {
+      favorite: [],
+      avoid: [],
+    },
       privacySettings: {
         showEmail: false,
         showPhone: false,
@@ -197,6 +211,20 @@ export function CompleteProfileForm() {
                   )}
                 </form.Field>
               </>
+            )}
+
+            {/* Game Preferences Step */}
+            {currentStep === "game-preferences" && (
+              <GamePreferencesStep
+                initialFavorites={formData.gameSystemPreferences?.favorite || []}
+                initialToAvoid={formData.gameSystemPreferences?.avoid || []}
+                onPreferencesChange={(favorite, avoid) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    gameSystemPreferences: { favorite, avoid },
+                  }))
+                }
+              />
             )}
 
             {/* Privacy Settings Step */}

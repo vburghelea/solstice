@@ -1,8 +1,6 @@
 import { createServerFn, serverOnly } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { memberships, membershipTypes } from "~/db/schema";
-import { getDb } from "~/db/server-helpers";
-import { getAuth } from "~/lib/auth/server-helpers";
 import type {
   CheckoutSessionResult,
   MembershipOperationResult,
@@ -29,6 +27,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" }).handler(
     data: { membershipTypeId: string };
   }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const db = await getDb();
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
@@ -48,6 +52,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" }).handler(
       }
 
       // Verify membership type exists and is active
+
       const [membershipType] = await db()
         .select()
         .from(membershipTypes)
@@ -133,6 +138,12 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" }).hand
     data: MembershipPurchaseInput;
   }): Promise<MembershipOperationResult<typeof memberships.$inferSelect>> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const db = await getDb();
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
@@ -171,6 +182,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" }).hand
       }
 
       // Get membership type details
+
       const [membershipType] = await db()
         .select()
         .from(membershipTypes)

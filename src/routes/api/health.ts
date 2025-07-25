@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { sql } from "drizzle-orm";
-import { db } from "~/db";
 import { membershipTypes } from "~/db/schema";
 
 export const Route = createFileRoute("/api/health")({
@@ -16,7 +15,12 @@ export async function GET() {
   };
 
   try {
+    // Import server-only modules inside the handler
+    const { getDb } = await import("~/db/server-helpers");
+
     // Check database connection
+    const db = await getDb();
+
     await db().execute(sql`SELECT 1`);
     checks.services["database"] = { status: "connected" };
   } catch {
@@ -29,6 +33,9 @@ export async function GET() {
 
   try {
     // Check membership types
+    const { getDb } = await import("~/db/server-helpers");
+    const db = await getDb();
+
     const types = await db()
       .select({ count: sql<number>`count(*)` })
       .from(membershipTypes);

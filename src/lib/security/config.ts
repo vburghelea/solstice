@@ -5,6 +5,8 @@
 
 import { getBaseUrl, isProduction } from "@/lib/env.server";
 
+// This module should only be imported in server-side code
+
 export const securityConfig = {
   // Cookie security settings
   cookies: {

@@ -209,8 +209,48 @@ const result = await myServerFn();
 
 3. **Type Issues**:
    - TanStack Start's type inference for server functions can be problematic
-   - If you get "Type 'X' is not assignable to type 'undefined'" errors, use `@ts-ignore`
+   - If you get "Type 'X' is not assignable to type 'undefined'" errors, use `@ts-expect-error`
    - The functions work at runtime despite TypeScript complaints
+
+4. **Server-Only Module Imports**:
+   - **IMPORTANT**: TanStack Start only extracts code INSIDE the `handler()` function
+   - Top-level imports in server function files are included in the client bundle
+   - If a module accesses server-only resources (env vars, Node APIs), it will crash in the browser
+
+   **❌ BAD - Top-level import causes client bundle pollution:**
+
+   ```typescript
+   import { squarePaymentService } from "~/lib/payments/square"; // Accesses process.env
+
+   export const createCheckout = createServerFn().handler(async () => {
+     return squarePaymentService.createCheckoutSession(...);
+   });
+   ```
+
+   **✅ GOOD - Use `serverOnly()` helper:**
+
+   ```typescript
+   import { serverOnly } from "@tanstack/react-start";
+
+   const getSquarePaymentService = serverOnly(async () => {
+     const { squarePaymentService } = await import("~/lib/payments/square");
+     return squarePaymentService;
+   });
+
+   export const createCheckout = createServerFn().handler(async () => {
+     const squarePaymentService = await getSquarePaymentService();
+     return squarePaymentService.createCheckoutSession(...);
+   });
+   ```
+
+   **✅ ALSO GOOD - Dynamic import inside handler:**
+
+   ```typescript
+   export const createCheckout = createServerFn().handler(async () => {
+     const { squarePaymentService } = await import("~/lib/payments/square");
+     return squarePaymentService.createCheckoutSession(...);
+   });
+   ```
 
 ### Common Tasks
 

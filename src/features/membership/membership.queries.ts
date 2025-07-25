@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getDb } from "~/db/server-helpers";
-import { getAuth } from "~/lib/auth/server-helpers";
 import type {
   MembershipOperationResult,
   MembershipStatus,
@@ -16,11 +14,15 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
     MembershipOperationResult<import("./membership.types").MembershipType[]>
   > => {
     try {
+      // Import server-only modules inside the handler
+      const { getDb } = await import("~/db/server-helpers");
+
       // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
       const { membershipTypes } = await import("~/db/schema");
 
       const db = await getDb();
+
       const activeTypes = await db()
         .select()
         .from(membershipTypes)
@@ -57,11 +59,15 @@ export const getMembershipType = createServerFn({ method: "GET" }).handler(
     membershipTypeId: string;
   }): Promise<MembershipOperationResult<import("./membership.types").MembershipType>> => {
     try {
+      // Import server-only modules inside the handler
+      const { getDb } = await import("~/db/server-helpers");
+
       // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
       const { membershipTypes } = await import("~/db/schema");
 
       const db = await getDb();
+
       const [membershipType] = await db()
         .select()
         .from(membershipTypes)
@@ -106,6 +112,12 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
   // @ts-expect-error - TanStack Start type inference issue
   async (): Promise<MembershipOperationResult<MembershipStatus>> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -129,6 +141,7 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
 
       // Get active membership for the user
       const db = await getDb();
+
       const [currentMembership] = await db()
         .select({
           membership: memberships,

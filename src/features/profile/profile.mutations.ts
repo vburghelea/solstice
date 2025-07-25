@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getDb } from "~/db/server-helpers";
-import { getAuth } from "~/lib/auth/server-helpers";
 import { isProfileComplete } from "./profile.queries";
 import {
   partialProfileInputSchema,
@@ -62,6 +60,12 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
     data?: Partial<ProfileInput> | undefined;
   }): Promise<ProfileOperationResult> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -123,6 +127,7 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
       }
 
       const db = await getDb();
+
       const [updatedUser] = await db()
         .update(user)
         .set(updateData)
@@ -180,6 +185,12 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
     data?: ProfileInput | undefined;
   }): Promise<ProfileOperationResult> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -229,6 +240,7 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
       };
 
       const db = await getDb();
+
       const [updatedUser] = await db()
         .update(user)
         .set(updateData)
@@ -268,6 +280,12 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
     data?: PrivacySettings | undefined;
   }): Promise<ProfileOperationResult> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -305,6 +323,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
       const { user } = await import("~/db/schema");
 
       const db = await getDb();
+
       const [updatedUser] = await db()
         .update(user)
         .set({

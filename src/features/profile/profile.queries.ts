@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getDb } from "~/db/server-helpers";
-import { getAuth } from "~/lib/auth/server-helpers";
 import type {
   EmergencyContact,
   PrivacySettings,
@@ -50,6 +48,12 @@ function mapDbUserToProfile(dbUser: {
 export const getUserProfile = createServerFn({ method: "GET" }).handler(
   async (): Promise<ProfileOperationResult> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -66,6 +70,7 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
       const { user } = await import("~/db/schema");
 
       const db = await getDb();
+
       const [dbUser] = await db()
         .select()
         .from(user)
@@ -101,6 +106,12 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
 export const getProfileCompletionStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ complete: boolean; missingFields: string[] }> => {
     try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
       const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -114,6 +125,7 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
       const { user } = await import("~/db/schema");
 
       const db = await getDb();
+
       const [dbUser] = await db()
         .select()
         .from(user)

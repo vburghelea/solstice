@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
-import { user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getAuth } from "~/lib/auth/server-helpers";
 import type { User } from "~/lib/auth/types";
@@ -18,6 +16,10 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     if (!session?.user) {
       return null;
     }
+
+    // Import schema and ORM inside the handler
+    const { eq } = await import("drizzle-orm");
+    const { user } = await import("~/db/schema");
 
     // Fetch the full user data from the database
     const db = await getDb();

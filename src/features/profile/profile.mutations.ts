@@ -1,6 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq, sql } from "drizzle-orm";
-import { user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getAuth } from "~/lib/auth/server-helpers";
 import { isProfileComplete } from "./profile.queries";
@@ -27,7 +25,20 @@ function parseJsonField<T>(value: string | null | undefined): T | undefined {
   }
 }
 
-function mapDbUserToProfile(dbUser: typeof user.$inferSelect): UserProfile {
+function mapDbUserToProfile(dbUser: {
+  id: string;
+  name: string;
+  email: string;
+  profileComplete: boolean;
+  dateOfBirth: Date | null;
+  emergencyContact: string | null;
+  gender: string | null;
+  pronouns: string | null;
+  phone: string | null;
+  privacySettings: string | null;
+  profileVersion: number;
+  profileUpdatedAt: Date | null;
+}): UserProfile {
   return {
     id: dbUser.id,
     name: dbUser.name,
@@ -82,6 +93,10 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
           })),
         };
       }
+
+      // Import database dependencies inside handler
+      const { eq, sql } = await import("drizzle-orm");
+      const { user } = await import("~/db/schema");
 
       const updateData: Record<string, unknown> = {
         profileUpdatedAt: new Date(),
@@ -197,6 +212,10 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
         };
       }
 
+      // Import database dependencies inside handler
+      const { eq, sql } = await import("drizzle-orm");
+      const { user } = await import("~/db/schema");
+
       const updateData = {
         dateOfBirth: data.dateOfBirth,
         emergencyContact: JSON.stringify(data.emergencyContact),
@@ -280,6 +299,10 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
           })),
         };
       }
+
+      // Import database dependencies inside handler
+      const { eq } = await import("drizzle-orm");
+      const { user } = await import("~/db/schema");
 
       const db = await getDb();
       const [updatedUser] = await db()

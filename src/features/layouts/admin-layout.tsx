@@ -1,9 +1,9 @@
-import { AdminSidebar } from "@/shared/ui/admin-sidebar";
-import { Button } from "@/shared/ui/button";
-import { MobileAdminHeader } from "@/shared/ui/mobile-admin-header";
 import { Outlet } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useState } from "react";
+import { AdminSidebar } from "~/shared/ui/admin-sidebar";
+import { Button } from "~/shared/ui/button";
+import { MobileAdminHeader } from "~/shared/ui/mobile-admin-header";
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, sql } from "drizzle-orm";
-import { db } from "~/db";
 import { user } from "~/db/schema";
-import { auth } from "~/lib/auth";
+import { getDb } from "~/db/server-helpers";
+import { getAuth } from "~/lib/auth/server-helpers";
 import { isProfileComplete } from "./profile.queries";
 import {
   partialProfileInputSchema,
@@ -51,6 +51,7 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
     data?: Partial<ProfileInput> | undefined;
   }): Promise<ProfileOperationResult> => {
     try {
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -106,6 +107,7 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
         updateData["privacySettings"] = JSON.stringify(data.privacySettings);
       }
 
+      const db = await getDb();
       const [updatedUser] = await db()
         .update(user)
         .set(updateData)
@@ -124,6 +126,7 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
       const profileComplete = isProfileComplete(profile);
 
       if (profileComplete !== updatedUser.profileComplete) {
+        const db = await getDb();
         const [finalUser] = await db()
           .update(user)
           .set({ profileComplete })
@@ -162,6 +165,7 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
     data?: ProfileInput | undefined;
   }): Promise<ProfileOperationResult> => {
     try {
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -205,6 +209,7 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
         profileVersion: sql`${user.profileVersion} + 1`,
       };
 
+      const db = await getDb();
       const [updatedUser] = await db()
         .update(user)
         .set(updateData)
@@ -244,6 +249,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
     data?: PrivacySettings | undefined;
   }): Promise<ProfileOperationResult> => {
     try {
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -275,6 +281,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
         };
       }
 
+      const db = await getDb();
       const [updatedUser] = await db()
         .update(user)
         .set({

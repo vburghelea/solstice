@@ -6,7 +6,7 @@ export const Route = createFileRoute("/onboarding")({
   beforeLoad: async ({ context }) => {
     // First check if user is authenticated
     if (!context.user) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: "/auth/login" });
     }
 
     // Check if profile is already complete

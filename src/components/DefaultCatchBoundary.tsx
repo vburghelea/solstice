@@ -37,7 +37,7 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
           <Button asChild variant="secondary">
             <Link
               to="/"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.preventDefault();
                 window.history.back();
               }}

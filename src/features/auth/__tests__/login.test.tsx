@@ -87,7 +87,7 @@ describe("LoginForm", () => {
     expect(screen.getByText("Don't have an account?")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Sign up" })).toHaveAttribute(
       "href",
-      "/signup",
+      "/auth/signup",
     );
   });
 

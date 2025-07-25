@@ -8,7 +8,9 @@ interface RateLimitStore {
   };
 }
 
-// In-memory store for rate limiting (consider using Redis in production)
+// TODO: In-memory store for rate limiting - this resets on each cold start in serverless environments.
+// For production, use a durable store like Upstash Redis, DynamoDB, or rely on CDN rate limiting.
+// Current implementation is suitable for development and single-instance deployments only.
 const rateLimitStore: RateLimitStore = {};
 
 /**

@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
-import { db } from "~/db";
 import { user } from "~/db/schema";
-import { auth } from "~/lib/auth";
+import { getDb } from "~/db/server-helpers";
+import { getAuth } from "~/lib/auth/server-helpers";
 import type {
   EmergencyContact,
   PrivacySettings,
@@ -39,6 +39,7 @@ function mapDbUserToProfile(dbUser: typeof user.$inferSelect): UserProfile {
 export const getUserProfile = createServerFn({ method: "GET" }).handler(
   async (): Promise<ProfileOperationResult> => {
     try {
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -50,6 +51,7 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
         };
       }
 
+      const db = await getDb();
       const [dbUser] = await db()
         .select()
         .from(user)
@@ -85,6 +87,7 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
 export const getProfileCompletionStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ complete: boolean; missingFields: string[] }> => {
     try {
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -93,6 +96,7 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
         throw new Error("User not authenticated");
       }
 
+      const db = await getDb();
       const [dbUser] = await db()
         .select()
         .from(user)

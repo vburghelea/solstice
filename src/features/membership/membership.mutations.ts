@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "~/db";
 import { memberships, membershipTypes } from "~/db/schema";
 import { auth } from "~/lib/auth";
+import { squarePaymentService } from "~/lib/payments/square";
 import type {
   CheckoutSessionResult,
   MembershipOperationResult,
@@ -82,7 +83,6 @@ export const createCheckoutSession = createServerFn({ method: "POST" }).handler(
       }
 
       // Create checkout session with Square
-      const { squarePaymentService } = await import("~/lib/payments/square");
       const checkoutSession = await squarePaymentService.createCheckoutSession(
         membershipType.id,
         session.user.id,
@@ -139,7 +139,6 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" }).hand
       }
 
       // Verify payment with Square
-      const { squarePaymentService } = await import("~/lib/payments/square");
       const paymentResult = await squarePaymentService.verifyPayment(
         data.sessionId,
         data.paymentId,

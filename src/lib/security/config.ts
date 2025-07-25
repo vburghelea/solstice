@@ -4,6 +4,7 @@
  */
 
 import { getBaseUrl, isProduction } from "@/lib/env.server";
+import { PASSWORD_CONFIG } from "./password-config";
 
 // This module should only be imported in server-side code
 
@@ -53,14 +54,10 @@ export const securityConfig = {
     },
   },
 
-  // Password requirements
+  // Password requirements (using shared config)
   password: {
-    minLength: 8,
-    maxLength: 128,
-    requireUppercase: true,
-    requireLowercase: true,
-    requireNumbers: true,
-    requireSpecialChars: true,
+    ...PASSWORD_CONFIG,
+    maxLength: 128, // Additional server-side constraint
   },
 
   // OAuth configuration

@@ -5,9 +5,8 @@
 
 // This module should only be imported in server-side code
 
-// Only load dotenv in non-browser environments
-if (typeof window === "undefined") {
-  // Load environment variables from .env during development
+// Only load dotenv on the server during development
+if (import.meta.env.SSR && import.meta.env.DEV) {
   const { config: dotenvConfig } = await import("dotenv");
   dotenvConfig();
 }

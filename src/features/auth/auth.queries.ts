@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
-import { db } from "~/db";
 import { user } from "~/db/schema";
-import { auth } from "~/lib/auth";
+import { getDb } from "~/db/server-helpers";
+import { getAuth } from "~/lib/auth/server-helpers";
 import type { User } from "~/lib/auth/types";
 
 /**
@@ -10,6 +10,7 @@ import type { User } from "~/lib/auth/types";
  */
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(
   async (): Promise<User | null> => {
+    const auth = await getAuth();
     const { getWebRequest } = await import("@tanstack/react-start/server");
     const { headers } = getWebRequest();
     const session = await auth.api.getSession({ headers });
@@ -19,6 +20,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     }
 
     // Fetch the full user data from the database
+    const db = await getDb();
     const dbUser = await db()
       .select()
       .from(user)

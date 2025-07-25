@@ -1,8 +1,8 @@
 import { createServerFn, serverOnly } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
-import { db } from "~/db";
 import { memberships, membershipTypes } from "~/db/schema";
-import { auth } from "~/lib/auth";
+import { getDb } from "~/db/server-helpers";
+import { getAuth } from "~/lib/auth/server-helpers";
 import type {
   CheckoutSessionResult,
   MembershipOperationResult,
@@ -29,6 +29,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" }).handler(
     data: { membershipTypeId: string };
   }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
     try {
+      const db = await getDb();
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -131,6 +133,8 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" }).hand
     data: MembershipPurchaseInput;
   }): Promise<MembershipOperationResult<typeof memberships.$inferSelect>> => {
     try {
+      const db = await getDb();
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });

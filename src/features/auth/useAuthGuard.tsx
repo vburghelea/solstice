@@ -87,7 +87,7 @@ export function useAuthGuard({
       navigate({
         to: redirectTo,
         replace: true,
-        search: (prev) => ({
+        search: (prev: Record<string, unknown>) => ({
           ...prev,
           redirect: window.location.pathname,
         }),

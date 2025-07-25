@@ -37,6 +37,18 @@
   path = "/api"
   url = "http://localhost:5173"
 
+# Server functions redirect (must come before catch-all)
+[[redirects]]
+  from = "/_serverFn/*"
+  to = "/_serverFn/:splat"
+  status = 200
+
+# API routes redirect (must come before catch-all)
+[[redirects]]
+  from = "/api/*"
+  to = "/api/:splat"
+  status = 200
+
 # SPA fallback for production (handles client-side routing)
 [[redirects]]
   from = "/*"

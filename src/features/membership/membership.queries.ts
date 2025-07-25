@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, gte, sql } from "drizzle-orm";
-import { db } from "~/db";
 import { membershipTypes, memberships } from "~/db/schema";
-import { auth } from "~/lib/auth";
+import { getDb } from "~/db/server-helpers";
+import { getAuth } from "~/lib/auth/server-helpers";
 import type {
   MembershipOperationResult,
   MembershipStatus,
@@ -18,6 +18,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
     MembershipOperationResult<(typeof membershipTypes.$inferSelect)[]>
   > => {
     try {
+      const db = await getDb();
       const activeTypes = await db()
         .select()
         .from(membershipTypes)
@@ -54,6 +55,7 @@ export const getMembershipType = createServerFn({ method: "GET" }).handler(
     membershipTypeId: string;
   }): Promise<MembershipOperationResult<typeof membershipTypes.$inferSelect>> => {
     try {
+      const db = await getDb();
       const [membershipType] = await db()
         .select()
         .from(membershipTypes)
@@ -98,6 +100,7 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
   // @ts-expect-error - TanStack Start type inference issue
   async (): Promise<MembershipOperationResult<MembershipStatus>> => {
     try {
+      const auth = await getAuth();
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
@@ -115,6 +118,7 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
       }
 
       // Get active membership for the user
+      const db = await getDb();
       const [currentMembership] = await db()
         .select({
           membership: memberships,

@@ -36,12 +36,12 @@ export function PublicHeader() {
           {/* Desktop Actions */}
           <div className="hidden items-center gap-3 lg:flex">
             <Link
-              to="/login"
+              to="/auth/login"
               className="rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
             >
               Login
             </Link>
-            <Link to="/signup">
+            <Link to="/auth/signup">
               <Button className="btn-brand-primary rounded-lg px-4 py-2 text-sm font-bold">
                 Register
               </Button>
@@ -96,13 +96,13 @@ export function PublicHeader() {
             </nav>
             <div className="flex flex-col space-y-3 border-t border-gray-200 pt-4">
               <Link
-                to="/login"
+                to="/auth/login"
                 className="rounded-lg px-4 py-2 text-center text-sm font-bold transition hover:bg-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Login
               </Link>
-              <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="btn-brand-primary w-full rounded-lg px-4 py-2 text-sm font-bold">
                   Register
                 </Button>

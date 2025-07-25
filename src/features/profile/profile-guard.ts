@@ -10,7 +10,7 @@ import type { User } from "~/lib/auth/types";
  */
 export function requireCompleteProfile(user: User | null | undefined) {
   if (!user) {
-    throw redirect({ to: "/login" });
+    throw redirect({ to: "/auth/login" });
   }
 
   if (!user.profileComplete) {

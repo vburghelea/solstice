@@ -3,7 +3,7 @@
  * Centralizes all security-related settings
  */
 
-import { getBaseUrl, isProduction } from "@/lib/env.server";
+import { getBaseUrl, isProduction } from "~/lib/env.server";
 import { PASSWORD_CONFIG } from "./password-config";
 
 // This module should only be imported in server-side code

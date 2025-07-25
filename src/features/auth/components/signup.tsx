@@ -8,7 +8,7 @@ import { Input } from "~/shared/ui/input";
 import { Label } from "~/shared/ui/label";
 
 export default function SignupForm() {
-  const { redirectUrl } = useRouteContext({ from: "/(auth)/signup" });
+  const { redirectUrl } = useRouteContext({ from: "/auth/signup" });
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
@@ -161,7 +161,7 @@ export default function SignupForm() {
 
       <div className="text-center text-sm">
         Already have an account?{" "}
-        <Link to="/login" className="underline underline-offset-4">
+        <Link to="/auth/login" className="underline underline-offset-4">
           Login
         </Link>
       </div>

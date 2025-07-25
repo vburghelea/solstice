@@ -71,7 +71,7 @@ function Home() {
                 Register your team for the upcoming season and compete for the
                 championship.
               </p>
-              <Link to="/signup">
+              <Link to="/auth/signup">
                 <Button className="btn-brand-primary">Register Now →</Button>
               </Link>
             </div>

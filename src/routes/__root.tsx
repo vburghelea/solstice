@@ -11,28 +11,36 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import { Toaster } from "sonner";
+import { lazy, Suspense } from "react";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import type { AuthUser } from "~/lib/auth/types";
 import appCss from "~/styles.css?url";
+
+// Lazy load Toaster to avoid SSR issues
+const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaster })));
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   user: AuthUser;
 }>()({
   beforeLoad: async ({ context }) => {
-    // Check if we're on the server or client
-    if (typeof window === "undefined") {
-      // Server: use the server function
-      const user = await getCurrentUser();
-      return { user };
-    } else {
-      // Client: fetch the full user data
-      const user = await context.queryClient.fetchQuery({
-        queryKey: ["user"],
-        queryFn: getCurrentUser,
-      });
-      return { user };
+    try {
+      // Check if we're on the server or client
+      if (typeof window === "undefined") {
+        // Server: use the server function
+        const user = await getCurrentUser();
+        return { user };
+      } else {
+        // Client: fetch the full user data
+        const user = await context.queryClient.fetchQuery({
+          queryKey: ["user"],
+          queryFn: getCurrentUser,
+        });
+        return { user };
+      }
+    } catch (error) {
+      console.error("Error loading user:", error);
+      return { user: null };
     }
   },
   head: () => ({
@@ -82,9 +90,15 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
 
         {children}
 
-        <Toaster richColors closeButton />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
-        <TanStackRouterDevtools position="bottom-right" />
+        <Suspense fallback={null}>
+          <Toaster richColors closeButton />
+        </Suspense>
+        {typeof window !== "undefined" && (
+          <>
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+            <TanStackRouterDevtools position="bottom-right" />
+          </>
+        )}
 
         <Scripts />
       </body>

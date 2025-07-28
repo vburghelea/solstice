@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 // Check if BETTER_AUTH_SECRET already exists in any env file or environment
-const envFiles = [".env", ".env.local", ".env.development", ".env.production"];
+const envFiles = [".env"];
 let secretExists = false;
 
 // First check if secret exists in environment variables (for CI)

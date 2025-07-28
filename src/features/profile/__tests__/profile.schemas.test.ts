@@ -26,11 +26,15 @@ describe("Profile Schemas", () => {
   });
 
   describe("profileInputSchema", () => {
-    it("validates valid profile input", () => {
+    it("validates valid profile input with all fields including gameSystemPreferences", () => {
       const validInput = {
         gender: "Male",
         pronouns: "he/him",
         phone: "987-654-3210",
+        gameSystemPreferences: {
+          favorite: [1, 2],
+          avoid: [3],
+        },
         privacySettings: {
           showEmail: true,
           showPhone: false,
@@ -40,6 +44,33 @@ describe("Profile Schemas", () => {
 
       const result = profileInputSchema.safeParse(validInput);
       expect(result.success).toBe(true);
+    });
+
+    it("validates profile input with only gameSystemPreferences", () => {
+      const validInput = {
+        gameSystemPreferences: {
+          favorite: [10],
+          avoid: [20, 30],
+        },
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("fails when gameSystemPreferences contains non-numeric IDs", () => {
+      const invalidInput = {
+        gameSystemPreferences: {
+          favorite: [1, "invalid"],
+          avoid: [3],
+        },
+      };
+
+      const result = profileInputSchema.safeParse(invalidInput);
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0].message).toContain(
+        "Expected number, received string",
+      );
     });
 
     it("validates profile input with only required fields", () => {

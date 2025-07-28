@@ -1,4 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import { eq } from "drizzle-orm";
+import { db } from "~/db";
+import { user } from "~/db/schema";
+import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
+import { auth } from "~/lib/auth";
 import type {
   PrivacySettings,
   ProfileOperationResult,
@@ -168,6 +173,62 @@ export const getGameSystems = createServerFn({ method: "GET" }).handler(async ()
     };
   }
 });
+
+/**
+ * Get user's game system preferences
+ */
+export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{
+    success: boolean;
+    data?: { favorite: number[]; avoid: number[] };
+    errors?: Array<{ code: string; message: string }>;
+  }> => {
+    try {
+      const { getWebRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getWebRequest();
+      const session = await auth.api.getSession({ headers });
+
+      if (!session?.user?.id) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
+        };
+      }
+
+      const preferences = await db()
+        .select()
+        .from(userGameSystemPreferences)
+        .where(eq(userGameSystemPreferences.userId, session.user.id));
+
+      const favorite: number[] = [];
+      const avoid: number[] = [];
+
+      for (const pref of preferences) {
+        if (pref.preferenceType === "favorite") {
+          favorite.push(pref.gameSystemId);
+        } else if (pref.preferenceType === "avoid") {
+          avoid.push(pref.gameSystemId);
+        }
+      }
+
+      return {
+        success: true,
+        data: { favorite, avoid },
+      };
+    } catch (error) {
+      console.error("Error fetching user game system preferences:", error);
+      return {
+        success: false,
+        errors: [
+          {
+            code: "DATABASE_ERROR",
+            message: "Failed to fetch user game system preferences",
+          },
+        ],
+      };
+    }
+  },
+);
 
 // Re-export utility function
 export { isProfileComplete } from "./profile.utils";

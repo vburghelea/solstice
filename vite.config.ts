@@ -44,8 +44,8 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     define: {
-      // Provide NODE_ENV to client
-      "process.env.NODE_ENV": JSON.stringify(mode),
+      // Provide minimal process.env shim for TanStack server functions
+      "process.env": {},
     },
     optimizeDeps: {
       include: [
@@ -58,9 +58,9 @@ export default defineConfig(({ mode }) => {
         "@radix-ui/react-slot",
         "@radix-ui/react-label",
         "class-variance-authority",
-        "@tanstack/react-start/server-functions-client",
         "@tanstack/react-query-devtools",
         "@tanstack/react-router-devtools",
+        "@tanstack/react-start/server-functions-client",
         "clsx",
         "tailwind-merge",
         "better-auth/react",
@@ -68,6 +68,11 @@ export default defineConfig(({ mode }) => {
         "zod",
         "lucide-react",
       ],
+      esbuildOptions: {
+        define: {
+          "process.env": "{}",
+        },
+      },
     },
   };
 });

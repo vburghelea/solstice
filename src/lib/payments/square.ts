@@ -1,10 +1,10 @@
 /**
  * Square payment integration helper
- * Currently a mock implementation for development
- * Will be replaced with real Square SDK integration in P1-1
+ * Switches between mock and real implementation based on environment
  */
 
 import { createId } from "@paralleldrive/cuid2";
+import { serverOnly } from "@tanstack/react-start";
 
 // This module should only be imported in server-side code
 
@@ -29,10 +29,9 @@ export interface PaymentResult {
  * Mock Square payment helper
  * Returns fake checkout URLs and payment confirmations for development
  */
-export class SquarePaymentService {
+export class MockSquarePaymentService {
   constructor() {
-    // In the future, this will check SQUARE_ENV env var
-    // For now, always use mock mode
+    console.log("Using MOCK Square payment service");
   }
 
   /**
@@ -108,7 +107,6 @@ export class SquarePaymentService {
     signature: string,
   ): Promise<{ processed: boolean; error?: string }> {
     // Mock implementation - not used in development
-    // Will be implemented in P1-1
 
     console.log("Mock webhook received:", { payload, signature });
 
@@ -128,6 +126,7 @@ export class SquarePaymentService {
     amount: number;
     currency: string;
     createdAt: Date;
+    receiptUrl?: string | undefined;
   } | null> {
     // Mock implementation
     // In production, this would fetch from Square API
@@ -142,7 +141,81 @@ export class SquarePaymentService {
       createdAt: new Date(),
     };
   }
+
+  /**
+   * Create a refund for a payment (mock)
+   * @param paymentId - The payment ID to refund
+   * @param amount - Amount to refund in cents (optional, defaults to full refund)
+   * @param reason - Reason for the refund
+   * @returns Refund result
+   */
+  async createRefund(
+    paymentId: string,
+    amount?: number,
+    reason?: string,
+  ): Promise<{ success: boolean; refundId?: string; error?: string }> {
+    // Mock implementation
+    console.log("Mock refund created:", { paymentId, amount, reason });
+
+    return {
+      success: true,
+      refundId: `mock_refund_${createId()}`,
+    };
+  }
 }
 
-// Export singleton instance
-export const squarePaymentService = new SquarePaymentService();
+// Type for the payment service interface
+export type ISquarePaymentService = MockSquarePaymentService;
+
+// Server-only function to get the appropriate payment service
+const getSquarePaymentServiceInternal = serverOnly(async () => {
+  const useRealSquare =
+    process.env["SQUARE_ENV"] === "production" || process.env["SQUARE_ENV"] === "sandbox";
+
+  if (useRealSquare && process.env["SQUARE_ACCESS_TOKEN"]) {
+    try {
+      const { getSquarePaymentService: getRealService } = await import("./square-real");
+      const realService = getRealService();
+      if (realService) {
+        console.log("Using REAL Square payment service");
+        return realService;
+      }
+    } catch (error) {
+      console.error("Failed to load real Square service:", error);
+    }
+  }
+
+  // Fall back to mock service
+  return new MockSquarePaymentService();
+});
+
+// Export singleton instance getter
+export const getSquarePaymentService = async (): Promise<ISquarePaymentService> => {
+  return getSquarePaymentServiceInternal();
+};
+
+// For backward compatibility
+export const squarePaymentService = {
+  createCheckoutSession: async (
+    ...args: Parameters<ISquarePaymentService["createCheckoutSession"]>
+  ) => {
+    const service = await getSquarePaymentService();
+    return service.createCheckoutSession(...args);
+  },
+  verifyPayment: async (...args: Parameters<ISquarePaymentService["verifyPayment"]>) => {
+    const service = await getSquarePaymentService();
+    return service.verifyPayment(...args);
+  },
+  processWebhook: async (
+    ...args: Parameters<ISquarePaymentService["processWebhook"]>
+  ) => {
+    const service = await getSquarePaymentService();
+    return service.processWebhook(...args);
+  },
+  getPaymentDetails: async (
+    ...args: Parameters<ISquarePaymentService["getPaymentDetails"]>
+  ) => {
+    const service = await getSquarePaymentService();
+    return service.getPaymentDetails(...args);
+  },
+};

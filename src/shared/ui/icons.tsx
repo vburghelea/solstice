@@ -13,8 +13,18 @@ export function GoogleIcon(props: SVGProps<SVGSVGElement>) {
 
 // Re-export commonly used Lucide icons for consistency
 export {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  CreditCard,
   LoaderCircle as LoaderIcon,
   GalleryVerticalEnd as LogoIcon,
   MoonIcon,
   SunIcon,
+  Trophy,
+  User,
+  UserPlus,
+  Users,
+  XCircle,
 } from "lucide-react";

@@ -17,11 +17,14 @@ import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
 import { Route as DashboardMembershipRouteImport } from "./routes/dashboard/membership";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
-import { Route as ApiHealthRouteImport } from "./routes/api/health";
+import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
+import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
+import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
 import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
 
 const rootServerRouteImport = createServerRootRoute();
@@ -56,6 +59,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: "/profile",
+  path: "/profile",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
   id: "/membership",
   path: "/membership",
@@ -71,16 +79,27 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any);
-const ApiHealthRoute = ApiHealthRouteImport.update({
+const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
   path: "/api/health",
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiWebhooksSquareServerRoute = ApiWebhooksSquareServerRouteImport.update({
+  id: "/api/webhooks/square",
+  path: "/api/webhooks/square",
+  getParentRoute: () => rootServerRouteImport,
 } as any);
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: "/api/auth/$",
   path: "/api/auth/$",
   getParentRoute: () => rootServerRouteImport,
 } as any);
+const ApiPaymentsSquareCallbackServerRoute =
+  ApiPaymentsSquareCallbackServerRouteImport.update({
+    id: "/api/payments/square/callback",
+    path: "/api/payments/square/callback",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
 const ApiAuthActionProviderServerRoute =
   ApiAuthActionProviderServerRouteImport.update({
     id: "/api/auth/$action/$provider",
@@ -93,20 +112,20 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
-  "/api/health": typeof ApiHealthRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
-  "/api/health": typeof ApiHealthRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
 }
@@ -116,10 +135,10 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
-  "/api/health": typeof ApiHealthRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
 }
@@ -130,20 +149,20 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
-    | "/api/health"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/membership"
+    | "/dashboard/profile"
     | "/dashboard/"
     | "/onboarding/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
     | "/auth"
-    | "/api/health"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/membership"
+    | "/dashboard/profile"
     | "/dashboard"
     | "/onboarding";
   id:
@@ -152,10 +171,10 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
-    | "/api/health"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/membership"
+    | "/dashboard/profile"
     | "/dashboard/"
     | "/onboarding/";
   fileRoutesById: FileRoutesById;
@@ -165,32 +184,59 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
-  ApiHealthRoute: typeof ApiHealthRoute;
 }
 export interface FileServerRoutesByFullPath {
+  "/api/health": typeof ApiHealthServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
 }
 export interface FileServerRoutesByTo {
+  "/api/health": typeof ApiHealthServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
+  "/api/health": typeof ApiHealthServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths: "/api/auth/$" | "/api/auth/$action/$provider";
+  fullPaths:
+    | "/api/health"
+    | "/api/auth/$"
+    | "/api/webhooks/square"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback";
   fileServerRoutesByTo: FileServerRoutesByTo;
-  to: "/api/auth/$" | "/api/auth/$action/$provider";
-  id: "__root__" | "/api/auth/$" | "/api/auth/$action/$provider";
+  to:
+    | "/api/health"
+    | "/api/auth/$"
+    | "/api/webhooks/square"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback";
+  id:
+    | "__root__"
+    | "/api/health"
+    | "/api/auth/$"
+    | "/api/webhooks/square"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback";
   fileServerRoutesById: FileServerRoutesById;
 }
 export interface RootServerRouteChildren {
+  ApiHealthServerRoute: typeof ApiHealthServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+  ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
   ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
+  ApiPaymentsSquareCallbackServerRoute: typeof ApiPaymentsSquareCallbackServerRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -237,6 +283,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/dashboard/profile": {
+      id: "/dashboard/profile";
+      path: "/profile";
+      fullPath: "/dashboard/profile";
+      preLoaderRoute: typeof DashboardProfileRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
     "/dashboard/membership": {
       id: "/dashboard/membership";
       path: "/membership";
@@ -258,22 +311,36 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
-    "/api/health": {
-      id: "/api/health";
-      path: "/api/health";
-      fullPath: "/api/health";
-      preLoaderRoute: typeof ApiHealthRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
   }
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
+    "/api/health": {
+      id: "/api/health";
+      path: "/api/health";
+      fullPath: "/api/health";
+      preLoaderRoute: typeof ApiHealthServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/webhooks/square": {
+      id: "/api/webhooks/square";
+      path: "/api/webhooks/square";
+      fullPath: "/api/webhooks/square";
+      preLoaderRoute: typeof ApiWebhooksSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/auth/$": {
       id: "/api/auth/$";
       path: "/api/auth/$";
       fullPath: "/api/auth/$";
       preLoaderRoute: typeof ApiAuthSplatServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/payments/square/callback": {
+      id: "/api/payments/square/callback";
+      path: "/api/payments/square/callback";
+      fullPath: "/api/payments/square/callback";
+      preLoaderRoute: typeof ApiPaymentsSquareCallbackServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
     "/api/auth/$action/$provider": {
@@ -302,11 +369,13 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface DashboardRouteRouteChildren {
   DashboardMembershipRoute: typeof DashboardMembershipRoute;
+  DashboardProfileRoute: typeof DashboardProfileRoute;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardMembershipRoute: DashboardMembershipRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 };
 
@@ -331,14 +400,16 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
-  ApiHealthRoute: ApiHealthRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiHealthServerRoute: ApiHealthServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
   ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,
+  ApiPaymentsSquareCallbackServerRoute: ApiPaymentsSquareCallbackServerRoute,
 };
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

@@ -28,14 +28,37 @@ export const Route = createFileRoute("/dashboard/membership")({
 function MembershipPage() {
   const [processingPayment, setProcessingPayment] = useState(false);
 
-  // Check for mock checkout return
+  // Check for payment return (both mock and real Square)
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const isMockCheckout = searchParams.get("mock_checkout") === "true";
     const sessionId = searchParams.get("session");
+    const success = searchParams.get("success") === "true";
+    const error = searchParams.get("error");
+    const paymentId = searchParams.get("payment_id");
 
+    // Handle mock checkout
     if (isMockCheckout && sessionId) {
       handleMockPaymentReturn(sessionId);
+    }
+    // Handle real Square success
+    else if (success && paymentId) {
+      toast.success("Membership purchased successfully!");
+      // Remove query params
+      window.history.replaceState({}, document.title, "/dashboard/membership");
+      // Refetch membership status
+      membershipStatusQuery.refetch();
+    }
+    // Handle errors
+    else if (error) {
+      const errorMessages: Record<string, string> = {
+        cancelled: "Payment was cancelled",
+        verification_failed: "Payment verification failed",
+        processing_error: "An error occurred while processing your payment",
+      };
+      toast.error(errorMessages[error] || "Payment failed");
+      // Remove query params
+      window.history.replaceState({}, document.title, "/dashboard/membership");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

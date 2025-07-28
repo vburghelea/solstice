@@ -43,7 +43,14 @@ export default defineConfig(({ mode }) => {
         target: "netlify",
       }),
     ],
-    // No need for process shims - we've fixed the root cause
+    define: {
+      // Define process for client-side code in development
+      // This prevents "process is not defined" errors from libraries
+      ...(mode === "development" && {
+        "process.env.NODE_ENV": JSON.stringify("development"),
+        "process.versions.node": JSON.stringify("20.0.0"),
+      }),
+    },
     optimizeDeps: {
       include: [
         "react",

@@ -8,6 +8,11 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { lazy, Suspense } from "react";
+import { getCurrentUser } from "~/features/auth/auth.queries";
+import type { AuthUser } from "~/lib/auth/types";
+import appCss from "~/styles.css?url";
+
 // Lazy load devtools to avoid hydration issues
 const ReactQueryDevtools = lazy(() =>
   import("@tanstack/react-query-devtools").then((mod) => ({
@@ -19,11 +24,6 @@ const TanStackRouterDevtools = lazy(() =>
     default: mod.TanStackRouterDevtools,
   })),
 );
-
-import { lazy, Suspense } from "react";
-import { getCurrentUser } from "~/features/auth/auth.queries";
-import type { AuthUser } from "~/lib/auth/types";
-import appCss from "~/styles.css?url";
 
 // Lazy load Toaster to avoid SSR issues
 const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaster })));
@@ -94,7 +94,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
           {`document.documentElement.classList.toggle(
             'dark',
             localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            )`}
+          )`}
         </ScriptOnce>
 
         {children}

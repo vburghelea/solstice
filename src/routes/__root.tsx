@@ -8,8 +8,17 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+// Lazy load devtools to avoid hydration issues
+const ReactQueryDevtools = lazy(() =>
+  import("@tanstack/react-query-devtools").then((mod) => ({
+    default: mod.ReactQueryDevtools,
+  })),
+);
+const TanStackRouterDevtools = lazy(() =>
+  import("@tanstack/react-router-devtools").then((mod) => ({
+    default: mod.TanStackRouterDevtools,
+  })),
+);
 
 import { lazy, Suspense } from "react";
 import { getCurrentUser } from "~/features/auth/auth.queries";
@@ -93,12 +102,10 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         <Suspense fallback={null}>
           <Toaster richColors closeButton />
         </Suspense>
-        {typeof window !== "undefined" && (
-          <>
-            <ReactQueryDevtools buttonPosition="bottom-left" />
-            <TanStackRouterDevtools position="bottom-right" />
-          </>
-        )}
+        <Suspense fallback={null}>
+          <ReactQueryDevtools buttonPosition="bottom-left" />
+          <TanStackRouterDevtools position="bottom-right" />
+        </Suspense>
 
         <Scripts />
       </body>

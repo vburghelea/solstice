@@ -43,10 +43,7 @@ export default defineConfig(({ mode }) => {
         target: "netlify",
       }),
     ],
-    define: {
-      // Provide minimal process.env shim for TanStack server functions
-      "process.env": {},
-    },
+    // No need for process shims - we've fixed the root cause
     optimizeDeps: {
       include: [
         "react",
@@ -68,11 +65,6 @@ export default defineConfig(({ mode }) => {
         "zod",
         "lucide-react",
       ],
-      esbuildOptions: {
-        define: {
-          "process.env": "{}",
-        },
-      },
     },
   };
 });

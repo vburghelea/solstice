@@ -3,7 +3,7 @@
  * Centralizes all security-related settings
  */
 
-import { getBaseUrl, isProduction } from "~/lib/env.server";
+import { env, getBaseUrl, isProduction } from "~/lib/env.server";
 import { PASSWORD_CONFIG } from "./password-config";
 
 // This module should only be imported in server-side code
@@ -19,9 +19,7 @@ export const securityConfig = {
     path: "/",
     // Optional domain restriction for production
     // Set COOKIE_DOMAIN env var to restrict cookies to specific domain
-    ...(process.env["NODE_ENV"] === "production" && process.env["COOKIE_DOMAIN"]
-      ? { domain: process.env["COOKIE_DOMAIN"] }
-      : {}),
+    ...(isProduction() && env.COOKIE_DOMAIN ? { domain: env.COOKIE_DOMAIN } : {}),
   },
 
   // Session configuration
@@ -64,7 +62,7 @@ export const securityConfig = {
   oauth: {
     // Allowed email domains for OAuth sign-ups (comma-separated in env)
     // Example: OAUTH_ALLOWED_DOMAINS=company.com,partner.com
-    allowedDomains: process.env["OAUTH_ALLOWED_DOMAINS"]?.split(",") || [],
+    allowedDomains: [], // TODO: Add OAUTH_ALLOWED_DOMAINS to env.server.ts if needed
   },
 } as const;
 

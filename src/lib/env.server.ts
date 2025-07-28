@@ -33,6 +33,20 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
 
+    // Square Payment Integration
+    SQUARE_ENV: z.enum(["sandbox", "production"]).optional(),
+    SQUARE_APPLICATION_ID: z.string().optional(),
+    SQUARE_ACCESS_TOKEN: z.string().optional(),
+    SQUARE_LOCATION_ID: z.string().optional(),
+    SQUARE_WEBHOOK_SIGNATURE_KEY: z.string().optional(),
+    SQUARE_WEBHOOK_URL: z.string().url().optional(),
+    SUPPORT_EMAIL: z.string().email().optional(),
+
+    // SendGrid Email Integration
+    SENDGRID_API_KEY: z.string().optional(),
+    SENDGRID_FROM_EMAIL: z.string().email().optional(),
+    SENDGRID_FROM_NAME: z.string().optional(),
+
     // Other
     COOKIE_DOMAIN: z.string().optional(),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),

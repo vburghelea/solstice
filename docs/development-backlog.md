@@ -86,16 +86,16 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ## Frontend Enhancement Tickets
 
-### FE-1: Dashboard Home Page Implementation
+### ✅ FE-1: Dashboard Home Page Implementation
 
-|                |                                                                                                                                                                                                                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                                         |
-| **Why now**    | Empty dashboard looks unfinished; users need immediate value after login                                                                                                                                                                                                                               |
-| **Depends on** | None (can be done in parallel with P0 work)                                                                                                                                                                                                                                                            |
-| **Code refs**  | `src/routes/dashboard/index.tsx`, existing admin layout                                                                                                                                                                                                                                                |
-| **Tasks**      | <ul><li>Create dashboard home with welcome message using user's name</li><li>Add quick stats cards (placeholder data ok): membership status, team count, upcoming events</li><li>Add quick action buttons: Complete Profile, Buy Membership, Join Team</li><li>Mobile-responsive grid layout</li></ul> |
-| **Thoughts**   | Use existing Card components; this gives immediate polish while backend work continues                                                                                                                                                                                                                 |
+|                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Status**     | ✅ Complete                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **Why now**    | Empty dashboard looks unfinished; users need immediate value after login                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Depends on** | None (can be done in parallel with P0 work)                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **Code refs**  | `src/routes/dashboard/index.tsx`, existing admin layout                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Delivered**  | <ul><li>Dashboard home with personalized welcome message</li><li>Quick stats cards showing: membership status (with active/inactive indicator), team count, upcoming events</li><li>Quick action buttons: View Profile, Buy/Renew Membership, Join Team</li><li>Mobile-responsive grid layout using Tailwind CSS</li><li>Recent activity section (placeholder)</li><li>Integration with membership status API</li><li>Dynamic membership button text based on status</li></ul> |
+| **Notes**      | Minor issue: React Compiler error in onboarding route (see Technical Debt section)                                                                                                                                                                                                                                                                                                                                                                                             |
 
 ---
 
@@ -154,16 +154,16 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ## P1 - Foundation & Production Readiness
 
-### ❌ P1-1: Real Square checkout & webhook handler
+### ✅ P1-1: Real Square checkout & webhook handler
 
-|                |                                                                                                                                                    |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                     |
-| **Why now**    | Turn fake flow into production-ready; blockers for any payment processing.                                                                         |
-| **Depends on** | P0-2, P0-3                                                                                                                                         |
-| **Code refs**  | Add `src/lib/payments/square.ts`, `src/routes/api/webhooks/square.ts` (see integration docs)                                                       |
-| **Tasks**      | Implement Square SDK client, environment-driven keys, idempotent webhook handler (upsert payment, mark membership paid). Add signature validation. |
-| **Thoughts**   | Follow the pattern in docs, reuse rate-limit util for webhook bursts.                                                                              |
+|                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ✅ Complete                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Why now**    | Turn fake flow into production-ready; blockers for any payment processing.                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Depends on** | P0-2, P0-3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Code refs**  | `src/lib/payments/square.ts`, `src/lib/payments/square-real.ts`, `src/routes/api/webhooks/square.ts`, `src/routes/api/payments/square/callback.ts`                                                                                                                                                                                                                                                                                                                                                |
+| **Delivered**  | <ul><li>Square SDK integration with environment-based switching (mock/sandbox/production)</li><li>Real checkout session creation with Square Checkout API</li><li>Webhook handler with signature validation</li><li>Payment callback handler for redirect flow</li><li>Refund support in payment service</li><li>Environment variable configuration with validation</li><li>Health check endpoint shows Square status</li><li>Backward compatibility maintained with existing mock flow</li></ul> |
+| **Notes**      | Requires Square credentials in environment variables to activate. Falls back to mock service when not configured.                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ---
 
@@ -251,6 +251,21 @@ Future roadmap (outline, not fully specced tickets yet):
 - **Cloudinary media upload**
 - **Social feed embeds**
 - **Mobile PWA optimizations**
+
+---
+
+## Technical Debt
+
+### TD-1: React Compiler useMemoCache Error
+
+|               |                                                                                                                                               |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**    | ❌ Not Started                                                                                                                                |
+| **Impact**    | Low - console errors only, no functional impact                                                                                               |
+| **Code refs** | `src/routes/onboarding/route.tsx`, `docs/react-compiler-error-investigation.md`                                                               |
+| **Issue**     | React Compiler throws `Cannot read properties of null (reading 'useMemoCache')` on onboarding route                                           |
+| **Cause**     | React Compiler RC version (19.1.0-rc.2) has issues with simple components in TanStack Router                                                  |
+| **Options**   | <ul><li>Add `// @react-compiler-skip` directive</li><li>Wait for React 19 stable</li><li>Disable React Compiler for specific routes</li></ul> |
 
 ---
 

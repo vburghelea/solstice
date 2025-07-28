@@ -224,6 +224,25 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" }).hand
         })
         .returning();
 
+      // Send confirmation email
+      try {
+        const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
+
+        await sendMembershipPurchaseReceipt({
+          to: {
+            email: session.user.email,
+            name: session.user.name || undefined,
+          },
+          membershipType: membershipType.name,
+          amount: membershipType.priceCents,
+          paymentId: paymentResult.paymentId || "unknown",
+          expiresAt: endDate,
+        });
+      } catch (emailError) {
+        // Log error but don't fail the purchase
+        console.error("Failed to send confirmation email:", emailError);
+      }
+
       return {
         success: true,
         data: newMembership,

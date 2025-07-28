@@ -91,10 +91,21 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       </head>
       <body>
         <ScriptOnce>
-          {`document.documentElement.classList.toggle(
-            'dark',
-            localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-          )`}
+          {`
+            // Minimal process shim for TanStack server functions
+            if (typeof globalThis.process === 'undefined') {
+              globalThis.process = {
+                env: { NODE_ENV: 'development' },
+                versions: { node: '20.0.0' }
+              };
+            }
+            
+            // Theme toggle
+            document.documentElement.classList.toggle(
+              'dark',
+              localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            );
+          `}
         </ScriptOnce>
 
         {children}

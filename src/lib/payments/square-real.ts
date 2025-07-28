@@ -4,8 +4,8 @@
  */
 
 import { createId } from "@paralleldrive/cuid2";
-// Square v43 types
-import { SquareClient, SquareEnvironment } from "square";
+import type { Square } from "square";
+import { SquareClient, SquareEnvironment, SquareError, WebhooksHelper } from "square";
 
 // This module should only be imported in server-side code
 
@@ -79,25 +79,20 @@ export class SquarePaymentService {
 
       // Create idempotency key for Square
       const idempotencyKey = createId();
-      const orderId = createId();
 
       // Create checkout request
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const request = {
+
+      // Create payment link with Square (recommended over Checkout API)
+      const paymentLinkRequest: Square.checkout.CreatePaymentLinkRequest = {
         idempotencyKey,
-        order: {
+        description: "Annual Player Membership",
+        quickPay: {
+          name: "Annual Player Membership",
+          priceMoney: {
+            amount: BigInt(amount),
+            currency: "CAD",
+          },
           locationId: this.locationId,
-          lineItems: [
-            {
-              name: "Annual Player Membership",
-              quantity: "1",
-              basePriceMoney: {
-                amount: BigInt(amount),
-                currency: "CAD",
-              },
-            },
-          ],
-          referenceId: orderId,
         },
         checkoutOptions: {
           allowTipping: false,
@@ -107,28 +102,21 @@ export class SquarePaymentService {
             process.env["SUPPORT_EMAIL"] || "support@quadballcanada.com",
         },
         prePopulatedData: {
-          buyerEmail: undefined, // Will be set from user data in the future
+          buyerEmail: null, // Will be set from user data in the future
         },
-        note: `Membership purchase for user ${userId}`,
+        paymentNote: `Membership purchase for user ${userId}`,
       };
 
-      // Create checkout with Square
-      // TODO: Update to use new Square v43 API
-      const result = {
-        checkout: {
-          id: createId(),
-          checkoutPageUrl: `https://square.link/checkout/${createId()}`,
-        },
-      };
+      const result = await this.client.checkout.paymentLinks.create(paymentLinkRequest);
 
-      if (!result.checkout?.id || !result.checkout?.checkoutPageUrl) {
-        throw new Error("Failed to create checkout session");
+      if (!result.paymentLink?.id || !result.paymentLink?.url) {
+        throw new Error("Failed to create payment link");
       }
 
       // Create our internal session object
       const checkoutSession: CheckoutSession = {
-        id: result.checkout.id,
-        checkoutUrl: result.checkout.checkoutPageUrl,
+        id: result.paymentLink.id,
+        checkoutUrl: result.paymentLink.url,
         membershipTypeId,
         userId,
         amount,
@@ -143,12 +131,9 @@ export class SquarePaymentService {
     } catch (error) {
       console.error("Square checkout error:", error);
 
-      if (error && typeof error === "object" && "errors" in error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const apiError = error as any;
-        throw new Error(
-          `Square API error: ${apiError.errors?.[0]?.detail || apiError.message || "Unknown error"}`,
-        );
+      if (error instanceof SquareError) {
+        const errorDetail = error.errors?.[0]?.detail || error.message || "Unknown error";
+        throw new Error(`Square API error: ${errorDetail}`);
       }
 
       throw error;
@@ -169,8 +154,10 @@ export class SquarePaymentService {
         };
       }
 
-      // Retrieve the checkout from Square
-      // TODO: Update to use new Square v43 API
+      // With Square v43, we need to track payments via Orders API or Payments API
+      // Since checkout doesn't have a retrieve method, we'll need to redesign this flow
+      // For now, we'll return a mock result
+      // TODO: Implement proper payment tracking via Orders or Payments API
       const result = {
         checkout: {
           order: { state: "COMPLETED", tenders: [{ id: "payment_" + createId() }] },
@@ -209,12 +196,11 @@ export class SquarePaymentService {
     } catch (error) {
       console.error("Payment verification error:", error);
 
-      if (error && typeof error === "object" && "errors" in error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const apiError = error as any;
+      if (error instanceof SquareError) {
+        const errorDetail = error.errors?.[0]?.detail || error.message || "Unknown error";
         return {
           success: false,
-          error: `Square API error: ${apiError.errors?.[0]?.detail || apiError.message || "Unknown error"}`,
+          error: `Square API error: ${errorDetail}`,
         };
       }
 
@@ -233,7 +219,6 @@ export class SquarePaymentService {
    */
   async processWebhook(
     payload: unknown,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     signature: string,
   ): Promise<{ processed: boolean; error?: string }> {
     try {
@@ -247,13 +232,15 @@ export class SquarePaymentService {
         };
       }
 
-      // Verify webhook signature
-      // Square v43 doesn't have webhooksHelper, we'll do manual verification
-      // For now, skip signature verification in development
-      const isValid = process.env["NODE_ENV"] === "development" ? true : false;
-      // TODO: Implement proper webhook signature verification
+      // Verify webhook signature using Square's WebhooksHelper
+      const isValid = await WebhooksHelper.verifySignature({
+        requestBody: JSON.stringify(payload),
+        signatureHeader: signature,
+        signatureKey: webhookSignatureKey,
+        notificationUrl: process.env["SQUARE_WEBHOOK_URL"] || "",
+      });
 
-      if (!isValid) {
+      if (!isValid && process.env["NODE_ENV"] !== "development") {
         return {
           processed: false,
           error: "Invalid webhook signature",
@@ -312,16 +299,7 @@ export class SquarePaymentService {
     try {
       if (!paymentId) return null;
 
-      // TODO: Update to use new Square v43 API
-      const result = {
-        payment: {
-          id: paymentId,
-          status: "COMPLETED",
-          amountMoney: { amount: BigInt(4000), currency: "CAD" },
-          createdAt: new Date().toISOString(),
-          receiptUrl: `https://square.link/receipt/${paymentId}`,
-        },
-      };
+      const result = await this.client.payments.get({ paymentId });
 
       if (!result.payment) {
         return null;
@@ -370,8 +348,7 @@ export class SquarePaymentService {
         };
       }
 
-      // TODO: Update to use new Square v43 API
-      const result = { refund: { id: "refund_" + createId() } };
+      const result = await this.client.refunds.refundPayment(request);
 
       if (!result.refund?.id) {
         return {
@@ -387,12 +364,11 @@ export class SquarePaymentService {
     } catch (error) {
       console.error("Refund creation error:", error);
 
-      if (error && typeof error === "object" && "errors" in error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const apiError = error as any;
+      if (error instanceof SquareError) {
+        const errorDetail = error.errors?.[0]?.detail || error.message || "Unknown error";
         return {
           success: false,
-          error: `Square API error: ${apiError.errors?.[0]?.detail || apiError.message || "Unknown error"}`,
+          error: `Square API error: ${errorDetail}`,
         };
       }
 

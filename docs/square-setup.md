@@ -1,8 +1,15 @@
-# Square Payment Integration Setup
+# Square Payment Integration
 
 ## Overview
 
-This document explains how to set up Square payment processing for the Quadball Canada platform.
+This document explains the Square payment integration for the Quadball Canada platform, including setup instructions, implementation details, and API reference.
+
+## Implementation Status
+
+- **Status**: ✅ Complete (January 2025)
+- **SDK Version**: Square SDK v43.0.0
+- **API**: Payment Links API (replaced deprecated Checkout API)
+- **Environments**: Mock (development), Sandbox (testing), Production
 
 ## Environment Variables
 
@@ -120,3 +127,86 @@ Check the configuration status at: `/api/health`
 - Ensure SQUARE_ENV matches your credentials
 - Sandbox and production use different endpoints
 - Test cards only work in sandbox
+
+## Code Architecture
+
+### Service Implementation
+
+The Square integration uses a service pattern with environment-based switching:
+
+```typescript
+// src/lib/payments/square.ts - Main service interface
+interface PaymentService {
+  createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession>;
+  confirmPurchase(params: ConfirmPurchaseParams): Promise<ConfirmPurchaseResult>;
+  refundPayment(params: RefundPaymentParams): Promise<RefundPaymentResult>;
+}
+
+// src/lib/payments/square-mock.ts - Mock service for development
+// src/lib/payments/square-real.ts - Real Square implementation
+```
+
+### Key Files
+
+- **Service Layer**:
+  - `src/lib/payments/square.ts` - Service factory and interface
+  - `src/lib/payments/square-real.ts` - Square SDK implementation
+  - `src/lib/payments/square-mock.ts` - Mock implementation
+
+- **API Routes**:
+  - `src/routes/api/webhooks/square.ts` - Webhook handler
+  - `src/routes/api/payments/square/callback.ts` - Payment callback
+
+- **Server Functions**:
+  - `src/features/membership/membership.mutations.ts` - `createCheckoutSession()`, `confirmMembershipPurchase()`
+
+### Payment Flow
+
+1. **Checkout Creation**:
+   - User clicks "Buy Membership"
+   - `createCheckoutSession()` server function called
+   - Square Payment Link created with return URLs
+   - User redirected to Square checkout
+
+2. **Payment Processing**:
+   - User completes payment on Square
+   - Square redirects to callback URL with payment ID
+   - Callback handler verifies payment status
+   - Membership record created/updated
+
+3. **Webhook Handling** (optional):
+   - Square sends webhook for payment events
+   - Signature verified using WebhooksHelper
+   - Payment status synchronized
+
+### Testing
+
+#### Unit Tests
+
+```bash
+pnpm test src/lib/payments/__tests__/
+```
+
+#### Integration Testing
+
+1. Set `SQUARE_ENV=sandbox`
+2. Use test cards:
+   - Success: `4111 1111 1111 1111`
+   - Decline: `4000 0000 0000 0002`
+3. Test full flow including callbacks
+
+### Migration from v42 to v43
+
+The implementation was updated to use Square SDK v43 best practices:
+
+- Replaced deprecated Checkout API with Payment Links API
+- Updated to new namespace imports (`Square.PaymentLink`)
+- Added proper TypeScript types for all Square objects
+- Implemented WebhooksHelper for signature verification
+
+### Security Considerations
+
+1. **Environment Isolation**: Credentials never exposed to client
+2. **Webhook Verification**: All webhooks verified with signature
+3. **Payment Validation**: Server-side verification of all payments
+4. **Error Handling**: Graceful fallback to mock service if misconfigured

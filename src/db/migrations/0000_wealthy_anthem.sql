@@ -1,2 +1,0 @@
--- Initial migration (auth tables already created by Better Auth)
--- This file exists to maintain migration sequence consistency

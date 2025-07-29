@@ -181,15 +181,16 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ---
 
-### ❌ P1-3: Team entity MVP (DB, server functions, UI list)
+### ✅ P1-3: Team entity MVP (DB, server functions, UI list)
 
-|                |                                                                                                                                                                                                    |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                                                                     |
-| **Why now**    | Teams are prerequisite for event registration.                                                                                                                                                     |
-| **Depends on** | P0 slice (so only members can create teams).                                                                                                                                                       |
-| **Code refs**  | `docs/quadball-plan/database/schema-overview.md` (Team System)                                                                                                                                     |
-| **Tasks**      | <ul><li>Add `teams`, `team_members` tables.</li><li>Server functions `createTeam`, `getTeam`, `listTeams`.</li><li>UI → simple page inside dashboard to create team & list user's teams.</li></ul> |
+|                |                                                                                                                                                                                                                                                                                                                                                                |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ✅ Complete                                                                                                                                                                                                                                                                                                                                                    |
+| **Why now**    | Teams are prerequisite for event registration.                                                                                                                                                                                                                                                                                                                 |
+| **Depends on** | P0 slice (so only members can create teams).                                                                                                                                                                                                                                                                                                                   |
+| **Code refs**  | `docs/quadball-plan/database/schema-overview.md` (Team System)                                                                                                                                                                                                                                                                                                 |
+| **Tasks**      | <ul><li>✅ Add `teams`, `team_members` tables.</li><li>✅ Server functions `createTeam`, `getTeam`, `listTeams`.</li><li>✅ UI → simple page inside dashboard to create team & list user's teams.</li></ul>                                                                                                                                                    |
+| **Delivery**   | <ul><li>Complete teams and team_members database schema with proper relationships</li><li>Full CRUD server functions with role-based permissions</li><li>Teams UI with list, detail, create, manage, and browse pages</li><li>Team member management with invite/role features</li><li>TypeScript type inference issues documented and worked around</li></ul> |
 
 ---
 

@@ -194,15 +194,15 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ---
 
-### 🚧 P1-4: Global auth + API rate-limit middleware wiring
+### ✅ P1-4: Global auth + API rate-limit middleware wiring
 
-|                |                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------ |
-| **Status**     | 🚧 Partially Complete (utility exists, not wired up)                                                   |
-| **Why now**    | Rate-limit util exists but no middleware; must protect login / membership endpoints before prod tests. |
-| **Depends on** | none (parallel)                                                                                        |
-| **Code refs**  | `src/lib/security/middleware/rate-limit.ts`                                                            |
-| **Tasks**      | Create middleware registered in auth routes and soon-to-be API mutations; throw 429 with JSON error.   |
+|                |                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ✅ Complete                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| **Why now**    | Rate-limit util exists but no middleware; must protect login / membership endpoints before prod tests.                                                                                                                                                                                                                                                                                                                                                      |
+| **Depends on** | none (parallel)                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Code refs**  | `src/lib/security/middleware/rate-limit.ts`, `src/lib/auth/rate-limited-handler.ts`, `src/lib/security/middleware/server-fn-rate-limit.ts`                                                                                                                                                                                                                                                                                                                  |
+| **Delivered**  | <ul><li>Rate limiting middleware with configurable limits (5 req/15min for auth, 100 for API)</li><li>Protected auth endpoints (sign-in, sign-up, password reset, etc.)</li><li>Proper 429 "Too Many Requests" responses when limits exceeded</li><li>Rate-limited handler wrapper for future server function protection</li><li>In-memory store for development with upgrade path documented</li><li>Full documentation in docs/rate-limiting.md</li></ul> |
 
 ---
 

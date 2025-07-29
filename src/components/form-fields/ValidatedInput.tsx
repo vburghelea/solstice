@@ -7,6 +7,15 @@ import { Label } from "~/shared/ui/label";
 // Type specifically for ValidatedInput, extending the base props
 interface ValidatedInputProps extends FieldComponentProps {
   type?: React.HTMLInputTypeAttribute; // Allow passing input type (text, password, email, etc.)
+  maxLength?: number;
+  min?: string | number;
+  max?: string | number;
+  step?: string | number;
+  autoComplete?: string;
+  autoFocus?: boolean;
+  pattern?: string;
+  required?: boolean;
+  readOnly?: boolean;
 }
 
 // Correctly define the component receiving props

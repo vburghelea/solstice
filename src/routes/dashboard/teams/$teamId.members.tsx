@@ -339,10 +339,10 @@ function TeamMembersPage() {
                         <AlertDialogAction
                           onClick={
                             () =>
-                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
                               removeMemberMutation.mutate({
                                 teamId,
                                 memberId: member.id,
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                               } as any) // Type assertion workaround
                           }
                         >

@@ -18,6 +18,14 @@ export function GamePreferencesStep({
   const [favorites, setFavorites] = useState(initialFavorites);
   const [toAvoid, setToAvoid] = useState(initialToAvoid);
 
+  useEffect(() => {
+    setFavorites(initialFavorites || []);
+  }, [initialFavorites]);
+
+  useEffect(() => {
+    setToAvoid(initialToAvoid || []);
+  }, [initialToAvoid]);
+
   const handleAddFavorite = (tag: { id: number; name: string }) => {
     if (!favorites.some((fav) => fav.id === tag.id)) {
       const newFavorites = [...favorites, tag];

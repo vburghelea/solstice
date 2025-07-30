@@ -33,6 +33,12 @@ export interface UserProfile {
   privacySettings?: PrivacySettings | undefined;
   profileVersion: number;
   profileUpdatedAt?: Date | undefined;
+  gameSystemPreferences?:
+    | {
+        favorite: { id: number; name: string }[];
+        avoid: { id: number; name: string }[];
+      }
+    | undefined;
 }
 
 export interface ProfileInput {

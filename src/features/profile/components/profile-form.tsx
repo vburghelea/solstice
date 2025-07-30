@@ -19,6 +19,9 @@ import { profileInputSchema, ProfileInputType } from "../profile.schemas";
 import type { ProfileOperationResult } from "../profile.types";
 
 import { useRouteContext } from "@tanstack/react-router";
+import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
+import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 const defaultProfile: ProfileInputType = {
@@ -137,7 +140,7 @@ export function ProfileForm() {
             <form.AppField
               name="gender"
               children={(field) => (
-                <field.ValidatedSelect
+                <ValidatedSelect
                   field={field}
                   label="Gender (optional)"
                   options={[
@@ -155,7 +158,7 @@ export function ProfileForm() {
             <form.AppField
               name="pronouns"
               children={(field) => (
-                <field.ValidatedInput
+                <ValidatedInput
                   field={field}
                   label="Pronouns (optional)"
                   placeholder="e.g., they/them, she/her, he/him"
@@ -166,7 +169,7 @@ export function ProfileForm() {
             <form.AppField
               name="phone"
               children={(field) => (
-                <field.ValidatedInput
+                <ValidatedInput
                   field={field}
                   label="Phone Number (optional)"
                   placeholder="+1 (555) 000-0000"
@@ -210,7 +213,7 @@ export function ProfileForm() {
             <form.AppField
               name="privacySettings.showEmail"
               children={(field) => (
-                <field.ValidatedCheckbox
+                <ValidatedCheckbox
                   field={field}
                   label="Show my email address to team members"
                 />
@@ -220,7 +223,7 @@ export function ProfileForm() {
             <form.AppField
               name="privacySettings.showPhone"
               children={(field) => (
-                <field.ValidatedCheckbox
+                <ValidatedCheckbox
                   field={field}
                   label="Show my phone number to team members"
                 />
@@ -230,7 +233,7 @@ export function ProfileForm() {
             <form.AppField
               name="privacySettings.allowTeamInvitations"
               children={(field) => (
-                <field.ValidatedCheckbox
+                <ValidatedCheckbox
                   field={field}
                   label="Allow team captains to send me invitations"
                 />

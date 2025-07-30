@@ -1,6 +1,6 @@
-# 🚀 Solstice – Full-Stack Development Guide
+# 🚀 Roundup Games – Full-Stack Development Guide
 
-Welcome to the Solstice project! This guide teaches modern full-stack web development through a real-world application while serving as a complete technical reference.
+Welcome to the Roundup Games project! This guide teaches modern full-stack web development through a real-world application while serving as a complete technical reference.
 
 ## 📚 Table of Contents
 
@@ -454,7 +454,7 @@ You now understand:
 - ✅ Where to find and modify code
 - ✅ How to contribute effectively
 
-_Solstice follows the mantra "simple, typed, secure by default."_  
+_Roundup Games follows the mantra "simple, typed, secure by default."_  
 _If you keep those three goals in mind, your contributions will fit right in._
 
 Happy coding! 🎉

@@ -22,6 +22,13 @@
       "when": 1753378788293,
       "tag": "0002_seed_game_systems_data",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753877458967,
+      "tag": "0003_add_events_system",
+      "breakpoints": true
     }
   ]
 }

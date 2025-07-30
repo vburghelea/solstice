@@ -129,3 +129,13 @@ export const gameSystemToMechanicRelations = relations(
     }),
   }),
 );
+
+// Types
+export type GameSystem = typeof gameSystems.$inferSelect;
+export type NewGameSystem = typeof gameSystems.$inferInsert;
+export type GameSystemCategory = typeof gameSystemCategories.$inferSelect;
+export type NewGameSystemCategory = typeof gameSystemCategories.$inferInsert;
+export type GameSystemMechanic = typeof gameSystemMechanics.$inferSelect;
+export type NewGameSystemMechanic = typeof gameSystemMechanics.$inferInsert;
+export type UserGameSystemPreference = typeof userGameSystemPreferences.$inferSelect;
+export type NewUserGameSystemPreference = typeof userGameSystemPreferences.$inferInsert;

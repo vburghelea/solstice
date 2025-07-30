@@ -1,9 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
-import { db } from "~/db";
-import { user } from "~/db/schema";
 import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
-import { auth } from "~/lib/auth";
 import type {
   PrivacySettings,
   ProfileOperationResult,
@@ -24,8 +21,6 @@ function mapDbUserToProfile(dbUser: {
   name: string;
   email: string;
   profileComplete: boolean;
-  dateOfBirth: Date | null;
-  emergencyContact: string | null;
   gender: string | null;
   pronouns: string | null;
   phone: string | null;
@@ -155,6 +150,8 @@ import { gameSystems } from "~/db/schema/game-systems.schema";
 
 export const getGameSystems = createServerFn({ method: "GET" }).handler(async () => {
   try {
+    const { getDb } = await import("~/db/server-helpers");
+    const db = await getDb();
     const systems = await db().select().from(gameSystems);
     return {
       success: true,
@@ -184,21 +181,20 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
     errors?: Array<{ code: string; message: string }>;
   }> => {
     try {
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        throw new Error("Not authenticated");
       }
 
       const preferences = await db()
         .select()
         .from(userGameSystemPreferences)
-        .where(eq(userGameSystemPreferences.userId, session.user.id));
+        .where(eq(userGameSystemPreferences.userId, currentUser.id));
 
       const favorite: number[] = [];
       const avoid: number[] = [];

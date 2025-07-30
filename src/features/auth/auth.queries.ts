@@ -52,3 +52,52 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     };
   },
 );
+
+export const getProviders = createServerFn({ method: "GET" }).handler(
+  async (): Promise<string[]> => {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return [];
+    }
+
+    const [{ getDb }, { eq }] = await Promise.all([
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+    ]);
+    const { account } = await import("~/db/schema");
+
+    const db = await getDb();
+    const linkedAccounts = await db()
+      .select({ providerId: account.providerId })
+      .from(account)
+      .where(eq(account.userId, currentUser.id));
+
+    return linkedAccounts.map((acc) => acc.providerId);
+  },
+);
+
+export const changePassword = createServerFn({ method: "POST" }).handler(
+  //@ts-expect-error:  Start type inference issue
+  async ({ data }: { data: { currentPassword: string; newPassword: string } }) => {
+    const { getAuth } = await import("~/lib/auth/server-helpers");
+    const auth = await getAuth();
+    const { getWebRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getWebRequest();
+
+    try {
+      await auth.api.changePassword({
+        body: {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        },
+        headers,
+      });
+      return { success: true };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return { success: false, error: error.message };
+      }
+      return { success: false, error: "An unknown error occurred." };
+    }
+  },
+);

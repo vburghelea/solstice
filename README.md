@@ -1,4 +1,4 @@
-# Solstice
+# Roundup Games
 
 [![CI](https://github.com/soleilheaney/solstice/actions/workflows/ci.yml/badge.svg)](https://github.com/soleilheaney/solstice/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/soleilheaney/solstice/branch/main/graph/badge.svg)](https://codecov.io/gh/soleilheaney/solstice)
@@ -6,7 +6,7 @@
 
 ## Sports Registration Platform
 
-Solstice is a **modern web platform for managing memberships, teams, and events**. Built with [TanStack Start](https://tanstack.com/start) and deployed on [Netlify](https://www.netlify.com/).
+Roundup Games is a **modern web platform for managing games, teams, and events**. Built with [TanStack Start](https://tanstack.com/start) and deployed on [Netlify](https://www.netlify.com/).
 
 ## Tech Stack
 
@@ -40,8 +40,8 @@ VITE_BASE_URL=http://localhost:5173
 BETTER_AUTH_SECRET=your-secret-key
 
 # OAuth Providers (optional)
-DISCORD_CLIENT_ID=your_github_client_id
-DISCORD_CLIENT_SECRET=your_github_client_secret
+DISCORD_CLIENT_ID=your_discord_client_id
+DISCORD_CLIENT_SECRET=your_discord_client_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
@@ -178,7 +178,7 @@ Configure these secrets in your GitHub repository settings:
 
 ## Overview and Purpose
 
-The Solstice platform streamlines sports league management – initially serving **Roundup Games** and eventually adaptable to other organizations. The platform enables tabletop and board game enthusiasts to connect and organize game sessions and events.
+The Roundup Games platform streamlines management – initially serving **Roundup Games** and eventually adaptable to other organizations. The platform enables tabletop and board game enthusiasts to connect and organize game sessions and events.
 
 **Key Features:**
 

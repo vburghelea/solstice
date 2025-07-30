@@ -17,10 +17,7 @@ import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
 import type { ProfileInputType } from "../profile.schemas";
-import type {
-  ProfileInput,
-  ProfileOperationResult,
-} from "../profile.types";
+import type { ProfileInput, ProfileOperationResult } from "../profile.types";
 
 import { GamePreferencesStep } from "./game-preferences-step";
 

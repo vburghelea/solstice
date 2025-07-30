@@ -54,21 +54,14 @@ export const updateUserProfile = createServerFn({ method: "POST" })
     // Now inputData contains the actual profile data
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        throw new Error("Not authenticated");
       }
 
       // Input is already validated by .validator(), just check if it's empty
@@ -106,7 +99,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       const [updatedUser] = await db
         .update(user)
         .set(updateData)
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, currentUser.id))
         .returning();
 
       if (!updatedUser) {
@@ -121,11 +114,12 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       const profileComplete = isProfileComplete(profile);
 
       if (profileComplete !== updatedUser.profileComplete) {
+        const { getDb } = await import("~/db/server-helpers");
         const db = await getDb();
         const [finalUser] = await db
           .update(user)
           .set({ profileComplete })
-          .where(eq(user.id, session.user.id))
+          .where(eq(user.id, currentUser.id))
           .returning();
 
         return {
@@ -160,21 +154,14 @@ export const completeUserProfile = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        throw new Error("Not authenticated");
       }
 
       // Input is already validated by .validator()
@@ -198,7 +185,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
       const [updatedUser] = await db
         .update(user)
         .set(updateData)
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, currentUser.id))
         .returning();
 
       if (!updatedUser) {
@@ -212,14 +199,14 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         const preferencesToInsert = [];
         for (const gameSystemId of data.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
-            userId: session.user.id,
+            userId: currentUser.id,
             gameSystemId,
             preferenceType: "favorite" as const,
           });
         }
         for (const gameSystemId of data.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
-            userId: session.user.id,
+            userId: currentUser.id,
             gameSystemId,
             preferenceType: "avoid" as const,
           });
@@ -259,21 +246,14 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        throw new Error("Not authenticated");
       }
 
       // Input is already validated by .validator()
@@ -290,7 +270,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
           privacySettings: JSON.stringify(data),
           profileUpdatedAt: new Date(),
         })
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, currentUser.id))
         .returning();
 
       if (!updatedUser) {

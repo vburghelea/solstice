@@ -1,6 +1,6 @@
 # Code Pattern Improvements
 
-This document outlines the code pattern improvements implemented in the Solstice sports league management platform.
+This document outlines the code pattern improvements implemented in the Roundup Games platform.
 
 ## Critical: Process Not Defined Error Analysis (UPDATED)
 

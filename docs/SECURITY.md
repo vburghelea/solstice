@@ -1,6 +1,6 @@
 # Security Configuration
 
-This document outlines the security measures implemented in the Solstice application.
+This document outlines the security measures implemented in the Roundup Games application.
 
 ## Overview
 

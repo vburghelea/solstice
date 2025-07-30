@@ -53,9 +53,32 @@ export function ProfileForm() {
   const [error, setError] = useState<string | null>(null);
 
   const form = useAppForm({
-    defaultValues: defaultProfile,
+    defaultValues: {
+      gender: user?.gender ?? "",
+      pronouns: user?.pronouns ?? "",
+      phone: user?.phone ?? "",
+      gameSystemPreferences: {
+        favorite: gamePreferences?.data?.favorite || [],
+        avoid: gamePreferences?.data?.avoid || [],
+      } as {
+        favorite: { id: number; name: string }[];
+        avoid: { id: number; name: string }[];
+      },
+      privacySettings: user?.privacySettings
+        ? JSON.parse(user.privacySettings as string)
+        : defaultProfile.privacySettings,
+    },
     validators: {
-      onChange: profileInputSchema,
+      onChange: ({ value }) => {
+        const result = profileInputSchema.safeParse(value);
+        if (!result.success) {
+          return result.error.errors.map((err) => ({
+            message: err.message,
+            path: err.path.join("."),
+          }));
+        }
+        return undefined;
+      },
     },
     onSubmit: async ({ value }) => {
       setIsSubmitting(true);
@@ -87,17 +110,6 @@ export function ProfileForm() {
 
   useEffect(() => {
     if (user && gamePreferences?.success) {
-      form.setFieldValue("gender", user.gender || "");
-      form.setFieldValue("pronouns", user.pronouns || "");
-      form.setFieldValue("phone", user.phone || "");
-      form.setFieldValue(
-        "gameSystemPreferences.favorite",
-        gamePreferences.data?.favorite || [],
-      );
-      form.setFieldValue(
-        "gameSystemPreferences.avoid",
-        gamePreferences.data?.avoid || [],
-      );
       const parsedPrivacySettings = user.privacySettings
         ? JSON.parse(user.privacySettings)
         : {};
@@ -193,9 +205,9 @@ export function ProfileForm() {
                 <GamePreferencesStep
                   initialFavorites={field.state.value?.favorite || []}
                   initialToAvoid={field.state.value?.avoid || []}
-                  onPreferencesChange={(favorite, avoid) =>
-                    field.handleChange({ favorite, avoid })
-                  }
+                  onPreferencesChange={(favorite, avoid) => {
+                    field.handleChange({ favorite: favorite, avoid: avoid });
+                  }}
                 />
               )}
             />

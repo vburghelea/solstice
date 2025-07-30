@@ -1,6 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react"; // Import useMemo
+import { useEffect, useMemo, useRef, useState } from "react";
+import { GameSystem } from "~/db/schema/game-systems.schema";
+import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
+import { getGameSystems } from "../../features/profile/profile.queries";
 import { Button } from "./button";
 import { Input } from "./input";
 
@@ -8,19 +12,35 @@ interface TagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   tags: { id: number; name: string }[];
   onAddTag: (tag: { id: number; name: string }) => void;
   onRemoveTag: (id: number) => void;
-  suggestions: { id: number; name: string }[];
   placeholder?: string;
 }
+
+type GetGameSystemsFn = (params?: {
+  data?: { searchTerm?: string } | undefined;
+}) => Promise<{ success: boolean; data: GameSystem[]; errors?: unknown[] }>;
 
 export function TagInput({
   tags,
   onAddTag,
   onRemoveTag,
-  suggestions,
   placeholder,
   ...props
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
+  const debouncedInputValue = useDebounce(inputValue, 500);
+
+  const { data: gameSystems } = useQuery({
+    queryKey: ["gameSystems", debouncedInputValue],
+    queryFn: ({ queryKey }) => {
+      const [, currentSearchTerm] = queryKey;
+      const data =
+        currentSearchTerm && currentSearchTerm.length >= 3
+          ? { searchTerm: currentSearchTerm as string }
+          : undefined;
+      return (getGameSystems as GetGameSystemsFn)({ data });
+    },
+  });
+
   const [filteredSuggestions, setFilteredSuggestions] = useState<
     {
       id: number;
@@ -30,16 +50,18 @@ export function TagInput({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const allGameSystems = gameSystems?.data || [];
+
   // Calculate derived state using useMemo
   const memoizedFilteredSuggestions = useMemo(() => {
     return inputValue
-      ? suggestions.filter(
+      ? allGameSystems.filter(
           (suggestion) =>
             !tags.some((tag) => tag.id === suggestion.id) &&
             suggestion.name.toLowerCase().includes(inputValue.toLowerCase()),
         )
       : [];
-  }, [inputValue, suggestions, tags]);
+  }, [inputValue, allGameSystems, tags]);
 
   const memoizedShowSuggestions = useMemo(() => {
     return Boolean(inputValue) && memoizedFilteredSuggestions.length > 0;
@@ -47,9 +69,7 @@ export function TagInput({
 
   // Use useEffect to set state based on memoized values
   useEffect(() => {
-    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
     setFilteredSuggestions(memoizedFilteredSuggestions);
-    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
     setShowSuggestions(memoizedShowSuggestions);
   }, [memoizedFilteredSuggestions, memoizedShowSuggestions]);
 

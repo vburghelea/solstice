@@ -13,8 +13,8 @@ export const profileInputSchema = z
     phone: z.string().optional(),
     gameSystemPreferences: z
       .object({
-        favorite: z.array(z.number()),
-        avoid: z.array(z.number()),
+        favorite: z.array(z.object({ id: z.number(), name: z.string() })),
+        avoid: z.array(z.object({ id: z.number(), name: z.string() })),
       })
       .optional(),
     privacySettings: privacySettingsSchema.optional(),

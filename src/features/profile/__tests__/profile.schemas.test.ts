@@ -32,8 +32,11 @@ describe("Profile Schemas", () => {
         pronouns: "he/him",
         phone: "987-654-3210",
         gameSystemPreferences: {
-          favorite: [1, 2],
-          avoid: [3],
+          favorite: [
+            { id: 1, name: "System 1" },
+            { id: 2, name: "System 2" },
+          ],
+          avoid: [{ id: 3, name: "System 3" }],
         },
         privacySettings: {
           showEmail: true,
@@ -49,8 +52,11 @@ describe("Profile Schemas", () => {
     it("validates profile input with only gameSystemPreferences", () => {
       const validInput = {
         gameSystemPreferences: {
-          favorite: [10],
-          avoid: [20, 30],
+          favorite: [{ id: 10, name: "System 10" }],
+          avoid: [
+            { id: 20, name: "System 20" },
+            { id: 30, name: "System 30" },
+          ],
         },
       };
 
@@ -61,8 +67,11 @@ describe("Profile Schemas", () => {
     it("fails when gameSystemPreferences contains non-numeric IDs", () => {
       const invalidInput = {
         gameSystemPreferences: {
-          favorite: [1, "invalid"],
-          avoid: [3],
+          favorite: [
+            { id: 1, name: "System 1" },
+            { id: "invalid", name: "Invalid System" },
+          ],
+          avoid: [{ id: 3, name: "System 3" }],
         },
       };
 

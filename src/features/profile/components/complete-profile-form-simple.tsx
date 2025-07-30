@@ -16,6 +16,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
+import { getUserGameSystemPreferences } from "../profile.queries";
 import type { ProfileInputType } from "../profile.schemas";
 import type { ProfileInput, ProfileOperationResult } from "../profile.types";
 
@@ -47,15 +48,23 @@ export function CompleteProfileForm() {
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
 
+  const { data: gamePreferencesData, isLoading: isLoadingGamePreferences } = useQuery({
+    queryKey: ["userGameSystemPreferences"],
+    queryFn: () => getUserGameSystemPreferences(),
+  });
+
   const form = useForm({
     defaultValues: {
       gender: "",
       pronouns: "",
       phone: "",
-    gameSystemPreferences: {
-      favorite: [],
-      avoid: [],
-    },
+      gameSystemPreferences: {
+        favorite: gamePreferencesData?.data?.favorite ?? [],
+        avoid: gamePreferencesData?.data?.avoid ?? [],
+      } as {
+        favorite: { id: number; name: string }[];
+        avoid: { id: number; name: string }[];
+      },
       privacySettings: {
         showEmail: false,
         showPhone: false,
@@ -211,18 +220,24 @@ export function CompleteProfileForm() {
             )}
 
             {/* Game Preferences Step */}
-            {currentStep === "game-preferences" && (
-              <GamePreferencesStep
-                initialFavorites={formData.gameSystemPreferences?.favorite || []}
-                initialToAvoid={formData.gameSystemPreferences?.avoid || []}
-                onPreferencesChange={(favorite, avoid) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    gameSystemPreferences: { favorite, avoid },
-                  }))
-                }
-              />
-            )}
+            {currentStep === "game-preferences" &&
+              (isLoadingGamePreferences ? (
+                <div>Loading game preferences...</div>
+              ) : (
+                <GamePreferencesStep
+                  initialFavorites={formData.gameSystemPreferences?.favorite || []}
+                  initialToAvoid={formData.gameSystemPreferences?.avoid || []}
+                  onPreferencesChange={(favorite, avoid) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      gameSystemPreferences: {
+                        favorite: favorite,
+                        avoid: avoid,
+                      },
+                    }));
+                  }}
+                />
+              ))}
 
             {/* Privacy Settings Step */}
             {currentStep === "privacy" && (

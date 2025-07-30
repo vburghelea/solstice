@@ -22,18 +22,24 @@ function parseJsonField<T>(value: string | null | undefined): T | undefined {
   }
 }
 
-function mapDbUserToProfile(dbUser: {
-  id: string;
-  name: string;
-  email: string;
-  profileComplete: boolean;
-  gender: string | null;
-  pronouns: string | null;
-  phone: string | null;
-  privacySettings: string | null;
-  profileVersion: number;
-  profileUpdatedAt: Date | null;
-}): UserProfile {
+function mapDbUserToProfile(
+  dbUser: {
+    id: string;
+    name: string;
+    email: string;
+    profileComplete: boolean;
+    gender: string | null;
+    pronouns: string | null;
+    phone: string | null;
+    privacySettings: string | null;
+    profileVersion: number;
+    profileUpdatedAt: Date | null;
+  },
+  preferences?: {
+    favorite: { id: number; name: string }[];
+    avoid: { id: number; name: string }[];
+  },
+): UserProfile {
   return {
     id: dbUser.id,
     name: dbUser.name,
@@ -45,6 +51,7 @@ function mapDbUserToProfile(dbUser: {
     privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings),
     profileVersion: dbUser.profileVersion,
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
+    gameSystemPreferences: preferences,
   };
 }
 
@@ -109,8 +116,41 @@ export const updateUserProfile = createServerFn({ method: "POST" })
         };
       }
 
+      let finalGameSystemPreferences = undefined;
+
+      if (data.gameSystemPreferences) {
+        // Delete existing preferences
+        await db()
+          .delete(userGameSystemPreferences)
+          .where(eq(userGameSystemPreferences.userId, currentUser.id));
+
+        const preferencesToInsert = [];
+        for (const gameSystem of data.gameSystemPreferences.favorite) {
+          preferencesToInsert.push({
+            userId: currentUser.id,
+            gameSystemId: gameSystem.id,
+            preferenceType: "favorite" as const,
+          });
+        }
+        for (const gameSystem of data.gameSystemPreferences.avoid) {
+          preferencesToInsert.push({
+            userId: currentUser.id,
+            gameSystemId: gameSystem.id,
+            preferenceType: "avoid" as const,
+          });
+        }
+
+        if (preferencesToInsert.length > 0) {
+          await db()
+            .insert(userGameSystemPreferences)
+            .values(preferencesToInsert)
+            .onConflictDoNothing();
+        }
+        finalGameSystemPreferences = data.gameSystemPreferences;
+      }
+
       // Check if profile is now complete
-      const profile = mapDbUserToProfile(updatedUser);
+      const profile = mapDbUserToProfile(updatedUser, finalGameSystemPreferences);
       const profileComplete = isProfileComplete(profile);
 
       if (profileComplete !== updatedUser.profileComplete) {
@@ -124,13 +164,13 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
         return {
           success: true,
-          data: mapDbUserToProfile(finalUser),
+          data: mapDbUserToProfile(finalUser, finalGameSystemPreferences),
         };
       }
 
       return {
         success: true,
-        data: profile,
+        data: mapDbUserToProfile(updatedUser, finalGameSystemPreferences),
       };
     } catch (error) {
       console.error("Error updating user profile:", error);
@@ -197,17 +237,17 @@ export const completeUserProfile = createServerFn({ method: "POST" })
 
       if (data.gameSystemPreferences) {
         const preferencesToInsert = [];
-        for (const gameSystemId of data.gameSystemPreferences.favorite) {
+        for (const gameSystem of data.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
             userId: currentUser.id,
-            gameSystemId,
+            gameSystemId: gameSystem.id,
             preferenceType: "favorite" as const,
           });
         }
-        for (const gameSystemId of data.gameSystemPreferences.avoid) {
+        for (const gameSystem of data.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
             userId: currentUser.id,
-            gameSystemId,
+            gameSystemId: gameSystem.id,
             preferenceType: "avoid" as const,
           });
         }

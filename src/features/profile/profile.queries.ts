@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
-import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
+import { eq, inArray } from "drizzle-orm";
+import { gameSystems, userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import type {
   PrivacySettings,
   ProfileOperationResult,
@@ -146,30 +146,43 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
   },
 );
 
-import { gameSystems } from "~/db/schema/game-systems.schema";
+export const getGameSystems = createServerFn({ method: "GET" }).handler(
+  //@ts-expect-error:  Start type inference issue
+  async ({ data }: { data?: { searchTerm?: string } }) => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
+      const { ilike } = await import("drizzle-orm");
 
-export const getGameSystems = createServerFn({ method: "GET" }).handler(async () => {
-  try {
-    const { getDb } = await import("~/db/server-helpers");
-    const db = await getDb();
-    const systems = await db().select().from(gameSystems);
-    return {
-      success: true,
-      data: systems,
-    };
-  } catch (error) {
-    console.error("Error fetching game systems:", error);
-    return {
-      success: false,
-      errors: [
-        {
-          code: "DATABASE_ERROR",
-          message: "Failed to fetch game systems",
-        },
-      ],
-    };
-  }
-});
+      if (!data?.searchTerm || data.searchTerm.length < 3) {
+        return {
+          success: true,
+          data: [],
+        };
+      }
+
+      const systems = await db()
+        .select()
+        .from(gameSystems)
+        .where(ilike(gameSystems.name, `%${data.searchTerm}%`));
+      return {
+        success: true,
+        data: systems,
+      };
+    } catch (error) {
+      console.error("Error fetching game systems:", error);
+      return {
+        success: false,
+        errors: [
+          {
+            code: "DATABASE_ERROR",
+            message: "Failed to fetch game systems",
+          },
+        ],
+      };
+    }
+  },
+);
 
 /**
  * Get user's game system preferences
@@ -177,7 +190,10 @@ export const getGameSystems = createServerFn({ method: "GET" }).handler(async ()
 export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
     success: boolean;
-    data?: { favorite: number[]; avoid: number[] };
+    data?: {
+      favorite: { id: number; name: string }[];
+      avoid: { id: number; name: string }[];
+    };
     errors?: Array<{ code: string; message: string }>;
   }> => {
     try {
@@ -196,16 +212,36 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
         .from(userGameSystemPreferences)
         .where(eq(userGameSystemPreferences.userId, currentUser.id));
 
-      const favorite: number[] = [];
-      const avoid: number[] = [];
+      const favoriteIds: number[] = [];
+      const avoidIds: number[] = [];
 
       for (const pref of preferences) {
         if (pref.preferenceType === "favorite") {
-          favorite.push(pref.gameSystemId);
+          favoriteIds.push(pref.gameSystemId);
         } else if (pref.preferenceType === "avoid") {
-          avoid.push(pref.gameSystemId);
+          avoidIds.push(pref.gameSystemId);
         }
       }
+
+      const allPreferredIds = [...new Set([...favoriteIds, ...avoidIds])];
+
+      let preferredGameSystems: { id: number; name: string }[] = [];
+      if (allPreferredIds.length > 0) {
+        preferredGameSystems = await db()
+          .select({ id: gameSystems.id, name: gameSystems.name })
+          .from(gameSystems)
+          .where(inArray(gameSystems.id, allPreferredIds));
+      }
+
+      const favorite: { id: number; name: string }[] = favoriteIds.map((id) => {
+        const system = preferredGameSystems.find((gs) => gs.id === id);
+        return { id, name: system?.name || "" };
+      });
+
+      const avoid: { id: number; name: string }[] = avoidIds.map((id) => {
+        const system = preferredGameSystems.find((gs) => gs.id === id);
+        return { id, name: system?.name || "" };
+      });
 
       return {
         success: true,

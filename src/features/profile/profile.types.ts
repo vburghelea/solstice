@@ -15,6 +15,12 @@ export interface UserProfile {
   privacySettings?: PrivacySettings | undefined;
   profileVersion: number;
   profileUpdatedAt?: Date | undefined;
+  gameSystemPreferences?:
+    | {
+        favorite: { id: number; name: string }[];
+        avoid: { id: number; name: string }[];
+      }
+    | undefined;
 }
 
 export interface ProfileInput {
@@ -22,8 +28,8 @@ export interface ProfileInput {
   pronouns?: string;
   phone?: string;
   gameSystemPreferences?: {
-    favorite: number[];
-    avoid: number[];
+    favorite: { id: number; name: string }[];
+    avoid: { id: number; name: string }[];
   };
   privacySettings?: PrivacySettings;
 }

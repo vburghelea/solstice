@@ -1,18 +1,11 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { redirectIfAuthenticated } from "~/lib/auth/guards/route-guards";
 
 export const Route = createFileRoute("/auth")({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
-    const REDIRECT_URL = "/dashboard";
-    if (context.user) {
-      throw redirect({
-        to: REDIRECT_URL,
-      });
-    }
-    return {
-      redirectUrl: REDIRECT_URL,
-    };
+    redirectIfAuthenticated({ user: context.user });
   },
 });
 

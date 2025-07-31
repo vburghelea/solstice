@@ -44,24 +44,22 @@ interface UseAuthGuardOptions {
 }
 
 /**
+ * @deprecated Use route-based guards instead. This hook uses useEffect for navigation
+ * which is an anti-pattern. Use `requireAuth` or `redirectIfAuthenticated` in your
+ * route's beforeLoad function instead.
+ *
+ * @see ~/lib/auth/guards/route-guards.ts
+ *
  * Hook to handle authentication guards for routes
  *
  * @example
- * // Require authentication
+ * // DEPRECATED - Don't use this:
  * useAuthGuard({ user, requireAuth: true });
  *
- * @example
- * // Redirect authenticated users away from login page
- * useAuthGuard({ user, redirectAuthenticated: true });
- *
- * @example
- * // Custom redirects and callbacks
- * useAuthGuard({
- *   user,
- *   requireAuth: true,
- *   redirectTo: "/auth/signin",
- *   onAuthSuccess: (user) => console.log("Authenticated as", user.name)
- * });
+ * // Instead, use in your route:
+ * beforeLoad: async ({ context, location }) => {
+ *   requireAuth({ user: context.user, location });
+ * }
  */
 export function useAuthGuard({
   user,

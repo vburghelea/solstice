@@ -1,4 +1,5 @@
 // Define types manually since we can't import from schema at top level
+import type { MembershipMetadata } from "./membership.db-types";
 export interface MembershipType {
   id: string;
   name: string;
@@ -6,7 +7,7 @@ export interface MembershipType {
   priceCents: number;
   durationMonths: number;
   status: "active" | "inactive";
-  metadata: Record<string, unknown> | null;
+  metadata: MembershipMetadata | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,7 +20,7 @@ export interface Membership {
   endDate: string | Date;
   status: "active" | "cancelled" | "expired";
   paymentId: string | null;
-  metadata: Record<string, unknown> | null;
+  metadata: MembershipMetadata | null;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,12 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
+import {
+  getTeamBySlugSchema,
+  getTeamMembersSchema,
+  getTeamSchema,
+  isTeamMemberSchema,
+  listTeamsSchema,
+  searchTeamsSchema,
+} from "./teams.schemas";
 
 /**
  * Get a team by ID with member count
  */
 export const getTeam = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string };
-  })
+  .validator(getTeamSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -36,9 +42,7 @@ export const getTeam = createServerFn({ method: "POST" })
  * Get a team by slug
  */
 export const getTeamBySlug = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { slug: string };
-  })
+  .validator(getTeamBySlugSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -68,17 +72,7 @@ export const getTeamBySlug = createServerFn({ method: "POST" })
  * List all active teams
  */
 export const listTeams = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    // Handle empty calls
-    if (
-      !data ||
-      (typeof data === "object" &&
-        Object.keys(data as Record<string, unknown>).length === 0)
-    ) {
-      return { includeInactive: false };
-    }
-    return data as { includeInactive?: boolean };
-  })
+  .validator(listTeamsSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -116,17 +110,7 @@ export const listTeams = createServerFn({ method: "POST" })
  * Get teams for the current user
  */
 export const getUserTeams = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    // Handle empty calls
-    if (
-      !data ||
-      (typeof data === "object" &&
-        Object.keys(data as Record<string, unknown>).length === 0)
-    ) {
-      return { includeInactive: false };
-    }
-    return data as { includeInactive?: boolean };
-  })
+  .validator(listTeamsSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }] = await Promise.all([
@@ -183,9 +167,7 @@ export const getUserTeams = createServerFn({ method: "POST" })
  * Get team members
  */
 export const getTeamMembers = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string; includeInactive?: boolean };
-  })
+  .validator(getTeamMembersSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -243,9 +225,7 @@ export const getTeamMembers = createServerFn({ method: "POST" })
  * Check if a user is a member of a team
  */
 export const isTeamMember = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string; userId: string };
-  })
+  .validator(isTeamMemberSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -274,9 +254,7 @@ export const isTeamMember = createServerFn({ method: "POST" })
  * Search teams by name or city
  */
 export const searchTeams = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { query: string };
-  })
+  .validator(searchTeamsSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");

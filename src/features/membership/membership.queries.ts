@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getMembershipTypeSchema } from "./membership.schemas";
 import type {
   MembershipOperationResult,
   MembershipStatus,
@@ -9,7 +10,6 @@ import type {
  * List all active membership types available for purchase
  */
 export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue with dynamic imports
   async (): Promise<
     MembershipOperationResult<import("./membership.types").MembershipType[]>
   > => {
@@ -51,65 +51,65 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
 /**
  * Get a specific membership type by ID
  */
-export const getMembershipType = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    membershipTypeId,
-  }: {
-    membershipTypeId: string;
-  }): Promise<MembershipOperationResult<import("./membership.types").MembershipType>> => {
-    try {
-      // Import server-only modules inside the handler
-      const { getDb } = await import("~/db/server-helpers");
+export const getMembershipType = createServerFn({ method: "GET" })
+  .validator(getMembershipTypeSchema.parse)
+  .handler(
+    async ({
+      data,
+    }): Promise<
+      MembershipOperationResult<import("./membership.types").MembershipType>
+    > => {
+      try {
+        // Import server-only modules inside the handler
+        const { getDb } = await import("~/db/server-helpers");
 
-      // Import database dependencies inside handler
-      const { eq } = await import("drizzle-orm");
-      const { membershipTypes } = await import("~/db/schema");
+        // Import database dependencies inside handler
+        const { eq } = await import("drizzle-orm");
+        const { membershipTypes } = await import("~/db/schema");
 
-      const db = await getDb();
+        const db = await getDb();
 
-      const [membershipType] = await db()
-        .select()
-        .from(membershipTypes)
-        .where(eq(membershipTypes.id, membershipTypeId))
-        .limit(1);
+        const [membershipType] = await db()
+          .select()
+          .from(membershipTypes)
+          .where(eq(membershipTypes.id, data.membershipTypeId))
+          .limit(1);
 
-      if (!membershipType) {
+        if (!membershipType) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "NOT_FOUND",
+                message: "Membership type not found",
+              },
+            ],
+          };
+        }
+
+        return {
+          success: true,
+          data: membershipType,
+        };
+      } catch (error) {
+        console.error("Error fetching membership type:", error);
         return {
           success: false,
           errors: [
             {
-              code: "NOT_FOUND",
-              message: "Membership type not found",
+              code: "DATABASE_ERROR",
+              message: "Failed to fetch membership type",
             },
           ],
         };
       }
-
-      return {
-        success: true,
-        data: membershipType,
-      };
-    } catch (error) {
-      console.error("Error fetching membership type:", error);
-      return {
-        success: false,
-        errors: [
-          {
-            code: "DATABASE_ERROR",
-            message: "Failed to fetch membership type",
-          },
-        ],
-      };
-    }
-  },
-);
+    },
+  );
 
 /**
  * Get current user's membership status
  */
 export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
   async (): Promise<MembershipOperationResult<MembershipStatus>> => {
     try {
       // Import server-only modules inside the handler

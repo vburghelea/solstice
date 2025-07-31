@@ -100,20 +100,20 @@ function ManageTeamPage() {
     onSubmit: async ({ value }) => {
       setServerError(null);
       await updateTeamMutation.mutateAsync({
-        teamId,
-        ...value,
-        description: value.description || undefined,
-        city: value.city || undefined,
-        province: value.province || undefined,
-        website: value.website || undefined,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any); // Type assertion workaround for TanStack Start type inference issue
+        data: {
+          teamId,
+          ...value,
+          description: value.description || undefined,
+          city: value.city || undefined,
+          province: value.province || undefined,
+          website: value.website || undefined,
+        },
+      });
     },
   });
 
   const handleDeactivate = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await deactivateTeamMutation.mutateAsync({ teamId } as any); // Type assertion workaround
+    await deactivateTeamMutation.mutateAsync({ data: { teamId } });
   };
 
   return (

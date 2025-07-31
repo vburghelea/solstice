@@ -1,24 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import type { TeamMemberRole, TeamMemberStatus } from "~/db/schema";
+import {
+  addTeamMemberSchema,
+  createTeamSchema,
+  removeTeamMemberSchema,
+  updateTeamMemberSchema,
+  updateTeamSchema,
+} from "./teams.schemas";
 
 /**
  * Create a new team
  */
 export const createTeam = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as {
-      name: string;
-      slug: string;
-      description?: string;
-      city?: string;
-      province?: string;
-      primaryColor?: string;
-      secondaryColor?: string;
-      foundedYear?: string;
-      website?: string;
-      socialLinks?: Record<string, string>;
-    };
-  })
+  .validator(createTeamSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { createId }] = await Promise.all([
@@ -74,21 +69,14 @@ export const createTeam = createServerFn({ method: "POST" })
  * Update team details
  */
 export const updateTeam = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as {
-      teamId: string;
-      name?: string;
-      description?: string;
-      city?: string;
-      province?: string;
-      primaryColor?: string;
-      secondaryColor?: string;
-      foundedYear?: string;
-      website?: string;
-      socialLinks?: Record<string, string>;
-      logoUrl?: string;
-    };
-  })
+  .validator(
+    updateTeamSchema.extend({
+      data: updateTeamSchema.shape.data.extend({
+        socialLinks: z.record(z.string()).optional(),
+        logoUrl: z.string().optional(),
+      }),
+    }).parse,
+  )
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
@@ -126,16 +114,18 @@ export const updateTeam = createServerFn({ method: "POST" })
     const [updatedTeam] = await db()
       .update(teams)
       .set({
-        name: data.name,
-        description: data.description,
-        city: data.city,
-        province: data.province,
-        primaryColor: data.primaryColor,
-        secondaryColor: data.secondaryColor,
-        foundedYear: data.foundedYear,
-        website: data.website,
-        socialLinks: data.socialLinks ? JSON.stringify(data.socialLinks) : undefined,
-        logoUrl: data.logoUrl,
+        name: data.data.name,
+        description: data.data.description,
+        city: data.data.city,
+        province: data.data.province,
+        primaryColor: data.data.primaryColor,
+        secondaryColor: data.data.secondaryColor,
+        foundedYear: data.data.foundedYear,
+        website: data.data.website,
+        socialLinks: data.data.socialLinks
+          ? JSON.stringify(data.data.socialLinks)
+          : undefined,
+        logoUrl: data.data.logoUrl,
       })
       .where(eq(teams.id, data.teamId))
       .returning();
@@ -147,9 +137,7 @@ export const updateTeam = createServerFn({ method: "POST" })
  * Deactivate a team (soft delete)
  */
 export const deactivateTeam = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string };
-  })
+  .validator(z.object({ teamId: z.string() }).parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
@@ -197,15 +185,7 @@ export const deactivateTeam = createServerFn({ method: "POST" })
  * Add a member to a team
  */
 export const addTeamMember = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as {
-      teamId: string;
-      email: string;
-      role: TeamMemberRole;
-      jerseyNumber?: string;
-      position?: string;
-    };
-  })
+  .validator(addTeamMemberSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }, { createId }] = await Promise.all([
@@ -304,16 +284,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
  * Update team member details
  */
 export const updateTeamMember = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as {
-      teamId: string;
-      memberId: string;
-      role?: TeamMemberRole;
-      jerseyNumber?: string;
-      position?: string;
-      notes?: string;
-    };
-  })
+  .validator(updateTeamMemberSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
@@ -391,12 +362,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
  * Remove a member from team
  */
 export const removeTeamMember = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as {
-      teamId: string;
-      memberId: string;
-    };
-  })
+  .validator(removeTeamMemberSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([

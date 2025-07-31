@@ -2,9 +2,9 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
+import { ValidatedCombobox } from "~/components/form-fields/ValidatedCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
-import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
-import { getTeam } from "~/features/teams/teams.queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,18 +15,37 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "~/shared/ui/alert-dialog";
-import { Button } from "~/shared/ui/button";
+} from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { AlertCircle, ArrowLeftIcon } from "~/shared/ui/icons";
-import { Label } from "~/shared/ui/label";
-import { Textarea } from "~/shared/ui/textarea";
+} from "~/components/ui/card";
+import { AlertCircle, ArrowLeftIcon } from "~/components/ui/icons";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
+import { getTeam } from "~/features/teams/teams.queries";
+
+// Canadian provinces and territories
+const PROVINCES = [
+  { value: "AB", label: "Alberta" },
+  { value: "BC", label: "British Columbia" },
+  { value: "MB", label: "Manitoba" },
+  { value: "NB", label: "New Brunswick" },
+  { value: "NL", label: "Newfoundland and Labrador" },
+  { value: "NT", label: "Northwest Territories" },
+  { value: "NS", label: "Nova Scotia" },
+  { value: "NU", label: "Nunavut" },
+  { value: "ON", label: "Ontario" },
+  { value: "PE", label: "Prince Edward Island" },
+  { value: "QC", label: "Quebec" },
+  { value: "SK", label: "Saskatchewan" },
+  { value: "YT", label: "Yukon" },
+];
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/manage")({
   loader: async ({ params }) => {
@@ -139,7 +158,7 @@ function ManageTeamPage() {
                   <ValidatedInput
                     field={field}
                     label="Team Name"
-                    placeholder="Windsor Witches"
+                    placeholder="UVic Valkyries"
                   />
                 )}
               </form.Field>
@@ -164,90 +183,42 @@ function ManageTeamPage() {
               <div className="grid grid-cols-2 gap-4">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Windsor" />
+                    <ValidatedInput field={field} label="City" placeholder="Victoria" />
                   )}
                 </form.Field>
 
-                <form.Field
-                  name="province"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (value && value.length > 2) {
-                        return "Province/State should be 2 characters (e.g., ON)";
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
+                <form.Field name="province">
                   {(field) => (
-                    <ValidatedInput
+                    <ValidatedCombobox
                       field={field}
-                      label="Province/State"
-                      placeholder="Ontario"
-                      maxLength={2}
+                      label="Province"
+                      placeholder="Select a province"
+                      options={PROVINCES}
+                      searchPlaceholder="Search provinces..."
+                      emptyText="No province found."
                     />
                   )}
                 </form.Field>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <form.Field
-                  name="primaryColor"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (value && !/^#[0-9A-F]{6}$/i.test(value)) {
-                        return "Color must be in hex format (e.g., #FF0000)";
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
+                <form.Field name="primaryColor">
                   {(field) => (
-                    <div className="space-y-2">
-                      <Label>Primary Color</Label>
-                      <div className="flex gap-2">
-                        <ValidatedInput
-                          field={field}
-                          label=""
-                          placeholder="#FF0000"
-                          maxLength={7}
-                        />
-                        <div
-                          className="h-10 w-10 rounded border"
-                          style={{ backgroundColor: field.state.value }}
-                        />
-                      </div>
-                    </div>
+                    <ValidatedColorPicker
+                      field={field}
+                      label="Primary Color"
+                      description="Used for jerseys, branding, and team identity"
+                    />
                   )}
                 </form.Field>
 
-                <form.Field
-                  name="secondaryColor"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (value && !/^#[0-9A-F]{6}$/i.test(value)) {
-                        return "Color must be in hex format (e.g., #0000FF)";
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
+                <form.Field name="secondaryColor">
                   {(field) => (
-                    <div className="space-y-2">
-                      <Label>Secondary Color</Label>
-                      <div className="flex gap-2">
-                        <ValidatedInput
-                          field={field}
-                          label=""
-                          placeholder="#0000FF"
-                          maxLength={7}
-                        />
-                        <div
-                          className="h-10 w-10 rounded border"
-                          style={{ backgroundColor: field.state.value }}
-                        />
-                      </div>
-                    </div>
+                    <ValidatedColorPicker
+                      field={field}
+                      label="Secondary Color"
+                      description="Accent color for team materials and website"
+                    />
                   )}
                 </form.Field>
               </div>
@@ -293,7 +264,7 @@ function ManageTeamPage() {
                     <ValidatedInput
                       field={field}
                       label="Website"
-                      placeholder="https://windsorwitches.com"
+                      placeholder="https://uvicvalkyries.com"
                       type="url"
                     />
                   )}

@@ -23,6 +23,7 @@ export {
   Clock,
   CreditCard,
   Link as LinkIcon,
+  Loader2,
   LoaderCircle as LoaderIcon,
   GalleryVerticalEnd as LogoIcon,
   MapPin as MapPinIcon,

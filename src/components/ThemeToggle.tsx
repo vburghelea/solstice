@@ -1,6 +1,6 @@
+import { Button } from "~/components/ui/button";
+import { MoonIcon, SunIcon } from "~/components/ui/icons";
 import { useTheme } from "~/shared/hooks/useTheme";
-import { Button } from "~/shared/ui/button";
-import { MoonIcon, SunIcon } from "~/shared/ui/icons";
 
 export default function ThemeToggle() {
   const { toggleTheme } = useTheme();

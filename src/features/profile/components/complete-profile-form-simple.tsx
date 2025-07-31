@@ -2,26 +2,26 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { cn } from "~/shared/lib/utils";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { Checkbox } from "~/shared/ui/checkbox";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
+} from "~/components/ui/card";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/shared/ui/select";
-import { Separator } from "~/shared/ui/separator";
+} from "~/components/ui/select";
+import { Separator } from "~/components/ui/separator";
+import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
 import type { ProfileInputType } from "../profile.schemas";
 import type {

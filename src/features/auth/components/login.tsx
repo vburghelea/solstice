@@ -1,11 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import React, { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { GoogleIcon, LoaderIcon, LogoIcon } from "~/components/ui/icons";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { auth } from "~/lib/auth-client";
-import { Button } from "~/shared/ui/button";
-import { GoogleIcon, LoaderIcon, LogoIcon } from "~/shared/ui/icons";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
 
 export default function LoginForm() {
   const { redirectUrl } = useRouteContext({ from: "/auth/login" });

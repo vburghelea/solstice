@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "~/components/ui/button";
+import { EventCard } from "~/components/ui/event-card";
+import { HeroSection } from "~/components/ui/hero-section";
 import { PublicLayout } from "~/features/layouts/public-layout";
-import { Button } from "~/shared/ui/button";
-import { EventCard } from "~/shared/ui/event-card";
-import { HeroSection } from "~/shared/ui/hero-section";
 
 export const Route = createFileRoute("/")({
   component: Home,

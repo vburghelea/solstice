@@ -1,8 +1,8 @@
 import React from "react";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { FieldComponentProps, isFieldApi } from "~/lib/form";
 import { cn } from "~/shared/lib/utils";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
 
 interface ValidatedDatePickerProps extends FieldComponentProps {
   minAge?: number;

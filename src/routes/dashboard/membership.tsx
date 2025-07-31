@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -12,6 +12,11 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  clearPaymentParams,
+  getPaymentErrorMessage,
+  usePaymentReturn,
+} from "~/features/membership/hooks/usePaymentReturn";
 import {
   confirmMembershipPurchase,
   createCheckoutSession,
@@ -27,43 +32,38 @@ export const Route = createFileRoute("/dashboard/membership")({
 
 function MembershipPage() {
   const [processingPayment, setProcessingPayment] = useState(false);
+  const paymentReturn = usePaymentReturn();
+  const [hasProcessedReturn, setHasProcessedReturn] = useState(false);
 
-  // Check for payment return (both mock and real Square)
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const isMockCheckout = searchParams.get("mock_checkout") === "true";
-    const sessionId = searchParams.get("session");
-    const success = searchParams.get("success") === "true";
-    const error = searchParams.get("error");
-    const paymentId = searchParams.get("payment_id");
+  // Process payment return if needed
+  const processPaymentReturn = async () => {
+    if (hasProcessedReturn) return;
 
     // Handle mock checkout
-    if (isMockCheckout && sessionId) {
-      handleMockPaymentReturn(sessionId);
+    if (paymentReturn.isMockCheckout && paymentReturn.sessionId) {
+      setHasProcessedReturn(true);
+      await handleMockPaymentReturn(
+        paymentReturn.sessionId,
+        paymentReturn.membershipTypeId || "",
+      );
     }
     // Handle real Square success
-    else if (success && paymentId) {
+    else if (paymentReturn.success && paymentReturn.paymentId) {
+      setHasProcessedReturn(true);
       toast.success("Membership purchased successfully!");
-      // Remove query params
-      window.history.replaceState({}, document.title, "/dashboard/membership");
-      // Refetch membership status
+      clearPaymentParams();
       membershipStatusQuery.refetch();
     }
     // Handle errors
-    else if (error) {
-      const errorMessages: Record<string, string> = {
-        cancelled: "Payment was cancelled",
-        verification_failed: "Payment verification failed",
-        processing_error: "An error occurred while processing your payment",
-      };
-      toast.error(errorMessages[error] || "Payment failed");
-      // Remove query params
-      window.history.replaceState({}, document.title, "/dashboard/membership");
+    else if (paymentReturn.error) {
+      setHasProcessedReturn(true);
+      const errorMessage = getPaymentErrorMessage(paymentReturn.error);
+      if (errorMessage) toast.error(errorMessage);
+      clearPaymentParams();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  };
 
-  const handleMockPaymentReturn = async (sessionId: string) => {
+  const handleMockPaymentReturn = async (sessionId: string, membershipTypeId: string) => {
     setProcessingPayment(true);
     try {
       const result = await (
@@ -75,7 +75,7 @@ function MembershipPage() {
         }>
       )({
         data: {
-          membershipTypeId: new URLSearchParams(window.location.search).get("type") || "",
+          membershipTypeId,
           sessionId,
           paymentId: `mock_payment_${Date.now()}`,
         },
@@ -83,8 +83,7 @@ function MembershipPage() {
 
       if (result.success) {
         toast.success("Membership purchased successfully!");
-        // Remove query params
-        window.history.replaceState({}, document.title, "/dashboard/membership");
+        clearPaymentParams();
         // Refetch membership status
         membershipStatusQuery.refetch();
       } else {
@@ -97,6 +96,14 @@ function MembershipPage() {
       setProcessingPayment(false);
     }
   };
+
+  // Process payment return before queries run
+  if (
+    !hasProcessedReturn &&
+    (paymentReturn.sessionId || paymentReturn.success || paymentReturn.error)
+  ) {
+    processPaymentReturn();
+  }
 
   const membershipStatusQuery = useQuery({
     queryKey: ["membership-status"],

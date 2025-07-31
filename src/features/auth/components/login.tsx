@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import React, { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LoaderIcon, LogoIcon } from "~/components/ui/icons";
@@ -8,10 +8,10 @@ import { Label } from "~/components/ui/label";
 import { auth } from "~/lib/auth-client";
 
 export default function LoginForm() {
-  const { redirectUrl } = useRouteContext({ from: "/auth/login" });
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
+  const redirectUrl = "/dashboard"; // Default redirect after login
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

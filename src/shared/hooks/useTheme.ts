@@ -50,9 +50,11 @@ export function useTheme() {
     setTheme((prevTheme) => {
       if (prevTheme === "light") return "dark";
       if (prevTheme === "dark") return "light";
-      return resolvedTheme === "dark" ? "light" : "dark";
+      // For system theme, check current preference without external dependency
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      return isDark ? "light" : "dark";
     });
-  }, [resolvedTheme]);
+  }, []);
 
   return {
     theme,

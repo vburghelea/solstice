@@ -89,6 +89,14 @@ VITE_SENTRY_DSN=your_sentry_dsn
    pnpm dev
    ```
 
+## Documentation
+
+- **[CLAUDE.md](./CLAUDE.md)** - Guidelines for Claude Code AI assistant
+- **[TanStack Start Best Practices](./docs/TANSTACK-START-BEST-PRACTICES.md)** - Server functions and type safety patterns
+- **[Database Connections](./docs/database-connections.md)** - Connection pooling and usage patterns
+- **[Project Brief](./docs/project-brief.md)** - High-level project overview
+- **[Development Backlog](./docs/development-backlog.md)** - Feature implementation roadmap
+
 ## Available Scripts
 
 ### Development

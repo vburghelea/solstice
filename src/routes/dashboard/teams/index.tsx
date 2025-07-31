@@ -15,7 +15,7 @@ import { getUserTeams } from "~/features/teams/teams.queries";
 export const Route = createFileRoute("/dashboard/teams/")({
   loader: async () => {
     // Pre-fetch user teams
-    const userTeams = await getUserTeams({});
+    const userTeams = await getUserTeams({ data: {} });
     return { userTeams };
   },
   component: TeamsIndexPage,
@@ -26,7 +26,7 @@ function TeamsIndexPage() {
 
   const { data: userTeams } = useSuspenseQuery({
     queryKey: ["userTeams"],
-    queryFn: async () => getUserTeams({}),
+    queryFn: async () => getUserTeams({ data: {} }),
     initialData: initialTeams,
   });
 

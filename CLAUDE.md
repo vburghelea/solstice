@@ -2,6 +2,31 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Quick Reference
+
+### Server Functions - Always Use Zod Validation
+
+```typescript
+// 1. Define schema
+const mySchema = z.object({
+  /* ... */
+});
+
+// 2. Use .validator(schema.parse)
+export const myServerFn = createServerFn({ method: "POST" })
+  .validator(mySchema.parse)
+  .handler(async ({ data }) => {
+    /* ... */
+  });
+```
+
+### Avoid @ts-expect-error
+
+- NEVER use as first solution
+- Try Zod validation first
+- Create proper type definitions
+- See [TanStack Start Best Practices](./docs/TANSTACK-START-BEST-PRACTICES.md) for details
+
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173, default to use)
@@ -186,33 +211,87 @@ The project includes automated documentation generation:
 
 Server functions are defined using `createServerFn()` and called from React components:
 
-1. **Definition Pattern**:
+1. **Best Practice - Use Zod Validation** (ALWAYS PREFER THIS):
 
 ```typescript
+import { z } from "zod";
+import { createServerFn } from "@tanstack/react-start";
+
+// Define schema first
+const myInputSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+});
+
+// Use .validator() with schema.parse
+export const myServerFn = createServerFn({ method: "POST" })
+  .validator(myInputSchema.parse)
+  .handler(async ({ data }) => {
+    // data is now properly typed from the schema
+    // Server-side implementation
+    return result;
+  });
+```
+
+2. **Why Use Zod Validation**:
+   - Provides runtime type safety, not just compile-time
+   - Eliminates need for `@ts-expect-error` in most cases
+   - Better error messages for invalid inputs
+   - Automatic TypeScript type inference from schemas
+   - Single source of truth for input validation
+
+3. **File Organization for Server Functions**:
+
+```
+src/features/[feature]/
+├── [feature].schemas.ts    # Zod schemas for all operations
+├── [feature].queries.ts    # GET server functions
+├── [feature].mutations.ts  # POST/PUT/DELETE server functions
+├── [feature].types.ts      # TypeScript types and interfaces
+└── [feature].db-types.ts   # Database-specific type overrides (if needed)
+```
+
+4. **Calling Pattern**:
+
+```typescript
+// With validation, call matches the schema structure:
+const result = await myServerFn({ data: { name: "John", email: "john@example.com" } });
+
+// For functions with no input:
+const result = await myServerFn();
+```
+
+5. **Handling Complex Types (e.g., jsonb fields)**:
+   - Create separate type definition files for complex database types
+   - Use type overrides when extending database types
+   - Add ESLint disable comments ONLY when absolutely necessary
+
+```typescript
+// events.db-types.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export interface EventMetadata {
+  [key: string]: any;
+}
+
+// events.types.ts
+export interface EventWithDetails extends Omit<Event, "metadata"> {
+  metadata: EventMetadata;
+  // ... other fields
+}
+```
+
+6. **Legacy Pattern** (AVOID - only for reference):
+
+```typescript
+// ❌ AVOID this pattern - it bypasses runtime validation
 export const myServerFn = createServerFn({ method: "POST" }).handler(
   async ({ data }: { data: MyInputType }) => {
-    // Server-side implementation
     return result;
   },
 );
 ```
 
-2. **Calling Pattern**:
-
-```typescript
-// If handler expects { data }, call with:
-const result = await myServerFn({ data: myData });
-
-// If handler expects no params, call with:
-const result = await myServerFn();
-```
-
-3. **Type Issues**:
-   - TanStack Start's type inference for server functions can be problematic
-   - If you get "Type 'X' is not assignable to type 'undefined'" errors, use `@ts-expect-error`
-   - The functions work at runtime despite TypeScript complaints
-
-4. **Server-Only Module Imports**:
+7. **Server-Only Module Imports**:
    - **IMPORTANT**: TanStack Start only extracts code INSIDE the `handler()` function
    - Top-level imports in server function files are included in the client bundle
    - If a module accesses server-only resources (env vars, Node APIs), it will crash in the browser
@@ -252,6 +331,28 @@ const result = await myServerFn();
    });
    ```
 
+### Best Practices for Type Safety
+
+1. **Avoid @ts-expect-error**:
+   - NEVER use `@ts-expect-error` as a first solution
+   - Always try proper type definitions or validation first
+   - If you must use it, add a detailed comment explaining why
+
+2. **Server Function Type Safety Checklist**:
+   - ✅ Create Zod schema for input validation
+   - ✅ Use `.validator(schema.parse)` on server functions
+   - ✅ Define return types explicitly
+   - ✅ Create type definitions for complex database fields
+   - ✅ Use type overrides for jsonb fields instead of `any`
+   - ❌ Avoid type assertions like `data as Type`
+   - ❌ Don't suppress errors without investigation
+
+3. **When Adding New Features**:
+   - Start with schema definitions
+   - Build types from schemas using `z.infer<typeof schema>`
+   - Use validation at runtime boundaries
+   - Test error cases to ensure validation works
+
 ### Common Tasks
 
 - **Add a new page**: Create file in `src/routes/`
@@ -262,6 +363,11 @@ const result = await myServerFn();
 - **Add UI components**: Check `src/shared/ui/` for existing components first
 - **Install shadcn components**: `npx shadcn@latest add <component>` (auto-installs to `src/shared/ui/`)
 - **Update documentation**: Run `pnpm docs:all` after significant changes
+- **Add a new server function**:
+  1. Create schema in `[feature].schemas.ts`
+  2. Use `.validator(schema.parse)` in the server function
+  3. Define proper return types
+  4. Handle errors with typed error responses
 
 ### User added context:
 

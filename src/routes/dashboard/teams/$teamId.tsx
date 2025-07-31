@@ -1,25 +1,23 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
-import { Avatar, AvatarFallback, AvatarImage } from "~/shared/ui/avatar";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/shared/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   ArrowLeftIcon,
   CalendarIcon,
   LinkIcon,
   MapPinIcon,
   UsersIcon,
-} from "~/shared/ui/icons";
+} from "~/components/ui/icons";
+import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({
   loader: async ({ params }) => {
     const [teamData, members] = await Promise.all([
-      // @ts-expect-error - TanStack Start server function type inference issue
-      getTeam({ teamId: params.teamId }),
-      // @ts-expect-error - TanStack Start server function type inference issue
-      getTeamMembers({ teamId: params.teamId }),
+      getTeam({ data: { teamId: params.teamId } }),
+      getTeamMembers({ data: { teamId: params.teamId } }),
     ]);
 
     if (!teamData) {
@@ -37,15 +35,13 @@ function TeamDetailsPage() {
 
   const { data: teamData } = useSuspenseQuery({
     queryKey: ["team", teamId],
-    // @ts-expect-error - TanStack Start server function type inference issue
-    queryFn: async () => getTeam({ teamId }),
+    queryFn: async () => getTeam({ data: { teamId } }),
     initialData: initialTeamData,
   });
 
   const { data: members } = useSuspenseQuery({
     queryKey: ["teamMembers", teamId],
-    // @ts-expect-error - TanStack Start server function type inference issue
-    queryFn: async () => getTeamMembers({ teamId }),
+    queryFn: async () => getTeamMembers({ data: { teamId } }),
     initialData: initialMembers,
   });
 

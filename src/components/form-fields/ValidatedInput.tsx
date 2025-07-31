@@ -1,8 +1,8 @@
 import React from "react";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { FieldComponentProps, isFieldApi } from "~/lib/form";
 import { cn } from "~/shared/lib/utils";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
 
 // Type specifically for ValidatedInput, extending the base props
 interface ValidatedInputProps extends FieldComponentProps {
@@ -31,7 +31,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
 
   // Ensure field is correctly passed
   if (!isFieldApi(field)) {
-    console.error("ValidatedInput requires a valid field prop.");
+    console.error("ValidatedInput requires a valid field prop.", { field, props });
     return null;
   }
 

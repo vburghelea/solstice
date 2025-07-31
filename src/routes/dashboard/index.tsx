@@ -1,14 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { getUserMembershipStatus } from "~/features/membership/membership.queries";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
 import {
   AlertCircle,
   Calendar,
@@ -20,7 +19,8 @@ import {
   UserPlus,
   Users,
   XCircle,
-} from "~/shared/ui/icons";
+} from "~/components/ui/icons";
+import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,

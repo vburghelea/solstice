@@ -1,18 +1,18 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import type { TeamListItem } from "~/features/teams/teams.queries";
-import { listTeams, searchTeams } from "~/features/teams/teams.queries";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { ArrowLeftIcon, SearchIcon, UsersIcon } from "~/shared/ui/icons";
-import { Input } from "~/shared/ui/input";
+} from "~/components/ui/card";
+import { ArrowLeftIcon, SearchIcon, UsersIcon } from "~/components/ui/icons";
+import { Input } from "~/components/ui/input";
+import type { TeamListItem } from "~/features/teams/teams.queries";
+import { listTeams, searchTeams } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/teams/browse")({
   loader: async () => {

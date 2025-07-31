@@ -1,44 +1,36 @@
 import React from "react";
-import {
-  formContext, // Import the context object itself
-  FormSubmitButtonProps,
-} from "~/lib/form"; // Use alias
+import { Button } from "~/components/ui/button";
+import { Loader2 } from "~/components/ui/icons";
 import { cn } from "~/shared/lib/utils";
-import { Button } from "~/shared/ui/button";
+
+interface FormSubmitButtonProps extends React.ComponentProps<typeof Button> {
+  isSubmitting?: boolean;
+  loadingText?: string;
+}
 
 export const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
+  isSubmitting = false,
+  loadingText,
   children,
+  disabled,
   className,
-  ...rest // Pass rest of props like variant, size etc. to Button
+  ...props
 }) => {
-  // Use the form context via useContext
-  const form = React.use(formContext);
-
-  // Check if form context exists (it should within AppForm)
-  if (!form) {
-    // This should ideally not happen if used within AppForm
-    console.error(
-      "FormSubmitButton must be used within a FormProvider (implicitly via AppForm)",
-    );
-    // Render a disabled button or null as fallback
-    return (
-      <Button type="submit" disabled className={cn(className)} {...rest}>
-        {children ?? "Submit"}
-      </Button>
-    );
-  }
-
-  // Determine if the button should be disabled
-  const isDisabled = form.state.isSubmitting || !form.state.canSubmit;
-
   return (
     <Button
       type="submit"
-      disabled={isDisabled}
-      className={cn(className)} // Allow overriding styles
-      {...rest}
+      disabled={disabled || isSubmitting}
+      className={cn(className)}
+      {...props}
     >
-      {form.state.isSubmitting ? "Submitting..." : (children ?? "Submit")}
+      {isSubmitting ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          {loadingText || "Loading..."}
+        </>
+      ) : (
+        children
+      )}
     </Button>
   );
 };

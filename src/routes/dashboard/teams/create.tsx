@@ -2,19 +2,39 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
+import { ValidatedCombobox } from "~/components/form-fields/ValidatedCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
-import { createTeam } from "~/features/teams/teams.mutations";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { ArrowLeftIcon } from "~/shared/ui/icons";
-import { Label } from "~/shared/ui/label";
-import { Textarea } from "~/shared/ui/textarea";
+} from "~/components/ui/card";
+import { AlertCircle, ArrowLeftIcon } from "~/components/ui/icons";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+import { createTeam } from "~/features/teams/teams.mutations";
+
+// Canadian provinces and territories
+const PROVINCES = [
+  { value: "AB", label: "Alberta" },
+  { value: "BC", label: "British Columbia" },
+  { value: "MB", label: "Manitoba" },
+  { value: "NB", label: "New Brunswick" },
+  { value: "NL", label: "Newfoundland and Labrador" },
+  { value: "NT", label: "Northwest Territories" },
+  { value: "NS", label: "Nova Scotia" },
+  { value: "NU", label: "Nunavut" },
+  { value: "ON", label: "Ontario" },
+  { value: "PE", label: "Prince Edward Island" },
+  { value: "QC", label: "Quebec" },
+  { value: "SK", label: "Saskatchewan" },
+  { value: "YT", label: "Yukon" },
+];
 
 export const Route = createFileRoute("/dashboard/teams/create")({
   component: CreateTeamPage,
@@ -49,18 +69,34 @@ function CreateTeamPage() {
     onSubmit: async ({ value }) => {
       setServerError(null);
 
-      // Generate slug from name if not provided
-      const slug = value.slug || value.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      // Validate required fields
+      if (!value.name) {
+        setServerError("Team name is required");
+        return;
+      }
 
-      await createTeamMutation.mutateAsync({
-        ...value,
-        slug,
-        description: value.description || undefined,
-        city: value.city || undefined,
-        province: value.province || undefined,
-        website: value.website || undefined,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any); // Type assertion workaround for TanStack Start type inference issue
+      try {
+        // Generate slug from name if not provided
+        const slug = value.slug || value.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+        await createTeamMutation.mutateAsync({
+          data: {
+            name: value.name,
+            slug,
+            description: value.description || undefined,
+            city: value.city || undefined,
+            province: value.province || undefined,
+            primaryColor: value.primaryColor || undefined,
+            secondaryColor: value.secondaryColor || undefined,
+            foundedYear: value.foundedYear || undefined,
+            website: value.website || undefined,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any); // Type assertion workaround for TanStack Start type inference issue
+      } catch (error) {
+        console.error("Form submission error:", error);
+        setServerError(error instanceof Error ? error.message : "Failed to create team");
+      }
     },
   });
 
@@ -92,8 +128,12 @@ function CreateTeamPage() {
             className="space-y-6"
           >
             {serverError && (
-              <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                {serverError}
+              <div className="bg-destructive/10 text-destructive border-destructive/20 flex items-start gap-3 rounded-lg border p-4">
+                <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Error creating team</p>
+                  <p className="mt-1 text-sm">{serverError}</p>
+                </div>
               </div>
             )}
 
@@ -108,7 +148,7 @@ function CreateTeamPage() {
                   <ValidatedInput
                     field={field}
                     label="Team Name"
-                    placeholder="Windsor Witches"
+                    placeholder="UVic Valkyries"
                   />
                 )}
               </form.Field>
@@ -129,7 +169,7 @@ function CreateTeamPage() {
                   <ValidatedInput
                     field={field}
                     label="URL Slug"
-                    placeholder="windsor-witches"
+                    placeholder="uvic-valkyries"
                   />
                 )}
               </form.Field>
@@ -154,7 +194,7 @@ function CreateTeamPage() {
               <div className="grid grid-cols-2 gap-4">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Windsor" />
+                    <ValidatedInput field={field} label="City" placeholder="Victoria" />
                   )}
                 </form.Field>
 
@@ -162,19 +202,21 @@ function CreateTeamPage() {
                   name="province"
                   validators={{
                     onChange: ({ value }) => {
-                      if (value && value.length > 2) {
-                        return "Province/State should be 2 characters (e.g., ON)";
+                      if (value && !PROVINCES.some((p) => p.value === value)) {
+                        return "Please select a valid province";
                       }
                       return undefined;
                     },
                   }}
                 >
                   {(field) => (
-                    <ValidatedInput
+                    <ValidatedCombobox
                       field={field}
-                      label="Province/State"
-                      placeholder="Ontario"
-                      maxLength={2}
+                      label="Province"
+                      placeholder="Select a province..."
+                      options={PROVINCES}
+                      searchPlaceholder="Search provinces..."
+                      emptyText="No province found."
                     />
                   )}
                 </form.Field>
@@ -193,21 +235,11 @@ function CreateTeamPage() {
                   }}
                 >
                   {(field) => (
-                    <div className="space-y-2">
-                      <Label>Primary Color</Label>
-                      <div className="flex gap-2">
-                        <ValidatedInput
-                          field={field}
-                          label=""
-                          placeholder="#FF0000"
-                          maxLength={7}
-                        />
-                        <div
-                          className="h-10 w-10 rounded border"
-                          style={{ backgroundColor: field.state.value }}
-                        />
-                      </div>
-                    </div>
+                    <ValidatedColorPicker
+                      field={field}
+                      label="Primary Color"
+                      description="Used for jerseys, branding, and team identity"
+                    />
                   )}
                 </form.Field>
 
@@ -223,21 +255,11 @@ function CreateTeamPage() {
                   }}
                 >
                   {(field) => (
-                    <div className="space-y-2">
-                      <Label>Secondary Color</Label>
-                      <div className="flex gap-2">
-                        <ValidatedInput
-                          field={field}
-                          label=""
-                          placeholder="#0000FF"
-                          maxLength={7}
-                        />
-                        <div
-                          className="h-10 w-10 rounded border"
-                          style={{ backgroundColor: field.state.value }}
-                        />
-                      </div>
-                    </div>
+                    <ValidatedColorPicker
+                      field={field}
+                      label="Secondary Color"
+                      description="Accent color for team materials and website"
+                    />
                   )}
                 </form.Field>
               </div>
@@ -283,7 +305,7 @@ function CreateTeamPage() {
                     <ValidatedInput
                       field={field}
                       label="Website"
-                      placeholder="https://windsorwitches.com"
+                      placeholder="https://uvicvalkyries.com"
                       type="url"
                     />
                   )}
@@ -295,9 +317,12 @@ function CreateTeamPage() {
               <Button variant="outline" asChild>
                 <Link to="/dashboard/teams">Cancel</Link>
               </Button>
-              <Button type="submit" disabled={form.state.isSubmitting}>
-                {form.state.isSubmitting ? "Creating..." : "Create Team"}
-              </Button>
+              <FormSubmitButton
+                isSubmitting={form.state.isSubmitting}
+                loadingText="Creating team..."
+              >
+                Create Team
+              </FormSubmitButton>
             </div>
           </form>
         </CardContent>

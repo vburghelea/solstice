@@ -1,5 +1,5 @@
-import { PublicFooter } from "~/shared/ui/public-footer";
-import { PublicHeader } from "~/shared/ui/public-header";
+import { PublicFooter } from "~/components/ui/public-footer";
+import { PublicHeader } from "~/components/ui/public-header";
 
 interface PublicLayoutProps {
   children: React.ReactNode;

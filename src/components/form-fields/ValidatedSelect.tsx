@@ -1,14 +1,14 @@
 import React from "react";
-import { FieldComponentProps, isFieldApi } from "~/lib/form";
-import { cn } from "~/shared/lib/utils";
-import { Label } from "~/shared/ui/label";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/shared/ui/select";
+} from "~/components/ui/select";
+import { FieldComponentProps, isFieldApi } from "~/lib/form";
+import { cn } from "~/shared/lib/utils";
 
 interface ValidatedSelectProps extends FieldComponentProps {
   options: Array<{ value: string; label: string }>;

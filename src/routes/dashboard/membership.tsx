@@ -3,6 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import {
   confirmMembershipPurchase,
   createCheckoutSession,
@@ -11,15 +20,6 @@ import {
   getUserMembershipStatus,
   listMembershipTypes,
 } from "~/features/membership/membership.queries";
-import { Button } from "~/shared/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/shared/ui/card";
 
 export const Route = createFileRoute("/dashboard/membership")({
   component: MembershipPage,

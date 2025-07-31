@@ -2,13 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import type { TeamMemberRole } from "~/db/schema";
-import {
-  addTeamMember,
-  removeTeamMember,
-  updateTeamMember,
-} from "~/features/teams/teams.mutations";
-import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,27 +12,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "~/shared/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "~/shared/ui/avatar";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
+} from "~/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { ArrowLeftIcon, UserPlus, XCircle } from "~/shared/ui/icons";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
+} from "~/components/ui/card";
+import { ArrowLeftIcon, UserPlus, XCircle } from "~/components/ui/icons";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/shared/ui/select";
+} from "~/components/ui/select";
+import type { TeamMemberRole } from "~/db/schema";
+import {
+  addTeamMember,
+  removeTeamMember,
+  updateTeamMember,
+} from "~/features/teams/teams.mutations";
+import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {

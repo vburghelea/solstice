@@ -91,8 +91,7 @@ function CreateTeamPage() {
             foundedYear: value.foundedYear || undefined,
             website: value.website || undefined,
           },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any); // Type assertion workaround for TanStack Start type inference issue
+        });
       } catch (error) {
         console.error("Form submission error:", error);
         setServerError(error instanceof Error ? error.message : "Failed to create team");

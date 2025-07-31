@@ -44,10 +44,8 @@ import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {
     const [team, members] = await Promise.all([
-      // @ts-expect-error - TanStack Start server function type inference issue
-      getTeam({ teamId: params.teamId }),
-      // @ts-expect-error - TanStack Start server function type inference issue
-      getTeamMembers({ teamId: params.teamId }),
+      getTeam({ data: { teamId: params.teamId } }),
+      getTeamMembers({ data: { teamId: params.teamId } }),
     ]);
     if (!team) throw new Error("Team not found");
     return { team, members };
@@ -65,8 +63,7 @@ function TeamMembersPage() {
 
   const { data: members } = useSuspenseQuery({
     queryKey: ["teamMembers", teamId],
-    // @ts-expect-error - TanStack Start server function type inference issue
-    queryFn: async () => getTeamMembers({ teamId }),
+    queryFn: async () => getTeamMembers({ data: { teamId } }),
     initialData: initialMembers,
   });
 
@@ -106,12 +103,13 @@ function TeamMembersPage() {
     onSubmit: async ({ value }) => {
       setServerError(null);
       await addMemberMutation.mutateAsync({
-        teamId,
-        ...value,
-        jerseyNumber: value.jerseyNumber || undefined,
-        position: value.position || undefined,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any); // Type assertion workaround for TanStack Start type inference issue
+        data: {
+          teamId,
+          ...value,
+          jerseyNumber: value.jerseyNumber || undefined,
+          position: value.position || undefined,
+        },
+      });
     },
   });
 
@@ -299,14 +297,14 @@ function TeamMembersPage() {
                 <div className="flex items-center gap-2">
                   <Select
                     value={member.role}
-                    onValueChange={
-                      (value) =>
-                        updateMemberMutation.mutate({
+                    onValueChange={(value) =>
+                      updateMemberMutation.mutate({
+                        data: {
                           teamId,
                           memberId: member.id,
                           role: value as TeamMemberRole,
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        } as any) // Type assertion workaround
+                        },
+                      })
                     }
                   >
                     <SelectTrigger className="w-32">
@@ -337,13 +335,13 @@ function TeamMembersPage() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={
-                            () =>
-                              removeMemberMutation.mutate({
+                          onClick={() =>
+                            removeMemberMutation.mutate({
+                              data: {
                                 teamId,
                                 memberId: member.id,
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                              } as any) // Type assertion workaround
+                              },
+                            })
                           }
                         >
                           Remove Member

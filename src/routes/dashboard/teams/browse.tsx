@@ -17,8 +17,7 @@ import { listTeams, searchTeams } from "~/features/teams/teams.queries";
 export const Route = createFileRoute("/dashboard/teams/browse")({
   loader: async () => {
     // Pre-fetch all teams
-    // @ts-expect-error - TanStack Start server function type inference issue
-    const teams = await listTeams({ includeInactive: false });
+    const teams = await listTeams({ data: { includeInactive: false } });
     return { teams };
   },
   component: BrowseTeamsPage,
@@ -30,15 +29,14 @@ function BrowseTeamsPage() {
 
   const { data: allTeams } = useSuspenseQuery({
     queryKey: ["allTeams"],
-    // @ts-expect-error - TanStack Start server function type inference issue
-    queryFn: async () => listTeams({ includeInactive: false }),
+    queryFn: async () => listTeams({ data: { includeInactive: false } }),
     initialData: initialTeams,
   });
 
   const { data: searchResults } = useQuery({
     queryKey: ["searchTeams", searchQuery],
-    // @ts-expect-error - TanStack Start server function type inference issue
-    queryFn: async () => (searchQuery ? searchTeams({ query: searchQuery }) : []),
+    queryFn: async () =>
+      searchQuery ? searchTeams({ data: { query: searchQuery } }) : [],
     enabled: searchQuery.length > 0,
   });
 

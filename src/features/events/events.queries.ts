@@ -3,7 +3,21 @@ import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, user } from "~/db/schema";
 import type {
-  EventFilters,
+  EventAmenities,
+  EventDivisions,
+  EventMetadata,
+  EventRegistrationRoster,
+  EventRequirements,
+  EventRules,
+  EventSchedule,
+} from "./events.db-types";
+import {
+  checkEventRegistrationSchema,
+  getEventSchema,
+  getUpcomingEventsSchema,
+  listEventsSchema,
+} from "./events.schemas";
+import type {
   EventListResult,
   EventOperationResult,
   EventWithDetails,
@@ -12,29 +26,19 @@ import type {
 /**
  * List events with filters and pagination
  */
-export const listEvents = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    data,
-  }: {
-    data?: {
-      filters?: EventFilters;
-      page?: number;
-      pageSize?: number;
-      sortBy?: "startDate" | "createdAt" | "name";
-      sortOrder?: "asc" | "desc";
-    };
-  }): Promise<EventListResult> => {
+export const listEvents = createServerFn({ method: "GET" })
+  .validator(listEventsSchema.parse)
+  .handler(async ({ data }): Promise<EventListResult> => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
 
-    const filters = data?.filters || {};
-    const page = Math.max(1, data?.page || 1);
-    const pageSize = Math.min(100, Math.max(1, data?.pageSize || 20));
+    const filters = data.filters || {};
+    const page = Math.max(1, data.page || 1);
+    const pageSize = Math.min(100, Math.max(1, data.pageSize || 20));
     const offset = (page - 1) * pageSize;
-    const sortBy = data?.sortBy || "startDate";
-    const sortOrder = data?.sortOrder || "asc";
+    const sortBy = data.sortBy || "startDate";
+    const sortOrder = data.sortOrder || "asc";
 
     // Build filter conditions
     const conditions: ReturnType<typeof eq>[] = [];
@@ -45,12 +49,14 @@ export const listEvents = createServerFn({ method: "GET" }).handler(
 
     if (filters.status) {
       const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
-      conditions.push(inArray(events.status, statuses));
+      conditions.push(
+        inArray(events.status, statuses as (typeof events.status._.data)[]),
+      );
     }
 
     if (filters.type) {
       const types = Array.isArray(filters.type) ? filters.type : [filters.type];
-      conditions.push(inArray(events.type, types));
+      conditions.push(inArray(events.type, types as (typeof events.type._.data)[]));
     }
 
     if (filters.organizerId) {
@@ -144,6 +150,12 @@ export const listEvents = createServerFn({ method: "GET" }).handler(
 
         return {
           ...event,
+          rules: (event.rules as EventRules) || {},
+          schedule: (event.schedule as EventSchedule) || {},
+          divisions: (event.divisions as EventDivisions) || {},
+          amenities: (event.amenities as EventAmenities) || {},
+          requirements: (event.requirements as EventRequirements) || {},
+          metadata: (event.metadata as EventMetadata) || {},
           organizer: organizer!,
           registrationCount,
           isRegistrationOpen,
@@ -165,19 +177,14 @@ export const listEvents = createServerFn({ method: "GET" }).handler(
         hasPreviousPage: page > 1,
       },
     };
-  },
-);
+  });
 
 /**
  * Get a single event by ID or slug
  */
-export const getEvent = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    data,
-  }: {
-    data: { id?: string; slug?: string };
-  }): Promise<EventOperationResult<EventWithDetails>> => {
+export const getEvent = createServerFn({ method: "GET" })
+  .validator(getEventSchema.parse)
+  .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       if (!data.id && !data.slug) {
         return {
@@ -254,6 +261,12 @@ export const getEvent = createServerFn({ method: "GET" }).handler(
         success: true,
         data: {
           ...event,
+          rules: (event.rules as EventRules) || {},
+          schedule: (event.schedule as EventSchedule) || {},
+          divisions: (event.divisions as EventDivisions) || {},
+          amenities: (event.amenities as EventAmenities) || {},
+          requirements: (event.requirements as EventRequirements) || {},
+          metadata: (event.metadata as EventMetadata) || {},
           organizer: organizer!,
           registrationCount,
           isRegistrationOpen,
@@ -272,18 +285,17 @@ export const getEvent = createServerFn({ method: "GET" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
 /**
  * Get upcoming events (public endpoint for homepage)
  */
-export const getUpcomingEvents = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({ data }: { data?: { limit?: number } }): Promise<EventWithDetails[]> => {
-    const limit = Math.min(10, data?.limit || 3);
+export const getUpcomingEvents = createServerFn({ method: "GET" })
+  .validator(getUpcomingEventsSchema.parse)
+  .handler(async ({ data }): Promise<EventWithDetails[]> => {
+    const limit = Math.min(10, data.limit || 3);
 
-    const result = await listEvents({
+    const result = (await listEvents({
       data: {
         filters: {
           status: ["published", "registration_open"],
@@ -294,55 +306,60 @@ export const getUpcomingEvents = createServerFn({ method: "GET" }).handler(
         sortBy: "startDate",
         sortOrder: "asc",
       },
-    } as unknown as Parameters<typeof listEvents>[0]);
+    })) as EventListResult;
 
     return result.events;
-  },
-);
+  });
 
 /**
  * Check if a user is registered for an event
  */
-export const checkEventRegistration = createServerFn({ method: "GET" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    data,
-  }: {
-    data: { eventId: string; userId?: string; teamId?: string };
-  }): Promise<{
-    isRegistered: boolean;
-    registration?: EventRegistration;
-  }> => {
-    if (!data.userId && !data.teamId) {
-      return { isRegistered: false };
-    }
+export const checkEventRegistration = createServerFn({ method: "GET" })
+  .validator(checkEventRegistrationSchema.parse)
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      isRegistered: boolean;
+      registration?: EventRegistration;
+    }> => {
+      if (!data.userId && !data.teamId) {
+        return { isRegistered: false };
+      }
 
-    // Import server-only modules inside the handler
-    const { getDb } = await import("~/db/server-helpers");
-    const db = await getDb();
+      // Import server-only modules inside the handler
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
-    const conditions: ReturnType<typeof eq>[] = [
-      eq(eventRegistrations.eventId, data.eventId),
-      eq(eventRegistrations.status, "confirmed"),
-    ];
+      const conditions: ReturnType<typeof eq>[] = [
+        eq(eventRegistrations.eventId, data.eventId),
+        eq(eventRegistrations.status, "confirmed"),
+      ];
 
-    if (data.userId) {
-      conditions.push(eq(eventRegistrations.userId, data.userId));
-    }
+      if (data.userId) {
+        conditions.push(eq(eventRegistrations.userId, data.userId));
+      }
 
-    if (data.teamId) {
-      conditions.push(eq(eventRegistrations.teamId, data.teamId));
-    }
+      if (data.teamId) {
+        conditions.push(eq(eventRegistrations.teamId, data.teamId));
+      }
 
-    const [registration] = await db()
-      .select()
-      .from(eventRegistrations)
-      .where(and(...conditions))
-      .limit(1);
+      const [registration] = await db()
+        .select()
+        .from(eventRegistrations)
+        .where(and(...conditions))
+        .limit(1);
 
-    return {
-      isRegistered: !!registration,
-      registration,
-    };
-  },
-);
+      if (!registration) {
+        return { isRegistered: false };
+      }
+
+      return {
+        isRegistered: true,
+        registration: {
+          ...registration,
+          roster: (registration.roster as EventRegistrationRoster) || {},
+        },
+      };
+    },
+  );

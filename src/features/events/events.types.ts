@@ -1,6 +1,15 @@
 import type { z } from "zod";
 import type { Event, EventRegistration } from "~/db/schema";
 import type { createEventInputSchema } from "~/db/schema/events.schema";
+import type {
+  EventAmenities,
+  EventDivisions,
+  EventMetadata,
+  EventRegistrationRoster,
+  EventRequirements,
+  EventRules,
+  EventSchedule,
+} from "./events.db-types";
 
 // Input types
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
@@ -31,7 +40,17 @@ export type EventRegistrationInput = {
 };
 
 // Response types
-export interface EventWithDetails extends Event {
+export interface EventWithDetails
+  extends Omit<
+    Event,
+    "rules" | "schedule" | "divisions" | "amenities" | "requirements" | "metadata"
+  > {
+  rules: EventRules;
+  schedule: EventSchedule;
+  divisions: EventDivisions;
+  amenities: EventAmenities;
+  requirements: EventRequirements;
+  metadata: EventMetadata;
   organizer: {
     id: string;
     name: string;
@@ -42,7 +61,8 @@ export interface EventWithDetails extends Event {
   availableSpots: number | undefined;
 }
 
-export interface EventRegistrationWithDetails extends EventRegistration {
+export interface EventRegistrationWithDetails extends Omit<EventRegistration, "roster"> {
+  roster: EventRegistrationRoster;
   event: Event;
   team?: {
     id: string;

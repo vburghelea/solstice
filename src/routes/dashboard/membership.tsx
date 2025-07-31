@@ -133,7 +133,6 @@ function MembershipPage() {
 
   const handlePurchase = async (membershipTypeId: string) => {
     try {
-      // @ts-expect-error - TanStack Start type inference issue
       const result = await createCheckoutSession({ data: { membershipTypeId } });
       if (result.success && result.data) {
         // Redirect to checkout URL

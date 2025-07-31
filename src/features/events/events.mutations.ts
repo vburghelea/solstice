@@ -1,21 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, or, sql } from "drizzle-orm";
-import type { EventRegistration } from "~/db/schema";
+import type { Event as DbEvent, EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teamMembers } from "~/db/schema";
 import { createEventInputSchema } from "~/db/schema/events.schema";
-import type {
-  CreateEventInput,
-  EventOperationResult,
-  EventRegistrationInput,
-  UpdateEventInput,
-} from "./events.types";
+import type { EventRegistrationRoster } from "./events.db-types";
+import {
+  cancelEventRegistrationSchema,
+  createEventSchema,
+  registerForEventSchema,
+  updateEventSchema,
+} from "./events.schemas";
+import type { EventOperationResult } from "./events.types";
 
 /**
  * Create a new event
  */
-export const createEvent = createServerFn({ method: "POST" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({ data }: { data: CreateEventInput }): Promise<EventOperationResult> => {
+export const createEvent = createServerFn({ method: "POST" })
+  .validator(createEventSchema.parse)
+  .handler(async ({ data }): Promise<EventOperationResult<DbEvent>> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -117,19 +119,14 @@ export const createEvent = createServerFn({ method: "POST" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
 /**
  * Update an event
  */
-export const updateEvent = createServerFn({ method: "POST" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    data,
-  }: {
-    data: { id: string; updates: UpdateEventInput };
-  }): Promise<EventOperationResult> => {
+export const updateEvent = createServerFn({ method: "POST" })
+  .validator(updateEventSchema.parse)
+  .handler(async ({ data }): Promise<EventOperationResult<DbEvent>> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -159,7 +156,7 @@ export const updateEvent = createServerFn({ method: "POST" }).handler(
       const [existingEvent] = await db()
         .select()
         .from(events)
-        .where(eq(events.id, data.id))
+        .where(eq(events.id, data.eventId))
         .limit(1);
 
       if (!existingEvent) {
@@ -187,11 +184,13 @@ export const updateEvent = createServerFn({ method: "POST" }).handler(
       }
 
       // Check for duplicate slug if updating
-      if (data.updates.slug && data.updates.slug !== existingEvent.slug) {
+      if (data.data.slug && data.data.slug !== existingEvent.slug) {
         const [duplicateEvent] = await db()
           .select({ id: events.id })
           .from(events)
-          .where(and(eq(events.slug, data.updates.slug), sql`${events.id} != ${data.id}`))
+          .where(
+            and(eq(events.slug, data.data.slug), sql`${events.id} != ${data.eventId}`),
+          )
           .limit(1);
 
         if (duplicateEvent) {
@@ -209,9 +208,9 @@ export const updateEvent = createServerFn({ method: "POST" }).handler(
       }
 
       // Validate dates if provided
-      if (data.updates.startDate || data.updates.endDate) {
-        const startDate = new Date(data.updates.startDate || existingEvent.startDate);
-        const endDate = new Date(data.updates.endDate || existingEvent.endDate);
+      if (data.data.startDate || data.data.endDate) {
+        const startDate = new Date(data.data.startDate || existingEvent.startDate);
+        const endDate = new Date(data.data.endDate || existingEvent.endDate);
 
         if (startDate > endDate) {
           return {
@@ -230,10 +229,10 @@ export const updateEvent = createServerFn({ method: "POST" }).handler(
       const [updatedEvent] = await db()
         .update(events)
         .set({
-          ...data.updates,
+          ...data.data,
           updatedAt: new Date(),
         })
-        .where(eq(events.id, data.id))
+        .where(eq(events.id, data.eventId))
         .returning();
 
       return {
@@ -252,19 +251,15 @@ export const updateEvent = createServerFn({ method: "POST" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
 /**
  * Register for an event
  */
-export const registerForEvent = createServerFn({ method: "POST" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    data,
-  }: {
-    data: EventRegistrationInput;
-  }): Promise<EventOperationResult<EventRegistration>> => {
+// @ts-expect-error - TanStack Start has issues with jsonb field type inference
+export const registerForEvent = createServerFn({ method: "POST" })
+  .validator(registerForEventSchema.parse)
+  .handler(async ({ data }): Promise<EventOperationResult<EventRegistration>> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -479,7 +474,10 @@ export const registerForEvent = createServerFn({ method: "POST" }).handler(
 
       return {
         success: true,
-        data: registration,
+        data: {
+          ...registration,
+          roster: (registration.roster as EventRegistrationRoster) || {},
+        },
       };
     } catch (error) {
       console.error("Error registering for event:", error);
@@ -493,19 +491,15 @@ export const registerForEvent = createServerFn({ method: "POST" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
 /**
  * Cancel event registration
  */
-export const cancelEventRegistration = createServerFn({ method: "POST" }).handler(
-  // @ts-expect-error - TanStack Start type inference issue
-  async ({
-    data,
-  }: {
-    data: { registrationId: string; reason?: string };
-  }): Promise<EventOperationResult<EventRegistration>> => {
+// @ts-expect-error - TanStack Start has issues with jsonb field type inference
+export const cancelEventRegistration = createServerFn({ method: "POST" })
+  .validator(cancelEventRegistrationSchema.parse)
+  .handler(async ({ data }): Promise<EventOperationResult<EventRegistration>> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -608,7 +602,10 @@ export const cancelEventRegistration = createServerFn({ method: "POST" }).handle
 
       return {
         success: true,
-        data: cancelledRegistration,
+        data: {
+          ...cancelledRegistration,
+          roster: (cancelledRegistration.roster as EventRegistrationRoster) || {},
+        },
       };
     } catch (error) {
       console.error("Error cancelling registration:", error);
@@ -622,5 +619,4 @@ export const cancelEventRegistration = createServerFn({ method: "POST" }).handle
         ],
       };
     }
-  },
-);
+  });

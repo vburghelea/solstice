@@ -23,6 +23,21 @@ import type {
   EventWithDetails,
 } from "./events.types";
 
+// Type for EventRegistration with properly typed roster
+type EventRegistrationWithRoster = Omit<EventRegistration, "roster"> & {
+  roster: EventRegistrationRoster;
+};
+
+// Helper to cast registration jsonb fields
+function castRegistrationJsonbFields(
+  registration: EventRegistration,
+): EventRegistrationWithRoster {
+  return {
+    ...registration,
+    roster: (registration.roster || {}) as EventRegistrationRoster,
+  };
+}
+
 /**
  * List events with filters and pagination
  */
@@ -321,7 +336,7 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
       data,
     }): Promise<{
       isRegistered: boolean;
-      registration?: EventRegistration;
+      registration?: EventRegistrationWithRoster;
     }> => {
       if (!data.userId && !data.teamId) {
         return { isRegistered: false };
@@ -356,10 +371,7 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
 
       return {
         isRegistered: true,
-        registration: {
-          ...registration,
-          roster: (registration.roster as EventRegistrationRoster) || {},
-        },
+        registration: castRegistrationJsonbFields(registration),
       };
     },
   );

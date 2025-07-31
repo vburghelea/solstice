@@ -1,14 +1,26 @@
 import { createServerFn, serverOnly } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { memberships, membershipTypes } from "~/db/schema";
+import type { MembershipMetadata } from "./membership.db-types";
 import {
   confirmMembershipPurchaseSchema,
   purchaseMembershipSchema,
 } from "./membership.schemas";
 import type {
   CheckoutSessionResult,
+  Membership,
   MembershipOperationResult,
 } from "./membership.types";
+
+// Helper to cast membership jsonb fields
+function castMembershipJsonbFields(
+  membership: typeof memberships.$inferSelect,
+): Membership {
+  return {
+    ...membership,
+    metadata: (membership.metadata || {}) as MembershipMetadata,
+  } as Membership;
+}
 
 /**
  * Server-only helper to get Square payment service
@@ -135,131 +147,127 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
  */
 export const confirmMembershipPurchase = createServerFn({ method: "POST" })
   .validator(confirmMembershipPurchaseSchema.parse)
-  .handler(
-    async ({
-      data,
-    }): Promise<MembershipOperationResult<typeof memberships.$inferSelect>> => {
-      try {
-        // Import server-only modules inside the handler
-        const [{ getDb }, { getAuth }] = await Promise.all([
-          import("~/db/server-helpers"),
-          import("~/lib/auth/server-helpers"),
-        ]);
+  .handler(async ({ data }): Promise<MembershipOperationResult<Membership>> => {
+    try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
 
-        const db = await getDb();
-        const auth = await getAuth();
-        const { getWebRequest } = await import("@tanstack/react-start/server");
-        const { headers } = getWebRequest();
-        const session = await auth.api.getSession({ headers });
+      const db = await getDb();
+      const auth = await getAuth();
+      const { getWebRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getWebRequest();
+      const session = await auth.api.getSession({ headers });
 
-        if (!session?.user?.id) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "VALIDATION_ERROR",
-                message: "User not authenticated",
-              },
-            ],
-          };
-        }
-
-        // Verify payment with Square
-        const squarePaymentService = await getSquarePaymentService();
-        const paymentResult = await squarePaymentService.verifyPayment(
-          data.sessionId,
-          data.paymentId,
-        );
-
-        if (!paymentResult.success) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "PAYMENT_ERROR",
-                message: paymentResult.error || "Payment verification failed",
-              },
-            ],
-          };
-        }
-
-        // Get membership type details
-
-        const [membershipType] = await db()
-          .select()
-          .from(membershipTypes)
-          .where(eq(membershipTypes.id, data.membershipTypeId))
-          .limit(1);
-
-        if (!membershipType) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "NOT_FOUND",
-                message: "Membership type not found",
-              },
-            ],
-          };
-        }
-
-        // Calculate membership dates
-        const startDate = new Date();
-        const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
-
-        // Create membership record
-        const [newMembership] = await db()
-          .insert(memberships)
-          .values({
-            userId: session.user.id,
-            membershipTypeId: membershipType.id,
-            startDate: startDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
-            endDate: endDate.toISOString().split("T")[0],
-            status: "active",
-            paymentProvider: "square",
-            paymentId: paymentResult.paymentId,
-            metadata: {
-              sessionId: data.sessionId,
-              purchasedAt: new Date().toISOString(),
-            },
-          })
-          .returning();
-
-        // Send confirmation email
-        try {
-          const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
-
-          await sendMembershipPurchaseReceipt({
-            to: {
-              email: session.user.email,
-              name: session.user.name || undefined,
-            },
-            membershipType: membershipType.name,
-            amount: membershipType.priceCents,
-            paymentId: paymentResult.paymentId || "unknown",
-            expiresAt: endDate,
-          });
-        } catch (emailError) {
-          // Log error but don't fail the purchase
-          console.error("Failed to send confirmation email:", emailError);
-        }
-
-        return {
-          success: true,
-          data: newMembership,
-        };
-      } catch (error) {
-        console.error("Error confirming membership purchase:", error);
+      if (!session?.user?.id) {
         return {
           success: false,
           errors: [
             {
-              code: "DATABASE_ERROR",
-              message: "Failed to create membership record",
+              code: "VALIDATION_ERROR",
+              message: "User not authenticated",
             },
           ],
         };
       }
-    },
-  );
+
+      // Verify payment with Square
+      const squarePaymentService = await getSquarePaymentService();
+      const paymentResult = await squarePaymentService.verifyPayment(
+        data.sessionId,
+        data.paymentId,
+      );
+
+      if (!paymentResult.success) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "PAYMENT_ERROR",
+              message: paymentResult.error || "Payment verification failed",
+            },
+          ],
+        };
+      }
+
+      // Get membership type details
+
+      const [membershipType] = await db()
+        .select()
+        .from(membershipTypes)
+        .where(eq(membershipTypes.id, data.membershipTypeId))
+        .limit(1);
+
+      if (!membershipType) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "NOT_FOUND",
+              message: "Membership type not found",
+            },
+          ],
+        };
+      }
+
+      // Calculate membership dates
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
+
+      // Create membership record
+      const [newMembership] = await db()
+        .insert(memberships)
+        .values({
+          userId: session.user.id,
+          membershipTypeId: membershipType.id,
+          startDate: startDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+          endDate: endDate.toISOString().split("T")[0],
+          status: "active",
+          paymentProvider: "square",
+          paymentId: paymentResult.paymentId,
+          metadata: {
+            sessionId: data.sessionId,
+            purchasedAt: new Date().toISOString(),
+          },
+        })
+        .returning();
+
+      // Send confirmation email
+      try {
+        const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
+
+        await sendMembershipPurchaseReceipt({
+          to: {
+            email: session.user.email,
+            name: session.user.name || undefined,
+          },
+          membershipType: membershipType.name,
+          amount: membershipType.priceCents,
+          paymentId: paymentResult.paymentId || "unknown",
+          expiresAt: endDate,
+        });
+      } catch (emailError) {
+        // Log error but don't fail the purchase
+        console.error("Failed to send confirmation email:", emailError);
+      }
+
+      return {
+        success: true,
+        data: castMembershipJsonbFields(newMembership),
+      };
+    } catch (error) {
+      console.error("Error confirming membership purchase:", error);
+      return {
+        success: false,
+        errors: [
+          {
+            code: "DATABASE_ERROR",
+            message: "Failed to create membership record",
+          },
+        ],
+      };
+    }
+  });

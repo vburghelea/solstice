@@ -6,4 +6,6 @@
 
 export interface MembershipMetadata {
   [key: string]: any;
+  paymentDetails?: Record<string, any>;
+  notes?: string;
 }

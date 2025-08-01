@@ -55,7 +55,7 @@ export interface EventWithDetails
   amenities: EventAmenities;
   requirements: EventRequirements;
   metadata: EventMetadata;
-  organizer: {
+  organizer?: {
     id: string;
     name: string;
     email: string;

@@ -105,8 +105,7 @@ export class SquarePaymentService {
           allowTipping: false,
           redirectUrl: `${baseUrl}/api/payments/square/callback`,
           askForShippingAddress: false,
-          merchantSupportEmail:
-            process.env["SUPPORT_EMAIL"] || "support@quadballcanada.com",
+          merchantSupportEmail: process.env["SUPPORT_EMAIL"] || "staff@roundup.games",
         },
         // Note: prePopulatedData.buyerEmail will be added when we have user email
         paymentNote: `Membership purchase for user ${userId}`,

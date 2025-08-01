@@ -14,7 +14,7 @@ export function MobileAdminHeader({ onMenuClick }: MobileAdminHeaderProps) {
             <Menu className="h-6 w-6" />
           </Button>
           <div>
-            <h1 className="text-admin-text-primary text-lg font-bold">Quadball Canada</h1>
+            <h1 className="text-admin-text-primary text-lg font-bold">Roundup Games</h1>
             <p className="text-admin-text-secondary text-xs">Admin Panel</p>
           </div>
         </div>

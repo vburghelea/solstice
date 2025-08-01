@@ -30,7 +30,7 @@ export const teamMemberStatusEnum = pgEnum("team_member_status", [
 
 /**
  * Teams table
- * Stores team information for Quadball teams
+ * Stores team information for teams
  */
 export const teams = pgTable(
   "teams",

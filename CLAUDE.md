@@ -39,6 +39,9 @@ export const myServerFn = createServerFn({ method: "POST" })
 - `pnpm test` - Run Vitest tests
 - `pnpm test:ui` - Run tests with UI
 - `pnpm test:coverage` - Generate test coverage report
+- `pnpm test:e2e` - Run Playwright E2E tests
+- `pnpm test:e2e:ui` - Run E2E tests with UI mode
+- `pnpm test:e2e:setup` - Seed database with E2E test data
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
 - `pnpm docs:reference` - Generate TypeDoc API documentation
@@ -158,6 +161,7 @@ See `docs/database-connections.md` for detailed usage guide.
 - **Testing Library**: React component testing utilities
 - **Coverage**: Code coverage reporting with c8
 - **Mocks**: Auth and router mocks for isolated testing
+- **E2E Testing**: Playwright for end-to-end testing
 
 ### CI/CD Pipeline
 
@@ -353,6 +357,44 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    - Use validation at runtime boundaries
    - Test error cases to ensure validation works
 
+### E2E Testing with Playwright
+
+**IMPORTANT**: Add E2E tests for all new features to ensure they work correctly from the user's perspective.
+
+1. **Test Structure**:
+   - Tests are organized by authentication requirement
+   - `e2e/tests/authenticated/` - Tests requiring login
+   - `e2e/tests/unauthenticated/` - Tests without login
+   - Use descriptive file names: `feature.auth.spec.ts` or `feature.unauth.spec.ts`
+
+2. **Writing Tests**:
+
+   ```typescript
+   import { test, expect } from "@playwright/test";
+
+   test("should display user dashboard", async ({ page }) => {
+     await page.goto("/dashboard");
+     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
+   });
+   ```
+
+3. **Best Practices**:
+   - Use Playwright's recommended locators: `getByRole`, `getByLabel`, `getByText`
+   - Avoid arbitrary waits - use proper wait conditions
+   - Keep tests isolated and independent
+   - Test user journeys, not implementation details
+
+4. **Running Tests**:
+   - `pnpm test:e2e` - Run all E2E tests
+   - `pnpm test:e2e:ui` - Interactive UI mode for debugging
+   - `pnpm test:e2e --project=chromium-auth` - Run specific test suite
+   - `pnpm test:e2e:setup` - Seed test data before running tests
+
+5. **Authentication in Tests**:
+   - Shared auth state is configured in `e2e/auth.setup.ts`
+   - Tests automatically use authenticated state when in `authenticated/` folder
+   - Test user credentials are in `.env.e2e`
+
 ### Common Tasks
 
 - **Add a new page**: Create file in `src/routes/`
@@ -368,6 +410,11 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
   2. Use `.validator(schema.parse)` in the server function
   3. Define proper return types
   4. Handle errors with typed error responses
+- **Add E2E tests for new features**:
+  1. Add tests in `e2e/tests/authenticated/` or `e2e/tests/unauthenticated/`
+  2. Use `.auth.spec.ts` suffix for tests requiring authentication
+  3. Use `.unauth.spec.ts` suffix for tests without authentication
+  4. Run `pnpm test:e2e` to execute tests locally
 
 ### User added context:
 

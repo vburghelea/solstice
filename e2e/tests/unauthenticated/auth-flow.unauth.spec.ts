@@ -20,9 +20,10 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     await page.waitForURL("/dashboard");
     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
 
-    // Verify user is logged in
+    // Verify user is logged in - check for sidebar navigation
     await expect(page.getByRole("link", { name: "Dashboard" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Profile" })).toBeVisible();
+    // Use exact match to avoid conflicts with "View Profile" button
+    await expect(page.getByRole("link", { name: "Profile", exact: true })).toBeVisible();
   });
 
   test("should complete successful signup flow for new user", async ({ page }) => {
@@ -41,16 +42,13 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     // Submit signup
     await page.getByRole("button", { name: "Sign up", exact: true }).click();
 
-    // Should redirect to dashboard or onboarding
-    await page.waitForURL((url) => {
-      const urlString = typeof url === "string" ? url : url.toString();
-      return urlString.includes("/dashboard") || urlString.includes("/onboarding");
-    });
+    // Should redirect to onboarding for new users
+    await page.waitForURL("/onboarding");
 
-    // If redirected to dashboard, verify user is logged in
-    if (page.url().includes("/dashboard")) {
-      await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
-    }
+    // Verify we're on the onboarding page
+    await expect(
+      page.getByRole("heading", { name: "Complete Your Profile" }),
+    ).toBeVisible();
 
     // Clean up: Note - in a real test suite, we'd have a cleanup step
     // to remove test users created during tests

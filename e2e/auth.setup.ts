@@ -7,8 +7,21 @@ const __dirname = dirname(__filename);
 const authFile = join(__dirname, ".auth/user.json");
 
 setup("authenticate", async ({ page }) => {
-  // First, try to login
+  // Clear any existing auth state first
+  await page.context().clearCookies();
+
+  // Navigate to login page
   await page.goto("/auth/login");
+
+  // Check if we're redirected to dashboard (already logged in)
+  if (page.url().includes("/dashboard")) {
+    console.log("Already logged in, skipping authentication");
+    await page.context().storageState({ path: authFile });
+    return;
+  }
+
+  // Wait for the login form to be ready
+  await page.waitForLoadState("networkidle");
 
   // Fill in credentials
   await page.getByLabel("Email").fill(process.env["E2E_TEST_EMAIL"]!);

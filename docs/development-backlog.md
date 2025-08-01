@@ -153,6 +153,37 @@ Below is a **prioritized ticket backlog** that will take the current "Solstice" 
 
 ---
 
+## Testing Requirements
+
+### E2E Testing for New Features
+
+**IMPORTANT**: All new features must include E2E tests to ensure quality and prevent regressions.
+
+For each new feature ticket:
+
+1. Add E2E tests in `e2e/tests/authenticated/` or `e2e/tests/unauthenticated/`
+2. Test the complete user journey, not just happy paths
+3. Include tests for error cases and edge conditions
+4. Run `pnpm test:e2e` locally before marking ticket complete
+5. Ensure tests pass in CI/CD pipeline
+
+Example test structure:
+
+```typescript
+// e2e/tests/authenticated/teams.auth.spec.ts
+test.describe("Teams Management", () => {
+  test("should create a new team", async ({ page }) => {
+    // Test implementation
+  });
+
+  test("should handle team creation errors", async ({ page }) => {
+    // Test error cases
+  });
+});
+```
+
+---
+
 ## P1 - Foundation & Production Readiness
 
 ### ✅ P1-1: Real Square checkout & webhook handler

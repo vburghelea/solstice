@@ -4,7 +4,7 @@ test.describe("Dashboard (Authenticated)", () => {
   test("should display user dashboard with correct information", async ({ page }) => {
     await page.goto("/dashboard");
 
-    // Check welcome message
+    // Check welcome message - the seeded user has name "Test User"
     await expect(
       page.getByRole("heading", { name: /Welcome back, Test User/ }),
     ).toBeVisible();

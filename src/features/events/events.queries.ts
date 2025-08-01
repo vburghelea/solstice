@@ -137,12 +137,12 @@ export const listEvents = createServerFn({ method: "GET" })
     const sortBy = data?.sortBy || "startDate";
     const sortOrder = data?.sortOrder || "asc";
 
-      // Build filter conditions
-      const conditions: ReturnType<typeof eq>[] = [];
+    // Build filter conditions
+    const conditions: ReturnType<typeof eq>[] = [];
 
-      if (filters.publicOnly !== false) {
-        conditions.push(eq(events.isPublic, true));
-      }
+    if (filters.publicOnly !== false) {
+      conditions.push(eq(events.isPublic, true));
+    }
 
     if (filters.status) {
       const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
@@ -154,35 +154,35 @@ export const listEvents = createServerFn({ method: "GET" })
       conditions.push(inArray(events.type, types));
     }
 
-      if (filters.organizerId) {
-        conditions.push(eq(events.organizerId, filters.organizerId));
-      }
+    if (filters.organizerId) {
+      conditions.push(eq(events.organizerId, filters.organizerId));
+    }
 
-      if (filters.startDateFrom) {
-        conditions.push(
-          gte(events.startDate, filters.startDateFrom.toISOString().split("T")[0]),
-        );
-      }
+    if (filters.startDateFrom) {
+      conditions.push(
+        gte(events.startDate, filters.startDateFrom.toISOString().split("T")[0]),
+      );
+    }
 
-      if (filters.startDateTo) {
-        conditions.push(
-          lte(events.startDate, filters.startDateTo.toISOString().split("T")[0]),
-        );
-      }
+    if (filters.startDateTo) {
+      conditions.push(
+        lte(events.startDate, filters.startDateTo.toISOString().split("T")[0]),
+      );
+    }
 
-      if (filters.city) {
-        conditions.push(eq(events.city, filters.city));
-      }
+    if (filters.city) {
+      conditions.push(eq(events.city, filters.city));
+    }
 
     if (filters.country) {
       conditions.push(eq(events.country, filters.country));
     }
 
-      if (filters.featured === true) {
-        conditions.push(eq(events.isFeatured, true));
-      }
+    if (filters.featured === true) {
+      conditions.push(eq(events.isFeatured, true));
+    }
 
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     // Get total count
     const [{ count }] = await db
@@ -190,13 +190,13 @@ export const listEvents = createServerFn({ method: "GET" })
       .from(events)
       .where(whereClause);
 
-      // Get events with details
-      const orderByColumn =
-        sortBy === "name"
-          ? events.name
-          : sortBy === "createdAt"
-            ? events.createdAt
-            : events.startDate;
+    // Get events with details
+    const orderByColumn =
+      sortBy === "name"
+        ? events.name
+        : sortBy === "createdAt"
+          ? events.createdAt
+          : events.startDate;
 
     const eventsList = await db
       .select({
@@ -212,13 +212,13 @@ export const listEvents = createServerFn({ method: "GET" })
           WHERE ${eventRegistrations.eventId} = ${events.id}
           AND ${eventRegistrations.status} != 'canceled'
         )`,
-        })
-        .from(events)
-        .leftJoin(user, eq(events.organizerId, user.id))
-        .where(whereClause)
-        .orderBy(sortOrder === "desc" ? desc(orderByColumn) : asc(orderByColumn))
-        .limit(pageSize)
-        .offset(offset);
+      })
+      .from(events)
+      .leftJoin(user, eq(events.organizerId, user.id))
+      .where(whereClause)
+      .orderBy(sortOrder === "desc" ? desc(orderByColumn) : asc(orderByColumn))
+      .limit(pageSize)
+      .offset(offset);
 
     // Transform results
     const eventsWithDetails: EventWithDetails[] = eventsList.map(

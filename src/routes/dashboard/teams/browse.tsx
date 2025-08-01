@@ -13,6 +13,7 @@ import { ArrowLeftIcon, SearchIcon, UsersIcon } from "~/components/ui/icons";
 import { Input } from "~/components/ui/input";
 import type { TeamListItem } from "~/features/teams/teams.queries";
 import { listTeams, searchTeams } from "~/features/teams/teams.queries";
+import { useCountries } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/browse")({
   loader: async () => {
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/dashboard/teams/browse")({
 function BrowseTeamsPage() {
   const { teams: initialTeams } = Route.useLoaderData();
   const [searchQuery, setSearchQuery] = useState("");
+  const { getCountryName } = useCountries();
 
   const { data: allTeams } = useSuspenseQuery({
     queryKey: ["allTeams"],
@@ -56,7 +58,7 @@ function BrowseTeamsPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Browse Teams</h1>
+        <h1 className="text-admin-text-primary text-3xl font-bold">Browse Teams</h1>
         <p className="text-muted-foreground">Discover and join teams in your area</p>
       </div>
 
@@ -68,7 +70,7 @@ function BrowseTeamsPage() {
             placeholder="Search teams by name or city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="text-muted-foreground pl-10"
           />
         </div>
       </div>
@@ -88,7 +90,11 @@ function BrowseTeamsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {teams.map((teamItem) => (
-            <PublicTeamCard key={teamItem.team.id} teamItem={teamItem} />
+            <PublicTeamCard
+              key={teamItem.team.id}
+              teamItem={teamItem}
+              getCountryName={getCountryName}
+            />
           ))}
         </div>
       )}
@@ -96,7 +102,13 @@ function BrowseTeamsPage() {
   );
 }
 
-function PublicTeamCard({ teamItem }: { teamItem: TeamListItem }) {
+function PublicTeamCard({
+  teamItem,
+  getCountryName,
+}: {
+  teamItem: TeamListItem;
+  getCountryName: (isoCode: string | null | undefined) => string;
+}) {
   const { team, memberCount, creator } = teamItem;
 
   return (
@@ -108,7 +120,7 @@ function PublicTeamCard({ teamItem }: { teamItem: TeamListItem }) {
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.country ? `, ${team.country}` : ""}
+                {team.country ? `, ${getCountryName(team.country)}` : ""}
               </CardDescription>
             )}
           </div>

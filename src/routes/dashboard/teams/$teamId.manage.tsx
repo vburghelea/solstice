@@ -30,7 +30,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
 import { getTeam } from "~/features/teams/teams.queries";
 
-import { COUNTRIES } from "~/shared/hooks/useCountries";
+import { useCountries } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/manage")({
   loader: async ({ params }) => {
@@ -45,9 +45,9 @@ function ManageTeamPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { teamId } = Route.useParams();
-  const { teamData } = Route.useLoaderData();
-  console.log("ManageTeamPage - teamData:", teamData);
-  const { team } = teamData || {};
+  const { team: teamData } = Route.useLoaderData();
+  const { team } = teamData;
+  const { COUNTRIES } = useCountries();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const updateTeamMutation = useMutation({

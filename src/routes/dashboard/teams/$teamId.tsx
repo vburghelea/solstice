@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import { useCountries } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({
   loader: async ({ params }) => {
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/dashboard/teams/$teamId")({
 function TeamDetailsPage() {
   const { teamId } = Route.useParams();
   const { teamData: initialTeamData, members: initialMembers } = Route.useLoaderData();
+  const { getCountryName } = useCountries();
 
   const { data: teamData } = useSuspenseQuery({
     queryKey: ["team", teamId],
@@ -53,12 +55,12 @@ function TeamDetailsPage() {
       <div className="mb-8">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold">{team.name}</h1>
+            <h1 className="text-admin-text-primary text-3xl font-bold">{team.name}</h1>
             {team.city && (
               <p className="text-muted-foreground mt-1 flex items-center">
                 <MapPinIcon className="mr-1 h-4 w-4" />
                 {team.city}
-                {team.country ? `, ${team.country}` : ""}
+                {team.country ? `, ${getCountryName(team.country)}` : ""}
               </p>
             )}
           </div>

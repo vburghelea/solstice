@@ -12,6 +12,7 @@ import {
 import { PlusIcon, UsersIcon } from "~/components/ui/icons";
 import type { UserTeam } from "~/features/teams/teams.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
+import { useCountries } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/")({
   loader: async () => {
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/dashboard/teams/")({
 
 function TeamsIndexPage() {
   const { userTeams: initialTeams } = Route.useLoaderData();
+  const { getCountryName } = useCountries();
 
   const { data: userTeams } = useSuspenseQuery({
     queryKey: ["userTeams"],
@@ -70,7 +72,11 @@ function TeamsIndexPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {userTeams.map((userTeam) => (
-            <TeamCard key={userTeam.team.id} userTeam={userTeam} />
+            <TeamCard
+              key={userTeam.team.id}
+              userTeam={userTeam}
+              getCountryName={getCountryName}
+            />
           ))}
         </div>
       )}
@@ -78,7 +84,13 @@ function TeamsIndexPage() {
   );
 }
 
-function TeamCard({ userTeam }: { userTeam: UserTeam }) {
+function TeamCard({
+  userTeam,
+  getCountryName,
+}: {
+  userTeam: UserTeam;
+  getCountryName: (isoCode: string | null | undefined) => string;
+}) {
   const { team, membership, memberCount } = userTeam;
 
   return (
@@ -90,7 +102,7 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.country ? `, ${team.country}` : ""}
+                {team.country ? `, ${getCountryName(team.country)}` : ""}
               </CardDescription>
             )}
           </div>

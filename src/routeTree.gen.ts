@@ -18,8 +18,12 @@ import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
+import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
+import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
 import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
 import { Route as DashboardMembershipRouteImport } from "./routes/dashboard/membership";
+import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members";
+import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -71,6 +75,16 @@ const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   path: "/teams",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: "/settings",
+  path: "/settings",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardReportsRoute = DashboardReportsRouteImport.update({
+  id: "/reports",
+  path: "/reports",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: "/profile",
   path: "/profile",
@@ -79,6 +93,16 @@ const DashboardProfileRoute = DashboardProfileRouteImport.update({
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
   id: "/membership",
   path: "/membership",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardMembersRoute = DashboardMembersRouteImport.update({
+  id: "/members",
+  path: "/members",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardEventsRoute = DashboardEventsRouteImport.update({
+  id: "/events",
+  path: "/events",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -158,8 +182,12 @@ export interface FileRoutesByFullPath {
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
+  "/dashboard/events": typeof DashboardEventsRoute;
+  "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
+  "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
@@ -175,8 +203,12 @@ export interface FileRoutesByTo {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
+  "/dashboard/events": typeof DashboardEventsRoute;
+  "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
+  "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
@@ -194,8 +226,12 @@ export interface FileRoutesById {
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
+  "/dashboard/events": typeof DashboardEventsRoute;
+  "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
+  "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
@@ -215,8 +251,12 @@ export interface FileRouteTypes {
     | "/onboarding"
     | "/auth/login"
     | "/auth/signup"
+    | "/dashboard/events"
+    | "/dashboard/members"
     | "/dashboard/membership"
     | "/dashboard/profile"
+    | "/dashboard/reports"
+    | "/dashboard/settings"
     | "/dashboard/teams"
     | "/dashboard/"
     | "/onboarding/"
@@ -232,8 +272,12 @@ export interface FileRouteTypes {
     | "/auth"
     | "/auth/login"
     | "/auth/signup"
+    | "/dashboard/events"
+    | "/dashboard/members"
     | "/dashboard/membership"
     | "/dashboard/profile"
+    | "/dashboard/reports"
+    | "/dashboard/settings"
     | "/dashboard"
     | "/onboarding"
     | "/dashboard/teams/$teamId"
@@ -250,8 +294,12 @@ export interface FileRouteTypes {
     | "/onboarding"
     | "/auth/login"
     | "/auth/signup"
+    | "/dashboard/events"
+    | "/dashboard/members"
     | "/dashboard/membership"
     | "/dashboard/profile"
+    | "/dashboard/reports"
+    | "/dashboard/settings"
     | "/dashboard/teams"
     | "/dashboard/"
     | "/onboarding/"
@@ -374,6 +422,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/dashboard/settings": {
+      id: "/dashboard/settings";
+      path: "/settings";
+      fullPath: "/dashboard/settings";
+      preLoaderRoute: typeof DashboardSettingsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/reports": {
+      id: "/dashboard/reports";
+      path: "/reports";
+      fullPath: "/dashboard/reports";
+      preLoaderRoute: typeof DashboardReportsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
     "/dashboard/profile": {
       id: "/dashboard/profile";
       path: "/profile";
@@ -386,6 +448,20 @@ declare module "@tanstack/react-router" {
       path: "/membership";
       fullPath: "/dashboard/membership";
       preLoaderRoute: typeof DashboardMembershipRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/members": {
+      id: "/dashboard/members";
+      path: "/members";
+      fullPath: "/dashboard/members";
+      preLoaderRoute: typeof DashboardMembersRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/events": {
+      id: "/dashboard/events";
+      path: "/events";
+      fullPath: "/dashboard/events";
+      preLoaderRoute: typeof DashboardEventsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
     "/auth/signup": {
@@ -532,15 +608,23 @@ const DashboardTeamsRouteWithChildren = DashboardTeamsRoute._addFileChildren(
 );
 
 interface DashboardRouteRouteChildren {
+  DashboardEventsRoute: typeof DashboardEventsRoute;
+  DashboardMembersRoute: typeof DashboardMembersRoute;
   DashboardMembershipRoute: typeof DashboardMembershipRoute;
   DashboardProfileRoute: typeof DashboardProfileRoute;
+  DashboardReportsRoute: typeof DashboardReportsRoute;
+  DashboardSettingsRoute: typeof DashboardSettingsRoute;
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardEventsRoute: DashboardEventsRoute,
+  DashboardMembersRoute: DashboardMembersRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardReportsRoute: DashboardReportsRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 };

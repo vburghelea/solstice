@@ -173,8 +173,8 @@ export const sendMembershipPurchaseReceipt = serverOnly(
   }) => {
     const service = await getEmailService();
 
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["SENDGRID_FROM_NAME"] || "Roundup Games";
 
     return service.send({
       to: params.to,
@@ -182,7 +182,7 @@ export const sendMembershipPurchaseReceipt = serverOnly(
         email: fromEmail,
         name: fromName,
       },
-      subject: "Membership Purchase Confirmation - Quadball Canada",
+      subject: "Membership Purchase Confirmation - Roundup Games",
       templateId: EMAIL_TEMPLATES.MEMBERSHIP_PURCHASE_RECEIPT,
       dynamicTemplateData: {
         memberName: params.to.name || "Member",
@@ -201,10 +201,10 @@ Expires: ${params.expiresAt.toLocaleDateString("en-CA")}
 
 You can view your membership status at any time by logging into your dashboard.
 
-If you have any questions, please contact us at support@quadballcanada.com.
+If you have any questions, please contact us at staff@roundup.games.
 
 Best regards,
-Quadball Canada Team`,
+Roundup Games Team`,
       // HTML version (used if no template ID is configured)
       html: `
 <!DOCTYPE html>
@@ -230,13 +230,13 @@ Quadball Canada Team`,
     
     <p>You can view your membership status at any time by logging into your dashboard.</p>
     
-    <p>If you have any questions, please contact us at <a href="mailto:support@quadballcanada.com">support@quadballcanada.com</a>.</p>
+    <p>If you have any questions, please contact us at <a href="mailto:staff@roundup.games">staff@roundup.games</a>.</p>
     
     <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
     
     <p style="color: #6b7280; font-size: 14px;">
       Best regards,<br>
-      Quadball Canada Team
+      Roundup Games Team
     </p>
   </div>
 </body>
@@ -251,8 +251,8 @@ export const sendWelcomeEmail = serverOnly(
   async (params: { to: EmailRecipient; profileUrl: string }) => {
     const service = await getEmailService();
 
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["SENDGRID_FROM_NAME"] || "Roundup Games";
 
     return service.send({
       to: params.to,
@@ -260,23 +260,23 @@ export const sendWelcomeEmail = serverOnly(
         email: fromEmail,
         name: fromName,
       },
-      subject: "Welcome to Quadball Canada!",
+      subject: "Welcome to Roundup Games!",
       templateId: EMAIL_TEMPLATES.WELCOME,
       dynamicTemplateData: {
         memberName: params.to.name || "New Member",
         profileUrl: params.profileUrl,
         year: new Date().getFullYear(),
       },
-      text: `Welcome to Quadball Canada!
+      text: `Welcome to Roundup Games!
 
 We're thrilled to have you join our community.
 
 To get started, please complete your profile: ${params.profileUrl}
 
-If you have any questions, feel free to reach out to us at support@quadballcanada.com.
+If you have any questions, feel free to reach out to us at staff@roundup.games.
 
 Best regards,
-Quadball Canada Team`,
+Roundup Games Team`,
     });
   },
 );

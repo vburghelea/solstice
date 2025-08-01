@@ -27,15 +27,12 @@ const initialState: ProfileFormState = {
   isSubmitting: false,
   error: null,
   formData: {
-    dateOfBirth: new Date(),
     gender: "",
     pronouns: "",
     phone: "",
-    emergencyContact: undefined,
     privacySettings: {
       showEmail: false,
       showPhone: false,
-      showBirthYear: false,
       allowTeamInvitations: true,
     },
   },

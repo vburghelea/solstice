@@ -65,7 +65,7 @@ function DashboardIndex() {
           Welcome back, {user?.name || "Player"}!
         </h1>
         <p className="text-muted-foreground mt-2">
-          Here's an overview of your Quadball Canada account
+          Here's an overview of your Roundup Games account
         </p>
       </div>
 

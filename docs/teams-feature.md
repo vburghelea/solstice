@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Teams feature allows Quadball Canada members to create and manage teams, invite members, and prepare for event registrations. This document covers the complete implementation including database schema, server functions, UI components, and known issues.
+The Teams feature allows Roundup Games members to create and manage teams, invite members, and prepare for event registrations. This document covers the complete implementation including database schema, server functions, UI components, and known issues.
 
 ## Implementation Status
 

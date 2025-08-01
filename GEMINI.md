@@ -2,6 +2,31 @@
 
 This file provides guidance to Google Gemini when working with code in this repository.
 
+## Quick Reference
+
+### Server Functions - Always Use Zod Validation
+
+```typescript
+// 1. Define schema
+const mySchema = z.object({
+  /* ... */
+});
+
+// 2. Use .validator(schema.parse)
+export const myServerFn = createServerFn({ method: "POST" })
+  .validator(mySchema.parse)
+  .handler(async ({ data }) => {
+    /* ... */
+  });
+```
+
+### Avoid @ts-expect-error
+
+- NEVER use as first solution
+- Try Zod validation first
+- Create proper type definitions
+- See [TanStack Start Best Practices](./docs/TANSTACK-START-BEST-PRACTICES.md) for details
+
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173, default to use)
@@ -22,20 +47,22 @@ This file provides guidance to Google Gemini when working with code in this repo
 
 ## Pre-Commit Requirements
 
-**IMPORTANT**: Before committing any code changes, you MUST run the following commands to ensure code quality:
+**IMPORTANT**: The pre-commit hook automatically runs the following checks to ensure code quality:
 
-1. `pnpm lint` - Run ESLint to check for code style issues
-2. `pnpm check-types` - Run TypeScript type checking
-3. `pnpm test` - Run all tests to ensure nothing is broken
+1. **Lint-staged** - Runs on staged files only:
+   - `eslint --fix` - Auto-fixes and checks ESLint rules
+   - `prettier --write` - Formats code consistently
+2. **Type checking** - `pnpm check-types` on entire codebase
+3. **Tests** - `pnpm test` to ensure nothing is broken
 
-All three commands must pass successfully before committing. If any errors are found, fix them before proceeding with the commit.
+All checks must pass before the commit is allowed. The pre-commit hook matches what GitHub Actions CI runs, ensuring no surprises after pushing.
 
 ## Architecture Overview
 
 This is a sports league management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
 
 - **TanStack Router** for file-based routing with type safety
-- **Better Auth** for authentication (email/password + OAuth via GitHub/Google)
+- **Better Auth** for authentication (email/password + OAuth via Discord/Google)
 - **Drizzle ORM** with PostgreSQL for database operations
 - **TanStack Query** for server state management and caching
 - **Tailwind CSS** for styling with shadcn/ui components
@@ -81,7 +108,7 @@ This is a sports league management platform built with TanStack Start (full-stac
 - `DATABASE_URL` - PostgreSQL connection string (pooled URL for serverless)
 - `DATABASE_URL_UNPOOLED` - Direct connection URL for migrations (optional)
 - `VITE_BASE_URL` - Application base URL (only required in development - use http://localhost:8888 for Netlify Dev, http://localhost:5173 for Vite)
-- `DISCORD_CLIENT_ID/SECRET` - GitHub OAuth (required for OAuth login)
+- `DISCORD_CLIENT_ID/SECRET` - Discord OAuth (required for OAuth login)
 - `GOOGLE_CLIENT_ID/SECRET` - Google OAuth (required for OAuth login)
 - `BETTER_AUTH_SECRET` - Secret key for Better Auth sessions
 
@@ -153,7 +180,7 @@ See `docs/database-connections.md` for detailed usage guide.
 
 1. **Login Methods**:
    - Email/password via `auth.signIn.email()`
-   - OAuth via `auth.signInWithOAuth()` (Google, GitHub)
+   - OAuth via `auth.signInWithOAuth()` (Google, Discord)
 2. **Protected Routes**:
    - Auth guard middleware redirects unauthenticated users
    - Profile completion guard redirects incomplete profiles to `/onboarding`
@@ -184,31 +211,147 @@ The project includes automated documentation generation:
 
 Server functions are defined using `createServerFn()` and called from React components:
 
-1. **Definition Pattern**:
+1. **Best Practice - Use Zod Validation** (ALWAYS PREFER THIS):
 
 ```typescript
+import { z } from "zod";
+import { createServerFn } from "@tanstack/react-start";
+
+// Define schema first
+const myInputSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+});
+
+// Use .validator() with schema.parse
+export const myServerFn = createServerFn({ method: "POST" })
+  .validator(myInputSchema.parse)
+  .handler(async ({ data }) => {
+    // data is now properly typed from the schema
+    // Server-side implementation
+    return result;
+  });
+```
+
+2. **Why Use Zod Validation**:
+   - Provides runtime type safety, not just compile-time
+   - Eliminates need for `@ts-expect-error` in most cases
+   - Better error messages for invalid inputs
+   - Automatic TypeScript type inference from schemas
+   - Single source of truth for input validation
+
+3. **File Organization for Server Functions**:
+
+```
+src/features/[feature]/
+├── [feature].schemas.ts    # Zod schemas for all operations
+├── [feature].queries.ts    # GET server functions
+├── [feature].mutations.ts  # POST/PUT/DELETE server functions
+├── [feature].types.ts      # TypeScript types and interfaces
+└── [feature].db-types.ts   # Database-specific type overrides (if needed)
+```
+
+4. **Calling Pattern**:
+
+```typescript
+// With validation, call matches the schema structure:
+const result = await myServerFn({ data: { name: "John", email: "john@example.com" } });
+
+// For functions with no input:
+const result = await myServerFn();
+```
+
+5. **Handling Complex Types (e.g., jsonb fields)**:
+   - Create separate type definition files for complex database types
+   - Use type overrides when extending database types
+   - Add ESLint disable comments ONLY when absolutely necessary
+
+```typescript
+// events.db-types.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export interface EventMetadata {
+  [key: string]: any;
+}
+
+// events.types.ts
+export interface EventWithDetails extends Omit<Event, "metadata"> {
+  metadata: EventMetadata;
+  // ... other fields
+}
+```
+
+6. **Legacy Pattern** (AVOID - only for reference):
+
+```typescript
+// ❌ AVOID this pattern - it bypasses runtime validation
 export const myServerFn = createServerFn({ method: "POST" }).handler(
   async ({ data }: { data: MyInputType }) => {
-    // Server-side implementation
     return result;
   },
 );
 ```
 
-2. **Calling Pattern**:
+7. **Server-Only Module Imports**:
+   - **IMPORTANT**: TanStack Start only extracts code INSIDE the `handler()` function
+   - Top-level imports in server function files are included in the client bundle
+   - If a module accesses server-only resources (env vars, Node APIs), it will crash in the browser
 
-```typescript
-// If handler expects { data }, call with:
-const result = await myServerFn({ data: myData });
+   **❌ BAD - Top-level import causes client bundle pollution:**
 
-// If handler expects no params, call with:
-const result = await myServerFn();
-```
+   ```typescript
+   import { squarePaymentService } from "~/lib/payments/square"; // Accesses process.env
 
-3. **Type Issues**:
-   - TanStack Start's type inference for server functions can be problematic
-   - If you get "Type 'X' is not assignable to type 'undefined'" errors, use `@ts-ignore`
-   - The functions work at runtime despite TypeScript complaints
+   export const createCheckout = createServerFn().handler(async () => {
+     return squarePaymentService.createCheckoutSession(...);
+   });
+   ```
+
+   **✅ GOOD - Use `serverOnly()` helper:**
+
+   ```typescript
+   import { serverOnly } from "@tanstack/react-start";
+
+   const getSquarePaymentService = serverOnly(async () => {
+     const { squarePaymentService } = await import("~/lib/payments/square");
+     return squarePaymentService;
+   });
+
+   export const createCheckout = createServerFn().handler(async () => {
+     const squarePaymentService = await getSquarePaymentService();
+     return squarePaymentService.createCheckoutSession(...);
+   });
+   ```
+
+   **✅ ALSO GOOD - Dynamic import inside handler:**
+
+   ```typescript
+   export const createCheckout = createServerFn().handler(async () => {
+     const { squarePaymentService } = await import("~/lib/payments/square");
+     return squarePaymentService.createCheckoutSession(...);
+   });
+   ```
+
+### Best Practices for Type Safety
+
+1. **Avoid @ts-expect-error**:
+   - NEVER use `@ts-expect-error` as a first solution
+   - Always try proper type definitions or validation first
+   - If you must use it, add a detailed comment explaining why
+
+2. **Server Function Type Safety Checklist**:
+   - ✅ Create Zod schema for input validation
+   - ✅ Use `.validator(schema.parse)` on server functions
+   - ✅ Define return types explicitly
+   - ✅ Create type definitions for complex database fields
+   - ✅ Use type overrides for jsonb fields instead of `any`
+   - ❌ Avoid type assertions like `data as Type`
+   - ❌ Don't suppress errors without investigation
+
+3. **When Adding New Features**:
+   - Start with schema definitions
+   - Build types from schemas using `z.infer<typeof schema>`
+   - Use validation at runtime boundaries
+   - Test error cases to ensure validation works
 
 ### Common Tasks
 
@@ -220,6 +363,11 @@ const result = await myServerFn();
 - **Add UI components**: Check `src/shared/ui/` for existing components first
 - **Install shadcn components**: `npx shadcn@latest add <component>` (auto-installs to `src/shared/ui/`)
 - **Update documentation**: Run `pnpm docs:all` after significant changes
+- **Add a new server function**:
+  1. Create schema in `[feature].schemas.ts`
+  2. Use `.validator(schema.parse)` in the server function
+  3. Define proper return types
+  4. Handle errors with typed error responses
 
 ### User added context:
 

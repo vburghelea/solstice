@@ -15,7 +15,7 @@ export function PublicHeader() {
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="maple-leaf-logo h-8 w-8 sm:h-10 sm:w-10"></div>
             <h1 className="text-brand-dark text-lg font-extrabold tracking-tight sm:text-xl">
-              Quadball Canada
+              Roundup Games
             </h1>
           </div>
 

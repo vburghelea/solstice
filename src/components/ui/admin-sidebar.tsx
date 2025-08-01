@@ -74,7 +74,7 @@ export function AdminSidebar() {
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="p-6">
         <Link to="/" className="transition-opacity hover:opacity-80">
-          <h1 className="text-admin-text-primary text-xl font-bold">Quadball Canada</h1>
+          <h1 className="text-admin-text-primary text-xl font-bold">Roundup Games</h1>
           <p className="text-admin-text-secondary text-sm">Dashboard</p>
         </Link>
       </div>

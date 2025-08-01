@@ -11,6 +11,7 @@ node_modules
 .env
 .env.local
 .env.*.local
+.env.e2e
 *.log
 
 .data
@@ -31,6 +32,12 @@ dist
 coverage
 .nyc_output
 *.lcov
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+e2e/.auth/
 
 # Generated documentation
 docs/reference/**

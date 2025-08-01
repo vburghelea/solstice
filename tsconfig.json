@@ -21,6 +21,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["src", "scripts", "app.config.ts", "*.config.ts", "netlify/**/*.ts"],
+  "include": ["src", "scripts", "app.config.ts", "*.config.ts", "netlify/**/*.ts", "e2e"],
   "exclude": ["node_modules", "dist"]
 }

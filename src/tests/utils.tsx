@@ -2,6 +2,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, RenderOptions } from "@testing-library/react";
 import { ReactElement, ReactNode } from "react";
 
+// Re-export router testing utilities
+export * from "./utils/router";
+
 // Create a custom render function that includes providers
 export function createTestQueryClient() {
   return new QueryClient({

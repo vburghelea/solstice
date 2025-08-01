@@ -1,0 +1,71 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: solstice_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8
+        
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+        
+    - name: Install dependencies
+      run: pnpm install
+      
+    - name: Install Playwright Browsers
+      run: pnpm exec playwright install --with-deps
+      
+    - name: Setup test database
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+        E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+      run: |
+        pnpm db:generate
+        pnpm db:migrate
+        pnpm test:e2e:setup
+        
+    - name: Run Playwright tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+        E2E_TEST_EMAIL: test@example.com
+        E2E_TEST_PASSWORD: testpassword123
+        VITE_BASE_URL: http://localhost:5173
+        BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+        CI: true
+      run: pnpm test:e2e
+      
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

@@ -1,14 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { isProfileComplete } from "./profile.queries";
 import {
-  partialProfileInputSchema,
-  privacySettingsSchema,
-  profileInputSchema,
+  completeUserProfileInputSchema,
+  updatePrivacySettingsInputSchema,
+  updateUserProfileInputSchema,
 } from "./profile.schemas";
 import type {
   EmergencyContact,
   PrivacySettings,
-  ProfileInput,
   ProfileOperationResult,
   UserProfile,
 } from "./profile.types";
@@ -53,12 +52,9 @@ function mapDbUserToProfile(dbUser: {
   };
 }
 
-export const updateUserProfile = createServerFn({ method: "POST" }).handler(
-  async ({
-    data,
-  }: {
-    data?: Partial<ProfileInput> | undefined;
-  }): Promise<ProfileOperationResult> => {
+export const updateUserProfile = createServerFn({ method: "POST" })
+  .validator(updateUserProfileInputSchema.parse)
+  .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -78,23 +74,11 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
         };
       }
 
-      if (!data) {
+      // Input is already validated by .validator(), just check if it's empty
+      if (!data.data || Object.keys(data.data).length === 0) {
         return {
           success: false,
           errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
-        };
-      }
-
-      // Validate input
-      const validation = partialProfileInputSchema.safeParse(data);
-      if (!validation.success) {
-        return {
-          success: false,
-          errors: validation.error.errors.map((err) => ({
-            code: "VALIDATION_ERROR" as const,
-            field: err.path.join("."),
-            message: err.message,
-          })),
         };
       }
 
@@ -107,23 +91,23 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
         profileVersion: sql`${user.profileVersion} + 1`,
       };
 
-      if (data.dateOfBirth !== undefined) {
-        updateData["dateOfBirth"] = data.dateOfBirth;
+      if (data.data.dateOfBirth !== undefined) {
+        updateData["dateOfBirth"] = data.data.dateOfBirth;
       }
-      if (data.emergencyContact !== undefined) {
-        updateData["emergencyContact"] = JSON.stringify(data.emergencyContact);
+      if (data.data.emergencyContact !== undefined) {
+        updateData["emergencyContact"] = JSON.stringify(data.data.emergencyContact);
       }
-      if (data.gender !== undefined) {
-        updateData["gender"] = data.gender;
+      if (data.data.gender !== undefined) {
+        updateData["gender"] = data.data.gender;
       }
-      if (data.pronouns !== undefined) {
-        updateData["pronouns"] = data.pronouns;
+      if (data.data.pronouns !== undefined) {
+        updateData["pronouns"] = data.data.pronouns;
       }
-      if (data.phone !== undefined) {
-        updateData["phone"] = data.phone;
+      if (data.data.phone !== undefined) {
+        updateData["phone"] = data.data.phone;
       }
-      if (data.privacySettings !== undefined) {
-        updateData["privacySettings"] = JSON.stringify(data.privacySettings);
+      if (data.data.privacySettings !== undefined) {
+        updateData["privacySettings"] = JSON.stringify(data.data.privacySettings);
       }
 
       const db = await getDb();
@@ -175,15 +159,11 @@ export const updateUserProfile = createServerFn({ method: "POST" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
-export const completeUserProfile = createServerFn({ method: "POST" }).handler(
-  async ({
-    data,
-  }: {
-    data?: ProfileInput | undefined;
-  }): Promise<ProfileOperationResult> => {
+export const completeUserProfile = createServerFn({ method: "POST" })
+  .validator(completeUserProfileInputSchema.parse)
+  .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -203,37 +183,21 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
         };
       }
 
-      if (!data) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
-        };
-      }
-
-      // Validate input
-      const validation = profileInputSchema.safeParse(data);
-      if (!validation.success) {
-        return {
-          success: false,
-          errors: validation.error.errors.map((err) => ({
-            code: "VALIDATION_ERROR" as const,
-            field: err.path.join("."),
-            message: err.message,
-          })),
-        };
-      }
+      // Input is already validated by .validator()
 
       // Import database dependencies inside handler
       const { eq, sql } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 
       const updateData = {
-        dateOfBirth: data.dateOfBirth,
-        emergencyContact: JSON.stringify(data.emergencyContact),
-        gender: data.gender || null,
-        pronouns: data.pronouns || null,
-        phone: data.phone || null,
-        privacySettings: JSON.stringify(data.privacySettings || defaultPrivacySettings),
+        dateOfBirth: data.data.dateOfBirth,
+        emergencyContact: JSON.stringify(data.data.emergencyContact),
+        gender: data.data.gender || null,
+        pronouns: data.data.pronouns || null,
+        phone: data.data.phone || null,
+        privacySettings: JSON.stringify(
+          data.data.privacySettings || defaultPrivacySettings,
+        ),
         profileComplete: true,
         profileUpdatedAt: new Date(),
         profileVersion: sql`${user.profileVersion} + 1`,
@@ -270,15 +234,11 @@ export const completeUserProfile = createServerFn({ method: "POST" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
-export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
-  async ({
-    data,
-  }: {
-    data?: PrivacySettings | undefined;
-  }): Promise<ProfileOperationResult> => {
+export const updatePrivacySettings = createServerFn({ method: "POST" })
+  .validator(updatePrivacySettingsInputSchema.parse)
+  .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -298,25 +258,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
         };
       }
 
-      if (!data) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
-        };
-      }
-
-      // Validate input
-      const validation = privacySettingsSchema.safeParse(data);
-      if (!validation.success) {
-        return {
-          success: false,
-          errors: validation.error.errors.map((err) => ({
-            code: "VALIDATION_ERROR" as const,
-            field: err.path.join("."),
-            message: err.message,
-          })),
-        };
-      }
+      // Input is already validated by .validator()
 
       // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
@@ -327,7 +269,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
       const [updatedUser] = await db()
         .update(user)
         .set({
-          privacySettings: JSON.stringify(data),
+          privacySettings: JSON.stringify(data.data),
           profileUpdatedAt: new Date(),
         })
         .where(eq(user.id, session.user.id))
@@ -358,5 +300,4 @@ export const updatePrivacySettings = createServerFn({ method: "POST" }).handler(
         ],
       };
     }
-  },
-);
+  });

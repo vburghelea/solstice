@@ -38,3 +38,16 @@ export const partialProfileInputSchema = profileInputSchema.partial();
 
 export type ProfileInputType = z.infer<typeof profileInputSchema>;
 export type PartialProfileInputType = z.infer<typeof partialProfileInputSchema>;
+
+// Server function input schemas
+export const updateUserProfileInputSchema = z.object({
+  data: partialProfileInputSchema,
+});
+
+export const completeUserProfileInputSchema = z.object({
+  data: profileInputSchema,
+});
+
+export const updatePrivacySettingsInputSchema = z.object({
+  data: privacySettingsSchema,
+});

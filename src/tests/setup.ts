@@ -35,3 +35,19 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+// Mock environment variables for tests
+vi.mock("~/lib/env.server", () => ({
+  env: {
+    NODE_ENV: "test",
+    DATABASE_URL: "postgresql://test",
+    DATABASE_URL_UNPOOLED: "postgresql://test",
+    BETTER_AUTH_SECRET: "test-secret",
+    VITE_BASE_URL: "http://localhost:3000",
+  },
+}));
+
+// Mock CSS imports
+vi.mock("~/styles.css?url", () => ({
+  default: "/test-styles.css",
+}));

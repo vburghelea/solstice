@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
@@ -8,7 +8,6 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
-import { cn } from "~/shared/lib/utils";
 
 const sidebarItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -24,8 +23,6 @@ const bottomItems = [
 ];
 
 export function AdminSidebar() {
-  const location = useLocation();
-
   return (
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="p-6">
@@ -35,12 +32,17 @@ export function AdminSidebar() {
       <nav className="flex-1 space-y-2 px-4 py-2">
         {sidebarItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.href;
           return (
             <Link
               key={item.href}
               to={item.href}
-              className={cn(isActive ? "nav-item-active" : "nav-item")}
+              className="nav-item"
+              activeOptions={{ exact: true }}
+              activeProps={{
+                className: "nav-item-active",
+                "aria-current": "page",
+                "data-status": "active",
+              }}
             >
               <Icon className="h-5 w-5" />
               <span>{item.label}</span>
@@ -51,12 +53,17 @@ export function AdminSidebar() {
       <div className="border-t border-gray-200 px-4 py-4">
         {bottomItems.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.href;
           return (
             <Link
               key={item.href}
               to={item.href}
-              className={cn(isActive ? "nav-item-active" : "nav-item")}
+              className="nav-item"
+              activeOptions={{ exact: true }}
+              activeProps={{
+                className: "nav-item-active",
+                "aria-current": "page",
+                "data-status": "active",
+              }}
             >
               <Icon className="h-5 w-5" />
               <span>{item.label}</span>

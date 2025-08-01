@@ -87,7 +87,16 @@ export const updateUserProfile = createServerFn({ method: "POST" })
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
       const db = await getDb();
-      const currentUser = requireUser(context);
+
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
 
       // Input is already validated by .validator(), just check if it's empty
       if (!inputData || Object.keys(inputData).length === 0) {
@@ -239,6 +248,19 @@ export const completeUserProfile = createServerFn({ method: "POST" })
       const db = await getDb();
       const currentUser = requireUser(context);
 
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      // Input is already validated by .validator()
+
+      // Import database dependencies inside handler
       const { eq, sql } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 
@@ -441,6 +463,34 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       const db = await getDb();
       const currentUser = requireUser(context);
 
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        throw new Error("Not authenticated");
+      }
+
+      if (!data) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
+        };
+      }
+
+      // Validate input
+      const validation = privacySettingsSchema.safeParse(data);
+      if (!validation.success) {
+        return {
+          success: false,
+          errors: validation.error.errors.map((err) => ({
+            code: "VALIDATION_ERROR" as const,
+            field: err.path.join("."),
+            message: err.message,
+          })),
+        };
+      }
+
+      // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 

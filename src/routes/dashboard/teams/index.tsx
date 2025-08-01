@@ -111,7 +111,13 @@ function TeamsIndexPage() {
   );
 }
 
-function TeamCard({ userTeam }: { userTeam: UserTeam }) {
+function TeamCard({
+  userTeam,
+  getCountryName,
+}: {
+  userTeam: UserTeam;
+  getCountryName: (isoCode: string | null | undefined) => string;
+}) {
   const { team, membership, memberCount } = userTeam;
 
   return (
@@ -123,7 +129,7 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.country ? `, ${team.country}` : ""}
+                {team.country ? `, ${getCountryName(team.country)}` : ""}
               </CardDescription>
             )}
           </div>

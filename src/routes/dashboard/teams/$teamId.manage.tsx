@@ -30,22 +30,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
 import { getTeam } from "~/features/teams/teams.queries";
 
-// Canadian provinces and territories
-const PROVINCES = [
-  { value: "AB", label: "Alberta" },
-  { value: "BC", label: "British Columbia" },
-  { value: "MB", label: "Manitoba" },
-  { value: "NB", label: "New Brunswick" },
-  { value: "NL", label: "Newfoundland and Labrador" },
-  { value: "NT", label: "Northwest Territories" },
-  { value: "NS", label: "Nova Scotia" },
-  { value: "NU", label: "Nunavut" },
-  { value: "ON", label: "Ontario" },
-  { value: "PE", label: "Prince Edward Island" },
-  { value: "QC", label: "Quebec" },
-  { value: "SK", label: "Saskatchewan" },
-  { value: "YT", label: "Yukon" },
-];
+import { COUNTRIES } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/manage")({
   loader: async ({ params }) => {
@@ -89,27 +74,25 @@ function ManageTeamPage() {
 
   const form = useForm({
     defaultValues: {
-      name: team?.name || "",
-      description: team?.description || "",
-      city: team?.city || "",
-      province: team?.province || "",
-      primaryColor: team?.primaryColor || "#000000",
-      secondaryColor: team?.secondaryColor || "#ffffff",
-      foundedYear: team?.foundedYear || new Date().getFullYear().toString(),
-      website: team?.website || "",
+      name: team.name,
+      description: team.description || "",
+      city: team.city || "",
+      country: team.country || "",
+      primaryColor: team.primaryColor || "#000000",
+      secondaryColor: team.secondaryColor || "#ffffff",
+      foundedYear: team.foundedYear || new Date().getFullYear().toString(),
+      website: team.website || "",
     },
     onSubmit: async ({ value }) => {
       setServerError(null);
       await updateTeamMutation.mutateAsync({
         data: {
           teamId,
-          data: {
-            ...value,
-            description: value.description || undefined,
-            city: value.city || undefined,
-            province: value.province || undefined,
-            website: value.website || undefined,
-          },
+          ...value,
+          description: value.description || undefined,
+          city: value.city || undefined,
+          country: value.country || undefined,
+          website: value.website || undefined,
         },
       });
     },
@@ -193,15 +176,15 @@ function ManageTeamPage() {
                   )}
                 </form.Field>
 
-                <form.Field name="province">
+                <form.Field name="country">
                   {(field) => (
                     <ValidatedCombobox
                       field={field}
-                      label="Province"
-                      placeholder="Select a province"
-                      options={PROVINCES}
-                      searchPlaceholder="Search provinces..."
-                      emptyText="No province found."
+                      label="Country"
+                      placeholder="Select a country"
+                      options={COUNTRIES}
+                      searchPlaceholder="Search countries..."
+                      emptyText="No country found."
                     />
                   )}
                 </form.Field>

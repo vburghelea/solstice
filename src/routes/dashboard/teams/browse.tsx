@@ -108,7 +108,7 @@ function PublicTeamCard({ teamItem }: { teamItem: TeamListItem }) {
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.province ? `, ${team.province}` : ""}
+                {team.country ? `, ${team.country}` : ""}
               </CardDescription>
             )}
           </div>

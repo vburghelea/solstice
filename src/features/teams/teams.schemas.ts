@@ -48,7 +48,7 @@ export const createTeamSchema = z.object({
     ),
   description: z.string().optional(),
   city: z.string().optional(),
-  province: z.string().optional(),
+  country: z.string().length(3, "Country must be a 3-letter ISO code").optional(),
   primaryColor: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/)

@@ -41,7 +41,7 @@ export const teams = pgTable(
     slug: varchar("slug", { length: 255 }).notNull().unique(),
     description: text("description"),
     city: varchar("city", { length: 255 }),
-    province: varchar("province", { length: 2 }), // ON, BC, etc.
+    country: varchar("country", { length: 3 }), // ISO 3166-1 alpha-3
     logoUrl: text("logo_url"),
     primaryColor: varchar("primary_color", { length: 7 }), // Hex color
     secondaryColor: varchar("secondary_color", { length: 7 }), // Hex color

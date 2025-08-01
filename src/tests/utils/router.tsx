@@ -184,7 +184,7 @@ export function createTestRouteTree({
   });
 
   const testRoutes = routes.map((route) => {
-    const routeOptions: Parameters<typeof createRoute>[0] = {
+    const baseOptions = {
       getParentRoute: () => rootRoute,
       path: route.path,
       component: route.component,
@@ -195,10 +195,13 @@ export function createTestRouteTree({
 
     // Only add loader if it exists
     if (route.loader) {
-      routeOptions.loader = route.loader;
+      return createRoute({
+        ...baseOptions,
+        loader: route.loader,
+      });
     }
 
-    return createRoute(routeOptions);
+    return createRoute(baseOptions);
   });
 
   return rootRoute.addChildren(testRoutes);

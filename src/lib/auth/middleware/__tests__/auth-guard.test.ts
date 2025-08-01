@@ -22,7 +22,7 @@ describe("authMiddleware", () => {
   it("should be defined", async () => {
     const { authMiddleware } = await import("../auth-guard");
     expect(authMiddleware).toBeDefined();
-    expect(typeof authMiddleware).toBe("object");
+    expect(typeof authMiddleware).toBe("function");
   });
 
   describe("authentication logic", () => {

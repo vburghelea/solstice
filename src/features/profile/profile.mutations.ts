@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
-import { isProfileComplete } from "./profile.queries";
 import {
   partialProfileInputSchema,
   privacySettingsSchema,
@@ -12,6 +11,7 @@ import type {
   UserProfile,
 } from "./profile.types";
 import { defaultPrivacySettings } from "./profile.types";
+import { isProfileComplete } from "./profile.utils";
 
 function parseJsonField<T>(value: string | null | undefined): T | undefined {
   if (!value) return undefined;
@@ -68,7 +68,10 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
-        throw new Error("Not authenticated");
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
       }
 
       // Input is already validated by .validator(), just check if it's empty
@@ -201,7 +204,10 @@ export const completeUserProfile = createServerFn({ method: "POST" })
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
-        throw new Error("Not authenticated");
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
       }
 
       // Input is already validated by .validator()
@@ -296,7 +302,25 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
         throw new Error("Not authenticated");
       }
 
-      // Input is already validated by .validator()
+      if (!data) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
+        };
+      }
+
+      // Validate input
+      const validation = privacySettingsSchema.safeParse(data);
+      if (!validation.success) {
+        return {
+          success: false,
+          errors: validation.error.errors.map((err) => ({
+            code: "VALIDATION_ERROR" as const,
+            field: err.path.join("."),
+            message: err.message,
+          })),
+        };
+      }
 
       // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");

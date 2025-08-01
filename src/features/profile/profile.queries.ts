@@ -146,9 +146,14 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
   },
 );
 
-export const getGameSystems = createServerFn({ method: "GET" }).handler(
-  //@ts-expect-error:  Start type inference issue
-  async ({ data }: { data?: { searchTerm?: string } }) => {
+export const getGameSystems = createServerFn({ method: "GET" })
+  .validator((data: unknown) => {
+    if (!data) return undefined;
+    if (typeof data !== "object") return undefined;
+    if (!("searchTerm" in data) || typeof data.searchTerm !== "string") return undefined;
+    return { searchTerm: data.searchTerm };
+  })
+  .handler(async ({ data }) => {
     try {
       const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
@@ -181,8 +186,7 @@ export const getGameSystems = createServerFn({ method: "GET" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
 /**
  * Get user's game system preferences

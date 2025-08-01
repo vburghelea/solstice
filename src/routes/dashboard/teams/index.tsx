@@ -123,7 +123,7 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.province ? `, ${team.province}` : ""}
+                {team.country ? `, ${team.country}` : ""}
               </CardDescription>
             )}
           </div>

@@ -29,6 +29,13 @@
       "when": 1753877458967,
       "tag": "0003_add_events_system",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1754050764776,
+      "tag": "0004_rename_province_to_country",
+      "breakpoints": true
     }
   ]
 }

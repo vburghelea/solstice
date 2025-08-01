@@ -1,13 +1,16 @@
-import { Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
   Home,
+  LogOut,
   Settings,
   User,
   UserCheck,
   Users,
 } from "lucide-react";
+import { auth } from "~/lib/auth-client";
 
 const sidebarItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -23,6 +26,27 @@ const bottomItems = [
 ];
 
 export function AdminSidebar() {
+  const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+
+      // Clear all cached data
+      queryClient.clear();
+
+      // Invalidate router cache
+      await router.invalidate();
+
+      // Navigate to login page
+      navigate({ to: "/auth/login" });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="p-6">
@@ -50,7 +74,7 @@ export function AdminSidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-gray-200 px-4 py-4">
+      <div className="space-y-2 border-t border-gray-200 px-4 py-4">
         {bottomItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -70,6 +94,13 @@ export function AdminSidebar() {
             </Link>
           );
         })}
+        <button
+          onClick={handleLogout}
+          className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600"
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );

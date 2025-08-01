@@ -1,6 +1,10 @@
 import type { UserProfile } from "./profile.types";
 
 export function isProfileComplete(profile: UserProfile): boolean {
-  // placeholder for now
-  return profile.profileVersion > 0;
+  return (
+    profile.gender !== undefined &&
+    profile.pronouns !== undefined &&
+    profile.phone !== undefined &&
+    profile.privacySettings !== undefined
+  );
 }

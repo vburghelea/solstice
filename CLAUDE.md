@@ -61,7 +61,7 @@ export const myServerFn = createServerFn({ method: "POST" })
    - `eslint --fix` - Auto-fixes and checks ESLint rules
    - `prettier --write` - Formats code consistently
 2. **Type checking** - `pnpm check-types` on entire codebase
-3. **Tests** - `pnpm test --run` to ensure nothing is broken
+3. **Tests** - `pnpm test` to ensure nothing is broken
 
 All checks must pass before the commit is allowed. The pre-commit hook matches what GitHub Actions CI runs, ensuring no surprises after pushing.
 

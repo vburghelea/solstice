@@ -15,7 +15,7 @@ fi
 
 # 2. Run tests
 echo "Running tests..."
-pnpm test --run
+pnpm test
 if [ $? -ne 0 ]; then
   echo "❌ Tests failed. Please fix failing tests before committing."
   exit 1

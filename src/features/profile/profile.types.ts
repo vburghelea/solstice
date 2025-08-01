@@ -38,6 +38,7 @@ export interface ProfileError {
   field?: string;
   message: string;
   code:
+    | "AUTH_ERROR"
     | "VALIDATION_ERROR"
     | "MISSING_REQUIRED_FIELD"
     | "INVALID_FORMAT"

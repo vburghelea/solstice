@@ -17,7 +17,7 @@
     "ui": "pnpm dlx shadcn@latest",
     "auth:secret": "pnpm dlx @better-auth/cli@latest secret",
     "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config ./src/lib/auth/index.ts --y --output ./src/db/schema/auth.schema.ts && prettier --write ./src/db/schema/auth.schema.ts",
-    "test": "vitest",
+    "test": "vitest --run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",

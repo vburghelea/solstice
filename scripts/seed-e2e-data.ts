@@ -14,6 +14,7 @@ import {
   memberships,
   membershipTypes,
   session,
+  teamMembers,
   teams,
   user,
 } from "../src/db/schema";
@@ -36,6 +37,9 @@ async function seed() {
 
   try {
     // Clear existing test data in correct order due to foreign key constraints
+    console.log("Clearing existing team members...");
+    await db.delete(teamMembers);
+
     console.log("Clearing existing test teams...");
     await db.delete(teams).where(like(teams.description, "%E2E test%"));
 
@@ -189,6 +193,36 @@ async function seed() {
         primaryColor: "#00FF00",
         secondaryColor: "#FF00FF",
         createdBy: "test-admin",
+      },
+    ]);
+
+    console.log("✅ Created test teams");
+
+    // Create team memberships
+    console.log("Creating team memberships...");
+
+    await db.insert(teamMembers).values([
+      {
+        id: "test-member-1",
+        teamId: "test-team-1",
+        userId: "test-user-1",
+        role: "captain" as const,
+        status: "active" as const,
+        jerseyNumber: "7",
+        position: "Chaser",
+        invitedBy: "test-user-1",
+        joinedAt: new Date(),
+      },
+      {
+        id: "test-member-2",
+        teamId: "test-team-2",
+        userId: "test-admin",
+        role: "captain" as const,
+        status: "active" as const,
+        jerseyNumber: "1",
+        position: "Keeper",
+        invitedBy: "test-admin",
+        joinedAt: new Date(),
       },
     ]);
 

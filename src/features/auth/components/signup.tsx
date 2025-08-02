@@ -1,10 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LoaderIcon, LogoIcon } from "~/components/ui/icons";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 
 export default function SignupForm() {

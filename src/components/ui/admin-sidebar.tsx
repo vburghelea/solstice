@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
@@ -10,6 +9,8 @@ import {
   UserCheck,
   Users,
 } from "lucide-react";
+import { useState } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 
 const sidebarItems = [
@@ -26,32 +27,33 @@ const bottomItems = [
 ];
 
 export function AdminSidebar() {
-  const navigate = useNavigate();
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
     try {
-      // 1 — Tell the server to remove the session
-      await auth.signOut().catch((e) => {
-        /* network hiccups shouldn't block UI logout */
-        console.error("signOut error:", e);
+      // Use Better Auth's signOut with fetchOptions as documented
+      await auth.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            // Clear client state
+            queryClient.clear();
+            // Force hard navigation to login page
+            window.location.href = "/auth/login";
+          },
+          onError: (error) => {
+            console.error("Logout error:", error);
+            // Even on error, navigate to login
+            window.location.href = "/auth/login";
+          },
+        },
       });
-
-      // 2 — Client‑side cleanup
-      queryClient.clear();
-      await router.invalidate();
-
-      // 3 — Small delay to ensure cleanup completes
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // 4 — Hard‑navigate so every browser instantly shows the login page
-      // Use both methods to ensure navigation happens
-      window.location.href = "/auth/login";
-      window.location.replace("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
-      // Even on error, try to navigate
+      // Fallback navigation
       window.location.href = "/auth/login";
     }
   };
@@ -70,17 +72,6 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
-              preload={false}
-              onClick={(e) => {
-                // For WebKit, ensure navigation happens
-                if (
-                  navigator.userAgent.includes("WebKit") &&
-                  !navigator.userAgent.includes("Chrome")
-                ) {
-                  e.preventDefault();
-                  navigate({ to: item.href });
-                }
-              }}
               activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
@@ -88,7 +79,7 @@ export function AdminSidebar() {
                 "data-status": "active",
               }}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="pointer-events-none h-5 w-5" />
               <span>{item.label}</span>
             </Link>
           );
@@ -102,17 +93,6 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
-              preload={false}
-              onClick={(e) => {
-                // For WebKit, ensure navigation happens
-                if (
-                  navigator.userAgent.includes("WebKit") &&
-                  !navigator.userAgent.includes("Chrome")
-                ) {
-                  e.preventDefault();
-                  navigate({ to: item.href });
-                }
-              }}
               activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
@@ -120,17 +100,18 @@ export function AdminSidebar() {
                 "data-status": "active",
               }}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="pointer-events-none h-5 w-5" />
               <span>{item.label}</span>
             </Link>
           );
         })}
         <button
           onClick={handleLogout}
-          className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600"
+          className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
+          disabled={isLoggingOut}
         >
           <LogOut className="h-5 w-5" />
-          <span>Logout</span>
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
         </button>
       </div>
     </aside>

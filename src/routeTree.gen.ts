@@ -32,6 +32,7 @@ import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/tea
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+import { ServerRoute as ApiLogoutServerRouteImport } from "./routes/api/logout";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
@@ -147,6 +148,11 @@ const DashboardTeamsTeamIdManageRoute =
     path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
+const ApiLogoutServerRoute = ApiLogoutServerRouteImport.update({
+  id: "/api/logout",
+  path: "/api/logout",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
   path: "/api/health",
@@ -319,6 +325,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/logout": typeof ApiLogoutServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
@@ -326,6 +333,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/logout": typeof ApiLogoutServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
@@ -334,6 +342,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/logout": typeof ApiLogoutServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
@@ -343,6 +352,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
   fullPaths:
     | "/api/health"
+    | "/api/logout"
     | "/api/auth/$"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
@@ -350,6 +360,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo;
   to:
     | "/api/health"
+    | "/api/logout"
     | "/api/auth/$"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
@@ -357,6 +368,7 @@ export interface FileServerRouteTypes {
   id:
     | "__root__"
     | "/api/health"
+    | "/api/logout"
     | "/api/auth/$"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
@@ -365,6 +377,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiHealthServerRoute: typeof ApiHealthServerRoute;
+  ApiLogoutServerRoute: typeof ApiLogoutServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
   ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
   ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
@@ -524,6 +537,13 @@ declare module "@tanstack/react-router" {
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
+    "/api/logout": {
+      id: "/api/logout";
+      path: "/api/logout";
+      fullPath: "/api/logout";
+      preLoaderRoute: typeof ApiLogoutServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/health": {
       id: "/api/health";
       path: "/api/health";
@@ -656,6 +676,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHealthServerRoute: ApiHealthServerRoute,
+  ApiLogoutServerRoute: ApiLogoutServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
   ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,

@@ -70,6 +70,7 @@ export default defineConfig({
       name: "firefox-no-auth",
       use: {
         ...devices["Desktop Firefox"],
+        launchOptions: { slowMo: 50 }, // tiny delay prevents spurious abort
       },
       testMatch: /.*\.(unauth|public)\.spec\.ts/,
     },
@@ -79,6 +80,7 @@ export default defineConfig({
       name: "firefox-auth",
       use: {
         ...devices["Desktop Firefox"],
+        launchOptions: { slowMo: 50 }, // tiny delay prevents spurious abort
         storageState: "e2e/.auth/user.json",
       },
       dependencies: ["setup"],

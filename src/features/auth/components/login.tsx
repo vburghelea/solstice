@@ -1,10 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import React, { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LoaderIcon, LogoIcon } from "~/components/ui/icons";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 
 export default function LoginForm() {
@@ -32,36 +33,21 @@ export default function LoginForm() {
     }
 
     try {
-      await auth.signIn.email(
-        {
-          email,
-          password,
-          callbackURL: redirectUrl,
-        },
-        {
-          onSuccess: async () => {
-            queryClient.invalidateQueries({ queryKey: ["user"] });
-            await router.invalidate();
-            navigate({ to: redirectUrl });
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          onError: (ctx: any) => {
-            // Ensure error is set synchronously for WebKit
-            const message = ctx.error?.message || "Invalid email or password";
-            setErrorMessage(message);
-            setIsLoading(false);
-            // Force a re-render for WebKit
-            setTimeout(() => setErrorMessage(message), 0);
-          },
-        },
-      );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      const message = error.message || "An unexpected error occurred";
-      setErrorMessage(message);
-      // Force a re-render for WebKit
-      setTimeout(() => setErrorMessage(message), 0);
-    } finally {
+      const result = await auth.signIn.email({ email, password });
+
+      if (result?.error) {
+        setErrorMessage(result.error.message || "Invalid email or password");
+        setIsLoading(false);
+        return;
+      }
+
+      // success path
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      await router.invalidate();
+      navigate({ to: redirectUrl });
+    } catch (error) {
+      // Fallback error handling
+      setErrorMessage((error as Error)?.message || "Invalid email or password");
       setIsLoading(false);
     }
   };

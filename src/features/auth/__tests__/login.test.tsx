@@ -38,8 +38,26 @@ vi.mock("@tanstack/react-router", () => ({
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouteContext: () => ({ redirectUrl: "/dashboard" }),
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
+  useRouterState: () => ({ location: { pathname: "/auth/login" } }),
+  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouter: () => ({ invalidate: vi.fn() }),
   Link: ({
+    to,
+    children,
+    ...props
+  }: {
+    to: string;
+    children: React.ReactNode;
+  } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
+// Mock SafeLink
+vi.mock("~/components/ui/SafeLink", () => ({
+  SafeLink: ({
     to,
     children,
     ...props
@@ -96,18 +114,9 @@ describe("LoginForm", () => {
     const { mockUser, mockSession } = createAuthMocks();
 
     // Setup successful login response
-    vi.mocked(auth.signIn.email).mockImplementationOnce((data, handlers) => {
-      handlers?.onSuccess?.({
-        data: {
-          user: mockUser,
-          session: mockSession,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
-      return Promise.resolve({
-        data: { user: mockUser, session: mockSession },
-        error: null,
-      });
+    vi.mocked(auth.signIn.email).mockResolvedValueOnce({
+      data: { user: mockUser, session: mockSession },
+      error: null,
     });
 
     render(<LoginForm />);
@@ -121,14 +130,10 @@ describe("LoginForm", () => {
 
     await waitFor(() => {
       // Verify auth client was called
-      expect(auth.signIn.email).toHaveBeenCalledWith(
-        {
-          email: "test@example.com",
-          password: "password123",
-          callbackURL: "/dashboard",
-        },
-        expect.any(Object),
-      );
+      expect(auth.signIn.email).toHaveBeenCalledWith({
+        email: "test@example.com",
+        password: "password123",
+      });
 
       // Verify queries were invalidated
       expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ["user"] });
@@ -143,17 +148,11 @@ describe("LoginForm", () => {
     const errorMessage = "Invalid email or password";
 
     // Setup failed login response
-    vi.mocked(auth.signIn.email).mockImplementationOnce((data, handlers) => {
-      const error = {
-        status: 401,
-        statusText: "Unauthorized",
-        error: { message: errorMessage },
-        name: "BetterFetchError" as const,
+    vi.mocked(auth.signIn.email).mockResolvedValueOnce({
+      data: null,
+      error: {
         message: errorMessage,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any;
-      handlers?.onError?.(error);
-      return Promise.reject(new Error(errorMessage));
+      },
     });
 
     render(<LoginForm />);
@@ -201,17 +200,13 @@ describe("LoginForm", () => {
     const user = userEvent.setup();
     const { mockUser } = createAuthMocks();
 
-    vi.mocked(auth.signInWithOAuth).mockImplementationOnce((data, handlers) => {
+    vi.mocked(auth.signInWithOAuth).mockResolvedValueOnce({
+      redirect: true,
+      token: "mock-token",
+      url: undefined,
+      user: mockUser,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handlers?.onRequest?.({} as any);
-      return Promise.resolve({
-        redirect: true,
-        token: "mock-token",
-        url: undefined,
-        user: mockUser,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
-    });
+    } as any);
 
     render(<LoginForm />);
 

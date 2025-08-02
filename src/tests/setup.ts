@@ -45,6 +45,7 @@ vi.mock("~/lib/env.server", () => ({
     BETTER_AUTH_SECRET: "test-secret",
     VITE_BASE_URL: "http://localhost:3000",
   },
+  isServerless: () => false,
 }));
 
 // Mock CSS imports

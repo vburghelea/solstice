@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouteContext } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
@@ -11,14 +12,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { userHasRole } from "~/features/roles/permission.service";
 import { auth } from "~/lib/auth-client";
 
 const allSidebarItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: Users, label: "Teams", href: "/dashboard/teams" },
-  { icon: Calendar, label: "Events", href: "/dashboard/events" },
-  { icon: UserCheck, label: "Members", href: "/dashboard/members" },
-  { icon: BarChart3, label: "Reports", href: "/dashboard/reports" },
+  { icon: Home, label: "Dashboard", href: "/dashboard", requiresRole: false },
+  { icon: Users, label: "Teams", href: "/dashboard/teams", requiresRole: false },
+  { icon: Calendar, label: "Events", href: "/dashboard/events", requiresRole: false },
+  { icon: UserCheck, label: "Members", href: "/dashboard/members", requiresRole: false },
+  {
+    icon: BarChart3,
+    label: "Reports",
+    href: "/dashboard/reports",
+    requiresRole: true,
+    roles: ["Solstice Admin", "Quadball Canada Admin"],
+  },
 ];
 
 const bottomItems = [
@@ -29,9 +37,17 @@ const bottomItems = [
 export function AdminSidebar() {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
 
-  // TODO: Add role-based filtering when user roles are implemented
-  const sidebarItems = allSidebarItems;
+  // Filter sidebar items based on user roles
+  const sidebarItems = allSidebarItems.filter((item) => {
+    if (!item.requiresRole) return true;
+    if (!user || !item.roles) return false;
+
+    // Check if user has any of the required roles
+    return item.roles.some((roleName) => userHasRole(user, roleName));
+  });
 
   const handleLogout = async () => {
     if (isLoggingOut) return;

@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { AdminMembershipsReport } from "~/features/membership/components/admin-memberships-report";
+import { requireGlobalAdmin } from "~/lib/auth/middleware/role-guard";
 
 export const Route = createFileRoute("/dashboard/reports")({
+  beforeLoad: async ({ context }) => {
+    await requireGlobalAdmin(context.user);
+  },
   component: ReportsPage,
 });
 

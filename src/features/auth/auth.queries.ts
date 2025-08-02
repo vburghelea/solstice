@@ -37,6 +37,10 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
       return null;
     }
 
+    // Fetch user roles
+    const { PermissionService } = await import("~/features/roles/permission.service");
+    const userRoles = await PermissionService.getUserRoles(session.user.id);
+
     // Map the database user to our extended User type
     return {
       ...session.user,
@@ -49,6 +53,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
       privacySettings: dbUser[0].privacySettings,
       profileVersion: dbUser[0].profileVersion,
       profileUpdatedAt: dbUser[0].profileUpdatedAt,
+      roles: userRoles,
     };
   },
 );

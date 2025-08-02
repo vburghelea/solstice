@@ -1,12 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import React, { useState } from "react";
+import { useState } from "react";
+import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
-import { GoogleIcon, LoaderIcon, LogoIcon } from "~/components/ui/icons";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
+import { useAppForm } from "~/lib/hooks/useAppForm";
 
 export default function LoginForm() {
   const queryClient = useQueryClient();
@@ -17,44 +18,45 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMessage("");
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      setErrorMessage("");
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+      try {
+        const result = await auth.signIn.email(value);
 
-    if (!email || !password) {
-      setErrorMessage("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
+        if (result?.error) {
+          setErrorMessage(result.error.message || "Invalid email or password");
+          setIsLoading(false);
+          return;
+        }
 
-    try {
-      const result = await auth.signIn.email({ email, password });
-
-      if (result?.error) {
-        setErrorMessage(result.error.message || "Invalid email or password");
+        // success path
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        await router.invalidate();
+        navigate({ to: redirectUrl });
+      } catch (error) {
+        // Fallback error handling
+        setErrorMessage((error as Error)?.message || "Invalid email or password");
         setIsLoading(false);
-        return;
       }
-
-      // success path
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      await router.invalidate();
-      navigate({ to: redirectUrl });
-    } catch (error) {
-      // Fallback error handling
-      setErrorMessage((error as Error)?.message || "Invalid email or password");
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a href="#" className="flex flex-col items-center gap-2 font-medium">
@@ -66,32 +68,37 @@ export default function LoginForm() {
             <h1 className="text-xl font-bold">Welcome back to Acme Inc.</h1>
           </div>
           <div className="flex flex-col gap-5">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="hello@example.com"
-                readOnly={isLoading}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Password"
-                readOnly={isLoading}
-                required
-              />
-            </div>
-            <Button type="submit" className="mt-2 w-full" size="lg" disabled={isLoading}>
-              {isLoading && <LoaderIcon className="animate-spin" />}
-              {isLoading ? "Logging in..." : "Login"}
-            </Button>
+            <form.Field name="email">
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Email"
+                  type="email"
+                  placeholder="hello@example.com"
+                  autoComplete="email"
+                  autoFocus
+                />
+              )}
+            </form.Field>
+            <form.Field name="password">
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Password"
+                  type="password"
+                  placeholder="Password"
+                  autoComplete="current-password"
+                />
+              )}
+            </form.Field>
+            <FormSubmitButton
+              isSubmitting={form.state.isSubmitting || isLoading}
+              className="mt-2 w-full"
+              size="lg"
+              loadingText="Logging in..."
+            >
+              Login
+            </FormSubmitButton>
           </div>
           {errorMessage && (
             <span className="text-destructive text-center text-sm">{errorMessage}</span>
@@ -105,7 +112,7 @@ export default function LoginForm() {
             variant="outline"
             className="w-full"
             type="button"
-            disabled={isLoading}
+            disabled={isLoading || form.state.isSubmitting}
             onClick={() =>
               auth.signInWithOAuth(
                 {

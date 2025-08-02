@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
-import { GoogleIcon, LoaderIcon, LogoIcon } from "~/components/ui/icons";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
+import { useAppForm } from "~/lib/hooks/useAppForm";
+import { signupFormFields } from "../auth.schemas";
 
 export default function SignupForm() {
   const queryClient = useQueryClient();
@@ -17,50 +19,48 @@ export default function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isLoading) return;
+  const form = useAppForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      setErrorMessage("");
 
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirm_password") as string;
-
-    if (!name || !email || !password || !confirmPassword) return;
-
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match");
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage("");
-
-    auth.signUp.email(
-      {
-        name,
-        email,
-        password,
-        callbackURL: redirectUrl,
-      },
-      {
-        onError: (ctx) => {
-          setErrorMessage(ctx.error.message);
-          setIsLoading(false);
+      auth.signUp.email(
+        {
+          name: value.name,
+          email: value.email,
+          password: value.password,
+          callbackURL: redirectUrl,
         },
-        onSuccess: async () => {
-          queryClient.invalidateQueries({ queryKey: ["user"] });
-          await router.invalidate();
-          navigate({ to: redirectUrl });
+        {
+          onError: (ctx) => {
+            setErrorMessage(ctx.error.message);
+            setIsLoading(false);
+          },
+          onSuccess: async () => {
+            queryClient.invalidateQueries({ queryKey: ["user"] });
+            await router.invalidate();
+            navigate({ to: redirectUrl });
+          },
         },
-      },
-    );
-  };
+      );
+    },
+  });
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a href="#" className="flex flex-col items-center gap-2 font-medium">
@@ -72,54 +72,85 @@ export default function SignupForm() {
             <h1 className="text-xl font-bold">Sign up for Acme Inc.</h1>
           </div>
           <div className="flex flex-col gap-5">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="John Doe"
-                readOnly={isLoading}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="hello@example.com"
-                readOnly={isLoading}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Password"
-                readOnly={isLoading}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirm_password">Confirm Password</Label>
-              <Input
-                id="confirm_password"
-                name="confirm_password"
-                type="password"
-                placeholder="Confirm Password"
-                readOnly={isLoading}
-                required
-              />
-            </div>
-            <Button type="submit" className="mt-2 w-full" size="lg" disabled={isLoading}>
-              {isLoading && <LoaderIcon className="animate-spin" />}
-              {isLoading ? "Signing up..." : "Sign up"}
-            </Button>
+            <form.Field
+              name="name"
+              validators={{
+                onChange: signupFormFields.name,
+              }}
+            >
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Name"
+                  type="text"
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  autoFocus
+                />
+              )}
+            </form.Field>
+            <form.Field
+              name="email"
+              validators={{
+                onChange: signupFormFields.email,
+              }}
+            >
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Email"
+                  type="email"
+                  placeholder="hello@example.com"
+                  autoComplete="email"
+                />
+              )}
+            </form.Field>
+            <form.Field
+              name="password"
+              validators={{
+                onChange: signupFormFields.password,
+              }}
+            >
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Password"
+                  type="password"
+                  placeholder="Password"
+                  autoComplete="new-password"
+                />
+              )}
+            </form.Field>
+            <form.Field
+              name="confirmPassword"
+              validators={{
+                onChangeListenTo: ["password"],
+                onChange: ({ value, fieldApi }) => {
+                  if (value !== fieldApi.form.getFieldValue("password")) {
+                    return "Passwords do not match";
+                  }
+                  return undefined;
+                },
+              }}
+            >
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Confirm Password"
+                  type="password"
+                  placeholder="Confirm Password"
+                  autoComplete="new-password"
+                />
+              )}
+            </form.Field>
+            <FormSubmitButton
+              isSubmitting={form.state.isSubmitting || isLoading}
+              className="mt-2 w-full"
+              size="lg"
+              loadingText="Signing up..."
+            >
+              Sign up
+            </FormSubmitButton>
           </div>
           {errorMessage && (
             <span className="text-destructive text-center text-sm">{errorMessage}</span>
@@ -133,7 +164,7 @@ export default function SignupForm() {
             variant="outline"
             className="w-full"
             type="button"
-            disabled={isLoading}
+            disabled={isLoading || form.state.isSubmitting}
             onClick={() =>
               auth.signInWithOAuth(
                 {

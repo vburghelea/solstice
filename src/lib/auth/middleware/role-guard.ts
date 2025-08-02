@@ -1,5 +1,5 @@
 import { redirect } from "@tanstack/react-router";
-import { PermissionService } from "~/features/roles/permission.service";
+import { serverOnly } from "@tanstack/react-start";
 import type { User } from "~/lib/auth/types";
 
 interface RoleGuardOptions {
@@ -14,7 +14,7 @@ interface RoleGuardOptions {
  * Role-based access control guard for routes
  * Use this in route beforeLoad to protect pages based on user roles
  */
-export async function requireRole({
+export const requireRole = serverOnly(async function requireRole({
   user,
   requiredRoles,
   teamId,
@@ -29,6 +29,9 @@ export async function requireRole({
   if (!requiredRoles || requiredRoles.length === 0) {
     return;
   }
+
+  // Import PermissionService dynamically to avoid client-side bundling
+  const { PermissionService } = await import("~/features/roles/permission.service");
 
   // Check if user has any of the required roles
   let hasAccess = false;
@@ -51,18 +54,23 @@ export async function requireRole({
   if (!hasAccess) {
     throw redirect({ to: redirectTo });
   }
-}
+});
 
 /**
  * Convenience function for requiring global admin access
  */
-export async function requireGlobalAdmin(user: User | null, redirectTo = "/dashboard") {
+export const requireGlobalAdmin = serverOnly(async function requireGlobalAdmin(
+  user: User | null,
+  redirectTo = "/dashboard",
+) {
   if (!user) {
     throw redirect({ to: "/auth/login" });
   }
 
+  // Import PermissionService dynamically to avoid client-side bundling
+  const { PermissionService } = await import("~/features/roles/permission.service");
   const isAdmin = await PermissionService.isGlobalAdmin(user.id);
   if (!isAdmin) {
     throw redirect({ to: redirectTo });
   }
-}
+});

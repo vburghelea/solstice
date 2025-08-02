@@ -2,15 +2,14 @@
 
 ## Overview
 
-The application implements comprehensive rate limiting to protect against abuse and ensure fair usage. We use a two-layer approach:
+The application uses **client-side rate limiting** with TanStack Pacer to protect against abuse and ensure fair usage. This approach prevents excessive requests before they're sent and provides immediate user feedback.
 
-1. **Client-Side Rate Limiting** (TanStack Pacer) - Prevents excessive requests before they're sent, provides immediate user feedback
-2. **Server-Side Rate Limiting** - Final protection layer that works across all clients
-
-Rate limiting is applied at two levels:
+Rate limiting is applied at different levels:
 
 1. **Authentication endpoints** - Stricter limits for sensitive operations
 2. **API endpoints** - General limits for regular API calls
+3. **Search operations** - Optimized for rapid queries
+4. **Mutations** - Balanced limits for write operations
 
 ## Client-Side Rate Limiting
 
@@ -21,101 +20,97 @@ We use TanStack Pacer for client-side rate limiting. See [Rate Limiting with Tan
 - Integration examples
 - Best practices
 
-## Server-Side Rate Limiting
-
 ## Configuration
 
-Rate limits are configured in `src/lib/security/config.ts`:
+Rate limits are configured in `src/lib/pacer/rate-limit-config.ts`:
 
 ```typescript
-rateLimit: {
-  auth: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 requests per window
-  },
-  api: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // 100 requests per window
-  },
+auth: {
+  limit: 5,
+  window: 15 * 60 * 1000, // 15 minutes
+  windowType: "fixed"
+},
+api: {
+  limit: 100,
+  window: 60 * 1000, // 1 minute
+  windowType: "sliding"
+},
+search: {
+  limit: 10,
+  window: 10 * 1000, // 10 seconds
+  windowType: "sliding"
+},
+mutation: {
+  limit: 20,
+  window: 60 * 1000, // 1 minute
+  windowType: "fixed"
 }
 ```
 
-## Protected Endpoints
+## How It Works
 
-### Authentication Endpoints (5 requests per 15 minutes)
+TanStack Pacer implements client-side rate limiting using:
 
-- `/api/auth/sign-in`
-- `/api/auth/sign-up`
-- `/api/auth/forgot-password`
-- `/api/auth/reset-password`
-- `/api/auth/verify-email`
+- **Token bucket algorithm** for smooth request distribution
+- **Local storage persistence** to maintain limits across page reloads
+- **Immediate user feedback** via toast notifications
 
-When the rate limit is exceeded, the server returns:
+When the rate limit is exceeded, users see a toast message:
 
-```json
-{
-  "error": "Too Many Requests",
-  "message": "Too many requests, please try again later."
-}
 ```
-
-Status Code: 429
+Too many requests. Please try again in X seconds.
+```
 
 ## Implementation Details
 
-### Rate Limit Store
+### Using Rate Limiting
 
-Currently uses an in-memory store suitable for development and single-instance deployments. For production with multiple instances, consider using:
-
-- Upstash Redis
-- DynamoDB
-- CDN-level rate limiting (Netlify, Cloudflare)
-
-### Client Identification
-
-Rate limiting is based on client IP address, extracted from these headers (in order):
-
-1. `x-forwarded-for`
-2. `x-real-ip`
-3. `cf-connecting-ip`
-4. Falls back to "unknown" if no IP found
-
-### Adding Rate Limiting to New Endpoints
-
-To add rate limiting to server functions:
+To add rate limiting to any server function call:
 
 ```typescript
-import { rateLimitedHandler } from "~/lib/security/middleware/server-fn-rate-limit";
+import { useRateLimitedServerFn } from "~/lib/pacer";
 
-export const myServerFunction = createServerFn({ method: "POST" }).handler(
-  rateLimitedHandler(
-    "api", // or "auth" for stricter limits
-    async ({ data }) => {
-      // Your server function logic
-    },
-  ),
-);
+// In your component
+const rateLimitedCreateTeam = useRateLimitedServerFn(createTeam, { type: "mutation" });
+
+// Use it like the original function
+await rateLimitedCreateTeam({ data: teamData });
 ```
 
-Note: Due to TanStack Start's type inference, you may need to use `@ts-expect-error` comments.
+### Rate Limit Types
+
+- **auth**: For authentication operations (login, signup, password reset)
+- **api**: For general API calls
+- **search**: For search operations with debouncing
+- **mutation**: For data modifications
+
+### Why Client-Side Only?
+
+For serverless deployments (like Netlify), client-side rate limiting is more effective because:
+
+1. **No shared state needed** between function invocations
+2. **Immediate feedback** without network round-trips
+3. **Reduced server load** by preventing requests entirely
+4. **Better UX** with instant feedback
+
+For additional protection, consider using:
+
+- CDN-level rate limiting (Netlify, Cloudflare)
+- Web Application Firewall (WAF) rules
 
 ## Testing
 
-Test rate limiting with curl:
+To test rate limiting in development:
 
-```bash
-# Test auth endpoint (limit: 5 requests)
-for i in {1..7}; do
-  curl -X POST -H "Content-Type: application/json" \
-    -d '{"email":"test@example.com","password":"test"}' \
-    http://localhost:5173/api/auth/sign-in
-done
-```
+1. Open your browser's developer console
+2. Rapidly click a button that triggers a rate-limited server function
+3. After hitting the limit, you should see a toast notification
+4. Check local storage for `tanstack-pacer-*` entries to see stored limits
 
 ## Future Improvements
 
-1. **Distributed Rate Limiting**: Implement Redis-based store for multi-instance deployments
+1. **Server-Side Validation**: Add server-side rate limiting for defense in depth
 2. **User-based Limits**: Different limits for authenticated vs anonymous users
-3. **Endpoint-specific Limits**: Custom limits for specific endpoints
-4. **Rate Limit Headers**: Return `X-RateLimit-*` headers to inform clients
+3. **Dynamic Limits**: Adjust limits based on user tier or subscription
+4. **Analytics**: Track rate limit hits for monitoring abuse patterns
 5. **Gradual Backoff**: Implement exponential backoff for repeated violations

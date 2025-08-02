@@ -36,11 +36,13 @@ export function HeroSection({
             {subtitle}
           </p>
           {ctaText && (
-            <Link to={ctaLink}>
-              <Button className="btn-brand-primary mt-6 inline-block rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:mt-8 sm:px-8 sm:py-3 sm:text-base">
-                {ctaText}
-              </Button>
-            </Link>
+            <div className="mt-6 sm:mt-8">
+              <Link to={ctaLink}>
+                <Button className="btn-brand-primary inline-block rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base">
+                  {ctaText}
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </div>

@@ -17,8 +17,9 @@ describe("AdminLayout with Router", () => {
   it("renders admin layout with navigation", async () => {
     await renderWithRouter(<AdminLayout />);
 
-    // Check navigation elements
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    // Check navigation elements - Dashboard appears multiple times
+    const dashboardTexts = screen.getAllByText("Dashboard");
+    expect(dashboardTexts.length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText("Teams")).toBeInTheDocument();
     expect(screen.getByText("Events")).toBeInTheDocument();
 
@@ -26,8 +27,8 @@ describe("AdminLayout with Router", () => {
     const quadballTexts = screen.getAllByText("Quadball Canada");
     expect(quadballTexts).toHaveLength(2); // One for desktop, one for mobile
 
-    const adminPanelTexts = screen.getAllByText("Admin Panel");
-    expect(adminPanelTexts).toHaveLength(2); // One for desktop, one for mobile
+    // "Admin Panel" text was changed to "Dashboard" in mobile view
+    expect(screen.getByText("Admin Panel")).toBeInTheDocument(); // Mobile header still shows Admin Panel
   });
 
   it("renders with user context", async () => {
@@ -61,11 +62,12 @@ describe("AdminLayout with Router", () => {
     await renderWithRouter(<AdminLayout />, { user: customUser });
 
     // Navigation should still render with custom user
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    // Multiple "Dashboard" texts appear (sidebar subtitle and nav link)
+    const dashboardTexts = screen.getAllByText("Dashboard");
+    expect(dashboardTexts.length).toBeGreaterThanOrEqual(2);
 
-    // Admin Panel appears in both desktop and mobile views
-    const adminPanelTexts = screen.getAllByText("Admin Panel");
-    expect(adminPanelTexts).toHaveLength(2);
+    // Admin Panel still appears in mobile view
+    expect(screen.getByText("Admin Panel")).toBeInTheDocument();
   });
 
   it("handles mobile menu toggle", async () => {
@@ -73,7 +75,7 @@ describe("AdminLayout with Router", () => {
 
     // Mobile menu is hidden by default on desktop
     // The test would need to mock window size to test mobile behavior
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.getAllByText("Dashboard")[0]).toBeInTheDocument();
   });
 
   it("displays all navigation links with correct hrefs", async () => {

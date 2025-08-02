@@ -1,10 +1,12 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./button";
 
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const context = useRouteContext({ strict: false });
+  const user = context?.user || null;
 
   return (
     <header className="bg-brand-light/95 sticky top-0 z-50 shadow-sm backdrop-blur-md">
@@ -35,17 +37,27 @@ export function PublicHeader() {
 
           {/* Desktop Actions */}
           <div className="hidden items-center gap-3 lg:flex">
-            <Link
-              to="/auth/login"
-              className="rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
-            >
-              Login
-            </Link>
-            <Link to="/auth/signup">
-              <Button className="btn-brand-primary rounded-lg px-4 py-2 text-sm font-bold">
-                Register
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/dashboard">
+                <Button className="btn-brand-primary rounded-lg px-4 py-2 text-sm font-bold">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/auth/login"
+                  className="rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
+                >
+                  Login
+                </Link>
+                <Link to="/auth/signup">
+                  <Button className="btn-brand-primary rounded-lg px-4 py-2 text-sm font-bold">
+                    Register
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -95,18 +107,28 @@ export function PublicHeader() {
               </Link>
             </nav>
             <div className="flex flex-col space-y-3 border-t border-gray-200 pt-4">
-              <Link
-                to="/auth/login"
-                className="rounded-lg px-4 py-2 text-center text-sm font-bold transition hover:bg-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Login
-              </Link>
-              <Link to="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="btn-brand-primary w-full rounded-lg px-4 py-2 text-sm font-bold">
-                  Register
-                </Button>
-              </Link>
+              {user ? (
+                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="btn-brand-primary w-full rounded-lg px-4 py-2 text-sm font-bold">
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/auth/login"
+                    className="rounded-lg px-4 py-2 text-center text-sm font-bold transition hover:bg-gray-100"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link to="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="btn-brand-primary w-full rounded-lg px-4 py-2 text-sm font-bold">
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

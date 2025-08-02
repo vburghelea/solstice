@@ -13,7 +13,7 @@ import { useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 
-const sidebarItems = [
+const allSidebarItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: Users, label: "Teams", href: "/dashboard/teams" },
   { icon: Calendar, label: "Events", href: "/dashboard/events" },
@@ -29,6 +29,9 @@ const bottomItems = [
 export function AdminSidebar() {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // TODO: Add role-based filtering when user roles are implemented
+  const sidebarItems = allSidebarItems;
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -61,8 +64,10 @@ export function AdminSidebar() {
   return (
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="p-6">
-        <h1 className="text-admin-text-primary text-xl font-bold">Quadball Canada</h1>
-        <p className="text-admin-text-secondary text-sm">Admin Panel</p>
+        <Link to="/" className="transition-opacity hover:opacity-80">
+          <h1 className="text-admin-text-primary text-xl font-bold">Quadball Canada</h1>
+          <p className="text-admin-text-secondary text-sm">Dashboard</p>
+        </Link>
       </div>
       <nav className="flex-1 space-y-2 px-4 py-2">
         {sidebarItems.map((item) => {
@@ -106,6 +111,7 @@ export function AdminSidebar() {
           );
         })}
         <button
+          type="button"
           onClick={handleLogout}
           className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
           disabled={isLoggingOut}

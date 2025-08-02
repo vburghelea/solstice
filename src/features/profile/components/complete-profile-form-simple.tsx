@@ -1,20 +1,12 @@
-"use no memo";
-
-// TODO: Refactor this component to be React Compiler compatible
-// The component currently uses complex nested state updates and creates
-// new objects in event handlers, which causes React Compiler optimization
-// issues. Consider:
-// 1. Using useReducer for complex state management
-// 2. Memoizing event handlers with useCallback
-// 3. Avoiding inline object creation in handlers
-// 4. Simplifying the emergencyContact state updates
-// Once refactored, remove the "use no memo" directive above
-
+import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
+import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
+import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
+import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import {
   Card,
   CardContent,
@@ -22,25 +14,11 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Checkbox } from "~/components/ui/checkbox";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
 import type { ProfileInputType } from "../profile.schemas";
-import type {
-  EmergencyContact,
-  ProfileInput,
-  ProfileOperationResult,
-} from "../profile.types";
+import type { ProfileInput } from "../profile.types";
 
 const STEPS = [
   {
@@ -66,96 +44,94 @@ export function CompleteProfileForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
-  const [formData, setFormData] = useState<ProfileInputType>(() => ({
-    dateOfBirth: new Date(),
-    gender: "",
-    pronouns: "",
-    phone: "",
-    emergencyContact: undefined,
-    privacySettings: {
-      showEmail: false,
-      showPhone: false,
-      showBirthYear: false,
-      allowTeamInvitations: true,
-    },
-  }));
+  const form = useForm({
+    defaultValues: {
+      dateOfBirth: new Date(),
+      gender: "",
+      pronouns: "",
+      phone: "",
+      emergencyContact: {
+        name: "",
+        relationship: "",
+        phone: "",
+        email: "",
+      },
+      privacySettings: {
+        showEmail: false,
+        showPhone: false,
+        showBirthYear: false,
+        allowTeamInvitations: true,
+      },
+    } as ProfileInputType,
+    onSubmit: async ({ value }) => {
+      if (currentStepIndex < STEPS.length - 1) {
+        goToNextStep();
+        return;
+      }
 
-  // Track if emergency contact has been started
-  const [emergencyContactStarted, setEmergencyContactStarted] = useState(false);
+      setError(null);
+
+      try {
+        // Build profile input with only defined values
+        const dataToSubmit: ProfileInput = {
+          dateOfBirth: value.dateOfBirth,
+        };
+
+        // Add optional fields only if they have values
+        if (value.gender) dataToSubmit.gender = value.gender;
+        if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
+        if (value.phone) dataToSubmit.phone = value.phone;
+        if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
+
+        // Only include emergency contact if it has meaningful data
+        if (
+          value.emergencyContact &&
+          (value.emergencyContact.name ||
+            value.emergencyContact.relationship ||
+            value.emergencyContact.phone ||
+            value.emergencyContact.email)
+        ) {
+          // Build emergency contact with required fields
+          const emergencyContact: ProfileInput["emergencyContact"] = {
+            name: value.emergencyContact.name || "",
+            relationship: value.emergencyContact.relationship || "",
+          };
+          if (value.emergencyContact.phone)
+            emergencyContact.phone = value.emergencyContact.phone;
+          if (value.emergencyContact.email)
+            emergencyContact.email = value.emergencyContact.email;
+
+          dataToSubmit.emergencyContact = emergencyContact;
+        }
+
+        const result = await completeUserProfile({ data: dataToSubmit });
+
+        if (result.success) {
+          await queryClient.invalidateQueries({ queryKey: ["user"] });
+          router.navigate({ to: "/dashboard" });
+        } else {
+          const errorMessage = result.errors?.[0]?.message || "Failed to save profile";
+          setError(errorMessage);
+        }
+      } catch (err) {
+        setError("An unexpected error occurred. Please try again.");
+        console.error("Profile submission error:", err);
+      }
+    },
+  });
 
   const currentStepIndex = STEPS.findIndex((step) => step.id === currentStep);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (currentStepIndex < STEPS.length - 1) {
-      goToNextStep();
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      // Build profile input with only defined values
-      const dataToSubmit: ProfileInput = {
-        dateOfBirth: formData.dateOfBirth,
-      };
-
-      // Add optional fields only if they have values
-      if (formData.gender) dataToSubmit.gender = formData.gender;
-      if (formData.pronouns) dataToSubmit.pronouns = formData.pronouns;
-      if (formData.phone) dataToSubmit.phone = formData.phone;
-      if (formData.privacySettings)
-        dataToSubmit.privacySettings = formData.privacySettings;
-
-      // Only include emergency contact if it has meaningful data
-      if (
-        formData.emergencyContact &&
-        (formData.emergencyContact.name ||
-          formData.emergencyContact.relationship ||
-          formData.emergencyContact.phone ||
-          formData.emergencyContact.email)
-      ) {
-        // Build emergency contact with required fields
-        const emergencyContact: EmergencyContact = {
-          name: formData.emergencyContact.name || "",
-          relationship: formData.emergencyContact.relationship || "",
-        };
-        if (formData.emergencyContact.phone)
-          emergencyContact.phone = formData.emergencyContact.phone;
-        if (formData.emergencyContact.email)
-          emergencyContact.email = formData.emergencyContact.email;
-
-        dataToSubmit.emergencyContact = emergencyContact;
-      }
-
-      const result = await (
-        completeUserProfile as unknown as (params: {
-          data: ProfileInput;
-        }) => Promise<ProfileOperationResult>
-      )({
-        data: dataToSubmit,
-      });
-
-      if (result.success) {
-        await queryClient.invalidateQueries({ queryKey: ["user"] });
-        router.navigate({ to: "/dashboard" });
-      } else {
-        const errorMessage = result.errors?.[0]?.message || "Failed to save profile";
-        setError(errorMessage);
-      }
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-      console.error("Profile submission error:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  // Check if emergency contact has any data
+  const emergencyContact = form.getFieldValue("emergencyContact");
+  const hasEmergencyContactData =
+    emergencyContact &&
+    (emergencyContact.name ||
+      emergencyContact.relationship ||
+      emergencyContact.phone ||
+      emergencyContact.email);
 
   const goToStep = (stepId: StepId) => setCurrentStep(stepId);
   const goToNextStep = () => {
@@ -172,6 +148,15 @@ export function CompleteProfileForm() {
   };
 
   const isLastStep = currentStepIndex === STEPS.length - 1;
+
+  // Gender options for select component
+  const genderOptions = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "non-binary", label: "Non-binary" },
+    { value: "other", label: "Other" },
+    { value: "prefer-not-to-say", label: "Prefer not to say" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -209,7 +194,13 @@ export function CompleteProfileForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
         <Card>
           <CardHeader>
             <CardTitle>{STEPS[currentStepIndex].title}</CardTitle>
@@ -219,76 +210,60 @@ export function CompleteProfileForm() {
             {/* Personal Information Step */}
             {currentStep === "personal" && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    value={
-                      formData.dateOfBirth
-                        ? new Date(formData.dateOfBirth).toISOString().split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        dateOfBirth: e.target.value
-                          ? new Date(e.target.value)
-                          : new Date(),
-                      }))
-                    }
-                    required
-                  />
-                  <p className="text-muted-foreground text-sm">
-                    You must be between 13 and 120 years old
-                  </p>
-                </div>
+                <form.Field
+                  name="dateOfBirth"
+                  validators={{
+                    onChange: ({ value }) => {
+                      if (!value) return "Date of birth is required";
+                      const age = new Date().getFullYear() - value.getFullYear();
+                      if (age < 13 || age > 120) {
+                        return "Age must be between 13 and 120 years";
+                      }
+                      return undefined;
+                    },
+                  }}
+                >
+                  {(field) => (
+                    <ValidatedDatePicker
+                      field={field}
+                      label="Date of Birth"
+                      minAge={13}
+                      maxAge={120}
+                    />
+                  )}
+                </form.Field>
 
-                <div className="space-y-2">
-                  <Label htmlFor="gender">Gender (optional)</Label>
-                  <Select
-                    value={formData.gender || ""}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, gender: value }))
-                    }
-                  >
-                    <SelectTrigger id="gender">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="non-binary">Non-binary</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <form.Field name="gender">
+                  {(field) => (
+                    <ValidatedSelect
+                      field={field}
+                      label="Gender (optional)"
+                      options={genderOptions}
+                      placeholderText="Select gender"
+                    />
+                  )}
+                </form.Field>
 
-                <div className="space-y-2">
-                  <Label htmlFor="pronouns">Pronouns (optional)</Label>
-                  <Input
-                    id="pronouns"
-                    value={formData.pronouns || ""}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, pronouns: e.target.value }))
-                    }
-                    placeholder="e.g., they/them, she/her, he/him"
-                  />
-                </div>
+                <form.Field name="pronouns">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Pronouns (optional)"
+                      placeholder="e.g., they/them, she/her, he/him"
+                    />
+                  )}
+                </form.Field>
 
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number (optional)</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone || ""}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, phone: e.target.value }))
-                    }
-                    placeholder="+1 (555) 000-0000"
-                  />
-                </div>
+                <form.Field name="phone">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Phone Number (optional)"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  )}
+                </form.Field>
               </>
             )}
 
@@ -300,105 +275,52 @@ export function CompleteProfileForm() {
                   safety.
                 </p>
 
-                <div className="space-y-2">
-                  <Label htmlFor="emergency-name">
-                    Emergency Contact Name (optional)
-                  </Label>
-                  <Input
-                    id="emergency-name"
-                    value={formData.emergencyContact?.name || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setEmergencyContactStarted(true);
-                      setFormData((prev) => ({
-                        ...prev,
-                        emergencyContact: {
-                          name: value,
-                          relationship: prev.emergencyContact?.relationship || "",
-                          phone: prev.emergencyContact?.phone || "",
-                          email: prev.emergencyContact?.email || "",
-                        },
-                      }));
-                    }}
-                    placeholder="Full name"
-                  />
-                </div>
+                <form.Field name="emergencyContact.name">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Emergency Contact Name (optional)"
+                      placeholder="Full name"
+                    />
+                  )}
+                </form.Field>
 
-                <div className="space-y-2">
-                  <Label htmlFor="emergency-relationship">Relationship</Label>
-                  <Input
-                    id="emergency-relationship"
-                    value={formData.emergencyContact?.relationship || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFormData((prev) => ({
-                        ...prev,
-                        emergencyContact: {
-                          name: prev.emergencyContact?.name || "",
-                          relationship: value,
-                          phone: prev.emergencyContact?.phone || "",
-                          email: prev.emergencyContact?.email || "",
-                        },
-                      }));
-                    }}
-                    placeholder="e.g., Parent, Spouse, Friend"
-                    disabled={
-                      !emergencyContactStarted && !formData.emergencyContact?.name
-                    }
-                  />
-                </div>
+                <form.Field name="emergencyContact.relationship">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Relationship"
+                      placeholder="e.g., Parent, Spouse, Friend"
+                      disabled={!hasEmergencyContactData}
+                    />
+                  )}
+                </form.Field>
 
-                <div className="space-y-2">
-                  <Label htmlFor="emergency-phone">Emergency Contact Phone</Label>
-                  <Input
-                    id="emergency-phone"
-                    type="tel"
-                    value={formData.emergencyContact?.phone || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFormData((prev) => ({
-                        ...prev,
-                        emergencyContact: {
-                          name: prev.emergencyContact?.name || "",
-                          relationship: prev.emergencyContact?.relationship || "",
-                          phone: value,
-                          email: prev.emergencyContact?.email || "",
-                        },
-                      }));
-                    }}
-                    placeholder="+1 (555) 000-0000"
-                    disabled={
-                      !emergencyContactStarted && !formData.emergencyContact?.name
-                    }
-                  />
-                </div>
+                <form.Field name="emergencyContact.phone">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Emergency Contact Phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      disabled={!hasEmergencyContactData}
+                    />
+                  )}
+                </form.Field>
 
-                <div className="space-y-2">
-                  <Label htmlFor="emergency-email">Emergency Contact Email</Label>
-                  <Input
-                    id="emergency-email"
-                    type="email"
-                    value={formData.emergencyContact?.email || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFormData((prev) => ({
-                        ...prev,
-                        emergencyContact: {
-                          name: prev.emergencyContact?.name || "",
-                          relationship: prev.emergencyContact?.relationship || "",
-                          phone: prev.emergencyContact?.phone || "",
-                          email: value,
-                        },
-                      }));
-                    }}
-                    placeholder="email@example.com"
-                    disabled={
-                      !emergencyContactStarted && !formData.emergencyContact?.name
-                    }
-                  />
-                </div>
+                <form.Field name="emergencyContact.email">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Emergency Contact Email"
+                      type="email"
+                      placeholder="email@example.com"
+                      disabled={!hasEmergencyContactData}
+                    />
+                  )}
+                </form.Field>
 
-                {emergencyContactStarted && (
+                {hasEmergencyContactData && (
                   <p className="text-muted-foreground text-sm">
                     If providing emergency contact, please include at least one contact
                     method (phone or email).
@@ -417,93 +339,41 @@ export function CompleteProfileForm() {
 
                   <Separator />
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="show-email"
-                      checked={formData.privacySettings?.showEmail || false}
-                      onCheckedChange={(checked) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          privacySettings: {
-                            ...prev.privacySettings!,
-                            showEmail: !!checked,
-                          },
-                        }))
-                      }
-                    />
-                    <Label
-                      htmlFor="show-email"
-                      className="cursor-pointer text-sm font-normal"
-                    >
-                      Show my email address to team members
-                    </Label>
-                  </div>
+                  <form.Field name="privacySettings.showEmail">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my email address to team members"
+                      />
+                    )}
+                  </form.Field>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="show-phone"
-                      checked={formData.privacySettings?.showPhone || false}
-                      onCheckedChange={(checked) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          privacySettings: {
-                            ...prev.privacySettings!,
-                            showPhone: !!checked,
-                          },
-                        }))
-                      }
-                    />
-                    <Label
-                      htmlFor="show-phone"
-                      className="cursor-pointer text-sm font-normal"
-                    >
-                      Show my phone number to team members
-                    </Label>
-                  </div>
+                  <form.Field name="privacySettings.showPhone">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my phone number to team members"
+                      />
+                    )}
+                  </form.Field>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="show-birth-year"
-                      checked={formData.privacySettings?.showBirthYear || false}
-                      onCheckedChange={(checked) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          privacySettings: {
-                            ...prev.privacySettings!,
-                            showBirthYear: !!checked,
-                          },
-                        }))
-                      }
-                    />
-                    <Label
-                      htmlFor="show-birth-year"
-                      className="cursor-pointer text-sm font-normal"
-                    >
-                      Show my birth year on my profile
-                    </Label>
-                  </div>
+                  <form.Field name="privacySettings.showBirthYear">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my birth year on my profile"
+                      />
+                    )}
+                  </form.Field>
 
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="allow-invitations"
-                      checked={formData.privacySettings?.allowTeamInvitations !== false}
-                      onCheckedChange={(checked) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          privacySettings: {
-                            ...prev.privacySettings!,
-                            allowTeamInvitations: !!checked,
-                          },
-                        }))
-                      }
-                    />
-                    <Label
-                      htmlFor="allow-invitations"
-                      className="cursor-pointer text-sm font-normal"
-                    >
-                      Allow team captains to send me invitations
-                    </Label>
-                  </div>
+                  <form.Field name="privacySettings.allowTeamInvitations">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Allow team captains to send me invitations"
+                      />
+                    )}
+                  </form.Field>
                 </div>
               </>
             )}
@@ -527,16 +397,12 @@ export function CompleteProfileForm() {
               </button>
 
               {isLastStep ? (
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                      Completing Profile...
-                    </>
-                  ) : (
-                    "Complete Profile"
-                  )}
-                </Button>
+                <FormSubmitButton
+                  isSubmitting={form.state.isSubmitting}
+                  loadingText="Completing Profile..."
+                >
+                  Complete Profile
+                </FormSubmitButton>
               ) : (
                 <button
                   type="submit"

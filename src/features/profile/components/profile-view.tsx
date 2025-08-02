@@ -1,7 +1,13 @@
+import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit2, LoaderCircle, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
+import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
+import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -10,25 +16,12 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Checkbox } from "~/components/ui/checkbox";
-import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
-import type { EmergencyContact, PrivacySettings, ProfileInput } from "../profile.types";
-
-function formatDate(date: Date | undefined): string {
-  if (!date) return "";
-  return new Date(date).toISOString().split("T")[0];
-}
+import type { PartialProfileInputType } from "../profile.schemas";
+import type { ProfileInput } from "../profile.types";
 
 function calculateAge(dateOfBirth: Date | undefined): number | null {
   if (!dateOfBirth) return null;
@@ -45,7 +38,6 @@ function calculateAge(dateOfBirth: Date | undefined): number | null {
 export function ProfileView() {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   // Fetch profile data
   const { data: profileResult, isLoading } = useQuery({
@@ -55,82 +47,125 @@ export function ProfileView() {
 
   const profile = profileResult?.success ? profileResult.data : null;
 
-  // Form state for editing
-  const [formData, setFormData] = useState<{
-    dateOfBirth?: Date;
-    gender?: string;
-    pronouns?: string;
-    phone?: string;
-    emergencyContact?: EmergencyContact;
-    privacySettings?: PrivacySettings;
-  }>({});
+  // TanStack Form for editing
+  const form = useForm({
+    defaultValues: {
+      dateOfBirth: undefined as Date | undefined,
+      gender: "",
+      pronouns: "",
+      phone: "",
+      emergencyContact: {
+        name: "",
+        relationship: "",
+        phone: "",
+        email: "",
+      },
+      privacySettings: {
+        showEmail: false,
+        showPhone: false,
+        showBirthYear: false,
+        allowTeamInvitations: true,
+      },
+    } as PartialProfileInputType,
+    onSubmit: async ({ value }) => {
+      try {
+        // Build ProfileInput with only defined values
+        const dataToSubmit: Partial<ProfileInput> = {};
+
+        if (value.dateOfBirth) dataToSubmit.dateOfBirth = value.dateOfBirth;
+        if (value.gender) dataToSubmit.gender = value.gender;
+        if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
+        if (value.phone) dataToSubmit.phone = value.phone;
+        if (value.emergencyContact) {
+          // Only include emergency contact if it has meaningful data
+          const ec = value.emergencyContact;
+          if (ec.name || ec.relationship || ec.phone || ec.email) {
+            dataToSubmit.emergencyContact = {
+              name: ec.name || "",
+              relationship: ec.relationship || "",
+              ...(ec.phone && { phone: ec.phone }),
+              ...(ec.email && { email: ec.email }),
+            };
+          }
+        }
+        if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
+
+        const result = await updateUserProfile({ data: dataToSubmit });
+
+        if (result.success) {
+          toast.success("Profile updated successfully");
+          await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+          setIsEditing(false);
+        } else {
+          const error = result.errors?.[0]?.message || "Failed to update profile";
+          toast.error(error);
+        }
+      } catch (error) {
+        toast.error("An unexpected error occurred");
+        console.error("Profile update error:", error);
+      }
+    },
+  });
+
+  // Gender options for select component
+  const genderOptions = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "non-binary", label: "Non-binary" },
+    { value: "other", label: "Other" },
+    { value: "prefer-not-to-say", label: "Prefer not to say" },
+  ];
 
   // Initialize form data when entering edit mode
   const startEditing = () => {
     if (!profile) return;
 
-    const formState: {
-      dateOfBirth?: Date;
-      gender?: string;
-      pronouns?: string;
-      phone?: string;
-      emergencyContact?: EmergencyContact;
-      privacySettings?: PrivacySettings;
-    } = {};
+    // Reset form with current profile data
+    form.reset();
 
-    if (profile.dateOfBirth) formState.dateOfBirth = profile.dateOfBirth;
-    if (profile.gender) formState.gender = profile.gender;
-    if (profile.pronouns) formState.pronouns = profile.pronouns;
-    if (profile.phone) formState.phone = profile.phone;
-    if (profile.emergencyContact) formState.emergencyContact = profile.emergencyContact;
-    formState.privacySettings = profile.privacySettings || {
+    // Set field values from profile
+    if (profile.dateOfBirth) {
+      form.setFieldValue("dateOfBirth", profile.dateOfBirth);
+    }
+    if (profile.gender) {
+      form.setFieldValue("gender", profile.gender);
+    }
+    if (profile.pronouns) {
+      form.setFieldValue("pronouns", profile.pronouns);
+    }
+    if (profile.phone) {
+      form.setFieldValue("phone", profile.phone);
+    }
+    if (profile.emergencyContact) {
+      form.setFieldValue("emergencyContact.name", profile.emergencyContact.name || "");
+      form.setFieldValue(
+        "emergencyContact.relationship",
+        profile.emergencyContact.relationship || "",
+      );
+      form.setFieldValue("emergencyContact.phone", profile.emergencyContact.phone || "");
+      form.setFieldValue("emergencyContact.email", profile.emergencyContact.email || "");
+    }
+
+    const privacySettings = profile.privacySettings || {
       showEmail: false,
       showPhone: false,
       showBirthYear: false,
       allowTeamInvitations: true,
     };
+    form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
+    form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
+    form.setFieldValue("privacySettings.showBirthYear", privacySettings.showBirthYear);
+    form.setFieldValue(
+      "privacySettings.allowTeamInvitations",
+      privacySettings.allowTeamInvitations,
+    );
 
-    setFormData(formState);
     setIsEditing(true);
   };
 
   const cancelEditing = () => {
     setIsEditing(false);
-    setFormData({});
-  };
-
-  const saveProfile = async () => {
-    setIsSaving(true);
-    try {
-      // Build ProfileInput with required fields
-      const dataToSubmit: Partial<ProfileInput> = {};
-
-      if (formData.dateOfBirth) dataToSubmit.dateOfBirth = formData.dateOfBirth;
-      if (formData.gender) dataToSubmit.gender = formData.gender;
-      if (formData.pronouns) dataToSubmit.pronouns = formData.pronouns;
-      if (formData.phone) dataToSubmit.phone = formData.phone;
-      if (formData.emergencyContact)
-        dataToSubmit.emergencyContact = formData.emergencyContact;
-      if (formData.privacySettings)
-        dataToSubmit.privacySettings = formData.privacySettings;
-
-      const result = await updateUserProfile({ data: dataToSubmit });
-
-      if (result.success) {
-        toast.success("Profile updated successfully");
-        await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
-        setIsEditing(false);
-        setFormData({});
-      } else {
-        const error = result.errors?.[0]?.message || "Failed to update profile";
-        toast.error(error);
-      }
-    } catch (error) {
-      toast.error("An unexpected error occurred");
-      console.error("Profile update error:", error);
-    } finally {
-      setIsSaving(false);
-    }
+    form.reset();
   };
 
   if (isLoading) {
@@ -175,24 +210,23 @@ export function ProfileView() {
                   onClick={cancelEditing}
                   variant="outline"
                   size="sm"
-                  disabled={isSaving}
+                  disabled={form.state.isSubmitting}
                 >
                   <X className="mr-2 h-4 w-4" />
                   Cancel
                 </Button>
-                <Button onClick={saveProfile} size="sm" disabled={isSaving}>
-                  {isSaving ? (
-                    <>
-                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
+                <FormSubmitButton
+                  isSubmitting={form.state.isSubmitting}
+                  loadingText="Saving..."
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                  }}
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Changes
+                </FormSubmitButton>
               </div>
             )}
           </div>
@@ -215,24 +249,30 @@ export function ProfileView() {
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth">Date of Birth</Label>
               {isEditing ? (
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth ? formatDate(formData.dateOfBirth) : ""}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setFormData((prev) => ({
-                        ...prev,
-                        dateOfBirth: new Date(e.target.value),
-                      }));
-                    } else {
-                      const newFormData = { ...formData };
-                      delete newFormData.dateOfBirth;
-                      setFormData(newFormData);
-                    }
+                <form.Field
+                  name="dateOfBirth"
+                  validators={{
+                    onChange: ({ value }) => {
+                      if (value) {
+                        const age = new Date().getFullYear() - value.getFullYear();
+                        if (age < 13 || age > 120) {
+                          return "Age must be between 13 and 120 years";
+                        }
+                      }
+                      return undefined;
+                    },
                   }}
-                  max={new Date().toISOString().split("T")[0]}
-                />
+                >
+                  {(field) => (
+                    <ValidatedDatePicker
+                      field={field}
+                      label=""
+                      minAge={13}
+                      maxAge={120}
+                      className="space-y-0"
+                    />
+                  )}
+                </form.Field>
               ) : (
                 <p className="text-base">
                   {profile.dateOfBirth
@@ -245,15 +285,17 @@ export function ProfileView() {
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               {isEditing ? (
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone || ""}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, phone: e.target.value }))
-                  }
-                  placeholder="+1 (555) 000-0000"
-                />
+                <form.Field name="phone">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label=""
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      className="space-y-0"
+                    />
+                  )}
+                </form.Field>
               ) : (
                 <p className="text-base">{profile.phone || "Not set"}</p>
               )}
@@ -262,29 +304,17 @@ export function ProfileView() {
             <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
               {isEditing ? (
-                <Select
-                  value={formData.gender || ""}
-                  onValueChange={(value) => {
-                    if (value) {
-                      setFormData((prev) => ({ ...prev, gender: value }));
-                    } else {
-                      const newFormData = { ...formData };
-                      delete newFormData.gender;
-                      setFormData(newFormData);
-                    }
-                  }}
-                >
-                  <SelectTrigger id="gender">
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="non-binary">Non-binary</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                  </SelectContent>
-                </Select>
+                <form.Field name="gender">
+                  {(field) => (
+                    <ValidatedSelect
+                      field={field}
+                      label=""
+                      options={genderOptions}
+                      placeholderText="Select gender"
+                      className="space-y-0"
+                    />
+                  )}
+                </form.Field>
               ) : (
                 <p className="text-base">{profile.gender || "Not set"}</p>
               )}
@@ -293,14 +323,16 @@ export function ProfileView() {
             <div className="space-y-2">
               <Label htmlFor="pronouns">Pronouns</Label>
               {isEditing ? (
-                <Input
-                  id="pronouns"
-                  value={formData.pronouns || ""}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, pronouns: e.target.value }))
-                  }
-                  placeholder="e.g., they/them, she/her, he/him"
-                />
+                <form.Field name="pronouns">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label=""
+                      placeholder="e.g., they/them, she/her, he/him"
+                      className="space-y-0"
+                    />
+                  )}
+                </form.Field>
               ) : (
                 <p className="text-base">{profile.pronouns || "Not set"}</p>
               )}
@@ -318,97 +350,47 @@ export function ProfileView() {
         <CardContent className="space-y-4">
           {isEditing ? (
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="emergency-name">Contact Name</Label>
-                <Input
-                  id="emergency-name"
-                  value={formData.emergencyContact?.name || ""}
-                  onChange={(e) => {
-                    const newContact: EmergencyContact = {
-                      name: e.target.value,
-                      relationship: formData.emergencyContact?.relationship || "",
-                    };
-                    if (formData.emergencyContact?.phone)
-                      newContact.phone = formData.emergencyContact.phone;
-                    if (formData.emergencyContact?.email)
-                      newContact.email = formData.emergencyContact.email;
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: newContact,
-                    }));
-                  }}
-                  placeholder="Full name"
-                />
-              </div>
+              <form.Field name="emergencyContact.name">
+                {(field) => (
+                  <ValidatedInput
+                    field={field}
+                    label="Contact Name"
+                    placeholder="Full name"
+                  />
+                )}
+              </form.Field>
 
-              <div className="space-y-2">
-                <Label htmlFor="emergency-relationship">Relationship</Label>
-                <Input
-                  id="emergency-relationship"
-                  value={formData.emergencyContact?.relationship || ""}
-                  onChange={(e) => {
-                    const newContact: EmergencyContact = {
-                      name: formData.emergencyContact?.name || "",
-                      relationship: e.target.value,
-                    };
-                    if (formData.emergencyContact?.phone)
-                      newContact.phone = formData.emergencyContact.phone;
-                    if (formData.emergencyContact?.email)
-                      newContact.email = formData.emergencyContact.email;
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: newContact,
-                    }));
-                  }}
-                  placeholder="e.g., Parent, Spouse, Friend"
-                />
-              </div>
+              <form.Field name="emergencyContact.relationship">
+                {(field) => (
+                  <ValidatedInput
+                    field={field}
+                    label="Relationship"
+                    placeholder="e.g., Parent, Spouse, Friend"
+                  />
+                )}
+              </form.Field>
 
-              <div className="space-y-2">
-                <Label htmlFor="emergency-phone">Contact Phone</Label>
-                <Input
-                  id="emergency-phone"
-                  type="tel"
-                  value={formData.emergencyContact?.phone || ""}
-                  onChange={(e) => {
-                    const newContact: EmergencyContact = {
-                      name: formData.emergencyContact?.name || "",
-                      relationship: formData.emergencyContact?.relationship || "",
-                    };
-                    if (e.target.value) newContact.phone = e.target.value;
-                    if (formData.emergencyContact?.email)
-                      newContact.email = formData.emergencyContact.email;
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: newContact,
-                    }));
-                  }}
-                  placeholder="+1 (555) 000-0000"
-                />
-              </div>
+              <form.Field name="emergencyContact.phone">
+                {(field) => (
+                  <ValidatedInput
+                    field={field}
+                    label="Contact Phone"
+                    type="tel"
+                    placeholder="+1 (555) 000-0000"
+                  />
+                )}
+              </form.Field>
 
-              <div className="space-y-2">
-                <Label htmlFor="emergency-email">Contact Email</Label>
-                <Input
-                  id="emergency-email"
-                  type="email"
-                  value={formData.emergencyContact?.email || ""}
-                  onChange={(e) => {
-                    const newContact: EmergencyContact = {
-                      name: formData.emergencyContact?.name || "",
-                      relationship: formData.emergencyContact?.relationship || "",
-                    };
-                    if (formData.emergencyContact?.phone)
-                      newContact.phone = formData.emergencyContact.phone;
-                    if (e.target.value) newContact.email = e.target.value;
-                    setFormData((prev) => ({
-                      ...prev,
-                      emergencyContact: newContact,
-                    }));
-                  }}
-                  placeholder="email@example.com"
-                />
-              </div>
+              <form.Field name="emergencyContact.email">
+                {(field) => (
+                  <ValidatedInput
+                    field={field}
+                    label="Contact Email"
+                    type="email"
+                    placeholder="email@example.com"
+                  />
+                )}
+              </form.Field>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
@@ -448,85 +430,41 @@ export function ProfileView() {
         <CardContent className="space-y-4">
           {isEditing ? (
             <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="show-email"
-                  checked={formData.privacySettings?.showEmail || false}
-                  onCheckedChange={(checked) => {
-                    const newSettings: PrivacySettings = {
-                      ...formData.privacySettings!,
-                      showEmail: !!checked,
-                    };
-                    setFormData((prev) => ({
-                      ...prev,
-                      privacySettings: newSettings,
-                    }));
-                  }}
-                />
-                <Label htmlFor="show-email" className="cursor-pointer">
-                  Show my email address to team members
-                </Label>
-              </div>
+              <form.Field name="privacySettings.showEmail">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my email address to team members"
+                  />
+                )}
+              </form.Field>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="show-phone"
-                  checked={formData.privacySettings?.showPhone || false}
-                  onCheckedChange={(checked) => {
-                    const newSettings: PrivacySettings = {
-                      ...formData.privacySettings!,
-                      showPhone: !!checked,
-                    };
-                    setFormData((prev) => ({
-                      ...prev,
-                      privacySettings: newSettings,
-                    }));
-                  }}
-                />
-                <Label htmlFor="show-phone" className="cursor-pointer">
-                  Show my phone number to team members
-                </Label>
-              </div>
+              <form.Field name="privacySettings.showPhone">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my phone number to team members"
+                  />
+                )}
+              </form.Field>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="show-birth-year"
-                  checked={formData.privacySettings?.showBirthYear || false}
-                  onCheckedChange={(checked) => {
-                    const newSettings: PrivacySettings = {
-                      ...formData.privacySettings!,
-                      showBirthYear: !!checked,
-                    };
-                    setFormData((prev) => ({
-                      ...prev,
-                      privacySettings: newSettings,
-                    }));
-                  }}
-                />
-                <Label htmlFor="show-birth-year" className="cursor-pointer">
-                  Show my birth year on my profile
-                </Label>
-              </div>
+              <form.Field name="privacySettings.showBirthYear">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my birth year on my profile"
+                  />
+                )}
+              </form.Field>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="allow-invitations"
-                  checked={formData.privacySettings?.allowTeamInvitations !== false}
-                  onCheckedChange={(checked) => {
-                    const newSettings: PrivacySettings = {
-                      ...formData.privacySettings!,
-                      allowTeamInvitations: !!checked,
-                    };
-                    setFormData((prev) => ({
-                      ...prev,
-                      privacySettings: newSettings,
-                    }));
-                  }}
-                />
-                <Label htmlFor="allow-invitations" className="cursor-pointer">
-                  Allow team captains to send me invitations
-                </Label>
-              </div>
+              <form.Field name="privacySettings.allowTeamInvitations">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Allow team captains to send me invitations"
+                  />
+                )}
+              </form.Field>
             </div>
           ) : (
             <div className="space-y-2">

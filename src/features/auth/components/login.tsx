@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
@@ -8,6 +9,7 @@ import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
+import { loginFormSchema } from "../auth.schemas";
 
 export default function LoginForm() {
   const queryClient = useQueryClient();
@@ -71,7 +73,17 @@ export default function LoginForm() {
             <form.Field
               name="email"
               validators={{
-                onChange: ({ value }) => (!value ? "Email is required" : undefined),
+                onChange: ({ value }) => {
+                  try {
+                    loginFormSchema.shape.email.parse(value);
+                    return undefined;
+                  } catch (error) {
+                    if (error instanceof z.ZodError) {
+                      return error.errors?.[0]?.message || "Invalid email";
+                    }
+                    return "Invalid email";
+                  }
+                },
               }}
             >
               {(field) => (
@@ -88,7 +100,17 @@ export default function LoginForm() {
             <form.Field
               name="password"
               validators={{
-                onChange: ({ value }) => (!value ? "Password is required" : undefined),
+                onChange: ({ value }) => {
+                  try {
+                    loginFormSchema.shape.password.parse(value);
+                    return undefined;
+                  } catch (error) {
+                    if (error instanceof z.ZodError) {
+                      return error.errors?.[0]?.message || "Password is required";
+                    }
+                    return "Password is required";
+                  }
+                },
               }}
             >
               {(field) => (

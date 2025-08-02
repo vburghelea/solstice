@@ -16,6 +16,7 @@ interface ValidatedInputProps extends FieldComponentProps {
   pattern?: string;
   required?: boolean;
   readOnly?: boolean;
+  disabled?: boolean;
 }
 
 // Correctly define the component receiving props

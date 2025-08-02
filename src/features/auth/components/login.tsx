@@ -68,7 +68,12 @@ export default function LoginForm() {
             <h1 className="text-xl font-bold">Welcome back to Acme Inc.</h1>
           </div>
           <div className="flex flex-col gap-5">
-            <form.Field name="email">
+            <form.Field
+              name="email"
+              validators={{
+                onChange: ({ value }) => (!value ? "Email is required" : undefined),
+              }}
+            >
               {(field) => (
                 <ValidatedInput
                   field={field}
@@ -80,7 +85,12 @@ export default function LoginForm() {
                 />
               )}
             </form.Field>
-            <form.Field name="password">
+            <form.Field
+              name="password"
+              validators={{
+                onChange: ({ value }) => (!value ? "Password is required" : undefined),
+              }}
+            >
               {(field) => (
                 <ValidatedInput
                   field={field}

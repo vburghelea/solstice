@@ -53,6 +53,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
         }
         placeholder={placeholder}
         disabled={field.form.state.isSubmitting}
+        readOnly={field.form.state.isSubmitting}
         // Add aria-invalid for accessibility based on errors
         aria-invalid={!!meta.errors.length}
         aria-describedby={meta.errors.length ? `${inputId}-errors` : undefined}

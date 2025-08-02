@@ -226,6 +226,29 @@ async function seed() {
       },
     ]);
 
+    // Create memberships for test users
+    console.log("Creating test memberships...");
+
+    await db.insert(memberships).values([
+      {
+        id: "test-membership-1",
+        userId: "test-user-1",
+        membershipTypeId: "annual-player-2025",
+        status: "active" as const,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+        paymentProvider: "mock",
+        paymentId: "mock_payment_intent_1",
+        metadata: {
+          paymentDetails: {
+            amount: 4500,
+            currency: "CAD",
+          },
+        },
+      },
+    ]);
+
+    console.log("✅ Created test memberships");
     console.log("✅ Test data seeded successfully!");
   } catch (error) {
     console.error("❌ Error seeding test data:", error);

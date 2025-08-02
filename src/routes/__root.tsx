@@ -62,11 +62,11 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "React TanStarter",
+        title: "Solstice",
       },
       {
         name: "description",
-        content: "A minimal starter template for 🏝️ TanStack Start.",
+        content: "Sports management platform for clubs and leagues",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

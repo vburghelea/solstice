@@ -11,7 +11,9 @@ export function SafeLink(props: Props) {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const isWebKit =
-    /WebKit/.test(navigator.userAgent) && !/Chrome|Edg|OPR/.test(navigator.userAgent);
+    typeof navigator !== "undefined" &&
+    /WebKit/.test(navigator.userAgent) &&
+    !/Chrome|Edg|OPR/.test(navigator.userAgent);
 
   if (isWebKit) {
     // For WebKit, manually handle active state

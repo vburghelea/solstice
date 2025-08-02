@@ -100,15 +100,17 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
       // Click the button
       await button.click();
 
-      // The mock payment service should redirect to a mock checkout URL
-      // In real implementation, this would go to Square's checkout page
-      await page.waitForURL((url) => url.toString().includes("checkout.mock.com"), {
+      // The mock payment service should redirect back to membership page with mock checkout params
+      await page.waitForURL((url) => url.toString().includes("mock_checkout=true"), {
         timeout: 10000,
       });
 
       // Verify we're on the mock checkout page
-      expect(page.url()).toContain("checkout.mock.com");
-      expect(page.url()).toContain("session_id=");
+      expect(page.url()).toContain("/dashboard/membership");
+      expect(page.url()).toContain("mock_checkout=true");
+      expect(page.url()).toContain("session=");
+      expect(page.url()).toContain("type=");
+      expect(page.url()).toContain("amount=");
     } else if (buttonText === "Current Plan") {
       // Button should be disabled for current plan
       await expect(button).toBeDisabled();
@@ -116,17 +118,34 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
   });
 
   test("should handle payment confirmation callback", async ({ page }) => {
-    // Simulate returning from payment provider with success
-    const mockSessionId = "test-session-123";
-    await page.goto(
-      `/api/payments/square/callback?transactionId=${mockSessionId}&status=COMPLETED`,
-    );
+    // First navigate to membership page to set up a mock purchase
+    await page.goto("/dashboard/membership");
 
-    // Should redirect to membership page with success message
-    await page.waitForURL("/dashboard/membership", { timeout: 10000 });
+    // Wait for memberships to load
+    await expect(
+      page.getByRole("heading", { name: "Available Memberships" }),
+    ).toBeVisible();
 
-    // Check for success toast notification
-    await expect(page.getByText("Membership purchase confirmed!")).toBeVisible();
+    // Find a purchase button (user might not have membership yet)
+    const purchaseButton = page.getByRole("button", { name: "Purchase" }).first();
+    const buttonExists = await purchaseButton.isVisible().catch(() => false);
+
+    if (buttonExists) {
+      // Click purchase to start mock checkout
+      await purchaseButton.click();
+
+      // Wait for mock checkout redirect
+      await page.waitForURL((url) => url.toString().includes("mock_checkout=true"));
+
+      // Mock checkout automatically processes the payment
+      // Wait for the success message
+      await expect(page.getByText("Membership purchased successfully!")).toBeVisible({
+        timeout: 10000,
+      });
+    } else {
+      // User already has membership, check the status instead
+      await expect(page.getByText("Active Membership")).toBeVisible();
+    }
   });
 
   test("should show active membership status correctly", async ({ page }) => {

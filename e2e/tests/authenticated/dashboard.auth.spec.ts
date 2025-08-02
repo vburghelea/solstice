@@ -89,16 +89,19 @@ test.describe("Dashboard (Authenticated)", () => {
     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
 
     // Navigate to teams
-    await page.goto("/dashboard/teams");
+    await page.goto("/dashboard/teams", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
     // Should not redirect to login
     await expect(page).not.toHaveURL(/\/auth\/login/);
 
     // Navigate to profile
-    await page.goto("/dashboard/profile");
+    await page.goto("/dashboard/profile", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
     await expect(page).not.toHaveURL(/\/auth\/login/);
 
     // Direct navigation should also work
-    await page.goto("/dashboard/events");
+    await page.goto("/dashboard/events", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
     await expect(page).not.toHaveURL(/\/auth\/login/);
   });
 });

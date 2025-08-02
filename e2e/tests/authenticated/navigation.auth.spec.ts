@@ -85,7 +85,8 @@ test.describe("Navigation (Authenticated)", () => {
     ];
 
     for (const url of authenticatedPages) {
-      await page.goto(url);
+      await page.goto(url, { waitUntil: "domcontentloaded" });
+      await page.waitForLoadState("networkidle");
       await expect(page).toHaveURL(url);
       await expect(page).not.toHaveURL(/\/auth\/login/);
     }

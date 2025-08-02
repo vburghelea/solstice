@@ -32,18 +32,27 @@ export function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      // 1 — Tell the server to remove the session
+      await auth.signOut().catch((e) => {
+        /* network hiccups shouldn't block UI logout */
+        console.error("signOut error:", e);
+      });
 
-      // Clear all cached data
+      // 2 — Client‑side cleanup
       queryClient.clear();
-
-      // Invalidate router cache
       await router.invalidate();
 
-      // Navigate to login page
-      navigate({ to: "/auth/login" });
+      // 3 — Small delay to ensure cleanup completes
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // 4 — Hard‑navigate so every browser instantly shows the login page
+      // Use both methods to ensure navigation happens
+      window.location.href = "/auth/login";
+      window.location.replace("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Even on error, try to navigate
+      window.location.href = "/auth/login";
     }
   };
 
@@ -61,6 +70,17 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
+              preload={false}
+              onClick={(e) => {
+                // For WebKit, ensure navigation happens
+                if (
+                  navigator.userAgent.includes("WebKit") &&
+                  !navigator.userAgent.includes("Chrome")
+                ) {
+                  e.preventDefault();
+                  navigate({ to: item.href });
+                }
+              }}
               activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
@@ -82,6 +102,17 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
+              preload={false}
+              onClick={(e) => {
+                // For WebKit, ensure navigation happens
+                if (
+                  navigator.userAgent.includes("WebKit") &&
+                  !navigator.userAgent.includes("Chrome")
+                ) {
+                  e.preventDefault();
+                  navigate({ to: item.href });
+                }
+              }}
               activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",

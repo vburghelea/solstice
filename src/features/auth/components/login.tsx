@@ -46,14 +46,21 @@ export default function LoginForm() {
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onError: (ctx: any) => {
-            setErrorMessage(ctx.error?.message || "Login failed");
+            // Ensure error is set synchronously for WebKit
+            const message = ctx.error?.message || "Invalid email or password";
+            setErrorMessage(message);
             setIsLoading(false);
+            // Force a re-render for WebKit
+            setTimeout(() => setErrorMessage(message), 0);
           },
         },
       );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setErrorMessage(error.message || "An unexpected error occurred");
+      const message = error.message || "An unexpected error occurred";
+      setErrorMessage(message);
+      // Force a re-render for WebKit
+      setTimeout(() => setErrorMessage(message), 0);
     } finally {
       setIsLoading(false);
     }

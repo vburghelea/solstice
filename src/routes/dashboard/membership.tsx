@@ -191,20 +191,28 @@ function MembershipPage() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="mb-8 text-3xl font-bold">Membership</h1>
+      <p className="text-muted-foreground mb-6">
+        Join Quadball Canada and access exclusive member benefits
+      </p>
 
       {/* Current Membership Status */}
-      {membershipStatus?.hasMembership && membershipStatus.currentMembership && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Your Active Membership</CardTitle>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Current Status</CardTitle>
+          {membershipStatus?.hasMembership && membershipStatus.currentMembership ? (
             <CardDescription>
               {membershipStatus.currentMembership.membershipType.name}
             </CardDescription>
-          </CardHeader>
-          <CardContent>
+          ) : (
+            <CardDescription>No Active Membership</CardDescription>
+          )}
+        </CardHeader>
+        <CardContent>
+          {membershipStatus?.hasMembership && membershipStatus.currentMembership ? (
             <div className="space-y-2">
               <p className="text-muted-foreground text-sm">
-                Status: <span className="font-medium text-green-600">Active</span>
+                Status:{" "}
+                <span className="font-medium text-green-600">Active Membership</span>
               </p>
               <p className="text-muted-foreground text-sm">
                 Expires: {membershipStatus.expiresAt?.toLocaleDateString()}
@@ -213,20 +221,22 @@ function MembershipPage() {
                 Days Remaining: {membershipStatus.daysRemaining} days
               </p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              Join today to participate in events and access member benefits
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Available Memberships */}
       <div className="mb-4">
-        <h2 className="mb-4 text-2xl font-semibold">
-          {membershipStatus?.hasMembership ? "Renew or Upgrade" : "Available Memberships"}
-        </h2>
+        <h2 className="mb-4 text-2xl font-semibold">Available Memberships</h2>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {membershipTypes?.map((type) => (
-          <Card key={type.id}>
+          <Card key={type.id} data-testid={`membership-card-${type.id}`}>
             <CardHeader>
               <CardTitle>{type.name}</CardTitle>
               <CardDescription>{type.description}</CardDescription>
@@ -234,7 +244,7 @@ function MembershipPage() {
             <CardContent>
               <div className="space-y-2">
                 <p className="text-3xl font-bold">
-                  ${(type.priceCents / 100).toFixed(2)} CAD
+                  ${(type.priceCents / 100).toFixed(2)}
                 </p>
                 <p className="text-muted-foreground text-sm">
                   Duration: {type.durationMonths} months
@@ -254,7 +264,7 @@ function MembershipPage() {
                 membershipStatus.currentMembership?.membershipTypeId === type.id
                   ? "Current Plan"
                   : membershipStatus?.hasMembership
-                    ? "Upgrade/Renew"
+                    ? "Renew"
                     : "Purchase"}
               </Button>
             </CardFooter>

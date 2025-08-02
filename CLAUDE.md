@@ -415,6 +415,11 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
   2. Use `.auth.spec.ts` suffix for tests requiring authentication
   3. Use `.unauth.spec.ts` suffix for tests without authentication
   4. Run `pnpm test:e2e` to execute tests locally
+- **Add client-side rate limiting to server functions**:
+  1. Import `useRateLimitedServerFn` from `~/lib/pacer/hooks`
+  2. Wrap your server function: `const rateLimited = useRateLimitedServerFn(serverFn, { type: "api" })`
+  3. Use types: "auth" (5/15min), "api" (100/1min), "search" (10/10s), "mutation" (20/1min)
+  4. See `docs/rate-limiting-with-pacer.md` for full guide
 
 ### User added context:
 

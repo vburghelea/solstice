@@ -2,10 +2,26 @@
 
 ## Overview
 
-The application implements rate limiting to protect against abuse and ensure fair usage of API endpoints. Rate limiting is applied at two levels:
+The application implements comprehensive rate limiting to protect against abuse and ensure fair usage. We use a two-layer approach:
+
+1. **Client-Side Rate Limiting** (TanStack Pacer) - Prevents excessive requests before they're sent, provides immediate user feedback
+2. **Server-Side Rate Limiting** - Final protection layer that works across all clients
+
+Rate limiting is applied at two levels:
 
 1. **Authentication endpoints** - Stricter limits for sensitive operations
 2. **API endpoints** - General limits for regular API calls
+
+## Client-Side Rate Limiting
+
+We use TanStack Pacer for client-side rate limiting. See [Rate Limiting with TanStack Pacer](./rate-limiting-with-pacer.md) for detailed documentation on:
+
+- Using the `useRateLimitedServerFn` hook
+- Rate limit presets and configuration
+- Integration examples
+- Best practices
+
+## Server-Side Rate Limiting
 
 ## Configuration
 

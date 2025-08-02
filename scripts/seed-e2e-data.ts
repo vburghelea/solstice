@@ -9,7 +9,14 @@ import dotenv from "dotenv";
 import { like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { account, session, teams, user } from "../src/db/schema";
+import {
+  account,
+  memberships,
+  membershipTypes,
+  session,
+  teams,
+  user,
+} from "../src/db/schema";
 
 // Load environment variables
 dotenv.config({ path: ".env.e2e" });
@@ -31,6 +38,12 @@ async function seed() {
     // Clear existing test data in correct order due to foreign key constraints
     console.log("Clearing existing test teams...");
     await db.delete(teams).where(like(teams.description, "%E2E test%"));
+
+    console.log("Clearing existing memberships...");
+    await db.delete(memberships);
+
+    console.log("Clearing existing membership types...");
+    await db.delete(membershipTypes);
 
     console.log("Clearing existing test users...");
     await db.delete(user).where(like(user.email, "%@example.com"));
@@ -87,6 +100,34 @@ async function seed() {
 
     // Hash password for all test users using Better Auth's hash function
     const hashedPassword = await hashPassword("testpassword123");
+
+    // Create membership types first
+    console.log("Creating membership types...");
+    await db.insert(membershipTypes).values([
+      {
+        id: "annual-player-2025",
+        name: "Annual Player Membership 2025",
+        description:
+          "Full access to all Quadball Canada events and programs for the 2025 season",
+        priceCents: 4500, // $45.00
+        durationMonths: 12,
+        status: "active" as const,
+        metadata: {
+          season: "2025",
+          membershipYear: 2025,
+          currency: "CAD",
+          features: [
+            "Access to all sanctioned tournaments",
+            "Player insurance coverage",
+            "Voting rights at AGM",
+            "Team registration eligibility",
+            "Member newsletter and updates",
+          ],
+          maxPurchases: 1,
+        },
+      },
+    ]);
+    console.log("✅ Created membership types");
 
     console.log("Creating test users...");
     for (const userData of testUsers) {

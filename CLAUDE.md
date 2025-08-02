@@ -625,6 +625,16 @@ Tree as of July 6, 2025
 
 Always use your playwright tool to navigate to localhost:5173 or 8888 to test changes before finishing
 
+## Before using Playwright MCP
+
+1. Check if dev server is running: `curl -s http://localhost:5173/api/health`
+2. If MCP shows error about browser already in use, close it first: `mcp__playwright__browser_close`
+3. Then navigate to the page you need
+
+## Before rerunning E2E tests
+
+Always use Playwright MCP to manually verify the expected behavior before running E2E tests. This helps ensure tests match the actual UI behavior.
+
 ## Dev server
 
 Assume the dev server is running on 5173 or 8888 for every session, and check via playwright or curl

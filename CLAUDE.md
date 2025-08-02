@@ -378,19 +378,26 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    });
    ```
 
-3. **Best Practices**:
+3. **Using Playwright MCP for Verification**:
+   - Before using Playwright MCP:
+     - Check if dev server is running: `curl -s http://localhost:5173/api/health`
+     - If browser already in use, close it first: `mcp__playwright__browser_close`
+   - Use MCP to verify UI behavior before writing/updating E2E tests
+   - This ensures tests match actual application behavior
+
+4. **Best Practices**:
    - Use Playwright's recommended locators: `getByRole`, `getByLabel`, `getByText`
    - Avoid arbitrary waits - use proper wait conditions
    - Keep tests isolated and independent
    - Test user journeys, not implementation details
 
-4. **Running Tests**:
+5. **Running Tests**:
    - `pnpm test:e2e` - Run all E2E tests
    - `pnpm test:e2e:ui` - Interactive UI mode for debugging
    - `pnpm test:e2e --project=chromium-auth` - Run specific test suite
    - `pnpm test:e2e:setup` - Seed test data before running tests
 
-5. **Authentication in Tests**:
+6. **Authentication in Tests**:
    - Shared auth state is configured in `e2e/auth.setup.ts`
    - Tests automatically use authenticated state when in `authenticated/` folder
    - Test user credentials are in `.env.e2e`

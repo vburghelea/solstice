@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ProfileView } from "~/features/profile/components/profile-view";
 
 export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
 });
 
 function ProfilePage() {
-  const { user } = Route.useRouteContext();
-
   return (
     <div className="container mx-auto space-y-8 p-6">
       <div>
@@ -16,19 +15,7 @@ function ProfilePage() {
         </p>
       </div>
 
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="mb-4 text-lg font-semibold">Profile Details</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="text-muted-foreground text-sm font-medium">Name</label>
-            <p className="text-base">{user?.name || "Not set"}</p>
-          </div>
-          <div>
-            <label className="text-muted-foreground text-sm font-medium">Email</label>
-            <p className="text-base">{user?.email || "Not set"}</p>
-          </div>
-        </div>
-      </div>
+      <ProfileView />
     </div>
   );
 }

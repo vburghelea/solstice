@@ -251,27 +251,27 @@ test.describe("Teams Management", () => {
 
 ---
 
-### ❌ P2-2: TanStack Form hook adoption sweep
+### ✅ P2-2: TanStack Form hook adoption sweep
 
-|                |                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------ |
-| **Status**     | ❌ Not Started                                                                                               |
-| **Why now**    | Only the onboarding/profile form uses the hook; bring login/signup to same pattern and document conventions. |
-| **Depends on** | P0-2 (proof of concept)                                                                                      |
-| **Code refs**  | `.cursor/rules/form-rule.mdc`, `src/lib/form.ts`, existing auth components                                   |
-| **Tasks**      | Refactor `LoginForm`, `SignupForm` to `useAppForm`. Remove prop drilling, ensure type inference.             |
+|                |                                                                                                                                                                                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Status**     | ✅ Complete                                                                                                                                                                                                                                                                                      |
+| **Why now**    | Only the onboarding/profile form uses the hook; bring login/signup to same pattern and document conventions.                                                                                                                                                                                     |
+| **Depends on** | P0-2 (proof of concept)                                                                                                                                                                                                                                                                          |
+| **Code refs**  | `src/lib/hooks/useAppForm.ts`, `src/features/auth/components/login.tsx`, `src/features/auth/components/signup.tsx`                                                                                                                                                                               |
+| **Delivered**  | <ul><li>Created `useAppForm` custom hook wrapping TanStack Form</li><li>Refactored LoginForm and SignupForm to use TanStack Form</li><li>Added field-level validation with Zod schemas</li><li>Updated ValidatedInput to work with TanStack Form fields</li><li>All auth tests passing</li></ul> |
 
 ---
 
-### ❌ P2-3: Admin "Memberships" report page
+### ✅ P2-3: Admin "Memberships" report page
 
-|                |                                                                                                                                                   |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                    |
-| **Why now**    | Finance team needs ability to see who paid; now that membership flow live.                                                                        |
-| **Depends on** | P1-1, P1-2                                                                                                                                        |
-| **Code refs**  | `docs/project-brief.md` Reporting section                                                                                                         |
-| **Tasks**      | <ul><li>Add RBAC check (`global_admin`) in server fn.</li><li>DataTable component (planned in UI guide) for roster.</li><li>CSV export.</li></ul> |
+|                |                                                                                                                                                                                                                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Status**     | ✅ Complete                                                                                                                                                                                                                                                                                                                          |
+| **Why now**    | Finance team needs ability to see who paid; now that membership flow live.                                                                                                                                                                                                                                                           |
+| **Depends on** | P1-1, P1-2                                                                                                                                                                                                                                                                                                                           |
+| **Code refs**  | `src/features/membership/membership.admin-queries.ts`, `src/components/ui/data-table.tsx`, `src/routes/dashboard/reports.tsx`                                                                                                                                                                                                        |
+| **Delivered**  | <ul><li>Admin-only `getAllMemberships` server query with RBAC check</li><li>Reusable DataTable component with TanStack Table</li><li>CSV export functionality with formatting</li><li>Status filtering (all, active, expired, cancelled)</li><li>Column sorting and pagination</li><li>Proper unauthorized access handling</li></ul> |
 
 ---
 
@@ -290,16 +290,17 @@ Future roadmap (outline, not fully specced tickets yet):
 
 ## Technical Debt
 
-### TD-1: React Compiler useMemoCache Error
+### ✅ TD-1: React Compiler useMemoCache Error
 
-|               |                                                                                                                                               |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**    | ❌ Not Started                                                                                                                                |
-| **Impact**    | Low - console errors only, no functional impact                                                                                               |
-| **Code refs** | `src/routes/onboarding/route.tsx`, `docs/react-compiler-error-investigation.md`                                                               |
-| **Issue**     | React Compiler throws `Cannot read properties of null (reading 'useMemoCache')` on onboarding route                                           |
-| **Cause**     | React Compiler RC version (19.1.0-rc.2) has issues with simple components in TanStack Router                                                  |
-| **Options**   | <ul><li>Add `// @react-compiler-skip` directive</li><li>Wait for React 19 stable</li><li>Disable React Compiler for specific routes</li></ul> |
+|               |                                                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Status**    | ✅ Complete (temporary fix applied)                                                                                                        |
+| **Impact**    | Low - build errors prevented deployment                                                                                                    |
+| **Code refs** | `src/features/profile/components/complete-profile-form-simple.tsx`                                                                         |
+| **Issue**     | React Compiler throws `Cannot read properties of null (reading 'useMemoCache')` due to complex state updates in profile form               |
+| **Cause**     | Complex nested state updates and inline object creation in event handlers                                                                  |
+| **Solution**  | Added `"use no memo"` directive to opt-out of React Compiler for this component                                                            |
+| **TODO**      | Refactor component to be React Compiler compatible: use useReducer, memoize handlers, avoid inline objects. See TODO comment in component. |
 
 ---
 

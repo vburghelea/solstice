@@ -1,3 +1,15 @@
+"use no memo";
+
+// TODO: Refactor this component to be React Compiler compatible
+// The component currently uses complex nested state updates and creates
+// new objects in event handlers, which causes React Compiler optimization
+// issues. Consider:
+// 1. Using useReducer for complex state management
+// 2. Memoizing event handlers with useCallback
+// 3. Avoiding inline object creation in handlers
+// 4. Simplifying the emergencyContact state updates
+// Once refactored, remove the "use no memo" directive above
+
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";

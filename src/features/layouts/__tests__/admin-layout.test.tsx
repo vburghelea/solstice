@@ -24,8 +24,8 @@ describe("AdminLayout with Router", () => {
     expect(screen.getByText("Events")).toBeInTheDocument();
 
     // Check admin panel header - use getAllByText since it appears in both desktop and mobile views
-    const quadballTexts = screen.getAllByText("Quadball Canada");
-    expect(quadballTexts).toHaveLength(2); // One for desktop, one for mobile
+    const roundupGamesTexts = screen.getAllByText("Roundup Games");
+    expect(roundupGamesTexts).toHaveLength(2); // One for desktop, one for mobile
 
     // "Admin Panel" text was changed to "Dashboard" in mobile view
     expect(screen.getByText("Admin Panel")).toBeInTheDocument(); // Mobile header still shows Admin Panel

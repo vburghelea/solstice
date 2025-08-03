@@ -111,7 +111,6 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
-          showBirthYear: false,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,
@@ -128,7 +127,6 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: false,
           showPhone: false,
-          showBirthYear: false,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,
@@ -370,7 +368,7 @@ async function seed() {
         description: "E2E test team",
         isActive: "true",
         city: "Toronto",
-        province: "ON",
+        country: "DEU",
         primaryColor: "#FF0000",
         secondaryColor: "#0000FF",
         createdBy: testUserId,
@@ -382,7 +380,7 @@ async function seed() {
         description: "Another E2E test team",
         isActive: "true",
         city: "Vancouver",
-        province: "BC",
+        country: "DEU",
         primaryColor: "#00FF00",
         secondaryColor: "#FF00FF",
         createdBy: adminUserId,

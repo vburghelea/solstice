@@ -92,6 +92,7 @@ describe("Profile Server Function Input Schemas", () => {
         data: {
           showEmail: true,
           showPhone: true,
+          // Missing allowTeamInvitations
         },
       };
 

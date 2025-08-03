@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
@@ -18,7 +18,7 @@ import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
 import { getUserGameSystemPreferences } from "../profile.queries";
 import type { ProfileInputType } from "../profile.schemas";
-import type { ProfileInput, ProfileOperationResult } from "../profile.types";
+import type { ProfileInput } from "../profile.types";
 
 import { GamePreferencesStep } from "./game-preferences-step";
 
@@ -47,6 +47,20 @@ export function CompleteProfileForm() {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<ProfileInputType>({
+    gender: "",
+    pronouns: "",
+    phone: "",
+    gameSystemPreferences: {
+      favorite: [],
+      avoid: [],
+    },
+    privacySettings: {
+      showEmail: false,
+      showPhone: false,
+      allowTeamInvitations: true,
+    },
+  });
 
   const { data: gamePreferencesData, isLoading: isLoadingGamePreferences } = useQuery({
     queryKey: ["userGameSystemPreferences"],
@@ -55,24 +69,25 @@ export function CompleteProfileForm() {
 
   const form = useForm({
     defaultValues: {
-      gender: "",
-      pronouns: "",
-      phone: "",
+      gender: formData.gender,
+      pronouns: formData.pronouns,
+      phone: formData.phone,
       gameSystemPreferences: {
-        favorite: gamePreferencesData?.data?.favorite ?? [],
-        avoid: gamePreferencesData?.data?.avoid ?? [],
+        favorite:
+          gamePreferencesData?.data?.favorite ??
+          formData.gameSystemPreferences?.favorite ??
+          [],
+        avoid:
+          gamePreferencesData?.data?.avoid ?? formData.gameSystemPreferences?.avoid ?? [],
       } as {
         favorite: { id: number; name: string }[];
         avoid: { id: number; name: string }[];
       },
-      privacySettings: {
-        showEmail: false,
-        showPhone: false,
-        allowTeamInvitations: true,
-      },
+      privacySettings: formData.privacySettings,
     } as ProfileInputType,
     onSubmit: async ({ value }) => {
       if (currentStepIndex < STEPS.length - 1) {
+        setFormData(value);
         goToNextStep();
         return;
       }
@@ -81,8 +96,7 @@ export function CompleteProfileForm() {
 
       try {
         // Build profile input with only defined values
-        const dataToSubmit: ProfileInput = {
-        };
+        const dataToSubmit: ProfileInput = {};
 
         // Add optional fields only if they have values
         if (value.gender) dataToSubmit.gender = value.gender;
@@ -228,7 +242,7 @@ export function CompleteProfileForm() {
                   initialFavorites={formData.gameSystemPreferences?.favorite || []}
                   initialToAvoid={formData.gameSystemPreferences?.avoid || []}
                   onPreferencesChange={(favorite, avoid) => {
-                    setFormData((prev) => ({
+                    setFormData((prev: ProfileInputType) => ({
                       ...prev,
                       gameSystemPreferences: {
                         favorite: favorite,

@@ -99,6 +99,13 @@
       "when": 1754050764776,
       "tag": "0004_rename_province_to_country",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1754214319845,
+      "tag": "0005_user_entity_updates",
+      "breakpoints": true
     }
   ]
 }

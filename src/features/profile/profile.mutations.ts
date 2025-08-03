@@ -295,16 +295,16 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         };
       }
 
-      if (data.gameSystemPreferences) {
+      if (data.data.gameSystemPreferences) {
         const preferencesToInsert = [];
-        for (const gameSystem of data.gameSystemPreferences.favorite) {
+        for (const gameSystem of data.data.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
             preferenceType: "favorite" as const,
           });
         }
-        for (const gameSystem of data.gameSystemPreferences.avoid) {
+        for (const gameSystem of data.data.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
@@ -478,11 +478,11 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       }
 
       // Validate input
-      const validation = privacySettingsSchema.safeParse(data);
+      const validation = privacySettingsSchema.safeParse(data.data);
       if (!validation.success) {
         return {
           success: false,
-          errors: validation.error.errors.map((err) => ({
+          errors: validation.error.errors.map((err: z.ZodIssue) => ({
             code: "VALIDATION_ERROR" as const,
             field: err.path.join("."),
             message: err.message,

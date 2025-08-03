@@ -38,7 +38,6 @@ test.describe("Profile Edit", () => {
     await expect(page.getByRole("button", { name: /Cancel/i })).toBeVisible();
 
     // Check that input fields are visible - use more specific selectors
-    await expect(page.getByLabel("Date of Birth")).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Phone Number" })).toBeVisible();
     await expect(page.getByLabel("Gender")).toBeVisible();
     await expect(page.getByLabel("Pronouns")).toBeVisible();
@@ -109,44 +108,6 @@ test.describe("Profile Edit", () => {
     await expect(page.getByText("+1 (555) 987-6543")).toBeVisible();
     await expect(page.getByText("they/them")).toBeVisible();
     await expect(page.getByText("non-binary")).toBeVisible();
-  });
-
-  test("should update emergency contact", async ({ page }) => {
-    // Enter edit mode
-    await page.getByRole("button", { name: /Edit Profile/i }).click();
-
-    // Wait for edit mode to be fully activated
-    await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
-
-    // Fill emergency contact information
-    await page.getByLabel("Contact Name").fill("Jane Doe");
-    await page.getByLabel("Relationship").fill("Spouse");
-    await page.getByLabel("Contact Phone").fill("+1 (555) 111-2222");
-    await page.getByLabel("Contact Email").fill("jane.doe@example.com");
-
-    // Save changes
-    await page.getByRole("button", { name: /Save Changes/i }).click();
-
-    // Wait for success toast
-    await expect(page.getByText("Profile updated successfully")).toBeVisible({
-      timeout: 10000,
-    });
-
-    // Wait for edit mode to exit - Save Changes button should disappear
-    await expect(page.getByRole("button", { name: /Save Changes/i })).not.toBeVisible({
-      timeout: 10000,
-    });
-
-    // Check that edit mode is exited
-    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible({
-      timeout: 10000,
-    });
-
-    // Check that emergency contact is displayed
-    await expect(page.getByText("Jane Doe")).toBeVisible();
-    await expect(page.getByText("Spouse")).toBeVisible();
-    await expect(page.getByText("+1 (555) 111-2222")).toBeVisible();
-    await expect(page.getByText("jane.doe@example.com")).toBeVisible();
   });
 
   test("should update privacy settings", async ({ page }) => {

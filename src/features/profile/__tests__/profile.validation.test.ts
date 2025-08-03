@@ -28,69 +28,12 @@ describe("Profile Server Function Input Schemas", () => {
       expect(result.success).toBe(true);
     });
 
-    it("validates with date of birth", () => {
-      const validInput = {
-        data: {
-          dateOfBirth: new Date("1990-01-01"),
-        },
-      };
-
-      const result = updateUserProfileInputSchema.safeParse(validInput);
-      expect(result.success).toBe(true);
-    });
-
-    it("fails with invalid date of birth (too young)", () => {
-      const invalidInput = {
-        data: {
-          dateOfBirth: new Date("2020-01-01"),
-        },
-      };
-
-      const result = updateUserProfileInputSchema.safeParse(invalidInput);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.errors[0].message).toContain(
-          "You must be between 13 and 120 years old",
-        );
-      }
-    });
-
-    it("validates with emergency contact", () => {
-      const validInput = {
-        data: {
-          emergencyContact: {
-            name: "John Doe",
-            relationship: "Friend",
-            phone: "123-456-7890",
-          },
-        },
-      };
-
-      const result = updateUserProfileInputSchema.safeParse(validInput);
-      expect(result.success).toBe(true);
-    });
-
-    it("fails with invalid emergency contact (missing contact method)", () => {
-      const invalidInput = {
-        data: {
-          emergencyContact: {
-            name: "John Doe",
-            relationship: "Friend",
-          },
-        },
-      };
-
-      const result = updateUserProfileInputSchema.safeParse(invalidInput);
-      expect(result.success).toBe(false);
-    });
-
     it("validates with privacy settings", () => {
       const validInput = {
         data: {
           privacySettings: {
             showEmail: true,
             showPhone: false,
-            showBirthYear: true,
             allowTeamInvitations: true,
           },
         },
@@ -114,19 +57,12 @@ describe("Profile Server Function Input Schemas", () => {
     it("validates complete profile data", () => {
       const validInput = {
         data: {
-          dateOfBirth: new Date("1990-01-01"),
-          emergencyContact: {
-            name: "Jane Doe",
-            relationship: "Mother",
-            phone: "555-123-4567",
-          },
           gender: "Female",
           pronouns: "she/her",
           phone: "555-987-6543",
           privacySettings: {
             showEmail: true,
             showPhone: false,
-            showBirthYear: false,
             allowTeamInvitations: true,
           },
         },
@@ -134,44 +70,6 @@ describe("Profile Server Function Input Schemas", () => {
 
       const result = completeUserProfileInputSchema.safeParse(validInput);
       expect(result.success).toBe(true);
-    });
-
-    it("validates minimal required data", () => {
-      const validInput = {
-        data: {
-          dateOfBirth: new Date("1990-01-01"),
-        },
-      };
-
-      const result = completeUserProfileInputSchema.safeParse(validInput);
-      expect(result.success).toBe(true);
-    });
-
-    it("fails without required dateOfBirth", () => {
-      const invalidInput = {
-        data: {
-          gender: "Male",
-        },
-      };
-
-      const result = completeUserProfileInputSchema.safeParse(invalidInput);
-      expect(result.success).toBe(false);
-    });
-
-    it("fails with invalid date of birth", () => {
-      const invalidInput = {
-        data: {
-          dateOfBirth: new Date("1800-01-01"),
-        },
-      };
-
-      const result = completeUserProfileInputSchema.safeParse(invalidInput);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.errors[0].message).toContain(
-          "You must be between 13 and 120 years old",
-        );
-      }
     });
   });
 
@@ -181,7 +79,6 @@ describe("Profile Server Function Input Schemas", () => {
         data: {
           showEmail: false,
           showPhone: false,
-          showBirthYear: false,
           allowTeamInvitations: false,
         },
       };
@@ -195,7 +92,7 @@ describe("Profile Server Function Input Schemas", () => {
         data: {
           showEmail: true,
           showPhone: true,
-          // Missing showBirthYear and allowTeamInvitations
+          // Missing allowTeamInvitations
         },
       };
 
@@ -208,7 +105,6 @@ describe("Profile Server Function Input Schemas", () => {
         data: {
           showEmail: "yes", // Should be boolean
           showPhone: true,
-          showBirthYear: true,
           allowTeamInvitations: true,
         },
       };
@@ -221,7 +117,6 @@ describe("Profile Server Function Input Schemas", () => {
       const invalidInput = {
         showEmail: true,
         showPhone: true,
-        showBirthYear: true,
         allowTeamInvitations: true,
       };
 

@@ -24,8 +24,8 @@ describe("AdminLayout with Router", () => {
     expect(screen.getByText("Events")).toBeInTheDocument();
 
     // Check admin panel header - use getAllByText since it appears in both desktop and mobile views
-    const quadballTexts = screen.getAllByText("Quadball Canada");
-    expect(quadballTexts).toHaveLength(2); // One for desktop, one for mobile
+    const roundupGamesTexts = screen.getAllByText("Roundup Games");
+    expect(roundupGamesTexts).toHaveLength(2); // One for desktop, one for mobile
 
     // "Admin Panel" text was changed to "Dashboard" in mobile view
     expect(screen.getByText("Admin Panel")).toBeInTheDocument(); // Mobile header still shows Admin Panel
@@ -41,19 +41,12 @@ describe("AdminLayout with Router", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       profileComplete: true,
-      dateOfBirth: new Date("1990-01-01"),
       phone: "+1234567890",
       gender: "male" as const,
       pronouns: "he/him",
-      emergencyContact: JSON.stringify({
-        name: "Emergency Contact",
-        phone: "+0987654321",
-        relationship: "spouse",
-      }),
       privacySettings: JSON.stringify({
         showEmail: false,
         showPhone: false,
-        showDateOfBirth: false,
       }),
       profileVersion: 1,
       profileUpdatedAt: new Date(),

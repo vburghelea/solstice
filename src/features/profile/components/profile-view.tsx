@@ -4,7 +4,6 @@ import { Edit2, LoaderCircle, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
-import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import {
@@ -20,18 +19,7 @@ import { Button } from "~/shared/ui/button";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
-
-function calculateAge(dateOfBirth: Date | undefined): number | null {
-  if (!dateOfBirth) return null;
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age;
-}
+import type { ProfileInput } from "../profile.types";
 
 export function ProfileView() {
   const queryClient = useQueryClient();
@@ -54,20 +42,12 @@ export function ProfileView() {
   // TanStack Form for editing
   const form = useForm({
     defaultValues: {
-      dateOfBirth: undefined as Date | undefined,
       gender: "",
       pronouns: "",
       phone: "",
-      emergencyContact: {
-        name: "",
-        relationship: "",
-        phone: "",
-        email: "",
-      },
       privacySettings: {
         showEmail: false,
         showPhone: false,
-        showBirthYear: false,
         allowTeamInvitations: true,
       },
     } as PartialProfileInputType,
@@ -76,62 +56,11 @@ export function ProfileView() {
       // Use a more flexible type since we need to handle Date serialization
       const dataToSubmit: Record<string, unknown> = {};
 
-      // Include fields that have values - convert Date to ISO string for serialization
-      if (value.dateOfBirth) {
-        dataToSubmit["dateOfBirth"] =
-          value.dateOfBirth instanceof Date
-            ? value.dateOfBirth.toISOString()
-            : value.dateOfBirth;
-      }
-      if (value.gender) dataToSubmit["gender"] = value.gender;
-      if (value.pronouns) dataToSubmit["pronouns"] = value.pronouns;
-      if (value.phone) dataToSubmit["phone"] = value.phone;
+        if (value.gender) dataToSubmit.gender = value.gender;
+        if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
+        if (value.phone) dataToSubmit.phone = value.phone;
+        if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
 
-      // Handle emergency contact
-      if (value.emergencyContact) {
-        const ec = value.emergencyContact;
-        if (ec.name || ec.relationship || ec.phone || ec.email) {
-          dataToSubmit["emergencyContact"] = {
-            name: ec.name || "",
-            relationship: ec.relationship || "",
-            ...(ec.phone && { phone: ec.phone }),
-            ...(ec.email && { email: ec.email }),
-          };
-        }
-      }
-
-      // Always include privacy settings as they have default values
-      if (value.privacySettings) {
-        dataToSubmit["privacySettings"] = {
-          showEmail: value.privacySettings.showEmail ?? false,
-          showPhone: value.privacySettings.showPhone ?? false,
-          showBirthYear: value.privacySettings.showBirthYear ?? false,
-          allowTeamInvitations: value.privacySettings.allowTeamInvitations ?? true,
-        };
-      }
-
-      try {
-        setFormError(null); // Clear any previous errors
-
-        // Debug logging to check what we're sending
-        console.log("Form value:", value);
-        console.log("Data to submit:", dataToSubmit);
-        console.log("Data to submit keys:", Object.keys(dataToSubmit));
-        console.log("Privacy settings in dataToSubmit:", dataToSubmit["privacySettings"]);
-
-        // Make sure we're not sending an empty object
-        if (Object.keys(dataToSubmit).length === 0) {
-          console.error("No data to submit!");
-          setFormError("No changes detected");
-          return;
-        }
-
-        // For server functions with validators expecting { data: ... },
-        // we pass the object directly and TanStack Start wraps it
-        console.log("Sending to server function:", JSON.stringify(dataToSubmit, null, 2));
-        console.log("Data type:", typeof dataToSubmit);
-
-        // Pass the data wrapped in { data: ... } as expected by TanStack Start
         const result = await updateUserProfile({ data: dataToSubmit });
 
         if (result.success) {
@@ -179,14 +108,6 @@ export function ProfileView() {
     form.reset();
 
     // Set field values from profile
-    if (profile.dateOfBirth) {
-      // Ensure dateOfBirth is a proper Date object
-      const date =
-        typeof profile.dateOfBirth === "string"
-          ? new Date(profile.dateOfBirth)
-          : profile.dateOfBirth;
-      form.setFieldValue("dateOfBirth", date);
-    }
     if (profile.gender) {
       form.setFieldValue("gender", profile.gender);
     }
@@ -196,25 +117,14 @@ export function ProfileView() {
     if (profile.phone) {
       form.setFieldValue("phone", profile.phone);
     }
-    if (profile.emergencyContact) {
-      form.setFieldValue("emergencyContact.name", profile.emergencyContact.name || "");
-      form.setFieldValue(
-        "emergencyContact.relationship",
-        profile.emergencyContact.relationship || "",
-      );
-      form.setFieldValue("emergencyContact.phone", profile.emergencyContact.phone || "");
-      form.setFieldValue("emergencyContact.email", profile.emergencyContact.email || "");
-    }
 
     const privacySettings = profile.privacySettings || {
       showEmail: false,
       showPhone: false,
-      showBirthYear: false,
       allowTeamInvitations: true,
     };
     form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
     form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
-    form.setFieldValue("privacySettings.showBirthYear", privacySettings.showBirthYear);
     form.setFieldValue(
       "privacySettings.allowTeamInvitations",
       privacySettings.allowTeamInvitations,
@@ -254,8 +164,6 @@ export function ProfileView() {
       </div>
     );
   }
-
-  const age = calculateAge(profile.dateOfBirth);
 
   return (
     <div className="space-y-6">
@@ -336,48 +244,6 @@ export function ProfileView() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               {isEditing ? (
-                <form.Field
-                  name="dateOfBirth"
-                  validators={{
-                    onChange: ({ value }) => {
-                      if (value) {
-                        const today = new Date();
-                        let age = today.getFullYear() - value.getFullYear();
-                        const m = today.getMonth() - value.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < value.getDate())) {
-                          age--;
-                        }
-                        if (age < 13 || age > 120) {
-                          return "You must be between 13 and 120 years old";
-                        }
-                      }
-                      return undefined;
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <ValidatedDatePicker
-                      field={field}
-                      label="Date of Birth"
-                      minAge={13}
-                      maxAge={120}
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>Date of Birth</Label>
-                  <p className="text-base">
-                    {profile.dateOfBirth
-                      ? `${new Date(profile.dateOfBirth).toLocaleDateString()} (Age: ${age})`
-                      : "Not set"}
-                  </p>
-                </>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              {isEditing ? (
                 <form.Field name="phone">
                   {(field) => (
                     <ValidatedInput
@@ -438,86 +304,6 @@ export function ProfileView() {
         </CardContent>
       </Card>
 
-      {/* Emergency Contact */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Emergency Contact</CardTitle>
-          <CardDescription>Who should we contact in case of emergency</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isEditing ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              <form.Field name="emergencyContact.name">
-                {(field) => (
-                  <ValidatedInput
-                    field={field}
-                    label="Contact Name"
-                    placeholder="Full name"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="emergencyContact.relationship">
-                {(field) => (
-                  <ValidatedInput
-                    field={field}
-                    label="Relationship"
-                    placeholder="e.g., Parent, Spouse, Friend"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="emergencyContact.phone">
-                {(field) => (
-                  <ValidatedInput
-                    field={field}
-                    label="Contact Phone"
-                    type="tel"
-                    placeholder="+1 (555) 000-0000"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="emergencyContact.email">
-                {(field) => (
-                  <ValidatedInput
-                    field={field}
-                    label="Contact Email"
-                    type="email"
-                    placeholder="email@example.com"
-                  />
-                )}
-              </form.Field>
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Contact Name</Label>
-                <p className="text-base">{profile.emergencyContact?.name || "Not set"}</p>
-              </div>
-              <div className="space-y-2">
-                <Label>Relationship</Label>
-                <p className="text-base">
-                  {profile.emergencyContact?.relationship || "Not set"}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label>Contact Phone</Label>
-                <p className="text-base">
-                  {profile.emergencyContact?.phone || "Not set"}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label>Contact Email</Label>
-                <p className="text-base">
-                  {profile.emergencyContact?.email || "Not set"}
-                </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Privacy Settings */}
       <Card>
         <CardHeader>
@@ -545,15 +331,6 @@ export function ProfileView() {
                 )}
               </form.Field>
 
-              <form.Field name="privacySettings.showBirthYear">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my birth year on my profile"
-                  />
-                )}
-              </form.Field>
-
               <form.Field name="privacySettings.allowTeamInvitations">
                 {(field) => (
                   <ValidatedCheckbox
@@ -576,10 +353,6 @@ export function ProfileView() {
                 {profile.privacySettings?.showPhone
                   ? "Visible to team members"
                   : "Hidden"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Birth year visibility:</span>{" "}
-                {profile.privacySettings?.showBirthYear ? "Visible on profile" : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Team invitations:</span>{" "}

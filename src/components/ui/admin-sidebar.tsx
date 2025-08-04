@@ -86,7 +86,6 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
-              activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",
@@ -107,7 +106,6 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
-              activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",

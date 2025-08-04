@@ -16,18 +16,24 @@ function parseJsonField<T>(value: string | null | undefined): T | undefined {
   }
 }
 
-function mapDbUserToProfile(dbUser: {
-  id: string;
-  name: string;
-  email: string;
-  profileComplete: boolean;
-  gender: string | null;
-  pronouns: string | null;
-  phone: string | null;
-  privacySettings: string | null;
-  profileVersion: number;
-  profileUpdatedAt: Date | null;
-}): UserProfile {
+function mapDbUserToProfile(
+  dbUser: {
+    id: string;
+    name: string;
+    email: string;
+    profileComplete: boolean;
+    gender: string | null;
+    pronouns: string | null;
+    phone: string | null;
+    privacySettings: string | null;
+    profileVersion: number;
+    profileUpdatedAt: Date | null;
+  },
+  preferences?: {
+    favorite: { id: number; name: string }[];
+    avoid: { id: number; name: string }[];
+  },
+): UserProfile {
   return {
     id: dbUser.id,
     name: dbUser.name,
@@ -39,6 +45,7 @@ function mapDbUserToProfile(dbUser: {
     privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings),
     profileVersion: dbUser.profileVersion,
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
+    gameSystemPreferences: preferences,
   };
 }
 
@@ -81,9 +88,13 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
         };
       }
 
+      // Fetch user's game system preferences
+      const preferencesResult = await getUserGameSystemPreferences();
+      const preferences = preferencesResult.success ? preferencesResult.data : undefined;
+
       return {
         success: true,
-        data: mapDbUserToProfile(dbUser),
+        data: mapDbUserToProfile(dbUser, preferences),
       };
     } catch (error) {
       console.error("Error fetching user profile:", error);

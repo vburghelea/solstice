@@ -21,7 +21,7 @@ test.describe("Dashboard (Authenticated)", () => {
       page.getByRole("heading", { name: /Welcome back, Test User/ }),
     ).toBeVisible();
     await expect(
-      page.getByText("Here's an overview of your Quadball Canada account"),
+      page.getByText("Here's an overview of your Roundup Games account"),
     ).toBeVisible();
 
     // Check dashboard sections

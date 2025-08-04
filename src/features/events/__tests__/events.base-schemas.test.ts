@@ -5,16 +5,16 @@ describe("Event Base Schemas", () => {
   describe("createEventInputSchema", () => {
     it("validates complete event input", () => {
       const validInput = {
-        name: "Summer Quadball Tournament 2025",
-        slug: "summer-quadball-2025",
+        name: "Summer Tournament 2025",
+        slug: "summer-games-2025",
         description: "Annual summer tournament",
-        shortDescription: "Join us for the biggest Quadball event of the summer!",
+        shortDescription: "Join us for the biggest event of the summer!",
         type: "tournament",
-        venueName: "Toronto Sports Complex",
+        venueName: "Sports Complex",
         venueAddress: "123 Sports Way",
-        city: "Toronto",
-        province: "ON",
-        postalCode: "M5V 3A8",
+        city: "Berlin",
+        country: "DEU",
+        postalCode: "10961",
         startDate: "2025-07-15",
         endDate: "2025-07-17",
         registrationType: "team",

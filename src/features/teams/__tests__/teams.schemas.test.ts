@@ -29,7 +29,7 @@ describe("Teams Schemas", () => {
 
     describe("getTeamBySlugSchema", () => {
       it("validates valid slug", () => {
-        const result = getTeamBySlugSchema.safeParse({ slug: "toronto-titans" });
+        const result = getTeamBySlugSchema.safeParse({ slug: "berlin-raiders" });
         expect(result.success).toBe(true);
       });
 
@@ -110,7 +110,7 @@ describe("Teams Schemas", () => {
     describe("searchTeamsSchema", () => {
       it("validates with valid query", () => {
         const result = searchTeamsSchema.safeParse({
-          query: "toronto",
+          query: "berlin",
         });
         expect(result.success).toBe(true);
       });
@@ -133,18 +133,18 @@ describe("Teams Schemas", () => {
     describe("createTeamSchema", () => {
       it("validates with all fields", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
-          slug: "toronto-titans",
-          description: "A competitive Quadball team",
-          city: "Toronto",
-          province: "ON",
+          name: "Berlin Raiders",
+          slug: "berlin-raiders",
+          description: "A competitive team",
+          city: "Berlin",
+          country: "DEU",
           primaryColor: "#FF0000",
           secondaryColor: "#0000FF",
           foundedYear: "2025",
-          website: "https://torontotitans.com",
+          website: "https://raiders.berlin",
           socialLinks: {
-            instagram: "@torontotitans",
-            facebook: "torontotitans",
+            instagram: "@berlinraiders",
+            facebook: "berlinraiders",
           },
         });
         expect(result.success).toBe(true);
@@ -152,30 +152,30 @@ describe("Teams Schemas", () => {
 
       it("validates with required fields only", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
-          slug: "toronto-titans",
+          name: "Berlin Raiders",
+          slug: "berlin-raiders",
         });
         expect(result.success).toBe(true);
       });
 
       it("fails without name", () => {
         const result = createTeamSchema.safeParse({
-          slug: "toronto-titans",
+          slug: "berlin-raiders",
         });
         expect(result.success).toBe(false);
       });
 
       it("fails without slug", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
+          name: "Berlin Raiders",
         });
         expect(result.success).toBe(false);
       });
 
       it("fails with invalid slug format", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
-          slug: "Toronto Titans", // Should be lowercase with hyphens
+          name: "Berlin Raiders",
+          slug: "Berlin Raiders", // Should be lowercase with hyphens
         });
         expect(result.success).toBe(false);
         if (!result.success) {
@@ -187,8 +187,8 @@ describe("Teams Schemas", () => {
 
       it("fails with invalid color format", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
-          slug: "toronto-titans",
+          name: "Berlin Raiders",
+          slug: "berlin-raiders",
           primaryColor: "red", // Should be hex
         });
         expect(result.success).toBe(false);
@@ -196,8 +196,8 @@ describe("Teams Schemas", () => {
 
       it("fails with invalid founded year", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
-          slug: "toronto-titans",
+          name: "Berlin Raiders",
+          slug: "berlin-raiders",
           foundedYear: "25", // Should be 4 digits
         });
         expect(result.success).toBe(false);
@@ -205,8 +205,8 @@ describe("Teams Schemas", () => {
 
       it("fails with invalid website URL", () => {
         const result = createTeamSchema.safeParse({
-          name: "Toronto Titans",
-          slug: "toronto-titans",
+          name: "Berlin Raiders",
+          slug: "berlin-raiders",
           website: "not-a-url",
         });
         expect(result.success).toBe(false);
@@ -218,7 +218,7 @@ describe("Teams Schemas", () => {
         const result = updateTeamSchema.safeParse({
           teamId: "team-123",
           data: {
-            name: "Toronto Titans Updated",
+            name: "Berlin Raiders Updated",
             description: "Updated description",
           },
         });

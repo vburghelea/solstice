@@ -24,7 +24,7 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
       page.getByRole("heading", { name: "Membership", exact: true }),
     ).toBeVisible({ timeout: 10000 });
     await expect(
-      page.getByText("Join Quadball Canada and access exclusive member benefits"),
+      page.getByText("Join Roundup Games and access exclusive member benefits"),
     ).toBeVisible();
 
     // Check current status section
@@ -59,7 +59,7 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
     await expect(page.getByText(ANNUAL_MEMBERSHIP_PRICE)).toBeVisible();
     await expect(
       page.getByText(
-        "Full access to all Quadball Canada events and programs for the 2025 season",
+        "Full access to all Roundup Games events and programs for the 2025 season",
       ),
     ).toBeVisible();
     // Button text depends on membership status

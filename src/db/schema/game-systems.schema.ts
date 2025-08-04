@@ -139,3 +139,5 @@ export type GameSystemMechanic = typeof gameSystemMechanics.$inferSelect;
 export type NewGameSystemMechanic = typeof gameSystemMechanics.$inferInsert;
 export type UserGameSystemPreference = typeof userGameSystemPreferences.$inferSelect;
 export type NewUserGameSystemPreference = typeof userGameSystemPreferences.$inferInsert;
+
+export type { GameSystem as gameSystem };

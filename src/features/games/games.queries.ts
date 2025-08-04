@@ -165,6 +165,41 @@ export const searchGameSystems = createServerFn({ method: "POST" })
   );
 
 /**
+ * Search game systems by name
+ */
+export const searchGameSystems = createServerFn({ method: "POST" })
+  .validator(searchGameSystemsSchema.parse)
+  .handler(
+    async ({ data }): Promise<OperationResult<Array<{ id: number; name: string }>>> => {
+      try {
+        const { getDb } = await import("~/db/server-helpers");
+        const { gameSystems } = await import("~/db/schema");
+        const { ilike } = await import("drizzle-orm");
+
+        const db = await getDb();
+        const searchTerm = `%${data.query}%`;
+
+        const systems = await db()
+          .select({
+            id: gameSystems.id,
+            name: gameSystems.name,
+          })
+          .from(gameSystems)
+          .where(ilike(gameSystems.name, searchTerm))
+          .limit(10);
+
+        return { success: true, data: systems };
+      } catch (error) {
+        console.error("Error searching game systems:", error);
+        return {
+          success: false,
+          errors: [{ code: "SERVER_ERROR", message: "Failed to search game systems" }],
+        };
+      }
+    },
+  );
+
+/**
  * Get a single game by ID with all details
  */
 export const getGame = createServerFn({ method: "POST" })
@@ -822,6 +857,102 @@ export const getGameParticipants = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to fetch participants" }],
+      };
+    }
+  });
+
+/**
+ * Search users for invitation by name or email
+ */
+export const searchUsersForInvitation = createServerFn({ method: "POST" })
+  .validator(searchUsersForInvitationSchema.parse)
+  .handler(
+    async ({
+      data,
+    }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
+      try {
+        const { getDb } = await import("~/db/server-helpers");
+        const { user } = await import("~/db/schema");
+        const { ilike, or } = await import("drizzle-orm");
+
+        const db = await getDb();
+        const searchTerm = `%${data.query}%`;
+
+        const users = await db()
+          .select({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          })
+          .from(user)
+          .where(or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)))
+          .limit(10);
+
+        return { success: true, data: users };
+      } catch (error) {
+        console.error("Error searching users for invitation:", error);
+        return {
+          success: false,
+          errors: [{ code: "SERVER_ERROR", message: "Failed to search users" }],
+        };
+      }
+    },
+  );
+
+/**
+ * Get pending applications for a specific game
+ */
+export const getGameApplications = createServerFn({ method: "POST" })
+  .validator(getGameSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { gameParticipants, games } = await import("~/db/schema");
+      const { eq, and } = await import("drizzle-orm");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      // Check if current user is the owner of the game
+      const game = await db().query.games.findFirst({
+        where: eq(games.id, data.id),
+      });
+
+      if (!game || game.ownerId !== currentUser.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Not authorized to view applications for this game",
+            },
+          ],
+        };
+      }
+
+      const applications = await db().query.gameParticipants.findMany({
+        where: and(
+          eq(gameParticipants.gameId, data.id),
+          eq(gameParticipants.status, "pending"),
+          eq(gameParticipants.role, "applicant"),
+        ),
+        with: { user: true },
+      });
+
+      return { success: true, data: applications as GameParticipant[] };
+    } catch (error) {
+      console.error("Error fetching game applications:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch applications" }],
       };
     }
   });

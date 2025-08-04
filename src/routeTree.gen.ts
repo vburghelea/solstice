@@ -85,20 +85,28 @@ import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-rev
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
 import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
 import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
 import { Route as DashboardAdminEventsReviewRouteImport } from "./routes/dashboard/admin/events-review";
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from "./routes/dashboard/campaigns/$campaignId/index";
+=======
+import { Route as DashboardGamesGameIdRouteRouteImport } from "./routes/dashboard/games/$gameId/route";
+import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
+import { Route as DashboardGamesGameIdIndexRouteImport } from "./routes/dashboard/games/$gameId/index";
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
 <<<<<<< HEAD
@@ -335,6 +343,7 @@ const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardSystemsIndexRoute = DashboardSystemsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -352,6 +361,13 @@ const DashboardGamesIndexRoute = DashboardGamesIndexRouteImport.update({
 } as any);
 =======
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+const DashboardGamesIndexRoute = DashboardGamesIndexRouteImport.update({
+  id: "/games/",
+  path: "/games/",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 const DashboardEventsIndexRoute = DashboardEventsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -390,6 +406,7 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
     id: "/$systemId",
@@ -424,6 +441,13 @@ const DashboardGamesGameIdRoute = DashboardGamesGameIdRouteImport.update({
 } as any);
 =======
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+const DashboardGamesCreateRoute = DashboardGamesCreateRouteImport.update({
+  id: "/games/create",
+  path: "/games/create",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
   id: "/create",
   path: "/create",
@@ -462,18 +486,35 @@ const DashboardAdminEventsReviewRoute =
     path: "/events-review",
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any);
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+const DashboardGamesGameIdRouteRoute =
+  DashboardGamesGameIdRouteRouteImport.update({
+    id: "/games/$gameId",
+    path: "/games/$gameId",
+    getParentRoute: () => DashboardRouteRoute,
+  } as any);
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 const DashboardTeamsTeamIdIndexRoute =
   DashboardTeamsTeamIdIndexRouteImport.update({
     id: "/",
     path: "/",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
+<<<<<<< HEAD
 const DashboardCampaignsCampaignIdIndexRoute =
   DashboardCampaignsCampaignIdIndexRouteImport.update({
     id: "/",
     path: "/",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
+=======
+const DashboardGamesGameIdIndexRoute =
+  DashboardGamesGameIdIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => DashboardGamesGameIdRouteRoute,
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
   } as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
@@ -664,21 +705,28 @@ export interface FileRoutesByFullPath {
   "/dashboard/": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/dashboard/games/$gameId": typeof DashboardGamesGameIdRouteRouteWithChildren;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+<<<<<<< HEAD
   "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
+=======
+  "/dashboard/games/$gameId/": typeof DashboardGamesGameIdIndexRoute;
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
@@ -753,17 +801,23 @@ export interface FileRoutesByTo {
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
+  "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/events/$slug": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+<<<<<<< HEAD
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdIndexRoute;
+=======
+  "/dashboard/games/$gameId": typeof DashboardGamesGameIdIndexRoute;
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
@@ -850,21 +904,28 @@ export interface FileRoutesById {
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/dashboard/games/$gameId": typeof DashboardGamesGameIdRouteRouteWithChildren;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+<<<<<<< HEAD
   "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
+=======
+  "/dashboard/games/$gameId/": typeof DashboardGamesGameIdIndexRoute;
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
@@ -948,21 +1009,28 @@ export interface FileRouteTypes {
     | "/dashboard/"
     | "/events"
     | "/onboarding/"
+    | "/dashboard/games/$gameId"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/events/create"
+    | "/dashboard/games/create"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
     | "/dashboard/events/"
+    | "/dashboard/games"
     | "/dashboard/teams/"
     | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+<<<<<<< HEAD
     | "/dashboard/campaigns/$campaignId/"
+=======
+    | "/dashboard/games/$gameId/"
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     | "/dashboard/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -1037,17 +1105,23 @@ export interface FileRouteTypes {
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/events/create"
+    | "/dashboard/games/create"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
     | "/dashboard/events"
+    | "/dashboard/games"
     | "/dashboard/teams"
     | "/events/$slug"
     | "/dashboard/events/$eventId/manage"
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+<<<<<<< HEAD
     | "/dashboard/campaigns/$campaignId"
+=======
+    | "/dashboard/games/$gameId"
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     | "/dashboard/teams/$teamId";
   id:
     | "__root__"
@@ -1129,21 +1203,28 @@ export interface FileRouteTypes {
     | "/dashboard/"
     | "/events/"
     | "/onboarding/"
+    | "/dashboard/games/$gameId"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/events/create"
+    | "/dashboard/games/create"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
     | "/dashboard/events/"
+    | "/dashboard/games/"
     | "/dashboard/teams/"
     | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+<<<<<<< HEAD
     | "/dashboard/campaigns/$campaignId/"
+=======
+    | "/dashboard/games/$gameId/"
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     | "/dashboard/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
@@ -1592,6 +1673,7 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof DashboardTeamsRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/systems/": {
       id: "/dashboard/systems/";
       path: "/";
@@ -1615,6 +1697,15 @@ declare module "@tanstack/react-router" {
     };
 =======
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+    "/dashboard/games/": {
+      id: "/dashboard/games/";
+      path: "/games";
+      fullPath: "/dashboard/games";
+      preLoaderRoute: typeof DashboardGamesIndexRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     "/dashboard/events/": {
       id: "/dashboard/events/";
       path: "/";
@@ -1667,6 +1758,7 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof DashboardTeamsRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/systems/$systemId": {
       id: "/dashboard/systems/$systemId";
       path: "/$systemId";
@@ -1711,6 +1803,15 @@ declare module "@tanstack/react-router" {
     };
 =======
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+    "/dashboard/games/create": {
+      id: "/dashboard/games/create";
+      path: "/games/create";
+      fullPath: "/dashboard/games/create";
+      preLoaderRoute: typeof DashboardGamesCreateRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     "/dashboard/events/create": {
       id: "/dashboard/events/create";
       path: "/create";
@@ -1758,7 +1859,17 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardAdminEventsReviewRouteImport;
       parentRoute: typeof DashboardAdminRouteRoute;
     };
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+    "/dashboard/games/$gameId": {
+      id: "/dashboard/games/$gameId";
+      path: "/games/$gameId";
+      fullPath: "/dashboard/games/$gameId";
+      preLoaderRoute: typeof DashboardGamesGameIdRouteRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     "/dashboard/teams/$teamId/": {
       id: "/dashboard/teams/$teamId/";
       path: "/";
@@ -1766,12 +1877,21 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdIndexRouteImport;
       parentRoute: typeof DashboardTeamsTeamIdRoute;
     };
+<<<<<<< HEAD
     "/dashboard/campaigns/$campaignId/": {
       id: "/dashboard/campaigns/$campaignId/";
       path: "/";
       fullPath: "/dashboard/campaigns/$campaignId/";
       preLoaderRoute: typeof DashboardCampaignsCampaignIdIndexRouteImport;
       parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+=======
+    "/dashboard/games/$gameId/": {
+      id: "/dashboard/games/$gameId/";
+      path: "/";
+      fullPath: "/dashboard/games/$gameId/";
+      preLoaderRoute: typeof DashboardGamesGameIdIndexRouteImport;
+      parentRoute: typeof DashboardGamesGameIdRouteRoute;
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
     };
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
@@ -2092,6 +2212,20 @@ const DashboardTeamsRouteWithChildren = DashboardTeamsRoute._addFileChildren(
   DashboardTeamsRouteChildren,
 );
 
+interface DashboardGamesGameIdRouteRouteChildren {
+  DashboardGamesGameIdIndexRoute: typeof DashboardGamesGameIdIndexRoute;
+}
+
+const DashboardGamesGameIdRouteRouteChildren: DashboardGamesGameIdRouteRouteChildren =
+  {
+    DashboardGamesGameIdIndexRoute: DashboardGamesGameIdIndexRoute,
+  };
+
+const DashboardGamesGameIdRouteRouteWithChildren =
+  DashboardGamesGameIdRouteRoute._addFileChildren(
+    DashboardGamesGameIdRouteRouteChildren,
+  );
+
 interface DashboardRouteRouteChildren {
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2115,7 +2249,13 @@ interface DashboardRouteRouteChildren {
   DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren;
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
+<<<<<<< HEAD
   DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute;
+=======
+  DashboardGamesGameIdRouteRoute: typeof DashboardGamesGameIdRouteRouteWithChildren;
+  DashboardGamesCreateRoute: typeof DashboardGamesCreateRoute;
+  DashboardGamesIndexRoute: typeof DashboardGamesIndexRoute;
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -2141,7 +2281,13 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardSystemsRoute: DashboardSystemsRouteWithChildren,
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
+<<<<<<< HEAD
   DashboardReviewsPendingRoute: DashboardReviewsPendingRoute,
+=======
+  DashboardGamesGameIdRouteRoute: DashboardGamesGameIdRouteRouteWithChildren,
+  DashboardGamesCreateRoute: DashboardGamesCreateRoute,
+  DashboardGamesIndexRoute: DashboardGamesIndexRoute,
+>>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 };
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

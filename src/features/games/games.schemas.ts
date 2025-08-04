@@ -101,4 +101,21 @@ export type AddGameParticipantInput = z.infer<typeof addGameParticipantInputSche
 export type UpdateGameParticipantInput = z.infer<typeof updateGameParticipantInputSchema>;
 export type RemoveGameParticipantInput = z.infer<typeof removeGameParticipantInputSchema>;
 export type ApplyToGameInput = z.infer<typeof applyToGameInputSchema>;
+export const searchUsersForInvitationSchema = z.object({
+  query: z.string().min(4, "Search term must be at least 4 characters"),
+});
+
 export type InviteToGameInput = z.infer<typeof inviteToGameInputSchema>;
+export const searchGameSystemsSchema = z.object({
+  query: z.string().min(3, "Search term must be at least 3 characters"),
+});
+
+export const gameFormSchema = createGameInputSchema.extend({
+  id: z.string().optional(),
+  status: z.enum(gameStatusEnum.enumValues).optional(),
+});
+
+export type SearchUsersForInvitationInput = z.infer<
+  typeof searchUsersForInvitationSchema
+>;
+export type SearchGameSystemsInput = z.infer<typeof searchGameSystemsSchema>;

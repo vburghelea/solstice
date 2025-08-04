@@ -54,6 +54,7 @@ export type GameParticipant = {
   role: GameParticipantRole;
   status: GameParticipantStatus;
   user: typeof user.$inferSelect;
+  message?: string;
 };
 
 export type GameListItem = Game & {

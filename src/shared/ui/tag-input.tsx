@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { GameSystem } from "~/db/schema/game-systems.schema";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
@@ -41,19 +41,12 @@ export function TagInput({
     },
   });
 
-  const [filteredSuggestions, setFilteredSuggestions] = useState<
-    {
-      id: number;
-      name: string;
-    }[]
-  >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const allGameSystems = gameSystems?.data || [];
-
   // Calculate derived state using useMemo
   const memoizedFilteredSuggestions = useMemo(() => {
+    const allGameSystems = gameSystems?.data || [];
     return inputValue
       ? allGameSystems.filter(
           (suggestion) =>
@@ -61,17 +54,7 @@ export function TagInput({
             suggestion.name.toLowerCase().includes(inputValue.toLowerCase()),
         )
       : [];
-  }, [inputValue, allGameSystems, tags]);
-
-  const memoizedShowSuggestions = useMemo(() => {
-    return Boolean(inputValue) && memoizedFilteredSuggestions.length > 0;
-  }, [inputValue, memoizedFilteredSuggestions]);
-
-  // Use useEffect to set state based on memoized values
-  useEffect(() => {
-    setFilteredSuggestions(memoizedFilteredSuggestions);
-    setShowSuggestions(memoizedShowSuggestions);
-  }, [memoizedFilteredSuggestions, memoizedShowSuggestions]);
+  }, [inputValue, gameSystems?.data, tags]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -117,14 +100,14 @@ export function TagInput({
         onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
         {...props}
       />
-      {showSuggestions && filteredSuggestions.length > 0 && (
+      {showSuggestions && memoizedFilteredSuggestions.length > 0 && (
         <ul
           className={cn(
             "bg-popover border-border absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-lg",
             props.className, // Allow external classNames to be applied
           )}
         >
-          {filteredSuggestions.map((suggestion) => (
+          {memoizedFilteredSuggestions.map((suggestion) => (
             <li
               key={suggestion.id}
               className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-4 py-2"

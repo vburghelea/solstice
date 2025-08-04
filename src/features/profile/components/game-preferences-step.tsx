@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { TagInput } from "~/shared/ui/tag-input";
 
 export function GamePreferencesStep({
@@ -13,39 +12,24 @@ export function GamePreferencesStep({
     toAvoid: { id: number; name: string }[],
   ) => void;
 }) {
-  const [favorites, setFavorites] = useState(initialFavorites || []);
-  const [toAvoid, setToAvoid] = useState(initialToAvoid || []);
-
-  useEffect(() => {
-    setFavorites(initialFavorites || []);
-  }, [initialFavorites]);
-
-  useEffect(() => {
-    setToAvoid(initialToAvoid || []);
-  }, [initialToAvoid]);
-
   const handleAddFavorite = (tag: { id: number; name: string }) => {
-    const newFavorites = [...favorites, tag];
-    setFavorites(newFavorites);
-    onPreferencesChange(newFavorites, toAvoid);
+    const newFavorites = [...(initialFavorites || []), tag];
+    onPreferencesChange(newFavorites, initialToAvoid || []);
   };
 
   const handleRemoveFavorite = (id: number) => {
-    const newFavorites = favorites.filter((fav) => fav.id !== id);
-    setFavorites(newFavorites);
-    onPreferencesChange(newFavorites, toAvoid);
+    const newFavorites = (initialFavorites || []).filter((fav) => fav.id !== id);
+    onPreferencesChange(newFavorites, initialToAvoid || []);
   };
 
   const handleAddToAvoid = (tag: { id: number; name: string }) => {
-    const newToAvoid = [...toAvoid, tag];
-    setToAvoid(newToAvoid);
-    onPreferencesChange(favorites, newToAvoid);
+    const newToAvoid = [...(initialToAvoid || []), tag];
+    onPreferencesChange(initialFavorites || [], newToAvoid);
   };
 
   const handleRemoveFromToAvoid = (id: number) => {
-    const newToAvoid = toAvoid.filter((avoid) => avoid.id !== id);
-    setToAvoid(newToAvoid);
-    onPreferencesChange(favorites, newToAvoid);
+    const newToAvoid = (initialToAvoid || []).filter((avoid) => avoid.id !== id);
+    onPreferencesChange(initialFavorites || [], newToAvoid);
   };
 
   return (
@@ -53,7 +37,7 @@ export function GamePreferencesStep({
       <div>
         <h3 className="mb-2 text-lg font-medium">Favorite Game Systems</h3>
         <TagInput
-          tags={favorites}
+          tags={initialFavorites || []}
           onAddTag={handleAddFavorite}
           onRemoveTag={handleRemoveFavorite}
           placeholder="Search and add favorite game systems..."
@@ -63,7 +47,7 @@ export function GamePreferencesStep({
       <div>
         <h3 className="mb-2 text-lg font-medium">Game Systems to Avoid</h3>
         <TagInput
-          tags={toAvoid}
+          tags={initialToAvoid || []}
           onAddTag={handleAddToAvoid}
           onRemoveTag={handleRemoveFromToAvoid}
           placeholder="Search and add game systems to avoid..."

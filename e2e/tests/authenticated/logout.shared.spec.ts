@@ -17,8 +17,8 @@ test.describe("Logout Flow (Authenticated)", () => {
     // Click logout button in the sidebar
     await page.getByRole("button", { name: "Logout" }).click();
 
-    // Should redirect to login page
-    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 15000 });
+    // Wait for navigation to complete (window.location.href is used)
+    await page.waitForURL(/\/auth\/login/, { timeout: 15000 });
 
     // Verify we're on the login page
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
@@ -29,7 +29,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();
-    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 10000 });
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
 
     // Try to access protected route
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
@@ -47,7 +47,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();
-    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 10000 });
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
   });
 
@@ -60,7 +60,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();
-    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 10000 });
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
     await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
   });
 });

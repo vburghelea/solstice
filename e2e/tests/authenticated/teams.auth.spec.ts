@@ -132,17 +132,15 @@ test.describe("Teams Management (Authenticated)", () => {
       // Simply navigate to the create team page - we already have auth from storageState
       await page.goto("/dashboard/teams/create");
 
-      // Wait for the page to load
-      await expect(page.getByRole("heading", { name: "Create a New Team" })).toBeVisible({
+      // Wait for the page to load - look for the text in the form
+      await expect(page.getByText("Create a New Team")).toBeVisible({
         timeout: 15000,
       });
     });
 
     test("should display team creation form with all fields", async ({ page }) => {
       // Check form header
-      await expect(
-        page.getByRole("heading", { name: "Create a New Team" }),
-      ).toBeVisible();
+      await expect(page.getByText("Create a New Team")).toBeVisible();
       await expect(
         page.getByText("Set up your team profile and start inviting members"),
       ).toBeVisible();

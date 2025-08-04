@@ -22,7 +22,7 @@ test.describe("Profile Edit", () => {
     // Check basic information card
     await expect(page.getByText("Basic Information")).toBeVisible();
     await expect(page.getByText("Email", { exact: true })).toBeVisible();
-    await expect(page.getByText("profile-edit@example.com")).toBeVisible();
+    await expect(page.getByText("test@example.com")).toBeVisible();
   });
 
   test("should toggle edit mode", async ({ page }) => {
@@ -146,22 +146,67 @@ test.describe("Profile Edit", () => {
   });
 
   test("should update privacy settings", async ({ page }) => {
+    // First ensure the profile data is loaded
+    await expect(page.getByText("test@example.com")).toBeVisible();
+
+    // Wait for privacy settings to be visible to ensure data is loaded
+    await expect(page.getByText("Email visibility:")).toBeVisible();
+
     // Enter edit mode
     await page.getByRole("button", { name: /Edit Profile/i }).click();
 
     // Wait for edit mode to be fully activated
     await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
 
-    // Update privacy settings
-    await page.getByLabel("Show my email address to team members").check();
-    await page.getByLabel("Show my phone number to team members").check();
+    // Wait for the form to load completely and verify fields are populated
+    await page.waitForTimeout(1000);
+
+    // Verify that existing data is loaded (date of birth should be populated)
+    const dateInput = page.getByLabel("Date of Birth");
+    await expect(dateInput).toHaveValue(/\d{4}-\d{2}-\d{2}/);
+
+    // Since we're just updating privacy settings, we only need to toggle the checkboxes
+    // The test user already has a complete profile from the seed data
+
+    // Toggle privacy checkboxes to ensure they're checked
+    const emailCheckbox = page.getByLabel("Show my email address to team members");
+    const phoneCheckbox = page.getByLabel("Show my phone number to team members");
+
+    // Check them if not already checked
+    if (!(await emailCheckbox.isChecked())) {
+      await emailCheckbox.check();
+    }
+    if (!(await phoneCheckbox.isChecked())) {
+      await phoneCheckbox.check();
+    }
 
     // Save changes
     await page.getByRole("button", { name: /Save Changes/i }).click();
 
-    // Wait for success toast
+    // Wait for success toast or handle error
+    const toastResult = await Promise.race([
+      page
+        .waitForSelector("text=Profile updated successfully", { timeout: 10000 })
+        .then(() => "success"),
+      page
+        .waitForSelector("text=Required", { timeout: 2000 })
+        .then(() => "validation-error"),
+    ]).catch(() => null);
+
+    if (toastResult === "validation-error") {
+      // Log the error for debugging
+      const errorText = await page
+        .locator("text=Required")
+        .first()
+        .locator("..")
+        .textContent();
+      console.log("Validation error:", errorText);
+      throw new Error(`Profile update failed with validation error: ${errorText}`);
+    }
+
+    // If we got here, it should be success
     await expect(page.getByText("Profile updated successfully")).toBeVisible({
-      timeout: 10000,
+      timeout: 5000,
     });
 
     // Wait for edit mode to exit - Save Changes button should disappear
@@ -176,7 +221,13 @@ test.describe("Profile Edit", () => {
 
     // Check that privacy settings are displayed correctly
     await expect(page.getByText("Email visibility:")).toBeVisible();
-    await expect(page.getByText("Visible to team members")).toBeVisible();
     await expect(page.getByText("Phone visibility:")).toBeVisible();
+
+    // Check that both are set to visible (find the paragraphs containing the visibility status)
+    const emailVisibility = page.locator("p:has-text('Email visibility:')");
+    const phoneVisibility = page.locator("p:has-text('Phone visibility:')");
+
+    await expect(emailVisibility).toContainText("Visible to team members");
+    await expect(phoneVisibility).toContainText("Visible to team members");
   });
 });

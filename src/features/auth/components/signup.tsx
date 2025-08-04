@@ -137,7 +137,9 @@ export default function SignupForm() {
               validators={{
                 onChangeListenTo: ["password"],
                 onChange: ({ value, fieldApi }) => {
-                  if (value !== fieldApi.form.getFieldValue("password")) {
+                  const password = fieldApi.form.getFieldValue("password");
+                  // Only validate if both fields have values
+                  if (value && password && value !== password) {
                     return "Passwords do not match";
                   }
                   return undefined;

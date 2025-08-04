@@ -89,47 +89,54 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
   });
 
   test("should handle membership button click", async ({ page }) => {
-    // Already on membership page from beforeEach
+    // Clear any existing memberships to ensure test starts fresh
+    const cleanupResponse = await page.request.post("/api/test/cleanup", {
+      data: {
+        action: "clear-user-memberships",
+        userEmail: process.env["E2E_TEST_EMAIL"] || "test@example.com",
+      },
+    });
+
+    if (!cleanupResponse.ok()) {
+      console.log("Warning: Failed to clear memberships, test may use existing state");
+    }
+
+    // Refresh the page to see updated state
+    await page.reload();
 
     // Wait for memberships to load
     await expect(
       page.getByRole("heading", { name: "Available Memberships" }),
     ).toBeVisible();
 
-    // Find the membership purchase/renew button specifically
-    // Use exact button names to avoid matching other buttons like "Logout"
+    // After cleanup, the button should always be "Purchase"
     const purchaseButton = page.getByRole("button", { name: "Purchase" });
-    const renewButton = page.getByRole("button", { name: "Renew" });
-    const currentPlanButton = page.getByRole("button", { name: "Current Plan" });
+    await expect(purchaseButton).toBeVisible();
+    await expect(purchaseButton).toBeEnabled();
 
-    // One of these buttons should be visible
-    const button = purchaseButton.or(renewButton).or(currentPlanButton);
-    await expect(button).toBeVisible();
+    // Click the button
+    await purchaseButton.click();
 
-    const buttonText = await button.textContent();
+    // The mock payment service should redirect back to membership page with mock checkout params
+    await page.waitForURL((url) => url.toString().includes("mock_checkout=true"), {
+      timeout: 10000,
+    });
 
-    if (buttonText === "Purchase" || buttonText === "Renew") {
-      // Only test checkout flow if button is clickable
-      await expect(button).toBeEnabled();
+    // Verify we're on the mock checkout page
+    expect(page.url()).toContain("/dashboard/membership");
+    expect(page.url()).toContain("mock_checkout=true");
+    expect(page.url()).toContain("session=");
+    expect(page.url()).toContain("type=");
+    expect(page.url()).toContain("amount=");
 
-      // Click the button
-      await button.click();
+    // Wait for the success toast
+    await expect(page.getByText("Membership purchased successfully")).toBeVisible({
+      timeout: 10000,
+    });
 
-      // The mock payment service should redirect back to membership page with mock checkout params
-      await page.waitForURL((url) => url.toString().includes("mock_checkout=true"), {
-        timeout: 10000,
-      });
-
-      // Verify we're on the mock checkout page
-      expect(page.url()).toContain("/dashboard/membership");
-      expect(page.url()).toContain("mock_checkout=true");
-      expect(page.url()).toContain("session=");
-      expect(page.url()).toContain("type=");
-      expect(page.url()).toContain("amount=");
-    } else if (buttonText === "Current Plan") {
-      // Button should be disabled for current plan
-      await expect(button).toBeDisabled();
-    }
+    // Verify button is now disabled "Current Plan"
+    await expect(page.getByRole("button", { name: "Current Plan" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Current Plan" })).toBeDisabled();
   });
 
   test("should handle payment confirmation callback", async ({ page }) => {

@@ -219,14 +219,24 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
     test("should show team member count", async ({ page }) => {
       // Member count is displayed for each team
-      // First team (Test Thunder) should show Members: 1
-      const membersLabel = page.getByText("Members").first();
-      await expect(membersLabel).toBeVisible();
+      // Teams are displayed in cards, each showing member count
 
-      // The count is in a separate element next to the label
-      const memberCount = membersLabel.locator("..").getByText(/\d+/);
-      await expect(memberCount).toBeVisible();
-      await expect(memberCount).toHaveText("1");
+      // Check that we have team cards
+      const teamCards = page.locator('[data-slot="card"]');
+      await expect(teamCards).toHaveCount(2);
+
+      // For Test Thunder team - look for the specific card
+      const thunderCard = teamCards.filter({ hasText: "Test Thunder" });
+      await expect(thunderCard).toBeVisible();
+      await expect(thunderCard.getByText("Members")).toBeVisible();
+      // The "1" is the member count
+      await expect(thunderCard.getByText("1", { exact: true })).toBeVisible();
+
+      // For Test Lightning team
+      const lightningCard = teamCards.filter({ hasText: "Test Lightning" });
+      await expect(lightningCard).toBeVisible();
+      await expect(lightningCard.getByText("Members")).toBeVisible();
+      await expect(lightningCard.getByText("1", { exact: true })).toBeVisible();
     });
 
     test.skip("should show team colors", async ({ page }) => {

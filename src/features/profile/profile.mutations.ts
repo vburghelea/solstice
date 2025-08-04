@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { isProfileComplete } from "./profile.queries";
 import {
-  completeUserProfileInputSchema,
-  updatePrivacySettingsInputSchema,
-  updateUserProfileInputSchema,
+  partialProfileInputSchema,
+  privacySettingsSchema,
+  profileInputSchema,
 } from "./profile.schemas";
 import type {
   EmergencyContact,
@@ -53,8 +53,9 @@ function mapDbUserToProfile(dbUser: {
 }
 
 export const updateUserProfile = createServerFn({ method: "POST" })
-  .validator(updateUserProfileInputSchema.parse)
-  .handler(async ({ data }): Promise<ProfileOperationResult> => {
+  .validator(partialProfileInputSchema.parse)
+  .handler(async ({ data: inputData }): Promise<ProfileOperationResult> => {
+    // Now inputData contains the actual profile data
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -75,7 +76,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       }
 
       // Input is already validated by .validator(), just check if it's empty
-      if (!data.data || Object.keys(data.data).length === 0) {
+      if (!inputData || Object.keys(inputData).length === 0) {
         return {
           success: false,
           errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
@@ -91,23 +92,27 @@ export const updateUserProfile = createServerFn({ method: "POST" })
         profileVersion: sql`${user.profileVersion} + 1`,
       };
 
-      if (data.data.dateOfBirth !== undefined) {
-        updateData["dateOfBirth"] = data.data.dateOfBirth;
+      if (inputData.dateOfBirth !== undefined) {
+        // Convert string date to Date object if needed
+        updateData["dateOfBirth"] =
+          typeof inputData.dateOfBirth === "string"
+            ? new Date(inputData.dateOfBirth)
+            : inputData.dateOfBirth;
       }
-      if (data.data.emergencyContact !== undefined) {
-        updateData["emergencyContact"] = JSON.stringify(data.data.emergencyContact);
+      if (inputData.emergencyContact !== undefined) {
+        updateData["emergencyContact"] = JSON.stringify(inputData.emergencyContact);
       }
-      if (data.data.gender !== undefined) {
-        updateData["gender"] = data.data.gender;
+      if (inputData.gender !== undefined) {
+        updateData["gender"] = inputData.gender;
       }
-      if (data.data.pronouns !== undefined) {
-        updateData["pronouns"] = data.data.pronouns;
+      if (inputData.pronouns !== undefined) {
+        updateData["pronouns"] = inputData.pronouns;
       }
-      if (data.data.phone !== undefined) {
-        updateData["phone"] = data.data.phone;
+      if (inputData.phone !== undefined) {
+        updateData["phone"] = inputData.phone;
       }
-      if (data.data.privacySettings !== undefined) {
-        updateData["privacySettings"] = JSON.stringify(data.data.privacySettings);
+      if (inputData.privacySettings !== undefined) {
+        updateData["privacySettings"] = JSON.stringify(inputData.privacySettings);
       }
 
       const db = await getDb();
@@ -162,7 +167,10 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   });
 
 export const completeUserProfile = createServerFn({ method: "POST" })
-  .validator(completeUserProfileInputSchema.parse)
+  .validator((input: unknown) => {
+    // The validator receives the raw data passed to the server function
+    return profileInputSchema.parse(input);
+  })
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
@@ -190,14 +198,12 @@ export const completeUserProfile = createServerFn({ method: "POST" })
       const { user } = await import("~/db/schema");
 
       const updateData = {
-        dateOfBirth: data.data.dateOfBirth,
-        emergencyContact: JSON.stringify(data.data.emergencyContact),
-        gender: data.data.gender || null,
-        pronouns: data.data.pronouns || null,
-        phone: data.data.phone || null,
-        privacySettings: JSON.stringify(
-          data.data.privacySettings || defaultPrivacySettings,
-        ),
+        dateOfBirth: data.dateOfBirth,
+        emergencyContact: JSON.stringify(data.emergencyContact),
+        gender: data.gender || null,
+        pronouns: data.pronouns || null,
+        phone: data.phone || null,
+        privacySettings: JSON.stringify(data.privacySettings || defaultPrivacySettings),
         profileComplete: true,
         profileUpdatedAt: new Date(),
         profileVersion: sql`${user.profileVersion} + 1`,
@@ -237,7 +243,10 @@ export const completeUserProfile = createServerFn({ method: "POST" })
   });
 
 export const updatePrivacySettings = createServerFn({ method: "POST" })
-  .validator(updatePrivacySettingsInputSchema.parse)
+  .validator((input: unknown) => {
+    // The validator receives the raw data passed to the server function
+    return privacySettingsSchema.parse(input);
+  })
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
@@ -269,7 +278,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       const [updatedUser] = await db
         .update(user)
         .set({
-          privacySettings: JSON.stringify(data.data),
+          privacySettings: JSON.stringify(data),
           profileUpdatedAt: new Date(),
         })
         .where(eq(user.id, session.user.id))

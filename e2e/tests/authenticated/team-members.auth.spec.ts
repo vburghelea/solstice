@@ -205,7 +205,7 @@ test.describe("Team Member Management (Authenticated)", () => {
       // Login as admin user who is a player in Test Thunder
       await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
         email: "admin@example.com",
-        password: "adminpassword123",
+        password: "testpassword123",
       });
 
       // Should not see manage button (admin is not a captain)
@@ -242,7 +242,7 @@ test.describe("Team Member Management (Authenticated)", () => {
       // Navigate to team page as a regular member
       await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
         email: "admin@example.com",
-        password: "adminpassword123",
+        password: "testpassword123",
       });
 
       // Look for leave team button with timeout

@@ -20,7 +20,6 @@ import { Button } from "~/shared/ui/button";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
-import type { ProfileInput } from "../profile.types";
 
 function calculateAge(dateOfBirth: Date | undefined): number | null {
   if (!dateOfBirth) return null;
@@ -74,19 +73,25 @@ export function ProfileView() {
     } as PartialProfileInputType,
     onSubmit: async ({ value }) => {
       // Build ProfileInput with only changed/meaningful values
-      const dataToSubmit: Partial<ProfileInput> = {};
+      // Use a more flexible type since we need to handle Date serialization
+      const dataToSubmit: Record<string, unknown> = {};
 
-      // Include fields that have values
-      if (value.dateOfBirth) dataToSubmit.dateOfBirth = value.dateOfBirth;
-      if (value.gender) dataToSubmit.gender = value.gender;
-      if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
-      if (value.phone) dataToSubmit.phone = value.phone;
+      // Include fields that have values - convert Date to ISO string for serialization
+      if (value.dateOfBirth) {
+        dataToSubmit["dateOfBirth"] =
+          value.dateOfBirth instanceof Date
+            ? value.dateOfBirth.toISOString()
+            : value.dateOfBirth;
+      }
+      if (value.gender) dataToSubmit["gender"] = value.gender;
+      if (value.pronouns) dataToSubmit["pronouns"] = value.pronouns;
+      if (value.phone) dataToSubmit["phone"] = value.phone;
 
       // Handle emergency contact
       if (value.emergencyContact) {
         const ec = value.emergencyContact;
         if (ec.name || ec.relationship || ec.phone || ec.email) {
-          dataToSubmit.emergencyContact = {
+          dataToSubmit["emergencyContact"] = {
             name: ec.name || "",
             relationship: ec.relationship || "",
             ...(ec.phone && { phone: ec.phone }),
@@ -97,7 +102,7 @@ export function ProfileView() {
 
       // Always include privacy settings as they have default values
       if (value.privacySettings) {
-        dataToSubmit.privacySettings = {
+        dataToSubmit["privacySettings"] = {
           showEmail: value.privacySettings.showEmail ?? false,
           showPhone: value.privacySettings.showPhone ?? false,
           showBirthYear: value.privacySettings.showBirthYear ?? false,
@@ -107,6 +112,26 @@ export function ProfileView() {
 
       try {
         setFormError(null); // Clear any previous errors
+
+        // Debug logging to check what we're sending
+        console.log("Form value:", value);
+        console.log("Data to submit:", dataToSubmit);
+        console.log("Data to submit keys:", Object.keys(dataToSubmit));
+        console.log("Privacy settings in dataToSubmit:", dataToSubmit["privacySettings"]);
+
+        // Make sure we're not sending an empty object
+        if (Object.keys(dataToSubmit).length === 0) {
+          console.error("No data to submit!");
+          setFormError("No changes detected");
+          return;
+        }
+
+        // For server functions with validators expecting { data: ... },
+        // we pass the object directly and TanStack Start wraps it
+        console.log("Sending to server function:", JSON.stringify(dataToSubmit, null, 2));
+        console.log("Data type:", typeof dataToSubmit);
+
+        // Pass the data wrapped in { data: ... } as expected by TanStack Start
         const result = await updateUserProfile({ data: dataToSubmit });
 
         if (result.success) {
@@ -131,11 +156,8 @@ export function ProfileView() {
         console.error("Profile update error:", error);
         // Don't throw - let form remain interactive
       } finally {
-        // Always ensure form is interactive again
-        // This is handled by TanStack Form automatically, but we can force it if needed
-        if (form.state.isSubmitting) {
-          form.reset(form.state.values);
-        }
+        // Don't reset form on error - this was causing fields to clear
+        // TanStack Form handles submission state automatically
       }
     },
   });

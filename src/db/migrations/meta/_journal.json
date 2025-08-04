@@ -50,6 +50,13 @@
       "when": 1754296052796,
       "tag": "0006_events_rename_province_to_country",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1754320839729,
+      "tag": "0007_game_sessions",
+      "breakpoints": true
     }
   ]
 }

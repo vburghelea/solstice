@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -38,7 +39,7 @@ export const games = pgTable("games", {
   ownerId: text("owner_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  gameSystemId: real("game_system_id")
+  gameSystemId: integer("game_system_id")
     .notNull()
     .references(() => gameSystem.id, { onDelete: "cascade" }),
   dateTime: timestamp("date_time", { mode: "date" }).notNull(),

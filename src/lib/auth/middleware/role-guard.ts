@@ -30,9 +30,22 @@ export async function requireRole({
     return;
   }
 
-  const hasAccess = requiredRoles.some((roleName) => {
-    if (roleName === "Team Admin" && teamId) {
-      return userHasRole(user, roleName, { teamId });
+  // Import PermissionService dynamically to avoid client-side bundling
+  const { PermissionService } = await import("~/features/roles/permission.service");
+
+  // Check if user has any of the required roles
+  let hasAccess = false;
+
+  for (const roleName of requiredRoles) {
+    if (roleName === "Platform Admin" || roleName === "Games Admin") {
+      // Global admin check
+      hasAccess = await PermissionService.isGlobalAdmin(user.id);
+    } else if (roleName === "Team Admin" && teamId) {
+      // Team-specific admin check
+      hasAccess = await PermissionService.canManageTeam(user.id, teamId);
+    } else if (roleName === "Event Admin" && eventId) {
+      // Event-specific admin check
+      hasAccess = await PermissionService.canManageEvent(user.id, eventId);
     }
 
     if (roleName === "Event Admin" && eventId) {

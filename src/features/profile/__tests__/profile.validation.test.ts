@@ -43,9 +43,9 @@ describe("Profile Server Function Input Schemas", () => {
       expect(result.success).toBe(true);
     });
 
-    it("fails with missing data wrapper", () => {
+    it("fails with invalid gender type", () => {
       const invalidInput = {
-        gender: "Female",
+        gender: 123, // Gender should be a string
       };
 
       const result = updateUserProfileInputSchema.safeParse(invalidInput);

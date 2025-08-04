@@ -139,8 +139,9 @@ export function ProfileView() {
         }
 
         // If no changes, just close the form
-        if (!hasChanges) {
+        if (!hasChanges || Object.keys(dataToSubmit).length === 0) {
           setIsEditing(false);
+          toast.info("No changes were made to your profile.");
           return;
         }
 

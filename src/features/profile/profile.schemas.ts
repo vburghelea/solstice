@@ -39,9 +39,7 @@ export type CompleteProfileInputType = z.infer<typeof completeProfileInputSchema
 export type PartialProfileInputType = z.infer<typeof partialProfileInputSchema>;
 
 // Server function input schemas
-export const updateUserProfileInputSchema = z.object({
-  data: partialProfileInputSchema,
-});
+export const updateUserProfileInputSchema = partialProfileInputSchema;
 
 export const completeUserProfileInputSchema = z.object({
   data: profileInputSchema,

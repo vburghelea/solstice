@@ -122,21 +122,21 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
       let finalGameSystemPreferences = undefined;
 
-      if (data.data.gameSystemPreferences) {
+      if (data.gameSystemPreferences) {
         // Delete existing preferences
         await db()
           .delete(userGameSystemPreferences)
           .where(eq(userGameSystemPreferences.userId, currentUser.id));
 
         const preferencesToInsert = [];
-        for (const gameSystem of data.data.gameSystemPreferences.favorite) {
+        for (const gameSystem of data.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
             preferenceType: "favorite" as const,
           });
         }
-        for (const gameSystem of data.data.gameSystemPreferences.avoid) {
+        for (const gameSystem of data.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
@@ -150,7 +150,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
             .values(preferencesToInsert)
             .onConflictDoNothing();
         }
-        finalGameSystemPreferences = data.data.gameSystemPreferences;
+        finalGameSystemPreferences = data.gameSystemPreferences;
       }
 
       // Check if profile is now complete

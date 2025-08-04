@@ -29,7 +29,7 @@ export const createTeam = createServerFn({ method: "POST" })
     }
 
     // Debug logging for E2E tests
-    if (process.env.NODE_ENV === "development") {
+    if (process.env["NODE_ENV"] === "development") {
       console.log("Creating team with user ID:", currentUser.id);
     }
 

@@ -127,13 +127,18 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
         </div>
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link to="/dashboard/teams/$teamId" params={{ teamId: team.id }}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <Link to="/dashboard/teams/$teamId" params={{ teamId: team.id } as any}>
               View Team
             </Link>
           </Button>
           {["captain", "coach"].includes(membership.role) && (
             <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link to="/dashboard/teams/$teamId/manage" params={{ teamId: team.id }}>
+              <Link
+                to="/dashboard/teams/$teamId/manage"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                params={{ teamId: team.id } as any}
+              >
                 Manage
               </Link>
             </Button>

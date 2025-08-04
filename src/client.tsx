@@ -6,13 +6,14 @@ import { createRouter } from "./router";
 const router = createRouter();
 
 // Add debug logging
-router.subscribe("onNavigateStart", () => {
-  console.log("Navigation starting...");
-});
+// TODO: Fix router event types
+// router.subscribe("onNavigateStart", () => {
+//   console.log("Navigation starting...");
+// });
 
-router.subscribe("onNavigateEnd", () => {
-  console.log("Navigation ended");
-});
+// router.subscribe("onNavigateEnd", () => {
+//   console.log("Navigation ended");
+// });
 
 hydrateRoot(
   document,

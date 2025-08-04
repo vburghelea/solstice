@@ -189,8 +189,8 @@ describe("LoginForm", () => {
 
     // Check loading state
     expect(screen.getByRole("button", { name: "Logging in..." })).toBeDisabled();
-    expect(screen.getByLabelText("Email")).toHaveAttribute("readonly");
-    expect(screen.getByLabelText("Password")).toHaveAttribute("readonly");
+    expect(screen.getByLabelText("Email")).toBeDisabled();
+    expect(screen.getByLabelText("Password")).toBeDisabled();
 
     // Social login button should also be disabled
     expect(screen.getByRole("button", { name: "Login with Google" })).toBeDisabled();

@@ -13,8 +13,12 @@ async function testRouting() {
 
   // Login
   console.log("2. Filling login form...");
-  await page.getByLabel("Email").fill(process.env.E2E_TEST_EMAIL || "test@example.com");
-  await page.getByLabel("Password").fill(process.env.E2E_TEST_PASSWORD || "password123");
+  await page
+    .getByLabel("Email")
+    .fill(process.env["E2E_TEST_EMAIL"] || "test@example.com");
+  await page
+    .getByLabel("Password")
+    .fill(process.env["E2E_TEST_PASSWORD"] || "password123");
 
   console.log("3. Clicking login button...");
   await page.getByRole("button", { name: "Login", exact: true }).click();

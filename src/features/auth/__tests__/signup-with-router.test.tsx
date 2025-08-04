@@ -77,8 +77,8 @@ describe("SignupForm with Router", () => {
           email: "newuser@example.com",
           password: "securepassword123",
           name: "New User",
+          callbackURL: "/dashboard",
         }),
-        expect.any(Object),
       );
     });
 

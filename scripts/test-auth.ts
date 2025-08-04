@@ -1,4 +1,4 @@
-import { auth } from "../src/lib/auth";
+import { getAuth } from "../src/lib/auth/server-helpers";
 import { env, getAuthSecret, getBaseUrl } from "../src/lib/env.server";
 
 async function testAuth() {
@@ -17,7 +17,8 @@ async function testAuth() {
   // Test auth instance proxy
   try {
     console.log("\n2. Testing auth instance proxy...");
-    // Access a property to trigger lazy initialization
+    // Get auth instance
+    const auth = await getAuth();
     const authApi = auth.api;
     console.log("✅ Auth instance initialized successfully");
     console.log("   Auth API available:", typeof authApi === "object");
@@ -28,7 +29,8 @@ async function testAuth() {
   // Test auth configuration
   try {
     console.log("\n3. Testing auth configuration...");
-    // Test if auth API has getSession method
+    // Get auth instance and test if API has getSession method
+    const auth = await getAuth();
     const hasGetSession = typeof auth.api?.getSession === "function";
     console.log("✅ Auth configuration loaded");
     console.log("   Session management available:", hasGetSession);

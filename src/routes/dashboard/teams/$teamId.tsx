@@ -210,7 +210,8 @@ function TeamDetailsPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <Button className="w-full" variant="outline" asChild>
-                <Link to="/dashboard/teams/$teamId/members" params={{ teamId }}>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <Link to="/dashboard/teams/$teamId/members" params={{ teamId } as any}>
                   <UsersIcon className="mr-2 h-4 w-4" />
                   Manage Members
                 </Link>

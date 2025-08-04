@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -127,18 +127,13 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
         </div>
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            <Link to="/dashboard/teams/$teamId" params={{ teamId: team.id } as any}>
+            <Link to="/dashboard/teams/$teamId" params={{ teamId: team.id }}>
               View Team
             </Link>
           </Button>
           {["captain", "coach"].includes(membership.role) && (
             <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link
-                to="/dashboard/teams/$teamId/manage"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                params={{ teamId: team.id } as any}
-              >
+              <Link to="/dashboard/teams/$teamId/manage" params={{ teamId: team.id }}>
                 Manage
               </Link>
             </Button>

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -210,8 +210,7 @@ function TeamDetailsPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <Button className="w-full" variant="outline" asChild>
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <Link to="/dashboard/teams/$teamId/members" params={{ teamId } as any}>
+                <Link to="/dashboard/teams/$teamId/members" params={{ teamId }}>
                   <UsersIcon className="mr-2 h-4 w-4" />
                   Manage Members
                 </Link>

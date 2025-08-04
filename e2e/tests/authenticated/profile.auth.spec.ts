@@ -1,53 +1,54 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../fixtures/auth-fixtures";
 
 test.describe("Profile Management (Authenticated)", () => {
-  test("should display profile page", async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to profile page - already authenticated via fixtures
     await page.goto("/dashboard/profile");
 
-    // Should show profile page content
-    // Note: Update these assertions based on actual profile page implementation
-    await expect(page).not.toHaveURL(/\/auth\/login/);
+    // Wait for page to be ready
+    await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({
+      timeout: 15000,
+    });
+  });
 
-    // Profile page should be accessible
-    // Add specific profile page assertions here once implemented
+  test("should display profile page", async ({ page }) => {
+    // Already on profile page from beforeEach
+
+    // Profile heading already verified in beforeEach
+
+    // Check basic information card is visible
+    await expect(page.getByText("Basic Information")).toBeVisible();
+
+    // Should show user email (name might vary based on test user)
+    await expect(page.getByText("Email", { exact: true })).toBeVisible();
   });
 
   test("should navigate to profile from dashboard", async ({ page }) => {
     await page.goto("/dashboard");
 
+    // Wait for dashboard to load
+    await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
+
     // Click View Profile quick action
     await page.getByRole("link", { name: "View Profile" }).click();
+
+    // Wait for navigation and verify
     await expect(page).toHaveURL("/dashboard/profile");
+    await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible();
   });
 
   test("should access profile from sidebar", async ({ page }) => {
     await page.goto("/dashboard");
 
-    // Click Profile in sidebar
+    // Wait for sidebar to be visible
     const sidebar = page.getByRole("complementary");
+    await expect(sidebar).toBeVisible();
+
+    // Click Profile in sidebar
     await sidebar.getByRole("link", { name: "Profile" }).click();
+
+    // Wait for navigation and verify
     await expect(page).toHaveURL("/dashboard/profile");
-  });
-
-  // Add more profile-specific tests as the feature is implemented
-  test.skip("should update profile information", async ({ page }) => {
-    await page.goto("/dashboard/profile");
-
-    // This test is skipped until profile editing is implemented
-    // Will include:
-    // - Editing personal information
-    // - Updating privacy settings
-    // - Changing profile picture
-    // - Saving changes
-  });
-
-  test.skip("should validate profile form inputs", async ({ page }) => {
-    await page.goto("/dashboard/profile");
-
-    // This test is skipped until profile editing is implemented
-    // Will include:
-    // - Required field validation
-    // - Email format validation
-    // - Phone number format validation
+    await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible();
   });
 });

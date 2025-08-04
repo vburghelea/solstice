@@ -42,6 +42,15 @@ export const myServerFn = createServerFn({ method: "POST" })
 - `pnpm test:e2e` - Run Playwright E2E tests
 - `pnpm test:e2e:ui` - Run E2E tests with UI mode
 - `pnpm test:e2e:setup` - Seed database with E2E test data
+- **E2E Test Iteration Strategy**: When fixing E2E tests, follow this loop:
+  1. Run `pnpm test:e2e --reporter=html --output=e2e-test-results` **in the background**
+  2. Use bash to sleep for 10 minutes
+  3. Check if there are any errors in the e2e-test-results folder
+     - If no errors, check if the test process is still running
+     - If still running, sleep 10 more minutes
+     - If not running and no errors, you're done
+  4. If errors exist, fix the errors in both functionality and tests, then go back to step 1
+  5. **CONTINUE THIS LOOP MANY TIMES until all errors are fixed**
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
 - `pnpm docs:reference` - Generate TypeDoc API documentation

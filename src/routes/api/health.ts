@@ -17,7 +17,7 @@ export const ServerRoute = createServerFileRoute("/api/health").methods({
       // Check database connection
       const db = await getDb();
 
-      await db().execute(sql`SELECT 1`);
+      await db.execute(sql`SELECT 1`);
       checks.services["database"] = { status: "connected" };
     } catch {
       checks.status = "unhealthy";
@@ -32,7 +32,7 @@ export const ServerRoute = createServerFileRoute("/api/health").methods({
       const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
 
-      const types = await db()
+      const types = await db
         .select({ count: sql<number>`count(*)` })
         .from(membershipTypes);
 

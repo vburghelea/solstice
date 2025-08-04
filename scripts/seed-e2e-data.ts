@@ -13,10 +13,12 @@ import {
   account,
   memberships,
   membershipTypes,
+  roles,
   session,
   teamMembers,
   teams,
   user,
+  userRoles,
 } from "../src/db/schema";
 
 // Load environment variables
@@ -32,37 +34,67 @@ async function seed() {
   if (!connectionString) {
     throw new Error("No database URL found. Please set E2E_DATABASE_URL or DATABASE_URL");
   }
-  const sql = postgres(connectionString);
+  const sql = postgres(connectionString, { max: 1 }); // open exactly one connection
   const db = drizzle(sql);
+
+  // Use static CUIDs for predictable test data
+  const testUserId = "clxpfz4jn000008l8b3f4e1j2";
+  const adminUserId = "clxpfz4jn000108l8h3g4a2k3";
+  const teamCreatorUserId = "clxpfz4jn000208l8c4h5b3l4"; // User for team creation tests
+  const profileEditUserId = "clxpfz4jn000308l8d5i6c4m5"; // User for profile editing tests
+  const membershipPurchaseUserId = "clxpfz4jn000408l8e6j7d5n6"; // User for membership purchase tests
+  const teamJoinUserId = "clxpfz4jn000508l8f7k8e6o7"; // User for team joining tests
 
   try {
     // Clear existing test data in correct order due to foreign key constraints
-    console.log("Clearing existing team members...");
+    console.log(
+      "Clearing existing data in correct order to handle foreign key constraints...",
+    );
+
+    // 1. First clear tables that reference other tables
+    console.log("Clearing team members...");
     await db.delete(teamMembers);
 
-    console.log("Clearing existing test teams...");
-    await db.delete(teams).where(like(teams.description, "%E2E test%"));
+    console.log("Clearing ALL teams to avoid foreign key issues...");
+    // For now, delete all teams to ensure clean state
+    // In production, you'd want to be more selective
+    await db.delete(teams);
 
-    console.log("Clearing existing memberships...");
+    console.log("Clearing memberships...");
     await db.delete(memberships);
 
-    console.log("Clearing existing membership types...");
+    console.log("Clearing user roles...");
+    await db.delete(userRoles);
+
+    // 2. Clear sessions and accounts before users
+    console.log("Clearing sessions...");
+    await db.delete(session).where(like(session.userId, "clxpfz4jn%"));
+
+    console.log("Clearing accounts...");
+    await db.delete(account).where(like(account.userId, "clxpfz4jn%"));
+
+    // 3. Now we can safely clear users
+    console.log("Clearing test users...");
+    await db.delete(user).where(like(user.email, "%@example.com"));
+
+    // 4. Clear standalone tables last
+    console.log("Clearing membership types...");
     await db.delete(membershipTypes);
 
-    console.log("Clearing existing test users...");
-    await db.delete(user).where(like(user.email, "%@example.com"));
+    console.log("Clearing roles...");
+    await db.delete(roles);
 
     // Create test users
     const testUsers = [
       {
-        id: "test-user-1",
+        id: testUserId,
         email: "test@example.com",
         name: "Test User",
         emailVerified: true,
         profileComplete: true,
         dateOfBirth: new Date("1990-01-01"),
         phone: "+1234567890",
-        gender: "male" as const,
+        gender: "male",
         pronouns: "he/him",
         emergencyContact: JSON.stringify({
           name: "Emergency Contact",
@@ -78,14 +110,14 @@ async function seed() {
         profileVersion: 1,
       },
       {
-        id: "test-admin",
+        id: adminUserId,
         email: "admin@example.com",
         name: "Admin User",
         emailVerified: true,
         profileComplete: true,
         dateOfBirth: new Date("1985-05-15"),
         phone: "+1234567891",
-        gender: "female" as const,
+        gender: "female",
         pronouns: "she/her",
         emergencyContact: JSON.stringify({
           name: "Admin Emergency",
@@ -100,10 +132,149 @@ async function seed() {
         }),
         profileVersion: 1,
       },
+      {
+        id: teamCreatorUserId,
+        email: "teamcreator@example.com",
+        name: "Team Creator",
+        emailVerified: true,
+        profileComplete: true,
+        dateOfBirth: new Date("1992-05-15"),
+        phone: "+1234567892",
+        gender: "female",
+        pronouns: "she/her",
+        emergencyContact: JSON.stringify({
+          name: "Emergency Contact 3",
+          phone: "+0987654323",
+          relationship: "parent",
+        }),
+        privacySettings: JSON.stringify({
+          showEmail: true,
+          showPhone: false,
+          showBirthYear: false,
+          allowTeamInvitations: true,
+        }),
+        profileVersion: 1,
+      },
     ];
+
+    // Add purpose-specific test users
+    testUsers.push(
+      {
+        id: profileEditUserId,
+        email: "profile-edit@example.com",
+        name: "Profile Edit User",
+        emailVerified: true,
+        profileComplete: true,
+        dateOfBirth: new Date("1991-03-15"),
+        phone: "+1234567893",
+        gender: "non-binary",
+        pronouns: "they/them",
+        emergencyContact: JSON.stringify({
+          name: "Profile Emergency",
+          phone: "+0987654324",
+          relationship: "friend",
+        }),
+        privacySettings: JSON.stringify({
+          showEmail: false,
+          showPhone: true,
+          showBirthYear: false,
+          allowTeamInvitations: true,
+        }),
+        profileVersion: 1,
+      },
+      {
+        id: membershipPurchaseUserId,
+        email: "membership-purchase@example.com",
+        name: "Membership Purchase User",
+        emailVerified: true,
+        profileComplete: true,
+        dateOfBirth: new Date("1988-07-20"),
+        phone: "+1234567894",
+        gender: "female",
+        pronouns: "she/her",
+        emergencyContact: JSON.stringify({
+          name: "Membership Emergency",
+          phone: "+0987654325",
+          relationship: "parent",
+        }),
+        privacySettings: JSON.stringify({
+          showEmail: true,
+          showPhone: false,
+          showBirthYear: true,
+          allowTeamInvitations: true,
+        }),
+        profileVersion: 1,
+      },
+      {
+        id: teamJoinUserId,
+        email: "team-join@example.com",
+        name: "Team Join User",
+        emailVerified: true,
+        profileComplete: true,
+        dateOfBirth: new Date("1995-11-30"),
+        phone: "+1234567895",
+        gender: "male",
+        pronouns: "he/him",
+        emergencyContact: JSON.stringify({
+          name: "Team Emergency",
+          phone: "+0987654326",
+          relationship: "sibling",
+        }),
+        privacySettings: JSON.stringify({
+          showEmail: true,
+          showPhone: true,
+          showBirthYear: false,
+          allowTeamInvitations: true,
+        }),
+        profileVersion: 1,
+      },
+    );
 
     // Hash password for all test users using Better Auth's hash function
     const hashedPassword = await hashPassword("testpassword123");
+
+    // Create roles first
+    console.log("Creating roles...");
+    await db.insert(roles).values([
+      {
+        id: "solstice-admin",
+        name: "Solstice Admin",
+        description: "Super admin role with full system access",
+        permissions: {
+          "system:all": true,
+        },
+      },
+      {
+        id: "quadball-canada-admin",
+        name: "Quadball Canada Admin",
+        description: "Administrative access to Quadball Canada features",
+        permissions: {
+          "teams:manage": true,
+          "events:manage": true,
+          "members:manage": true,
+          "memberships:manage": true,
+        },
+      },
+      {
+        id: "team-admin",
+        name: "Team Admin",
+        description: "Administrative access to a specific team",
+        permissions: {
+          "team:manage": true,
+          "team:members:manage": true,
+        },
+      },
+      {
+        id: "event-admin",
+        name: "Event Admin",
+        description: "Administrative access to a specific event",
+        permissions: {
+          "event:manage": true,
+          "event:participants:manage": true,
+        },
+      },
+    ]);
+    console.log("✅ Created roles");
 
     // Create membership types first
     console.log("Creating membership types...");
@@ -180,7 +351,7 @@ async function seed() {
         province: "ON",
         primaryColor: "#FF0000",
         secondaryColor: "#0000FF",
-        createdBy: "test-user-1",
+        createdBy: testUserId,
       },
       {
         id: "test-team-2",
@@ -192,7 +363,7 @@ async function seed() {
         province: "BC",
         primaryColor: "#00FF00",
         secondaryColor: "#FF00FF",
-        createdBy: "test-admin",
+        createdBy: adminUserId,
       },
     ]);
 
@@ -205,34 +376,35 @@ async function seed() {
       {
         id: "test-member-1",
         teamId: "test-team-1",
-        userId: "test-user-1",
+        userId: testUserId,
         role: "captain" as const,
         status: "active" as const,
         jerseyNumber: "7",
         position: "Chaser",
-        invitedBy: "test-user-1",
+        invitedBy: testUserId,
         joinedAt: new Date(),
       },
       {
         id: "test-member-2",
         teamId: "test-team-2",
-        userId: "test-admin",
+        userId: adminUserId,
         role: "captain" as const,
         status: "active" as const,
         jerseyNumber: "1",
         position: "Keeper",
-        invitedBy: "test-admin",
+        invitedBy: adminUserId,
         joinedAt: new Date(),
       },
     ]);
 
     // Create memberships for test users
-    console.log("Creating test memberships...");
+    console.log("Creating memberships for test users...");
 
+    // Create an active membership for admin user (for tests that need active membership)
     await db.insert(memberships).values([
       {
         id: "test-membership-1",
-        userId: "test-user-1",
+        userId: adminUserId,
         membershipTypeId: "annual-player-2025",
         status: "active" as const,
         startDate: new Date().toISOString(),
@@ -248,13 +420,15 @@ async function seed() {
       },
     ]);
 
-    console.log("✅ Created test memberships");
+    // Test user remains without membership for purchase flow tests
+    console.log("✅ Created test memberships (admin has active, test user has none)");
     console.log("✅ Test data seeded successfully!");
   } catch (error) {
     console.error("❌ Error seeding test data:", error);
     throw error;
   } finally {
-    await sql.end();
+    await sql.end({ timeout: 3 }); // force close idle clients
+    process.exit(0); // and make 100% sure node exits
   }
 }
 

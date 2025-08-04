@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - heading "Quadball Canada" [level=1]
+  - navigation:
+    - link "Events":
+      - /url: /
+    - link "Teams":
+      - /url: /
+    - link "Resources":
+      - /url: /
+    - link "About Us":
+      - /url: /
+  - link "Login":
+    - /url: /auth/login
+  - link "Register":
+    - /url: /auth/signup
+    - button "Register"
+- main:
+  - link "Quadball Canada":
+    - /url: "#"
+  - heading "Welcome back to Quadball Canada" [level=1]
+  - text: Email
+  - textbox "Email"
+  - text: Password
+  - textbox "Password"
+  - button "Login"
+  - text: Or
+  - button "Login with Google":
+    - img
+    - text: Login with Google
+  - text: Don't have an account?
+  - link "Sign up":
+    - /url: /auth/signup
+- contentinfo:
+  - heading "Quadball Canada" [level=2]
+  - paragraph: Promoting and developing the sport of Quadball across Canada.
+  - heading "Quick Links" [level=3]
+  - navigation:
+    - link "Events":
+      - /url: /
+    - link "Teams":
+      - /url: /
+    - link "Resources":
+      - /url: /
+    - link "About Us":
+      - /url: /
+    - link "Contact":
+      - /url: /
+  - heading "Follow Us" [level=3]
+  - link:
+    - /url: "#"
+  - link:
+    - /url: "#"
+  - link:
+    - /url: "#"
+  - paragraph: © 2024 Quadball Canada. All Rights Reserved.
+- region "Notifications alt+T"
+```

@@ -8,12 +8,19 @@ test.describe("Authentication Form Validation (Unauthenticated)", () => {
 
   test("should show validation for empty login form", async ({ page }) => {
     await page.goto("/auth/login");
+    await page.waitForLoadState("networkidle");
 
-    // Clear the form (in case of autofill)
-    await page.getByLabel("Email").clear();
-    await page.getByLabel("Password").clear();
+    // Wait for form to be ready
+    await expect(page.getByLabel("Email")).toBeEnabled();
 
-    // Try to submit empty form - should trigger TanStack Form validation
+    // Make sure fields are empty (in case of autofill)
+    const emailField = page.getByLabel("Email");
+    const passwordField = page.getByLabel("Password");
+
+    await emailField.clear();
+    await passwordField.clear();
+
+    // Try to submit empty form
     await page.getByRole("button", { name: "Login", exact: true }).click();
 
     // Check that validation errors are shown
@@ -25,18 +32,22 @@ test.describe("Authentication Form Validation (Unauthenticated)", () => {
     page,
   }) => {
     await page.goto("/auth/signup");
+    await page.waitForLoadState("networkidle");
+
+    // Wait for form to be ready
+    await expect(page.getByLabel("Name")).toBeEnabled();
 
     await page.getByLabel("Name").fill("Test User");
     await page.getByLabel("Email").fill("newuser@example.com");
     await page.getByLabel("Password", { exact: true }).fill("password123");
     await page.getByLabel("Confirm Password").fill("password456");
 
-    // Try to move focus or submit - TanStack Form validates on blur
-    await page.getByRole("button", { name: "Sign up", exact: true }).click();
+    // Tab out of the confirm password field to trigger validation
+    await page.keyboard.press("Tab");
 
-    // Check for password mismatch error - wait a bit for validation to trigger
+    // Check for password mismatch error
     await expect(page.getByText("Passwords do not match")).toBeVisible({
-      timeout: 10000,
+      timeout: 5000,
     });
   });
 

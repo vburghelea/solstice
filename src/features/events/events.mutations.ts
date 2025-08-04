@@ -78,7 +78,7 @@ export const createEvent = createServerFn({ method: "POST" })
       }
 
       // Check for duplicate slug
-      const [existingEvent] = await db()
+      const [existingEvent] = await db
         .select({ id: events.id })
         .from(events)
         .where(eq(events.slug, data.slug))
@@ -114,7 +114,7 @@ export const createEvent = createServerFn({ method: "POST" })
       }
 
       // Create event
-      const [newEvent] = await db()
+      const [newEvent] = await db
         .insert(events)
         .values({
           ...data,
@@ -174,7 +174,7 @@ export const updateEvent = createServerFn({ method: "POST" })
       }
 
       // Check if event exists and user is organizer
-      const [existingEvent] = await db()
+      const [existingEvent] = await db
         .select()
         .from(events)
         .where(eq(events.id, data.eventId))
@@ -206,7 +206,7 @@ export const updateEvent = createServerFn({ method: "POST" })
 
       // Check for duplicate slug if updating
       if (data.data.slug && data.data.slug !== existingEvent.slug) {
-        const [duplicateEvent] = await db()
+        const [duplicateEvent] = await db
           .select({ id: events.id })
           .from(events)
           .where(
@@ -247,7 +247,7 @@ export const updateEvent = createServerFn({ method: "POST" })
       }
 
       // Update event
-      const [updatedEvent] = await db()
+      const [updatedEvent] = await db
         .update(events)
         .set({
           ...data.data,
@@ -322,7 +322,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         }
 
         // Get event details
-        const [event] = await db()
+        const [event] = await db
           .select()
           .from(events)
           .where(eq(events.id, data.eventId))
@@ -379,7 +379,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         }
 
         // Check if already registered
-        const existingRegistration = await db()
+        const existingRegistration = await db
           .select()
           .from(eventRegistrations)
           .where(
@@ -407,7 +407,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         }
 
         // Check capacity
-        const registrationCount = await db()
+        const registrationCount = await db
           .select({ count: sql<number>`count(*)::int` })
           .from(eventRegistrations)
           .where(
@@ -453,7 +453,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
         // If team registration, verify user is team member
         if (data.teamId) {
-          const [membership] = await db()
+          const [membership] = await db
             .select()
             .from(teamMembers)
             .where(
@@ -493,7 +493,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         }
 
         // Create registration
-        const [registration] = await db()
+        const [registration] = await db
           .insert(eventRegistrations)
           .values({
             eventId: data.eventId,
@@ -560,7 +560,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
         }
 
         // Get registration
-        const [registration] = await db()
+        const [registration] = await db
           .select()
           .from(eventRegistrations)
           .where(eq(eventRegistrations.id, data.registrationId))
@@ -582,7 +582,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
         if (registration.userId !== session.user.id) {
           // Check if user is team captain/coach
           if (registration.teamId) {
-            const [membership] = await db()
+            const [membership] = await db
               .select()
               .from(teamMembers)
               .where(
@@ -623,7 +623,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
         }
 
         // Update registration
-        const [cancelledRegistration] = await db()
+        const [cancelledRegistration] = await db
           .update(eventRegistrations)
           .set({
             status: "cancelled",

@@ -6,7 +6,7 @@ import { serverOnly } from "@tanstack/react-start";
  */
 export const getDb = serverOnly(async () => {
   const { db } = await import("~/db");
-  return db;
+  return db();
 });
 
 /**
@@ -15,5 +15,5 @@ export const getDb = serverOnly(async () => {
  */
 export const getUnpooledDb = serverOnly(async () => {
   const { unpooledDb } = await import("~/db");
-  return unpooledDb;
+  return unpooledDb();
 });

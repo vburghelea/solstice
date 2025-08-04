@@ -30,35 +30,46 @@ export default function SignupForm() {
       setIsLoading(true);
       setErrorMessage("");
 
-      auth.signUp.email(
-        {
+      try {
+        const result = await auth.signUp.email({
           name: value.name,
           email: value.email,
           password: value.password,
           callbackURL: redirectUrl,
-        },
-        {
-          onError: (ctx) => {
-            setErrorMessage(ctx.error.message);
-            setIsLoading(false);
-          },
-          onSuccess: async () => {
-            queryClient.invalidateQueries({ queryKey: ["user"] });
-            await router.invalidate();
-            navigate({ to: redirectUrl });
-          },
-        },
-      );
+        });
+
+        if (result?.error) {
+          throw new Error(result.error.message || "Signup failed");
+        }
+
+        // Success path
+        await queryClient.invalidateQueries({ queryKey: ["user"] });
+        await router.invalidate();
+        await navigate({ to: redirectUrl });
+      } catch (error) {
+        // Error handling
+        setErrorMessage((error as Error)?.message || "Signup failed");
+        // Keep form values but reset submitting state by resetting with current values
+        form.reset({
+          name: value.name,
+          email: value.email,
+          password: value.password,
+          confirmPassword: value.confirmPassword,
+        });
+      } finally {
+        // Always reset loading state
+        setIsLoading(false);
+      }
     },
   });
 
   return (
     <div className="flex flex-col gap-6">
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           e.stopPropagation();
-          form.handleSubmit();
+          await form.handleSubmit();
         }}
       >
         <div className="flex flex-col gap-6">
@@ -67,9 +78,9 @@ export default function SignupForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Acme Inc.</span>
+              <span className="sr-only">Quadball Canada</span>
             </a>
-            <h1 className="text-xl font-bold">Sign up for Acme Inc.</h1>
+            <h1 className="text-xl font-bold">Sign up for Quadball Canada</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field

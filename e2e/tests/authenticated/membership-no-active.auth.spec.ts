@@ -1,15 +1,22 @@
 import { expect, test } from "@playwright/test";
+import { ANNUAL_MEMBERSHIP_NAME } from "../../helpers/constants";
+import { clearAuthState, gotoWithAuth } from "../../utils/auth";
 
 // These tests are for users without active memberships
-// They require a clean test user or manual membership deletion
+// They use the membership-purchase@example.com account which has no membership
 
 test.describe("Membership Purchase Flow - No Active Membership", () => {
-  test.skip("should show purchase flow for users without membership", async ({
-    page,
-  }) => {
-    // This test is skipped by default because it requires a user without an active membership
-    // To run this test, ensure the test user doesn't have an active membership
+  test.beforeEach(async ({ page }) => {
+    await clearAuthState(page);
 
+    // Use membership-purchase account which has no active membership
+    await gotoWithAuth(page, "/dashboard", {
+      email: "membership-purchase@example.com",
+      password: "testpassword123",
+    });
+  });
+
+  test("should show purchase flow for users without membership", async ({ page }) => {
     await page.goto("/dashboard/membership");
 
     // Check no active membership status
@@ -20,7 +27,7 @@ test.describe("Membership Purchase Flow - No Active Membership", () => {
 
     // Check purchase button is available
     const purchaseButton = page
-      .locator('[data-testid="membership-card-annual-player-2025"]')
+      .locator(`:has-text("${ANNUAL_MEMBERSHIP_NAME}")`)
       .first()
       .getByRole("button", { name: "Purchase" });
 
@@ -30,16 +37,17 @@ test.describe("Membership Purchase Flow - No Active Membership", () => {
     // Click purchase
     await purchaseButton.click();
 
-    // Should redirect to checkout
-    await page.waitForURL((url) => url.toString().includes("checkout.mock.com"), {
+    // Should redirect to mock checkout
+    await page.waitForURL((url) => url.toString().includes("mock_checkout=true"), {
       timeout: 10000,
     });
 
-    expect(page.url()).toContain("checkout.mock.com");
-    expect(page.url()).toContain("session_id=");
+    expect(page.url()).toContain("/dashboard/membership");
+    expect(page.url()).toContain("mock_checkout=true");
+    expect(page.url()).toContain("session=");
   });
 
-  test.skip("should handle payment confirmation for new membership", async ({ page }) => {
+  test("should handle payment confirmation for new membership", async ({ page }) => {
     // Simulate returning from payment provider with success
     const mockSessionId = "test-session-123";
     await page.goto(

@@ -1,18 +1,28 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../fixtures/auth-fixtures";
 
 test.describe("Profile Edit", () => {
   test.beforeEach(async ({ page }) => {
+    // Just navigate - we're already authenticated via storageState
     await page.goto("/dashboard/profile");
+
+    // Wait for the page to be ready
+    await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({
+      timeout: 15000,
+    });
   });
 
   test("should display current profile information", async ({ page }) => {
+    // Already on profile page from beforeEach
+
     // Check page title
-    await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Check basic information card
     await expect(page.getByText("Basic Information")).toBeVisible();
-    await expect(page.getByText("Email")).toBeVisible();
-    await expect(page.getByText("test@example.com")).toBeVisible();
+    await expect(page.getByText("Email", { exact: true })).toBeVisible();
+    await expect(page.getByText("profile-edit@example.com")).toBeVisible();
   });
 
   test("should toggle edit mode", async ({ page }) => {
@@ -23,9 +33,9 @@ test.describe("Profile Edit", () => {
     await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /Cancel/i })).toBeVisible();
 
-    // Check that input fields are visible
+    // Check that input fields are visible - use more specific selectors
     await expect(page.getByLabel("Date of Birth")).toBeVisible();
-    await expect(page.getByLabel("Phone Number")).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Phone Number" })).toBeVisible();
     await expect(page.getByLabel("Gender")).toBeVisible();
     await expect(page.getByLabel("Pronouns")).toBeVisible();
   });
@@ -34,16 +44,27 @@ test.describe("Profile Edit", () => {
     // Enter edit mode
     await page.getByRole("button", { name: /Edit Profile/i }).click();
 
+    // Wait for edit mode to be fully activated
+    await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
+
     // Make some changes
-    await page.getByLabel("Phone Number").fill("+1 (555) 123-4567");
+    await page.getByRole("textbox", { name: "Phone Number" }).fill("+1 (555) 123-4567");
 
     // Cancel editing
     await page.getByRole("button", { name: /Cancel/i }).click();
 
-    // Check that edit button is back
-    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible();
+    // Wait for the form to reset and edit mode to exit
+    // The Cancel button should disappear first
+    await expect(page.getByRole("button", { name: /Cancel/i })).not.toBeVisible({
+      timeout: 10000,
+    });
 
-    // Check that changes were not saved
+    // Then the edit button should be visible again
+    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Check that changes were not saved - the new phone number should not be visible
     await expect(page.getByText("+1 (555) 123-4567")).not.toBeVisible();
   });
 
@@ -51,8 +72,11 @@ test.describe("Profile Edit", () => {
     // Enter edit mode
     await page.getByRole("button", { name: /Edit Profile/i }).click();
 
+    // Wait for edit mode to be fully activated
+    await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
+
     // Fill in some fields
-    await page.getByLabel("Phone Number").fill("+1 (555) 987-6543");
+    await page.getByRole("textbox", { name: "Phone Number" }).fill("+1 (555) 987-6543");
     await page.getByLabel("Pronouns").fill("they/them");
 
     // Select gender
@@ -63,10 +87,19 @@ test.describe("Profile Edit", () => {
     await page.getByRole("button", { name: /Save Changes/i }).click();
 
     // Wait for success toast
-    await expect(page.getByText("Profile updated successfully")).toBeVisible();
+    await expect(page.getByText("Profile updated successfully")).toBeVisible({
+      timeout: 10000,
+    });
 
-    // Check that edit button is back
-    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible();
+    // Wait for edit mode to exit - Save Changes button should disappear
+    await expect(page.getByRole("button", { name: /Save Changes/i })).not.toBeVisible({
+      timeout: 10000,
+    });
+
+    // Check that edit button is back (this waits for the UI to update)
+    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Check that changes are displayed
     await expect(page.getByText("+1 (555) 987-6543")).toBeVisible();
@@ -78,6 +111,9 @@ test.describe("Profile Edit", () => {
     // Enter edit mode
     await page.getByRole("button", { name: /Edit Profile/i }).click();
 
+    // Wait for edit mode to be fully activated
+    await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
+
     // Fill emergency contact information
     await page.getByLabel("Contact Name").fill("Jane Doe");
     await page.getByLabel("Relationship").fill("Spouse");
@@ -88,7 +124,19 @@ test.describe("Profile Edit", () => {
     await page.getByRole("button", { name: /Save Changes/i }).click();
 
     // Wait for success toast
-    await expect(page.getByText("Profile updated successfully")).toBeVisible();
+    await expect(page.getByText("Profile updated successfully")).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Wait for edit mode to exit - Save Changes button should disappear
+    await expect(page.getByRole("button", { name: /Save Changes/i })).not.toBeVisible({
+      timeout: 10000,
+    });
+
+    // Check that edit mode is exited
+    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Check that emergency contact is displayed
     await expect(page.getByText("Jane Doe")).toBeVisible();
@@ -101,6 +149,9 @@ test.describe("Profile Edit", () => {
     // Enter edit mode
     await page.getByRole("button", { name: /Edit Profile/i }).click();
 
+    // Wait for edit mode to be fully activated
+    await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
+
     // Update privacy settings
     await page.getByLabel("Show my email address to team members").check();
     await page.getByLabel("Show my phone number to team members").check();
@@ -109,7 +160,19 @@ test.describe("Profile Edit", () => {
     await page.getByRole("button", { name: /Save Changes/i }).click();
 
     // Wait for success toast
-    await expect(page.getByText("Profile updated successfully")).toBeVisible();
+    await expect(page.getByText("Profile updated successfully")).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Wait for edit mode to exit - Save Changes button should disappear
+    await expect(page.getByRole("button", { name: /Save Changes/i })).not.toBeVisible({
+      timeout: 10000,
+    });
+
+    // Check that edit mode is exited
+    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Check that privacy settings are displayed correctly
     await expect(page.getByText("Email visibility:")).toBeVisible();

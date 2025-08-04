@@ -1,0 +1,58 @@
+# Page snapshot
+
+```yaml
+- complementary:
+    - link "Quadball Canada Dashboard":
+        - /url: /
+        - heading "Quadball Canada" [level=1]
+        - paragraph: Dashboard
+    - navigation:
+        - link "Dashboard":
+            - /url: /dashboard
+        - link "Teams":
+            - /url: /dashboard/teams
+        - link "Events":
+            - /url: /dashboard/events
+        - link "Members":
+            - /url: /dashboard/members
+    - link "Profile":
+        - /url: /dashboard/profile
+    - link "Settings":
+        - /url: /dashboard/settings
+    - button "Logout"
+- main:
+    - heading "My Profile" [level=1]
+    - paragraph: View and manage your personal information
+    - text: Basic Information Your personal details and contact information
+    - button "Edit Profile"
+    - text: Name
+    - paragraph: Test User
+    - text: Email
+    - paragraph: test@example.com
+    - text: Date of Birth
+    - paragraph: "12/31/1989 (Age: 35)"
+    - text: Phone Number
+    - paragraph: "+1234567890"
+    - text: Gender
+    - paragraph: male
+    - text: Pronouns
+    - paragraph: he/him
+    - text: Emergency Contact Who should we contact in case of emergency Contact Name
+    - paragraph: Emergency Contact
+    - text: Relationship
+    - paragraph: spouse
+    - text: Contact Phone
+    - paragraph: "+0987654321"
+    - text: Contact Email
+    - paragraph: Not set
+    - text: Privacy Settings Control what information is visible to others
+    - paragraph: "Email visibility: Visible to team members"
+    - paragraph: "Phone visibility: Hidden"
+    - paragraph: "Birth year visibility: Hidden"
+    - paragraph: "Team invitations: Allowed"
+    - text: Profile Information Technical details about your profile
+    - paragraph: "Profile Status: Complete"
+    - paragraph: "Profile Version: 1"
+    - paragraph: "Last Updated: 8/4/2025, 12:02:05 AM"
+- region "Notifications alt+T"
+```

@@ -15,7 +15,10 @@ export default function LoginForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
-  const redirectUrl = "/dashboard"; // Default redirect after login
+
+  // Get redirect parameter from URL, default to dashboard
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,18 +36,20 @@ export default function LoginForm() {
         const result = await auth.signIn.email(value);
 
         if (result?.error) {
-          setErrorMessage(result.error.message || "Invalid email or password");
-          setIsLoading(false);
-          return;
+          throw new Error(result.error.message || "Invalid email or password");
         }
 
-        // success path
-        queryClient.invalidateQueries({ queryKey: ["user"] });
+        // Success path
+        await queryClient.invalidateQueries({ queryKey: ["user"] });
         await router.invalidate();
-        navigate({ to: redirectUrl });
+        await navigate({ to: redirectUrl });
       } catch (error) {
-        // Fallback error handling
+        // Error handling
         setErrorMessage((error as Error)?.message || "Invalid email or password");
+        // Keep form values but reset submitting state by resetting with current values
+        form.reset(value);
+      } finally {
+        // Always reset loading state
         setIsLoading(false);
       }
     },
@@ -53,10 +58,10 @@ export default function LoginForm() {
   return (
     <div className="flex flex-col gap-6">
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           e.stopPropagation();
-          form.handleSubmit();
+          await form.handleSubmit();
         }}
       >
         <div className="flex flex-col gap-6">
@@ -65,9 +70,9 @@ export default function LoginForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Acme Inc.</span>
+              <span className="sr-only">Quadball Canada</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome back to Acme Inc.</h1>
+            <h1 className="text-xl font-bold">Welcome back to Quadball Canada</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field

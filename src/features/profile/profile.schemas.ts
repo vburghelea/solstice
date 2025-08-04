@@ -20,13 +20,25 @@ export const privacySettingsSchema = z.object({
 });
 
 export const profileInputSchema = z.object({
-  dateOfBirth: z.date().refine(
-    (date) => {
-      const age = new Date().getFullYear() - date.getFullYear();
-      return age >= 13 && age <= 120;
-    },
-    { message: "Age must be between 13 and 120 years" },
-  ),
+  dateOfBirth: z
+    .preprocess((arg) => {
+      if (typeof arg === "string" && !arg.includes("T")) {
+        return new Date(`${arg}T00:00:00.000Z`);
+      }
+      return typeof arg === "string" ? new Date(arg) : arg;
+    }, z.date())
+    .refine(
+      (date) => {
+        const today = new Date();
+        let age = today.getUTCFullYear() - date.getUTCFullYear();
+        const m = today.getUTCMonth() - date.getUTCMonth();
+        if (m < 0 || (m === 0 && today.getUTCDate() < date.getUTCDate())) {
+          age--;
+        }
+        return age >= 13 && age <= 120;
+      },
+      { message: "You must be between 13 and 120 years old" },
+    ),
   emergencyContact: emergencyContactSchema.optional(),
   gender: z.string().optional(),
   pronouns: z.string().optional(),

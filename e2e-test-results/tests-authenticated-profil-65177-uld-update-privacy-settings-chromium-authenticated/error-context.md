@@ -1,0 +1,63 @@
+# Page snapshot
+
+```yaml
+- complementary:
+    - link "Quadball Canada Dashboard":
+        - /url: /
+        - heading "Quadball Canada" [level=1]
+        - paragraph: Dashboard
+    - navigation:
+        - link "Dashboard":
+            - /url: /dashboard
+        - link "Teams":
+            - /url: /dashboard/teams
+        - link "Events":
+            - /url: /dashboard/events
+        - link "Members":
+            - /url: /dashboard/members
+    - link "Profile":
+        - /url: /dashboard/profile
+    - link "Settings":
+        - /url: /dashboard/settings
+    - button "Logout"
+- main:
+    - heading "My Profile" [level=1]
+    - paragraph: View and manage your personal information
+    - text: Basic Information Your personal details and contact information
+    - button "Cancel"
+    - button "Save Changes"
+    - text: Name
+    - paragraph: Test User
+    - text: Email
+    - paragraph: test@example.com
+    - text: Date of Birth
+    - textbox "Date of Birth": 1990-01-01
+    - paragraph: You must be between 13 and 120 years old
+    - text: Phone Number
+    - textbox "Phone Number"
+    - text: Gender
+    - combobox "Gender": Select gender
+    - text: Pronouns
+    - textbox "Pronouns"
+    - text: Emergency Contact Who should we contact in case of emergency Contact Name
+    - textbox "Contact Name"
+    - text: Relationship
+    - textbox "Relationship"
+    - text: Contact Phone
+    - textbox "Contact Phone"
+    - text: Contact Email
+    - textbox "Contact Email"
+    - text: Privacy Settings Control what information is visible to others
+    - checkbox "Show my email address to team members"
+    - text: Show my email address to team members
+    - checkbox "Show my phone number to team members"
+    - text: Show my phone number to team members
+    - checkbox "Show my birth year on my profile"
+    - text: Show my birth year on my profile
+    - checkbox "Allow team captains to send me invitations" [checked]
+    - text: Allow team captains to send me invitations Profile Information Technical details about your profile
+    - paragraph: "Profile Status: Complete"
+    - paragraph: "Profile Version: 1"
+    - paragraph: "Last Updated: 8/4/2025, 12:02:05 AM"
+- region "Notifications alt+T"
+```

@@ -112,7 +112,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      const [updatedUser] = await db()
+      const [updatedUser] = await db
         .update(user)
         .set(updateData)
         .where(eq(user.id, session.user.id))
@@ -131,7 +131,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
       if (profileComplete !== updatedUser.profileComplete) {
         const db = await getDb();
-        const [finalUser] = await db()
+        const [finalUser] = await db
           .update(user)
           .set({ profileComplete })
           .where(eq(user.id, session.user.id))
@@ -205,7 +205,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      const [updatedUser] = await db()
+      const [updatedUser] = await db
         .update(user)
         .set(updateData)
         .where(eq(user.id, session.user.id))
@@ -266,7 +266,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      const [updatedUser] = await db()
+      const [updatedUser] = await db
         .update(user)
         .set({
           privacySettings: JSON.stringify(data.data),

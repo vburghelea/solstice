@@ -3,14 +3,7 @@ import { serverOnly } from "@tanstack/react-start";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { getPooledDbUrl, getUnpooledDbUrl, isServerless } from "../lib/env.server";
 import * as schema from "./schema";
-
-// Configure Neon for serverless environments
-if (isServerless()) {
-  neonConfig.useSecureWebSocket = true;
-  neonConfig.poolQueryViaFetch = true;
-}
 
 /**
  * Pooled database connection using Neon's serverless driver.
@@ -24,7 +17,15 @@ if (isServerless()) {
  * - Short-lived queries
  * - High-concurrency scenarios
  */
-export const pooledDb = serverOnly(() => {
+export const pooledDb = serverOnly(async () => {
+  const { getPooledDbUrl, isServerless } = await import("../lib/env.server");
+
+  // Configure Neon for serverless environments
+  if (isServerless()) {
+    neonConfig.useSecureWebSocket = true;
+    neonConfig.poolQueryViaFetch = true;
+  }
+
   const connectionString = getPooledDbUrl();
 
   const pool = new Pool({ connectionString });
@@ -48,7 +49,8 @@ export const pooledDb = serverOnly(() => {
  * - Batch imports/exports
  * - Operations requiring session-level features
  */
-export const unpooledDb = serverOnly(() => {
+export const unpooledDb = serverOnly(async () => {
+  const { getUnpooledDbUrl } = await import("../lib/env.server");
   const connectionString = getUnpooledDbUrl();
 
   const sql = postgres(connectionString);
@@ -68,12 +70,13 @@ export const unpooledDb = serverOnly(() => {
  * This is the recommended export for most use cases as it automatically
  * selects the optimal connection type.
  */
-export const getDb = serverOnly(() => {
+export const getDb = serverOnly(async () => {
+  const { isServerless } = await import("../lib/env.server");
   if (isServerless()) {
     console.log("Using pooled connection for serverless environment");
-    return pooledDb();
+    return await pooledDb();
   } else {
     console.log("Using unpooled connection for traditional environment");
-    return unpooledDb();
+    return await unpooledDb();
   }
 });

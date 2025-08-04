@@ -7,11 +7,8 @@ import type { User } from "~/lib/auth/types";
 export const getCurrentUser = createServerFn({ method: "GET" }).handler(
   async (): Promise<User | null> => {
     // Import server-only modules inside the handler
-    const [{ getDb }, { getAuth }] = await Promise.all([
-      import("~/db/server-helpers"),
-      import("~/lib/auth/server-helpers"),
-    ]);
-
+    const { getDb } = await import("~/db/server-helpers");
+    const { getAuth } = await import("~/lib/auth/server-helpers");
     const auth = await getAuth();
     const { getWebRequest } = await import("@tanstack/react-start/server");
     const { headers } = getWebRequest();
@@ -27,7 +24,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
 
     // Fetch the full user data from the database
     const db = await getDb();
-    const dbUser = await db()
+    const dbUser = await db
       .select()
       .from(user)
       .where(eq(user.id, session.user.id))

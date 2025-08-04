@@ -15,7 +15,7 @@ export class PermissionService {
       .where(
         and(
           eq(userRoles.userId, userId),
-          inArray(roles.name, ["Solstice Admin", "Quadball Canada Admin"]),
+          inArray(roles.name, ["Platform Admin", "Games Admin"]),
         ),
       )
       .limit(1);
@@ -153,7 +153,7 @@ export function isAnyAdmin(user: { roles?: Array<{ role: { name: string } }> }):
   if (!user.roles) return false;
 
   return user.roles.some((userRole) =>
-    ["Solstice Admin", "Quadball Canada Admin", "Team Admin", "Event Admin"].includes(
+    ["Platform Admin", "Games Admin", "Team Admin", "Event Admin"].includes(
       userRole.role.name,
     ),
   );

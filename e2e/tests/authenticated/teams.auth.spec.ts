@@ -152,7 +152,7 @@ test.describe("Teams Management (Authenticated)", () => {
       await expect(page.getByLabel("URL Slug")).toBeVisible();
       await expect(page.getByLabel("Description")).toBeVisible();
       await expect(page.getByLabel("City")).toBeVisible();
-      await expect(page.getByLabel("Province")).toBeVisible();
+      await expect(page.getByLabel("Country")).toBeVisible();
       await expect(page.getByLabel("Primary Color")).toBeVisible();
       await expect(page.getByLabel("Secondary Color")).toBeVisible();
       await expect(page.getByLabel("Founded Year")).toBeVisible();

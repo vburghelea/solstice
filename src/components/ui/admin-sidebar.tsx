@@ -25,7 +25,7 @@ const allSidebarItems = [
     label: "Reports",
     href: "/dashboard/reports",
     requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
+    roles: ["Platform Admin", "Games Admin"],
   },
 ];
 

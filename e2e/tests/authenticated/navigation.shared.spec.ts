@@ -131,16 +131,16 @@ test.describe("Navigation (Authenticated)", () => {
     }
   });
 
-  test("should show Quadball Canada branding", async ({ page }) => {
+  test("should show Roundup Games branding", async ({ page }) => {
     // Already on dashboard from beforeEach
     const sidebar = page.getByRole("complementary");
 
     // Check branding elements
-    await expect(sidebar.getByRole("heading", { name: "Quadball Canada" })).toBeVisible();
-    // Check for the subtitle "Dashboard" that appears under "Quadball Canada"
+    await expect(sidebar.getByRole("heading", { name: "Roundup Games" })).toBeVisible();
+    // Check for the subtitle "Dashboard" that appears under "Roundup Games"
     const brandingSection = sidebar
       .locator("div")
-      .filter({ hasText: "Quadball Canada" })
+      .filter({ hasText: "Roundup Games" })
       .first();
     await expect(brandingSection.getByText("Dashboard")).toBeVisible();
   });

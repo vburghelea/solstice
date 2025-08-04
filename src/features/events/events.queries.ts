@@ -133,8 +133,8 @@ export const listEvents = createServerFn({ method: "GET" })
       conditions.push(eq(events.city, filters.city));
     }
 
-    if (filters.province) {
-      conditions.push(eq(events.province, filters.province));
+    if (filters.country) {
+      conditions.push(eq(events.country, filters.country));
     }
 
     if (filters.featured === true) {

@@ -205,7 +205,7 @@ function MembershipPage() {
     <div className="container mx-auto py-8">
       <h1 className="mb-8 text-3xl font-bold">Membership</h1>
       <p className="text-muted-foreground mb-6">
-        Join Quadball Canada and access exclusive member benefits
+        Join Roundup Games and access exclusive member benefits
       </p>
 
       {/* Current Membership Status */}

@@ -23,7 +23,7 @@ export type EventFilters = {
   startDateFrom?: Date;
   startDateTo?: Date;
   city?: string;
-  province?: string;
+  country?: string;
   featured?: boolean;
   publicOnly?: boolean;
 };

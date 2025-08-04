@@ -269,7 +269,7 @@ async function seed() {
         id: "annual-player-2025",
         name: "Annual Player Membership 2025",
         description:
-          "Full access to all Quadball Canada events and programs for the 2025 season",
+          "Full access to all Roundup Games events and programs for the 2025 season",
         priceCents: 4500, // $45.00
         durationMonths: 12,
         status: "active" as const,

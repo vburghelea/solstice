@@ -72,7 +72,7 @@ export const events = pgTable("events", {
   venueName: varchar("venue_name", { length: 255 }),
   venueAddress: text("venue_address"),
   city: varchar("city", { length: 100 }),
-  province: varchar("province", { length: 50 }),
+  country: varchar("country", { length: 50 }),
   postalCode: varchar("postal_code", { length: 10 }),
   locationNotes: text("location_notes"), // Parking info, directions, etc.
 
@@ -242,7 +242,7 @@ export const createEventInputSchema = z.object({
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
   city: z.string().optional(),
-  province: z.string().optional(),
+  country: z.string().optional(),
   postalCode: z.string().optional(),
   startDate: z.string(), // Will be converted to Date
   endDate: z.string(), // Will be converted to Date

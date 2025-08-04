@@ -37,7 +37,7 @@ export const requireRole = serverOnly(async function requireRole({
   let hasAccess = false;
 
   for (const roleName of requiredRoles) {
-    if (roleName === "Solstice Admin" || roleName === "Quadball Canada Admin") {
+    if (roleName === "Platform Admin" || roleName === "Games Admin") {
       // Global admin check
       hasAccess = await PermissionService.isGlobalAdmin(user.id);
     } else if (roleName === "Team Admin" && teamId) {

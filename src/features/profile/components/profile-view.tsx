@@ -20,6 +20,7 @@ import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 import type { ProfileInput } from "../profile.types";
+import { GamePreferencesStep } from "./game-preferences-step";
 
 export function ProfileView() {
   const queryClient = useQueryClient();
@@ -45,6 +46,10 @@ export function ProfileView() {
       gender: "",
       pronouns: "",
       phone: "",
+      gameSystemPreferences: {
+        favorite: [],
+        avoid: [],
+      },
       privacySettings: {
         showEmail: false,
         showPhone: false,
@@ -56,10 +61,88 @@ export function ProfileView() {
       // Use a more flexible type since we need to handle Date serialization
       const dataToSubmit: Record<string, unknown> = {};
 
-        if (value.gender) dataToSubmit.gender = value.gender;
-        if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
-        if (value.phone) dataToSubmit.phone = value.phone;
-        if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
+        // Track if we have any actual changes to submit
+        let hasChanges = false;
+
+        if (value.gender !== (profile?.gender || "")) {
+          if (value.gender) {
+            dataToSubmit.gender = value.gender;
+          } else {
+            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
+            delete dataToSubmit.gender;
+          }
+          hasChanges = true;
+        }
+        if (value.pronouns !== (profile?.pronouns || "")) {
+          if (value.pronouns) {
+            dataToSubmit.pronouns = value.pronouns;
+          } else {
+            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
+            delete dataToSubmit.pronouns;
+          }
+          hasChanges = true;
+        }
+        if (value.phone !== (profile?.phone || "")) {
+          if (value.phone) {
+            dataToSubmit.phone = value.phone;
+          } else {
+            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
+            delete dataToSubmit.phone;
+          }
+          hasChanges = true;
+        }
+
+        // Check if game system preferences have changed
+        const currentFavorites = profile?.gameSystemPreferences?.favorite || [];
+        const currentAvoid = profile?.gameSystemPreferences?.avoid || [];
+        const newFavorites = value.gameSystemPreferences?.favorite || [];
+        const newAvoid = value.gameSystemPreferences?.avoid || [];
+
+        // Compare game system preferences
+        const favoritesChanged =
+          JSON.stringify(currentFavorites) !== JSON.stringify(newFavorites);
+        const avoidChanged = JSON.stringify(currentAvoid) !== JSON.stringify(newAvoid);
+
+        if (favoritesChanged || avoidChanged) {
+          if (
+            value.gameSystemPreferences &&
+            (value.gameSystemPreferences.favorite.length > 0 ||
+              value.gameSystemPreferences.avoid.length > 0)
+          ) {
+            dataToSubmit.gameSystemPreferences = value.gameSystemPreferences;
+          } else {
+            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
+            delete dataToSubmit.gameSystemPreferences;
+          }
+          hasChanges = true;
+        }
+
+        // Check if privacy settings have changed
+        const currentPrivacy = profile?.privacySettings || {
+          showEmail: false,
+          showPhone: false,
+          allowTeamInvitations: true,
+        };
+        const newPrivacy = value.privacySettings || {
+          showEmail: false,
+          showPhone: false,
+          allowTeamInvitations: true,
+        };
+
+        if (
+          newPrivacy.showEmail !== currentPrivacy.showEmail ||
+          newPrivacy.showPhone !== currentPrivacy.showPhone ||
+          newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations
+        ) {
+          dataToSubmit.privacySettings = newPrivacy;
+          hasChanges = true;
+        }
+
+        // If no changes, just close the form
+        if (!hasChanges) {
+          setIsEditing(false);
+          return;
+        }
 
         const result = await updateUserProfile({ data: dataToSubmit });
 
@@ -116,6 +199,10 @@ export function ProfileView() {
     }
     if (profile.phone) {
       form.setFieldValue("phone", profile.phone);
+    }
+
+    if (profile.gameSystemPreferences) {
+      form.setFieldValue("gameSystemPreferences", profile.gameSystemPreferences);
     }
 
     const privacySettings = profile.privacySettings || {
@@ -360,6 +447,72 @@ export function ProfileView() {
                   ? "Allowed"
                   : "Not allowed"}
               </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Game Preferences */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Game Preferences</CardTitle>
+          <CardDescription>
+            Tell us which game systems you prefer to play or want to avoid
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isEditing ? (
+            <form.Field name="gameSystemPreferences">
+              {(field) => (
+                <GamePreferencesStep
+                  initialFavorites={field.state.value?.favorite || []}
+                  initialToAvoid={field.state.value?.avoid || []}
+                  onPreferencesChange={(favorites, toAvoid) => {
+                    field.handleChange({ favorite: favorites, avoid: toAvoid });
+                  }}
+                />
+              )}
+            </form.Field>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium">Favorite Game Systems</h4>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {profile.gameSystemPreferences?.favorite.length ? (
+                    profile.gameSystemPreferences.favorite.map((gameSystem) => (
+                      <span
+                        key={gameSystem.id}
+                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
+                      >
+                        {gameSystem.name}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      No favorite game systems selected
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium">Game Systems to Avoid</h4>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {profile.gameSystemPreferences?.avoid.length ? (
+                    profile.gameSystemPreferences.avoid.map((gameSystem) => (
+                      <span
+                        key={gameSystem.id}
+                        className="bg-destructive text-destructive-foreground rounded-md px-2 py-1 text-sm"
+                      >
+                        {gameSystem.name}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-sm">
+                      No game systems to avoid selected
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </CardContent>

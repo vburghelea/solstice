@@ -12,7 +12,7 @@ export const listEventsSchema = z
         startDateFrom: z.date().optional(),
         startDateTo: z.date().optional(),
         city: z.string().optional(),
-        province: z.string().optional(),
+        country: z.string().optional(),
         featured: z.boolean().optional(),
         publicOnly: z.boolean().optional(),
       })

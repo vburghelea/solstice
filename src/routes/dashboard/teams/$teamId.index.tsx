@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -12,15 +12,26 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "~/components/ui/icons";
-import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import {
+  getTeam,
+  getTeamMembers,
+  type TeamMemberDetails,
+  type TeamWithMemberCount,
+} from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
   component: TeamDetailsPage,
 });
 
+const parentRouteApi = getRouteApi("/dashboard/teams/$teamId");
+
 function TeamDetailsPage() {
   const { teamId } = Route.useParams();
-  const { teamData: initialTeamData, members: initialMembers } = Route.useRouteContext();
+  const { teamData: initialTeamData, members: initialMembers } =
+    parentRouteApi.useLoaderData() as {
+      teamData: TeamWithMemberCount;
+      members: TeamMemberDetails[];
+    };
 
   const { data: teamData } = useSuspenseQuery({
     queryKey: ["team", teamId],

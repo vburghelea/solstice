@@ -31,6 +31,7 @@ export function TypedLink<
     return (
       <a
         href={to as string}
+        dsf
         {...restProps}
         {...activeAttributes}
         onClick={(e) => {

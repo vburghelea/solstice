@@ -28,10 +28,15 @@ export const createTeam = createServerFn({ method: "POST" })
       throw new Error("Not authenticated");
     }
 
+    // Debug logging for E2E tests
+    if (process.env["NODE_ENV"] === "development") {
+      console.log("Creating team with user ID:", currentUser.id);
+    }
+
     const db = await getDb();
 
     // Start a transaction
-    return await db().transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       // Create the team
       const [newTeam] = await tx
         .insert(teams)
@@ -94,7 +99,7 @@ export const updateTeam = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Check if user is captain or coach
-    const [memberCheck] = await db()
+    const [memberCheck] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(
@@ -111,7 +116,7 @@ export const updateTeam = createServerFn({ method: "POST" })
     }
 
     // Update team
-    const [updatedTeam] = await db()
+    const [updatedTeam] = await db
       .update(teams)
       .set({
         name: data.data.name,
@@ -155,7 +160,7 @@ export const deactivateTeam = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Check if user is captain
-    const [memberCheck] = await db()
+    const [memberCheck] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(
@@ -172,7 +177,7 @@ export const deactivateTeam = createServerFn({ method: "POST" })
     }
 
     // Deactivate team
-    const [deactivatedTeam] = await db()
+    const [deactivatedTeam] = await db
       .update(teams)
       .set({ isActive: "false" })
       .where(eq(teams.id, data.teamId))
@@ -204,7 +209,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Check if current user has permission to add members
-    const [memberCheck] = await db()
+    const [memberCheck] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(
@@ -221,7 +226,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
     }
 
     // Find user by email
-    const [targetUser] = await db()
+    const [targetUser] = await db
       .select({ id: user.id })
       .from(user)
       .where(eq(user.email, data.email))
@@ -232,7 +237,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
     }
 
     // Check if user is already a member
-    const [existingMember] = await db()
+    const [existingMember] = await db
       .select({ status: teamMembers.status })
       .from(teamMembers)
       .where(
@@ -245,7 +250,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
         throw new Error("User is already an active member of this team");
       }
       // Reactivate if they were previously removed
-      const [reactivated] = await db()
+      const [reactivated] = await db
         .update(teamMembers)
         .set({
           status: "pending" as TeamMemberStatus,
@@ -263,7 +268,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
     }
 
     // Add new member
-    const [newMember] = await db()
+    const [newMember] = await db
       .insert(teamMembers)
       .values({
         id: createId(),
@@ -302,7 +307,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Check if current user has permission
-    const [memberCheck] = await db()
+    const [memberCheck] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(
@@ -320,14 +325,14 @@ export const updateTeamMember = createServerFn({ method: "POST" })
 
     // Don't allow demoting the last captain
     if (data.role && data.role !== "captain") {
-      const [targetMember] = await db()
+      const [targetMember] = await db
         .select({ role: teamMembers.role })
         .from(teamMembers)
         .where(eq(teamMembers.id, data.memberId))
         .limit(1);
 
       if (targetMember?.role === "captain") {
-        const captainCount = await db()
+        const captainCount = await db
           .select({ count: teamMembers.id })
           .from(teamMembers)
           .where(
@@ -344,7 +349,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
     }
 
     // Update member
-    const [updatedMember] = await db()
+    const [updatedMember] = await db
       .update(teamMembers)
       .set({
         role: data.role,
@@ -380,7 +385,7 @@ export const removeTeamMember = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Check if current user has permission
-    const [memberCheck] = await db()
+    const [memberCheck] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(
@@ -397,14 +402,14 @@ export const removeTeamMember = createServerFn({ method: "POST" })
     }
 
     // Don't allow removing the last captain
-    const [targetMember] = await db()
+    const [targetMember] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(eq(teamMembers.id, data.memberId))
       .limit(1);
 
     if (targetMember?.role === "captain") {
-      const captainCount = await db()
+      const captainCount = await db
         .select({ count: teamMembers.id })
         .from(teamMembers)
         .where(
@@ -420,7 +425,7 @@ export const removeTeamMember = createServerFn({ method: "POST" })
     }
 
     // Soft delete by updating status
-    const [removedMember] = await db()
+    const [removedMember] = await db
       .update(teamMembers)
       .set({
         status: "inactive" as TeamMemberStatus,
@@ -456,7 +461,7 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Update membership status
-    const [updatedMember] = await db()
+    const [updatedMember] = await db
       .update(teamMembers)
       .set({
         status: "active" as TeamMemberStatus,
@@ -502,7 +507,7 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Update membership status
-    const [declinedMember] = await db()
+    const [declinedMember] = await db
       .update(teamMembers)
       .set({
         status: "inactive" as TeamMemberStatus,
@@ -548,7 +553,7 @@ export const leaveTeam = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Check membership
-    const [member] = await db()
+    const [member] = await db
       .select({ role: teamMembers.role })
       .from(teamMembers)
       .where(
@@ -566,7 +571,7 @@ export const leaveTeam = createServerFn({ method: "POST" })
 
     // Don't allow the last captain to leave
     if (member.role === "captain") {
-      const captainCount = await db()
+      const captainCount = await db
         .select({ count: teamMembers.id })
         .from(teamMembers)
         .where(
@@ -584,7 +589,7 @@ export const leaveTeam = createServerFn({ method: "POST" })
     }
 
     // Update membership status
-    const [leftMember] = await db()
+    const [leftMember] = await db
       .update(teamMembers)
       .set({
         status: "inactive" as TeamMemberStatus,

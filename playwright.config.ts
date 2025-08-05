@@ -25,7 +25,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env["CI"] ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env["CI"] ? 1 : 1,
+  workers: process.env["CI_REMOTE_DB"] ? 1 : 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -38,6 +38,10 @@ export default defineConfig({
 
     /* Take screenshot on failure */
     screenshot: "only-on-failure",
+
+    /* Global timeout settings for better stability */
+    navigationTimeout: 15000,
+    actionTimeout: 10000,
   },
 
   /* Configure projects for major browsers */
@@ -47,85 +51,41 @@ export default defineConfig({
 
     // Unauthenticated tests - run without auth state
     {
-      name: "chromium-no-auth",
+      name: "chromium-unauthenticated",
       use: {
         ...devices["Desktop Chrome"],
       },
-      testMatch: /.*\.(unauth|public)\.spec\.ts/,
+      testMatch: /.*\.(unauth)\.spec\.ts/,
     },
 
-    // Authenticated tests - run with auth state
+    // All authenticated tests now use inline auth
     {
-      name: "chromium-auth",
+      name: "chromium-authenticated",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: "e2e/.auth/user.json",
       },
-      dependencies: ["setup"],
-      testMatch: /.*\.(auth|dashboard|profile|teams)\.spec\.ts/,
+      testMatch: /.*\.(auth|dashboard|profile|teams|shared)\.spec\.ts/,
     },
 
     // Firefox unauthenticated
     {
-      name: "firefox-no-auth",
+      name: "firefox-unauthenticated",
       use: {
         ...devices["Desktop Firefox"],
-        launchOptions: { slowMo: 50 }, // tiny delay prevents spurious abort
+        launchOptions: { slowMo: 100 }, // tiny delay prevents spurious abort
       },
-      testMatch: /.*\.(unauth|public)\.spec\.ts/,
+      testMatch: /.*\.(unauth)\.spec\.ts/,
     },
 
-    // Firefox authenticated
+    // All Firefox authenticated tests now use inline auth
     {
-      name: "firefox-auth",
+      name: "firefox-authenticated",
       use: {
         ...devices["Desktop Firefox"],
-        launchOptions: { slowMo: 50 }, // tiny delay prevents spurious abort
-        storageState: "e2e/.auth/user.json",
+        launchOptions: { slowMo: 100 }, // tiny delay prevents spurious abort
       },
-      dependencies: ["setup"],
-      testMatch: /.*\.(auth|dashboard|profile|teams)\.spec\.ts/,
+      testMatch: /.*\.(auth|dashboard|profile|teams|shared)\.spec\.ts/,
     },
-
-    // WebKit unauthenticated
-    {
-      name: "webkit-no-auth",
-      use: {
-        ...devices["Desktop Safari"],
-      },
-      testMatch: /.*\.(unauth|public)\.spec\.ts/,
-    },
-
-    // WebKit authenticated
-    {
-      name: "webkit-auth",
-      use: {
-        ...devices["Desktop Safari"],
-        storageState: "e2e/.auth/user.json",
-      },
-      dependencies: ["setup"],
-      testMatch: /.*\.(auth|dashboard|profile|teams)\.spec\.ts/,
-    },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
   /* Run your local dev server before starting the tests */

@@ -67,8 +67,7 @@ export const getAllMemberships = createServerFn({ method: "GET" })
         if (data.status !== "all") {
           conditions.push(eq(memberships.status, data.status));
         }
-
-        const query = db()
+        const query = db
           .select({
             id: memberships.id,
             userName: user.name,

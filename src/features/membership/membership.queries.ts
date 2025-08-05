@@ -23,7 +23,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
 
       const db = await getDb();
 
-      const activeTypes = await db()
+      const activeTypes = await db
         .select()
         .from(membershipTypes)
         .where(eq(membershipTypes.status, "active"))
@@ -69,7 +69,7 @@ export const getMembershipType = createServerFn({ method: "GET" })
 
         const db = await getDb();
 
-        const [membershipType] = await db()
+        const [membershipType] = await db
           .select()
           .from(membershipTypes)
           .where(eq(membershipTypes.id, data.membershipTypeId))
@@ -142,7 +142,7 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
       // Get active membership for the user
       const db = await getDb();
 
-      const [currentMembership] = await db()
+      const [currentMembership] = await db
         .select({
           membership: memberships,
           membershipType: membershipTypes,

@@ -1,12 +1,16 @@
+import type { InferSelectModel } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import { getDb } from "../src/db/connections";
 import { account, user } from "../src/db/schema";
+
+type User = InferSelectModel<typeof user>;
+type Account = InferSelectModel<typeof account>;
 
 async function checkUsers() {
   console.log("Checking users in database...\n");
 
   try {
-    const db = getDb();
+    const db = await getDb();
 
     // Get all users
     const users = await db.select().from(user);
@@ -17,12 +21,12 @@ async function checkUsers() {
       .select()
       .from(account)
       .where(sql`${account.providerId} = 'credential'`);
-    const credentialUserIds = credentialAccounts.map((a) => a.userId);
+    const credentialUserIds = credentialAccounts.map((a: Account) => a.userId);
 
     console.log("\nCredential (email/password) users:");
     users
-      .filter((u) => credentialUserIds.includes(u.id))
-      .forEach((u) => {
+      .filter((u: User) => credentialUserIds.includes(u.id))
+      .forEach((u: User) => {
         console.log(`- ${u.name || "No name"} (${u.email}) - ID: ${u.id}`);
         console.log(`  Created: ${u.createdAt}`);
         console.log(`  Email verified: ${u.emailVerified ? "Yes" : "No"}`);
@@ -30,8 +34,8 @@ async function checkUsers() {
 
     console.log("\nOAuth users:");
     users
-      .filter((u) => !credentialUserIds.includes(u.id))
-      .forEach((u) => {
+      .filter((u: User) => !credentialUserIds.includes(u.id))
+      .forEach((u: User) => {
         console.log(`- ${u.name || "No name"} (${u.email}) - ID: ${u.id}`);
         console.log(`  Created: ${u.createdAt}`);
         console.log(`  Email verified: ${u.emailVerified ? "Yes" : "No"}`);
@@ -41,7 +45,7 @@ async function checkUsers() {
     console.log("\nChecking OAuth accounts:");
     const accounts = await db.select().from(account);
     console.log(`Found ${accounts.length} OAuth accounts:`);
-    accounts.forEach((a) => {
+    accounts.forEach((a: Account) => {
       console.log(`- Provider: ${a.providerId} - User ID: ${a.userId}`);
       console.log(`  Account ID: ${a.accountId}`);
       console.log(`  Has access token: ${a.accessToken ? "Yes" : "No"}`);

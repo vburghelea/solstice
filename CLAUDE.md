@@ -39,9 +39,18 @@ export const myServerFn = createServerFn({ method: "POST" })
 - `pnpm test` - Run Vitest tests
 - `pnpm test:ui` - Run tests with UI
 - `pnpm test:coverage` - Generate test coverage report
-- `pnpm test:e2e` - Run Playwright E2E tests
+- `pnpm test:e2e` - Run Playwright E2E tests (automatically runs test:e2e:setup first)
 - `pnpm test:e2e:ui` - Run E2E tests with UI mode
-- `pnpm test:e2e:setup` - Seed database with E2E test data
+- `pnpm test:e2e:setup` - Seed database with E2E test data (automatically run before test:e2e)
+- **E2E Test Iteration Strategy**: When fixing E2E tests, follow this loop:
+  1. Run `pnpm test:e2e --reporter=html --output=e2e-test-results &` **in the background**
+  2. Use bash to sleep for 10 minutes
+  3. Check if there are any errors in the e2e-test-results folder
+     - If no errors, check if the test process is still running
+     - If still running, sleep 10 more minutes
+     - If not running and no errors, you're done
+  4. If errors exist, fix the errors in both functionality and tests, then go back to step 1
+  5. **CONTINUE THIS LOOP MANY TIMES until all errors are fixed**
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
 - `pnpm docs:reference` - Generate TypeDoc API documentation
@@ -367,7 +376,28 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    - `e2e/tests/unauthenticated/` - Tests without login
    - Use descriptive file names: `feature.auth.spec.ts` or `feature.unauth.spec.ts`
 
-2. **Writing Tests**:
+2. **Test Data Management (CRITICAL)**:
+   - **Always clean up before and after tests** to ensure isolation
+   - Use cleanup utilities from `e2e/utils/cleanup.ts`
+   - Example:
+
+     ```typescript
+     import { clearUserTeams } from "../../utils/cleanup";
+
+     test.beforeEach(async ({ page }) => {
+       await clearUserTeams(page, process.env.E2E_TEST_EMAIL!);
+     });
+
+     test.afterEach(async ({ page }) => {
+       try {
+         await clearUserTeams(page, process.env.E2E_TEST_EMAIL!);
+       } catch (error) {
+         console.warn("Cleanup failed:", error);
+       }
+     });
+     ```
+
+3. **Writing Tests**:
 
    ```typescript
    import { test, expect } from "@playwright/test";
@@ -378,29 +408,41 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    });
    ```
 
-3. **Using Playwright MCP for Verification**:
+4. **Using Playwright MCP for Verification**:
    - Before using Playwright MCP:
      - Check if dev server is running: `curl -s http://localhost:5173/api/health`
      - If browser already in use, close it first: `mcp__playwright__browser_close`
    - Use MCP to verify UI behavior before writing/updating E2E tests
    - This ensures tests match actual application behavior
 
-4. **Best Practices**:
+5. **Best Practices**:
    - Use Playwright's recommended locators: `getByRole`, `getByLabel`, `getByText`
    - Avoid arbitrary waits - use proper wait conditions
    - Keep tests isolated and independent
    - Test user journeys, not implementation details
+   - **Clean up test data** - don't leave data that affects other tests
+   - Use dedicated test users for different scenarios
+   - Handle known issues (like redirect parameter stripping) pragmatically
 
-5. **Running Tests**:
+6. **Running Tests**:
+   - `pnpm test:e2e:setup` - **Run this first** to seed clean test data
    - `pnpm test:e2e` - Run all E2E tests
    - `pnpm test:e2e:ui` - Interactive UI mode for debugging
    - `pnpm test:e2e --project=chromium-auth` - Run specific test suite
-   - `pnpm test:e2e:setup` - Seed test data before running tests
 
-6. **Authentication in Tests**:
+7. **Authentication in Tests**:
    - Shared auth state is configured in `e2e/auth.setup.ts`
    - Tests automatically use authenticated state when in `authenticated/` folder
    - Test user credentials are in `.env.e2e`
+   - For tests needing fresh auth: `test.use({ storageState: undefined });`
+
+8. **Test Users**:
+   - `test@example.com` - General authenticated tests
+   - `teamcreator@example.com` - Team creation (no existing teams)
+   - `profile-edit@example.com` - Profile editing tests
+   - See `scripts/seed-e2e-data.ts` for all test users
+
+9. **See Also**: `e2e/E2E-TEST-STRATEGY.md` for comprehensive testing guidelines
 
 ### Common Tasks
 

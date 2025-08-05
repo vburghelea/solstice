@@ -1,4 +1,4 @@
-import { getDb, pooledDb, unpooledDb } from "./connections";
+import { closeConnections, getDb, pooledDb, unpooledDb } from "./connections";
 import * as schema from "./schema";
 
 // Export the auto-selected database connection based on environment
@@ -6,7 +6,7 @@ import * as schema from "./schema";
 export const db = getDb;
 
 // Export specific connections for when you need explicit control
-export { pooledDb, unpooledDb };
+export { closeConnections, pooledDb, unpooledDb };
 
 // Re-export all schemas and types
 export * from "./schema";

@@ -50,7 +50,7 @@ describe("Profile Server Function Input Schemas", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.errors[0].message).toContain(
-          "Age must be between 13 and 120 years",
+          "You must be between 13 and 120 years old",
         );
       }
     });
@@ -169,7 +169,7 @@ describe("Profile Server Function Input Schemas", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.errors[0].message).toContain(
-          "Age must be between 13 and 120 years",
+          "You must be between 13 and 120 years old",
         );
       }
     });

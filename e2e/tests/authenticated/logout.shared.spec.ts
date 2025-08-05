@@ -1,0 +1,69 @@
+import { expect, test } from "@playwright/test";
+import { clearAuthState, gotoWithAuth } from "../../utils/auth";
+
+// Opt out of shared auth state for now until we fix the root issue
+test.use({ storageState: undefined });
+
+test.describe("Logout Flow (Authenticated)", () => {
+  test.beforeEach(async ({ page }) => {
+    await clearAuthState(page);
+    await gotoWithAuth(page, "/dashboard", {
+      email: process.env["E2E_TEST_EMAIL"]!,
+      password: process.env["E2E_TEST_PASSWORD"]!,
+    });
+  });
+
+  test("should logout successfully", async ({ page }) => {
+    // Already on dashboard from beforeEach
+
+    // Click logout button in the sidebar
+    await page.getByRole("button", { name: "Logout" }).click();
+
+    // Wait for navigation to complete (window.location.href is used)
+    await page.waitForURL(/\/auth\/login/, { timeout: 15000 });
+
+    // Verify we're on the login page
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+    ).toBeVisible();
+  });
+
+  test("should clear session on logout", async ({ page }) => {
+    // Already on dashboard from beforeEach
+
+    // Perform logout
+    await page.getByRole("button", { name: "Logout" }).click();
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+
+    // Try to access protected route - don't use authenticatedGoto here
+    // because we're testing that we should NOT be authenticated
+    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+
+    // Should redirect to login
+    await expect(page).toHaveURL(/\/auth\/login/);
+  });
+
+  test("should handle logout from profile page", async ({ page }) => {
+    // Navigate to profile page - already authenticated from beforeEach
+    await page.goto("/dashboard/profile");
+
+    // Perform logout
+    await page.getByRole("button", { name: "Logout" }).click();
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+    ).toBeVisible();
+  });
+
+  test("should handle logout from teams page", async ({ page }) => {
+    // Navigate to teams page - already authenticated from beforeEach
+    await page.goto("/dashboard/teams");
+
+    // Perform logout
+    await page.getByRole("button", { name: "Logout" }).click();
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+    ).toBeVisible();
+  });
+});

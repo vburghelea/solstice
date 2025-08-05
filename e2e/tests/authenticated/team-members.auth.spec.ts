@@ -1,10 +1,15 @@
 import { expect, test } from "@playwright/test";
+import { clearAuthState, gotoWithAuth } from "../../utils/auth";
 
 test.describe("Team Member Management (Authenticated)", () => {
   test.describe("Team Details Page", () => {
     test.beforeEach(async ({ page }) => {
+      await clearAuthState(page);
       // Navigate to Test Thunder team detail page
-      await page.goto("/dashboard/teams/test-team-1");
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
+        email: "test@example.com",
+        password: "testpassword123",
+      });
     });
 
     test("should display team information", async ({ page }) => {
@@ -13,17 +18,20 @@ test.describe("Team Member Management (Authenticated)", () => {
       await expect(page.getByText("Toronto, ON")).toBeVisible();
       await expect(page.getByText("E2E test team")).toBeVisible();
 
-      // Team colors
-      const primaryColor = page.locator("[data-testid='primary-color']");
-      if (await primaryColor.isVisible()) {
-        await expect(primaryColor).toHaveCSS("background-color", "rgb(255, 0, 0)");
+      // Team colors - look for color indicator elements
+      const colorIndicator = page.locator("div[style*='background-color']").first();
+      if (await colorIndicator.isVisible()) {
+        await expect(colorIndicator).toHaveCSS("background-color", "rgb(255, 0, 0)");
       }
     });
 
     test("should display team statistics", async ({ page }) => {
-      // Member count
-      await expect(page.getByText("Members")).toBeVisible();
-      await expect(page.getByText("1")).toBeVisible(); // Test Thunder has 1 member
+      // Look for member count in the team stats section
+      const memberStats = page.locator("text=Total Members").locator("..");
+      await expect(memberStats).toBeVisible({ timeout: 10000 });
+
+      // Check the member count - should show "1"
+      await expect(memberStats.locator("text=1")).toBeVisible({ timeout: 10000 });
 
       // Founded year if displayed
       const foundedYear = page.locator("text=Founded");
@@ -49,22 +57,22 @@ test.describe("Team Member Management (Authenticated)", () => {
     });
 
     test("should navigate to team management for captains", async ({ page }) => {
-      // Captain should see manage button
-      const manageButton = page.getByRole("link", { name: "Manage Team" });
-      if (await manageButton.isVisible()) {
-        await manageButton.click();
-        await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1\/manage/);
-      }
+      // Captain should see manage members button
+      const manageButton = page.getByRole("link", { name: "Manage Members" });
+      await expect(manageButton).toBeVisible();
+      await manageButton.click();
+      await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1\/members/);
     });
   });
 
-  test.describe("Team Management Page", () => {
-    test.beforeEach(async ({ page }) => {
-      // Navigate to Test Thunder management page
-      await page.goto("/dashboard/teams/test-team-1/manage");
-    });
-
+  test.describe("Team Members Management Page", () => {
     test("should display management tabs", async ({ page }) => {
+      await clearAuthState(page);
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1/members", {
+        email: "test@example.com",
+        password: "testpassword123",
+      });
+
       // Check for management sections
       const tabs = ["Team Info", "Members", "Settings"];
 
@@ -77,15 +85,16 @@ test.describe("Team Member Management (Authenticated)", () => {
     });
 
     test("should allow editing team information", async ({ page }) => {
-      // Navigate to team info section if needed
-      const infoTab = page.getByRole("tab", { name: "Team Info" });
-      if (await infoTab.isVisible()) {
-        await infoTab.click();
-      }
+      // Fresh login for this test
+      await clearAuthState(page);
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+        email: "test@example.com",
+        password: "testpassword123",
+      });
 
-      // Check for edit form
-      await expect(page.getByLabel("Team Name")).toBeVisible();
-      await expect(page.getByLabel("Description")).toBeVisible();
+      // Check for edit form with extended timeout
+      await expect(page.getByLabel("Team Name")).toBeVisible({ timeout: 10000 });
+      await expect(page.getByLabel("Description")).toBeVisible({ timeout: 10000 });
 
       // Update team name
       await page.getByLabel("Team Name").clear();
@@ -94,19 +103,24 @@ test.describe("Team Member Management (Authenticated)", () => {
       // Save changes
       await page.getByRole("button", { name: "Save Changes" }).click();
 
-      // Verify success message or updated content
+      // Wait for navigation back to team details page after successful save
+      await page.waitForURL("/dashboard/teams/test-team-1");
+
+      // Verify the updated team name is displayed
       await expect(
-        page
-          .getByText("Team updated successfully")
-          .or(page.getByRole("heading", { name: "Test Thunder Updated" })),
-      ).toBeVisible();
+        page.getByRole("heading", { name: "Test Thunder Updated" }),
+      ).toBeVisible({ timeout: 10000 });
     });
   });
 
   test.describe("Member Management", () => {
     test.beforeEach(async ({ page }) => {
+      await clearAuthState(page);
       // Navigate to team management members section
-      await page.goto("/dashboard/teams/test-team-1/manage");
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+        email: "test@example.com",
+        password: "testpassword123",
+      });
 
       const membersTab = page.getByRole("tab", { name: "Members" });
       if (await membersTab.isVisible()) {
@@ -188,14 +202,14 @@ test.describe("Team Member Management (Authenticated)", () => {
 
   test.describe("Member Permissions", () => {
     test("players should not see manage button", async ({ page }) => {
+      await clearAuthState(page);
       // Login as admin user who is a player in Test Thunder
-      await page.goto("/dashboard");
-      await page.waitForSelector("text=admin@example.com");
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
+        email: "admin@example.com",
+        password: "testpassword123",
+      });
 
-      // Navigate to Test Thunder team page
-      await page.goto("/dashboard/teams/test-team-1");
-
-      // Should not see manage button
+      // Should not see manage button (admin is not a captain)
       await expect(page.getByRole("link", { name: "Manage Team" })).not.toBeVisible();
     });
 
@@ -225,22 +239,23 @@ test.describe("Team Member Management (Authenticated)", () => {
 
   test.describe("Leave Team", () => {
     test("should allow members to leave team", async ({ page }) => {
+      await clearAuthState(page);
       // Navigate to team page as a regular member
-      await page.goto("/dashboard");
-      await page.waitForSelector("text=admin@example.com");
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
+        email: "admin@example.com",
+        password: "testpassword123",
+      });
 
-      await page.goto("/dashboard/teams/test-team-1");
-
-      // Look for leave team button
+      // Look for leave team button with timeout
       const leaveButton = page.getByRole("button", { name: "Leave Team" });
-      if (await leaveButton.isVisible()) {
+      if (await leaveButton.isVisible({ timeout: 5000 }).catch(() => false)) {
         await leaveButton.click();
 
         // Confirm dialog
         await page.getByRole("button", { name: "Confirm" }).click();
 
         // Should redirect to teams list
-        await expect(page).toHaveURL("/dashboard/teams");
+        await expect(page).toHaveURL("/dashboard/teams", { timeout: 10000 });
 
         // Team should no longer appear in list
         await expect(page.getByText("Test Thunder")).not.toBeVisible();

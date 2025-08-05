@@ -105,7 +105,7 @@ export const listEvents = createServerFn({ method: "GET" })
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     // Get total count
-    const [{ count }] = await db()
+    const [{ count }] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(events)
       .where(whereClause);
@@ -118,7 +118,7 @@ export const listEvents = createServerFn({ method: "GET" })
           ? events.createdAt
           : events.startDate;
 
-    const eventsList = await db()
+    const eventsList = await db
       .select({
         event: events,
         organizer: {
@@ -219,7 +219,7 @@ export const getEvent = createServerFn({ method: "GET" })
 
       const condition = data.id ? eq(events.id, data.id) : eq(events.slug, data.slug!);
 
-      const result = await db()
+      const result = await db
         .select({
           event: events,
           organizer: {
@@ -359,7 +359,7 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
         conditions.push(eq(eventRegistrations.teamId, data.teamId));
       }
 
-      const [registration] = await db()
+      const [registration] = await db
         .select()
         .from(eventRegistrations)
         .where(and(...conditions))

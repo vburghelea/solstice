@@ -20,25 +20,24 @@ export const ValidatedDatePicker: React.FC<ValidatedDatePickerProps> = (props) =
   const inputId = `${field.name}-date`;
   const meta = field.state.meta;
 
-  // Calculate min and max dates based on age restrictions
+  // Calculate min and max dates based on age restrictions, using UTC for consistency
   const today = new Date();
   const maxDate = new Date(
-    today.getFullYear() - minAge,
-    today.getMonth(),
-    today.getDate(),
+    Date.UTC(today.getUTCFullYear() - minAge, today.getUTCMonth(), today.getUTCDate()),
   );
   const minDate = new Date(
-    today.getFullYear() - maxAge,
-    today.getMonth(),
-    today.getDate(),
+    Date.UTC(today.getUTCFullYear() - maxAge, today.getUTCMonth(), today.getUTCDate()),
   );
 
-  // Format date for input value
+  // Format date for input value using UTC components
   const formatDate = (date: Date | string | undefined): string => {
     if (!date) return "";
     const d = typeof date === "string" ? new Date(date) : date;
     if (isNaN(d.getTime())) return "";
-    return d.toISOString().split("T")[0];
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -50,7 +49,15 @@ export const ValidatedDatePicker: React.FC<ValidatedDatePickerProps> = (props) =
         value={formatDate(field.state.value)}
         onChange={(e) => {
           const value = e.target.value;
-          field.handleChange(value ? new Date(value) : undefined);
+          if (value) {
+            // Parse the date string as UTC to prevent timezone shifts
+            const [year, month, day] = value.split("-").map(Number);
+            const date = new Date(Date.UTC(year, month - 1, day));
+            // Always store a UTC midnight ISO string so client & server match
+            field.handleChange(date.toISOString().split("T")[0]);
+          } else {
+            field.handleChange(undefined);
+          }
         }}
         onBlur={field.handleBlur}
         min={formatDate(minDate)}

@@ -151,7 +151,23 @@
 
   /* Button Variants */
   .btn-brand-primary {
-    @apply bg-brand-red hover:bg-brand-red-dark text-white shadow-md transition;
+    background-color: var(--color-brand-red);
+    color: white;
+    box-shadow:
+      0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition:
+      background-color 200ms,
+      transform 100ms;
+  }
+
+  .btn-brand-primary:hover {
+    background-color: var(--color-brand-red-dark);
+    transform: translateY(-1px);
+  }
+
+  .btn-brand-primary:active {
+    transform: translateY(0);
   }
 
   .btn-admin-primary {

@@ -58,14 +58,12 @@ export default defineConfig({
       testMatch: /.*\.(unauth)\.spec\.ts/,
     },
 
-    // All authenticated tests use the shared auth state
+    // All authenticated tests now use inline auth
     {
       name: "chromium-authenticated",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: "e2e/.auth/user.json",
       },
-      dependencies: ["setup"],
       testMatch: /.*\.(auth|dashboard|profile|teams|shared)\.spec\.ts/,
     },
 
@@ -79,15 +77,13 @@ export default defineConfig({
       testMatch: /.*\.(unauth)\.spec\.ts/,
     },
 
-    // All Firefox authenticated tests use the shared auth state
+    // All Firefox authenticated tests now use inline auth
     {
       name: "firefox-authenticated",
       use: {
         ...devices["Desktop Firefox"],
         launchOptions: { slowMo: 100 }, // tiny delay prevents spurious abort
-        storageState: "e2e/.auth/user.json",
       },
-      dependencies: ["setup"],
       testMatch: /.*\.(auth|dashboard|profile|teams|shared)\.spec\.ts/,
     },
   ],

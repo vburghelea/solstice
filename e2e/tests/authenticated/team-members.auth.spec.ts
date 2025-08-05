@@ -26,9 +26,12 @@ test.describe("Team Member Management (Authenticated)", () => {
     });
 
     test("should display team statistics", async ({ page }) => {
-      // Member count - wait for it to appear
-      await expect(page.getByText("Members")).toBeVisible({ timeout: 10000 });
-      await expect(page.getByText("1")).toBeVisible({ timeout: 10000 }); // Test Thunder has 1 member
+      // Look for member count in the team stats section
+      const memberStats = page.locator("text=Total Members").locator("..");
+      await expect(memberStats).toBeVisible({ timeout: 10000 });
+
+      // Check the member count - should show "1"
+      await expect(memberStats.locator("text=1")).toBeVisible({ timeout: 10000 });
 
       // Founded year if displayed
       const foundedYear = page.locator("text=Founded");
@@ -86,6 +89,10 @@ test.describe("Team Member Management (Authenticated)", () => {
     });
 
     test("should allow editing team information", async ({ page }) => {
+      // Navigate directly to the manage page
+      await page.goto("/dashboard/teams/test-team-1/manage");
+      await page.waitForLoadState("networkidle");
+
       // Navigate to team info section if needed
       const infoTab = page.getByRole("tab", { name: "Team Info" });
       if (await infoTab.isVisible()) {

@@ -22,6 +22,7 @@ import {
   XCircle,
 } from "~/components/ui/icons";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
+import { getUserTeams } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -44,8 +45,16 @@ function DashboardIndex() {
     },
   });
 
-  // For now, team count and events are placeholder data
-  const teamCount = 0;
+  // Fetch user's teams
+  const { data: userTeams = [] } = useQuery({
+    queryKey: ["userTeams"],
+    queryFn: async () => {
+      const result = await getUserTeams({ data: {} });
+      return result || [];
+    },
+  });
+
+  const teamCount = userTeams.length;
   const upcomingEventsCount = 0;
 
   return (

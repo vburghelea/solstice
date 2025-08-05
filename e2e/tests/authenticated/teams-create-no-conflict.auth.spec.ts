@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { clearAuthState } from "../../utils/auth";
-import { clearUserTeams } from "../../utils/cleanup";
 import { generateUniqueTeam } from "../../utils/test-data";
 
 // Don't use the default auth state
@@ -27,15 +26,6 @@ test.describe("Team Creation Without Conflict", () => {
     await expect(page.getByText("Create a New Team")).toBeVisible({
       timeout: 15000,
     });
-  });
-
-  test.afterEach(async ({ page }) => {
-    // Clean up any teams created during the test
-    try {
-      await clearUserTeams(page, "teamcreator@example.com");
-    } catch (error) {
-      console.warn("Cleanup failed:", error);
-    }
   });
 
   test("should successfully create a team without database conflicts", async ({
@@ -79,7 +69,12 @@ test.describe("Team Creation Without Conflict", () => {
     await page.waitForTimeout(500);
 
     // Submit the form
-    await page.getByRole("button", { name: "Create Team" }).click();
+    const submitButton = page.getByRole("button", { name: "Create Team" });
+
+    // Check if button is enabled before clicking
+    await expect(submitButton).toBeEnabled();
+
+    await submitButton.click();
 
     // Wait for either success redirect or error message
     await Promise.race([

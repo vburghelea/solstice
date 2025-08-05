@@ -214,7 +214,7 @@ function MembershipPage() {
           <CardTitle>Current Status</CardTitle>
         </CardHeader>
         <CardContent>
-          {membershipStatus ? (
+          {membershipStatus?.hasMembership ? (
             <div className="space-y-2">
               <p className="text-lg font-semibold text-green-600 dark:text-green-400">
                 Active Membership
@@ -230,11 +230,12 @@ function MembershipPage() {
                     ).toLocaleDateString()
                   : "N/A"}
               </p>
-              {membershipStatus.daysRemaining && (
-                <p className="text-muted-foreground text-sm">
-                  Days Remaining: {membershipStatus.daysRemaining}
-                </p>
-              )}
+              {membershipStatus.daysRemaining != null &&
+                membershipStatus.daysRemaining > 0 && (
+                  <p className="text-muted-foreground text-sm">
+                    Days Remaining: {membershipStatus.daysRemaining}
+                  </p>
+                )}
             </div>
           ) : (
             <div>

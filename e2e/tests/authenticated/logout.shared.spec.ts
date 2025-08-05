@@ -23,7 +23,9 @@ test.describe("Logout Flow (Authenticated)", () => {
     await page.waitForURL(/\/auth\/login/, { timeout: 15000 });
 
     // Verify we're on the login page
-    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+    ).toBeVisible();
   });
 
   test("should clear session on logout", async ({ page }) => {
@@ -48,7 +50,9 @@ test.describe("Logout Flow (Authenticated)", () => {
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();
     await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
-    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+    ).toBeVisible();
   });
 
   test("should handle logout from teams page", async ({ page }) => {
@@ -58,6 +62,8 @@ test.describe("Logout Flow (Authenticated)", () => {
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();
     await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
-    await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+    ).toBeVisible();
   });
 });

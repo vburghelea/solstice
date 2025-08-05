@@ -57,26 +57,22 @@ test.describe("Team Member Management (Authenticated)", () => {
     });
 
     test("should navigate to team management for captains", async ({ page }) => {
-      // Captain should see manage button
-      const manageButton = page.getByRole("link", { name: "Manage Team" });
-      if (await manageButton.isVisible()) {
-        await manageButton.click();
-        await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1\/manage/);
-      }
+      // Captain should see manage members button
+      const manageButton = page.getByRole("link", { name: "Manage Members" });
+      await expect(manageButton).toBeVisible();
+      await manageButton.click();
+      await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1\/members/);
     });
   });
 
-  test.describe("Team Management Page", () => {
-    test.beforeEach(async ({ page }) => {
+  test.describe("Team Members Management Page", () => {
+    test("should display management tabs", async ({ page }) => {
       await clearAuthState(page);
-      // Navigate to Test Thunder management page
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1/members", {
         email: "test@example.com",
         password: "testpassword123",
       });
-    });
 
-    test("should display management tabs", async ({ page }) => {
       // Check for management sections
       const tabs = ["Team Info", "Members", "Settings"];
 
@@ -89,15 +85,12 @@ test.describe("Team Member Management (Authenticated)", () => {
     });
 
     test("should allow editing team information", async ({ page }) => {
-      // Navigate directly to the manage page
-      await page.goto("/dashboard/teams/test-team-1/manage");
-      await page.waitForLoadState("networkidle");
-
-      // Navigate to team info section if needed
-      const infoTab = page.getByRole("tab", { name: "Team Info" });
-      if (await infoTab.isVisible()) {
-        await infoTab.click();
-      }
+      // Fresh login for this test
+      await clearAuthState(page);
+      await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+        email: "test@example.com",
+        password: "testpassword123",
+      });
 
       // Check for edit form with extended timeout
       await expect(page.getByLabel("Team Name")).toBeVisible({ timeout: 10000 });
@@ -110,11 +103,12 @@ test.describe("Team Member Management (Authenticated)", () => {
       // Save changes
       await page.getByRole("button", { name: "Save Changes" }).click();
 
-      // Verify success message or updated content
+      // Wait for navigation back to team details page after successful save
+      await page.waitForURL("/dashboard/teams/test-team-1");
+
+      // Verify the updated team name is displayed
       await expect(
-        page
-          .getByText("Team updated successfully")
-          .or(page.getByRole("heading", { name: "Test Thunder Updated" })),
+        page.getByRole("heading", { name: "Test Thunder Updated" }),
       ).toBeVisible({ timeout: 10000 });
     });
   });

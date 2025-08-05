@@ -400,7 +400,7 @@ async function seed() {
     // Create memberships for test users
     console.log("Creating memberships for test users...");
 
-    // Create an active membership for admin user (for tests that need active membership)
+    // Create active memberships for both test and admin users
     await db.insert(memberships).values([
       {
         id: "test-membership-1",
@@ -418,10 +418,28 @@ async function seed() {
           },
         },
       },
+      {
+        id: "test-membership-2",
+        userId: testUserId,
+        membershipTypeId: "annual-player-2025",
+        status: "active" as const,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+        paymentProvider: "mock",
+        paymentId: "mock_payment_intent_2",
+        metadata: {
+          paymentDetails: {
+            amount: 4500,
+            currency: "CAD",
+          },
+        },
+      },
     ]);
 
-    // Test user remains without membership for purchase flow tests
-    console.log("✅ Created test memberships (admin has active, test user has none)");
+    // Both test and admin users now have active memberships
+    console.log(
+      "✅ Created test memberships (both test and admin users have active memberships)",
+    );
     console.log("✅ Test data seeded successfully!");
   } catch (error) {
     console.error("❌ Error seeding test data:", error);

@@ -29,19 +29,17 @@ test.describe("Dashboard (Authenticated)", () => {
     await expect(page.getByText("My Teams")).toBeVisible();
     await expect(page.getByText("Upcoming Events")).toBeVisible();
 
-    // Check status cards - membership status depends on test order
-    const hasActiveMembership = await page
-      .getByText("Active")
-      .isVisible()
-      .catch(() => false);
-    if (hasActiveMembership) {
-      await expect(page.getByText("Active")).toBeVisible();
-      await expect(page.getByText(/\d+ days remaining/)).toBeVisible();
-    } else {
-      await expect(page.getByText("Inactive")).toBeVisible();
-      await expect(page.getByText("No active membership")).toBeVisible();
-    }
-    await expect(page.getByText("Not on any teams yet")).toBeVisible();
+    // Check status cards - test@example.com now has active membership
+    // The page shows "Membership Status Active" as combined text
+    await expect(page.getByText("Membership Status")).toBeVisible();
+    await expect(page.getByText("Active", { exact: true })).toBeVisible();
+    await expect(page.getByText(/\d+ days remaining/)).toBeVisible();
+
+    // test@example.com is now a member of test-team-1
+    // The "1" appears as a large number in the teams card
+    await expect(page.getByText("1", { exact: true })).toBeVisible();
+    await expect(page.getByText("Active team")).toBeVisible();
+
     await expect(page.getByText("No events scheduled")).toBeVisible();
   });
 
@@ -64,9 +62,9 @@ test.describe("Dashboard (Authenticated)", () => {
     await page.getByRole("link", { name: "Dashboard", exact: true }).click();
     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
 
-    // Test membership action - could be "Get Membership" or "Renew Now" depending on test order
+    // Test membership action - should be "Renew Now" since test user has active membership
     const getMembershipLink = page.getByRole("link", {
-      name: /Get Membership|Renew Now/,
+      name: "Renew Now",
     });
     await expect(getMembershipLink).toBeVisible();
 

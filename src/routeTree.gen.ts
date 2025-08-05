@@ -30,6 +30,7 @@ import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/team
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
@@ -136,6 +137,12 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardTeamsTeamIdIndexRoute =
+  DashboardTeamsTeamIdIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => DashboardTeamsTeamIdRoute,
+  } as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
     id: "/members",
@@ -203,6 +210,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
@@ -217,12 +225,12 @@ export interface FileRoutesByTo {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
-  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -271,7 +280,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams/create"
     | "/dashboard/teams/"
     | "/dashboard/teams/$teamId/manage"
-    | "/dashboard/teams/$teamId/members";
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
@@ -286,12 +296,12 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard"
     | "/onboarding"
-    | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/dashboard/teams"
     | "/dashboard/teams/$teamId/manage"
-    | "/dashboard/teams/$teamId/members";
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/teams/$teamId";
   id:
     | "__root__"
     | "/"
@@ -314,7 +324,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams/create"
     | "/dashboard/teams/"
     | "/dashboard/teams/$teamId/manage"
-    | "/dashboard/teams/$teamId/members";
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -519,6 +530,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/teams/$teamId/": {
+      id: "/dashboard/teams/$teamId/";
+      path: "/";
+      fullPath: "/dashboard/teams/$teamId/";
+      preLoaderRoute: typeof DashboardTeamsTeamIdIndexRouteImport;
+      parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
       path: "/members";
@@ -599,11 +617,13 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
+  DashboardTeamsTeamIdIndexRoute: typeof DashboardTeamsTeamIdIndexRoute;
 }
 
 const DashboardTeamsTeamIdRouteChildren: DashboardTeamsTeamIdRouteChildren = {
   DashboardTeamsTeamIdManageRoute: DashboardTeamsTeamIdManageRoute,
   DashboardTeamsTeamIdMembersRoute: DashboardTeamsTeamIdMembersRoute,
+  DashboardTeamsTeamIdIndexRoute: DashboardTeamsTeamIdIndexRoute,
 };
 
 const DashboardTeamsTeamIdRouteWithChildren =

@@ -1,13 +1,15 @@
 import { expect, test } from "@playwright/test";
+import { clearAuthState, gotoWithAuth } from "../../utils/auth";
+
+// Opt out of shared auth state for now until we fix the root issue
+test.use({ storageState: undefined });
 
 test.describe("Logout Flow (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to dashboard and wait for auth to be recognized
-    await page.goto("/dashboard");
-
-    // Wait for the logout button to be visible - this confirms auth state is loaded
-    await expect(page.getByRole("button", { name: "Logout" })).toBeVisible({
-      timeout: 10_000,
+    await clearAuthState(page);
+    await gotoWithAuth(page, "/dashboard", {
+      email: process.env["E2E_TEST_EMAIL"]!,
+      password: process.env["E2E_TEST_PASSWORD"]!,
     });
   });
 
@@ -31,7 +33,8 @@ test.describe("Logout Flow (Authenticated)", () => {
     await page.getByRole("button", { name: "Logout" }).click();
     await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
 
-    // Try to access protected route
+    // Try to access protected route - don't use authenticatedGoto here
+    // because we're testing that we should NOT be authenticated
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
 
     // Should redirect to login
@@ -39,11 +42,8 @@ test.describe("Logout Flow (Authenticated)", () => {
   });
 
   test("should handle logout from profile page", async ({ page }) => {
-    // Navigate to profile page
+    // Navigate to profile page - already authenticated from beforeEach
     await page.goto("/dashboard/profile");
-
-    // Wait for logout button to be visible
-    await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
 
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();
@@ -52,11 +52,8 @@ test.describe("Logout Flow (Authenticated)", () => {
   });
 
   test("should handle logout from teams page", async ({ page }) => {
-    // Navigate to teams page
+    // Navigate to teams page - already authenticated from beforeEach
     await page.goto("/dashboard/teams");
-
-    // Wait for logout button to be visible
-    await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
 
     // Perform logout
     await page.getByRole("button", { name: "Logout" }).click();

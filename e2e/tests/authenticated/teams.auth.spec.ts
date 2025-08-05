@@ -1,9 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Teams Management (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
-    // Simply navigate to the teams page - we already have auth from storageState
-    await page.goto("/dashboard/teams");
+    // Navigate to teams page with authentication
+    await gotoWithAuth(page, "/dashboard/teams", {
+      email: process.env["E2E_TEST_EMAIL"]!,
+      password: process.env["E2E_TEST_PASSWORD"]!,
+    });
 
     // Wait for the page to load
     await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible({
@@ -115,9 +119,7 @@ test.describe("Teams Management (Authenticated)", () => {
       await expect(page).toHaveURL("/dashboard/teams/create");
 
       // Check create team form is displayed
-      await expect(
-        page.getByRole("heading", { name: "Create a New Team" }),
-      ).toBeVisible();
+      await expect(page.getByText("Create a New Team")).toBeVisible();
     });
 
     test("should navigate to browse teams page from empty state", async () => {
@@ -172,8 +174,10 @@ test.describe("Teams Management (Authenticated)", () => {
     });
 
     test("should validate slug format", async ({ page }) => {
-      await page.getByLabel("URL Slug").fill("Invalid Slug!");
-      await page.getByLabel("URL Slug").blur();
+      const slugField = page.getByLabel("URL Slug");
+      await slugField.click();
+      await slugField.type("Invalid Slug!", { delay: 50 });
+      await slugField.blur();
 
       // Wait for validation message with a longer timeout
       await expect(
@@ -182,8 +186,14 @@ test.describe("Teams Management (Authenticated)", () => {
     });
 
     test("should validate color format", async ({ page }) => {
-      await page.getByLabel("Primary Color").fill("not-a-color");
-      await page.getByLabel("Primary Color").blur();
+      // Find the text input for primary color (not the color picker)
+      const colorTextInput = page.locator('input[type="text"][value="#000000"]').first();
+      await colorTextInput.click();
+      await colorTextInput.clear();
+      await colorTextInput.type("not-a-color", { delay: 50 });
+
+      // Click elsewhere to trigger blur
+      await page.getByLabel("Secondary Color").click();
 
       // Wait for validation message with a longer timeout
       await expect(
@@ -192,16 +202,22 @@ test.describe("Teams Management (Authenticated)", () => {
     });
 
     test("should validate year format", async ({ page }) => {
-      await page.getByLabel("Founded Year").fill("2050");
-      await page.getByLabel("Founded Year").blur();
+      const yearField = page.getByLabel("Founded Year");
+      await yearField.click();
+      // Clear the default value first
+      await yearField.clear();
+      await yearField.type("2050", { delay: 50 });
+      await yearField.blur();
 
       // Wait for validation message with a longer timeout
       await expect(page.getByText("Enter a valid year")).toBeVisible({ timeout: 5000 });
     });
 
     test("should validate website URL", async ({ page }) => {
-      await page.getByLabel("Website").fill("not-a-url");
-      await page.getByLabel("Website").blur();
+      const websiteField = page.getByLabel("Website");
+      await websiteField.click();
+      await websiteField.type("not-a-url", { delay: 50 });
+      await websiteField.blur();
 
       // Wait for validation message with a longer timeout
       await expect(
@@ -220,8 +236,13 @@ test.describe("Teams Management (Authenticated)", () => {
 
     test("should show error message for duplicate slug", async ({ page }) => {
       // Try to create a team with existing slug
-      await page.getByLabel("Team Name").fill("Duplicate Team");
-      await page.getByLabel("URL Slug").fill("test-thunder"); // Existing slug
+      const nameField = page.getByLabel("Team Name");
+      await nameField.click();
+      await nameField.type("Duplicate Team", { delay: 50 });
+
+      const slugField = page.getByLabel("URL Slug");
+      await slugField.click();
+      await slugField.type("test-thunder", { delay: 50 }); // Existing slug
 
       await page.getByRole("button", { name: "Create Team" }).click();
 

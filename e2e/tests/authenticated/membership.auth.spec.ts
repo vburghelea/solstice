@@ -1,10 +1,14 @@
-import { expect, test } from "../../fixtures/auth-fixtures";
+import { expect, test } from "@playwright/test";
 import { ANNUAL_MEMBERSHIP_NAME, ANNUAL_MEMBERSHIP_PRICE } from "../../helpers/constants";
+import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Membership Purchase Flow (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to membership page - already authenticated via fixtures
-    await page.goto("/dashboard/membership");
+    // Navigate to membership page with authentication
+    await gotoWithAuth(page, "/dashboard/membership", {
+      email: process.env["E2E_TEST_EMAIL"]!,
+      password: process.env["E2E_TEST_PASSWORD"]!,
+    });
 
     // Wait for page to be ready
     await expect(
@@ -117,22 +121,14 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
     // Click the button
     await purchaseButton.click();
 
-    // The mock payment service should redirect back to membership page with mock checkout params
-    await page.waitForURL((url) => url.toString().includes("mock_checkout=true"), {
+    // Mock checkout processes immediately and shows success
+    // Wait for the success toast notification
+    await expect(page.getByText("Membership purchased successfully!")).toBeVisible({
       timeout: 10000,
     });
 
-    // Verify we're on the mock checkout page
-    expect(page.url()).toContain("/dashboard/membership");
-    expect(page.url()).toContain("mock_checkout=true");
-    expect(page.url()).toContain("session=");
-    expect(page.url()).toContain("type=");
-    expect(page.url()).toContain("amount=");
-
-    // Wait for the success toast
-    await expect(page.getByText("Membership purchased successfully")).toBeVisible({
-      timeout: 10000,
-    });
+    // Verify membership status updated
+    await expect(page.getByText("Active Membership")).toBeVisible();
 
     // Verify button is now disabled "Current Plan"
     await expect(page.getByRole("button", { name: "Current Plan" })).toBeVisible();
@@ -155,10 +151,7 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
       // Click purchase to start mock checkout
       await purchaseButton.click();
 
-      // Wait for mock checkout redirect
-      await page.waitForURL((url) => url.toString().includes("mock_checkout=true"));
-
-      // Mock checkout automatically processes the payment
+      // Mock checkout processes immediately and shows success
       // Wait for the success message
       await expect(page.getByText("Membership purchased successfully!")).toBeVisible({
         timeout: 10000,
@@ -337,14 +330,13 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
       await button.click();
 
       // Should only trigger one checkout session
-      // Wait for redirect to mock checkout
-      await page.waitForURL((url) => url.toString().includes("mock_checkout=true"), {
+      // Wait for success toast (only one should appear)
+      await expect(page.getByText("Membership purchased successfully!")).toBeVisible({
         timeout: 10000,
       });
 
-      // Verify we're on the mock checkout page (only one redirect should occur)
-      expect(page.url()).toContain("/dashboard/membership");
-      expect(page.url()).toContain("mock_checkout=true");
+      // Verify membership status updated
+      await expect(page.getByText("Active Membership")).toBeVisible();
     } else {
       // Skip test if user already has current plan
       test.skip();

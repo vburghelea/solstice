@@ -1,10 +1,14 @@
-import { expect, test } from "../../fixtures/auth-fixtures";
+import { expect, test } from "@playwright/test";
+import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Browse Teams Page", () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to browse teams page - already authenticated via fixtures
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
 
       // Wait for page to be ready
       await expect(
@@ -97,8 +101,11 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
   test.describe("Join Team Flow", () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to browse teams page - already authenticated via fixtures
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
 
       // Wait for page to be ready
       await expect(
@@ -146,8 +153,11 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
   test.describe("Team Filtering", () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to browse teams page - already authenticated via fixtures
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
 
       // Wait for page to be ready
       await expect(
@@ -198,8 +208,11 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
   test.describe("Team Quick Actions", () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to browse teams page - already authenticated via fixtures
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
 
       // Wait for page to be ready
       await expect(
@@ -256,8 +269,11 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
   test.describe("Empty States", () => {
     test.beforeEach(async ({ page }) => {
-      // Navigate to browse teams page - already authenticated via fixtures
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
 
       // Wait for page to be ready
       await expect(

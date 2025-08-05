@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { clearAuthState } from "../../utils/auth";
+import { clearUserTeams } from "../../utils/cleanup";
 import { generateUniqueTeam } from "../../utils/test-data";
 
 // Don't use the default auth state
@@ -26,6 +27,15 @@ test.describe("Team Creation Without Conflict", () => {
     await expect(page.getByText("Create a New Team")).toBeVisible({
       timeout: 15000,
     });
+  });
+
+  test.afterEach(async ({ page }) => {
+    // Clean up any teams created during the test
+    try {
+      await clearUserTeams(page, "teamcreator@example.com");
+    } catch (error) {
+      console.warn("Cleanup failed:", error);
+    }
   });
 
   test("should successfully create a team without database conflicts", async ({

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -35,8 +35,73 @@ function MembershipPage() {
   const paymentReturn = usePaymentReturn();
   const [hasProcessedReturn, setHasProcessedReturn] = useState(false);
 
+  const membershipStatusQuery = useQuery({
+    queryKey: ["membership-status"],
+    queryFn: async () => {
+      const result = await getUserMembershipStatus();
+      if (!result.success) {
+        throw new Error(
+          result.errors?.[0]?.message || "Failed to fetch membership status",
+        );
+      }
+      return result.data || null;
+    },
+  });
+
+  const { refetch: refetchMembershipStatus } = membershipStatusQuery;
+
+  const membershipTypesQuery = useQuery({
+    queryKey: ["membership-types"],
+    queryFn: async () => {
+      const result = await listMembershipTypes();
+      if (!result.success) {
+        throw new Error(
+          result.errors?.[0]?.message || "Failed to fetch membership types",
+        );
+      }
+      return result.data || [];
+    },
+  });
+
+  const handleMockPaymentReturn = useCallback(
+    async (sessionId: string, membershipTypeId: string) => {
+      setProcessingPayment(true);
+      try {
+        const result = await (
+          confirmMembershipPurchase as unknown as (params: {
+            data: { membershipTypeId: string; sessionId: string; paymentId: string };
+          }) => Promise<{
+            success: boolean;
+            errors?: Array<{ code: string; message: string }>;
+          }>
+        )({
+          data: {
+            membershipTypeId,
+            sessionId,
+            paymentId: `mock_payment_${Date.now()}`,
+          },
+        });
+
+        if (result.success) {
+          toast.success("Membership purchased successfully!");
+          clearPaymentParams();
+          // Refetch membership status
+          await refetchMembershipStatus();
+        } else {
+          toast.error(result.errors?.[0]?.message || "Failed to confirm membership");
+        }
+      } catch (error) {
+        console.error("Error confirming membership:", error);
+        toast.error("Failed to confirm membership purchase");
+      } finally {
+        setProcessingPayment(false);
+      }
+    },
+    [refetchMembershipStatus],
+  );
+
   // Process payment return if needed
-  const processPaymentReturn = async () => {
+  const processPaymentReturn = useCallback(async () => {
     if (hasProcessedReturn) return;
 
     // Handle mock checkout
@@ -52,7 +117,7 @@ function MembershipPage() {
       setHasProcessedReturn(true);
       toast.success("Membership purchased successfully!");
       clearPaymentParams();
-      membershipStatusQuery.refetch();
+      refetchMembershipStatus();
     }
     // Handle errors
     else if (paymentReturn.error) {
@@ -61,75 +126,23 @@ function MembershipPage() {
       if (errorMessage) toast.error(errorMessage);
       clearPaymentParams();
     }
-  };
+  }, [
+    hasProcessedReturn,
+    paymentReturn,
+    handleMockPaymentReturn,
+    refetchMembershipStatus,
+  ]);
 
-  const handleMockPaymentReturn = async (sessionId: string, membershipTypeId: string) => {
-    setProcessingPayment(true);
-    try {
-      const result = await (
-        confirmMembershipPurchase as unknown as (params: {
-          data: { membershipTypeId: string; sessionId: string; paymentId: string };
-        }) => Promise<{
-          success: boolean;
-          errors?: Array<{ code: string; message: string }>;
-        }>
-      )({
-        data: {
-          membershipTypeId,
-          sessionId,
-          paymentId: `mock_payment_${Date.now()}`,
-        },
-      });
-
-      if (result.success) {
-        toast.success("Membership purchased successfully!");
-        clearPaymentParams();
-        // Refetch membership status
-        membershipStatusQuery.refetch();
-      } else {
-        toast.error(result.errors?.[0]?.message || "Failed to confirm membership");
-      }
-    } catch (error) {
-      console.error("Error confirming membership:", error);
-      toast.error("Failed to confirm membership purchase");
-    } finally {
-      setProcessingPayment(false);
+  // Process payment return using useEffect
+  useEffect(() => {
+    if (
+      !hasProcessedReturn &&
+      (paymentReturn.isMockCheckout || paymentReturn.success || paymentReturn.error) &&
+      (paymentReturn.sessionId || paymentReturn.paymentId || paymentReturn.error)
+    ) {
+      processPaymentReturn();
     }
-  };
-
-  // Process payment return before queries run
-  if (
-    !hasProcessedReturn &&
-    (paymentReturn.sessionId || paymentReturn.success || paymentReturn.error)
-  ) {
-    processPaymentReturn();
-  }
-
-  const membershipStatusQuery = useQuery({
-    queryKey: ["membership-status"],
-    queryFn: async () => {
-      const result = await getUserMembershipStatus();
-      if (!result.success) {
-        throw new Error(
-          result.errors?.[0]?.message || "Failed to fetch membership status",
-        );
-      }
-      return result.data || null;
-    },
-  });
-
-  const membershipTypesQuery = useQuery({
-    queryKey: ["membership-types"],
-    queryFn: async () => {
-      const result = await listMembershipTypes();
-      if (!result.success) {
-        throw new Error(
-          result.errors?.[0]?.message || "Failed to fetch membership types",
-        );
-      }
-      return result.data || [];
-    },
-  });
+  }, [paymentReturn, hasProcessedReturn, processPaymentReturn]);
 
   const handlePurchase = async (membershipTypeId: string) => {
     try {
@@ -171,7 +184,7 @@ function MembershipPage() {
   }
 
   const membershipStatus = membershipStatusQuery.data;
-  const membershipTypes = membershipTypesQuery.data;
+  const membershipTypes = membershipTypesQuery.data || [];
 
   if (processingPayment) {
     return (
@@ -199,77 +212,87 @@ function MembershipPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Current Status</CardTitle>
-          {membershipStatus?.hasMembership && membershipStatus.currentMembership ? (
-            <CardDescription>
-              {membershipStatus.currentMembership.membershipType.name}
-            </CardDescription>
-          ) : (
-            <CardDescription>No Active Membership</CardDescription>
-          )}
         </CardHeader>
         <CardContent>
-          {membershipStatus?.hasMembership && membershipStatus.currentMembership ? (
+          {membershipStatus ? (
             <div className="space-y-2">
-              <p className="text-muted-foreground text-sm">
-                Status:{" "}
-                <span className="font-medium text-green-600">Active Membership</span>
+              <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                Active Membership
               </p>
               <p className="text-muted-foreground text-sm">
-                Expires: {membershipStatus.expiresAt?.toLocaleDateString()}
+                Type: {membershipStatus.currentMembership?.membershipType.name}
               </p>
               <p className="text-muted-foreground text-sm">
-                Days Remaining: {membershipStatus.daysRemaining} days
+                Expires:{" "}
+                {membershipStatus.currentMembership
+                  ? new Date(
+                      membershipStatus.currentMembership.endDate,
+                    ).toLocaleDateString()
+                  : "N/A"}
               </p>
+              {membershipStatus.daysRemaining && (
+                <p className="text-muted-foreground text-sm">
+                  Days Remaining: {membershipStatus.daysRemaining}
+                </p>
+              )}
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">
-              Join today to participate in events and access member benefits
-            </p>
+            <div>
+              <p className="text-lg font-semibold">No Active Membership</p>
+              <p className="text-muted-foreground text-sm">
+                Join today to participate in events and access member benefits
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Available Memberships */}
-      <div className="mb-4">
-        <h2 className="mb-4 text-2xl font-semibold">Available Memberships</h2>
-      </div>
+      <div>
+        <h2 className="mb-4 text-2xl font-bold">Available Memberships</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {membershipTypes.map((type) => {
+            const isCurrent =
+              membershipStatus?.currentMembership?.membershipType.id === type.id;
+            const canPurchase =
+              !membershipStatus?.hasMembership ||
+              (membershipStatus.daysRemaining ?? 0) <= 30;
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {membershipTypes?.map((type) => (
-          <Card key={type.id} data-testid={`membership-card-${type.id}`}>
-            <CardHeader>
-              <CardTitle>{type.name}</CardTitle>
-              <CardDescription>{type.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p className="text-3xl font-bold">
-                  ${(type.priceCents / 100).toFixed(2)}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  Duration: {type.durationMonths} months
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={() => handlePurchase(type.id)}
-                className="w-full"
-                disabled={
-                  membershipStatus?.hasMembership &&
-                  membershipStatus.currentMembership?.membershipTypeId === type.id
-                }
-              >
-                {membershipStatus?.hasMembership &&
-                membershipStatus.currentMembership?.membershipTypeId === type.id
-                  ? "Current Plan"
-                  : membershipStatus?.hasMembership
-                    ? "Renew"
-                    : "Purchase"}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+            return (
+              <Card key={type.id}>
+                <CardHeader>
+                  <CardTitle>{type.name}</CardTitle>
+                  <CardDescription>${(type.priceCents / 100).toFixed(2)}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm">{type.description}</p>
+                </CardContent>
+                <CardFooter>
+                  {isCurrent ? (
+                    <Button className="w-full" disabled>
+                      Current Plan
+                    </Button>
+                  ) : canPurchase ? (
+                    <Button
+                      className="w-full"
+                      onClick={() => handlePurchase(type.id)}
+                      disabled={processingPayment}
+                    >
+                      {membershipStatus?.hasMembership &&
+                      (membershipStatus.daysRemaining ?? 0) <= 30
+                        ? "Renew"
+                        : "Purchase"}
+                    </Button>
+                  ) : (
+                    <Button className="w-full" disabled>
+                      Not Available
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

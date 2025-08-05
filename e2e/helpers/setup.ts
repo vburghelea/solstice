@@ -44,17 +44,14 @@ export async function waitForAuthStateToLoad(page: Page) {
  * Navigates to a URL and ensures authentication is maintained
  */
 export async function authenticatedGoto(page: Page, url: string) {
-  // First check if we have an active session via API
-  const hasAuth = await waitForAuthStateToLoad(page);
-
-  if (!hasAuth) {
-    console.warn("No auth state found, will need fresh login");
-  }
-
   // Navigate to the URL - use domcontentloaded for faster navigation
   await page.goto(url, { waitUntil: "domcontentloaded" });
 
-  // If we end up on login page, authenticate using our helper
+  // Wait for the application's auth state to resolve
+  // This is critical - we need to give the app time to check cookies and populate context
+  await page.waitForLoadState("networkidle", { timeout: 15_000 });
+
+  // Check if we were redirected to login
   if (page.url().includes("/auth/login")) {
     console.log("Redirected to login, authenticating...");
 
@@ -67,14 +64,26 @@ export async function authenticatedGoto(page: Page, url: string) {
     );
   }
 
-  // Wait for page to stabilize - use UI-based wait instead of networkidle
+  // Wait for page to stabilize by checking for auth UI elements
+  // This confirms the auth context is fully loaded
   try {
-    await page.waitForSelector('[role="complementary"] button:has-text("Logout")', {
+    // Use getByRole which is more reliable and matches the test patterns
+    await page.getByRole("button", { name: "Logout" }).waitFor({
       timeout: 10_000,
       state: "visible",
     });
   } catch {
-    // Not all pages have the sidebar, so this is ok
-    console.debug("Page may not have sidebar");
+    // For pages without sidebar, check for other auth indicators
+    const currentUrl = page.url();
+    if (
+      currentUrl.includes("/dashboard") ||
+      currentUrl.includes("/profile") ||
+      currentUrl.includes("/teams")
+    ) {
+      // These pages should have auth UI, re-throw if missing
+      console.error("Failed to find logout button. Current URL:", currentUrl);
+      console.error("Page title:", await page.title());
+      throw new Error(`Authentication check failed on ${url}. Logout button not found.`);
+    }
   }
 }

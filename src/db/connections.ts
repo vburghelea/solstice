@@ -5,6 +5,12 @@ import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
+// Singleton instances
+let pooledInstance: ReturnType<typeof drizzleNeon> | null = null;
+let unpooledInstance: ReturnType<typeof drizzlePostgres> | null = null;
+let poolInstance: Pool | null = null;
+let sqlInstance: ReturnType<typeof postgres> | null = null;
+
 /**
  * Pooled database connection using Neon's serverless driver.
  *
@@ -18,6 +24,11 @@ import * as schema from "./schema";
  * - High-concurrency scenarios
  */
 export const pooledDb = serverOnly(async () => {
+  // Return existing instance if available
+  if (pooledInstance) {
+    return pooledInstance;
+  }
+
   const { getPooledDbUrl, isServerless } = await import("../lib/env.server");
 
   // Configure Neon for serverless environments
@@ -28,12 +39,14 @@ export const pooledDb = serverOnly(async () => {
 
   const connectionString = getPooledDbUrl();
 
-  const pool = new Pool({ connectionString });
-  return drizzleNeon({
-    client: pool,
+  poolInstance = new Pool({ connectionString });
+  pooledInstance = drizzleNeon({
+    client: poolInstance,
     schema,
     casing: "snake_case",
   });
+
+  return pooledInstance;
 });
 
 /**
@@ -50,15 +63,28 @@ export const pooledDb = serverOnly(async () => {
  * - Operations requiring session-level features
  */
 export const unpooledDb = serverOnly(async () => {
+  // Return existing instance if available
+  if (unpooledInstance) {
+    return unpooledInstance;
+  }
+
   const { getUnpooledDbUrl } = await import("../lib/env.server");
   const connectionString = getUnpooledDbUrl();
 
-  const sql = postgres(connectionString);
-  return drizzlePostgres({
-    client: sql,
+  // Set a reasonable connection pool size
+  sqlInstance = postgres(connectionString, {
+    max: 10, // Maximum number of connections in the pool
+    idle_timeout: 20, // Close idle connections after 20 seconds
+    connect_timeout: 10, // Connection timeout
+  });
+
+  unpooledInstance = drizzlePostgres({
+    client: sqlInstance,
     schema,
     casing: "snake_case",
   });
+
+  return unpooledInstance;
 });
 
 /**
@@ -79,4 +105,27 @@ export const getDb = serverOnly(async () => {
     console.log("Using unpooled connection for traditional environment");
     return await unpooledDb();
   }
+});
+
+/**
+ * Cleanup function to close all database connections
+ * Should be called when shutting down the server
+ */
+export const closeConnections = serverOnly(async () => {
+  const promises: Promise<void>[] = [];
+
+  if (poolInstance) {
+    promises.push(poolInstance.end());
+    poolInstance = null;
+    pooledInstance = null;
+  }
+
+  if (sqlInstance) {
+    promises.push(sqlInstance.end({ timeout: 3 }));
+    sqlInstance = null;
+    unpooledInstance = null;
+  }
+
+  await Promise.all(promises);
+  console.log("Database connections closed");
 });

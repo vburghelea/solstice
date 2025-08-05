@@ -44,28 +44,31 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     const timestamp = Date.now();
     const testEmail = `test+${timestamp}@example.com`;
 
-    // Wait for form fields to be ready
+    // Wait for form fields to be ready and interact naturally
     const nameField = page.getByLabel("Name");
     await expect(nameField).toBeVisible({ timeout: 10_000 });
     await expect(nameField).toBeEnabled({ timeout: 10_000 });
 
-    // Fill signup form with explicit clicks
+    // Type slowly to ensure the form registers the input
     await nameField.click();
-    await nameField.fill("New Test User");
+    await nameField.type("New Test User", { delay: 50 });
 
     const emailField = page.getByLabel("Email");
     await emailField.click();
-    await emailField.fill(testEmail);
+    await emailField.type(testEmail, { delay: 50 });
 
     // Fill password field
     const passwordField = page.getByLabel("Password", { exact: true });
     await passwordField.click();
-    await passwordField.fill("testpassword123");
+    await passwordField.type("testpassword123", { delay: 50 });
 
     // Fill confirm password
     const confirmField = page.getByLabel("Confirm Password");
     await confirmField.click();
-    await confirmField.fill("testpassword123");
+    await confirmField.type("testpassword123", { delay: 50 });
+
+    // Tab out to trigger final validation
+    await page.keyboard.press("Tab");
 
     // Wait for form validation to complete
     await page.waitForTimeout(1000);

@@ -1,9 +1,13 @@
-import { expect, test } from "../../fixtures/auth-fixtures";
+import { expect, test } from "@playwright/test";
+import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Profile Edit", () => {
   test.beforeEach(async ({ page }) => {
-    // Just navigate - we're already authenticated via storageState
-    await page.goto("/dashboard/profile");
+    // Navigate to profile page with authentication
+    await gotoWithAuth(page, "/dashboard/profile", {
+      email: process.env["E2E_TEST_EMAIL"]!,
+      password: process.env["E2E_TEST_PASSWORD"]!,
+    });
 
     // Wait for the page to be ready
     await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({

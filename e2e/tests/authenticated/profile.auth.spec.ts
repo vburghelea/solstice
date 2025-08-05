@@ -1,9 +1,13 @@
-import { expect, test } from "../../fixtures/auth-fixtures";
+import { expect, test } from "@playwright/test";
+import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Profile Management (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to profile page - already authenticated via fixtures
-    await page.goto("/dashboard/profile");
+    // Navigate to profile page with authentication
+    await gotoWithAuth(page, "/dashboard/profile", {
+      email: process.env["E2E_TEST_EMAIL"]!,
+      password: process.env["E2E_TEST_PASSWORD"]!,
+    });
 
     // Wait for page to be ready
     await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({

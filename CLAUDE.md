@@ -42,15 +42,11 @@ export const myServerFn = createServerFn({ method: "POST" })
 - `pnpm test:e2e` - Run Playwright E2E tests (automatically runs test:e2e:setup first)
 - `pnpm test:e2e:ui` - Run E2E tests with UI mode
 - `pnpm test:e2e:setup` - Seed database with E2E test data (automatically run before test:e2e)
-- **E2E Test Iteration Strategy**: When fixing E2E tests, follow this loop:
-  1. Run `pnpm test:e2e --reporter=html --output=e2e-test-results &` **in the background**
-  2. Use bash to sleep for 10 minutes
-  3. Check if there are any errors in the e2e-test-results folder
-     - If no errors, check if the test process is still running
-     - If still running, sleep 10 more minutes
-     - If not running and no errors, you're done
-  4. If errors exist, fix the errors in both functionality and tests, then go back to step 1
-  5. **CONTINUE THIS LOOP MANY TIMES until all errors are fixed**
+- **Pre-commit E2E Testing**: Before committing changes to main, run Chromium E2E tests:
+  ```bash
+  pnpm test:e2e --reporter=html --output=e2e-test-results --workers 1 --project=chromium-unauthenticated --project=chromium-authenticated
+  ```
+  This ensures all browser tests pass before merging. Use `--workers 1` for consistent execution.
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
 - `pnpm docs:reference` - Generate TypeDoc API documentation
@@ -442,7 +438,7 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    - `profile-edit@example.com` - Profile editing tests
    - See `scripts/seed-e2e-data.ts` for all test users
 
-9. **See Also**: `e2e/E2E-TEST-STRATEGY.md` for comprehensive testing guidelines
+9. **See Also**: `docs/E2E-BEST-PRACTICES.md` for comprehensive testing guidelines
 
 ### Common Tasks
 

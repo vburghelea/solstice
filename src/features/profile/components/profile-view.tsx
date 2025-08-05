@@ -3,12 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit2, LoaderCircle, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,10 +16,10 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+import { Button } from "~/shared/ui/button";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
-import type { ProfileInput } from "../profile.types";
 
 function calculateAge(dateOfBirth: Date | undefined): number | null {
   if (!dateOfBirth) return null;
@@ -38,11 +36,17 @@ function calculateAge(dateOfBirth: Date | undefined): number | null {
 export function ProfileView() {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Fetch profile data
-  const { data: profileResult, isLoading } = useQuery({
+  const {
+    data: profileResult,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["userProfile"],
     queryFn: async () => getUserProfile(),
+    retry: 1,
   });
 
   const profile = profileResult?.success ? profileResult.data : null;
@@ -68,41 +72,92 @@ export function ProfileView() {
       },
     } as PartialProfileInputType,
     onSubmit: async ({ value }) => {
-      try {
-        // Build ProfileInput with only defined values
-        const dataToSubmit: Partial<ProfileInput> = {};
+      // Build ProfileInput with only changed/meaningful values
+      // Use a more flexible type since we need to handle Date serialization
+      const dataToSubmit: Record<string, unknown> = {};
 
-        if (value.dateOfBirth) dataToSubmit.dateOfBirth = value.dateOfBirth;
-        if (value.gender) dataToSubmit.gender = value.gender;
-        if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
-        if (value.phone) dataToSubmit.phone = value.phone;
-        if (value.emergencyContact) {
-          // Only include emergency contact if it has meaningful data
-          const ec = value.emergencyContact;
-          if (ec.name || ec.relationship || ec.phone || ec.email) {
-            dataToSubmit.emergencyContact = {
-              name: ec.name || "",
-              relationship: ec.relationship || "",
-              ...(ec.phone && { phone: ec.phone }),
-              ...(ec.email && { email: ec.email }),
-            };
-          }
+      // Include fields that have values - convert Date to ISO string for serialization
+      if (value.dateOfBirth) {
+        dataToSubmit["dateOfBirth"] =
+          value.dateOfBirth instanceof Date
+            ? value.dateOfBirth.toISOString()
+            : value.dateOfBirth;
+      }
+      if (value.gender) dataToSubmit["gender"] = value.gender;
+      if (value.pronouns) dataToSubmit["pronouns"] = value.pronouns;
+      if (value.phone) dataToSubmit["phone"] = value.phone;
+
+      // Handle emergency contact
+      if (value.emergencyContact) {
+        const ec = value.emergencyContact;
+        if (ec.name || ec.relationship || ec.phone || ec.email) {
+          dataToSubmit["emergencyContact"] = {
+            name: ec.name || "",
+            relationship: ec.relationship || "",
+            ...(ec.phone && { phone: ec.phone }),
+            ...(ec.email && { email: ec.email }),
+          };
         }
-        if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
+      }
 
+      // Always include privacy settings as they have default values
+      if (value.privacySettings) {
+        dataToSubmit["privacySettings"] = {
+          showEmail: value.privacySettings.showEmail ?? false,
+          showPhone: value.privacySettings.showPhone ?? false,
+          showBirthYear: value.privacySettings.showBirthYear ?? false,
+          allowTeamInvitations: value.privacySettings.allowTeamInvitations ?? true,
+        };
+      }
+
+      try {
+        setFormError(null); // Clear any previous errors
+
+        // Debug logging to check what we're sending
+        console.log("Form value:", value);
+        console.log("Data to submit:", dataToSubmit);
+        console.log("Data to submit keys:", Object.keys(dataToSubmit));
+        console.log("Privacy settings in dataToSubmit:", dataToSubmit["privacySettings"]);
+
+        // Make sure we're not sending an empty object
+        if (Object.keys(dataToSubmit).length === 0) {
+          console.error("No data to submit!");
+          setFormError("No changes detected");
+          return;
+        }
+
+        // For server functions with validators expecting { data: ... },
+        // we pass the object directly and TanStack Start wraps it
+        console.log("Sending to server function:", JSON.stringify(dataToSubmit, null, 2));
+        console.log("Data type:", typeof dataToSubmit);
+
+        // Pass the data wrapped in { data: ... } as expected by TanStack Start
         const result = await updateUserProfile({ data: dataToSubmit });
 
         if (result.success) {
           toast.success("Profile updated successfully");
           await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+          // Only exit edit mode on success
           setIsEditing(false);
+          setFormError(null);
         } else {
+          // Show error but don't exit edit mode
           const error = result.errors?.[0]?.message || "Failed to update profile";
+          setFormError(error);
           toast.error(error);
+          // Don't throw - let form remain interactive
         }
       } catch (error) {
-        toast.error("An unexpected error occurred");
+        // Network/unexpected errors
+        const errorMessage =
+          error instanceof Error ? error.message : "An unexpected error occurred";
+        setFormError(errorMessage);
+        toast.error(errorMessage);
         console.error("Profile update error:", error);
+        // Don't throw - let form remain interactive
+      } finally {
+        // Don't reset form on error - this was causing fields to clear
+        // TanStack Form handles submission state automatically
       }
     },
   });
@@ -125,7 +180,12 @@ export function ProfileView() {
 
     // Set field values from profile
     if (profile.dateOfBirth) {
-      form.setFieldValue("dateOfBirth", profile.dateOfBirth);
+      // Ensure dateOfBirth is a proper Date object
+      const date =
+        typeof profile.dateOfBirth === "string"
+          ? new Date(profile.dateOfBirth)
+          : profile.dateOfBirth;
+      form.setFieldValue("dateOfBirth", date);
     }
     if (profile.gender) {
       form.setFieldValue("gender", profile.gender);
@@ -164,8 +224,12 @@ export function ProfileView() {
   };
 
   const cancelEditing = () => {
-    setIsEditing(false);
+    // Reset form to original values
     form.reset();
+    // Clear any errors
+    setFormError(null);
+    // Exit edit mode
+    setIsEditing(false);
   };
 
   if (isLoading) {
@@ -177,9 +241,16 @@ export function ProfileView() {
   }
 
   if (!profile) {
+    const errorMessage =
+      profileResult?.errors?.[0]?.message || error?.message || "Failed to load profile";
     return (
       <div className="p-8 text-center">
-        <p className="text-muted-foreground">Failed to load profile</p>
+        <p className="text-muted-foreground">{errorMessage}</p>
+        {profileResult?.errors?.[0]?.code === "VALIDATION_ERROR" && (
+          <p className="text-muted-foreground mt-2 text-sm">
+            Please try logging in again
+          </p>
+        )}
       </div>
     );
   }
@@ -215,23 +286,40 @@ export function ProfileView() {
                   <X className="mr-2 h-4 w-4" />
                   Cancel
                 </Button>
-                <FormSubmitButton
-                  isSubmitting={form.state.isSubmitting}
-                  loadingText="Saving..."
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    form.handleSubmit();
-                  }}
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
                 >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Changes
-                </FormSubmitButton>
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="button"
+                      onClick={() => form.handleSubmit()}
+                      disabled={!canSubmit || isSubmitting}
+                      size="sm"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </form.Subscribe>
               </div>
             )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {formError && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {formError}
+            </div>
+          )}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Name</Label>
@@ -247,16 +335,20 @@ export function ProfileView() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="dateOfBirth">Date of Birth</Label>
               {isEditing ? (
                 <form.Field
                   name="dateOfBirth"
                   validators={{
                     onChange: ({ value }) => {
                       if (value) {
-                        const age = new Date().getFullYear() - value.getFullYear();
+                        const today = new Date();
+                        let age = today.getFullYear() - value.getFullYear();
+                        const m = today.getMonth() - value.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < value.getDate())) {
+                          age--;
+                        }
                         if (age < 13 || age > 120) {
-                          return "Age must be between 13 and 120 years";
+                          return "You must be between 13 and 120 years old";
                         }
                       }
                       return undefined;
@@ -266,75 +358,80 @@ export function ProfileView() {
                   {(field) => (
                     <ValidatedDatePicker
                       field={field}
-                      label=""
+                      label="Date of Birth"
                       minAge={13}
                       maxAge={120}
-                      className="space-y-0"
                     />
                   )}
                 </form.Field>
               ) : (
-                <p className="text-base">
-                  {profile.dateOfBirth
-                    ? `${new Date(profile.dateOfBirth).toLocaleDateString()} (Age: ${age})`
-                    : "Not set"}
-                </p>
+                <>
+                  <Label>Date of Birth</Label>
+                  <p className="text-base">
+                    {profile.dateOfBirth
+                      ? `${new Date(profile.dateOfBirth).toLocaleDateString()} (Age: ${age})`
+                      : "Not set"}
+                  </p>
+                </>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
               {isEditing ? (
                 <form.Field name="phone">
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label=""
+                      label="Phone Number"
                       type="tel"
                       placeholder="+1 (555) 000-0000"
-                      className="space-y-0"
                     />
                   )}
                 </form.Field>
               ) : (
-                <p className="text-base">{profile.phone || "Not set"}</p>
+                <>
+                  <Label>Phone Number</Label>
+                  <p className="text-base">{profile.phone || "Not set"}</p>
+                </>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
               {isEditing ? (
                 <form.Field name="gender">
                   {(field) => (
                     <ValidatedSelect
                       field={field}
-                      label=""
+                      label="Gender"
                       options={genderOptions}
                       placeholderText="Select gender"
-                      className="space-y-0"
                     />
                   )}
                 </form.Field>
               ) : (
-                <p className="text-base">{profile.gender || "Not set"}</p>
+                <>
+                  <Label>Gender</Label>
+                  <p className="text-base">{profile.gender || "Not set"}</p>
+                </>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pronouns">Pronouns</Label>
               {isEditing ? (
                 <form.Field name="pronouns">
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label=""
+                      label="Pronouns"
                       placeholder="e.g., they/them, she/her, he/him"
-                      className="space-y-0"
                     />
                   )}
                 </form.Field>
               ) : (
-                <p className="text-base">{profile.pronouns || "Not set"}</p>
+                <>
+                  <Label>Pronouns</Label>
+                  <p className="text-base">{profile.pronouns || "Not set"}</p>
+                </>
               )}
             </div>
           </div>

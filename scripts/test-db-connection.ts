@@ -7,7 +7,7 @@ async function testConnections() {
   // Test pooled connection
   try {
     console.log("1. Testing pooled connection...");
-    const pooled = pooledDb();
+    const pooled = await pooledDb();
     const pooledResult = await pooled.execute(sql`SELECT current_database(), version()`);
     console.log("✅ Pooled connection successful");
     // Handle both result types
@@ -22,7 +22,7 @@ async function testConnections() {
   // Test unpooled connection
   try {
     console.log("\n2. Testing unpooled connection...");
-    const unpooled = unpooledDb();
+    const unpooled = await unpooledDb();
     const unpooledResult = await unpooled.execute(
       sql`SELECT current_database(), version()`,
     );
@@ -39,7 +39,7 @@ async function testConnections() {
   // Test auto-selected connection
   try {
     console.log("\n3. Testing auto-selected connection...");
-    const db = getDb();
+    const db = await getDb();
     const dbResult = await db.execute(sql`SELECT current_database(), version()`);
     console.log("✅ Auto-selected connection successful");
     // Handle both result types
@@ -54,7 +54,7 @@ async function testConnections() {
   // Test schema access
   try {
     console.log("\n4. Testing schema access...");
-    const db = getDb();
+    const db = await getDb();
     const users = await db.execute(sql`SELECT COUNT(*) as count FROM "user"`);
     console.log("✅ Schema access successful");
     // Handle both result types

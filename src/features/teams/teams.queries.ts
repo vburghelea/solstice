@@ -21,7 +21,7 @@ export const getTeam = createServerFn({ method: "POST" })
 
     const db = await getDb();
 
-    const result = await db()
+    const result = await db
       .select({
         team: teams,
         memberCount: sql<number>`count(distinct ${teamMembers.userId})::int`,
@@ -51,7 +51,7 @@ export const getTeamBySlug = createServerFn({ method: "POST" })
 
     const db = await getDb();
 
-    const result = await db()
+    const result = await db
       .select({
         team: teams,
         memberCount: sql<number>`count(distinct ${teamMembers.userId})::int`,
@@ -83,7 +83,7 @@ export const listTeams = createServerFn({ method: "POST" })
 
     const conditions = data?.includeInactive ? undefined : eq(teams.isActive, "true");
 
-    const result = await db()
+    const result = await db
       .select({
         team: teams,
         memberCount: sql<number>`count(distinct ${teamMembers.userId})::int`,
@@ -131,7 +131,7 @@ export const getUserTeams = createServerFn({ method: "POST" })
       ? undefined
       : eq(teamMembers.status, "active");
 
-    const result = await db()
+    const result = await db
       .select({
         team: teams,
         membership: {
@@ -181,7 +181,7 @@ export const getTeamMembers = createServerFn({ method: "POST" })
       data.includeInactive ? undefined : eq(teamMembers.status, "active"),
     );
 
-    const result = await db()
+    const result = await db
       .select({
         member: {
           id: teamMembers.id,
@@ -234,7 +234,7 @@ export const isTeamMember = createServerFn({ method: "POST" })
 
     const db = await getDb();
 
-    const result = await db()
+    const result = await db
       .select({
         isMember: sql<boolean>`COUNT(*) > 0`,
         role: teamMembers.role,
@@ -264,7 +264,7 @@ export const searchTeams = createServerFn({ method: "POST" })
     const db = await getDb();
     const searchTerm = `%${data.query}%`;
 
-    const result = await db()
+    const result = await db
       .select({
         team: teams,
         memberCount: sql<number>`count(distinct ${teamMembers.userId})::int`,

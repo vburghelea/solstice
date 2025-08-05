@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Button } from "~/components/ui/button";
 import {
   Card,

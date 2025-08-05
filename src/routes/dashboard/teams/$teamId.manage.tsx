@@ -49,9 +49,9 @@ const PROVINCES = [
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/manage")({
   loader: async ({ params }) => {
-    const team = await getTeam({ data: { teamId: params.teamId } });
-    if (!team) throw new Error("Team not found");
-    return { team };
+    const teamData = await getTeam({ data: { teamId: params.teamId } });
+    if (!teamData) throw new Error("Team not found");
+    return { teamData };
   },
   component: ManageTeamPage,
 });
@@ -60,8 +60,9 @@ function ManageTeamPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { teamId } = Route.useParams();
-  const { team: teamData } = Route.useLoaderData();
-  const { team } = teamData;
+  const { teamData } = Route.useLoaderData();
+  console.log("ManageTeamPage - teamData:", teamData);
+  const { team } = teamData || {};
   const [serverError, setServerError] = useState<string | null>(null);
 
   const updateTeamMutation = useMutation({
@@ -88,25 +89,27 @@ function ManageTeamPage() {
 
   const form = useForm({
     defaultValues: {
-      name: team.name,
-      description: team.description || "",
-      city: team.city || "",
-      province: team.province || "",
-      primaryColor: team.primaryColor || "#000000",
-      secondaryColor: team.secondaryColor || "#ffffff",
-      foundedYear: team.foundedYear || new Date().getFullYear().toString(),
-      website: team.website || "",
+      name: team?.name || "",
+      description: team?.description || "",
+      city: team?.city || "",
+      province: team?.province || "",
+      primaryColor: team?.primaryColor || "#000000",
+      secondaryColor: team?.secondaryColor || "#ffffff",
+      foundedYear: team?.foundedYear || new Date().getFullYear().toString(),
+      website: team?.website || "",
     },
     onSubmit: async ({ value }) => {
       setServerError(null);
       await updateTeamMutation.mutateAsync({
         data: {
           teamId,
-          ...value,
-          description: value.description || undefined,
-          city: value.city || undefined,
-          province: value.province || undefined,
-          website: value.website || undefined,
+          data: {
+            ...value,
+            description: value.description || undefined,
+            city: value.city || undefined,
+            province: value.province || undefined,
+            website: value.website || undefined,
+          },
         },
       });
     },
@@ -115,6 +118,10 @@ function ManageTeamPage() {
   const handleDeactivate = async () => {
     await deactivateTeamMutation.mutateAsync({ data: { teamId } });
   };
+
+  if (!team) {
+    return <div>Team not found (teamData: {JSON.stringify(teamData)})</div>;
+  }
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -126,7 +133,6 @@ function ManageTeamPage() {
           </Link>
         </Button>
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Manage Team Settings</CardTitle>

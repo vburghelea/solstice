@@ -1,9 +1,19 @@
 import { expect, test } from "@playwright/test";
+import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Browse Teams Page", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
+
+      // Wait for page to be ready
+      await expect(
+        page.getByRole("heading", { name: /Browse.*Teams|Find.*Team|Discover.*Teams/i }),
+      ).toBeVisible({ timeout: 15000 });
     });
 
     test("should display browse teams page", async ({ page }) => {
@@ -36,12 +46,12 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
       // Search for Thunder
       await searchInput.fill("Thunder");
+      await searchInput.press("Enter");
 
-      // Wait for search to execute (debounce + API call)
-      await page.waitForTimeout(2000);
+      // Wait for search results to update by checking for expected content
+      await expect(page.getByText("Test Thunder")).toBeVisible({ timeout: 5000 });
 
       // Should only show Test Thunder
-      await expect(page.getByText("Test Thunder")).toBeVisible();
       await expect(page.getByText("Test Lightning")).not.toBeVisible();
     });
 
@@ -50,12 +60,12 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
       // Search for Toronto
       await searchInput.fill("Toronto");
+      await searchInput.press("Enter");
 
-      // Wait for search to execute
-      await page.waitForTimeout(2000);
+      // Wait for search results to update by checking for expected content
+      await expect(page.getByText("Test Thunder")).toBeVisible({ timeout: 5000 });
 
       // Should only show Toronto team
-      await expect(page.getByText("Test Thunder")).toBeVisible();
       await expect(page.getByText("Test Lightning")).not.toBeVisible();
     });
 
@@ -64,12 +74,12 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
       // Search for non-existent team
       await searchInput.fill("NonexistentTeam");
-
-      // Wait for search to execute
-      await page.waitForTimeout(2000);
+      await searchInput.press("Enter");
 
       // Should show no results message
-      await expect(page.getByText(/No teams found|No results/i)).toBeVisible();
+      await expect(page.getByText(/No teams found|No results/i)).toBeVisible({
+        timeout: 5000,
+      });
     });
 
     test("should clear search results", async ({ page }) => {
@@ -91,7 +101,16 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
   test.describe("Join Team Flow", () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto("/dashboard/teams/browse");
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
+
+      // Wait for page to be ready
+      await expect(
+        page.getByRole("heading", { name: /Browse.*Teams|Find.*Team|Discover.*Teams/i }),
+      ).toBeVisible({ timeout: 15000 });
     });
 
     test("should show join button for teams user is not in", async () => {
@@ -133,6 +152,19 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   });
 
   test.describe("Team Filtering", () => {
+    test.beforeEach(async ({ page }) => {
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
+
+      // Wait for page to be ready
+      await expect(
+        page.getByRole("heading", { name: /Browse.*Teams|Find.*Team|Discover.*Teams/i }),
+      ).toBeVisible({ timeout: 15000 });
+    });
+
     test("should filter teams by province", async ({ page }) => {
       // If province filter exists
       const provinceFilter = page.getByLabel("Province");
@@ -175,6 +207,19 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   });
 
   test.describe("Team Quick Actions", () => {
+    test.beforeEach(async ({ page }) => {
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
+
+      // Wait for page to be ready
+      await expect(
+        page.getByRole("heading", { name: /Browse.*Teams|Find.*Team|Discover.*Teams/i }),
+      ).toBeVisible({ timeout: 15000 });
+    });
+
     test("should view team details from browse page", async ({ page }) => {
       // Click the View Team link for Test Thunder
       const viewTeamLink = page.getByRole("link", { name: "View Team" }).first();
@@ -187,14 +232,24 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
     test("should show team member count", async ({ page }) => {
       // Member count is displayed for each team
-      // First team (Test Thunder) should show Members: 1
-      const membersLabel = page.getByText("Members").first();
-      await expect(membersLabel).toBeVisible();
+      // Teams are displayed in cards, each showing member count
 
-      // The count is in a separate element next to the label
-      const memberCount = membersLabel.locator("..").getByText(/\d+/);
-      await expect(memberCount).toBeVisible();
-      await expect(memberCount).toHaveText("1");
+      // Check that we have team cards
+      const teamCards = page.locator('[data-slot="card"]');
+      await expect(teamCards).toHaveCount(2);
+
+      // For Test Thunder team - look for the specific card
+      const thunderCard = teamCards.filter({ hasText: "Test Thunder" });
+      await expect(thunderCard).toBeVisible();
+      await expect(thunderCard.getByText("Members")).toBeVisible();
+      // The "1" is the member count
+      await expect(thunderCard.getByText("1", { exact: true })).toBeVisible();
+
+      // For Test Lightning team
+      const lightningCard = teamCards.filter({ hasText: "Test Lightning" });
+      await expect(lightningCard).toBeVisible();
+      await expect(lightningCard.getByText("Members")).toBeVisible();
+      await expect(lightningCard.getByText("1", { exact: true })).toBeVisible();
     });
 
     test.skip("should show team colors", async ({ page }) => {
@@ -213,6 +268,19 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   });
 
   test.describe("Empty States", () => {
+    test.beforeEach(async ({ page }) => {
+      // Navigate to browse teams page with authentication
+      await gotoWithAuth(page, "/dashboard/teams/browse", {
+        email: process.env["E2E_TEST_EMAIL"]!,
+        password: process.env["E2E_TEST_PASSWORD"]!,
+      });
+
+      // Wait for page to be ready
+      await expect(
+        page.getByRole("heading", { name: /Browse.*Teams|Find.*Team|Discover.*Teams/i }),
+      ).toBeVisible({ timeout: 15000 });
+    });
+
     test("should show appropriate message when no teams exist", async () => {
       // This would require clearing all teams from the database
       // or mocking the API response

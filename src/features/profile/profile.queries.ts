@@ -71,7 +71,7 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
 
       const db = await getDb();
 
-      const [dbUser] = await db()
+      const [dbUser] = await db
         .select()
         .from(user)
         .where(eq(user.id, session.user.id))
@@ -126,7 +126,7 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
 
       const db = await getDb();
 
-      const [dbUser] = await db()
+      const [dbUser] = await db
         .select()
         .from(user)
         .where(eq(user.id, session.user.id))

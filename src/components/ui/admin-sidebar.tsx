@@ -54,25 +54,18 @@ export function AdminSidebar() {
     setIsLoggingOut(true);
 
     try {
-      // Use Better Auth's signOut with fetchOptions as documented
-      await auth.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            // Clear client state
-            queryClient.clear();
-            // Force hard navigation to login page
-            window.location.href = "/auth/login";
-          },
-          onError: (error) => {
-            console.error("Logout error:", error);
-            // Even on error, navigate to login
-            window.location.href = "/auth/login";
-          },
-        },
-      });
+      // Use Better Auth's signOut
+      await auth.signOut();
+
+      // Clear client state
+      queryClient.clear();
+
+      // Force hard navigation to login page
+      window.location.href = "/auth/login";
     } catch (error) {
       console.error("Logout failed:", error);
-      // Fallback navigation
+      // Even on error, clear state and navigate to login
+      queryClient.clear();
       window.location.href = "/auth/login";
     }
   };

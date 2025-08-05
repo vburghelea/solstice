@@ -30,11 +30,12 @@ import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/team
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
-import { ServerRoute as ApiLogoutServerRouteImport } from "./routes/api/logout";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
+import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
 import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
@@ -136,6 +137,12 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardTeamsTeamIdIndexRoute =
+  DashboardTeamsTeamIdIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => DashboardTeamsTeamIdRoute,
+  } as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
     id: "/members",
@@ -148,11 +155,6 @@ const DashboardTeamsTeamIdManageRoute =
     path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
-const ApiLogoutServerRoute = ApiLogoutServerRouteImport.update({
-  id: "/api/logout",
-  path: "/api/logout",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
   path: "/api/health",
@@ -161,6 +163,11 @@ const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
 const ApiWebhooksSquareServerRoute = ApiWebhooksSquareServerRouteImport.update({
   id: "/api/webhooks/square",
   path: "/api/webhooks/square",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiTestCleanupServerRoute = ApiTestCleanupServerRouteImport.update({
+  id: "/api/test/cleanup",
+  path: "/api/test/cleanup",
   getParentRoute: () => rootServerRouteImport,
 } as any);
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -203,6 +210,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
@@ -217,12 +225,12 @@ export interface FileRoutesByTo {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
-  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -271,7 +280,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams/create"
     | "/dashboard/teams/"
     | "/dashboard/teams/$teamId/manage"
-    | "/dashboard/teams/$teamId/members";
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
@@ -286,12 +296,12 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard"
     | "/onboarding"
-    | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/dashboard/teams"
     | "/dashboard/teams/$teamId/manage"
-    | "/dashboard/teams/$teamId/members";
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/teams/$teamId";
   id:
     | "__root__"
     | "/"
@@ -314,7 +324,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams/create"
     | "/dashboard/teams/"
     | "/dashboard/teams/$teamId/manage"
-    | "/dashboard/teams/$teamId/members";
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -325,16 +336,16 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
-  "/api/logout": typeof ApiLogoutServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
 }
 export interface FileServerRoutesByTo {
   "/api/health": typeof ApiHealthServerRoute;
-  "/api/logout": typeof ApiLogoutServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
@@ -342,8 +353,8 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
   "/api/health": typeof ApiHealthServerRoute;
-  "/api/logout": typeof ApiLogoutServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
   "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
@@ -352,24 +363,24 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
   fullPaths:
     | "/api/health"
-    | "/api/logout"
     | "/api/auth/$"
+    | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
     | "/api/payments/square/callback";
   fileServerRoutesByTo: FileServerRoutesByTo;
   to:
     | "/api/health"
-    | "/api/logout"
     | "/api/auth/$"
+    | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
     | "/api/payments/square/callback";
   id:
     | "__root__"
     | "/api/health"
-    | "/api/logout"
     | "/api/auth/$"
+    | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
     | "/api/payments/square/callback";
@@ -377,8 +388,8 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiHealthServerRoute: typeof ApiHealthServerRoute;
-  ApiLogoutServerRoute: typeof ApiLogoutServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+  ApiTestCleanupServerRoute: typeof ApiTestCleanupServerRoute;
   ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
   ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
   ApiPaymentsSquareCallbackServerRoute: typeof ApiPaymentsSquareCallbackServerRoute;
@@ -519,6 +530,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/teams/$teamId/": {
+      id: "/dashboard/teams/$teamId/";
+      path: "/";
+      fullPath: "/dashboard/teams/$teamId/";
+      preLoaderRoute: typeof DashboardTeamsTeamIdIndexRouteImport;
+      parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
       path: "/members";
@@ -537,13 +555,6 @@ declare module "@tanstack/react-router" {
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
-    "/api/logout": {
-      id: "/api/logout";
-      path: "/api/logout";
-      fullPath: "/api/logout";
-      preLoaderRoute: typeof ApiLogoutServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
     "/api/health": {
       id: "/api/health";
       path: "/api/health";
@@ -556,6 +567,13 @@ declare module "@tanstack/react-start/server" {
       path: "/api/webhooks/square";
       fullPath: "/api/webhooks/square";
       preLoaderRoute: typeof ApiWebhooksSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/test/cleanup": {
+      id: "/api/test/cleanup";
+      path: "/api/test/cleanup";
+      fullPath: "/api/test/cleanup";
+      preLoaderRoute: typeof ApiTestCleanupServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
     "/api/auth/$": {
@@ -599,11 +617,13 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
+  DashboardTeamsTeamIdIndexRoute: typeof DashboardTeamsTeamIdIndexRoute;
 }
 
 const DashboardTeamsTeamIdRouteChildren: DashboardTeamsTeamIdRouteChildren = {
   DashboardTeamsTeamIdManageRoute: DashboardTeamsTeamIdManageRoute,
   DashboardTeamsTeamIdMembersRoute: DashboardTeamsTeamIdMembersRoute,
+  DashboardTeamsTeamIdIndexRoute: DashboardTeamsTeamIdIndexRoute,
 };
 
 const DashboardTeamsTeamIdRouteWithChildren =
@@ -676,8 +696,8 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHealthServerRoute: ApiHealthServerRoute,
-  ApiLogoutServerRoute: ApiLogoutServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiTestCleanupServerRoute: ApiTestCleanupServerRoute,
   ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
   ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,
   ApiPaymentsSquareCallbackServerRoute: ApiPaymentsSquareCallbackServerRoute,

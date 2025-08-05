@@ -11,7 +11,7 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
     // Check page heading
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Acme Inc." }),
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
     ).toBeVisible();
 
     // Check form elements using labels and roles
@@ -33,7 +33,7 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
     // Check page heading
     await expect(
-      page.getByRole("heading", { name: "Sign up for Acme Inc." }),
+      page.getByRole("heading", { name: "Sign up for Quadball Canada" }),
     ).toBeVisible();
 
     // Check form elements using labels
@@ -62,14 +62,14 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
     await page.getByRole("main").getByRole("link", { name: "Sign up" }).click();
     await expect(page).toHaveURL("/auth/signup");
     await expect(
-      page.getByRole("heading", { name: "Sign up for Acme Inc." }),
+      page.getByRole("heading", { name: "Sign up for Quadball Canada" }),
     ).toBeVisible();
 
     // Click login link
     await page.getByRole("main").getByRole("link", { name: "Login" }).click();
     await expect(page).toHaveURL("/auth/login");
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Acme Inc." }),
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
     ).toBeVisible();
   });
 
@@ -80,7 +80,7 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
     // Should redirect to login
     await expect(page).toHaveURL(/\/auth\/login/);
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Acme Inc." }),
+      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
     ).toBeVisible();
   });
 

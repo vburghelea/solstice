@@ -1,5 +1,4 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { db } from "~/db";
 import { roles, userRoles } from "~/db/schema";
 
 export class PermissionService {
@@ -7,7 +6,9 @@ export class PermissionService {
    * Check if a user has global admin permissions
    */
   static async isGlobalAdmin(userId: string): Promise<boolean> {
-    const [row] = await db()
+    const { db } = await import("~/db");
+    const database = await db();
+    const [row] = await database
       .select()
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
@@ -30,7 +31,9 @@ export class PermissionService {
     if (await this.isGlobalAdmin(userId)) return true;
 
     // Check for team-specific admin role
-    const [row] = await db()
+    const { db } = await import("~/db");
+    const database = await db();
+    const [row] = await database
       .select()
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
@@ -54,7 +57,9 @@ export class PermissionService {
     if (await this.isGlobalAdmin(userId)) return true;
 
     // Check for event-specific admin role
-    const [row] = await db()
+    const { db } = await import("~/db");
+    const database = await db();
+    const [row] = await database
       .select()
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
@@ -74,7 +79,9 @@ export class PermissionService {
    * Get all roles for a user including scope information
    */
   static async getUserRoles(userId: string) {
-    const userRolesList = await db()
+    const { db } = await import("~/db");
+    const database = await db();
+    const userRolesList = await database
       .select({
         id: userRoles.id,
         userId: userRoles.userId,

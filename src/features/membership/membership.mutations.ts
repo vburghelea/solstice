@@ -65,7 +65,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
         // Verify membership type exists and is active
 
-        const [membershipType] = await db()
+        const [membershipType] = await db
           .select()
           .from(membershipTypes)
           .where(
@@ -89,7 +89,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         }
 
         // Check if user already has an active membership
-        const [existingMembership] = await db()
+        const [existingMembership] = await db
           .select()
           .from(memberships)
           .where(
@@ -194,7 +194,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
 
       // Get membership type details
 
-      const [membershipType] = await db()
+      const [membershipType] = await db
         .select()
         .from(membershipTypes)
         .where(eq(membershipTypes.id, data.membershipTypeId))
@@ -218,7 +218,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
       endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
 
       // Create membership record
-      const [newMembership] = await db()
+      const [newMembership] = await db
         .insert(memberships)
         .values({
           userId: session.user.id,

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { inviteToGame } from "~/features/games/games.mutations";
+import { inviteToGame, removeGameParticipant } from "~/features/games/games.mutations";
 import { searchUsersForInvitation } from "~/features/games/games.queries";
 import type { GameParticipant } from "~/features/games/games.types";
 import { useRateLimitedServerFn } from "~/lib/pacer";
@@ -60,6 +60,23 @@ export function InviteParticipants({
     },
   });
 
+  const revokeMutation = useMutation<
+    OperationResult<boolean>,
+    Error,
+    { data: { id: string } }
+  >({
+    mutationFn: removeGameParticipant,
+    onSuccess: () => {
+      toast.success("Invitation revoked successfully!");
+      queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] }); // Invalidate participants list
+    },
+    onError: (error) => {
+      toast.error(`Failed to revoke invitation: ${error.message}`);
+    },
+  });
+
   const handleInviteUser = (userId: string) => {
     inviteMutation.mutate({ data: { gameId, userId, role: "invited" } });
   };
@@ -71,6 +88,14 @@ export function InviteParticipants({
       });
     }
   };
+
+  const handleRevokeInvitation = (participantId: string) => {
+    revokeMutation.mutate({ data: { id: participantId } });
+  };
+
+  const pendingInvites = currentParticipants.filter(
+    (p) => p.role === "invited" && p.status === "pending",
+  );
 
   return (
     <Card>

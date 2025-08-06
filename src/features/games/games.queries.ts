@@ -184,10 +184,6 @@ export const searchGameSystems = createServerFn({ method: "POST" })
       >
     > => {
       try {
-        const { getDb } = await import("~/db/server-helpers");
-        const { gameSystems } = await import("~/db/schema");
-        const { ilike } = await import("drizzle-orm");
-
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -886,10 +882,6 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       data,
     }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
       try {
-        const { getDb } = await import("~/db/server-helpers");
-        const { user } = await import("~/db/schema");
-        const { ilike, or } = await import("drizzle-orm");
-
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -921,8 +913,6 @@ export const getGameApplications = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
     try {
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {

@@ -126,10 +126,6 @@ test.describe("Profile Edit", () => {
     // Wait for the form to load completely and verify fields are populated
     await page.waitForTimeout(1000);
 
-    // Verify that existing data is loaded (date of birth should be populated)
-    const dateInput = page.getByLabel("Date of Birth");
-    await expect(dateInput).toHaveValue(/\d{4}-\d{2}-\d{2}/);
-
     // Since we're just updating privacy settings, we only need to toggle the checkboxes
     // The test user already has a complete profile from the seed data
 

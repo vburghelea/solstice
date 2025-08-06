@@ -668,11 +668,11 @@ test.describe("Team Creation Without Conflict", () => {
     await page
       .getByLabel("Description")
       .fill("This is a test team created by a user with no existing team membership");
-    await page.getByLabel("City").fill("Vancouver");
+    await page.getByLabel("City").fill("Berlin");
 
-    // Select province from combobox
-    await page.getByLabel("Province").click();
-    await page.getByRole("option", { name: "British Columbia" }).click();
+    // Select country from combobox
+    await page.getByLabel("Country").click();
+    await page.getByRole("option", { name: "Germany" }).click();
 
     await page.getByLabel("Founded Year").fill("2024");
     await page.getByLabel("Website").fill("https://no-conflict.example.com");
@@ -1734,7 +1734,6 @@ test.describe("Profile Edit", () => {
     await expect(page.getByRole("button", { name: /Cancel/i })).toBeVisible();
 
     // Check that input fields are visible - use more specific selectors
-    await expect(page.getByLabel("Date of Birth")).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Phone Number" })).toBeVisible();
     await expect(page.getByLabel("Gender")).toBeVisible();
     await expect(page.getByLabel("Pronouns")).toBeVisible();
@@ -1795,38 +1794,6 @@ test.describe("Profile Edit", () => {
     await expect(page.getByText("+1 (555) 987-6543")).toBeVisible();
     await expect(page.getByText("they/them")).toBeVisible();
     await expect(page.getByText("non-binary")).toBeVisible();
-  });
-
-  test("should update emergency contact", async ({ page }) => {
-    // Enter edit mode
-    await page.getByRole("button", { name: /Edit Profile/i }).click();
-    
-    // Wait for edit mode to be fully activated
-    await expect(page.getByRole("button", { name: /Save Changes/i })).toBeVisible();
-
-    // Fill emergency contact information
-    await page.getByLabel("Contact Name").fill("Jane Doe");
-    await page.getByLabel("Relationship").fill("Spouse");
-    await page.getByLabel("Contact Phone").fill("+1 (555) 111-2222");
-    await page.getByLabel("Contact Email").fill("jane.doe@example.com");
-
-    // Save changes
-    await page.getByRole("button", { name: /Save Changes/i }).click();
-
-    // Wait for success toast
-    await expect(page.getByText("Profile updated successfully")).toBeVisible({ timeout: 10000 });
-
-    // Wait for edit mode to exit - Save Changes button should disappear
-    await expect(page.getByRole("button", { name: /Save Changes/i })).not.toBeVisible({ timeout: 10000 });
-    
-    // Check that edit mode is exited
-    await expect(page.getByRole("button", { name: /Edit Profile/i })).toBeVisible({ timeout: 10000 });
-    
-    // Check that emergency contact is displayed
-    await expect(page.getByText("Jane Doe")).toBeVisible();
-    await expect(page.getByText("Spouse")).toBeVisible();
-    await expect(page.getByText("+1 (555) 111-2222")).toBeVisible();
-    await expect(page.getByText("jane.doe@example.com")).toBeVisible();
   });
 
   test("should update privacy settings", async ({ page }) => {
@@ -3424,14 +3391,14 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
       });
     });
 
-    test("should filter teams by province", async ({ page }) => {
-      // If province filter exists
-      const provinceFilter = page.getByLabel("Province");
-      if (await provinceFilter.isVisible()) {
-        await provinceFilter.click();
-        await page.getByRole("option", { name: "Ontario" }).click();
+    test("should filter teams by country", async ({ page }) => {
+      // If country filter exists
+      const countryFilter = page.getByLabel("Country");
+      if (await countryFilter.isVisible()) {
+        await countryFilter.click();
+        await page.getByRole("option", { name: "Germany" }).click();
 
-        // Should only show Ontario teams
+        // Should only show Germany teams
         await expect(page.getByText("Test Thunder")).toBeVisible();
         await expect(page.getByText("Test Lightning")).not.toBeVisible();
       }
@@ -3692,7 +3659,7 @@ test.describe("Teams Management (Authenticated)", () => {
       await expect(page.getByLabel("URL Slug")).toBeVisible();
       await expect(page.getByLabel("Description")).toBeVisible();
       await expect(page.getByLabel("City")).toBeVisible();
-      await expect(page.getByLabel("Province")).toBeVisible();
+      await expect(page.getByLabel("Country")).toBeVisible();
       await expect(page.getByLabel("Primary Color")).toBeVisible();
       await expect(page.getByLabel("Secondary Color")).toBeVisible();
       await expect(page.getByLabel("Founded Year")).toBeVisible();
@@ -4201,42 +4168,13 @@ test.describe("Authentication Form Validation (Unauthenticated)", () => {
 <file path="src/features/profile/profile.schemas.ts">
 import { z } from "zod";
 
-export const emergencyContactSchema = z
-  .object({
-    name: z.string().min(1, "Emergency contact name is required"),
-    relationship: z.string().min(1, "Relationship is required"),
-    phone: z.string().optional(),
-    email: z.string().email("Invalid emergency contact email").optional(),
-  })
-  .refine((data) => data.phone || data.email, {
-    message: "Please provide at least one contact method (phone or email)",
-    path: ["phone"], // This will show the error on the phone field
-  });
-
 export const privacySettingsSchema = z.object({
   showEmail: z.boolean(),
   showPhone: z.boolean(),
-  showBirthYear: z.boolean(),
   allowTeamInvitations: z.boolean(),
 });
 
 export const profileInputSchema = z.object({
-  dateOfBirth: z.preprocess(
-    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
-    z.date(),
-  ).refine(
-    (date) => {
-      const age = new Date().getFullYear() - date.getFullYear();
-      const m = new Date().getMonth() - date.getMonth();
-      let finalAge = age;
-      if (m < 0 || (m === 0 && new Date().getDate() < date.getDate())) {
-        finalAge--;
-      }
-      return finalAge >= 13 && finalAge <= 120;
-    },
-    { message: "You must be between 13 and 120 years old" },
-  ),
-  emergencyContact: emergencyContactSchema.optional(),
   gender: z.string().optional(),
   pronouns: z.string().optional(),
   phone: z.string().optional(),

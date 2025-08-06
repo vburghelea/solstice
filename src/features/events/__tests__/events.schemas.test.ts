@@ -43,7 +43,7 @@ describe("Events Schemas", () => {
         const result = listEventsSchema.safeParse({
           filters: {
             type: ["tournament", "league"],
-            city: "Vancouver",
+            city: "Berlin",
           },
           sortBy: "name",
         });

@@ -1,14 +1,13 @@
 import { useReducer } from "react";
 import type { ProfileInputType } from "~/features/profile/profile.schemas";
 
-export type StepId = "personal" | "emergency" | "privacy";
+export type StepId = "personal" | "privacy";
 
 interface ProfileFormState {
   currentStep: StepId;
   isSubmitting: boolean;
   error: string | null;
   formData: ProfileInputType;
-  emergencyContactStarted: boolean;
 }
 
 type ProfileFormAction =
@@ -16,7 +15,6 @@ type ProfileFormAction =
   | { type: "SET_SUBMITTING"; isSubmitting: boolean }
   | { type: "SET_ERROR"; error: string | null }
   | { type: "UPDATE_FORM_DATA"; data: Partial<ProfileInputType> }
-  | { type: "SET_EMERGENCY_STARTED"; started: boolean }
   | { type: "RESET_FORM" }
   | { type: "SUBMIT_START" }
   | { type: "SUBMIT_SUCCESS" }
@@ -36,7 +34,6 @@ const initialState: ProfileFormState = {
       allowTeamInvitations: true,
     },
   },
-  emergencyContactStarted: false,
 };
 
 function profileFormReducer(
@@ -58,9 +55,6 @@ function profileFormReducer(
         ...state,
         formData: { ...state.formData, ...action.data },
       };
-
-    case "SET_EMERGENCY_STARTED":
-      return { ...state, emergencyContactStarted: action.started };
 
     case "RESET_FORM":
       return initialState;
@@ -93,8 +87,6 @@ export function useProfileFormReducer() {
     setStep: (step: StepId) => dispatch({ type: "SET_STEP", step }),
     updateFormData: (data: Partial<ProfileInputType>) =>
       dispatch({ type: "UPDATE_FORM_DATA", data }),
-    setEmergencyStarted: (started: boolean) =>
-      dispatch({ type: "SET_EMERGENCY_STARTED", started }),
     submitStart: () => dispatch({ type: "SUBMIT_START" }),
     submitSuccess: () => dispatch({ type: "SUBMIT_SUCCESS" }),
     submitError: (error: string) => dispatch({ type: "SUBMIT_ERROR", error }),

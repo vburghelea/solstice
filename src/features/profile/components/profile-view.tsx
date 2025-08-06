@@ -19,7 +19,6 @@ import { Button } from "~/shared/ui/button";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
-import type { ProfileInput } from "../profile.types";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 export function ProfileView() {
@@ -53,48 +52,48 @@ export function ProfileView() {
       privacySettings: {
         showEmail: false,
         showPhone: false,
-        allowTeamInvitations: true,
+        allowTeamInvitations: false,
       },
     } as PartialProfileInputType,
     onSubmit: async ({ value }) => {
-      // Build ProfileInput with only changed/meaningful values
-      // Use a more flexible type since we need to handle Date serialization
-      const dataToSubmit: Record<string, unknown> = {};
+      // Build ProfileInput with only changed. The values are already typed.
+      try {
+        const dataToSubmit: Record<string, unknown> = {};
 
         // Track if we have any actual changes to submit
         let hasChanges = false;
 
-        if (value.gender !== (profile?.gender || "")) {
+        if (value.gender !== (profile?.["gender"] || "")) {
           if (value.gender) {
-            dataToSubmit.gender = value.gender;
+            dataToSubmit["gender"] = value.gender;
           } else {
             // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
-            delete dataToSubmit.gender;
+            delete dataToSubmit["gender"];
           }
           hasChanges = true;
         }
-        if (value.pronouns !== (profile?.pronouns || "")) {
+        if (value.pronouns !== (profile?.["pronouns"] || "")) {
           if (value.pronouns) {
-            dataToSubmit.pronouns = value.pronouns;
+            dataToSubmit["pronouns"] = value.pronouns;
           } else {
-            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
-            delete dataToSubmit.pronouns;
+            // With exactOptionalPropertyTypes. we need to delete the property instead of setting it to undefined
+            delete dataToSubmit["pronouns"];
           }
           hasChanges = true;
         }
-        if (value.phone !== (profile?.phone || "")) {
+        if (value.phone !== (profile?.["phone"] || "")) {
           if (value.phone) {
-            dataToSubmit.phone = value.phone;
+            dataToSubmit["phone"] = value.phone;
           } else {
-            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
-            delete dataToSubmit.phone;
+            // With exactOptionalPropertyTypes. we need to delete the property instead of setting it to undefined
+            delete dataToSubmit["phone"];
           }
           hasChanges = true;
         }
 
         // Check if game system preferences have changed
-        const currentFavorites = profile?.gameSystemPreferences?.favorite || [];
-        const currentAvoid = profile?.gameSystemPreferences?.avoid || [];
+        const currentFavorites = profile?.["gameSystemPreferences"]?.favorite || [];
+        const currentAvoid = profile?.["gameSystemPreferences"]?.avoid || [];
         const newFavorites = value.gameSystemPreferences?.favorite || [];
         const newAvoid = value.gameSystemPreferences?.avoid || [];
 
@@ -109,16 +108,16 @@ export function ProfileView() {
             (value.gameSystemPreferences.favorite.length > 0 ||
               value.gameSystemPreferences.avoid.length > 0)
           ) {
-            dataToSubmit.gameSystemPreferences = value.gameSystemPreferences;
+            dataToSubmit["gameSystemPreferences"] = value.gameSystemPreferences;
           } else {
             // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
-            delete dataToSubmit.gameSystemPreferences;
+            delete dataToSubmit["gameSystemPreferences"];
           }
           hasChanges = true;
         }
 
         // Check if privacy settings have changed
-        const currentPrivacy = profile?.privacySettings || {
+        const currentPrivacy = profile?.["privacySettings"] || {
           showEmail: false,
           showPhone: false,
           allowTeamInvitations: true,
@@ -134,7 +133,7 @@ export function ProfileView() {
           newPrivacy.showPhone !== currentPrivacy.showPhone ||
           newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations
         ) {
-          dataToSubmit.privacySettings = newPrivacy;
+          dataToSubmit["privacySettings"] = newPrivacy;
           hasChanges = true;
         }
 
@@ -168,9 +167,6 @@ export function ProfileView() {
         toast.error(errorMessage);
         console.error("Profile update error:", error);
         // Don't throw - let form remain interactive
-      } finally {
-        // Don't reset form on error - this was causing fields to clear
-        // TanStack Form handles submission state automatically
       }
     },
   });
@@ -244,7 +240,7 @@ export function ProfileView() {
     return (
       <div className="p-8 text-center">
         <p className="text-muted-foreground">{errorMessage}</p>
-        {profileResult?.errors?.[0]?.code === "VALIDATION_ERROR" && (
+        {profileResult?.errors?.[0].code === "VALIDATION_ERROR" && (
           <p className="text-muted-foreground mt-2 text-sm">
             Please try logging in again
           </p>
@@ -345,7 +341,7 @@ export function ProfileView() {
               ) : (
                 <>
                   <Label>Phone Number</Label>
-                  <p className="text-base">{profile.phone || "Not set"}</p>
+                  <p className="text-base">{profile?.["phone"] || "Not set"}</p>
                 </>
               )}
             </div>
@@ -365,7 +361,7 @@ export function ProfileView() {
               ) : (
                 <>
                   <Label>Gender</Label>
-                  <p className="text-base">{profile.gender || "Not set"}</p>
+                  <p className="text-base">{profile?.["gender"] || "Not set"}</p>
                 </>
               )}
             </div>
@@ -384,7 +380,7 @@ export function ProfileView() {
               ) : (
                 <>
                   <Label>Pronouns</Label>
-                  <p className="text-base">{profile.pronouns || "Not set"}</p>
+                  <p className="text-base">{profile?.["pronouns"] || "Not set"}</p>
                 </>
               )}
             </div>
@@ -421,10 +417,7 @@ export function ProfileView() {
 
               <form.Field name="privacySettings.allowTeamInvitations">
                 {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Allow team captains to send me invitations"
-                  />
+                  <ValidatedCheckbox field={field} label="Allow team invitations" />
                 )}
               </form.Field>
             </div>
@@ -432,21 +425,21 @@ export function ProfileView() {
             <div className="space-y-2">
               <p className="text-sm">
                 <span className="font-medium">Email visibility:</span>{" "}
-                {profile.privacySettings?.showEmail
+                {profile["privacySettings"]?.showEmail
                   ? "Visible to team members"
                   : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Phone visibility:</span>{" "}
-                {profile.privacySettings?.showPhone
+                {profile["privacySettings"]?.showPhone
                   ? "Visible to team members"
                   : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Team invitations:</span>{" "}
-                {profile.privacySettings?.allowTeamInvitations !== false
+                {profile["privacySettings"]?.allowTeamInvitations !== false
                   ? "Allowed"
-                  : "Not allowed"}
+                  : "Not Allowed"}
               </p>
             </div>
           )}
@@ -479,8 +472,8 @@ export function ProfileView() {
               <div>
                 <h4 className="font-medium">Favorite Game Systems</h4>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {profile.gameSystemPreferences?.favorite.length ? (
-                    profile.gameSystemPreferences.favorite.map((gameSystem) => (
+                  {profile["gameSystemPreferences"]?.favorite.length ? (
+                    profile["gameSystemPreferences"].favorite.map((gameSystem) => (
                       <span
                         key={gameSystem.id}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
@@ -498,8 +491,8 @@ export function ProfileView() {
               <div>
                 <h4 className="font-medium">Game Systems to Avoid</h4>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {profile.gameSystemPreferences?.avoid.length ? (
-                    profile.gameSystemPreferences.avoid.map((gameSystem) => (
+                  {profile["gameSystemPreferences"]?.avoid.length ? (
+                    profile["gameSystemPreferences"].avoid.map((gameSystem) => (
                       <span
                         key={gameSystem.id}
                         className="bg-destructive text-destructive-foreground rounded-md px-2 py-1 text-sm"
@@ -528,15 +521,16 @@ export function ProfileView() {
         <CardContent className="space-y-2">
           <p className="text-sm">
             <span className="font-medium">Profile Status:</span>{" "}
-            {profile.profileComplete ? "Complete" : "Incomplete"}
+            {profile["profileComplete"] ? "Complete" : "Incomplete"}
           </p>
           <p className="text-sm">
-            <span className="font-medium">Profile Version:</span> {profile.profileVersion}
+            <span className="font-medium">Profile Version:</span>{" "}
+            {profile["profileVersion"]}
           </p>
           <p className="text-sm">
             <span className="font-medium">Last Updated:</span>{" "}
-            {profile.profileUpdatedAt
-              ? new Date(profile.profileUpdatedAt).toLocaleString()
+            {profile["profileUpdatedAt"]
+              ? new Date(profile["profileUpdatedAt"]).toLocaleString()
               : "Never"}
           </p>
         </CardContent>

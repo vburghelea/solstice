@@ -1,6 +1,18 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  LinkIcon,
+  MapPinIcon,
+  UsersIcon,
+} from "lucide-react";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
+import { Avatar, AvatarFallback, AvatarImage } from "~/shared/ui/avatar";
+import { Badge } from "~/shared/ui/badge";
+import { Button } from "~/shared/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/shared/ui/card";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({
   loader: async ({ params }) => {

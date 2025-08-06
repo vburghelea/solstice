@@ -59,7 +59,7 @@ function TeamDetailsPage() {
               <p className="text-muted-foreground mt-1 flex items-center">
                 <MapPinIcon className="mr-1 h-4 w-4" />
                 {team.city}
-                {team.province ? `, ${team.province}` : ""}
+                {team.country ? `, ${team.country}` : ""}
               </p>
             )}
           </div>

@@ -6,8 +6,8 @@ import postgres from "postgres";
 import * as schema from "./schema";
 
 // Singleton instances
-let pooledInstance: ReturnType<typeof drizzleNeon> | null = null;
-let unpooledInstance: ReturnType<typeof drizzlePostgres> | null = null;
+let pooledInstance: ReturnType<typeof drizzleNeon<typeof schema>> | null = null;
+let unpooledInstance: ReturnType<typeof drizzlePostgres<typeof schema>> | null = null;
 let poolInstance: Pool | null = null;
 let sqlInstance: ReturnType<typeof postgres> | null = null;
 

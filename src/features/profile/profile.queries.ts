@@ -177,7 +177,7 @@ export const getGameSystems = createServerFn({ method: "GET" })
         };
       }
 
-      const systems = await db()
+      const systems = await db
         .select()
         .from(gameSystems)
         .where(ilike(gameSystems.name, `%${data.searchTerm}%`));
@@ -222,7 +222,7 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
         throw new Error("Not authenticated");
       }
 
-      const preferences = await db()
+      const preferences = await db
         .select()
         .from(userGameSystemPreferences)
         .where(eq(userGameSystemPreferences.userId, currentUser.id));
@@ -242,7 +242,7 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
 
       let preferredGameSystems: { id: number; name: string }[] = [];
       if (allPreferredIds.length > 0) {
-        preferredGameSystems = await db()
+        preferredGameSystems = await db
           .select({ id: gameSystems.id, name: gameSystems.name })
           .from(gameSystems)
           .where(inArray(gameSystems.id, allPreferredIds));

@@ -33,6 +33,7 @@ import { GameParticipant, GameWithDetails } from "./games.types";
 export const createGame = createServerFn({ method: "POST" })
   .validator(createGameInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
+    console.log("createGame mutation called with data:", data);
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");

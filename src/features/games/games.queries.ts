@@ -170,7 +170,19 @@ export const searchGameSystems = createServerFn({ method: "POST" })
 export const searchGameSystems = createServerFn({ method: "POST" })
   .validator(searchGameSystemsSchema.parse)
   .handler(
-    async ({ data }): Promise<OperationResult<Array<{ id: number; name: string }>>> => {
+    async ({
+      data,
+    }): Promise<
+      OperationResult<
+        Array<{
+          id: number;
+          name: string;
+          averagePlayTime: number | null;
+          minPlayers: number | null;
+          maxPlayers: number | null;
+        }>
+      >
+    > => {
       try {
         const { getDb } = await import("~/db/server-helpers");
         const { gameSystems } = await import("~/db/schema");
@@ -183,6 +195,9 @@ export const searchGameSystems = createServerFn({ method: "POST" })
           .select({
             id: gameSystems.id,
             name: gameSystems.name,
+            averagePlayTime: gameSystems.averagePlayTime,
+            minPlayers: gameSystems.minPlayers,
+            maxPlayers: gameSystems.maxPlayers,
           })
           .from(gameSystems)
           .where(ilike(gameSystems.name, searchTerm))

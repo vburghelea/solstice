@@ -176,11 +176,47 @@ export function GameForm({
     }
   }, [form, effectiveGameSystem]);
 
+  // Update form fields when game system changes
+  React.useEffect(() => {
+    if (selectedGameSystem) {
+      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime || 1);
+      form.setFieldValue(
+        "minimumRequirements.minPlayers",
+        selectedGameSystem.minPlayers || 1,
+      );
+      form.setFieldValue(
+        "minimumRequirements.maxPlayers",
+        selectedGameSystem.maxPlayers || 1,
+      );
+    }
+  }, [form, selectedGameSystem]);
+
+  // Most spoken languages in the world
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "zh", label: "Chinese" },
+    { value: "hi", label: "Hindi" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+    { value: "ar", label: "Arabic" },
+    { value: "bn", label: "Bengali" },
+    { value: "ru", label: "Russian" },
+  ];
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log("Form onSubmit handler called");
+        console.log("Form state:", form.state);
+        console.log("Field meta:", form.state.fieldMeta);
+        // Check for field errors
+        Object.entries(form.state.fieldMeta).forEach(([fieldName, fieldMeta]) => {
+          if (fieldMeta.errors && fieldMeta.errors.length > 0) {
+            console.log(`Field ${fieldName} has errors:`, fieldMeta.errors);
+          }
+        });
         form.handleSubmit();
       }}
       className="space-y-8"

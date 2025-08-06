@@ -24,7 +24,19 @@ import type {
 export const searchGameSystems = createServerFn({ method: "POST" })
   .validator(searchGameSystemsSchema.parse)
   .handler(
-    async ({ data }): Promise<OperationResult<Array<{ id: number; name: string }>>> => {
+    async ({
+      data,
+    }): Promise<
+      OperationResult<
+        Array<{
+          id: number;
+          name: string;
+          averagePlayTime: number | null;
+          minPlayers: number | null;
+          maxPlayers: number | null;
+        }>
+      >
+    > => {
       try {
         const { getDb } = await import("~/db/server-helpers");
         const { gameSystems } = await import("~/db/schema");
@@ -37,6 +49,9 @@ export const searchGameSystems = createServerFn({ method: "POST" })
           .select({
             id: gameSystems.id,
             name: gameSystems.name,
+            averagePlayTime: gameSystems.averagePlayTime,
+            minPlayers: gameSystems.minPlayers,
+            maxPlayers: gameSystems.maxPlayers,
           })
           .from(gameSystems)
           .where(ilike(gameSystems.name, searchTerm))
@@ -60,6 +75,16 @@ export const getGame = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails | null>> => {
     try {
+      // Simple UUID validation
+      const UUID_REGEX =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!UUID_REGEX.test(data.id)) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "Invalid game ID format" }],
+        };
+      }
+
       const { getDb } = await import("~/db/server-helpers");
       const { games } = await import("~/db/schema");
       const { eq } = await import("drizzle-orm");

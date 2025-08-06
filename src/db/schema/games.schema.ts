@@ -7,6 +7,7 @@ import {
   real,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
@@ -35,13 +36,14 @@ export const gameParticipantStatusEnum = pgEnum("game_participant_status", [
 ]);
 
 export const games = pgTable("games", {
-  id: text("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   ownerId: text("owner_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   gameSystemId: integer("game_system_id")
     .notNull()
     .references(() => gameSystem.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(), // Game session name
   dateTime: timestamp("date_time", { mode: "date" }).notNull(),
   description: text("description").notNull(),
   expectedDuration: real("expected_duration").notNull(), // in hours
@@ -57,8 +59,8 @@ export const games = pgTable("games", {
 });
 
 export const gameParticipants = pgTable("game_participants", {
-  id: text("id").primaryKey(),
-  gameId: text("game_id")
+  id: uuid("id").primaryKey().defaultRandom(),
+  gameId: uuid("game_id")
     .notNull()
     .references(() => games.id, { onDelete: "cascade" }),
   userId: text("user_id")

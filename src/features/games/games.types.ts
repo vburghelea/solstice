@@ -27,13 +27,12 @@ export interface GameLocation {
   placeId?: string;
 }
 
-export interface MinimumRequirements {
-  language?: string;
+export type MinimumRequirements = {
   minPlayers?: number;
   maxPlayers?: number;
-  sameCity?: boolean;
-  // Add more as needed
-}
+  languageLevel?: "beginner" | "intermediate" | "advanced" | "fluent";
+  playerRadiusKm?: number;
+};
 
 export interface SafetyRules {
   [key: string]: boolean;

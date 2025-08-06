@@ -24,6 +24,7 @@ import type {
 export const createGame = createServerFn({ method: "POST" })
   .validator(createGameInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
+    console.log("createGame mutation called with data:", data);
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { games, gameParticipants } = await import("~/db/schema");
@@ -42,9 +43,9 @@ export const createGame = createServerFn({ method: "POST" })
       const [newGame] = await db()
         .insert(games)
         .values({
-          id: `game-${Date.now()}`,
           ownerId: currentUser.id,
           gameSystemId: data.gameSystemId,
+          name: data.name,
           dateTime: new Date(data.dateTime),
           description: data.description,
           expectedDuration: data.expectedDuration,
@@ -69,7 +70,6 @@ export const createGame = createServerFn({ method: "POST" })
       const [ownerParticipant] = await db()
         .insert(gameParticipants)
         .values({
-          id: `game-participant-${Date.now()}`,
           gameId: newGame.id,
           userId: currentUser.id,
           role: "player",
@@ -283,7 +283,6 @@ export const addGameParticipant = createServerFn({ method: "POST" })
       const [newParticipant] = await db()
         .insert(gameParticipants)
         .values({
-          id: `game-participant-${Date.now()}`,
           gameId: data.gameId,
           userId: data.userId,
           role: data.role,
@@ -501,7 +500,6 @@ export const applyToGame = createServerFn({ method: "POST" })
       const [newParticipant] = await db()
         .insert(gameParticipants)
         .values({
-          id: `game-participant-${Date.now()}`,
           gameId: data.gameId,
           userId: currentUser.id,
           role: "applicant",
@@ -622,7 +620,6 @@ export const inviteToGame = createServerFn({ method: "POST" })
       const [newParticipant] = await db()
         .insert(gameParticipants)
         .values({
-          id: `game-participant-${Date.now()}`,
           gameId: data.gameId,
           userId: targetUserId,
           role: data.role,

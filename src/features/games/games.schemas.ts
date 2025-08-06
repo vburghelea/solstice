@@ -116,6 +116,7 @@ export const searchUsersForInvitationSchema = z.object({
 });
 
 export type InviteToGameInput = z.infer<typeof inviteToGameInputSchema>;
+export type RespondToGameInvitationInput = z.infer<typeof respondToGameInvitationSchema>;
 export const searchGameSystemsSchema = z.object({
   query: z.string().min(3, "Search term must be at least 3 characters"),
 });

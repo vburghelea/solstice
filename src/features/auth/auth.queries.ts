@@ -41,6 +41,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     // Map the database user to our extended User type
     return {
       ...session.user,
+      image: dbUser[0].image,
       profileComplete: dbUser[0].profileComplete,
       gender: dbUser[0].gender,
       pronouns: dbUser[0].pronouns,

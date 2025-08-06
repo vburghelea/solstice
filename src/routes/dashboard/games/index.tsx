@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
+import { Gamepad2, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
-import { GameList } from "~/features/games/components/GameList";
+import { Card, CardContent } from "~/components/ui/card";
+import { GameCard } from "~/features/games/components/GameCard";
 import { listGames } from "~/features/games/games.queries";
+import type { GameListItem } from "~/features/games/games.types";
 import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/dashboard/games/")({
@@ -22,42 +24,52 @@ function MyGamesPage() {
   const { games: initialGames } = Route.useLoaderData();
   const { user } = Route.useRouteContext();
 
-  const { data, isLoading, error } = useQuery({
+  const { data: gamesData } = useSuspenseQuery({
     queryKey: ["myGames", user?.id],
     queryFn: () => listGames({ data: { filters: { ownerId: user?.id } } }),
     initialData: { success: true, data: initialGames },
-    enabled: !!user?.id,
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="text-primary h-12 w-12 animate-spin" />
-      </div>
-    );
-  }
-
-  if (error || (data && !data.success)) {
-    return (
-      <div className="text-destructive text-center">
-        <p>
-          Error loading games:{" "}
-          {error?.message || (!data?.success && data?.errors?.[0]?.message)}
-        </p>
-      </div>
-    );
-  }
+  const games = gamesData.success ? gamesData.data : [];
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">My Games</h1>
-        <Link to="/dashboard/games/create">
-          <Button>Create New Game</Button>
-        </Link>
+    <div className="container mx-auto p-6">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">My Games</h1>
+          <p className="text-muted-foreground">Manage your game sessions</p>
+        </div>
+        <Button asChild>
+          <Link to="/dashboard/games/create">
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Create New Game
+          </Link>
+        </Button>
       </div>
 
-      <GameList games={data.data || []} />
+      {games.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Gamepad2 className="text-muted-foreground mb-4 h-12 w-12" />
+            <h3 className="mb-2 text-lg font-semibold">No games yet</h3>
+            <p className="text-muted-foreground mb-4 text-center">
+              Create your first game session to get started
+            </p>
+            <Button asChild>
+              <Link to="/dashboard/games/create">
+                <PlusIcon className="mr-2 h-4 w-4" />
+                Create New Game
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {games.map((game: GameListItem) => (
+            <GameCard key={game.id} game={game} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

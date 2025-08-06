@@ -9,21 +9,22 @@ export const gameLocationSchema = z.object({
 });
 
 export const minimumRequirementsSchema = z.object({
-  language: z.string().optional(),
+  languageLevel: z.enum(["beginner", "intermediate", "advanced", "fluent"]).optional(),
   minPlayers: z.number().int().positive().optional(),
   maxPlayers: z.number().int().positive().optional(),
-  sameCity: z.boolean().optional(),
+  playerRadiusKm: z.number().int().min(1).max(10).optional(), // Radius in kilometers
   // Add more as needed
 });
 
-export const safetyRulesSchema = z.record(z.boolean()); // e.g., { "no-alcohol": true, "safe-word": false }
+export const safetyRulesSchema = z.record(z.boolean()).optional(); // e.g., { "no-alcohol": true, "safe-word": false }
 
 export const createGameInputSchema = z.object({
   gameSystemId: z.number().int().positive(),
+  name: z.string().min(1, "Game session name is required"),
   dateTime: z.string().datetime(), // ISO string
   description: z.string().min(1, "Description is required"),
   expectedDuration: z.number().positive(), // in hours
-  price: z.number().positive().optional(),
+  price: z.number().min(0).optional(),
   language: z.string().min(1, "Language is required"),
   location: gameLocationSchema,
   minimumRequirements: minimumRequirementsSchema.optional(),
@@ -110,10 +111,27 @@ export const searchGameSystemsSchema = z.object({
   query: z.string().min(3, "Search term must be at least 3 characters"),
 });
 
-export const gameFormSchema = createGameInputSchema.extend({
-  id: z.string().optional(),
-  status: z.enum(gameStatusEnum.enumValues).optional(),
-});
+export const gameFormSchema = createGameInputSchema
+  .extend({
+    id: z.string().optional(),
+    status: z.enum(gameStatusEnum.enumValues).optional(),
+  })
+  .partial()
+  .extend({
+    // For form validation, we want to allow empty values initially
+    // but still validate the types when values are provided
+    gameSystemId: z.number().int().positive().optional(),
+    name: z.string().optional(),
+    dateTime: z.string().optional(),
+    description: z.string().optional(),
+    expectedDuration: z.number().positive().optional(),
+    price: z.number().min(0).optional(),
+    language: z.string().optional(),
+    location: gameLocationSchema.optional(),
+    minimumRequirements: minimumRequirementsSchema.optional(),
+    visibility: z.enum(gameVisibilityEnum.enumValues).optional(),
+    safetyRules: safetyRulesSchema.optional(),
+  });
 
 export type SearchUsersForInvitationInput = z.infer<
   typeof searchUsersForInvitationSchema

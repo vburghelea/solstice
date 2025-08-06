@@ -96,20 +96,43 @@ test.describe("Team Member Management (Authenticated)", () => {
       await expect(page.getByLabel("Team Name")).toBeVisible({ timeout: 10000 });
       await expect(page.getByLabel("Description")).toBeVisible({ timeout: 10000 });
 
+      // Generate a unique name for this test run to avoid conflicts
+      const timestamp = Date.now();
+      const newTeamName = `Thunder ${timestamp}`; // Shorter name to avoid "Test Thunder" matching
+
       // Update team name
       await page.getByLabel("Team Name").clear();
-      await page.getByLabel("Team Name").fill("Test Thunder Updated");
+      await page.getByLabel("Team Name").fill(newTeamName);
+
+      // Also update description to ensure we're making changes
+      await page.getByLabel("Description").clear();
+      await page.getByLabel("Description").fill(`Updated E2E test team - ${timestamp}`);
 
       // Save changes
       await page.getByRole("button", { name: "Save Changes" }).click();
 
       // Wait for navigation back to team details page after successful save
-      await page.waitForURL("/dashboard/teams/test-team-1");
+      await page.waitForURL("/dashboard/teams/test-team-1", { timeout: 10000 });
 
       // Verify the updated team name is displayed
+      // Look for the heading in the main content area
+      const mainContent = page.locator("main");
+
+      // Wait for the heading to contain the new team name
+      // React Query should refetch the data after invalidation
+      await expect(mainContent.getByRole("heading", { level: 1 })).toHaveText(
+        newTeamName,
+        {
+          timeout: 10000,
+        },
+      );
+
+      // Also verify the description was updated
       await expect(
-        page.getByRole("heading", { name: "Test Thunder Updated" }),
-      ).toBeVisible({ timeout: 10000 });
+        mainContent.getByText(`Updated E2E test team - ${timestamp}`),
+      ).toBeVisible({
+        timeout: 10000,
+      });
     });
   });
 

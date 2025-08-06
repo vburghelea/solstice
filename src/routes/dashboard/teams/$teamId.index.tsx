@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, getRouteApi } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -12,37 +12,26 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "~/components/ui/icons";
-import {
-  getTeam,
-  getTeamMembers,
-  type TeamMemberDetails,
-  type TeamWithMemberCount,
-} from "~/features/teams/teams.queries";
+import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
   component: TeamDetailsPage,
 });
 
-const parentRouteApi = getRouteApi("/dashboard/teams/$teamId");
-
 function TeamDetailsPage() {
   const { teamId } = Route.useParams();
-  const { teamData: initialTeamData, members: initialMembers } =
-    parentRouteApi.useLoaderData() as {
-      teamData: TeamWithMemberCount;
-      members: TeamMemberDetails[];
-    };
 
   const { data: teamData } = useSuspenseQuery({
     queryKey: ["team", teamId],
     queryFn: async () => getTeam({ data: { teamId } }),
-    initialData: initialTeamData,
+    // Don't pass stale data - let React Query fetch fresh data when invalidated
+    // This ensures updates are reflected immediately after navigation
   });
 
   const { data: members } = useSuspenseQuery({
     queryKey: ["teamMembers", teamId],
     queryFn: async () => getTeamMembers({ data: { teamId } }),
-    initialData: initialMembers,
+    // Don't pass stale data - let React Query fetch fresh data when invalidated
   });
 
   if (!teamData) {

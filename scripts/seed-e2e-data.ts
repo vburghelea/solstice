@@ -203,9 +203,9 @@ async function seed() {
         },
       },
       {
-        id: "quadball-canada-admin",
-        name: "Quadball Canada Admin",
-        description: "Administrative access to Quadball Canada features",
+        id: "roundup-games-admin",
+        name: "Roundup Games Admin",
+        description: "Administrative access to Roundup Games features",
         permissions: {
           "teams:manage": true,
           "events:manage": true,

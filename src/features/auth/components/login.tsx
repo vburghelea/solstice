@@ -70,9 +70,9 @@ export default function LoginForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Quadball Canada</span>
+              <span className="sr-only">Roundup Games</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome back to Quadball Canada</h1>
+            <h1 className="text-xl font-bold">Welcome back to Roundup Games</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field

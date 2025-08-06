@@ -24,7 +24,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Verify we're on the login page
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
     ).toBeVisible();
   });
 
@@ -51,7 +51,7 @@ test.describe("Logout Flow (Authenticated)", () => {
     await page.getByRole("button", { name: "Logout" }).click();
     await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
     ).toBeVisible();
   });
 
@@ -63,7 +63,7 @@ test.describe("Logout Flow (Authenticated)", () => {
     await page.getByRole("button", { name: "Logout" }).click();
     await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
     ).toBeVisible();
   });
 });

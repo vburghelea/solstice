@@ -17,8 +17,10 @@ export default function LoginForm() {
   const router = useRouter();
 
   // Get redirect parameter from URL, default to dashboard
-  const searchParams = new URLSearchParams(window.location.search);
-  const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  const redirectUrl =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("redirect") || "/dashboard"
+      : "/dashboard";
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

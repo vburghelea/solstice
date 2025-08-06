@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { inviteToGame } from "~/features/games/games.mutations";
+import { inviteToGame, removeGameParticipant } from "~/features/games/games.mutations";
 import { searchUsersForInvitation } from "~/features/games/games.queries";
-import { GameParticipant } from "~/features/games/games.types";
+import type { GameParticipant, OperationResult } from "~/features/games/games.types";
 import type { User } from "~/lib/auth/types";
 import { useDebounce } from "~/shared/hooks/useDebounce";
 import { Button } from "~/shared/ui/button";
@@ -46,21 +46,47 @@ export function InviteParticipants({
       setEmailInvite("");
       queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
       queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] }); // Invalidate participants list
     },
     onError: (error) => {
       toast.error(`Failed to invite participant: ${error.message}`);
     },
   });
 
+  const revokeMutation = useMutation<
+    OperationResult<boolean>,
+    Error,
+    { data: { id: string } }
+  >({
+    mutationFn: removeGameParticipant,
+    onSuccess: () => {
+      toast.success("Invitation revoked successfully!");
+      queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] }); // Invalidate participants list
+    },
+    onError: (error) => {
+      toast.error(`Failed to revoke invitation: ${error.message}`);
+    },
+  });
+
   const handleInviteUser = (userId: string) => {
-    inviteMutation.mutate({ data: { gameId, userId } });
+    inviteMutation.mutate({ data: { gameId, userId, role: "invited" } });
   };
 
   const handleInviteEmail = () => {
     if (emailInvite.length > 0) {
-      inviteMutation.mutate({ data: { gameId, email: emailInvite } });
+      inviteMutation.mutate({ data: { gameId, email: emailInvite, role: "invited" } });
     }
   };
+
+  const handleRevokeInvitation = (participantId: string) => {
+    revokeMutation.mutate({ data: { id: participantId } });
+  };
+
+  const pendingInvites = currentParticipants.filter(
+    (p) => p.role === "invited" && p.status === "pending",
+  );
 
   return (
     <Card>
@@ -134,16 +160,25 @@ export function InviteParticipants({
         </div>
 
         <div className="space-y-2">
-          <h4 className="font-semibold">Current Participants</h4>
-          {currentParticipants.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No participants yet.</p>
+          <h4 className="font-semibold">Pending Invitations</h4>
+          {pendingInvites.length === 0 ? (
+            <p className="text-muted-foreground text-sm">No pending invitations.</p>
           ) : (
             <ul className="bg-background max-h-48 overflow-y-auto rounded-md border p-2">
-              {currentParticipants.map((p) => (
+              {pendingInvites.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
-                  <span>
-                    {p.user?.name || p.user?.email} ({p.role} - {p.status})
-                  </span>
+                  <span>{p.user?.name || p.user?.email}</span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleRevokeInvitation(p.id)}
+                    disabled={revokeMutation.isPending}
+                  >
+                    {revokeMutation.isPending &&
+                    revokeMutation.variables?.data.id === p.id
+                      ? "Revoking..."
+                      : "Revoke"}
+                  </Button>
                 </li>
               ))}
             </ul>

@@ -41,20 +41,24 @@ export const getGameSchema = z.object({
   id: z.string().min(1),
 });
 
-export const listGamesSchema = z.object({
-  filters: z
-    .object({
-      gameSystemId: z.number().int().positive().optional(),
-      status: z.enum(gameStatusEnum.enumValues).optional(),
-      visibility: z.enum(gameVisibilityEnum.enumValues).optional(),
-      ownerId: z.string().optional(),
-      participantId: z.string().optional(),
-      dateFrom: z.string().datetime().optional(),
-      dateTo: z.string().datetime().optional(),
-      searchTerm: z.string().optional(),
-    })
-    .optional(),
-});
+export const listGamesSchema = z
+  .object({
+    filters: z
+      .object({
+        gameSystemId: z.number().int().positive().optional(),
+        status: z.enum(gameStatusEnum.enumValues).optional(),
+        visibility: z.enum(gameVisibilityEnum.enumValues).optional(),
+        ownerId: z.string().optional(),
+        participantId: z.string().optional(),
+        dateFrom: z.string().datetime().optional(),
+        dateTo: z.string().datetime().optional(),
+        searchTerm: z.string().optional(),
+      })
+      .optional(),
+  })
+  .nullable()
+  .transform((val) => (val === null ? {} : val))
+  .default({});
 
 export const searchGamesSchema = z.object({
   query: z.string().min(3, "Search term must be at least 3 characters"),
@@ -92,6 +96,11 @@ export const inviteToGameInputSchema = z
   .refine((data) => data.userId || data.email, {
     message: "Either userId or email must be provided",
   });
+
+export const respondToGameInvitationSchema = z.object({
+  participantId: z.string().min(1),
+  action: z.enum(["accept", "reject"]),
+});
 
 export type CreateGameInput = z.infer<typeof createGameInputSchema>;
 export type UpdateGameInput = z.infer<typeof updateGameInputSchema>;

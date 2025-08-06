@@ -10,10 +10,10 @@ import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/dashboard/games/")({
   component: MyGamesPage,
-  loader: async ({ context }) => {
-    const result = await listGames({ data: { filters: { ownerId: context.user?.id } } });
+  loader: async () => {
+    const result = await listGames({});
     if (!result.success) {
-      toast.error("Failed to load your games.");
+      toast.error("Failed to load games.");
       return { games: [] };
     }
     return { games: result.data };
@@ -22,11 +22,10 @@ export const Route = createFileRoute("/dashboard/games/")({
 
 function MyGamesPage() {
   const { games: initialGames } = Route.useLoaderData();
-  const { user } = Route.useRouteContext();
 
   const { data: gamesData } = useSuspenseQuery({
-    queryKey: ["myGames", user?.id],
-    queryFn: () => listGames({ data: { filters: { ownerId: user?.id } } }),
+    queryKey: ["allVisibleGames"],
+    queryFn: () => listGames({}),
     initialData: { success: true, data: initialGames },
   });
 

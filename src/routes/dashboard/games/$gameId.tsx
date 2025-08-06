@@ -14,8 +14,10 @@ import {
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { GameForm } from "~/features/games/components/GameForm";
+import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 import { ManageApplications } from "~/features/games/components/ManageApplications";
+import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
 import { updateGame } from "~/features/games/games.mutations";
 import { getGame, getGameApplications } from "~/features/games/games.queries";
 import type { GameWithDetails } from "~/features/games/games.types";
@@ -107,16 +109,36 @@ function GameDetailsPage() {
   const initialData = Route.useLoaderData();
   const queryClient = useQueryClient();
   const { gameId } = Route.useParams();
+  const { user: currentUser } = Route.useRouteContext();
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const { data: gameResult, isLoading } = useQuery({
-    queryKey: ["game", gameId],
-    queryFn: () => getGame({ data: { id: gameId } }),
-    initialData: { success: true, data: initialData.game },
+  const { data: game, isLoading } = useQuery({
+    queryKey: [gameId, initialData.game.id],
+    queryFn: async () => {
+      const result = await getGame({ data: { id: gameId } });
+      if (!result.success) {
+        throw new Error(result.errors?.[0]?.message || "Failed to fetch game");
+      }
+      if (!result.data) {
+        throw new Error("Game data not found");
+      }
+      return result.data;
+    },
+    initialData: initialData.game,
+    enabled: !!gameId,
   });
 
-  const game = gameResult?.success ? gameResult.data : null;
+  const isOwner = game?.owner?.id === currentUser?.id;
+  const isInvited = game?.participants?.some(
+    (p) => p.userId === currentUser?.id && p.role === "invited",
+  );
+  const invitedParticipant = game?.participants?.find(
+    (p) => p.userId === currentUser?.id && p.role === "invited",
+  );
+  const isParticipant = game?.participants?.some(
+    (p) => p.userId === currentUser?.id && (p.role === "player" || p.role === "invited"),
+  );
 
   const updateGameMutation = useMutation({
     mutationFn: updateGame,
@@ -137,6 +159,7 @@ function GameDetailsPage() {
   const { data: applicationsData, isLoading: isLoadingApplications } = useQuery({
     queryKey: ["gameApplications", gameId],
     queryFn: () => getGameApplications({ data: { id: gameId } }),
+    enabled: !!gameId && isOwner, // Only enable if gameId is available and current user is owner
   });
 
   if (isLoading || isLoadingApplications) {
@@ -158,12 +181,12 @@ function GameDetailsPage() {
                 View and manage the details of this game session.
               </CardDescription>
             </div>
-            {!isEditing ? (
+            {isOwner && !isEditing ? (
               <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                 <Edit2 className="mr-2 h-4 w-4" />
                 Edit Game
               </Button>
-            ) : (
+            ) : isOwner && isEditing ? (
               <div className="flex gap-2">
                 <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
                   <X className="mr-2 h-4 w-4" />
@@ -178,7 +201,7 @@ function GameDetailsPage() {
                   Save Changes
                 </FormSubmitButton>
               </div>
-            )}
+            ) : null}
           </div>
         </CardHeader>
         <CardContent>
@@ -202,16 +225,31 @@ function GameDetailsPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <InviteParticipants
+      {isInvited && invitedParticipant && (
+        <RespondToInvitation participant={invitedParticipant} />
+      )}
+
+      {isParticipant && (
+        <GameParticipantsList
           gameId={gameId}
-          currentParticipants={game.participants || []}
+          isOwner={isOwner}
+          currentUser={currentUser}
+          gameOwnerId={game.owner?.id || ""}
         />
-        <ManageApplications
-          gameId={gameId}
-          applications={applicationsData?.success ? applicationsData.data : []}
-        />
-      </div>
+      )}
+
+      {isOwner && (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <InviteParticipants
+            gameId={gameId}
+            currentParticipants={game.participants || []}
+          />
+          <ManageApplications
+            gameId={gameId}
+            applications={applicationsData?.success ? applicationsData.data : []}
+          />
+        </div>
+      )}
     </div>
   );
 }

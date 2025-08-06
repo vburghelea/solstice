@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { eq } from "drizzle-orm";
 import { gameParticipants, games } from "~/db/schema";
 import {
   findGameById,
@@ -13,6 +14,7 @@ import {
   getGameSchema,
   inviteToGameInputSchema,
   removeGameParticipantInputSchema,
+  respondToGameInvitationSchema,
   updateGameInputSchema,
   updateGameParticipantInputSchema,
 } from "./games.schemas";
@@ -589,12 +591,54 @@ export const inviteToGame = createServerFn({ method: "POST" })
       );
 
       if (existingParticipant) {
-        return {
-          success: false,
-          errors: [
-            { code: "CONFLICT", message: "User is already a participant or has applied" },
-          ],
-        };
+        if (existingParticipant.status === "rejected") {
+          // Re-invite: update status to pending and role to invited
+          const [updatedParticipant] = await db
+            .update(gameParticipants)
+            .set({
+              role: "invited",
+              status: "pending",
+              updatedAt: new Date(),
+            })
+            .where(eq(gameParticipants.id, existingParticipant.id))
+            .returning();
+
+          if (!updatedParticipant) {
+            return {
+              success: false,
+              errors: [
+                { code: "DATABASE_ERROR", message: "Failed to re-invite participant" },
+              ],
+            };
+          }
+
+          const participantWithUser = await findGameParticipantById(
+            updatedParticipant.id,
+          );
+
+          if (!participantWithUser) {
+            return {
+              success: false,
+              errors: [
+                {
+                  code: "DATABASE_ERROR",
+                  message: "Failed to fetch re-invited participant",
+                },
+              ],
+            };
+          }
+          return { success: true, data: participantWithUser as GameParticipant };
+        } else {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message: "User is already a participant or has applied",
+              },
+            ],
+          };
+        }
       }
 
       const [newParticipant] = await db
@@ -632,6 +676,107 @@ export const inviteToGame = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to invite participant" }],
+      };
+    }
+  });
+
+/**
+ * Respond to a game invitation (accept or reject)
+ */
+export const respondToGameInvitation = createServerFn({ method: "POST" })
+  .validator(respondToGameInvitationSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameParticipant | boolean>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { eq } = await import("drizzle-orm");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      const existingParticipant = await findGameParticipantById(data.participantId);
+
+      if (!existingParticipant) {
+        return {
+          success: false,
+          errors: [{ code: "NOT_FOUND", message: "Invitation not found" }],
+        };
+      }
+
+      // Ensure the current user is the invitee
+      if (existingParticipant.userId !== currentUser.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Not authorized to respond to this invitation",
+            },
+          ],
+        };
+      }
+
+      // Ensure the role is 'invited' before responding
+      if (existingParticipant.role !== "invited") {
+        return {
+          success: false,
+          errors: [{ code: "CONFLICT", message: "Not an active invitation" }],
+        };
+      }
+
+      if (data.action === "accept") {
+        const [updatedParticipant] = await db
+          .update(gameParticipants)
+          .set({
+            role: "player",
+            status: "approved",
+            updatedAt: new Date(),
+          })
+          .where(eq(gameParticipants.id, data.participantId))
+          .returning();
+
+        if (!updatedParticipant) {
+          return {
+            success: false,
+            errors: [{ code: "DATABASE_ERROR", message: "Failed to accept invitation" }],
+          };
+        }
+
+        const participantWithUser = await findGameParticipantById(updatedParticipant.id);
+
+        if (!participantWithUser) {
+          return {
+            success: false,
+            errors: [
+              { code: "DATABASE_ERROR", message: "Failed to fetch accepted participant" },
+            ],
+          };
+        }
+
+        return { success: true, data: participantWithUser as GameParticipant };
+      } else if (data.action === "reject") {
+        await db
+          .delete(gameParticipants)
+          .where(eq(gameParticipants.id, data.participantId));
+        return { success: true, data: true };
+      }
+
+      return {
+        success: false,
+        errors: [{ code: "VALIDATION_ERROR", message: "Invalid action" }],
+      };
+    } catch (error) {
+      console.error("Error responding to invitation:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to respond to invitation" }],
       };
     }
   });

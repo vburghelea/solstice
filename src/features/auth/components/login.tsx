@@ -20,11 +20,12 @@ export default function LoginForm(props?: LoginFormProps) {
   const navigate = useNavigate();
   const router = useRouter();
 
-  const safeRedirectPath = props?.redirectPath?.startsWith("/")
-    ? props.redirectPath
-    : "/dashboard";
+  // Get redirect parameter from URL, default to dashboard
+  const redirectUrl =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("redirect") || "/dashboard"
+      : "/dashboard";
 
-  const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 

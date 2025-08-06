@@ -23,6 +23,25 @@ import type {
   SafetyRules,
 } from "./games.types";
 
+import { and, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
+import { gameParticipants, games, gameSystems, user } from "~/db/schema";
+import { getDb } from "~/db/server-helpers";
+import { getCurrentUser } from "~/features/auth/auth.queries";
+
+interface GameQueryResultRow {
+  game: typeof games.$inferSelect;
+  owner: {
+    id: typeof user.$inferSelect.id;
+    name: typeof user.$inferSelect.name;
+    email: typeof user.$inferSelect.email;
+  };
+  gameSystem: {
+    id: typeof gameSystems.$inferSelect.id;
+    name: typeof gameSystems.$inferSelect.name;
+  };
+  participantCount: number;
+}
+
 /**
  * Search game systems by name
  */
@@ -43,10 +62,6 @@ export const searchGameSystems = createServerFn({ method: "POST" })
       >
     > => {
       try {
-        const { getDb } = await import("~/db/server-helpers");
-        const { gameSystems } = await import("~/db/schema");
-        const { ilike } = await import("drizzle-orm");
-
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -121,50 +136,79 @@ export const getGame = createServerFn({ method: "POST" })
  */
 export const listGames = createServerFn({ method: "POST" })
   .validator(listGamesSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
+  .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
     try {
-      const { getDb } = await import("~/db/server-helpers");
-      const { games, user, gameSystems, gameParticipants } = await import("~/db/schema");
-      const { and, eq, sql, gte, lte } = await import("drizzle-orm");
-
       const db = await getDb();
 
-      const conditions = [];
+      const currentUser = await getCurrentUser();
+      const currentUserId = currentUser?.id;
+
+      const baseConditions = [];
 
       if (data.filters?.gameSystemId) {
-        conditions.push(eq(games.gameSystemId, data.filters.gameSystemId));
+        baseConditions.push(eq(games.gameSystemId, data.filters.gameSystemId));
       }
       if (data.filters?.status) {
-        conditions.push(eq(games.status, data.filters.status));
-      }
-      if (data.filters?.visibility) {
-        conditions.push(eq(games.visibility, data.filters.visibility));
-      }
-      if (data.filters?.ownerId) {
-        conditions.push(eq(games.ownerId, data.filters.ownerId));
+        baseConditions.push(eq(games.status, data.filters.status));
       }
       if (data.filters?.dateFrom) {
-        conditions.push(gte(games.dateTime, new Date(data.filters.dateFrom)));
+        baseConditions.push(gte(games.dateTime, new Date(data.filters.dateFrom)));
       }
       if (data.filters?.dateTo) {
-        conditions.push(lte(games.dateTime, new Date(data.filters.dateTo)));
+        baseConditions.push(lte(games.dateTime, new Date(data.filters.dateTo)));
       }
       if (data.filters?.searchTerm) {
         const searchTerm = `%${data.filters.searchTerm.toLowerCase()}%`;
-        conditions.push(
-          sql`lower(${games.description}) LIKE ${searchTerm} OR lower(${games.language}) LIKE ${searchTerm}`,
+        baseConditions.push(
+          or(
+            sql`lower(${games.description}) LIKE ${searchTerm}`,
+            sql`lower(${games.language}) LIKE ${searchTerm}`,
+          ),
         );
       }
 
-      // Filter by participant
-      if (data.filters?.participantId) {
-        const participantGames = await db
+      const visibilityConditions = [];
+
+      // Rule 1: All public games
+      visibilityConditions.push(eq(games.visibility, "public"));
+
+      if (currentUserId) {
+        // Rule 2: All private games they are a participant of or invited to
+        const userGames = db
           .select({ gameId: gameParticipants.gameId })
           .from(gameParticipants)
-          .where(eq(gameParticipants.userId, data.filters.participantId));
-        const gameIds = participantGames.map((p) => p.gameId);
-        conditions.push(sql`${games.id} IN ${gameIds}`);
+          .where(
+            and(
+              eq(gameParticipants.userId, currentUserId),
+              or(
+                eq(gameParticipants.role, "player"),
+                eq(gameParticipants.role, "invited"),
+              ),
+            ),
+          );
+
+        visibilityConditions.push(
+          and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`),
+        );
+
+        // Rule 3: All games they own
+        visibilityConditions.push(eq(games.ownerId, currentUserId));
+
+        // Rule 4: Protected games where user meets minimum requirements (placeholder)
+        // This would involve checking the user's profile against games.minimumRequirements
+        // For now, we'll just include games where the user is an owner or participant/invited
+        // and the game is protected. A more robust check would be needed here.
+        visibilityConditions.push(
+          and(
+            eq(games.visibility, "protected"),
+            or(eq(games.ownerId, currentUserId), sql`${games.id} IN ${userGames}`),
+            // TODO: Add actual minimum requirements check here
+          ),
+        );
       }
+
+      // Combine base conditions with visibility conditions
+      const finalConditions = and(...baseConditions, or(...visibilityConditions));
 
       const result = await db
         .select({
@@ -174,15 +218,15 @@ export const listGames = createServerFn({ method: "POST" })
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
         })
         .from(games)
-        .leftJoin(user, eq(games.ownerId, user.id))
-        .leftJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
+        .innerJoin(user, eq(games.ownerId, user.id))
+        .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
-        .where(and(...conditions))
+        .where(finalConditions)
         .groupBy(games.id, user.id, gameSystems.id);
 
       return {
         success: true,
-        data: result.map((r) => ({
+        data: result.map((r: GameQueryResultRow) => ({
           ...r.game,
           location: r.game.location as GameLocation,
           minimumRequirements: r.game.minimumRequirements as MinimumRequirements,
@@ -206,12 +250,8 @@ export const listGames = createServerFn({ method: "POST" })
  */
 export const searchGames = createServerFn({ method: "POST" })
   .validator(searchGamesSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
+  .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
     try {
-      const { getDb } = await import("~/db/server-helpers");
-      const { games, user, gameSystems, gameParticipants } = await import("~/db/schema");
-      const { and, eq, ilike, sql } = await import("drizzle-orm");
-
       const db = await getDb();
       const searchTerm = `%${data.query}%`;
 
@@ -223,8 +263,8 @@ export const searchGames = createServerFn({ method: "POST" })
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
         })
         .from(games)
-        .leftJoin(user, eq(games.ownerId, user.id))
-        .leftJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
+        .innerJoin(user, eq(games.ownerId, user.id))
+        .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
         .where(
           and(
@@ -238,7 +278,7 @@ export const searchGames = createServerFn({ method: "POST" })
 
       return {
         success: true,
-        data: result.map((r) => ({
+        data: result.map((r: GameQueryResultRow) => ({
           ...r.game,
           location: r.game.location as GameLocation,
           minimumRequirements: r.game.minimumRequirements as MinimumRequirements,
@@ -267,10 +307,6 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       data,
     }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
       try {
-        const { getDb } = await import("~/db/server-helpers");
-        const { user } = await import("~/db/schema");
-        const { ilike, or } = await import("drizzle-orm");
-
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -302,8 +338,6 @@ export const getGameApplications = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
     try {
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {

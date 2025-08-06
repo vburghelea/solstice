@@ -250,8 +250,8 @@ async function seed() {
         },
       },
       {
-        id: "games-admin",
-        name: "Games Admin",
+        id: "roundup-games-admin",
+        name: "Roundup Games Admin",
         description: "Administrative access to Roundup Games features",
         permissions: {
           "teams:manage": true,

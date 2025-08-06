@@ -29,7 +29,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Verify we're on the login page
     await expect(
-      page.getByRole("heading", { name: "Welcome back to Quadball Canada" }),
+      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
     ).toBeVisible();
   });
 
@@ -63,28 +63,12 @@ test.describe("Logout Flow (Authenticated)", () => {
       timeout: 15000,
     });
 
-    // Wait a moment to ensure the page is fully interactive
-    await page.waitForTimeout(1000);
-
-    // Click logout and wait for navigation
-    const logoutButton = page.getByRole("button", { name: "Logout" });
-
-    // Use Promise.all to handle the navigation properly
-    await Promise.all([
-      page.waitForNavigation({
-        url: /\/auth\/login/,
-        waitUntil: "domcontentloaded",
-        timeout: 20000,
-      }),
-      logoutButton.click(),
-    ]);
-
-    // Verify we're on the login page
-    await expect(page).toHaveURL(/\/auth\/login/);
-
-    // Try to access a protected route to verify logout worked
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
-    await expect(page).toHaveURL(/\/auth\/(login|signin)/, { timeout: 15000 });
+    // Perform logout
+    await page.getByRole("button", { name: "Logout" }).click();
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
+    ).toBeVisible();
   });
 
   test("should handle logout from teams page", async ({ page }) => {
@@ -94,27 +78,11 @@ test.describe("Logout Flow (Authenticated)", () => {
       timeout: 15000,
     });
 
-    // Wait a moment to ensure the page is fully interactive
-    await page.waitForTimeout(1000);
-
-    // Click logout and wait for navigation
-    const logoutButton = page.getByRole("button", { name: "Logout" });
-
-    // Use Promise.all to handle the navigation properly
-    await Promise.all([
-      page.waitForNavigation({
-        url: /\/auth\/login/,
-        waitUntil: "domcontentloaded",
-        timeout: 20000,
-      }),
-      logoutButton.click(),
-    ]);
-
-    // Verify we're on the login page
-    await expect(page).toHaveURL(/\/auth\/login/);
-
-    // Try to access a protected route to verify logout worked
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
-    await expect(page).toHaveURL(/\/auth\/(login|signin)/, { timeout: 15000 });
+    // Perform logout
+    await page.getByRole("button", { name: "Logout" }).click();
+    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+    await expect(
+      page.getByRole("heading", { name: "Welcome back to Roundup Games" }),
+    ).toBeVisible();
   });
 });

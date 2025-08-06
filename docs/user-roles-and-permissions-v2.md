@@ -178,7 +178,7 @@ CREATE INDEX idx_user_tags_expires_at ON user_tags(expires_at) WHERE expires_at 
 -- Insert default roles
 INSERT INTO roles (name, description, permissions) VALUES
   ('Platform Admin', 'Platform administrator with full system access', '{"*": true}'),
-  ('Games Admin', 'Roundup Games organization administrator', '{"quadball_canada.*": true}'),
+  ('Games Admin', 'Roundup Games organization administrator', '{"roundup_games.*": true}'),
   ('Team Admin', 'Team-specific administrator', '{"team.*": true}'),
   ('Event Admin', 'Event-specific administrator', '{"event.*": true}');
 

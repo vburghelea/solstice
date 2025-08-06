@@ -45,7 +45,7 @@ function ManageTeamPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { teamId } = Route.useParams();
-  const { team: teamData } = Route.useLoaderData();
+  const { teamData } = Route.useLoaderData();
   const { team } = teamData;
   const { COUNTRIES } = useCountries();
   const [serverError, setServerError] = useState<string | null>(null);

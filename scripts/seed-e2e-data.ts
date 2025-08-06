@@ -143,7 +143,6 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
-          showBirthYear: false,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,
@@ -164,7 +163,6 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: false,
           showPhone: true,
-          showBirthYear: false,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,
@@ -181,7 +179,6 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: false,
-          showBirthYear: true,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,
@@ -198,7 +195,6 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: true,
-          showBirthYear: false,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,
@@ -367,7 +363,7 @@ async function seed() {
         slug: "test-thunder",
         description: "E2E test team",
         isActive: "true",
-        city: "Toronto",
+        city: "Bremen",
         country: "DEU",
         primaryColor: "#FF0000",
         secondaryColor: "#0000FF",
@@ -379,7 +375,7 @@ async function seed() {
         slug: "test-lightning",
         description: "Another E2E test team",
         isActive: "true",
-        city: "Vancouver",
+        city: "Berlin",
         country: "DEU",
         primaryColor: "#00FF00",
         secondaryColor: "#FF00FF",

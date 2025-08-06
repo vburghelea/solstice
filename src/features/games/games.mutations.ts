@@ -1,4 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
+import { gameParticipants, games } from "~/db/schema";
+import {
+  findGameById,
+  findGameParticipantByGameAndUserId,
+  findGameParticipantById,
+  findUserByEmail,
+} from "./games.repository";
 import {
   addGameParticipantInputSchema,
   applyToGameInputSchema,
@@ -27,7 +34,6 @@ export const createGame = createServerFn({ method: "POST" })
     console.log("createGame mutation called with data:", data);
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { games, gameParticipants } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
       const currentUser = await getCurrentUser();
@@ -40,7 +46,7 @@ export const createGame = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      const [newGame] = await db()
+      const [newGame] = await db
         .insert(games)
         .values({
           ownerId: currentUser.id,
@@ -67,7 +73,7 @@ export const createGame = createServerFn({ method: "POST" })
       }
 
       // Add owner as a participant
-      const [ownerParticipant] = await db()
+      const [ownerParticipant] = await db
         .insert(gameParticipants)
         .values({
           gameId: newGame.id,
@@ -121,7 +127,6 @@ export const updateGame = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { games } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { eq } = await import("drizzle-orm");
 
@@ -136,9 +141,7 @@ export const updateGame = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if current user is the owner
-      const existingGame = await db().query.games.findFirst({
-        where: eq(games.id, data.id),
-      });
+      const existingGame = await findGameById(data.id);
 
       if (!existingGame || existingGame.ownerId !== currentUser.id) {
         return {
@@ -147,7 +150,7 @@ export const updateGame = createServerFn({ method: "POST" })
         };
       }
 
-      const [updatedGame] = await db()
+      const [updatedGame] = await db
         .update(games)
         .set({
           gameSystemId: data.gameSystemId,
@@ -208,7 +211,6 @@ export const deleteGame = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { games } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { eq } = await import("drizzle-orm");
 
@@ -223,9 +225,7 @@ export const deleteGame = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if current user is the owner
-      const existingGame = await db().query.games.findFirst({
-        where: eq(games.id, data.id),
-      });
+      const existingGame = await findGameById(data.id);
 
       if (!existingGame || existingGame.ownerId !== currentUser.id) {
         return {
@@ -234,7 +234,7 @@ export const deleteGame = createServerFn({ method: "POST" })
         };
       }
 
-      await db().delete(games).where(eq(games.id, data.id));
+      await db.delete(games).where(eq(games.id, data.id));
 
       return { success: true, data: true };
     } catch (error) {
@@ -254,9 +254,7 @@ export const addGameParticipant = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { gameParticipants, games } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq } = await import("drizzle-orm");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -269,9 +267,7 @@ export const addGameParticipant = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if current user is game owner or has permission to add participants
-      const game = await db().query.games.findFirst({
-        where: eq(games.id, data.gameId),
-      });
+      const game = await findGameById(data.gameId);
 
       if (!game || game.ownerId !== currentUser.id) {
         return {
@@ -280,7 +276,7 @@ export const addGameParticipant = createServerFn({ method: "POST" })
         };
       }
 
-      const [newParticipant] = await db()
+      const [newParticipant] = await db
         .insert(gameParticipants)
         .values({
           gameId: data.gameId,
@@ -299,10 +295,7 @@ export const addGameParticipant = createServerFn({ method: "POST" })
 
       // Fetch participant with user details
 
-      const participantWithUser = await db().query.gameParticipants.findFirst({
-        where: eq(gameParticipants.id, newParticipant.id),
-        with: { user: true },
-      });
+      const participantWithUser = await findGameParticipantById(newParticipant.id);
 
       if (!participantWithUser) {
         return {
@@ -331,7 +324,6 @@ export const updateGameParticipant = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { gameParticipants } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { eq } = await import("drizzle-orm");
 
@@ -346,10 +338,7 @@ export const updateGameParticipant = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if current user is game owner or the participant themselves
-      const existingParticipant = await db().query.gameParticipants.findFirst({
-        where: eq(gameParticipants.id, data.id),
-        with: { game: true },
-      });
+      const existingParticipant = await findGameParticipantById(data.id);
 
       if (
         !existingParticipant ||
@@ -364,7 +353,7 @@ export const updateGameParticipant = createServerFn({ method: "POST" })
         };
       }
 
-      const [updatedParticipant] = await db()
+      const [updatedParticipant] = await db
         .update(gameParticipants)
         .set({
           status: data.status,
@@ -383,10 +372,7 @@ export const updateGameParticipant = createServerFn({ method: "POST" })
 
       // Fetch updated participant with user details
 
-      const participantWithUser = await db().query.gameParticipants.findFirst({
-        where: eq(gameParticipants.id, updatedParticipant.id),
-        with: { user: true },
-      });
+      const participantWithUser = await findGameParticipantById(updatedParticipant.id);
 
       if (!participantWithUser) {
         return {
@@ -415,7 +401,6 @@ export const removeGameParticipant = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { gameParticipants } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { eq } = await import("drizzle-orm");
 
@@ -430,10 +415,7 @@ export const removeGameParticipant = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if current user is game owner or the participant themselves
-      const existingParticipant = await db().query.gameParticipants.findFirst({
-        where: eq(gameParticipants.id, data.id),
-        with: { game: true },
-      });
+      const existingParticipant = await findGameParticipantById(data.id);
 
       if (
         !existingParticipant ||
@@ -448,7 +430,7 @@ export const removeGameParticipant = createServerFn({ method: "POST" })
         };
       }
 
-      await db().delete(gameParticipants).where(eq(gameParticipants.id, data.id));
+      await db.delete(gameParticipants).where(eq(gameParticipants.id, data.id));
 
       return { success: true, data: true };
     } catch (error) {
@@ -468,9 +450,7 @@ export const applyToGame = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { gameParticipants } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq, and } = await import("drizzle-orm");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -483,12 +463,10 @@ export const applyToGame = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if already a participant
-      const existingParticipant = await db().query.gameParticipants.findFirst({
-        where: and(
-          eq(gameParticipants.gameId, data.gameId),
-          eq(gameParticipants.userId, currentUser.id),
-        ),
-      });
+      const existingParticipant = await findGameParticipantByGameAndUserId(
+        data.gameId,
+        currentUser.id,
+      );
 
       if (existingParticipant) {
         return {
@@ -497,7 +475,7 @@ export const applyToGame = createServerFn({ method: "POST" })
         };
       }
 
-      const [newParticipant] = await db()
+      const [newParticipant] = await db
         .insert(gameParticipants)
         .values({
           gameId: data.gameId,
@@ -516,10 +494,7 @@ export const applyToGame = createServerFn({ method: "POST" })
 
       // Fetch participant with user details
 
-      const participantWithUser = await db().query.gameParticipants.findFirst({
-        where: eq(gameParticipants.id, newParticipant.id),
-        with: { user: true },
-      });
+      const participantWithUser = await findGameParticipantById(newParticipant.id);
 
       if (!participantWithUser) {
         return {
@@ -548,9 +523,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
-      const { gameParticipants, games, user } = await import("~/db/schema");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq, and } = await import("drizzle-orm");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -563,9 +536,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
       const db = await getDb();
 
       // Check if current user is game owner
-      const game = await db().query.games.findFirst({
-        where: eq(games.id, data.gameId),
-      });
+      const game = await findGameById(data.gameId);
 
       if (!game || game.ownerId !== currentUser.id) {
         return {
@@ -576,14 +547,12 @@ export const inviteToGame = createServerFn({ method: "POST" })
         };
       }
 
-      let targetUserId: string | undefined;
+      let targetUserId: string;
 
       if (data.userId) {
         targetUserId = data.userId;
       } else if (data.email) {
-        const invitedUser = await db().query.user.findFirst({
-          where: eq(user.email, data.email),
-        });
+        const invitedUser = await findUserByEmail(data.email);
         if (!invitedUser) {
           return {
             success: false,
@@ -600,13 +569,24 @@ export const inviteToGame = createServerFn({ method: "POST" })
         };
       }
 
+      // Ensure targetUserId is defined before proceeding
+      if (!targetUserId) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "VALIDATION_ERROR",
+              message: "Target user ID could not be determined",
+            },
+          ],
+        };
+      }
+
       // Check if already a participant
-      const existingParticipant = await db().query.gameParticipants.findFirst({
-        where: and(
-          eq(gameParticipants.gameId, data.gameId),
-          eq(gameParticipants.userId, targetUserId),
-        ),
-      });
+      const existingParticipant = await findGameParticipantByGameAndUserId(
+        data.gameId,
+        targetUserId,
+      );
 
       if (existingParticipant) {
         return {
@@ -617,7 +597,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
         };
       }
 
-      const [newParticipant] = await db()
+      const [newParticipant] = await db
         .insert(gameParticipants)
         .values({
           gameId: data.gameId,
@@ -635,10 +615,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
       }
 
       // Fetch participant with user details
-      const participantWithUser = await db().query.gameParticipants.findFirst({
-        where: eq(gameParticipants.id, newParticipant.id),
-        with: { user: true },
-      });
+      const participantWithUser = await findGameParticipantById(newParticipant.id);
 
       if (!participantWithUser) {
         return {

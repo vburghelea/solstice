@@ -172,7 +172,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
         await countryFilter.click();
         await page.getByRole("option", { name: "Germany" }).click();
 
-        // Should only show Ontario teams
+        // Should only show Germany teams
         await expect(page.getByText("Test Thunder")).toBeVisible();
         await expect(page.getByText("Test Lightning")).not.toBeVisible();
       }

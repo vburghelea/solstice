@@ -1,7 +1,7 @@
 import { useReducer } from "react";
 import type { ProfileInputType } from "~/features/profile/profile.schemas";
 
-export type StepId = "personal" | "emergency" | "privacy";
+export type StepId = "personal" | "privacy";
 
 interface ProfileFormState {
   currentStep: StepId;

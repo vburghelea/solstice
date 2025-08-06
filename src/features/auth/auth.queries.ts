@@ -67,7 +67,7 @@ export const getProviders = createServerFn({ method: "GET" }).handler(
     const { account } = await import("~/db/schema");
 
     const db = await getDb();
-    const linkedAccounts = await db()
+    const linkedAccounts = await db
       .select({ providerId: account.providerId })
       .from(account)
       .where(eq(account.userId, currentUser.id));

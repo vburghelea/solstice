@@ -61,10 +61,6 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   .handler(async ({ data: inputData }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
-      // Import server-only modules inside the handler
-      const { getDb } = await import("~/db/server-helpers");
-      const db = await getDb();
-
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
       const currentUser = await getCurrentUser();
@@ -105,6 +101,8 @@ export const updateUserProfile = createServerFn({ method: "POST" })
         updateData["privacySettings"] = JSON.stringify(inputData.privacySettings);
       }
 
+      // Import server-only modules inside the handler
+      const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
 
       const [updatedUser] = await db
@@ -122,21 +120,21 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
       let finalGameSystemPreferences = undefined;
 
-      if (data.gameSystemPreferences) {
+      if (inputData.gameSystemPreferences) {
         // Delete existing preferences
-        await db()
+        await db
           .delete(userGameSystemPreferences)
           .where(eq(userGameSystemPreferences.userId, currentUser.id));
 
         const preferencesToInsert = [];
-        for (const gameSystem of data.gameSystemPreferences.favorite) {
+        for (const gameSystem of inputData.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
             preferenceType: "favorite" as const,
           });
         }
-        for (const gameSystem of data.gameSystemPreferences.avoid) {
+        for (const gameSystem of inputData.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
@@ -145,12 +143,12 @@ export const updateUserProfile = createServerFn({ method: "POST" })
         }
 
         if (preferencesToInsert.length > 0) {
-          await db()
+          await db
             .insert(userGameSystemPreferences)
             .values(preferencesToInsert)
             .onConflictDoNothing();
         }
-        finalGameSystemPreferences = data.gameSystemPreferences;
+        finalGameSystemPreferences = inputData.gameSystemPreferences;
       }
 
       // Check if profile is now complete
@@ -227,8 +225,6 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         profileVersion: sql`${user.profileVersion} + 1`,
       };
 
-      const db = await getDb();
-
       const [updatedUser] = await db
         .update(user)
         .set(updateData)
@@ -242,16 +238,16 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         };
       }
 
-      if (data.data.gameSystemPreferences) {
+      if (data.gameSystemPreferences) {
         const preferencesToInsert = [];
-        for (const gameSystem of data.data.gameSystemPreferences.favorite) {
+        for (const gameSystem of data.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
             preferenceType: "favorite" as const,
           });
         }
-        for (const gameSystem of data.data.gameSystemPreferences.avoid) {
+        for (const gameSystem of data.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
@@ -260,7 +256,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         }
 
         if (preferencesToInsert.length > 0) {
-          await db()
+          await db
             .insert(userGameSystemPreferences)
             .values(preferencesToInsert)
             .onConflictDoNothing();
@@ -311,7 +307,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       }
 
       // Validate input
-      const validation = privacySettingsSchema.safeParse(data.data);
+      const validation = privacySettingsSchema.safeParse(data);
       if (!validation.success) {
         return {
           success: false,
@@ -326,8 +322,6 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
-
-      const db = await getDb();
 
       const [updatedUser] = await db
         .update(user)

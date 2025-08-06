@@ -76,7 +76,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     }
 
     // Fetch full user data from database
-    const dbUser = await db()
+    const dbUser = await db
       .select()
       .from(user)
       .where(eq(user.id, session.user.id))

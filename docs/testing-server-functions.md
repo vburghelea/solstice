@@ -17,10 +17,10 @@ export default createAPIFileRoute("/api/health/membership")({
   GET: async () => {
     try {
       // Test database connection
-      await db().execute(sql`SELECT 1`);
+      await db.execute(sql`SELECT 1`);
 
       // Test membership types query
-      const types = await db().select().from(membershipTypes).limit(1);
+      const types = await db.select().from(membershipTypes).limit(1);
 
       return new Response(
         JSON.stringify({
@@ -96,7 +96,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(asy
   const startTime = Date.now();
 
   try {
-    const result = await db()
+    const result = await db
       .select()
       .from(membershipTypes)
       .where(eq(membershipTypes.status, "active"));
@@ -306,7 +306,7 @@ export default createAPIFileRoute("/api/debug/membership")({
       environment: process.env.NODE_ENV,
       databaseUrl: process.env.DATABASE_URL ? "set" : "missing",
       squareEnv: process.env.SQUARE_ENV || "not set",
-      membershipTypesCount: await db()
+      membershipTypesCount: await db
         .select({ count: sql<number>`count(*)` })
         .from(membershipTypes),
       recentErrors: await getRecentErrors(),

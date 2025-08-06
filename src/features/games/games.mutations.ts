@@ -411,7 +411,6 @@ export const cancelGame = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq } = await import("drizzle-orm");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {

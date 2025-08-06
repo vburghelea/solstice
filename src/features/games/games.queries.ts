@@ -191,7 +191,7 @@ export const searchGameSystems = createServerFn({ method: "POST" })
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
-        const systems = await db()
+        const systems = await db
           .select({
             id: gameSystems.id,
             name: gameSystems.name,
@@ -893,7 +893,7 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
-        const users = await db()
+        const users = await db
           .select({
             id: user.id,
             name: user.name,
@@ -921,9 +921,6 @@ export const getGameApplications = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
     try {
-      const { getDb } = await import("~/db/server-helpers");
-      const { gameParticipants, games } = await import("~/db/schema");
-      const { eq, and } = await import("drizzle-orm");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
       const currentUser = await getCurrentUser();
@@ -934,12 +931,8 @@ export const getGameApplications = createServerFn({ method: "POST" })
         };
       }
 
-      const db = await getDb();
-
       // Check if current user is the owner of the game
-      const game = await db().query.games.findFirst({
-        where: eq(games.id, data.id),
-      });
+      const game = await findGameById(data.id);
 
       if (!game || game.ownerId !== currentUser.id) {
         return {
@@ -953,14 +946,7 @@ export const getGameApplications = createServerFn({ method: "POST" })
         };
       }
 
-      const applications = await db().query.gameParticipants.findMany({
-        where: and(
-          eq(gameParticipants.gameId, data.id),
-          eq(gameParticipants.status, "pending"),
-          eq(gameParticipants.role, "applicant"),
-        ),
-        with: { user: true },
-      });
+      const applications = await findPendingGameApplicationsByGameId(data.id);
 
       return { success: true, data: applications as GameParticipant[] };
     } catch (error) {
@@ -968,6 +954,25 @@ export const getGameApplications = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to fetch applications" }],
+      };
+    }
+  });
+
+/**
+ * Get participants for a specific game
+ */
+export const getGameParticipants = createServerFn({ method: "POST" })
+  .validator(getGameSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
+    try {
+      const participants = await findGameParticipantsByGameId(data.id);
+
+      return { success: true, data: participants as GameParticipant[] };
+    } catch (error) {
+      console.error("Error fetching game participants:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch participants" }],
       };
     }
   });

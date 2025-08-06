@@ -85,9 +85,6 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   .handler(async ({ data: inputData, context }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
-      const db = await getDb();
-
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
       const currentUser = await getCurrentUser();
@@ -295,16 +292,16 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         };
       }
 
-      if (data.data.gameSystemPreferences) {
+      if (data.gameSystemPreferences) {
         const preferencesToInsert = [];
-        for (const gameSystem of data.data.gameSystemPreferences.favorite) {
+        for (const gameSystem of data.gameSystemPreferences.favorite) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
             preferenceType: "favorite" as const,
           });
         }
-        for (const gameSystem of data.data.gameSystemPreferences.avoid) {
+        for (const gameSystem of data.gameSystemPreferences.avoid) {
           preferencesToInsert.push({
             userId: currentUser.id,
             gameSystemId: gameSystem.id,
@@ -478,7 +475,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       }
 
       // Validate input
-      const validation = privacySettingsSchema.safeParse(data.data);
+      const validation = privacySettingsSchema.safeParse(data);
       if (!validation.success) {
         return {
           success: false,

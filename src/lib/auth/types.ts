@@ -34,6 +34,7 @@ export interface UserTag {
 
 // Extended user type that includes our custom fields
 export interface User extends BetterAuthUser {
+  image: string | null;
   // Profile completion tracking
   profileComplete: boolean;
 

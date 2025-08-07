@@ -1,4 +1,5 @@
 export * from "./auth.schema";
+export * from "./campaigns.schema";
 export * from "./events.schema";
 export * from "./game-systems.schema";
 export * from "./games.schema";

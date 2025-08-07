@@ -9,7 +9,7 @@ import type { GameListItem } from "~/features/games/games.types";
 import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/dashboard/games/")({
-  component: MyGamesPage,
+  component: GamesPage,
   loader: async () => {
     const result = await listGames({});
     if (!result.success) {
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/dashboard/games/")({
   },
 });
 
-function MyGamesPage() {
+function GamesPage() {
   const { games: initialGames } = Route.useLoaderData();
 
   const { data: gamesData } = useSuspenseQuery({

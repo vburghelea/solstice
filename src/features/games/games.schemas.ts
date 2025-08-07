@@ -20,11 +20,12 @@ export const safetyRulesSchema = z.record(z.boolean()).optional(); // e.g., { "n
 
 export const createGameInputSchema = z.object({
   gameSystemId: z.number().int().positive(),
+  ownerId: z.string().optional(),
   name: z.string().min(1, "Game session name is required"),
   dateTime: z.string().datetime(), // ISO string
   description: z.string().min(1, "Description is required"),
   expectedDuration: z.number().positive(), // in hours
-  price: z.number().min(0).optional(),
+  price: z.number().optional(),
   language: z.string().min(1, "Language is required"),
   location: gameLocationSchema,
   minimumRequirements: minimumRequirementsSchema.optional(),

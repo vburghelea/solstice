@@ -68,7 +68,7 @@ export const searchGamesSchema = z.object({
 export const addGameParticipantInputSchema = z.object({
   gameId: z.string().min(1),
   userId: z.string().min(1),
-  role: z.enum(["player", "invited", "applicant"]), // Specific roles for adding
+  role: z.enum(["owner", "player", "invited", "applicant"]), // Specific roles for adding
   status: z.enum(["approved", "rejected", "pending"]), // Specific statuses for adding
 });
 

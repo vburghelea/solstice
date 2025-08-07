@@ -8,6 +8,7 @@ import {
   real,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
@@ -65,6 +66,7 @@ export const campaignParticipantRoleEnum = pgEnum("campaign_participant_role", [
   "owner",
   "player",
   "invited",
+  "applicant",
 ]);
 export const campaignParticipantStatusEnum = pgEnum("campaign_participant_status", [
   "approved",
@@ -73,9 +75,7 @@ export const campaignParticipantStatusEnum = pgEnum("campaign_participant_status
 ]);
 
 export const campaignParticipants = pgTable("campaign_participants", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => createId()),
+  id: uuid("id").primaryKey().defaultRandom(),
   campaignId: text("campaign_id")
     .notNull()
     .references(() => campaigns.id, { onDelete: "cascade" }),

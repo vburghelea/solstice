@@ -1,4 +1,4 @@
-CREATE TYPE "public"."game_participant_role" AS ENUM('player', 'invited', 'applicant');--> statement-breakpoint
+CREATE TYPE "public"."game_participant_role" AS ENUM('owner', 'player', 'invited', 'applicant');--> statement-breakpoint
 CREATE TYPE "public"."game_participant_status" AS ENUM('approved', 'rejected', 'pending');--> statement-breakpoint
 CREATE TYPE "public"."game_status" AS ENUM('scheduled', 'canceled', 'completed');--> statement-breakpoint
 CREATE TYPE "public"."game_visibility" AS ENUM('public', 'protected', 'private');--> statement-breakpoint

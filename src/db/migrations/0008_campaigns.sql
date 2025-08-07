@@ -2,7 +2,7 @@ CREATE TYPE "public"."application_status" AS ENUM('pending', 'approved', 'reject
 CREATE TYPE "public"."campaign_recurrence" AS ENUM('weekly', 'bi-weekly', 'monthly');--> statement-breakpoint
 CREATE TYPE "public"."campaign_status" AS ENUM('active', 'cancelled', 'completed');--> statement-breakpoint
 CREATE TYPE "public"."campaign_visibility" AS ENUM('public', 'protected', 'private');--> statement-breakpoint
-CREATE TYPE "public"."campaign_participant_role" AS ENUM('owner', 'player', 'invited');--> statement-breakpoint
+CREATE TYPE "public"."campaign_participant_role" AS ENUM('owner', 'player', 'invited', 'applicant');--> statement-breakpoint
 CREATE TYPE "public"."campaign_participant_status" AS ENUM('approved', 'rejected', 'pending');--> statement-breakpoint
 
 CREATE TABLE "campaign_applications" (
@@ -15,7 +15,7 @@ CREATE TABLE "campaign_applications" (
 );
 --> statement-breakpoint
 CREATE TABLE "campaign_participants" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
 	"campaign_id" text NOT NULL,
 	"user_id" text NOT NULL,
 	"role" "campaign_participant_role" NOT NULL,

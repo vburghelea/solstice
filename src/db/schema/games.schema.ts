@@ -25,6 +25,7 @@ export const gameVisibilityEnum = pgEnum("game_visibility", [
   "private",
 ]);
 export const gameParticipantRoleEnum = pgEnum("game_participant_role", [
+  "owner",
   "player",
   "invited",
   "applicant",

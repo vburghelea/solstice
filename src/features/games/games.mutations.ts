@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { gameParticipants, games } from "~/db/schema";
+import { OperationResult } from "~/shared/types/common";
 import {
   findGameById,
   findGameParticipantByGameAndUserId,
@@ -18,14 +19,7 @@ import {
   updateGameInputSchema,
   updateGameParticipantInputSchema,
 } from "./games.schemas";
-import type {
-  GameLocation,
-  GameParticipant,
-  GameWithDetails,
-  MinimumRequirements,
-  OperationResult,
-  SafetyRules,
-} from "./games.types";
+import { GameParticipant, GameWithDetails } from "./games.types";
 
 /**
  * Create a new game session
@@ -61,9 +55,9 @@ export const createGame = createServerFn({ method: "POST" })
           language: data.language,
           location: data.location,
           status: "scheduled",
-          minimumRequirements: data.minimumRequirements as MinimumRequirements,
+          minimumRequirements: data.minimumRequirements,
           visibility: data.visibility,
-          safetyRules: data.safetyRules as SafetyRules,
+          safetyRules: data.safetyRules,
         })
         .returning();
 
@@ -109,7 +103,7 @@ export const createGame = createServerFn({ method: "POST" })
         success: true,
         data: {
           ...gameWithDetails.data,
-          location: gameWithDetails.data.location as GameLocation,
+          location: gameWithDetails.data.location,
         },
       };
     } catch (error) {
@@ -161,11 +155,11 @@ export const updateGame = createServerFn({ method: "POST" })
           expectedDuration: data.expectedDuration,
           price: data.price,
           language: data.language,
-          location: data.location as GameLocation,
+          location: data.location,
           status: data.status,
-          minimumRequirements: data.minimumRequirements as MinimumRequirements,
+          minimumRequirements: data.minimumRequirements,
           visibility: data.visibility,
-          safetyRules: data.safetyRules as SafetyRules,
+          safetyRules: data.safetyRules,
           updatedAt: new Date(),
         })
         .where(eq(games.id, data.id))
@@ -193,7 +187,7 @@ export const updateGame = createServerFn({ method: "POST" })
         success: true,
         data: {
           ...gameWithDetails.data,
-          location: gameWithDetails.data.location as GameLocation,
+          location: gameWithDetails.data.location,
         },
       };
     } catch (error) {

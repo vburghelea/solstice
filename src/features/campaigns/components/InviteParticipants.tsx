@@ -6,13 +6,10 @@ import {
   inviteToCampaign,
   removeCampaignParticipant,
 } from "~/features/campaigns/campaigns.mutations";
-import type {
-  CampaignParticipant,
-  OperationResult,
-} from "~/features/campaigns/campaigns.types";
+import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
 import { searchUsersForInvitation } from "~/features/games/games.queries"; // Re-using games query for user search
-import type { User } from "~/lib/auth/types";
 import { useDebounce } from "~/shared/hooks/useDebounce";
+import { OperationResult } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
 import {
   Card,
@@ -128,11 +125,11 @@ export function InviteParticipants({
                     key={user.id}
                     className="hover:bg-accent flex items-center justify-between rounded-sm p-2"
                   >
-                    <span>{(user as User).name || (user as User).email}</span>
+                    <span>{user.name || user.email}</span>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleInviteUser((user as User).id)}
+                      onClick={() => handleInviteUser(user.id)}
                       disabled={inviteMutation.isPending}
                     >
                       Invite

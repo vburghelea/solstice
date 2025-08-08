@@ -62,17 +62,7 @@ export const campaigns = pgTable("campaigns", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const campaignParticipantRoleEnum = pgEnum("campaign_participant_role", [
-  "owner",
-  "player",
-  "invited",
-  "applicant",
-]);
-export const campaignParticipantStatusEnum = pgEnum("campaign_participant_status", [
-  "approved",
-  "rejected",
-  "pending",
-]);
+import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
 
 export const campaignParticipants = pgTable("campaign_participants", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -82,8 +72,8 @@ export const campaignParticipants = pgTable("campaign_participants", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  role: campaignParticipantRoleEnum("role").notNull(),
-  status: campaignParticipantStatusEnum("status").notNull(),
+  role: participantRoleEnum("role").notNull(),
+  status: participantStatusEnum("status").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

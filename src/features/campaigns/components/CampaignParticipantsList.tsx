@@ -5,8 +5,8 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { removeCampaignParticipant } from "~/features/campaigns/campaigns.mutations";
 import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
-import type { OperationResult } from "~/features/campaigns/campaigns.types";
 import type { User } from "~/lib/auth/types";
+import { OperationResult } from "~/shared/types/common";
 
 interface CampaignParticipantsListProps {
   campaignId: string;

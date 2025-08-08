@@ -1,50 +1,39 @@
 import { z } from "zod";
 import {
-  campaignParticipantRoleEnum,
-  campaignParticipantStatusEnum,
   campaignRecurrenceEnum,
   campaignStatusEnum,
   campaignVisibilityEnum,
 } from "~/db/schema/campaigns.schema";
+import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
 
-export const campaignLocationSchema = z.object({
-  address: z.string().min(1, "Address is required"),
-  lat: z.number().min(-90).max(90),
-  lng: z.number().min(-180).max(180),
-  placeId: z.string().optional(),
-});
-
-export const minimumRequirementsSchema = z.object({
-  languageLevel: z.enum(["beginner", "intermediate", "advanced", "fluent"]).optional(),
-  minPlayers: z.number().int().positive().optional(),
-  maxPlayers: z.number().int().positive().optional(),
-  playerRadiusKm: z.number().int().min(1).max(10).optional(),
-});
-
-export const safetyRulesSchema = z.record(z.boolean()).optional();
+import {
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
 
 export const createCampaignInputSchema = z.object({
   name: z.string().min(1, "Campaign name is required"),
   description: z.string().min(1, "Description is required"),
   images: z.array(z.string()).nullable().optional(),
   gameSystemId: z.number().int().positive(),
-  ownerId: z.string(),
+  ownerId: z.string().optional(),
   recurrence: z.enum(campaignRecurrenceEnum.enumValues),
   timeOfDay: z.string(),
   sessionDuration: z.number().positive(),
   pricePerSession: z.number().optional(),
   language: z.string().min(1, "Language is required"),
-  location: campaignLocationSchema.optional(),
+  location: locationSchema.optional(),
   minimumRequirements: minimumRequirementsSchema.optional(),
-  visibility: z.enum(campaignVisibilityEnum.enumValues).default("public"),
+  visibility: z.enum(campaignVisibilityEnum.enumValues),
   safetyRules: safetyRulesSchema.optional(),
 });
 
 export const addCampaignParticipantInputSchema = z.object({
   campaignId: z.string().min(1),
   userId: z.string().min(1),
-  role: z.enum(campaignParticipantRoleEnum.enumValues),
-  status: z.enum(campaignParticipantStatusEnum.enumValues),
+  role: z.enum(participantRoleEnum.enumValues),
+  status: z.enum(participantStatusEnum.enumValues),
 });
 
 export const updateCampaignInputSchema = createCampaignInputSchema.partial().extend({
@@ -99,8 +88,8 @@ export const searchUsersForInvitationSchema = z.object({
 
 export const updateCampaignParticipantInputSchema = z.object({
   participantId: z.string().min(1),
-  role: z.enum(campaignParticipantRoleEnum.enumValues).optional(),
-  status: z.enum(campaignParticipantStatusEnum.enumValues).optional(),
+  role: z.enum(participantRoleEnum.enumValues).optional(),
+  status: z.enum(participantStatusEnum.enumValues).optional(),
 });
 
 export const removeCampaignParticipantInputSchema = z.object({

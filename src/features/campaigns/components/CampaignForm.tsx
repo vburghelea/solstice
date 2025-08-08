@@ -12,14 +12,17 @@ import {
   campaignVisibilityEnum,
 } from "~/db/schema/campaigns.schema";
 import {
-  campaignLocationSchema,
   createCampaignInputSchema,
-  minimumRequirementsSchema,
   updateCampaignInputSchema,
 } from "~/features/campaigns/campaigns.schemas";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import { searchGameSystems } from "~/features/games/games.queries";
 import { useDebounce } from "~/shared/hooks/useDebounce";
+import {
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
 import { Checkbox } from "~/shared/ui/checkbox";
 import { Label } from "~/shared/ui/label";
 import {
@@ -642,7 +645,7 @@ export function CampaignForm({
                 }
               }
               try {
-                campaignLocationSchema.shape.address.parse(value);
+                locationSchema.shape.address.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -686,7 +689,7 @@ export function CampaignForm({
                 return undefined;
               }
               try {
-                campaignLocationSchema.shape.lat.parse(value);
+                locationSchema.shape.lat.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -713,7 +716,7 @@ export function CampaignForm({
                 return undefined;
               }
               try {
-                campaignLocationSchema.shape.lng.parse(value);
+                locationSchema.shape.lng.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -946,55 +949,53 @@ export function CampaignForm({
         </form.Field>
       </fieldset>
 
-      {initialValues && (
-        <form.Field
-          name="status"
-          validators={{
-            onChange: ({ value }) => {
-              try {
-                updateCampaignInputSchema.shape.status.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
+      <form.Field
+        name="status"
+        validators={{
+          onChange: ({ value }) => {
+            try {
+              updateCampaignInputSchema.shape.status.parse(value);
+              return undefined;
+            } catch (error: unknown) {
+              return (error as z.ZodError).errors[0]?.message;
+            }
+          },
+        }}
+      >
+        {(field) => (
+          <div>
+            <Label htmlFor={field.name}>Status</Label>
+            <Select
+              value={field.state.value as string}
+              onValueChange={(value: "active" | "cancelled" | "completed") =>
+                field.handleChange(value)
               }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Status</Label>
-              <Select
-                value={field.state.value as string}
-                onValueChange={(value: "active" | "cancelled" | "completed") =>
-                  field.handleChange(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {campaignStatusEnum.enumValues.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "What organizational status does this campaign have?",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      )}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {campaignStatusEnum.enumValues.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {field.state.meta.errors?.length > 0 && (
+              <p className="text-destructive mt-1 text-sm">
+                {field.state.meta.errors
+                  .map((error) =>
+                    typeof error === "string"
+                      ? error
+                      : "What organizational status does this campaign have?",
+                  )
+                  .join(", ")}
+              </p>
+            )}
+          </div>
+        )}
+      </form.Field>
 
       <fieldset className="space-y-2 rounded-md border p-4">
         <legend className="text-lg font-semibold">Safety Rules (Optional)</legend>
@@ -1006,7 +1007,7 @@ export function CampaignForm({
                 return undefined;
               }
               try {
-                z.boolean().parse(value);
+                safetyRulesSchema.shape["no-alcohol"].parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -1034,7 +1035,7 @@ export function CampaignForm({
                 return undefined;
               }
               try {
-                z.boolean().parse(value);
+                safetyRulesSchema.shape["safe-word"].parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -1056,126 +1057,14 @@ export function CampaignForm({
         </form.Field>
       </fieldset>
 
-      <fieldset className="space-y-2 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Safety Rules (Optional)</legend>
-        <form.Field
-          name="safetyRules.no-alcohol"
-          validators={{
-            onChange: ({ value }) => {
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                z.boolean().parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={field.name}
-                checked={field.state.value as boolean}
-                onCheckedChange={(checked) => field.handleChange(!!checked)}
-                onBlur={field.handleBlur}
-              />
-              <Label htmlFor={field.name}>No Alcohol</Label>
-            </div>
-          )}
-        </form.Field>
-        <form.Field
-          name="safetyRules.safe-word"
-          validators={{
-            onChange: ({ value }) => {
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                z.boolean().parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id={field.name}
-                checked={field.state.value as boolean}
-                onCheckedChange={(checked) => field.handleChange(!!checked)}
-                onBlur={field.handleBlur}
-              />
-              <Label htmlFor={field.name}>Safe Word Required</Label>
-            </div>
-          )}
-        </form.Field>
-      </fieldset>
-
-      {initialValues && (
-        <form.Field
-          name="status"
-          validators={{
-            onChange: ({ value }) => {
-              try {
-                updateCampaignInputSchema.shape.status.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Status</Label>
-              <Select
-                value={field.state.value as string}
-                onValueChange={(value: "active" | "cancelled" | "completed") =>
-                  field.handleChange(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {campaignStatusEnum.enumValues.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "What organizational status does this campaign have?",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      )}
-
-      <fieldset className="space-y-2 rounded-md border p-4">
-        <div className="flex justify-end gap-4">
-          <Button variant="outline" asChild>
-            <Link to="/dashboard/campaigns">Cancel</Link>
-          </Button>
-          <FormSubmitButton isSubmitting={isSubmitting}>
-            {initialValues ? "Update Campaign" : "Create Campaign"}
-          </FormSubmitButton>
-        </div>
-      </fieldset>
+      <div className="flex justify-end gap-4">
+        <Button variant="outline" asChild>
+          <Link to="/dashboard/campaigns">Cancel</Link>
+        </Button>
+        <FormSubmitButton isSubmitting={isSubmitting}>
+          {initialValues ? "Update Campaign" : "Create Campaign"}
+        </FormSubmitButton>
+      </div>
     </form>
   );
 }

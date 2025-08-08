@@ -9,7 +9,8 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { respondToGameInvitation } from "~/features/games/games.mutations";
-import type { GameParticipant, OperationResult } from "~/features/games/games.types";
+import type { GameParticipant } from "~/features/games/games.types";
+import { OperationResult } from "~/shared/types/common";
 
 interface RespondToInvitationProps {
   participant: GameParticipant;

@@ -5,8 +5,9 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { updateGameParticipant } from "~/features/games/games.mutations";
 import { getGameParticipants } from "~/features/games/games.queries";
-import type { GameParticipant, OperationResult } from "~/features/games/games.types";
+import { GameParticipant } from "~/features/games/games.types";
 import type { User } from "~/lib/auth/types";
+import { OperationResult } from "~/shared/types/common";
 
 interface GameParticipantsListProps {
   gameId: string;

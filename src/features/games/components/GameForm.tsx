@@ -12,11 +12,14 @@ import { GameSystemCombobox } from "~/features/games/components/GameSystemCombob
 import { searchGameSystems } from "~/features/games/games.queries";
 import {
   createGameInputSchema,
-  gameLocationSchema,
-  minimumRequirementsSchema,
   updateGameInputSchema,
 } from "~/features/games/games.schemas";
 import { useDebounce } from "~/shared/hooks/useDebounce";
+import {
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
 import { Checkbox } from "~/shared/ui/checkbox";
 import { Label } from "~/shared/ui/label";
 import {
@@ -642,7 +645,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 }
               }
               try {
-                gameLocationSchema.shape.address.parse(value);
+                locationSchema.shape.address.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -686,7 +689,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 return undefined;
               }
               try {
-                gameLocationSchema.shape.lat.parse(value);
+                locationSchema.shape.lat.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -713,7 +716,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 return undefined;
               }
               try {
-                gameLocationSchema.shape.lng.parse(value);
+                locationSchema.shape.lng.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -906,12 +909,11 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
           name="safetyRules.no-alcohol"
           validators={{
             onChange: ({ value }) => {
-              // Safety rules are optional, so undefined/null values are valid
               if (value === undefined || value === null) {
                 return undefined;
               }
               try {
-                z.boolean().parse(value);
+                safetyRulesSchema.shape["no-alcohol"].parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -935,12 +937,11 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
           name="safetyRules.safe-word"
           validators={{
             onChange: ({ value }) => {
-              // Safety rules are optional, so undefined/null values are valid
               if (value === undefined || value === null) {
                 return undefined;
               }
               try {
-                z.boolean().parse(value);
+                safetyRulesSchema.shape["safe-word"].parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;

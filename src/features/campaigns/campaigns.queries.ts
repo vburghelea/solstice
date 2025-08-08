@@ -3,6 +3,7 @@ import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { campaignParticipants, campaigns, user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getCurrentUser } from "~/features/auth/auth.queries";
+import { OperationResult } from "~/shared/types/common";
 import {
   findCampaignById,
   findCampaignParticipantsByCampaignId,
@@ -13,12 +14,11 @@ import {
   listCampaignsSchema,
   searchUsersForInvitationSchema,
 } from "./campaigns.schemas";
-import type {
+import {
   CampaignApplication,
   CampaignListItem,
   CampaignParticipant,
   CampaignWithDetails,
-  OperationResult,
 } from "./campaigns.types";
 
 export const getCampaign = createServerFn({ method: "POST" })

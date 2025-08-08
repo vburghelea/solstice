@@ -208,15 +208,6 @@ export function GameForm({
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Form onSubmit handler called");
-        console.log("Form state:", form.state);
-        console.log("Field meta:", form.state.fieldMeta);
-        // Check for field errors
-        Object.entries(form.state.fieldMeta).forEach(([fieldName, fieldMeta]) => {
-          if (fieldMeta.errors && fieldMeta.errors.length > 0) {
-            console.log(`Field ${fieldName} has errors:`, fieldMeta.errors);
-          }
-        });
         form.handleSubmit();
       }}
       className="space-y-8"

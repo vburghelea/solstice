@@ -1,22 +1,12 @@
 import { z } from "zod";
 import { gameStatusEnum, gameVisibilityEnum } from "~/db/schema/games.schema";
+import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
 
-export const gameLocationSchema = z.object({
-  address: z.string().min(1, "Address is required"),
-  lat: z.number().min(-90).max(90), // Latitude
-  lng: z.number().min(-180).max(180), // Longitude
-  placeId: z.string().optional(), // Google Maps Place ID
-});
-
-export const minimumRequirementsSchema = z.object({
-  languageLevel: z.enum(["beginner", "intermediate", "advanced", "fluent"]).optional(),
-  minPlayers: z.number().int().positive().optional(),
-  maxPlayers: z.number().int().positive().optional(),
-  playerRadiusKm: z.number().int().min(1).max(10).optional(), // Radius in kilometers
-  // Add more as needed
-});
-
-export const safetyRulesSchema = z.record(z.boolean()).optional(); // e.g., { "no-alcohol": true, "safe-word": false }
+import {
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
 
 export const createGameInputSchema = z.object({
   gameSystemId: z.number().int().positive(),
@@ -27,7 +17,7 @@ export const createGameInputSchema = z.object({
   expectedDuration: z.number().positive(), // in hours
   price: z.number().optional(),
   language: z.string().min(1, "Language is required"),
-  location: gameLocationSchema,
+  location: locationSchema,
   minimumRequirements: minimumRequirementsSchema.optional(),
   visibility: z.enum(gameVisibilityEnum.enumValues).default("public"),
   safetyRules: safetyRulesSchema.optional(),
@@ -68,14 +58,14 @@ export const searchGamesSchema = z.object({
 export const addGameParticipantInputSchema = z.object({
   gameId: z.string().min(1),
   userId: z.string().min(1),
-  role: z.enum(["owner", "player", "invited", "applicant"]), // Specific roles for adding
-  status: z.enum(["approved", "rejected", "pending"]), // Specific statuses for adding
+  role: z.enum(participantRoleEnum.enumValues),
+  status: z.enum(participantStatusEnum.enumValues),
 });
 
 export const updateGameParticipantInputSchema = z.object({
   id: z.string().min(1), // Participant ID
-  status: z.enum(["approved", "rejected", "pending"]).optional(),
-  role: z.enum(["player", "invited", "applicant"]).optional(),
+  status: z.enum(participantStatusEnum.enumValues).optional(),
+  role: z.enum(participantRoleEnum.enumValues).optional(),
 });
 
 export const removeGameParticipantInputSchema = z.object({
@@ -92,7 +82,7 @@ export const inviteToGameInputSchema = z
     gameId: z.string().min(1),
     userId: z.string().min(1).optional(), // Either userId or email
     email: z.string().email().optional(),
-    role: z.enum(["player", "invited"]).default("invited"),
+    role: z.enum(participantRoleEnum.enumValues).default("invited"),
   })
   .refine((data) => data.userId || data.email, {
     message: "Either userId or email must be provided",
@@ -138,7 +128,7 @@ export const gameFormSchema = createGameInputSchema
     expectedDuration: z.number().positive().optional(),
     price: z.number().min(0).optional(),
     language: z.string().optional(),
-    location: gameLocationSchema.optional(),
+    location: locationSchema.optional(),
     minimumRequirements: minimumRequirementsSchema.optional(),
     visibility: z.enum(gameVisibilityEnum.enumValues).optional(),
     safetyRules: safetyRulesSchema.optional(),

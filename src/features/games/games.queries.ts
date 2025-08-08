@@ -7,29 +7,42 @@ import {
   searchUsersForInvitationSchema,
 } from "./games.schemas";
 
-import type { User } from "~/lib/auth/types";
+import { z } from "zod";
 import {
-  findGameById,
-  findGameParticipantsByGameId,
-  findPendingGameApplicationsByGameId,
-} from "./games.repository";
-import type {
-  GameListItem,
-  GameLocation,
-  GameParticipant,
-  GameWithDetails,
-  MinimumRequirements,
-  OperationResult,
-  SafetyRules,
-} from "./games.types";
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
+import { OperationResult } from "~/shared/types/common";
+import { GameListItem, GameParticipant, GameWithDetails } from "./games.types";
 
 import { and, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 import { gameParticipants, games, gameSystems, user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getCurrentUser } from "~/features/auth/auth.queries";
+import {
+  findGameById,
+  findGameParticipantsByGameId,
+  findPendingGameApplicationsByGameId,
+} from "./games.repository";
 
 interface GameQueryResultRow {
-  game: typeof games.$inferSelect;
+  id: typeof games.$inferSelect.id;
+  ownerId: typeof games.$inferSelect.ownerId;
+  gameSystemId: typeof games.$inferSelect.gameSystemId;
+  name: typeof games.$inferSelect.name;
+  dateTime: typeof games.$inferSelect.dateTime;
+  description: typeof games.$inferSelect.description;
+  expectedDuration: typeof games.$inferSelect.expectedDuration;
+  price: typeof games.$inferSelect.price;
+  language: typeof games.$inferSelect.language;
+  location: z.infer<typeof locationSchema>;
+  status: typeof games.$inferSelect.status;
+  minimumRequirements: z.infer<typeof minimumRequirementsSchema>;
+  visibility: typeof games.$inferSelect.visibility;
+  safetyRules: z.infer<typeof safetyRulesSchema>;
+  createdAt: typeof games.$inferSelect.createdAt;
+  updatedAt: typeof games.$inferSelect.updatedAt;
   owner: {
     id: typeof user.$inferSelect.id;
     name: typeof user.$inferSelect.name;
@@ -118,8 +131,8 @@ export const getGame = createServerFn({ method: "POST" })
         success: true,
         data: {
           ...game,
-          location: game.location as GameLocation,
-          owner: game.owner as User,
+          location: game.location,
+          owner: game.owner,
         } as GameWithDetails,
       };
     } catch (error) {
@@ -210,9 +223,26 @@ export const listGames = createServerFn({ method: "POST" })
       // Combine base conditions with visibility conditions
       const finalConditions = and(...baseConditions, or(...visibilityConditions));
 
-      const result = await db
+      const result: GameQueryResultRow[] = await db
         .select({
-          game: games,
+          id: games.id,
+          ownerId: games.ownerId,
+          gameSystemId: games.gameSystemId,
+          name: games.name,
+          dateTime: games.dateTime,
+          description: games.description,
+          expectedDuration: games.expectedDuration,
+          price: games.price,
+          language: games.language,
+          location: sql<z.infer<typeof locationSchema>>`${games.location}`,
+          status: games.status,
+          minimumRequirements: sql<
+            z.infer<typeof minimumRequirementsSchema>
+          >`${games.minimumRequirements}`,
+          visibility: games.visibility,
+          safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
+          createdAt: games.createdAt,
+          updatedAt: games.updatedAt,
           owner: { id: user.id, name: user.name, email: user.email },
           gameSystem: { id: gameSystems.id, name: gameSystems.name },
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
@@ -226,14 +256,8 @@ export const listGames = createServerFn({ method: "POST" })
 
       return {
         success: true,
-        data: result.map((r: GameQueryResultRow) => ({
-          ...r.game,
-          location: r.game.location as GameLocation,
-          minimumRequirements: r.game.minimumRequirements as MinimumRequirements,
-          safetyRules: r.game.safetyRules as SafetyRules,
-          owner: r.owner as User,
-          gameSystem: r.gameSystem,
-          participantCount: r.participantCount,
+        data: result.map((r) => ({
+          ...r,
         })),
       };
     } catch (error) {
@@ -255,9 +279,26 @@ export const searchGames = createServerFn({ method: "POST" })
       const db = await getDb();
       const searchTerm = `%${data.query}%`;
 
-      const result = await db
+      const result: GameQueryResultRow[] = await db
         .select({
-          game: games,
+          id: games.id,
+          ownerId: games.ownerId,
+          gameSystemId: games.gameSystemId,
+          name: games.name,
+          dateTime: games.dateTime,
+          description: games.description,
+          expectedDuration: games.expectedDuration,
+          price: games.price,
+          language: games.language,
+          location: sql<z.infer<typeof locationSchema>>`${games.location}`,
+          status: games.status,
+          minimumRequirements: sql<
+            z.infer<typeof minimumRequirementsSchema>
+          >`${games.minimumRequirements}`,
+          visibility: games.visibility,
+          safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
+          createdAt: games.createdAt,
+          updatedAt: games.updatedAt,
           owner: { id: user.id, name: user.name, email: user.email },
           gameSystem: { id: gameSystems.id, name: gameSystems.name },
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
@@ -278,14 +319,8 @@ export const searchGames = createServerFn({ method: "POST" })
 
       return {
         success: true,
-        data: result.map((r: GameQueryResultRow) => ({
-          ...r.game,
-          location: r.game.location as GameLocation,
-          minimumRequirements: r.game.minimumRequirements as MinimumRequirements,
-          safetyRules: r.game.safetyRules as SafetyRules,
-          owner: r.owner as User,
-          gameSystem: r.gameSystem,
-          participantCount: r.participantCount,
+        data: result.map((r) => ({
+          ...r,
         })),
       };
     } catch (error) {

@@ -1,58 +1,38 @@
 import { z } from "zod";
 import type { user } from "~/db/schema";
 import type { gameSystems as gameSystem } from "~/db/schema/game-systems.schema";
-import type {
-  gameParticipantRoleEnum,
-  gameParticipantStatusEnum,
-  gameStatusEnum,
-  gameVisibilityEnum,
-  games,
-} from "~/db/schema/games.schema";
-import { gameLocationSchema } from "./games.schemas";
+import type { gameStatusEnum, gameVisibilityEnum, games } from "~/db/schema/games.schema";
+import {
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
+import {
+  BaseParticipantWithUser,
+  ParticipantRole,
+  ParticipantStatus,
+} from "~/shared/types/participants";
 
 export type Game = typeof games.$inferSelect & {
-  location: z.infer<typeof gameLocationSchema>;
+  location: z.infer<typeof locationSchema>;
 };
 export type NewGame = typeof games.$inferInsert;
 
 export type GameStatus = (typeof gameStatusEnum.enumValues)[number];
 export type GameVisibility = (typeof gameVisibilityEnum.enumValues)[number];
-export type GameParticipantRole = (typeof gameParticipantRoleEnum.enumValues)[number];
-export type GameParticipantStatus = (typeof gameParticipantStatusEnum.enumValues)[number];
-
-export interface GameLocation {
-  address: string;
-  lat: number;
-  lng: number;
-  placeId?: string;
-}
-
-export type MinimumRequirements = {
-  minPlayers?: number;
-  maxPlayers?: number;
-  languageLevel?: "beginner" | "intermediate" | "advanced" | "fluent";
-  playerRadiusKm?: number;
-};
-
-export interface SafetyRules {
-  [key: string]: boolean;
-}
+export type GameParticipantRole = ParticipantRole;
+export type GameParticipantStatus = ParticipantStatus;
 
 export type GameWithDetails = Game & {
   owner: typeof user.$inferSelect | null;
   gameSystem: typeof gameSystem.$inferSelect;
   participants: GameParticipant[];
-  minimumRequirements: MinimumRequirements | null;
-  safetyRules: SafetyRules | null;
+  minimumRequirements: z.infer<typeof minimumRequirementsSchema> | null;
+  safetyRules: z.infer<typeof safetyRulesSchema> | null;
 };
 
-export type GameParticipant = {
-  id: string;
+export type GameParticipant = BaseParticipantWithUser & {
   gameId: string;
-  userId: string;
-  role: GameParticipantRole;
-  status: GameParticipantStatus;
-  user: typeof user.$inferSelect;
   message?: string;
 };
 
@@ -60,8 +40,8 @@ export type GameListItem = Game & {
   owner: { id: string; name: string | null; email: string } | null;
   gameSystem: { id: number; name: string } | null;
   participantCount: number;
-  minimumRequirements: MinimumRequirements | null;
-  safetyRules: SafetyRules | null;
+  minimumRequirements: z.infer<typeof minimumRequirementsSchema> | null;
+  safetyRules: z.infer<typeof safetyRulesSchema> | null;
 };
 
 export type GameSearchFilters = {
@@ -95,7 +75,3 @@ export type GameParticipantUpdate = {
   status?: GameParticipantStatus;
   role?: GameParticipantRole;
 };
-
-export type OperationResult<T> =
-  | { success: true; data: T }
-  | { success: false; errors: { code: string; message: string; field?: string }[] };

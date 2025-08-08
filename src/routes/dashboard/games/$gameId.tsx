@@ -20,7 +20,7 @@ import { ManageApplications } from "~/features/games/components/ManageApplicatio
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
 import { updateGame } from "~/features/games/games.mutations";
 import { getGame, getGameApplications } from "~/features/games/games.queries";
-import type { GameWithDetails } from "~/features/games/games.types";
+import type { GameParticipant, GameWithDetails } from "~/features/games/games.types";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -131,13 +131,14 @@ function GameDetailsPage() {
 
   const isOwner = game?.owner?.id === currentUser?.id;
   const isInvited = game?.participants?.some(
-    (p) => p.userId === currentUser?.id && p.role === "invited",
+    (p: GameParticipant) => p.userId === currentUser?.id && p.role === "invited",
   );
   const invitedParticipant = game?.participants?.find(
-    (p) => p.userId === currentUser?.id && p.role === "invited",
+    (p: GameParticipant) => p.userId === currentUser?.id && p.role === "invited",
   );
   const isParticipant = game?.participants?.some(
-    (p) => p.userId === currentUser?.id && (p.role === "player" || p.role === "invited"),
+    (p: GameParticipant) =>
+      p.userId === currentUser?.id && (p.role === "player" || p.role === "invited"),
   );
 
   const updateGameMutation = useMutation({

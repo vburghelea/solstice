@@ -4,9 +4,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { inviteToGame, removeGameParticipant } from "~/features/games/games.mutations";
 import { searchUsersForInvitation } from "~/features/games/games.queries";
-import type { GameParticipant, OperationResult } from "~/features/games/games.types";
-import type { User } from "~/lib/auth/types";
+import type { GameParticipant } from "~/features/games/games.types";
 import { useDebounce } from "~/shared/hooks/useDebounce";
+import { OperationResult } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
 import {
   Card,
@@ -110,22 +110,29 @@ export function InviteParticipants({
           )}
           {searchResults?.success && searchResults.data.length > 0 && (
             <div className="bg-popover mt-2 max-h-48 overflow-y-auto rounded-md border p-2 shadow-md">
-              {searchResults.data.map((user) => (
-                <div
-                  key={user.id}
-                  className="hover:bg-accent flex items-center justify-between rounded-sm p-2"
-                >
-                  <span>{(user as User).name || (user as User).email}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleInviteUser((user as User).id)}
-                    disabled={inviteMutation.isPending}
+              {searchResults.data
+                .filter(
+                  (user) =>
+                    !currentParticipants.some(
+                      (participant) => participant.userId === user.id,
+                    ),
+                )
+                .map((user) => (
+                  <div
+                    key={user.id}
+                    className="hover:bg-accent flex items-center justify-between rounded-sm p-2"
                   >
-                    Invite
-                  </Button>
-                </div>
-              ))}
+                    <span>{user.name || user.email}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleInviteUser(user.id)}
+                      disabled={inviteMutation.isPending}
+                    >
+                      Invite
+                    </Button>
+                  </div>
+                ))}
             </div>
           )}
           {searchResults?.success &&

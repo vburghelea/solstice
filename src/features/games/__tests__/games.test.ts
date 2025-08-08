@@ -5,9 +5,9 @@ import type {
   GameListItem,
   GameParticipant,
   GameWithDetails,
-  OperationResult,
 } from "~/features/games/games.types";
 import type { User } from "~/lib/auth/types";
+import { OperationResult } from "~/shared/types/common";
 import type {
   ApplyToGameInput,
   CreateGameInput,
@@ -157,7 +157,7 @@ const MOCK_GAME = {
   status: "scheduled" as const,
   minimumRequirements: {},
   visibility: "public" as const,
-  safetyRules: {},
+  safetyRules: { "no-alcohol": false, "safe-word": false },
   createdAt: new Date(),
   updatedAt: new Date(),
   owner: MOCK_OWNER_USER,
@@ -173,6 +173,8 @@ const MOCK_OWNER_PARTICIPANT = {
   role: "player" as const,
   status: "approved" as const,
   user: MOCK_OWNER_USER,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const MOCK_INVITED_PARTICIPANT = {
@@ -182,6 +184,8 @@ const MOCK_INVITED_PARTICIPANT = {
   role: "invited" as const,
   status: "pending" as const,
   user: MOCK_INVITED_USER,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const MOCK_PLAYER_PARTICIPANT = {
@@ -191,6 +195,8 @@ const MOCK_PLAYER_PARTICIPANT = {
   role: "player" as const,
   status: "approved" as const,
   user: MOCK_PLAYER_USER,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const MOCK_APPLICANT_PARTICIPANT = {
@@ -200,6 +206,8 @@ const MOCK_APPLICANT_PARTICIPANT = {
   role: "applicant" as const,
   status: "pending" as const,
   user: MOCK_OTHER_USER,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 describe("Game Management Feature Tests", () => {
@@ -941,115 +949,6 @@ describe("Game Management Feature Tests", () => {
       vi.mocked(getGameParticipants).mockResolvedValue({
         success: true,
         data: [MOCK_OWNER_PARTICIPANT, MOCK_PLAYER_PARTICIPANT, MOCK_INVITED_PARTICIPANT],
-      });
-
-      const result = await getGameParticipants({ data: { id: MOCK_GAME.id } });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.length).toBe(3);
-        expect(result.data).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({ userId: MOCK_OWNER_USER.id }),
-            expect.objectContaining({ userId: MOCK_PLAYER_USER.id }),
-            expect.objectContaining({ userId: MOCK_INVITED_USER.id }),
-          ]),
-        );
-      }
-    });
-
-    it("should return empty array if no participants", async () => {
-      vi.mocked(getGameParticipants).mockResolvedValue({
-        success: true,
-        data: [],
-      } as OperationResult<GameParticipant[]>);
-
-      const result = await getGameParticipants({ data: { id: MOCK_GAME.id } });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toEqual([]);
-      }
-    });
-  });
-
-  // --- Search Users for Invitation Tests ---
-  describe("searchUsersForInvitation", () => {
-    it("should return users matching search term", async () => {
-      vi.mocked(searchUsersForInvitation).mockResolvedValue({
-        success: true,
-        data: [{ id: "user-2", name: "Search User", email: "search@example.com" }],
-      } as OperationResult<User[]>);
-
-      const result = await searchUsersForInvitation({ data: { query: "search" } });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.length).toBe(1);
-        expect(result.data[0].email).toBe("search@example.com");
-      }
-    });
-
-    it("should return empty array if no users found", async () => {
-      vi.mocked(searchUsersForInvitation).mockResolvedValue({
-        success: true,
-        data: [],
-      });
-
-      const result = await searchUsersForInvitation({ data: { query: "nonexistent" } });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toEqual([]);
-      }
-    });
-  });
-
-  // --- Get Game Details Tests ---
-  describe("getGame", () => {
-    it("should return game details for a valid game ID", async () => {
-      vi.mocked(getGame).mockResolvedValue({ success: true, data: MOCK_GAME });
-
-      const result = await getGame({ data: { id: MOCK_GAME.id } });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result?.data?.id).toBe(MOCK_GAME.id);
-      }
-    });
-
-    it("should return error for invalid game ID format", async () => {
-      vi.mocked(getGame).mockResolvedValue({
-        success: false,
-        errors: [{ code: "VALIDATION_ERROR", message: "Invalid game ID format" }],
-      });
-
-      const result = await getGame({ data: { id: "invalid-uuid" } });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.errors[0].code).toBe("VALIDATION_ERROR");
-      }
-    });
-
-    it("should return error if game not found", async () => {
-      vi.mocked(getGame).mockResolvedValue({
-        success: false,
-        errors: [{ code: "NOT_FOUND", message: "Game not found" }],
-      });
-
-      const result = await getGame({ data: { id: "non-existent-game-id" } });
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.errors[0].code).toBe("NOT_FOUND");
-      }
-    });
-  });
-
-  // --- Get Game Participants Tests ---
-  describe("getGameParticipants", () => {
-    it("should return all participants for a game", async () => {
-      vi.mocked(getGameParticipants).mockResolvedValue({
-        success: true,
-        data: [
-          MOCK_OWNER_PARTICIPANT as GameParticipant,
-          MOCK_PLAYER_PARTICIPANT as GameParticipant,
-          MOCK_INVITED_PARTICIPANT as GameParticipant,
-        ],
       });
 
       const result = await getGameParticipants({ data: { id: MOCK_GAME.id } });

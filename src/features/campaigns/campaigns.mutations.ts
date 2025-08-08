@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { campaignApplications, campaignParticipants, campaigns } from "~/db/schema";
+import { OperationResult } from "~/shared/types/common";
 import {
   findCampaignApplicationById,
   findCampaignById,
@@ -20,11 +21,10 @@ import {
   updateCampaignInputSchema,
   updateCampaignParticipantInputSchema,
 } from "./campaigns.schemas";
-import type {
+import {
   CampaignApplication,
   CampaignParticipant,
   CampaignWithDetails,
-  OperationResult,
 } from "./campaigns.types";
 
 export const createCampaign = createServerFn({ method: "POST" })
@@ -60,7 +60,7 @@ export const createCampaign = createServerFn({ method: "POST" })
           location: data.location,
           status: "active",
           minimumRequirements: data.minimumRequirements,
-          visibility: data.visibility,
+          visibility: (data as z.infer<typeof createCampaignInputSchema>).visibility,
           safetyRules: data.safetyRules,
         })
         .returning();

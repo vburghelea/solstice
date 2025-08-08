@@ -6,9 +6,9 @@ import type {
   CampaignListItem,
   CampaignParticipant,
   CampaignWithDetails,
-  OperationResult,
 } from "~/features/campaigns/campaigns.types";
 import type { User } from "~/lib/auth/types";
+import { OperationResult } from "~/shared/types/common";
 import {
   applyToCampaignInputSchema,
   createCampaignInputSchema,
@@ -187,7 +187,7 @@ const MOCK_CAMPAIGN = {
   status: "active" as const,
   minimumRequirements: { languageLevel: "beginner" as const },
   visibility: "public" as const,
-  safetyRules: { "no-alcohol": true },
+  safetyRules: { "no-alcohol": true, "safe-word": false },
   createdAt: new Date(),
   updatedAt: new Date(),
   owner: MOCK_OWNER_USER,

@@ -10,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
 import { user } from "./auth.schema";
 import { gameSystems as gameSystem } from "./game-systems.schema";
 
@@ -23,17 +24,6 @@ export const gameVisibilityEnum = pgEnum("game_visibility", [
   "public",
   "protected",
   "private",
-]);
-export const gameParticipantRoleEnum = pgEnum("game_participant_role", [
-  "owner",
-  "player",
-  "invited",
-  "applicant",
-]);
-export const gameParticipantStatusEnum = pgEnum("game_participant_status", [
-  "approved",
-  "rejected",
-  "pending",
 ]);
 
 export const games = pgTable("games", {
@@ -67,8 +57,8 @@ export const gameParticipants = pgTable("game_participants", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  role: gameParticipantRoleEnum("role").notNull().default("player"),
-  status: gameParticipantStatusEnum("status").notNull().default("pending"),
+  role: participantRoleEnum("role").notNull().default("player"),
+  status: participantStatusEnum("status").notNull().default("pending"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });

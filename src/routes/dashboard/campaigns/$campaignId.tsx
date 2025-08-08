@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Edit2, LoaderCircle, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { ArrowLeftIcon } from "~/components/ui/icons";
 import { Separator } from "~/components/ui/separator";
 import { updateCampaign } from "~/features/campaigns/campaigns.mutations";
 import {
@@ -23,15 +24,8 @@ import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 import { ManageApplications } from "~/features/campaigns/components/ManageApplications";
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export const Route = createFileRoute("/dashboard/campaigns/$campaignId")({
   loader: async ({ params }) => {
-    if (!UUID_REGEX.test(params.campaignId)) {
-      toast.error("Invalid campaign ID format.");
-      throw new Error("Invalid campaign ID");
-    }
-
     const result = await getCampaign({ data: { id: params.campaignId } });
     if (!result.success || !result.data) {
       toast.error("Failed to load campaign details.");
@@ -179,6 +173,12 @@ function CampaignDetailsPage() {
                 <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
                   <X className="mr-2 h-4 w-4" />
                   Cancel
+                </Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/dashboard/campaigns">
+                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                    Back to Campaigns
+                  </Link>
                 </Button>
                 <FormSubmitButton
                   isSubmitting={updateCampaignMutation.isPending}

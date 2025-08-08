@@ -51,6 +51,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link
+              from="/dashboard/campaigns"
               to="/dashboard/campaigns/$campaignId"
               params={{ campaignId: campaign.id }}
             >

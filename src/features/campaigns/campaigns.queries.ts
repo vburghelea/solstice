@@ -25,15 +25,6 @@ export const getCampaign = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails | null>> => {
     try {
-      const UUID_REGEX =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!UUID_REGEX.test(data.id)) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "Invalid campaign ID format" }],
-        };
-      }
-
       const campaign = await findCampaignById(data.id);
 
       if (!campaign) {

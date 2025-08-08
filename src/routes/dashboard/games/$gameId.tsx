@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Edit2, LoaderCircle, Save, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { ArrowLeftIcon } from "~/components/ui/icons";
 import { Separator } from "~/components/ui/separator";
 import { GameForm } from "~/features/games/components/GameForm";
 import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
@@ -192,6 +193,12 @@ function GameDetailsPage() {
                 <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
                   <X className="mr-2 h-4 w-4" />
                   Cancel
+                </Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/dashboard/games">
+                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Link>
                 </Button>
                 <FormSubmitButton
                   isSubmitting={updateGameMutation.isPending}

@@ -61,7 +61,11 @@ export function GameCard({ game }: GameCardProps) {
         </div>
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link to="/dashboard/games/$gameId" params={{ gameId: game.id }}>
+            <Link
+              from="/dashboard/games"
+              to="/dashboard/games/$gameId"
+              params={{ gameId: game.id }}
+            >
               View Game
             </Link>
           </Button>

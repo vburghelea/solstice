@@ -67,18 +67,12 @@ function CreateGamePage() {
 
           <GameForm
             onSubmit={async (values) => {
-              console.log("Route component onSubmit called with values:", values);
               setServerError(null);
 
               try {
-                console.log("Calling createGameMutation.mutateAsync");
-                const result = await createGameMutation.mutateAsync({
+                await createGameMutation.mutateAsync({
                   data: values as z.infer<typeof createGameInputSchema>,
                 });
-                console.log(
-                  "createGameMutation.mutateAsync completed with result:",
-                  result,
-                );
               } catch (error) {
                 console.error("Form submission error:", error);
                 setServerError(

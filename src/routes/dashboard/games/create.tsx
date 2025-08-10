@@ -37,6 +37,10 @@ const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),
 });
 
+const createGameSearchSchema = z.object({
+  campaignId: z.string().optional(),
+});
+
 export const Route = createFileRoute("/dashboard/games/create")({
   component: CreateGamePage,
   validateSearch: (search) => createGameSearchSchema.parse(search),
@@ -142,6 +146,19 @@ export function CreateGamePage() {
     },
   });
 
+  const initialValues =
+    campaignData?.success && campaignData.data
+      ? {
+          gameSystemId: campaignData.data.gameSystemId,
+          expectedDuration: campaignData.data.sessionDuration,
+          visibility: campaignData.data.visibility,
+          language: campaignData.data.language,
+          price: campaignData.data.pricePerSession ?? undefined,
+          minimumRequirements: campaignData.data.minimumRequirements,
+          safetyRules: campaignData.data.safetyRules,
+        }
+      : {};
+
   return (
     <div className="container mx-auto max-w-2xl p-6">
       <div className="mb-6">
@@ -161,6 +178,20 @@ export function CreateGamePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {campaignId && campaignData?.success && campaignData.data && (
+            <div className="mb-4">
+              <label htmlFor="campaign">Campaign</label>
+              <Select value={campaignId} disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a campaign" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={campaignId}>{campaignData.data.name}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {serverError && (
             <div className="bg-destructive/10 text-destructive border-destructive/20 mb-4 flex items-start gap-3 rounded-lg border p-4">
               <div className="flex-1">

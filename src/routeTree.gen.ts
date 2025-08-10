@@ -86,6 +86,7 @@ import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashb
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 >>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
+import { Route as authLoginRouteImport } from "./routes/(auth)/login";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
 import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -348,6 +349,11 @@ const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
   id: "/admin/events-review",
   path: "/admin/events-review",
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+  getParentRoute: () => rootRouteImport,
+} as any);
+const authLoginRoute = authLoginRouteImport.update({
+  id: "/(auth)/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
@@ -688,7 +694,11 @@ export interface FileRoutesByFullPath {
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 =======
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+  "/login": typeof authLoginRoute;
+>>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
   "/admin/events-review": typeof AdminEventsReviewRoute;
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -806,7 +816,11 @@ export interface FileRoutesByTo {
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 =======
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+  "/login": typeof authLoginRoute;
+>>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
   "/admin/events-review": typeof AdminEventsReviewRoute;
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -907,7 +921,11 @@ export interface FileRoutesById {
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 =======
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+  "/(auth)/login": typeof authLoginRoute;
+>>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
   "/admin/events-review": typeof AdminEventsReviewRoute;
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -1029,7 +1047,11 @@ export interface FileRouteTypes {
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 =======
     | "/dashboard/admin"
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+    | "/login"
+>>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
     | "/admin/events-review"
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -1140,7 +1162,11 @@ export interface FileRouteTypes {
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 =======
     | "/dashboard/admin"
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+    | "/login"
+>>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
     | "/admin/events-review"
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -1240,7 +1266,11 @@ export interface FileRouteTypes {
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 =======
     | "/dashboard/admin"
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
+=======
+    | "/(auth)/login"
+>>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
     | "/admin/events-review"
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -1359,6 +1389,7 @@ export interface RootRouteChildren {
   DesignSystemRoute: typeof DesignSystemRoute;
   ResourcesRoute: typeof ResourcesRoute;
   TeamsRoute: typeof TeamsRoute;
+  authLoginRoute: typeof authLoginRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
@@ -1763,6 +1794,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin/events-review";
       preLoaderRoute: typeof AdminEventsReviewRouteImport;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(auth)/login": {
+      id: "/(auth)/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof authLoginRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/admin": {
@@ -2510,6 +2548,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesignSystemRoute: DesignSystemRoute,
   ResourcesRoute: ResourcesRoute,
   TeamsRoute: TeamsRoute,
+  authLoginRoute: authLoginRoute,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
   AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,

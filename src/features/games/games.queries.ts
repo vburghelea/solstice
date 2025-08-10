@@ -907,6 +907,68 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
   );
 
 /**
+ * List game sessions by campaign ID
+ */
+export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
+  .validator(listGameSessionsByCampaignIdSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
+    try {
+      const db = await getDb();
+
+      const conditions = [eq(games.campaignId, data.campaignId)];
+
+      if (data.status) {
+        conditions.push(eq(games.status, data.status));
+      }
+
+      const result: GameQueryResultRow[] = await db
+        .select({
+          id: games.id,
+          ownerId: games.ownerId,
+          campaignId: games.campaignId,
+          gameSystemId: games.gameSystemId,
+          name: games.name,
+          dateTime: games.dateTime,
+          description: games.description,
+          expectedDuration: games.expectedDuration,
+          price: games.price,
+          language: games.language,
+          location: sql<z.infer<typeof locationSchema>>`${games.location}`,
+          status: games.status,
+          minimumRequirements: sql<
+            z.infer<typeof minimumRequirementsSchema>
+          >`${games.minimumRequirements}`,
+          visibility: games.visibility,
+          safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
+          createdAt: games.createdAt,
+          updatedAt: games.updatedAt,
+          owner: { id: user.id, name: user.name, email: user.email },
+          gameSystem: { id: gameSystems.id, name: gameSystems.name },
+          participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
+        })
+        .from(games)
+        .innerJoin(user, eq(games.ownerId, user.id))
+        .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
+        .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+        .where(and(...conditions))
+        .groupBy(games.id, user.id, gameSystems.id);
+
+      return {
+        success: true,
+        data: result.map((r) => ({
+          ...r,
+        })),
+      };
+    } catch (error) {
+      console.error("Error listing game sessions by campaign ID:", error);
+      return {
+        success: false,
+        errors: [{ code: "DATABASE_ERROR", message: "Failed to list game sessions" }],
+      };
+    }
+  });
+
+/**
  * Get pending applications for a specific game
  */
 export const getGameApplications = createServerFn({ method: "POST" })

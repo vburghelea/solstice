@@ -179,14 +179,14 @@ export function GameForm({
   // Update form fields when game system changes
   React.useEffect(() => {
     if (selectedGameSystem) {
-      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime || 1);
+      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime ?? 1);
       form.setFieldValue(
         "minimumRequirements.minPlayers",
-        selectedGameSystem.minPlayers || 1,
+        selectedGameSystem.minPlayers ?? 1,
       );
       form.setFieldValue(
         "minimumRequirements.maxPlayers",
-        selectedGameSystem.maxPlayers || 1,
+        selectedGameSystem.maxPlayers ?? 1,
       );
     }
   }, [form, selectedGameSystem]);

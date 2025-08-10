@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { gameParticipants, games } from "~/db/schema";
 import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
 import { OperationResult } from "~/shared/types/common";
@@ -17,6 +17,7 @@ import {
   getGameSchema,
   inviteToGameInputSchema,
   removeGameParticipantInputSchema,
+  respondToGameApplicationSchema,
   respondToGameInvitationSchema,
   updateGameInputSchema,
   updateGameParticipantInputSchema,
@@ -461,12 +462,16 @@ export const removeGameParticipant = createServerFn({ method: "POST" })
     }
   });
 
+import { gameApplications } from "~/db/schema"; // Add gameApplications import
+import { findGameApplicationById } from "./games.repository"; // Import findGameApplicationById
+import { GameApplication } from "./games.types"; // Import GameApplication type
+
 /**
  * Player applies to join a game
  */
 export const applyToGame = createServerFn({ method: "POST" })
   .validator(applyToGameInputSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
+  .handler(async ({ data }): Promise<OperationResult<GameApplication>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
@@ -481,50 +486,51 @@ export const applyToGame = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      // Check if already a participant
-      const existingParticipant = await findGameParticipantByGameAndUserId(
-        data.gameId,
-        currentUser.id,
-      );
+      // Check if already applied
+      const existingApplication = await db.query.gameApplications.findFirst({
+        where: and(
+          eq(gameApplications.gameId, data.gameId),
+          eq(gameApplications.userId, currentUser.id),
+        ),
+      });
 
-      if (existingParticipant) {
+      if (existingApplication) {
         return {
           success: false,
-          errors: [{ code: "CONFLICT", message: "Already a participant or applicant" }],
+          errors: [
+            { code: "CONFLICT", message: "You have already applied to this game" },
+          ],
         };
       }
 
-      const [newParticipant] = await db
-        .insert(gameParticipants)
+      const [newApplication] = await db
+        .insert(gameApplications)
         .values({
           gameId: data.gameId,
           userId: currentUser.id,
-          role: "applicant",
           status: "pending",
         })
         .returning();
 
-      if (!newParticipant) {
+      if (!newApplication) {
         return {
           success: false,
           errors: [{ code: "DATABASE_ERROR", message: "Failed to apply to game" }],
         };
       }
 
-      // Fetch participant with user details
+      const applicationWithDetails = await findGameApplicationById(newApplication.id);
 
-      const participantWithUser = await findGameParticipantById(newParticipant.id);
-
-      if (!participantWithUser) {
+      if (!applicationWithDetails) {
         return {
           success: false,
           errors: [
-            { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
+            { code: "DATABASE_ERROR", message: "Failed to fetch new application" },
           ],
         };
       }
 
-      return { success: true, data: participantWithUser as GameParticipant };
+      return { success: true, data: applicationWithDetails as GameApplication };
     } catch (error) {
       console.error("Error applying to game:", error);
       return {
@@ -960,6 +966,96 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
         errors: [
           { code: "SERVER_ERROR", message: "Failed to update game session status" },
         ],
+      };
+    }
+  });
+
+/**
+ * Respond to a game application (approve or reject)
+ */
+export const respondToGameApplication = createServerFn({ method: "POST" })
+  .validator(respondToGameApplicationSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameApplication | boolean>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      const application = await findGameApplicationById(data.applicationId);
+
+      if (!application || application.game.ownerId !== currentUser.id) {
+        // Renamed from gameSession
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Application not found or you are not the owner of the game",
+            },
+          ],
+        };
+      }
+
+      if (data.status === "approved") {
+        const [updatedApplication] = await db
+          .update(gameApplications)
+          .set({ status: data.status, updatedAt: new Date() })
+          .where(eq(gameApplications.id, data.applicationId))
+          .returning();
+
+        if (!updatedApplication) {
+          return {
+            success: false,
+            errors: [{ code: "DATABASE_ERROR", message: "Failed to update application" }],
+          };
+        }
+
+        await db.insert(gameParticipants).values({
+          gameId: application.gameId, // Renamed from gameSessionId
+          userId: application.userId,
+          role: "player", // Default role for approved applicants
+          status: "approved",
+        });
+
+        const applicationWithDetails = await findGameApplicationById(
+          updatedApplication.id,
+        );
+
+        if (!applicationWithDetails) {
+          return {
+            success: false,
+            errors: [
+              { code: "DATABASE_ERROR", message: "Failed to fetch updated application" },
+            ],
+          };
+        }
+
+        return { success: true, data: applicationWithDetails as GameApplication };
+      } else if (data.status === "rejected") {
+        await db
+          .delete(gameApplications)
+          .where(eq(gameApplications.id, data.applicationId));
+        return { success: true, data: true };
+      }
+
+      return {
+        success: false,
+        errors: [{ code: "VALIDATION_ERROR", message: "Invalid action" }],
+      };
+    } catch (error) {
+      console.error("Error responding to application:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to respond to application" }],
       };
     }
   });

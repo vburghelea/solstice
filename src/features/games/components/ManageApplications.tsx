@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { updateGameParticipant } from "~/features/games/games.mutations";
-import { GameParticipant } from "~/features/games/games.types";
+import { respondToGameApplication } from "~/features/games/games.mutations"; // Import respondToGameApplication
+import { GameApplication } from "~/features/games/games.types";
 import { Button } from "~/shared/ui/button";
 import {
   Card,
@@ -14,38 +14,41 @@ import {
 
 interface ManageApplicationsProps {
   gameId: string;
-  applications: GameParticipant[];
+  applications: GameApplication[];
 }
 
 export function ManageApplications({ gameId, applications }: ManageApplicationsProps) {
   const queryClient = useQueryClient();
 
-  const updateParticipantMutation = useMutation({
-    mutationFn: updateGameParticipant,
-    onSuccess: () => {
-      toast.success("Participant status updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
-      queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
+  const respondToApplicationMutation = useMutation({
+    mutationFn: respondToGameApplication,
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("Application status updated successfully!");
+        queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
+        queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
+      } else {
+        toast.error(data.errors?.[0]?.message || "Failed to update application status");
+      }
     },
     onError: (error) => {
-      toast.error(`Failed to update participant status: ${error.message}`);
+      toast.error(`Failed to update application status: ${error.message}`);
     },
   });
 
-  const handleApprove = (participantId: string) => {
-    updateParticipantMutation.mutate({
+  const handleApprove = (applicationId: string) => {
+    respondToApplicationMutation.mutate({
       data: {
-        id: participantId,
+        applicationId: applicationId,
         status: "approved",
-        role: "player", // Change role to player upon approval
       },
     });
   };
 
-  const handleReject = (participantId: string) => {
-    updateParticipantMutation.mutate({
+  const handleReject = (applicationId: string) => {
+    respondToApplicationMutation.mutate({
       data: {
-        id: participantId,
+        applicationId: applicationId,
         status: "rejected",
       },
     });
@@ -69,20 +72,15 @@ export function ManageApplications({ gameId, applications }: ManageApplicationsP
               >
                 <span>
                   {app.user?.name || app.user?.email} (Applicant - {app.status})
-                  {app.message && (
-                    <p className="text-muted-foreground mt-1 text-xs">
-                      Message: {app.message}
-                    </p>
-                  )}
                 </span>
                 <div className="flex space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleApprove(app.id)}
-                    disabled={updateParticipantMutation.isPending}
+                    disabled={respondToApplicationMutation.isPending}
                   >
-                    {updateParticipantMutation.isPending ? (
+                    {respondToApplicationMutation.isPending ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       "Approve"
@@ -92,9 +90,9 @@ export function ManageApplications({ gameId, applications }: ManageApplicationsP
                     variant="destructive"
                     size="sm"
                     onClick={() => handleReject(app.id)}
-                    disabled={updateParticipantMutation.isPending}
+                    disabled={respondToApplicationMutation.isPending}
                   >
-                    {updateParticipantMutation.isPending ? (
+                    {respondToApplicationMutation.isPending ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       "Reject"

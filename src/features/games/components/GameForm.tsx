@@ -7,7 +7,8 @@ import { z } from "zod";
 import { DateTimePicker } from "~/components/form-fields/DateTimePicker";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
-import { gameStatusEnum, gameVisibilityEnum } from "~/db/schema/games.schema";
+import { gameStatusEnum } from "~/db/schema/games.schema"; // Removed gameVisibilityEnum
+import { visibilityEnum } from "~/db/schema/shared.schema"; // Added visibilityEnum
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import { searchGameSystems } from "~/features/games/games.queries";
 import {
@@ -504,11 +505,13 @@ export function GameForm({
                   <SelectValue placeholder="Select visibility" />
                 </SelectTrigger>
                 <SelectContent>
-                  {gameVisibilityEnum.enumValues.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </SelectItem>
-                  ))}
+                  {visibilityEnum.enumValues.map(
+                    (v: (typeof visibilityEnum.enumValues)[number]) => (
+                      <SelectItem key={v} value={v}>
+                        {v.charAt(0).toUpperCase() + v.slice(1)}
+                      </SelectItem>
+                    ),
+                  )}
                 </SelectContent>
               </Select>
               {field.state.meta.errors?.length > 0 && (

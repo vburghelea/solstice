@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { campaignRecurrenceEnum, campaignStatusEnum } from "~/db/schema/campaigns.schema"; // Removed campaignVisibilityEnum
 import {
-  campaignRecurrenceEnum,
-  campaignStatusEnum,
-  campaignVisibilityEnum,
-} from "~/db/schema/campaigns.schema";
-import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
+  applicationStatusEnum,
+  participantRoleEnum,
+  participantStatusEnum,
+  visibilityEnum,
+} from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 
 import {
   locationSchema,
@@ -25,7 +26,7 @@ export const createCampaignInputSchema = z.object({
   language: z.string().min(1, "Language is required"),
   location: locationSchema.optional(),
   minimumRequirements: minimumRequirementsSchema.optional(),
-  visibility: z.enum(campaignVisibilityEnum.enumValues),
+  visibility: z.enum(visibilityEnum.enumValues), // Changed to visibilityEnum
   safetyRules: safetyRulesSchema.optional(),
 });
 
@@ -51,7 +52,7 @@ export const listCampaignsSchema = z
     filters: z
       .object({
         status: z.enum(campaignStatusEnum.enumValues).optional(),
-        visibility: z.enum(campaignVisibilityEnum.enumValues).optional(),
+        visibility: z.enum(visibilityEnum.enumValues).optional(), // Changed to visibilityEnum
         ownerId: z.string().optional(),
         participantId: z.string().optional(),
         searchTerm: z.string().optional(),
@@ -79,7 +80,7 @@ export const inviteToCampaignInputSchema = z
 
 export const respondToCampaignApplicationSchema = z.object({
   applicationId: z.string().min(1),
-  status: z.enum(["approved", "rejected"]),
+  status: z.enum(applicationStatusEnum.enumValues),
 });
 
 export const searchUsersForInvitationSchema = z.object({

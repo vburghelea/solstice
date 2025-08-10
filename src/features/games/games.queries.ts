@@ -442,12 +442,14 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
     }
   });
 
+import { GameApplication } from "./games.types"; // Import GameApplication type
+
 /**
  * Get pending applications for a specific game
  */
 export const getGameApplications = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
+  .handler(async ({ data }): Promise<OperationResult<GameApplication[]>> => {
     try {
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -474,7 +476,7 @@ export const getGameApplications = createServerFn({ method: "POST" })
 
       const applications = await findPendingGameApplicationsByGameId(data.id);
 
-      return { success: true, data: applications as GameParticipant[] };
+      return { success: true, data: applications as GameApplication[] };
     } catch (error) {
       console.error("Error fetching game applications:", error);
       return {

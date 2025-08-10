@@ -107,7 +107,6 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
 }
 
 function GameDetailsPage() {
-  const initialData = Route.useLoaderData();
   const queryClient = useQueryClient();
   const { gameId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
@@ -115,7 +114,7 @@ function GameDetailsPage() {
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: game, isLoading } = useQuery({
-    queryKey: [gameId, initialData.game.id],
+    queryKey: ["game", gameId], // Simplified queryKey
     queryFn: async () => {
       const result = await getGame({ data: { id: gameId } });
       if (!result.success) {
@@ -126,20 +125,23 @@ function GameDetailsPage() {
       }
       return result.data;
     },
-    initialData: initialData.game,
     enabled: !!gameId,
   });
 
   const isOwner = game?.owner?.id === currentUser?.id;
   const isInvited = game?.participants?.some(
-    (p: GameParticipant) => p.userId === currentUser?.id && p.role === "invited",
+    (p: GameParticipant) =>
+      p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
   );
   const invitedParticipant = game?.participants?.find(
-    (p: GameParticipant) => p.userId === currentUser?.id && p.role === "invited",
+    (p: GameParticipant) =>
+      p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
   );
   const isParticipant = game?.participants?.some(
     (p: GameParticipant) =>
-      p.userId === currentUser?.id && (p.role === "player" || p.role === "invited"),
+      p.userId === currentUser?.id &&
+      (p.role === "player" || p.role === "invited") &&
+      p.status !== "rejected",
   );
 
   const updateGameMutation = useMutation({

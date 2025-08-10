@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/soleilheaney/solstice/branch/main/graph/badge.svg)](https://codecov.io/gh/soleilheaney/solstice)
 [![Deploy Preview](https://github.com/soleilheaney/solstice/actions/workflows/deploy-preview.yml/badge.svg)](https://github.com/soleilheaney/solstice/actions/workflows/deploy-preview.yml)
 
-## Sports Registration Platform
+## Tabletop and Board Game Platform
 
 Roundup Games is a **modern web platform for managing games, teams, and events**. Built with [TanStack Start](https://tanstack.com/start) and deployed on [Netlify](https://www.netlify.com/).
 

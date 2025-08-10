@@ -62,11 +62,11 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Solstice",
+        title: "Roundup Games",
       },
       {
         name: "description",
-        content: "Sports management platform for clubs and leagues",
+        content: "Tabletop and board game platform for players all over the world!",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

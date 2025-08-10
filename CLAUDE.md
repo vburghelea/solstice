@@ -67,7 +67,7 @@ All checks must pass before the commit is allowed. The pre-commit hook matches w
 
 ## Architecture Overview
 
-This is a sports league management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
+This is a tabletop and board game management platform built with TanStack Start (full-stack React framework) and deployed to Netlify. The application uses:
 
 - **TanStack Router** for file-based routing with type safety
 - **Better Auth** for authentication (email/password + OAuth via Discord/Google)

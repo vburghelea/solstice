@@ -162,29 +162,30 @@ export const getGame = createServerFn({ method: "POST" })
 export const listGames = createServerFn({ method: "POST" })
   .validator(listGamesSchema.parse)
   .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
+    console.log("listGames received filters:", data.filters);
     try {
       const db = await getDb();
 
       const currentUser = await getCurrentUser();
       const currentUserId = currentUser?.id;
 
-      const baseConditions = [];
+      const statusFilterCondition = data.filters?.status
+        ? eq(games.status, data.filters.status)
+        : null;
 
+      const otherBaseConditions = [];
       if (data.filters?.gameSystemId) {
-        baseConditions.push(eq(games.gameSystemId, data.filters.gameSystemId));
-      }
-      if (data.filters?.status) {
-        baseConditions.push(eq(games.status, data.filters.status));
+        otherBaseConditions.push(eq(games.gameSystemId, data.filters.gameSystemId));
       }
       if (data.filters?.dateFrom) {
-        baseConditions.push(gte(games.dateTime, new Date(data.filters.dateFrom)));
+        otherBaseConditions.push(gte(games.dateTime, new Date(data.filters.dateFrom)));
       }
       if (data.filters?.dateTo) {
-        baseConditions.push(lte(games.dateTime, new Date(data.filters.dateTo)));
+        otherBaseConditions.push(lte(games.dateTime, new Date(data.filters.dateTo)));
       }
       if (data.filters?.searchTerm) {
         const searchTerm = `%${data.filters.searchTerm.toLowerCase()}%`;
-        baseConditions.push(
+        otherBaseConditions.push(
           or(
             sql`lower(${games.description}) LIKE ${searchTerm}`,
             sql`lower(${games.language}) LIKE ${searchTerm}`,
@@ -192,10 +193,10 @@ export const listGames = createServerFn({ method: "POST" })
         );
       }
 
-      const visibilityConditions = [];
+      const visibilityConditionsForOr = [];
 
       // Rule 1: All public games
-      visibilityConditions.push(eq(games.visibility, "public"));
+      visibilityConditionsForOr.push(eq(games.visibility, "public"));
 
       if (currentUserId) {
         // Rule 2: All private games they are a participant of or invited to
@@ -212,18 +213,18 @@ export const listGames = createServerFn({ method: "POST" })
             ),
           );
 
-        visibilityConditions.push(
+        visibilityConditionsForOr.push(
           and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`),
         );
 
         // Rule 3: All games they own
-        visibilityConditions.push(eq(games.ownerId, currentUserId));
+        visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
 
         // Rule 4: Protected games where user meets minimum requirements (placeholder)
         // This would involve checking the user's profile against games.minimumRequirements
         // For now, we'll just include games where the user is an owner or participant/invited
         // and the game is protected. A more robust check would be needed here.
-        visibilityConditions.push(
+        visibilityConditionsForOr.push(
           and(
             eq(games.visibility, "protected"),
             or(eq(games.ownerId, currentUserId), sql`${games.id} IN ${userGames}`),
@@ -232,8 +233,21 @@ export const listGames = createServerFn({ method: "POST" })
         );
       }
 
-      // Combine base conditions with visibility conditions
-      const finalConditions = and(...baseConditions, or(...visibilityConditions));
+      // Build visibility conditions, ensuring each one is ANDed with the status filter if it exists
+      const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
+        (condition) => {
+          if (statusFilterCondition) {
+            return and(statusFilterCondition, condition);
+          }
+          return condition;
+        },
+      );
+
+      // Combine all conditions: otherBaseConditions AND (OR of visibility conditions with status)
+      const finalWhereClause = and(
+        ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
+        or(...visibilityConditionsForOrWithStatus),
+      );
 
       const result: GameQueryResultRow[] = await db
         .select({
@@ -264,7 +278,7 @@ export const listGames = createServerFn({ method: "POST" })
         .innerJoin(user, eq(games.ownerId, user.id))
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
-        .where(finalConditions)
+        .where(finalWhereClause)
         .groupBy(games.id, user.id, gameSystems.id);
 
       return {

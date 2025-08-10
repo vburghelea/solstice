@@ -50,24 +50,26 @@ export const getCampaign = createServerFn({ method: "POST" })
 export const listCampaigns = createServerFn({ method: "POST" })
   .validator(listCampaignsSchema.parse)
   .handler(async ({ data = {} }): Promise<OperationResult<CampaignListItem[]>> => {
+    console.log("listCampaigns received filters:", data.filters);
     try {
       const db = await getDb();
       const currentUser = await getCurrentUser();
       const currentUserId = currentUser?.id;
 
-      const baseConditions = [];
-      if (data.filters?.status) {
-        baseConditions.push(eq(campaigns.status, data.filters.status));
-      }
+      const statusFilterCondition = data.filters?.status
+        ? eq(campaigns.status, data.filters.status)
+        : null;
+
+      const otherBaseConditions = [];
       if (data.filters?.searchTerm) {
         const searchTerm = `%${data.filters.searchTerm.toLowerCase()}%`;
-        baseConditions.push(
+        otherBaseConditions.push(
           or(ilike(campaigns.name, searchTerm), ilike(campaigns.description, searchTerm)),
         );
       }
 
-      const visibilityConditions = [];
-      visibilityConditions.push(eq(campaigns.visibility, "public"));
+      const visibilityConditionsForOr = [];
+      visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
 
       if (currentUserId) {
         const userCampaigns = db
@@ -75,16 +77,16 @@ export const listCampaigns = createServerFn({ method: "POST" })
           .from(campaignParticipants)
           .where(eq(campaignParticipants.userId, currentUserId));
 
-        visibilityConditions.push(
+        visibilityConditionsForOr.push(
           and(
             eq(campaigns.visibility, "private"),
             sql`${campaigns.id} IN ${userCampaigns}`,
           ),
         );
 
-        visibilityConditions.push(eq(campaigns.ownerId, currentUserId));
+        visibilityConditionsForOr.push(eq(campaigns.ownerId, currentUserId));
 
-        visibilityConditions.push(
+        visibilityConditionsForOr.push(
           and(
             eq(campaigns.visibility, "protected"),
             or(
@@ -95,7 +97,21 @@ export const listCampaigns = createServerFn({ method: "POST" })
         );
       }
 
-      const finalConditions = and(...baseConditions, or(...visibilityConditions));
+      // Build visibility conditions, ensuring each one is ANDed with the status filter if it exists
+      const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
+        (condition) => {
+          if (statusFilterCondition) {
+            return and(statusFilterCondition, condition);
+          }
+          return condition;
+        },
+      );
+
+      // Combine all conditions: otherBaseConditions AND (OR of visibility conditions with status)
+      const finalWhereClause = and(
+        ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
+        or(...visibilityConditionsForOrWithStatus),
+      );
 
       const result = await db
         .select({
@@ -106,7 +122,7 @@ export const listCampaigns = createServerFn({ method: "POST" })
         .from(campaigns)
         .innerJoin(user, eq(campaigns.ownerId, user.id))
         .leftJoin(campaignParticipants, eq(campaignParticipants.campaignId, campaigns.id))
-        .where(finalConditions)
+        .where(finalWhereClause)
         .groupBy(campaigns.id, user.id);
 
       return {

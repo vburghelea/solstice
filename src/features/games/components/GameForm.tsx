@@ -7,8 +7,7 @@ import { z } from "zod";
 import { DateTimePicker } from "~/components/form-fields/DateTimePicker";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
-import { gameStatusEnum } from "~/db/schema/games.schema"; // Removed gameVisibilityEnum
-import { visibilityEnum } from "~/db/schema/shared.schema"; // Added visibilityEnum
+import { visibilityEnum } from "~/db/schema/shared.schema";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import { searchGameSystems } from "~/features/games/games.queries";
 import {
@@ -728,56 +727,6 @@ export function GameForm({
           )}
         </form.Field>
       </fieldset>
-
-      {initialValues?.id && (
-        <form.Field
-          name="status"
-          validators={{
-            onChange: ({ value }) => {
-              try {
-                updateGameInputSchema.shape.status.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Status</Label>
-              <Select
-                value={field.state.value as string}
-                onValueChange={(value: "scheduled" | "canceled" | "completed") =>
-                  field.handleChange(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gameStatusEnum.enumValues.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "What organizational status does this event have?",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      )}
 
       <fieldset className="space-y-2 rounded-md border p-4">
         <legend className="text-lg font-semibold">Minimum Requirements (Optional)</legend>

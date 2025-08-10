@@ -29,15 +29,23 @@ import {
 } from "~/features/campaigns/campaigns.queries";
 import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
-import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList"; // Added
+import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 import { ManageApplications } from "~/features/campaigns/components/ManageApplications";
-import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation"; // Added
+import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation";
 import { CampaignGameSessionCard } from "~/features/games/components/CampaignGameSessionCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
+import type { GameListItem } from "~/features/games/games.types";
+import type { OperationResult } from "~/shared/types/common";
+
+import { z } from "zod";
 
 export const Route = createFileRoute("/dashboard/campaigns/$campaignId")({
+  validateSearch: z.object({
+    status: z.enum(gameStatusEnum.enumValues).optional().default("scheduled"),
+  }),
+  component: CampaignDetailsPage,
   loader: async ({ params }) => {
     const result = await getCampaign({ data: { id: params.campaignId } });
     if (!result.success || !result.data) {
@@ -46,7 +54,6 @@ export const Route = createFileRoute("/dashboard/campaigns/$campaignId")({
     }
     return { campaign: result.data };
   },
-  component: CampaignDetailsPage,
 });
 
 function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
@@ -113,10 +120,9 @@ export function CampaignDetailsPage() {
   const queryClient = useQueryClient();
   const { campaignId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
+  const navigate = Route.useNavigate(); // Use route-specific useNavigate
 
   const [isEditing, setIsEditing] = useState(false);
-  const [statusFilter, setStatusFilter] =
-    useState<(typeof gameStatusEnum.enumValues)[number]>("scheduled");
 
   const { data: campaign, isLoading } = useQuery({
     queryKey: ["campaign", campaignId], // Simplified queryKey
@@ -190,10 +196,14 @@ export function CampaignDetailsPage() {
     enabled: !!campaignId && isOwner,
   });
 
-  const { data: gameSessionsData, isLoading: isLoadingGameSessions } = useQuery({
+  const { status: statusFilter } = Route.useSearch(); // Use useSearch for statusFilter
+
+  const { data: gameSessionsData, isLoading: isLoadingGameSessions } = useQuery<
+    OperationResult<GameListItem[]> // Explicitly type the data
+  >({
     queryKey: ["campaignGameSessions", campaignId, statusFilter],
-    queryFn: () =>
-      listGameSessionsByCampaignId({ data: { campaignId, status: statusFilter } }),
+    queryFn: async () =>
+      await listGameSessionsByCampaignId({ data: { campaignId, status: statusFilter } }),
     enabled: !!campaignId,
   });
 
@@ -208,7 +218,7 @@ export function CampaignDetailsPage() {
   const gameSessions = gameSessionsData?.success ? gameSessionsData.data : [];
 
   return (
-    <div className="space-y-6">
+    <div key={campaignId} className="space-y-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -276,9 +286,13 @@ export function CampaignDetailsPage() {
             <div className="flex items-center gap-4">
               <Select
                 value={statusFilter}
-                onValueChange={(value) =>
-                  setStatusFilter(value as (typeof gameStatusEnum.enumValues)[number])
-                }
+                onValueChange={(value) => {
+                  navigate({
+                    search: {
+                      status: value as (typeof gameStatusEnum.enumValues)[number],
+                    },
+                  });
+                }}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Filter by status" />
@@ -301,16 +315,19 @@ export function CampaignDetailsPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          {isLoadingGameSessions ? (
-            <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />
-          ) : gameSessions.length === 0 ? (
+        <CardContent className="relative">
+          {isLoadingGameSessions && (
+            <div className="bg-background/80 absolute inset-0 z-10 flex items-center justify-center">
+              <LoaderCircle className="text-primary h-8 w-8 animate-spin" />
+            </div>
+          )}
+          {gameSessions.length === 0 ? (
             <p className="text-muted-foreground">
               No game sessions found for this campaign with the selected status.
             </p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {gameSessions.map((gameSession) => (
+              {gameSessions.map((gameSession: GameListItem) => (
                 <CampaignGameSessionCard
                   key={gameSession.id}
                   game={gameSession}

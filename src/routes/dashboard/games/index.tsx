@@ -11,7 +11,7 @@ import { Button } from "~/shared/ui/button";
 export const Route = createFileRoute("/dashboard/games/")({
   component: GamesPage,
   loader: async () => {
-    const result = await listGames({});
+    const result = await listGames({ data: { filters: { status: "scheduled" } } });
     if (!result.success) {
       toast.error("Failed to load games.");
       return { games: [] };
@@ -24,8 +24,8 @@ function GamesPage() {
   const { games: initialGames } = Route.useLoaderData();
 
   const { data: gamesData } = useSuspenseQuery({
-    queryKey: ["allVisibleGames"],
-    queryFn: () => listGames({}),
+    queryKey: ["allVisibleGames", "scheduled"],
+    queryFn: () => listGames({ data: { filters: { status: "scheduled" } } }),
     initialData: { success: true, data: initialGames },
   });
 

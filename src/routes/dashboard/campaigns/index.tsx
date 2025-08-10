@@ -12,7 +12,7 @@ import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
 export const Route = createFileRoute("/dashboard/campaigns/")({
   component: CampaignsPage,
   loader: async () => {
-    const result = await listCampaigns({ data: {} });
+    const result = await listCampaigns({ data: { filters: { status: "active" } } });
     if (!result.success) {
       toast.error("Failed to load campaigns.");
       return { campaigns: [] };
@@ -25,8 +25,8 @@ export function CampaignsPage() {
   const { campaigns: initialCampaigns } = Route.useLoaderData();
 
   const { data: campaignsData } = useSuspenseQuery({
-    queryKey: ["allVisibleCampaigns"],
-    queryFn: () => listCampaigns({ data: {} }),
+    queryKey: ["allVisibleCampaigns", "active"],
+    queryFn: () => listCampaigns({ data: { filters: { status: "active" } } }),
     initialData: { success: true, data: initialCampaigns },
   });
 

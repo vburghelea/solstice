@@ -32,6 +32,8 @@ export const env = createEnv({
       .default("dev-secret-change-in-production"),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    DISCORD_CLIENT_ID: z.string().optional(),
+    DISCORD_CLIENT_SECRET: z.string().optional(),
 
     // Square Payment Integration
     SQUARE_ENV: z.enum(["sandbox", "production"]).optional(),

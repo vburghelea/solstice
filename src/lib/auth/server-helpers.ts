@@ -25,6 +25,8 @@ const createAuth = async () => {
   console.log("Base URL:", baseUrl);
   const googleClientId = env.GOOGLE_CLIENT_ID || "";
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
+  const discordClientId = env.DISCORD_CLIENT_ID || "";
+  const discordClientSecret = env.DISCORD_CLIENT_SECRET || "";
 
   console.log(
     "Google Client ID:",
@@ -86,6 +88,10 @@ const createAuth = async () => {
       google: {
         clientId: googleClientId,
         clientSecret: googleClientSecret,
+      },
+      discord: {
+        clientId: discordClientId,
+        clientSecret: discordClientSecret,
       },
     },
 

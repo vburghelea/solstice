@@ -51,12 +51,12 @@ export function GameForm({
 }: GameFormProps) {
   const form = useForm({
     defaultValues: {
-      gameSystemId: initialValues?.gameSystemId ?? undefined,
+      gameSystemId: initialValues?.gameSystemId,
       name: initialValues?.name ?? "",
       dateTime: initialValues?.dateTime ?? new Date().toISOString(),
       description: initialValues?.description ?? "",
-      expectedDuration: initialValues?.expectedDuration ?? 1,
-      price: initialValues?.price ?? undefined,
+      expectedDuration: initialValues?.expectedDuration,
+      price: initialValues?.price,
       language: initialValues?.language ?? "",
       location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
       minimumRequirements: initialValues?.minimumRequirements ?? {

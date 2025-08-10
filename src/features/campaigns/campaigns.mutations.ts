@@ -725,3 +725,101 @@ export const respondToApplication = createServerFn({ method: "POST" })
       };
     }
   });
+
+export const respondToCampaignInvitation = createServerFn({ method: "POST" })
+  .validator(
+    z.object({ participantId: z.string().min(1), action: z.enum(["accept", "reject"]) })
+      .parse,
+  ) // Define schema inline or import from schemas
+  .handler(async ({ data }): Promise<OperationResult<CampaignParticipant | boolean>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      const existingParticipant = await findCampaignParticipantById(data.participantId);
+
+      if (!existingParticipant) {
+        return {
+          success: false,
+          errors: [{ code: "NOT_FOUND", message: "Invitation not found" }],
+        };
+      }
+
+      // Ensure the current user is the invitee
+      if (existingParticipant.userId !== currentUser.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Not authorized to respond to this invitation",
+            },
+          ],
+        };
+      }
+
+      // Ensure the role is 'invited' before responding
+      if (existingParticipant.role !== "invited") {
+        return {
+          success: false,
+          errors: [{ code: "CONFLICT", message: "Not an active invitation" }],
+        };
+      }
+
+      if (data.action === "accept") {
+        const [updatedParticipant] = await db
+          .update(campaignParticipants)
+          .set({ role: "player", status: "approved", updatedAt: new Date() })
+          .where(eq(campaignParticipants.id, data.participantId))
+          .returning();
+
+        if (!updatedParticipant) {
+          return {
+            success: false,
+            errors: [{ code: "DATABASE_ERROR", message: "Failed to accept invitation" }],
+          };
+        }
+
+        const participantWithUser = await findCampaignParticipantById(
+          updatedParticipant.id,
+        );
+
+        if (!participantWithUser) {
+          return {
+            success: false,
+            errors: [
+              { code: "DATABASE_ERROR", message: "Failed to fetch accepted participant" },
+            ],
+          };
+        }
+
+        return { success: true, data: participantWithUser as CampaignParticipant };
+      } else if (data.action === "reject") {
+        await db
+          .delete(campaignParticipants)
+          .where(eq(campaignParticipants.id, data.participantId));
+        return { success: true, data: true };
+      }
+
+      return {
+        success: false,
+        errors: [{ code: "VALIDATION_ERROR", message: "Invalid action" }],
+      };
+    } catch (error) {
+      console.error("Error responding to invitation:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to respond to invitation" }],
+      };
+    }
+  });

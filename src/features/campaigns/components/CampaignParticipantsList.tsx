@@ -3,8 +3,9 @@ import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { removeCampaignParticipant } from "~/features/campaigns/campaigns.mutations";
+import { updateCampaignParticipant } from "~/features/campaigns/campaigns.mutations";
 import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
+import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
 
@@ -30,11 +31,11 @@ export function CampaignParticipantsList({
   });
 
   const removeParticipantMutation = useMutation<
-    OperationResult<boolean>,
+    OperationResult<CampaignParticipant>,
     Error,
-    { data: { id: string } }
+    { data: { participantId: string; status: "rejected" } }
   >({
-    mutationFn: removeCampaignParticipant,
+    mutationFn: updateCampaignParticipant,
     onSuccess: () => {
       toast.success("Participant removed successfully!");
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
@@ -46,7 +47,9 @@ export function CampaignParticipantsList({
   });
 
   const handleRemoveParticipant = (participantId: string) => {
-    removeParticipantMutation.mutate({ data: { id: participantId } });
+    removeParticipantMutation.mutate({
+      data: { participantId: participantId, status: "rejected" },
+    });
   };
 
   if (isLoading) {
@@ -84,22 +87,25 @@ export function CampaignParticipantsList({
                   {p.user.name || p.user.email} (
                   {p.userId === campaignOwnerId ? "owner" : p.role} - {p.status})
                 </span>
-                {isOwner && p.userId !== currentUser?.id && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveParticipant(p.id)}
-                    disabled={
-                      removeParticipantMutation.isPending &&
-                      removeParticipantMutation.variables?.data.id === p.id
-                    }
-                  >
-                    {removeParticipantMutation.isPending &&
-                    removeParticipantMutation.variables?.data.id === p.id
-                      ? "Removing..."
-                      : "Remove"}
-                  </Button>
-                )}
+                {isOwner &&
+                  p.role !== "applicant" &&
+                  p.status !== "rejected" &&
+                  p.userId !== currentUser?.id && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveParticipant(p.id)}
+                      disabled={
+                        removeParticipantMutation.isPending &&
+                        removeParticipantMutation.variables?.data.participantId === p.id
+                      }
+                    >
+                      {removeParticipantMutation.isPending &&
+                      removeParticipantMutation.variables?.data.participantId === p.id
+                        ? "Removing..."
+                        : "Remove"}
+                    </Button>
+                  )}
               </li>
             ))}
           </ul>

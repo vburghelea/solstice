@@ -110,7 +110,6 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
 }
 
 export function CampaignDetailsPage() {
-  const initialData = Route.useLoaderData();
   const queryClient = useQueryClient();
   const { campaignId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
@@ -120,7 +119,7 @@ export function CampaignDetailsPage() {
     useState<(typeof gameStatusEnum.enumValues)[number]>("scheduled");
 
   const { data: campaign, isLoading } = useQuery({
-    queryKey: [campaignId, initialData.campaign.id],
+    queryKey: ["campaign", campaignId], // Simplified queryKey
     queryFn: async () => {
       const result = await getCampaign({ data: { id: campaignId } });
       if (!result.success) {
@@ -131,11 +130,10 @@ export function CampaignDetailsPage() {
       }
       return result.data;
     },
-    initialData: initialData.campaign,
     enabled: !!campaignId,
   });
 
-  const isOwner = initialData.campaign?.owner?.id === currentUser?.id;
+  const isOwner = campaign?.owner?.id === currentUser?.id;
 
   const isInvited = campaign?.participants?.some(
     (p) => p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",

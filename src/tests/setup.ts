@@ -52,3 +52,16 @@ vi.mock("~/lib/env.server", () => ({
 vi.mock("~/styles.css?url", () => ({
   default: "/test-styles.css",
 }));
+
+// Mock sonner globally
+vi.mock("sonner", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("sonner")>();
+  return {
+    ...actual,
+    toast: {
+      error: vi.fn(),
+      success: vi.fn(),
+    },
+    Toaster: vi.fn(() => null), // Mock Toaster component to render nothing
+  };
+});

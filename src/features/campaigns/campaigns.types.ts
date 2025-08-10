@@ -38,6 +38,7 @@ export type CampaignWithDetails = Campaign & {
   owner: typeof user.$inferSelect | null;
   participants: CampaignParticipant[];
   applications: CampaignApplication[];
+  participantCount?: number;
 };
 
 export type CampaignParticipant = BaseParticipantWithUser & {

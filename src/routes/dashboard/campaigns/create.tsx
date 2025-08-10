@@ -20,7 +20,7 @@ export const Route = createFileRoute("/dashboard/campaigns/create")({
   component: CreateCampaignPage,
 });
 
-function CreateCampaignPage() {
+export function CreateCampaignPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
 

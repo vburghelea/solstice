@@ -13,12 +13,14 @@ import type {
   CreateGameInput,
   GetGameInput,
   InviteToGameInput,
+  ListGameSessionsByCampaignIdInput,
   ListGamesInput,
   RemoveGameParticipantInput,
   RespondToGameInvitationInput,
   SearchUsersForInvitationInput,
   UpdateGameInput,
   UpdateGameParticipantInput,
+  UpdateGameSessionStatusInput,
 } from "../games.schemas";
 
 // Mock getCurrentUser directly at the top level
@@ -30,6 +32,15 @@ vi.mock("~/features/auth/auth.queries", () => ({
 const mockCurrentUser = (user: User | null) => {
   vi.mocked(getCurrentUser).mockResolvedValue(user);
 };
+
+// Mock campaign queries
+vi.mock("~/features/campaigns/campaigns.queries", async (importOriginal) => {
+  const original = await importOriginal<object>();
+  return {
+    ...original,
+    getCampaignParticipants: vi.fn(),
+  };
+});
 
 // Mock game mutations and queries
 vi.mock("../games.mutations", async (importOriginal) => {
@@ -57,6 +68,10 @@ vi.mock("../games.mutations", async (importOriginal) => {
       >(),
     removeGameParticipant:
       vi.fn<(data: RemoveGameParticipantInput) => Promise<OperationResult<boolean>>>(),
+    updateGameSessionStatus:
+      vi.fn<
+        (data: UpdateGameSessionStatusInput) => Promise<OperationResult<GameWithDetails>>
+      >(),
   };
 });
 
@@ -78,11 +93,39 @@ vi.mock("../games.queries", async (importOriginal) => {
           data: SearchUsersForInvitationInput,
         ) => Promise<OperationResult<Array<{ id: string; name: string; email: string }>>>
       >(),
+    listGameSessionsByCampaignId:
+      vi.fn<
+        (
+          data: ListGameSessionsByCampaignIdInput,
+        ) => Promise<OperationResult<GameListItem[]>>
+      >(),
   };
 });
 
 // Import mocked functions
-import { GameSystem } from "~/db";
+import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
+import {
+  MOCK_CAMPAIGN,
+  MOCK_CAMPAIGN_PARTICIPANT_1,
+  MOCK_CAMPAIGN_PARTICIPANT_2,
+} from "~/tests/mocks/campaigns";
+import {
+  MOCK_APPLICANT_GAME_PARTICIPANT,
+  MOCK_CAMPAIGN_GAME_1,
+  MOCK_CAMPAIGN_GAME_2,
+  MOCK_CAMPAIGN_GAME_3,
+  MOCK_GAME,
+  MOCK_GAME_CAMPAIGN,
+  MOCK_INVITED_GAME_PARTICIPANT,
+  MOCK_OWNER_GAME_PARTICIPANT,
+  MOCK_PLAYER_GAME_PARTICIPANT,
+} from "~/tests/mocks/games";
+import {
+  MOCK_INVITED_USER,
+  MOCK_OTHER_USER,
+  MOCK_OWNER_USER,
+  MOCK_PLAYER_USER,
+} from "~/tests/mocks/users";
 import {
   applyToGame,
   createGame,
@@ -92,123 +135,16 @@ import {
   respondToGameInvitation,
   updateGame,
   updateGameParticipant,
+  updateGameSessionStatus,
 } from "../games.mutations";
 import {
   getGame,
   getGameApplications,
   getGameParticipants,
   listGames,
+  listGameSessionsByCampaignId,
   searchUsersForInvitation,
 } from "../games.queries";
-
-// Mock data (simplified for testing)
-const BASE_USER_PROPS = {
-  emailVerified: true,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  image: null,
-  profileComplete: true,
-  profileVersion: 1,
-  gender: null,
-  pronouns: null,
-  phone: null,
-  profileUpdatedAt: null,
-  privacySettings: null,
-};
-
-const MOCK_OWNER_USER = {
-  id: "owner-1",
-  email: "owner@example.com",
-  name: "Game Owner",
-  ...BASE_USER_PROPS,
-};
-const MOCK_PLAYER_USER = {
-  id: "player-1",
-  email: "player@example.com",
-  name: "Game Player",
-  ...BASE_USER_PROPS,
-};
-const MOCK_INVITED_USER = {
-  id: "invited-1",
-  email: "invited@example.com",
-  name: "Game Invited",
-  ...BASE_USER_PROPS,
-};
-const MOCK_OTHER_USER = {
-  id: "other-1",
-  email: "other@example.com",
-  name: "Other User",
-  ...BASE_USER_PROPS,
-};
-
-const MOCK_GAME_SYSTEM = { id: 1, name: "Test System" } as GameSystem;
-
-const MOCK_GAME = {
-  id: "game-1",
-  ownerId: MOCK_OWNER_USER.id,
-  gameSystemId: MOCK_GAME_SYSTEM.id,
-  name: "Test Game",
-  dateTime: new Date(),
-  description: "A test game session",
-  expectedDuration: 120,
-  price: 0,
-  language: "English",
-  location: { address: "Test Location", lat: 0, lng: 0 },
-  status: "scheduled" as const,
-  minimumRequirements: {},
-  visibility: "public" as const,
-  safetyRules: { "no-alcohol": false, "safe-word": false },
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  owner: MOCK_OWNER_USER,
-  gameSystem: MOCK_GAME_SYSTEM,
-  participants: [],
-  participantCount: 0,
-};
-
-const MOCK_OWNER_PARTICIPANT = {
-  id: "part-owner-1",
-  gameId: MOCK_GAME.id,
-  userId: MOCK_OWNER_USER.id,
-  role: "player" as const,
-  status: "approved" as const,
-  user: MOCK_OWNER_USER,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_INVITED_PARTICIPANT = {
-  id: "part-invited-1",
-  gameId: MOCK_GAME.id,
-  userId: MOCK_INVITED_USER.id,
-  role: "invited" as const,
-  status: "pending" as const,
-  user: MOCK_INVITED_USER,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_PLAYER_PARTICIPANT = {
-  id: "part-player-1",
-  gameId: MOCK_GAME.id,
-  userId: MOCK_PLAYER_USER.id,
-  role: "player" as const,
-  status: "approved" as const,
-  user: MOCK_PLAYER_USER,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_APPLICANT_PARTICIPANT = {
-  id: "part-applicant-1",
-  gameId: MOCK_GAME.id,
-  userId: MOCK_OTHER_USER.id,
-  role: "applicant" as const,
-  status: "pending" as const,
-  user: MOCK_OTHER_USER,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
 
 describe("Game Management Feature Tests", () => {
   beforeEach(() => {
@@ -222,7 +158,10 @@ describe("Game Management Feature Tests", () => {
     it("should create a game and add owner as participant when authenticated", async () => {
       vi.mocked(createGame).mockResolvedValue({
         success: true,
-        data: { ...MOCK_GAME, participants: [MOCK_OWNER_PARTICIPANT as GameParticipant] },
+        data: {
+          ...MOCK_GAME,
+          participants: [MOCK_OWNER_GAME_PARTICIPANT as GameParticipant],
+        },
       });
 
       const result = await createGame({ data: MOCK_GAME });
@@ -236,6 +175,62 @@ describe("Game Management Feature Tests", () => {
               userId: MOCK_OWNER_USER.id,
               role: "player",
               status: "approved",
+            }),
+          ]),
+        );
+      }
+    });
+
+    it("should create a game linked to a campaign and invite campaign participants", async () => {
+      vi.mocked(getCampaignParticipants).mockResolvedValue({
+        success: true,
+        data: [MOCK_CAMPAIGN_PARTICIPANT_1, MOCK_CAMPAIGN_PARTICIPANT_2],
+      });
+
+      vi.mocked(createGame).mockResolvedValue({
+        success: true,
+        data: {
+          ...MOCK_GAME_CAMPAIGN,
+          participants: [
+            MOCK_OWNER_GAME_PARTICIPANT as GameParticipant,
+            {
+              ...MOCK_CAMPAIGN_PARTICIPANT_1,
+              gameId: MOCK_GAME_CAMPAIGN.id,
+              role: "invited",
+              status: "pending",
+            } as GameParticipant,
+            {
+              ...MOCK_CAMPAIGN_PARTICIPANT_2,
+              gameId: MOCK_GAME_CAMPAIGN.id,
+              role: "invited",
+              status: "pending",
+            } as GameParticipant,
+          ],
+        },
+      });
+
+      const result = await createGame({
+        data: { ...MOCK_GAME, campaignId: MOCK_CAMPAIGN.id },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.campaignId).toBe(MOCK_CAMPAIGN.id);
+        expect(result.data.participants).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              userId: MOCK_OWNER_USER.id,
+              role: "player",
+              status: "approved",
+            }),
+            expect.objectContaining({
+              userId: MOCK_CAMPAIGN_PARTICIPANT_1.userId,
+              role: "invited",
+              status: "pending",
+            }),
+            expect.objectContaining({
+              userId: MOCK_CAMPAIGN_PARTICIPANT_2.userId,
+              role: "invited",
+              status: "pending",
             }),
           ]),
         );
@@ -381,7 +376,7 @@ describe("Game Management Feature Tests", () => {
     it("should invite a user by owner (by userId)", async () => {
       vi.mocked(inviteToGame).mockResolvedValue({
         success: true,
-        data: MOCK_INVITED_PARTICIPANT,
+        data: MOCK_INVITED_GAME_PARTICIPANT,
       });
 
       const result = await inviteToGame({
@@ -398,7 +393,7 @@ describe("Game Management Feature Tests", () => {
     it("should invite a user by owner (by email)", async () => {
       vi.mocked(inviteToGame).mockResolvedValue({
         success: true,
-        data: MOCK_INVITED_PARTICIPANT,
+        data: MOCK_INVITED_GAME_PARTICIPANT,
       });
 
       const result = await inviteToGame({
@@ -466,7 +461,7 @@ describe("Game Management Feature Tests", () => {
     it("should re-invite a rejected participant (status changes to pending, role to invited)", async () => {
       vi.mocked(inviteToGame).mockResolvedValue({
         success: true,
-        data: { ...MOCK_INVITED_PARTICIPANT, status: "pending", role: "invited" },
+        data: { ...MOCK_INVITED_GAME_PARTICIPANT, status: "pending", role: "invited" },
       });
 
       const result = await inviteToGame({
@@ -487,11 +482,11 @@ describe("Game Management Feature Tests", () => {
       mockCurrentUser(MOCK_INVITED_USER); // Authenticate as the invited user
       vi.mocked(respondToGameInvitation).mockResolvedValue({
         success: true,
-        data: { ...MOCK_INVITED_PARTICIPANT, status: "approved", role: "player" },
+        data: { ...MOCK_INVITED_GAME_PARTICIPANT, status: "approved", role: "player" },
       });
 
       const result = await respondToGameInvitation({
-        data: { participantId: MOCK_INVITED_PARTICIPANT.id, action: "accept" },
+        data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -507,7 +502,7 @@ describe("Game Management Feature Tests", () => {
       vi.mocked(respondToGameInvitation).mockResolvedValue({ success: true, data: true });
 
       const result = await respondToGameInvitation({
-        data: { participantId: MOCK_INVITED_PARTICIPANT.id, action: "reject" },
+        data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "reject" },
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -525,7 +520,7 @@ describe("Game Management Feature Tests", () => {
       });
 
       const result = await respondToGameInvitation({
-        data: { participantId: MOCK_INVITED_PARTICIPANT.id, action: "accept" },
+        data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -541,7 +536,7 @@ describe("Game Management Feature Tests", () => {
       });
 
       const result = await respondToGameInvitation({
-        data: { participantId: MOCK_INVITED_PARTICIPANT.id, action: "accept" },
+        data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -557,7 +552,7 @@ describe("Game Management Feature Tests", () => {
       });
 
       const result = await respondToGameInvitation({
-        data: { participantId: MOCK_INVITED_PARTICIPANT.id, action: "accept" },
+        data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -572,7 +567,7 @@ describe("Game Management Feature Tests", () => {
       mockCurrentUser(MOCK_OTHER_USER);
       vi.mocked(applyToGame).mockResolvedValue({
         success: true,
-        data: MOCK_APPLICANT_PARTICIPANT,
+        data: MOCK_APPLICANT_GAME_PARTICIPANT,
       });
 
       const result = await applyToGame({ data: { gameId: MOCK_GAME.id } });
@@ -617,13 +612,13 @@ describe("Game Management Feature Tests", () => {
     it("should return pending applications for game owner", async () => {
       vi.mocked(getGameApplications).mockResolvedValue({
         success: true,
-        data: [MOCK_APPLICANT_PARTICIPANT],
+        data: [MOCK_APPLICANT_GAME_PARTICIPANT],
       });
 
       const result = await getGameApplications({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual([MOCK_APPLICANT_PARTICIPANT]);
+        expect(result.data).toEqual([MOCK_APPLICANT_GAME_PARTICIPANT]);
       }
     });
 
@@ -666,11 +661,15 @@ describe("Game Management Feature Tests", () => {
     it("should allow owner to change participant status/role", async () => {
       vi.mocked(updateGameParticipant).mockResolvedValue({
         success: true,
-        data: { ...MOCK_APPLICANT_PARTICIPANT, status: "approved", role: "player" },
+        data: { ...MOCK_APPLICANT_GAME_PARTICIPANT, status: "approved", role: "player" },
       });
 
       const result = await updateGameParticipant({
-        data: { id: MOCK_APPLICANT_PARTICIPANT.id, status: "approved", role: "player" },
+        data: {
+          id: MOCK_APPLICANT_GAME_PARTICIPANT.id,
+          status: "approved",
+          role: "player",
+        },
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -683,11 +682,11 @@ describe("Game Management Feature Tests", () => {
       mockCurrentUser(MOCK_PLAYER_USER); // Authenticate as the participant
       vi.mocked(updateGameParticipant).mockResolvedValue({
         success: true,
-        data: { ...MOCK_PLAYER_PARTICIPANT, status: "pending" },
+        data: { ...MOCK_PLAYER_GAME_PARTICIPANT, status: "pending" },
       });
 
       const result = await updateGameParticipant({
-        data: { id: MOCK_PLAYER_PARTICIPANT.id, status: "pending" },
+        data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id, status: "pending" },
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -705,7 +704,7 @@ describe("Game Management Feature Tests", () => {
       });
 
       const result = await updateGameParticipant({
-        data: { id: MOCK_APPLICANT_PARTICIPANT.id, status: "approved" },
+        data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id, status: "approved" },
       });
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -719,7 +718,7 @@ describe("Game Management Feature Tests", () => {
       vi.mocked(removeGameParticipant).mockResolvedValue({ success: true, data: true });
 
       const result = await removeGameParticipant({
-        data: { id: MOCK_PLAYER_PARTICIPANT.id },
+        data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -732,7 +731,7 @@ describe("Game Management Feature Tests", () => {
       vi.mocked(removeGameParticipant).mockResolvedValue({ success: true, data: true });
 
       const result = await removeGameParticipant({
-        data: { id: MOCK_PLAYER_PARTICIPANT.id },
+        data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -750,7 +749,7 @@ describe("Game Management Feature Tests", () => {
       });
 
       const result = await removeGameParticipant({
-        data: { id: MOCK_APPLICANT_PARTICIPANT.id },
+        data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -766,7 +765,7 @@ describe("Game Management Feature Tests", () => {
       vi.mocked(removeGameParticipant).mockResolvedValue({ success: true, data: true });
 
       const result = await removeGameParticipant({
-        data: { id: MOCK_OWNER_PARTICIPANT.id },
+        data: { id: MOCK_OWNER_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(true); // This would pass if server allows
       if (result.success) {
@@ -780,7 +779,13 @@ describe("Game Management Feature Tests", () => {
     it("should return public games to all users", async () => {
       vi.mocked(listGames).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_GAME, visibility: "public" }],
+        data: [
+          {
+            ...MOCK_GAME,
+            visibility: "public",
+            participantCount: MOCK_GAME.participants.length,
+          },
+        ],
       });
 
       const result = await listGames({ data: {} });
@@ -796,7 +801,13 @@ describe("Game Management Feature Tests", () => {
       // Owner
       vi.mocked(listGames).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_GAME, visibility: "private" }],
+        data: [
+          {
+            ...MOCK_GAME,
+            visibility: "private",
+            participantCount: MOCK_GAME.participants.length,
+          },
+        ],
       });
       const resultOwner = await listGames({ data: {} });
       expect(resultOwner.success).toBe(true);
@@ -810,7 +821,13 @@ describe("Game Management Feature Tests", () => {
       mockCurrentUser(MOCK_INVITED_USER);
       vi.mocked(listGames).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_GAME, visibility: "private" }],
+        data: [
+          {
+            ...MOCK_GAME,
+            visibility: "private",
+            participantCount: MOCK_GAME.participants.length,
+          },
+        ],
       });
       const resultInvited = await listGames({ data: {} });
       expect(resultInvited.success).toBe(true);
@@ -837,7 +854,13 @@ describe("Game Management Feature Tests", () => {
       // Owner
       vi.mocked(listGames).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_GAME, visibility: "protected" }],
+        data: [
+          {
+            ...MOCK_GAME,
+            visibility: "protected",
+            participantCount: MOCK_GAME.participants.length,
+          },
+        ],
       });
       const resultProtectedOwner = await listGames({ data: {} });
       expect(resultProtectedOwner.success).toBe(true);
@@ -851,7 +874,13 @@ describe("Game Management Feature Tests", () => {
       mockCurrentUser(MOCK_INVITED_USER);
       vi.mocked(listGames).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_GAME, visibility: "protected" }],
+        data: [
+          {
+            ...MOCK_GAME,
+            visibility: "protected",
+            participantCount: MOCK_GAME.participants.length,
+          },
+        ],
       });
       const resultProtectedInvited = await listGames({ data: {} });
       expect(resultProtectedInvited.success).toBe(true);
@@ -904,7 +933,7 @@ describe("Game Management Feature Tests", () => {
     });
   });
 
-  // --- Get Game Details Tests ---
+  // --- Game Details Tests ---
   describe("getGame", () => {
     it("should return game details for a valid game ID", async () => {
       vi.mocked(getGame).mockResolvedValue({ success: true, data: MOCK_GAME });
@@ -943,12 +972,16 @@ describe("Game Management Feature Tests", () => {
     });
   });
 
-  // --- Get Game Participants Tests ---
+  // --- Game Participants Tests ---
   describe("getGameParticipants", () => {
     it("should return all participants for a game", async () => {
       vi.mocked(getGameParticipants).mockResolvedValue({
         success: true,
-        data: [MOCK_OWNER_PARTICIPANT, MOCK_PLAYER_PARTICIPANT, MOCK_INVITED_PARTICIPANT],
+        data: [
+          MOCK_OWNER_GAME_PARTICIPANT,
+          MOCK_PLAYER_GAME_PARTICIPANT,
+          MOCK_INVITED_GAME_PARTICIPANT,
+        ],
       });
 
       const result = await getGameParticipants({ data: { id: MOCK_GAME.id } });
@@ -1005,6 +1038,155 @@ describe("Game Management Feature Tests", () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([]);
+      }
+    });
+  });
+
+  // --- Campaign Game Session Listing Tests ---
+  describe("listGameSessionsByCampaignId", () => {
+    it("should return all game sessions for a given campaign ID", async () => {
+      vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
+        success: true,
+        data: [
+          MOCK_CAMPAIGN_GAME_1 as unknown as GameListItem,
+          MOCK_CAMPAIGN_GAME_2 as unknown as GameListItem,
+          MOCK_CAMPAIGN_GAME_3 as unknown as GameListItem,
+        ],
+      });
+
+      const result = await listGameSessionsByCampaignId({
+        data: { campaignId: MOCK_CAMPAIGN.id },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.length).toBe(3);
+        expect(result.data).toEqual(
+          expect.arrayContaining([
+            MOCK_CAMPAIGN_GAME_1,
+            MOCK_CAMPAIGN_GAME_2,
+            MOCK_CAMPAIGN_GAME_3,
+          ]),
+        );
+      }
+    });
+
+    it("should return game sessions filtered by status", async () => {
+      vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
+        success: true,
+        data: [MOCK_CAMPAIGN_GAME_1 as unknown as GameListItem],
+      });
+
+      const result = await listGameSessionsByCampaignId({
+        data: { campaignId: MOCK_CAMPAIGN.id, status: "scheduled" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.length).toBe(1);
+        expect(result.data).toEqual([MOCK_CAMPAIGN_GAME_1]);
+      }
+    });
+
+    it("should return empty array if no game sessions found for campaign", async () => {
+      vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
+        success: true,
+        data: [],
+      });
+
+      const result = await listGameSessionsByCampaignId({
+        data: { campaignId: "non-existent-campaign" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toEqual([]);
+      }
+    });
+  });
+
+  // --- Update Game Session Status Tests ---
+  describe("updateGameSessionStatus", () => {
+    it("should update game session status to completed", async () => {
+      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+        success: true,
+        data: { ...MOCK_GAME, status: "completed" as const },
+      });
+
+      const result = await updateGameSessionStatus({
+        data: { id: MOCK_GAME.id, status: "completed" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("completed");
+      }
+    });
+
+    it("should update game session status to canceled", async () => {
+      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+        success: true,
+        data: { ...MOCK_GAME, status: "canceled" as const },
+      });
+
+      const result = await updateGameSessionStatus({
+        data: { id: MOCK_GAME.id, status: "canceled" },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("canceled");
+      }
+    });
+
+    it("should fail to update status if game is already completed", async () => {
+      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+        success: false,
+        errors: [
+          {
+            code: "INVALID_OPERATION",
+            message: "Cannot change status of a completed game",
+          },
+        ],
+      });
+
+      const result = await updateGameSessionStatus({
+        data: { id: MOCK_GAME.id, status: "scheduled" },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("INVALID_OPERATION");
+      }
+    });
+
+    it("should fail to update status if game is already canceled", async () => {
+      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+        success: false,
+        errors: [
+          {
+            code: "INVALID_OPERATION",
+            message: "Cannot change status of a canceled game",
+          },
+        ],
+      });
+
+      const result = await updateGameSessionStatus({
+        data: { id: MOCK_GAME.id, status: "scheduled" },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("INVALID_OPERATION");
+      }
+    });
+
+    it("should fail to update status if not authenticated", async () => {
+      mockCurrentUser(null);
+      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+        success: false,
+        errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+      });
+
+      const result = await updateGameSessionStatus({
+        data: { id: MOCK_GAME.id, status: "completed" },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("AUTH_ERROR");
       }
     });
   });

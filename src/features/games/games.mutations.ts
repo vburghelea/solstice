@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { gameParticipants, games } from "~/db/schema";
+import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
 import { OperationResult } from "~/shared/types/common";
 import {
   findGameById,
@@ -12,12 +13,14 @@ import {
   addGameParticipantInputSchema,
   applyToGameInputSchema,
   createGameInputSchema,
+  createGameSessionForCampaignInputSchema,
   getGameSchema,
   inviteToGameInputSchema,
   removeGameParticipantInputSchema,
   respondToGameInvitationSchema,
   updateGameInputSchema,
   updateGameParticipantInputSchema,
+  updateGameSessionStatusInputSchema,
 } from "./games.schemas";
 import { GameParticipant, GameWithDetails } from "./games.types";
 
@@ -57,6 +60,7 @@ export const createGame = createServerFn({ method: "POST" })
           minimumRequirements: data.minimumRequirements,
           visibility: data.visibility,
           safetyRules: data.safetyRules,
+          campaignId: data.campaignId,
         })
         .returning();
 
@@ -85,6 +89,26 @@ export const createGame = createServerFn({ method: "POST" })
             { code: "DATABASE_ERROR", message: "Failed to add owner as participant" },
           ],
         };
+      }
+
+      if (data.campaignId) {
+        const participantsResult = await getCampaignParticipants({
+          data: { id: data.campaignId },
+        });
+        if (participantsResult.success && participantsResult.data) {
+          const participantPromises = participantsResult.data.map((p) => {
+            if (p.userId !== currentUser.id) {
+              return db.insert(gameParticipants).values({
+                gameId: newGame.id,
+                userId: p.userId,
+                role: "invited",
+                status: "pending",
+              });
+            }
+            return null;
+          });
+          await Promise.all(participantPromises);
+        }
       }
 
       // Fetch the newly created game with details
@@ -770,6 +794,172 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to respond to invitation" }],
+      };
+    }
+  });
+
+/**
+ * Create a new game session for a campaign
+ */
+export const createGameSessionForCampaign = createServerFn({ method: "POST" })
+  .validator(createGameSessionForCampaignInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      const [newGame] = await db
+        .insert(games)
+        .values({
+          ownerId: currentUser.id,
+          campaignId: data.campaignId,
+          gameSystemId: data.gameSystemId,
+          name: data.name,
+          dateTime: new Date(data.dateTime),
+          description: data.description,
+          expectedDuration: data.expectedDuration,
+          price: data.price,
+          language: data.language,
+          location: data.location,
+          status: "scheduled",
+          minimumRequirements: data.minimumRequirements,
+          visibility: data.visibility,
+          safetyRules: data.safetyRules,
+        })
+        .returning();
+
+      if (!newGame) {
+        return {
+          success: false,
+          errors: [{ code: "DATABASE_ERROR", message: "Failed to create game session" }],
+        };
+      }
+
+      // Add owner as a participant
+      const [ownerParticipant] = await db
+        .insert(gameParticipants)
+        .values({
+          gameId: newGame.id,
+          userId: currentUser.id,
+          role: "player",
+          status: "approved",
+        })
+        .returning();
+
+      if (!ownerParticipant) {
+        return {
+          success: false,
+          errors: [
+            { code: "DATABASE_ERROR", message: "Failed to add owner as participant" },
+          ],
+        };
+      }
+
+      // Fetch the newly created game with details
+      const { getGame } = await import("./games.queries");
+      const gameWithDetails = await getGame({ data: { id: newGame.id } });
+
+      if (!gameWithDetails.success || !gameWithDetails.data) {
+        return {
+          success: false,
+          errors: [
+            { code: "DATABASE_ERROR", message: "Failed to fetch created game session" },
+          ],
+        };
+      }
+
+      return { success: true, data: gameWithDetails.data };
+    } catch (error) {
+      console.error("Error creating game session:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to create game session" }],
+      };
+    }
+  });
+
+/**
+ * Update a game session's status (e.g., cancel, complete)
+ */
+export const updateGameSessionStatus = createServerFn({ method: "POST" })
+  .validator(updateGameSessionStatusInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { eq } = await import("drizzle-orm");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      // Check if current user is the owner of the game session
+      const existingGame = await findGameById(data.gameId);
+
+      if (!existingGame || existingGame.ownerId !== currentUser.id) {
+        return {
+          success: false,
+          errors: [
+            { code: "AUTH_ERROR", message: "Not authorized to update this game session" },
+          ],
+        };
+      }
+
+      const [updatedGame] = await db
+        .update(games)
+        .set({
+          status: data.status,
+          updatedAt: new Date(),
+        })
+        .where(eq(games.id, data.gameId))
+        .returning();
+
+      if (!updatedGame) {
+        return {
+          success: false,
+          errors: [
+            { code: "DATABASE_ERROR", message: "Failed to update game session status" },
+          ],
+        };
+      }
+
+      // Fetch the updated game with details
+      const { getGame } = await import("./games.queries");
+      const gameWithDetails = await getGame({ data: { id: updatedGame.id } });
+
+      if (!gameWithDetails.success || !gameWithDetails.data) {
+        return {
+          success: false,
+          errors: [
+            { code: "DATABASE_ERROR", message: "Failed to fetch updated game session" },
+          ],
+        };
+      }
+
+      return { success: true, data: gameWithDetails.data };
+    } catch (error) {
+      console.error("Error updating game session status:", error);
+      return {
+        success: false,
+        errors: [
+          { code: "SERVER_ERROR", message: "Failed to update game session status" },
+        ],
       };
     }
   });

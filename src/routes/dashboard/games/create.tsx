@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -11,17 +11,48 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { ArrowLeftIcon } from "~/components/ui/icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { getCampaign } from "~/features/campaigns/campaigns.queries";
 import { GameForm } from "~/features/games/components/GameForm";
 import { createGame } from "~/features/games/games.mutations";
+import { getGameSystem } from "~/features/games/games.queries";
 import { createGameInputSchema } from "~/features/games/games.schemas";
+
+const createGameSearchSchema = z.object({
+  campaignId: z.string().optional(),
+});
 
 export const Route = createFileRoute("/dashboard/games/create")({
   component: CreateGamePage,
+  validateSearch: (search) => createGameSearchSchema.parse(search),
 });
 
-function CreateGamePage() {
+export function CreateGamePage() {
   const navigate = useNavigate();
+  const { campaignId } = useSearch({ from: Route.id });
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const { data: campaignData } = useQuery({
+    queryKey: ["campaign", campaignId],
+    queryFn: () => getCampaign({ data: { id: campaignId! } }),
+    enabled: !!campaignId,
+  });
+
+  const gameSystemId = campaignData?.success
+    ? campaignData.data?.gameSystemId
+    : undefined;
+
+  const { data: gameSystemData } = useQuery({
+    queryKey: ["gameSystem", gameSystemId],
+    queryFn: () => getGameSystem({ data: { id: gameSystemId! } }),
+    enabled: !!gameSystemId,
+  });
 
   const createGameMutation = useMutation({
     mutationFn: createGame,
@@ -36,6 +67,19 @@ function CreateGamePage() {
       setServerError(error.message || "Failed to create game");
     },
   });
+
+  const initialValues =
+    campaignData?.success && campaignData.data
+      ? {
+          gameSystemId: campaignData.data.gameSystemId,
+          expectedDuration: campaignData.data.sessionDuration,
+          visibility: campaignData.data.visibility,
+          language: campaignData.data.language,
+          price: campaignData.data.pricePerSession ?? undefined,
+          minimumRequirements: campaignData.data.minimumRequirements,
+          safetyRules: campaignData.data.safetyRules,
+        }
+      : {};
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -56,6 +100,20 @@ function CreateGamePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {campaignId && campaignData?.success && campaignData.data && (
+            <div className="mb-4">
+              <label htmlFor="campaign">Campaign</label>
+              <Select value={campaignId} disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a campaign" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={campaignId}>{campaignData.data.name}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {serverError && (
             <div className="bg-destructive/10 text-destructive border-destructive/20 mb-4 flex items-start gap-3 rounded-lg border p-4">
               <div className="flex-1">
@@ -71,7 +129,10 @@ function CreateGamePage() {
 
               try {
                 await createGameMutation.mutateAsync({
-                  data: values as z.infer<typeof createGameInputSchema>,
+                  data: {
+                    ...values,
+                    campaignId,
+                  } as z.infer<typeof createGameInputSchema>,
                 });
               } catch (error) {
                 console.error("Form submission error:", error);
@@ -81,6 +142,13 @@ function CreateGamePage() {
               }
             }}
             isSubmitting={createGameMutation.isPending}
+            initialValues={initialValues}
+            isCampaignGame={!!campaignId}
+            gameSystemName={
+              gameSystemData?.success && gameSystemData.data
+                ? gameSystemData.data.name
+                : ""
+            }
           />
         </CardContent>
       </Card>

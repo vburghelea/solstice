@@ -39,16 +39,16 @@ export interface User extends BetterAuthUser {
   profileComplete: boolean;
 
   // Optional profile fields
-  gender?: string | null;
-  pronouns?: string | null;
-  phone?: string | null;
+  gender: string | null;
+  pronouns: string | null;
+  phone: string | null;
 
   // Privacy and preferences
-  privacySettings?: string | null; // JSON string
+  privacySettings: string | null; // JSON string
 
   // Audit and versioning
   profileVersion: number;
-  profileUpdatedAt?: Date | null;
+  profileUpdatedAt: Date | null;
 
   // Roles and permissions
   roles?: UserRole[];

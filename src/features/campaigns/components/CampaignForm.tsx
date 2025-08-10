@@ -73,15 +73,11 @@ export function CampaignForm({
       },
     },
     onSubmit: async ({ value }) => {
-      try {
-        await onSubmit(
-          value as
-            | z.infer<typeof createCampaignInputSchema>
-            | z.infer<typeof updateCampaignInputSchema>,
-        );
-      } catch (error) {
-        console.error("Error in form onSubmit:", error);
-      }
+      await onSubmit(
+        value as
+          | z.infer<typeof createCampaignInputSchema>
+          | z.infer<typeof updateCampaignInputSchema>,
+      );
     },
   });
 
@@ -139,10 +135,10 @@ export function CampaignForm({
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        form.handleSubmit();
+        await form.handleSubmit();
       }}
       className="space-y-6"
     >
@@ -293,6 +289,7 @@ export function CampaignForm({
                 return ""; // Fallback for unexpected types
               }) || []
             }
+            data-testid="game-system-combobox"
           />
         )}
       </form.Field>

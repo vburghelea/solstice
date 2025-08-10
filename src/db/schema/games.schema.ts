@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
 import { user } from "./auth.schema";
+import { campaigns } from "./campaigns.schema";
 import { gameSystems as gameSystem } from "./game-systems.schema";
 
 // Enums for game status and visibility
@@ -31,6 +32,9 @@ export const games = pgTable("games", {
   ownerId: text("owner_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  campaignId: uuid("campaign_id").references(() => campaigns.id, {
+    onDelete: "set null",
+  }),
   gameSystemId: integer("game_system_id")
     .notNull()
     .references(() => gameSystem.id, { onDelete: "cascade" }),
@@ -67,6 +71,10 @@ export const gamesRelations = relations(games, ({ one, many }) => ({
   owner: one(user, {
     fields: [games.ownerId],
     references: [user.id],
+  }),
+  campaign: one(campaigns, {
+    fields: [games.campaignId],
+    references: [campaigns.id],
   }),
   gameSystem: one(gameSystem, {
     fields: [games.gameSystemId],

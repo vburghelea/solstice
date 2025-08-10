@@ -21,6 +21,7 @@ export const createGameInputSchema = z.object({
   minimumRequirements: minimumRequirementsSchema.optional(),
   visibility: z.enum(gameVisibilityEnum.enumValues).default("public"),
   safetyRules: safetyRulesSchema.optional(),
+  campaignId: z.string().optional(),
 });
 
 export const updateGameInputSchema = createGameInputSchema.partial().extend({
@@ -138,3 +139,28 @@ export type SearchUsersForInvitationInput = z.infer<
   typeof searchUsersForInvitationSchema
 >;
 export type SearchGameSystemsInput = z.infer<typeof searchGameSystemsSchema>;
+
+export const listGameSessionsByCampaignIdSchema = z.object({
+  campaignId: z.string().min(1),
+  status: z.enum(gameStatusEnum.enumValues).optional(),
+});
+
+export type ListGameSessionsByCampaignIdInput = z.infer<
+  typeof listGameSessionsByCampaignIdSchema
+>;
+
+export const createGameSessionForCampaignInputSchema = createGameInputSchema.extend({
+  campaignId: z.string().min(1),
+});
+
+export const updateGameSessionStatusInputSchema = z.object({
+  gameId: z.string().min(1),
+  status: z.enum(gameStatusEnum.enumValues),
+});
+
+export type CreateGameSessionForCampaignInput = z.infer<
+  typeof createGameSessionForCampaignInputSchema
+>;
+export type UpdateGameSessionStatusInput = z.infer<
+  typeof updateGameSessionStatusInputSchema
+>;

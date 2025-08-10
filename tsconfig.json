@@ -16,7 +16,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["vite/client", "@types/node"],
+    "types": ["vite/client", "@types/node", "vitest/globals"],
     "paths": {
       "~/*": ["./src/*"]
     }

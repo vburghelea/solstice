@@ -6,11 +6,8 @@ import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
-import {
-  campaignRecurrenceEnum,
-  campaignStatusEnum,
-  campaignVisibilityEnum,
-} from "~/db/schema/campaigns.schema";
+import { campaignRecurrenceEnum, campaignStatusEnum } from "~/db/schema/campaigns.schema";
+import { visibilityEnum } from "~/db/schema/shared.schema"; // Added visibilityEnum
 import {
   createCampaignInputSchema,
   updateCampaignInputSchema,
@@ -590,11 +587,13 @@ export function CampaignForm({
                   <SelectValue placeholder="Select visibility" />
                 </SelectTrigger>
                 <SelectContent>
-                  {campaignVisibilityEnum.enumValues.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </SelectItem>
-                  ))}
+                  {visibilityEnum.enumValues.map(
+                    (v: (typeof visibilityEnum.enumValues)[number]) => (
+                      <SelectItem key={v} value={v}>
+                        {v.charAt(0).toUpperCase() + v.slice(1)}
+                      </SelectItem>
+                    ),
+                  )}
                 </SelectContent>
               </Select>
               {field.state.meta.errors?.length > 0 && (

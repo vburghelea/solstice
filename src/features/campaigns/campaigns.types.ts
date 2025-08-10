@@ -2,12 +2,11 @@ import { z } from "zod";
 import type { user } from "~/db/schema";
 import type {
   campaignApplications,
-  campaignApplicationStatusEnum,
   campaignRecurrenceEnum,
   campaigns,
   campaignStatusEnum,
-  campaignVisibilityEnum,
-} from "~/db/schema/campaigns.schema";
+} from "~/db/schema/campaigns.schema"; // Removed campaignApplicationStatusEnum
+import type { applicationStatusEnum, visibilityEnum } from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -27,10 +26,9 @@ export type Campaign = typeof campaigns.$inferSelect & {
 export type NewCampaign = typeof campaigns.$inferInsert;
 
 export type CampaignStatus = (typeof campaignStatusEnum.enumValues)[number];
-export type CampaignVisibility = (typeof campaignVisibilityEnum.enumValues)[number];
+export type CampaignVisibility = (typeof visibilityEnum.enumValues)[number]; // Changed to visibilityEnum
 export type CampaignRecurrence = (typeof campaignRecurrenceEnum.enumValues)[number];
-export type CampaignApplicationStatus =
-  (typeof campaignApplicationStatusEnum.enumValues)[number];
+export type ApplicationStatus = (typeof applicationStatusEnum.enumValues)[number];
 export type CampaignParticipantRole = ParticipantRole;
 export type CampaignParticipantStatus = ParticipantStatus;
 

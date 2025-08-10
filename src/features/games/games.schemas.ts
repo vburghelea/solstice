@@ -1,6 +1,11 @@
 import { z } from "zod";
-import { gameStatusEnum, gameVisibilityEnum } from "~/db/schema/games.schema";
-import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
+import { gameStatusEnum } from "~/db/schema/games.schema";
+import {
+  applicationStatusEnum,
+  participantRoleEnum,
+  participantStatusEnum,
+  visibilityEnum,
+} from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 
 import {
   locationSchema,
@@ -19,7 +24,7 @@ export const createGameInputSchema = z.object({
   language: z.string().min(1, "Language is required"),
   location: locationSchema,
   minimumRequirements: minimumRequirementsSchema.optional(),
-  visibility: z.enum(gameVisibilityEnum.enumValues).default("public"),
+  visibility: z.enum(visibilityEnum.enumValues).default("public"), // Changed to visibilityEnum
   safetyRules: safetyRulesSchema.optional(),
   campaignId: z.string().optional(),
 });
@@ -39,7 +44,7 @@ export const listGamesSchema = z
       .object({
         gameSystemId: z.number().int().positive().optional(),
         status: z.enum(gameStatusEnum.enumValues).optional(),
-        visibility: z.enum(gameVisibilityEnum.enumValues).optional(),
+        visibility: z.enum(visibilityEnum.enumValues).optional(), // Changed to visibilityEnum
         ownerId: z.string().optional(),
         participantId: z.string().optional(),
         dateFrom: z.string().datetime().optional(),
@@ -131,7 +136,7 @@ export const gameFormSchema = createGameInputSchema
     language: z.string().optional(),
     location: locationSchema.optional(),
     minimumRequirements: minimumRequirementsSchema.optional(),
-    visibility: z.enum(gameVisibilityEnum.enumValues).optional(),
+    visibility: z.enum(visibilityEnum.enumValues).optional(), // Changed to visibilityEnum
     safetyRules: safetyRulesSchema.optional(),
   });
 
@@ -163,4 +168,13 @@ export type CreateGameSessionForCampaignInput = z.infer<
 >;
 export type UpdateGameSessionStatusInput = z.infer<
   typeof updateGameSessionStatusInputSchema
+>;
+
+export const respondToGameApplicationSchema = z.object({
+  applicationId: z.string().min(1),
+  status: z.enum(applicationStatusEnum.enumValues),
+});
+
+export type RespondToGameApplicationInput = z.infer<
+  typeof respondToGameApplicationSchema
 >;

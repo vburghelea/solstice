@@ -13,3 +13,11 @@ export const participantRoleEnum = pgEnum("participant_role", [
   "invited",
   "applicant",
 ]);
+
+export const visibilityEnum = pgEnum("visibility", ["public", "protected", "private"]);
+
+export const applicationStatusEnum = pgEnum("application_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);

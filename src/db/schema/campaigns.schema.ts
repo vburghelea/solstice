@@ -1,4 +1,3 @@
-import { createId } from "@paralleldrive/cuid2";
 import { relations } from "drizzle-orm";
 import {
   integer,
@@ -11,6 +10,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { applicationStatusEnum, visibilityEnum } from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 import { user } from "./auth.schema";
 import { gameSystems as gameSystem } from "./game-systems.schema";
 
@@ -19,26 +19,14 @@ export const campaignStatusEnum = pgEnum("campaign_status", [
   "cancelled",
   "completed",
 ]);
-export const campaignVisibilityEnum = pgEnum("campaign_visibility", [
-  "public",
-  "protected",
-  "private",
-]);
 export const campaignRecurrenceEnum = pgEnum("campaign_recurrence", [
   "weekly",
   "bi-weekly",
   "monthly",
 ]);
-export const campaignApplicationStatusEnum = pgEnum("application_status", [
-  "pending",
-  "approved",
-  "rejected",
-]);
 
 export const campaigns = pgTable("campaigns", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => createId()),
+  id: uuid("id").primaryKey().defaultRandom(),
   ownerId: text("owner_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -56,7 +44,7 @@ export const campaigns = pgTable("campaigns", {
   location: jsonb("location"), // Google Maps geocoded entity
   status: campaignStatusEnum("status").notNull().default("active"),
   minimumRequirements: jsonb("minimum_requirements"),
-  visibility: campaignVisibilityEnum("visibility").notNull().default("public"),
+  visibility: visibilityEnum("visibility").notNull().default("public"), // Changed to visibilityEnum
   safetyRules: jsonb("safety_rules"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -66,7 +54,7 @@ import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.s
 
 export const campaignParticipants = pgTable("campaign_participants", {
   id: uuid("id").primaryKey().defaultRandom(),
-  campaignId: text("campaign_id")
+  campaignId: uuid("campaign_id")
     .notNull()
     .references(() => campaigns.id, { onDelete: "cascade" }),
   userId: text("user_id")
@@ -79,16 +67,14 @@ export const campaignParticipants = pgTable("campaign_participants", {
 });
 
 export const campaignApplications = pgTable("campaign_applications", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => createId()),
-  campaignId: text("campaign_id")
+  id: uuid("id").primaryKey().defaultRandom(),
+  campaignId: uuid("campaign_id")
     .notNull()
     .references(() => campaigns.id, { onDelete: "cascade" }),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  status: campaignApplicationStatusEnum("status").notNull().default("pending"),
+  status: applicationStatusEnum("status").notNull().default("pending"), // Changed to applicationStatusEnum
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

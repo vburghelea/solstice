@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser } from "~/features/auth/auth.queries"; // Import the actual function to be mocked
 import type {
+  GameApplication,
   GameListItem,
   GameParticipant,
   GameWithDetails,
@@ -61,7 +62,7 @@ vi.mock("../games.mutations", async (importOriginal) => {
         ) => Promise<OperationResult<GameParticipant | boolean>>
       >(),
     applyToGame:
-      vi.fn<(data: ApplyToGameInput) => Promise<OperationResult<GameParticipant>>>(),
+      vi.fn<(data: ApplyToGameInput) => Promise<OperationResult<GameApplication>>>(),
     updateGameParticipant:
       vi.fn<
         (data: UpdateGameParticipantInput) => Promise<OperationResult<GameParticipant>>
@@ -145,6 +146,16 @@ import {
   listGameSessionsByCampaignId,
   searchUsersForInvitation,
 } from "../games.queries";
+
+const MOCK_GAME_APPLICATION = {
+  id: "app-game-1",
+  gameId: MOCK_GAME.id,
+  userId: MOCK_OTHER_USER.id,
+  status: "pending" as const,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  user: MOCK_OTHER_USER,
+};
 
 describe("Game Management Feature Tests", () => {
   beforeEach(() => {
@@ -567,14 +578,14 @@ describe("Game Management Feature Tests", () => {
       mockCurrentUser(MOCK_OTHER_USER);
       vi.mocked(applyToGame).mockResolvedValue({
         success: true,
-        data: MOCK_APPLICANT_GAME_PARTICIPANT,
+        data: MOCK_GAME_APPLICATION,
       });
 
       const result = await applyToGame({ data: { gameId: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.userId).toBe(MOCK_OTHER_USER.id);
-        expect(result.data.role).toBe("applicant");
+        expect(result.data.gameId).toBe(MOCK_GAME.id);
         expect(result.data.status).toBe("pending");
       }
     });
@@ -612,13 +623,13 @@ describe("Game Management Feature Tests", () => {
     it("should return pending applications for game owner", async () => {
       vi.mocked(getGameApplications).mockResolvedValue({
         success: true,
-        data: [MOCK_APPLICANT_GAME_PARTICIPANT],
+        data: [MOCK_GAME_APPLICATION],
       });
 
       const result = await getGameApplications({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual([MOCK_APPLICANT_GAME_PARTICIPANT]);
+        expect(result.data).toEqual([MOCK_GAME_APPLICATION]);
       }
     });
 

@@ -1,13 +1,9 @@
-CREATE TYPE "public"."application_status" AS ENUM('pending', 'approved', 'rejected');--> statement-breakpoint
 CREATE TYPE "public"."campaign_recurrence" AS ENUM('weekly', 'bi-weekly', 'monthly');--> statement-breakpoint
 CREATE TYPE "public"."campaign_status" AS ENUM('active', 'cancelled', 'completed');--> statement-breakpoint
-CREATE TYPE "public"."campaign_visibility" AS ENUM('public', 'protected', 'private');--> statement-breakpoint
-CREATE TYPE "public"."campaign_participant_role" AS ENUM('owner', 'player', 'invited', 'applicant');--> statement-breakpoint
-CREATE TYPE "public"."campaign_participant_status" AS ENUM('approved', 'rejected', 'pending');--> statement-breakpoint
 
 CREATE TABLE "campaign_applications" (
-	"id" text PRIMARY KEY NOT NULL,
-	"campaign_id" text NOT NULL,
+	"id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
+	"campaign_id" uuid NOT NULL,
 	"user_id" text NOT NULL,
 	"status" "application_status" DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -16,16 +12,16 @@ CREATE TABLE "campaign_applications" (
 --> statement-breakpoint
 CREATE TABLE "campaign_participants" (
 	"id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
-	"campaign_id" text NOT NULL,
+	"campaign_id" uuid NOT NULL,
 	"user_id" text NOT NULL,
-	"role" "campaign_participant_role" NOT NULL,
-	"status" "campaign_participant_status" NOT NULL,
+	"role" "participant_role" DEFAULT 'player' NOT NULL,
+	"status" "participant_status"  DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "campaigns" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"description" text NOT NULL,
 	"game_system_id" integer NOT NULL,

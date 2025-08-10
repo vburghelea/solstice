@@ -10,21 +10,21 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { participantRoleEnum, participantStatusEnum } from "~/db/schema/shared.schema";
+import {
+  applicationStatusEnum,
+  participantRoleEnum,
+  participantStatusEnum,
+  visibilityEnum,
+} from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 import { user } from "./auth.schema";
 import { campaigns } from "./campaigns.schema";
 import { gameSystems as gameSystem } from "./game-systems.schema";
 
-// Enums for game status and visibility
+// Enums for game status
 export const gameStatusEnum = pgEnum("game_status", [
   "scheduled",
   "canceled",
   "completed",
-]);
-export const gameVisibilityEnum = pgEnum("game_visibility", [
-  "public",
-  "protected",
-  "private",
 ]);
 
 export const games = pgTable("games", {
@@ -47,7 +47,7 @@ export const games = pgTable("games", {
   location: jsonb("location").notNull(), // Google Maps geocoded entity
   status: gameStatusEnum("status").notNull().default("scheduled"),
   minimumRequirements: jsonb("minimum_requirements"), // e.g., { language: "en", city: "Berlin" }
-  visibility: gameVisibilityEnum("visibility").notNull().default("public"),
+  visibility: visibilityEnum("visibility").notNull().default("public"), // Changed to visibilityEnum
   safetyRules: jsonb("safety_rules"), // e.g., ["no-alcohol", "safe-word"]
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
@@ -67,6 +67,19 @@ export const gameParticipants = pgTable("game_participants", {
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const gameApplications = pgTable("game_applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  gameId: uuid("game_id")
+    .notNull()
+    .references(() => games.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: applicationStatusEnum("status").notNull().default("pending"), // Changed to applicationStatusEnum
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
+
 export const gamesRelations = relations(games, ({ one, many }) => ({
   owner: one(user, {
     fields: [games.ownerId],
@@ -81,6 +94,7 @@ export const gamesRelations = relations(games, ({ one, many }) => ({
     references: [gameSystem.id],
   }),
   participants: many(gameParticipants),
+  applications: many(gameApplications),
 }));
 
 export const gameParticipantsRelations = relations(gameParticipants, ({ one }) => ({
@@ -90,6 +104,17 @@ export const gameParticipantsRelations = relations(gameParticipants, ({ one }) =
   }),
   user: one(user, {
     fields: [gameParticipants.userId],
+    references: [user.id],
+  }),
+}));
+
+export const gameApplicationsRelations = relations(gameApplications, ({ one }) => ({
+  game: one(games, {
+    fields: [gameApplications.gameId],
+    references: [games.id],
+  }),
+  user: one(user, {
+    fields: [gameApplications.userId],
     references: [user.id],
   }),
 }));

@@ -52,18 +52,30 @@ export async function findGameParticipantsByGameId(gameId: string) {
   });
 }
 
+import { gameApplications } from "~/db/schema"; // Add gameApplications import
+
 /**
  * Finds pending applications for a given game ID.
  */
 export async function findPendingGameApplicationsByGameId(gameId: string) {
   const db = await getDb();
-  return db.query.gameParticipants.findMany({
+  return db.query.gameApplications.findMany({
     where: and(
-      eq(gameParticipants.gameId, gameId),
-      eq(gameParticipants.status, "pending"),
-      eq(gameParticipants.role, "applicant"),
+      eq(gameApplications.gameId, gameId),
+      eq(gameApplications.status, "pending"),
     ),
     with: { user: true },
+  });
+}
+
+/**
+ * Finds a game application by its ID.
+ */
+export async function findGameApplicationById(applicationId: string) {
+  const db = await getDb();
+  return db.query.gameApplications.findFirst({
+    where: eq(gameApplications.id, applicationId),
+    with: { game: true, user: true }, // Renamed from gameSession
   });
 }
 

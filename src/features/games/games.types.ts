@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type { user } from "~/db/schema";
 import type { gameSystems as gameSystem } from "~/db/schema/game-systems.schema";
-import type { gameStatusEnum, gameVisibilityEnum, games } from "~/db/schema/games.schema";
+import type { gameStatusEnum, games } from "~/db/schema/games.schema"; // Removed gameVisibilityEnum
+import type { visibilityEnum } from "~/db/schema/shared.schema"; // Added visibilityEnum
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -19,7 +20,7 @@ export type Game = typeof games.$inferSelect & {
 export type NewGame = typeof games.$inferInsert;
 
 export type GameStatus = (typeof gameStatusEnum.enumValues)[number];
-export type GameVisibility = (typeof gameVisibilityEnum.enumValues)[number];
+export type GameVisibility = (typeof visibilityEnum.enumValues)[number]; // Changed to visibilityEnum
 export type GameParticipantRole = ParticipantRole;
 export type GameParticipantStatus = ParticipantStatus;
 
@@ -56,12 +57,10 @@ export type GameSearchFilters = {
   searchTerm?: string;
 };
 
-export type GameApplication = {
-  gameId: string;
-  userId: string;
-  status: GameParticipantStatus;
-  role: GameParticipantRole;
-  message?: string;
+import type { gameApplications } from "~/db/schema/games.schema";
+
+export type GameApplication = typeof gameApplications.$inferSelect & {
+  user: typeof user.$inferSelect;
 };
 
 export type GameInvitation = {
@@ -76,3 +75,7 @@ export type GameParticipantUpdate = {
   status?: GameParticipantStatus;
   role?: GameParticipantRole;
 };
+
+import type { applicationStatusEnum } from "~/db/schema/shared.schema";
+
+export type ApplicationStatus = (typeof applicationStatusEnum.enumValues)[number];

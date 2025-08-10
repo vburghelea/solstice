@@ -70,15 +70,19 @@ export function CreateGamePage() {
 
   const initialValues =
     campaignData?.success && campaignData.data
-      ? {
-          gameSystemId: campaignData.data.gameSystemId,
-          expectedDuration: campaignData.data.sessionDuration,
-          visibility: campaignData.data.visibility,
-          language: campaignData.data.language,
-          price: campaignData.data.pricePerSession ?? undefined,
-          minimumRequirements: campaignData.data.minimumRequirements,
-          safetyRules: campaignData.data.safetyRules,
-        }
+      ? (() => {
+          const campaign = campaignData.data;
+          return {
+            gameSystemId: campaign.gameSystemId,
+            expectedDuration: campaign.sessionDuration,
+            price: campaign.pricePerSession ?? undefined,
+            language: campaign.language,
+            location: campaign.location,
+            minimumRequirements: campaign.minimumRequirements,
+            visibility: campaign.visibility,
+            safetyRules: campaign.safetyRules,
+          };
+        })()
       : {};
 
   return (
@@ -124,6 +128,7 @@ export function CreateGamePage() {
           )}
 
           <GameForm
+            key={JSON.stringify(initialValues)} // Add key to force re-mount when initialValues change
             onSubmit={async (values) => {
               setServerError(null);
 

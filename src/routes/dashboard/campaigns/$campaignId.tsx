@@ -29,8 +29,10 @@ import {
 } from "~/features/campaigns/campaigns.queries";
 import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
+import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList"; // Added
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 import { ManageApplications } from "~/features/campaigns/components/ManageApplications";
+import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation"; // Added
 import { CampaignGameSessionCard } from "~/features/games/components/CampaignGameSessionCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
@@ -134,6 +136,19 @@ export function CampaignDetailsPage() {
   });
 
   const isOwner = initialData.campaign?.owner?.id === currentUser?.id;
+
+  const isInvited = campaign?.participants?.some(
+    (p) => p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
+  );
+  const invitedParticipant = campaign?.participants?.find(
+    (p) => p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
+  );
+  const isParticipant = campaign?.participants?.some(
+    (p) =>
+      p.userId === currentUser?.id &&
+      (p.role === "player" || p.role === "invited") &&
+      p.status !== "rejected",
+  );
 
   const updateGameSessionStatusMutation = useMutation({
     mutationFn: updateGameSessionStatus,
@@ -309,6 +324,19 @@ export function CampaignDetailsPage() {
           )}
         </CardContent>
       </Card>
+
+      {isInvited && invitedParticipant && (
+        <RespondToInvitation participant={invitedParticipant} />
+      )}
+
+      {isParticipant && (
+        <CampaignParticipantsList
+          campaignId={campaignId}
+          isOwner={isOwner}
+          currentUser={currentUser}
+          campaignOwnerId={campaign.owner?.id || ""}
+        />
+      )}
 
       {isOwner && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

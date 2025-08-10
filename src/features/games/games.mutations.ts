@@ -804,6 +804,8 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
     }
   });
 
+import { getCampaign } from "~/features/campaigns/campaigns.queries"; // Import getCampaign
+
 /**
  * Create a new game session for a campaign
  */
@@ -824,6 +826,16 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
+      // Fetch campaign details to get expectedDuration and safetyRules
+      const campaignResult = await getCampaign({ data: { id: data.campaignId } });
+      if (!campaignResult.success || !campaignResult.data) {
+        return {
+          success: false,
+          errors: [{ code: "NOT_FOUND", message: "Campaign not found" }],
+        };
+      }
+      const campaign = campaignResult.data;
+
       const [newGame] = await db
         .insert(games)
         .values({
@@ -833,14 +845,14 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
           name: data.name,
           dateTime: new Date(data.dateTime),
           description: data.description,
-          expectedDuration: data.expectedDuration,
+          expectedDuration: campaign.sessionDuration, // Use campaign's sessionDuration
           price: data.price,
           language: data.language,
           location: data.location,
           status: "scheduled",
           minimumRequirements: data.minimumRequirements,
           visibility: data.visibility,
-          safetyRules: data.safetyRules,
+          safetyRules: campaign.safetyRules, // Use campaign's safetyRules
         })
         .returning();
 

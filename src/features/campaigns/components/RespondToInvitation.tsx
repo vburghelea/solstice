@@ -8,29 +8,31 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { respondToGameInvitation } from "~/features/games/games.mutations";
-import type { GameParticipant } from "~/features/games/games.types";
+import { respondToCampaignInvitation } from "~/features/campaigns/campaigns.mutations";
+import type { CampaignParticipant } from "~/features/campaigns/campaigns.types";
 import { OperationResult } from "~/shared/types/common";
 
 interface RespondToInvitationProps {
-  participant: GameParticipant;
+  participant: CampaignParticipant;
 }
 
 export function RespondToInvitation({ participant }: RespondToInvitationProps) {
   const queryClient = useQueryClient();
 
   const respondMutation = useMutation<
-    OperationResult<GameParticipant | boolean>,
+    OperationResult<CampaignParticipant | boolean>,
     Error,
     { data: { participantId: string; action: "accept" | "reject" } }
   >({
-    mutationFn: respondToGameInvitation,
+    mutationFn: respondToCampaignInvitation,
     onSuccess: async (data) => {
       if (data.success) {
         toast.success("Invitation response recorded.");
-        await queryClient.invalidateQueries({ queryKey: ["game", participant.gameId] });
         await queryClient.invalidateQueries({
-          queryKey: ["gameApplications", participant.gameId],
+          queryKey: ["campaign", participant.campaignId],
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["campaignApplications", participant.campaignId],
         });
         await queryClient.invalidateQueries({ queryKey: ["currentUser"] }); // Invalidate currentUser query
       } else {
@@ -53,9 +55,9 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Game Invitation</CardTitle>
+        <CardTitle>Campaign Invitation</CardTitle>
         <CardDescription>
-          You have been invited to this game. Please accept or reject the invitation.
+          You have been invited to this campaign. Please accept or reject the invitation.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex gap-4">

@@ -402,6 +402,7 @@ export function ProfileView() {
                   <ValidatedCheckbox
                     field={field}
                     label="Show my email address to team members"
+                    disabled={false}
                   />
                 )}
               </form.Field>
@@ -411,13 +412,18 @@ export function ProfileView() {
                   <ValidatedCheckbox
                     field={field}
                     label="Show my phone number to team members"
+                    disabled={false}
                   />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.allowTeamInvitations">
                 {(field) => (
-                  <ValidatedCheckbox field={field} label="Allow team invitations" />
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Allow team invitations"
+                    disabled={false}
+                  />
                 )}
               </form.Field>
             </div>

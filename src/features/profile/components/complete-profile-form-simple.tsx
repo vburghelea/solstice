@@ -268,6 +268,7 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my email address to team members"
+                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -277,6 +278,7 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my phone number to team members"
+                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -286,6 +288,7 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Allow team captains to send me invitations"
+                        disabled={false}
                       />
                     )}
                   </form.Field>

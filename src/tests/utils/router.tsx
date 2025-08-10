@@ -93,6 +93,7 @@ interface RenderWithRouterOptions extends Omit<RenderOptions, "wrapper"> {
   initialEntries?: string[];
   user?: User | null;
   includeQueryClient?: boolean;
+  path?: string;
 }
 
 // Main render function with router - based on TanStack Router best practices
@@ -102,6 +103,7 @@ export async function renderWithRouter(
     initialEntries = ["/"],
     user = mockUser,
     includeQueryClient = true,
+    path = "/",
     ...renderOptions
   }: RenderWithRouterOptions = {},
 ) {
@@ -115,7 +117,7 @@ export async function renderWithRouter(
   // Create a test route that renders our component
   const testRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/",
+    path: path,
     component: () => ui,
     beforeLoad: () => ({
       user,

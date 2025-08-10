@@ -32,35 +32,44 @@ import {
 import { Textarea } from "~/shared/ui/textarea";
 
 interface GameFormProps {
-  initialValues?: z.infer<typeof updateGameInputSchema>;
+  initialValues?: Partial<z.infer<typeof updateGameInputSchema>>;
   onSubmit: (
     values: z.infer<typeof createGameInputSchema> | z.infer<typeof updateGameInputSchema>,
   ) => Promise<void>;
   isSubmitting: boolean;
+  isCampaignGame?: boolean;
+  gameSystemName?: string;
 }
 
-export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProps) {
+export function GameForm({
+  initialValues,
+  onSubmit,
+  isSubmitting,
+  isCampaignGame,
+  gameSystemName,
+}: GameFormProps) {
   const form = useForm({
-    defaultValues: initialValues || {
-      gameSystemId: undefined,
-      name: "",
-      dateTime: new Date().toISOString(),
-      description: "",
-      expectedDuration: 1,
-      price: undefined,
-      language: "",
-      location: { address: "", lat: 0, lng: 0 },
-      minimumRequirements: {
+    defaultValues: {
+      gameSystemId: initialValues?.gameSystemId ?? undefined,
+      name: initialValues?.name ?? "",
+      dateTime: initialValues?.dateTime ?? new Date().toISOString(),
+      description: initialValues?.description ?? "",
+      expectedDuration: initialValues?.expectedDuration ?? 1,
+      price: initialValues?.price ?? undefined,
+      language: initialValues?.language ?? "",
+      location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
+      minimumRequirements: initialValues?.minimumRequirements ?? {
         minPlayers: undefined,
         maxPlayers: undefined,
         languageLevel: undefined,
         playerRadiusKm: undefined,
       },
-      safetyRules: {
+      safetyRules: initialValues?.safetyRules ?? {
         "no-alcohol": false,
         "safe-word": false,
       },
-      visibility: "public",
+      visibility: initialValues?.visibility ?? "public",
+      status: initialValues?.status ?? "scheduled",
     },
     onSubmit: async ({ value }) => {
       try {
@@ -81,7 +90,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
   const { data: gameSystemSearchResults, isLoading: isLoadingGameSystems } = useQuery({
     queryKey: ["searchGameSystems", debouncedGameSystemSearchTerm],
     queryFn: () => searchGameSystems({ data: { query: debouncedGameSystemSearchTerm } }),
-    enabled: debouncedGameSystemSearchTerm.length >= 3,
+    enabled: debouncedGameSystemSearchTerm.length >= 3 && !isCampaignGame,
   });
 
   // State to store the selected game system details
@@ -99,19 +108,21 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
           value: gs.id.toString(),
           label: gs.name,
         }))
-      : [];
+      : isCampaignGame && initialValues?.gameSystemId && gameSystemName
+        ? [{ value: initialValues.gameSystemId.toString(), label: gameSystemName }]
+        : [];
 
   // Update form fields when game system changes
   React.useEffect(() => {
     if (selectedGameSystem) {
-      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime || 1);
+      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime ?? 1);
       form.setFieldValue(
         "minimumRequirements.minPlayers",
-        selectedGameSystem.minPlayers || 1,
+        selectedGameSystem.minPlayers ?? 1,
       );
       form.setFieldValue(
         "minimumRequirements.maxPlayers",
-        selectedGameSystem.maxPlayers || 1,
+        selectedGameSystem.maxPlayers ?? 1,
       );
     }
   }, [form, selectedGameSystem]);
@@ -270,6 +281,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
             }}
             onSearchChange={setGameSystemSearchTerm}
             isLoading={isLoadingGameSystems}
+            disabled={!!isCampaignGame}
             error={
               field.state.meta.errors?.filter(Boolean).map((e) => {
                 if (typeof e === "string") {
@@ -333,15 +345,9 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 id={field.name}
                 name={field.name}
                 type="number"
-                value={
-                  field.state.value
-                    ? field.state.value
-                    : (selectedGameSystem?.averagePlayTime ?? "")
-                }
+                value={field.state.value ?? selectedGameSystem?.averagePlayTime ?? 1}
                 onBlur={field.handleBlur}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : undefined)
-                }
+                onChange={(e) => field.handleChange(Number(e.target.value))}
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {field.state.meta.errors?.length > 0 && (
@@ -437,7 +443,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
             <div>
               <Label htmlFor={field.name}>Language</Label>
               <Select
-                value={field.state.value || ""}
+                value={field.state.value as string}
                 onValueChange={(value) => field.handleChange(value)}
               >
                 <SelectTrigger>
@@ -472,7 +478,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null || value === "") {
+                if (value === undefined || value === null) {
                   return undefined;
                 }
               }
@@ -551,7 +557,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 id={field.name}
                 name={field.name}
                 type="number"
-                value={field.state.value || selectedGameSystem?.minPlayers || ""}
+                value={field.state.value ?? selectedGameSystem?.minPlayers ?? 1}
                 onBlur={field.handleBlur}
                 onChange={(e) =>
                   field.handleChange(e.target.value ? Number(e.target.value) : undefined)
@@ -597,7 +603,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 id={field.name}
                 name={field.name}
                 type="number"
-                value={field.state.value || selectedGameSystem?.maxPlayers || ""}
+                value={field.state.value ?? selectedGameSystem?.maxPlayers ?? 1}
                 onBlur={field.handleBlur}
                 onChange={(e) =>
                   field.handleChange(e.target.value ? Number(e.target.value) : undefined)
@@ -689,9 +695,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
             <input
               type="hidden"
               value={field.state.value || 0}
-              onChange={(e) =>
-                field.handleChange(e.target.value ? Number(e.target.value) : undefined)
-              }
+              onChange={(e) => field.handleChange(Number(e.target.value))}
             />
           )}
         </form.Field>
@@ -716,15 +720,13 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
             <input
               type="hidden"
               value={field.state.value || 0}
-              onChange={(e) =>
-                field.handleChange(e.target.value ? Number(e.target.value) : undefined)
-              }
+              onChange={(e) => field.handleChange(Number(e.target.value))}
             />
           )}
         </form.Field>
       </fieldset>
 
-      {initialValues && (
+      {initialValues?.id && (
         <form.Field
           name="status"
           validators={{
@@ -797,15 +799,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
             <div>
               <Label htmlFor={field.name}>Language Level</Label>
               <Select
-                value={
-                  field.state.value === undefined || field.state.value === null
-                    ? ""
-                    : (field.state.value as
-                        | "beginner"
-                        | "intermediate"
-                        | "advanced"
-                        | "fluent")
-                }
+                value={field.state.value as string}
                 onValueChange={(value) =>
                   field.handleChange(
                     value as "beginner" | "intermediate" | "advanced" | "fluent",
@@ -816,10 +810,11 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                   <SelectValue placeholder="Select a language level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                  <SelectItem value="fluent">Fluent</SelectItem>
+                  {languageOptions.map((lang) => (
+                    <SelectItem key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {field.state.meta.errors?.length > 0 && (
@@ -863,15 +858,13 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
                 type="range"
                 min="1"
                 max="10"
-                value={field.state.value || 5}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : undefined)
-                }
+                value={field.state.value ?? 5}
+                onChange={(e) => field.handleChange(Number(e.target.value))}
                 className="w-full"
               />
               <div className="text-muted-foreground flex justify-between text-sm">
                 <span>1 km</span>
-                <span className="text-center">Selected: {field.state.value || 5} km</span>
+                <span className="text-center">Selected: {field.state.value ?? 5} km</span>
                 <span>10 km</span>
               </div>
               {field.state.meta.errors?.length > 0 && (
@@ -956,7 +949,7 @@ export function GameForm({ initialValues, onSubmit, isSubmitting }: GameFormProp
           <Link to="/dashboard/games">Cancel</Link>
         </Button>
         <FormSubmitButton isSubmitting={isSubmitting}>
-          {initialValues ? "Update Game" : "Create Game"}
+          {initialValues?.id ? "Update Game" : "Create Game"}
         </FormSubmitButton>
       </div>
     </form>

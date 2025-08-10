@@ -21,7 +21,7 @@ export const createCampaignInputSchema = z.object({
   recurrence: z.enum(campaignRecurrenceEnum.enumValues),
   timeOfDay: z.string(),
   sessionDuration: z.number().positive(),
-  pricePerSession: z.number().optional(),
+  pricePerSession: z.number().nullable().optional(),
   language: z.string().min(1, "Language is required"),
   location: locationSchema.optional(),
   minimumRequirements: minimumRequirementsSchema.optional(),

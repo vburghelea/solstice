@@ -42,6 +42,7 @@ export type GameListItem = Game & {
   participantCount: number;
   minimumRequirements: z.infer<typeof minimumRequirementsSchema> | null;
   safetyRules: z.infer<typeof safetyRulesSchema> | null;
+  campaignId: string | null;
 };
 
 export type GameSearchFilters = {

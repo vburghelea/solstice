@@ -217,6 +217,7 @@ function GameDetailsPage() {
             <GameForm
               initialValues={{
                 ...game,
+                campaignId: game.campaignId ?? undefined,
                 price: game.price ?? undefined,
                 minimumRequirements: game.minimumRequirements ?? undefined,
                 safetyRules: game.safetyRules ?? undefined,

@@ -21,7 +21,7 @@ export const Route = createFileRoute("/dashboard/campaigns/")({
   },
 });
 
-function CampaignsPage() {
+export function CampaignsPage() {
   const { campaigns: initialCampaigns } = Route.useLoaderData();
 
   const { data: campaignsData } = useSuspenseQuery({

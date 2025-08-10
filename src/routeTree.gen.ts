@@ -31,6 +31,7 @@ import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
+import { Route as authLoginRouteImport } from "./routes/(auth)/login";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
@@ -157,6 +158,11 @@ const AdminRolesRoute = AdminRolesRouteImport.update({
 const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
   id: "/admin/events-review",
   path: "/admin/events-review",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const authLoginRoute = authLoginRouteImport.update({
+  id: "/(auth)/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
@@ -298,6 +304,7 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -335,6 +342,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
+  "/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/(auth)/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -411,6 +420,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/login"
     | "/admin/events-review"
     | "/admin/roles"
     | "/auth/login"
@@ -448,6 +458,7 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/auth"
+    | "/login"
     | "/admin/events-review"
     | "/admin/roles"
     | "/auth/login"
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/(auth)/login"
     | "/admin/events-review"
     | "/admin/roles"
     | "/auth/login"
@@ -522,6 +534,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  authLoginRoute: typeof authLoginRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
@@ -741,6 +754,13 @@ declare module "@tanstack/react-router" {
       path: "/admin/events-review";
       fullPath: "/admin/events-review";
       preLoaderRoute: typeof AdminEventsReviewRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(auth)/login": {
+      id: "/(auth)/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof authLoginRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams/": {
@@ -1078,6 +1098,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  authLoginRoute: authLoginRoute,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
   AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,

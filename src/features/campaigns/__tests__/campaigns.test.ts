@@ -132,112 +132,20 @@ import {
   searchUsersForInvitation,
 } from "../campaigns.queries";
 
-const BASE_USER_PROPS = {
-  emailVerified: true,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  image: null,
-  profileComplete: true,
-  profileVersion: 1,
-  gender: null,
-  pronouns: null,
-  phone: null,
-  profileUpdatedAt: null,
-  privacySettings: null,
-};
+import {
+  MOCK_INVITED_USER,
+  MOCK_OTHER_USER,
+  MOCK_OWNER_USER,
+  MOCK_PLAYER_USER,
+} from "~/tests/mocks/users";
 
-const MOCK_OWNER_USER = {
-  id: "owner-1",
-  email: "owner@example.com",
-  name: "Campaign Owner",
-  ...BASE_USER_PROPS,
-};
-const MOCK_PLAYER_USER = {
-  id: "player-1",
-  email: "player@example.com",
-  name: "Campaign Player",
-  ...BASE_USER_PROPS,
-};
-const MOCK_INVITED_USER = {
-  id: "invited-1",
-  email: "invited@example.com",
-  name: "Campaign Invited",
-  ...BASE_USER_PROPS,
-};
-const MOCK_OTHER_USER = {
-  id: "other-1",
-  email: "other@example.com",
-  name: "Other User",
-  ...BASE_USER_PROPS,
-};
-
-const MOCK_CAMPAIGN = {
-  id: "campaign-1",
-  ownerId: MOCK_OWNER_USER.id,
-  gameSystemId: 1,
-  name: "Test Campaign",
-  description: "A test campaign session",
-  images: [],
-  recurrence: "weekly" as const,
-  timeOfDay: "evenings",
-  sessionDuration: 240,
-  pricePerSession: 0,
-  language: "English",
-  location: { address: "Test Location", lat: 0, lng: 0 },
-  status: "active" as const,
-  minimumRequirements: { languageLevel: "beginner" as const },
-  visibility: "public" as const,
-  safetyRules: { "no-alcohol": true, "safe-word": false },
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  owner: MOCK_OWNER_USER,
-  participants: [],
-  applications: [],
-  participantCount: 0,
-};
-
-const MOCK_OWNER_PARTICIPANT = {
-  id: "part-owner-1",
-  campaignId: MOCK_CAMPAIGN.id,
-  userId: MOCK_OWNER_USER.id,
-  user: MOCK_OWNER_USER,
-  role: "owner" as const,
-  status: "approved" as const,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_PLAYER_PARTICIPANT = {
-  id: "part-player-1",
-  campaignId: MOCK_CAMPAIGN.id,
-  userId: MOCK_PLAYER_USER.id,
-  user: MOCK_PLAYER_USER,
-  role: "player" as const,
-  status: "approved" as const,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_INVITED_PARTICIPANT = {
-  id: "part-invited-1",
-  campaignId: MOCK_CAMPAIGN.id,
-  userId: MOCK_INVITED_USER.id,
-  user: MOCK_INVITED_USER,
-  role: "invited" as const,
-  status: "pending" as const,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_APPLICANT_APPLICATION = {
-  id: "app-applicant-1",
-  campaignId: MOCK_CAMPAIGN.id,
-  userId: MOCK_OTHER_USER.id,
-  status: "pending" as const,
-  user: MOCK_OTHER_USER,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+import {
+  MOCK_APPLICANT_APPLICATION,
+  MOCK_CAMPAIGN,
+  MOCK_INVITED_PARTICIPANT,
+  MOCK_OWNER_PARTICIPANT,
+  MOCK_PLAYER_PARTICIPANT,
+} from "~/tests/mocks/campaigns";
 
 describe("Campaign Management Feature Tests", () => {
   beforeEach(() => {
@@ -475,7 +383,13 @@ describe("Campaign Management Feature Tests", () => {
     it("should return public campaigns to all users", async () => {
       vi.mocked(listCampaigns).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_CAMPAIGN, visibility: "public" }],
+        data: [
+          {
+            ...MOCK_CAMPAIGN,
+            visibility: "public",
+            participantCount: MOCK_CAMPAIGN.participants.length,
+          },
+        ],
       });
 
       const result = await listCampaigns({ data: {} });
@@ -490,7 +404,13 @@ describe("Campaign Management Feature Tests", () => {
     it("should return private campaigns to owner and participants", async () => {
       vi.mocked(listCampaigns).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_CAMPAIGN, visibility: "private" }],
+        data: [
+          {
+            ...MOCK_CAMPAIGN,
+            visibility: "private",
+            participantCount: MOCK_CAMPAIGN.participants.length,
+          },
+        ],
       });
       const resultOwner = await listCampaigns({ data: {} });
       expect(resultOwner.success).toBe(true);
@@ -503,7 +423,13 @@ describe("Campaign Management Feature Tests", () => {
       mockCurrentUser(MOCK_INVITED_USER);
       vi.mocked(listCampaigns).mockResolvedValue({
         success: true,
-        data: [{ ...MOCK_CAMPAIGN, visibility: "private" }],
+        data: [
+          {
+            ...MOCK_CAMPAIGN,
+            visibility: "private",
+            participantCount: MOCK_CAMPAIGN.participants.length,
+          },
+        ],
       });
       const resultInvited = await listCampaigns({ data: {} });
       expect(resultInvited.success).toBe(true);

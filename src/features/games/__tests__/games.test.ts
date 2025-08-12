@@ -1,5 +1,4 @@
 // src/features/games/__tests__/games.test.ts
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser } from "~/features/auth/auth.queries"; // Import the actual function to be mocked
 
@@ -489,6 +488,25 @@ describe("Game Management Feature Tests", () => {
       mocks.mockApplyToGame.mockResolvedValue({
         success: false,
         errors: [{ code: "CONFLICT", message: "Already a participant or applicant" }],
+      });
+
+      const result = await mocks.mockApplyToGame({ data: { gameId: MOCK_GAME.id } });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("CONFLICT");
+      }
+    });
+
+    it("should fail if user has a rejected participant entry", async () => {
+      mockCurrentUser(MOCK_OTHER_USER);
+      mocks.mockApplyToGame.mockResolvedValue({
+        success: false,
+        errors: [
+          {
+            code: "CONFLICT",
+            message: "You cannot apply to this game as you were previously rejected.",
+          },
+        ],
       });
 
       const result = await mocks.mockApplyToGame({ data: { gameId: MOCK_GAME.id } });
@@ -1096,6 +1114,75 @@ describe("Game Management Feature Tests", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
+      }
+    });
+  });
+
+  // --- Remove Game Participant Ban Tests ---
+  describe("removeGameParticipantBan", () => {
+    it("should allow owner to remove a rejected participant's ban", async () => {
+      mockCurrentUser(MOCK_OWNER_USER);
+      mocks.mockRemoveGameParticipantBan.mockResolvedValue({ success: true, data: true });
+
+      const result = await mocks.mockRemoveGameParticipantBan({
+        data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBe(true);
+      }
+    });
+
+    it("should fail if not authenticated", async () => {
+      mockCurrentUser(null);
+      mocks.mockRemoveGameParticipantBan.mockResolvedValue({
+        success: false,
+        errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+      });
+
+      const result = await mocks.mockRemoveGameParticipantBan({
+        data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("AUTH_ERROR");
+      }
+    });
+
+    it("should fail if not authorized (not game owner)", async () => {
+      mockCurrentUser(MOCK_PLAYER_USER);
+      mocks.mockRemoveGameParticipantBan.mockResolvedValue({
+        success: false,
+        errors: [
+          {
+            code: "AUTH_ERROR",
+            message: "Not authorized to remove this participant's ban",
+          },
+        ],
+      });
+
+      const result = await mocks.mockRemoveGameParticipantBan({
+        data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("AUTH_ERROR");
+      }
+    });
+
+    it("should fail if participant is not currently rejected", async () => {
+      mockCurrentUser(MOCK_OWNER_USER);
+      mocks.mockRemoveGameParticipantBan.mockResolvedValue({
+        success: false,
+        errors: [{ code: "CONFLICT", message: "Participant is not currently rejected" }],
+      });
+
+      const result = await mocks.mockRemoveGameParticipantBan({
+        data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id }, // Assuming this participant is 'approved'
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("CONFLICT");
       }
     });
   });

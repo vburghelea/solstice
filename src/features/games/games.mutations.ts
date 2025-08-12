@@ -16,6 +16,7 @@ import {
   createGameSessionForCampaignInputSchema,
   getGameSchema,
   inviteToGameInputSchema,
+  removeGameParticipantBanInputSchema,
   removeGameParticipantInputSchema,
   respondToGameApplicationSchema,
   respondToGameInvitationSchema,
@@ -491,6 +492,27 @@ export const applyToGame = createServerFn({ method: "POST" })
         return {
           success: false,
           errors: [{ code: "NOT_FOUND", message: "Game not found" }],
+        };
+      }
+
+      // Check if user has a rejected participant entry for this game
+      const existingRejectedParticipant = await db.query.gameParticipants.findFirst({
+        where: and(
+          eq(gameParticipants.gameId, data.gameId),
+          eq(gameParticipants.userId, currentUser.id),
+          eq(gameParticipants.status, "rejected"),
+        ),
+      });
+
+      if (existingRejectedParticipant) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message: "You cannot apply to this game as you were previously rejected.",
+            },
+          ],
         };
       }
 
@@ -1135,6 +1157,64 @@ export const respondToGameApplication = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to respond to application" }],
+      };
+    }
+  });
+
+/**
+ * Remove a participant's rejection ban from a game
+ */
+export const removeGameParticipantBan = createServerFn({ method: "POST" })
+  .validator(removeGameParticipantBanInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<boolean>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { eq } = await import("drizzle-orm");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      // Check if current user is game owner
+      const existingParticipant = await findGameParticipantById(data.id);
+
+      if (!existingParticipant || existingParticipant.game.ownerId !== currentUser.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Not authorized to remove this participant's ban",
+            },
+          ],
+        };
+      }
+
+      // Only remove if the participant is currently 'rejected'
+      if (existingParticipant.status !== "rejected") {
+        return {
+          success: false,
+          errors: [
+            { code: "CONFLICT", message: "Participant is not currently rejected" },
+          ],
+        };
+      }
+
+      await db.delete(gameParticipants).where(eq(gameParticipants.id, data.id));
+
+      return { success: true, data: true };
+    } catch (error) {
+      console.error("Error removing participant ban:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to remove participant ban" }],
       };
     }
   });

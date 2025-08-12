@@ -16,6 +16,7 @@ import {
   createCampaignInputSchema,
   getCampaignSchema,
   inviteToCampaignInputSchema,
+  removeCampaignParticipantBanInputSchema,
   removeCampaignParticipantInputSchema,
   respondToCampaignApplicationSchema,
   updateCampaignInputSchema,
@@ -453,6 +454,28 @@ export const applyToCampaign = createServerFn({ method: "POST" })
         };
       }
 
+      // Check if user has a rejected participant entry for this campaign
+      const existingRejectedParticipant = await db.query.campaignParticipants.findFirst({
+        where: and(
+          eq(campaignParticipants.campaignId, data.campaignId),
+          eq(campaignParticipants.userId, currentUser.id),
+          eq(campaignParticipants.status, "rejected"),
+        ),
+      });
+
+      if (existingRejectedParticipant) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message:
+                "You cannot apply to this campaign as you were previously rejected.",
+            },
+          ],
+        };
+      }
+
       // Check if campaign is open for applications (e.g., not canceled or completed)
       if (campaign.status === "cancelled" || campaign.status === "completed") {
         return {
@@ -684,7 +707,7 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
     }
   });
 
-export const respondToApplication = createServerFn({ method: "POST" })
+export const respondToCampaignApplication = createServerFn({ method: "POST" })
   .validator(respondToCampaignApplicationSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication | boolean>> => {
     try {
@@ -887,6 +910,67 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to respond to invitation" }],
+      };
+    }
+  });
+
+/**
+ * Remove a participant's rejection ban from a campaign
+ */
+export const removeCampaignParticipantBan = createServerFn({ method: "POST" })
+  .validator(removeCampaignParticipantBanInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<boolean>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { eq } = await import("drizzle-orm");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      // Check if current user is campaign owner
+      const existingParticipant = await findCampaignParticipantById(data.id);
+
+      if (
+        !existingParticipant ||
+        existingParticipant.campaign.ownerId !== currentUser.id
+      ) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Not authorized to remove this participant's ban",
+            },
+          ],
+        };
+      }
+
+      // Only remove if the participant is currently 'rejected'
+      if (existingParticipant.status !== "rejected") {
+        return {
+          success: false,
+          errors: [
+            { code: "CONFLICT", message: "Participant is not currently rejected" },
+          ],
+        };
+      }
+
+      await db.delete(campaignParticipants).where(eq(campaignParticipants.id, data.id));
+
+      return { success: true, data: true };
+    } catch (error) {
+      console.error("Error removing participant ban:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to remove participant ban" }],
       };
     }
   });

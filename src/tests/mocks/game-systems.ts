@@ -1,0 +1,86 @@
+import { GameSystem } from "~/db/schema/game-systems.schema";
+
+export const MOCK_GAME_SYSTEM: GameSystem = {
+  id: 1,
+  name: "Test System",
+  slug: "test-system",
+  description: "A test game system",
+  images: [],
+  minPlayers: 1,
+  maxPlayers: 10,
+  optimalPlayers: 4,
+  averagePlayTime: 120,
+  ageRating: "10+",
+  complexityRating: "medium",
+  yearReleased: 2020,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const MOCK_GAME_SYSTEM_2: GameSystem = {
+  id: 2,
+  name: "Fantasy RPG",
+  slug: "fantasy-rpg",
+  description: "A classic fantasy role-playing game system.",
+  images: [],
+  minPlayers: 2,
+  maxPlayers: 6,
+  optimalPlayers: 4,
+  averagePlayTime: 180,
+  ageRating: "12+",
+  complexityRating: "high",
+  yearReleased: 1980,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const MOCK_GAME_SYSTEM_3: GameSystem = {
+  id: 3,
+  name: "Sci-Fi Skirmish",
+  slug: "sci-fi-skirmish",
+  description: "A fast-paced science fiction skirmish game.",
+  images: [],
+  minPlayers: 2,
+  maxPlayers: 4,
+  optimalPlayers: 2,
+  averagePlayTime: 90,
+  ageRating: "8+",
+  complexityRating: "low",
+  yearReleased: 2022,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const MOCK_GAME_SYSTEM_DND5E: GameSystem = {
+  id: 100,
+  name: "D&D 5e",
+  slug: "dnd-5e",
+  description: "Dungeons & Dragons Fifth Edition",
+  images: [],
+  minPlayers: 2,
+  maxPlayers: 7,
+  optimalPlayers: 4,
+  averagePlayTime: 240,
+  ageRating: "12+",
+  complexityRating: "medium",
+  yearReleased: 2014,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const MOCK_GAME_SYSTEM_PATHFINDER2E: GameSystem = {
+  id: 101,
+  name: "Pathfinder 2e",
+  slug: "pathfinder-2e",
+  description: "Pathfinder Second Edition",
+  images: [],
+  minPlayers: 3,
+  maxPlayers: 6,
+  optimalPlayers: 4,
+  averagePlayTime: 240,
+  ageRating: "12+",
+  complexityRating: "high",
+  yearReleased: 2019,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};

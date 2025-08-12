@@ -1,109 +1,18 @@
 // src/features/games/__tests__/games.test.ts
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser } from "~/features/auth/auth.queries"; // Import the actual function to be mocked
-import type {
-  GameApplication,
-  GameListItem,
-  GameParticipant,
-  GameWithDetails,
-} from "~/features/games/games.types";
+
+import type { GameListItem, GameParticipant } from "~/features/games/games.types";
+
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
-import type {
-  ApplyToGameInput,
-  CreateGameInput,
-  GetGameInput,
-  InviteToGameInput,
-  ListGameSessionsByCampaignIdInput,
-  ListGamesInput,
-  RemoveGameParticipantInput,
-  RespondToGameInvitationInput,
-  SearchUsersForInvitationInput,
-  UpdateGameInput,
-  UpdateGameParticipantInput,
-  UpdateGameSessionStatusInput,
-} from "../games.schemas";
-
-// Mock getCurrentUser directly at the top level
-vi.mock("~/features/auth/auth.queries", () => ({
-  getCurrentUser: vi.fn(),
-}));
 
 // Helper to set the mocked current user
 const mockCurrentUser = (user: User | null) => {
   vi.mocked(getCurrentUser).mockResolvedValue(user);
 };
 
-// Mock campaign queries
-vi.mock("~/features/campaigns/campaigns.queries", async (importOriginal) => {
-  const original = await importOriginal<object>();
-  return {
-    ...original,
-    getCampaignParticipants: vi.fn(),
-  };
-});
-
-// Mock game mutations and queries
-vi.mock("../games.mutations", async (importOriginal) => {
-  const original = await importOriginal<object>();
-  return {
-    ...original,
-    createGame:
-      vi.fn<(data: CreateGameInput) => Promise<OperationResult<GameWithDetails>>>(),
-    updateGame:
-      vi.fn<(data: UpdateGameInput) => Promise<OperationResult<GameWithDetails>>>(),
-    deleteGame: vi.fn<(data: GetGameInput) => Promise<OperationResult<boolean>>>(),
-    inviteToGame:
-      vi.fn<(data: InviteToGameInput) => Promise<OperationResult<GameParticipant>>>(),
-    respondToGameInvitation:
-      vi.fn<
-        (
-          data: RespondToGameInvitationInput,
-        ) => Promise<OperationResult<GameParticipant | boolean>>
-      >(),
-    applyToGame:
-      vi.fn<(data: ApplyToGameInput) => Promise<OperationResult<GameApplication>>>(),
-    updateGameParticipant:
-      vi.fn<
-        (data: UpdateGameParticipantInput) => Promise<OperationResult<GameParticipant>>
-      >(),
-    removeGameParticipant:
-      vi.fn<(data: RemoveGameParticipantInput) => Promise<OperationResult<boolean>>>(),
-    updateGameSessionStatus:
-      vi.fn<
-        (data: UpdateGameSessionStatusInput) => Promise<OperationResult<GameWithDetails>>
-      >(),
-  };
-});
-
-vi.mock("../games.queries", async (importOriginal) => {
-  const original = await importOriginal<object>();
-  return {
-    ...original,
-    getGame:
-      vi.fn<(data: GetGameInput) => Promise<OperationResult<GameWithDetails | null>>>(),
-    listGames:
-      vi.fn<(data: ListGamesInput) => Promise<OperationResult<GameListItem[]>>>(),
-    getGameApplications:
-      vi.fn<(data: GetGameInput) => Promise<OperationResult<GameParticipant[]>>>(),
-    getGameParticipants:
-      vi.fn<(data: GetGameInput) => Promise<OperationResult<GameParticipant[]>>>(),
-    searchUsersForInvitation:
-      vi.fn<
-        (
-          data: SearchUsersForInvitationInput,
-        ) => Promise<OperationResult<Array<{ id: string; name: string; email: string }>>>
-      >(),
-    listGameSessionsByCampaignId:
-      vi.fn<
-        (
-          data: ListGameSessionsByCampaignIdInput,
-        ) => Promise<OperationResult<GameListItem[]>>
-      >(),
-  };
-});
-
-// Import mocked functions
 import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
 import {
   MOCK_CAMPAIGN,
@@ -120,6 +29,7 @@ import {
   MOCK_INVITED_GAME_PARTICIPANT,
   MOCK_OWNER_GAME_PARTICIPANT,
   MOCK_PLAYER_GAME_PARTICIPANT,
+  setupGameMocks,
 } from "~/tests/mocks/games";
 import {
   MOCK_INVITED_USER,
@@ -127,25 +37,6 @@ import {
   MOCK_OWNER_USER,
   MOCK_PLAYER_USER,
 } from "~/tests/mocks/users";
-import {
-  applyToGame,
-  createGame,
-  deleteGame,
-  inviteToGame,
-  removeGameParticipant,
-  respondToGameInvitation,
-  updateGame,
-  updateGameParticipant,
-  updateGameSessionStatus,
-} from "../games.mutations";
-import {
-  getGame,
-  getGameApplications,
-  getGameParticipants,
-  listGames,
-  listGameSessionsByCampaignId,
-  searchUsersForInvitation,
-} from "../games.queries";
 
 const MOCK_GAME_APPLICATION = {
   id: "app-game-1",
@@ -158,16 +49,19 @@ const MOCK_GAME_APPLICATION = {
 };
 
 describe("Game Management Feature Tests", () => {
+  let mocks: ReturnType<typeof setupGameMocks>;
+
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock getCurrentUser for authenticated scenarios
     mockCurrentUser(MOCK_OWNER_USER);
+    mocks = setupGameMocks(); // Call the game mocks setup function and capture returned mocks
   });
 
   // --- Game Creation Tests ---
   describe("createGame", () => {
     it("should create a game and add owner as participant when authenticated", async () => {
-      vi.mocked(createGame).mockResolvedValue({
+      mocks.mockCreateGame.mockResolvedValue({
         success: true,
         data: {
           ...MOCK_GAME,
@@ -175,7 +69,7 @@ describe("Game Management Feature Tests", () => {
         },
       });
 
-      const result = await createGame({ data: MOCK_GAME });
+      const result = await mocks.mockCreateGame({ data: MOCK_GAME });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.id).toBe(MOCK_GAME.id);
@@ -198,7 +92,7 @@ describe("Game Management Feature Tests", () => {
         data: [MOCK_CAMPAIGN_PARTICIPANT_1, MOCK_CAMPAIGN_PARTICIPANT_2],
       });
 
-      vi.mocked(createGame).mockResolvedValue({
+      mocks.mockCreateGame.mockResolvedValue({
         success: true,
         data: {
           ...MOCK_GAME_CAMPAIGN,
@@ -220,7 +114,7 @@ describe("Game Management Feature Tests", () => {
         },
       });
 
-      const result = await createGame({
+      const result = await mocks.mockCreateGame({
         data: { ...MOCK_GAME, campaignId: MOCK_CAMPAIGN.id },
       });
       expect(result.success).toBe(true);
@@ -250,12 +144,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to create game if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(createGame).mockResolvedValue({
+      mocks.mockCreateGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await createGame({ data: MOCK_GAME });
+      const result = await mocks.mockCreateGame({ data: MOCK_GAME });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -263,12 +157,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return validation error for invalid data", async () => {
-      vi.mocked(createGame).mockResolvedValue({
+      mocks.mockCreateGame.mockResolvedValue({
         success: false,
         errors: [{ code: "VALIDATION_ERROR", message: "Invalid game name" }],
       });
 
-      const result = await createGame({ data: { ...MOCK_GAME, name: "" } });
+      const result = await mocks.mockCreateGame({ data: { ...MOCK_GAME, name: "" } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("VALIDATION_ERROR");
@@ -279,12 +173,12 @@ describe("Game Management Feature Tests", () => {
   // --- Game Update Tests ---
   describe("updateGame", () => {
     it("should update game by owner", async () => {
-      vi.mocked(updateGame).mockResolvedValue({
+      mocks.mockUpdateGame.mockResolvedValue({
         success: true,
         data: { ...MOCK_GAME, name: "Updated Game Name" },
       });
 
-      const result = await updateGame({
+      const result = await mocks.mockUpdateGame({
         data: { id: MOCK_GAME.id, name: "Updated Game Name" },
       });
       expect(result.success).toBe(true);
@@ -295,12 +189,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to update game if not owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER); // Authenticate as non-owner
-      vi.mocked(updateGame).mockResolvedValue({
+      mocks.mockUpdateGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authorized to update this game" }],
       });
 
-      const result = await updateGame({
+      const result = await mocks.mockUpdateGame({
         data: { id: MOCK_GAME.id, name: "Updated Game Name" },
       });
       expect(result.success).toBe(false);
@@ -311,12 +205,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to update game if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(updateGame).mockResolvedValue({
+      mocks.mockUpdateGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await updateGame({
+      const result = await mocks.mockUpdateGame({
         data: { id: MOCK_GAME.id, name: "Updated Game Name" },
       });
       expect(result.success).toBe(false);
@@ -326,12 +220,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return validation error for invalid data", async () => {
-      vi.mocked(updateGame).mockResolvedValue({
+      mocks.mockUpdateGame.mockResolvedValue({
         success: false,
         errors: [{ code: "VALIDATION_ERROR", message: "Invalid game name" }],
       });
 
-      const result = await updateGame({
+      const result = await mocks.mockUpdateGame({
         data: { id: MOCK_GAME.id, name: "" },
       });
       expect(result.success).toBe(false);
@@ -344,9 +238,9 @@ describe("Game Management Feature Tests", () => {
   // --- Game Deletion Tests ---
   describe("deleteGame", () => {
     it("should delete game by owner", async () => {
-      vi.mocked(deleteGame).mockResolvedValue({ success: true, data: true });
+      mocks.mockDeleteGame.mockResolvedValue({ success: true, data: true });
 
-      const result = await deleteGame({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockDeleteGame({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toBe(true);
@@ -355,12 +249,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to delete game if not owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(deleteGame).mockResolvedValue({
+      mocks.mockDeleteGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authorized to delete this game" }],
       });
 
-      const result = await deleteGame({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockDeleteGame({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -369,12 +263,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to delete game if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(deleteGame).mockResolvedValue({
+      mocks.mockDeleteGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await deleteGame({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockDeleteGame({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -385,12 +279,12 @@ describe("Game Management Feature Tests", () => {
   // --- Game Invitation Tests ---
   describe("inviteToGame", () => {
     it("should invite a user by owner (by userId)", async () => {
-      vi.mocked(inviteToGame).mockResolvedValue({
+      mocks.mockInviteToGame.mockResolvedValue({
         success: true,
         data: MOCK_INVITED_GAME_PARTICIPANT,
       });
 
-      const result = await inviteToGame({
+      const result = await mocks.mockInviteToGame({
         data: { gameId: MOCK_GAME.id, userId: MOCK_INVITED_USER.id, role: "invited" },
       });
       expect(result.success).toBe(true);
@@ -402,12 +296,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should invite a user by owner (by email)", async () => {
-      vi.mocked(inviteToGame).mockResolvedValue({
+      mocks.mockInviteToGame.mockResolvedValue({
         success: true,
         data: MOCK_INVITED_GAME_PARTICIPANT,
       });
 
-      const result = await inviteToGame({
+      const result = await mocks.mockInviteToGame({
         data: { gameId: MOCK_GAME.id, email: MOCK_INVITED_USER.email, role: "invited" },
       });
       expect(result.success).toBe(true);
@@ -420,14 +314,14 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to invite if not owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER); // Authenticate as non-owner
-      vi.mocked(inviteToGame).mockResolvedValue({
+      mocks.mockInviteToGame.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to invite participants" },
         ],
       });
 
-      const result = await inviteToGame({
+      const result = await mocks.mockInviteToGame({
         data: { gameId: MOCK_GAME.id, userId: MOCK_INVITED_USER.id, role: "invited" },
       });
       expect(result.success).toBe(false);
@@ -438,12 +332,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to invite if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(inviteToGame).mockResolvedValue({
+      mocks.mockInviteToGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await inviteToGame({
+      const result = await mocks.mockInviteToGame({
         data: { gameId: MOCK_GAME.id, userId: MOCK_INVITED_USER.id, role: "invited" },
       });
       expect(result.success).toBe(false);
@@ -453,14 +347,14 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should fail if inviting an already existing participant", async () => {
-      vi.mocked(inviteToGame).mockResolvedValue({
+      mocks.mockInviteToGame.mockResolvedValue({
         success: false,
         errors: [
           { code: "CONFLICT", message: "User is already a participant or has applied" },
         ],
       });
 
-      const result = await inviteToGame({
+      const result = await mocks.mockInviteToGame({
         data: { gameId: MOCK_GAME.id, userId: MOCK_PLAYER_USER.id, role: "invited" },
       });
       expect(result.success).toBe(false);
@@ -470,12 +364,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should re-invite a rejected participant (status changes to pending, role to invited)", async () => {
-      vi.mocked(inviteToGame).mockResolvedValue({
+      mocks.mockInviteToGame.mockResolvedValue({
         success: true,
         data: { ...MOCK_INVITED_GAME_PARTICIPANT, status: "pending", role: "invited" },
       });
 
-      const result = await inviteToGame({
+      const result = await mocks.mockInviteToGame({
         data: { gameId: MOCK_GAME.id, userId: MOCK_INVITED_USER.id, role: "invited" },
       });
       expect(result.success).toBe(true);
@@ -491,12 +385,12 @@ describe("Game Management Feature Tests", () => {
   describe("respondToGameInvitation", () => {
     it("should allow invited user to accept invitation", async () => {
       mockCurrentUser(MOCK_INVITED_USER); // Authenticate as the invited user
-      vi.mocked(respondToGameInvitation).mockResolvedValue({
+      mocks.mockRespondToGameApplication.mockResolvedValue({
         success: true,
         data: { ...MOCK_INVITED_GAME_PARTICIPANT, status: "approved", role: "player" },
       });
 
-      const result = await respondToGameInvitation({
+      const result = await mocks.mockRespondToGameApplication({
         data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(true);
@@ -510,9 +404,9 @@ describe("Game Management Feature Tests", () => {
 
     it("should allow invited user to reject invitation", async () => {
       mockCurrentUser(MOCK_INVITED_USER);
-      vi.mocked(respondToGameInvitation).mockResolvedValue({ success: true, data: true });
+      mocks.mockRespondToGameApplication.mockResolvedValue({ success: true, data: true });
 
-      const result = await respondToGameInvitation({
+      const result = await mocks.mockRespondToGameApplication({
         data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "reject" },
       });
       expect(result.success).toBe(true);
@@ -523,14 +417,14 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if non-invited user tries to respond to invitation", async () => {
       mockCurrentUser(MOCK_OTHER_USER); // Authenticate as a different user
-      vi.mocked(respondToGameInvitation).mockResolvedValue({
+      mocks.mockRespondToGameApplication.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to respond to this invitation" },
         ],
       });
 
-      const result = await respondToGameInvitation({
+      const result = await mocks.mockRespondToGameApplication({
         data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(false);
@@ -541,12 +435,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(respondToGameInvitation).mockResolvedValue({
+      mocks.mockRespondToGameApplication.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await respondToGameInvitation({
+      const result = await mocks.mockRespondToGameApplication({
         data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(false);
@@ -557,12 +451,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if trying to respond to a non-active invitation", async () => {
       // Simulate already accepted invitation
-      vi.mocked(respondToGameInvitation).mockResolvedValue({
+      mocks.mockRespondToGameApplication.mockResolvedValue({
         success: false,
         errors: [{ code: "CONFLICT", message: "Not an active invitation" }],
       });
 
-      const result = await respondToGameInvitation({
+      const result = await mocks.mockRespondToGameApplication({
         data: { participantId: MOCK_INVITED_GAME_PARTICIPANT.id, action: "accept" },
       });
       expect(result.success).toBe(false);
@@ -576,12 +470,12 @@ describe("Game Management Feature Tests", () => {
   describe("applyToGame", () => {
     it("should allow user to apply to a game", async () => {
       mockCurrentUser(MOCK_OTHER_USER);
-      vi.mocked(applyToGame).mockResolvedValue({
+      mocks.mockApplyToGame.mockResolvedValue({
         success: true,
         data: MOCK_GAME_APPLICATION,
       });
 
-      const result = await applyToGame({ data: { gameId: MOCK_GAME.id } });
+      const result = await mocks.mockApplyToGame({ data: { gameId: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.userId).toBe(MOCK_OTHER_USER.id);
@@ -592,12 +486,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if user is already a participant or applicant", async () => {
       mockCurrentUser(MOCK_PLAYER_USER); // Already a player
-      vi.mocked(applyToGame).mockResolvedValue({
+      mocks.mockApplyToGame.mockResolvedValue({
         success: false,
         errors: [{ code: "CONFLICT", message: "Already a participant or applicant" }],
       });
 
-      const result = await applyToGame({ data: { gameId: MOCK_GAME.id } });
+      const result = await mocks.mockApplyToGame({ data: { gameId: MOCK_GAME.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("CONFLICT");
@@ -606,12 +500,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(applyToGame).mockResolvedValue({
+      mocks.mockApplyToGame.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await applyToGame({ data: { gameId: MOCK_GAME.id } });
+      const result = await mocks.mockApplyToGame({ data: { gameId: MOCK_GAME.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -621,12 +515,12 @@ describe("Game Management Feature Tests", () => {
 
   describe("getGameApplications", () => {
     it("should return pending applications for game owner", async () => {
-      vi.mocked(getGameApplications).mockResolvedValue({
+      mocks.mockGetGameApplications.mockResolvedValue({
         success: true,
         data: [MOCK_GAME_APPLICATION],
       });
 
-      const result = await getGameApplications({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockGetGameApplications({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([MOCK_GAME_APPLICATION]);
@@ -635,7 +529,7 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to return applications if not game owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(getGameApplications).mockResolvedValue({
+      mocks.mockGetGameApplications.mockResolvedValue({
         success: false,
         errors: [
           {
@@ -645,7 +539,7 @@ describe("Game Management Feature Tests", () => {
         ],
       });
 
-      const result = await getGameApplications({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockGetGameApplications({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -654,12 +548,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to return applications if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(getGameApplications).mockResolvedValue({
+      mocks.mockGetGameApplications.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await getGameApplications({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockGetGameApplications({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -670,12 +564,12 @@ describe("Game Management Feature Tests", () => {
   // --- Participant Management Tests ---
   describe("updateGameParticipant", () => {
     it("should allow owner to change participant status/role", async () => {
-      vi.mocked(updateGameParticipant).mockResolvedValue({
+      mocks.mockUpdateGameParticipant.mockResolvedValue({
         success: true,
         data: { ...MOCK_APPLICANT_GAME_PARTICIPANT, status: "approved", role: "player" },
       });
 
-      const result = await updateGameParticipant({
+      const result = await mocks.mockUpdateGameParticipant({
         data: {
           id: MOCK_APPLICANT_GAME_PARTICIPANT.id,
           status: "approved",
@@ -691,12 +585,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should allow participant to change their own status/role (if allowed by rules)", async () => {
       mockCurrentUser(MOCK_PLAYER_USER); // Authenticate as the participant
-      vi.mocked(updateGameParticipant).mockResolvedValue({
+      mocks.mockUpdateGameParticipant.mockResolvedValue({
         success: true,
         data: { ...MOCK_PLAYER_GAME_PARTICIPANT, status: "pending" },
       });
 
-      const result = await updateGameParticipant({
+      const result = await mocks.mockUpdateGameParticipant({
         data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id, status: "pending" },
       });
       expect(result.success).toBe(true);
@@ -707,14 +601,14 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if non-owner tries to manage other participants", async () => {
       mockCurrentUser(MOCK_PLAYER_USER); // Authenticate as a player, not owner
-      vi.mocked(updateGameParticipant).mockResolvedValue({
+      mocks.mockUpdateGameParticipant.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to update this participant" },
         ],
       });
 
-      const result = await updateGameParticipant({
+      const result = await mocks.mockUpdateGameParticipant({
         data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id, status: "approved" },
       });
       expect(result.success).toBe(false);
@@ -726,9 +620,9 @@ describe("Game Management Feature Tests", () => {
 
   describe("removeGameParticipant", () => {
     it("should allow owner to remove any participant (sets status to rejected)", async () => {
-      vi.mocked(removeGameParticipant).mockResolvedValue({ success: true, data: true });
+      mocks.mockRemoveGameParticipant.mockResolvedValue({ success: true, data: true });
 
-      const result = await removeGameParticipant({
+      const result = await mocks.mockRemoveGameParticipant({
         data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(true);
@@ -739,9 +633,9 @@ describe("Game Management Feature Tests", () => {
 
     it("should allow participant to remove themselves", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(removeGameParticipant).mockResolvedValue({ success: true, data: true });
+      mocks.mockRemoveGameParticipant.mockResolvedValue({ success: true, data: true });
 
-      const result = await removeGameParticipant({
+      const result = await mocks.mockRemoveGameParticipant({
         data: { id: MOCK_PLAYER_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(true);
@@ -752,14 +646,14 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail if non-owner tries to remove other participants", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(removeGameParticipant).mockResolvedValue({
+      mocks.mockRemoveGameParticipant.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to remove this participant" },
         ],
       });
 
-      const result = await removeGameParticipant({
+      const result = await mocks.mockRemoveGameParticipant({
         data: { id: MOCK_APPLICANT_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(false);
@@ -773,9 +667,9 @@ describe("Game Management Feature Tests", () => {
       // The server-side logic for removeGameParticipant allows owner to remove themselves.
       // If we want to prevent this server-side, we'd need to add a check in the mutation.
       // For now, assuming UI prevents this.
-      vi.mocked(removeGameParticipant).mockResolvedValue({ success: true, data: true });
+      mocks.mockRemoveGameParticipant.mockResolvedValue({ success: true, data: true });
 
-      const result = await removeGameParticipant({
+      const result = await mocks.mockRemoveGameParticipant({
         data: { id: MOCK_OWNER_GAME_PARTICIPANT.id },
       });
       expect(result.success).toBe(true); // This would pass if server allows
@@ -788,7 +682,7 @@ describe("Game Management Feature Tests", () => {
   // --- Game Listing Tests ---
   describe("listGames", () => {
     it("should return public games to all users", async () => {
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [
           {
@@ -799,7 +693,7 @@ describe("Game Management Feature Tests", () => {
         ],
       });
 
-      const result = await listGames({ data: {} });
+      const result = await mocks.mockListGames({ data: {} });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual(
@@ -810,7 +704,7 @@ describe("Game Management Feature Tests", () => {
 
     it("should return private games to owner and participants", async () => {
       // Owner
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [
           {
@@ -820,7 +714,7 @@ describe("Game Management Feature Tests", () => {
           },
         ],
       });
-      const resultOwner = await listGames({ data: {} });
+      const resultOwner = await mocks.mockListGames({ data: {} });
       expect(resultOwner.success).toBe(true);
       if (resultOwner.success) {
         expect(resultOwner.data).toEqual(
@@ -830,7 +724,7 @@ describe("Game Management Feature Tests", () => {
 
       // Invited participant
       mockCurrentUser(MOCK_INVITED_USER);
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [
           {
@@ -840,7 +734,7 @@ describe("Game Management Feature Tests", () => {
           },
         ],
       });
-      const resultInvited = await listGames({ data: {} });
+      const resultInvited = await mocks.mockListGames({ data: {} });
       expect(resultInvited.success).toBe(true);
       if (resultInvited.success) {
         expect(resultInvited.data).toEqual(
@@ -850,11 +744,11 @@ describe("Game Management Feature Tests", () => {
 
       // Non-participant, non-owner should not see private game
       mockCurrentUser(MOCK_OTHER_USER);
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [],
       });
-      const resultOther = await listGames({ data: {} });
+      const resultOther = await mocks.mockListGames({ data: {} });
       expect(resultOther.success).toBe(true);
       if (resultOther.success) {
         expect(resultOther.data).toEqual([]);
@@ -863,7 +757,7 @@ describe("Game Management Feature Tests", () => {
 
     it("should return protected games to owner and participants (placeholder for requirements)", async () => {
       // Owner
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [
           {
@@ -873,7 +767,7 @@ describe("Game Management Feature Tests", () => {
           },
         ],
       });
-      const resultProtectedOwner = await listGames({ data: {} });
+      const resultProtectedOwner = await mocks.mockListGames({ data: {} });
       expect(resultProtectedOwner.success).toBe(true);
       if (resultProtectedOwner.success) {
         expect(resultProtectedOwner.data).toEqual(
@@ -883,7 +777,7 @@ describe("Game Management Feature Tests", () => {
 
       // Invited participant
       mockCurrentUser(MOCK_INVITED_USER);
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [
           {
@@ -893,7 +787,7 @@ describe("Game Management Feature Tests", () => {
           },
         ],
       });
-      const resultProtectedInvited = await listGames({ data: {} });
+      const resultProtectedInvited = await mocks.mockListGames({ data: {} });
       expect(resultProtectedInvited.success).toBe(true);
       if (resultProtectedInvited.success) {
         expect(resultProtectedInvited.data).toEqual(
@@ -903,11 +797,11 @@ describe("Game Management Feature Tests", () => {
 
       // Non-participant, non-owner should not see protected game (without meeting requirements)
       mockCurrentUser(MOCK_OTHER_USER);
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [],
       });
-      const resultProtectedOther = await listGames({ data: {} });
+      const resultProtectedOther = await mocks.mockListGames({ data: {} });
       expect(resultProtectedOther.success).toBe(true);
       if (resultProtectedOther.success) {
         expect(resultProtectedOther.data).toEqual([]);
@@ -917,12 +811,12 @@ describe("Game Management Feature Tests", () => {
     it("should not return games without an owner or game system (due to innerJoin)", async () => {
       // This test case would ideally involve mocking the DB query to return null for owner/gameSystem
       // but since we're mocking the server function directly, we'll simulate the expected outcome.
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: true,
         data: [],
       });
 
-      const result = await listGames({ data: {} });
+      const result = await mocks.mockListGames({ data: {} });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([]);
@@ -931,12 +825,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to list games if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(listGames).mockResolvedValue({
+      mocks.mockListGames.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await listGames({ data: {} });
+      const result = await mocks.mockListGames({ data: {} });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -947,9 +841,9 @@ describe("Game Management Feature Tests", () => {
   // --- Game Details Tests ---
   describe("getGame", () => {
     it("should return game details for a valid game ID", async () => {
-      vi.mocked(getGame).mockResolvedValue({ success: true, data: MOCK_GAME });
+      mocks.mockGetGame.mockResolvedValue({ success: true, data: MOCK_GAME });
 
-      const result = await getGame({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockGetGame({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result?.data?.id).toBe(MOCK_GAME.id);
@@ -957,12 +851,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return error for invalid game ID format", async () => {
-      vi.mocked(getGame).mockResolvedValue({
+      mocks.mockGetGame.mockResolvedValue({
         success: false,
         errors: [{ code: "VALIDATION_ERROR", message: "Invalid game ID format" }],
       });
 
-      const result = await getGame({ data: { id: "invalid-uuid" } });
+      const result = await mocks.mockGetGame({ data: { id: "invalid-uuid" } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("VALIDATION_ERROR");
@@ -970,12 +864,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return error if game not found", async () => {
-      vi.mocked(getGame).mockResolvedValue({
+      mocks.mockGetGame.mockResolvedValue({
         success: false,
         errors: [{ code: "NOT_FOUND", message: "Game not found" }],
       });
 
-      const result = await getGame({ data: { id: "non-existent-game-id" } });
+      const result = await mocks.mockGetGame({ data: { id: "non-existent-game-id" } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("NOT_FOUND");
@@ -986,7 +880,7 @@ describe("Game Management Feature Tests", () => {
   // --- Game Participants Tests ---
   describe("getGameParticipants", () => {
     it("should return all participants for a game", async () => {
-      vi.mocked(getGameParticipants).mockResolvedValue({
+      mocks.mockGetGameParticipants.mockResolvedValue({
         success: true,
         data: [
           MOCK_OWNER_GAME_PARTICIPANT,
@@ -995,7 +889,7 @@ describe("Game Management Feature Tests", () => {
         ],
       });
 
-      const result = await getGameParticipants({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockGetGameParticipants({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.length).toBe(3);
@@ -1010,12 +904,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return empty array if no participants", async () => {
-      vi.mocked(getGameParticipants).mockResolvedValue({
+      mocks.mockGetGameParticipants.mockResolvedValue({
         success: true,
         data: [],
       } as OperationResult<GameParticipant[]>);
 
-      const result = await getGameParticipants({ data: { id: MOCK_GAME.id } });
+      const result = await mocks.mockGetGameParticipants({ data: { id: MOCK_GAME.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([]);
@@ -1026,12 +920,14 @@ describe("Game Management Feature Tests", () => {
   // --- Search Users for Invitation Tests ---
   describe("searchUsersForInvitation", () => {
     it("should return users matching search term", async () => {
-      vi.mocked(searchUsersForInvitation).mockResolvedValue({
+      mocks.mockSearchUsersForInvitation.mockResolvedValue({
         success: true,
         data: [{ id: "user-2", name: "Search User", email: "search@example.com" }],
       } as OperationResult<User[]>);
 
-      const result = await searchUsersForInvitation({ data: { query: "search" } });
+      const result = await mocks.mockSearchUsersForInvitation({
+        data: { query: "search" },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.length).toBe(1);
@@ -1040,12 +936,14 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return empty array if no users found", async () => {
-      vi.mocked(searchUsersForInvitation).mockResolvedValue({
+      mocks.mockSearchUsersForInvitation.mockResolvedValue({
         success: true,
         data: [],
       } as OperationResult<User[]>);
 
-      const result = await searchUsersForInvitation({ data: { query: "nonexistent" } });
+      const result = await mocks.mockSearchUsersForInvitation({
+        data: { query: "nonexistent" },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([]);
@@ -1056,7 +954,7 @@ describe("Game Management Feature Tests", () => {
   // --- Campaign Game Session Listing Tests ---
   describe("listGameSessionsByCampaignId", () => {
     it("should return all game sessions for a given campaign ID", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
+      mocks.mockListGameSessionsByCampaignId.mockResolvedValue({
         success: true,
         data: [
           MOCK_CAMPAIGN_GAME_1 as unknown as GameListItem,
@@ -1065,7 +963,7 @@ describe("Game Management Feature Tests", () => {
         ],
       });
 
-      const result = await listGameSessionsByCampaignId({
+      const result = await mocks.mockListGameSessionsByCampaignId({
         data: { campaignId: MOCK_CAMPAIGN.id },
       });
       expect(result.success).toBe(true);
@@ -1082,12 +980,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return game sessions filtered by status", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
+      mocks.mockListGameSessionsByCampaignId.mockResolvedValue({
         success: true,
         data: [MOCK_CAMPAIGN_GAME_1 as unknown as GameListItem],
       });
 
-      const result = await listGameSessionsByCampaignId({
+      const result = await mocks.mockListGameSessionsByCampaignId({
         data: { campaignId: MOCK_CAMPAIGN.id, status: "scheduled" },
       });
       expect(result.success).toBe(true);
@@ -1098,12 +996,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should return empty array if no game sessions found for campaign", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
+      mocks.mockListGameSessionsByCampaignId.mockResolvedValue({
         success: true,
         data: [],
       });
 
-      const result = await listGameSessionsByCampaignId({
+      const result = await mocks.mockListGameSessionsByCampaignId({
         data: { campaignId: "non-existent-campaign" },
       });
       expect(result.success).toBe(true);
@@ -1116,12 +1014,12 @@ describe("Game Management Feature Tests", () => {
   // --- Update Game Session Status Tests ---
   describe("updateGameSessionStatus", () => {
     it("should update game session status to completed", async () => {
-      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+      mocks.mockUpdateGameSessionStatus.mockResolvedValue({
         success: true,
         data: { ...MOCK_GAME, status: "completed" as const },
       });
 
-      const result = await updateGameSessionStatus({
+      const result = await mocks.mockUpdateGameSessionStatus({
         data: { id: MOCK_GAME.id, status: "completed" },
       });
       expect(result.success).toBe(true);
@@ -1131,12 +1029,12 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should update game session status to canceled", async () => {
-      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+      mocks.mockUpdateGameSessionStatus.mockResolvedValue({
         success: true,
         data: { ...MOCK_GAME, status: "canceled" as const },
       });
 
-      const result = await updateGameSessionStatus({
+      const result = await mocks.mockUpdateGameSessionStatus({
         data: { id: MOCK_GAME.id, status: "canceled" },
       });
       expect(result.success).toBe(true);
@@ -1146,7 +1044,7 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should fail to update status if game is already completed", async () => {
-      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+      mocks.mockUpdateGameSessionStatus.mockResolvedValue({
         success: false,
         errors: [
           {
@@ -1156,7 +1054,7 @@ describe("Game Management Feature Tests", () => {
         ],
       });
 
-      const result = await updateGameSessionStatus({
+      const result = await mocks.mockUpdateGameSessionStatus({
         data: { id: MOCK_GAME.id, status: "scheduled" },
       });
       expect(result.success).toBe(false);
@@ -1166,7 +1064,7 @@ describe("Game Management Feature Tests", () => {
     });
 
     it("should fail to update status if game is already canceled", async () => {
-      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+      mocks.mockUpdateGameSessionStatus.mockResolvedValue({
         success: false,
         errors: [
           {
@@ -1176,7 +1074,7 @@ describe("Game Management Feature Tests", () => {
         ],
       });
 
-      const result = await updateGameSessionStatus({
+      const result = await mocks.mockUpdateGameSessionStatus({
         data: { id: MOCK_GAME.id, status: "scheduled" },
       });
       expect(result.success).toBe(false);
@@ -1187,12 +1085,12 @@ describe("Game Management Feature Tests", () => {
 
     it("should fail to update status if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(updateGameSessionStatus).mockResolvedValue({
+      mocks.mockUpdateGameSessionStatus.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await updateGameSessionStatus({
+      const result = await mocks.mockUpdateGameSessionStatus({
         data: { id: MOCK_GAME.id, status: "completed" },
       });
       expect(result.success).toBe(false);

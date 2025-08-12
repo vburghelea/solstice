@@ -445,6 +445,24 @@ export const applyToCampaign = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
+      const campaign = await findCampaignById(data.campaignId);
+      if (!campaign) {
+        return {
+          success: false,
+          errors: [{ code: "NOT_FOUND", message: "Campaign not found" }],
+        };
+      }
+
+      // Check if campaign is open for applications (e.g., not canceled or completed)
+      if (campaign.status === "cancelled" || campaign.status === "completed") {
+        return {
+          success: false,
+          errors: [
+            { code: "CONFLICT", message: "This campaign is not open for applications." },
+          ],
+        };
+      }
+
       const existingApplication = await db.query.campaignApplications.findFirst({
         where: and(
           eq(campaignApplications.campaignId, data.campaignId),
@@ -453,12 +471,38 @@ export const applyToCampaign = createServerFn({ method: "POST" })
       });
 
       if (existingApplication) {
-        return {
-          success: false,
-          errors: [
-            { code: "CONFLICT", message: "You have already applied to this campaign" },
-          ],
-        };
+        if (existingApplication.status === "rejected") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message:
+                  "You have already applied to this campaign and your application was rejected.",
+              },
+            ],
+          };
+        } else if (existingApplication.status === "pending") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message: "You have a pending application for this campaign.",
+              },
+            ],
+          };
+        } else if (existingApplication.status === "approved") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message: "You have already been approved for this campaign.",
+              },
+            ],
+          };
+        }
       }
 
       const [newApplication] = await db
@@ -707,10 +751,33 @@ export const respondToApplication = createServerFn({ method: "POST" })
 
         return { success: true, data: applicationWithDetails as CampaignApplication };
       } else if (data.status === "rejected") {
-        await db
-          .delete(campaignApplications)
-          .where(eq(campaignApplications.id, data.applicationId));
-        return { success: true, data: true };
+        const [updatedApplication] = await db
+          .update(campaignApplications)
+          .set({ status: data.status, updatedAt: new Date() })
+          .where(eq(campaignApplications.id, data.applicationId))
+          .returning();
+
+        if (!updatedApplication) {
+          return {
+            success: false,
+            errors: [{ code: "DATABASE_ERROR", message: "Failed to reject application" }],
+          };
+        }
+
+        const applicationWithDetails = await findCampaignApplicationById(
+          updatedApplication.id,
+        );
+
+        if (!applicationWithDetails) {
+          return {
+            success: false,
+            errors: [
+              { code: "DATABASE_ERROR", message: "Failed to fetch rejected application" },
+            ],
+          };
+        }
+
+        return { success: true, data: applicationWithDetails as CampaignApplication };
       }
 
       return {

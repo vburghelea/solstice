@@ -14,8 +14,15 @@ export const BASE_USER_PROPS = {
   privacySettings: null,
 };
 
+export const MOCK_NON_OWNER_USER: User = {
+  id: "non-owner-test-user-id",
+  name: "Non Owner",
+  email: "nonowner@example.com",
+  ...BASE_USER_PROPS,
+};
+
 export const MOCK_OWNER_USER: User = {
-  id: "owner-user-id",
+  id: "test-user-id",
   name: "Owner User",
   email: "owner@example.com",
   emailVerified: true,

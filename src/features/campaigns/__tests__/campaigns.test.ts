@@ -1,136 +1,51 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { z } from "zod";
 import { getCurrentUser } from "~/features/auth/auth.queries";
-import type {
-  CampaignApplication,
-  CampaignListItem,
-  CampaignParticipant,
-  CampaignWithDetails,
-} from "~/features/campaigns/campaigns.types";
+
 import type { User } from "~/lib/auth/types";
-import { OperationResult } from "~/shared/types/common";
+
 import {
-  applyToCampaignInputSchema,
-  createCampaignInputSchema,
-  getCampaignSchema,
-  inviteToCampaignInputSchema,
-  listCampaignsSchema,
-  removeCampaignParticipantInputSchema,
-  respondToCampaignApplicationSchema,
-  searchUsersForInvitationSchema,
-  updateCampaignInputSchema,
-  updateCampaignParticipantInputSchema,
+  applyToCampaignInputSchema as _applyToCampaignInputSchema,
+  createCampaignInputSchema as _createCampaignInputSchema,
+  getCampaignSchema as _getCampaignSchema,
+  inviteToCampaignInputSchema as _inviteToCampaignInputSchema,
+  listCampaignsSchema as _listCampaignsSchema,
+  removeCampaignParticipantInputSchema as _removeCampaignParticipantInputSchema,
+  respondToCampaignApplicationSchema as _respondToCampaignApplicationSchema,
+  updateCampaignInputSchema as _updateCampaignInputSchema,
+  updateCampaignParticipantInputSchema as _updateCampaignParticipantInputSchema,
 } from "../campaigns.schemas";
 
-type ApplyToCampaignInput = z.infer<typeof applyToCampaignInputSchema>;
-type CreateCampaignInput = z.infer<typeof createCampaignInputSchema>;
-type GetCampaignInput = z.infer<typeof getCampaignSchema>;
-type InviteToCampaignInput = z.infer<typeof inviteToCampaignInputSchema>;
-type ListCampaignsInput = z.infer<typeof listCampaignsSchema>;
+type ApplyToCampaignInput = z.infer<typeof _applyToCampaignInputSchema>;
+
+type CreateCampaignInput = z.infer<typeof _createCampaignInputSchema>;
+
+type GetCampaignInput = z.infer<typeof _getCampaignSchema>;
+
+type InviteToCampaignInput = z.infer<typeof _inviteToCampaignInputSchema>;
+
+type ListCampaignsInput = z.infer<typeof _listCampaignsSchema>;
+
 type RespondToCampaignApplicationInput = z.infer<
-  typeof respondToCampaignApplicationSchema
->;
-type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>;
-type UpdateCampaignParticipantInput = z.infer<
-  typeof updateCampaignParticipantInputSchema
->;
-type RemoveCampaignParticipantInput = z.infer<
-  typeof removeCampaignParticipantInputSchema
+  typeof _respondToCampaignApplicationSchema
 >;
 
-vi.mock("~/features/auth/auth.queries", () => ({
-  getCurrentUser: vi.fn(),
-}));
+type UpdateCampaignInput = z.infer<typeof _updateCampaignInputSchema>;
+
+type UpdateCampaignParticipantInput = z.infer<
+  typeof _updateCampaignParticipantInputSchema
+>;
+
+type RemoveCampaignParticipantInput = z.infer<
+  typeof _removeCampaignParticipantInputSchema
+>;
 
 const mockCurrentUser = (user: User | null) => {
   vi.mocked(getCurrentUser).mockResolvedValue(user);
 };
 
-vi.mock("../campaigns.mutations", async (importOriginal) => {
-  const original = await importOriginal<object>();
-  return {
-    ...original,
-    createCampaign:
-      vi.fn<
-        (data: CreateCampaignInput) => Promise<OperationResult<CampaignWithDetails>>
-      >(),
-    updateCampaign:
-      vi.fn<
-        (data: UpdateCampaignInput) => Promise<OperationResult<CampaignWithDetails>>
-      >(),
-    deleteCampaign:
-      vi.fn<(data: GetCampaignInput) => Promise<OperationResult<boolean>>>(),
-    inviteToCampaign:
-      vi.fn<
-        (data: InviteToCampaignInput) => Promise<OperationResult<CampaignParticipant>>
-      >(),
-    respondToApplication:
-      vi.fn<
-        (
-          data: RespondToCampaignApplicationInput,
-        ) => Promise<OperationResult<CampaignApplication | boolean>>
-      >(),
-    applyToCampaign:
-      vi.fn<
-        (data: ApplyToCampaignInput) => Promise<OperationResult<CampaignApplication>>
-      >(),
-    updateCampaignParticipant:
-      vi.fn<
-        (
-          data: UpdateCampaignParticipantInput,
-        ) => Promise<OperationResult<CampaignParticipant>>
-      >(),
-    removeCampaignParticipant:
-      vi.fn<
-        (data: RemoveCampaignParticipantInput) => Promise<OperationResult<boolean>>
-      >(),
-  };
-});
-
-vi.mock("../campaigns.queries", async (importOriginal) => {
-  const original = await importOriginal<object>();
-  return {
-    ...original,
-    getCampaign:
-      vi.fn<
-        (data: GetCampaignInput) => Promise<OperationResult<CampaignWithDetails | null>>
-      >(),
-    listCampaigns:
-      vi.fn<(data: ListCampaignsInput) => Promise<OperationResult<CampaignListItem[]>>>(),
-    getCampaignApplications:
-      vi.fn<
-        (data: GetCampaignInput) => Promise<OperationResult<CampaignApplication[]>>
-      >(),
-    getCampaignParticipants:
-      vi.fn<
-        (data: GetCampaignInput) => Promise<OperationResult<CampaignParticipant[]>>
-      >(),
-    searchUsersForInvitation:
-      vi.fn<
-        (
-          data: z.infer<typeof searchUsersForInvitationSchema>,
-        ) => Promise<OperationResult<Array<{ id: string; name: string; email: string }>>>
-      >(),
-  };
-});
-
-import {
-  applyToCampaign,
-  createCampaign,
-  deleteCampaign,
-  inviteToCampaign,
-  removeCampaignParticipant,
-  respondToApplication,
-  updateCampaign,
-  updateCampaignParticipant,
-} from "../campaigns.mutations";
-import {
-  getCampaign,
-  getCampaignApplications,
-  getCampaignParticipants,
-  listCampaigns,
-  searchUsersForInvitation,
-} from "../campaigns.queries";
+import { setupCampaignMocks } from "~/tests/mocks/campaigns";
 
 import {
   MOCK_INVITED_USER,
@@ -148,19 +63,22 @@ import {
 } from "~/tests/mocks/campaigns";
 
 describe("Campaign Management Feature Tests", () => {
+  let mocks: ReturnType<typeof setupCampaignMocks>;
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockCurrentUser(MOCK_OWNER_USER);
+    mocks = setupCampaignMocks(); // Call the campaign mocks setup function and capture returned mocks
   });
 
   describe("createCampaign", () => {
     it("should create a campaign and add owner as participant when authenticated", async () => {
-      vi.mocked(createCampaign).mockResolvedValue({
+      mocks.mockCreateCampaign.mockResolvedValue({
         success: true,
         data: MOCK_CAMPAIGN,
       });
 
-      const result = await createCampaign({ data: MOCK_CAMPAIGN });
+      const result = await mocks.mockCreateCampaign({ data: MOCK_CAMPAIGN });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.id).toBe(MOCK_CAMPAIGN.id);
@@ -170,12 +88,12 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail to create campaign if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(createCampaign).mockResolvedValue({
+      mocks.mockCreateCampaign.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await createCampaign({ data: MOCK_CAMPAIGN });
+      const result = await mocks.mockCreateCampaign({ data: MOCK_CAMPAIGN });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -185,12 +103,12 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("updateCampaign", () => {
     it("should update campaign by owner", async () => {
-      vi.mocked(updateCampaign).mockResolvedValue({
+      mocks.mockUpdateCampaign.mockResolvedValue({
         success: true,
         data: { ...MOCK_CAMPAIGN, name: "Updated Campaign Name" },
       });
 
-      const result = await updateCampaign({
+      const result = await mocks.mockUpdateCampaign({
         data: { id: MOCK_CAMPAIGN.id, name: "Updated Campaign Name" },
       });
       expect(result.success).toBe(true);
@@ -201,14 +119,14 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail to update campaign if not owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(updateCampaign).mockResolvedValue({
+      mocks.mockUpdateCampaign.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to update this campaign" },
         ],
       });
 
-      const result = await updateCampaign({
+      const result = await mocks.mockUpdateCampaign({
         data: { id: MOCK_CAMPAIGN.id, name: "Updated Campaign Name" },
       });
       expect(result.success).toBe(false);
@@ -220,9 +138,9 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("deleteCampaign", () => {
     it("should delete campaign by owner", async () => {
-      vi.mocked(deleteCampaign).mockResolvedValue({ success: true, data: true });
+      mocks.mockDeleteCampaign.mockResolvedValue({ success: true, data: true });
 
-      const result = await deleteCampaign({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockDeleteCampaign({ data: { id: MOCK_CAMPAIGN.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toBe(true);
@@ -231,14 +149,14 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail to delete campaign if not owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(deleteCampaign).mockResolvedValue({
+      mocks.mockDeleteCampaign.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to delete this campaign" },
         ],
       });
 
-      const result = await deleteCampaign({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockDeleteCampaign({ data: { id: MOCK_CAMPAIGN.id } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -249,12 +167,14 @@ describe("Campaign Management Feature Tests", () => {
   describe("applyToCampaign", () => {
     it("should allow user to apply to a campaign", async () => {
       mockCurrentUser(MOCK_OTHER_USER);
-      vi.mocked(applyToCampaign).mockResolvedValue({
+      mocks.mockApplyToCampaign.mockResolvedValue({
         success: true,
         data: MOCK_APPLICANT_APPLICATION,
       });
 
-      const result = await applyToCampaign({ data: { campaignId: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockApplyToCampaign({
+        data: { campaignId: MOCK_CAMPAIGN.id },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.userId).toBe(MOCK_OTHER_USER.id);
@@ -264,14 +184,16 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail if user is already an applicant", async () => {
       mockCurrentUser(MOCK_OTHER_USER);
-      vi.mocked(applyToCampaign).mockResolvedValue({
+      mocks.mockApplyToCampaign.mockResolvedValue({
         success: false,
         errors: [
           { code: "CONFLICT", message: "You have already applied to this campaign" },
         ],
       });
 
-      const result = await applyToCampaign({ data: { campaignId: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockApplyToCampaign({
+        data: { campaignId: MOCK_CAMPAIGN.id },
+      });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("CONFLICT");
@@ -281,12 +203,12 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("respondToApplication", () => {
     it("should allow owner to approve an application", async () => {
-      vi.mocked(respondToApplication).mockResolvedValue({
+      mocks.mockRespondToApplication.mockResolvedValue({
         success: true,
         data: { ...MOCK_APPLICANT_APPLICATION, status: "approved" },
       });
 
-      const result = await respondToApplication({
+      const result = await mocks.mockRespondToApplication({
         data: { applicationId: MOCK_APPLICANT_APPLICATION.id, status: "approved" },
       });
       expect(result.success).toBe(true);
@@ -296,9 +218,9 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should allow owner to reject an application", async () => {
-      vi.mocked(respondToApplication).mockResolvedValue({ success: true, data: true });
+      mocks.mockRespondToApplication.mockResolvedValue({ success: true, data: true });
 
-      const result = await respondToApplication({
+      const result = await mocks.mockRespondToApplication({
         data: { applicationId: MOCK_APPLICANT_APPLICATION.id, status: "rejected" },
       });
       expect(result.success).toBe(true);
@@ -309,7 +231,7 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail if not campaign owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(respondToApplication).mockResolvedValue({
+      mocks.mockRespondToApplication.mockResolvedValue({
         success: false,
         errors: [
           {
@@ -319,7 +241,7 @@ describe("Campaign Management Feature Tests", () => {
         ],
       });
 
-      const result = await respondToApplication({
+      const result = await mocks.mockRespondToApplication({
         data: { applicationId: MOCK_APPLICANT_APPLICATION.id, status: "approved" },
       });
       expect(result.success).toBe(false);
@@ -331,12 +253,12 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("inviteToCampaign", () => {
     it("should invite a user by owner (by userId)", async () => {
-      vi.mocked(inviteToCampaign).mockResolvedValue({
+      mocks.mockInviteToCampaign.mockResolvedValue({
         success: true,
         data: MOCK_INVITED_PARTICIPANT,
       });
 
-      const result = await inviteToCampaign({
+      const result = await mocks.mockInviteToCampaign({
         data: { campaignId: MOCK_CAMPAIGN.id, userId: MOCK_INVITED_USER.id },
       });
       expect(result.success).toBe(true);
@@ -346,12 +268,12 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should invite a user by owner (by email)", async () => {
-      vi.mocked(inviteToCampaign).mockResolvedValue({
+      mocks.mockInviteToCampaign.mockResolvedValue({
         success: true,
         data: MOCK_INVITED_PARTICIPANT,
       });
 
-      const result = await inviteToCampaign({
+      const result = await mocks.mockInviteToCampaign({
         data: { campaignId: MOCK_CAMPAIGN.id, email: MOCK_INVITED_USER.email },
       });
       expect(result.success).toBe(true);
@@ -362,14 +284,14 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail to invite if not owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(inviteToCampaign).mockResolvedValue({
+      mocks.mockInviteToCampaign.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to invite participants" },
         ],
       });
 
-      const result = await inviteToCampaign({
+      const result = await mocks.mockInviteToCampaign({
         data: { campaignId: MOCK_CAMPAIGN.id, userId: MOCK_INVITED_USER.id },
       });
       expect(result.success).toBe(false);
@@ -381,7 +303,7 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("listCampaigns", () => {
     it("should return public campaigns to all users", async () => {
-      vi.mocked(listCampaigns).mockResolvedValue({
+      mocks.mockListCampaigns.mockResolvedValue({
         success: true,
         data: [
           {
@@ -392,7 +314,7 @@ describe("Campaign Management Feature Tests", () => {
         ],
       });
 
-      const result = await listCampaigns({ data: {} });
+      const result = await mocks.mockListCampaigns({ data: {} });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual(
@@ -402,7 +324,7 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should return private campaigns to owner and participants", async () => {
-      vi.mocked(listCampaigns).mockResolvedValue({
+      mocks.mockListCampaigns.mockResolvedValue({
         success: true,
         data: [
           {
@@ -412,7 +334,7 @@ describe("Campaign Management Feature Tests", () => {
           },
         ],
       });
-      const resultOwner = await listCampaigns({ data: {} });
+      const resultOwner = await mocks.mockListCampaigns({ data: {} });
       expect(resultOwner.success).toBe(true);
       if (resultOwner.success) {
         expect(resultOwner.data).toEqual(
@@ -421,7 +343,7 @@ describe("Campaign Management Feature Tests", () => {
       }
 
       mockCurrentUser(MOCK_INVITED_USER);
-      vi.mocked(listCampaigns).mockResolvedValue({
+      mocks.mockListCampaigns.mockResolvedValue({
         success: true,
         data: [
           {
@@ -431,7 +353,7 @@ describe("Campaign Management Feature Tests", () => {
           },
         ],
       });
-      const resultInvited = await listCampaigns({ data: {} });
+      const resultInvited = await mocks.mockListCampaigns({ data: {} });
       expect(resultInvited.success).toBe(true);
       if (resultInvited.success) {
         expect(resultInvited.data).toEqual(
@@ -440,11 +362,11 @@ describe("Campaign Management Feature Tests", () => {
       }
 
       mockCurrentUser(MOCK_OTHER_USER);
-      vi.mocked(listCampaigns).mockResolvedValue({
+      mocks.mockListCampaigns.mockResolvedValue({
         success: true,
         data: [],
       });
-      const resultOther = await listCampaigns({ data: {} });
+      const resultOther = await mocks.mockListCampaigns({ data: {} });
       expect(resultOther.success).toBe(true);
       if (resultOther.success) {
         expect(resultOther.data).toEqual([]);
@@ -454,9 +376,9 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("getCampaign", () => {
     it("should return campaign details for a valid campaign ID", async () => {
-      vi.mocked(getCampaign).mockResolvedValue({ success: true, data: MOCK_CAMPAIGN });
+      mocks.mockGetCampaign.mockResolvedValue({ success: true, data: MOCK_CAMPAIGN });
 
-      const result = await getCampaign({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockGetCampaign({ data: { id: MOCK_CAMPAIGN.id } });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result?.data?.id).toBe(MOCK_CAMPAIGN.id);
@@ -464,12 +386,12 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should return error for invalid campaign ID format", async () => {
-      vi.mocked(getCampaign).mockResolvedValue({
+      mocks.mockGetCampaign.mockResolvedValue({
         success: false,
         errors: [{ code: "VALIDATION_ERROR", message: "Invalid campaign ID format" }],
       });
 
-      const result = await getCampaign({ data: { id: "invalid-uuid" } });
+      const result = await mocks.mockGetCampaign({ data: { id: "invalid-uuid" } });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("VALIDATION_ERROR");
@@ -477,12 +399,14 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should return error if campaign not found", async () => {
-      vi.mocked(getCampaign).mockResolvedValue({
+      mocks.mockGetCampaign.mockResolvedValue({
         success: false,
         errors: [{ code: "NOT_FOUND", message: "Campaign not found" }],
       });
 
-      const result = await getCampaign({ data: { id: "non-existent-campaign-id" } });
+      const result = await mocks.mockGetCampaign({
+        data: { id: "non-existent-campaign-id" },
+      });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("NOT_FOUND");
@@ -492,12 +416,14 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("getCampaignApplications", () => {
     it("should return pending applications for campaign owner", async () => {
-      vi.mocked(getCampaignApplications).mockResolvedValue({
+      mocks.mockGetCampaignApplications.mockResolvedValue({
         success: true,
         data: [MOCK_APPLICANT_APPLICATION],
       });
 
-      const result = await getCampaignApplications({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockGetCampaignApplications({
+        data: { id: MOCK_CAMPAIGN.id },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([MOCK_APPLICANT_APPLICATION]);
@@ -506,7 +432,7 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail to return applications if not campaign owner", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(getCampaignApplications).mockResolvedValue({
+      mocks.mockGetCampaignApplications.mockResolvedValue({
         success: false,
         errors: [
           {
@@ -516,7 +442,9 @@ describe("Campaign Management Feature Tests", () => {
         ],
       });
 
-      const result = await getCampaignApplications({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockGetCampaignApplications({
+        data: { id: MOCK_CAMPAIGN.id },
+      });
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
@@ -526,12 +454,14 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("getCampaignParticipants", () => {
     it("should return all participants for a campaign", async () => {
-      vi.mocked(getCampaignParticipants).mockResolvedValue({
+      mocks.mockGetCampaignParticipants.mockResolvedValue({
         success: true,
         data: [MOCK_OWNER_PARTICIPANT, MOCK_INVITED_PARTICIPANT],
       });
 
-      const result = await getCampaignParticipants({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockGetCampaignParticipants({
+        data: { id: MOCK_CAMPAIGN.id },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.length).toBe(2);
@@ -545,12 +475,14 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should return empty array if no participants", async () => {
-      vi.mocked(getCampaignParticipants).mockResolvedValue({
+      mocks.mockGetCampaignParticipants.mockResolvedValue({
         success: true,
         data: [],
       });
 
-      const result = await getCampaignParticipants({ data: { id: MOCK_CAMPAIGN.id } });
+      const result = await mocks.mockGetCampaignParticipants({
+        data: { id: MOCK_CAMPAIGN.id },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([]);
@@ -560,12 +492,14 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("searchUsersForInvitation", () => {
     it("should return users matching search term", async () => {
-      vi.mocked(searchUsersForInvitation).mockResolvedValue({
+      mocks.mockSearchUsersForInvitation.mockResolvedValue({
         success: true,
         data: [{ id: "user-2", name: "Search User", email: "search@example.com" }],
       });
 
-      const result = await searchUsersForInvitation({ data: { query: "search" } });
+      const result = await mocks.mockSearchUsersForInvitation({
+        data: { query: "search" },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.length).toBe(1);
@@ -574,12 +508,14 @@ describe("Campaign Management Feature Tests", () => {
     });
 
     it("should return empty array if no users found", async () => {
-      vi.mocked(searchUsersForInvitation).mockResolvedValue({
+      mocks.mockSearchUsersForInvitation.mockResolvedValue({
         success: true,
         data: [],
       });
 
-      const result = await searchUsersForInvitation({ data: { query: "nonexistent" } });
+      const result = await mocks.mockSearchUsersForInvitation({
+        data: { query: "nonexistent" },
+      });
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual([]);
@@ -589,12 +525,12 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("updateCampaignParticipant", () => {
     it("should allow owner to update a participant", async () => {
-      vi.mocked(updateCampaignParticipant).mockResolvedValue({
+      mocks.mockUpdateCampaignParticipant.mockResolvedValue({
         success: true,
         data: { ...MOCK_PLAYER_PARTICIPANT, status: "approved" },
       });
 
-      const result = await updateCampaignParticipant({
+      const result = await mocks.mockUpdateCampaignParticipant({
         data: { id: MOCK_PLAYER_PARTICIPANT.id, status: "approved" },
       });
       expect(result.success).toBe(true);
@@ -605,14 +541,14 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail if non-owner tries to update other participants", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(updateCampaignParticipant).mockResolvedValue({
+      mocks.mockUpdateCampaignParticipant.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to update this participant" },
         ],
       });
 
-      const result = await updateCampaignParticipant({
+      const result = await mocks.mockUpdateCampaignParticipant({
         data: { id: MOCK_OWNER_PARTICIPANT.id, status: "approved" },
       });
       expect(result.success).toBe(false);
@@ -623,12 +559,12 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(updateCampaignParticipant).mockResolvedValue({
+      mocks.mockUpdateCampaignParticipant.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await updateCampaignParticipant({
+      const result = await mocks.mockUpdateCampaignParticipant({
         data: { id: MOCK_PLAYER_PARTICIPANT.id, status: "approved" },
       });
       expect(result.success).toBe(false);
@@ -640,12 +576,12 @@ describe("Campaign Management Feature Tests", () => {
 
   describe("removeCampaignParticipant", () => {
     it("should allow owner to remove any participant", async () => {
-      vi.mocked(removeCampaignParticipant).mockResolvedValue({
+      mocks.mockRemoveCampaignParticipant.mockResolvedValue({
         success: true,
         data: true,
       });
 
-      const result = await removeCampaignParticipant({
+      const result = await mocks.mockRemoveCampaignParticipant({
         data: { id: MOCK_PLAYER_PARTICIPANT.id },
       });
       expect(result.success).toBe(true);
@@ -656,12 +592,12 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should allow participant to remove themselves", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(removeCampaignParticipant).mockResolvedValue({
+      mocks.mockRemoveCampaignParticipant.mockResolvedValue({
         success: true,
         data: true,
       });
 
-      const result = await removeCampaignParticipant({
+      const result = await mocks.mockRemoveCampaignParticipant({
         data: { id: MOCK_PLAYER_PARTICIPANT.id },
       });
       expect(result.success).toBe(true);
@@ -672,14 +608,14 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail if non-owner tries to remove other participants", async () => {
       mockCurrentUser(MOCK_PLAYER_USER);
-      vi.mocked(removeCampaignParticipant).mockResolvedValue({
+      mocks.mockRemoveCampaignParticipant.mockResolvedValue({
         success: false,
         errors: [
           { code: "AUTH_ERROR", message: "Not authorized to remove this participant" },
         ],
       });
 
-      const result = await removeCampaignParticipant({
+      const result = await mocks.mockRemoveCampaignParticipant({
         data: { id: MOCK_OWNER_PARTICIPANT.id },
       });
       expect(result.success).toBe(false);
@@ -690,12 +626,12 @@ describe("Campaign Management Feature Tests", () => {
 
     it("should fail if not authenticated", async () => {
       mockCurrentUser(null);
-      vi.mocked(removeCampaignParticipant).mockResolvedValue({
+      mocks.mockRemoveCampaignParticipant.mockResolvedValue({
         success: false,
         errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
       });
 
-      const result = await removeCampaignParticipant({
+      const result = await mocks.mockRemoveCampaignParticipant({
         data: { id: MOCK_PLAYER_PARTICIPANT.id },
       });
       expect(result.success).toBe(false);

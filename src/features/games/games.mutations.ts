@@ -486,6 +486,24 @@ export const applyToGame = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
+      const game = await findGameById(data.gameId);
+      if (!game) {
+        return {
+          success: false,
+          errors: [{ code: "NOT_FOUND", message: "Game not found" }],
+        };
+      }
+
+      // Check if game is open for applications (e.g., not canceled or completed)
+      if (game.status === "canceled" || game.status === "completed") {
+        return {
+          success: false,
+          errors: [
+            { code: "CONFLICT", message: "This game is not open for applications." },
+          ],
+        };
+      }
+
       // Check if already applied
       const existingApplication = await db.query.gameApplications.findFirst({
         where: and(
@@ -495,12 +513,38 @@ export const applyToGame = createServerFn({ method: "POST" })
       });
 
       if (existingApplication) {
-        return {
-          success: false,
-          errors: [
-            { code: "CONFLICT", message: "You have already applied to this game" },
-          ],
-        };
+        if (existingApplication.status === "rejected") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message:
+                  "You have already applied to this game and your application was rejected.",
+              },
+            ],
+          };
+        } else if (existingApplication.status === "pending") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message: "You have a pending application for this game.",
+              },
+            ],
+          };
+        } else if (existingApplication.status === "approved") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "CONFLICT",
+                message: "You have already been approved for this game.",
+              },
+            ],
+          };
+        }
       }
 
       const [newApplication] = await db
@@ -1053,10 +1097,33 @@ export const respondToGameApplication = createServerFn({ method: "POST" })
 
         return { success: true, data: applicationWithDetails as GameApplication };
       } else if (data.status === "rejected") {
-        await db
-          .delete(gameApplications)
-          .where(eq(gameApplications.id, data.applicationId));
-        return { success: true, data: true };
+        const [updatedApplication] = await db
+          .update(gameApplications)
+          .set({ status: data.status, updatedAt: new Date() })
+          .where(eq(gameApplications.id, data.applicationId))
+          .returning();
+
+        if (!updatedApplication) {
+          return {
+            success: false,
+            errors: [{ code: "DATABASE_ERROR", message: "Failed to reject application" }],
+          };
+        }
+
+        const applicationWithDetails = await findGameApplicationById(
+          updatedApplication.id,
+        );
+
+        if (!applicationWithDetails) {
+          return {
+            success: false,
+            errors: [
+              { code: "DATABASE_ERROR", message: "Failed to fetch rejected application" },
+            ],
+          };
+        }
+
+        return { success: true, data: applicationWithDetails as GameApplication };
       }
 
       return {

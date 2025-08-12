@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
-import { campaignParticipants, campaigns, user } from "~/db/schema";
+import {
+  campaignApplications,
+  campaignParticipants,
+  campaigns,
+  gameSystems,
+  user,
+} from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { OperationResult } from "~/shared/types/common";
@@ -10,6 +16,7 @@ import {
   findPendingCampaignApplicationsByCampaignId,
 } from "./campaigns.repository";
 import {
+  getCampaignApplicationForUserInputSchema,
   getCampaignSchema,
   listCampaignsSchema,
   searchUsersForInvitationSchema,
@@ -118,12 +125,14 @@ export const listCampaigns = createServerFn({ method: "POST" })
           campaign: campaigns,
           owner: { id: user.id, name: user.name, email: user.email },
           participantCount: sql<number>`count(distinct ${campaignParticipants.userId})::int`,
+          gameSystem: gameSystems, // Include gameSystem in the select
         })
         .from(campaigns)
         .innerJoin(user, eq(campaigns.ownerId, user.id))
+        .innerJoin(gameSystems, eq(campaigns.gameSystemId, gameSystems.id)) // Join with gameSystems
         .leftJoin(campaignParticipants, eq(campaignParticipants.campaignId, campaigns.id))
         .where(finalWhereClause)
-        .groupBy(campaigns.id, user.id);
+        .groupBy(campaigns.id, user.id, gameSystems.id); // Add gameSystems.id to groupBy
 
       return {
         success: true,
@@ -131,6 +140,7 @@ export const listCampaigns = createServerFn({ method: "POST" })
           ...r.campaign,
           owner: r.owner,
           participantCount: r.participantCount,
+          gameSystem: r.gameSystem, // Include gameSystem in the mapped object
         })) as CampaignListItem[],
       };
     } catch (error) {
@@ -191,6 +201,34 @@ export const getCampaignParticipants = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to fetch participants" }],
+      };
+    }
+  });
+
+/**
+ * Get a single campaign application for a specific user
+ */
+export const getCampaignApplicationForUser = createServerFn({ method: "POST" })
+  .validator(getCampaignApplicationForUserInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<CampaignApplication | null>> => {
+    try {
+      const db = await getDb();
+      const application = await db.query.campaignApplications.findFirst({
+        where: and(
+          eq(campaignApplications.campaignId, data.campaignId),
+          eq(campaignApplications.userId, data.userId),
+        ),
+        with: {
+          user: { columns: { id: true, name: true, email: true } },
+        },
+      });
+
+      return { success: true, data: application as CampaignApplication };
+    } catch (error) {
+      console.error("Error fetching campaign application for user:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch application" }],
       };
     }
   });

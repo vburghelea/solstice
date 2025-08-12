@@ -5,7 +5,12 @@ process.env["NODE_ENV"] = "test";
 global.IS_REACT_ACT_ENVIRONMENT = true;
 
 import "@testing-library/jest-dom";
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
+import { setupCampaignMocks } from "~/tests/mocks/campaigns";
+import { setupGameMocks } from "~/tests/mocks/games";
+import { mockReactQuery } from "~/tests/mocks/react-query";
+
+mockReactQuery();
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
@@ -48,6 +53,10 @@ vi.mock("~/lib/env.server", () => ({
   isServerless: () => false,
 }));
 
+vi.mock("~/features/auth/auth.queries", () => ({
+  getCurrentUser: vi.fn(),
+}));
+
 // Mock CSS imports
 vi.mock("~/styles.css?url", () => ({
   default: "/test-styles.css",
@@ -64,4 +73,10 @@ vi.mock("sonner", async (importOriginal) => {
     },
     Toaster: vi.fn(() => null), // Mock Toaster component to render nothing
   };
+});
+
+// Reset mocks before each test
+beforeEach(() => {
+  setupCampaignMocks();
+  setupGameMocks();
 });

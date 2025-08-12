@@ -39,12 +39,18 @@ interface CampaignFormProps {
       | z.infer<typeof updateCampaignInputSchema>,
   ) => Promise<void>;
   isSubmitting: boolean;
+  onCancelEdit?: () => void;
+  isGameSystemReadOnly?: boolean;
+  gameSystemName?: string;
 }
 
 export function CampaignForm({
   initialValues,
   onSubmit,
   isSubmitting,
+  onCancelEdit,
+  isGameSystemReadOnly,
+  gameSystemName,
 }: CampaignFormProps) {
   const form = useForm({
     defaultValues: initialValues || {
@@ -256,38 +262,56 @@ export function CampaignForm({
         }}
       >
         {(field) => (
-          <GameSystemCombobox
-            label="Game System Used"
-            options={gameSystemOptions}
-            placeholder="Search and select the game system you want to use"
-            value={field.state.value?.toString() ?? ""}
-            onValueChange={(value) => {
-              const parsedValue = parseInt(value);
-              field.handleChange(isNaN(parsedValue) ? undefined : parsedValue);
-              // Find and store the selected game system details
-              const selectedId = isNaN(parsedValue) ? undefined : parsedValue;
-              const selected =
-                gameSystemSearchResults?.success &&
-                gameSystemSearchResults.data &&
-                selectedId !== undefined
-                  ? gameSystemSearchResults.data.find((gs) => gs.id === selectedId)
-                  : null;
-              setSelectedGameSystem(selected || null);
-            }}
-            onSearchChange={setGameSystemSearchTerm}
-            isLoading={isLoadingGameSystems}
-            error={
-              field.state.meta.errors?.filter(Boolean).map((e) => {
-                if (typeof e === "string") {
-                  return e;
-                } else if (e && typeof e === "object" && "message" in e) {
-                  return (e as z.ZodIssue).message;
+          <div>
+            <Label htmlFor={field.name}>Game System Used</Label>
+            {isGameSystemReadOnly ? (
+              <p className="text-muted-foreground mt-1 text-sm">{gameSystemName}</p>
+            ) : (
+              <GameSystemCombobox
+                label="" // Label is already rendered above
+                options={gameSystemOptions}
+                placeholder="Search and select the game system you want to use"
+                value={field.state.value?.toString() ?? ""}
+                onValueChange={(value) => {
+                  const parsedValue = parseInt(value);
+                  field.handleChange(isNaN(parsedValue) ? undefined : parsedValue);
+                  // Find and store the selected game system details
+                  const selectedId = isNaN(parsedValue) ? undefined : parsedValue;
+                  const selected =
+                    gameSystemSearchResults?.success &&
+                    gameSystemSearchResults.data &&
+                    selectedId !== undefined
+                      ? gameSystemSearchResults.data.find((gs) => gs.id === selectedId)
+                      : null;
+                  setSelectedGameSystem(selected || null);
+                }}
+                onSearchChange={setGameSystemSearchTerm}
+                isLoading={isLoadingGameSystems}
+                error={
+                  field.state.meta.errors?.filter(Boolean).map((e) => {
+                    if (typeof e === "string") {
+                      return e;
+                    } else if (e && typeof e === "object" && "message" in e) {
+                      return (e as z.ZodIssue).message;
+                    }
+                    return ""; // Fallback for unexpected types
+                  }) || []
                 }
-                return ""; // Fallback for unexpected types
-              }) || []
-            }
-            data-testid="game-system-combobox"
-          />
+                data-testid="game-system-combobox"
+              />
+            )}
+            {field.state.meta.errors?.length > 0 && (
+              <p className="text-destructive mt-1 text-sm">
+                {field.state.meta.errors
+                  .map((error) =>
+                    typeof error === "string"
+                      ? error
+                      : "Please select a game system for your campaign.",
+                  )
+                  .join(", ")}
+              </p>
+            )}
+          </div>
         )}
       </form.Field>
 
@@ -994,9 +1018,15 @@ export function CampaignForm({
       </fieldset>
 
       <div className="flex justify-end gap-4">
-        <Button variant="outline" asChild>
-          <Link to="/dashboard/campaigns">Cancel</Link>
-        </Button>
+        {onCancelEdit ? (
+          <Button variant="outline" onClick={onCancelEdit}>
+            Cancel
+          </Button>
+        ) : (
+          <Button variant="outline" asChild>
+            <Link to="/dashboard/campaigns">Cancel</Link>
+          </Button>
+        )}
         <FormSubmitButton isSubmitting={isSubmitting}>
           {initialValues ? "Update Campaign" : "Create Campaign"}
         </FormSubmitButton>

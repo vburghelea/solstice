@@ -1,4 +1,7 @@
-import { CampaignListItem } from "~/features/campaigns/campaigns.types";
+import {
+  CampaignListItem,
+  CampaignWithDetails,
+} from "~/features/campaigns/campaigns.types";
 import { MOCK_CAMPAIGN } from "~/tests/mocks/campaigns";
 import { renderWithRouter, screen } from "~/tests/utils";
 import { CampaignCard } from "../CampaignCard";
@@ -6,7 +9,9 @@ import { CampaignCard } from "../CampaignCard";
 describe("CampaignCard", () => {
   it("renders campaign information correctly", async () => {
     await renderWithRouter(
-      <CampaignCard campaign={MOCK_CAMPAIGN as unknown as CampaignListItem} />,
+      <CampaignCard
+        campaign={MOCK_CAMPAIGN as CampaignWithDetails as CampaignListItem}
+      />,
       {
         path: "/dashboard/campaigns",
         initialEntries: ["/dashboard/campaigns"],

@@ -3,6 +3,7 @@ import {
   CampaignParticipant,
   CampaignWithDetails,
 } from "~/features/campaigns/campaigns.types";
+import { MOCK_GAME_SYSTEM } from "./game-systems"; // Import MOCK_GAME_SYSTEM
 import {
   MOCK_INVITED_USER,
   MOCK_OTHER_USER,
@@ -14,6 +15,7 @@ export const MOCK_CAMPAIGN: CampaignWithDetails = {
   id: "campaign-1",
   ownerId: MOCK_OWNER_USER.id,
   gameSystemId: 1,
+  gameSystem: MOCK_GAME_SYSTEM, // Add gameSystem here
   name: "Test Campaign",
   description: "A test campaign session",
   images: [],
@@ -98,4 +100,159 @@ export const MOCK_CAMPAIGN_PARTICIPANT_2: CampaignParticipant = {
   user: MOCK_PLAYER_USER,
   createdAt: new Date(),
   updatedAt: new Date(),
+};
+
+import { vi } from "vitest";
+
+export const MOCK_CAMPAIGN_APPLICATION_PENDING = {
+  id: "app-pending-1",
+  campaignId: MOCK_CAMPAIGN.id,
+  userId: "user-non-owner",
+  user: {
+    ...MOCK_OWNER_USER,
+    id: "user-non-owner",
+    name: "Non Owner",
+    email: "nonowner@example.com",
+  },
+  status: "pending" as const,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const MOCK_CAMPAIGN_APPLICATION_REJECTED = {
+  id: "app-rejected-1",
+  campaignId: MOCK_CAMPAIGN.id,
+  userId: "user-non-owner",
+  user: {
+    ...MOCK_OWNER_USER,
+    id: "user-non-owner",
+    name: "Non Owner",
+    email: "nonowner@example.com",
+  },
+  status: "rejected" as const,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+export const MOCK_APPLICATIONS = [
+  {
+    id: "app-1",
+    campaignId: MOCK_CAMPAIGN.id,
+    userId: "user-2",
+    user: { ...MOCK_OWNER_USER, id: "user-2", name: "Alice", email: "alice@example.com" },
+    status: "pending" as const,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: "app-2",
+    campaignId: MOCK_CAMPAIGN.id,
+    userId: "user-3",
+    user: { ...MOCK_OWNER_USER, id: "user-3", name: "Bob", email: "bob@example.com" },
+    status: "pending" as const,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
+
+// Top-level mocks for campaigns.mutations
+export const mockApplyToCampaign = vi.fn().mockResolvedValue({
+  success: true,
+  data: MOCK_CAMPAIGN_APPLICATION_PENDING,
+});
+export const mockRespondToApplication = vi.fn().mockResolvedValue({
+  success: true,
+  data: MOCK_CAMPAIGN_APPLICATION_PENDING,
+});
+export const mockCreateCampaign = vi.fn();
+export const mockDeleteCampaign = vi.fn();
+export const mockInviteToCampaign = vi.fn();
+export const mockRemoveCampaignParticipant = vi.fn();
+export const mockUpdateCampaign = vi.fn();
+export const mockUpdateCampaignParticipant = vi.fn();
+
+// Top-level mocks for campaigns.queries
+export const mockGetCampaign = vi
+  .fn()
+  .mockResolvedValue({ success: true, data: MOCK_CAMPAIGN });
+export const mockGetCampaignApplications = vi
+  .fn()
+  .mockResolvedValue({ success: true, data: [] });
+export const mockGetCampaignApplicationForUser = vi
+  .fn()
+  .mockResolvedValue({ success: true, data: null });
+export const mockGetCampaignParticipants = vi.fn();
+export const mockListCampaigns = vi.fn();
+export const mockSearchUsersForInvitation = vi.fn();
+
+vi.mock("~/features/campaigns/campaigns.mutations", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("~/features/campaigns/campaigns.mutations")>();
+  return {
+    ...actual,
+    applyToCampaign: mockApplyToCampaign,
+    respondToApplication: mockRespondToApplication,
+    createCampaign: mockCreateCampaign,
+    deleteCampaign: mockDeleteCampaign,
+    inviteToCampaign: mockInviteToCampaign,
+    removeCampaignParticipant: mockRemoveCampaignParticipant,
+    updateCampaign: mockUpdateCampaign,
+    updateCampaignParticipant: mockUpdateCampaignParticipant,
+  };
+});
+
+vi.mock("~/features/campaigns/campaigns.queries", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("~/features/campaigns/campaigns.queries")>();
+  return {
+    ...actual,
+    getCampaign: mockGetCampaign,
+    getCampaignApplications: mockGetCampaignApplications,
+    getCampaignApplicationForUser: mockGetCampaignApplicationForUser,
+    getCampaignParticipants: mockGetCampaignParticipants,
+    listCampaigns: mockListCampaigns,
+    searchUsersForInvitation: mockSearchUsersForInvitation,
+  };
+});
+
+export const setupCampaignMocks = () => {
+  // Reset mocks to their initial state for each test
+  mockApplyToCampaign
+    .mockReset()
+    .mockResolvedValue({ success: true, data: MOCK_CAMPAIGN_APPLICATION_PENDING });
+  mockRespondToApplication
+    .mockReset()
+    .mockResolvedValue({ success: true, data: MOCK_CAMPAIGN_APPLICATION_PENDING });
+  mockCreateCampaign.mockReset();
+  mockDeleteCampaign.mockReset();
+  mockInviteToCampaign.mockReset();
+  mockRemoveCampaignParticipant.mockReset();
+  mockUpdateCampaign.mockReset();
+  mockUpdateCampaignParticipant.mockReset();
+
+  mockGetCampaign.mockReset().mockResolvedValue({ success: true, data: MOCK_CAMPAIGN });
+  mockGetCampaignApplications.mockReset().mockResolvedValue({ success: true, data: [] });
+  mockGetCampaignApplicationForUser
+    .mockReset()
+    .mockResolvedValue({ success: true, data: null });
+  mockGetCampaignParticipants.mockReset();
+  mockListCampaigns.mockReset();
+  mockSearchUsersForInvitation.mockReset();
+
+  return {
+    mockApplyToCampaign,
+    mockRespondToApplication,
+    mockGetCampaign,
+    mockGetCampaignApplications,
+    mockGetCampaignApplicationForUser,
+    mockCreateCampaign,
+    mockDeleteCampaign,
+    mockInviteToCampaign,
+    mockRemoveCampaignParticipant,
+    mockUpdateCampaign,
+    mockUpdateCampaignParticipant,
+    mockGetCampaignParticipants,
+    mockListCampaigns,
+    mockSearchUsersForInvitation,
+  };
 };

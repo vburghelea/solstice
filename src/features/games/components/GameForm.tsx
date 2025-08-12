@@ -39,6 +39,7 @@ interface GameFormProps {
   isSubmitting: boolean;
   isCampaignGame?: boolean;
   gameSystemName?: string;
+  onCancelEdit?: () => void;
 }
 
 export function GameForm({
@@ -47,16 +48,17 @@ export function GameForm({
   isSubmitting,
   isCampaignGame,
   gameSystemName,
+  onCancelEdit,
 }: GameFormProps) {
   const form = useForm({
     defaultValues: {
-      gameSystemId: initialValues?.gameSystemId,
+      gameSystemId: initialValues?.gameSystemId ?? 0,
       name: initialValues?.name ?? "",
       dateTime: initialValues?.dateTime ?? new Date().toISOString(),
       description: initialValues?.description ?? "",
-      expectedDuration: initialValues?.expectedDuration,
-      price: initialValues?.price,
-      language: initialValues?.language ?? "",
+      expectedDuration: initialValues?.expectedDuration ?? 0,
+      price: initialValues?.price ?? 0,
+      language: initialValues?.language ?? "en",
       location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
       minimumRequirements: initialValues?.minimumRequirements ?? {
         minPlayers: undefined,
@@ -265,34 +267,54 @@ export function GameForm({
         }}
       >
         {(field) => (
-          <GameSystemCombobox
-            label="Game System Used"
-            options={gameSystemOptions}
-            placeholder="Search and select the game system you want to use"
-            value={field.state.value?.toString() ?? ""}
-            onValueChange={(value) => {
-              field.handleChange(parseInt(value));
-              // Find and store the selected game system details
-              const selected =
-                gameSystemSearchResults?.success && gameSystemSearchResults.data
-                  ? gameSystemSearchResults.data.find((gs) => gs.id === parseInt(value))
-                  : null;
-              setSelectedGameSystem(selected || null);
-            }}
-            onSearchChange={setGameSystemSearchTerm}
-            isLoading={isLoadingGameSystems}
-            disabled={!!isCampaignGame}
-            error={
-              field.state.meta.errors?.filter(Boolean).map((e) => {
-                if (typeof e === "string") {
-                  return e;
-                } else if (e && typeof e === "object" && "message" in e) {
-                  return (e as z.ZodIssue).message;
+          <div>
+            <Label htmlFor={field.name}>Game System Used</Label>
+            {isCampaignGame ? (
+              <p className="text-muted-foreground mt-1 text-sm">{gameSystemName}</p>
+            ) : (
+              <GameSystemCombobox
+                label="" // Label is already rendered above
+                options={gameSystemOptions}
+                placeholder="Search and select the game system you want to use"
+                value={field.state.value?.toString() ?? ""}
+                onValueChange={(value) => {
+                  field.handleChange(parseInt(value));
+                  // Find and store the selected game system details
+                  const selected =
+                    gameSystemSearchResults?.success && gameSystemSearchResults.data
+                      ? gameSystemSearchResults.data.find(
+                          (gs) => gs.id === parseInt(value),
+                        )
+                      : null;
+                  setSelectedGameSystem(selected || null);
+                }}
+                onSearchChange={setGameSystemSearchTerm}
+                isLoading={isLoadingGameSystems}
+                disabled={!!isCampaignGame}
+                error={
+                  field.state.meta.errors?.filter(Boolean).map((e) => {
+                    if (typeof e === "string") {
+                      return e;
+                    } else if (e && typeof e === "object" && "message" in e) {
+                      return (e as z.ZodIssue).message;
+                    }
+                    return ""; // Fallback for unexpected types
+                  }) || []
                 }
-                return ""; // Fallback for unexpected types
-              }) || []
-            }
-          />
+              />
+            )}
+            {field.state.meta.errors?.length > 0 && (
+              <p className="text-destructive mt-1 text-sm">
+                {field.state.meta.errors
+                  .map((error) =>
+                    typeof error === "string"
+                      ? error
+                      : "Please select a game system for your session.",
+                  )
+                  .join(", ")}
+              </p>
+            )}
+          </div>
         )}
       </form.Field>
 
@@ -347,7 +369,9 @@ export function GameForm({
                 type="number"
                 value={field.state.value ?? selectedGameSystem?.averagePlayTime ?? 1}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(Number(e.target.value))}
+                onChange={(e) =>
+                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                }
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {field.state.meta.errors?.length > 0 && (
@@ -396,9 +420,7 @@ export function GameForm({
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) =>
-                    field.handleChange(
-                      e.target.value ? Number(e.target.value) : undefined,
-                    )
+                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -562,7 +584,7 @@ export function GameForm({
                 value={field.state.value ?? selectedGameSystem?.minPlayers ?? 1}
                 onBlur={field.handleBlur}
                 onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
                 }
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
@@ -608,7 +630,7 @@ export function GameForm({
                 value={field.state.value ?? selectedGameSystem?.maxPlayers ?? 1}
                 onBlur={field.handleBlur}
                 onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
                 }
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
@@ -811,7 +833,9 @@ export function GameForm({
                 min="1"
                 max="10"
                 value={field.state.value ?? 5}
-                onChange={(e) => field.handleChange(Number(e.target.value))}
+                onChange={(e) =>
+                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                }
                 className="w-full"
               />
               <div className="text-muted-foreground flex justify-between text-sm">
@@ -897,9 +921,15 @@ export function GameForm({
       </fieldset>
 
       <div className="flex justify-end gap-4">
-        <Button variant="outline" asChild>
-          <Link to="/dashboard/games">Cancel</Link>
-        </Button>
+        {onCancelEdit ? (
+          <Button variant="outline" onClick={onCancelEdit}>
+            Cancel
+          </Button>
+        ) : (
+          <Button variant="outline" asChild>
+            <Link to="/dashboard/games">Cancel</Link>
+          </Button>
+        )}
         <FormSubmitButton isSubmitting={isSubmitting}>
           {initialValues?.id ? "Update Game" : "Create Game"}
         </FormSubmitButton>

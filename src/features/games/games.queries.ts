@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
+  getGameApplicationForUserInputSchema,
   getGameSchema,
   listGameSessionsByCampaignIdSchema,
   listGamesSchema,
@@ -15,10 +16,21 @@ import {
   safetyRulesSchema,
 } from "~/shared/schemas/common";
 import { OperationResult } from "~/shared/types/common";
-import { GameListItem, GameParticipant, GameWithDetails } from "./games.types";
+import {
+  GameApplication,
+  GameListItem,
+  GameParticipant,
+  GameWithDetails,
+} from "./games.types";
 
 import { and, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-import { gameParticipants, games, gameSystems, user } from "~/db/schema";
+import {
+  gameApplications,
+  gameParticipants,
+  games,
+  gameSystems,
+  user,
+} from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import {
@@ -456,8 +468,6 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
     }
   });
 
-import { GameApplication } from "./games.types"; // Import GameApplication type
-
 /**
  * Get pending applications for a specific game
  */
@@ -496,6 +506,34 @@ export const getGameApplications = createServerFn({ method: "POST" })
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to fetch applications" }],
+      };
+    }
+  });
+
+/**
+ * Get a single game application for a specific user
+ */
+export const getGameApplicationForUser = createServerFn({ method: "POST" })
+  .validator(getGameApplicationForUserInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameApplication | null>> => {
+    try {
+      const db = await getDb();
+      const application = await db.query.gameApplications.findFirst({
+        where: and(
+          eq(gameApplications.gameId, data.gameId),
+          eq(gameApplications.userId, data.userId),
+        ),
+        with: {
+          user: { columns: { id: true, name: true, email: true } },
+        },
+      });
+
+      return { success: true, data: application as GameApplication };
+    } catch (error) {
+      console.error("Error fetching game application for user:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch application" }],
       };
     }
   });

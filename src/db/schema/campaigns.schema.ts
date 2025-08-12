@@ -84,6 +84,11 @@ export const campaignsRelations = relations(campaigns, ({ one, many }) => ({
     fields: [campaigns.ownerId],
     references: [user.id],
   }),
+  gameSystem: one(gameSystem, {
+    // Add this relation
+    fields: [campaigns.gameSystemId],
+    references: [gameSystem.id],
+  }),
   participants: many(campaignParticipants),
   applications: many(campaignApplications),
 }));

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { user } from "~/db/schema";
+import type { GameSystem, user } from "~/db/schema";
 import type {
   campaignApplications,
   campaignRecurrenceEnum,
@@ -34,6 +34,7 @@ export type CampaignParticipantStatus = ParticipantStatus;
 
 export type CampaignWithDetails = Campaign & {
   owner: typeof user.$inferSelect | null;
+  gameSystem: GameSystem;
   participants: CampaignParticipant[];
   applications: CampaignApplication[];
   participantCount?: number;
@@ -50,4 +51,5 @@ export type CampaignApplication = typeof campaignApplications.$inferSelect & {
 export type CampaignListItem = Campaign & {
   owner: { id: string; name: string | null; email: string } | null;
   participantCount: number;
+  gameSystem: { id: number; name: string }; // Add gameSystem to CampaignListItem
 };

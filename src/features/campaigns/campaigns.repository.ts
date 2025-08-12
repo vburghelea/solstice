@@ -8,6 +8,7 @@ export async function findCampaignById(campaignId: string) {
     where: eq(campaigns.id, campaignId),
     with: {
       owner: true,
+      gameSystem: true, // Add this line to fetch game system details
       participants: {
         with: { user: true },
       },

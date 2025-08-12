@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -22,7 +22,11 @@ import { getCampaign } from "~/features/campaigns/campaigns.queries";
 import { GameForm } from "~/features/games/components/GameForm";
 import { createGame } from "~/features/games/games.mutations";
 import { getGameSystem } from "~/features/games/games.queries";
-import { createGameInputSchema } from "~/features/games/games.schemas";
+import {
+  createGameInputSchema,
+  gameFormSchema,
+  updateGameInputSchema,
+} from "~/features/games/games.schemas";
 
 const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),
@@ -38,7 +42,11 @@ export function CreateGamePage() {
   const { campaignId } = useSearch({ from: Route.id });
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { data: campaignData } = useQuery({
+  const {
+    data: campaignData,
+    isPending: isCampaignDataPending,
+    isSuccess: isCampaignDataSuccess,
+  } = useQuery({
     queryKey: ["campaign", campaignId],
     queryFn: () => getCampaign({ data: { id: campaignId! } }),
     enabled: !!campaignId,
@@ -48,11 +56,35 @@ export function CreateGamePage() {
     ? campaignData.data?.gameSystemId
     : undefined;
 
-  const { data: gameSystemData } = useQuery({
+  const { data: gameSystemData, isSuccess: isGameSystemDataSuccess } = useQuery({
     queryKey: ["gameSystem", gameSystemId],
     queryFn: () => getGameSystem({ data: { id: gameSystemId! } }),
     enabled: !!gameSystemId,
   });
+
+  const initialValues = useMemo<Partial<z.infer<typeof gameFormSchema>>>(() => {
+    if (!campaignId) {
+      return {};
+    }
+
+    if (isCampaignDataSuccess && campaignData?.success && campaignData.data) {
+      const campaign = campaignData.data;
+      // Type assertion to tell TypeScript that campaign is not null
+      return {
+        gameSystemId: (campaign as NonNullable<typeof campaign>).gameSystemId,
+        expectedDuration: (campaign as NonNullable<typeof campaign>).sessionDuration,
+        price: (campaign as NonNullable<typeof campaign>).pricePerSession ?? undefined,
+        language: (campaign as NonNullable<typeof campaign>).language,
+        location: (campaign as NonNullable<typeof campaign>).location,
+        minimumRequirements: (campaign as NonNullable<typeof campaign>)
+          .minimumRequirements,
+        visibility: (campaign as NonNullable<typeof campaign>).visibility,
+        safetyRules: (campaign as NonNullable<typeof campaign>).safetyRules,
+      };
+    }
+
+    return {};
+  }, [isCampaignDataSuccess, campaignData, campaignId]);
 
   const createGameMutation = useMutation({
     mutationFn: createGame,
@@ -67,23 +99,6 @@ export function CreateGamePage() {
       setServerError(error.message || "Failed to create game");
     },
   });
-
-  const initialValues =
-    campaignData?.success && campaignData.data
-      ? (() => {
-          const campaign = campaignData.data;
-          return {
-            gameSystemId: campaign.gameSystemId,
-            expectedDuration: campaign.sessionDuration,
-            price: campaign.pricePerSession ?? undefined,
-            language: campaign.language,
-            location: campaign.location,
-            minimumRequirements: campaign.minimumRequirements,
-            visibility: campaign.visibility,
-            safetyRules: campaign.safetyRules,
-          };
-        })()
-      : {};
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -104,20 +119,6 @@ export function CreateGamePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {campaignId && campaignData?.success && campaignData.data && (
-            <div className="mb-4">
-              <label htmlFor="campaign">Campaign</label>
-              <Select value={campaignId} disabled>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a campaign" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={campaignId}>{campaignData.data.name}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
           {serverError && (
             <div className="bg-destructive/10 text-destructive border-destructive/20 mb-4 flex items-start gap-3 rounded-lg border p-4">
               <div className="flex-1">
@@ -127,34 +128,63 @@ export function CreateGamePage() {
             </div>
           )}
 
-          <GameForm
-            key={JSON.stringify(initialValues)} // Add key to force re-mount when initialValues change
-            onSubmit={async (values) => {
-              setServerError(null);
+          {campaignId && isCampaignDataPending ? (
+            <div className="text-muted-foreground mb-4 text-center">
+              Loading campaign data...
+            </div>
+          ) : (
+            <>
+              {campaignId &&
+                isCampaignDataSuccess &&
+                campaignData.success &&
+                campaignData.data && (
+                  <div className="mb-4">
+                    <label htmlFor="campaign">Campaign</label>
+                    <Select value={campaignId} disabled>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a campaign" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={campaignId}>
+                          {campaignData.data.name}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
-              try {
-                await createGameMutation.mutateAsync({
-                  data: {
-                    ...values,
-                    campaignId,
-                  } as z.infer<typeof createGameInputSchema>,
-                });
-              } catch (error) {
-                console.error("Form submission error:", error);
-                setServerError(
-                  error instanceof Error ? error.message : "Failed to create game",
-                );
-              }
-            }}
-            isSubmitting={createGameMutation.isPending}
-            initialValues={initialValues}
-            isCampaignGame={!!campaignId}
-            gameSystemName={
-              gameSystemData?.success && gameSystemData.data
-                ? gameSystemData.data.name
-                : ""
-            }
-          />
+              <GameForm
+                key={JSON.stringify(initialValues)} // Add key to force re-mount when initialValues change
+                onSubmit={async (values) => {
+                  setServerError(null);
+
+                  try {
+                    await createGameMutation.mutateAsync({
+                      data: {
+                        ...values,
+                        campaignId,
+                      } as z.infer<typeof createGameInputSchema>,
+                    });
+                  } catch (error) {
+                    console.error("Form submission error:", error);
+                    setServerError(
+                      error instanceof Error ? error.message : "Failed to create game",
+                    );
+                  }
+                }}
+                isSubmitting={createGameMutation.isPending}
+                initialValues={
+                  initialValues as Partial<z.infer<typeof updateGameInputSchema>>
+                }
+                isCampaignGame={!!campaignId}
+                gameSystemName={
+                  isGameSystemDataSuccess && gameSystemData?.data
+                    ? gameSystemData.data.name
+                    : ""
+                }
+              />
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

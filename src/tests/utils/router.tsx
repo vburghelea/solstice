@@ -10,6 +10,7 @@ import {
 import { act, render, RenderOptions } from "@testing-library/react";
 import { ReactElement, ReactNode } from "react";
 import type { User } from "~/lib/auth/types";
+import { MOCK_OWNER_USER } from "~/tests/mocks/users";
 
 // Create a test query client with optimized settings
 export function createTestQueryClient() {
@@ -27,32 +28,11 @@ export function createTestQueryClient() {
   });
 }
 
-// Mock user for route context
-export const mockUser: User = {
-  id: "test-user-id",
-  email: "test@example.com",
-  name: "Test User",
-  emailVerified: true,
-  image: null,
-  createdAt: new Date("2024-01-01"),
-  updatedAt: new Date("2024-01-01"),
-  profileComplete: true,
-  phone: "+1234567890",
-  gender: "male",
-  pronouns: "he/him",
-  privacySettings: JSON.stringify({
-    showEmail: false,
-    showPhone: false,
-  }),
-  profileVersion: 1,
-  profileUpdatedAt: new Date("2024-01-01"),
-};
-
 // Create test routes
 export function createTestRouter({
   children,
   initialEntries = ["/"],
-  user = mockUser,
+  user = MOCK_OWNER_USER,
 }: {
   children: ReactNode;
   initialEntries?: string[];
@@ -101,7 +81,7 @@ export async function renderWithRouter(
   ui: ReactElement,
   {
     initialEntries = ["/"],
-    user = mockUser,
+    user = MOCK_OWNER_USER,
     includeQueryClient = true,
     path = "/",
     ...renderOptions
@@ -165,7 +145,7 @@ export async function renderWithRouter(
 // Utility to create a full route tree for integration tests
 export function createTestRouteTree({
   routes = [],
-  user = mockUser,
+  user = MOCK_OWNER_USER,
 }: {
   routes?: Array<{
     path: string;

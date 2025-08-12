@@ -96,3 +96,12 @@ export const updateCampaignParticipantInputSchema = z.object({
 export const removeCampaignParticipantInputSchema = z.object({
   participantId: z.string().min(1),
 });
+
+export const getCampaignApplicationForUserInputSchema = z.object({
+  campaignId: z.string().min(1),
+  userId: z.string().min(1),
+});
+
+export type GetCampaignApplicationForUserInput = z.infer<
+  typeof getCampaignApplicationForUserInputSchema
+>;

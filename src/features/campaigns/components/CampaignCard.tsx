@@ -32,6 +32,10 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
       <CardContent>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Game System</span>
+            <span className="font-medium">{campaign.gameSystem.name}</span>
+          </div>
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Time of Day</span>
             <span className="font-medium">{campaign.timeOfDay}</span>
           </div>

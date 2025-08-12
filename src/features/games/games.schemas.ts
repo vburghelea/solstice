@@ -178,3 +178,12 @@ export const respondToGameApplicationSchema = z.object({
 export type RespondToGameApplicationInput = z.infer<
   typeof respondToGameApplicationSchema
 >;
+
+export const getGameApplicationForUserInputSchema = z.object({
+  gameId: z.string().min(1),
+  userId: z.string().min(1),
+});
+
+export type GetGameApplicationForUserInput = z.infer<
+  typeof getGameApplicationForUserInputSchema
+>;

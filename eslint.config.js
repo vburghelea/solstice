@@ -22,7 +22,7 @@ export default tseslint.config(
     ],
   },
   {
-    files: ["**/*.{ts,tsx}"],
+    files: ["**/*.{ts,tsx}", "src/tests/mocks/**/*.ts"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

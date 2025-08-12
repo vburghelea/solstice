@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Edit2, LoaderCircle, Save, X } from "lucide-react";
+import { Edit2, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ArrowLeftIcon } from "~/components/ui/icons";
 import {
   Select,
   SelectContent,
@@ -22,9 +20,13 @@ import {
 } from "~/components/ui/select";
 import { Separator } from "~/components/ui/separator";
 import { gameStatusEnum } from "~/db/schema/games.schema";
-import { updateCampaign } from "~/features/campaigns/campaigns.mutations";
+import {
+  applyToCampaign,
+  updateCampaign,
+} from "~/features/campaigns/campaigns.mutations";
 import {
   getCampaign,
+  getCampaignApplicationForUser,
   getCampaignApplications,
 } from "~/features/campaigns/campaigns.queries";
 import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
@@ -65,6 +67,10 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <p className="font-semibold">Game System</p>
+            <p>{campaign.gameSystem.name}</p>
+          </div>
           <div>
             <p className="font-semibold">Recurrence</p>
             <p>{campaign.recurrence}</p>
@@ -196,6 +202,42 @@ export function CampaignDetailsPage() {
     enabled: !!campaignId && isOwner,
   });
 
+  const { data: userApplication, isLoading: isLoadingUserApplication } = useQuery({
+    queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const result = await getCampaignApplicationForUser({
+        data: { campaignId, userId: currentUser.id },
+      });
+      if (!result.success) {
+        toast.error(
+          result.errors?.[0]?.message || "Failed to fetch your application status.",
+        );
+        return null;
+      }
+      return result.data;
+    },
+    enabled: !!campaignId && !!currentUser?.id && !isOwner && !isParticipant, // Only fetch if not owner/participant
+  });
+
+  const applyToCampaignMutation = useMutation({
+    mutationFn: applyToCampaign,
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("Application submitted successfully!");
+        queryClient.invalidateQueries({
+          queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
+        });
+        queryClient.invalidateQueries({ queryKey: ["campaignApplications", campaignId] }); // Invalidate owner's view
+      } else {
+        toast.error(data.errors?.[0]?.message || "Failed to submit application.");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "An unexpected error occurred while applying.");
+    },
+  });
+
   const { status: statusFilter } = Route.useSearch(); // Use useSearch for statusFilter
 
   const { data: gameSessionsData, isLoading: isLoadingGameSessions } = useQuery<
@@ -207,13 +249,30 @@ export function CampaignDetailsPage() {
     enabled: !!campaignId,
   });
 
-  if (isLoading || isLoadingApplications || isLoadingGameSessions) {
+  if (
+    isLoading ||
+    isLoadingApplications ||
+    isLoadingGameSessions ||
+    isLoadingUserApplication
+  ) {
     return <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />;
   }
 
   if (!campaign) {
     return <div>Campaign not found</div>;
   }
+
+  const hasPendingApplication = userApplication?.status === "pending";
+  const hasRejectedApplication = userApplication?.status === "rejected";
+
+  const canApply =
+    currentUser &&
+    !isOwner &&
+    !isParticipant &&
+    !hasPendingApplication &&
+    !hasRejectedApplication &&
+    campaign?.status === "active" && // Only allow applying to active campaigns
+    (campaign?.visibility === "public" || campaign?.visibility === "protected"); // Only allow applying to public/protected campaigns
 
   const gameSessions = gameSessionsData?.success ? gameSessionsData.data : [];
 
@@ -233,27 +292,6 @@ export function CampaignDetailsPage() {
                 <Edit2 className="mr-2 h-4 w-4" />
                 Edit Campaign
               </Button>
-            ) : isOwner && isEditing ? (
-              <div className="flex gap-2">
-                <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
-                </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/dashboard/campaigns">
-                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                    Back to Campaigns
-                  </Link>
-                </Button>
-                <FormSubmitButton
-                  isSubmitting={updateCampaignMutation.isPending}
-                  onClick={() => {}}
-                  size="sm"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Changes
-                </FormSubmitButton>
-              </div>
             ) : null}
           </div>
         </CardHeader>
@@ -262,6 +300,7 @@ export function CampaignDetailsPage() {
             <CampaignForm
               initialValues={{
                 ...campaign,
+                gameSystemId: campaign.gameSystem.id, // Pre-populate gameSystemId
                 pricePerSession: campaign.pricePerSession ?? undefined,
                 minimumRequirements: campaign.minimumRequirements ?? undefined,
                 safetyRules: campaign.safetyRules ?? undefined,
@@ -272,12 +311,32 @@ export function CampaignDetailsPage() {
                 });
               }}
               isSubmitting={updateCampaignMutation.isPending}
+              onCancelEdit={() => setIsEditing(false)} // Pass cancel handler
+              isGameSystemReadOnly={true} // Game system should be read-only when editing an existing campaign
+              gameSystemName={campaign.gameSystem.name} // Pass game system name for display
             />
           ) : (
             <CampaignDetailsView campaign={campaign} />
           )}
         </CardContent>
       </Card>
+
+      {canApply && (
+        <Button
+          onClick={() => applyToCampaignMutation.mutate({ data: { campaignId } })}
+          disabled={applyToCampaignMutation.isPending}
+        >
+          {applyToCampaignMutation.isPending ? "Applying..." : "Apply to Campaign"}
+        </Button>
+      )}
+
+      {hasPendingApplication && (
+        <p className="text-muted-foreground">Your application is pending review.</p>
+      )}
+
+      {hasRejectedApplication && (
+        <p className="text-destructive">Your application was rejected.</p>
+      )}
 
       <Card>
         <CardHeader>

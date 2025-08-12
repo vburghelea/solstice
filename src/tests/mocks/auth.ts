@@ -62,5 +62,8 @@ export const createAuthMocks = () => {
     }),
   };
 
-  return { authClient, mockUser, mockSession };
+  // Add getCurrentUser mock
+  const getCurrentUser = vi.fn().mockResolvedValue(mockUser);
+
+  return { authClient, mockUser, mockSession, getCurrentUser };
 };

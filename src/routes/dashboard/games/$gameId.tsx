@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Edit2, LoaderCircle, Save, X } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Edit2, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,15 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ArrowLeftIcon } from "~/components/ui/icons";
 import { Separator } from "~/components/ui/separator";
 import { GameForm } from "~/features/games/components/GameForm";
 import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 import { ManageApplications } from "~/features/games/components/ManageApplications";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
-import { updateGame } from "~/features/games/games.mutations";
-import { getGame, getGameApplications } from "~/features/games/games.queries";
+import { applyToGame, updateGame } from "~/features/games/games.mutations";
+import {
+  getGame,
+  getGameApplicationForUser,
+  getGameApplications,
+} from "~/features/games/games.queries";
 import type { GameParticipant, GameWithDetails } from "~/features/games/games.types";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -106,7 +108,7 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
   );
 }
 
-function GameDetailsPage() {
+export function GameDetailsPage() {
   const queryClient = useQueryClient();
   const { gameId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
@@ -166,13 +168,61 @@ function GameDetailsPage() {
     enabled: !!gameId && isOwner, // Only enable if gameId is available and current user is owner
   });
 
-  if (isLoading || isLoadingApplications) {
+  const { data: userApplication, isLoading: isLoadingUserApplication } = useQuery({
+    queryKey: ["userGameApplication", gameId, currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const result = await getGameApplicationForUser({
+        data: { gameId, userId: currentUser.id },
+      });
+      if (!result.success) {
+        toast.error(
+          result.errors?.[0]?.message || "Failed to fetch your application status.",
+        );
+        return null;
+      }
+      return result.data;
+    },
+    enabled: !!gameId && !!currentUser?.id && !isOwner && !isParticipant, // Only fetch if not owner/participant
+  });
+
+  const applyToGameMutation = useMutation({
+    mutationFn: applyToGame,
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("Application submitted successfully!");
+        queryClient.invalidateQueries({
+          queryKey: ["userGameApplication", gameId, currentUser?.id],
+        });
+        queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] }); // Invalidate owner's view
+      } else {
+        toast.error(data.errors?.[0]?.message || "Failed to submit application.");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "An unexpected error occurred while applying.");
+    },
+  });
+
+  if (isLoading || isLoadingApplications || isLoadingUserApplication) {
     return <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />;
   }
 
   if (!game) {
     return <div>Game not found</div>;
   }
+
+  const hasPendingApplication = userApplication?.status === "pending";
+  const hasRejectedApplication = userApplication?.status === "rejected";
+
+  const canApply =
+    currentUser &&
+    !isOwner &&
+    !isParticipant &&
+    !hasPendingApplication &&
+    !hasRejectedApplication &&
+    game?.status === "scheduled" && // Only allow applying to scheduled games
+    (game?.visibility === "public" || game?.visibility === "protected"); // Only allow applying to public/protected games
 
   return (
     <div className="space-y-6">
@@ -190,27 +240,6 @@ function GameDetailsPage() {
                 <Edit2 className="mr-2 h-4 w-4" />
                 Edit Game
               </Button>
-            ) : isOwner && isEditing ? (
-              <div className="flex gap-2">
-                <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
-                </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/dashboard/games">
-                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                    Back to Games
-                  </Link>
-                </Button>
-                <FormSubmitButton
-                  isSubmitting={updateGameMutation.isPending}
-                  onClick={() => {}}
-                  size="sm"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Changes
-                </FormSubmitButton>
-              </div>
             ) : null}
           </div>
         </CardHeader>
@@ -219,6 +248,7 @@ function GameDetailsPage() {
             <GameForm
               initialValues={{
                 ...game,
+                gameSystemId: game.gameSystem.id, // Pre-populate gameSystemId
                 campaignId: game.campaignId ?? undefined,
                 price: game.price ?? undefined,
                 minimumRequirements: game.minimumRequirements ?? undefined,
@@ -229,12 +259,32 @@ function GameDetailsPage() {
                 await updateGameMutation.mutateAsync({ data: { ...values, id: gameId } });
               }}
               isSubmitting={updateGameMutation.isPending}
+              isCampaignGame={!!game.campaignId} // Pass campaign status
+              gameSystemName={game.gameSystem.name} // Pass game system name for display
+              onCancelEdit={() => setIsEditing(false)} // Pass cancel handler
             />
           ) : (
             <GameDetailsView game={game} />
           )}
         </CardContent>
       </Card>
+
+      {canApply && (
+        <Button
+          onClick={() => applyToGameMutation.mutate({ data: { gameId } })}
+          disabled={applyToGameMutation.isPending}
+        >
+          {applyToGameMutation.isPending ? "Applying..." : "Apply to Game"}
+        </Button>
+      )}
+
+      {hasPendingApplication && (
+        <p className="text-muted-foreground">Your application is pending review.</p>
+      )}
+
+      {hasRejectedApplication && (
+        <p className="text-destructive">Your application was rejected.</p>
+      )}
 
       {isInvited && invitedParticipant && (
         <RespondToInvitation participant={invitedParticipant} />

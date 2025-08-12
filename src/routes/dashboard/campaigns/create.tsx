@@ -1,9 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ArrowLeftIcon } from "~/components/ui/icons";
 import { createCampaign } from "~/features/campaigns/campaigns.mutations";
 import { createCampaignInputSchema } from "~/features/campaigns/campaigns.schemas";
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
@@ -40,15 +38,6 @@ export function CreateCampaignPage() {
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
-      <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/dashboard/campaigns">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Campaigns
-          </Link>
-        </Button>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Create a New Campaign</CardTitle>
@@ -74,6 +63,7 @@ export function CreateCampaignPage() {
               });
             }}
             isSubmitting={createCampaignMutation.isPending}
+            onCancelEdit={() => navigate({ to: "/dashboard/campaigns" })} // Pass cancel handler
           />
         </CardContent>
       </Card>

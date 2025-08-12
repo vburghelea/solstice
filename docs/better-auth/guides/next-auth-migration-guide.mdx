@@ -36,13 +36,13 @@ Map the following fields in the session schema:
 
 ```typescript title="auth.ts"
 export const auth = betterAuth({
-    // Other configs
-    session: {
-        fields: {
-            expiresAt: "expires", // Map your existing `expires` field to Better Auth's `expiresAt`
-            token: "sessionToken" // Map your existing `sessionToken` field to Better Auth's `token`
-        }
+  // Other configs
+  session: {
+    fields: {
+      expiresAt: "expires", // Map your existing `expires` field to Better Auth's `expiresAt`
+      token: "sessionToken", // Map your existing `sessionToken` field to Better Auth's `token`
     },
+  },
 });
 ```
 
@@ -66,16 +66,16 @@ Remove the `session_state`, `type`, and `token_type` fields, as they are not req
 
 ```typescript title="auth.ts"
 export const auth = betterAuth({
-    // Other configs
-    account: {
-        fields: {
-            accountId: "providerAccountId",
-            refreshToken: "refresh_token",
-            accessToken: "access_token",
-            accessTokenExpiresAt: "access_token_expires",
-            idToken: "id_token",
-        }
+  // Other configs
+  account: {
+    fields: {
+      accountId: "providerAccountId",
+      refreshToken: "refresh_token",
+      accessToken: "access_token",
+      accessTokenExpiresAt: "access_token_expires",
+      idToken: "id_token",
     },
+  },
 });
 ```
 
@@ -94,6 +94,7 @@ model Session {
 ```
 
 Make sure to have `createdAt` and `updatedAt` fields on your account schema.
+
 </Step>
 <Step>
 
@@ -107,6 +108,7 @@ import { auth } from "~/server/auth";
 
 export const { POST, GET } = toNextJsHandler(auth);
 ```
+
 </Step>
 
 <Step>
@@ -118,7 +120,7 @@ Create a file named `auth-client.ts` in the `lib` folder. Add the following code
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-    baseURL: process.env.BASE_URL! // Optional if the API base URL matches the frontend
+  baseURL: process.env.BASE_URL!, // Optional if the API base URL matches the frontend
 });
 
 export const { signIn, signOut, useSession } = authClient;
@@ -132,10 +134,10 @@ Update your social login functions to use Better Auth. For example, for Discord:
 import { signIn } from "~/lib/auth-client";
 
 export const signInDiscord = async () => {
-    const data = await signIn.social({
-        provider: "discord"
-    });
-    return data;
+  const data = await signIn.social({
+    provider: "discord",
+  });
+  return data;
 };
 ```
 
@@ -157,6 +159,7 @@ export const Profile = () => {
     );
 };
 ```
+
 </Step>
 
 <Step>
@@ -172,20 +175,21 @@ import { auth } from "~/server/auth";
 import { headers } from "next/headers";
 
 export const protectedAction = async () => {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 };
 ```
+
 </Step>
 
 <Step>
 ### Middleware
 
 To protect routes with middleware, refer to the [Next.js middleware guide](/docs/integrations/next#middleware).
+
 </Step>
 </Steps>
-
 
 ## Wrapping Up
 

@@ -11,7 +11,7 @@ The username plugin wraps the email and password authenticator and adds username
     <Step>
         ### Add Plugin to the server
 
-        ```ts title="auth.ts" 
+        ```ts title="auth.ts"
         import { betterAuth } from "better-auth"
         import { username } from "better-auth/plugins"
 
@@ -43,11 +43,11 @@ The username plugin wraps the email and password authenticator and adds username
     </Step>
     <Step>
         ### Add the client plugin
-        
+
         ```ts title="auth-client.ts"
         import { createAuthClient } from "better-auth/client"
         import { usernameClient } from "better-auth/client/plugins"
-        
+
         export const authClient = createAuthClient({
             plugins: [ // [!code highlight]
                 usernameClient() // [!code highlight]
@@ -55,6 +55,7 @@ The username plugin wraps the email and password authenticator and adds username
         })
         ```
     </Step>
+
 </Steps>
 
 ## Usage
@@ -65,11 +66,11 @@ To sign up a user with username, you can use the existing `signUp.email` functio
 
 ```ts title="auth-client.ts"
 const data = await authClient.signUp.email({
-    email: "email@domain.com",
-    name: "Test User",
-    password: "password1234",
-    username: "test"
-})
+  email: "email@domain.com",
+  name: "Test User",
+  password: "password1234",
+  username: "test",
+});
 ```
 
 ### Sign in
@@ -79,11 +80,11 @@ To sign in a user with username, you can use the `signIn.username` function prov
 - `username`: The username of the user.
 - `password`: The password of the user.
 
-```ts title="auth-client.ts" 
+```ts title="auth-client.ts"
 const data = await authClient.signIn.username({
-    username: "test",
-    password: "password1234",
-})
+  username: "test",
+  password: "password1234",
+});
 ```
 
 ### Update username
@@ -92,8 +93,8 @@ To update the username of a user, you can use the `updateUser` function provided
 
 ```ts title="auth-client.ts"
 const data = await authClient.updateUser({
-    username: "new-username"
-})
+  username: "new-username",
+});
 ```
 
 ### Check if username is available
@@ -102,36 +103,35 @@ To check if a username is available, you can use the `isUsernameAvailable` funct
 
 ```ts title="auth-client.ts"
 const response = await authClient.isUsernameAvailable({
-    username: "new-username"
+  username: "new-username",
 });
 
-if(response.data?.available) {
-    console.log("Username is available");
+if (response.data?.available) {
+  console.log("Username is available");
 } else {
-    console.log("Username is not available");
+  console.log("Username is not available");
 }
 ```
-
 
 ## Schema
 
 The plugin requires 2 fields to be added to the user table:
 
 <DatabaseTable
-    fields={[
-        { 
-            name: "username", 
-            type: "string", 
-            description: "The username of the user",
-            isUnique: true
-        },
-        { 
-            name: "displayUsername", 
-            type: "string", 
-            description: "Non normalized username of the user",
-            isUnique: true
-        },
-    ]}
+  fields={[
+    {
+      name: "username",
+      type: "string",
+      description: "The username of the user",
+      isUnique: true,
+    },
+    {
+      name: "displayUsername",
+      type: "string",
+      description: "Non normalized username of the user",
+      isUnique: true,
+    },
+  ]}
 />
 
 ## Options
@@ -141,16 +141,16 @@ The plugin requires 2 fields to be added to the user table:
 The minimum length of the username. Default is `3`.
 
 ```ts title="auth.ts"
-import { betterAuth } from "better-auth"
-import { username } from "better-auth/plugins"
+import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 
 const auth = betterAuth({
-    plugins: [
-        username({
-            minUsernameLength: 5
-        })
-    ]
-})
+  plugins: [
+    username({
+      minUsernameLength: 5,
+    }),
+  ],
+});
 ```
 
 **Max Username Length**
@@ -158,16 +158,16 @@ const auth = betterAuth({
 The maximum length of the username. Default is `30`.
 
 ```ts title="auth.ts"
-import { betterAuth } from "better-auth"
-import { username } from "better-auth/plugins"
+import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 
 const auth = betterAuth({
-    plugins: [
-        username({
-            maxUsernameLength: 100
-        })
-    ]
-})
+  plugins: [
+    username({
+      maxUsernameLength: 100,
+    }),
+  ],
+});
 ```
 
 **Username Validator**
@@ -175,21 +175,21 @@ const auth = betterAuth({
 A function that validates the username. The function should return false if the username is invalid. By default, the username should only contain alphanumeric characters, underscores, and dots.
 
 ```ts title="auth.ts"
-import { betterAuth } from "better-auth"
-import { username } from "better-auth/plugins"
+import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 
 const auth = betterAuth({
-    plugins: [
-        username({
-            usernameValidator: (username) => {
-                if (username === "admin") {
-                    return false
-                }
-                return true
-            }
-        })
-    ]
-})
+  plugins: [
+    username({
+      usernameValidator: (username) => {
+        if (username === "admin") {
+          return false;
+        }
+        return true;
+      },
+    }),
+  ],
+});
 ```
 
 ### Username Normalization
@@ -199,19 +199,20 @@ A function that normalizes the username, or `false` if you want to disable norma
 By default, usernames are case-insensitive, so "TestUser" and "testuser", for example, are considered the same username. The `username` field will contain the normalized (lower case) username, while `displayUsername` will contain the original `username`.
 
 ```ts title="auth.ts"
-import { betterAuth } from "better-auth"
-import { username } from "better-auth/plugins"
+import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 
 const auth = betterAuth({
-    plugins: [
-        username({
-            usernameNormalization: (username) => {
-                return username.toLowerCase()
-                    .replaceAll("0", "o")
-                    .replaceAll("3", "e")
-                    .replaceAll("4", "a");
-            }
-        })
-    ]
-})
+  plugins: [
+    username({
+      usernameNormalization: (username) => {
+        return username
+          .toLowerCase()
+          .replaceAll("0", "o")
+          .replaceAll("3", "e")
+          .replaceAll("4", "a");
+      },
+    }),
+  ],
+});
 ```

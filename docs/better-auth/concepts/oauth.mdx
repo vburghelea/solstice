@@ -37,7 +37,7 @@ To sign in with a social provider, you can use the `signIn.social` function with
 // client-side usage
 await authClient.signIn.social({
   provider: "google", // or any other provider id
-})
+});
 ```
 
 ```ts
@@ -56,7 +56,7 @@ To link an account to a social provider, you can use the `linkAccount` function 
 ```ts
 await authClient.linkSocial({
   provider: "google", // or any other provider id
-})
+});
 ```
 
 server-side usage:
@@ -78,7 +78,7 @@ To get the access token for a social provider, you can use the `getAccessToken` 
 const { accessToken } = await authClient.getAccessToken({
   providerId: "google", // or any other provider id
   accountId: "accountId", // optional, if you want to get the access token for a specific account
-})
+});
 ```
 
 server-side usage:
@@ -101,7 +101,7 @@ To get provider specific account info you can use the `accountInfo` function wit
 ```ts
 const info = await authClient.accountInfo({
   accountId: "accountId", // here you pass in the provider given account id, the provider is automatically detected from the account id
-})
+});
 ```
 
 server-side usage:
@@ -121,15 +121,17 @@ You can request additional scopes by using the `linkSocial` method with the same
 
 ```ts
 const requestAdditionalScopes = async () => {
-    await authClient.linkSocial({
-        provider: "google",
-        scopes: ["https://www.googleapis.com/auth/drive.file"],
-    });
+  await authClient.linkSocial({
+    provider: "google",
+    scopes: ["https://www.googleapis.com/auth/drive.file"],
+  });
 };
 ```
 
 <Callout>
-Make sure you're running Better Auth version 1.2.7 or later. Earlier versions (like 1.2.2) may show a "Social account already linked" error when trying to link with an existing provider for additional scopes.
+  Make sure you're running Better Auth version 1.2.7 or later. Earlier versions (like
+  1.2.2) may show a "Social account already linked" error when trying to link with an
+  existing provider for additional scopes.
 </Callout>
 
 ### Other Provider Configurations

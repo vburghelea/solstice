@@ -80,42 +80,32 @@ export const setupReactQueryMocks = () => {
   mockUseQueryGameSystem
     .mockReset()
     .mockReturnValue({ data: MOCK_GAME_SYSTEM, isLoading: false, error: null });
-  mockUseQueryCampaignApplications
-    .mockReset()
-    .mockReturnValue({
-      data: { success: true, data: MOCK_APPLICATIONS },
-      isLoading: false,
-      error: null,
-    });
-  mockUseQueryGameApplications
-    .mockReset()
-    .mockReturnValue({
-      data: { success: true, data: [] },
-      isLoading: false,
-      error: null,
-    });
-  mockUseQueryUserCampaignApplication
-    .mockReset()
-    .mockReturnValue({
-      data: { success: true, data: null },
-      isLoading: false,
-      error: null,
-    });
-  mockUseQueryUserGameApplication
-    .mockReset()
-    .mockReturnValue({
-      data: { success: true, data: null },
-      isLoading: false,
-      error: null,
-    });
-  mockUseQueryCampaignGameSessions
-    .mockReset()
-    .mockReturnValue({
-      data: {
-        success: true,
-        data: [MOCK_CAMPAIGN_GAME_1, MOCK_CAMPAIGN_GAME_2, MOCK_CAMPAIGN_GAME_3],
-      },
-      isLoading: false,
-      error: null,
-    });
+  mockUseQueryCampaignApplications.mockReset().mockReturnValue({
+    data: { success: true, data: MOCK_APPLICATIONS },
+    isLoading: false,
+    error: null,
+  });
+  mockUseQueryGameApplications.mockReset().mockReturnValue({
+    data: { success: true, data: [] },
+    isLoading: false,
+    error: null,
+  });
+  mockUseQueryUserCampaignApplication.mockReset().mockReturnValue({
+    data: { success: true, data: null },
+    isLoading: false,
+    error: null,
+  });
+  mockUseQueryUserGameApplication.mockReset().mockReturnValue({
+    data: { success: true, data: null },
+    isLoading: false,
+    error: null,
+  });
+  mockUseQueryCampaignGameSessions.mockReset().mockReturnValue({
+    data: {
+      success: true,
+      data: [MOCK_CAMPAIGN_GAME_1, MOCK_CAMPAIGN_GAME_2, MOCK_CAMPAIGN_GAME_3],
+    },
+    isLoading: false,
+    error: null,
+  });
 };

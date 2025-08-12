@@ -5,11 +5,9 @@ description: Better Auth Plugin for Dodo Payments
 
 [Dodo Payments](https://dodopayments.com) is a global Merchant-of-Record platform that lets AI, SaaS and digital businesses sell in 150+ countries without touching tax, fraud, or compliance. A single, developer-friendly API powers checkout, billing, and payouts so you can launch worldwide in minutes.
 
-<Card
-  href="https://discord.gg/bYqAp4ayYh"
-  title="Get support on Dodo Payments' Discord"
->
-  This plugin is maintained by the Dodo Payments team.<br />
+<Card href="https://discord.gg/bYqAp4ayYh" title="Get support on Dodo Payments' Discord">
+  This plugin is maintained by the Dodo Payments team.
+  <br />
   Have questions? Our team is available on Discord to assist you anytime.
 </Card>
 
@@ -166,7 +164,8 @@ const { data: payments, error } = await authClient.dodopayments.customer.payment
 ### Webhooks
 
 <Card>
-  The webhooks plugin processes real-time payment events from Dodo Payments with secure signature verification. The default endpoint is `/api/auth/dodopayments/webhooks`.
+  The webhooks plugin processes real-time payment events from Dodo Payments with secure
+  signature verification. The default endpoint is `/api/auth/dodopayments/webhooks`.
 </Card>
 
 <Steps>
@@ -195,7 +194,7 @@ webhooks({
 ### Plugin Options
 
 - **client** (required): DodoPayments client instance
-- **createCustomerOnSignUp** (optional): Auto-create customers on user signup  
+- **createCustomerOnSignUp** (optional): Auto-create customers on user signup
 - **use** (required): Array of plugins to enable (checkout, portal, webhooks)
 
 ### Checkout Plugin Options

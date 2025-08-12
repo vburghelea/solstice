@@ -20,7 +20,6 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 - Usage tracking for usage billing and periodic limits
 - Custom plans and pricing changes through Autumn's dashboard
 
-
 <Steps>
   <Step>
     ### Setup Autumn Account
@@ -35,6 +34,7 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
     <Callout>
       If you're using a separate client and server setup, make sure to install the plugin in both parts of your project.
     </Callout>
+
   </Step>
 
   <Step>
@@ -45,6 +45,7 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
     ```bash title=".env"
     AUTUMN_SECRET_KEY=am_sk_xxxxxxxxxx
     ```
+
   </Step>
 
   <Step>
@@ -58,6 +59,7 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
       plugins: [autumn()],
     });
     ```
+
   <Callout>
     Autumn will auto-create your customers when they sign up, and assign them any
     default plans you created (eg your Free plan)
@@ -89,6 +91,7 @@ import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
         );
       }
       ```
+
   </Step>  
 </Steps>
 
@@ -157,9 +160,7 @@ export default function SendChatMessage() {
           if (allowed({ featureId: "messages" })) {
             //... send chatbot message server-side, then
             await refetch(); // refetch customer usage data
-            alert(
-              "Remaining messages: " + customer?.features.messages?.balance
-            );
+            alert("Remaining messages: " + customer?.features.messages?.balance);
           } else {
             alert("You're out of messages");
           }

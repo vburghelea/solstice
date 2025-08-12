@@ -17,16 +17,16 @@ import { betterAuth } from "better-auth";
 import { oneTap } from "better-auth/plugins"; // [!code highlight]
 
 export const auth = betterAuth({
-    plugins: [ // [!code highlight]
-        oneTap(), // Add the One Tap server plugin  // [!code highlight]
-    ] // [!code highlight]
+  plugins: [
+    // [!code highlight]
+    oneTap(), // Add the One Tap server plugin  // [!code highlight]
+  ], // [!code highlight]
 });
 ```
 
 ### Add the Client Plugin
 
 Add the client plugin and specify where the user should be redirected after sign-in or if additional verification (like 2FA) is needed.
-
 
 ```ts
 import { createAuthClient } from "better-auth/client";
@@ -45,11 +45,11 @@ export const authClient = createAuthClient({
       },
       // Configure prompt behavior and exponential backoff:
       promptOptions: {
-        baseDelay: 1000,   // Base delay in ms (default: 1000)
-        maxAttempts: 5     // Maximum number of attempts before triggering onPromptNotification (default: 5)
-      }
-    })
-  ]
+        baseDelay: 1000, // Base delay in ms (default: 1000)
+        maxAttempts: 5, // Maximum number of attempts before triggering onPromptNotification (default: 5)
+      },
+    }),
+  ],
 });
 ```
 
@@ -75,8 +75,8 @@ await authClient.oneTap({
     onSuccess: () => {
       // For example, use a router to navigate without a full reload:
       router.push("/dashboard");
-    }
-  }
+    },
+  },
 });
 ```
 
@@ -86,7 +86,7 @@ To perform a hard redirect to a different page after login, use the callbackURL 
 
 ```ts
 await authClient.oneTap({
-  callbackURL: "/dashboard"
+  callbackURL: "/dashboard",
 });
 ```
 
@@ -99,9 +99,12 @@ If the maximum number of attempts is reached without a successful sign-in, you c
 ```ts
 await authClient.oneTap({
   onPromptNotification: (notification) => {
-    console.warn("Prompt was dismissed or skipped. Consider displaying an alternative sign-in option.", notification);
+    console.warn(
+      "Prompt was dismissed or skipped. Consider displaying an alternative sign-in option.",
+      notification,
+    );
     // Render your alternative UI here
-  }
+  },
 });
 ```
 
@@ -118,6 +121,5 @@ await authClient.oneTap({
 
 ### Server Options
 
-- **disableSignUp**:  Disable the sign-up option, allowing only existing users to sign in. Default is `false`.
+- **disableSignUp**: Disable the sign-up option, allowing only existing users to sign in. Default is `false`.
 - **ClientId**: Optionally, pass a client ID here if it is not provided in your social provider configuration.
-

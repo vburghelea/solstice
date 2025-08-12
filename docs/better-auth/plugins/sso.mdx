@@ -64,6 +64,7 @@ Single Sign-On (SSO) allows users to authenticate with multiple applications usi
         })
         ```
     </Step>
+
 </Steps>
 
 ## Usage
@@ -83,28 +84,29 @@ import { authClient } from "@/lib/auth-client";
 
 // Register with OIDC configuration
 await authClient.sso.register({
-    providerId: "example-provider",
-    issuer: "https://idp.example.com",
-    domain: "example.com",
-    oidcConfig: {
-        clientId: "client-id",
-        clientSecret: "client-secret",
-        authorizationEndpoint: "https://idp.example.com/authorize",
-        tokenEndpoint: "https://idp.example.com/token",
-        jwksEndpoint: "https://idp.example.com/jwks",
-        discoveryEndpoint: "https://idp.example.com/.well-known/openid-configuration",
-        scopes: ["openid", "email", "profile"],
-        pkce: true,
-    },
-    mapping: {
-        id: "sub",
-        email: "email",
-        emailVerified: "email_verified",
-        name: "name",
-        image: "picture",
-    },
+providerId: "example-provider",
+issuer: "https://idp.example.com",
+domain: "example.com",
+oidcConfig: {
+clientId: "client-id",
+clientSecret: "client-secret",
+authorizationEndpoint: "https://idp.example.com/authorize",
+tokenEndpoint: "https://idp.example.com/token",
+jwksEndpoint: "https://idp.example.com/jwks",
+discoveryEndpoint: "https://idp.example.com/.well-known/openid-configuration",
+scopes: ["openid", "email", "profile"],
+pkce: true,
+},
+mapping: {
+id: "sub",
+email: "email",
+emailVerified: "email_verified",
+name: "name",
+image: "picture",
+},
 });
-```
+
+````
     </Tab>
 
     <Tab value="server">
@@ -135,10 +137,11 @@ await auth.api.registerSSOProvider({
     },
     headers,
 });
-```
-    </Tab>
-</Tabs>
+````
 
+    </Tab>
+
+</Tabs>
 
 ### Register a SAML Provider
 
@@ -150,49 +153,50 @@ To register a SAML provider, use the `registerSSOProvider` endpoint with SAML co
 import { authClient } from "@/lib/auth-client";
 
 await authClient.sso.register({
-    providerId: "saml-provider",
-    issuer: "https://idp.example.com",
-    domain: "example.com",
-    samlConfig: {
-        entryPoint: "https://idp.example.com/sso",
-        cert: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
-        callbackUrl: "https://yourapp.com/api/auth/sso/saml2/callback/saml-provider",
-        audience: "https://yourapp.com",
-        wantAssertionsSigned: true,
-        signatureAlgorithm: "sha256",
-        digestAlgorithm: "sha256",
-        identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-        idpMetadata: {
-            metadata: "<!-- IdP Metadata XML -->",
-            privateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
-            privateKeyPass: "your-private-key-password",
-            isAssertionEncrypted: true,
-            encPrivateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
-            encPrivateKeyPass: "your-encryption-key-password"
-        },
-        spMetadata: {
-            metadata: "<!-- SP Metadata XML -->",
-            binding: "post",
-            privateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
-            privateKeyPass: "your-sp-private-key-password",
-            isAssertionEncrypted: true,
-            encPrivateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
-            encPrivateKeyPass: "your-sp-encryption-key-password"
-        }
-    },
-    mapping: {
-        id: "nameID",
-        email: "email",
-        name: "displayName",
-        firstName: "givenName",
-        lastName: "surname",
-        extraFields: {
-            department: "department",
-            role: "role"
-        }
-    },
+providerId: "saml-provider",
+issuer: "https://idp.example.com",
+domain: "example.com",
+samlConfig: {
+entryPoint: "https://idp.example.com/sso",
+cert: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----",
+callbackUrl: "https://yourapp.com/api/auth/sso/saml2/callback/saml-provider",
+audience: "https://yourapp.com",
+wantAssertionsSigned: true,
+signatureAlgorithm: "sha256",
+digestAlgorithm: "sha256",
+identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+idpMetadata: {
+metadata: "<!-- IdP Metadata XML -->",
+privateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
+privateKeyPass: "your-private-key-password",
+isAssertionEncrypted: true,
+encPrivateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
+encPrivateKeyPass: "your-encryption-key-password"
+},
+spMetadata: {
+metadata: "<!-- SP Metadata XML -->",
+binding: "post",
+privateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
+privateKeyPass: "your-sp-private-key-password",
+isAssertionEncrypted: true,
+encPrivateKey: "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
+encPrivateKeyPass: "your-sp-encryption-key-password"
+}
+},
+mapping: {
+id: "nameID",
+email: "email",
+name: "displayName",
+firstName: "givenName",
+lastName: "surname",
+extraFields: {
+department: "department",
+role: "role"
+}
+},
 });
-```
+
+````
     </Tab>
 
     <Tab value="server">
@@ -244,8 +248,10 @@ await auth.api.registerSSOProvider({
     },
     headers,
 });
-```
+````
+
     </Tab>
+
 </Tabs>
 
 ### Get Service Provider Metadata
@@ -254,10 +260,10 @@ For SAML providers, you can retrieve the Service Provider metadata XML that need
 
 ```ts title="get-sp-metadata.ts"
 const response = await auth.api.spMetadata({
-    query: {
-        providerId: "saml-provider",
-        format: "xml" // or "json"
-    }
+  query: {
+    providerId: "saml-provider",
+    format: "xml", // or "json"
+  },
 });
 
 const metadataXML = await response.text();
@@ -272,8 +278,8 @@ You can sign in using the email with domain matching:
 
 ```ts title="sign-in.ts"
 const res = await authClient.signIn.sso({
-    email: "user@example.com",
-    callbackURL: "/dashboard",
+  email: "user@example.com",
+  callbackURL: "/dashboard",
 });
 ```
 
@@ -281,8 +287,8 @@ or you can specify the domain:
 
 ```ts title="sign-in-domain.ts"
 const res = await authClient.signIn.sso({
-    domain: "example.com",
-    callbackURL: "/dashboard",
+  domain: "example.com",
+  callbackURL: "/dashboard",
 });
 ```
 
@@ -290,8 +296,8 @@ You can also sign in using the organization slug if a provider is associated wit
 
 ```ts title="sign-in-org.ts"
 const res = await authClient.signIn.sso({
-    organizationSlug: "example-org",
-    callbackURL: "/dashboard",
+  organizationSlug: "example-org",
+  callbackURL: "/dashboard",
 });
 ```
 
@@ -299,8 +305,8 @@ Alternatively, you can sign in using the provider's ID:
 
 ```ts title="sign-in-provider-id.ts"
 const res = await authClient.signIn.sso({
-    providerId: "example-provider-id",
-    callbackURL: "/dashboard",
+  providerId: "example-provider-id",
+  callbackURL: "/dashboard",
 });
 ```
 
@@ -308,10 +314,10 @@ To use the server API you can use `signInSSO`
 
 ```ts title="sign-in-org.ts"
 const res = await auth.api.signInSSO({
-    body: {
-        organizationSlug: "example-org",
-        callbackURL: "/dashboard",
-    }
+  body: {
+    organizationSlug: "example-org",
+    callbackURL: "/dashboard",
+  },
 });
 ```
 
@@ -364,20 +370,20 @@ When a user is authenticated, if the user does not exist, the user will be provi
 
 ```ts title="auth.ts"
 const auth = betterAuth({
-    plugins: [
-        sso({
-            provisionUser: async (user) => {
-                // provision user
-            },
-            organizationProvisioning: {
-                disabled: false,
-                defaultRole: "member",
-                getRole: async (user) => {
-                    // get role if needed
-                },
-            },
-        }),
-    ],
+  plugins: [
+    sso({
+      provisionUser: async (user) => {
+        // provision user
+      },
+      organizationProvisioning: {
+        disabled: false,
+        defaultRole: "member",
+        getRole: async (user) => {
+          // get role if needed
+        },
+      },
+    }),
+  ],
 });
 ```
 
@@ -397,40 +403,41 @@ User provisioning allows you to run custom logic whenever a user signs in throug
 
 ```ts title="auth.ts"
 const auth = betterAuth({
-    plugins: [
-        sso({
-            provisionUser: async ({ user, userInfo, token, provider }) => {
-                // Update user profile with SSO data
-                await updateUserProfile(user.id, {
-                    department: userInfo.attributes?.department,
-                    jobTitle: userInfo.attributes?.jobTitle,
-                    manager: userInfo.attributes?.manager,
-                    lastSSOLogin: new Date(),
-                });
+  plugins: [
+    sso({
+      provisionUser: async ({ user, userInfo, token, provider }) => {
+        // Update user profile with SSO data
+        await updateUserProfile(user.id, {
+          department: userInfo.attributes?.department,
+          jobTitle: userInfo.attributes?.jobTitle,
+          manager: userInfo.attributes?.manager,
+          lastSSOLogin: new Date(),
+        });
 
-                // Create user-specific resources
-                await createUserWorkspace(user.id);
+        // Create user-specific resources
+        await createUserWorkspace(user.id);
 
-                // Sync with external systems
-                await syncUserWithCRM(user.id, userInfo);
+        // Sync with external systems
+        await syncUserWithCRM(user.id, userInfo);
 
-                // Log the SSO sign-in
-                await auditLog.create({
-                    userId: user.id,
-                    action: 'sso_signin',
-                    provider: provider.providerId,
-                    metadata: {
-                        email: userInfo.email,
-                        ssoProvider: provider.issuer,
-                    },
-                });
-            },
-        }),
-    ],
+        // Log the SSO sign-in
+        await auditLog.create({
+          userId: user.id,
+          action: "sso_signin",
+          provider: provider.providerId,
+          metadata: {
+            email: userInfo.email,
+            ssoProvider: provider.issuer,
+          },
+        });
+      },
+    }),
+  ],
 });
 ```
 
 The `provisionUser` function receives:
+
 - **user**: The user object from the database
 - **userInfo**: User information from the SSO provider (includes attributes, email, name, etc.)
 - **token**: OAuth2 tokens (for OIDC providers) - may be undefined for SAML
@@ -448,14 +455,14 @@ Organization provisioning automatically manages user memberships in organization
 
 ```ts title="auth.ts"
 const auth = betterAuth({
-    plugins: [
-        sso({
-            organizationProvisioning: {
-                disabled: false,           // Enable org provisioning
-                defaultRole: "member",     // Default role for new members
-            },
-        }),
-    ],
+  plugins: [
+    sso({
+      organizationProvisioning: {
+        disabled: false, // Enable org provisioning
+        defaultRole: "member", // Default role for new members
+      },
+    }),
+  ],
 });
 ```
 
@@ -463,34 +470,36 @@ const auth = betterAuth({
 
 ```ts title="auth.ts"
 const auth = betterAuth({
-    plugins: [
-        sso({
-            organizationProvisioning: {
-                disabled: false,
-                defaultRole: "member",
-                getRole: async ({ user, userInfo, provider }) => {
-                    // Assign roles based on SSO attributes
-                    const department = userInfo.attributes?.department;
-                    const jobTitle = userInfo.attributes?.jobTitle;
-                    
-                    // Admins based on job title
-                    if (jobTitle?.toLowerCase().includes('manager') || 
-                        jobTitle?.toLowerCase().includes('director') ||
-                        jobTitle?.toLowerCase().includes('vp')) {
-                        return "admin";
-                    }
-                    
-                    // Special roles for IT department
-                    if (department?.toLowerCase() === 'it') {
-                        return "admin";
-                    }
-                    
-                    // Default to member for everyone else
-                    return "member";
-                },
-            },
-        }),
-    ],
+  plugins: [
+    sso({
+      organizationProvisioning: {
+        disabled: false,
+        defaultRole: "member",
+        getRole: async ({ user, userInfo, provider }) => {
+          // Assign roles based on SSO attributes
+          const department = userInfo.attributes?.department;
+          const jobTitle = userInfo.attributes?.jobTitle;
+
+          // Admins based on job title
+          if (
+            jobTitle?.toLowerCase().includes("manager") ||
+            jobTitle?.toLowerCase().includes("director") ||
+            jobTitle?.toLowerCase().includes("vp")
+          ) {
+            return "admin";
+          }
+
+          // Special roles for IT department
+          if (department?.toLowerCase() === "it") {
+            return "admin";
+          }
+
+          // Default to member for everyone else
+          return "member";
+        },
+      },
+    }),
+  ],
 });
 ```
 
@@ -500,16 +509,16 @@ When registering an SSO provider, you can link it to a specific organization:
 
 ```ts title="register-org-provider.ts"
 await auth.api.registerSSOProvider({
-    body: {
-        providerId: "acme-corp-saml",
-        issuer: "https://acme-corp.okta.com",
-        domain: "acmecorp.com",
-        organizationId: "org_acme_corp_id", // Link to organization
-        samlConfig: {
-            // SAML configuration...
-        },
+  body: {
+    providerId: "acme-corp-saml",
+    issuer: "https://acme-corp.okta.com",
+    domain: "acmecorp.com",
+    organizationId: "org_acme_corp_id", // Link to organization
+    samlConfig: {
+      // SAML configuration...
     },
-    headers,
+  },
+  headers,
 });
 ```
 
@@ -522,26 +531,30 @@ You can set up multiple SSO providers for different organizations:
 ```ts title="multi-org-setup.ts"
 // Acme Corp SAML provider
 await auth.api.registerSSOProvider({
-    body: {
-        providerId: "acme-corp",
-        issuer: "https://acme.okta.com",
-        domain: "acmecorp.com",
-        organizationId: "org_acme_id",
-        samlConfig: { /* ... */ },
+  body: {
+    providerId: "acme-corp",
+    issuer: "https://acme.okta.com",
+    domain: "acmecorp.com",
+    organizationId: "org_acme_id",
+    samlConfig: {
+      /* ... */
     },
-    headers,
+  },
+  headers,
 });
 
 // TechStart OIDC provider
 await auth.api.registerSSOProvider({
-    body: {
-        providerId: "techstart-google",
-        issuer: "https://accounts.google.com",
-        domain: "techstart.io",
-        organizationId: "org_techstart_id",
-        oidcConfig: { /* ... */ },
+  body: {
+    providerId: "techstart-google",
+    issuer: "https://accounts.google.com",
+    domain: "techstart.io",
+    organizationId: "org_techstart_id",
+    oidcConfig: {
+      /* ... */
     },
-    headers,
+  },
+  headers,
 });
 ```
 
@@ -557,6 +570,7 @@ await auth.api.registerSSOProvider({
 ### Provisioning Best Practices
 
 #### 1. Idempotent Operations
+
 Make sure your provisioning functions can be safely run multiple times:
 
 ```ts
@@ -567,13 +581,14 @@ provisionUser: async ({ user, userInfo }) => {
         await createUserResources(user.id);
         await markAsProvisioned(user.id);
     }
-    
+
     // Always update attributes (they might change)
     await updateUserAttributes(user.id, userInfo.attributes);
 },
 ```
 
 #### 2. Error Handling
+
 Handle errors gracefully to avoid blocking user sign-in:
 
 ```ts
@@ -589,6 +604,7 @@ provisionUser: async ({ user, userInfo }) => {
 ```
 
 #### 3. Conditional Provisioning
+
 Only run certain provisioning steps when needed:
 
 ```ts
@@ -660,18 +676,60 @@ The plugin automatically creates the following SAML endpoints:
 The plugin requires additional fields in the `ssoProvider` table to store the provider's configuration.
 
 <DatabaseTable
-    fields={[
-        {
-            name: "id", type: "string", description: "A database identifier", isRequired: true, isPrimaryKey: true,
-        },
-        { name: "issuer", type: "string", description: "The issuer identifier", isRequired: true },
-        { name: "domain", type: "string", description: "The domain of the provider", isRequired: true },
-        { name: "oidcConfig", type: "string", description: "The OIDC configuration (JSON string)", isRequired: false },
-        { name: "samlConfig", type: "string", description: "The SAML configuration (JSON string)", isRequired: false },
-        { name: "userId", type: "string", description: "The user ID", isRequired: true, references: { model: "user", field: "id" } },
-        { name: "providerId", type: "string", description: "The provider ID. Used to identify a provider and to generate a redirect URL.", isRequired: true, isUnique: true },
-        { name: "organizationId", type: "string", description: "The organization Id. If provider is linked to an organization.", isRequired: false },
-    ]}
+  fields={[
+    {
+      name: "id",
+      type: "string",
+      description: "A database identifier",
+      isRequired: true,
+      isPrimaryKey: true,
+    },
+    {
+      name: "issuer",
+      type: "string",
+      description: "The issuer identifier",
+      isRequired: true,
+    },
+    {
+      name: "domain",
+      type: "string",
+      description: "The domain of the provider",
+      isRequired: true,
+    },
+    {
+      name: "oidcConfig",
+      type: "string",
+      description: "The OIDC configuration (JSON string)",
+      isRequired: false,
+    },
+    {
+      name: "samlConfig",
+      type: "string",
+      description: "The SAML configuration (JSON string)",
+      isRequired: false,
+    },
+    {
+      name: "userId",
+      type: "string",
+      description: "The user ID",
+      isRequired: true,
+      references: { model: "user", field: "id" },
+    },
+    {
+      name: "providerId",
+      type: "string",
+      description:
+        "The provider ID. Used to identify a provider and to generate a redirect URL.",
+      isRequired: true,
+      isUnique: true,
+    },
+    {
+      name: "organizationId",
+      type: "string",
+      description: "The organization Id. If provider is linked to an organization.",
+      isRequired: false,
+    },
+  ]}
 />
 
 ## Options
@@ -691,44 +749,47 @@ The plugin requires additional fields in the `ssoProvider` table to store the pr
 <TypeTable
   type={{
     provisionUser: {
-        description: "A custom function to provision a user when they sign in with an SSO provider.",
-        type: "function",
+      description:
+        "A custom function to provision a user when they sign in with an SSO provider.",
+      type: "function",
     },
     organizationProvisioning: {
-        description: "Options for provisioning users to an organization.",
-        type: "object",
-        properties: {
-            disabled: {
-                description: "Disable organization provisioning.",
-                type: "boolean",
-                default: false,
-            },
-            defaultRole: {
-                description: "The default role for new users.",
-                type: "string",
-                enum: ["member", "admin"],
-                default: "member",
-            },
-            getRole: {
-                description: "A custom function to determine the role for new users.",
-                type: "function",
-            },
+      description: "Options for provisioning users to an organization.",
+      type: "object",
+      properties: {
+        disabled: {
+          description: "Disable organization provisioning.",
+          type: "boolean",
+          default: false,
         },
+        defaultRole: {
+          description: "The default role for new users.",
+          type: "string",
+          enum: ["member", "admin"],
+          default: "member",
+        },
+        getRole: {
+          description: "A custom function to determine the role for new users.",
+          type: "function",
+        },
+      },
     },
     defaultOverrideUserInfo: {
-        description: "Override user info with the provider info by default.",
-        type: "boolean",
-        default: false,
+      description: "Override user info with the provider info by default.",
+      type: "boolean",
+      default: false,
     },
     disableImplicitSignUp: {
-        description: "Disable implicit sign up for new users. When set to true, sign-in needs to be called with requestSignUp as true to create new users.",
-        type: "boolean",
-        default: false,
+      description:
+        "Disable implicit sign up for new users. When set to true, sign-in needs to be called with requestSignUp as true to create new users.",
+      type: "boolean",
+      default: false,
     },
     providersLimit: {
-        description: "Configure the maximum number of SSO providers a user can register. Set to 0 to disable SSO provider registration.",
-        type: "number | function",
-        default: 10,
+      description:
+        "Configure the maximum number of SSO providers a user can register. Set to 0 to disable SSO provider registration.",
+      type: "number | function",
+      default: 10,
     },
   }}
 />

@@ -8,7 +8,8 @@ This guide will show you how to integrate Better Auth with [NestJS](https://nest
 Before you start, make sure you have a Better Auth instance configured. If you haven't done that yet, check out the [installation](/docs/installation).
 
 <Callout type="info">
-The NestJS integration is **community maintained**. If you encounter any issues, please open them at [nestjs-better-auth](https://github.com/ThallesP/nestjs-better-auth).
+  The NestJS integration is **community maintained**. If you encounter any issues, please
+  open them at [nestjs-better-auth](https://github.com/ThallesP/nestjs-better-auth).
 </Callout>
 
 ## Installation
@@ -22,7 +23,8 @@ Install the NestJS integration library:
 ## Basic Setup
 
 <Callout type="warn">
-Currently, Better Auth's NestJS integration **only supports Express** and does not work with Fastify.
+  Currently, Better Auth's NestJS integration **only supports Express** and does not work
+  with Fastify.
 </Callout>
 
 ### 1. Disable Body Parser
@@ -47,14 +49,12 @@ bootstrap();
 Import the `AuthModule` in your root module:
 
 ```ts title="app.module.ts"
-import { Module } from '@nestjs/common';
-import { AuthModule } from '@thallesp/nestjs-better-auth';
+import { Module } from "@nestjs/common";
+import { AuthModule } from "@thallesp/nestjs-better-auth";
 import { auth } from "./auth"; // Your Better Auth instance
 
 @Module({
-  imports: [
-    AuthModule.forRoot(auth),
-  ],
+  imports: [AuthModule.forRoot(auth)],
 })
 export class AppModule {}
 ```
@@ -64,13 +64,13 @@ export class AppModule {}
 Use the `AuthGuard` to protect your routes:
 
 ```ts title="user.controller.ts"
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AuthGuard, Session, UserSession } from '@thallesp/nestjs-better-auth';
+import { Controller, Get, UseGuards } from "@nestjs/common";
+import { AuthGuard, Session, UserSession } from "@thallesp/nestjs-better-auth";
 
-@Controller('users')
+@Controller("users")
 @UseGuards(AuthGuard)
 export class UserController {
-  @Get('me')
+  @Get("me")
   async getProfile(@Session() session: UserSession) {
     return { user: session.user };
   }

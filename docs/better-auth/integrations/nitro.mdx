@@ -22,7 +22,8 @@ This will create the `nitro-app` directory and install all the dependencies. You
 <Callout>
   This guide assumes that you have a basic understanding of Prisma. If you are new to Prisma, you can check out the [Prisma documentation](https://www.prisma.io/docs/getting-started).
 
-  The `sqlite` database used in this guide will not work in a production environment. You should replace it with a production-ready database like `PostgreSQL`.
+The `sqlite` database used in this guide will not work in a production environment. You should replace it with a production-ready database like `PostgreSQL`.
+
 </Callout>
 
 For this guide, we will be using the Prisma adapter. You can install prisma client by running the following command:
@@ -101,7 +102,8 @@ npx @better-auth/cli generate --config server/utils/auth.ts
 ```
 
 <Callout>
-  The `--config` flag is used to specify the path to the file where you have created your Better Auth instance.
+  The `--config` flag is used to specify the path to the file where you have created your
+  Better Auth instance.
 </Callout>
 
 Head over to the `prisma/schema.prisma` file & save the file to trigger the format on save.
@@ -117,8 +119,10 @@ export default defineEventHandler((event) => {
   return auth.handler(toWebRequest(event));
 });
 ```
+
 <Callout>
-  This is a [catch-all](https://nitro.build/guide/routing#catch-all-route) route that will handle all requests to `/api/auth/*`.
+  This is a [catch-all](https://nitro.build/guide/routing#catch-all-route) route that will
+  handle all requests to `/api/auth/*`.
 </Callout>
 
 ### CORS
@@ -145,8 +149,11 @@ export default defineNitroPlugin((plugin) => {
   );
 });
 ```
+
 <Callout>
-  This will enable CORS for all routes. You can customize the `origin` property to allow requests from specific domains. Ensure that the config is in sync with your frontend application.
+  This will enable CORS for all routes. You can customize the `origin` property to allow
+  requests from specific domains. Ensure that the config is in sync with your frontend
+  application.
 </Callout>
 
 ### Auth Guard/Middleware

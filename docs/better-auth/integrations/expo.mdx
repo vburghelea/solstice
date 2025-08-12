@@ -18,7 +18,7 @@ Expo is a popular framework for building cross-platform apps with React Native. 
 
         ```ts title="app/api/auth/[...auth]+api.ts"
         import { auth } from "@/lib/auth"; // import Better Auth handler
-        
+
         const handler = auth.handler;
         export { handler as GET, handler as POST }; // export handler for both GET and POST requests
         ```
@@ -40,17 +40,17 @@ Expo is a popular framework for building cross-platform apps with React Native. 
         You also need to install both the Better Auth package and Expo plugin into your Expo application.
 
         ```package-install
-        better-auth @better-auth/expo 
+        better-auth @better-auth/expo
         ```
 
         If you plan on using our social integrations (Google, Apple etc.) then there are a few more dependencies that are required in your Expo app. In the default Expo template these are already installed so you may be able to skip this step if you have these dependencies already.
 
         ```package-install
         expo-linking expo-web-browser expo-constants
-        
+
         ```
     </Step>
-    
+
     <Step>
         ## Add the Expo Plugin on Your Server
 
@@ -62,16 +62,16 @@ Expo is a popular framework for building cross-platform apps with React Native. 
 
         export const auth = betterAuth({
             plugins: [expo()],
-            emailAndPassword: { 
+            emailAndPassword: {
                 enabled: true, // Enable authentication using email and password.
-              }, 
+              },
         });
         ```
     </Step>
 
     <Step>
         ## Initialize Better Auth Client
-        
+
         To initialize Better Auth in your Expo app, you need to call `createAuthClient` with the base URL of your Better Auth backend. Make sure to import the client from `/react`.
 
         Make sure you install the `expo-secure-store` package into your Expo app. This is used to store the session data and cookies securely.
@@ -111,7 +111,7 @@ Expo is a popular framework for building cross-platform apps with React Native. 
      <Step>
         ## Scheme and Trusted Origins
 
-        Better Auth uses deep links to redirect users back to your app after authentication. To enable this, you need to add your app's scheme to the `trustedOrigins` list in your Better Auth config. 
+        Better Auth uses deep links to redirect users back to your app after authentication. To enable this, you need to add your app's scheme to the `trustedOrigins` list in your Better Auth config.
 
         First, make sure you have a scheme defined in your `app.json` file.
 
@@ -137,12 +137,12 @@ Expo is a popular framework for building cross-platform apps with React Native. 
         export const auth = betterAuth({
             trustedOrigins: [
                 // Basic scheme
-                "myapp://", 
-                
+                "myapp://",
+
                 // Production & staging schemes
                 "myapp-prod://",
                 "myapp-staging://",
-                
+
                 // Wildcard support for all paths following the scheme
                 "myapp://*"
             ]
@@ -153,11 +153,11 @@ Expo is a popular framework for building cross-platform apps with React Native. 
           The wildcard pattern can be particularly useful if your app uses different URL formats for deep linking based on features or screens.
         </Callout>
     </Step>
- 
+
     <Step>
         ## Configure Metro Bundler
 
-        To resolve Better Auth exports you'll need to enable `unstable_enablePackageExports` in your metro config. 
+        To resolve Better Auth exports you'll need to enable `unstable_enablePackageExports` in your metro config.
 
         ```js title="metro.config.js"
         const { getDefaultConfig } = require("expo/metro-config");
@@ -170,7 +170,7 @@ Expo is a popular framework for building cross-platform apps with React Native. 
         ```
 
         <Callout>In case you don't have a `metro.config.js` file in your project run `npx expo customize metro.config.js`.</Callout>
-        
+
         If you can't enable `unstable_enablePackageExports` option, you can use [babel-plugin-module-resolver](https://github.com/tleunen/babel-plugin-module-resolver) to manually resolve the paths.
 
         ```ts title="babel.config.js"
@@ -203,8 +203,8 @@ Expo is a popular framework for building cross-platform apps with React Native. 
         ```
 
     </Step>
-</Steps>
 
+</Steps>
 
 ## Usage
 
@@ -290,6 +290,7 @@ With Better Auth initialized, you can now use the `authClient` to authenticate u
         }
         ```
     </Tab>
+
 </Tabs>
 
 #### Social Sign-In
@@ -300,13 +301,13 @@ For social sign-in, you can use the `authClient.signIn.social` method with the p
 import { Button } from "react-native";
 
 export default function SocialSignIn() {
-    const handleLogin = async () => {
-        await authClient.signIn.social({
-            provider: "google",
-            callbackURL: "/dashboard" // this will be converted to a deep link (eg. `myapp://dashboard`) on native
-        })
-    };
-    return <Button title="Login with Google" onPress={handleLogin} />;
+  const handleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/dashboard", // this will be converted to a deep link (eg. `myapp://dashboard`) on native
+    });
+  };
+  return <Button title="Login with Google" onPress={handleLogin} />;
 }
 ```
 
@@ -341,14 +342,13 @@ import { Text } from "react-native";
 import { authClient } from "@/lib/auth-client";
 
 export default function Index() {
-    const { data: session } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
-    return <Text>Welcome, {session?.user.name}</Text>;
+  return <Text>Welcome, {session?.user.name}</Text>;
 }
 ```
 
 On native, the session data will be cached in SecureStore. This will allow you to remove the need for a loading spinner when the app is reloaded. You can disable this behavior by passing the `disableCache` option to the client.
-
 
 ### Making Authenticated Requests to Your Server
 
@@ -360,7 +360,7 @@ import { authClient } from "@/lib/auth-client";
 const makeAuthenticatedRequest = async () => {
   const cookies = authClient.getCookie(); // [!code highlight]
   const headers = {
-    "Cookie": cookies, // [!code highlight]
+    Cookie: cookies, // [!code highlight]
   };
   const response = await fetch("http://localhost:8081/api/secure-endpoint", { headers });
   const data = await response.json();
@@ -369,7 +369,7 @@ const makeAuthenticatedRequest = async () => {
 ```
 
 **Example: Usage With TRPC**
-    
+
 ```tsx title="lib/trpc-provider.tsx"
 //...other imports
 import { authClient } from "@/lib/auth-client"; // [!code highlight]
@@ -386,7 +386,8 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
           headers() {
             const headers = new Map<string, string>(); // [!code highlight]
             const cookies = authClient.getCookie(); // [!code highlight]
-            if (cookies) { // [!code highlight]
+            if (cookies) {
+              // [!code highlight]
               headers.set("Cookie", cookies); // [!code highlight]
             } // [!code highlight]
             return Object.fromEntries(headers); // [!code highlight]
@@ -398,14 +399,11 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
 
   return (
     <api.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        {props.children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{props.children}</QueryClientProvider>
     </api.Provider>
   );
 }
 ```
-
 
 ## Options
 
@@ -418,8 +416,8 @@ import { createAuthClient } from "better-auth/react";
 import SecureStorage from "expo-secure-store";
 
 const authClient = createAuthClient({
-    baseURL: "http://localhost:8081",
-    storage: SecureStorage
+  baseURL: "http://localhost:8081",
+  storage: SecureStorage,
 });
 ```
 
@@ -429,8 +427,8 @@ const authClient = createAuthClient({
 import { createAuthClient } from "better-auth/react";
 
 const authClient = createAuthClient({
-    baseURL: "http://localhost:8081",
-    scheme: "myapp"
+  baseURL: "http://localhost:8081",
+  scheme: "myapp",
 });
 ```
 
@@ -440,11 +438,10 @@ const authClient = createAuthClient({
 import { createAuthClient } from "better-auth/react";
 
 const authClient = createAuthClient({
-    baseURL: "http://localhost:8081",
-    disableCache: true
+  baseURL: "http://localhost:8081",
+  disableCache: true,
 });
 ```
-
 
 ### Expo Servers
 

@@ -73,7 +73,7 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <p className="font-semibold">Game System</p>
-            <p>{campaign.gameSystem.name}</p>
+            <p>{campaign.gameSystem?.name || "Not specified"}</p>
           </div>
           <div>
             <p className="font-semibold">Recurrence</p>
@@ -103,7 +103,7 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
         <Separator />
         <div>
           <p className="font-semibold">Location</p>
-          <p>{campaign.location.address}</p>
+          <p>{campaign.location?.address || "Not specified"}</p>
         </div>
         <Separator />
         <div>

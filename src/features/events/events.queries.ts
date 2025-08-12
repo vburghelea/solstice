@@ -342,11 +342,11 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
       conditions.push(eq(eventRegistrations.teamId, data.teamId));
     }
 
-      const [registration] = await db
-        .select()
-        .from(eventRegistrations)
-        .where(and(...conditions))
-        .limit(1);
+    const [registration] = await db
+      .select()
+      .from(eventRegistrations)
+      .where(and(...conditions))
+      .limit(1);
 
     if (!registration) {
       return { isRegistered: false };

@@ -51,6 +51,7 @@ The **MCP** plugin lets your app act as an OAuth provider for MCP clients. It ha
         </Tabs>
         The MCP plugin uses the same schema as the OIDC Provider plugin. See the [OIDC Provider Schema](#schema) section for details.
     </Step>
+
 </Steps>
 
 ## Usage
@@ -70,7 +71,6 @@ export const GET = oAuthDiscoveryMetadata(auth);
 
 You can use the helper function `withMcpAuth` to get the session and handle unauthenticated calls automatically.
 
-
 ```ts title="api/[transport]/route.ts"
 import { auth } from "@/lib/auth";
 import { createMcpHandler } from "@vercel/mcp-adapter";
@@ -78,36 +78,36 @@ import { withMcpAuth } from "better-auth/plugins";
 import { z } from "zod";
 
 const handler = withMcpAuth(auth, (req, session) => {
-    // session contains the access token record with scopes and user ID
-    return createMcpHandler(
-        (server) => {
-            server.tool(
-                "echo",
-                "Echo a message",
-                { message: z.string() },
-                async ({ message }) => {
-                    return {
-                        content: [{ type: "text", text: `Tool echo: ${message}` }],
-                    };
-                },
-            );
+  // session contains the access token record with scopes and user ID
+  return createMcpHandler(
+    (server) => {
+      server.tool(
+        "echo",
+        "Echo a message",
+        { message: z.string() },
+        async ({ message }) => {
+          return {
+            content: [{ type: "text", text: `Tool echo: ${message}` }],
+          };
         },
-        {
-            capabilities: {
-                tools: {
-                    echo: {
-                        description: "Echo a message",
-                    },
-                },
-            },
+      );
+    },
+    {
+      capabilities: {
+        tools: {
+          echo: {
+            description: "Echo a message",
+          },
         },
-        {
-            redisUrl: process.env.REDIS_URL,
-            basePath: "/api",
-            verboseLogs: true,
-            maxDuration: 60,
-        },
-    )(req);
+      },
+    },
+    {
+      redisUrl: process.env.REDIS_URL,
+      basePath: "/api",
+      verboseLogs: true,
+      maxDuration: 60,
+    },
+  )(req);
 });
 
 export { handler as GET, handler as POST, handler as DELETE };
@@ -121,46 +121,46 @@ import { createMcpHandler } from "@vercel/mcp-adapter";
 import { z } from "zod";
 
 const handler = async (req: Request) => {
-     // session contains the access token record with scopes and user ID
-    const session = await auth.api.getMcpSession({
-        headers: req.headers
-    })
-    if(!session){
-        //this is important and you must return 401
-        return new Response(null, {
-            status: 401
-        })
-    }
-    return createMcpHandler(
-        (server) => {
-            server.tool(
-                "echo",
-                "Echo a message",
-                { message: z.string() },
-                async ({ message }) => {
-                    return {
-                        content: [{ type: "text", text: `Tool echo: ${message}` }],
-                    };
-                },
-            );
+  // session contains the access token record with scopes and user ID
+  const session = await auth.api.getMcpSession({
+    headers: req.headers,
+  });
+  if (!session) {
+    //this is important and you must return 401
+    return new Response(null, {
+      status: 401,
+    });
+  }
+  return createMcpHandler(
+    (server) => {
+      server.tool(
+        "echo",
+        "Echo a message",
+        { message: z.string() },
+        async ({ message }) => {
+          return {
+            content: [{ type: "text", text: `Tool echo: ${message}` }],
+          };
         },
-        {
-            capabilities: {
-                tools: {
-                    echo: {
-                        description: "Echo a message",
-                    },
-                },
-            },
+      );
+    },
+    {
+      capabilities: {
+        tools: {
+          echo: {
+            description: "Echo a message",
+          },
         },
-        {
-            redisUrl: process.env.REDIS_URL,
-            basePath: "/api",
-            verboseLogs: true,
-            maxDuration: 60,
-        },
-    )(req);
-}
+      },
+    },
+    {
+      redisUrl: process.env.REDIS_URL,
+      basePath: "/api",
+      verboseLogs: true,
+      maxDuration: 60,
+    },
+  )(req);
+};
 
 export { handler as GET, handler as POST, handler as DELETE };
 ```
@@ -172,15 +172,16 @@ The MCP plugin accepts the following configuration options:
 <TypeTable
   type={{
     loginPage: {
-        description: "Path to the login page where users will be redirected for authentication",
-        type: "string",
-        required: true
+      description:
+        "Path to the login page where users will be redirected for authentication",
+      type: "string",
+      required: true,
     },
     oidcConfig: {
-        description: "Optional OIDC configuration options",
-        type: "object",
-        required: false
-    }
+      description: "Optional OIDC configuration options",
+      type: "object",
+      required: false,
+    },
   }}
 />
 
@@ -191,30 +192,30 @@ The plugin supports additional OIDC configuration options through the `oidcConfi
 <TypeTable
   type={{
     codeExpiresIn: {
-        description: "Expiration time for authorization codes in seconds",
-        type: "number",
-        default: 600
+      description: "Expiration time for authorization codes in seconds",
+      type: "number",
+      default: 600,
     },
     accessTokenExpiresIn: {
-        description: "Expiration time for access tokens in seconds",
-        type: "number",
-        default: 3600
+      description: "Expiration time for access tokens in seconds",
+      type: "number",
+      default: 3600,
     },
     refreshTokenExpiresIn: {
-        description: "Expiration time for refresh tokens in seconds",
-        type: "number",
-        default: 604800
+      description: "Expiration time for refresh tokens in seconds",
+      type: "number",
+      default: 604800,
     },
     defaultScope: {
-        description: "Default scope for OAuth requests",
-        type: "string",
-        default: "openid"
+      description: "Default scope for OAuth requests",
+      type: "string",
+      default: "openid",
     },
     scopes: {
-        description: "Additional scopes to support",
-        type: "string[]",
-        default: '["openid", "profile", "email", "offline_access"]'
-    }
+      description: "Additional scopes to support",
+      type: "string[]",
+      default: '["openid", "profile", "email", "offline_access"]',
+    },
   }}
 />
 

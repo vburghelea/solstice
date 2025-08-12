@@ -17,9 +17,7 @@ import { auth } from "./auth";
 
 const app = new Elysia().mount(auth.handler).listen(3000);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
-);
+console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 ```
 
 ### CORS
@@ -44,9 +42,7 @@ const app = new Elysia()
   .mount(auth.handler)
   .listen(3000);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
-);
+console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 ```
 
 ### Macro
@@ -58,24 +54,22 @@ import { Elysia } from "elysia";
 import { auth } from "./auth";
 
 // user middleware (compute user and session and pass to routes)
-const betterAuth = new Elysia({ name: "better-auth" })
-  .mount(auth.handler)
-  .macro({
-    auth: {
-      async resolve({ status, request: { headers } }) {
-        const session = await auth.api.getSession({
-          headers,
-        });
+const betterAuth = new Elysia({ name: "better-auth" }).mount(auth.handler).macro({
+  auth: {
+    async resolve({ status, request: { headers } }) {
+      const session = await auth.api.getSession({
+        headers,
+      });
 
-        if (!session) return status(401);
+      if (!session) return status(401);
 
-        return {
-          user: session.user,
-          session: session.session,
-        };
-      },
+      return {
+        user: session.user,
+        session: session.session,
+      };
     },
-  });
+  },
+});
 
 const app = new Elysia()
   .use(betterAuth)
@@ -84,9 +78,7 @@ const app = new Elysia()
   })
   .listen(3000);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
-);
+console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 ```
 
 This will allow you to access the `user` and `session` object in all of your routes.

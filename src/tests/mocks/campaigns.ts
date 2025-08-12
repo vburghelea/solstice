@@ -170,6 +170,7 @@ export const mockInviteToCampaign = vi.fn();
 export const mockRemoveCampaignParticipant = vi.fn();
 export const mockUpdateCampaign = vi.fn();
 export const mockUpdateCampaignParticipant = vi.fn();
+export const mockRemoveCampaignParticipantBan = vi.fn();
 
 // Top-level mocks for campaigns.queries
 export const mockGetCampaign = vi
@@ -198,6 +199,7 @@ vi.mock("~/features/campaigns/campaigns.mutations", async (importOriginal) => {
     removeCampaignParticipant: mockRemoveCampaignParticipant,
     updateCampaign: mockUpdateCampaign,
     updateCampaignParticipant: mockUpdateCampaignParticipant,
+    removeCampaignParticipantBan: mockRemoveCampaignParticipantBan,
   };
 });
 
@@ -229,6 +231,7 @@ export const setupCampaignMocks = () => {
   mockRemoveCampaignParticipant.mockReset();
   mockUpdateCampaign.mockReset();
   mockUpdateCampaignParticipant.mockReset();
+  mockRemoveCampaignParticipantBan.mockReset();
 
   mockGetCampaign.mockReset().mockResolvedValue({ success: true, data: MOCK_CAMPAIGN });
   mockGetCampaignApplications.mockReset().mockResolvedValue({ success: true, data: [] });
@@ -254,5 +257,6 @@ export const setupCampaignMocks = () => {
     mockGetCampaignParticipants,
     mockListCampaigns,
     mockSearchUsersForInvitation,
+    mockRemoveCampaignParticipantBan,
   };
 };

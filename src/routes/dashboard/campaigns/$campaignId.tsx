@@ -29,11 +29,15 @@ import {
   getCampaignApplicationForUser,
   getCampaignApplications,
 } from "~/features/campaigns/campaigns.queries";
-import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
+import type {
+  CampaignParticipant,
+  CampaignWithDetails,
+} from "~/features/campaigns/campaigns.types";
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
-import { ManageApplications } from "~/features/campaigns/components/ManageApplications";
+
+import { ManageInvitations } from "~/features/campaigns/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation";
 import { CampaignGameSessionCard } from "~/features/games/components/CampaignGameSessionCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
@@ -196,12 +200,6 @@ export function CampaignDetailsPage() {
     },
   });
 
-  const { data: applicationsData, isLoading: isLoadingApplications } = useQuery({
-    queryKey: ["campaignApplications", campaignId],
-    queryFn: () => getCampaignApplications({ data: { id: campaignId } }),
-    enabled: !!campaignId && isOwner,
-  });
-
   const { data: userApplication, isLoading: isLoadingUserApplication } = useQuery({
     queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
     queryFn: async () => {
@@ -229,6 +227,7 @@ export function CampaignDetailsPage() {
           queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
         });
         queryClient.invalidateQueries({ queryKey: ["campaignApplications", campaignId] }); // Invalidate owner's view
+        queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] }); // Invalidate participants list
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to submit application.");
       }
@@ -249,6 +248,12 @@ export function CampaignDetailsPage() {
     enabled: !!campaignId,
   });
 
+  const { data: applicationsData, isLoading: isLoadingApplications } = useQuery({
+    queryKey: ["campaignApplications", campaignId],
+    queryFn: () => getCampaignApplications({ data: { id: campaignId } }),
+    enabled: !!campaignId && isOwner,
+  });
+
   if (
     isLoading ||
     isLoadingApplications ||
@@ -264,6 +269,10 @@ export function CampaignDetailsPage() {
 
   const hasPendingApplication = userApplication?.status === "pending";
   const hasRejectedApplication = userApplication?.status === "rejected";
+  const currentUserParticipant = campaign?.participants?.find(
+    (p) => p.userId === currentUser?.id,
+  );
+  const hasRejectedParticipantStatus = currentUserParticipant?.status === "rejected";
 
   const canApply =
     currentUser &&
@@ -271,6 +280,7 @@ export function CampaignDetailsPage() {
     !isParticipant &&
     !hasPendingApplication &&
     !hasRejectedApplication &&
+    !hasRejectedParticipantStatus &&
     campaign?.status === "active" && // Only allow applying to active campaigns
     (campaign?.visibility === "public" || campaign?.visibility === "protected"); // Only allow applying to public/protected campaigns
 
@@ -409,20 +419,33 @@ export function CampaignDetailsPage() {
           isOwner={isOwner}
           currentUser={currentUser}
           campaignOwnerId={campaign.owner?.id || ""}
+          applications={applicationsData?.success ? applicationsData.data : []}
+          participants={
+            campaign.participants?.map((p: CampaignParticipant) => ({
+              ...p,
+              role: p.role || "player", // Default to "player" if role is missing
+            })) || []
+          }
         />
       )}
 
       {isOwner && (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <InviteParticipants
-            campaignId={campaignId}
-            currentParticipants={campaign.participants || []}
-          />
-          <ManageApplications
-            campaignId={campaignId}
-            applications={applicationsData?.success ? applicationsData.data : []}
-          />
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <InviteParticipants
+              campaignId={campaignId}
+              currentParticipants={campaign.participants || []}
+            />
+            <ManageInvitations
+              campaignId={campaignId}
+              invitations={
+                campaign?.participants?.filter(
+                  (p) => p.role === "invited" && p.status === "pending",
+                ) || []
+              }
+            />
+          </div>
+        </>
       )}
     </div>
   );

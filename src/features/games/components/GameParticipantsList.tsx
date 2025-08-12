@@ -1,11 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { updateGameParticipant } from "~/features/games/games.mutations";
-import { getGameParticipants } from "~/features/games/games.queries";
-import { GameParticipant } from "~/features/games/games.types";
+import {
+  removeGameParticipantBan,
+  respondToGameApplication,
+  updateGameParticipant,
+} from "~/features/games/games.mutations";
+import { GameApplication, GameParticipant } from "~/features/games/games.types";
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
 
@@ -14,6 +16,8 @@ interface GameParticipantsListProps {
   isOwner: boolean;
   currentUser: User | null;
   gameOwnerId: string;
+  applications: GameApplication[];
+  participants: GameParticipant[];
 }
 
 export function GameParticipantsList({
@@ -21,14 +25,10 @@ export function GameParticipantsList({
   isOwner,
   currentUser,
   gameOwnerId,
+  applications,
+  participants,
 }: GameParticipantsListProps) {
   const queryClient = useQueryClient();
-
-  const { data: participantsData, isLoading } = useQuery({
-    queryKey: ["gameParticipants", gameId],
-    queryFn: () => getGameParticipants({ data: { id: gameId } }),
-    enabled: !!gameId,
-  });
 
   const removeParticipantMutation = useMutation<
     OperationResult<GameParticipant>,
@@ -50,65 +50,182 @@ export function GameParticipantsList({
     removeParticipantMutation.mutate({ data: { id: participantId, status: "rejected" } });
   };
 
-  if (isLoading) {
-    return <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />;
-  }
+  const handleAllowParticipant = (participantId: string) => {
+    removeRejectedParticipantMutation.mutate({ data: { id: participantId } });
+  };
 
-  if (!participantsData?.success || !participantsData.data) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Participants</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Failed to load participants or no participants found.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const removeRejectedParticipantMutation = useMutation<
+    OperationResult<boolean>,
+    Error,
+    { data: { id: string } }
+  >({
+    mutationFn: removeGameParticipantBan,
+    onSuccess: () => {
+      toast.success("Participant ban removed successfully!");
+      queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
+    },
+    onError: (error) => {
+      toast.error(`Failed to remove participant ban: ${error.message}`);
+    },
+  });
 
-  const participants = participantsData.data;
+  const respondToGameApplicationMutation = useMutation({
+    mutationFn: respondToGameApplication,
+    onSuccess: () => {
+      toast.success("Application status updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
+    },
+    onError: (error) => {
+      toast.error(`Failed to update application status: ${error.message}`);
+    },
+  });
+
+  const handleApproveApplication = (applicationId: string) => {
+    respondToGameApplicationMutation.mutate({
+      data: {
+        applicationId,
+        status: "approved",
+      },
+    });
+  };
+
+  const handleRejectApplication = (applicationId: string) => {
+    respondToGameApplicationMutation.mutate({
+      data: {
+        applicationId,
+        status: "rejected",
+      },
+    });
+  };
+
+  const approvedParticipants = participants.filter(
+    (p: GameParticipant) => p.status !== "rejected" && p.status !== "pending",
+  );
+  const rejectedParticipants = participants.filter(
+    (p: GameParticipant) => p.status === "rejected",
+  );
+  const pendingApplications = applications.filter(
+    (p: GameApplication) => p.status === "pending",
+  );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Participants ({participants.length})</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {participants.length === 0 ? (
-          <p>No participants yet.</p>
-        ) : (
-          <ul className="space-y-2">
-            {participants.map((p) => (
-              <li key={p.id} className="flex items-center justify-between py-1">
-                <span>
-                  {p.user.name || p.user.email} (
-                  {p.userId === gameOwnerId ? "owner" : p.role} - {p.status})
-                </span>
-                {isOwner &&
-                  p.role !== "applicant" &&
-                  p.status !== "rejected" &&
-                  p.userId !== currentUser?.id && (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Participants ({approvedParticipants.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {approvedParticipants.length === 0 ? (
+            <p>No participants yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {approvedParticipants.map((p) => (
+                <li key={p.id} className="flex items-center justify-between py-1">
+                  <span>
+                    {p.user.name || p.user.email} (
+                    {p.userId === gameOwnerId ? "owner" : p.role} - {p.status})
+                  </span>
+                  {isOwner &&
+                    p.role !== "applicant" &&
+                    p.status !== "rejected" &&
+                    p.userId !== currentUser?.id && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveParticipant(p.id)}
+                        disabled={
+                          removeParticipantMutation.isPending &&
+                          removeParticipantMutation.variables?.data.id === p.id
+                        }
+                      >
+                        {removeParticipantMutation.isPending &&
+                        removeParticipantMutation.variables?.data.id === p.id
+                          ? "Removing..."
+                          : "Remove"}
+                      </Button>
+                    )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      {isOwner && pendingApplications.length > 0 && (
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>Pending Applications ({pendingApplications.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {pendingApplications.map((p) => (
+                <li key={p.id} className="flex items-center justify-between py-1">
+                  <span>
+                    {p.user.name || p.user.email} ({p.status})
+                  </span>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleApproveApplication(p.id)}
+                      disabled={respondToGameApplicationMutation.isPending}
+                    >
+                      {respondToGameApplicationMutation.isPending
+                        ? "Approving..."
+                        : "Approve"}
+                    </Button>
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleRemoveParticipant(p.id)}
-                      disabled={
-                        removeParticipantMutation.isPending &&
-                        removeParticipantMutation.variables?.data.id === p.id
-                      }
+                      onClick={() => handleRejectApplication(p.id)}
+                      disabled={respondToGameApplicationMutation.isPending}
                     >
-                      {removeParticipantMutation.isPending &&
-                      removeParticipantMutation.variables?.data.id === p.id
-                        ? "Removing..."
-                        : "Remove"}
+                      {respondToGameApplicationMutation.isPending
+                        ? "Rejecting..."
+                        : "Reject"}
                     </Button>
-                  )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {isOwner && rejectedParticipants.length > 0 && (
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>Banned from the Game ({rejectedParticipants.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {rejectedParticipants.map((p) => (
+                <li key={p.id} className="flex items-center justify-between py-1">
+                  <span>
+                    {p.user.name || p.user.email} ({p.role} - {p.status})
+                  </span>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => handleAllowParticipant(p.id)}
+                    disabled={
+                      removeRejectedParticipantMutation.isPending &&
+                      removeRejectedParticipantMutation.variables?.data.id === p.id
+                    }
+                  >
+                    {removeRejectedParticipantMutation.isPending &&
+                    removeRejectedParticipantMutation.variables?.data.id === p.id
+                      ? "Allowing..."
+                      : "Allow"}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+    </>
   );
 }

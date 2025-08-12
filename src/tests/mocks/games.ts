@@ -182,6 +182,7 @@ export const mockRemoveGameParticipant = vi.fn();
 export const mockUpdateGame = vi.fn();
 export const mockUpdateGameParticipant = vi.fn();
 export const mockUpdateGameSessionStatus = vi.fn();
+export const mockRemoveGameParticipantBan = vi.fn();
 
 // Top-level mocks for games.queries
 export const mockGetGame = vi.fn().mockResolvedValue({ success: true, data: MOCK_GAME });
@@ -196,12 +197,10 @@ export const mockGetGameParticipants = vi
   .mockResolvedValue({ success: true, data: [] });
 export const mockListGames = vi.fn();
 export const mockSearchUsersForInvitation = vi.fn();
-export const mockListGameSessionsByCampaignId = vi
-  .fn()
-  .mockResolvedValue({
-    success: true,
-    data: [MOCK_CAMPAIGN_GAME_1, MOCK_CAMPAIGN_GAME_2, MOCK_CAMPAIGN_GAME_3],
-  });
+export const mockListGameSessionsByCampaignId = vi.fn().mockResolvedValue({
+  success: true,
+  data: [MOCK_CAMPAIGN_GAME_1, MOCK_CAMPAIGN_GAME_2, MOCK_CAMPAIGN_GAME_3],
+});
 export const mockGetGameSystem = vi
   .fn()
   .mockResolvedValue({ success: true, data: MOCK_GAME_SYSTEM });
@@ -223,6 +222,7 @@ vi.mock("~/features/games/games.mutations", async (importOriginal) => {
     updateGame: mockUpdateGame,
     updateGameParticipant: mockUpdateGameParticipant,
     updateGameSessionStatus: mockUpdateGameSessionStatus,
+    removeGameParticipantBan: mockRemoveGameParticipantBan,
   };
 });
 
@@ -270,6 +270,7 @@ export const setupGameMocks = () => {
   mockUpdateGame.mockReset();
   mockUpdateGameParticipant.mockReset();
   mockUpdateGameSessionStatus.mockReset();
+  mockRemoveGameParticipantBan.mockReset();
 
   mockGetGame.mockReset().mockResolvedValue({
     success: true,
@@ -312,5 +313,6 @@ export const setupGameMocks = () => {
     mockListGameSessionsByCampaignId,
     mockGetGameSystem,
     mockSearchGameSystems,
+    mockRemoveGameParticipantBan,
   };
 };

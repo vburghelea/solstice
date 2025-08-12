@@ -199,6 +199,27 @@ describe("Campaign Management Feature Tests", () => {
         expect(result.errors[0].code).toBe("CONFLICT");
       }
     });
+
+    it("should fail if user has a rejected participant entry", async () => {
+      mockCurrentUser(MOCK_OTHER_USER);
+      mocks.mockApplyToCampaign.mockResolvedValue({
+        success: false,
+        errors: [
+          {
+            code: "CONFLICT",
+            message: "You cannot apply to this campaign as you were previously rejected.",
+          },
+        ],
+      });
+
+      const result = await mocks.mockApplyToCampaign({
+        data: { campaignId: MOCK_CAMPAIGN.id },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("CONFLICT");
+      }
+    });
   });
 
   describe("respondToApplication", () => {
@@ -637,6 +658,78 @@ describe("Campaign Management Feature Tests", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
+      }
+    });
+  });
+
+  // --- Remove Campaign Participant Ban Tests ---
+  describe("removeCampaignParticipantBan", () => {
+    it("should allow owner to remove a rejected participant's ban", async () => {
+      mockCurrentUser(MOCK_OWNER_USER);
+      mocks.mockRemoveCampaignParticipantBan.mockResolvedValue({
+        success: true,
+        data: true,
+      });
+
+      const result = await mocks.mockRemoveCampaignParticipantBan({
+        data: { id: MOCK_APPLICANT_APPLICATION.id },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBe(true);
+      }
+    });
+
+    it("should fail if not authenticated", async () => {
+      mockCurrentUser(null);
+      mocks.mockRemoveCampaignParticipantBan.mockResolvedValue({
+        success: false,
+        errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+      });
+
+      const result = await mocks.mockRemoveCampaignParticipantBan({
+        data: { id: MOCK_APPLICANT_APPLICATION.id },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("AUTH_ERROR");
+      }
+    });
+
+    it("should fail if not authorized (not campaign owner)", async () => {
+      mockCurrentUser(MOCK_PLAYER_USER);
+      mocks.mockRemoveCampaignParticipantBan.mockResolvedValue({
+        success: false,
+        errors: [
+          {
+            code: "AUTH_ERROR",
+            message: "Not authorized to remove this participant's ban",
+          },
+        ],
+      });
+
+      const result = await mocks.mockRemoveCampaignParticipantBan({
+        data: { id: MOCK_APPLICANT_APPLICATION.id },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("AUTH_ERROR");
+      }
+    });
+
+    it("should fail if participant is not currently rejected", async () => {
+      mockCurrentUser(MOCK_OWNER_USER);
+      mocks.mockRemoveCampaignParticipantBan.mockResolvedValue({
+        success: false,
+        errors: [{ code: "CONFLICT", message: "Participant is not currently rejected" }],
+      });
+
+      const result = await mocks.mockRemoveCampaignParticipantBan({
+        data: { id: MOCK_PLAYER_PARTICIPANT.id }, // Assuming this participant is 'approved'
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors[0].code).toBe("CONFLICT");
       }
     });
   });

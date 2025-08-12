@@ -2,14 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  inviteToCampaign,
-  removeCampaignParticipant,
-} from "~/features/campaigns/campaigns.mutations";
+import { inviteToCampaign } from "~/features/campaigns/campaigns.mutations";
 import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
 import { searchUsersForInvitation } from "~/features/games/games.queries"; // Re-using games query for user search
 import { useDebounce } from "~/shared/hooks/useDebounce";
-import { OperationResult } from "~/shared/types/common";
+
 import { Button } from "~/shared/ui/button";
 import {
   Card,
@@ -55,22 +52,6 @@ export function InviteParticipants({
     },
   });
 
-  const revokeMutation = useMutation<
-    OperationResult<boolean>,
-    Error,
-    { data: { id: string } }
-  >({
-    mutationFn: removeCampaignParticipant,
-    onSuccess: () => {
-      toast.success("Invitation revoked successfully!");
-      queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
-      queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
-    },
-    onError: (error) => {
-      toast.error(`Failed to revoke invitation: ${error.message}`);
-    },
-  });
-
   const handleInviteUser = (userId: string) => {
     inviteMutation.mutate({ data: { campaignId, userId, role: "invited" } });
   };
@@ -82,14 +63,6 @@ export function InviteParticipants({
       });
     }
   };
-
-  const handleRevokeInvitation = (participantId: string) => {
-    revokeMutation.mutate({ data: { id: participantId } });
-  };
-
-  const pendingInvites = currentParticipants.filter(
-    (p) => p.role === "invited" && p.status === "pending",
-  );
 
   return (
     <Card>
@@ -167,32 +140,6 @@ export function InviteParticipants({
               )}
             </Button>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <h4 className="font-semibold">Pending Invitations</h4>
-          {pendingInvites.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No pending invitations.</p>
-          ) : (
-            <ul className="bg-background max-h-48 overflow-y-auto rounded-md border p-2">
-              {pendingInvites.map((p) => (
-                <li key={p.id} className="flex items-center justify-between py-1">
-                  <span>{p.user?.name || p.user?.email}</span>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRevokeInvitation(p.id)}
-                    disabled={revokeMutation.isPending}
-                  >
-                    {revokeMutation.isPending &&
-                    revokeMutation.variables?.data.id === p.id
-                      ? "Revoking..."
-                      : "Revoke"}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </CardContent>
     </Card>

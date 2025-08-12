@@ -15,7 +15,8 @@ import { Separator } from "~/components/ui/separator";
 import { GameForm } from "~/features/games/components/GameForm";
 import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
-import { ManageApplications } from "~/features/games/components/ManageApplications";
+
+import { ManageInvitations } from "~/features/games/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
 import { applyToGame, updateGame } from "~/features/games/games.mutations";
 import {
@@ -195,6 +196,7 @@ export function GameDetailsPage() {
           queryKey: ["userGameApplication", gameId, currentUser?.id],
         });
         queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] }); // Invalidate owner's view
+        queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] }); // Invalidate participants list
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to submit application.");
       }
@@ -214,6 +216,10 @@ export function GameDetailsPage() {
 
   const hasPendingApplication = userApplication?.status === "pending";
   const hasRejectedApplication = userApplication?.status === "rejected";
+  const currentUserParticipant = game?.participants?.find(
+    (p) => p.userId === currentUser?.id,
+  );
+  const hasRejectedParticipantStatus = currentUserParticipant?.status === "rejected";
 
   const canApply =
     currentUser &&
@@ -221,6 +227,7 @@ export function GameDetailsPage() {
     !isParticipant &&
     !hasPendingApplication &&
     !hasRejectedApplication &&
+    !hasRejectedParticipantStatus &&
     game?.status === "scheduled" && // Only allow applying to scheduled games
     (game?.visibility === "public" || game?.visibility === "protected"); // Only allow applying to public/protected games
 
@@ -296,20 +303,33 @@ export function GameDetailsPage() {
           isOwner={isOwner}
           currentUser={currentUser}
           gameOwnerId={game.owner?.id || ""}
+          applications={applicationsData?.success ? applicationsData.data : []}
+          participants={
+            game.participants?.map((p: GameParticipant) => ({
+              ...p,
+              role: p.role || "player", // Default to "player" if role is missing
+            })) || []
+          }
         />
       )}
 
       {isOwner && (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <InviteParticipants
-            gameId={gameId}
-            currentParticipants={game.participants || []}
-          />
-          <ManageApplications
-            gameId={gameId}
-            applications={applicationsData?.success ? applicationsData.data : []}
-          />
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <InviteParticipants
+              gameId={gameId}
+              currentParticipants={game.participants || []}
+            />
+            <ManageInvitations
+              gameId={gameId}
+              invitations={
+                game?.participants?.filter(
+                  (p) => p.role === "invited" && p.status === "pending",
+                ) || []
+              }
+            />
+          </div>
+        </>
       )}
     </div>
   );

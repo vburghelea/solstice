@@ -105,3 +105,11 @@ export const getCampaignApplicationForUserInputSchema = z.object({
 export type GetCampaignApplicationForUserInput = z.infer<
   typeof getCampaignApplicationForUserInputSchema
 >;
+
+export const removeCampaignParticipantBanInputSchema = z.object({
+  id: z.string().min(1), // Participant ID
+});
+
+export type RemoveCampaignParticipantBanInput = z.infer<
+  typeof removeCampaignParticipantBanInputSchema
+>;

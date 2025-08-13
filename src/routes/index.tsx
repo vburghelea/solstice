@@ -13,6 +13,8 @@ import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, Trophy, UsersIcon } from "~/components/ui/icons";
 import { getUpcomingEvents } from "~/features/events/events.queries";
 import type { EventWithDetails } from "~/features/events/events.types";
+import { listGames } from "~/features/games/games.queries";
+import { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
@@ -403,6 +405,9 @@ function Index() {
                 Become a host
               </Link>
             </div>
+            <p className="mt-4 text-sm opacity-80">
+              (We'll try to infer your city from your GeoIP)
+            </p>
           </div>
         </section>
       </div>

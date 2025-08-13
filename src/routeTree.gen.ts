@@ -12,14 +12,23 @@ import { createServerRootRoute } from "@tanstack/react-start/server";
 
 import { Route as rootRouteImport } from "./routes/__root";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as SearchRouteImport } from "./routes/search";
 import { Route as EventsRouteImport } from "./routes/events";
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 import { Route as TeamsRouteImport } from "./routes/teams";
 import { Route as ResourcesRouteImport } from "./routes/resources";
 import { Route as DesignSystemRouteImport } from "./routes/design-system";
 import { Route as AboutRouteImport } from "./routes/about";
+<<<<<<< HEAD
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
+=======
+=======
+import { Route as SearchRouteImport } from "./routes/search";
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
@@ -29,12 +38,19 @@ import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as EventsIndexRouteImport } from "./routes/events/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 =======
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
+=======
+import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
 import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
@@ -152,6 +168,7 @@ import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/
 const rootServerRouteImport = createServerRootRoute();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const SearchRoute = SearchRouteImport.update({
   id: "/search",
   path: "/search",
@@ -161,6 +178,8 @@ const EventsRoute = EventsRouteImport.update({
   id: "/events",
   path: "/events",
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 const TeamsRoute = TeamsRouteImport.update({
   id: "/teams",
   path: "/teams",
@@ -179,7 +198,15 @@ const DesignSystemRoute = DesignSystemRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: "/about",
   path: "/about",
+<<<<<<< HEAD
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
+=======
+=======
+const SearchRoute = SearchRouteImport.update({
+  id: "/search",
+  path: "/search",
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   getParentRoute: () => rootRouteImport,
 } as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
@@ -223,6 +250,7 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
 const SystemsSlugRoute = SystemsSlugRouteImport.update({
   id: "/systems/$slug",
   path: "/systems/$slug",
@@ -241,6 +269,16 @@ const EventsSlugRoute = EventsSlugRouteImport.update({
   id: "/events/$slug",
   path: "/events/$slug",
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: "/events/$slug",
+  path: "/events/$slug",
+=======
+const GameGameIdRoute = GameGameIdRouteImport.update({
+  id: "/game/$gameId",
+  path: "/game/$gameId",
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
@@ -681,11 +719,14 @@ export interface FileRoutesByFullPath {
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/about": typeof AboutRoute;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
@@ -695,8 +736,14 @@ export interface FileRoutesByFullPath {
 =======
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+  "/search": typeof SearchRoute;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/login": typeof authLoginRoute;
 >>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
   "/admin/events-review": typeof AdminEventsReviewRoute;
@@ -735,6 +782,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
@@ -764,7 +812,12 @@ export interface FileRoutesByFullPath {
   "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+=======
+  "/game/$gameId": typeof GameGameIdRoute;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/dashboard/": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
@@ -803,11 +856,14 @@ export interface FileRoutesByTo {
   "/auth": typeof AuthRouteRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/about": typeof AboutRoute;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
@@ -817,8 +873,14 @@ export interface FileRoutesByTo {
 =======
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+  "/search": typeof SearchRoute;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/login": typeof authLoginRoute;
 >>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
   "/admin/events-review": typeof AdminEventsReviewRoute;
@@ -835,6 +897,7 @@ export interface FileRoutesByTo {
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
@@ -868,6 +931,9 @@ export interface FileRoutesByTo {
   "/events/$slug": typeof EventsSlugRouteWithChildren;
 =======
 >>>>>>> 877a7a5 (fix: resolve registration route not rendering in production)
+=======
+  "/game/$gameId": typeof GameGameIdRoute;
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
@@ -908,11 +974,14 @@ export interface FileRoutesById {
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/about": typeof AboutRoute;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
@@ -922,8 +991,14 @@ export interface FileRoutesById {
 =======
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+  "/search": typeof SearchRoute;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/(auth)/login": typeof authLoginRoute;
 >>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
   "/admin/events-review": typeof AdminEventsReviewRoute;
@@ -962,6 +1037,7 @@ export interface FileRoutesById {
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
@@ -991,7 +1067,12 @@ export interface FileRoutesById {
   "/dev/email/": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+=======
+  "/game/$gameId": typeof GameGameIdRoute;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
@@ -1034,11 +1115,14 @@ export interface FileRouteTypes {
     | "/onboarding"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
 =======
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/about"
     | "/design-system"
     | "/resources"
@@ -1048,8 +1132,14 @@ export interface FileRouteTypes {
 =======
     | "/dashboard/admin"
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+    | "/search"
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/login"
 >>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
     | "/admin/events-review"
@@ -1081,6 +1171,7 @@ export interface FileRouteTypes {
     | "/dashboard/systems"
     | "/dashboard/teams"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -1110,7 +1201,12 @@ export interface FileRouteTypes {
     | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/events/$slug"
+=======
+    | "/game/$gameId"
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/dashboard/"
     | "/events"
     | "/onboarding/"
@@ -1149,11 +1245,14 @@ export interface FileRouteTypes {
     | "/auth"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
 =======
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/about"
     | "/design-system"
     | "/resources"
@@ -1163,8 +1262,14 @@ export interface FileRouteTypes {
 =======
     | "/dashboard/admin"
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+    | "/search"
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/login"
 >>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
     | "/admin/events-review"
@@ -1181,6 +1286,7 @@ export interface FileRouteTypes {
     | "/dashboard/membership"
     | "/dashboard/reports"
     | "/dashboard/settings"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     | "/dashboard/social-audits"
@@ -1214,6 +1320,9 @@ export interface FileRouteTypes {
     | "/events/$slug"
 =======
 >>>>>>> 877a7a5 (fix: resolve registration route not rendering in production)
+=======
+    | "/game/$gameId"
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/dashboard"
     | "/events"
     | "/onboarding"
@@ -1253,11 +1362,14 @@ export interface FileRouteTypes {
     | "/onboarding"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
 =======
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/about"
     | "/design-system"
     | "/resources"
@@ -1267,8 +1379,14 @@ export interface FileRouteTypes {
 =======
     | "/dashboard/admin"
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+    | "/search"
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/(auth)/login"
 >>>>>>> 5c9d7d8 (feat: linked campaigns with game sessions, added the necessary management functionality, partially covered by tests)
     | "/admin/events-review"
@@ -1300,6 +1418,7 @@ export interface FileRouteTypes {
     | "/dashboard/systems"
     | "/dashboard/teams"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -1329,7 +1448,12 @@ export interface FileRouteTypes {
     | "/dev/email/"
     | "/dashboard/campaigns/$campaignId/zero"
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/events/$slug"
+=======
+    | "/game/$gameId"
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/dashboard/"
     | "/events/"
     | "/onboarding/"
@@ -1371,6 +1495,7 @@ export interface RootRouteChildren {
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   EventsRoute: typeof EventsRoute;
   SearchRoute: typeof SearchRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
@@ -1385,6 +1510,8 @@ export interface RootRouteChildren {
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   AboutRoute: typeof AboutRoute;
   DesignSystemRoute: typeof DesignSystemRoute;
   ResourcesRoute: typeof ResourcesRoute;
@@ -1394,7 +1521,15 @@ export interface RootRouteChildren {
   AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
   EventsIndexRoute: typeof EventsIndexRoute;
+<<<<<<< HEAD
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
+=======
+=======
+  SearchRoute: typeof SearchRoute;
+  authLoginRoute: typeof authLoginRoute;
+  GameGameIdRoute: typeof GameGameIdRoute;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 }
 export interface FileServerRoutesByFullPath {
   "/api/debug-square": typeof ApiDebugSquareServerRoute;
@@ -1523,6 +1658,7 @@ export interface RootServerRouteChildren {
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/search": {
       id: "/search";
       path: "/search";
@@ -1536,6 +1672,8 @@ declare module "@tanstack/react-router" {
       fullPath: "/events";
       preLoaderRoute: typeof EventsRouteImport;
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     "/teams": {
       id: "/teams";
       path: "/teams";
@@ -1562,7 +1700,17 @@ declare module "@tanstack/react-router" {
       path: "/about";
       fullPath: "/about";
       preLoaderRoute: typeof AboutRouteImport;
+<<<<<<< HEAD
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
+=======
+=======
+    "/search": {
+      id: "/search";
+      path: "/search";
+      fullPath: "/search";
+      preLoaderRoute: typeof SearchRouteImport;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
       parentRoute: typeof rootRouteImport;
     };
     "/onboarding": {
@@ -1622,6 +1770,7 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof DashboardRouteRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/systems/$slug": {
       id: "/systems/$slug";
       path: "/systems/$slug";
@@ -1642,12 +1791,24 @@ declare module "@tanstack/react-router" {
       fullPath: "/event/$eventId";
       preLoaderRoute: typeof EventEventIdRouteImport;
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
     "/events/$slug": {
       id: "/events/$slug";
       path: "/events/$slug";
       fullPath: "/events/$slug";
       preLoaderRoute: typeof EventsSlugRouteImport;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+=======
+    "/game/$gameId": {
+      id: "/game/$gameId";
+      path: "/game/$gameId";
+      fullPath: "/game/$gameId";
+      preLoaderRoute: typeof GameGameIdRouteImport;
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams": {
@@ -2530,6 +2691,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   EventsRoute: EventsRoute,
   SearchRoute: SearchRoute,
   EventEventIdRoute: EventEventIdRoute,
@@ -2544,6 +2706,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventsSlugRoute: EventsSlugRouteWithChildren,
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
+=======
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   AboutRoute: AboutRoute,
   DesignSystemRoute: DesignSystemRoute,
   ResourcesRoute: ResourcesRoute,
@@ -2553,7 +2717,15 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
   EventsIndexRoute: EventsIndexRoute,
+<<<<<<< HEAD
 >>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
+=======
+=======
+  SearchRoute: SearchRoute,
+  authLoginRoute: authLoginRoute,
+  GameGameIdRoute: GameGameIdRoute,
+>>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+>>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

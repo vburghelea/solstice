@@ -52,15 +52,43 @@ export function CreateGamePage() {
     enabled: !!campaignId,
   });
 
-  const gameSystemId = campaignData?.success
-    ? campaignData.data?.gameSystemId
-    : undefined;
+  const gameSystemId =
+    campaignData &&
+    campaignData.success &&
+    campaignData.data &&
+    campaignData.data.gameSystemId
+      ? campaignData.data.gameSystemId
+      : undefined;
 
   const { data: gameSystemData, isSuccess: isGameSystemDataSuccess } = useQuery({
     queryKey: ["gameSystem", gameSystemId],
     queryFn: () => getGameSystem({ data: { id: gameSystemId! } }),
     enabled: !!gameSystemId,
   });
+
+  // Create a key that changes when all data is loaded
+  const formKey = useMemo(() => {
+    if (!campaignId) {
+      return "no-campaign";
+    }
+
+    if (
+      isCampaignDataSuccess &&
+      campaignData?.success &&
+      campaignData.data &&
+      (!gameSystemId || (gameSystemId && isGameSystemDataSuccess))
+    ) {
+      return `all-data-loaded-${campaignId}`;
+    }
+
+    return `data-loading-${campaignId}`;
+  }, [
+    campaignId,
+    isCampaignDataSuccess,
+    campaignData,
+    gameSystemId,
+    isGameSystemDataSuccess,
+  ]);
 
   const initialValues = useMemo<Partial<z.infer<typeof gameFormSchema>>>(() => {
     if (!campaignId) {
@@ -70,21 +98,43 @@ export function CreateGamePage() {
     if (isCampaignDataSuccess && campaignData?.success && campaignData.data) {
       const campaign = campaignData.data;
       // Type assertion to tell TypeScript that campaign is not null
+      const gameSystem =
+        gameSystemData?.success && gameSystemData.data ? gameSystemData.data : null;
+
       return {
         gameSystemId: (campaign as NonNullable<typeof campaign>).gameSystemId,
-        expectedDuration: (campaign as NonNullable<typeof campaign>).sessionDuration,
+        expectedDuration:
+          (campaign as NonNullable<typeof campaign>).sessionDuration ??
+          (gameSystem && gameSystem.averagePlayTime !== null
+            ? gameSystem.averagePlayTime
+            : undefined),
         price: (campaign as NonNullable<typeof campaign>).pricePerSession ?? undefined,
         language: (campaign as NonNullable<typeof campaign>).language,
         location: (campaign as NonNullable<typeof campaign>).location,
-        minimumRequirements: (campaign as NonNullable<typeof campaign>)
-          .minimumRequirements,
+        minimumRequirements: {
+          minPlayers:
+            (campaign as NonNullable<typeof campaign>).minimumRequirements?.minPlayers ??
+            (gameSystem && gameSystem.minPlayers !== null
+              ? gameSystem.minPlayers
+              : undefined),
+          maxPlayers:
+            (campaign as NonNullable<typeof campaign>).minimumRequirements?.maxPlayers ??
+            (gameSystem && gameSystem.maxPlayers !== null
+              ? gameSystem.maxPlayers
+              : undefined),
+          languageLevel: (campaign as NonNullable<typeof campaign>).minimumRequirements
+            ?.languageLevel,
+          playerRadiusKm: (campaign as NonNullable<typeof campaign>).minimumRequirements
+            ?.playerRadiusKm,
+        },
         visibility: (campaign as NonNullable<typeof campaign>).visibility,
         safetyRules: (campaign as NonNullable<typeof campaign>).safetyRules,
       };
     }
 
+    // Return empty object while data is loading
     return {};
-  }, [isCampaignDataSuccess, campaignData, campaignId]);
+  }, [isCampaignDataSuccess, campaignData, campaignId, gameSystemData]);
 
   const createGameMutation = useMutation({
     mutationFn: createGame,
@@ -136,7 +186,7 @@ export function CreateGamePage() {
             <>
               {campaignId &&
                 isCampaignDataSuccess &&
-                campaignData.success &&
+                campaignData?.success &&
                 campaignData.data && (
                   <div className="mb-4">
                     <label htmlFor="campaign">Campaign</label>
@@ -154,7 +204,7 @@ export function CreateGamePage() {
                 )}
 
               <GameForm
-                key={JSON.stringify(initialValues)} // Add key to force re-mount when initialValues change
+                key={formKey} // Add key to force re-mount when all data is loaded
                 onSubmit={async (values) => {
                   setServerError(null);
 

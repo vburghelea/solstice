@@ -20,6 +20,11 @@ import {
   minimumRequirementsSchema,
   safetyRulesSchema,
 } from "~/shared/schemas/common";
+import {
+  LanguageLevel,
+  languageLevelOptions,
+  languageOptions,
+} from "~/shared/types/common";
 import { Checkbox } from "~/shared/ui/checkbox";
 import { Label } from "~/shared/ui/label";
 import {
@@ -128,18 +133,6 @@ export function GameForm({
       );
     }
   }, [form, selectedGameSystem]);
-
-  // Most spoken languages in the world
-  const languageOptions = [
-    { value: "en", label: "English" },
-    { value: "zh", label: "Chinese" },
-    { value: "hi", label: "Hindi" },
-    { value: "es", label: "Spanish" },
-    { value: "fr", label: "French" },
-    { value: "ar", label: "Arabic" },
-    { value: "bn", label: "Bengali" },
-    { value: "ru", label: "Russian" },
-  ];
 
   return (
     <form
@@ -773,20 +766,20 @@ export function GameForm({
             <div>
               <Label htmlFor={field.name}>Language Level</Label>
               <Select
-                value={field.state.value as string}
-                onValueChange={(value) =>
-                  field.handleChange(
-                    value as "beginner" | "intermediate" | "advanced" | "fluent",
-                  )
+                value={
+                  field.state.value === undefined || field.state.value === null
+                    ? ""
+                    : (field.state.value as LanguageLevel)
                 }
+                onValueChange={(value) => field.handleChange(value as LanguageLevel)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a language level" />
                 </SelectTrigger>
                 <SelectContent>
-                  {languageOptions.map((lang) => (
-                    <SelectItem key={lang.value} value={lang.value}>
-                      {lang.label}
+                  {languageLevelOptions.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -20,6 +20,11 @@ import {
   minimumRequirementsSchema,
   safetyRulesSchema,
 } from "~/shared/schemas/common";
+import {
+  LanguageLevel,
+  languageLevelOptions,
+  languageOptions,
+} from "~/shared/types/common";
 import { Checkbox } from "~/shared/ui/checkbox";
 import { Label } from "~/shared/ui/label";
 import {
@@ -124,17 +129,6 @@ export function CampaignForm({
       );
     }
   }, [form, selectedGameSystem]);
-
-  const languageOptions = [
-    { value: "en", label: "English" },
-    { value: "zh", label: "Chinese" },
-    { value: "hi", label: "Hindi" },
-    { value: "es", label: "Spanish" },
-    { value: "fr", label: "French" },
-    { value: "ar", label: "Arabic" },
-    { value: "bn", label: "Bengali" },
-    { value: "ru", label: "Russian" },
-  ];
 
   return (
     <form
@@ -866,26 +860,19 @@ export function CampaignForm({
                 value={
                   field.state.value === undefined || field.state.value === null
                     ? ""
-                    : (field.state.value as
-                        | "beginner"
-                        | "intermediate"
-                        | "advanced"
-                        | "fluent")
+                    : (field.state.value as LanguageLevel)
                 }
-                onValueChange={(value) =>
-                  field.handleChange(
-                    value as "beginner" | "intermediate" | "advanced" | "fluent",
-                  )
-                }
+                onValueChange={(value) => field.handleChange(value as LanguageLevel)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a language level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                  <SelectItem value="fluent">Fluent</SelectItem>
+                  {languageLevelOptions.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {field.state.meta.errors?.length > 0 && (

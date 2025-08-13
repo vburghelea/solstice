@@ -587,15 +587,6 @@ Read /docs/roundup-games-plan/* as appropriate
 See /docs/development-backlog.md for prioritized feature implementation tickets
 ```
 
-## Gemini Added Memories
-
-- **Forms Documentation (docs/FORMS.md):**
-- **Location of Form Components:** `src/components/form-fields/` (e.g., `ValidatedInput`, `ValidatedSelect`, `FormSubmitButton`).
-- **Validation Strategy:** Prefer Zod schemas for runtime validation and type inference. Avoid inline validation.
-- **Server Function Validation:** Use `.validator(schema.parse)` for server functions.
-- **Best Practices:** Schema-first validation, consistent error handling, loading state management, accessibility, performance optimization (debouncing).
-- **Migration:** Guide provided for migrating from `useState` to TanStack Form.
-
 **Security Configuration (docs/SECURITY.md):**
 
 - **Layers of Security:** Security Headers (Netlify Edge Functions), Secure Cookie Configuration (Better Auth), Rate Limiting, Password Validation, Content Security Policy (CSP).
@@ -832,3 +823,13 @@ See /docs/development-backlog.md for prioritized feature implementation tickets
 - **Benefits:** Clear separation, flexible scoping, searchability, membership independence, extensibility, performance.
 - **Migration Strategy:** Phase 1 (roles), Phase 2 (tags), Phase 3 (search/filtering), Phase 4 (admin UI), Phase 5 (automated tag management).
 - **Immediate Tasks:** Create roles schema, update schema index, create `PermissionService`, update `getCurrentUser`, hide Reports tab, add role guards, create seed script, write tests for `PermissionService`.
+
+## Gemini Added Memories
+
+- **Forms Documentation (docs/FORMS.md):**
+- **Location of Form Components:** `src/components/form-fields/` (e.g., `ValidatedInput`, `ValidatedSelect`, `FormSubmitButton`).
+- **Validation Strategy:** Prefer Zod schemas for runtime validation and type inference. Avoid inline validation.
+- **Server Function Validation:** Use `.validator(schema.parse)` for server functions.
+- **Best Practices:** Schema-first validation, consistent error handling, loading state management, accessibility, performance optimization (debouncing).
+- **Migration:** Guide provided for migrating from `useState` to TanStack Form.
+- The user has indicated that 'pnpm dev' is always running in the background and I should not suggest using it.

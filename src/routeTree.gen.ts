@@ -11,12 +11,14 @@
 import { createServerRootRoute } from "@tanstack/react-start/server";
 
 import { Route as rootRouteImport } from "./routes/__root";
+import { Route as SearchRouteImport } from "./routes/search";
 import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
@@ -60,6 +62,11 @@ import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/
 
 const rootServerRouteImport = createServerRootRoute();
 
+const SearchRoute = SearchRouteImport.update({
+  id: "/search",
+  path: "/search",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
   id: "/onboarding",
   path: "/onboarding",
@@ -89,6 +96,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
+} as any);
+const GameGameIdRoute = GameGameIdRouteImport.update({
+  id: "/game/$gameId",
+  path: "/game/$gameId",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const EventsSlugRoute = EventsSlugRouteImport.update({
   id: "/events/$slug",
@@ -304,6 +316,7 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/search": typeof SearchRoute;
   "/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
@@ -319,6 +332,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
@@ -342,6 +356,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
+  "/search": typeof SearchRoute;
   "/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
@@ -353,6 +368,7 @@ export interface FileRoutesByTo {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
@@ -378,6 +394,7 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/search": typeof SearchRoute;
   "/(auth)/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
@@ -393,6 +410,7 @@ export interface FileRoutesById {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
@@ -420,6 +438,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/search"
     | "/login"
     | "/admin/events-review"
     | "/admin/roles"
@@ -435,6 +454,7 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard/teams"
     | "/events/$slug"
+    | "/game/$gameId"
     | "/dashboard/"
     | "/onboarding/"
     | "/dashboard/campaigns/$campaignId"
@@ -458,6 +478,7 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/auth"
+    | "/search"
     | "/login"
     | "/admin/events-review"
     | "/admin/roles"
@@ -469,6 +490,7 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/events/$slug"
+    | "/game/$gameId"
     | "/dashboard"
     | "/onboarding"
     | "/dashboard/campaigns/$campaignId"
@@ -493,6 +515,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/search"
     | "/(auth)/login"
     | "/admin/events-review"
     | "/admin/roles"
@@ -508,6 +531,7 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard/teams"
     | "/events/$slug"
+    | "/game/$gameId"
     | "/dashboard/"
     | "/onboarding/"
     | "/dashboard/campaigns/$campaignId"
@@ -534,10 +558,12 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  SearchRoute: typeof SearchRoute;
   authLoginRoute: typeof authLoginRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
+  GameGameIdRoute: typeof GameGameIdRoute;
 }
 export interface FileServerRoutesByFullPath {
   "/api/debug-square": typeof ApiDebugSquareServerRoute;
@@ -616,6 +642,13 @@ export interface RootServerRouteChildren {
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/search": {
+      id: "/search";
+      path: "/search";
+      fullPath: "/search";
+      preLoaderRoute: typeof SearchRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/onboarding": {
       id: "/onboarding";
       path: "/onboarding";
@@ -657,6 +690,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/";
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
+    };
+    "/game/$gameId": {
+      id: "/game/$gameId";
+      path: "/game/$gameId";
+      fullPath: "/game/$gameId";
+      preLoaderRoute: typeof GameGameIdRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/events/$slug": {
       id: "/events/$slug";
@@ -1098,10 +1138,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  SearchRoute: SearchRoute,
   authLoginRoute: authLoginRoute,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
   AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
+  GameGameIdRoute: GameGameIdRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -49,7 +49,13 @@ describe("CampaignForm", () => {
 
   it("renders correctly for updating an existing campaign", async () => {
     await renderCampaignForm({
-      initialValues: MOCK_CAMPAIGN,
+      initialValues: {
+        ...MOCK_CAMPAIGN,
+        sessionZeroData: MOCK_CAMPAIGN.sessionZeroData ?? undefined,
+        campaignExpectations: MOCK_CAMPAIGN.campaignExpectations ?? undefined,
+        tableExpectations: MOCK_CAMPAIGN.tableExpectations ?? undefined,
+        characterCreationOutcome: MOCK_CAMPAIGN.characterCreationOutcome ?? undefined,
+      },
       onSubmit: vi.fn(),
       isSubmitting: false,
     });

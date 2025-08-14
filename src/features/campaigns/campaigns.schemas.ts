@@ -13,6 +13,46 @@ import {
   safetyRulesSchema,
 } from "~/shared/schemas/common";
 
+// Define sub-schemas for sessionZeroData
+export const campaignExpectationsSchema = z.object({
+  style: z.string().nullable().optional(),
+  difficulty: z.string().nullable().optional(),
+  houseRules: z.string().nullable().optional(),
+  levelingUp: z.string().nullable().optional(),
+  campaignLength: z.string().nullable().optional(),
+});
+
+export const tableExpectationsSchema = z.object({
+  foodDrinks: z.string().nullable().optional(),
+  nonTableActivities: z.string().nullable().optional(),
+  diceRolls: z.string().nullable().optional(),
+  pvp: z.string().nullable().optional(),
+  characterSecrets: z.string().nullable().optional(),
+  playerAbsences: z.string().nullable().optional(),
+});
+
+export const sessionZeroSafetyToolsSchema = z.object({
+  openCommunication: z.boolean().nullable().optional(),
+  xCardSystem: z.boolean().nullable().optional(),
+  xCardDetails: z.string().nullable().optional(),
+  playerBoundariesConsent: z.string().nullable().optional(),
+});
+
+export const sessionZeroCharacterCreationSchema = z.object({
+  creationQuestions: z.string().nullable().optional(),
+  featsAllowed: z.boolean().nullable().optional(),
+  statsDetermination: z.string().nullable().optional(),
+  contextIntegration: z.string().nullable().optional(),
+});
+
+// Main sessionZeroData schema
+export const sessionZeroSchema = z.object({
+  campaignExpectations: campaignExpectationsSchema.optional(),
+  tableExpectations: tableExpectationsSchema.optional(),
+  safetyTools: sessionZeroSafetyToolsSchema.optional(),
+  characterCreation: sessionZeroCharacterCreationSchema.optional(),
+});
+
 export const createCampaignInputSchema = z.object({
   name: z.string().min(1, "Campaign name is required"),
   description: z.string().min(1, "Description is required"),
@@ -28,6 +68,11 @@ export const createCampaignInputSchema = z.object({
   minimumRequirements: minimumRequirementsSchema.optional(),
   visibility: z.enum(visibilityEnum.enumValues), // Changed to visibilityEnum
   safetyRules: safetyRulesSchema.optional(),
+  // New fields for Session Zero
+  sessionZeroData: sessionZeroSchema.optional(),
+  campaignExpectations: campaignExpectationsSchema.optional(),
+  tableExpectations: tableExpectationsSchema.optional(),
+  characterCreationOutcome: z.string().optional(),
 });
 
 export const addCampaignParticipantInputSchema = z.object({
@@ -41,6 +86,11 @@ export const updateCampaignInputSchema = createCampaignInputSchema.partial().ext
   id: z.string().min(1),
   gameSystemId: z.number().int().optional(),
   status: z.enum(campaignStatusEnum.enumValues).optional(),
+  // New fields for Session Zero
+  sessionZeroData: sessionZeroSchema.nullable().optional(), // Added .nullable()
+  campaignExpectations: campaignExpectationsSchema.nullable().optional(), // Added .nullable()
+  tableExpectations: tableExpectationsSchema.nullable().optional(), // Added .nullable()
+  characterCreationOutcome: z.string().nullable().optional(), // Added .nullable()
 });
 
 export const getCampaignSchema = z.object({

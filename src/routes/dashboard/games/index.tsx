@@ -35,7 +35,7 @@ function GamesPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Games</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Games</h1>
           <p className="text-muted-foreground">Manage your game sessions</p>
         </div>
         <Button asChild>

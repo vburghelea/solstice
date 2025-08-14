@@ -118,7 +118,7 @@ function ManageTeamPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Manage Team Settings</CardTitle>
+          <CardTitle className="text-gray-900">Manage Team Settings</CardTitle>
           <CardDescription>Update your team profile and settings</CardDescription>
         </CardHeader>
         <CardContent>

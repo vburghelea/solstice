@@ -125,7 +125,7 @@ function TeamCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">{team.name}</CardTitle>
+            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}

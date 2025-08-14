@@ -9,7 +9,10 @@ import { Button } from "~/components/ui/button";
 import { campaignRecurrenceEnum } from "~/db/schema/campaigns.schema";
 import { visibilityEnum } from "~/db/schema/shared.schema"; // Added visibilityEnum
 import {
+  campaignExpectationsSchema, // Import new schema
   createCampaignInputSchema,
+  sessionZeroSchema, // Import new schema
+  tableExpectationsSchema, // Import new schema
   updateCampaignInputSchema,
 } from "~/features/campaigns/campaigns.schemas";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
@@ -37,7 +40,13 @@ import {
 import { Textarea } from "~/shared/ui/textarea";
 
 interface CampaignFormProps {
-  initialValues?: z.infer<typeof updateCampaignInputSchema>;
+  initialValues?: Partial<z.infer<typeof updateCampaignInputSchema>> & {
+    // Use Partial for all optional fields
+    characterCreationOutcome?: string | null | undefined; // Explicitly allow undefined
+    sessionZeroData?: z.infer<typeof sessionZeroSchema> | null | undefined; // Explicitly allow undefined
+    campaignExpectations?: z.infer<typeof campaignExpectationsSchema> | null | undefined; // Explicitly allow undefined
+    tableExpectations?: z.infer<typeof tableExpectationsSchema> | null | undefined; // Explicitly allow undefined
+  };
   onSubmit: (
     values:
       | z.infer<typeof createCampaignInputSchema>

@@ -141,6 +141,11 @@ export const listCampaigns = createServerFn({ method: "POST" })
           owner: r.owner,
           participantCount: r.participantCount,
           gameSystem: r.gameSystem, // Include gameSystem in the mapped object
+          // Explicitly set new fields to undefined if null from DB
+          sessionZeroData: r.campaign.sessionZeroData ?? undefined,
+          campaignExpectations: r.campaign.campaignExpectations ?? undefined,
+          tableExpectations: r.campaign.tableExpectations ?? undefined,
+          characterCreationOutcome: r.campaign.characterCreationOutcome ?? undefined,
         })) as CampaignListItem[],
       };
     } catch (error) {

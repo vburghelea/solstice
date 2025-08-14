@@ -49,7 +49,7 @@ import {
 } from "~/tests/mocks/games";
 import { MOCK_OWNER_USER } from "~/tests/mocks/users";
 import { renderWithRouter } from "~/tests/utils/router";
-import { CampaignDetailsPage } from "../$campaignId";
+import { CampaignDetailsPage } from "../$campaignId/index";
 
 // Mock CampaignGameSessionCard
 vi.mock("~/features/games/components/CampaignGameSessionCard", () => ({

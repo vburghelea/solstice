@@ -163,7 +163,7 @@ export function CreateGamePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Create a New Game</CardTitle>
+          <CardTitle className="text-gray-900">Create a New Game</CardTitle>
           <CardDescription>
             Set up your game session and start inviting players
           </CardDescription>

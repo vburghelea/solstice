@@ -8,6 +8,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { listCampaigns } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
+import type { OperationResult } from "~/shared/types/common"; // Import OperationResult
 
 export const Route = createFileRoute("/dashboard/campaigns/")({
   component: CampaignsPage,
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/dashboard/campaigns/")({
 export function CampaignsPage() {
   const { campaigns: initialCampaigns } = Route.useLoaderData();
 
-  const { data: campaignsData } = useSuspenseQuery({
+  const { data: campaignsData } = useSuspenseQuery<OperationResult<CampaignListItem[]>>({
     queryKey: ["allVisibleCampaigns", "active"],
     queryFn: () => listCampaigns({ data: { filters: { status: "active" } } }),
     initialData: { success: true, data: initialCampaigns },
@@ -36,7 +37,7 @@ export function CampaignsPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Campaigns</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Campaigns</h1>
           <p className="text-muted-foreground">Manage your campaign sessions</p>
         </div>
         <Button asChild>

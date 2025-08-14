@@ -10,7 +10,13 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { z } from "zod"; // Import z
 import { applicationStatusEnum, visibilityEnum } from "~/db/schema/shared.schema"; // Added applicationStatusEnum
+import {
+  campaignExpectationsSchema, // Import new schemas
+  sessionZeroSchema,
+  tableExpectationsSchema,
+} from "~/features/campaigns/campaigns.schemas"; // Import new schemas
 import { user } from "./auth.schema";
 import { gameSystems as gameSystem } from "./game-systems.schema";
 
@@ -46,6 +52,17 @@ export const campaigns = pgTable("campaigns", {
   minimumRequirements: jsonb("minimum_requirements"),
   visibility: visibilityEnum("visibility").notNull().default("public"), // Changed to visibilityEnum
   safetyRules: jsonb("safety_rules"),
+  // New fields for Session Zero
+  sessionZeroData: jsonb("session_zero_data").$type<z.infer<
+    typeof sessionZeroSchema
+  > | null>(),
+  campaignExpectations: jsonb("campaign_expectations").$type<z.infer<
+    typeof campaignExpectationsSchema
+  > | null>(),
+  tableExpectations: jsonb("table_expectations").$type<z.infer<
+    typeof tableExpectationsSchema
+  > | null>(),
+  characterCreationOutcome: text("character_creation_outcome").$type<string | null>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

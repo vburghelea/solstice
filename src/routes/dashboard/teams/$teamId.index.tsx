@@ -99,7 +99,7 @@ function TeamDetailsPage() {
       <div className="mb-8">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold">{team.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{team.name}</h1>
             {team.city && (
               <p className="text-muted-foreground mt-1 flex items-center">
                 <MapPinIcon className="mr-1 h-4 w-4" />
@@ -129,7 +129,7 @@ function TeamDetailsPage() {
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>About</CardTitle>
+              <CardTitle className="text-gray-900">About</CardTitle>
             </CardHeader>
             <CardContent>
               {team.description ? (
@@ -166,7 +166,7 @@ function TeamDetailsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-gray-900">
                 Members
                 <Badge variant="secondary">{memberCount}</Badge>
               </CardTitle>
@@ -222,7 +222,7 @@ function TeamDetailsPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Team Stats</CardTitle>
+              <CardTitle className="text-gray-900">Team Stats</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -248,7 +248,7 @@ function TeamDetailsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle className="text-gray-900">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {requestState && (

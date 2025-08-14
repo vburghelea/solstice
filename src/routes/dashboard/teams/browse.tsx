@@ -58,7 +58,7 @@ function BrowseTeamsPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-admin-text-primary text-3xl font-bold">Browse Teams</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Browse Teams</h1>
         <p className="text-muted-foreground">Discover and join teams in your area</p>
       </div>
 
@@ -116,7 +116,7 @@ function PublicTeamCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">{team.name}</CardTitle>
+            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}

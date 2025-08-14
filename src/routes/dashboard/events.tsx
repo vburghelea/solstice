@@ -7,7 +7,7 @@ export const Route = createFileRoute("/dashboard/events")({
 function EventsPage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <h1 className="text-3xl font-bold tracking-tight">Events</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-gray-900">Events</h1>
       <p className="text-muted-foreground">Feature coming soon.</p>
     </div>
   );

@@ -172,7 +172,7 @@ function MembershipPage() {
       <div className="container mx-auto py-8">
         <Card className="border-destructive">
           <CardHeader>
-            <CardTitle>Error</CardTitle>
+            <CardTitle className="text-gray-900">Error</CardTitle>
             <CardDescription>
               {membershipStatusQuery.error?.message ||
                 membershipTypesQuery.error?.message}
@@ -203,7 +203,7 @@ function MembershipPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="mb-8 text-3xl font-bold">Membership</h1>
+      <h1 className="mb-8 text-3xl font-bold text-gray-900">Membership</h1>
       <p className="text-muted-foreground mb-6">
         Join Roundup Games and access exclusive member benefits
       </p>
@@ -211,7 +211,7 @@ function MembershipPage() {
       {/* Current Membership Status */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Current Status</CardTitle>
+          <CardTitle className="text-gray-900">Current Status</CardTitle>
         </CardHeader>
         <CardContent>
           {membershipStatus?.hasMembership ? (
@@ -262,7 +262,7 @@ function MembershipPage() {
             return (
               <Card key={type.id}>
                 <CardHeader>
-                  <CardTitle>{type.name}</CardTitle>
+                  <CardTitle className="text-gray-900">{type.name}</CardTitle>
                   <CardDescription>${(type.priceCents / 100).toFixed(2)}</CardDescription>
                 </CardHeader>
                 <CardContent>

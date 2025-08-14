@@ -37,7 +37,7 @@ function TeamsIndexPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Teams</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Teams</h1>
           <p className="text-muted-foreground">Manage your teams and memberships</p>
         </div>
         <Button asChild>
@@ -52,7 +52,7 @@ function TeamsIndexPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">No teams yet</h3>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">No teams yet</h3>
             <p className="text-muted-foreground mb-4 text-center">
               Join an existing team or create your own to get started
             </p>
@@ -98,7 +98,7 @@ function TeamCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">{team.name}</CardTitle>
+            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}

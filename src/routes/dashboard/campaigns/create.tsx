@@ -40,7 +40,7 @@ export function CreateCampaignPage() {
     <div className="container mx-auto max-w-2xl p-6">
       <Card>
         <CardHeader>
-          <CardTitle>Create a New Campaign</CardTitle>
+          <CardTitle className="text-gray-900">Create a New Campaign</CardTitle>
           <CardDescription>
             Set up your campaign and start inviting players
           </CardDescription>

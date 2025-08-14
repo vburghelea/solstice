@@ -61,7 +61,7 @@ function DashboardIndex() {
     <div className="container mx-auto space-y-8 p-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
           Welcome back, {user?.name || "Player"}!
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -74,7 +74,9 @@ function DashboardIndex() {
         {/* Membership Status Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Membership Status</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-900">
+              Membership Status
+            </CardTitle>
             {membershipStatus?.hasMembership ? (
               <CheckCircle2 className="h-4 w-4 text-green-600" />
             ) : (
@@ -103,7 +105,7 @@ function DashboardIndex() {
         {/* Teams Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">My Teams</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-900">My Teams</CardTitle>
             <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -119,7 +121,9 @@ function DashboardIndex() {
         {/* Upcoming Events Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Upcoming Events</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-900">
+              Upcoming Events
+            </CardTitle>
             <Calendar className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -138,7 +142,7 @@ function DashboardIndex() {
           {/* Complete Profile - always shown since profile is complete to access dashboard */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-gray-900">
                 <User className="h-5 w-5" />
                 View Profile
               </CardTitle>
@@ -156,7 +160,7 @@ function DashboardIndex() {
           {/* Buy/Renew Membership */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-gray-900">
                 <CreditCard className="h-5 w-5" />
                 {membershipStatus?.hasMembership ? "Renew Membership" : "Buy Membership"}
               </CardTitle>
@@ -178,7 +182,7 @@ function DashboardIndex() {
           {/* Join Team */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-gray-900">
                 <UserPlus className="h-5 w-5" />
                 Join a Team
               </CardTitle>

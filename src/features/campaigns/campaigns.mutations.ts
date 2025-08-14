@@ -145,11 +145,23 @@ export const updateCampaign = createServerFn({ method: "POST" })
         };
       }
 
+      // Extract session zero data and other derived fields
+      const sessionZeroData = data.sessionZeroData;
+      const safetyRules = sessionZeroData?.safetyTools || null;
+      const campaignExpectations = sessionZeroData?.campaignExpectations || null;
+      const tableExpectations = sessionZeroData?.tableExpectations || null;
+      const characterCreationOutcome = data.characterCreationOutcome || null;
+
       const [updatedCampaign] = await db
         .update(campaigns)
         .set({
           ...data,
           pricePerSession: data.pricePerSession || null,
+          safetyRules: safetyRules, // Update safetyRules from sessionZeroData
+          sessionZeroData: sessionZeroData, // Store the full session zero data
+          campaignExpectations: campaignExpectations, // Store campaign expectations
+          tableExpectations: tableExpectations, // Store table expectations
+          characterCreationOutcome: characterCreationOutcome, // Store character creation outcome
           updatedAt: new Date(),
         })
         .where(eq(campaigns.id, data.id))

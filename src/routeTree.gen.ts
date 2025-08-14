@@ -42,8 +42,10 @@ import { Route as DashboardGamesGameIdRouteImport } from "./routes/dashboard/gam
 import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard/campaigns/create";
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
+import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from "./routes/dashboard/campaigns/$campaignId/index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from "./routes/dashboard/campaigns/$campaignId/zero";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
@@ -211,6 +213,12 @@ const DashboardTeamsTeamIdIndexRoute =
     path: "/",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
+const DashboardCampaignsCampaignIdIndexRoute =
+  DashboardCampaignsCampaignIdIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => DashboardCampaignsCampaignIdRoute,
+  } as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
     id: "/members",
@@ -222,6 +230,12 @@ const DashboardTeamsTeamIdManageRoute =
     id: "/manage",
     path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
+  } as any);
+const DashboardCampaignsCampaignIdZeroRoute =
+  DashboardCampaignsCampaignIdZeroRouteImport.update({
+    id: "/zero",
+    path: "/zero",
+    getParentRoute: () => DashboardCampaignsCampaignIdRoute,
   } as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
@@ -277,7 +291,7 @@ export interface FileRoutesByFullPath {
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
-  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -287,8 +301,10 @@ export interface FileRoutesByFullPath {
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
@@ -307,7 +323,6 @@ export interface FileRoutesByTo {
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
-  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -316,8 +331,10 @@ export interface FileRoutesByTo {
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdIndexRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
@@ -342,7 +359,7 @@ export interface FileRoutesById {
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
-  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -352,8 +369,10 @@ export interface FileRoutesById {
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
@@ -389,8 +408,10 @@ export interface FileRouteTypes {
     | "/dashboard/campaigns/"
     | "/dashboard/games/"
     | "/dashboard/teams/"
+    | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId/"
     | "/dashboard/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -409,7 +430,6 @@ export interface FileRouteTypes {
     | "/game/$gameId"
     | "/dashboard"
     | "/onboarding"
-    | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -418,8 +438,10 @@ export interface FileRouteTypes {
     | "/dashboard/campaigns"
     | "/dashboard/games"
     | "/dashboard/teams"
+    | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId"
     | "/dashboard/teams/$teamId";
   id:
     | "__root__"
@@ -453,8 +475,10 @@ export interface FileRouteTypes {
     | "/dashboard/campaigns/"
     | "/dashboard/games/"
     | "/dashboard/teams/"
+    | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId/"
     | "/dashboard/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
@@ -747,6 +771,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdIndexRouteImport;
       parentRoute: typeof DashboardTeamsTeamIdRoute;
     };
+    "/dashboard/campaigns/$campaignId/": {
+      id: "/dashboard/campaigns/$campaignId/";
+      path: "/";
+      fullPath: "/dashboard/campaigns/$campaignId/";
+      preLoaderRoute: typeof DashboardCampaignsCampaignIdIndexRouteImport;
+      parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+    };
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
       path: "/members";
@@ -760,6 +791,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/teams/$teamId/manage";
       preLoaderRoute: typeof DashboardTeamsTeamIdManageRouteImport;
       parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
+    "/dashboard/campaigns/$campaignId/zero": {
+      id: "/dashboard/campaigns/$campaignId/zero";
+      path: "/zero";
+      fullPath: "/dashboard/campaigns/$campaignId/zero";
+      preLoaderRoute: typeof DashboardCampaignsCampaignIdZeroRouteImport;
+      parentRoute: typeof DashboardCampaignsCampaignIdRoute;
     };
   }
 }
@@ -824,14 +862,33 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 );
 
+interface DashboardCampaignsCampaignIdRouteChildren {
+  DashboardCampaignsCampaignIdZeroRoute: typeof DashboardCampaignsCampaignIdZeroRoute;
+  DashboardCampaignsCampaignIdIndexRoute: typeof DashboardCampaignsCampaignIdIndexRoute;
+}
+
+const DashboardCampaignsCampaignIdRouteChildren: DashboardCampaignsCampaignIdRouteChildren =
+  {
+    DashboardCampaignsCampaignIdZeroRoute:
+      DashboardCampaignsCampaignIdZeroRoute,
+    DashboardCampaignsCampaignIdIndexRoute:
+      DashboardCampaignsCampaignIdIndexRoute,
+  };
+
+const DashboardCampaignsCampaignIdRouteWithChildren =
+  DashboardCampaignsCampaignIdRoute._addFileChildren(
+    DashboardCampaignsCampaignIdRouteChildren,
+  );
+
 interface DashboardCampaignsRouteChildren {
-  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRoute;
+  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRouteWithChildren;
   DashboardCampaignsCreateRoute: typeof DashboardCampaignsCreateRoute;
   DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute;
 }
 
 const DashboardCampaignsRouteChildren: DashboardCampaignsRouteChildren = {
-  DashboardCampaignsCampaignIdRoute: DashboardCampaignsCampaignIdRoute,
+  DashboardCampaignsCampaignIdRoute:
+    DashboardCampaignsCampaignIdRouteWithChildren,
   DashboardCampaignsCreateRoute: DashboardCampaignsCreateRoute,
   DashboardCampaignsIndexRoute: DashboardCampaignsIndexRoute,
 };

@@ -29,6 +29,11 @@ export const MOCK_CAMPAIGN: CampaignWithDetails = {
   minimumRequirements: { languageLevel: "beginner" },
   visibility: "public",
   safetyRules: { "no-alcohol": true, "safe-word": false },
+  // New fields for Session Zero
+  sessionZeroData: null, // Or a mock object if needed for specific tests
+  campaignExpectations: null,
+  tableExpectations: null,
+  characterCreationOutcome: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   owner: MOCK_OWNER_USER,

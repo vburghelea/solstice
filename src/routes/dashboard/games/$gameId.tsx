@@ -49,7 +49,7 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{game.name}</CardTitle>
+        <CardTitle className="text-gray-900">{game.name}</CardTitle>
         <CardDescription>{game.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -237,7 +237,7 @@ export function GameDetailsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Game Details</CardTitle>
+              <CardTitle className="text-gray-900">Game Details</CardTitle>
               <CardDescription>
                 View and manage the details of this game session.
               </CardDescription>

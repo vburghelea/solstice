@@ -131,6 +131,7 @@ import { Route as DashboardAdminEventsReviewRouteImport } from "./routes/dashboa
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from "./routes/dashboard/campaigns/$campaignId/index";
+<<<<<<< HEAD
 =======
 import { Route as DashboardGamesGameIdRouteRouteImport } from "./routes/dashboard/games/$gameId/route";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
@@ -144,12 +145,23 @@ import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboa
 <<<<<<< HEAD
 import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from "./routes/dashboard/campaigns/$campaignId/zero";
 =======
+=======
+import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
+import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+<<<<<<< HEAD
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
 import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
+<<<<<<< HEAD
 >>>>>>> 9097c81 (fix: remove null buyerEmail from Square payment link request)
+=======
+=======
+import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from "./routes/dashboard/campaigns/$campaignId/zero";
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiDebugSquareServerRouteImport } from "./routes/api/debug-square";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
@@ -591,11 +603,15 @@ const DashboardTeamsTeamIdIndexRoute =
   } as any);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 const DashboardCampaignsCampaignIdIndexRoute =
   DashboardCampaignsCampaignIdIndexRouteImport.update({
     id: "/",
     path: "/",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
+<<<<<<< HEAD
 =======
 const DashboardGamesGameIdIndexRoute =
   DashboardGamesGameIdIndexRouteImport.update({
@@ -606,6 +622,9 @@ const DashboardGamesGameIdIndexRoute =
   } as any);
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+  } as any);
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
     id: "/members",
@@ -619,12 +638,15 @@ const DashboardTeamsTeamIdManageRoute =
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardCampaignsCampaignIdZeroRoute =
   DashboardCampaignsCampaignIdZeroRouteImport.update({
     id: "/zero",
     path: "/zero",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
 =======
+=======
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 const DashboardEventsEventIdManageRoute =
   DashboardEventsEventIdManageRouteImport.update({
     id: "/$eventId/manage",
@@ -637,6 +659,14 @@ const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
   path: "/api/test-square",
   getParentRoute: () => rootServerRouteImport,
 } as any);
+=======
+const DashboardCampaignsCampaignIdZeroRoute =
+  DashboardCampaignsCampaignIdZeroRouteImport.update({
+    id: "/zero",
+    path: "/zero",
+    getParentRoute: () => DashboardCampaignsCampaignIdRoute,
+  } as any);
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
   path: "/api/health",
@@ -821,9 +851,13 @@ export interface FileRoutesByFullPath {
   "/dashboard/": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+<<<<<<< HEAD
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
+=======
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
@@ -836,8 +870,10 @@ export interface FileRoutesByFullPath {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+<<<<<<< HEAD
   "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -849,6 +885,14 @@ export interface FileRoutesByFullPath {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+=======
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+  "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
+  "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
@@ -937,9 +981,12 @@ export interface FileRoutesByTo {
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
+<<<<<<< HEAD
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
+=======
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
@@ -951,8 +998,10 @@ export interface FileRoutesByTo {
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+<<<<<<< HEAD
   "/events/$slug": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -964,6 +1013,14 @@ export interface FileRoutesByTo {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+=======
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+  "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
+  "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdIndexRoute;
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
@@ -1076,9 +1133,13 @@ export interface FileRoutesById {
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+<<<<<<< HEAD
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
+=======
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
@@ -1091,8 +1152,10 @@ export interface FileRoutesById {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+<<<<<<< HEAD
   "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -1104,6 +1167,14 @@ export interface FileRoutesById {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+=======
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+  "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
+  "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
@@ -1225,8 +1296,10 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/teams/"
+<<<<<<< HEAD
     | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -1238,6 +1311,14 @@ export interface FileRouteTypes {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+=======
+    | "/dashboard/campaigns/$campaignId/zero"
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+    | "/dashboard/teams/$teamId/manage"
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId/"
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -1326,9 +1407,12 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/events"
     | "/onboarding"
+<<<<<<< HEAD
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/$campaignId"
+=======
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/campaigns/create"
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
@@ -1340,8 +1424,10 @@ export interface FileRouteTypes {
     | "/dashboard/events"
     | "/dashboard/games"
     | "/dashboard/teams"
+<<<<<<< HEAD
     | "/events/$slug"
     | "/dashboard/events/$eventId/manage"
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -1353,6 +1439,14 @@ export interface FileRouteTypes {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+=======
+    | "/dashboard/campaigns/$campaignId/zero"
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+    | "/dashboard/teams/$teamId/manage"
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId"
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/teams/$teamId";
   id:
     | "__root__"
@@ -1472,8 +1566,10 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/teams/"
+<<<<<<< HEAD
     | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -1485,6 +1581,14 @@ export interface FileRouteTypes {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+=======
+    | "/dashboard/campaigns/$campaignId/zero"
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+    | "/dashboard/teams/$teamId/manage"
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId/"
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
@@ -2214,12 +2318,16 @@ declare module "@tanstack/react-router" {
     };
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     "/dashboard/campaigns/$campaignId/": {
       id: "/dashboard/campaigns/$campaignId/";
       path: "/";
       fullPath: "/dashboard/campaigns/$campaignId/";
       preLoaderRoute: typeof DashboardCampaignsCampaignIdIndexRouteImport;
       parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+<<<<<<< HEAD
 =======
     "/dashboard/games/$gameId/": {
       id: "/dashboard/games/$gameId/";
@@ -2231,6 +2339,9 @@ declare module "@tanstack/react-router" {
     };
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+    };
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
       path: "/members";
@@ -2246,6 +2357,7 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof DashboardTeamsTeamIdRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/campaigns/$campaignId/zero": {
       id: "/dashboard/campaigns/$campaignId/zero";
       path: "/zero";
@@ -2253,13 +2365,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardCampaignsCampaignIdZeroRouteImport;
       parentRoute: typeof DashboardCampaignsCampaignIdRoute;
 =======
+=======
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     "/dashboard/events/$eventId/manage": {
       id: "/dashboard/events/$eventId/manage";
       path: "/$eventId/manage";
       fullPath: "/dashboard/events/$eventId/manage";
       preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
       parentRoute: typeof DashboardEventsRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+=======
+    "/dashboard/campaigns/$campaignId/zero": {
+      id: "/dashboard/campaigns/$campaignId/zero";
+      path: "/zero";
+      fullPath: "/dashboard/campaigns/$campaignId/zero";
+      preLoaderRoute: typeof DashboardCampaignsCampaignIdZeroRouteImport;
+      parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     };
   }
 }
@@ -2393,6 +2518,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 interface DashboardCampaignsCampaignIdRouteChildren {
   DashboardCampaignsCampaignIdZeroRoute: typeof DashboardCampaignsCampaignIdZeroRoute;
   DashboardCampaignsCampaignIdIndexRoute: typeof DashboardCampaignsCampaignIdIndexRoute;
@@ -2439,6 +2565,8 @@ const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
   DashboardEventsIndexRoute: DashboardEventsIndexRoute,
 =======
 =======
+=======
+>>>>>>> 28f55e6 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 interface DashboardAdminRouteRouteChildren {
   DashboardAdminEventsReviewRoute: typeof DashboardAdminEventsReviewRoute;
   DashboardAdminRolesRoute: typeof DashboardAdminRolesRoute;
@@ -2451,18 +2579,38 @@ const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
 
 const DashboardAdminRouteRouteWithChildren =
   DashboardAdminRouteRoute._addFileChildren(DashboardAdminRouteRouteChildren);
+=======
+interface DashboardCampaignsCampaignIdRouteChildren {
+  DashboardCampaignsCampaignIdZeroRoute: typeof DashboardCampaignsCampaignIdZeroRoute;
+  DashboardCampaignsCampaignIdIndexRoute: typeof DashboardCampaignsCampaignIdIndexRoute;
+}
+
+const DashboardCampaignsCampaignIdRouteChildren: DashboardCampaignsCampaignIdRouteChildren =
+  {
+    DashboardCampaignsCampaignIdZeroRoute:
+      DashboardCampaignsCampaignIdZeroRoute,
+    DashboardCampaignsCampaignIdIndexRoute:
+      DashboardCampaignsCampaignIdIndexRoute,
+  };
+
+const DashboardCampaignsCampaignIdRouteWithChildren =
+  DashboardCampaignsCampaignIdRoute._addFileChildren(
+    DashboardCampaignsCampaignIdRouteChildren,
+  );
+>>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
 
 <<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
 interface DashboardCampaignsRouteChildren {
-  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRoute;
+  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRouteWithChildren;
   DashboardCampaignsCreateRoute: typeof DashboardCampaignsCreateRoute;
   DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute;
 }
 
 const DashboardCampaignsRouteChildren: DashboardCampaignsRouteChildren = {
-  DashboardCampaignsCampaignIdRoute: DashboardCampaignsCampaignIdRoute,
+  DashboardCampaignsCampaignIdRoute:
+    DashboardCampaignsCampaignIdRouteWithChildren,
   DashboardCampaignsCreateRoute: DashboardCampaignsCreateRoute,
   DashboardCampaignsIndexRoute: DashboardCampaignsIndexRoute,
 };

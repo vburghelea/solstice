@@ -15,12 +15,15 @@ import {
   CheckCircle2,
   Clock,
   CreditCard,
+  ScrollText,
+  Swords,
   Trophy,
   User,
   UserPlus,
   Users,
   XCircle,
 } from "~/components/ui/icons";
+import { getDashboardStats } from "~/features/dashboard/dashboard.queries";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 
@@ -30,6 +33,17 @@ export const Route = createFileRoute("/dashboard/")({
 
 function DashboardIndex() {
   const { user } = Route.useRouteContext();
+
+  const { data: dashboardStats } = useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: async () => {
+      const result = await getDashboardStats();
+      if (!result.success) {
+        throw new Error(result.errors?.[0]?.message || "Failed to fetch dashboard stats");
+      }
+      return result.data;
+    },
+  });
 
   // Fetch membership status
   const { data: membershipStatus } = useQuery({
@@ -130,6 +144,38 @@ function DashboardIndex() {
             <div className="text-2xl font-bold">{upcomingEventsCount}</div>
             <p className="text-muted-foreground mt-1 text-xs">
               {upcomingEventsCount === 0 ? "No events scheduled" : "Events this season"}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Campaigns Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-900">Campaigns</CardTitle>
+            <ScrollText className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {dashboardStats?.campaigns.owned ?? 0}
+            </div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {dashboardStats?.campaigns.member ?? 0} as member,{" "}
+              {dashboardStats?.campaigns.pendingInvites ?? 0} invites
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Games Card */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-900">Games</CardTitle>
+            <Swords className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardStats?.games.owned ?? 0}</div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {dashboardStats?.games.member ?? 0} as member,{" "}
+              {dashboardStats?.games.pendingInvites ?? 0} invites
             </p>
           </CardContent>
         </Card>

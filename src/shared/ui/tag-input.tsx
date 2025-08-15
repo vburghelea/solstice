@@ -13,6 +13,7 @@ interface TagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onAddTag: (tag: { id: number; name: string }) => void;
   onRemoveTag: (id: number) => void;
   placeholder?: string;
+  isDestructive?: boolean;
 }
 
 type GetGameSystemsFn = (params?: {
@@ -24,6 +25,7 @@ export function TagInput({
   onAddTag,
   onRemoveTag,
   placeholder,
+  isDestructive, // Add this line
   ...props
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
@@ -76,13 +78,23 @@ export function TagInput({
         {tags.map((tag) => (
           <span
             key={tag.id}
-            className="bg-primary text-primary-foreground flex items-center gap-1 rounded-md px-2 py-1 text-sm"
+            className={cn(
+              "flex items-center gap-1 rounded-md px-2 py-1 text-sm",
+              isDestructive
+                ? "bg-destructive text-destructive-foreground"
+                : "bg-primary text-primary-foreground",
+            )}
           >
             {tag.name}
             <Button
               variant="ghost"
               size="sm"
-              className="text-primary-foreground/80 hover:bg-primary/80 hover:text-primary-foreground ml-1 h-auto p-0"
+              className={cn(
+                "ml-1 h-auto p-0",
+                isDestructive
+                  ? "text-destructive-foreground/80 hover:bg-destructive/80 hover:text-destructive-foreground"
+                  : "text-primary-foreground/80 hover:bg-primary/80 hover:text-primary-foreground",
+              )}
               onClick={() => handleRemoveTag(tag.id)}
             >
               &times;

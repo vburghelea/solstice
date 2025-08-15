@@ -105,7 +105,11 @@ export function CampaignGameSessionCard({
                 variant="outline"
                 size="sm"
                 className="flex-1"
-                onClick={() => handleUpdateStatus("canceled")}
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to cancel this session?")) {
+                    handleUpdateStatus("canceled");
+                  }
+                }}
               >
                 <XCircle className="mr-2 h-4 w-4" />
                 Cancel Session

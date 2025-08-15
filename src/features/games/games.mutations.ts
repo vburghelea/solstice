@@ -268,6 +268,80 @@ export const deleteGame = createServerFn({ method: "POST" })
   });
 
 /**
+ * Cancel a game session
+ */
+export const cancelGame = createServerFn({ method: "POST" })
+  .validator(getGameSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { eq } = await import("drizzle-orm");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      // Check if current user is the owner
+      const existingGame = await findGameById(data.id);
+
+      if (!existingGame || existingGame.ownerId !== currentUser.id) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authorized to cancel this game" }],
+        };
+      }
+
+      const [updatedGame] = await db
+        .update(games)
+        .set({
+          status: "canceled",
+          updatedAt: new Date(),
+        })
+        .where(eq(games.id, data.id))
+        .returning();
+
+      if (!updatedGame) {
+        return {
+          success: false,
+          errors: [{ code: "DATABASE_ERROR", message: "Failed to cancel game" }],
+        };
+      }
+
+      // Fetch the updated game with details
+      const { getGame } = await import("./games.queries");
+      const gameWithDetails = await getGame({ data: { id: updatedGame.id } });
+
+      if (!gameWithDetails.success || !gameWithDetails.data) {
+        return {
+          success: false,
+          errors: [{ code: "DATABASE_ERROR", message: "Failed to fetch updated game" }],
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          ...gameWithDetails.data,
+          location: gameWithDetails.data.location,
+        },
+      };
+    } catch (error) {
+      console.error("Error cancelling game:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to cancel game" }],
+      };
+    }
+  });
+
+/**
  * Add a participant to a game (e.g., owner adding a player, or inviting)
  */
 export const addGameParticipant = createServerFn({ method: "POST" })

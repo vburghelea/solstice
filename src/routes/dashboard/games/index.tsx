@@ -2,7 +2,16 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Gamepad2, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Card, CardContent } from "~/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { gameStatusEnum } from "~/db/schema";
 import { GameCard } from "~/features/games/components/GameCard";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
@@ -10,6 +19,9 @@ import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/dashboard/games/")({
   component: GamesPage,
+  validateSearch: z.object({
+    status: z.enum(gameStatusEnum.enumValues).optional(),
+  }),
   loader: async () => {
     const result = await listGames({ data: { filters: { status: "scheduled" } } });
     if (!result.success) {
@@ -21,12 +33,19 @@ export const Route = createFileRoute("/dashboard/games/")({
 });
 
 function GamesPage() {
-  const { games: initialGames } = Route.useLoaderData();
+  const { status = "scheduled" } = Route.useSearch();
+  const navigate = Route.useNavigate();
 
   const { data: gamesData } = useSuspenseQuery({
-    queryKey: ["allVisibleGames", "scheduled"],
-    queryFn: () => listGames({ data: { filters: { status: "scheduled" } } }),
-    initialData: { success: true, data: initialGames },
+    queryKey: ["allVisibleGames", status],
+    queryFn: async () => {
+      const result = await listGames({ data: { filters: { status } } });
+      if (!result.success) {
+        toast.error("Failed to load games.");
+        return { success: false, data: [] };
+      }
+      return result;
+    },
   });
 
   const games = gamesData.success ? gamesData.data : [];
@@ -38,12 +57,33 @@ function GamesPage() {
           <h1 className="text-3xl font-bold text-gray-900">My Games</h1>
           <p className="text-muted-foreground">Manage your game sessions</p>
         </div>
-        <Button asChild>
-          <Link to="/dashboard/games/create">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Create New Game
-          </Link>
-        </Button>
+        <div className="flex items-center gap-4">
+          <Select
+            value={status}
+            onValueChange={(value) => {
+              navigate({
+                search: { status: value as (typeof gameStatusEnum.enumValues)[number] },
+              });
+            }}
+          >
+            <SelectTrigger className="w-[180px] border border-gray-300 bg-white text-gray-900">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              {gameStatusEnum.enumValues.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button asChild>
+            <Link to="/dashboard/games/create">
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Create New Game
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {games.length === 0 ? (

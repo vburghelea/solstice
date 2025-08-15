@@ -134,9 +134,11 @@ describe("CampaignGameSessionCard", () => {
     });
   });
 
-  it('calls onUpdateStatus with "canceled" when Cancel Session is clicked', async () => {
+  it('calls onUpdateStatus with "canceled" when Cancel Session is clicked and confirmed', async () => {
     const user = userEvent.setup();
     const onUpdateStatus = vi.fn();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
     await renderWithRouter(
       <CampaignGameSessionCard
         game={MOCK_CAMPAIGN_GAME_1 as GameListItem}
@@ -151,8 +153,36 @@ describe("CampaignGameSessionCard", () => {
 
     await user.click(screen.getByRole("button", { name: /Cancel Session/i }));
 
+    expect(window.confirm).toHaveBeenCalledWith(
+      "Are you sure you want to cancel this session?",
+    );
     expect(onUpdateStatus).toHaveBeenCalledWith({
       data: { gameId: MOCK_CAMPAIGN_GAME_1.id, status: "canceled" },
     });
+  });
+
+  it("does not call onUpdateStatus when Cancel Session is clicked and not confirmed", async () => {
+    const user = userEvent.setup();
+    const onUpdateStatus = vi.fn();
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    await renderWithRouter(
+      <CampaignGameSessionCard
+        game={MOCK_CAMPAIGN_GAME_1 as GameListItem}
+        isOwner={true}
+        onUpdateStatus={onUpdateStatus}
+      />,
+      {
+        path: "/dashboard/campaigns/$campaignId",
+        initialEntries: ["/dashboard/campaigns/123"],
+      },
+    );
+
+    await user.click(screen.getByRole("button", { name: /Cancel Session/i }));
+
+    expect(window.confirm).toHaveBeenCalledWith(
+      "Are you sure you want to cancel this session?",
+    );
+    expect(onUpdateStatus).not.toHaveBeenCalled();
   });
 });

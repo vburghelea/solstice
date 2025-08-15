@@ -51,6 +51,7 @@ export function GamePreferencesStep({
           onAddTag={handleAddToAvoid}
           onRemoveTag={handleRemoveFromToAvoid}
           placeholder="Search and add game systems to avoid..."
+          isDestructive={true} // Add this line
         />
       </div>
     </div>

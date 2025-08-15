@@ -291,7 +291,8 @@ export const listGames = createServerFn({ method: "POST" })
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
         .where(finalWhereClause)
-        .groupBy(games.id, user.id, gameSystems.id);
+        .groupBy(games.id, user.id, gameSystems.id)
+        .orderBy(games.dateTime);
 
       return {
         success: true,
@@ -451,7 +452,8 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
         .where(and(...conditions))
-        .groupBy(games.id, user.id, gameSystems.id);
+        .groupBy(games.id, user.id, gameSystems.id)
+        .orderBy(games.dateTime);
 
       return {
         success: true,

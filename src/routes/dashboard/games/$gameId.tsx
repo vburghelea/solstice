@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Edit2, LoaderCircle } from "lucide-react";
+import { Edit2, LoaderCircle, XCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -18,7 +18,7 @@ import { InviteParticipants } from "~/features/games/components/InviteParticipan
 
 import { ManageInvitations } from "~/features/games/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
-import { applyToGame, updateGame } from "~/features/games/games.mutations";
+import { applyToGame, cancelGame, updateGame } from "~/features/games/games.mutations";
 import {
   getGame,
   getGameApplicationForUser,
@@ -163,6 +163,21 @@ export function GameDetailsPage() {
     },
   });
 
+  const cancelGameMutation = useMutation({
+    mutationFn: cancelGame,
+    onSuccess: async (data) => {
+      if (data.success) {
+        toast.success("Game cancelled successfully");
+        await queryClient.invalidateQueries({ queryKey: ["game", gameId] });
+      } else {
+        toast.error(data.errors?.[0]?.message || "Failed to cancel game");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "An unexpected error occurred");
+    },
+  });
+
   const { data: applicationsData, isLoading: isLoadingApplications } = useQuery({
     queryKey: ["gameApplications", gameId],
     queryFn: () => getGameApplications({ data: { id: gameId } }),
@@ -242,12 +257,27 @@ export function GameDetailsPage() {
                 View and manage the details of this game session.
               </CardDescription>
             </div>
-            {isOwner && !isEditing ? (
-              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                <Edit2 className="mr-2 h-4 w-4" />
-                Edit Game
-              </Button>
-            ) : null}
+            {isOwner && !isEditing && game.status === "scheduled" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to cancel this game?")) {
+                      cancelGameMutation.mutate({ data: { id: gameId } });
+                    }
+                  }}
+                  variant="destructive"
+                  size="sm"
+                  disabled={cancelGameMutation.isPending}
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel Game
+                </Button>
+                <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Game
+                </Button>
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent>

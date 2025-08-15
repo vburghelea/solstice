@@ -4,16 +4,29 @@ import { Button } from "~/components/ui/button";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Gamepad2, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Card, CardContent } from "~/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { campaignStatusEnum } from "~/db/schema";
 import { listCampaigns } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
-import type { OperationResult } from "~/shared/types/common"; // Import OperationResult
 
 export const Route = createFileRoute("/dashboard/campaigns/")({
   component: CampaignsPage,
+  validateSearch: z.object({
+    status: z.enum(campaignStatusEnum.enumValues).optional(),
+  }),
   loader: async () => {
-    const result = await listCampaigns({ data: { filters: { status: "active" } } });
+    const result = await listCampaigns({
+      data: { filters: { status: "active" } },
+    });
     if (!result.success) {
       toast.error("Failed to load campaigns.");
       return { campaigns: [] };
@@ -23,12 +36,23 @@ export const Route = createFileRoute("/dashboard/campaigns/")({
 });
 
 export function CampaignsPage() {
-  const { campaigns: initialCampaigns } = Route.useLoaderData();
+  const { status = "active" } = Route.useSearch();
+  const navigate = Route.useNavigate();
 
-  const { data: campaignsData } = useSuspenseQuery<OperationResult<CampaignListItem[]>>({
-    queryKey: ["allVisibleCampaigns", "active"],
-    queryFn: () => listCampaigns({ data: { filters: { status: "active" } } }),
-    initialData: { success: true, data: initialCampaigns },
+  const { data: campaignsData } = useSuspenseQuery({
+    queryKey: ["allVisibleCampaigns", status],
+    queryFn: async () => {
+      const result = await listCampaigns({ data: { filters: { status } } });
+      if (!result.success) {
+        toast.error("Failed to load campaigns.");
+        return {
+          success: false,
+          errors: [{ code: "FETCH_ERROR", message: "Failed to load campaigns" }],
+          data: [],
+        };
+      }
+      return result;
+    },
   });
 
   const campaigns = campaignsData.success ? campaignsData.data : [];
@@ -40,12 +64,35 @@ export function CampaignsPage() {
           <h1 className="text-3xl font-bold text-gray-900">My Campaigns</h1>
           <p className="text-muted-foreground">Manage your campaign sessions</p>
         </div>
-        <Button asChild>
-          <Link to="/dashboard/campaigns/create">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Create New Campaign
-          </Link>
-        </Button>
+        <div className="flex items-center gap-4">
+          <Select
+            value={status}
+            onValueChange={(value) => {
+              navigate({
+                search: {
+                  status: value as (typeof campaignStatusEnum.enumValues)[number],
+                },
+              });
+            }}
+          >
+            <SelectTrigger className="w-[180px] border border-gray-300 bg-white text-gray-900">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              {campaignStatusEnum.enumValues.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button asChild>
+            <Link to="/dashboard/campaigns/create">
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Create New Campaign
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {campaigns.length === 0 ? (

@@ -63,7 +63,11 @@ describe("Profile Server Function Input Schemas", () => {
           privacySettings: {
             showEmail: true,
             showPhone: false,
+            showLocation: false,
+            showLanguages: false,
+            showGamePreferences: false,
             allowTeamInvitations: true,
+            allowFollows: true,
           },
         },
       };
@@ -79,7 +83,11 @@ describe("Profile Server Function Input Schemas", () => {
         data: {
           showEmail: false,
           showPhone: false,
+          showLocation: false,
+          showLanguages: false,
+          showGamePreferences: false,
           allowTeamInvitations: false,
+          allowFollows: true,
         },
       };
 

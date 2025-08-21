@@ -7,6 +7,7 @@ import { searchUsersForInvitation } from "~/features/games/games.queries";
 import type { GameParticipant } from "~/features/games/games.types";
 import { useDebounce } from "~/shared/hooks/useDebounce";
 
+import { ProfileLink } from "~/components/ProfileLink";
 import { Button } from "~/shared/ui/button";
 import {
   Card,
@@ -97,7 +98,7 @@ export function InviteParticipants({
                     key={user.id}
                     className="hover:bg-accent flex items-center justify-between rounded-sm p-2"
                   >
-                    <span>{user.name || user.email}</span>
+                    <ProfileLink userId={user.id} username={user.name || user.email} />
                     <Button
                       variant="outline"
                       size="sm"

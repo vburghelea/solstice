@@ -1,37 +1,104 @@
 export interface PrivacySettings {
   showEmail: boolean;
   showPhone: boolean;
+  showLocation: boolean;
+  showLanguages: boolean;
+  showGamePreferences: boolean;
   allowTeamInvitations: boolean;
+  allowFollows: boolean;
 }
+
+import type { AvailabilityData } from "~/db/schema/auth.schema";
 
 export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  image?: string;
   profileComplete: boolean;
-  gender?: string | undefined;
-  pronouns?: string | undefined;
-  phone?: string | undefined;
-  privacySettings?: PrivacySettings | undefined;
+  gender?: string;
+  pronouns?: string;
+  phone?: string;
+  city?: string;
+  country?: string;
+  languages: string[];
+  identityTags: string[];
+  preferredGameThemes: string[];
+  overallExperienceLevel?: "beginner" | "intermediate" | "advanced" | "expert";
+  gameSystemPreferences?: {
+    favorite: { id: number; name: string }[];
+    avoid: { id: number; name: string }[];
+  };
+  calendarAvailability?: AvailabilityData;
+  privacySettings?: PrivacySettings;
+  isGM: boolean;
+  gamesHosted: number;
+  averageResponseTime?: number;
+  responseRate: number;
+  gmStyle?: string;
+  gmRating?: number;
   profileVersion: number;
-  profileUpdatedAt?: Date | undefined;
-  gameSystemPreferences?:
-    | {
-        favorite: { id: number; name: string }[];
-        avoid: { id: number; name: string }[];
-      }
-    | undefined;
+  profileUpdatedAt?: Date;
 }
 
 export interface ProfileInput {
   gender?: string;
   pronouns?: string;
   phone?: string;
+  city?: string;
+  country?: string;
+  languages?: string[];
+  identityTags?: string[];
+  preferredGameThemes?: string[];
+  overallExperienceLevel?: "beginner" | "intermediate" | "advanced" | "expert";
   gameSystemPreferences?: {
     favorite: { id: number; name: string }[];
     avoid: { id: number; name: string }[];
   };
+  calendarAvailability?: AvailabilityData;
   privacySettings?: PrivacySettings;
+  isGM?: boolean;
+  gmStyle?: string;
+}
+
+// Social Feature Types
+export interface UserFollow {
+  id: string;
+  followerId: string;
+  followingId: string;
+  createdAt: Date;
+}
+
+export interface GMReview {
+  id: string;
+  reviewerId: string;
+  gmId: string;
+  rating: number; // 1-5 scale
+  selectedStrengths: string[];
+  comment?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface FollowInput {
+  followingId: string;
+}
+
+export interface GMReviewInput {
+  gmId: string;
+  rating: number;
+  selectedStrengths: string[];
+  comment?: string;
+}
+
+// Profile Display Types
+export interface ProfileDisplayData extends UserProfile {
+  followersCount: number;
+  followingCount: number;
+  isFollowing: boolean;
+  canFollow: boolean;
+  gmReviews: GMReview[];
+  averageGMRating?: number;
 }
 
 export interface ProfileError {
@@ -54,5 +121,9 @@ export interface ProfileOperationResult {
 export const defaultPrivacySettings: PrivacySettings = {
   showEmail: false,
   showPhone: false,
+  showLocation: false,
+  showLanguages: false,
+  showGamePreferences: false,
   allowTeamInvitations: true,
+  allowFollows: true,
 };

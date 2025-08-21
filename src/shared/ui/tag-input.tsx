@@ -1,74 +1,76 @@
-import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useMemo, useRef, useState } from "react";
-import { GameSystem } from "~/db/schema/game-systems.schema";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
-import { getGameSystems } from "../../features/profile/profile.queries";
 import { Button } from "./button";
 import { Input } from "./input";
 
 interface TagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  tags: { id: number; name: string }[];
-  onAddTag: (tag: { id: number; name: string }) => void;
-  onRemoveTag: (id: number) => void;
+  tags: { id: string; name: string }[];
+  onAddTag: (tag: { id: string; name: string }) => void;
+  onRemoveTag: (id: string) => void;
   placeholder?: string;
   isDestructive?: boolean;
+  availableSuggestions?: { id: string; name: string }[];
 }
-
-type GetGameSystemsFn = (params?: {
-  data?: { searchTerm?: string } | undefined;
-}) => Promise<{ success: boolean; data: GameSystem[]; errors?: unknown[] }>;
 
 export function TagInput({
   tags,
   onAddTag,
   onRemoveTag,
   placeholder,
-  isDestructive, // Add this line
+  isDestructive,
+  availableSuggestions = [],
   ...props
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
-  const debouncedInputValue = useDebounce(inputValue, 500);
-
-  const { data: gameSystems } = useQuery({
-    queryKey: ["gameSystems", debouncedInputValue],
-    queryFn: ({ queryKey }) => {
-      const [, currentSearchTerm] = queryKey;
-      const data =
-        currentSearchTerm && currentSearchTerm.length >= 3
-          ? { searchTerm: currentSearchTerm as string }
-          : undefined;
-      return (getGameSystems as GetGameSystemsFn)({ data });
-    },
-  });
-
+  const debouncedInputValue = useDebounce(inputValue, 300); // Debounce for client-side filtering
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Calculate derived state using useMemo
+  // Calculate derived state using useMemo for filtered suggestions
   const memoizedFilteredSuggestions = useMemo(() => {
-    const allGameSystems = gameSystems?.data || [];
-    return inputValue
-      ? allGameSystems.filter(
-          (suggestion) =>
-            !tags.some((tag) => tag.id === suggestion.id) &&
-            suggestion.name.toLowerCase().includes(inputValue.toLowerCase()),
-        )
-      : [];
-  }, [inputValue, gameSystems?.data, tags]);
+    if (!debouncedInputValue) {
+      return [];
+    }
+
+    const lowercasedInput = debouncedInputValue.toLowerCase();
+    return availableSuggestions.filter(
+      (suggestion) =>
+        !tags.some((tag) => tag.id === suggestion.id) && // Exclude already added tags
+        suggestion.name.toLowerCase().includes(lowercasedInput),
+    );
+  }, [debouncedInputValue, availableSuggestions, tags]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+    setShowSuggestions(true); // Show suggestions as soon as user types
   };
 
-  const handleAddSuggestion = (suggestion: { id: number; name: string }) => {
+  const handleAddSuggestion = (suggestion: { id: string; name: string }) => {
     onAddTag(suggestion);
     setInputValue("");
     setShowSuggestions(false);
   };
 
-  const handleRemoveTag = (id: number) => {
+  const handleAddTag = () => {
+    if (inputValue.trim() !== "") {
+      // Check if the input value matches an existing suggestion
+      const existingSuggestion = availableSuggestions.find(
+        (s) => s.name.toLowerCase() === inputValue.trim().toLowerCase(),
+      );
+      if (existingSuggestion) {
+        onAddTag(existingSuggestion);
+      } else {
+        // Add as a custom tag if no match
+        onAddTag({ id: inputValue.trim(), name: inputValue.trim() });
+      }
+      setInputValue("");
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleRemoveTag = (id: string) => {
     onRemoveTag(id);
   };
 
@@ -102,34 +104,45 @@ export function TagInput({
           </span>
         ))}
       </div>
-      <Input
-        ref={inputRef}
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        placeholder={placeholder}
-        onFocus={() => setShowSuggestions(true)}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
-        {...props}
-      />
-      {showSuggestions && memoizedFilteredSuggestions.length > 0 && (
-        <ul
-          className={cn(
-            "bg-popover border-border absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-lg",
-            props.className, // Allow external classNames to be applied
-          )}
-        >
-          {memoizedFilteredSuggestions.map((suggestion) => (
-            <li
-              key={suggestion.id}
-              className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-4 py-2"
-              onMouseDown={() => handleAddSuggestion(suggestion)}
-            >
-              {suggestion.name}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="relative flex gap-2">
+        <Input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder={placeholder}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 100)} // Delay to allow click on suggestions
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddTag();
+            }
+          }}
+          {...props}
+        />
+        <Button type="button" onClick={handleAddTag}>
+          Add
+        </Button>
+        {showSuggestions && memoizedFilteredSuggestions.length > 0 && (
+          <ul
+            className={cn(
+              "bg-popover border-border absolute top-full right-0 left-0 z-10 mt-1 max-h-60 overflow-auto rounded-md border shadow-lg",
+              props.className, // Allow external classNames to be applied
+            )}
+          >
+            {memoizedFilteredSuggestions.map((suggestion) => (
+              <li
+                key={suggestion.id}
+                className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-4 py-2"
+                onMouseDown={() => handleAddSuggestion(suggestion)} // Use onMouseDown to prevent onBlur
+              >
+                {suggestion.name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

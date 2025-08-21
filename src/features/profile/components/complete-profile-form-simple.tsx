@@ -13,13 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+import { defaultAvailabilityData } from "~/db/schema/auth.schema";
 import { cn } from "~/shared/lib/utils";
+import { experienceLevelOptions } from "~/shared/types/common";
+import { TagInput } from "~/shared/ui/tag-input";
 import { completeUserProfile } from "../profile.mutations";
 import { getUserGameSystemPreferences } from "../profile.queries";
 import type { ProfileInputType } from "../profile.schemas";
 import type { ProfileInput } from "../profile.types";
-
+import { AvailabilityEditor } from "./availability-editor";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 const STEPS = [
@@ -27,6 +31,11 @@ const STEPS = [
     id: "personal",
     title: "Personal Information",
     description: "Basic information about you",
+  },
+  {
+    id: "additional",
+    title: "Additional Information",
+    description: "More details about your gaming preferences and experience",
   },
   {
     id: "privacy",
@@ -51,6 +60,15 @@ export function CompleteProfileForm() {
     gender: "",
     pronouns: "",
     phone: "",
+    city: "",
+    country: "",
+    languages: [],
+    identityTags: [],
+    preferredGameThemes: [],
+    overallExperienceLevel: undefined,
+    calendarAvailability: defaultAvailabilityData,
+    isGM: false,
+    gmStyle: "",
     gameSystemPreferences: {
       favorite: [],
       avoid: [],
@@ -58,7 +76,11 @@ export function CompleteProfileForm() {
     privacySettings: {
       showEmail: false,
       showPhone: false,
+      showLocation: false,
+      showLanguages: false,
+      showGamePreferences: false,
       allowTeamInvitations: true,
+      allowFollows: true,
     },
   });
 
@@ -69,9 +91,7 @@ export function CompleteProfileForm() {
 
   const form = useForm({
     defaultValues: {
-      gender: formData.gender,
-      pronouns: formData.pronouns,
-      phone: formData.phone,
+      ...formData,
       gameSystemPreferences: {
         favorite:
           gamePreferencesData?.data?.favorite ??
@@ -79,15 +99,11 @@ export function CompleteProfileForm() {
           [],
         avoid:
           gamePreferencesData?.data?.avoid ?? formData.gameSystemPreferences?.avoid ?? [],
-      } as {
-        favorite: { id: number; name: string }[];
-        avoid: { id: number; name: string }[];
       },
-      privacySettings: formData.privacySettings,
     } as ProfileInputType,
     onSubmit: async ({ value }) => {
       if (currentStepIndex < STEPS.length - 1) {
-        setFormData(value);
+        setFormData(value as ProfileInputType);
         goToNextStep();
         return;
       }
@@ -102,6 +118,22 @@ export function CompleteProfileForm() {
         if (value.gender) dataToSubmit.gender = value.gender;
         if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
         if (value.phone) dataToSubmit.phone = value.phone;
+        if (value.city) dataToSubmit.city = value.city;
+        if (value.country) dataToSubmit.country = value.country;
+        if (value.languages && value.languages.length > 0)
+          dataToSubmit.languages = value.languages;
+        if (value.identityTags && value.identityTags.length > 0)
+          dataToSubmit.identityTags = value.identityTags;
+        if (value.preferredGameThemes && value.preferredGameThemes.length > 0)
+          dataToSubmit.preferredGameThemes = value.preferredGameThemes;
+        if (value.overallExperienceLevel)
+          dataToSubmit.overallExperienceLevel = value.overallExperienceLevel;
+        if (value.calendarAvailability)
+          dataToSubmit.calendarAvailability = value.calendarAvailability;
+        if (value.isGM !== undefined) dataToSubmit.isGM = value.isGM;
+        if (value.isGM && value.gmStyle) dataToSubmit.gmStyle = value.gmStyle;
+        if (value.gameSystemPreferences)
+          dataToSubmit.gameSystemPreferences = value.gameSystemPreferences;
         if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
 
         const result = await completeUserProfile({ data: dataToSubmit });
@@ -146,6 +178,11 @@ export function CompleteProfileForm() {
     { value: "other", label: "Other" },
     { value: "prefer-not-to-say", label: "Prefer not to say" },
   ];
+
+  const mappedExperienceLevelOptions = experienceLevelOptions.map((level) => ({
+    value: level,
+    label: level.charAt(0).toUpperCase() + level.slice(1),
+  }));
 
   return (
     <div className="space-y-6">
@@ -230,7 +267,158 @@ export function CompleteProfileForm() {
                     />
                   )}
                 </form.Field>
+                <form.Field name="city">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="City (optional)"
+                      placeholder="e.g., Toronto"
+                    />
+                  )}
+                </form.Field>
+                <form.Field name="country">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Country (optional)"
+                      placeholder="e.g., Canada"
+                    />
+                  )}
+                </form.Field>
               </>
+            )}
+
+            {/* Additional Information Step */}
+            {currentStep === "additional" && (
+              <div className="space-y-4">
+                <form.Field name="languages">
+                  {(field) => (
+                    <div>
+                      <Label>Languages (optional)</Label>
+                      <TagInput
+                        tags={
+                          field.state.value?.map((lang) => ({ id: lang, name: lang })) ||
+                          []
+                        }
+                        onAddTag={(tag) => {
+                          const newLanguages = [...(field.state.value || []), tag.name];
+                          field.handleChange(newLanguages);
+                        }}
+                        onRemoveTag={(id) => {
+                          const newLanguages = (field.state.value || []).filter(
+                            (lang) => lang !== id,
+                          );
+                          field.handleChange(newLanguages);
+                        }}
+                        placeholder="Add languages you speak"
+                      />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="identityTags">
+                  {(field) => (
+                    <div>
+                      <Label>Identity Tags (optional)</Label>
+                      <TagInput
+                        tags={
+                          field.state.value?.map((tag) => ({ id: tag, name: tag })) || []
+                        }
+                        onAddTag={(tag) => {
+                          const newTags = [...(field.state.value || []), tag.name];
+                          field.handleChange(newTags);
+                        }}
+                        onRemoveTag={(id) => {
+                          const newTags = (field.state.value || []).filter(
+                            (tag) => tag !== id,
+                          );
+                          field.handleChange(newTags);
+                        }}
+                        placeholder="Add identity tags that represent you"
+                      />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="preferredGameThemes">
+                  {(field) => (
+                    <div>
+                      <Label>Preferred Game Themes (optional)</Label>
+                      <TagInput
+                        tags={
+                          field.state.value?.map((theme) => ({
+                            id: theme,
+                            name: theme,
+                          })) || []
+                        }
+                        onAddTag={(tag) => {
+                          const newThemes = [...(field.state.value || []), tag.name];
+                          field.handleChange(newThemes);
+                        }}
+                        onRemoveTag={(id) => {
+                          const newThemes = (field.state.value || []).filter(
+                            (theme) => theme !== id,
+                          );
+                          field.handleChange(newThemes);
+                        }}
+                        placeholder="Add game themes you prefer"
+                      />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="overallExperienceLevel">
+                  {(field) => (
+                    <ValidatedSelect
+                      field={field}
+                      label="Overall Experience Level (optional)"
+                      options={mappedExperienceLevelOptions}
+                      placeholderText="Select your experience level"
+                    />
+                  )}
+                </form.Field>
+
+                <form.Field name="calendarAvailability">
+                  {(field) => (
+                    <div>
+                      <Label>Calendar Availability (optional)</Label>
+                      <p className="text-muted-foreground text-sm">
+                        Click and drag to select your available time slots each week.
+                      </p>
+                      <AvailabilityEditor
+                        value={field.state.value ?? defaultAvailabilityData}
+                        onChange={field.handleChange}
+                      />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="isGM">
+                  {(field) => (
+                    <ValidatedCheckbox
+                      field={field}
+                      label="I am a Game Master"
+                      disabled={false}
+                    />
+                  )}
+                </form.Field>
+
+                <form.Subscribe selector={(state) => state.values.isGM}>
+                  {(isGM) =>
+                    isGM ? (
+                      <form.Field name="gmStyle">
+                        {(field) => (
+                          <ValidatedInput
+                            field={field}
+                            label="GM Style (optional)"
+                            placeholder="Describe your GM style"
+                          />
+                        )}
+                      </form.Field>
+                    ) : null
+                  }
+                </form.Subscribe>
+              </div>
             )}
 
             {/* Game Preferences Step */}
@@ -242,13 +430,10 @@ export function CompleteProfileForm() {
                   initialFavorites={formData.gameSystemPreferences?.favorite || []}
                   initialToAvoid={formData.gameSystemPreferences?.avoid || []}
                   onPreferencesChange={(favorite, avoid) => {
-                    setFormData((prev: ProfileInputType) => ({
-                      ...prev,
-                      gameSystemPreferences: {
-                        favorite: favorite,
-                        avoid: avoid,
-                      },
-                    }));
+                    form.setFieldValue("gameSystemPreferences", {
+                      favorite,
+                      avoid,
+                    });
                   }}
                 />
               ))}
@@ -283,11 +468,51 @@ export function CompleteProfileForm() {
                     )}
                   </form.Field>
 
+                  <form.Field name="privacySettings.showLocation">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my location (city/country) to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showLanguages">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my languages to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showGamePreferences">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my game preferences to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
                   <form.Field name="privacySettings.allowTeamInvitations">
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
                         label="Allow team captains to send me invitations"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.allowFollows">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Allow others to follow me"
                         disabled={false}
                       />
                     )}

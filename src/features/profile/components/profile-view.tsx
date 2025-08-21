@@ -15,10 +15,14 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
+import { defaultAvailabilityData } from "~/db/schema/auth.schema";
+import { experienceLevelOptions } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
+import { TagInput } from "~/shared/ui/tag-input";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
+import { AvailabilityEditor } from "./availability-editor";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 export function ProfileView() {
@@ -33,26 +37,36 @@ export function ProfileView() {
     error,
   } = useQuery({
     queryKey: ["userProfile"],
-    queryFn: async () => getUserProfile(),
+    queryFn: async () => getUserProfile({ data: {} }),
     retry: 1,
   });
 
   const profile = profileResult?.success ? profileResult.data : null;
 
-  // TanStack Form for editing
   const form = useForm({
     defaultValues: {
       gender: "",
       pronouns: "",
       phone: "",
+      city: "",
+      country: "",
+      languages: [],
+      identityTags: [],
+      preferredGameThemes: [],
+      overallExperienceLevel: undefined,
       gameSystemPreferences: {
         favorite: [],
         avoid: [],
       },
+      calendarAvailability: defaultAvailabilityData,
       privacySettings: {
         showEmail: false,
         showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
         allowTeamInvitations: false,
+        allowFollows: true,
       },
     } as PartialProfileInputType,
     onSubmit: async ({ value }) => {
@@ -90,6 +104,85 @@ export function ProfileView() {
           }
           hasChanges = true;
         }
+        if (value.city !== (profile?.["city"] || "")) {
+          if (value.city) {
+            dataToSubmit["city"] = value.city;
+          } else {
+            delete dataToSubmit["city"];
+          }
+          hasChanges = true;
+        }
+        if (value.country !== (profile?.["country"] || "")) {
+          if (value.country) {
+            dataToSubmit["country"] = value.country;
+          } else {
+            delete dataToSubmit["country"];
+          }
+          hasChanges = true;
+        }
+        if (
+          value.overallExperienceLevel !==
+          (profile?.["overallExperienceLevel"] || undefined)
+        ) {
+          if (value.overallExperienceLevel) {
+            dataToSubmit["overallExperienceLevel"] = value.overallExperienceLevel;
+          } else {
+            delete dataToSubmit["overallExperienceLevel"];
+          }
+          hasChanges = true;
+        }
+        if (
+          JSON.stringify(value.calendarAvailability) !==
+          JSON.stringify(profile?.["calendarAvailability"] || defaultAvailabilityData)
+        ) {
+          dataToSubmit["calendarAvailability"] = value.calendarAvailability;
+          hasChanges = true;
+        }
+        if (value.gmStyle !== (profile?.["gmStyle"] || "")) {
+          if (value.gmStyle) {
+            dataToSubmit["gmStyle"] = value.gmStyle;
+          } else {
+            delete dataToSubmit["gmStyle"];
+          }
+          hasChanges = true;
+        }
+        if (value.isGM !== (profile?.["isGM"] || false)) {
+          dataToSubmit["isGM"] = value.isGM;
+          hasChanges = true;
+        }
+
+        // Check if languages have changed
+        const currentLanguages = profile?.["languages"] || [];
+        const newLanguages = value.languages || [];
+        const languagesChanged =
+          JSON.stringify(currentLanguages) !== JSON.stringify(newLanguages);
+        if (languagesChanged) {
+          dataToSubmit["languages"] = newLanguages.length > 0 ? newLanguages : null;
+          hasChanges = true;
+        }
+
+        // Check if identityTags have changed
+        const currentIdentityTags = profile?.["identityTags"] || [];
+        const newIdentityTags = value.identityTags || [];
+        const identityTagsChanged =
+          JSON.stringify(currentIdentityTags) !== JSON.stringify(newIdentityTags);
+        if (identityTagsChanged) {
+          dataToSubmit["identityTags"] =
+            newIdentityTags.length > 0 ? newIdentityTags : null;
+          hasChanges = true;
+        }
+
+        // Check if preferredGameThemes have changed
+        const currentPreferredGameThemes = profile?.["preferredGameThemes"] || [];
+        const newPreferredGameThemes = value.preferredGameThemes || [];
+        const preferredGameThemesChanged =
+          JSON.stringify(currentPreferredGameThemes) !==
+          JSON.stringify(newPreferredGameThemes);
+        if (preferredGameThemesChanged) {
+          dataToSubmit["preferredGameThemes"] =
+            newPreferredGameThemes.length > 0 ? newPreferredGameThemes : null;
+          hasChanges = true;
+        }
 
         // Check if game system preferences have changed
         const currentFavorites = profile?.["gameSystemPreferences"]?.favorite || [];
@@ -120,18 +213,30 @@ export function ProfileView() {
         const currentPrivacy = profile?.["privacySettings"] || {
           showEmail: false,
           showPhone: false,
+          showLocation: false,
+          showLanguages: false,
+          showGamePreferences: false,
           allowTeamInvitations: true,
+          allowFollows: true,
         };
         const newPrivacy = value.privacySettings || {
           showEmail: false,
           showPhone: false,
+          showLocation: false,
+          showLanguages: false,
+          showGamePreferences: false,
           allowTeamInvitations: true,
+          allowFollows: true,
         };
 
         if (
           newPrivacy.showEmail !== currentPrivacy.showEmail ||
           newPrivacy.showPhone !== currentPrivacy.showPhone ||
-          newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations
+          newPrivacy.showLocation !== currentPrivacy.showLocation ||
+          newPrivacy.showLanguages !== currentPrivacy.showLanguages ||
+          newPrivacy.showGamePreferences !== currentPrivacy.showGamePreferences ||
+          newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations ||
+          newPrivacy.allowFollows !== currentPrivacy.allowFollows
         ) {
           dataToSubmit["privacySettings"] = newPrivacy;
           hasChanges = true;
@@ -180,6 +285,11 @@ export function ProfileView() {
     { value: "prefer-not-to-say", label: "Prefer not to say" },
   ];
 
+  const mappedExperienceLevelOptions = experienceLevelOptions.map((level) => ({
+    value: level,
+    label: level.charAt(0).toUpperCase() + level.slice(1),
+  }));
+
   // Initialize form data when entering edit mode
   const startEditing = () => {
     if (!profile) return;
@@ -197,6 +307,28 @@ export function ProfileView() {
     if (profile.phone) {
       form.setFieldValue("phone", profile.phone);
     }
+    if (profile.city) {
+      form.setFieldValue("city", profile.city);
+    }
+    if (profile.country) {
+      form.setFieldValue("country", profile.country);
+    }
+    if (profile.overallExperienceLevel) {
+      form.setFieldValue("overallExperienceLevel", profile.overallExperienceLevel);
+    }
+    if (profile.calendarAvailability) {
+      form.setFieldValue("calendarAvailability", profile.calendarAvailability);
+    }
+
+    if (profile.languages) {
+      form.setFieldValue("languages", profile.languages);
+    }
+    if (profile.identityTags) {
+      form.setFieldValue("identityTags", profile.identityTags);
+    }
+    if (profile.preferredGameThemes) {
+      form.setFieldValue("preferredGameThemes", profile.preferredGameThemes);
+    }
 
     if (profile.gameSystemPreferences) {
       form.setFieldValue("gameSystemPreferences", profile.gameSystemPreferences);
@@ -205,14 +337,25 @@ export function ProfileView() {
     const privacySettings = profile.privacySettings || {
       showEmail: false,
       showPhone: false,
+      showLocation: false,
+      showLanguages: false,
+      showGamePreferences: false,
       allowTeamInvitations: true,
+      allowFollows: true,
     };
     form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
     form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
+    form.setFieldValue("privacySettings.showLocation", privacySettings.showLocation);
+    form.setFieldValue("privacySettings.showLanguages", privacySettings.showLanguages);
+    form.setFieldValue(
+      "privacySettings.showGamePreferences",
+      privacySettings.showGamePreferences,
+    );
     form.setFieldValue(
       "privacySettings.allowTeamInvitations",
       privacySettings.allowTeamInvitations,
     );
+    form.setFieldValue("privacySettings.allowFollows", privacySettings.allowFollows);
 
     setIsEditing(true);
   };
@@ -384,6 +527,250 @@ export function ProfileView() {
                 </>
               )}
             </div>
+
+            <div className="space-y-2">
+              {isEditing ? (
+                <form.Field name="city">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="City"
+                      placeholder="Enter your city"
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <>
+                  <Label>City</Label>
+                  <p className="text-base">{profile?.["city"] || "Not set"}</p>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {isEditing ? (
+                <form.Field name="country">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Country"
+                      placeholder="Enter your country"
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <>
+                  <Label>Country</Label>
+                  <p className="text-base">{profile?.["country"] || "Not set"}</p>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {isEditing ? (
+                <form.Field name="overallExperienceLevel">
+                  {(field) => (
+                    <ValidatedSelect
+                      field={field}
+                      label="Overall Experience Level"
+                      options={mappedExperienceLevelOptions}
+                      placeholderText="Select your experience level"
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <>
+                  <Label>Overall Experience Level</Label>
+                  <p className="text-base">
+                    {profile?.["overallExperienceLevel"] || "Not set"}
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Additional Information */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Additional Information</CardTitle>
+              <CardDescription>
+                More details about your gaming preferences and experience
+              </CardDescription>
+            </div>
+            {!isEditing && (
+              <Button onClick={startEditing} variant="outline" size="sm">
+                <Edit2 className="mr-2 h-4 w-4" />
+                Edit Profile
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Languages</Label>
+              {isEditing ? (
+                <form.Field name="languages">
+                  {(field) => (
+                    <TagInput
+                      tags={
+                        field.state.value?.map((lang) => ({ id: lang, name: lang })) || []
+                      }
+                      onAddTag={(tag) => {
+                        const newLanguages = [...(field.state.value || []), tag.name];
+                        field.handleChange(newLanguages);
+                      }}
+                      onRemoveTag={(id) => {
+                        const newLanguages = (field.state.value || []).filter(
+                          (lang) => lang !== id,
+                        );
+                        field.handleChange(newLanguages);
+                      }}
+                      placeholder="Add languages you speak"
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {profile?.["languages"]?.length ? (
+                    profile["languages"].map((lang) => (
+                      <span
+                        key={lang}
+                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
+                      >
+                        {lang}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-sm">Not set</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Identity Tags</Label>
+              {isEditing ? (
+                <form.Field name="identityTags">
+                  {(field) => (
+                    <TagInput
+                      tags={
+                        field.state.value?.map((tag) => ({ id: tag, name: tag })) || []
+                      }
+                      onAddTag={(tag) => {
+                        const newTags = [...(field.state.value || []), tag.name];
+                        field.handleChange(newTags);
+                      }}
+                      onRemoveTag={(id) => {
+                        const newTags = (field.state.value || []).filter(
+                          (tag) => tag !== id,
+                        );
+                        field.handleChange(newTags);
+                      }}
+                      placeholder="Add identity tags that represent you"
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {profile?.["identityTags"]?.length ? (
+                    profile["identityTags"].map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-sm">Not set</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Preferred Game Themes</Label>
+              {isEditing ? (
+                <form.Field name="preferredGameThemes">
+                  {(field) => (
+                    <TagInput
+                      tags={
+                        field.state.value?.map((theme) => ({ id: theme, name: theme })) ||
+                        []
+                      }
+                      onAddTag={(tag) => {
+                        const newThemes = [...(field.state.value || []), tag.name];
+                        field.handleChange(newThemes);
+                      }}
+                      onRemoveTag={(id) => {
+                        const newThemes = (field.state.value || []).filter(
+                          (theme) => theme !== id,
+                        );
+                        field.handleChange(newThemes);
+                      }}
+                      placeholder="Add game themes you prefer"
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {profile?.["preferredGameThemes"]?.length ? (
+                    profile["preferredGameThemes"].map((theme) => (
+                      <span
+                        key={theme}
+                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
+                      >
+                        {theme}
+                      </span>
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-sm">Not set</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {isEditing ? (
+                <></>
+              ) : (
+                <>
+                  <Label>Game Master</Label>
+                  <p className="text-base">{profile?.["isGM"] ? "Yes" : "No"}</p>
+                  {profile?.["isGM"] && (
+                    <>
+                      <Label>GM Style</Label>
+                      <p className="text-base">{profile?.["gmStyle"] || "Not set"}</p>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <Label>Calendar Availability</Label>
+              {isEditing ? (
+                <form.Field name="calendarAvailability">
+                  {(field) => (
+                    <AvailabilityEditor
+                      value={field.state.value ?? defaultAvailabilityData}
+                      onChange={field.handleChange}
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <AvailabilityEditor
+                  value={profile?.["calendarAvailability"] ?? defaultAvailabilityData}
+                  onChange={() => {}}
+                  readOnly
+                />
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -417,11 +804,51 @@ export function ProfileView() {
                 )}
               </form.Field>
 
+              <form.Field name="privacySettings.showLocation">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my location (city/country) to others"
+                    disabled={false}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="privacySettings.showLanguages">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my languages to others"
+                    disabled={false}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="privacySettings.showGamePreferences">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my game preferences to others"
+                    disabled={false}
+                  />
+                )}
+              </form.Field>
+
               <form.Field name="privacySettings.allowTeamInvitations">
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
                     label="Allow team invitations"
+                    disabled={false}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="privacySettings.allowFollows">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Allow others to follow me"
                     disabled={false}
                   />
                 )}
@@ -442,10 +869,32 @@ export function ProfileView() {
                   : "Hidden"}
               </p>
               <p className="text-sm">
+                <span className="font-medium">Location visibility:</span>{" "}
+                {profile["privacySettings"]?.showLocation
+                  ? "Visible to others"
+                  : "Hidden"}
+              </p>
+              <p className="text-sm">
+                <span className="font-medium">Languages visibility:</span>{" "}
+                {profile["privacySettings"]?.showLanguages
+                  ? "Visible to others"
+                  : "Hidden"}
+              </p>
+              <p className="text-sm">
+                <span className="font-medium">Game preferences visibility:</span>{" "}
+                {profile["privacySettings"]?.showGamePreferences
+                  ? "Visible to others"
+                  : "Hidden"}
+              </p>
+              <p className="text-sm">
                 <span className="font-medium">Team invitations:</span>{" "}
                 {profile["privacySettings"]?.allowTeamInvitations !== false
                   ? "Allowed"
                   : "Not Allowed"}
+              </p>
+              <p className="text-sm">
+                <span className="font-medium">Follow permissions:</span>{" "}
+                {profile["privacySettings"]?.allowFollows ? "Allowed" : "Not Allowed"}
               </p>
             </div>
           )}

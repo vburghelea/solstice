@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { ProfileLink } from "~/components/ProfileLink";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -279,7 +280,7 @@ function TeamMembersPage() {
                   </Avatar>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{user.name || user.email}</h3>
+                      <ProfileLink userId={user.id} username={user.name || user.email} />
                       <Badge
                         variant={member.status === "active" ? "default" : "secondary"}
                       >

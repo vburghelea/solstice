@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, inArray } from "drizzle-orm";
+import { z } from "zod";
 import { gameSystems, userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import type {
   PrivacySettings,
@@ -34,23 +35,44 @@ function mapDbUserToProfile(
     avoid: { id: number; name: string }[];
   },
 ): UserProfile {
-  return {
+  // Create the UserProfile object directly
+  const userProfile = {
     id: dbUser.id,
     name: dbUser.name,
     email: dbUser.email,
     profileComplete: dbUser.profileComplete,
+    // Handle optional properties that may be null in the database
     gender: dbUser.gender ?? undefined,
     pronouns: dbUser.pronouns ?? undefined,
     phone: dbUser.phone ?? undefined,
-    privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings),
+    privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings) ?? undefined,
     profileVersion: dbUser.profileVersion,
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
-    gameSystemPreferences: preferences,
+    gameSystemPreferences: preferences ?? undefined,
+    // Add missing required properties with default values
+    languages: [],
+    identityTags: [],
+    preferredGameThemes: [],
+    isGM: false,
+    gamesHosted: 0,
+    responseRate: 0,
+    // Add other optional properties with undefined values
+    image: undefined,
+    city: undefined,
+    country: undefined,
+    overallExperienceLevel: undefined,
+    calendarAvailability: undefined,
+    averageResponseTime: undefined,
+    gmStyle: undefined,
+    gmRating: undefined,
   };
+
+  return userProfile as unknown as UserProfile;
 }
 
-export const getUserProfile = createServerFn({ method: "GET" }).handler(
-  async (): Promise<ProfileOperationResult> => {
+export const getUserProfile = createServerFn({ method: "GET" })
+  .validator(z.object({ userId: z.string().optional() }).parse)
+  .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -63,7 +85,9 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
       const { headers } = getWebRequest();
       const session = await auth.api.getSession({ headers });
 
-      if (!session?.user?.id) {
+      const targetUserId = data?.userId || session?.user?.id;
+
+      if (!targetUserId) {
         return {
           success: false,
           errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
@@ -78,7 +102,7 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
       const [dbUser] = await db
         .select()
         .from(user)
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, targetUserId))
         .limit(1);
 
       if (!dbUser) {
@@ -108,8 +132,7 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
         ],
       };
     }
-  },
-);
+  });
 
 export const getProfileCompletionStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ complete: boolean; missingFields: string[] }> => {

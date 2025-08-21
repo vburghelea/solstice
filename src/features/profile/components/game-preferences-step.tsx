@@ -1,4 +1,4 @@
-import { TagInput } from "~/shared/ui/tag-input";
+import { GameTagInput } from "~/shared/ui/game-tag-input";
 
 export function GamePreferencesStep({
   initialFavorites,
@@ -36,7 +36,7 @@ export function GamePreferencesStep({
     <div className="space-y-8">
       <div>
         <h3 className="mb-2 text-lg font-medium">Favorite Game Systems</h3>
-        <TagInput
+        <GameTagInput
           tags={initialFavorites || []}
           onAddTag={handleAddFavorite}
           onRemoveTag={handleRemoveFavorite}
@@ -46,12 +46,12 @@ export function GamePreferencesStep({
 
       <div>
         <h3 className="mb-2 text-lg font-medium">Game Systems to Avoid</h3>
-        <TagInput
+        <GameTagInput
           tags={initialToAvoid || []}
           onAddTag={handleAddToAvoid}
           onRemoveTag={handleRemoveFromToAvoid}
           placeholder="Search and add game systems to avoid..."
-          isDestructive={true} // Add this line
+          isDestructive={true}
         />
       </div>
     </div>

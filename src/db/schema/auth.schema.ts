@@ -1,4 +1,39 @@
-import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
+import { experienceLevelOptions } from "~/shared/types/common";
+
+// Enums for profile fields
+export const experienceLevelEnum = pgEnum("experience_level", experienceLevelOptions);
+
+// Types for JSONB fields
+export type DayAvailability = boolean[]; // 96 slots for 15-minute intervals
+export interface AvailabilityData {
+  monday: DayAvailability;
+  tuesday: DayAvailability;
+  wednesday: DayAvailability;
+  thursday: DayAvailability;
+  friday: DayAvailability;
+  saturday: DayAvailability;
+  sunday: DayAvailability;
+}
+
+export const defaultDayAvailability: DayAvailability = Array(96).fill(false);
+export const defaultAvailabilityData: AvailabilityData = {
+  monday: defaultDayAvailability,
+  tuesday: defaultDayAvailability,
+  wednesday: defaultDayAvailability,
+  thursday: defaultDayAvailability,
+  friday: defaultDayAvailability,
+  saturday: defaultDayAvailability,
+  sunday: defaultDayAvailability,
+};
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -19,13 +54,36 @@ export const user = pgTable("user", {
     .$defaultFn(() => false)
     .notNull(),
 
-  // Optional profile fields
+  // Basic profile fields
   gender: text("gender"),
   pronouns: text("pronouns"),
   phone: text("phone"),
+  city: text("city"),
+  country: text("country"),
+
+  // Array fields stored as JSONB
+  languages: jsonb("languages").$type<string[]>().default([]),
+  identityTags: jsonb("identity_tags").$type<string[]>().default([]),
+  preferredGameThemes: jsonb("preferred_game_themes").$type<string[]>().default([]),
+
+  // Game preferences
+  overallExperienceLevel: experienceLevelEnum("overall_experience_level"),
+
+  // Calendar availability
+  calendarAvailability: jsonb("calendar_availability")
+    .$type<AvailabilityData>()
+    .default(defaultAvailabilityData),
 
   // Privacy and preferences
   privacySettings: text("privacy_settings"), // JSON string
+
+  // GM-specific fields
+  isGM: boolean("is_gm").default(false),
+  gamesHosted: integer("games_hosted").default(0),
+  averageResponseTime: integer("average_response_time"), // in minutes
+  responseRate: integer("response_rate").default(0), // percentage 0-100
+  gmStyle: text("gm_style"),
+  gmRating: integer("gm_rating"), // average rating out of 5
 
   // Audit and versioning
   profileVersion: integer("profile_version")

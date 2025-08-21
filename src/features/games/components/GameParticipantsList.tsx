@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { ProfileLink } from "~/components/ProfileLink";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -124,8 +125,11 @@ export function GameParticipantsList({
               {approvedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <span>
-                    {p.user.name || p.user.email} (
-                    {p.userId === gameOwnerId ? "owner" : p.role} - {p.status})
+                    <ProfileLink
+                      userId={p.userId}
+                      username={p.user.name || p.user.email}
+                    />{" "}
+                    {p.userId === gameOwnerId ? "(owner)" : `(${p.role} - ${p.status})`}
                   </span>
                   {isOwner &&
                     p.role !== "applicant" &&
@@ -163,7 +167,11 @@ export function GameParticipantsList({
               {pendingApplications.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <span>
-                    {p.user.name || p.user.email} ({p.status})
+                    <ProfileLink
+                      userId={p.userId}
+                      username={p.user.name || p.user.email}
+                    />{" "}
+                    ({p.status})
                   </span>
                   <div className="flex space-x-2">
                     <Button
@@ -204,7 +212,11 @@ export function GameParticipantsList({
               {rejectedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <span>
-                    {p.user.name || p.user.email} ({p.role} - {p.status})
+                    <ProfileLink
+                      userId={p.userId}
+                      username={p.user.name || p.user.email}
+                    />{" "}
+                    ({p.role} - {p.status})
                   </span>
                   <Button
                     variant="default"

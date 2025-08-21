@@ -202,11 +202,13 @@ import { authClient } from "@/lib/auth-client"
 function App(){
 const { data: organizations } = authClient.useListOrganizations()
 return (
+
 <div>
-{organizations.map(org => <p>{org.name}</p>)}
+  {organizations.map((org) => (
+    <p>{org.name}</p>
+  ))}
 </div>
-)
-}
+) }
 
 ````
 </Tab>

@@ -28,3 +28,91 @@ export const languageLevelOptions: SelectOption[] = [
   { value: "advanced", label: "Advanced" },
   { value: "fluent", label: "Fluent" },
 ];
+
+// Constants for profile options
+export const identityTagOptions = [
+  "LGBTQ+",
+  "Queer",
+  "BIMPOC",
+  "Disabled",
+  "Neurodivergent",
+  "Artist",
+  "Cosplayer",
+  "Educator",
+  "Femme Identifying",
+  "Game Designer",
+  "Multi-lingual",
+] as const;
+
+export const experienceLevelOptions = [
+  "beginner",
+  "intermediate",
+  "advanced",
+  "expert",
+] as const;
+
+export const gameThemeOptions = [
+  "Anime",
+  "Battle Royale",
+  "Comedy",
+  "Cosmic Horror",
+  "Cozy",
+  "Cyberpunk",
+  "Dark Fantasy",
+  "Eldritch Horror",
+  "Espionage",
+  "Fantasy",
+  "Futuristic",
+  "Gothic Horror",
+  "Grimdark",
+  "Gritty Fantasy",
+  "Heartwarming",
+  "High Fantasy",
+  "Historical",
+  "Horror",
+  "Imaginative",
+  "Modern",
+  "Mystery",
+  "Pirate",
+  "Political",
+  "Post-Apocalyptic",
+  "Romance",
+  "Rustic",
+  "Scifi",
+  "Space Western",
+  "Steampunk",
+  "Super Heroes",
+  "Supernatural",
+  "Survival",
+  "Urban Fantasy",
+  "Victorian",
+  "Viking",
+  "Wacky",
+  "Western",
+] as const;
+
+export const gmStrengthOptions = [
+  "creativity",
+  "world_builder",
+  "inclusive",
+  "rule_of_cool",
+  "storytelling",
+  "voices",
+  "sets_the_mood",
+  "teacher",
+  "knows_the_rules",
+  "visual_aid",
+] as const;
+
+export const gmStrengthLabels: Record<string, string> = {
+  creativity: "Creativity",
+  world_builder: "World Builder",
+  inclusive: "Inclusive",
+  rule_of_cool: "Rule of Cool",
+  storytelling: "Storytelling",
+  voices: "Voices",
+  sets_the_mood: "Sets the Mood",
+  teacher: "Teacher",
+  knows_the_rules: "Knows the Rules",
+  visual_aid: "Visual Aid",
+};

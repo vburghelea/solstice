@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ProfileLink } from "~/components/ProfileLink";
 import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -190,7 +191,10 @@ function TeamDetailsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{user.name || user.email}</p>
+                        <ProfileLink
+                          userId={user.id}
+                          username={user.name || user.email}
+                        />
                         <div className="text-muted-foreground flex items-center gap-2 text-sm">
                           <Badge variant="outline" className="capitalize">
                             {member.role}

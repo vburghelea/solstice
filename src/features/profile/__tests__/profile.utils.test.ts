@@ -13,7 +13,26 @@ describe("profile.utils", () => {
       gender: "Male",
       pronouns: "he/him",
       phone: "1234567890",
-      privacySettings: { showEmail: true, showPhone: false, allowTeamInvitations: true },
+      privacySettings: {
+        showEmail: true,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      },
+      // Add missing required properties with default values
+      languages: ["en", "es"],
+      identityTags: ["LGBTQ+", "Artist"],
+      preferredGameThemes: ["Fantasy", "Scifi"],
+      isGM: true,
+      gamesHosted: 0,
+      responseRate: 0,
+      overallExperienceLevel: "intermediate",
+      city: "Test City",
+      country: "Test Country",
+      gmStyle: "Narrative",
     };
 
     expect(isProfileComplete(profile)).toBe(true);
@@ -26,10 +45,28 @@ describe("profile.utils", () => {
       email: "test@example.com",
       profileComplete: false,
       profileVersion: 1,
-      gender: undefined,
       pronouns: "he/him",
       phone: "1234567890",
-      privacySettings: { showEmail: true, showPhone: false, allowTeamInvitations: true },
+      privacySettings: {
+        showEmail: true,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      },
+      // Add missing required properties with default values
+      languages: ["en", "es"],
+      identityTags: ["LGBTQ+", "Artist"],
+      preferredGameThemes: ["Fantasy", "Scifi"],
+      isGM: true,
+      gamesHosted: 0,
+      responseRate: 0,
+      overallExperienceLevel: "intermediate",
+      city: "Test City",
+      country: "Test Country",
+      gmStyle: "Narrative",
     };
     expect(isProfileComplete(profile)).toBe(false);
   });
@@ -42,9 +79,27 @@ describe("profile.utils", () => {
       profileComplete: false,
       profileVersion: 1,
       gender: "Male",
-      pronouns: undefined,
       phone: "1234567890",
-      privacySettings: { showEmail: true, showPhone: false, allowTeamInvitations: true },
+      privacySettings: {
+        showEmail: true,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      },
+      // Add missing required properties with default values
+      languages: ["en", "es"],
+      identityTags: ["LGBTQ+", "Artist"],
+      preferredGameThemes: ["Fantasy", "Scifi"],
+      isGM: true,
+      gamesHosted: 0,
+      responseRate: 0,
+      overallExperienceLevel: "intermediate",
+      city: "Test City",
+      country: "Test Country",
+      gmStyle: "Narrative",
     };
     expect(isProfileComplete(profile)).toBe(false);
   });
@@ -58,8 +113,26 @@ describe("profile.utils", () => {
       profileVersion: 1,
       gender: "Male",
       pronouns: "he/him",
-      phone: undefined,
-      privacySettings: { showEmail: true, showPhone: false, allowTeamInvitations: true },
+      privacySettings: {
+        showEmail: true,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      },
+      // Add missing required properties with default values
+      languages: ["en", "es"],
+      identityTags: ["LGBTQ+", "Artist"],
+      preferredGameThemes: ["Fantasy", "Scifi"],
+      isGM: true,
+      gamesHosted: 0,
+      responseRate: 0,
+      overallExperienceLevel: "intermediate",
+      city: "Test City",
+      country: "Test Country",
+      gmStyle: "Narrative",
     };
     expect(isProfileComplete(profile)).toBe(false);
   });
@@ -74,7 +147,17 @@ describe("profile.utils", () => {
       gender: "Male",
       pronouns: "he/him",
       phone: "1234567890",
-      privacySettings: undefined,
+      // Add missing required properties with default values
+      languages: ["en", "es"],
+      identityTags: ["LGBTQ+", "Artist"],
+      preferredGameThemes: ["Fantasy", "Scifi"],
+      isGM: true,
+      gamesHosted: 0,
+      responseRate: 0,
+      overallExperienceLevel: "intermediate",
+      city: "Test City",
+      country: "Test Country",
+      gmStyle: "Narrative",
     };
     expect(isProfileComplete(profile)).toBe(false);
   });
@@ -89,8 +172,22 @@ describe("profile.utils", () => {
       gender: "Male",
       pronouns: "he/him",
       phone: "1234567890",
-      privacySettings: { showEmail: true, showPhone: false, allowTeamInvitations: true },
-      gameSystemPreferences: undefined,
+      privacySettings: {
+        showEmail: true,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      },
+      // Add missing required properties with default values
+      languages: [],
+      identityTags: [],
+      preferredGameThemes: [],
+      isGM: false,
+      gamesHosted: 0,
+      responseRate: 0,
     };
     expect(isProfileComplete(profile)).toBe(true);
   });

@@ -31,7 +31,11 @@ const initialState: ProfileFormState = {
     privacySettings: {
       showEmail: false,
       showPhone: false,
+      showLocation: false,
+      showLanguages: false,
+      showGamePreferences: false,
       allowTeamInvitations: true,
+      allowFollows: true,
     },
   },
 };

@@ -7,6 +7,7 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "lucide-react";
+import { ProfileLink } from "~/components/ProfileLink";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
 import { Avatar, AvatarFallback, AvatarImage } from "~/shared/ui/avatar";
@@ -158,7 +159,10 @@ function TeamDetailsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{user.name || user.email}</p>
+                        <ProfileLink
+                          userId={user.id}
+                          username={user.name || user.email}
+                        />
                         <div className="text-muted-foreground flex items-center gap-2 text-sm">
                           <Badge variant="outline" className="capitalize">
                             {member.role}

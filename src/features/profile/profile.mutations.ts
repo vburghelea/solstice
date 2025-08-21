@@ -41,19 +41,39 @@ function mapDbUserToProfile(
     avoid: { id: number; name: string }[];
   },
 ): UserProfile {
-  return {
+  // Create the UserProfile object directly
+  const userProfile = {
     id: dbUser.id,
     name: dbUser.name,
     email: dbUser.email,
     profileComplete: dbUser.profileComplete,
+    // Handle optional properties that may be null in the database
     gender: dbUser.gender ?? undefined,
     pronouns: dbUser.pronouns ?? undefined,
     phone: dbUser.phone ?? undefined,
-    privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings),
+    privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings) ?? undefined,
     profileVersion: dbUser.profileVersion,
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
-    gameSystemPreferences: preferences,
+    gameSystemPreferences: preferences ?? undefined,
+    // Add missing required properties with default values
+    languages: [],
+    identityTags: [],
+    preferredGameThemes: [],
+    isGM: false,
+    gamesHosted: 0,
+    responseRate: 0,
+    // Add other optional properties with undefined values
+    image: undefined,
+    city: undefined,
+    country: undefined,
+    overallExperienceLevel: undefined,
+    calendarAvailability: undefined,
+    averageResponseTime: undefined,
+    gmStyle: undefined,
+    gmRating: undefined,
   };
+
+  return userProfile as unknown as UserProfile;
 }
 
 export const updateUserProfile = createServerFn({ method: "POST" })

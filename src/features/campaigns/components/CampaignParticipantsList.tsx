@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { ProfileLink } from "~/components/ProfileLink";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -129,8 +130,13 @@ export function CampaignParticipantsList({
               {approvedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <span>
-                    {p.user.name || p.user.email} (
-                    {p.userId === campaignOwnerId ? "owner" : p.role} - {p.status})
+                    <ProfileLink
+                      userId={p.userId}
+                      username={p.user.name || p.user.email}
+                    />{" "}
+                    {p.userId === campaignOwnerId
+                      ? "(owner)"
+                      : `(${p.role} - ${p.status})`}
                   </span>
                   {isOwner &&
                     p.role !== "applicant" &&
@@ -168,16 +174,20 @@ export function CampaignParticipantsList({
               {pendingApplications.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <span>
-                    {p.user.name || p.user.email} ({p.status})
+                    <ProfileLink
+                      userId={p.userId}
+                      username={p.user.name || p.user.email}
+                    />{" "}
+                    ({p.status})
                   </span>
                   <div className="flex space-x-2">
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => handleApproveApplication(p.id)}
-                      disabled={removeRejectedParticipantMutation.isPending}
+                      disabled={respondToCampaignApplicationMutation.isPending}
                     >
-                      {removeRejectedParticipantMutation.isPending
+                      {respondToCampaignApplicationMutation.isPending
                         ? "Approving..."
                         : "Approve"}
                     </Button>
@@ -185,9 +195,11 @@ export function CampaignParticipantsList({
                       variant="destructive"
                       size="sm"
                       onClick={() => handleRejectApplication(p.id)}
-                      disabled={removeParticipantMutation.isPending}
+                      disabled={respondToCampaignApplicationMutation.isPending}
                     >
-                      {removeParticipantMutation.isPending ? "Rejecting..." : "Reject"}
+                      {respondToCampaignApplicationMutation.isPending
+                        ? "Rejecting..."
+                        : "Reject"}
                     </Button>
                   </div>
                 </li>
@@ -209,7 +221,11 @@ export function CampaignParticipantsList({
               {rejectedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <span>
-                    {p.user.name || p.user.email} ({p.role} - {p.status})
+                    <ProfileLink
+                      userId={p.userId}
+                      username={p.user.name || p.user.email}
+                    />{" "}
+                    ({p.role} - {p.status})
                   </span>
                   <Button
                     variant="default"

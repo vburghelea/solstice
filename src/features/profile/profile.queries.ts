@@ -64,6 +64,7 @@ function mapDbUserToProfile(
     name: dbUser.name,
     email: dbUser.email,
     profileComplete: dbUser.profileComplete,
+    // Handle optional properties that may be null in the database
     gender: dbUser.gender ?? undefined,
     pronouns: dbUser.pronouns ?? undefined,
     phone: dbUser.phone ?? undefined,

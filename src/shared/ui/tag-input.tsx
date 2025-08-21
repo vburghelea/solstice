@@ -1,9 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useMemo, useRef, useState } from "react";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
-import { getGameSystems } from "../../features/profile/profile.queries";
 import { Button } from "./button";
 import { Input } from "./input";
 

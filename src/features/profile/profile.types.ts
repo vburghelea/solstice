@@ -20,6 +20,8 @@ export interface NotificationPreferences {
   socialNotifications: boolean;
 }
 
+import type { AvailabilityData } from "~/db/schema/auth.schema";
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -27,18 +29,29 @@ export interface UserProfile {
   image?: string;
   uploadedAvatarPath?: string;
   profileComplete: boolean;
-  gender?: string | undefined;
-  pronouns?: string | undefined;
-  phone?: string | undefined;
-  privacySettings?: PrivacySettings | undefined;
+  gender?: string;
+  pronouns?: string;
+  phone?: string;
+  city?: string;
+  country?: string;
+  languages: string[];
+  identityTags: string[];
+  preferredGameThemes: string[];
+  overallExperienceLevel?: "beginner" | "intermediate" | "advanced" | "expert";
+  gameSystemPreferences?: {
+    favorite: { id: number; name: string }[];
+    avoid: { id: number; name: string }[];
+  };
+  calendarAvailability?: AvailabilityData;
+  privacySettings?: PrivacySettings;
+  isGM: boolean;
+  gamesHosted: number;
+  averageResponseTime?: number;
+  responseRate: number;
+  gmStyle?: string;
+  gmRating?: number;
   profileVersion: number;
-  profileUpdatedAt?: Date | undefined;
-  gameSystemPreferences?:
-    | {
-        favorite: { id: number; name: string }[];
-        avoid: { id: number; name: string }[];
-      }
-    | undefined;
+  profileUpdatedAt?: Date;
 }
 
 export interface ProfileInput {

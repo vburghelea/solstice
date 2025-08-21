@@ -437,6 +437,28 @@ export function ProfileView() {
       );
       return;
     }
+    if (profile.city) {
+      form.setFieldValue("city", profile.city);
+    }
+    if (profile.country) {
+      form.setFieldValue("country", profile.country);
+    }
+    if (profile.overallExperienceLevel) {
+      form.setFieldValue("overallExperienceLevel", profile.overallExperienceLevel);
+    }
+    if (profile.calendarAvailability) {
+      form.setFieldValue("calendarAvailability", profile.calendarAvailability);
+    }
+
+    if (profile.languages) {
+      form.setFieldValue("languages", profile.languages);
+    }
+    if (profile.identityTags) {
+      form.setFieldValue("identityTags", profile.identityTags);
+    }
+    if (profile.preferredGameThemes) {
+      form.setFieldValue("preferredGameThemes", profile.preferredGameThemes);
+    }
 
     // Set field values from profile for the specific section
     if (sectionId === "basic") {
@@ -1278,6 +1300,36 @@ export function ProfileView() {
                   <ValidatedCheckbox
                     field={field}
                     label="Show my game preferences to everyone"
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="privacySettings.showLocation">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my location (city/country) to others"
+                    disabled={false}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="privacySettings.showLanguages">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my languages to others"
+                    disabled={false}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="privacySettings.showGamePreferences">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show my game preferences to others"
+                    disabled={false}
                   />
                 )}
               </form.Field>

@@ -66,7 +66,6 @@ function mapDbUserToProfile(
     gamesHosted: 0,
     responseRate: 0,
     // Add other optional properties with undefined values
-
     city: undefined,
     country: undefined,
     overallExperienceLevel: undefined,

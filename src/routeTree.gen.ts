@@ -106,6 +106,7 @@ import { Route as authLoginRouteImport } from "./routes/(auth)/login";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
 import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
@@ -113,6 +114,7 @@ import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.re
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
 import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
 import { Route as DashboardGamesGameIdRouteImport } from "./routes/dashboard/games/$gameId";
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
@@ -423,11 +425,14 @@ const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
 } as any);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardSystemsIndexRoute = DashboardSystemsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardSystemsRoute,
 } as any);
+=======
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -492,6 +497,7 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
 } as any);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
     id: "/$systemId",
@@ -509,6 +515,8 @@ const DashboardProfileBlocklistRoute =
     path: "/blocklist",
     getParentRoute: () => DashboardProfileRoute,
   } as any);
+=======
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
 const DashboardProfileUserIdRoute = DashboardProfileUserIdRouteImport.update({
   id: "/$userId",
   path: "/$userId",
@@ -862,6 +870,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
+  "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -869,6 +878,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
+  "/dashboard/profile/": typeof DashboardProfileIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
 <<<<<<< HEAD
   "/events/$slug/": typeof EventsSlugIndexRoute;
@@ -991,12 +1001,14 @@ export interface FileRoutesByTo {
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
+  "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
+  "/dashboard/profile": typeof DashboardProfileIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
 <<<<<<< HEAD
   "/events/$slug": typeof EventsSlugIndexRoute;
@@ -1144,6 +1156,7 @@ export interface FileRoutesById {
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
+  "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1151,6 +1164,7 @@ export interface FileRoutesById {
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
+  "/dashboard/profile/": typeof DashboardProfileIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
 <<<<<<< HEAD
   "/events/$slug/": typeof EventsSlugIndexRoute;
@@ -1288,6 +1302,7 @@ export interface FileRouteTypes {
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
+    | "/dashboard/profile/$userId"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1295,6 +1310,7 @@ export interface FileRouteTypes {
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
+    | "/dashboard/profile/"
     | "/dashboard/teams/"
 <<<<<<< HEAD
     | "/events/$slug/"
@@ -1417,12 +1433,14 @@ export interface FileRouteTypes {
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
+    | "/dashboard/profile/$userId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
     | "/dashboard/campaigns"
     | "/dashboard/events"
     | "/dashboard/games"
+    | "/dashboard/profile"
     | "/dashboard/teams"
 <<<<<<< HEAD
     | "/events/$slug"
@@ -1558,6 +1576,7 @@ export interface FileRouteTypes {
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
+    | "/dashboard/profile/$userId"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1565,6 +1584,7 @@ export interface FileRouteTypes {
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
+    | "/dashboard/profile/"
     | "/dashboard/teams/"
 <<<<<<< HEAD
     | "/events/$slug/"
@@ -2091,6 +2111,7 @@ declare module "@tanstack/react-router" {
     };
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/systems/": {
       id: "/dashboard/systems/";
       path: "/";
@@ -2098,6 +2119,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSystemsIndexRouteImport;
       parentRoute: typeof DashboardSystemsRoute;
     };
+=======
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
     "/dashboard/profile/": {
       id: "/dashboard/profile/";
       path: "/";
@@ -2182,6 +2205,7 @@ declare module "@tanstack/react-router" {
     };
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/systems/$systemId": {
       id: "/dashboard/systems/$systemId";
       path: "/$systemId";
@@ -2203,6 +2227,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardProfileBlocklistRouteImport;
       parentRoute: typeof DashboardProfileRoute;
     };
+=======
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
     "/dashboard/profile/$userId": {
       id: "/dashboard/profile/$userId";
       path: "/$userId";
@@ -2657,21 +2683,30 @@ const DashboardGamesRouteWithChildren = DashboardGamesRoute._addFileChildren(
 );
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 interface DashboardProfileRouteChildren {
   DashboardProfileUserIdRoute: typeof DashboardProfileUserIdRoute;
   DashboardProfileBlocklistRoute: typeof DashboardProfileBlocklistRoute;
+=======
+interface DashboardProfileRouteChildren {
+  DashboardProfileUserIdRoute: typeof DashboardProfileUserIdRoute;
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
   DashboardProfileIndexRoute: typeof DashboardProfileIndexRoute;
 }
 
 const DashboardProfileRouteChildren: DashboardProfileRouteChildren = {
   DashboardProfileUserIdRoute: DashboardProfileUserIdRoute,
+<<<<<<< HEAD
   DashboardProfileBlocklistRoute: DashboardProfileBlocklistRoute,
+=======
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
   DashboardProfileIndexRoute: DashboardProfileIndexRoute,
 };
 
 const DashboardProfileRouteWithChildren =
   DashboardProfileRoute._addFileChildren(DashboardProfileRouteChildren);
 
+<<<<<<< HEAD
 interface DashboardSystemsRouteChildren {
   DashboardSystemsSystemIdRoute: typeof DashboardSystemsSystemIdRoute;
   DashboardSystemsIndexRoute: typeof DashboardSystemsIndexRoute;
@@ -2689,6 +2724,8 @@ const DashboardSystemsRouteWithChildren =
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+>>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;

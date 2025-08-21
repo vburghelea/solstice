@@ -70,6 +70,15 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     gender: "",
     pronouns: "",
     phone: "",
+    city: "",
+    country: "",
+    languages: [],
+    identityTags: [],
+    preferredGameThemes: [],
+    overallExperienceLevel: undefined,
+    calendarAvailability: defaultAvailabilityData,
+    isGM: false,
+    gmStyle: "",
     gameSystemPreferences: {
       favorite: [],
       avoid: [],
@@ -77,7 +86,11 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     privacySettings: {
       showEmail: false,
       showPhone: false,
+      showLocation: false,
+      showLanguages: false,
+      showGamePreferences: false,
       allowTeamInvitations: true,
+      allowFollows: true,
     },
   });
 
@@ -462,6 +475,36 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     )}
                   </form.Field>
 
+                  <form.Field name="privacySettings.showLocation">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my location (city/country) to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showLanguages">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my languages to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showGamePreferences">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my game preferences to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
                   <form.Field name="privacySettings.allowTeamInvitations">
                     {(field) => (
                       <ValidatedCheckbox
@@ -485,6 +528,16 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                       <ValidatedCheckbox
                         field={field}
                         label="Allow others to follow me"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.allowFollows">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Allow others to follow me"
+                        disabled={false}
                       />
                     )}
                   </form.Field>

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { createFileRoute } from "@tanstack/react-router";
 import { ProfileLink } from "~/components/ProfileLink";
 import { useState } from "react";
+import { ProfileLink } from "~/components/ProfileLink";
 import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";

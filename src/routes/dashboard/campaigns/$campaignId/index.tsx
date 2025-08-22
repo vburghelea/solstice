@@ -197,15 +197,18 @@ export function CampaignDetailsPage() {
     queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return null;
+
       const result = await getCampaignApplicationForUser({
         data: { campaignId, userId: currentUser.id },
       });
+
       if (!result.success) {
         toast.error(
           result.errors?.[0]?.message || "Failed to fetch your application status.",
         );
         return null;
       }
+
       return result.data;
     },
     enabled: !!campaignId && !!currentUser?.id && !isOwner && !isParticipant, // Only fetch if not owner/participant
@@ -236,8 +239,14 @@ export function CampaignDetailsPage() {
     OperationResult<GameListItem[]>
   >({
     queryKey: ["campaignGameSessions", campaignId, statusFilter],
-    queryFn: async () =>
-      await listGameSessionsByCampaignId({ data: { campaignId, status: statusFilter } }),
+    queryFn: async () => {
+      const baseData = { campaignId };
+      const data =
+        statusFilter && statusFilter.trim() !== ""
+          ? { ...baseData, status: statusFilter }
+          : baseData;
+      return await listGameSessionsByCampaignId({ data });
+    },
     enabled: !!campaignId,
   });
 

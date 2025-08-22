@@ -228,7 +228,10 @@ export const getCampaignApplicationForUser = createServerFn({ method: "POST" })
         },
       });
 
-      return { success: true, data: application as CampaignApplication };
+      return {
+        success: true,
+        data: application ? (application as CampaignApplication) : null,
+      };
     } catch (error) {
       console.error("Error fetching campaign application for user:", error);
       return {

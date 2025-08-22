@@ -12,12 +12,12 @@ export type LanguageLevel = "beginner" | "intermediate" | "advanced" | "fluent";
 // Most spoken languages in the world
 export const languageOptions: SelectOption[] = [
   { value: "en", label: "English" },
-  { value: "zh", label: "Chinese" },
-  { value: "hi", label: "Hindi" },
-  { value: "es", label: "Spanish" },
+  { value: "de", label: "German" },
   { value: "fr", label: "French" },
+  { value: "es", label: "Spanish" },
+  { value: "pl", label: "Polish" },
   { value: "ar", label: "Arabic" },
-  { value: "bn", label: "Bengali" },
+  { value: "pt", label: "Portuguese" },
   { value: "ru", label: "Russian" },
 ];
 

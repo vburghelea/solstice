@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { GameTagInput } from "~/shared/ui/game-tag-input";
 
+const EMPTY_GAME_SYSTEM_ARRAY: { id: number; name: string }[] = [];
+
 export function GamePreferencesStep({
-  initialFavorites,
-  initialToAvoid,
+  initialFavorites = EMPTY_GAME_SYSTEM_ARRAY,
+  initialToAvoid = EMPTY_GAME_SYSTEM_ARRAY,
   onPreferencesChange,
 }: {
   initialFavorites?: { id: number; name: string }[];
@@ -12,24 +15,35 @@ export function GamePreferencesStep({
     toAvoid: { id: number; name: string }[],
   ) => void;
 }) {
+  const [favorites, setFavorites] = useState(initialFavorites);
+  const [toAvoid, setToAvoid] = useState(initialToAvoid);
+
   const handleAddFavorite = (tag: { id: number; name: string }) => {
-    const newFavorites = [...(initialFavorites || []), tag];
-    onPreferencesChange(newFavorites, initialToAvoid || []);
+    if (!favorites.some((fav) => fav.id === tag.id)) {
+      const newFavorites = [...favorites, tag];
+      setFavorites(newFavorites);
+      onPreferencesChange(newFavorites, toAvoid);
+    }
   };
 
   const handleRemoveFavorite = (id: number) => {
-    const newFavorites = (initialFavorites || []).filter((fav) => fav.id !== id);
-    onPreferencesChange(newFavorites, initialToAvoid || []);
+    const newFavorites = favorites.filter((fav) => fav.id !== id);
+    setFavorites(newFavorites);
+    onPreferencesChange(newFavorites, toAvoid);
   };
 
   const handleAddToAvoid = (tag: { id: number; name: string }) => {
-    const newToAvoid = [...(initialToAvoid || []), tag];
-    onPreferencesChange(initialFavorites || [], newToAvoid);
+    if (!toAvoid.some((avoid) => avoid.id === tag.id)) {
+      const newToAvoid = [...toAvoid, tag];
+      setToAvoid(newToAvoid);
+      onPreferencesChange(favorites, newToAvoid);
+    }
   };
 
   const handleRemoveFromToAvoid = (id: number) => {
-    const newToAvoid = (initialToAvoid || []).filter((avoid) => avoid.id !== id);
-    onPreferencesChange(initialFavorites || [], newToAvoid);
+    const newToAvoid = toAvoid.filter((avoid) => avoid.id !== id);
+    setToAvoid(newToAvoid);
+    onPreferencesChange(favorites, newToAvoid);
   };
 
   return (
@@ -37,7 +51,7 @@ export function GamePreferencesStep({
       <div>
         <h3 className="mb-2 text-lg font-medium">Favorite Game Systems</h3>
         <GameTagInput
-          tags={initialFavorites || []}
+          tags={favorites}
           onAddTag={handleAddFavorite}
           onRemoveTag={handleRemoveFavorite}
           placeholder="Search and add favorite game systems..."
@@ -47,7 +61,7 @@ export function GamePreferencesStep({
       <div>
         <h3 className="mb-2 text-lg font-medium">Game Systems to Avoid</h3>
         <GameTagInput
-          tags={initialToAvoid || []}
+          tags={toAvoid}
           onAddTag={handleAddToAvoid}
           onRemoveTag={handleRemoveFromToAvoid}
           placeholder="Search and add game systems to avoid..."

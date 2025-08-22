@@ -5,14 +5,21 @@ import { cn } from "~/shared/lib/utils";
 import { Button } from "./button";
 import { Input } from "./input";
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 interface TagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  tags: { id: string; name: string }[];
-  onAddTag: (tag: { id: string; name: string }) => void;
+  tags: Tag[];
+  onAddTag: (tag: Tag) => void;
   onRemoveTag: (id: string) => void;
   placeholder?: string;
   isDestructive?: boolean;
-  availableSuggestions?: { id: string; name: string }[];
+  availableSuggestions?: Tag[];
 }
+
+const EMPTY_TAG_SUGGESTIONS: Tag[] = [];
 
 export function TagInput({
   tags,
@@ -20,7 +27,7 @@ export function TagInput({
   onRemoveTag,
   placeholder,
   isDestructive,
-  availableSuggestions = [],
+  availableSuggestions = EMPTY_TAG_SUGGESTIONS,
   ...props
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState("");
@@ -55,15 +62,12 @@ export function TagInput({
 
   const handleAddTag = () => {
     if (inputValue.trim() !== "") {
-      // Check if the input value matches an existing suggestion
       const existingSuggestion = availableSuggestions.find(
-        (s) => s.name.toLowerCase() === inputValue.trim().toLowerCase(),
+        (suggestion) => suggestion.name.toLowerCase() === inputValue.trim().toLowerCase(),
       );
+      // Only add tag if it exists in suggestions
       if (existingSuggestion) {
         onAddTag(existingSuggestion);
-      } else {
-        // Add as a custom tag if no match
-        onAddTag({ id: inputValue.trim(), name: inputValue.trim() });
       }
       setInputValue("");
       setShowSuggestions(false);

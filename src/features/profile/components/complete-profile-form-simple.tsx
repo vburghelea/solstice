@@ -17,12 +17,18 @@ import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
 import { cn } from "~/shared/lib/utils";
-import { experienceLevelOptions } from "~/shared/types/common";
+import {
+  experienceLevelOptions,
+  gameThemeOptions,
+  identityTagOptions,
+  languageOptions,
+} from "~/shared/types/common";
 import { TagInput } from "~/shared/ui/tag-input";
 import { completeUserProfile } from "../profile.mutations";
-import { getUserGameSystemPreferences } from "../profile.queries";
+import { getUserProfile } from "../profile.queries";
 import type { ProfileInputType } from "../profile.schemas";
-import type { ProfileInput } from "../profile.types";
+import type { ProfileInput, UserProfile } from "../profile.types";
+import { defaultPrivacySettings } from "../profile.types";
 import { AvailabilityEditor } from "./availability-editor";
 import { GamePreferencesStep } from "./game-preferences-step";
 
@@ -51,92 +57,36 @@ const STEPS = [
 
 type StepId = (typeof STEPS)[number]["id"];
 
-export function CompleteProfileForm() {
+interface ProfileFormInnerProps {
+  initialData: UserProfile;
+}
+
+function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<ProfileInputType>({
-    gender: "",
-    pronouns: "",
-    phone: "",
-    city: "",
-    country: "",
-    languages: [],
-    identityTags: [],
-    preferredGameThemes: [],
-    overallExperienceLevel: undefined,
-    calendarAvailability: defaultAvailabilityData,
-    isGM: false,
-    gmStyle: "",
+
+  // Merge initial data with default privacy settings to ensure all required fields are present
+  const formDefaultValues = {
+    ...initialData,
+    privacySettings: {
+      ...defaultPrivacySettings,
+      ...initialData.privacySettings,
+    },
     gameSystemPreferences: {
       favorite: [],
       avoid: [],
+      ...initialData.gameSystemPreferences,
     },
-    privacySettings: {
-      showEmail: false,
-      showPhone: false,
-      showLocation: false,
-      showLanguages: false,
-      showGamePreferences: false,
-      allowTeamInvitations: true,
-      allowFollows: true,
-    },
-  });
-
-  const { data: gamePreferencesData, isLoading: isLoadingGamePreferences } = useQuery({
-    queryKey: ["userGameSystemPreferences"],
-    queryFn: () => getUserGameSystemPreferences(),
-  });
+  };
 
   const form = useForm({
-    defaultValues: {
-      ...formData,
-      gameSystemPreferences: {
-        favorite:
-          gamePreferencesData?.data?.favorite ??
-          formData.gameSystemPreferences?.favorite ??
-          [],
-        avoid:
-          gamePreferencesData?.data?.avoid ?? formData.gameSystemPreferences?.avoid ?? [],
-      },
-    } as ProfileInputType,
+    defaultValues: formDefaultValues as ProfileInputType,
     onSubmit: async ({ value }) => {
-      if (currentStepIndex < STEPS.length - 1) {
-        setFormData(value as ProfileInputType);
-        goToNextStep();
-        return;
-      }
-
       setError(null);
-
       try {
-        // Build profile input with only defined values
-        const dataToSubmit: ProfileInput = {};
-
-        // Add optional fields only if they have values
-        if (value.gender) dataToSubmit.gender = value.gender;
-        if (value.pronouns) dataToSubmit.pronouns = value.pronouns;
-        if (value.phone) dataToSubmit.phone = value.phone;
-        if (value.city) dataToSubmit.city = value.city;
-        if (value.country) dataToSubmit.country = value.country;
-        if (value.languages && value.languages.length > 0)
-          dataToSubmit.languages = value.languages;
-        if (value.identityTags && value.identityTags.length > 0)
-          dataToSubmit.identityTags = value.identityTags;
-        if (value.preferredGameThemes && value.preferredGameThemes.length > 0)
-          dataToSubmit.preferredGameThemes = value.preferredGameThemes;
-        if (value.overallExperienceLevel)
-          dataToSubmit.overallExperienceLevel = value.overallExperienceLevel;
-        if (value.calendarAvailability)
-          dataToSubmit.calendarAvailability = value.calendarAvailability;
-        if (value.isGM !== undefined) dataToSubmit.isGM = value.isGM;
-        if (value.isGM && value.gmStyle) dataToSubmit.gmStyle = value.gmStyle;
-        if (value.gameSystemPreferences)
-          dataToSubmit.gameSystemPreferences = value.gameSystemPreferences;
-        if (value.privacySettings) dataToSubmit.privacySettings = value.privacySettings;
-
-        const result = await completeUserProfile({ data: dataToSubmit });
+        const result = await completeUserProfile({ data: value as ProfileInput });
 
         if (result.success) {
           await queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -170,7 +120,6 @@ export function CompleteProfileForm() {
 
   const isLastStep = currentStepIndex === STEPS.length - 1;
 
-  // Gender options for select component
   const genderOptions = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
@@ -182,6 +131,21 @@ export function CompleteProfileForm() {
   const mappedExperienceLevelOptions = experienceLevelOptions.map((level) => ({
     value: level,
     label: level.charAt(0).toUpperCase() + level.slice(1),
+  }));
+
+  const mappedLanguageOptions = languageOptions.map((lang) => ({
+    id: lang.value,
+    name: lang.label,
+  }));
+
+  const mappedIdentityTagOptions = identityTagOptions.map((tag) => ({
+    id: tag,
+    name: tag,
+  }));
+
+  const mappedGameThemeOptions = gameThemeOptions.map((theme) => ({
+    id: theme,
+    name: theme,
   }));
 
   return (
@@ -224,7 +188,11 @@ export function CompleteProfileForm() {
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          form.handleSubmit();
+          if (isLastStep) {
+            form.handleSubmit();
+          } else {
+            goToNextStep();
+          }
         }}
       >
         <Card>
@@ -297,11 +265,15 @@ export function CompleteProfileForm() {
                       <Label>Languages (optional)</Label>
                       <TagInput
                         tags={
-                          field.state.value?.map((lang) => ({ id: lang, name: lang })) ||
-                          []
+                          field.state.value?.map((lang) => ({
+                            id: lang,
+                            name:
+                              mappedLanguageOptions.find((l) => l.id === lang)?.name ||
+                              lang,
+                          })) || []
                         }
                         onAddTag={(tag) => {
-                          const newLanguages = [...(field.state.value || []), tag.name];
+                          const newLanguages = [...(field.state.value || []), tag.id];
                           field.handleChange(newLanguages);
                         }}
                         onRemoveTag={(id) => {
@@ -311,6 +283,7 @@ export function CompleteProfileForm() {
                           field.handleChange(newLanguages);
                         }}
                         placeholder="Add languages you speak"
+                        availableSuggestions={mappedLanguageOptions}
                       />
                     </div>
                   )}
@@ -325,7 +298,7 @@ export function CompleteProfileForm() {
                           field.state.value?.map((tag) => ({ id: tag, name: tag })) || []
                         }
                         onAddTag={(tag) => {
-                          const newTags = [...(field.state.value || []), tag.name];
+                          const newTags = [...(field.state.value || []), tag.id];
                           field.handleChange(newTags);
                         }}
                         onRemoveTag={(id) => {
@@ -335,6 +308,7 @@ export function CompleteProfileForm() {
                           field.handleChange(newTags);
                         }}
                         placeholder="Add identity tags that represent you"
+                        availableSuggestions={mappedIdentityTagOptions}
                       />
                     </div>
                   )}
@@ -352,7 +326,7 @@ export function CompleteProfileForm() {
                           })) || []
                         }
                         onAddTag={(tag) => {
-                          const newThemes = [...(field.state.value || []), tag.name];
+                          const newThemes = [...(field.state.value || []), tag.id];
                           field.handleChange(newThemes);
                         }}
                         onRemoveTag={(id) => {
@@ -362,6 +336,7 @@ export function CompleteProfileForm() {
                           field.handleChange(newThemes);
                         }}
                         placeholder="Add game themes you prefer"
+                        availableSuggestions={mappedGameThemeOptions}
                       />
                     </div>
                   )}
@@ -392,51 +367,22 @@ export function CompleteProfileForm() {
                     </div>
                   )}
                 </form.Field>
-
-                <form.Field name="isGM">
-                  {(field) => (
-                    <ValidatedCheckbox
-                      field={field}
-                      label="I am a Game Master"
-                      disabled={false}
-                    />
-                  )}
-                </form.Field>
-
-                <form.Subscribe selector={(state) => state.values.isGM}>
-                  {(isGM) =>
-                    isGM ? (
-                      <form.Field name="gmStyle">
-                        {(field) => (
-                          <ValidatedInput
-                            field={field}
-                            label="GM Style (optional)"
-                            placeholder="Describe your GM style"
-                          />
-                        )}
-                      </form.Field>
-                    ) : null
-                  }
-                </form.Subscribe>
               </div>
             )}
 
             {/* Game Preferences Step */}
-            {currentStep === "game-preferences" &&
-              (isLoadingGamePreferences ? (
-                <div>Loading game preferences...</div>
-              ) : (
-                <GamePreferencesStep
-                  initialFavorites={formData.gameSystemPreferences?.favorite || []}
-                  initialToAvoid={formData.gameSystemPreferences?.avoid || []}
-                  onPreferencesChange={(favorite, avoid) => {
-                    form.setFieldValue("gameSystemPreferences", {
-                      favorite,
-                      avoid,
-                    });
-                  }}
-                />
-              ))}
+            {currentStep === "game-preferences" && (
+              <GamePreferencesStep
+                initialFavorites={form.state.values.gameSystemPreferences?.favorite || []}
+                initialToAvoid={form.state.values.gameSystemPreferences?.avoid || []}
+                onPreferencesChange={(favorite, avoid) => {
+                  form.setFieldValue("gameSystemPreferences", {
+                    favorite,
+                    avoid,
+                  });
+                }}
+              />
+            )}
 
             {/* Privacy Settings Step */}
             {currentStep === "privacy" && (
@@ -453,7 +399,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my email address to team members"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -463,7 +408,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my phone number to team members"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -473,7 +417,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my location (city/country) to others"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -483,7 +426,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my languages to others"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -493,7 +435,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Show my game preferences to others"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -503,7 +444,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Allow team captains to send me invitations"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -513,7 +453,6 @@ export function CompleteProfileForm() {
                       <ValidatedCheckbox
                         field={field}
                         label="Allow others to follow me"
-                        disabled={false}
                       />
                     )}
                   </form.Field>
@@ -560,4 +499,21 @@ export function CompleteProfileForm() {
       </form>
     </div>
   );
+}
+
+export function CompleteProfileForm() {
+  const { data: userProfileData, isLoading: isLoadingUserProfile } = useQuery({
+    queryKey: ["userProfile"],
+    queryFn: () => getUserProfile({}),
+  });
+
+  if (isLoadingUserProfile) {
+    return <div>Loading profile...</div>;
+  }
+
+  if (!userProfileData?.success || !userProfileData.data) {
+    return <div>Failed to load profile. Please try again.</div>;
+  }
+
+  return <ProfileFormInner initialData={userProfileData.data} />;
 }

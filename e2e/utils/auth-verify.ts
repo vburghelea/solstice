@@ -6,7 +6,7 @@ import { Page } from "@playwright/test";
 export async function verifySharedAuth(page: Page) {
   // Quick check for session cookies
   const cookies = await page.context().cookies();
-  const hasSession = cookies.some((c) => c.name.startsWith("solstice.session"));
+  const hasSession = cookies.some((c) => c.name.startsWith("roundup.session"));
 
   if (!hasSession) {
     throw new Error(

@@ -35,15 +35,21 @@ export function ProfileView() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Fetch profile data
+  // Fetch profile data with better hydration handling
   const {
     data: profileResult,
     isLoading,
     error,
+    isSuccess,
   } = useQuery({
     queryKey: ["userProfile"],
     queryFn: async () => getUserProfile({}),
     retry: 1,
+    // Prevent hydration mismatches by ensuring consistent loading states
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const profile = profileResult?.success ? profileResult.data : null;
@@ -352,15 +358,18 @@ export function ProfileView() {
     setEditingSection(null);
   };
 
-  if (isLoading) {
+  // Handle loading state - only show loading if we don't have data yet
+  if (isLoading && !profileResult) {
     return (
       <div className="flex items-center justify-center p-8">
         <LoaderCircle className="h-8 w-8 animate-spin" />
+        <span className="text-muted-foreground ml-2">Loading profile...</span>
       </div>
     );
   }
 
-  if (!profile) {
+  // Handle error state - only show error if we have an error and no successful data
+  if (error && !isSuccess && !profile) {
     const errorMessage =
       profileResult?.errors?.[0]?.message || error?.message || "Failed to load profile";
     return (
@@ -371,6 +380,16 @@ export function ProfileView() {
             Please try logging in again
           </p>
         )}
+      </div>
+    );
+  }
+
+  // If we don't have profile data but also don't have an error, show loading
+  if (!profile && !isSuccess) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <LoaderCircle className="h-8 w-8 animate-spin" />
+        <span className="text-muted-foreground ml-2">Loading profile data...</span>
       </div>
     );
   }
@@ -445,11 +464,11 @@ export function ProfileView() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Name</Label>
-              <p className="text-base">{profile.name || "Not set"}</p>
+              <p className="text-base">{profile?.name || "Not set"}</p>
             </div>
             <div className="space-y-2">
               <Label>Email</Label>
-              <p className="text-base">{profile.email}</p>
+              <p className="text-base">{profile?.email || "Not set"}</p>
             </div>
           </div>
 
@@ -471,7 +490,7 @@ export function ProfileView() {
               ) : (
                 <>
                   <Label>Phone Number</Label>
-                  <p className="text-base">{profile?.["phone"] || "Not set"}</p>
+                  <p className="text-base">{profile?.phone || "Not set"}</p>
                 </>
               )}
             </div>
@@ -676,7 +695,7 @@ export function ProfileView() {
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {profile?.["languages"]?.length ? (
-                    profile["languages"].map((langCode) => (
+                    profile?.languages?.map((langCode) => (
                       <span
                         key={langCode}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
@@ -719,7 +738,7 @@ export function ProfileView() {
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {profile?.["identityTags"]?.length ? (
-                    profile["identityTags"].map((tag) => (
+                    profile?.identityTags?.map((tag) => (
                       <span
                         key={tag}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
@@ -762,7 +781,7 @@ export function ProfileView() {
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {profile?.["preferredGameThemes"]?.length ? (
-                    profile["preferredGameThemes"].map((theme) => (
+                    profile?.preferredGameThemes?.map((theme) => (
                       <span
                         key={theme}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
@@ -926,43 +945,39 @@ export function ProfileView() {
             <div className="space-y-2">
               <p className="text-sm">
                 <span className="font-medium">Email visibility:</span>{" "}
-                {profile["privacySettings"]?.showEmail
+                {profile?.privacySettings?.showEmail
                   ? "Visible to team members"
                   : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Phone visibility:</span>{" "}
-                {profile["privacySettings"]?.showPhone
+                {profile?.privacySettings?.showPhone
                   ? "Visible to team members"
                   : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Location visibility:</span>{" "}
-                {profile["privacySettings"]?.showLocation
-                  ? "Visible to others"
-                  : "Hidden"}
+                {profile?.privacySettings?.showLocation ? "Visible to others" : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Languages visibility:</span>{" "}
-                {profile["privacySettings"]?.showLanguages
-                  ? "Visible to others"
-                  : "Hidden"}
+                {profile?.privacySettings?.showLanguages ? "Visible to others" : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Game preferences visibility:</span>{" "}
-                {profile["privacySettings"]?.showGamePreferences
+                {profile?.privacySettings?.showGamePreferences
                   ? "Visible to others"
                   : "Hidden"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Team invitations:</span>{" "}
-                {profile["privacySettings"]?.allowTeamInvitations !== false
+                {profile?.privacySettings?.allowTeamInvitations !== false
                   ? "Allowed"
                   : "Not Allowed"}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Follow permissions:</span>{" "}
-                {profile["privacySettings"]?.allowFollows ? "Allowed" : "Not Allowed"}
+                {profile?.privacySettings?.allowFollows ? "Allowed" : "Not Allowed"}
               </p>
             </div>
           )}
@@ -1051,8 +1066,8 @@ export function ProfileView() {
               <div>
                 <h4 className="font-medium">Favorite Game Systems</h4>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {profile["gameSystemPreferences"]?.favorite.length ? (
-                    profile["gameSystemPreferences"].favorite.map((gameSystem) => (
+                  {profile?.gameSystemPreferences?.favorite.length ? (
+                    profile?.gameSystemPreferences.favorite.map((gameSystem) => (
                       <span
                         key={gameSystem.id}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
@@ -1070,8 +1085,8 @@ export function ProfileView() {
               <div>
                 <h4 className="font-medium">Game Systems to Avoid</h4>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {profile["gameSystemPreferences"]?.avoid.length ? (
-                    profile["gameSystemPreferences"].avoid.map((gameSystem) => (
+                  {profile?.gameSystemPreferences?.avoid.length ? (
+                    profile?.gameSystemPreferences.avoid.map((gameSystem) => (
                       <span
                         key={gameSystem.id}
                         className="bg-destructive text-destructive-foreground rounded-md px-2 py-1 text-sm"
@@ -1100,16 +1115,16 @@ export function ProfileView() {
         <CardContent className="space-y-2">
           <p className="text-sm">
             <span className="font-medium">Profile Status:</span>{" "}
-            {profile["profileComplete"] ? "Complete" : "Incomplete"}
+            {profile?.profileComplete ? "Complete" : "Incomplete"}
           </p>
           <p className="text-sm">
             <span className="font-medium">Profile Version:</span>{" "}
-            {profile["profileVersion"]}
+            {profile?.profileVersion}
           </p>
           <p className="text-sm">
             <span className="font-medium">Last Updated:</span>{" "}
-            {profile["profileUpdatedAt"]
-              ? new Date(profile["profileUpdatedAt"]).toLocaleString()
+            {profile?.profileUpdatedAt
+              ? new Date(profile.profileUpdatedAt).toLocaleString()
               : "Never"}
           </p>
         </CardContent>

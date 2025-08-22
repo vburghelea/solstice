@@ -530,7 +530,10 @@ export const getGameApplicationForUser = createServerFn({ method: "POST" })
         },
       });
 
-      return { success: true, data: application as GameApplication };
+      return {
+        success: true,
+        data: application ? (application as GameApplication) : null,
+      };
     } catch (error) {
       console.error("Error fetching game application for user:", error);
       return {

@@ -26,9 +26,22 @@ function mapDbUserToProfile(
     gender: string | null;
     pronouns: string | null;
     phone: string | null;
+    city: string | null;
+    country: string | null;
+    languages: string[] | null;
+    identityTags: string[] | null;
+    preferredGameThemes: string[] | null;
+    overallExperienceLevel: "beginner" | "intermediate" | "advanced" | "expert" | null;
+    isGM: boolean | null;
+    gamesHosted: number | null;
+    responseRate: number | null;
+    averageResponseTime: number | null;
+    gmStyle: string | null;
+    gmRating: number | null;
     privacySettings: string | null;
     profileVersion: number;
     profileUpdatedAt: Date | null;
+    image: string | null;
   },
   preferences?: {
     favorite: { id: number; name: string }[];
@@ -41,37 +54,38 @@ function mapDbUserToProfile(
     name: dbUser.name,
     email: dbUser.email,
     profileComplete: dbUser.profileComplete,
-    // Handle optional properties that may be null in the database
     gender: dbUser.gender ?? undefined,
     pronouns: dbUser.pronouns ?? undefined,
     phone: dbUser.phone ?? undefined,
+    city: dbUser.city ?? undefined,
+    country: dbUser.country ?? undefined,
+    languages: dbUser.languages ?? [],
+    identityTags: dbUser.identityTags ?? [],
+    preferredGameThemes: dbUser.preferredGameThemes ?? [],
+    overallExperienceLevel: dbUser.overallExperienceLevel ?? undefined,
+    isGM: dbUser.isGM ?? false,
+    gamesHosted: dbUser.gamesHosted ?? 0,
+    responseRate: dbUser.responseRate ?? 0,
+    averageResponseTime: dbUser.averageResponseTime ?? undefined,
+    gmStyle: dbUser.gmStyle ?? undefined,
+    gmRating: dbUser.gmRating ?? undefined,
     privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings) ?? undefined,
     profileVersion: dbUser.profileVersion,
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
     gameSystemPreferences: preferences ?? undefined,
-    // Add missing required properties with default values
-    languages: [],
-    identityTags: [],
-    preferredGameThemes: [],
-    isGM: false,
-    gamesHosted: 0,
-    responseRate: 0,
-    // Add other optional properties with undefined values
-    image: undefined,
-    city: undefined,
-    country: undefined,
-    overallExperienceLevel: undefined,
-    calendarAvailability: undefined,
-    averageResponseTime: undefined,
-    gmStyle: undefined,
-    gmRating: undefined,
+    ...(dbUser.image !== null && { image: dbUser.image }),
   };
 
-  return userProfile as unknown as UserProfile;
+  return userProfile as UserProfile;
 }
 
 export const getUserProfile = createServerFn({ method: "GET" })
-  .validator(z.object({ userId: z.string().optional() }).parse)
+  .validator((data: unknown) => {
+    if (data === undefined || data === null) {
+      return {}; // Default to empty object if no data is provided
+    }
+    return z.object({ userId: z.string().optional() }).parse(data);
+  })
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       // Import server-only modules inside the handler
@@ -94,8 +108,11 @@ export const getUserProfile = createServerFn({ method: "GET" })
         };
       }
 
-      const { eq } = await import("drizzle-orm");
+      const { eq, inArray } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
+      const { gameSystems, userGameSystemPreferences } = await import(
+        "~/db/schema/game-systems.schema"
+      );
 
       const db = await getDb();
 
@@ -113,12 +130,49 @@ export const getUserProfile = createServerFn({ method: "GET" })
       }
 
       // Fetch user's game system preferences
-      const preferencesResult = await getUserGameSystemPreferences();
-      const preferences = preferencesResult.success ? preferencesResult.data : undefined;
+      const preferencesResult = await (async () => {
+        const preferences = await db
+          .select()
+          .from(userGameSystemPreferences)
+          .where(eq(userGameSystemPreferences.userId, targetUserId));
+
+        const favoriteIds: number[] = [];
+        const avoidIds: number[] = [];
+
+        for (const pref of preferences) {
+          if (pref.preferenceType === "favorite") {
+            favoriteIds.push(pref.gameSystemId);
+          } else if (pref.preferenceType === "avoid") {
+            avoidIds.push(pref.gameSystemId);
+          }
+        }
+
+        const allPreferredIds = [...new Set([...favoriteIds, ...avoidIds])];
+
+        let preferredGameSystems: { id: number; name: string }[] = [];
+        if (allPreferredIds.length > 0) {
+          preferredGameSystems = await db
+            .select({ id: gameSystems.id, name: gameSystems.name })
+            .from(gameSystems)
+            .where(inArray(gameSystems.id, allPreferredIds));
+        }
+
+        const favorite: { id: number; name: string }[] = favoriteIds.map((id) => {
+          const system = preferredGameSystems.find((gs) => gs.id === id);
+          return { id, name: system?.name || "" };
+        });
+
+        const avoid: { id: number; name: string }[] = avoidIds.map((id) => {
+          const system = preferredGameSystems.find((gs) => gs.id === id);
+          return { id, name: system?.name || "" };
+        });
+
+        return { favorite, avoid };
+      })();
 
       return {
         success: true,
-        data: mapDbUserToProfile(dbUser, preferences),
+        data: mapDbUserToProfile(dbUser, preferencesResult),
       };
     } catch (error) {
       console.error("Error fetching user profile:", error);

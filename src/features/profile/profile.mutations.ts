@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { z } from "zod";
+import { defaultAvailabilityData } from "~/db/schema/auth.schema";
 import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import {
   partialProfileInputSchema,
@@ -63,7 +64,7 @@ function mapDbUserToProfile(
     gamesHosted: 0,
     responseRate: 0,
     // Add other optional properties with undefined values
-    image: undefined,
+
     city: undefined,
     country: undefined,
     overallExperienceLevel: undefined,
@@ -119,6 +120,27 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       }
       if (inputData.privacySettings !== undefined) {
         updateData["privacySettings"] = JSON.stringify(inputData.privacySettings);
+      }
+      if (inputData.city !== undefined) {
+        updateData["city"] = inputData.city;
+      }
+      if (inputData.country !== undefined) {
+        updateData["country"] = inputData.country;
+      }
+      if (inputData.overallExperienceLevel !== undefined) {
+        updateData["overallExperienceLevel"] = inputData.overallExperienceLevel;
+      }
+      if (inputData.languages !== undefined) {
+        updateData["languages"] = inputData.languages;
+      }
+      if (inputData.identityTags !== undefined) {
+        updateData["identityTags"] = inputData.identityTags;
+      }
+      if (inputData.preferredGameThemes !== undefined) {
+        updateData["preferredGameThemes"] = inputData.preferredGameThemes;
+      }
+      if (inputData.calendarAvailability !== undefined) {
+        updateData["calendarAvailability"] = inputData.calendarAvailability;
       }
 
       // Import server-only modules inside the handler
@@ -239,6 +261,14 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         gender: data.gender || null,
         pronouns: data.pronouns || null,
         phone: data.phone || null,
+        city: data.city || null,
+        country: data.country || null,
+        languages: data.languages || [],
+        identityTags: data.identityTags || [],
+        preferredGameThemes: data.preferredGameThemes || [],
+        overallExperienceLevel: data.overallExperienceLevel || null,
+        calendarAvailability: data.calendarAvailability || defaultAvailabilityData,
+        isGM: false, // Set to false by default
         privacySettings: JSON.stringify(data.privacySettings || defaultPrivacySettings),
         profileComplete: true,
         profileUpdatedAt: new Date(),

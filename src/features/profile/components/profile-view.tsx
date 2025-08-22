@@ -16,7 +16,12 @@ import {
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
-import { experienceLevelOptions } from "~/shared/types/common";
+import {
+  experienceLevelOptions,
+  gameThemeOptions,
+  identityTagOptions,
+  languageOptions,
+} from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
 import { TagInput } from "~/shared/ui/tag-input";
 import { updateUserProfile } from "../profile.mutations";
@@ -27,7 +32,7 @@ import { GamePreferencesStep } from "./game-preferences-step";
 
 export function ProfileView() {
   const queryClient = useQueryClient();
-  const [isEditing, setIsEditing] = useState(false);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Fetch profile data
@@ -37,7 +42,7 @@ export function ProfileView() {
     error,
   } = useQuery({
     queryKey: ["userProfile"],
-    queryFn: async () => getUserProfile({ data: {} }),
+    queryFn: async () => getUserProfile({}),
     retry: 1,
   });
 
@@ -77,174 +82,144 @@ export function ProfileView() {
         // Track if we have any actual changes to submit
         let hasChanges = false;
 
-        if (value.gender !== (profile?.["gender"] || "")) {
-          if (value.gender) {
-            dataToSubmit["gender"] = value.gender;
-          } else {
-            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
-            delete dataToSubmit["gender"];
+        // Basic Information Fields
+        if (editingSection === "basic") {
+          if (value.gender !== (profile?.["gender"] || "")) {
+            dataToSubmit["gender"] = value.gender || null;
+            hasChanges = true;
           }
-          hasChanges = true;
-        }
-        if (value.pronouns !== (profile?.["pronouns"] || "")) {
-          if (value.pronouns) {
-            dataToSubmit["pronouns"] = value.pronouns;
-          } else {
-            // With exactOptionalPropertyTypes. we need to delete the property instead of setting it to undefined
-            delete dataToSubmit["pronouns"];
+          if (value.pronouns !== (profile?.["pronouns"] || "")) {
+            dataToSubmit["pronouns"] = value.pronouns || null;
+            hasChanges = true;
           }
-          hasChanges = true;
-        }
-        if (value.phone !== (profile?.["phone"] || "")) {
-          if (value.phone) {
-            dataToSubmit["phone"] = value.phone;
-          } else {
-            // With exactOptionalPropertyTypes. we need to delete the property instead of setting it to undefined
-            delete dataToSubmit["phone"];
+          if (value.phone !== (profile?.["phone"] || "")) {
+            dataToSubmit["phone"] = value.phone || null;
+            hasChanges = true;
           }
-          hasChanges = true;
-        }
-        if (value.city !== (profile?.["city"] || "")) {
-          if (value.city) {
-            dataToSubmit["city"] = value.city;
-          } else {
-            delete dataToSubmit["city"];
+          if (value.city !== (profile?.["city"] || "")) {
+            dataToSubmit["city"] = value.city || null;
+            hasChanges = true;
           }
-          hasChanges = true;
-        }
-        if (value.country !== (profile?.["country"] || "")) {
-          if (value.country) {
-            dataToSubmit["country"] = value.country;
-          } else {
-            delete dataToSubmit["country"];
+          if (value.country !== (profile?.["country"] || "")) {
+            dataToSubmit["country"] = value.country || null;
+            hasChanges = true;
           }
-          hasChanges = true;
-        }
-        if (
-          value.overallExperienceLevel !==
-          (profile?.["overallExperienceLevel"] || undefined)
-        ) {
-          if (value.overallExperienceLevel) {
-            dataToSubmit["overallExperienceLevel"] = value.overallExperienceLevel;
-          } else {
-            delete dataToSubmit["overallExperienceLevel"];
-          }
-          hasChanges = true;
-        }
-        if (
-          JSON.stringify(value.calendarAvailability) !==
-          JSON.stringify(profile?.["calendarAvailability"] || defaultAvailabilityData)
-        ) {
-          dataToSubmit["calendarAvailability"] = value.calendarAvailability;
-          hasChanges = true;
-        }
-        if (value.gmStyle !== (profile?.["gmStyle"] || "")) {
-          if (value.gmStyle) {
-            dataToSubmit["gmStyle"] = value.gmStyle;
-          } else {
-            delete dataToSubmit["gmStyle"];
-          }
-          hasChanges = true;
-        }
-        if (value.isGM !== (profile?.["isGM"] || false)) {
-          dataToSubmit["isGM"] = value.isGM;
-          hasChanges = true;
-        }
-
-        // Check if languages have changed
-        const currentLanguages = profile?.["languages"] || [];
-        const newLanguages = value.languages || [];
-        const languagesChanged =
-          JSON.stringify(currentLanguages) !== JSON.stringify(newLanguages);
-        if (languagesChanged) {
-          dataToSubmit["languages"] = newLanguages.length > 0 ? newLanguages : null;
-          hasChanges = true;
-        }
-
-        // Check if identityTags have changed
-        const currentIdentityTags = profile?.["identityTags"] || [];
-        const newIdentityTags = value.identityTags || [];
-        const identityTagsChanged =
-          JSON.stringify(currentIdentityTags) !== JSON.stringify(newIdentityTags);
-        if (identityTagsChanged) {
-          dataToSubmit["identityTags"] =
-            newIdentityTags.length > 0 ? newIdentityTags : null;
-          hasChanges = true;
-        }
-
-        // Check if preferredGameThemes have changed
-        const currentPreferredGameThemes = profile?.["preferredGameThemes"] || [];
-        const newPreferredGameThemes = value.preferredGameThemes || [];
-        const preferredGameThemesChanged =
-          JSON.stringify(currentPreferredGameThemes) !==
-          JSON.stringify(newPreferredGameThemes);
-        if (preferredGameThemesChanged) {
-          dataToSubmit["preferredGameThemes"] =
-            newPreferredGameThemes.length > 0 ? newPreferredGameThemes : null;
-          hasChanges = true;
-        }
-
-        // Check if game system preferences have changed
-        const currentFavorites = profile?.["gameSystemPreferences"]?.favorite || [];
-        const currentAvoid = profile?.["gameSystemPreferences"]?.avoid || [];
-        const newFavorites = value.gameSystemPreferences?.favorite || [];
-        const newAvoid = value.gameSystemPreferences?.avoid || [];
-
-        // Compare game system preferences
-        const favoritesChanged =
-          JSON.stringify(currentFavorites) !== JSON.stringify(newFavorites);
-        const avoidChanged = JSON.stringify(currentAvoid) !== JSON.stringify(newAvoid);
-
-        if (favoritesChanged || avoidChanged) {
           if (
-            value.gameSystemPreferences &&
-            (value.gameSystemPreferences.favorite.length > 0 ||
-              value.gameSystemPreferences.avoid.length > 0)
+            value.overallExperienceLevel !==
+            (profile?.["overallExperienceLevel"] || undefined)
           ) {
-            dataToSubmit["gameSystemPreferences"] = value.gameSystemPreferences;
-          } else {
-            // With exactOptionalPropertyTypes, we need to delete the property instead of setting it to undefined
-            delete dataToSubmit["gameSystemPreferences"];
+            dataToSubmit["overallExperienceLevel"] = value.overallExperienceLevel || null;
+            hasChanges = true;
           }
-          hasChanges = true;
         }
 
-        // Check if privacy settings have changed
-        const currentPrivacy = profile?.["privacySettings"] || {
-          showEmail: false,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
-          allowTeamInvitations: true,
-          allowFollows: true,
-        };
-        const newPrivacy = value.privacySettings || {
-          showEmail: false,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
-          allowTeamInvitations: true,
-          allowFollows: true,
-        };
+        // Additional Information Fields
+        if (editingSection === "additional") {
+          if (
+            JSON.stringify(value.calendarAvailability) !==
+            JSON.stringify(profile?.["calendarAvailability"] || defaultAvailabilityData)
+          ) {
+            dataToSubmit["calendarAvailability"] = value.calendarAvailability;
+            hasChanges = true;
+          }
 
-        if (
-          newPrivacy.showEmail !== currentPrivacy.showEmail ||
-          newPrivacy.showPhone !== currentPrivacy.showPhone ||
-          newPrivacy.showLocation !== currentPrivacy.showLocation ||
-          newPrivacy.showLanguages !== currentPrivacy.showLanguages ||
-          newPrivacy.showGamePreferences !== currentPrivacy.showGamePreferences ||
-          newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations ||
-          newPrivacy.allowFollows !== currentPrivacy.allowFollows
-        ) {
-          dataToSubmit["privacySettings"] = newPrivacy;
-          hasChanges = true;
+          // Check if languages have changed
+          const currentLanguages = profile?.["languages"] || [];
+          const newLanguages = value.languages || [];
+          const languagesChanged =
+            JSON.stringify(currentLanguages) !== JSON.stringify(newLanguages);
+          if (languagesChanged) {
+            dataToSubmit["languages"] = newLanguages.length > 0 ? newLanguages : null;
+            hasChanges = true;
+          }
+
+          // Check if identityTags have changed
+          const currentIdentityTags = profile?.["identityTags"] || [];
+          const newIdentityTags = value.identityTags || [];
+          const identityTagsChanged =
+            JSON.stringify(currentIdentityTags) !== JSON.stringify(newIdentityTags);
+          if (identityTagsChanged) {
+            dataToSubmit["identityTags"] =
+              newIdentityTags.length > 0 ? newIdentityTags : null;
+            hasChanges = true;
+          }
+
+          // Check if preferredGameThemes have changed
+          const currentPreferredGameThemes = profile?.["preferredGameThemes"] || [];
+          const newPreferredGameThemes = value.preferredGameThemes || [];
+          const preferredGameThemesChanged =
+            JSON.stringify(currentPreferredGameThemes) !==
+            JSON.stringify(newPreferredGameThemes);
+          if (preferredGameThemesChanged) {
+            dataToSubmit["preferredGameThemes"] =
+              newPreferredGameThemes.length > 0 ? newPreferredGameThemes : null;
+            hasChanges = true;
+          }
+        }
+
+        // Game Preferences Fields
+        if (editingSection === "game-preferences") {
+          const currentFavorites = profile?.["gameSystemPreferences"]?.favorite || [];
+          const currentAvoid = profile?.["gameSystemPreferences"]?.avoid || [];
+          const newFavorites = value.gameSystemPreferences?.favorite || [];
+          const newAvoid = value.gameSystemPreferences?.avoid || [];
+
+          const favoritesChanged =
+            JSON.stringify(currentFavorites) !== JSON.stringify(newFavorites);
+          const avoidChanged = JSON.stringify(currentAvoid) !== JSON.stringify(newAvoid);
+
+          if (favoritesChanged || avoidChanged) {
+            if (
+              value.gameSystemPreferences &&
+              (value.gameSystemPreferences.favorite.length > 0 ||
+                value.gameSystemPreferences.avoid.length > 0)
+            ) {
+              dataToSubmit["gameSystemPreferences"] = value.gameSystemPreferences;
+            } else {
+              delete dataToSubmit["gameSystemPreferences"];
+            }
+            hasChanges = true;
+          }
+        }
+
+        // Privacy Settings Fields
+        if (editingSection === "privacy") {
+          const currentPrivacy = profile?.["privacySettings"] || {
+            showEmail: false,
+            showPhone: false,
+            showLocation: false,
+            showLanguages: false,
+            showGamePreferences: false,
+            allowTeamInvitations: true,
+            allowFollows: true,
+          };
+          const newPrivacy = value.privacySettings || {
+            showEmail: false,
+            showPhone: false,
+            showLocation: false,
+            showLanguages: false,
+            showGamePreferences: false,
+            allowTeamInvitations: true,
+            allowFollows: true,
+          };
+
+          if (
+            newPrivacy.showEmail !== currentPrivacy.showEmail ||
+            newPrivacy.showPhone !== currentPrivacy.showPhone ||
+            newPrivacy.showLocation !== currentPrivacy.showLocation ||
+            newPrivacy.showLanguages !== currentPrivacy.showLanguages ||
+            newPrivacy.showGamePreferences !== currentPrivacy.showGamePreferences ||
+            newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations ||
+            newPrivacy.allowFollows !== currentPrivacy.allowFollows
+          ) {
+            dataToSubmit["privacySettings"] = newPrivacy;
+            hasChanges = true;
+          }
         }
 
         // If no changes, just close the form
         if (!hasChanges || Object.keys(dataToSubmit).length === 0) {
-          setIsEditing(false);
+          setEditingSection(null);
           toast.info("No changes were made to your profile.");
           return;
         }
@@ -255,7 +230,7 @@ export function ProfileView() {
           toast.success("Profile updated successfully");
           await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
           // Only exit edit mode on success
-          setIsEditing(false);
+          setEditingSection(null);
           setFormError(null);
         } else {
           // Show error but don't exit edit mode
@@ -290,74 +265,82 @@ export function ProfileView() {
     label: level.charAt(0).toUpperCase() + level.slice(1),
   }));
 
+  const mappedLanguageOptions = languageOptions.map((lang) => ({
+    id: lang.value,
+    name: lang.label,
+  }));
+
+  const mappedIdentityTagOptions = identityTagOptions.map((tag) => ({
+    id: tag,
+    name: tag,
+  }));
+
+  const mappedGameThemeOptions = gameThemeOptions.map((theme) => ({
+    id: theme,
+    name: theme,
+  }));
+
   // Initialize form data when entering edit mode
-  const startEditing = () => {
+  const startEditingSection = (sectionId: string) => {
     if (!profile) return;
 
-    // Reset form with current profile data
-    form.reset();
-
-    // Set field values from profile
-    if (profile.gender) {
-      form.setFieldValue("gender", profile.gender);
-    }
-    if (profile.pronouns) {
-      form.setFieldValue("pronouns", profile.pronouns);
-    }
-    if (profile.phone) {
-      form.setFieldValue("phone", profile.phone);
-    }
-    if (profile.city) {
-      form.setFieldValue("city", profile.city);
-    }
-    if (profile.country) {
-      form.setFieldValue("country", profile.country);
-    }
-    if (profile.overallExperienceLevel) {
-      form.setFieldValue("overallExperienceLevel", profile.overallExperienceLevel);
-    }
-    if (profile.calendarAvailability) {
-      form.setFieldValue("calendarAvailability", profile.calendarAvailability);
+    if (form.state.isDirty && editingSection !== null) {
+      toast.info(
+        "Please save or cancel your current changes before editing another section.",
+      );
+      return;
     }
 
-    if (profile.languages) {
-      form.setFieldValue("languages", profile.languages);
-    }
-    if (profile.identityTags) {
-      form.setFieldValue("identityTags", profile.identityTags);
-    }
-    if (profile.preferredGameThemes) {
-      form.setFieldValue("preferredGameThemes", profile.preferredGameThemes);
+    // Set field values from profile for the specific section
+    if (sectionId === "basic") {
+      form.setFieldValue("gender", profile.gender || "");
+      form.setFieldValue("pronouns", profile.pronouns || "");
+      form.setFieldValue("phone", profile.phone || "");
+      form.setFieldValue("city", profile.city || "");
+      form.setFieldValue("country", profile.country || "");
+      form.setFieldValue(
+        "overallExperienceLevel",
+        profile.overallExperienceLevel || undefined,
+      );
+    } else if (sectionId === "additional") {
+      form.setFieldValue(
+        "calendarAvailability",
+        profile.calendarAvailability || defaultAvailabilityData,
+      );
+      form.setFieldValue("languages", profile.languages || []);
+      form.setFieldValue("identityTags", profile.identityTags || []);
+      form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
+    } else if (sectionId === "game-preferences") {
+      form.setFieldValue(
+        "gameSystemPreferences",
+        profile.gameSystemPreferences || { favorite: [], avoid: [] },
+      );
+    } else if (sectionId === "privacy") {
+      const privacySettings = profile.privacySettings || {
+        showEmail: false,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      };
+      form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
+      form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
+      form.setFieldValue("privacySettings.showLocation", privacySettings.showLocation);
+      form.setFieldValue("privacySettings.showLanguages", privacySettings.showLanguages);
+      form.setFieldValue(
+        "privacySettings.showGamePreferences",
+        privacySettings.showGamePreferences,
+      );
+      form.setFieldValue(
+        "privacySettings.allowTeamInvitations",
+        privacySettings.allowTeamInvitations,
+      );
+      form.setFieldValue("privacySettings.allowFollows", privacySettings.allowFollows);
     }
 
-    if (profile.gameSystemPreferences) {
-      form.setFieldValue("gameSystemPreferences", profile.gameSystemPreferences);
-    }
-
-    const privacySettings = profile.privacySettings || {
-      showEmail: false,
-      showPhone: false,
-      showLocation: false,
-      showLanguages: false,
-      showGamePreferences: false,
-      allowTeamInvitations: true,
-      allowFollows: true,
-    };
-    form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
-    form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
-    form.setFieldValue("privacySettings.showLocation", privacySettings.showLocation);
-    form.setFieldValue("privacySettings.showLanguages", privacySettings.showLanguages);
-    form.setFieldValue(
-      "privacySettings.showGamePreferences",
-      privacySettings.showGamePreferences,
-    );
-    form.setFieldValue(
-      "privacySettings.allowTeamInvitations",
-      privacySettings.allowTeamInvitations,
-    );
-    form.setFieldValue("privacySettings.allowFollows", privacySettings.allowFollows);
-
-    setIsEditing(true);
+    setEditingSection(sectionId);
   };
 
   const cancelEditing = () => {
@@ -366,7 +349,7 @@ export function ProfileView() {
     // Clear any errors
     setFormError(null);
     // Exit edit mode
-    setIsEditing(false);
+    setEditingSection(null);
   };
 
   if (isLoading) {
@@ -404,13 +387,17 @@ export function ProfileView() {
                 Your personal details and contact information
               </CardDescription>
             </div>
-            {!isEditing && (
-              <Button onClick={startEditing} variant="outline" size="sm">
+            {editingSection !== "basic" && (
+              <Button
+                onClick={() => startEditingSection("basic")}
+                variant="outline"
+                size="sm"
+              >
                 <Edit2 className="mr-2 h-4 w-4" />
-                Edit Profile
+                Edit Basic Information
               </Button>
             )}
-            {isEditing && (
+            {editingSection === "basic" && (
               <div className="flex gap-2">
                 <Button
                   onClick={cancelEditing}
@@ -450,7 +437,7 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formError && (
+          {formError && editingSection === "basic" && (
             <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
               {formError}
             </div>
@@ -470,7 +457,7 @@ export function ProfileView() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              {isEditing ? (
+              {editingSection === "basic" ? (
                 <form.Field name="phone">
                   {(field) => (
                     <ValidatedInput
@@ -490,7 +477,7 @@ export function ProfileView() {
             </div>
 
             <div className="space-y-2">
-              {isEditing ? (
+              {editingSection === "basic" ? (
                 <form.Field name="gender">
                   {(field) => (
                     <ValidatedSelect
@@ -510,7 +497,7 @@ export function ProfileView() {
             </div>
 
             <div className="space-y-2">
-              {isEditing ? (
+              {editingSection === "basic" ? (
                 <form.Field name="pronouns">
                   {(field) => (
                     <ValidatedInput
@@ -529,7 +516,7 @@ export function ProfileView() {
             </div>
 
             <div className="space-y-2">
-              {isEditing ? (
+              {editingSection === "basic" ? (
                 <form.Field name="city">
                   {(field) => (
                     <ValidatedInput
@@ -548,7 +535,7 @@ export function ProfileView() {
             </div>
 
             <div className="space-y-2">
-              {isEditing ? (
+              {editingSection === "basic" ? (
                 <form.Field name="country">
                   {(field) => (
                     <ValidatedInput
@@ -567,7 +554,7 @@ export function ProfileView() {
             </div>
 
             <div className="space-y-2">
-              {isEditing ? (
+              {editingSection === "basic" ? (
                 <form.Field name="overallExperienceLevel">
                   {(field) => (
                     <ValidatedSelect
@@ -601,27 +588,78 @@ export function ProfileView() {
                 More details about your gaming preferences and experience
               </CardDescription>
             </div>
-            {!isEditing && (
-              <Button onClick={startEditing} variant="outline" size="sm">
+            {editingSection !== "additional" && (
+              <Button
+                onClick={() => startEditingSection("additional")}
+                variant="outline"
+                size="sm"
+              >
                 <Edit2 className="mr-2 h-4 w-4" />
-                Edit Profile
+                Edit Additional Information
               </Button>
+            )}
+            {editingSection === "additional" && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={cancelEditing}
+                  variant="outline"
+                  size="sm"
+                  disabled={form.state.isSubmitting}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                >
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="button"
+                      onClick={() => form.handleSubmit()}
+                      disabled={!canSubmit || isSubmitting}
+                      size="sm"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </form.Subscribe>
+              </div>
             )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {formError && editingSection === "additional" && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {formError}
+            </div>
+          )}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>Languages</Label>
-              {isEditing ? (
+              {editingSection === "additional" ? (
                 <form.Field name="languages">
                   {(field) => (
                     <TagInput
                       tags={
-                        field.state.value?.map((lang) => ({ id: lang, name: lang })) || []
+                        field.state.value?.map((langCode) => ({
+                          id: langCode,
+                          name:
+                            mappedLanguageOptions.find((l) => l.id === langCode)?.name ||
+                            langCode,
+                        })) || []
                       }
                       onAddTag={(tag) => {
-                        const newLanguages = [...(field.state.value || []), tag.name];
+                        const newLanguages = [...(field.state.value || []), tag.id];
                         field.handleChange(newLanguages);
                       }}
                       onRemoveTag={(id) => {
@@ -631,18 +669,20 @@ export function ProfileView() {
                         field.handleChange(newLanguages);
                       }}
                       placeholder="Add languages you speak"
+                      availableSuggestions={mappedLanguageOptions}
                     />
                   )}
                 </form.Field>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {profile?.["languages"]?.length ? (
-                    profile["languages"].map((lang) => (
+                    profile["languages"].map((langCode) => (
                       <span
-                        key={lang}
+                        key={langCode}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
                       >
-                        {lang}
+                        {languageOptions.find((l) => l.value === langCode)?.label ||
+                          langCode}
                       </span>
                     ))
                   ) : (
@@ -654,7 +694,7 @@ export function ProfileView() {
 
             <div className="space-y-2">
               <Label>Identity Tags</Label>
-              {isEditing ? (
+              {editingSection === "additional" ? (
                 <form.Field name="identityTags">
                   {(field) => (
                     <TagInput
@@ -672,6 +712,7 @@ export function ProfileView() {
                         field.handleChange(newTags);
                       }}
                       placeholder="Add identity tags that represent you"
+                      availableSuggestions={mappedIdentityTagOptions}
                     />
                   )}
                 </form.Field>
@@ -683,7 +724,7 @@ export function ProfileView() {
                         key={tag}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
                       >
-                        {tag}
+                        {mappedIdentityTagOptions.find((t) => t.id === tag)?.name || tag}
                       </span>
                     ))
                   ) : (
@@ -695,7 +736,7 @@ export function ProfileView() {
 
             <div className="space-y-2">
               <Label>Preferred Game Themes</Label>
-              {isEditing ? (
+              {editingSection === "additional" ? (
                 <form.Field name="preferredGameThemes">
                   {(field) => (
                     <TagInput
@@ -714,6 +755,7 @@ export function ProfileView() {
                         field.handleChange(newThemes);
                       }}
                       placeholder="Add game themes you prefer"
+                      availableSuggestions={mappedGameThemeOptions}
                     />
                   )}
                 </form.Field>
@@ -725,7 +767,8 @@ export function ProfileView() {
                         key={theme}
                         className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
                       >
-                        {theme}
+                        {mappedGameThemeOptions.find((t) => t.id === theme)?.name ||
+                          theme}
                       </span>
                     ))
                   ) : (
@@ -735,26 +778,9 @@ export function ProfileView() {
               )}
             </div>
 
-            <div className="space-y-2">
-              {isEditing ? (
-                <></>
-              ) : (
-                <>
-                  <Label>Game Master</Label>
-                  <p className="text-base">{profile?.["isGM"] ? "Yes" : "No"}</p>
-                  {profile?.["isGM"] && (
-                    <>
-                      <Label>GM Style</Label>
-                      <p className="text-base">{profile?.["gmStyle"] || "Not set"}</p>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
-
             <div className="space-y-2 md:col-span-2">
               <Label>Calendar Availability</Label>
-              {isEditing ? (
+              {editingSection === "additional" ? (
                 <form.Field name="calendarAvailability">
                   {(field) => (
                     <AvailabilityEditor
@@ -778,18 +804,75 @@ export function ProfileView() {
       {/* Privacy Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Privacy Settings</CardTitle>
-          <CardDescription>Control what information is visible to others</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Privacy Settings</CardTitle>
+              <CardDescription>
+                Control what information is visible to others
+              </CardDescription>
+            </div>
+            {editingSection !== "privacy" && (
+              <Button
+                onClick={() => startEditingSection("privacy")}
+                variant="outline"
+                size="sm"
+              >
+                <Edit2 className="mr-2 h-4 w-4" />
+                Edit Privacy Settings
+              </Button>
+            )}
+            {editingSection === "privacy" && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={cancelEditing}
+                  variant="outline"
+                  size="sm"
+                  disabled={form.state.isSubmitting}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                >
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="button"
+                      onClick={() => form.handleSubmit()}
+                      disabled={!canSubmit || isSubmitting}
+                      size="sm"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </form.Subscribe>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isEditing ? (
+          {formError && editingSection === "privacy" && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {formError}
+            </div>
+          )}
+          {editingSection === "privacy" ? (
             <div className="space-y-4">
               <form.Field name="privacySettings.showEmail">
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
                     label="Show my email address to team members"
-                    disabled={false}
                   />
                 )}
               </form.Field>
@@ -799,7 +882,6 @@ export function ProfileView() {
                   <ValidatedCheckbox
                     field={field}
                     label="Show my phone number to team members"
-                    disabled={false}
                   />
                 )}
               </form.Field>
@@ -809,18 +891,13 @@ export function ProfileView() {
                   <ValidatedCheckbox
                     field={field}
                     label="Show my location (city/country) to others"
-                    disabled={false}
                   />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.showLanguages">
                 {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my languages to others"
-                    disabled={false}
-                  />
+                  <ValidatedCheckbox field={field} label="Show my languages to others" />
                 )}
               </form.Field>
 
@@ -829,28 +906,19 @@ export function ProfileView() {
                   <ValidatedCheckbox
                     field={field}
                     label="Show my game preferences to others"
-                    disabled={false}
                   />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.allowTeamInvitations">
                 {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Allow team invitations"
-                    disabled={false}
-                  />
+                  <ValidatedCheckbox field={field} label="Allow team invitations" />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.allowFollows">
                 {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Allow others to follow me"
-                    disabled={false}
-                  />
+                  <ValidatedCheckbox field={field} label="Allow others to follow me" />
                 )}
               </form.Field>
             </div>
@@ -904,13 +972,69 @@ export function ProfileView() {
       {/* Game Preferences */}
       <Card>
         <CardHeader>
-          <CardTitle>Game Preferences</CardTitle>
-          <CardDescription>
-            Tell us which game systems you prefer to play or want to avoid
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Game Preferences</CardTitle>
+              <CardDescription>
+                Tell us which game systems you prefer to play or want to avoid
+              </CardDescription>
+            </div>
+            {editingSection !== "game-preferences" && (
+              <Button
+                onClick={() => startEditingSection("game-preferences")}
+                variant="outline"
+                size="sm"
+              >
+                <Edit2 className="mr-2 h-4 w-4" />
+                Edit Game Preferences
+              </Button>
+            )}
+            {editingSection === "game-preferences" && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={cancelEditing}
+                  variant="outline"
+                  size="sm"
+                  disabled={form.state.isSubmitting}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                >
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="button"
+                      onClick={() => form.handleSubmit()}
+                      disabled={!canSubmit || isSubmitting}
+                      size="sm"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </form.Subscribe>
+              </div>
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
-          {isEditing ? (
+        <CardContent className="space-y-4">
+          {formError && editingSection === "game-preferences" && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {formError}
+            </div>
+          )}
+          {editingSection === "game-preferences" ? (
             <form.Field name="gameSystemPreferences">
               {(field) => (
                 <GamePreferencesStep

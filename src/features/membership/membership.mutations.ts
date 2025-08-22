@@ -237,12 +237,12 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
 
       // Send confirmation email
       try {
-        const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
+        const { sendMembershipPurchaseReceipt } = await import("~/lib/email/resend");
 
         await sendMembershipPurchaseReceipt({
           to: {
             email: session.user.email,
-            name: session.user.name || undefined,
+            name: session.user.name,
           },
           membershipType: membershipType.name,
           amount: membershipType.priceCents,

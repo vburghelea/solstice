@@ -5,6 +5,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { reactStartCookies } from "better-auth/react-start";
+import { sendEmailVerification } from "~/lib/email/resend";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | null = null;
@@ -65,7 +66,7 @@ const createAuth = async () => {
 
     // Secure cookie configuration
     advanced: {
-      cookiePrefix: "solstice",
+      cookiePrefix: "roundup",
       useSecureCookies: isProduction,
       defaultCookieAttributes: cookieDomain
         ? {
@@ -99,6 +100,27 @@ const createAuth = async () => {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: isProduction,
+      sendVerificationEmail: async (
+        user: { email: string; name?: string },
+        url: string,
+      ) => {
+        try {
+          const result = await sendEmailVerification({
+            to: { email: user.email, name: user.name },
+            verificationUrl: url,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          });
+
+          if (!result.success) {
+            console.error("Failed to send verification email:", result.error);
+          }
+
+          return result.success;
+        } catch (error) {
+          console.error("Error sending verification email:", error);
+          return false;
+        }
+      },
     },
 
     // Account linking configuration

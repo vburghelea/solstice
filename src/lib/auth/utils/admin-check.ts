@@ -6,7 +6,7 @@
 // For demo purposes, we'll use a simple email-based check
 // In production, this should be replaced with proper RBAC
 const ADMIN_EMAILS = [
-  "admin@solstice.com",
+  "admin@roundup.games",
   "admin@example.com",
   // Add more admin emails as needed
 ];
@@ -20,7 +20,7 @@ export function isAdmin(email: string | undefined | null): boolean {
   }
 
   // Check if email domain is admin domain (for development)
-  if (email.endsWith("@solstice.com")) {
+  if (email.endsWith("@roundup.games")) {
     return true;
   }
 

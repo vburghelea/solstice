@@ -195,8 +195,8 @@ async function seed() {
     console.log("Creating roles...");
     await db.insert(roles).values([
       {
-        id: "solstice-admin",
-        name: "Solstice Admin",
+        id: "super-admin",
+        name: "Super Admin",
         description: "Super admin role with full system access",
         permissions: {
           "system:all": true,

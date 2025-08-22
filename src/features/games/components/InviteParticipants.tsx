@@ -45,9 +45,7 @@ export function InviteParticipants({
       toast.success("Participant invited successfully!");
       setSearchTerm("");
       setEmailInvite("");
-      queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
-      queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
-      queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] }); // Invalidate participants list
+      queryClient.invalidateQueries({ queryKey: ["game", gameId] });
     },
     onError: (error) => {
       toast.error(`Failed to invite participant: ${error.message}`);

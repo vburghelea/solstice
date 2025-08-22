@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { ProfileLink } from "~/components/ProfileLink";
 import { removeCampaignParticipant } from "~/features/campaigns/campaigns.mutations";
 import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
 import { Button } from "~/shared/ui/button";
@@ -25,8 +26,7 @@ export function ManageInvitations({ campaignId, invitations }: ManageInvitations
     onSuccess: (data) => {
       if (data.success) {
         toast.success("Invitation rejected successfully!");
-        queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
-        queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
+        queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to reject invitation");
       }
@@ -61,8 +61,15 @@ export function ManageInvitations({ campaignId, invitations }: ManageInvitations
                 className="flex items-center justify-between border-b py-2 last:border-b-0"
               >
                 <span>
-                  {invitation.user?.name || invitation.user?.email} (Invited -{" "}
-                  {invitation.status})
+                  {invitation.user ? (
+                    <ProfileLink
+                      userId={invitation.user.id}
+                      username={invitation.user.name || invitation.user.email}
+                    />
+                  ) : (
+                    "Unknown User"
+                  )}{" "}
+                  (Invited - {invitation.status})
                 </span>
                 <div className="flex space-x-2">
                   <Button

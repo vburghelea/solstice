@@ -45,7 +45,7 @@ export function InviteParticipants({
       toast.success("Participant invited successfully!");
       setSearchTerm("");
       setEmailInvite("");
-      queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
+      queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
     },
     onError: (error) => {

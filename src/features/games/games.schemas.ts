@@ -88,6 +88,7 @@ export const inviteToGameInputSchema = z
     gameId: z.string().min(1),
     userId: z.string().min(1).optional(), // Either userId or email
     email: z.string().email().optional(),
+    recipientName: z.string().optional(),
     role: z.enum(participantRoleEnum.enumValues).default("invited"),
   })
   .refine((data) => data.userId || data.email, {

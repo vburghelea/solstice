@@ -718,31 +718,62 @@ export const inviteToGame = createServerFn({ method: "POST" })
         targetUserId = data.userId;
       } else if (data.email) {
         const invitedUser = await findUserByEmail(data.email);
-        if (!invitedUser) {
-          return {
-            success: false,
-            errors: [{ code: "NOT_FOUND", message: "User with this email not found" }],
-          };
+        if (invitedUser) {
+          targetUserId = invitedUser.id;
+        } else {
+          // For non-users, create a user account using Better Auth
+          const { getAuth } = await import("~/lib/auth/server-helpers");
+          const auth = await getAuth();
+
+          // Generate a random password for the user
+          const { randomBytes } = await import("crypto");
+          const randomPassword = randomBytes(32).toString("hex");
+
+          try {
+            const newUser = await auth.api.signUpEmail({
+              body: {
+                email: data.email,
+                password: randomPassword,
+                name: data.recipientName || data.email.split("@")[0],
+              },
+            });
+
+            targetUserId = newUser.user.id;
+
+            // Send email invitation immediately after creating the user
+            try {
+              const { sendGameInvitation } = await import("~/lib/email/resend");
+              const inviteUrl = `${process.env["SITE_URL"] || "https://roundup.games"}/games/${data.gameId}?token=${newUser.user.id}`;
+              await sendGameInvitation({
+                to: {
+                  email: data.email,
+                  name: newUser.user.name,
+                },
+                gameName: game.name,
+                inviterName: currentUser.name || "A game organizer",
+                inviteUrl,
+              });
+            } catch (emailError) {
+              console.error("Failed to send email invitation:", emailError);
+            }
+          } catch (signUpError) {
+            console.error("Failed to create user account:", signUpError);
+            return {
+              success: false,
+              errors: [
+                {
+                  code: "DATABASE_ERROR",
+                  message: "Failed to create user account for invitation",
+                },
+              ],
+            };
+          }
         }
-        targetUserId = invitedUser.id;
       } else {
         return {
           success: false,
           errors: [
             { code: "VALIDATION_ERROR", message: "User ID or email must be provided" },
-          ],
-        };
-      }
-
-      // Ensure targetUserId is defined before proceeding
-      if (!targetUserId) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "VALIDATION_ERROR",
-              message: "Target user ID could not be determined",
-            },
           ],
         };
       }

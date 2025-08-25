@@ -6,7 +6,6 @@ import { OperationResult } from "~/shared/types/common";
 import {
   findCampaignApplicationById,
   findCampaignById,
-  findCampaignParticipantByCampaignAndUserId,
   findCampaignParticipantById,
   findUserByEmail,
 } from "./campaigns.repository";
@@ -16,9 +15,9 @@ import {
   createCampaignInputSchema,
   getCampaignSchema,
   inviteToCampaignInputSchema,
-  removeCampaignParticipantBanInputSchema,
   removeCampaignParticipantInputSchema,
   respondToCampaignApplicationSchema,
+  respondToCampaignInvitationSchema,
   updateCampaignInputSchema,
   updateCampaignParticipantInputSchema,
 } from "./campaigns.schemas";
@@ -498,48 +497,6 @@ export const applyToCampaign = createServerFn({ method: "POST" })
         };
       }
 
-      const existingApplication = await db.query.campaignApplications.findFirst({
-        where: and(
-          eq(campaignApplications.campaignId, data.campaignId),
-          eq(campaignApplications.userId, currentUser.id),
-        ),
-      });
-
-      if (existingApplication) {
-        if (existingApplication.status === "rejected") {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "CONFLICT",
-                message:
-                  "You have already applied to this campaign and your application was rejected.",
-              },
-            ],
-          };
-        } else if (existingApplication.status === "pending") {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "CONFLICT",
-                message: "You have a pending application for this campaign.",
-              },
-            ],
-          };
-        } else if (existingApplication.status === "approved") {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "CONFLICT",
-                message: "You have already been approved for this campaign.",
-              },
-            ],
-          };
-        }
-      }
-
       const [newApplication] = await db
         .insert(campaignApplications)
         .values({
@@ -552,22 +509,22 @@ export const applyToCampaign = createServerFn({ method: "POST" })
       if (!newApplication) {
         return {
           success: false,
-          errors: [{ code: "DATABASE_ERROR", message: "Failed to apply to campaign" }],
+          errors: [{ code: "DATABASE_ERROR", message: "Failed to submit application" }],
         };
       }
 
-      const applicationWithDetails = await findCampaignApplicationById(newApplication.id);
+      const applicationWithUser = await findCampaignApplicationById(newApplication.id);
 
-      if (!applicationWithDetails) {
+      if (!applicationWithUser) {
         return {
           success: false,
           errors: [
-            { code: "DATABASE_ERROR", message: "Failed to fetch new application" },
+            { code: "DATABASE_ERROR", message: "Failed to fetch submitted application" },
           ],
         };
       }
 
-      return { success: true, data: applicationWithDetails as CampaignApplication };
+      return { success: true, data: applicationWithUser as CampaignApplication };
     } catch (error) {
       console.error("Error applying to campaign:", error);
       return {
@@ -577,12 +534,117 @@ export const applyToCampaign = createServerFn({ method: "POST" })
     }
   });
 
+export const respondToCampaignApplication = createServerFn({ method: "POST" })
+  .validator(respondToCampaignApplicationSchema.parse)
+  .handler(
+    async ({
+      data,
+    }: {
+      data: z.infer<typeof respondToCampaignApplicationSchema>;
+    }): Promise<OperationResult<CampaignApplication | boolean>> => {
+      try {
+        const { getDb } = await import("~/db/server-helpers");
+        const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+        const currentUser = await getCurrentUser();
+        if (!currentUser) {
+          return {
+            success: false,
+            errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+          };
+        }
+
+        const db = await getDb();
+
+        const existingApplication = await findCampaignApplicationById(data.applicationId);
+
+        if (
+          !existingApplication ||
+          existingApplication.campaign.ownerId !== currentUser.id
+        ) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "AUTH_ERROR",
+                message: "Not authorized to respond to this application",
+              },
+            ],
+          };
+        }
+
+        const [updatedApplication] = await db
+          .update(campaignApplications)
+          .set({
+            status: data.status,
+            updatedAt: new Date(),
+          })
+          .where(eq(campaignApplications.id, data.applicationId))
+          .returning();
+
+        if (!updatedApplication) {
+          return {
+            success: false,
+            errors: [{ code: "DATABASE_ERROR", message: "Failed to update application" }],
+          };
+        }
+
+        if (data.status === "approved") {
+          // Create participant entry
+          const [newParticipant] = await db
+            .insert(campaignParticipants)
+            .values({
+              campaignId: existingApplication.campaignId,
+              userId: existingApplication.userId,
+              role: "player",
+              status: "approved",
+            })
+            .returning();
+
+          if (!newParticipant) {
+            return {
+              success: false,
+              errors: [
+                { code: "DATABASE_ERROR", message: "Failed to create participant entry" },
+              ],
+            };
+          }
+
+          return { success: true, data: true };
+        }
+
+        const applicationWithUser = await findCampaignApplicationById(
+          updatedApplication.id,
+        );
+
+        if (!applicationWithUser) {
+          return {
+            success: false,
+            errors: [
+              { code: "DATABASE_ERROR", message: "Failed to fetch updated application" },
+            ],
+          };
+        }
+
+        return { success: true, data: applicationWithUser as CampaignApplication };
+      } catch (error) {
+        console.error("Error responding to application:", error);
+        return {
+          success: false,
+          errors: [{ code: "SERVER_ERROR", message: "Failed to respond to application" }],
+        };
+      }
+    },
+  );
+
 export const inviteToCampaign = createServerFn({ method: "POST" })
   .validator(inviteToCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { getAuth } = await import("~/lib/auth/server-helpers");
+      const auth = await getAuth();
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -605,235 +667,186 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
         };
       }
 
-      let targetUserId: string;
-
-      if (data.userId) {
-        targetUserId = data.userId;
-      } else if (data.email) {
-        const invitedUser = await findUserByEmail(data.email);
-        if (!invitedUser) {
-          return {
-            success: false,
-            errors: [{ code: "NOT_FOUND", message: "User with this email not found" }],
-          };
-        }
-        targetUserId = invitedUser.id;
-      } else {
+      // Check if user already exists
+      if (!data.email) {
         return {
           success: false,
-          errors: [
-            { code: "VALIDATION_ERROR", message: "User ID or email must be provided" },
-          ],
+          errors: [{ code: "VALIDATION_ERROR", message: "Email is required" }],
         };
       }
+      const invitedUser = await findUserByEmail(data.email);
 
-      const existingParticipant = await findCampaignParticipantByCampaignAndUserId(
-        data.campaignId,
-        targetUserId,
-      );
+      if (invitedUser) {
+        // User exists, create participant entry
+        const [existingParticipant] = await db
+          .select()
+          .from(campaignParticipants)
+          .where(
+            and(
+              eq(campaignParticipants.campaignId, data.campaignId),
+              eq(campaignParticipants.userId, invitedUser.id),
+            ),
+          );
 
-      if (existingParticipant) {
-        if (existingParticipant.status === "rejected") {
-          const [updatedParticipant] = await db
-            .update(campaignParticipants)
-            .set({
-              status: "pending",
-              updatedAt: new Date(),
-            })
-            .where(eq(campaignParticipants.id, existingParticipant.id))
-            .returning();
+        if (existingParticipant) {
+          if (existingParticipant.status === "rejected") {
+            const [updatedParticipant] = await db
+              .update(campaignParticipants)
+              .set({
+                status: "pending",
+                updatedAt: new Date(),
+              })
+              .where(eq(campaignParticipants.id, existingParticipant.id))
+              .returning();
 
-          if (!updatedParticipant) {
+            if (!updatedParticipant) {
+              return {
+                success: false,
+                errors: [
+                  { code: "DATABASE_ERROR", message: "Failed to update participant" },
+                ],
+              };
+            }
+
+            const participantWithUser = await findCampaignParticipantById(
+              updatedParticipant.id,
+            );
+
+            if (!participantWithUser) {
+              return {
+                success: false,
+                errors: [
+                  { code: "DATABASE_ERROR", message: "Failed to fetch participant" },
+                ],
+              };
+            }
+
+            return { success: true, data: participantWithUser as CampaignParticipant };
+          } else {
             return {
               success: false,
               errors: [
-                { code: "DATABASE_ERROR", message: "Failed to re-invite participant" },
+                {
+                  code: "CONFLICT",
+                  message: "User is already participating in this campaign",
+                },
+              ],
+            };
+          }
+        } else {
+          const [newParticipant] = await db
+            .insert(campaignParticipants)
+            .values({
+              campaignId: data.campaignId,
+              userId: invitedUser.id,
+              role: "player",
+              status: "pending",
+            })
+            .returning();
+
+          if (!newParticipant) {
+            return {
+              success: false,
+              errors: [
+                { code: "DATABASE_ERROR", message: "Failed to create participant" },
               ],
             };
           }
 
           const participantWithUser = await findCampaignParticipantById(
-            updatedParticipant.id,
+            newParticipant.id,
           );
 
           if (!participantWithUser) {
             return {
               success: false,
               errors: [
-                {
-                  code: "DATABASE_ERROR",
-                  message: "Failed to fetch re-invited participant",
-                },
+                { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
               ],
             };
           }
+
           return { success: true, data: participantWithUser as CampaignParticipant };
-        } else {
+        }
+      } else {
+        // User doesn't exist, create invitation using Better Auth
+        try {
+          // Create a sign-up invitation
+          const signUpData = await auth.api.signUpEmail({
+            body: {
+              email: data.email,
+              name: data.recipientName || "New User",
+              password: Math.random().toString(36).slice(-12), // Temporary password
+            },
+          });
+
+          if (signUpData.user) {
+            const [newParticipant] = await db
+              .insert(campaignParticipants)
+              .values({
+                campaignId: data.campaignId,
+                userId: signUpData.user.id,
+                role: "player",
+                status: "pending",
+              })
+              .returning();
+
+            if (!newParticipant) {
+              return {
+                success: false,
+                errors: [
+                  { code: "DATABASE_ERROR", message: "Failed to create participant" },
+                ],
+              };
+            }
+
+            const participantWithUser = await findCampaignParticipantById(
+              newParticipant.id,
+            );
+
+            if (!participantWithUser) {
+              return {
+                success: false,
+                errors: [
+                  { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
+                ],
+              };
+            }
+
+            return { success: true, data: participantWithUser as CampaignParticipant };
+          } else {
+            return {
+              success: false,
+              errors: [
+                { code: "AUTH_ERROR", message: "Failed to create user invitation" },
+              ],
+            };
+          }
+        } catch (signUpError) {
+          console.error("Error creating user invitation:", signUpError);
           return {
             success: false,
             errors: [
               {
-                code: "CONFLICT",
-                message: "User is already a participant or has applied",
+                code: "SERVER_ERROR",
+                message: "Failed to create user invitation. Please try again.",
               },
             ],
           };
         }
       }
-
-      const [newParticipant] = await db
-        .insert(campaignParticipants)
-        .values({
-          campaignId: data.campaignId,
-          userId: targetUserId,
-          role: "invited",
-          status: "pending",
-        })
-        .returning();
-
-      if (!newParticipant) {
-        return {
-          success: false,
-          errors: [{ code: "DATABASE_ERROR", message: "Failed to invite participant" }],
-        };
-      }
-
-      const participantWithDetails = await findCampaignParticipantById(newParticipant.id);
-
-      if (!participantWithDetails) {
-        return {
-          success: false,
-          errors: [
-            { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
-          ],
-        };
-      }
-
-      return { success: true, data: participantWithDetails as CampaignParticipant };
     } catch (error) {
-      console.error("Error inviting participant:", error);
+      console.error("Error inviting to campaign:", error);
       return {
         success: false,
-        errors: [{ code: "SERVER_ERROR", message: "Failed to invite participant" }],
+        errors: [{ code: "SERVER_ERROR", message: "Failed to send campaign invitation" }],
       };
     }
   });
 
-export const respondToCampaignApplication = createServerFn({ method: "POST" })
-  .validator(respondToCampaignApplicationSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<CampaignApplication | boolean>> => {
-    try {
-      const { getDb } = await import("~/db/server-helpers");
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        return {
-          success: false,
-          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
-        };
-      }
-
-      const db = await getDb();
-
-      const application = await findCampaignApplicationById(data.applicationId);
-
-      if (!application || application.campaign.ownerId !== currentUser.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "AUTH_ERROR",
-              message: "Application not found or you are not the owner of the campaign",
-            },
-          ],
-        };
-      }
-
-      if (data.status === "approved") {
-        const [updatedApplication] = await db
-          .update(campaignApplications)
-          .set({ status: data.status, updatedAt: new Date() })
-          .where(eq(campaignApplications.id, data.applicationId))
-          .returning();
-
-        if (!updatedApplication) {
-          return {
-            success: false,
-            errors: [{ code: "DATABASE_ERROR", message: "Failed to update application" }],
-          };
-        }
-
-        await db.insert(campaignParticipants).values({
-          campaignId: application.campaignId,
-          userId: application.userId,
-          role: "player", // Default role for approved applicants
-          status: "approved",
-        });
-
-        const applicationWithDetails = await findCampaignApplicationById(
-          updatedApplication.id,
-        );
-
-        if (!applicationWithDetails) {
-          return {
-            success: false,
-            errors: [
-              { code: "DATABASE_ERROR", message: "Failed to fetch updated application" },
-            ],
-          };
-        }
-
-        return { success: true, data: applicationWithDetails as CampaignApplication };
-      } else if (data.status === "rejected") {
-        const [updatedApplication] = await db
-          .update(campaignApplications)
-          .set({ status: data.status, updatedAt: new Date() })
-          .where(eq(campaignApplications.id, data.applicationId))
-          .returning();
-
-        if (!updatedApplication) {
-          return {
-            success: false,
-            errors: [{ code: "DATABASE_ERROR", message: "Failed to reject application" }],
-          };
-        }
-
-        const applicationWithDetails = await findCampaignApplicationById(
-          updatedApplication.id,
-        );
-
-        if (!applicationWithDetails) {
-          return {
-            success: false,
-            errors: [
-              { code: "DATABASE_ERROR", message: "Failed to fetch rejected application" },
-            ],
-          };
-        }
-
-        return { success: true, data: applicationWithDetails as CampaignApplication };
-      }
-
-      return {
-        success: false,
-        errors: [{ code: "VALIDATION_ERROR", message: "Invalid action" }],
-      };
-    } catch (error) {
-      console.error("Error responding to application:", error);
-      return {
-        success: false,
-        errors: [{ code: "SERVER_ERROR", message: "Failed to respond to application" }],
-      };
-    }
-  });
-
-export const respondToCampaignInvitation = createServerFn({ method: "POST" })
-  .validator(
-    z.object({ participantId: z.string().min(1), action: z.enum(["accept", "reject"]) })
-      .parse,
-  ) // Define schema inline or import from schemas
-  .handler(async ({ data }): Promise<OperationResult<CampaignParticipant | boolean>> => {
+export const removeCampaignParticipantBan = createServerFn({ method: "POST" })
+  .validator(removeCampaignParticipantInputSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
@@ -850,6 +863,70 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
 
       const existingParticipant = await findCampaignParticipantById(data.participantId);
 
+      if (
+        !existingParticipant ||
+        existingParticipant.campaign.ownerId !== currentUser.id
+      ) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "AUTH_ERROR",
+              message: "Not authorized to remove ban from this participant",
+            },
+          ],
+        };
+      }
+
+      const [updatedParticipant] = await db
+        .update(campaignParticipants)
+        .set({
+          status: "pending",
+          updatedAt: new Date(),
+        })
+        .where(eq(campaignParticipants.id, data.participantId))
+        .returning();
+
+      if (!updatedParticipant) {
+        return {
+          success: false,
+          errors: [{ code: "DATABASE_ERROR", message: "Failed to remove ban" }],
+        };
+      }
+
+      return { success: true, data: true };
+    } catch (error) {
+      console.error("Error removing participant ban:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to remove participant ban" }],
+      };
+    }
+  });
+
+/**
+ * Respond to a campaign invitation (accept or reject)
+ */
+export const respondToCampaignInvitation = createServerFn({ method: "POST" })
+  .validator(respondToCampaignInvitationSchema.parse)
+  .handler(async ({ data }): Promise<OperationResult<CampaignParticipant | boolean>> => {
+    try {
+      const { getDb } = await import("~/db/server-helpers");
+      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+
+      const db = await getDb();
+
+      // Find the participant and validate ownership
+      const existingParticipant = await findCampaignParticipantById(data.participantId);
+
       if (!existingParticipant) {
         return {
           success: false,
@@ -857,7 +934,7 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
         };
       }
 
-      // Ensure the current user is the invitee
+      // Only the invited user can respond to their invitation
       if (existingParticipant.userId !== currentUser.id) {
         return {
           success: false,
@@ -870,119 +947,60 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
         };
       }
 
-      // Ensure the role is 'invited' before responding
-      if (existingParticipant.role !== "invited") {
-        return {
-          success: false,
-          errors: [{ code: "CONFLICT", message: "Not an active invitation" }],
-        };
-      }
-
-      if (data.action === "accept") {
-        const [updatedParticipant] = await db
-          .update(campaignParticipants)
-          .set({ role: "player", status: "approved", updatedAt: new Date() })
-          .where(eq(campaignParticipants.id, data.participantId))
-          .returning();
-
-        if (!updatedParticipant) {
-          return {
-            success: false,
-            errors: [{ code: "DATABASE_ERROR", message: "Failed to accept invitation" }],
-          };
-        }
-
-        const participantWithUser = await findCampaignParticipantById(
-          updatedParticipant.id,
-        );
-
-        if (!participantWithUser) {
-          return {
-            success: false,
-            errors: [
-              { code: "DATABASE_ERROR", message: "Failed to fetch accepted participant" },
-            ],
-          };
-        }
-
-        return { success: true, data: participantWithUser as CampaignParticipant };
-      } else if (data.action === "reject") {
-        await db
-          .delete(campaignParticipants)
-          .where(eq(campaignParticipants.id, data.participantId));
-        return { success: true, data: true };
-      }
-
-      return {
-        success: false,
-        errors: [{ code: "VALIDATION_ERROR", message: "Invalid action" }],
-      };
-    } catch (error) {
-      console.error("Error responding to invitation:", error);
-      return {
-        success: false,
-        errors: [{ code: "SERVER_ERROR", message: "Failed to respond to invitation" }],
-      };
-    }
-  });
-
-/**
- * Remove a participant's rejection ban from a campaign
- */
-export const removeCampaignParticipantBan = createServerFn({ method: "POST" })
-  .validator(removeCampaignParticipantBanInputSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<boolean>> => {
-    try {
-      const { getDb } = await import("~/db/server-helpers");
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq } = await import("drizzle-orm");
-
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        return {
-          success: false,
-          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
-        };
-      }
-
-      const db = await getDb();
-
-      // Check if current user is campaign owner
-      const existingParticipant = await findCampaignParticipantById(data.id);
-
-      if (
-        !existingParticipant ||
-        existingParticipant.campaign.ownerId !== currentUser.id
-      ) {
+      // Check if the participant is in pending status (invited)
+      if (existingParticipant.status !== "pending") {
         return {
           success: false,
           errors: [
             {
-              code: "AUTH_ERROR",
-              message: "Not authorized to remove this participant's ban",
+              code: "CONFLICT",
+              message: "This invitation has already been responded to",
             },
           ],
         };
       }
 
-      // Only remove if the participant is currently 'rejected'
-      if (existingParticipant.status !== "rejected") {
+      // Update participant status based on action
+      const newStatus = data.action === "accept" ? "approved" : "rejected";
+
+      const [updatedParticipant] = await db
+        .update(campaignParticipants)
+        .set({
+          status: newStatus,
+          updatedAt: new Date(),
+        })
+        .where(eq(campaignParticipants.id, data.participantId))
+        .returning();
+
+      if (!updatedParticipant) {
         return {
           success: false,
           errors: [
-            { code: "CONFLICT", message: "Participant is not currently rejected" },
+            { code: "DATABASE_ERROR", message: "Failed to update invitation response" },
           ],
         };
       }
 
-      await db.delete(campaignParticipants).where(eq(campaignParticipants.id, data.id));
+      // Fetch updated participant with user details
+      const participantWithUser = await findCampaignParticipantById(
+        updatedParticipant.id,
+      );
 
-      return { success: true, data: true };
+      if (!participantWithUser) {
+        return {
+          success: false,
+          errors: [
+            { code: "DATABASE_ERROR", message: "Failed to fetch updated participant" },
+          ],
+        };
+      }
+
+      return { success: true, data: participantWithUser as CampaignParticipant };
     } catch (error) {
-      console.error("Error removing participant ban:", error);
+      console.error("Error responding to campaign invitation:", error);
       return {
         success: false,
-        errors: [{ code: "SERVER_ERROR", message: "Failed to remove participant ban" }],
+        errors: [{ code: "SERVER_ERROR", message: "Failed to respond to invitation" }],
       };
     }
   });

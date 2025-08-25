@@ -123,6 +123,7 @@ export const inviteToCampaignInputSchema = z
     campaignId: z.string().min(1),
     userId: z.string().min(1).optional(),
     email: z.string().email().optional(),
+    recipientName: z.string().optional(),
   })
   .refine((data) => data.userId || data.email, {
     message: "Either userId or email must be provided",
@@ -162,4 +163,13 @@ export const removeCampaignParticipantBanInputSchema = z.object({
 
 export type RemoveCampaignParticipantBanInput = z.infer<
   typeof removeCampaignParticipantBanInputSchema
+>;
+
+export const respondToCampaignInvitationSchema = z.object({
+  participantId: z.string().min(1),
+  action: z.enum(["accept", "reject"]),
+});
+
+export type RespondToCampaignInvitationInput = z.infer<
+  typeof respondToCampaignInvitationSchema
 >;

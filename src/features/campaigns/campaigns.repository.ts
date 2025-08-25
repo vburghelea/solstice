@@ -24,6 +24,15 @@ export async function findCampaignParticipantById(participantId: string) {
   return db.query.campaignParticipants.findFirst({
     where: eq(campaignParticipants.id, participantId),
     with: { campaign: true, user: true },
+    columns: {
+      id: true,
+      campaignId: true,
+      userId: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
 }
 

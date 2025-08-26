@@ -33,6 +33,8 @@ const createAuth = async () => {
   const allowedOAuthDomains = Array.isArray(env.OAUTH_ALLOWED_DOMAINS)
     ? env.OAUTH_ALLOWED_DOMAINS
     : [];
+
+  // Debug OAuth configuration
   const googleClientId = env.GOOGLE_CLIENT_ID || "";
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
   const discordClientId = env.DISCORD_CLIENT_ID || "";

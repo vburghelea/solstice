@@ -8,12 +8,15 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/auth/login")({
-  validateSearch: (search) => searchSchema.parse(search),
-  component: LoginRoute,
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+  }),
+  beforeLoad: async ({ context }) => {
+    redirectIfAuthenticated({ user: context.user });
+  },
+  component: LoginPage,
 });
 
-function LoginRoute() {
-  const { redirect } = Route.useSearch();
-
-  return <LoginForm redirectPath={redirect} />;
+function LoginPage() {
+  return <LoginForm />;
 }

@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { AvailabilityData, DayAvailability } from "~/db/schema/auth.schema";
 import { cn } from "~/shared/lib/utils";
+import { AVAILABILITY_CONFIG } from "~/shared/types/common";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/shared/ui/tooltip";
 
 const DAYS = [
   "sunday",
@@ -11,7 +18,50 @@ const DAYS = [
   "friday",
   "saturday",
 ] as const;
-const HOURS = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
+
+const TIME_INTERVALS = Array.from(
+  {
+    length:
+      ((AVAILABILITY_CONFIG.endHour - AVAILABILITY_CONFIG.startHour) * 60) /
+        AVAILABILITY_CONFIG.displayIntervalMinutes +
+      1,
+  },
+  (_, i) => {
+    const totalMinutes = i * AVAILABILITY_CONFIG.displayIntervalMinutes;
+    const hour = AVAILABILITY_CONFIG.startHour + Math.floor(totalMinutes / 60);
+    const minute = totalMinutes % 60;
+    const timeString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+
+    const endTotalMinutes = totalMinutes + AVAILABILITY_CONFIG.displayIntervalMinutes;
+    const endHour = AVAILABILITY_CONFIG.startHour + Math.floor(endTotalMinutes / 60);
+    const endMinute = endTotalMinutes % 60;
+    const endTimeString = `${endHour.toString().padStart(2, "0")}:${endMinute.toString().padStart(2, "0")}`;
+
+    const startDataSlot = (hour * 60 + minute) / AVAILABILITY_CONFIG.dataIntervalMinutes;
+    const dataSlots = Array.from(
+      {
+        length:
+          AVAILABILITY_CONFIG.displayIntervalMinutes /
+          AVAILABILITY_CONFIG.dataIntervalMinutes,
+      },
+      (_, k) => startDataSlot + k,
+    );
+
+    return {
+      time: timeString,
+      endTime: endTimeString,
+      displayIndex: i,
+      dataSlots,
+    };
+  },
+);
+
+function isSlotAvailable(dayAvailability: DayAvailability, dataSlots: number[]): boolean {
+  return dataSlots.every(
+    (slotIndex) =>
+      slotIndex < dayAvailability.length && dayAvailability[slotIndex] === true,
+  );
+}
 
 interface AvailabilityEditorProps {
   value: AvailabilityData;
@@ -24,90 +74,198 @@ export function AvailabilityEditor({
   onChange,
   readOnly = false,
 }: AvailabilityEditorProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragValue, setDragValue] = useState(false);
+  const [dragState, setDragState] = useState<{
+    isDragging: boolean;
+    startDay: string | null;
+    startIntervalIndex: number | null;
+    dragMode: "select" | "deselect" | null;
+    startAvailability: DayAvailability | null;
+  }>({
+    isDragging: false,
+    startDay: null,
+    startIntervalIndex: null,
+    dragMode: null,
+    startAvailability: null,
+  });
 
-  const handleSlotClick = (day: keyof AvailabilityData, index: number) => {
-    if (readOnly) return;
-    const newDayAvailability = [...value[day]];
-    newDayAvailability[index] = !newDayAvailability[index];
-    onChange({ ...value, [day]: newDayAvailability });
-  };
-
-  const handleMouseDown = (
-    day: keyof AvailabilityData,
-    slotIndex: number,
-    isSlotSelected: boolean,
-  ) => {
-    if (readOnly) return;
-    setIsDragging(true);
-    const newDragValue = !isSlotSelected;
-    setDragValue(newDragValue);
-    updateSlot(day, slotIndex, newDragValue);
-  };
-
-  const handleMouseUp = () => {
-    if (readOnly) return;
-    setIsDragging(false);
-  };
-
-  const handleMouseEnter = (day: keyof AvailabilityData, slotIndex: number) => {
-    if (readOnly || !isDragging) return;
-    updateSlot(day, slotIndex, dragValue);
-  };
-
-  const updateSlot = (
-    day: keyof AvailabilityData,
-    slotIndex: number,
-    newValue: boolean,
-  ) => {
-    const newDayAvailability = [...value[day]];
-    if (newDayAvailability[slotIndex] !== newValue) {
-      newDayAvailability[slotIndex] = newValue;
-      onChange({ ...value, [day]: newDayAvailability });
+  const handleMouseUp = useCallback(() => {
+    if (dragState.isDragging) {
+      setDragState({
+        isDragging: false,
+        startDay: null,
+        startIntervalIndex: null,
+        dragMode: null,
+        startAvailability: null,
+      });
     }
+  }, [dragState.isDragging]);
+
+  useEffect(() => {
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [handleMouseUp]);
+
+  const handleMouseDown = (day: string, intervalIndex: number) => {
+    if (readOnly) return;
+    const dayAvailability = value[day as keyof AvailabilityData];
+    const currentSlots = TIME_INTERVALS[intervalIndex].dataSlots;
+    const mode = isSlotAvailable(dayAvailability, currentSlots) ? "deselect" : "select";
+
+    const newAvailability = [...dayAvailability];
+    currentSlots.forEach((slot) => (newAvailability[slot] = mode === "select"));
+    onChange({ ...value, [day]: newAvailability });
+
+    setDragState({
+      isDragging: true,
+      startDay: day,
+      startIntervalIndex: intervalIndex,
+      dragMode: mode,
+      startAvailability: dayAvailability,
+    });
+  };
+
+  const handleMouseEnter = (day: string, intervalIndex: number) => {
+    const { isDragging, startDay, startIntervalIndex, dragMode, startAvailability } =
+      dragState;
+    if (
+      !isDragging ||
+      startDay !== day ||
+      startIntervalIndex === null ||
+      !startAvailability
+    )
+      return;
+
+    const newAvailability = [...startAvailability];
+    const start = Math.min(startIntervalIndex, intervalIndex);
+    const end = Math.max(startIntervalIndex, intervalIndex);
+
+    for (let i = start; i <= end; i++) {
+      const currentSlots = TIME_INTERVALS[i].dataSlots;
+      currentSlots.forEach((slot) => (newAvailability[slot] = dragMode === "select"));
+    }
+
+    onChange({ ...value, [day]: newAvailability });
   };
 
   return (
     <div
-      className="space-y-4"
-      onMouseUp={handleMouseUp}
+      className="space-y-4 select-none"
       data-testid="availability-editor"
+      onMouseUp={handleMouseUp}
     >
-      <div className="grid grid-cols-[auto_1fr] gap-2">
-        <div />
-        <div className="grid grid-cols-24 gap-px">
-          {HOURS.map((hour) => (
-            <div key={hour} className="text-muted-foreground text-center text-xs">
-              {hour}
+      <div className="grid grid-cols-[120px_1fr] gap-2">
+        <div className="text-muted-foreground text-sm font-medium">Time</div>
+        <div
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${TIME_INTERVALS.length}, 1fr)` }}
+        >
+          {TIME_INTERVALS.map((interval, index) => (
+            <div
+              key={interval.time}
+              className="text-muted-foreground pb-2 text-center text-xs"
+            >
+              {index % 2 === 0 ? interval.time : ""}
             </div>
           ))}
         </div>
       </div>
+
       {DAYS.map((day) => (
-        <div key={day} className="grid grid-cols-[auto_1fr] items-center gap-2">
-          <div className="text-right text-sm font-medium capitalize">
-            {day.slice(0, 3)}
-          </div>
-          <div className="grid grid-cols-96 gap-px">
-            {(value[day] as DayAvailability).map((isAvailable, index) => (
-              <div
-                key={`${day}-${index}`}
-                onMouseDown={() => handleMouseDown(day, index, isAvailable)}
-                onMouseEnter={() => handleMouseEnter(day, index)}
-                onClick={() => handleSlotClick(day, index)}
-                className={cn(
-                  "h-6 w-full",
-                  isAvailable ? "bg-primary" : "bg-muted",
-                  !readOnly && "hover:bg-primary/80 cursor-pointer",
-                  index % 4 === 0 && "border-l",
-                )}
-                data-testid={`slot-${day}-${index}`}
-              />
-            ))}
-          </div>
-        </div>
+        <DayRow
+          key={day}
+          day={day}
+          value={value}
+          readOnly={readOnly}
+          onMouseDown={handleMouseDown}
+          onMouseEnter={handleMouseEnter}
+        />
       ))}
+    </div>
+  );
+}
+
+interface DayRowProps {
+  day: (typeof DAYS)[number];
+  value: AvailabilityData;
+  readOnly?: boolean;
+  onMouseDown: (day: string, intervalIndex: number) => void;
+  onMouseEnter: (day: string, intervalIndex: number) => void;
+}
+
+function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps) {
+  const dayAvailability = value[day];
+
+  const segments = [];
+  let currentSegment = null;
+
+  for (let i = 0; i < TIME_INTERVALS.length; i++) {
+    const isAvailable = isSlotAvailable(dayAvailability, TIME_INTERVALS[i].dataSlots);
+    if (currentSegment && currentSegment.isAvailable === isAvailable) {
+      currentSegment.end = i;
+    } else {
+      if (currentSegment) segments.push(currentSegment);
+      currentSegment = { start: i, end: i, isAvailable };
+    }
+  }
+  if (currentSegment) segments.push(currentSegment);
+
+  return (
+    <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+      <div className="text-sm font-medium capitalize">{day.slice(0, 3)}</div>
+      <div
+        className="grid w-full"
+        style={{ gridTemplateColumns: `repeat(${TIME_INTERVALS.length}, 1fr)` }}
+      >
+        {segments.map((segment, segIndex) => {
+          const startTime = TIME_INTERVALS[segment.start].time;
+          const endTime = TIME_INTERVALS[segment.end].endTime;
+          const segmentWidth = segment.end - segment.start + 1;
+
+          const segmentElement = (
+            <div
+              key={segIndex}
+              className="flex h-8"
+              style={{ gridColumn: `span ${segmentWidth}` }}
+            >
+              {Array.from({ length: segmentWidth }).map((_, i) => {
+                const intervalIndex = segment.start + i;
+                return (
+                  <div
+                    key={intervalIndex}
+                    className={cn(
+                      "h-full flex-1 border-y border-r first:border-l",
+                      segment.isAvailable ? "bg-primary" : "bg-background",
+                      !readOnly && "cursor-pointer",
+                      segment.isAvailable ? "hover:bg-primary/90" : "hover:bg-muted",
+                    )}
+                    onMouseDown={() => onMouseDown(day, intervalIndex)}
+                    onMouseEnter={() => onMouseEnter(day, intervalIndex)}
+                  />
+                );
+              })}
+            </div>
+          );
+
+          if (!segment.isAvailable) {
+            return segmentElement;
+          }
+
+          return (
+            <TooltipProvider key={`${day}-${startTime}`}>
+              <Tooltip>
+                <TooltipTrigger asChild>{segmentElement}</TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    Available: {startTime} - {endTime}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })}
+      </div>
     </div>
   );
 }

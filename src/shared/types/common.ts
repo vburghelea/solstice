@@ -116,3 +116,11 @@ export const gmStrengthLabels: Record<string, string> = {
   knows_the_rules: "Knows the Rules",
   visual_aid: "Visual Aid",
 };
+
+// Availability editor configuration
+export const AVAILABILITY_CONFIG = {
+  startHour: 9, // 09:00
+  endHour: 22, // 22:00
+  displayIntervalMinutes: 30, // Display 30-minute intervals
+  dataIntervalMinutes: 15, // Keep data at 15-minute resolution
+} as const;

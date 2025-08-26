@@ -472,10 +472,12 @@ export function ProfileView() {
         profile.overallExperienceLevel || undefined,
       );
     } else if (sectionId === "additional") {
-      form.setFieldValue(
-        "calendarAvailability",
-        profile.calendarAvailability || defaultAvailabilityData,
-      );
+      const availability =
+        typeof profile.calendarAvailability === "string"
+          ? JSON.parse(profile.calendarAvailability)
+          : profile.calendarAvailability;
+
+      form.setFieldValue("calendarAvailability", availability || defaultAvailabilityData);
       form.setFieldValue("languages", profile.languages || []);
       form.setFieldValue("identityTags", profile.identityTags || []);
       form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
@@ -698,6 +700,13 @@ export function ProfileView() {
                   </div>
                 </div>
               )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Pronouns</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.pronouns || "Not specified"}
+              </p>
             </div>
           ) : null}
 

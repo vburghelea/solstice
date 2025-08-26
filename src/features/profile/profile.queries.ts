@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+import type { AvailabilityData } from "~/db/schema/auth.schema";
 import { gameSystems, userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import type {
   PrivacySettings,
@@ -32,6 +33,7 @@ function mapDbUserToProfile(
     identityTags: string[] | null;
     preferredGameThemes: string[] | null;
     overallExperienceLevel: "beginner" | "intermediate" | "advanced" | "expert" | null;
+    calendarAvailability: unknown; // JSONB field from database
     isGM: boolean | null;
     gamesHosted: number | null;
     responseRate: number | null;
@@ -63,6 +65,20 @@ function mapDbUserToProfile(
     identityTags: dbUser.identityTags ?? [],
     preferredGameThemes: dbUser.preferredGameThemes ?? [],
     overallExperienceLevel: dbUser.overallExperienceLevel ?? undefined,
+    calendarAvailability: (() => {
+      const rawValue = dbUser.calendarAvailability;
+      if (typeof rawValue === "string") {
+        try {
+          return JSON.parse(rawValue) as AvailabilityData;
+        } catch {
+          return undefined;
+        }
+      }
+      if (rawValue && typeof rawValue === "object") {
+        return rawValue as AvailabilityData;
+      }
+      return undefined;
+    })(),
     isGM: dbUser.isGM ?? false,
     gamesHosted: dbUser.gamesHosted ?? 0,
     responseRate: dbUser.responseRate ?? 0,

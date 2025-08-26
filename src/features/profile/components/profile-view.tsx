@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit2, LoaderCircle, Save, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
@@ -33,7 +33,6 @@ import { GamePreferencesStep } from "./game-preferences-step";
 export function ProfileView() {
   const queryClient = useQueryClient();
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
 
   // Fetch profile data with better hydration handling
   const {
@@ -237,11 +236,10 @@ export function ProfileView() {
           await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
           // Only exit edit mode on success
           setEditingSection(null);
-          setFormError(null);
         } else {
           // Show error but don't exit edit mode
           const error = result.errors?.[0]?.message || "Failed to update profile";
-          setFormError(error);
+
           toast.error(error);
           // Don't throw - let form remain interactive
         }
@@ -249,13 +247,65 @@ export function ProfileView() {
         // Network/unexpected errors
         const errorMessage =
           error instanceof Error ? error.message : "An unexpected error occurred";
-        setFormError(errorMessage);
+
         toast.error(errorMessage);
         console.error("Profile update error:", error);
         // Don't throw - let form remain interactive
       }
     },
   });
+
+  // Update form field values when profile data loads
+  useEffect(() => {
+    if (profile && !editingSection) {
+      // Set form field values from profile data for display mode
+      const availability =
+        typeof profile.calendarAvailability === "string"
+          ? JSON.parse(profile.calendarAvailability)
+          : profile.calendarAvailability;
+
+      form.setFieldValue("calendarAvailability", availability || defaultAvailabilityData);
+      form.setFieldValue("languages", profile.languages || []);
+      form.setFieldValue("identityTags", profile.identityTags || []);
+      form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
+      form.setFieldValue("gender", profile.gender || "");
+      form.setFieldValue("pronouns", profile.pronouns || "");
+      form.setFieldValue("phone", profile.phone || "");
+      form.setFieldValue("city", profile.city || "");
+      form.setFieldValue("country", profile.country || "");
+      form.setFieldValue(
+        "overallExperienceLevel",
+        profile.overallExperienceLevel || undefined,
+      );
+      form.setFieldValue(
+        "gameSystemPreferences",
+        profile.gameSystemPreferences || { favorite: [], avoid: [] },
+      );
+
+      const privacySettings = profile.privacySettings || {
+        showEmail: false,
+        showPhone: false,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
+        allowTeamInvitations: true,
+        allowFollows: true,
+      };
+      form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
+      form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
+      form.setFieldValue("privacySettings.showLocation", privacySettings.showLocation);
+      form.setFieldValue("privacySettings.showLanguages", privacySettings.showLanguages);
+      form.setFieldValue(
+        "privacySettings.showGamePreferences",
+        privacySettings.showGamePreferences,
+      );
+      form.setFieldValue(
+        "privacySettings.allowTeamInvitations",
+        privacySettings.allowTeamInvitations,
+      );
+      form.setFieldValue("privacySettings.allowFollows", privacySettings.allowFollows);
+    }
+  }, [profile, editingSection, form]);
 
   // Gender options for select component
   const genderOptions = [
@@ -309,10 +359,12 @@ export function ProfileView() {
         profile.overallExperienceLevel || undefined,
       );
     } else if (sectionId === "additional") {
-      form.setFieldValue(
-        "calendarAvailability",
-        profile.calendarAvailability || defaultAvailabilityData,
-      );
+      const availability =
+        typeof profile.calendarAvailability === "string"
+          ? JSON.parse(profile.calendarAvailability)
+          : profile.calendarAvailability;
+
+      form.setFieldValue("calendarAvailability", availability || defaultAvailabilityData);
       form.setFieldValue("languages", profile.languages || []);
       form.setFieldValue("identityTags", profile.identityTags || []);
       form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
@@ -353,7 +405,7 @@ export function ProfileView() {
     // Reset form to original values
     form.reset();
     // Clear any errors
-    setFormError(null);
+
     // Exit edit mode
     setEditingSection(null);
   };
@@ -456,144 +508,120 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formError && editingSection === "basic" && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-              {formError}
+          {editingSection === "basic" ? (
+            <form.Field name="gender">
+              {(field) => (
+                <ValidatedSelect
+                  field={field}
+                  label="Gender"
+                  placeholder="Select gender"
+                  options={genderOptions}
+                />
+              )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Gender</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.gender || "Not specified"}
+              </p>
             </div>
           )}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <p className="text-base">{profile?.name || "Not set"}</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <p className="text-base">{profile?.email || "Not set"}</p>
-            </div>
-          </div>
 
-          <Separator />
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              {editingSection === "basic" ? (
-                <form.Field name="phone">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Phone Number"
-                      type="tel"
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>Phone Number</Label>
-                  <p className="text-base">{profile?.phone || "Not set"}</p>
-                </>
+          {editingSection === "basic" ? (
+            <form.Field name="pronouns">
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Pronouns"
+                  placeholder="e.g. he/him, she/her, they/them"
+                />
               )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Pronouns</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.pronouns || "Not specified"}
+              </p>
             </div>
+          )}
 
-            <div className="space-y-2">
-              {editingSection === "basic" ? (
-                <form.Field name="gender">
-                  {(field) => (
-                    <ValidatedSelect
-                      field={field}
-                      label="Gender"
-                      options={genderOptions}
-                      placeholderText="Select gender"
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>Gender</Label>
-                  <p className="text-base">{profile?.["gender"] || "Not set"}</p>
-                </>
+          {editingSection === "basic" ? (
+            <form.Field name="phone">
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Phone Number"
+                  placeholder="Your phone number"
+                />
               )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Phone Number</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.phone || "Not specified"}
+              </p>
             </div>
+          )}
 
-            <div className="space-y-2">
-              {editingSection === "basic" ? (
-                <form.Field name="pronouns">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Pronouns"
-                      placeholder="e.g., they/them, she/her, he/him"
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>Pronouns</Label>
-                  <p className="text-base">{profile?.["pronouns"] || "Not set"}</p>
-                </>
+          {editingSection === "basic" ? (
+            <form.Field name="city">
+              {(field) => (
+                <ValidatedInput field={field} label="City" placeholder="Your city" />
               )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>City</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.city || "Not specified"}
+              </p>
             </div>
+          )}
 
-            <div className="space-y-2">
-              {editingSection === "basic" ? (
-                <form.Field name="city">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="City"
-                      placeholder="Enter your city"
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>City</Label>
-                  <p className="text-base">{profile?.["city"] || "Not set"}</p>
-                </>
+          {editingSection === "basic" ? (
+            <form.Field name="country">
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Country"
+                  placeholder="Your country"
+                />
               )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Country</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.country || "Not specified"}
+              </p>
             </div>
+          )}
 
-            <div className="space-y-2">
-              {editingSection === "basic" ? (
-                <form.Field name="country">
-                  {(field) => (
-                    <ValidatedInput
-                      field={field}
-                      label="Country"
-                      placeholder="Enter your country"
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>Country</Label>
-                  <p className="text-base">{profile?.["country"] || "Not set"}</p>
-                </>
+          {editingSection === "basic" ? (
+            <form.Field name="overallExperienceLevel">
+              {(field) => (
+                <ValidatedSelect
+                  field={field}
+                  label="Overall Experience Level"
+                  placeholder="Select experience level"
+                  options={mappedExperienceLevelOptions}
+                />
               )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Overall Experience Level</Label>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {profile?.overallExperienceLevel
+                  ? profile.overallExperienceLevel.charAt(0).toUpperCase() +
+                    profile.overallExperienceLevel.slice(1)
+                  : "Not specified"}
+              </p>
             </div>
-
-            <div className="space-y-2">
-              {editingSection === "basic" ? (
-                <form.Field name="overallExperienceLevel">
-                  {(field) => (
-                    <ValidatedSelect
-                      field={field}
-                      label="Overall Experience Level"
-                      options={mappedExperienceLevelOptions}
-                      placeholderText="Select your experience level"
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <>
-                  <Label>Overall Experience Level</Label>
-                  <p className="text-base">
-                    {profile?.["overallExperienceLevel"] || "Not set"}
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -603,9 +631,7 @@ export function ProfileView() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Additional Information</CardTitle>
-              <CardDescription>
-                More details about your gaming preferences and experience
-              </CardDescription>
+              <CardDescription>Your gaming preferences and availability</CardDescription>
             </div>
             {editingSection !== "additional" && (
               <Button
@@ -657,165 +683,210 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formError && editingSection === "additional" && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-              {formError}
-            </div>
-          )}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Languages</Label>
-              {editingSection === "additional" ? (
-                <form.Field name="languages">
-                  {(field) => (
+          {/* Calendar Availability */}
+          <div>
+            <Label className="text-base font-medium">Availability Calendar</Label>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Set your weekly availability for gaming sessions
+            </p>
+            {editingSection === "additional" ? (
+              <form.Field name="calendarAvailability">
+                {(field) => (
+                  <AvailabilityEditor
+                    value={field.state.value || defaultAvailabilityData}
+                    onChange={(newValue) => {
+                      field.handleChange(newValue);
+                    }}
+                    readOnly={false}
+                  />
+                )}
+              </form.Field>
+            ) : (
+              <AvailabilityEditor
+                value={
+                  profile?.calendarAvailability
+                    ? typeof profile.calendarAvailability === "string"
+                      ? JSON.parse(profile.calendarAvailability)
+                      : profile.calendarAvailability
+                    : defaultAvailabilityData
+                }
+                onChange={() => {}}
+                readOnly={true}
+              />
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Languages */}
+          <div>
+            <Label className="text-base font-medium">Languages</Label>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Languages you speak fluently
+            </p>
+            {editingSection === "additional" ? (
+              <form.Field name="languages">
+                {(field) => {
+                  const currentLanguages = field.state.value || [];
+                  const tags = currentLanguages.map((langCode) => {
+                    const lang = languageOptions.find((l) => l.value === langCode);
+                    return lang
+                      ? { id: langCode, name: lang.label }
+                      : { id: langCode, name: langCode };
+                  });
+
+                  return (
                     <TagInput
-                      tags={
-                        field.state.value?.map((langCode) => ({
-                          id: langCode,
-                          name:
-                            mappedLanguageOptions.find((l) => l.id === langCode)?.name ||
-                            langCode,
-                        })) || []
-                      }
+                      tags={tags}
                       onAddTag={(tag) => {
-                        const newLanguages = [...(field.state.value || []), tag.id];
-                        field.handleChange(newLanguages);
+                        const currentValue = field.state.value || [];
+                        if (!currentValue.includes(tag.id)) {
+                          field.handleChange([...currentValue, tag.id]);
+                        }
                       }}
                       onRemoveTag={(id) => {
-                        const newLanguages = (field.state.value || []).filter(
-                          (lang) => lang !== id,
-                        );
-                        field.handleChange(newLanguages);
+                        const currentValue = field.state.value || [];
+                        field.handleChange(currentValue.filter((lang) => lang !== id));
                       }}
-                      placeholder="Add languages you speak"
                       availableSuggestions={mappedLanguageOptions}
+                      placeholder="Select languages you speak"
                     />
-                  )}
-                </form.Field>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {profile?.["languages"]?.length ? (
-                    profile?.languages?.map((langCode) => (
-                      <span
-                        key={langCode}
-                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
-                      >
-                        {languageOptions.find((l) => l.value === langCode)?.label ||
-                          langCode}
-                      </span>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-sm">Not set</p>
-                  )}
-                </div>
-              )}
-            </div>
+                  );
+                }}
+              </form.Field>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {profile?.languages?.map((langCode) => {
+                  const lang = languageOptions.find((l) => l.value === langCode);
+                  return lang ? (
+                    <span
+                      key={langCode}
+                      className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
+                    >
+                      {lang.label}
+                    </span>
+                  ) : null;
+                })}
+                {(!profile?.languages || profile.languages.length === 0) && (
+                  <span className="text-muted-foreground text-sm">
+                    No languages specified
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label>Identity Tags</Label>
-              {editingSection === "additional" ? (
-                <form.Field name="identityTags">
-                  {(field) => (
+          <Separator />
+
+          {/* Identity Tags */}
+          <div>
+            <Label className="text-base font-medium">Identity Tags</Label>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Help others find compatible gaming partners
+            </p>
+            {editingSection === "additional" ? (
+              <form.Field name="identityTags">
+                {(field) => {
+                  const currentTags = field.state.value || [];
+                  const tags = currentTags.map((tagId) => {
+                    const tag = identityTagOptions.find((t) => t === tagId);
+                    return tag ? { id: tagId, name: tag } : { id: tagId, name: tagId };
+                  });
+
+                  return (
                     <TagInput
-                      tags={
-                        field.state.value?.map((tag) => ({ id: tag, name: tag })) || []
-                      }
+                      tags={tags}
                       onAddTag={(tag) => {
-                        const newTags = [...(field.state.value || []), tag.name];
-                        field.handleChange(newTags);
+                        const currentValue = field.state.value || [];
+                        if (!currentValue.includes(tag.id)) {
+                          field.handleChange([...currentValue, tag.id]);
+                        }
                       }}
                       onRemoveTag={(id) => {
-                        const newTags = (field.state.value || []).filter(
-                          (tag) => tag !== id,
-                        );
-                        field.handleChange(newTags);
+                        const currentValue = field.state.value || [];
+                        field.handleChange(currentValue.filter((tag) => tag !== id));
                       }}
-                      placeholder="Add identity tags that represent you"
                       availableSuggestions={mappedIdentityTagOptions}
+                      placeholder="Select identity tags"
                     />
-                  )}
-                </form.Field>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {profile?.["identityTags"]?.length ? (
-                    profile?.identityTags?.map((tag) => (
-                      <span
-                        key={tag}
-                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
-                      >
-                        {mappedIdentityTagOptions.find((t) => t.id === tag)?.name || tag}
-                      </span>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-sm">Not set</p>
-                  )}
-                </div>
-              )}
-            </div>
+                  );
+                }}
+              </form.Field>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {profile?.identityTags?.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                {(!profile?.identityTags || profile.identityTags.length === 0) && (
+                  <span className="text-muted-foreground text-sm">
+                    No identity tags specified
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label>Preferred Game Themes</Label>
-              {editingSection === "additional" ? (
-                <form.Field name="preferredGameThemes">
-                  {(field) => (
+          <Separator />
+
+          {/* Preferred Game Themes */}
+          <div>
+            <Label className="text-base font-medium">Preferred Game Themes</Label>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Game themes you enjoy most
+            </p>
+            {editingSection === "additional" ? (
+              <form.Field name="preferredGameThemes">
+                {(field) => {
+                  const currentThemes = field.state.value || [];
+                  const tags = currentThemes.map((themeId) => {
+                    const theme = gameThemeOptions.find((t) => t === themeId);
+                    return theme
+                      ? { id: themeId, name: theme }
+                      : { id: themeId, name: themeId };
+                  });
+
+                  return (
                     <TagInput
-                      tags={
-                        field.state.value?.map((theme) => ({ id: theme, name: theme })) ||
-                        []
-                      }
+                      tags={tags}
                       onAddTag={(tag) => {
-                        const newThemes = [...(field.state.value || []), tag.name];
-                        field.handleChange(newThemes);
+                        const currentValue = field.state.value || [];
+                        if (!currentValue.includes(tag.id)) {
+                          field.handleChange([...currentValue, tag.id]);
+                        }
                       }}
                       onRemoveTag={(id) => {
-                        const newThemes = (field.state.value || []).filter(
-                          (theme) => theme !== id,
-                        );
-                        field.handleChange(newThemes);
+                        const currentValue = field.state.value || [];
+                        field.handleChange(currentValue.filter((theme) => theme !== id));
                       }}
-                      placeholder="Add game themes you prefer"
                       availableSuggestions={mappedGameThemeOptions}
+                      placeholder="Select preferred game themes"
                     />
-                  )}
-                </form.Field>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {profile?.["preferredGameThemes"]?.length ? (
-                    profile?.preferredGameThemes?.map((theme) => (
-                      <span
-                        key={theme}
-                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
-                      >
-                        {mappedGameThemeOptions.find((t) => t.id === theme)?.name ||
-                          theme}
-                      </span>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-sm">Not set</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <Label>Calendar Availability</Label>
-              {editingSection === "additional" ? (
-                <form.Field name="calendarAvailability">
-                  {(field) => (
-                    <AvailabilityEditor
-                      value={field.state.value ?? defaultAvailabilityData}
-                      onChange={field.handleChange}
-                    />
-                  )}
-                </form.Field>
-              ) : (
-                <AvailabilityEditor
-                  value={profile?.["calendarAvailability"] ?? defaultAvailabilityData}
-                  onChange={() => {}}
-                  readOnly
-                />
-              )}
-            </div>
+                  );
+                }}
+              </form.Field>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {profile?.preferredGameThemes?.map((theme) => (
+                  <span
+                    key={theme}
+                    className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
+                  >
+                    {theme}
+                  </span>
+                ))}
+                {(!profile?.preferredGameThemes ||
+                  profile.preferredGameThemes.length === 0) && (
+                  <span className="text-muted-foreground text-sm">
+                    No game themes specified
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -880,18 +951,13 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formError && editingSection === "privacy" && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-              {formError}
-            </div>
-          )}
           {editingSection === "privacy" ? (
-            <div className="space-y-4">
+            <>
               <form.Field name="privacySettings.showEmail">
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show my email address to team members"
+                    label="Show email address to other users"
                   />
                 )}
               </form.Field>
@@ -900,7 +966,7 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show my phone number to team members"
+                    label="Show phone number to other users"
                   />
                 )}
               </form.Field>
@@ -909,14 +975,17 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show my location (city/country) to others"
+                    label="Show location (city and country) to other users"
                   />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.showLanguages">
                 {(field) => (
-                  <ValidatedCheckbox field={field} label="Show my languages to others" />
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Show languages to other users"
+                  />
                 )}
               </form.Field>
 
@@ -924,62 +993,80 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show my game preferences to others"
+                    label="Show game preferences to other users"
                   />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.allowTeamInvitations">
                 {(field) => (
-                  <ValidatedCheckbox field={field} label="Allow team invitations" />
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Allow team invitations from other users"
+                  />
                 )}
               </form.Field>
 
               <form.Field name="privacySettings.allowFollows">
                 {(field) => (
-                  <ValidatedCheckbox field={field} label="Allow others to follow me" />
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Allow other users to follow you"
+                  />
                 )}
               </form.Field>
-            </div>
+            </>
           ) : (
-            <div className="space-y-2">
-              <p className="text-sm">
-                <span className="font-medium">Email visibility:</span>{" "}
-                {profile?.privacySettings?.showEmail
-                  ? "Visible to team members"
-                  : "Hidden"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Phone visibility:</span>{" "}
-                {profile?.privacySettings?.showPhone
-                  ? "Visible to team members"
-                  : "Hidden"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Location visibility:</span>{" "}
-                {profile?.privacySettings?.showLocation ? "Visible to others" : "Hidden"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Languages visibility:</span>{" "}
-                {profile?.privacySettings?.showLanguages ? "Visible to others" : "Hidden"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Game preferences visibility:</span>{" "}
-                {profile?.privacySettings?.showGamePreferences
-                  ? "Visible to others"
-                  : "Hidden"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Team invitations:</span>{" "}
-                {profile?.privacySettings?.allowTeamInvitations !== false
-                  ? "Allowed"
-                  : "Not Allowed"}
-              </p>
-              <p className="text-sm">
-                <span className="font-medium">Follow permissions:</span>{" "}
-                {profile?.privacySettings?.allowFollows ? "Allowed" : "Not Allowed"}
-              </p>
-            </div>
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Show email address</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.showEmail ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Show phone number</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.showPhone ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Show location</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.showLocation ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Show languages</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.showLanguages ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Show game preferences</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.showGamePreferences ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Allow team invitations</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.allowTeamInvitations ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Allow follows</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.allowFollows ? "Yes" : "No"}
+                </span>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -990,9 +1077,7 @@ export function ProfileView() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Game Preferences</CardTitle>
-              <CardDescription>
-                Tell us which game systems you prefer to play or want to avoid
-              </CardDescription>
+              <CardDescription>Your favorite and avoided game systems</CardDescription>
             </div>
             {editingSection !== "game-preferences" && (
               <Button
@@ -1044,11 +1129,6 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {formError && editingSection === "game-preferences" && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-              {formError}
-            </div>
-          )}
           {editingSection === "game-preferences" ? (
             <form.Field name="gameSystemPreferences">
               {(field) => (
@@ -1062,71 +1142,48 @@ export function ProfileView() {
               )}
             </form.Field>
           ) : (
-            <div className="space-y-4">
+            <>
               <div>
-                <h4 className="font-medium">Favorite Game Systems</h4>
+                <Label className="text-base font-medium">Favorite Systems</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {profile?.gameSystemPreferences?.favorite.length ? (
-                    profile?.gameSystemPreferences.favorite.map((gameSystem) => (
-                      <span
-                        key={gameSystem.id}
-                        className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm"
-                      >
-                        {gameSystem.name}
-                      </span>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-sm">
-                      No favorite game systems selected
-                    </p>
+                  {profile?.gameSystemPreferences?.favorite?.map((system) => (
+                    <span
+                      key={system.id}
+                      className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
+                    >
+                      {system.name}
+                    </span>
+                  ))}
+                  {(!profile?.gameSystemPreferences?.favorite ||
+                    profile.gameSystemPreferences.favorite.length === 0) && (
+                    <span className="text-muted-foreground text-sm">
+                      No favorites specified
+                    </span>
                   )}
                 </div>
               </div>
-              <div>
-                <h4 className="font-medium">Game Systems to Avoid</h4>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {profile?.gameSystemPreferences?.avoid.length ? (
-                    profile?.gameSystemPreferences.avoid.map((gameSystem) => (
-                      <span
-                        key={gameSystem.id}
-                        className="bg-destructive text-destructive-foreground rounded-md px-2 py-1 text-sm"
-                      >
-                        {gameSystem.name}
-                      </span>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-sm">
-                      No game systems to avoid selected
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Profile Metadata */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
-          <CardDescription>Technical details about your profile</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-sm">
-            <span className="font-medium">Profile Status:</span>{" "}
-            {profile?.profileComplete ? "Complete" : "Incomplete"}
-          </p>
-          <p className="text-sm">
-            <span className="font-medium">Profile Version:</span>{" "}
-            {profile?.profileVersion}
-          </p>
-          <p className="text-sm">
-            <span className="font-medium">Last Updated:</span>{" "}
-            {profile?.profileUpdatedAt
-              ? new Date(profile.profileUpdatedAt).toLocaleString()
-              : "Never"}
-          </p>
+              <div>
+                <Label className="text-base font-medium">Avoided Systems</Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {profile?.gameSystemPreferences?.avoid?.map((system) => (
+                    <span
+                      key={system.id}
+                      className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs text-red-800"
+                    >
+                      {system.name}
+                    </span>
+                  ))}
+                  {(!profile?.gameSystemPreferences?.avoid ||
+                    profile.gameSystemPreferences.avoid.length === 0) && (
+                    <span className="text-muted-foreground text-sm">
+                      No avoided systems specified
+                    </span>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>

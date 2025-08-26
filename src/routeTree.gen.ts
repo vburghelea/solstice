@@ -29,8 +29,9 @@ import { Route as DashboardGamesRouteImport } from "./routes/dashboard/games";
 import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as DashboardCampaignsRouteImport } from "./routes/dashboard/campaigns";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
+import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
-import { Route as authLoginRouteImport } from "./routes/(auth)/login";
+import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
@@ -147,15 +148,20 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   path: "/signup",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: "/reset-password",
+  path: "/reset-password",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: "/login",
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any);
-const authLoginRoute = authLoginRouteImport.update({
-  id: "/(auth)/login",
-  path: "/login",
-  getParentRoute: () => rootRouteImport,
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: "/forgot-password",
+  path: "/forgot-password",
+  getParentRoute: () => AuthRouteRoute,
 } as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
@@ -288,8 +294,9 @@ export interface FileRoutesByFullPath {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/search": typeof SearchRoute;
-  "/login": typeof authLoginRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRoute;
@@ -325,8 +332,9 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
   "/search": typeof SearchRoute;
-  "/login": typeof authLoginRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
@@ -359,8 +367,9 @@ export interface FileRoutesById {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/search": typeof SearchRoute;
-  "/(auth)/login": typeof authLoginRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRoute;
@@ -400,8 +409,9 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
     | "/search"
-    | "/login"
+    | "/auth/forgot-password"
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/campaigns"
     | "/dashboard/events"
@@ -437,8 +447,9 @@ export interface FileRouteTypes {
     | "/"
     | "/auth"
     | "/search"
-    | "/login"
+    | "/auth/forgot-password"
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/events"
     | "/dashboard/members"
@@ -470,8 +481,9 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
     | "/search"
-    | "/(auth)/login"
+    | "/auth/forgot-password"
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/campaigns"
     | "/dashboard/events"
@@ -510,7 +522,6 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
   SearchRoute: typeof SearchRoute;
-  authLoginRoute: typeof authLoginRoute;
   GameGameIdRoute: typeof GameGameIdRoute;
 }
 export interface FileServerRoutesByFullPath {
@@ -702,6 +713,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthSignupRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/auth/reset-password": {
+      id: "/auth/reset-password";
+      path: "/reset-password";
+      fullPath: "/auth/reset-password";
+      preLoaderRoute: typeof AuthResetPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
     "/auth/login": {
       id: "/auth/login";
       path: "/login";
@@ -709,12 +727,12 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
-    "/(auth)/login": {
-      id: "/(auth)/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof authLoginRouteImport;
-      parentRoute: typeof rootRouteImport;
+    "/auth/forgot-password": {
+      id: "/auth/forgot-password";
+      path: "/forgot-password";
+      fullPath: "/auth/forgot-password";
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
     };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
@@ -885,12 +903,16 @@ declare module "@tanstack/react-start/server" {
 }
 
 interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute;
   AuthLoginRoute: typeof AuthLoginRoute;
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute;
   AuthSignupRoute: typeof AuthSignupRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
 };
 
@@ -1042,7 +1064,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
   SearchRoute: SearchRoute,
-  authLoginRoute: authLoginRoute,
   GameGameIdRoute: GameGameIdRoute,
 };
 export const routeTree = rootRouteImport

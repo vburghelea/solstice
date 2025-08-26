@@ -734,7 +734,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
               body: {
                 email: data.email,
                 password: randomPassword,
-                name: data.recipientName || data.email.split("@")[0],
+                name: data.name || data.email.split("@")[0],
               },
             });
 

@@ -31,6 +31,7 @@ export function InviteParticipants({
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [emailInvite, setEmailInvite] = useState("");
+  const [inviteeName, setInviteeName] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { data: searchResults, isLoading: isSearchingUsers } = useQuery({
@@ -45,6 +46,7 @@ export function InviteParticipants({
       toast.success("Participant invited successfully!");
       setSearchTerm("");
       setEmailInvite("");
+      setInviteeName("");
       queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
     },
@@ -58,9 +60,9 @@ export function InviteParticipants({
   };
 
   const handleInviteEmail = () => {
-    if (emailInvite.length > 0) {
+    if (emailInvite.length > 0 && inviteeName.length > 0) {
       inviteMutation.mutate({
-        data: { campaignId, email: emailInvite, role: "invited" },
+        data: { campaignId, email: emailInvite, name: inviteeName, role: "invited" },
       });
     }
   };
@@ -124,6 +126,12 @@ export function InviteParticipants({
           <Label htmlFor="email-invite">Invite by Email</Label>
           <div className="flex space-x-2">
             <Input
+              id="invitee-name"
+              placeholder="Enter name"
+              value={inviteeName}
+              onChange={(e) => setInviteeName(e.target.value)}
+            />
+            <Input
               id="email-invite"
               type="email"
               placeholder="Enter email address"
@@ -132,7 +140,11 @@ export function InviteParticipants({
             />
             <Button
               onClick={handleInviteEmail}
-              disabled={inviteMutation.isPending || emailInvite.length === 0}
+              disabled={
+                inviteMutation.isPending ||
+                emailInvite.length === 0 ||
+                inviteeName.length === 0
+              }
             >
               {inviteMutation.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

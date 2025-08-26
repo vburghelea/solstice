@@ -130,6 +130,11 @@ export default function LoginForm() {
                 />
               )}
             </form.Field>
+            <div className="text-right text-sm">
+              <Link to="/auth/forgot-password" className="underline underline-offset-4">
+                Forgot Password?
+              </Link>
+            </div>
             <FormSubmitButton
               isSubmitting={form.state.isSubmitting || isLoading}
               className="mt-2 w-full"

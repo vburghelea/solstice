@@ -123,7 +123,7 @@ export const inviteToCampaignInputSchema = z
     campaignId: z.string().min(1),
     userId: z.string().min(1).optional(),
     email: z.string().email().optional(),
-    recipientName: z.string().optional(),
+    name: z.string().optional(),
   })
   .refine((data) => data.userId || data.email, {
     message: "Either userId or email must be provided",

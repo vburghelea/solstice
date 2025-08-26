@@ -50,6 +50,21 @@ export interface WelcomeEmailData {
   profileUrl: string;
 }
 
+export interface EmailVerificationOTPData {
+  recipientName: string;
+  otp: string;
+}
+
+export interface PasswordResetOTPData {
+  recipientName: string;
+  otp: string;
+}
+
+export interface SignInOTPData {
+  recipientName: string;
+  otp: string;
+}
+
 /**
  * Load and render a campaign invitation email template
  */
@@ -171,6 +186,61 @@ export async function renderWelcomeEmail(data: WelcomeEmailData): Promise<string
   // Replace template variables
   template = template.replace(/{{recipientName}}/g, data.recipientName);
   template = template.replace(/{{profileUrl}}/g, data.profileUrl);
+
+  return template;
+}
+
+/**
+ * Load and render an email verification OTP template
+ */
+export async function renderEmailVerificationOTP(
+  data: EmailVerificationOTPData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/email-verification-otp.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  // Replace template variables
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{otp}}/g, data.otp);
+
+  return template;
+}
+
+/**
+ * Load and render a password reset OTP template
+ */
+export async function renderPasswordResetOTP(
+  data: PasswordResetOTPData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/password-reset-otp.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  // Replace template variables
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{otp}}/g, data.otp);
+
+  return template;
+}
+
+/**
+ * Load and render a sign-in OTP template
+ */
+export async function renderSignInOTP(data: SignInOTPData): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/sign-in-otp.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  // Replace template variables
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{otp}}/g, data.otp);
 
   return template;
 }

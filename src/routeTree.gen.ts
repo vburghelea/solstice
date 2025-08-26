@@ -30,10 +30,15 @@ import { Route as DashboardGamesRouteImport } from "./routes/dashboard/games";
 import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as DashboardCampaignsRouteImport } from "./routes/dashboard/campaigns";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
+import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+<<<<<<< HEAD
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as authLoginRouteImport } from "./routes/(auth)/login";
+=======
+import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
@@ -161,11 +166,17 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
   path: "/signup",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: "/reset-password",
+  path: "/reset-password",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: "/login",
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+<<<<<<< HEAD
 const AdminRolesRoute = AdminRolesRouteImport.update({
   id: "/admin/roles",
   path: "/admin/roles",
@@ -180,6 +191,12 @@ const authLoginRoute = authLoginRouteImport.update({
   id: "/(auth)/login",
   path: "/login",
   getParentRoute: () => rootRouteImport,
+=======
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: "/forgot-password",
+  path: "/forgot-password",
+  getParentRoute: () => AuthRouteRoute,
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
 } as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
@@ -343,10 +360,15 @@ export interface FileRoutesByFullPath {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/search": typeof SearchRoute;
+<<<<<<< HEAD
   "/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
+=======
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -387,10 +409,15 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
   "/search": typeof SearchRoute;
+<<<<<<< HEAD
   "/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
+=======
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
@@ -427,10 +454,15 @@ export interface FileRoutesById {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/search": typeof SearchRoute;
+<<<<<<< HEAD
   "/(auth)/login": typeof authLoginRoute;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
+=======
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
   "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -475,10 +507,15 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
     | "/search"
+<<<<<<< HEAD
     | "/login"
     | "/admin/events-review"
     | "/admin/roles"
+=======
+    | "/auth/forgot-password"
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/campaigns"
     | "/dashboard/events"
@@ -519,10 +556,15 @@ export interface FileRouteTypes {
     | "/"
     | "/auth"
     | "/search"
+<<<<<<< HEAD
     | "/login"
     | "/admin/events-review"
     | "/admin/roles"
+=======
+    | "/auth/forgot-password"
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/members"
     | "/dashboard/membership"
@@ -558,10 +600,15 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
     | "/search"
+<<<<<<< HEAD
     | "/(auth)/login"
     | "/admin/events-review"
     | "/admin/roles"
+=======
+    | "/auth/forgot-password"
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
     | "/auth/login"
+    | "/auth/reset-password"
     | "/auth/signup"
     | "/dashboard/campaigns"
     | "/dashboard/events"
@@ -605,10 +652,13 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
   SearchRoute: typeof SearchRoute;
+<<<<<<< HEAD
   authLoginRoute: typeof authLoginRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
+=======
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
   GameGameIdRoute: typeof GameGameIdRoute;
 }
 export interface FileServerRoutesByFullPath {
@@ -821,6 +871,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthSignupRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/auth/reset-password": {
+      id: "/auth/reset-password";
+      path: "/reset-password";
+      fullPath: "/auth/reset-password";
+      preLoaderRoute: typeof AuthResetPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
     "/auth/login": {
       id: "/auth/login";
       path: "/login";
@@ -828,6 +885,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+<<<<<<< HEAD
     "/admin/roles": {
       id: "/admin/roles";
       path: "/admin/roles";
@@ -848,6 +906,14 @@ declare module "@tanstack/react-router" {
       fullPath: "/login";
       preLoaderRoute: typeof authLoginRouteImport;
       parentRoute: typeof rootRouteImport;
+=======
+    "/auth/forgot-password": {
+      id: "/auth/forgot-password";
+      path: "/forgot-password";
+      fullPath: "/auth/forgot-password";
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
     };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
@@ -1060,12 +1126,16 @@ declare module "@tanstack/react-start/server" {
 }
 
 interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute;
   AuthLoginRoute: typeof AuthLoginRoute;
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute;
   AuthSignupRoute: typeof AuthSignupRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
 };
 
@@ -1245,10 +1315,13 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
   SearchRoute: SearchRoute,
+<<<<<<< HEAD
   authLoginRoute: authLoginRoute,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
   AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
+=======
+>>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
   GameGameIdRoute: GameGameIdRoute,
 };
 export const routeTree = rootRouteImport

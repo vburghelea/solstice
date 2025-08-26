@@ -11,7 +11,12 @@ import { Resend } from "resend";
 import {
   generateTextFromHtml,
   renderEmailVerificationEmail,
+  renderEmailVerificationOTP,
+  renderGameInvitationEmail,
   renderMembershipReceiptEmail,
+  renderPasswordResetEmail,
+  renderPasswordResetOTP,
+  renderSignInOTP,
 } from "~/shared/email-templates";
 
 // Define types for better type safety
@@ -126,6 +131,8 @@ class ResendEmailService {
       // Send email using Resend
       const response = await this.client.emails.send(emailData as never);
 
+      console.log("Resend API call successful:", response);
+
       return {
         success: true,
         messageId: response.data?.id,
@@ -235,45 +242,15 @@ export const sendGameInvitation = serverOnly(
     inviterName: string;
   }) => {
     const service = await getEmailService();
-    const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Invitation - Roundup Games</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: #2563eb; margin: 0;">Roundup Games</h1>
-    <p style="color: #6b7280; margin: 10px 0 0 0;">Game Invitation</p>
-  </div>
-
-  <div style="background-color: #f8fafc; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
-    <h2 style="margin-top: 0; color: #1f2937;">You've been invited to join a game!</h2>
-
-    <p>Hi ${params.to.name || "there"},</p>
-
-    <p><strong>${params.inviterName}</strong> has invited you to join their game <strong>"${params.gameName}"</strong> on Roundup Games.</p>
-
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="${params.inviteUrl}" style="background-color: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Accept Invitation</a>
-    </div>
-
-    <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
-    <p style="word-break: break-all; color: #6b7280; font-size: 14px;">${params.inviteUrl}</p>
-
-    <p>We hope to see you in the game soon!</p>
-
-    <p>Best regards,<br>The Roundup Games Team</p>
-  </div>
-
-  <div style="text-align: center; color: #9ca3af; font-size: 14px;">
-    <p>If you didn't expect this invitation, you can safely ignore this email.</p>
-    <p>© 2024 Roundup Games. All rights reserved.</p>
-  </div>
-</body>
-</html>`;
+    const htmlContent = await renderGameInvitationEmail({
+      recipientName: params.to.name || "there",
+      inviterName: params.inviterName,
+      gameName: params.gameName,
+      inviteUrl: params.inviteUrl,
+      gameDescription: "", // Placeholder, as it's not provided in params
+      gameSystem: "", // Placeholder, as it's not provided in params
+      expiresAt: "", // Placeholder, as it's not provided in params
+    });
 
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
     const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
@@ -286,22 +263,118 @@ export const sendGameInvitation = serverOnly(
       },
       subject: `Game Invitation: ${params.gameName} - Roundup Games`,
       html: htmlContent,
-      text: `
-You've been invited to join a game!
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
 
-Hi ${params.to.name || "there"},
+// Convenience function for sending email verification OTP
+export const sendEmailVerificationOTP = serverOnly(
+  async (params: { to: EmailRecipient; otp: string }) => {
+    const service = await getEmailService();
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
 
-${params.inviterName} has invited you to join their game "${params.gameName}" on Roundup Games.
+    const htmlContent = await renderEmailVerificationOTP({
+      recipientName: params.to.name || "there",
+      otp: params.otp,
+    });
 
-Accept the invitation here: ${params.inviteUrl}
+    return service.send({
+      to: params.to,
+      from: {
+        email: fromEmail,
+        name: fromName,
+      },
+      subject: "Verify Your Email - Roundup Games",
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
 
-If you didn't expect this invitation, you can safely ignore this email.
+// Convenience function for sending password reset OTP
+export const sendPasswordResetOTP = serverOnly(
+  async (params: { to: EmailRecipient; otp: string }) => {
+    const service = await getEmailService();
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
 
-Best regards,
-The Roundup Games Team
+    const htmlContent = await renderPasswordResetOTP({
+      recipientName: params.to.name || "there",
+      otp: params.otp,
+    });
 
-© 2024 Roundup Games. All rights reserved.
-      `.trim(),
+    return service.send({
+      to: params.to,
+      from: {
+        email: fromEmail,
+        name: fromName,
+      },
+      subject: "Password Reset - Roundup Games",
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Convenience function for sending password reset email
+export const sendPasswordResetEmail = serverOnly(
+  async (params: {
+    to: { email: string; name?: string | undefined };
+    resetUrl: string;
+    expiresAt: Date;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderPasswordResetEmail({
+      recipientName: params.to.name || "there",
+      resetUrl: params.resetUrl,
+      expiresAt: params.expiresAt.toLocaleDateString("en-CA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: {
+        email: fromEmail,
+        name: fromName,
+      },
+      subject: "Reset Your Password - Roundup Games",
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Convenience function for sending sign-in OTP
+export const sendSignInOTP = serverOnly(
+  async (params: { to: EmailRecipient; otp: string }) => {
+    const service = await getEmailService();
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    const htmlContent = await renderSignInOTP({
+      recipientName: params.to.name || "there",
+      otp: params.otp,
+    });
+
+    return service.send({
+      to: params.to,
+      from: {
+        email: fromEmail,
+        name: fromName,
+      },
+      subject: "Sign-in OTP - Roundup Games",
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
     });
   },
 );

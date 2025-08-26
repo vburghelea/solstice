@@ -775,7 +775,7 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
           const signUpData = await auth.api.signUpEmail({
             body: {
               email: data.email,
-              name: data.recipientName || "New User",
+              name: data.name || "New User",
               password: Math.random().toString(36).slice(-12), // Temporary password
             },
           });

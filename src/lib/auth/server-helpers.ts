@@ -4,8 +4,10 @@
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { emailOTP } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
-import { sendEmailVerification } from "~/lib/email/resend";
+import { sendEmailVerificationOTP, sendSignInOTP } from "~/lib/email/otp-emails";
+import { sendEmailVerification, sendPasswordResetEmail } from "~/lib/email/resend";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | null = null;
@@ -22,18 +24,10 @@ const createAuth = async () => {
   const cookieDomain = env.COOKIE_DOMAIN;
 
   // Debug OAuth configuration
-  console.log("Auth config loading...");
-  console.log("Base URL:", baseUrl);
   const googleClientId = env.GOOGLE_CLIENT_ID || "";
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
   const discordClientId = env.DISCORD_CLIENT_ID || "";
   const discordClientSecret = env.DISCORD_CLIENT_SECRET || "";
-
-  console.log(
-    "Google Client ID:",
-    googleClientId ? `Set (${googleClientId.substring(0, 10)}...)` : "Missing",
-  );
-  console.log("Google Client Secret:", googleClientSecret ? "Set" : "Missing");
 
   // Get database connection
   const dbConnection = await db();
@@ -121,6 +115,28 @@ const createAuth = async () => {
           return false;
         }
       },
+      sendResetPassword: async (params: {
+        user: { email: string; name?: string };
+        url: string;
+        token: string;
+      }): Promise<void> => {
+        const baseUrl = getBaseUrl();
+        const resetClientUrl = `${baseUrl}/auth/reset-password?token=${params.token}`;
+
+        try {
+          const result = await sendPasswordResetEmail({
+            to: { email: params.user.email, name: params.user.name },
+            resetUrl: resetClientUrl,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Assuming 24 hours expiry for reset links
+          });
+
+          if (!result.success) {
+            console.error("Failed to send password reset email:", result.error);
+          }
+        } catch (error) {
+          console.error("Error sending password reset email:", error);
+        }
+      },
     },
 
     // Account linking configuration
@@ -132,7 +148,18 @@ const createAuth = async () => {
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
-    plugins: [reactStartCookies()], // MUST be the last plugin
+    plugins: [
+      emailOTP({
+        async sendVerificationOTP({ email, otp, type }) {
+          if (type === "email-verification") {
+            await sendEmailVerificationOTP({ to: { email }, otp });
+          } else if (type === "sign-in") {
+            await sendSignInOTP({ to: { email }, otp });
+          }
+        },
+      }),
+      reactStartCookies(), // MUST be the last plugin
+    ],
   });
 };
 

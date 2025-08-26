@@ -87,3 +87,27 @@ export const signupFormSchema = z
   });
 
 export type SignupFormData = z.infer<typeof signupFormSchema>;
+
+/**
+ * Password reset request form validation schema
+ */
+export const passwordResetRequestSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+});
+
+/**
+ * Reset password form validation schema
+ */
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, "Reset token is required"),
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });

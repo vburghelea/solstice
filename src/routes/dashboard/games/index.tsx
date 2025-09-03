@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Gamepad2, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -13,8 +13,10 @@ import {
 } from "~/components/ui/select";
 import { gameStatusEnum } from "~/db/schema";
 import { GameCard } from "~/features/games/components/GameCard";
+import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
+import type { OperationResult } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/dashboard/games/")({
@@ -35,6 +37,8 @@ export const Route = createFileRoute("/dashboard/games/")({
 function GamesPage() {
   const { status = "scheduled" } = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { user } = Route.useRouteContext();
+  const queryClient = useQueryClient();
 
   const { data: gamesData } = useSuspenseQuery({
     queryKey: ["allVisibleGames", status],
@@ -49,6 +53,95 @@ function GamesPage() {
   });
 
   const games = gamesData.success ? gamesData.data : [];
+
+  const updateStatusMutation = useMutation({
+    mutationFn: updateGameSessionStatus,
+    // Optimistic update list caches for all statuses
+    onMutate: async (variables: {
+      data: { gameId: string; status: "scheduled" | "completed" | "canceled" };
+    }) => {
+      const { gameId, status: newStatus } = variables.data;
+      const statuses: Array<"scheduled" | "completed" | "canceled"> = [
+        "scheduled",
+        "completed",
+        "canceled",
+      ];
+
+      // Cancel ongoing fetches for any games lists
+      await Promise.all(
+        statuses.map((s) =>
+          queryClient.cancelQueries({ queryKey: ["allVisibleGames", s] }),
+        ),
+      );
+
+      // Snapshot previous caches and locate the game item
+      const previous: Record<string, OperationResult<GameListItem[]> | undefined> = {};
+      let foundItem: GameListItem | undefined = undefined;
+
+      for (const s of statuses) {
+        const key = ["allVisibleGames", s] as const;
+        const prev = queryClient.getQueryData<OperationResult<GameListItem[]>>(key);
+        previous[s] = prev;
+        if (prev?.success) {
+          const item = prev.data.find((g) => g.id === gameId);
+          if (item && !foundItem) foundItem = item;
+        }
+      }
+
+      // Update caches
+      for (const s of statuses) {
+        const key = ["allVisibleGames", s] as const;
+        const prev = previous[s];
+        if (!prev?.success) continue;
+        let list = prev.data;
+        if (s === newStatus) {
+          if (foundItem) {
+            const updatedItem: GameListItem = {
+              ...foundItem,
+              status: newStatus,
+            } as GameListItem;
+            list = [updatedItem, ...list.filter((g) => g.id !== gameId)];
+          }
+        } else {
+          // Remove from lists of other statuses
+          list = list.filter((g) => g.id !== gameId);
+        }
+        queryClient.setQueryData<OperationResult<GameListItem[]>>(key, {
+          success: true,
+          data: list,
+        });
+      }
+
+      return { previous };
+    },
+    onError: (err, _vars, context) => {
+      // Rollback to previous caches
+      const prev = context?.previous as
+        | Record<string, OperationResult<GameListItem[]> | undefined>
+        | undefined;
+      if (prev) {
+        (Object.keys(prev) as Array<"scheduled" | "completed" | "canceled">).forEach(
+          (s) => {
+            const key = ["allVisibleGames", s] as const;
+            const val = prev[s];
+            if (val) queryClient.setQueryData(key, val);
+          },
+        );
+      }
+      toast.error(err.message || "An unexpected error occurred");
+    },
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Game status updated");
+      } else {
+        toast.error(result.errors?.[0]?.message || "Failed to update status");
+      }
+    },
+    onSettled: async () => {
+      // Ensure server truth eventually
+      await queryClient.invalidateQueries({ queryKey: ["allVisibleGames"] });
+    },
+  });
 
   return (
     <div className="container mx-auto p-6">
@@ -105,7 +198,12 @@ function GamesPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {games.map((game: GameListItem) => (
-            <GameCard key={game.id} game={game} />
+            <GameCard
+              key={game.id}
+              game={game}
+              isOwner={!!user && game.owner?.id === user.id}
+              onUpdateStatus={updateStatusMutation.mutate}
+            />
           ))}
         </div>
       )}

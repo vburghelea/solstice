@@ -22,6 +22,7 @@ import {
   locationSchema,
   minimumRequirementsSchema,
   safetyRulesSchema,
+  xCardSystemEnum,
 } from "~/shared/schemas/common";
 import {
   LanguageLevel,
@@ -66,29 +67,36 @@ export function CampaignForm({
   isGameSystemReadOnly,
   gameSystemName,
 }: CampaignFormProps) {
-  const form = useForm({
-    defaultValues: initialValues || {
-      gameSystemId: undefined,
-      name: "",
-      description: "",
-      recurrence: "weekly",
-      timeOfDay: "",
-      sessionDuration: undefined,
-      pricePerSession: undefined,
-      language: "",
-      location: { address: "", lat: 0, lng: 0 },
-      visibility: "public",
-      minimumRequirements: {
-        minPlayers: undefined,
-        maxPlayers: undefined,
-        languageLevel: undefined,
-        playerRadiusKm: undefined,
-      },
-      safetyRules: {
-        "no-alcohol": false,
-        "safe-word": false,
-      },
+  const defaults = {
+    gameSystemId: initialValues?.gameSystemId ?? undefined,
+    name: initialValues?.name ?? "",
+    description: initialValues?.description ?? "",
+    recurrence: initialValues?.recurrence ?? "weekly",
+    timeOfDay: initialValues?.timeOfDay ?? "",
+    sessionDuration: initialValues?.sessionDuration ?? undefined,
+    pricePerSession: initialValues?.pricePerSession ?? undefined,
+    language: initialValues?.language ?? "",
+    location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
+    visibility: initialValues?.visibility ?? "public",
+    minimumRequirements: initialValues?.minimumRequirements ?? {
+      minPlayers: undefined,
+      maxPlayers: undefined,
+      languageLevel: undefined,
+      playerRadiusKm: undefined,
     },
+    safetyRules: {
+      "no-alcohol": false,
+      "safe-word": false,
+      openCommunication: false,
+      xCardSystem: null,
+      xCardDetails: null,
+      playerBoundariesConsent: null,
+      ...(initialValues?.safetyRules || {}),
+    },
+  } as const;
+
+  const form = useForm({
+    defaultValues: defaults,
     onSubmit: async ({ value }) => {
       await onSubmit(
         value as
@@ -325,7 +333,7 @@ export function CampaignForm({
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null || value === "") {
+                if (value === undefined || value === null) {
                   return undefined;
                 }
               }
@@ -379,7 +387,7 @@ export function CampaignForm({
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null || value === "") {
+                if (value === undefined || value === null) {
                   return undefined;
                 }
               }
@@ -536,7 +544,7 @@ export function CampaignForm({
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null || value === "") {
+                if (value === undefined || value === null) {
                   return undefined;
                 }
               }
@@ -588,7 +596,7 @@ export function CampaignForm({
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null || value === "") {
+                if (value === undefined || value === null) {
                   return undefined;
                 }
               }
@@ -651,7 +659,7 @@ export function CampaignForm({
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null || value === "") {
+                if (value === undefined || value === null) {
                   return undefined;
                 }
               }
@@ -713,7 +721,7 @@ export function CampaignForm({
               type="hidden"
               value={field.state.value || 0}
               onChange={(e) =>
-                field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                field.handleChange(e.target.value ? Number(e.target.value) : 0)
               }
             />
           )}
@@ -740,7 +748,7 @@ export function CampaignForm({
               type="hidden"
               value={field.state.value || 0}
               onChange={(e) =>
-                field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                field.handleChange(e.target.value ? Number(e.target.value) : 0)
               }
             />
           )}
@@ -777,9 +785,7 @@ export function CampaignForm({
                   value={field.state.value ?? selectedGameSystem?.minPlayers ?? ""}
                   onBlur={field.handleBlur}
                   onChange={(e) =>
-                    field.handleChange(
-                      e.target.value === "" ? undefined : Number(e.target.value),
-                    )
+                    field.handleChange(e.target.value === "" ? 0 : Number(e.target.value))
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -825,9 +831,7 @@ export function CampaignForm({
                   value={field.state.value ?? selectedGameSystem?.maxPlayers ?? ""}
                   onBlur={field.handleBlur}
                   onChange={(e) =>
-                    field.handleChange(
-                      e.target.value === "" ? undefined : Number(e.target.value),
-                    )
+                    field.handleChange(e.target.value === "" ? 0 : Number(e.target.value))
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -926,9 +930,7 @@ export function CampaignForm({
                 max="10"
                 value={field.state.value ?? 5}
                 onChange={(e) =>
-                  field.handleChange(
-                    e.target.value === "" ? undefined : Number(e.target.value),
-                  )
+                  field.handleChange(e.target.value === "" ? 0 : Number(e.target.value))
                 }
                 className="w-full"
               />
@@ -953,7 +955,7 @@ export function CampaignForm({
         </form.Field>
       </fieldset>
 
-      <fieldset className="space-y-2 rounded-md border p-4">
+      <fieldset className="space-y-3 rounded-md border p-4">
         <legend className="text-lg font-semibold">Safety Rules (Optional)</legend>
         <form.Field
           name="safetyRules.no-alcohol"
@@ -975,7 +977,7 @@ export function CampaignForm({
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={field.name}
-                checked={field.state.value as boolean}
+                checked={!!field.state.value}
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
@@ -1003,11 +1005,141 @@ export function CampaignForm({
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={field.name}
-                checked={field.state.value as boolean}
+                checked={!!field.state.value}
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
               <Label htmlFor={field.name}>Safe Word Required</Label>
+            </div>
+          )}
+        </form.Field>
+        <form.Field
+          name="safetyRules.openCommunication"
+          validators={{
+            onChange: ({ value }) => {
+              if (value === undefined || value === null) return undefined;
+              try {
+                safetyRulesSchema.shape.openCommunication.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={field.name}
+                checked={!!field.state.value}
+                onCheckedChange={(checked) => field.handleChange(!!checked)}
+                onBlur={field.handleBlur}
+              />
+              <Label htmlFor={field.name}>Encourage Open Communication</Label>
+            </div>
+          )}
+        </form.Field>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <form.Field
+            name="safetyRules.xCardSystem"
+            validators={{
+              onChange: ({ value }) => {
+                if (value === undefined) return undefined;
+                try {
+                  safetyRulesSchema.shape.xCardSystem.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label>Safety Tool</Label>
+                <Select
+                  value={(field.state.value as string | null) ?? "none"}
+                  onValueChange={(v) =>
+                    field.handleChange(
+                      v === "none"
+                        ? (null as z.infer<typeof xCardSystemEnum> | null)
+                        : (v as z.infer<typeof xCardSystemEnum>),
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a safety tool" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {xCardSystemEnum.options.map(
+                      (opt: z.infer<typeof xCardSystemEnum>) => (
+                        <SelectItem key={opt} value={opt}>
+                          {opt
+                            .replace(/-/g, " ")
+                            .replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="safetyRules.xCardDetails"
+            validators={{
+              onChange: ({ value }) => {
+                if (value === undefined) return undefined;
+                try {
+                  safetyRulesSchema.shape.xCardDetails.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label>Safety Tool Details (optional)</Label>
+                <Textarea
+                  value={(field.state.value as string | null) ?? ""}
+                  onChange={(e) => field.handleChange(e.target.value || null)}
+                  onBlur={field.handleBlur}
+                  placeholder="Any specifics about the chosen safety tool"
+                  rows={3}
+                />
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        <form.Field
+          name="safetyRules.playerBoundariesConsent"
+          validators={{
+            onChange: ({ value }) => {
+              if (value === undefined) return undefined;
+              try {
+                safetyRulesSchema.shape.playerBoundariesConsent.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div>
+              <Label>Player Boundaries / Consent Notes (optional)</Label>
+              <Textarea
+                value={(field.state.value as string | null) ?? ""}
+                onChange={(e) => field.handleChange(e.target.value || null)}
+                onBlur={field.handleBlur}
+                placeholder="Any boundaries or consent notes players should be aware of"
+                rows={3}
+              />
             </div>
           )}
         </form.Field>

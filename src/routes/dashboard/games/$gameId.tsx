@@ -34,6 +34,7 @@ import type {
   GameParticipant,
   GameWithDetails,
 } from "~/features/games/games.types";
+import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -106,13 +107,7 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
         <Separator />
         <div>
           <p className="font-semibold">Safety Rules</p>
-          <ul>
-            {game.safetyRules &&
-              Object.entries(game.safetyRules).map(
-                ([rule, enabled]) =>
-                  enabled && <li key={rule}>{rule.replace(/-/g, " ")}</li>,
-              )}
-          </ul>
+          <SafetyRulesView safetyRules={game.safetyRules} />
         </div>
       </CardContent>
     </Card>

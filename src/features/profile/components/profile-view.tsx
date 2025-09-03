@@ -506,6 +506,12 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Email (view-only) */}
+          <div>
+            <Label>Email Address</Label>
+            <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
+          </div>
+
           {editingSection === "basic" ? (
             <form.Field name="gender">
               {(field) => (

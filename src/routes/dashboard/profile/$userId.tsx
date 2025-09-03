@@ -11,6 +11,7 @@ import {
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { getUserProfile } from "~/features/profile/profile.queries";
+import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/profile/$userId")({
   loader: async ({ params }) => {
@@ -31,6 +32,12 @@ function UserProfileComponent() {
     queryFn: () => getUserProfile({ data: { userId } }),
     enabled: !!userId,
     refetchOnMount: "always",
+  });
+
+  const { data: teamRelation } = useQuery({
+    queryKey: ["areTeammates", userId],
+    queryFn: () => areTeammatesWithCurrentUser({ data: { userId } }),
+    enabled: !!userId,
   });
 
   if (isLoading) {
@@ -55,10 +62,11 @@ function UserProfileComponent() {
 
   const profile = profileResult.data;
   const privacySettings = profile.privacySettings;
+  const isTeammate = !!teamRelation?.areTeammates;
 
   // Determine what information to display based on privacy settings
-  const showEmail = privacySettings?.showEmail;
-  const showPhone = privacySettings?.showPhone;
+  const showEmail = privacySettings?.showEmail && isTeammate;
+  const showPhone = privacySettings?.showPhone && isTeammate;
   const showLocation = privacySettings?.showLocation;
   const showLanguages = privacySettings?.showLanguages;
   const showGamePreferences = privacySettings?.showGamePreferences;

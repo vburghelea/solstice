@@ -955,7 +955,7 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show email address to other users"
+                    label="Show my email address to teammates"
                   />
                 )}
               </form.Field>
@@ -964,7 +964,7 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show phone number to other users"
+                    label="Show my phone number to teammates"
                   />
                 )}
               </form.Field>
@@ -973,7 +973,7 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show location (city and country) to other users"
+                    label="Show my location (city and country) to everyone"
                   />
                 )}
               </form.Field>
@@ -982,7 +982,7 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show languages to other users"
+                    label="Show my languages to everyone"
                   />
                 )}
               </form.Field>
@@ -991,7 +991,7 @@ export function ProfileView() {
                 {(field) => (
                   <ValidatedCheckbox
                     field={field}
-                    label="Show game preferences to other users"
+                    label="Show my game preferences to everyone"
                   />
                 )}
               </form.Field>
@@ -1017,35 +1017,35 @@ export function ProfileView() {
           ) : (
             <>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Show email address</span>
+                <span className="text-sm">Email visible to teammates</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showEmail ? "Yes" : "No"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Show phone number</span>
+                <span className="text-sm">Phone number visible to teammates</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showPhone ? "Yes" : "No"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Show location</span>
+                <span className="text-sm">Location visible to everyone</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showLocation ? "Yes" : "No"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Show languages</span>
+                <span className="text-sm">Languages visible to everyone</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showLanguages ? "Yes" : "No"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Show game preferences</span>
+                <span className="text-sm">Game preferences visible to everyone</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showGamePreferences ? "Yes" : "No"}
                 </span>

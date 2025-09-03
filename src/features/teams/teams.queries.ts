@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import {
   getTeamBySlugSchema,
   getTeamMembersSchema,
@@ -248,6 +249,55 @@ export const isTeamMember = createServerFn({ method: "POST" })
       .limit(1);
 
     return result[0] || { isMember: false, role: null, status: null };
+  });
+
+/**
+ * Determine if the current user and a target user are teammates (share the same active team)
+ */
+export const areTeammatesWithCurrentUser = createServerFn({ method: "GET" })
+  .validator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .handler(async ({ data }) => {
+    const [{ getDb }, { teamMembers }, { and, eq }] = await Promise.all([
+      import("~/db/server-helpers"),
+      import("~/db/schema"),
+      import("drizzle-orm"),
+    ]);
+
+    // Get current session user
+    const { getAuth } = await import("~/lib/auth/server-helpers");
+    const auth = await getAuth();
+    const { getWebRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getWebRequest();
+    const session = await auth.api.getSession({ headers });
+    const viewerId = session?.user?.id;
+
+    if (!viewerId) return { areTeammates: false };
+
+    const db = await getDb();
+
+    // Find viewer's active team
+    const [viewerMembership] = await db
+      .select({ teamId: teamMembers.teamId })
+      .from(teamMembers)
+      .where(and(eq(teamMembers.userId, viewerId), eq(teamMembers.status, "active")))
+      .limit(1);
+
+    if (!viewerMembership?.teamId) return { areTeammates: false };
+
+    // Check if target user has an active membership in the same team
+    const [targetMembership] = await db
+      .select({ teamId: teamMembers.teamId })
+      .from(teamMembers)
+      .where(
+        and(
+          eq(teamMembers.userId, data.userId),
+          eq(teamMembers.status, "active"),
+          eq(teamMembers.teamId, viewerMembership.teamId),
+        ),
+      )
+      .limit(1);
+
+    return { areTeammates: !!targetMembership };
   });
 
 /**

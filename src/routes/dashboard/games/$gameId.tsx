@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Edit2, LoaderCircle, XCircle } from "lucide-react";
+import { CheckCircle, Edit2, LoaderCircle, XCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -18,13 +18,23 @@ import { InviteParticipants } from "~/features/games/components/InviteParticipan
 
 import { ManageInvitations } from "~/features/games/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
-import { applyToGame, cancelGame, updateGame } from "~/features/games/games.mutations";
+import {
+  applyToGame,
+  cancelGame,
+  updateGame,
+  updateGameSessionStatus,
+} from "~/features/games/games.mutations";
 import {
   getGame,
   getGameApplicationForUser,
   getGameApplications,
 } from "~/features/games/games.queries";
-import type { GameParticipant, GameWithDetails } from "~/features/games/games.types";
+import type {
+  GameListItem,
+  GameParticipant,
+  GameWithDetails,
+} from "~/features/games/games.types";
+import type { OperationResult } from "~/shared/types/common";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -165,16 +175,192 @@ export function GameDetailsPage() {
 
   const cancelGameMutation = useMutation({
     mutationFn: cancelGame,
-    onSuccess: async (data) => {
+    onMutate: async () => {
+      // Cancel queries for detail and lists
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["game", gameId] }),
+        queryClient.cancelQueries({ queryKey: ["allVisibleGames"] }),
+      ]);
+
+      // Snapshot previous state
+      const prevGame = queryClient.getQueryData<GameWithDetails | undefined>([
+        "game",
+        gameId,
+      ]);
+
+      const statuses: Array<"scheduled" | "completed" | "canceled"> = [
+        "scheduled",
+        "completed",
+        "canceled",
+      ];
+      const previousLists: Record<string, OperationResult<GameListItem[]> | undefined> =
+        {};
+      let foundItem: GameListItem | undefined = undefined;
+      for (const s of statuses) {
+        const key = ["allVisibleGames", s] as const;
+        const prev = queryClient.getQueryData<OperationResult<GameListItem[]>>(key);
+        previousLists[s] = prev;
+        if (prev?.success && !foundItem) {
+          const item = prev.data.find((g) => g.id === gameId);
+          if (item) foundItem = item;
+        }
+      }
+
+      // Optimistically update detail
+      if (prevGame) {
+        queryClient.setQueryData<GameWithDetails>(["game", gameId], {
+          ...prevGame,
+          status: "canceled",
+        });
+      }
+
+      // Optimistically update lists
+      for (const s of statuses) {
+        const key = ["allVisibleGames", s] as const;
+        const prev = previousLists[s];
+        if (!prev?.success) continue;
+        let list = prev.data;
+        if (s === "canceled") {
+          if (foundItem) {
+            const updatedItem: GameListItem = {
+              ...foundItem,
+              status: "canceled",
+            } as GameListItem;
+            list = [updatedItem, ...list.filter((g) => g.id !== gameId)];
+          }
+        } else {
+          list = list.filter((g) => g.id !== gameId);
+        }
+        queryClient.setQueryData<OperationResult<GameListItem[]>>(key, {
+          success: true,
+          data: list,
+        });
+      }
+
+      return { prevGame, previousLists };
+    },
+    onError: (error, _vars, context) => {
+      // Rollback detail
+      if (context?.prevGame) {
+        queryClient.setQueryData(["game", gameId], context.prevGame);
+      }
+      // Rollback lists
+      const prev = context?.previousLists;
+      if (prev) {
+        (Object.keys(prev) as Array<"scheduled" | "completed" | "canceled">).forEach(
+          (s) => {
+            const key = ["allVisibleGames", s] as const;
+            const val = prev[s];
+            if (val) queryClient.setQueryData(key, val);
+          },
+        );
+      }
+      toast.error(error.message || "An unexpected error occurred");
+    },
+    onSuccess: (data) => {
       if (data.success) {
         toast.success("Game cancelled successfully");
-        await queryClient.invalidateQueries({ queryKey: ["game", gameId] });
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to cancel game");
       }
     },
-    onError: (error) => {
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["game", gameId] });
+      await queryClient.invalidateQueries({ queryKey: ["allVisibleGames"] });
+    },
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: updateGameSessionStatus,
+    onMutate: async (variables: {
+      data: { gameId: string; status: "scheduled" | "completed" | "canceled" };
+    }) => {
+      const { gameId: gid, status: newStatus } = variables.data;
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["game", gid] }),
+        queryClient.cancelQueries({ queryKey: ["allVisibleGames"] }),
+      ]);
+
+      const prevGame = queryClient.getQueryData<GameWithDetails | undefined>([
+        "game",
+        gid,
+      ]);
+
+      const statuses: Array<"scheduled" | "completed" | "canceled"> = [
+        "scheduled",
+        "completed",
+        "canceled",
+      ];
+      const previousLists: Record<string, OperationResult<GameListItem[]> | undefined> =
+        {};
+      let foundItem: GameListItem | undefined = undefined;
+      for (const s of statuses) {
+        const key = ["allVisibleGames", s] as const;
+        const prev = queryClient.getQueryData<OperationResult<GameListItem[]>>(key);
+        previousLists[s] = prev;
+        if (prev?.success && !foundItem) {
+          const item = prev.data.find((g) => g.id === gid);
+          if (item) foundItem = item;
+        }
+      }
+
+      if (prevGame) {
+        queryClient.setQueryData<GameWithDetails>(["game", gid], {
+          ...prevGame,
+          status: newStatus,
+        });
+      }
+
+      for (const s of statuses) {
+        const key = ["allVisibleGames", s] as const;
+        const prev = previousLists[s];
+        if (!prev?.success) continue;
+        let list = prev.data;
+        if (s === newStatus) {
+          if (foundItem) {
+            const updatedItem: GameListItem = {
+              ...foundItem,
+              status: newStatus,
+            } as GameListItem;
+            list = [updatedItem, ...list.filter((g) => g.id !== gid)];
+          }
+        } else {
+          list = list.filter((g) => g.id !== gid);
+        }
+        queryClient.setQueryData<OperationResult<GameListItem[]>>(key, {
+          success: true,
+          data: list,
+        });
+      }
+
+      return { prevGame, previousLists };
+    },
+    onError: (error, _vars, context) => {
+      if (context?.prevGame) {
+        queryClient.setQueryData(["game", gameId], context.prevGame);
+      }
+      const prev = context?.previousLists;
+      if (prev) {
+        (Object.keys(prev) as Array<"scheduled" | "completed" | "canceled">).forEach(
+          (s) => {
+            const key = ["allVisibleGames", s] as const;
+            const val = prev[s];
+            if (val) queryClient.setQueryData(key, val);
+          },
+        );
+      }
       toast.error(error.message || "An unexpected error occurred");
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("Game marked as completed");
+      } else {
+        toast.error(data.errors?.[0]?.message || "Failed to update status");
+      }
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["game", gameId] });
+      await queryClient.invalidateQueries({ queryKey: ["allVisibleGames"] });
     },
   });
 
@@ -259,6 +445,17 @@ export function GameDetailsPage() {
             </div>
             {isOwner && !isEditing && game.status === "scheduled" && (
               <div className="flex items-center gap-2">
+                <Button
+                  onClick={() =>
+                    updateStatusMutation.mutate({ data: { gameId, status: "completed" } })
+                  }
+                  variant="outline"
+                  size="sm"
+                  disabled={updateStatusMutation.isPending}
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Mark Completed
+                </Button>
                 <Button
                   onClick={() => {
                     if (window.confirm("Are you sure you want to cancel this game?")) {

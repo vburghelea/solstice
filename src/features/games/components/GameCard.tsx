@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar } from "lucide-react";
+import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -8,13 +8,18 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 
 interface GameCardProps {
   game: GameListItem;
+  isOwner?: boolean;
+  onUpdateStatus?: (variables: {
+    data: { gameId: string; status: (typeof gameStatusEnum.enumValues)[number] };
+  }) => void;
 }
 
-export function GameCard({ game }: GameCardProps) {
+export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProps) {
   const formattedDateTime = new Date(game.dateTime).toLocaleString("en-US", {
     year: "numeric",
     month: "long",
@@ -22,6 +27,10 @@ export function GameCard({ game }: GameCardProps) {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const canCancel = game.status !== "completed" && game.status !== "canceled";
+  const isActionable =
+    isOwner && game.status !== "completed" && game.status !== "canceled";
 
   return (
     <Card className="transition-shadow hover:shadow-lg">
@@ -71,6 +80,40 @@ export function GameCard({ game }: GameCardProps) {
           </Button>
         </div>
       </CardContent>
+      {isActionable && onUpdateStatus && (
+        <div className="p-4 pt-0">
+          <div className="flex gap-2">
+            {game.status !== "completed" && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() =>
+                  onUpdateStatus({ data: { gameId: game.id, status: "completed" } })
+                }
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Mark Completed
+              </Button>
+            )}
+            {canCancel && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to cancel this session?")) {
+                    onUpdateStatus({ data: { gameId: game.id, status: "canceled" } });
+                  }
+                }}
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Cancel Session
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

@@ -19,6 +19,7 @@ import {
   locationSchema,
   minimumRequirementsSchema,
   safetyRulesSchema,
+  xCardSystemEnum,
 } from "~/shared/schemas/common";
 import {
   LanguageLevel,
@@ -55,29 +56,36 @@ export function GameForm({
   gameSystemName,
   onCancelEdit,
 }: GameFormProps) {
-  const form = useForm({
-    defaultValues: {
-      gameSystemId: initialValues?.gameSystemId ?? 0,
-      name: initialValues?.name ?? "",
-      dateTime: initialValues?.dateTime ?? new Date().toISOString(),
-      description: initialValues?.description ?? "",
-      expectedDuration: initialValues?.expectedDuration ?? 0,
-      price: initialValues?.price ?? 0,
-      language: initialValues?.language ?? "en",
-      location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
-      minimumRequirements: initialValues?.minimumRequirements ?? {
-        minPlayers: undefined,
-        maxPlayers: undefined,
-        languageLevel: undefined,
-        playerRadiusKm: undefined,
-      },
-      safetyRules: initialValues?.safetyRules ?? {
-        "no-alcohol": false,
-        "safe-word": false,
-      },
-      visibility: initialValues?.visibility ?? "public",
-      status: initialValues?.status ?? "scheduled",
+  const defaults = {
+    gameSystemId: initialValues?.gameSystemId ?? 0,
+    name: initialValues?.name ?? "",
+    dateTime: initialValues?.dateTime ?? new Date().toISOString(),
+    description: initialValues?.description ?? "",
+    expectedDuration: initialValues?.expectedDuration ?? 0,
+    price: initialValues?.price ?? 0,
+    language: initialValues?.language ?? "en",
+    location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
+    minimumRequirements: initialValues?.minimumRequirements ?? {
+      minPlayers: undefined,
+      maxPlayers: undefined,
+      languageLevel: undefined,
+      playerRadiusKm: undefined,
     },
+    safetyRules: {
+      "no-alcohol": false,
+      "safe-word": false,
+      openCommunication: false,
+      xCardSystem: null,
+      xCardDetails: null,
+      playerBoundariesConsent: null,
+      ...(initialValues?.safetyRules || {}),
+    },
+    visibility: initialValues?.visibility ?? "public",
+    status: initialValues?.status ?? "scheduled",
+  } as const;
+
+  const form = useForm({
+    defaultValues: defaults,
     onSubmit: async ({ value }) => {
       try {
         await onSubmit(
@@ -852,7 +860,7 @@ export function GameForm({
         </form.Field>
       </fieldset>
 
-      <fieldset className="space-y-2 rounded-md border p-4">
+      <fieldset className="space-y-3 rounded-md border p-4">
         <legend className="text-lg font-semibold">Safety Rules (Optional)</legend>
         {/* This is a simple example, a more robust solution would involve dynamic fields */}
         <form.Field
@@ -908,6 +916,136 @@ export function GameForm({
                 onBlur={field.handleBlur}
               />
               <Label htmlFor={field.name}>Safe Word Required</Label>
+            </div>
+          )}
+        </form.Field>
+        <form.Field
+          name="safetyRules.openCommunication"
+          validators={{
+            onChange: ({ value }) => {
+              if (value === undefined || value === null) return undefined;
+              try {
+                safetyRulesSchema.shape.openCommunication.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={field.name}
+                checked={!!field.state.value}
+                onCheckedChange={(checked) => field.handleChange(!!checked)}
+                onBlur={field.handleBlur}
+              />
+              <Label htmlFor={field.name}>Encourage Open Communication</Label>
+            </div>
+          )}
+        </form.Field>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <form.Field
+            name="safetyRules.xCardSystem"
+            validators={{
+              onChange: ({ value }) => {
+                if (value === undefined) return undefined;
+                try {
+                  safetyRulesSchema.shape.xCardSystem.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label>Safety Tool</Label>
+                <Select
+                  value={(field.state.value as string | null) ?? "none"}
+                  onValueChange={(v) =>
+                    field.handleChange(
+                      v === "none"
+                        ? (null as z.infer<typeof xCardSystemEnum> | null)
+                        : (v as z.infer<typeof xCardSystemEnum>),
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a safety tool" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {xCardSystemEnum.options.map(
+                      (opt: z.infer<typeof xCardSystemEnum>) => (
+                        <SelectItem key={opt} value={opt}>
+                          {opt
+                            .replace(/-/g, " ")
+                            .replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="safetyRules.xCardDetails"
+            validators={{
+              onChange: ({ value }) => {
+                if (value === undefined) return undefined;
+                try {
+                  safetyRulesSchema.shape.xCardDetails.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label>Safety Tool Details (optional)</Label>
+                <Textarea
+                  value={(field.state.value as string | null) ?? ""}
+                  onChange={(e) => field.handleChange(e.target.value || null)}
+                  onBlur={field.handleBlur}
+                  placeholder="Any specifics about the chosen safety tool"
+                  rows={3}
+                />
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        <form.Field
+          name="safetyRules.playerBoundariesConsent"
+          validators={{
+            onChange: ({ value }) => {
+              if (value === undefined) return undefined;
+              try {
+                safetyRulesSchema.shape.playerBoundariesConsent.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div>
+              <Label>Player Boundaries / Consent Notes (optional)</Label>
+              <Textarea
+                value={(field.state.value as string | null) ?? ""}
+                onChange={(e) => field.handleChange(e.target.value || null)}
+                onBlur={field.handleBlur}
+                placeholder="Any boundaries or consent notes players should be aware of"
+                rows={3}
+              />
             </div>
           )}
         </form.Field>

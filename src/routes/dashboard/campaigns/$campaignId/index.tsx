@@ -44,6 +44,7 @@ import { CampaignGameSessionCard } from "~/features/games/components/CampaignGam
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
+import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
 
 import { z } from "zod";
@@ -106,13 +107,7 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
         <Separator />
         <div>
           <p className="font-semibold">Safety Rules</p>
-          <ul>
-            {campaign.safetyRules &&
-              Object.entries(campaign.safetyRules).map(
-                ([rule, enabled]) =>
-                  enabled && <li key={rule}>{rule.replace(/-/g, " ")}</li>,
-              )}
-          </ul>
+          <SafetyRulesView safetyRules={campaign.safetyRules} />
         </div>
       </CardContent>
     </Card>

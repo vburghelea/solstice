@@ -14,7 +14,27 @@ export const minimumRequirementsSchema = z.object({
   playerRadiusKm: z.number().int().min(1).max(10).optional(),
 });
 
+// Standardized safety tools/rules used across campaigns and game sessions
+export const xCardSystemEnum = z.enum([
+  "none",
+  "x-card",
+  "open-door",
+  "script-change",
+  "consent-flowers",
+  "lines-and-veils",
+  "other",
+]);
+
 export const safetyRulesSchema = z.object({
-  "no-alcohol": z.boolean(),
-  "safe-word": z.boolean(),
+  // Legacy/common toggles
+  "no-alcohol": z.boolean().optional(),
+  "safe-word": z.boolean().optional(),
+
+  // Communication & boundaries
+  openCommunication: z.boolean().optional(),
+  playerBoundariesConsent: z.string().max(1000).nullable().optional(),
+
+  // Safety tool selection and details
+  xCardSystem: xCardSystemEnum.nullable().optional(),
+  xCardDetails: z.string().max(500).nullable().optional(),
 });

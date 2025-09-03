@@ -146,7 +146,12 @@ export const updateCampaign = createServerFn({ method: "POST" })
 
       // Extract session zero data and other derived fields
       const sessionZeroData = data.sessionZeroData;
-      const safetyRules = sessionZeroData?.safetyTools || null;
+      // Prefer explicit safetyRules from the form; fallback to session zero safety tools, then existing
+      const providedSafetyRules = (data as { safetyRules?: unknown }).safetyRules;
+      const safetyRules =
+        providedSafetyRules !== undefined
+          ? providedSafetyRules
+          : (sessionZeroData?.safetyTools ?? existingCampaign.safetyRules ?? null);
       const campaignExpectations = sessionZeroData?.campaignExpectations || null;
       const tableExpectations = sessionZeroData?.tableExpectations || null;
       const characterCreationOutcome = data.characterCreationOutcome || null;
@@ -156,7 +161,7 @@ export const updateCampaign = createServerFn({ method: "POST" })
         .set({
           ...data,
           pricePerSession: data.pricePerSession || null,
-          safetyRules: safetyRules, // Update safetyRules from sessionZeroData
+          safetyRules: safetyRules,
           sessionZeroData: sessionZeroData, // Store the full session zero data
           campaignExpectations: campaignExpectations, // Store campaign expectations
           tableExpectations: tableExpectations, // Store table expectations

@@ -26,13 +26,13 @@ export interface AvailabilityData {
 
 export const defaultDayAvailability: DayAvailability = Array(96).fill(false);
 export const defaultAvailabilityData: AvailabilityData = {
-  monday: defaultDayAvailability,
-  tuesday: defaultDayAvailability,
-  wednesday: defaultDayAvailability,
-  thursday: defaultDayAvailability,
-  friday: defaultDayAvailability,
-  saturday: defaultDayAvailability,
-  sunday: defaultDayAvailability,
+  monday: [...defaultDayAvailability],
+  tuesday: [...defaultDayAvailability],
+  wednesday: [...defaultDayAvailability],
+  thursday: [...defaultDayAvailability],
+  friday: [...defaultDayAvailability],
+  saturday: [...defaultDayAvailability],
+  sunday: [...defaultDayAvailability],
 };
 
 export const user = pgTable("user", {

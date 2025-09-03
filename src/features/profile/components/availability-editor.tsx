@@ -218,14 +218,14 @@ function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps
         className="grid w-full"
         style={{ gridTemplateColumns: `repeat(${TIME_INTERVALS.length}, 1fr)` }}
       >
-        {segments.map((segment, segIndex) => {
+        {segments.map((segment) => {
           const startTime = TIME_INTERVALS[segment.start].time;
           const endTime = TIME_INTERVALS[segment.end].endTime;
           const segmentWidth = segment.end - segment.start + 1;
 
           const segmentElement = (
             <div
-              key={segIndex}
+              key={`${day}-${startTime}-${endTime}-${segment.isAvailable ? 1 : 0}`}
               className="flex h-8"
               style={{ gridColumn: `span ${segmentWidth}` }}
             >
@@ -233,7 +233,7 @@ function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps
                 const intervalIndex = segment.start + i;
                 return (
                   <div
-                    key={intervalIndex}
+                    key={`${day}-${TIME_INTERVALS[intervalIndex].time}`}
                     className={cn(
                       "h-full flex-1 border-y border-r first:border-l",
                       segment.isAvailable ? "bg-primary" : "bg-background",
@@ -253,7 +253,7 @@ function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps
           }
 
           return (
-            <TooltipProvider key={`${day}-${startTime}`}>
+            <TooltipProvider key={`${day}-${startTime}-${endTime}`}>
               <Tooltip>
                 <TooltipTrigger asChild>{segmentElement}</TooltipTrigger>
                 <TooltipContent>

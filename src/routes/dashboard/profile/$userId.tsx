@@ -30,6 +30,7 @@ function UserProfileComponent() {
     queryKey: ["userProfile", userId],
     queryFn: () => getUserProfile({ data: { userId } }),
     enabled: !!userId,
+    refetchOnMount: "always",
   });
 
   if (isLoading) {

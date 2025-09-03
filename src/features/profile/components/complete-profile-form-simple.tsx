@@ -79,6 +79,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
       avoid: [],
       ...initialData.gameSystemPreferences,
     },
+    calendarAvailability: initialData.calendarAvailability || defaultAvailabilityData,
   };
 
   const form = useForm({
@@ -89,6 +90,14 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
         const result = await completeUserProfile({ data: value as ProfileInput });
 
         if (result.success) {
+          // Invalidate all profile caches so subsequent profile views refetch fresh data
+          await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+          if (result.data?.id) {
+            await queryClient.invalidateQueries({
+              queryKey: ["userProfile", result.data.id],
+            });
+          }
+          // Also invalidate generic user info if used elsewhere in UI
           await queryClient.invalidateQueries({ queryKey: ["user"] });
           router.navigate({ to: "/dashboard" });
         } else {
@@ -487,7 +496,8 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                 </FormSubmitButton>
               ) : (
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={goToNextStep}
                   className="text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
                 >
                   Next

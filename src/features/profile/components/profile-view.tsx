@@ -45,6 +45,8 @@ export function ProfileView() {
     queryKey: ["userProfile"],
     queryFn: async () => getUserProfile({}),
     retry: 1,
+    // Prefer fresh data on initial mount after navigation
+    refetchOnMount: "always",
     // Prevent hydration mismatches by ensuring consistent loading states
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
@@ -260,12 +262,10 @@ export function ProfileView() {
   useEffect(() => {
     if (profile && !editingSection) {
       // Set form field values from profile data for display mode
-      const availability =
-        typeof profile.calendarAvailability === "string"
-          ? JSON.parse(profile.calendarAvailability)
-          : profile.calendarAvailability;
-
-      form.setFieldValue("calendarAvailability", availability || defaultAvailabilityData);
+      form.setFieldValue(
+        "calendarAvailability",
+        profile.calendarAvailability || defaultAvailabilityData,
+      );
       form.setFieldValue("languages", profile.languages || []);
       form.setFieldValue("identityTags", profile.identityTags || []);
       form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
@@ -360,12 +360,10 @@ export function ProfileView() {
         profile.overallExperienceLevel || undefined,
       );
     } else if (sectionId === "additional") {
-      const availability =
-        typeof profile.calendarAvailability === "string"
-          ? JSON.parse(profile.calendarAvailability)
-          : profile.calendarAvailability;
-
-      form.setFieldValue("calendarAvailability", availability || defaultAvailabilityData);
+      form.setFieldValue(
+        "calendarAvailability",
+        profile.calendarAvailability || defaultAvailabilityData,
+      );
       form.setFieldValue("languages", profile.languages || []);
       form.setFieldValue("identityTags", profile.identityTags || []);
       form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
@@ -704,13 +702,7 @@ export function ProfileView() {
               </form.Field>
             ) : (
               <AvailabilityEditor
-                value={
-                  profile?.calendarAvailability
-                    ? typeof profile.calendarAvailability === "string"
-                      ? JSON.parse(profile.calendarAvailability)
-                      : profile.calendarAvailability
-                    : defaultAvailabilityData
-                }
+                value={profile?.calendarAvailability || defaultAvailabilityData}
                 onChange={() => {}}
                 readOnly={true}
               />

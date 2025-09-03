@@ -65,20 +65,10 @@ function mapDbUserToProfile(
     identityTags: dbUser.identityTags ?? [],
     preferredGameThemes: dbUser.preferredGameThemes ?? [],
     overallExperienceLevel: dbUser.overallExperienceLevel ?? undefined,
-    calendarAvailability: (() => {
-      const rawValue = dbUser.calendarAvailability;
-      if (typeof rawValue === "string") {
-        try {
-          return JSON.parse(rawValue) as AvailabilityData;
-        } catch {
-          return undefined;
-        }
-      }
-      if (rawValue && typeof rawValue === "object") {
-        return rawValue as AvailabilityData;
-      }
-      return undefined;
-    })(),
+    calendarAvailability:
+      dbUser.calendarAvailability && typeof dbUser.calendarAvailability === "object"
+        ? (dbUser.calendarAvailability as AvailabilityData)
+        : undefined,
     isGM: dbUser.isGM ?? false,
     gamesHosted: dbUser.gamesHosted ?? 0,
     responseRate: dbUser.responseRate ?? 0,

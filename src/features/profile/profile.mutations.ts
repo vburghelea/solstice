@@ -267,7 +267,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         identityTags: data.identityTags || [],
         preferredGameThemes: data.preferredGameThemes || [],
         overallExperienceLevel: data.overallExperienceLevel || null,
-        calendarAvailability: data.calendarAvailability || defaultAvailabilityData,
+        calendarAvailability: data.calendarAvailability ?? defaultAvailabilityData,
         isGM: false, // Set to false by default
         privacySettings: JSON.stringify(data.privacySettings || defaultPrivacySettings),
         profileComplete: true,

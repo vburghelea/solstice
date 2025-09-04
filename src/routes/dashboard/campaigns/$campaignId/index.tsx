@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Separator } from "~/components/ui/separator";
 import { gameStatusEnum } from "~/db/schema/games.schema";
 import {
   applyToCampaign,
@@ -38,6 +37,7 @@ import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 
+import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { ManageInvitations } from "~/features/campaigns/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation";
 import { CampaignGameSessionCard } from "~/features/games/components/CampaignGameSessionCard";
@@ -58,52 +58,79 @@ export const Route = createFileRoute("/dashboard/campaigns/$campaignId/")({
 
 function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <p className="font-semibold">Game System</p>
-          <p>{campaign.gameSystem?.name || "Not specified"}</p>
+    <div className="space-y-3">
+      <details id="general" className="rounded-lg border bg-white open:shadow-sm" open>
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          General
+        </summary>
+        <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
+          <div>
+            <p className="font-semibold">Game System</p>
+            <p>{campaign.gameSystem?.name || "Not specified"}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Recurrence</p>
+            <p>{campaign.recurrence}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Time of Day</p>
+            <p>{campaign.timeOfDay}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Session Duration</p>
+            <p>{campaign.sessionDuration}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Price Per Session</p>
+            <p>{campaign.pricePerSession ? `€${campaign.pricePerSession}` : "Free"}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Language</p>
+            <p>{campaign.language}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Visibility</p>
+            <p className="capitalize">{campaign.visibility}</p>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold">Recurrence</p>
-          <p>{campaign.recurrence}</p>
+      </details>
+
+      <details id="location" className="rounded-lg border bg-white open:shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          Location
+        </summary>
+        <div className="px-4 pt-2 pb-4 text-gray-900">
+          <p>{campaign.location?.address || "Not specified"}</p>
         </div>
-        <div>
-          <p className="font-semibold">Time of Day</p>
-          <p>{campaign.timeOfDay}</p>
+      </details>
+
+      <details id="requirements" className="rounded-lg border bg-white open:shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          Minimum Requirements
+        </summary>
+        <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
+          <div>
+            <p className="font-semibold">Players</p>
+            <p>
+              {campaign.minimumRequirements?.minPlayers ?? "?"} -{" "}
+              {campaign.minimumRequirements?.maxPlayers ?? "?"}
+            </p>
+          </div>
+          <div>
+            <p className="font-semibold">Language Level</p>
+            <p>{campaign.minimumRequirements?.languageLevel || "N/A"}</p>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold">Session Duration</p>
-          <p>{campaign.sessionDuration}</p>
+      </details>
+
+      <details id="safety" className="rounded-lg border bg-white open:shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          Safety Rules
+        </summary>
+        <div className="px-4 pt-2 pb-4 text-gray-900">
+          <SafetyRulesView safetyRules={campaign.safetyRules} />
         </div>
-        <div>
-          <p className="font-semibold">Price Per Session</p>
-          <p>{campaign.pricePerSession ? `€${campaign.pricePerSession}` : "Free"}</p>
-        </div>
-        <div>
-          <p className="font-semibold">Language</p>
-          <p>{campaign.language}</p>
-        </div>
-        <div>
-          <p className="font-semibold">Visibility</p>
-          <p>{campaign.visibility}</p>
-        </div>
-      </div>
-      <Separator />
-      <div>
-        <p className="font-semibold">Location</p>
-        <p>{campaign.location?.address || "Not specified"}</p>
-      </div>
-      <Separator />
-      <div>
-        <p className="font-semibold">Minimum Requirements</p>
-        <p>Language Level: {campaign.minimumRequirements?.languageLevel}</p>
-      </div>
-      <Separator />
-      <div>
-        <p className="font-semibold">Safety Rules</p>
-        <SafetyRulesView safetyRules={campaign.safetyRules} />
-      </div>
+      </details>
     </div>
   );
 }
@@ -299,19 +326,9 @@ export function CampaignDetailsPage() {
     <div key={campaignId} className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <CardTitle className="text-gray-900">{campaign.name}</CardTitle>
-              {campaign.description ? (
-                <CardDescription className="mt-1">{campaign.description}</CardDescription>
-              ) : null}
-              <div className="text-muted-foreground mt-2 text-sm">
-                🗓️ {campaign.recurrence} • 🕒 {campaign.timeOfDay} • 🎲{" "}
-                {campaign.gameSystem.name}
-              </div>
-            </div>
+          <div className="flex flex-col gap-3">
             {isOwner && !isEditing ? (
-              <div className="flex gap-2">
+              <div className="flex items-center justify-end gap-2">
                 <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                   <Edit2 className="mr-2 h-4 w-4" />
                   Edit Campaign
@@ -325,6 +342,16 @@ export function CampaignDetailsPage() {
                 </Link>
               </div>
             ) : null}
+            <div>
+              <CardTitle className="text-gray-900">{campaign.name}</CardTitle>
+              {campaign.description ? (
+                <CardDescription className="mt-1">{campaign.description}</CardDescription>
+              ) : null}
+            </div>
+            <div className="text-muted-foreground text-sm">
+              🗓️ {campaign.recurrence} • 🕒 {campaign.timeOfDay} • 🎲{" "}
+              {campaign.gameSystem.name}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -359,12 +386,25 @@ export function CampaignDetailsPage() {
       </Card>
 
       {canApply && (
-        <Button
-          onClick={() => applyToCampaignMutation.mutate({ data: { campaignId } })}
-          disabled={applyToCampaignMutation.isPending}
-        >
-          {applyToCampaignMutation.isPending ? "Applying..." : "Apply to Campaign"}
-        </Button>
+        <StickyActionBar>
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div className="text-sm">
+              {campaign.pricePerSession
+                ? `Price/Session: €${campaign.pricePerSession}`
+                : "Free"}
+              {campaign.minimumRequirements?.minPlayers &&
+              campaign.minimumRequirements?.maxPlayers
+                ? ` • Players ${campaign.minimumRequirements.minPlayers}-${campaign.minimumRequirements.maxPlayers}`
+                : ""}
+            </div>
+            <Button
+              onClick={() => applyToCampaignMutation.mutate({ data: { campaignId } })}
+              disabled={applyToCampaignMutation.isPending}
+            >
+              {applyToCampaignMutation.isPending ? "Applying..." : "Apply to Campaign"}
+            </Button>
+          </div>
+        </StickyActionBar>
       )}
 
       {hasPendingApplication && (

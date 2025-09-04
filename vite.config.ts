@@ -44,10 +44,15 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     optimizeDeps: {
+      // Avoid prebundling Start internals that reference AsyncLocalStorage
+      exclude: [
+        "@tanstack/react-store",
+        "@tanstack/react-start",
+        "@tanstack/start-storage-context",
+      ],
       include: [
         "react",
         "react-dom",
-        "@tanstack/react-start",
         "@tanstack/react-query",
         "@tanstack/react-router",
         "@tanstack/react-router-with-query",
@@ -56,7 +61,6 @@ export default defineConfig(({ mode }) => {
         "class-variance-authority",
         "@tanstack/react-query-devtools",
         "@tanstack/react-router-devtools",
-        "@tanstack/react-start/server-functions-client",
         "clsx",
         "tailwind-merge",
         "better-auth/react",

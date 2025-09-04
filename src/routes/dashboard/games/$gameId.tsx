@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Separator } from "~/components/ui/separator";
+import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { GameForm } from "~/features/games/components/GameForm";
 import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
@@ -59,51 +59,70 @@ export const Route = createFileRoute("/dashboard/games/$gameId")({
 function GameDetailsView({ game }: { game: GameWithDetails }) {
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <p className="font-semibold">Game System</p>
-          <p>{game.gameSystem.name}</p>
+      <details id="general" className="rounded-lg border bg-white open:shadow-sm" open>
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          General
+        </summary>
+        <div className="px-4 pt-2 pb-4 text-gray-900">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <p className="font-semibold">Game System</p>
+              <p>{game.gameSystem.name}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Date & Time</p>
+              <p>{new Date(game.dateTime).toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Expected Duration</p>
+              <p>{game.expectedDuration} minutes</p>
+            </div>
+            <div>
+              <p className="font-semibold">Price</p>
+              <p>{game.price ? `€${game.price}` : "Free"}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Language</p>
+              <p>{game.language}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Visibility</p>
+              <p className="capitalize">{game.visibility}</p>
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold">Date & Time</p>
-          <p>{new Date(game.dateTime).toLocaleString()}</p>
+      </details>
+
+      <details id="location" className="rounded-lg border bg-white open:shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          Location
+        </summary>
+        <div className="px-4 pt-2 pb-4 text-gray-900">
+          <p>{game.location.address}</p>
         </div>
-        <div>
-          <p className="font-semibold">Expected Duration</p>
-          <p>{game.expectedDuration} minutes</p>
+      </details>
+
+      <details id="requirements" className="rounded-lg border bg-white open:shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          Minimum Requirements
+        </summary>
+        <div className="px-4 pt-2 pb-4 text-gray-900">
+          <p>
+            Players: {game.minimumRequirements?.minPlayers} -{" "}
+            {game.minimumRequirements?.maxPlayers}
+          </p>
+          <p>Language Level: {game.minimumRequirements?.languageLevel}</p>
         </div>
-        <div>
-          <p className="font-semibold">Price</p>
-          <p>{game.price ? `€${game.price}` : "Free"}</p>
+      </details>
+
+      <details id="safety" className="rounded-lg border bg-white open:shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+          Safety Rules
+        </summary>
+        <div className="px-4 pt-2 pb-4 text-gray-900">
+          <SafetyRulesView safetyRules={game.safetyRules} />
         </div>
-        <div>
-          <p className="font-semibold">Language</p>
-          <p>{game.language}</p>
-        </div>
-        <div>
-          <p className="font-semibold">Visibility</p>
-          <p>{game.visibility}</p>
-        </div>
-      </div>
-      <Separator />
-      <div>
-        <p className="font-semibold">Location</p>
-        <p>{game.location.address}</p>
-      </div>
-      <Separator />
-      <div>
-        <p className="font-semibold">Minimum Requirements</p>
-        <p>
-          Players: {game.minimumRequirements?.minPlayers} -{" "}
-          {game.minimumRequirements?.maxPlayers}
-        </p>
-        <p>Language Level: {game.minimumRequirements?.languageLevel}</p>
-      </div>
-      <Separator />
-      <div>
-        <p className="font-semibold">Safety Rules</p>
-        <SafetyRulesView safetyRules={game.safetyRules} />
-      </div>
+      </details>
     </div>
   );
 }
@@ -425,19 +444,9 @@ export function GameDetailsPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <CardTitle className="text-gray-900">{game.name}</CardTitle>
-              {game.description ? (
-                <CardDescription className="mt-1">{game.description}</CardDescription>
-              ) : null}
-              <div className="text-muted-foreground mt-2 text-sm">
-                🗓️ {new Date(game.dateTime).toLocaleString()} • 📍 {game.location.address}{" "}
-                • 🎲 {game.gameSystem.name}
-              </div>
-            </div>
-            {isOwner && !isEditing && game.status === "scheduled" && (
-              <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-3">
+            {isOwner && !isEditing && game.status === "scheduled" ? (
+              <div className="flex items-center justify-end gap-2">
                 <Button
                   onClick={() =>
                     updateStatusMutation.mutate({ data: { gameId, status: "completed" } })
@@ -467,7 +476,17 @@ export function GameDetailsPage() {
                   Edit Game
                 </Button>
               </div>
-            )}
+            ) : null}
+            <div>
+              <CardTitle className="text-gray-900">{game.name}</CardTitle>
+              {game.description ? (
+                <CardDescription className="mt-1">{game.description}</CardDescription>
+              ) : null}
+            </div>
+            <div className="text-muted-foreground text-sm">
+              🗓️ {new Date(game.dateTime).toLocaleString()} • 📍 {game.location.address} •
+              🎲 {game.gameSystem.name}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -497,12 +516,23 @@ export function GameDetailsPage() {
       </Card>
 
       {canApply && (
-        <Button
-          onClick={() => applyToGameMutation.mutate({ data: { gameId } })}
-          disabled={applyToGameMutation.isPending}
-        >
-          {applyToGameMutation.isPending ? "Applying..." : "Apply to Game"}
-        </Button>
+        <StickyActionBar>
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div className="text-sm">
+              {game.price ? `Price: €${game.price}` : "Free"}
+              {game.minimumRequirements?.minPlayers &&
+              game.minimumRequirements?.maxPlayers
+                ? ` • Players ${game.minimumRequirements.minPlayers}-${game.minimumRequirements.maxPlayers}`
+                : ""}
+            </div>
+            <Button
+              onClick={() => applyToGameMutation.mutate({ data: { gameId } })}
+              disabled={applyToGameMutation.isPending}
+            >
+              {applyToGameMutation.isPending ? "Applying..." : "Apply to Game"}
+            </Button>
+          </div>
+        </StickyActionBar>
       )}
 
       {hasPendingApplication && (

@@ -182,14 +182,14 @@ export function GameForm({
       form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime ?? 1);
       form.setFieldValue(
         "minimumRequirements.minPlayers",
-        selectedGameSystem.minPlayers ?? 1,
+        effectiveGameSystem.minPlayers ?? 1,
       );
       form.setFieldValue(
         "minimumRequirements.maxPlayers",
-        selectedGameSystem.maxPlayers ?? 1,
+        effectiveGameSystem.maxPlayers ?? 1,
       );
     }
-  }, [form, selectedGameSystem]);
+  }, [form, effectiveGameSystem]);
 
   // Most spoken languages in the world
   const languageOptions = [

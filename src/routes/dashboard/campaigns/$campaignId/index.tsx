@@ -58,59 +58,53 @@ export const Route = createFileRoute("/dashboard/campaigns/$campaignId/")({
 
 function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{campaign.name}</CardTitle>
-        <CardDescription>{campaign.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <p className="font-semibold">Game System</p>
-            <p>{campaign.gameSystem?.name || "Not specified"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Recurrence</p>
-            <p>{campaign.recurrence}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Time of Day</p>
-            <p>{campaign.timeOfDay}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Session Duration</p>
-            <p>{campaign.sessionDuration}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Price Per Session</p>
-            <p>{campaign.pricePerSession ? `€${campaign.pricePerSession}` : "Free"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Language</p>
-            <p>{campaign.language}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Visibility</p>
-            <p>{campaign.visibility}</p>
-          </div>
-        </div>
-        <Separator />
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <p className="font-semibold">Location</p>
-          <p>{campaign.location?.address || "Not specified"}</p>
+          <p className="font-semibold">Game System</p>
+          <p>{campaign.gameSystem?.name || "Not specified"}</p>
         </div>
-        <Separator />
         <div>
-          <p className="font-semibold">Minimum Requirements</p>
-          <p>Language Level: {campaign.minimumRequirements?.languageLevel}</p>
+          <p className="font-semibold">Recurrence</p>
+          <p>{campaign.recurrence}</p>
         </div>
-        <Separator />
         <div>
-          <p className="font-semibold">Safety Rules</p>
-          <SafetyRulesView safetyRules={campaign.safetyRules} />
+          <p className="font-semibold">Time of Day</p>
+          <p>{campaign.timeOfDay}</p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <p className="font-semibold">Session Duration</p>
+          <p>{campaign.sessionDuration}</p>
+        </div>
+        <div>
+          <p className="font-semibold">Price Per Session</p>
+          <p>{campaign.pricePerSession ? `€${campaign.pricePerSession}` : "Free"}</p>
+        </div>
+        <div>
+          <p className="font-semibold">Language</p>
+          <p>{campaign.language}</p>
+        </div>
+        <div>
+          <p className="font-semibold">Visibility</p>
+          <p>{campaign.visibility}</p>
+        </div>
+      </div>
+      <Separator />
+      <div>
+        <p className="font-semibold">Location</p>
+        <p>{campaign.location?.address || "Not specified"}</p>
+      </div>
+      <Separator />
+      <div>
+        <p className="font-semibold">Minimum Requirements</p>
+        <p>Language Level: {campaign.minimumRequirements?.languageLevel}</p>
+      </div>
+      <Separator />
+      <div>
+        <p className="font-semibold">Safety Rules</p>
+        <SafetyRulesView safetyRules={campaign.safetyRules} />
+      </div>
+    </div>
   );
 }
 
@@ -150,8 +144,7 @@ export function CampaignDetailsPage() {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campaignId]);
+  }, [campaignId, queryClient, currentUser?.id]);
 
   const isOwner = campaign?.owner?.id === currentUser?.id;
 
@@ -306,12 +299,16 @@ export function CampaignDetailsPage() {
     <div key={campaignId} className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-gray-900">Campaign Details</CardTitle>
-              <CardDescription>
-                View and manage the details of this campaign.
-              </CardDescription>
+              <CardTitle className="text-gray-900">{campaign.name}</CardTitle>
+              {campaign.description ? (
+                <CardDescription className="mt-1">{campaign.description}</CardDescription>
+              ) : null}
+              <div className="text-muted-foreground mt-2 text-sm">
+                🗓️ {campaign.recurrence} • 🕒 {campaign.timeOfDay} • 🎲{" "}
+                {campaign.gameSystem.name}
+              </div>
             </div>
             {isOwner && !isEditing ? (
               <div className="flex gap-2">

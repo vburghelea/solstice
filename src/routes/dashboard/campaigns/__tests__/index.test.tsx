@@ -65,8 +65,10 @@ describe("CampaignsPage", () => {
     ]);
 
     expect(screen.getByText("My Campaigns")).toBeInTheDocument();
-    expect(screen.getByText(MOCK_CAMPAIGN.name)).toBeInTheDocument();
-    expect(screen.getByText("Another Campaign")).toBeInTheDocument();
+    // Both mobile list and desktop grid render in tests (no CSS),
+    // so names can appear multiple times. Assert at least once.
+    expect(screen.getAllByText(MOCK_CAMPAIGN.name).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Another Campaign").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/View Campaign/i)).toHaveLength(2);
 
     // When campaigns are present, only the header link should exist

@@ -128,22 +128,24 @@ export function GameForm({
     enabled: !!isCampaignGame && !!defaults.gameSystemId,
   });
 
-  React.useEffect(() => {
+  // Derive effective game system (campaign-provided or user selection)
+  const effectiveGameSystem = React.useMemo(() => {
     if (
       isCampaignGame &&
       campaignGameSystemData?.success &&
       campaignGameSystemData.data
     ) {
       const gs = campaignGameSystemData.data;
-      setSelectedGameSystem({
+      return {
         id: gs.id,
         name: gs.name,
         averagePlayTime: gs.averagePlayTime,
         minPlayers: gs.minPlayers,
         maxPlayers: gs.maxPlayers,
-      });
+      } as typeof selectedGameSystem;
     }
-  }, [isCampaignGame, campaignGameSystemData]);
+    return selectedGameSystem;
+  }, [isCampaignGame, campaignGameSystemData, selectedGameSystem]);
 
   const gameSystemOptions =
     gameSystemSearchResults?.success && gameSystemSearchResults.data
@@ -157,18 +159,18 @@ export function GameForm({
 
   // Update form fields when game system changes
   React.useEffect(() => {
-    if (selectedGameSystem) {
-      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime ?? 1);
+    if (effectiveGameSystem) {
+      form.setFieldValue("expectedDuration", effectiveGameSystem.averagePlayTime ?? 1);
       form.setFieldValue(
         "minimumRequirements.minPlayers",
-        selectedGameSystem.minPlayers ?? 1,
+        effectiveGameSystem.minPlayers ?? 1,
       );
       form.setFieldValue(
         "minimumRequirements.maxPlayers",
-        selectedGameSystem.maxPlayers ?? 1,
+        effectiveGameSystem.maxPlayers ?? 1,
       );
     }
-  }, [form, selectedGameSystem]);
+  }, [form, effectiveGameSystem]);
 
   return (
     <form
@@ -302,7 +304,7 @@ export function GameForm({
               <p className="text-muted-foreground mt-1 text-sm">
                 {gameSystemName && gameSystemName.trim().length > 0
                   ? gameSystemName
-                  : selectedGameSystem?.name || ""}
+                  : effectiveGameSystem?.name || ""}
               </p>
             ) : (
               <GameSystemCombobox
@@ -400,7 +402,7 @@ export function GameForm({
                 id={field.name}
                 name={field.name}
                 type="number"
-                value={field.state.value ?? selectedGameSystem?.averagePlayTime ?? 1}
+                value={field.state.value ?? effectiveGameSystem?.averagePlayTime ?? 1}
                 onBlur={field.handleBlur}
                 onChange={(e) =>
                   field.handleChange(e.target.value ? Number(e.target.value) : 0)

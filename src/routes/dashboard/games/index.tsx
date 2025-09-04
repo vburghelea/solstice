@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gamepad2, PlusIcon } from "lucide-react";
+import { Calendar, ChevronRight, Gamepad2, PlusIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Card, CardContent } from "~/components/ui/card";
@@ -144,13 +144,13 @@ function GamesPage() {
   });
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Games</h1>
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">My Games</h1>
           <p className="text-muted-foreground">Manage your game sessions</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Select
             value={status}
             onValueChange={(value) => {
@@ -159,7 +159,7 @@ function GamesPage() {
               });
             }}
           >
-            <SelectTrigger className="w-[180px] border border-gray-300 bg-white text-gray-900">
+            <SelectTrigger className="w-[160px] border border-gray-300 bg-white text-gray-900 sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -196,16 +196,66 @@ function GamesPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {games.map((game: GameListItem) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              isOwner={!!user && game.owner?.id === user.id}
-              onUpdateStatus={updateStatusMutation.mutate}
-            />
-          ))}
-        </div>
+        <>
+          {/* Mobile list */}
+          <div className="space-y-3 md:hidden">
+            {games.map((g: GameListItem) => {
+              const formattedDateTime = new Date(g.dateTime).toLocaleString();
+              const statusBadgeClass =
+                g.status === "scheduled"
+                  ? "bg-blue-50 text-blue-700 border-blue-200"
+                  : g.status === "completed"
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-red-50 text-red-700 border-red-200";
+              return (
+                <Link
+                  key={g.id}
+                  to="/dashboard/games/$gameId"
+                  params={{ gameId: g.id }}
+                  className="block rounded-lg border bg-white p-4 shadow-sm transition hover:bg-gray-50"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize ${statusBadgeClass}`}
+                        >
+                          {g.status}
+                        </div>
+                        <div className="truncate text-base font-semibold text-gray-900">
+                          {g.name}
+                        </div>
+                      </div>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5" /> {formattedDateTime}
+                        </span>
+                        <span className="truncate">{g.gameSystem?.name || "N/A"}</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                        <Users className="h-3.5 w-3.5" /> {g.participantCount}{" "}
+                        participants
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Desktop grid */}
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+            {games.map((game: GameListItem) => (
+              <GameCard
+                key={game.id}
+                game={game}
+                isOwner={!!user && game.owner?.id === user.id}
+                onUpdateStatus={updateStatusMutation.mutate}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

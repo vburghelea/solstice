@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
@@ -20,8 +20,10 @@ import {
 } from "~/components/ui/select";
 import { getCampaign } from "~/features/campaigns/campaigns.queries";
 import { GameForm } from "~/features/games/components/GameForm";
-import { createGame } from "~/features/games/games.mutations";
-import { getGameSystem } from "~/features/games/games.queries";
+import {
+  createGame,
+  createGameSessionForCampaign,
+} from "~/features/games/games.mutations";
 import {
   createGameInputSchema,
   gameFormSchema,
@@ -41,6 +43,7 @@ export function CreateGamePage() {
   const navigate = useNavigate();
   const { campaignId } = useSearch({ from: Route.id });
   const [serverError, setServerError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const {
     data: campaignData,
@@ -50,45 +53,24 @@ export function CreateGamePage() {
     queryKey: ["campaign", campaignId],
     queryFn: () => getCampaign({ data: { id: campaignId! } }),
     enabled: !!campaignId,
+    refetchOnMount: "always",
   });
 
-  const gameSystemId =
-    campaignData &&
-    campaignData.success &&
-    campaignData.data &&
-    campaignData.data.gameSystemId
-      ? campaignData.data.gameSystemId
-      : undefined;
-
-  const { data: gameSystemData, isSuccess: isGameSystemDataSuccess } = useQuery({
-    queryKey: ["gameSystem", gameSystemId],
-    queryFn: () => getGameSystem({ data: { id: gameSystemId! } }),
-    enabled: !!gameSystemId,
-  });
+  // Proactively refresh possible stale/empty cache when arriving via navigation
+  useEffect(() => {
+    if (campaignId) {
+      queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
+    }
+  }, [campaignId, queryClient]);
 
   // Create a key that changes when all data is loaded
   const formKey = useMemo(() => {
-    if (!campaignId) {
-      return "no-campaign";
+    if (!campaignId) return "no-campaign";
+    if (isCampaignDataSuccess && campaignData?.success && campaignData.data) {
+      return `loaded-${campaignId}`;
     }
-
-    if (
-      isCampaignDataSuccess &&
-      campaignData?.success &&
-      campaignData.data &&
-      (!gameSystemId || (gameSystemId && isGameSystemDataSuccess))
-    ) {
-      return `all-data-loaded-${campaignId}`;
-    }
-
-    return `data-loading-${campaignId}`;
-  }, [
-    campaignId,
-    isCampaignDataSuccess,
-    campaignData,
-    gameSystemId,
-    isGameSystemDataSuccess,
-  ]);
+    return `loading-${campaignId}`;
+  }, [campaignId, isCampaignDataSuccess, campaignData]);
 
   const initialValues = useMemo<Partial<z.infer<typeof gameFormSchema>>>(() => {
     if (!campaignId) {
@@ -97,47 +79,51 @@ export function CreateGamePage() {
 
     if (isCampaignDataSuccess && campaignData?.success && campaignData.data) {
       const campaign = campaignData.data;
-      // Type assertion to tell TypeScript that campaign is not null
-      const gameSystem =
-        gameSystemData?.success && gameSystemData.data ? gameSystemData.data : null;
+      const gameSystem = campaign.gameSystem ?? null;
 
       return {
-        gameSystemId: (campaign as NonNullable<typeof campaign>).gameSystemId,
+        gameSystemId: campaign.gameSystemId,
         expectedDuration:
-          (campaign as NonNullable<typeof campaign>).sessionDuration ??
+          campaign.sessionDuration ??
           (gameSystem && gameSystem.averagePlayTime !== null
             ? gameSystem.averagePlayTime
             : undefined),
-        price: (campaign as NonNullable<typeof campaign>).pricePerSession ?? undefined,
-        language: (campaign as NonNullable<typeof campaign>).language,
-        location: (campaign as NonNullable<typeof campaign>).location,
+        price: campaign.pricePerSession ?? undefined,
+        language: campaign.language,
+        location: campaign.location,
         minimumRequirements: {
           minPlayers:
-            (campaign as NonNullable<typeof campaign>).minimumRequirements?.minPlayers ??
+            campaign.minimumRequirements?.minPlayers ??
             (gameSystem && gameSystem.minPlayers !== null
               ? gameSystem.minPlayers
               : undefined),
           maxPlayers:
-            (campaign as NonNullable<typeof campaign>).minimumRequirements?.maxPlayers ??
+            campaign.minimumRequirements?.maxPlayers ??
             (gameSystem && gameSystem.maxPlayers !== null
               ? gameSystem.maxPlayers
               : undefined),
-          languageLevel: (campaign as NonNullable<typeof campaign>).minimumRequirements
-            ?.languageLevel,
-          playerRadiusKm: (campaign as NonNullable<typeof campaign>).minimumRequirements
-            ?.playerRadiusKm,
+          languageLevel: campaign.minimumRequirements?.languageLevel,
+          playerRadiusKm: campaign.minimumRequirements?.playerRadiusKm,
         },
-        visibility: (campaign as NonNullable<typeof campaign>).visibility,
-        safetyRules: (campaign as NonNullable<typeof campaign>).safetyRules,
+        visibility: campaign.visibility,
+        safetyRules: campaign.safetyRules,
       };
     }
 
     // Return empty object while data is loading
     return {};
-  }, [isCampaignDataSuccess, campaignData, campaignId, gameSystemData]);
+  }, [isCampaignDataSuccess, campaignData, campaignId]);
 
   const createGameMutation = useMutation({
-    mutationFn: createGame,
+    mutationFn: async (args: { data: z.infer<typeof createGameInputSchema> }) => {
+      // If creating within a campaign, leverage the campaign-aware server fn
+      if (campaignId) {
+        return await createGameSessionForCampaign({
+          data: args.data as z.infer<typeof createGameInputSchema>,
+        });
+      }
+      return await createGame({ data: args.data });
+    },
     onSuccess: (data) => {
       if (data.success) {
         navigate({ to: `/dashboard/games/${data.data?.id}` });
@@ -184,55 +170,60 @@ export function CreateGamePage() {
             </div>
           ) : (
             <>
-              {campaignId &&
-                isCampaignDataSuccess &&
-                campaignData?.success &&
-                campaignData.data && (
-                  <div className="mb-4">
-                    <label htmlFor="campaign">Campaign</label>
-                    <Select value={campaignId} disabled>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a campaign" />
-                      </SelectTrigger>
-                      <SelectContent>
+              {campaignId && isCampaignDataSuccess && campaignData?.success && (
+                <div className="mb-4">
+                  <label htmlFor="campaign">Campaign</label>
+                  <Select value={campaignId} disabled>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a campaign" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {campaignData.data && (
                         <SelectItem value={campaignId}>
                           {campaignData.data.name}
                         </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-              <GameForm
-                key={formKey} // Add key to force re-mount when all data is loaded
-                onSubmit={async (values) => {
-                  setServerError(null);
+              {/* Only render the form when campaign context is ready or when not creating from a campaign */}
+              {(!campaignId ||
+                (isCampaignDataSuccess &&
+                  campaignData?.success &&
+                  campaignData.data)) && (
+                <GameForm
+                  key={formKey}
+                  onSubmit={async (values) => {
+                    setServerError(null);
 
-                  try {
-                    await createGameMutation.mutateAsync({
-                      data: {
-                        ...values,
-                        campaignId,
-                      } as z.infer<typeof createGameInputSchema>,
-                    });
-                  } catch (error) {
-                    console.error("Form submission error:", error);
-                    setServerError(
-                      error instanceof Error ? error.message : "Failed to create game",
-                    );
+                    try {
+                      await createGameMutation.mutateAsync({
+                        data: {
+                          ...values,
+                          campaignId,
+                        } as z.infer<typeof createGameInputSchema>,
+                      });
+                    } catch (error) {
+                      console.error("Form submission error:", error);
+                      setServerError(
+                        error instanceof Error ? error.message : "Failed to create game",
+                      );
+                    }
+                  }}
+                  isSubmitting={createGameMutation.isPending}
+                  initialValues={
+                    initialValues as Partial<z.infer<typeof updateGameInputSchema>>
                   }
-                }}
-                isSubmitting={createGameMutation.isPending}
-                initialValues={
-                  initialValues as Partial<z.infer<typeof updateGameInputSchema>>
-                }
-                isCampaignGame={!!campaignId}
-                gameSystemName={
-                  isGameSystemDataSuccess && gameSystemData?.data
-                    ? gameSystemData.data.name
-                    : ""
-                }
-              />
+                  isCampaignGame={!!campaignId}
+                  gameSystemName={
+                    isCampaignDataSuccess && campaignData?.success && campaignData.data
+                      ? campaignData.data.gameSystem?.name || ""
+                      : ""
+                  }
+                />
+              )}
             </>
           )}
         </CardContent>

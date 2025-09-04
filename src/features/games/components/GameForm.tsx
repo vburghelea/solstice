@@ -57,11 +57,11 @@ export function GameForm({
   onCancelEdit,
 }: GameFormProps) {
   const defaults = {
-    gameSystemId: initialValues?.gameSystemId ?? 0,
+    gameSystemId: initialValues?.gameSystemId,
     name: initialValues?.name ?? "",
     dateTime: initialValues?.dateTime ?? new Date().toISOString(),
     description: initialValues?.description ?? "",
-    expectedDuration: initialValues?.expectedDuration ?? 0,
+    expectedDuration: initialValues?.expectedDuration,
     price: initialValues?.price ?? 0,
     language: initialValues?.language ?? "en",
     location: initialValues?.location ?? { address: "", lat: 0, lng: 0 },
@@ -116,6 +116,34 @@ export function GameForm({
     minPlayers: number | null;
     maxPlayers: number | null;
   } | null>(null);
+
+  // When creating within a campaign, fetch the game system details by ID to ensure
+  // the name and defaults are available immediately without requiring reload
+  const { data: campaignGameSystemData } = useQuery({
+    queryKey: ["gameSystemById", defaults.gameSystemId],
+    queryFn: async () => {
+      const { getGameSystem } = await import("~/features/games/games.queries");
+      return getGameSystem({ data: { id: defaults.gameSystemId! } });
+    },
+    enabled: !!isCampaignGame && !!defaults.gameSystemId,
+  });
+
+  React.useEffect(() => {
+    if (
+      isCampaignGame &&
+      campaignGameSystemData?.success &&
+      campaignGameSystemData.data
+    ) {
+      const gs = campaignGameSystemData.data;
+      setSelectedGameSystem({
+        id: gs.id,
+        name: gs.name,
+        averagePlayTime: gs.averagePlayTime,
+        minPlayers: gs.minPlayers,
+        maxPlayers: gs.maxPlayers,
+      });
+    }
+  }, [isCampaignGame, campaignGameSystemData]);
 
   const gameSystemOptions =
     gameSystemSearchResults?.success && gameSystemSearchResults.data
@@ -271,7 +299,11 @@ export function GameForm({
           <div>
             <Label htmlFor={field.name}>Game System Used</Label>
             {isCampaignGame ? (
-              <p className="text-muted-foreground mt-1 text-sm">{gameSystemName}</p>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {gameSystemName && gameSystemName.trim().length > 0
+                  ? gameSystemName
+                  : selectedGameSystem?.name || ""}
+              </p>
             ) : (
               <GameSystemCombobox
                 label="" // Label is already rendered above

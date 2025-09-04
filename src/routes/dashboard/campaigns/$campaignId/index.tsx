@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Edit2, LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
@@ -135,7 +135,23 @@ export function CampaignDetailsPage() {
       return result.data;
     },
     enabled: !!campaignId,
+    refetchOnMount: "always",
   });
+
+  // Proactively invalidate potentially stale caches on initial mount to avoid empty flashes
+  useEffect(() => {
+    if (campaignId) {
+      queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
+      queryClient.invalidateQueries({ queryKey: ["campaignGameSessions", campaignId] });
+      queryClient.invalidateQueries({ queryKey: ["campaignApplications", campaignId] });
+      if (currentUser?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ["userCampaignApplication", campaignId, currentUser.id],
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaignId]);
 
   const isOwner = campaign?.owner?.id === currentUser?.id;
 
@@ -207,6 +223,7 @@ export function CampaignDetailsPage() {
       return result.data;
     },
     enabled: !!campaignId && !!currentUser?.id && !isOwner && !isParticipant, // Only fetch if not owner/participant
+    refetchOnMount: "always",
   });
 
   const applyToCampaignMutation = useMutation({
@@ -243,12 +260,14 @@ export function CampaignDetailsPage() {
       return await listGameSessionsByCampaignId({ data });
     },
     enabled: !!campaignId,
+    refetchOnMount: "always",
   });
 
   const { data: applicationsData, isLoading: isLoadingApplications } = useQuery({
     queryKey: ["campaignApplications", campaignId],
     queryFn: () => getCampaignApplications({ data: { id: campaignId } }),
     enabled: !!campaignId && isOwner,
+    refetchOnMount: "always",
   });
 
   if (

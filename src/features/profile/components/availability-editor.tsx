@@ -149,13 +149,19 @@ export function AvailabilityEditor({
     onChange({ ...value, [day]: newAvailability });
   };
 
+  const headerLabelIndexes = [
+    0,
+    Math.floor((TIME_INTERVALS.length - 1) / 2),
+    TIME_INTERVALS.length - 1,
+  ];
+
   return (
     <div
       className="space-y-4 select-none"
       data-testid="availability-editor"
       onMouseUp={handleMouseUp}
     >
-      <div className="grid grid-cols-[120px_1fr] gap-2">
+      <div className="grid grid-cols-[80px_1fr] gap-2 lg:grid-cols-[120px_1fr]">
         <div className="text-muted-foreground text-sm font-medium">Time</div>
         <div
           className="grid gap-1"
@@ -166,7 +172,14 @@ export function AvailabilityEditor({
               key={interval.time}
               className="text-muted-foreground pb-2 text-center text-xs"
             >
-              {index % 2 === 0 ? interval.time : ""}
+              {/* Mobile/Tablet: show only start, middle, end time labels */}
+              <span className="lg:hidden">
+                {headerLabelIndexes.includes(index) ? interval.time : ""}
+              </span>
+              {/* Desktop (lg+): show every other label as before */}
+              <span className="hidden lg:inline">
+                {index % 2 === 0 ? interval.time : ""}
+              </span>
             </div>
           ))}
         </div>
@@ -212,7 +225,7 @@ function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps
   if (currentSegment) segments.push(currentSegment);
 
   return (
-    <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+    <div className="grid grid-cols-[80px_1fr] items-center gap-2 lg:grid-cols-[120px_1fr]">
       <div className="text-sm font-medium capitalize">{day.slice(0, 3)}</div>
       <div
         className="grid w-full"
@@ -226,7 +239,7 @@ function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps
           const segmentElement = (
             <div
               key={`${day}-${startTime}-${endTime}-${segment.isAvailable ? 1 : 0}`}
-              className="flex h-8"
+              className="flex h-7 lg:h-8"
               style={{ gridColumn: `span ${segmentWidth}` }}
             >
               {Array.from({ length: segmentWidth }).map((_, i) => {

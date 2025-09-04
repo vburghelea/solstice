@@ -58,59 +58,53 @@ export const Route = createFileRoute("/dashboard/games/$gameId")({
 
 function GameDetailsView({ game }: { game: GameWithDetails }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-gray-900">{game.name}</CardTitle>
-        <CardDescription>{game.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <p className="font-semibold">Game System</p>
-            <p>{game.gameSystem.name}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Date & Time</p>
-            <p>{new Date(game.dateTime).toLocaleString()}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Expected Duration</p>
-            <p>{game.expectedDuration} minutes</p>
-          </div>
-          <div>
-            <p className="font-semibold">Price</p>
-            <p>{game.price ? `€${game.price}` : "Free"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Language</p>
-            <p>{game.language}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Visibility</p>
-            <p>{game.visibility}</p>
-          </div>
-        </div>
-        <Separator />
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <p className="font-semibold">Location</p>
-          <p>{game.location.address}</p>
+          <p className="font-semibold">Game System</p>
+          <p>{game.gameSystem.name}</p>
         </div>
-        <Separator />
         <div>
-          <p className="font-semibold">Minimum Requirements</p>
-          <p>
-            Players: {game.minimumRequirements?.minPlayers} -{" "}
-            {game.minimumRequirements?.maxPlayers}
-          </p>
-          <p>Language Level: {game.minimumRequirements?.languageLevel}</p>
+          <p className="font-semibold">Date & Time</p>
+          <p>{new Date(game.dateTime).toLocaleString()}</p>
         </div>
-        <Separator />
         <div>
-          <p className="font-semibold">Safety Rules</p>
-          <SafetyRulesView safetyRules={game.safetyRules} />
+          <p className="font-semibold">Expected Duration</p>
+          <p>{game.expectedDuration} minutes</p>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <p className="font-semibold">Price</p>
+          <p>{game.price ? `€${game.price}` : "Free"}</p>
+        </div>
+        <div>
+          <p className="font-semibold">Language</p>
+          <p>{game.language}</p>
+        </div>
+        <div>
+          <p className="font-semibold">Visibility</p>
+          <p>{game.visibility}</p>
+        </div>
+      </div>
+      <Separator />
+      <div>
+        <p className="font-semibold">Location</p>
+        <p>{game.location.address}</p>
+      </div>
+      <Separator />
+      <div>
+        <p className="font-semibold">Minimum Requirements</p>
+        <p>
+          Players: {game.minimumRequirements?.minPlayers} -{" "}
+          {game.minimumRequirements?.maxPlayers}
+        </p>
+        <p>Language Level: {game.minimumRequirements?.languageLevel}</p>
+      </div>
+      <Separator />
+      <div>
+        <p className="font-semibold">Safety Rules</p>
+        <SafetyRulesView safetyRules={game.safetyRules} />
+      </div>
+    </div>
   );
 }
 
@@ -431,12 +425,16 @@ export function GameDetailsPage() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-gray-900">Game Details</CardTitle>
-              <CardDescription>
-                View and manage the details of this game session.
-              </CardDescription>
+              <CardTitle className="text-gray-900">{game.name}</CardTitle>
+              {game.description ? (
+                <CardDescription className="mt-1">{game.description}</CardDescription>
+              ) : null}
+              <div className="text-muted-foreground mt-2 text-sm">
+                🗓️ {new Date(game.dateTime).toLocaleString()} • 📍 {game.location.address}{" "}
+                • 🎲 {game.gameSystem.name}
+              </div>
             </div>
             {isOwner && !isEditing && game.status === "scheduled" && (
               <div className="flex items-center gap-2">

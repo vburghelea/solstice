@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Gamepad2, PlusIcon } from "lucide-react";
+import { Calendar, ChevronRight, Gamepad2, PlusIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Card, CardContent } from "~/components/ui/card";
@@ -58,13 +58,13 @@ export function CampaignsPage() {
   const campaigns = campaignsData.success ? campaignsData.data : [];
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="container mx-auto p-4 sm:p-6">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Campaigns</h1>
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">My Campaigns</h1>
           <p className="text-muted-foreground">Manage your campaign sessions</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Select
             value={status}
             onValueChange={(value) => {
@@ -75,7 +75,7 @@ export function CampaignsPage() {
               });
             }}
           >
-            <SelectTrigger className="w-[180px] border border-gray-300 bg-white text-gray-900">
+            <SelectTrigger className="w-[160px] border border-gray-300 bg-white text-gray-900 sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -112,11 +112,44 @@ export function CampaignsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {campaigns.map((campaign: CampaignListItem) => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
-          ))}
-        </div>
+        <>
+          {/* Mobile list */}
+          <div className="space-y-3 md:hidden">
+            {campaigns.map((c: CampaignListItem) => (
+              <Link
+                key={c.id}
+                to="/dashboard/campaigns/$campaignId"
+                params={{ campaignId: c.id }}
+                className="block rounded-lg border bg-white p-4 shadow-sm transition hover:bg-gray-50"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-base font-semibold text-gray-900">
+                      {c.name}
+                    </div>
+                    <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+                      <span className="inline-flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5" /> {c.recurrence}
+                      </span>
+                      <span className="truncate">{c.gameSystem.name}</span>
+                    </div>
+                    <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                      <Users className="h-3.5 w-3.5" /> {c.participantCount} participants
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop grid */}
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+            {campaigns.map((campaign: CampaignListItem) => (
+              <CampaignCard key={campaign.id} campaign={campaign} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -17,6 +17,8 @@ import {
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
+import { LinkedAccounts } from "~/features/auth/components/linked-accounts";
+import { SecuritySettings } from "~/features/auth/components/security-settings";
 import {
   experienceLevelOptions,
   gameThemeOptions,
@@ -1183,6 +1185,21 @@ export function ProfileView() {
               </div>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Security & Linked Accounts (Combined) */}
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>Security & Accounts</CardTitle>
+            <CardDescription>Manage your password and connected logins</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <SecuritySettings embedded />
+          <Separator />
+          <LinkedAccounts embedded />
         </CardContent>
       </Card>
     </div>

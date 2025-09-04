@@ -17,11 +17,11 @@ describe("AdminLayout with Router", () => {
   it("renders admin layout with navigation", async () => {
     await renderWithRouter(<AdminLayout />);
 
-    // Check navigation elements - Dashboard appears multiple times
+    // Check navigation elements - labels may appear in sidebar and mobile tab bar
     const dashboardTexts = screen.getAllByText("Dashboard");
     expect(dashboardTexts.length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText("Teams")).toBeInTheDocument();
-    expect(screen.getByText("Events")).toBeInTheDocument();
+    expect(screen.getAllByText("Teams").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Events").length).toBeGreaterThanOrEqual(1);
 
     // Check admin panel header - use getAllByText since it appears in both desktop and mobile views
     const roundupGamesTexts = screen.getAllByText("Roundup Games");

@@ -23,7 +23,10 @@ import {
   Users,
   XCircle,
 } from "~/components/ui/icons";
-import { getDashboardStats } from "~/features/dashboard/dashboard.queries";
+import {
+  getDashboardStats,
+  getNextUserGame,
+} from "~/features/dashboard/dashboard.queries";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 
@@ -69,22 +72,79 @@ function DashboardIndex() {
   });
 
   const teamCount = userTeams.length;
-  const upcomingEventsCount = 0;
+  // Next upcoming game for the user (owner or participant)
+  const { data: nextGameResult } = useQuery({
+    queryKey: ["next-user-game"],
+    queryFn: async () => {
+      const result = await getNextUserGame();
+      return result;
+    },
+  });
+  const nextGame = nextGameResult?.success ? nextGameResult.data : null;
+  const upcomingEventsCount = nextGame ? 1 : 0;
+
+  function formatTimeDistance(date: Date) {
+    const now = new Date().getTime();
+    const diff = new Date(date).getTime() - now;
+    if (diff <= 0) return "now";
+    const mins = Math.round(diff / 60000);
+    if (mins < 60) return `in ${mins}m`;
+    const hours = Math.round(mins / 60);
+    if (hours < 24) return `in ${hours}h`;
+    const days = Math.round(hours / 24);
+    return `in ${days}d`;
+  }
 
   return (
-    <div className="container mx-auto space-y-8 p-6">
+    <div className="container mx-auto space-y-8 p-4 sm:p-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
           Welcome back, {user?.name || "Player"}!
         </h1>
-        <p className="text-muted-foreground mt-2">
-          Here's an overview of your Roundup Games account
+        <p className="text-muted-foreground mt-1 sm:mt-2">
+          Here's an overview of your account
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Now & Next (Mobile-first) */}
+      <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-5">
+        {nextGame ? (
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-xs font-medium text-gray-500">Next up</div>
+              <div className="mt-1 text-base font-semibold text-gray-900">
+                {nextGame.name}
+              </div>
+              <div className="mt-1 text-sm text-gray-600">
+                🗓️ {new Date(nextGame.dateTime).toLocaleString()} •{" "}
+                {nextGame.location.address}
+              </div>
+              <div className="mt-1 text-xs text-gray-500">
+                {formatTimeDistance(new Date(nextGame.dateTime))}
+              </div>
+            </div>
+            <Button asChild>
+              <Link to={`/dashboard/games/${nextGame.id}`}>View</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-base font-semibold text-gray-900">
+                No upcoming games
+              </div>
+              <div className="text-sm text-gray-600">Discover and join a new session</div>
+            </div>
+            <Button asChild variant="secondary">
+              <Link to="/search">Find games</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Stats Cards (mobile 1-col, desktop grid) */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Membership Status Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -184,7 +244,23 @@ function DashboardIndex() {
       {/* Quick Actions */}
       <div>
         <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Mobile: Full-width buttons */}
+        <div className="grid gap-3 md:hidden">
+          <Button asChild className="w-full">
+            <Link to="/dashboard/profile">View Profile</Link>
+          </Button>
+          <Button asChild className="w-full">
+            <Link to="/dashboard/membership">
+              {membershipStatus?.hasMembership ? "Renew Membership" : "Buy Membership"}
+            </Link>
+          </Button>
+          <Button className="w-full" variant="outline" disabled>
+            Join a Team (Soon)
+          </Button>
+        </div>
+
+        {/* Desktop: Cards */}
+        <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
           {/* Complete Profile - always shown since profile is complete to access dashboard */}
           <Card>
             <CardHeader>

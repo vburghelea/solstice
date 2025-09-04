@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AdminSidebar } from "~/components/ui/admin-sidebar";
 import { Button } from "~/components/ui/button";
 import { MobileAdminHeader } from "~/components/ui/mobile-admin-header";
+import { MobileTabBar } from "~/components/ui/mobile-tab-bar";
 
 export function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -39,11 +40,14 @@ export function AdminLayout() {
       {/* Main Content */}
       <div className="flex flex-1 flex-col">
         <MobileAdminHeader onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        {/* Add bottom padding to avoid overlap with mobile tab bar */}
+        <main className="flex-1 p-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
           <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
         </main>
+        {/* Persistent mobile navigation */}
+        <MobileTabBar />
       </div>
     </div>
   );

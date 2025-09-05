@@ -12,7 +12,10 @@ export const Route = createFileRoute("/game/$gameId")({
   loader: async ({ params }) => {
     const result = await getGame({ data: { id: params.gameId } });
     if (result.success && result.data) {
-      return { gameDetails: result.data };
+      if (result.data.visibility === "public") {
+        return { gameDetails: result.data };
+      }
+      return { gameDetails: null };
     } else {
       console.error(
         "Failed to fetch game details:",
@@ -59,9 +62,7 @@ function GameDetailPage() {
   const isOwner = gameDetails.owner?.id && user?.id === gameDetails.owner.id;
   const isOpenForApplications = gameDetails.status === "scheduled";
   const canApply =
-    isOpenForApplications &&
-    !isOwner &&
-    (gameDetails.visibility === "public" || gameDetails.visibility === "protected");
+    isOpenForApplications && !isOwner && gameDetails.visibility === "public";
 
   return (
     <PublicLayout>

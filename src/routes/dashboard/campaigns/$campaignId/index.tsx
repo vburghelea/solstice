@@ -44,8 +44,10 @@ import { CampaignGameSessionCard } from "~/features/games/components/CampaignGam
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
+import { getRelationshipSnapshot } from "~/features/social";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
+import { Badge } from "~/shared/ui/badge";
 
 import { z } from "zod";
 
@@ -94,7 +96,11 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
           </div>
           <div>
             <p className="font-semibold">Visibility</p>
-            <p className="capitalize">{campaign.visibility}</p>
+            {campaign.visibility === "protected" ? (
+              <Badge variant="secondary">Connections-only</Badge>
+            ) : (
+              <p className="capitalize">{campaign.visibility}</p>
+            )}
           </div>
         </div>
       </details>
@@ -187,6 +193,14 @@ export function CampaignDetailsPage() {
   }, [campaignId, queryClient, currentUser?.id]);
 
   const isOwner = campaign?.owner?.id === currentUser?.id;
+  const { data: rel } = useQuery({
+    queryKey: ["relationship", campaign?.owner?.id],
+    queryFn: () => getRelationshipSnapshot({ data: { userId: campaign!.owner!.id } }),
+    enabled: !!currentUser?.id && !!campaign?.owner?.id,
+    refetchOnMount: "always",
+  });
+  const blockedAny = !!rel && rel.success && (rel.data.blocked || rel.data.blockedBy);
+  const isConnection = !!rel && rel.success && rel.data.isConnection;
 
   const isInvited = campaign?.participants?.some(
     (p) => p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
@@ -331,12 +345,19 @@ export function CampaignDetailsPage() {
     !hasRejectedApplication &&
     !hasRejectedParticipantStatus &&
     campaign?.status === "active" && // Only allow applying to active campaigns
-    (campaign?.visibility === "public" || campaign?.visibility === "protected"); // Only allow applying to public/protected campaigns
+    (campaign?.visibility === "public" ||
+      (campaign?.visibility === "protected" && isConnection)) &&
+    !blockedAny;
 
   const gameSessions = gameSessionsData?.success ? gameSessionsData.data : [];
 
   return (
     <div key={campaignId} className="space-y-6">
+      {blockedAny && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          You cannot interact with this organizer due to block settings.
+        </div>
+      )}
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-3">

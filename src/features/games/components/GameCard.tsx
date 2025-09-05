@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/card";
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
+import { Badge } from "~/shared/ui/badge";
 
 interface GameCardProps {
   game: GameListItem;
@@ -61,7 +62,11 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Visibility</span>
-            <span className="font-medium capitalize">{game.visibility}</span>
+            {game.visibility === "protected" ? (
+              <Badge variant="secondary">Connections-only</Badge>
+            ) : (
+              <span className="font-medium capitalize">{game.visibility}</span>
+            )}
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Participants</span>

@@ -74,6 +74,12 @@ import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiDebugSquareServerRouteImport } from "./routes/api/debug-square";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
+import { ServerRoute as ApiSocialUnfollowServerRouteImport } from "./routes/api/social/unfollow";
+import { ServerRoute as ApiSocialUnblockServerRouteImport } from "./routes/api/social/unblock";
+import { ServerRoute as ApiSocialRelationshipServerRouteImport } from "./routes/api/social/relationship";
+import { ServerRoute as ApiSocialFollowServerRouteImport } from "./routes/api/social/follow";
+import { ServerRoute as ApiSocialBlocklistServerRouteImport } from "./routes/api/social/blocklist";
+import { ServerRoute as ApiSocialBlockServerRouteImport } from "./routes/api/social/block";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
 import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
@@ -362,6 +368,38 @@ const ApiWebhooksSquareServerRoute = ApiWebhooksSquareServerRouteImport.update({
 const ApiTestCleanupServerRoute = ApiTestCleanupServerRouteImport.update({
   id: "/api/test/cleanup",
   path: "/api/test/cleanup",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialUnfollowServerRoute = ApiSocialUnfollowServerRouteImport.update({
+  id: "/api/social/unfollow",
+  path: "/api/social/unfollow",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialUnblockServerRoute = ApiSocialUnblockServerRouteImport.update({
+  id: "/api/social/unblock",
+  path: "/api/social/unblock",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialRelationshipServerRoute =
+  ApiSocialRelationshipServerRouteImport.update({
+    id: "/api/social/relationship",
+    path: "/api/social/relationship",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
+const ApiSocialFollowServerRoute = ApiSocialFollowServerRouteImport.update({
+  id: "/api/social/follow",
+  path: "/api/social/follow",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialBlocklistServerRoute =
+  ApiSocialBlocklistServerRouteImport.update({
+    id: "/api/social/blocklist",
+    path: "/api/social/blocklist",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
+const ApiSocialBlockServerRoute = ApiSocialBlockServerRouteImport.update({
+  id: "/api/social/block",
+  path: "/api/social/block",
   getParentRoute: () => rootServerRouteImport,
 } as any);
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -753,6 +791,12 @@ export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/social/block": typeof ApiSocialBlockServerRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
+  "/api/social/follow": typeof ApiSocialFollowServerRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
   "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
@@ -763,6 +807,12 @@ export interface FileServerRoutesByTo {
   "/api/health": typeof ApiHealthServerRoute;
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/social/block": typeof ApiSocialBlockServerRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
+  "/api/social/follow": typeof ApiSocialFollowServerRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
   "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
@@ -774,6 +824,12 @@ export interface FileServerRoutesById {
   "/api/health": typeof ApiHealthServerRoute;
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/social/block": typeof ApiSocialBlockServerRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
+  "/api/social/follow": typeof ApiSocialFollowServerRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
   "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
   "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
@@ -786,6 +842,12 @@ export interface FileServerRouteTypes {
     | "/api/health"
     | "/api/test-square"
     | "/api/auth/$"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
@@ -796,6 +858,12 @@ export interface FileServerRouteTypes {
     | "/api/health"
     | "/api/test-square"
     | "/api/auth/$"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
@@ -806,6 +874,12 @@ export interface FileServerRouteTypes {
     | "/api/health"
     | "/api/test-square"
     | "/api/auth/$"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
     | "/api/test/cleanup"
     | "/api/webhooks/square"
     | "/api/auth/$action/$provider"
@@ -817,6 +891,12 @@ export interface RootServerRouteChildren {
   ApiHealthServerRoute: typeof ApiHealthServerRoute;
   ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+  ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
+  ApiSocialBlocklistServerRoute: typeof ApiSocialBlocklistServerRoute;
+  ApiSocialFollowServerRoute: typeof ApiSocialFollowServerRoute;
+  ApiSocialRelationshipServerRoute: typeof ApiSocialRelationshipServerRoute;
+  ApiSocialUnblockServerRoute: typeof ApiSocialUnblockServerRoute;
+  ApiSocialUnfollowServerRoute: typeof ApiSocialUnfollowServerRoute;
   ApiTestCleanupServerRoute: typeof ApiTestCleanupServerRoute;
   ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
   ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
@@ -1213,6 +1293,48 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiTestCleanupServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+    "/api/social/unfollow": {
+      id: "/api/social/unfollow";
+      path: "/api/social/unfollow";
+      fullPath: "/api/social/unfollow";
+      preLoaderRoute: typeof ApiSocialUnfollowServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/unblock": {
+      id: "/api/social/unblock";
+      path: "/api/social/unblock";
+      fullPath: "/api/social/unblock";
+      preLoaderRoute: typeof ApiSocialUnblockServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/relationship": {
+      id: "/api/social/relationship";
+      path: "/api/social/relationship";
+      fullPath: "/api/social/relationship";
+      preLoaderRoute: typeof ApiSocialRelationshipServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/follow": {
+      id: "/api/social/follow";
+      path: "/api/social/follow";
+      fullPath: "/api/social/follow";
+      preLoaderRoute: typeof ApiSocialFollowServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/blocklist": {
+      id: "/api/social/blocklist";
+      path: "/api/social/blocklist";
+      fullPath: "/api/social/blocklist";
+      preLoaderRoute: typeof ApiSocialBlocklistServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/block": {
+      id: "/api/social/block";
+      path: "/api/social/block";
+      fullPath: "/api/social/block";
+      preLoaderRoute: typeof ApiSocialBlockServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/auth/$": {
       id: "/api/auth/$";
       path: "/api/auth/$";
@@ -1461,6 +1583,12 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHealthServerRoute: ApiHealthServerRoute,
   ApiTestSquareServerRoute: ApiTestSquareServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,
+  ApiSocialBlocklistServerRoute: ApiSocialBlocklistServerRoute,
+  ApiSocialFollowServerRoute: ApiSocialFollowServerRoute,
+  ApiSocialRelationshipServerRoute: ApiSocialRelationshipServerRoute,
+  ApiSocialUnblockServerRoute: ApiSocialUnblockServerRoute,
+  ApiSocialUnfollowServerRoute: ApiSocialUnfollowServerRoute,
   ApiTestCleanupServerRoute: ApiTestCleanupServerRoute,
   ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
   ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,

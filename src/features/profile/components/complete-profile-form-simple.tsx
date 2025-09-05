@@ -457,6 +457,15 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     )}
                   </form.Field>
 
+                  <form.Field name="privacySettings.allowInvitesOnlyFromConnections">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Only allow invites from connections"
+                      />
+                    )}
+                  </form.Field>
+
                   <form.Field name="privacySettings.allowFollows">
                     {(field) => (
                       <ValidatedCheckbox

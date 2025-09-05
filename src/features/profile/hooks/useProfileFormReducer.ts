@@ -36,6 +36,7 @@ const initialState: ProfileFormState = {
       showGamePreferences: false,
       allowTeamInvitations: true,
       allowFollows: true,
+      allowInvitesOnlyFromConnections: false,
     },
   },
 };

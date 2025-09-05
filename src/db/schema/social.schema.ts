@@ -15,6 +15,14 @@ export const gmStrengthEnum = pgEnum("gm_strength", [
   "visual_aid",
 ]);
 
+// Social audit action enum
+export const socialActionEnum = pgEnum("social_action", [
+  "follow",
+  "unfollow",
+  "block",
+  "unblock",
+]);
+
 // Follow relationships
 export const userFollows = pgTable(
   "user_follows",
@@ -39,6 +47,30 @@ export const userFollows = pgTable(
   }),
 );
 
+// Block relationships (unidirectional)
+export const userBlocks = pgTable(
+  "user_blocks",
+  {
+    id: text("id").primaryKey(),
+    blockerId: text("blocker_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    blockeeId: text("blockee_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    reason: text("reason"),
+    createdAt: timestamp("created_at")
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    uniqueBlock: {
+      name: "user_blocks_unique",
+      columns: [table.blockerId, table.blockeeId],
+    },
+  }),
+);
+
 // GM Reviews
 export const gmReviews = pgTable("gm_reviews", {
   id: text("id").primaryKey(),
@@ -59,8 +91,28 @@ export const gmReviews = pgTable("gm_reviews", {
     .notNull(),
 });
 
+// Social audit logs
+export const socialAuditLogs = pgTable("social_audit_logs", {
+  id: text("id").primaryKey(),
+  actorUserId: text("actor_user_id").references(() => user.id, {
+    onDelete: "set null",
+  }),
+  targetUserId: text("target_user_id").references(() => user.id, {
+    onDelete: "set null",
+  }),
+  action: socialActionEnum("action").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Types
 export type UserFollow = typeof userFollows.$inferSelect;
 export type NewUserFollow = typeof userFollows.$inferInsert;
+export type UserBlock = typeof userBlocks.$inferSelect;
+export type NewUserBlock = typeof userBlocks.$inferInsert;
 export type GMReview = typeof gmReviews.$inferSelect;
 export type NewGMReview = typeof gmReviews.$inferInsert;
+export type SocialAuditLog = typeof socialAuditLogs.$inferSelect;
+export type NewSocialAuditLog = typeof socialAuditLogs.$inferInsert;

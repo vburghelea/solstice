@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, ShieldBan, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,7 +12,15 @@ import {
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { getUserProfile } from "~/features/profile/profile.queries";
+import {
+  blockUser,
+  followUser,
+  getRelationshipSnapshot,
+  unblockUser,
+  unfollowUser,
+} from "~/features/social";
 import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
+import { Badge } from "~/shared/ui/badge";
 
 export const Route = createFileRoute("/dashboard/profile/$userId")({
   loader: async ({ params }) => {
@@ -38,6 +47,151 @@ function UserProfileComponent() {
     queryKey: ["areTeammates", userId],
     queryFn: () => areTeammatesWithCurrentUser({ data: { userId } }),
     enabled: !!userId,
+  });
+
+  const queryClient = useQueryClient();
+  const relKey = ["relationship", userId] as const;
+  const { data: relResult, refetch: refetchRel } = useQuery({
+    queryKey: ["relationship", userId],
+    queryFn: () => getRelationshipSnapshot({ data: { userId } }),
+    enabled: !!userId,
+    refetchOnMount: "always",
+  });
+
+  const follows = !!relResult && relResult.success && relResult.data.follows;
+  const followedBy = !!relResult && relResult.success && relResult.data.followedBy;
+  const blockedAny =
+    !!relResult &&
+    relResult.success &&
+    (relResult.data.blocked || relResult.data.blockedBy);
+
+  const doFollow = useMutation({
+    mutationFn: async () => {
+      if (!userId) return;
+      await followUser({ data: { followingId: userId } });
+    },
+    onSuccess: async () => {
+      queryClient.setQueryData(
+        relKey,
+        (
+          prev:
+            | {
+                success?: boolean;
+                data?: {
+                  follows?: boolean;
+                  followedBy?: boolean;
+                  isConnection?: boolean;
+                  blocked?: boolean;
+                  blockedBy?: boolean;
+                };
+              }
+            | undefined,
+        ) => {
+          if (prev?.success && prev?.data) {
+            return { ...prev, data: { ...prev.data, follows: true, isConnection: true } };
+          }
+          return prev;
+        },
+      );
+      await refetchRel();
+    },
+  });
+  const doUnfollow = useMutation({
+    mutationFn: async () => {
+      if (!userId) return;
+      await unfollowUser({ data: { followingId: userId } });
+    },
+    onSuccess: async () => {
+      queryClient.setQueryData(
+        relKey,
+        (
+          prev:
+            | {
+                success?: boolean;
+                data?: {
+                  follows?: boolean;
+                  followedBy?: boolean;
+                  isConnection?: boolean;
+                  blocked?: boolean;
+                  blockedBy?: boolean;
+                };
+              }
+            | undefined,
+        ) => {
+          if (prev?.success && prev?.data) {
+            const isConn = !!prev.data.followedBy; // still a connection if they follow you
+            return {
+              ...prev,
+              data: { ...prev.data, follows: false, isConnection: isConn },
+            };
+          }
+          return prev;
+        },
+      );
+      await refetchRel();
+    },
+  });
+  const doBlock = useMutation({
+    mutationFn: async () => {
+      if (!userId) return;
+      await blockUser({ data: { userId } });
+    },
+    onSuccess: async () => {
+      queryClient.setQueryData(
+        relKey,
+        (
+          prev:
+            | {
+                success?: boolean;
+                data?: {
+                  follows?: boolean;
+                  followedBy?: boolean;
+                  isConnection?: boolean;
+                  blocked?: boolean;
+                  blockedBy?: boolean;
+                };
+              }
+            | undefined,
+        ) => {
+          if (prev?.success && prev?.data) {
+            return { ...prev, data: { ...prev.data, blocked: true } };
+          }
+          return prev;
+        },
+      );
+      await refetchRel();
+    },
+  });
+  const doUnblock = useMutation({
+    mutationFn: async () => {
+      if (!userId) return;
+      await unblockUser({ data: { userId } });
+    },
+    onSuccess: async () => {
+      queryClient.setQueryData(
+        relKey,
+        (
+          prev:
+            | {
+                success?: boolean;
+                data?: {
+                  follows?: boolean;
+                  followedBy?: boolean;
+                  isConnection?: boolean;
+                  blocked?: boolean;
+                  blockedBy?: boolean;
+                };
+              }
+            | undefined,
+        ) => {
+          if (prev?.success && prev?.data) {
+            return { ...prev, data: { ...prev.data, blocked: false } };
+          }
+          return prev;
+        },
+      );
+      await refetchRel();
+    },
   });
 
   if (isLoading) {
@@ -83,6 +237,34 @@ function UserProfileComponent() {
           </Avatar>
           <CardTitle className="text-2xl">{profile.name || "Anonymous User"}</CardTitle>
           <CardDescription>{profile.pronouns && `(${profile.pronouns})`}</CardDescription>
+          {/* Social actions */}
+          <div className="mt-3 flex items-center gap-3">
+            {/* Follow star (you → them) */}
+            <Button
+              variant={follows ? "default" : "outline"}
+              size="sm"
+              onClick={() => (follows ? doUnfollow.mutate() : doFollow.mutate())}
+              disabled={blockedAny}
+            >
+              <Star className="mr-1 h-4 w-4" />
+              {follows ? "Following" : "Follow"}
+            </Button>
+            {/* Followed-by indicator */}
+            {followedBy && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Star className="h-3 w-3" /> Followed by them
+              </Badge>
+            )}
+            {/* Block / Unblock */}
+            <Button
+              variant={blockedAny ? "destructive" : "outline"}
+              size="sm"
+              onClick={() => (blockedAny ? doUnblock.mutate() : doBlock.mutate())}
+            >
+              <ShieldBan className="mr-1 h-4 w-4" />
+              {blockedAny ? "Unblock" : "Block"}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Separator />

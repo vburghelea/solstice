@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
+import { Badge } from "~/shared/ui/badge";
 
 interface CampaignCardProps {
   campaign: CampaignListItem;
@@ -45,7 +46,11 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Visibility</span>
-            <span className="font-medium capitalize">{campaign.visibility}</span>
+            {campaign.visibility === "protected" ? (
+              <Badge variant="secondary">Connections-only</Badge>
+            ) : (
+              <span className="font-medium capitalize">{campaign.visibility}</span>
+            )}
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Participants</span>

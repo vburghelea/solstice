@@ -24,7 +24,9 @@ import {
   identityTagOptions,
   languageOptions,
 } from "~/shared/types/common";
-import { Button } from "~/shared/ui/button";
+//
+import { Link } from "@tanstack/react-router";
+import { Button } from "~/components/ui/button";
 import { TagInput } from "~/shared/ui/tag-input";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
@@ -1217,6 +1219,27 @@ export function ProfileView() {
               </div>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Blocklist Management */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Blocklist</CardTitle>
+              <CardDescription>Manage users you’ve blocked</CardDescription>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/dashboard/profile/blocklist">Open Blocklist</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">
+            Blocked users cannot follow you, invite you, or apply to your games/campaigns.
+            You can unblock them at any time.
+          </p>
         </CardContent>
       </Card>
 

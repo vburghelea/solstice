@@ -12,6 +12,7 @@ import { createServerRootRoute } from "@tanstack/react-start/server";
 
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as SearchRouteImport } from "./routes/search";
+import { Route as EventsRouteImport } from "./routes/events";
 import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
@@ -19,7 +20,11 @@ import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
+<<<<<<< HEAD
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
+=======
+import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
@@ -52,6 +57,10 @@ import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/p
 import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
 import { Route as DashboardGamesGameIdRouteImport } from "./routes/dashboard/games/$gameId";
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
+<<<<<<< HEAD
+=======
+import { Route as DashboardEventsEventIdRouteImport } from "./routes/dashboard/events/$eventId";
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard/campaigns/create";
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
@@ -74,6 +83,11 @@ const rootServerRouteImport = createServerRootRoute();
 const SearchRoute = SearchRouteImport.update({
   id: "/search",
   path: "/search",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const EventsRoute = EventsRouteImport.update({
+  id: "/events",
+  path: "/events",
   getParentRoute: () => rootRouteImport,
 } as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
@@ -111,9 +125,15 @@ const GameGameIdRoute = GameGameIdRouteImport.update({
   path: "/game/$gameId",
   getParentRoute: () => rootRouteImport,
 } as any);
+<<<<<<< HEAD
 const EventsSlugRoute = EventsSlugRouteImport.update({
   id: "/events/$slug",
   path: "/events/$slug",
+=======
+const EventEventIdRoute = EventEventIdRouteImport.update({
+  id: "/event/$eventId",
+  path: "/event/$eventId",
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
@@ -263,6 +283,14 @@ const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
   path: "/create",
   getParentRoute: () => DashboardEventsRoute,
 } as any);
+<<<<<<< HEAD
+=======
+const DashboardEventsEventIdRoute = DashboardEventsEventIdRouteImport.update({
+  id: "/$eventId",
+  path: "/$eventId",
+  getParentRoute: () => DashboardEventsRoute,
+} as any);
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 const DashboardCampaignsCreateRoute =
   DashboardCampaignsCreateRouteImport.update({
     id: "/create",
@@ -359,6 +387,7 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
 <<<<<<< HEAD
   "/login": typeof authLoginRoute;
@@ -379,12 +408,20 @@ export interface FileRoutesByFullPath {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+<<<<<<< HEAD
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+=======
+  "/event/$eventId": typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+<<<<<<< HEAD
+=======
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -408,6 +445,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
+  "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
 <<<<<<< HEAD
   "/login": typeof authLoginRoute;
@@ -423,11 +461,19 @@ export interface FileRoutesByTo {
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+<<<<<<< HEAD
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+=======
+  "/event/$eventId": typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+<<<<<<< HEAD
+=======
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -453,6 +499,7 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
 <<<<<<< HEAD
   "/(auth)/login": typeof authLoginRoute;
@@ -473,12 +520,20 @@ export interface FileRoutesById {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+<<<<<<< HEAD
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+=======
+  "/event/$eventId": typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+<<<<<<< HEAD
+=======
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -506,6 +561,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/events"
     | "/search"
 <<<<<<< HEAD
     | "/login"
@@ -526,12 +582,20 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/teams"
+<<<<<<< HEAD
     | "/events/$slug"
+=======
+    | "/event/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
     | "/dashboard/"
     | "/onboarding/"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
+<<<<<<< HEAD
+=======
+    | "/dashboard/events/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -555,6 +619,7 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/auth"
+    | "/events"
     | "/search"
 <<<<<<< HEAD
     | "/login"
@@ -570,11 +635,19 @@ export interface FileRouteTypes {
     | "/dashboard/membership"
     | "/dashboard/reports"
     | "/dashboard/settings"
+<<<<<<< HEAD
     | "/events/$slug"
+=======
+    | "/event/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
     | "/dashboard"
     | "/onboarding"
     | "/dashboard/campaigns/create"
+<<<<<<< HEAD
+=======
+    | "/dashboard/events/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -599,6 +672,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/events"
     | "/search"
 <<<<<<< HEAD
     | "/(auth)/login"
@@ -619,12 +693,20 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/teams"
+<<<<<<< HEAD
     | "/events/$slug"
+=======
+    | "/event/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
     | "/dashboard/"
     | "/onboarding/"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
+<<<<<<< HEAD
+=======
+    | "/dashboard/events/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -651,7 +733,9 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  EventsRoute: typeof EventsRoute;
   SearchRoute: typeof SearchRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   authLoginRoute: typeof authLoginRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
@@ -659,6 +743,9 @@ export interface RootRouteChildren {
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
 =======
 >>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
+=======
+  EventEventIdRoute: typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: typeof GameGameIdRoute;
 }
 export interface FileServerRoutesByFullPath {
@@ -745,6 +832,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SearchRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/events": {
+      id: "/events";
+      path: "/events";
+      fullPath: "/events";
+      preLoaderRoute: typeof EventsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/onboarding": {
       id: "/onboarding";
       path: "/onboarding";
@@ -794,11 +888,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GameGameIdRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+<<<<<<< HEAD
     "/events/$slug": {
       id: "/events/$slug";
       path: "/events/$slug";
       fullPath: "/events/$slug";
       preLoaderRoute: typeof EventsSlugRouteImport;
+=======
+    "/event/$eventId": {
+      id: "/event/$eventId";
+      path: "/event/$eventId";
+      fullPath: "/event/$eventId";
+      preLoaderRoute: typeof EventEventIdRouteImport;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams": {
@@ -1006,6 +1108,16 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsCreateRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
+<<<<<<< HEAD
+=======
+    "/dashboard/events/$eventId": {
+      id: "/dashboard/events/$eventId";
+      path: "/$eventId";
+      fullPath: "/dashboard/events/$eventId";
+      preLoaderRoute: typeof DashboardEventsEventIdRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+    };
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     "/dashboard/campaigns/create": {
       id: "/dashboard/campaigns/create";
       path: "/create";
@@ -1178,6 +1290,7 @@ const DashboardCampaignsRouteWithChildren =
   DashboardCampaignsRoute._addFileChildren(DashboardCampaignsRouteChildren);
 
 interface DashboardEventsRouteChildren {
+<<<<<<< HEAD
   DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
   DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
   DashboardEventsEventIdManageRoute: typeof DashboardEventsEventIdManageRoute;
@@ -1187,6 +1300,17 @@ const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
   DashboardEventsCreateRoute: DashboardEventsCreateRoute,
   DashboardEventsIndexRoute: DashboardEventsIndexRoute,
   DashboardEventsEventIdManageRoute: DashboardEventsEventIdManageRoute,
+=======
+  DashboardEventsEventIdRoute: typeof DashboardEventsEventIdRoute;
+  DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
+  DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
+}
+
+const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
+  DashboardEventsEventIdRoute: DashboardEventsEventIdRoute,
+  DashboardEventsCreateRoute: DashboardEventsCreateRoute,
+  DashboardEventsIndexRoute: DashboardEventsIndexRoute,
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 };
 
 const DashboardEventsRouteWithChildren = DashboardEventsRoute._addFileChildren(
@@ -1314,7 +1438,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  EventsRoute: EventsRoute,
   SearchRoute: SearchRoute,
+<<<<<<< HEAD
 <<<<<<< HEAD
   authLoginRoute: authLoginRoute,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
@@ -1322,6 +1448,9 @@ const rootRouteChildren: RootRouteChildren = {
   EventsSlugRoute: EventsSlugRouteWithChildren,
 =======
 >>>>>>> 033d8e8 (feat: added password reset functionality and actual email sending for invites to games and campaigns)
+=======
+  EventEventIdRoute: EventEventIdRoute,
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: GameGameIdRoute,
 };
 export const routeTree = rootRouteImport

@@ -27,6 +27,7 @@ import {
   getDashboardStats,
   getNextUserGame,
 } from "~/features/dashboard/dashboard.queries";
+import { getUpcomingEvents } from "~/features/events/events.queries";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 
@@ -81,7 +82,15 @@ function DashboardIndex() {
     },
   });
   const nextGame = nextGameResult?.success ? nextGameResult.data : null;
-  const upcomingEventsCount = nextGame ? 1 : 0;
+
+  // Upcoming events count (public, published or registration_open, starting today or later)
+  const { data: upcomingEventsRes } = useQuery({
+    queryKey: ["upcoming-events-dashboard"],
+    queryFn: async () => getUpcomingEvents({ data: { limit: 3 } }),
+  });
+  const upcomingEventsCount = Array.isArray(upcomingEventsRes)
+    ? upcomingEventsRes.length
+    : 0;
 
   function formatTimeDistance(date: Date) {
     const now = new Date().getTime();

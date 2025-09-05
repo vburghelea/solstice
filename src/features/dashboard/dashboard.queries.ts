@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, count, eq, gte, inArray, or, sql } from "drizzle-orm";
+import { and, count, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   campaignParticipants,
@@ -118,7 +118,7 @@ export const getDashboardStats = createServerFn({ method: "GET" }).handler(
 );
 
 /**
- * Get the next upcoming game for the current user (owner or participant).
+ * Get the next upcoming game for the current user as a confirmed participant.
  */
 export const getNextUserGame = createServerFn({ method: "GET" }).handler(
   async (): Promise<OperationResult<GameListItem | null>> => {
@@ -162,17 +162,14 @@ export const getNextUserGame = createServerFn({ method: "GET" }).handler(
         .from(games)
         .innerJoin(user, eq(games.ownerId, user.id))
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
-        .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+        .innerJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
         .where(
           and(
             gte(games.dateTime, now),
-            or(
-              eq(games.ownerId, currentUser.id),
-              and(
-                eq(gameParticipants.userId, currentUser.id),
-                inArray(gameParticipants.role, ["player", "invited"]),
-              ),
-            ),
+            eq(games.status, "scheduled"),
+            eq(gameParticipants.userId, currentUser.id),
+            eq(gameParticipants.role, "player"),
+            eq(gameParticipants.status, "approved"),
           ),
         )
         .groupBy(games.id, user.id, gameSystems.id)

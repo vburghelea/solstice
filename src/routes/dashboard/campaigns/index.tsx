@@ -17,6 +17,7 @@ import { campaignStatusEnum } from "~/db/schema";
 import { listCampaigns } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/campaigns/")({
   component: CampaignsPage,
@@ -114,33 +115,38 @@ export function CampaignsPage() {
       ) : (
         <>
           {/* Mobile list */}
-          <div className="space-y-3 md:hidden">
-            {campaigns.map((c: CampaignListItem) => (
-              <Link
-                key={c.id}
-                to="/dashboard/campaigns/$campaignId"
-                params={{ campaignId: c.id }}
-                className="block rounded-lg border bg-white p-4 shadow-sm transition hover:bg-gray-50"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-base font-semibold text-gray-900">
-                      {c.name}
+          <div className="md:hidden">
+            <List>
+              {campaigns.map((c: CampaignListItem) => (
+                <List.Item key={c.id} className="group">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-base font-semibold text-gray-900">
+                        {c.name}
+                      </div>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5" /> {c.recurrence}
+                        </span>
+                        <span className="truncate">{c.gameSystem.name}</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                        <Users className="h-3.5 w-3.5" /> {c.participantCount}{" "}
+                        participants
+                      </div>
                     </div>
-                    <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" /> {c.recurrence}
-                      </span>
-                      <span className="truncate">{c.gameSystem.name}</span>
-                    </div>
-                    <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                      <Users className="h-3.5 w-3.5" /> {c.participantCount} participants
-                    </div>
+                    <Link
+                      to="/dashboard/campaigns/$campaignId"
+                      params={{ campaignId: c.id }}
+                      className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                    >
+                      View
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
                   </div>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
-                </div>
-              </Link>
-            ))}
+                </List.Item>
+              ))}
+            </List>
           </div>
 
           {/* Desktop grid */}

@@ -350,6 +350,9 @@ export const addGameParticipant = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const [{ canInvite, getRelationship }] = await Promise.all([
+        import("~/features/social/relationship.server"),
+      ]);
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -369,6 +372,29 @@ export const addGameParticipant = createServerFn({ method: "POST" })
           success: false,
           errors: [{ code: "AUTH_ERROR", message: "Not authorized to add participants" }],
         };
+      }
+
+      // Respect blocklist and invitee privacy for owner → target actions
+      if (data.userId !== currentUser.id) {
+        const rel = await getRelationship(currentUser.id, data.userId);
+        if (rel.blocked || rel.blockedBy) {
+          return {
+            success: false,
+            errors: [{ code: "FORBIDDEN", message: "You cannot add this user" }],
+          };
+        }
+        const ok = await canInvite(currentUser.id, data.userId);
+        if (!ok) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "This user only accepts invites from connections",
+              },
+            ],
+          };
+        }
       }
 
       const [newParticipant] = await db
@@ -550,6 +576,7 @@ export const applyToGame = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { getRelationship } = await import("~/features/social/relationship.server");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -566,6 +593,25 @@ export const applyToGame = createServerFn({ method: "POST" })
         return {
           success: false,
           errors: [{ code: "NOT_FOUND", message: "Game not found" }],
+        };
+      }
+
+      // Blocklist restrictions (symmetric): cannot apply if either side has blocked
+      const rel = await getRelationship(currentUser.id, game.ownerId);
+      if (rel.blocked || rel.blockedBy) {
+        return {
+          success: false,
+          errors: [
+            { code: "FORBIDDEN", message: "You cannot interact with this organizer" },
+          ],
+        };
+      }
+
+      // Connections-only gate for protected games
+      if (game.visibility === "protected" && !rel.isConnection) {
+        return {
+          success: false,
+          errors: [{ code: "FORBIDDEN", message: "Not eligible to apply to this game" }],
         };
       }
 
@@ -689,6 +735,9 @@ export const inviteToGame = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const [{ canInvite, getRelationship }] = await Promise.all([
+        import("~/features/social/relationship.server"),
+      ]);
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -774,6 +823,29 @@ export const inviteToGame = createServerFn({ method: "POST" })
           success: false,
           errors: [
             { code: "VALIDATION_ERROR", message: "User ID or email must be provided" },
+          ],
+        };
+      }
+
+      // Blocklist restriction between inviter and invitee
+      const relToInvitee = await getRelationship(currentUser.id, targetUserId);
+      if (relToInvitee.blocked || relToInvitee.blockedBy) {
+        return {
+          success: false,
+          errors: [{ code: "FORBIDDEN", message: "You cannot invite this user" }],
+        };
+      }
+
+      // Invitee privacy: only allow invites from connections if enabled
+      const canInviteNow = await canInvite(currentUser.id, targetUserId);
+      if (!canInviteNow) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "FORBIDDEN",
+              message: "This user only accepts invites from connections",
+            },
           ],
         };
       }
@@ -884,6 +956,7 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { eq } = await import("drizzle-orm");
+      const { getRelationship } = await import("~/features/social/relationship.server");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -926,6 +999,17 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
       }
 
       if (data.action === "accept") {
+        // Blocklist restriction: invitee cannot accept if blocked any direction with owner
+        const rel = await getRelationship(
+          currentUser.id,
+          existingParticipant.game.ownerId,
+        );
+        if (rel.blocked || rel.blockedBy) {
+          return {
+            success: false,
+            errors: [{ code: "FORBIDDEN", message: "You cannot accept this invitation" }],
+          };
+        }
         const [updatedParticipant] = await db
           .update(gameParticipants)
           .set({

@@ -211,6 +211,7 @@ export const listGames = createServerFn({ method: "POST" })
       visibilityConditionsForOr.push(eq(games.visibility, "public"));
 
       if (currentUserId) {
+        const { userFollows, userBlocks } = await import("~/db/schema");
         // Rule 2: All private games they are a participant of or invited to
         const userGames = db
           .select({ gameId: gameParticipants.gameId })
@@ -232,15 +233,25 @@ export const listGames = createServerFn({ method: "POST" })
         // Rule 3: All games they own
         visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
 
-        // Rule 4: Protected games where user meets minimum requirements (placeholder)
-        // This would involve checking the user's profile against games.minimumRequirements
-        // For now, we'll just include games where the user is an owner or participant/invited
-        // and the game is protected. A more robust check would be needed here.
+        // Rule 4: Protected (connections-only) where viewer and owner are connected and not blocked
+        const isConnectedSql = sql<boolean>`(
+          EXISTS (
+            SELECT 1 FROM ${userFollows} uf
+            WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
+          ) OR EXISTS (
+            SELECT 1 FROM ${userFollows} uf2
+            WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
+          )
+        )`;
+        const isBlockedSql = sql<boolean>`EXISTS (
+          SELECT 1 FROM ${userBlocks} ub
+          WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${games.ownerId})
+             OR (ub.blocker_id = ${games.ownerId} AND ub.blockee_id = ${currentUserId})
+        )`;
         visibilityConditionsForOr.push(
           and(
             eq(games.visibility, "protected"),
-            or(eq(games.ownerId, currentUserId), sql`${games.id} IN ${userGames}`),
-            // TODO: Add actual minimum requirements check here
+            sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
           ),
         );
       }
@@ -317,6 +328,9 @@ export const searchGames = createServerFn({ method: "POST" })
   .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
     try {
       const db = await getDb();
+      const currentUser = await getCurrentUser();
+      const currentUserId = currentUser?.id;
+      const { userBlocks } = await import("~/db/schema");
       const searchTerm = `%${data.query}%`;
 
       const result: GameQueryResultRow[] = await db
@@ -348,12 +362,19 @@ export const searchGames = createServerFn({ method: "POST" })
         .innerJoin(user, eq(games.ownerId, user.id))
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
-        .where(
-          and(
-            eq(games.visibility, "public"), // Only search public games
+        .where(() => {
+          const base = and(
+            eq(games.visibility, "public"),
             ilike(games.description, searchTerm),
-          ),
-        )
+          );
+          if (!currentUserId) return base;
+          const blockedSql = sql<boolean>`EXISTS (
+            SELECT 1 FROM ${userBlocks} ub
+            WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${games.ownerId})
+               OR (ub.blocker_id = ${games.ownerId} AND ub.blockee_id = ${currentUserId})
+          )`;
+          return and(base, sql`NOT (${blockedSql})`);
+        })
         .groupBy(games.id, user.id, gameSystems.id)
         .orderBy(games.dateTime)
         .limit(20);

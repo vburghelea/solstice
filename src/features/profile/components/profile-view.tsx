@@ -222,7 +222,9 @@ export function ProfileView() {
             newPrivacy.showLanguages !== currentPrivacy.showLanguages ||
             newPrivacy.showGamePreferences !== currentPrivacy.showGamePreferences ||
             newPrivacy.allowTeamInvitations !== currentPrivacy.allowTeamInvitations ||
-            newPrivacy.allowFollows !== currentPrivacy.allowFollows
+            newPrivacy.allowFollows !== currentPrivacy.allowFollows ||
+            (newPrivacy.allowInvitesOnlyFromConnections ?? false) !==
+              (currentPrivacy.allowInvitesOnlyFromConnections ?? false)
           ) {
             dataToSubmit["privacySettings"] = newPrivacy;
             hasChanges = true;

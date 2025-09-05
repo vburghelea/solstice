@@ -211,6 +211,10 @@ export const blockUser = createServerFn({ method: "POST" })
               ),
             ),
           );
+
+        // Cancel pending invites and applications between users
+        const { cancelPendingBetweenUsers } = await import("./enforcement.server");
+        await cancelPendingBetweenUsers(currentUser.id, data.userId);
       }
 
       // Audit

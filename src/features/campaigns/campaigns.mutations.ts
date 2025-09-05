@@ -253,6 +253,9 @@ export const addCampaignParticipant = createServerFn({ method: "POST" })
       try {
         const { getDb } = await import("~/db/server-helpers");
         const { getCurrentUser } = await import("~/features/auth/auth.queries");
+        const [{ canInvite, getRelationship }] = await Promise.all([
+          import("~/features/social/relationship.server"),
+        ]);
 
         const currentUser = await getCurrentUser();
         if (!currentUser) {
@@ -273,6 +276,29 @@ export const addCampaignParticipant = createServerFn({ method: "POST" })
               { code: "AUTH_ERROR", message: "Not authorized to add participants" },
             ],
           };
+        }
+
+        // Respect blocklist and invitee privacy for owner → target actions
+        if (data.userId !== currentUser.id) {
+          const rel = await getRelationship(currentUser.id, data.userId);
+          if (rel.blocked || rel.blockedBy) {
+            return {
+              success: false,
+              errors: [{ code: "FORBIDDEN", message: "You cannot add this user" }],
+            };
+          }
+          const ok = await canInvite(currentUser.id, data.userId);
+          if (!ok) {
+            return {
+              success: false,
+              errors: [
+                {
+                  code: "FORBIDDEN",
+                  message: "This user only accepts invites from connections",
+                },
+              ],
+            };
+          }
         }
 
         const [newParticipant] = await db
@@ -451,6 +477,7 @@ export const applyToCampaign = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { getRelationship } = await import("~/features/social/relationship.server");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -467,6 +494,27 @@ export const applyToCampaign = createServerFn({ method: "POST" })
         return {
           success: false,
           errors: [{ code: "NOT_FOUND", message: "Campaign not found" }],
+        };
+      }
+
+      // Blocklist restrictions (symmetric): cannot apply if either side has blocked
+      const rel = await getRelationship(currentUser.id, campaign.ownerId);
+      if (rel.blocked || rel.blockedBy) {
+        return {
+          success: false,
+          errors: [
+            { code: "FORBIDDEN", message: "You cannot interact with this organizer" },
+          ],
+        };
+      }
+
+      // Connections-only gate for protected campaigns
+      if (campaign.visibility === "protected" && !rel.isConnection) {
+        return {
+          success: false,
+          errors: [
+            { code: "FORBIDDEN", message: "Not eligible to apply to this campaign" },
+          ],
         };
       }
 
@@ -650,6 +698,9 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { getAuth } = await import("~/lib/auth/server-helpers");
       const auth = await getAuth();
+      const [{ canInvite, getRelationship }] = await Promise.all([
+        import("~/features/social/relationship.server"),
+      ]);
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -683,6 +734,27 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
 
       if (invitedUser) {
         // User exists, create participant entry
+        // Blocklist restriction
+        const rel = await getRelationship(currentUser.id, invitedUser.id);
+        if (rel.blocked || rel.blockedBy) {
+          return {
+            success: false,
+            errors: [{ code: "FORBIDDEN", message: "You cannot invite this user" }],
+          };
+        }
+        // Invitee privacy
+        const ok = await canInvite(currentUser.id, invitedUser.id);
+        if (!ok) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "This user only accepts invites from connections",
+              },
+            ],
+          };
+        }
         const [existingParticipant] = await db
           .select()
           .from(campaignParticipants)
@@ -918,6 +990,7 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const { getRelationship } = await import("~/features/social/relationship.server");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -966,6 +1039,19 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
       }
 
       // Update participant status based on action
+      if (data.action === "accept") {
+        // Blocklist restriction: invitee cannot accept if blocked any direction with owner
+        const rel = await getRelationship(
+          currentUser.id,
+          existingParticipant.campaign.ownerId,
+        );
+        if (rel.blocked || rel.blockedBy) {
+          return {
+            success: false,
+            errors: [{ code: "FORBIDDEN", message: "You cannot accept this invitation" }],
+          };
+        }
+      }
       const newStatus = data.action === "accept" ? "approved" : "rejected";
 
       const [updatedParticipant] = await db

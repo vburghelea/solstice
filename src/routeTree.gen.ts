@@ -128,6 +128,7 @@ import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.re
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardProfileBlocklistRouteImport } from "./routes/dashboard/profile/blocklist";
 import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
 import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
 import { Route as DashboardGamesGameIdRouteImport } from "./routes/dashboard/games/$gameId";
@@ -531,6 +532,7 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
     id: "/$systemId",
@@ -542,14 +544,19 @@ const DashboardReviewsPendingRoute = DashboardReviewsPendingRouteImport.update({
   path: "/reviews/pending",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+=======
+>>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
 const DashboardProfileBlocklistRoute =
   DashboardProfileBlocklistRouteImport.update({
     id: "/blocklist",
     path: "/blocklist",
     getParentRoute: () => DashboardProfileRoute,
   } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+>>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
 const DashboardProfileUserIdRoute = DashboardProfileUserIdRouteImport.update({
   id: "/$userId",
   path: "/$userId",
@@ -937,6 +944,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
+  "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1084,6 +1092,7 @@ export interface FileRoutesByTo {
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
+  "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
@@ -1261,6 +1270,7 @@ export interface FileRoutesById {
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
+  "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1423,6 +1433,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
+    | "/dashboard/profile/blocklist"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1570,6 +1581,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
+    | "/dashboard/profile/blocklist"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
@@ -1729,6 +1741,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
+    | "/dashboard/profile/blocklist"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -2401,6 +2414,7 @@ declare module "@tanstack/react-router" {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/systems/$systemId": {
       id: "/dashboard/systems/$systemId";
       path: "/$systemId";
@@ -2415,6 +2429,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardReviewsPendingRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+=======
+>>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
     "/dashboard/profile/blocklist": {
       id: "/dashboard/profile/blocklist";
       path: "/blocklist";
@@ -2422,8 +2438,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardProfileBlocklistRouteImport;
       parentRoute: typeof DashboardProfileRoute;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+>>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
     "/dashboard/profile/$userId": {
       id: "/dashboard/profile/$userId";
       path: "/$userId";
@@ -2908,19 +2927,26 @@ const DashboardGamesRouteWithChildren = DashboardGamesRoute._addFileChildren(
 interface DashboardProfileRouteChildren {
   DashboardProfileUserIdRoute: typeof DashboardProfileUserIdRoute;
   DashboardProfileBlocklistRoute: typeof DashboardProfileBlocklistRoute;
+<<<<<<< HEAD
 =======
 interface DashboardProfileRouteChildren {
   DashboardProfileUserIdRoute: typeof DashboardProfileUserIdRoute;
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+>>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
   DashboardProfileIndexRoute: typeof DashboardProfileIndexRoute;
 }
 
 const DashboardProfileRouteChildren: DashboardProfileRouteChildren = {
   DashboardProfileUserIdRoute: DashboardProfileUserIdRoute,
 <<<<<<< HEAD
+<<<<<<< HEAD
   DashboardProfileBlocklistRoute: DashboardProfileBlocklistRoute,
 =======
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+  DashboardProfileBlocklistRoute: DashboardProfileBlocklistRoute,
+>>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
   DashboardProfileIndexRoute: DashboardProfileIndexRoute,
 };
 

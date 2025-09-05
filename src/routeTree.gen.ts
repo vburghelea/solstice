@@ -27,8 +27,15 @@ import { Route as AboutRouteImport } from "./routes/about";
 =======
 =======
 import { Route as SearchRouteImport } from "./routes/search";
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+<<<<<<< HEAD
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+=======
+import { Route as EventsRouteImport } from "./routes/events";
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
@@ -49,8 +56,15 @@ import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 =======
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+<<<<<<< HEAD
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+=======
+import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
 import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
@@ -120,9 +134,15 @@ import { Route as DashboardGamesGameIdRouteImport } from "./routes/dashboard/gam
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
 =======
+=======
+=======
+import { Route as DashboardEventsEventIdRouteImport } from "./routes/dashboard/events/$eventId";
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard/campaigns/create";
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 >>>>>>> 2c22514 (feat: added baseline campaign functionality, based on games)
@@ -223,6 +243,11 @@ const SearchRoute = SearchRouteImport.update({
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
   getParentRoute: () => rootRouteImport,
 } as any);
+const EventsRoute = EventsRouteImport.update({
+  id: "/events",
+  path: "/events",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
   id: "/onboarding",
   path: "/onboarding",
@@ -293,6 +318,11 @@ const GameGameIdRoute = GameGameIdRouteImport.update({
   path: "/game/$gameId",
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+  getParentRoute: () => rootRouteImport,
+} as any);
+const EventEventIdRoute = EventEventIdRouteImport.update({
+  id: "/event/$eventId",
+  path: "/event/$eventId",
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
@@ -554,13 +584,21 @@ const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 const DashboardEventsEventIdRoute = DashboardEventsEventIdRouteImport.update({
   id: "/$eventId",
   path: "/$eventId",
   getParentRoute: () => DashboardEventsRoute,
 } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> 2c22514 (feat: added baseline campaign functionality, based on games)
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 const DashboardCampaignsCreateRoute =
   DashboardCampaignsCreateRouteImport.update({
     id: "/create",
@@ -758,6 +796,7 @@ export interface FileRoutesByFullPath {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
@@ -765,6 +804,8 @@ export interface FileRoutesByFullPath {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/about": typeof AboutRoute;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
@@ -779,6 +820,9 @@ export interface FileRoutesByFullPath {
 =======
 =======
 =======
+=======
+  "/events": typeof EventsRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/search": typeof SearchRoute;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -800,6 +844,12 @@ export interface FileRoutesByFullPath {
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  "/dashboard/forbidden": typeof DashboardForbiddenRoute;
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/games": typeof DashboardGamesRouteWithChildren;
 =======
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -819,6 +869,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   "/event/$eventId": typeof EventEventIdRoute;
@@ -852,8 +903,13 @@ export interface FileRoutesByFullPath {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/events/$slug": typeof EventsSlugRouteWithChildren;
 =======
+=======
+  "/event/$eventId": typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/dashboard/": typeof DashboardIndexRoute;
@@ -867,6 +923,10 @@ export interface FileRoutesByFullPath {
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+<<<<<<< HEAD
+=======
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -911,6 +971,7 @@ export interface FileRoutesByTo {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
@@ -918,6 +979,8 @@ export interface FileRoutesByTo {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/about": typeof AboutRoute;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
@@ -932,6 +995,9 @@ export interface FileRoutesByTo {
 =======
 =======
 =======
+=======
+  "/events": typeof EventsRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/search": typeof SearchRoute;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -946,7 +1012,10 @@ export interface FileRoutesByTo {
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
+<<<<<<< HEAD
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
@@ -954,7 +1023,10 @@ export interface FileRoutesByTo {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
@@ -998,6 +1070,10 @@ export interface FileRoutesByTo {
 =======
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+<<<<<<< HEAD
+=======
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -1044,6 +1120,7 @@ export interface FileRoutesById {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
@@ -1051,6 +1128,8 @@ export interface FileRoutesById {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/about": typeof AboutRoute;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
@@ -1065,6 +1144,9 @@ export interface FileRoutesById {
 =======
 =======
 =======
+=======
+  "/events": typeof EventsRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/search": typeof SearchRoute;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -1086,6 +1168,12 @@ export interface FileRoutesById {
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  "/dashboard/forbidden": typeof DashboardForbiddenRoute;
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/games": typeof DashboardGamesRouteWithChildren;
 =======
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -1105,6 +1193,7 @@ export interface FileRoutesById {
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   "/event/$eventId": typeof EventEventIdRoute;
@@ -1138,8 +1227,13 @@ export interface FileRoutesById {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/events/$slug": typeof EventsSlugRouteWithChildren;
 =======
+=======
+  "/event/$eventId": typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
   "/dashboard/": typeof DashboardIndexRoute;
@@ -1153,6 +1247,10 @@ export interface FileRoutesById {
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+<<<<<<< HEAD
+=======
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
@@ -1201,6 +1299,7 @@ export interface FileRouteTypes {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
@@ -1208,6 +1307,8 @@ export interface FileRouteTypes {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/about"
     | "/design-system"
     | "/resources"
@@ -1222,6 +1323,9 @@ export interface FileRouteTypes {
 =======
 =======
 =======
+=======
+    | "/events"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/search"
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -1257,6 +1361,7 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -1288,8 +1393,13 @@ export interface FileRouteTypes {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/events/$slug"
 =======
+=======
+    | "/event/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/dashboard/"
@@ -1299,6 +1409,10 @@ export interface FileRouteTypes {
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
+<<<<<<< HEAD
+=======
+    | "/dashboard/events/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -1343,6 +1457,7 @@ export interface FileRouteTypes {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
@@ -1350,6 +1465,8 @@ export interface FileRouteTypes {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/about"
     | "/design-system"
     | "/resources"
@@ -1364,6 +1481,9 @@ export interface FileRouteTypes {
 =======
 =======
 =======
+=======
+    | "/events"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/search"
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -1378,7 +1498,10 @@ export interface FileRouteTypes {
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
+<<<<<<< HEAD
     | "/dashboard/forbidden"
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/members"
     | "/dashboard/membership"
     | "/dashboard/reports"
@@ -1386,7 +1509,10 @@ export interface FileRouteTypes {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/dashboard/social-audits"
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -1430,6 +1556,10 @@ export interface FileRouteTypes {
 =======
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/campaigns/create"
+<<<<<<< HEAD
+=======
+    | "/dashboard/events/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -1475,6 +1605,7 @@ export interface FileRouteTypes {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
@@ -1482,6 +1613,8 @@ export interface FileRouteTypes {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/about"
     | "/design-system"
     | "/resources"
@@ -1496,6 +1629,9 @@ export interface FileRouteTypes {
 =======
 =======
 =======
+=======
+    | "/events"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/search"
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -1531,6 +1667,7 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -1562,8 +1699,13 @@ export interface FileRouteTypes {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/events/$slug"
 =======
+=======
+    | "/event/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
     | "/dashboard/"
@@ -1573,6 +1715,10 @@ export interface FileRouteTypes {
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
+<<<<<<< HEAD
+=======
+    | "/dashboard/events/$eventId"
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/dashboard/events/create"
     | "/dashboard/games/$gameId"
     | "/dashboard/games/create"
@@ -1620,6 +1766,7 @@ export interface RootRouteChildren {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   EventsRoute: typeof EventsRoute;
   SearchRoute: typeof SearchRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
@@ -1636,6 +1783,8 @@ export interface RootRouteChildren {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   AboutRoute: typeof AboutRoute;
   DesignSystemRoute: typeof DesignSystemRoute;
   ResourcesRoute: typeof ResourcesRoute;
@@ -1651,6 +1800,11 @@ export interface RootRouteChildren {
 =======
   SearchRoute: typeof SearchRoute;
   authLoginRoute: typeof authLoginRoute;
+=======
+  EventsRoute: typeof EventsRoute;
+  SearchRoute: typeof SearchRoute;
+  EventEventIdRoute: typeof EventEventIdRoute;
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: typeof GameGameIdRoute;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -1837,6 +1991,13 @@ declare module "@tanstack/react-router" {
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
       parentRoute: typeof rootRouteImport;
     };
+    "/events": {
+      id: "/events";
+      path: "/events";
+      fullPath: "/events";
+      preLoaderRoute: typeof EventsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/onboarding": {
       id: "/onboarding";
       path: "/onboarding";
@@ -1933,6 +2094,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GameGameIdRouteImport;
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+      parentRoute: typeof rootRouteImport;
+    };
+    "/event/$eventId": {
+      id: "/event/$eventId";
+      path: "/event/$eventId";
+      fullPath: "/event/$eventId";
+      preLoaderRoute: typeof EventEventIdRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams": {
@@ -2278,6 +2446,10 @@ declare module "@tanstack/react-router" {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     "/dashboard/events/$eventId": {
       id: "/dashboard/events/$eventId";
       path: "/$eventId";
@@ -2285,8 +2457,12 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsEventIdRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> 2c22514 (feat: added baseline campaign functionality, based on games)
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     "/dashboard/campaigns/create": {
       id: "/dashboard/campaigns/create";
       path: "/create";
@@ -2646,6 +2822,7 @@ const DashboardCampaignsRouteWithChildren =
 
 >>>>>>> 2c22514 (feat: added baseline campaign functionality, based on games)
 interface DashboardEventsRouteChildren {
+<<<<<<< HEAD
   DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
   DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
   DashboardEventsEventIdManageRoute: typeof DashboardEventsEventIdManageRoute;
@@ -2655,7 +2832,21 @@ const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
   DashboardEventsCreateRoute: DashboardEventsCreateRoute,
   DashboardEventsIndexRoute: DashboardEventsIndexRoute,
   DashboardEventsEventIdManageRoute: DashboardEventsEventIdManageRoute,
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+=======
+  DashboardEventsEventIdRoute: typeof DashboardEventsEventIdRoute;
+  DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
+  DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
+}
+
+const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
+  DashboardEventsEventIdRoute: DashboardEventsEventIdRoute,
+  DashboardEventsCreateRoute: DashboardEventsCreateRoute,
+  DashboardEventsIndexRoute: DashboardEventsIndexRoute,
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 };
 
 const DashboardEventsRouteWithChildren = DashboardEventsRoute._addFileChildren(
@@ -2772,10 +2963,16 @@ interface DashboardRouteRouteChildren {
   DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren;
   DashboardCampaignsRoute: typeof DashboardCampaignsRouteWithChildren;
   DashboardEventsRoute: typeof DashboardEventsRouteWithChildren;
+<<<<<<< HEAD
   DashboardForbiddenRoute: typeof DashboardForbiddenRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   DashboardGamesRoute: typeof DashboardGamesRouteWithChildren;
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
   DashboardMembersRoute: typeof DashboardMembersRoute;
@@ -2812,10 +3009,16 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAdminRouteRoute: DashboardAdminRouteRouteWithChildren,
   DashboardCampaignsRoute: DashboardCampaignsRouteWithChildren,
   DashboardEventsRoute: DashboardEventsRouteWithChildren,
+<<<<<<< HEAD
   DashboardForbiddenRoute: DashboardForbiddenRoute,
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 4ad1b44 (feat: enhance admin navigation and event management features)
 =======
+=======
+=======
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   DashboardGamesRoute: DashboardGamesRouteWithChildren,
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
   DashboardMembersRoute: DashboardMembersRoute,
@@ -2877,6 +3080,7 @@ const rootRouteChildren: RootRouteChildren = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   EventsRoute: EventsRoute,
   SearchRoute: SearchRoute,
   EventEventIdRoute: EventEventIdRoute,
@@ -2893,6 +3097,8 @@ const rootRouteChildren: RootRouteChildren = {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   AboutRoute: AboutRoute,
   DesignSystemRoute: DesignSystemRoute,
   ResourcesRoute: ResourcesRoute,
@@ -2908,6 +3114,11 @@ const rootRouteChildren: RootRouteChildren = {
 =======
   SearchRoute: SearchRoute,
   authLoginRoute: authLoginRoute,
+=======
+  EventsRoute: EventsRoute,
+  SearchRoute: SearchRoute,
+  EventEventIdRoute: EventEventIdRoute,
+>>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: GameGameIdRoute,
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)

@@ -37,6 +37,16 @@ import type {
   EventPaymentStatus,
   EventWithDetails,
 } from "./events.types";
+import type { EventFilters, EventListResult, EventWithDetails } from "./events.types";
+// Lightweight DTO for registrations list
+export type EventRegistrationListItem = {
+  id: string;
+  registrationType: string;
+  status: string;
+  division: string | null;
+  team: { id: string; name: string; slug: string } | null;
+  user: { id: string; name: string; email: string };
+};
 
 // Type for EventRegistration with properly typed roster + metadata
 type EventRegistrationWithRoster = Omit<

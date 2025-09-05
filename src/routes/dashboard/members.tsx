@@ -29,6 +29,7 @@ import {
   type MemberDirectoryResponse,
 } from "~/features/members";
 import { exportToCSV, formatDate } from "~/lib/utils/csv-export";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/members")({
   component: MembersPage,

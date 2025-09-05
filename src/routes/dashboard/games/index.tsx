@@ -21,6 +21,7 @@ import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
+import { List } from "~/shared/ui/list";
 
 function getStatusBadgeVariant(status: GameListItem["status"]) {
   switch (status) {

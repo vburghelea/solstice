@@ -1184,6 +1184,15 @@ export const user = pgTable(
   (table) => [unique("user_email_unique").on(table.email)],
 );
 
+export const verification = pgTable("verification", {
+  id: text().primaryKey().notNull(),
+  identifier: text().notNull(),
+  value: text().notNull(),
+  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }),
+  updatedAt: timestamp("updated_at", { mode: "string" }),
+});
+
 export const account = pgTable(
   "account",
   {

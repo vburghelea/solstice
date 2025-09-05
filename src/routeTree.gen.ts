@@ -194,7 +194,10 @@ import { ServerRoute as ApiSocialRelationshipServerRouteImport } from "./routes/
 import { ServerRoute as ApiSocialFollowServerRouteImport } from "./routes/api/social/follow";
 import { ServerRoute as ApiSocialBlocklistServerRouteImport } from "./routes/api/social/blocklist";
 import { ServerRoute as ApiSocialBlockServerRouteImport } from "./routes/api/social/block";
+<<<<<<< HEAD
 import { ServerRoute as ApiAvatarsFileServerRouteImport } from "./routes/api/avatars/$file";
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
 import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
@@ -765,11 +768,14 @@ const ApiSocialBlockServerRoute = ApiSocialBlockServerRouteImport.update({
   path: "/api/social/block",
   getParentRoute: () => rootServerRouteImport,
 } as any);
+<<<<<<< HEAD
 const ApiAvatarsFileServerRoute = ApiAvatarsFileServerRouteImport.update({
   id: "/api/avatars/$file",
   path: "/api/avatars/$file",
   getParentRoute: () => rootServerRouteImport,
 } as any);
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: "/api/auth/$",
   path: "/api/auth/$",
@@ -1814,7 +1820,10 @@ export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+<<<<<<< HEAD
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1831,7 +1840,10 @@ export interface FileServerRoutesByTo {
   "/api/health": typeof ApiHealthServerRoute;
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+<<<<<<< HEAD
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1849,7 +1861,10 @@ export interface FileServerRoutesById {
   "/api/health": typeof ApiHealthServerRoute;
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
+<<<<<<< HEAD
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1868,7 +1883,10 @@ export interface FileServerRouteTypes {
     | "/api/health"
     | "/api/test-square"
     | "/api/auth/$"
+<<<<<<< HEAD
     | "/api/avatars/$file"
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1885,7 +1903,10 @@ export interface FileServerRouteTypes {
     | "/api/health"
     | "/api/test-square"
     | "/api/auth/$"
+<<<<<<< HEAD
     | "/api/avatars/$file"
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1902,7 +1923,10 @@ export interface FileServerRouteTypes {
     | "/api/health"
     | "/api/test-square"
     | "/api/auth/$"
+<<<<<<< HEAD
     | "/api/avatars/$file"
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1920,7 +1944,10 @@ export interface RootServerRouteChildren {
   ApiHealthServerRoute: typeof ApiHealthServerRoute;
   ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+<<<<<<< HEAD
   ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
   ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
   ApiSocialBlocklistServerRoute: typeof ApiSocialBlocklistServerRoute;
   ApiSocialFollowServerRoute: typeof ApiSocialFollowServerRoute;
@@ -2669,6 +2696,7 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiSocialBlockServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+<<<<<<< HEAD
     "/api/avatars/$file": {
       id: "/api/avatars/$file";
       path: "/api/avatars/$file";
@@ -2676,6 +2704,8 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiAvatarsFileServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
     "/api/auth/$": {
       id: "/api/auth/$";
       path: "/api/auth/$";
@@ -3131,7 +3161,10 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHealthServerRoute: ApiHealthServerRoute,
   ApiTestSquareServerRoute: ApiTestSquareServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+<<<<<<< HEAD
   ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
+=======
+>>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
   ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,
   ApiSocialBlocklistServerRoute: ApiSocialBlocklistServerRoute,
   ApiSocialFollowServerRoute: ApiSocialFollowServerRoute,

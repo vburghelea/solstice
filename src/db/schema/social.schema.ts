@@ -128,6 +128,22 @@ export const socialAuditLogs = pgTable("social_audit_logs", {
     .notNull(),
 });
 
+// Social audit logs
+export const socialAuditLogs = pgTable("social_audit_logs", {
+  id: text("id").primaryKey(),
+  actorUserId: text("actor_user_id").references(() => user.id, {
+    onDelete: "set null",
+  }),
+  targetUserId: text("target_user_id").references(() => user.id, {
+    onDelete: "set null",
+  }),
+  action: socialActionEnum("action").notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Types
 export type UserFollow = typeof userFollows.$inferSelect;
 export type NewUserFollow = typeof userFollows.$inferInsert;

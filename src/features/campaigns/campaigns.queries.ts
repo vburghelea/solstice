@@ -79,6 +79,7 @@ export const listCampaigns = createServerFn({ method: "POST" })
       visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
 
       if (currentUserId) {
+        const { userFollows, userBlocks } = await import("~/db/schema");
         const userCampaigns = db
           .select({ campaignId: campaignParticipants.campaignId })
           .from(campaignParticipants)
@@ -93,13 +94,25 @@ export const listCampaigns = createServerFn({ method: "POST" })
 
         visibilityConditionsForOr.push(eq(campaigns.ownerId, currentUserId));
 
+        // Protected (connections-only) where viewer and owner are connected and not blocked
+        const isConnectedSql = sql<boolean>`(
+          EXISTS (
+            SELECT 1 FROM ${userFollows} uf
+            WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${campaigns.ownerId}
+          ) OR EXISTS (
+            SELECT 1 FROM ${userFollows} uf2
+            WHERE uf2.follower_id = ${campaigns.ownerId} AND uf2.following_id = ${currentUserId}
+          )
+        )`;
+        const isBlockedSql = sql<boolean>`EXISTS (
+          SELECT 1 FROM ${userBlocks} ub
+          WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${campaigns.ownerId})
+             OR (ub.blocker_id = ${campaigns.ownerId} AND ub.blockee_id = ${currentUserId})
+        )`;
         visibilityConditionsForOr.push(
           and(
             eq(campaigns.visibility, "protected"),
-            or(
-              eq(campaigns.ownerId, currentUserId),
-              sql`${campaigns.id} IN ${userCampaigns}`,
-            ),
+            sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
           ),
         );
       }

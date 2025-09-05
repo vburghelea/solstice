@@ -9,6 +9,7 @@ export const privacySettingsSchema = z.object({
   showGamePreferences: z.boolean(),
   allowTeamInvitations: z.boolean(),
   allowFollows: z.boolean(),
+  allowInvitesOnlyFromConnections: z.boolean().optional(),
 });
 
 export const dayAvailabilitySchema = z.array(z.boolean()).length(96);

@@ -6,6 +6,7 @@ export interface PrivacySettings {
   showGamePreferences: boolean;
   allowTeamInvitations: boolean;
   allowFollows: boolean;
+  allowInvitesOnlyFromConnections?: boolean;
 }
 
 import type { AvailabilityData } from "~/db/schema/auth.schema";
@@ -126,4 +127,5 @@ export const defaultPrivacySettings: PrivacySettings = {
   showGamePreferences: false,
   allowTeamInvitations: true,
   allowFollows: true,
+  allowInvitesOnlyFromConnections: false,
 };

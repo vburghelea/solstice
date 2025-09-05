@@ -81,6 +81,7 @@ export function ProfileView() {
         showGamePreferences: false,
         allowTeamInvitations: false,
         allowFollows: true,
+        allowInvitesOnlyFromConnections: false,
       },
     } as PartialProfileInputType,
     onSubmit: async ({ value }) => {
@@ -201,6 +202,7 @@ export function ProfileView() {
             showGamePreferences: false,
             allowTeamInvitations: true,
             allowFollows: true,
+            allowInvitesOnlyFromConnections: false,
           };
           const newPrivacy = value.privacySettings || {
             showEmail: false,
@@ -210,6 +212,7 @@ export function ProfileView() {
             showGamePreferences: false,
             allowTeamInvitations: true,
             allowFollows: true,
+            allowInvitesOnlyFromConnections: false,
           };
 
           if (
@@ -292,6 +295,7 @@ export function ProfileView() {
         showGamePreferences: false,
         allowTeamInvitations: true,
         allowFollows: true,
+        allowInvitesOnlyFromConnections: false,
       };
       form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
       form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
@@ -306,6 +310,10 @@ export function ProfileView() {
         privacySettings.allowTeamInvitations,
       );
       form.setFieldValue("privacySettings.allowFollows", privacySettings.allowFollows);
+      form.setFieldValue(
+        "privacySettings.allowInvitesOnlyFromConnections",
+        privacySettings.allowInvitesOnlyFromConnections ?? false,
+      );
     }
   }, [profile, editingSection, form]);
 
@@ -382,6 +390,7 @@ export function ProfileView() {
         showGamePreferences: false,
         allowTeamInvitations: true,
         allowFollows: true,
+        allowInvitesOnlyFromConnections: false,
       };
       form.setFieldValue("privacySettings.showEmail", privacySettings.showEmail);
       form.setFieldValue("privacySettings.showPhone", privacySettings.showPhone);
@@ -396,6 +405,10 @@ export function ProfileView() {
         privacySettings.allowTeamInvitations,
       );
       form.setFieldValue("privacySettings.allowFollows", privacySettings.allowFollows);
+      form.setFieldValue(
+        "privacySettings.allowInvitesOnlyFromConnections",
+        privacySettings.allowInvitesOnlyFromConnections ?? false,
+      );
     }
 
     setEditingSection(sectionId);
@@ -1007,6 +1020,15 @@ export function ProfileView() {
                 )}
               </form.Field>
 
+              <form.Field name="privacySettings.allowInvitesOnlyFromConnections">
+                {(field) => (
+                  <ValidatedCheckbox
+                    field={field}
+                    label="Only allow invites from connections"
+                  />
+                )}
+              </form.Field>
+
               <form.Field name="privacySettings.allowFollows">
                 {(field) => (
                   <ValidatedCheckbox
@@ -1057,6 +1079,15 @@ export function ProfileView() {
                 <span className="text-sm">Allow team invitations</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.allowTeamInvitations ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Only allow invites from connections</span>
+                <span className="text-muted-foreground text-sm">
+                  {profile?.privacySettings?.allowInvitesOnlyFromConnections
+                    ? "Yes"
+                    : "No"}
                 </span>
               </div>
 

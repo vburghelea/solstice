@@ -15,14 +15,18 @@ import {
   gameSystems,
   gameSystemToCategory,
   gameSystemToMechanics,
+  gmReviews,
   memberships,
   membershipTypes,
   roles,
   session,
+  socialAuditLogs,
   tags,
   teamMembers,
   teams,
   user,
+  userBlocks,
+  userFollows,
   userGameSystemPreferences,
   userRoles,
   userTags,
@@ -49,6 +53,30 @@ export const userRelations = relations(user, ({ many }) => ({
   games: many(games),
   gameApplications: many(gameApplications),
   gameParticipants: many(gameParticipants),
+  gmReviews_reviewerId: many(gmReviews, {
+    relationName: "gmReviews_reviewerId_user_id",
+  }),
+  gmReviews_gmId: many(gmReviews, {
+    relationName: "gmReviews_gmId_user_id",
+  }),
+  userFollows_followerId: many(userFollows, {
+    relationName: "userFollows_followerId_user_id",
+  }),
+  userFollows_followingId: many(userFollows, {
+    relationName: "userFollows_followingId_user_id",
+  }),
+  socialAuditLogs_actorUserId: many(socialAuditLogs, {
+    relationName: "socialAuditLogs_actorUserId_user_id",
+  }),
+  socialAuditLogs_targetUserId: many(socialAuditLogs, {
+    relationName: "socialAuditLogs_targetUserId_user_id",
+  }),
+  userBlocks_blockerId: many(userBlocks, {
+    relationName: "userBlocks_blockerId_user_id",
+  }),
+  userBlocks_blockeeId: many(userBlocks, {
+    relationName: "userBlocks_blockeeId_user_id",
+  }),
   accounts: many(account),
   sessions: many(session),
   events: many(events),
@@ -149,6 +177,58 @@ export const gameParticipantsRelations = relations(gameParticipants, ({ one }) =
   user: one(user, {
     fields: [gameParticipants.userId],
     references: [user.id],
+  }),
+}));
+
+export const gmReviewsRelations = relations(gmReviews, ({ one }) => ({
+  user_reviewerId: one(user, {
+    fields: [gmReviews.reviewerId],
+    references: [user.id],
+    relationName: "gmReviews_reviewerId_user_id",
+  }),
+  user_gmId: one(user, {
+    fields: [gmReviews.gmId],
+    references: [user.id],
+    relationName: "gmReviews_gmId_user_id",
+  }),
+}));
+
+export const userFollowsRelations = relations(userFollows, ({ one }) => ({
+  user_followerId: one(user, {
+    fields: [userFollows.followerId],
+    references: [user.id],
+    relationName: "userFollows_followerId_user_id",
+  }),
+  user_followingId: one(user, {
+    fields: [userFollows.followingId],
+    references: [user.id],
+    relationName: "userFollows_followingId_user_id",
+  }),
+}));
+
+export const socialAuditLogsRelations = relations(socialAuditLogs, ({ one }) => ({
+  user_actorUserId: one(user, {
+    fields: [socialAuditLogs.actorUserId],
+    references: [user.id],
+    relationName: "socialAuditLogs_actorUserId_user_id",
+  }),
+  user_targetUserId: one(user, {
+    fields: [socialAuditLogs.targetUserId],
+    references: [user.id],
+    relationName: "socialAuditLogs_targetUserId_user_id",
+  }),
+}));
+
+export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
+  user_blockerId: one(user, {
+    fields: [userBlocks.blockerId],
+    references: [user.id],
+    relationName: "userBlocks_blockerId_user_id",
+  }),
+  user_blockeeId: one(user, {
+    fields: [userBlocks.blockeeId],
+    references: [user.id],
+    relationName: "userBlocks_blockeeId_user_id",
   }),
 }));
 

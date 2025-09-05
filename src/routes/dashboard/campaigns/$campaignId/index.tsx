@@ -59,7 +59,11 @@ export const Route = createFileRoute("/dashboard/campaigns/$campaignId/")({
 function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
   return (
     <div className="space-y-3">
-      <details id="general" className="rounded-lg border bg-white open:shadow-sm" open>
+      <details
+        id="general"
+        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        open
+      >
         <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
           General
         </summary>
@@ -95,7 +99,10 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
         </div>
       </details>
 
-      <details id="location" className="rounded-lg border bg-white open:shadow-sm">
+      <details
+        id="location"
+        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+      >
         <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
           Location
         </summary>
@@ -104,7 +111,10 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
         </div>
       </details>
 
-      <details id="requirements" className="rounded-lg border bg-white open:shadow-sm">
+      <details
+        id="requirements"
+        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+      >
         <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
           Minimum Requirements
         </summary>
@@ -123,7 +133,10 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
         </div>
       </details>
 
-      <details id="safety" className="rounded-lg border bg-white open:shadow-sm">
+      <details
+        id="safety"
+        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+      >
         <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
           Safety Rules
         </summary>

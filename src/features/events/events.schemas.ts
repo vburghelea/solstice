@@ -90,3 +90,13 @@ export const cancelEventRegistrationSchema = z.object({
   reason: z.string().optional(),
 });
 export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistrationSchema>;
+
+export const updateEventRegistrationStatusSchema = z.object({
+  eventId: z.string(),
+  registrationId: z.string(),
+  status: z.enum(["pending", "confirmed", "waitlisted", "cancelled"]),
+  paymentStatus: z.enum(["pending", "paid", "refunded"]).optional(),
+});
+export type UpdateEventRegistrationStatusInput = z.infer<
+  typeof updateEventRegistrationStatusSchema
+>;

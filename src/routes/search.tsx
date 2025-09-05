@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { GameListItemView } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
-import { GameListItem } from "~/features/games/games.types";
+import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/search")({
   loader: async () => {
@@ -24,37 +26,50 @@ function SearchPage() {
     <PublicLayout>
       <div className="container mx-auto px-4 py-16">
         <h1 className="font-heading mb-8 text-center text-4xl">All Game Sessions</h1>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {games.length === 0 ? (
-            <p className="text-muted-foreground col-span-full text-center">
-              No public games found.
-            </p>
-          ) : (
-            games.map(
-              (
-                game: GameListItem, // Use GameListItem type
-              ) => (
-                <div
-                  key={game.id}
-                  className="rounded-lg bg-white p-6 text-left shadow-md"
-                >
-                  <h3 className="mb-2 text-xl font-semibold">{game.name}</h3>
-                  <p className="text-muted-foreground mb-4">{game.description}</p>
-                  <p className="text-sm text-gray-600">📍 {game.location.address}</p>
-                  <p className="text-sm text-gray-600">
+
+        {games.length === 0 ? (
+          <p className="text-muted-foreground text-center">No public games found.</p>
+        ) : (
+          <>
+            {/* Mobile: dense list */}
+            <div className="md:hidden">
+              <List>
+                {games.map((game: GameListItem) => (
+                  <GameListItemView key={game.id} game={game} />
+                ))}
+              </List>
+            </div>
+
+            {/* Desktop: simple cards */}
+            <div className="hidden grid-cols-2 gap-6 md:grid lg:grid-cols-3">
+              {games.map((game: GameListItem) => (
+                <div key={game.id} className="rounded-lg border bg-white p-6 shadow-sm">
+                  <div className="mb-2 text-xl font-semibold text-gray-900">
+                    {game.name}
+                  </div>
+                  {game.description ? (
+                    <div className="text-muted-foreground mb-4 line-clamp-2 text-sm">
+                      {game.description}
+                    </div>
+                  ) : null}
+                  <div className="mt-1 text-sm text-gray-600">
+                    📍 {game.location.address}
+                  </div>
+                  <div className="mt-1 text-sm text-gray-600">
                     🗓️ {new Date(game.dateTime).toLocaleString()}
-                  </p>
-                  <a
-                    href={`/game/${game.id}`}
-                    className="mt-4 inline-block text-blue-600 hover:underline"
+                  </div>
+                  <Link
+                    to="/game/$gameId"
+                    params={{ gameId: game.id }}
+                    className="text-primary mt-4 inline-flex items-center gap-1 text-sm font-medium hover:underline"
                   >
                     View Details
-                  </a>
+                  </Link>
                 </div>
-              ),
-            )
-          )}
-        </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </PublicLayout>
   );

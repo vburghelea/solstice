@@ -18,6 +18,7 @@ import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import type { OperationResult } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/games/")({
   component: GamesPage,
@@ -198,50 +199,54 @@ function GamesPage() {
       ) : (
         <>
           {/* Mobile list */}
-          <div className="space-y-3 md:hidden">
-            {games.map((g: GameListItem) => {
-              const formattedDateTime = new Date(g.dateTime).toLocaleString();
-              const statusBadgeClass =
-                g.status === "scheduled"
-                  ? "bg-blue-50 text-blue-700 border-blue-200"
-                  : g.status === "completed"
-                    ? "bg-green-50 text-green-700 border-green-200"
-                    : "bg-red-50 text-red-700 border-red-200";
-              return (
-                <Link
-                  key={g.id}
-                  to="/dashboard/games/$gameId"
-                  params={{ gameId: g.id }}
-                  className="block rounded-lg border bg-white p-4 shadow-sm transition hover:bg-gray-50"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize ${statusBadgeClass}`}
-                        >
-                          {g.status}
+          <div className="md:hidden">
+            <List>
+              {games.map((g: GameListItem) => {
+                const formattedDateTime = new Date(g.dateTime).toLocaleString();
+                const statusBadgeClass =
+                  g.status === "scheduled"
+                    ? "bg-blue-50 text-blue-700 border-blue-200"
+                    : g.status === "completed"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : "bg-red-50 text-red-700 border-red-200";
+                return (
+                  <List.Item key={g.id} className="group">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize ${statusBadgeClass}`}
+                          >
+                            {g.status}
+                          </div>
+                          <div className="truncate text-base font-semibold text-gray-900">
+                            {g.name}
+                          </div>
                         </div>
-                        <div className="truncate text-base font-semibold text-gray-900">
-                          {g.name}
+                        <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="h-3.5 w-3.5" /> {formattedDateTime}
+                          </span>
+                          <span className="truncate">{g.gameSystem?.name || "N/A"}</span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                          <Users className="h-3.5 w-3.5" /> {g.participantCount}{" "}
+                          participants
                         </div>
                       </div>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
-                        <span className="inline-flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5" /> {formattedDateTime}
-                        </span>
-                        <span className="truncate">{g.gameSystem?.name || "N/A"}</span>
-                      </div>
-                      <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                        <Users className="h-3.5 w-3.5" /> {g.participantCount}{" "}
-                        participants
-                      </div>
+                      <Link
+                        to="/dashboard/games/$gameId"
+                        params={{ gameId: g.id }}
+                        className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                      >
+                        View
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
                     </div>
-                    <ChevronRight className="h-5 w-5 shrink-0 text-gray-400" />
-                  </div>
-                </Link>
-              );
-            })}
+                  </List.Item>
+                );
+              })}
+            </List>
           </div>
 
           {/* Desktop grid */}

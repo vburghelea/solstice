@@ -126,7 +126,7 @@ function GameDetailPage() {
         <div className="space-y-3">
           <details
             id="general"
-            className="rounded-lg border bg-white open:shadow-sm"
+            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
             open
           >
             <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
@@ -160,7 +160,10 @@ function GameDetailPage() {
             </div>
           </details>
 
-          <details id="location" className="rounded-lg border bg-white open:shadow-sm">
+          <details
+            id="location"
+            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+          >
             <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
               Location
             </summary>
@@ -171,7 +174,7 @@ function GameDetailPage() {
 
           <details
             id="requirements"
-            className="rounded-lg border bg-white open:shadow-sm"
+            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
           >
             <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
               Minimum Requirements
@@ -191,7 +194,10 @@ function GameDetailPage() {
             </div>
           </details>
 
-          <details id="safety" className="rounded-lg border bg-white open:shadow-sm">
+          <details
+            id="safety"
+            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+          >
             <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
               Safety Rules
             </summary>

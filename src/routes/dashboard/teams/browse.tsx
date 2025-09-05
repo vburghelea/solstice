@@ -14,6 +14,7 @@ import { Input } from "~/components/ui/input";
 import type { TeamListItem } from "~/features/teams/teams.queries";
 import { listTeams, searchTeams } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/teams/browse")({
   loader: async () => {
@@ -88,15 +89,51 @@ function BrowseTeamsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {teams.map((teamItem) => (
-            <PublicTeamCard
-              key={teamItem.team.id}
-              teamItem={teamItem}
-              getCountryName={getCountryName}
-            />
-          ))}
-        </div>
+        <>
+          {/* Mobile list */}
+          <div className="md:hidden">
+            <List>
+              {teams.map((teamItem) => (
+                <List.Item key={teamItem.team.id} className="group">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-base font-semibold text-gray-900">
+                        {teamItem.team.name}
+                      </div>
+                      <div className="text-muted-foreground mt-1 text-xs">
+                        {teamItem.team.city}
+                        {teamItem.team.country
+                          ? `, ${getCountryName(teamItem.team.country)}`
+                          : ""}
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        Members: {teamItem.memberCount}
+                      </div>
+                    </div>
+                    <Link
+                      to="/dashboard/teams/$teamId"
+                      params={{ teamId: teamItem.team.id }}
+                      className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </List.Item>
+              ))}
+            </List>
+          </div>
+
+          {/* Desktop grid */}
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+            {teams.map((teamItem) => (
+              <PublicTeamCard
+                key={teamItem.team.id}
+                teamItem={teamItem}
+                getCountryName={getCountryName}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

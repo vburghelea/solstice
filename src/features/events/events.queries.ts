@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { EventRegistration } from "~/db/schema";
-import { eventRegistrations, events, user } from "~/db/schema";
+import { eventRegistrations, events, teams, user } from "~/db/schema";
 import type {
   EventAmenities,
   EventDivisions,
@@ -12,6 +12,15 @@ import type {
   EventSchedule,
 } from "./events.db-types";
 import type { EventFilters, EventListResult, EventWithDetails } from "./events.types";
+// Lightweight DTO for registrations list
+export type EventRegistrationListItem = {
+  id: string;
+  registrationType: string;
+  status: string;
+  division: string | null;
+  team: { id: string; name: string; slug: string } | null;
+  user: { id: string; name: string; email: string };
+};
 
 // Type for EventRegistration with properly typed roster
 type EventRegistrationWithRoster = Omit<EventRegistration, "roster"> & {
@@ -276,6 +285,85 @@ export const getEvent = createServerFn({ method: "GET" })
             message: "Failed to fetch event",
           },
         ],
+      };
+    }
+  });
+
+/**
+ * List registrations for an event (organizers only)
+ */
+export const listEventRegistrations = createServerFn({ method: "GET" })
+  .validator((data: unknown) => data as { eventId: string })
+  .handler(async ({ data }) => {
+    try {
+      const [{ getDb }, { getAuth }, { PermissionService }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+        import("~/features/roles/permission.server"),
+      ]);
+
+      const db = await getDb();
+      const auth = await getAuth();
+      const { getWebRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getWebRequest();
+      const session = await auth.api.getSession({ headers });
+
+      if (!session?.user?.id) {
+        return {
+          success: false as const,
+          errors: [{ code: "UNAUTHORIZED", message: "Not signed in" }],
+        };
+      }
+
+      // Organizer or permitted role only
+      const canManage = await PermissionService.canManageEvent(
+        session.user.id,
+        data.eventId,
+      );
+      if (!canManage) {
+        // Also allow event organizerId
+        const [ev] = await db
+          .select()
+          .from(events)
+          .where(eq(events.id, data.eventId))
+          .limit(1);
+        if (!ev || ev.organizerId !== session.user.id) {
+          return {
+            success: false as const,
+            errors: [{ code: "FORBIDDEN", message: "Insufficient permissions" }],
+          };
+        }
+      }
+
+      const rows = await db
+        .select({
+          registration: eventRegistrations,
+          user: { id: user.id, name: user.name, email: user.email },
+          team: teams,
+          event: events,
+        })
+        .from(eventRegistrations)
+        .innerJoin(events, eq(eventRegistrations.eventId, events.id))
+        .innerJoin(user, eq(eventRegistrations.userId, user.id))
+        .leftJoin(teams, eq(eventRegistrations.teamId, teams.id))
+        .where(eq(eventRegistrations.eventId, data.eventId))
+        .orderBy(desc(eventRegistrations.createdAt));
+
+      const result: EventRegistrationListItem[] = rows.map((r) => ({
+        id: r.registration.id,
+        registrationType: r.registration.registrationType,
+        status: r.registration.status,
+        division: r.registration.division,
+        team: r.team ? { id: r.team.id, name: r.team.name, slug: r.team.slug } : null,
+        user: { id: r.user.id, name: r.user.name, email: r.user.email },
+      }));
+
+      return { success: true as const, data: result };
+    } catch (error) {
+      console.error("Error listing registrations:", error);
+      return {
+        success: false as const,
+        errors: [{ code: "DATABASE_ERROR", message: "Failed to list registrations" }],
       };
     }
   });

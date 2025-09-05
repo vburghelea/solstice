@@ -13,6 +13,7 @@ import { PlusIcon, UsersIcon } from "~/components/ui/icons";
 import type { UserTeam } from "~/features/teams/teams.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/teams/")({
   loader: async () => {
@@ -70,15 +71,53 @@ function TeamsIndexPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {userTeams.map((userTeam) => (
-            <TeamCard
-              key={userTeam.team.id}
-              userTeam={userTeam}
-              getCountryName={getCountryName}
-            />
-          ))}
-        </div>
+        <>
+          {/* Mobile list */}
+          <div className="md:hidden">
+            <List>
+              {userTeams.map((userTeam) => (
+                <List.Item key={userTeam.team.id} className="group">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-base font-semibold text-gray-900">
+                        {userTeam.team.name}
+                      </div>
+                      <div className="text-muted-foreground mt-1 text-xs">
+                        {userTeam.team.city}
+                        {userTeam.team.country
+                          ? `, ${getCountryName(userTeam.team.country)}`
+                          : ""}
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        Role:{" "}
+                        <span className="capitalize">{userTeam.membership.role}</span> •
+                        Members: {userTeam.memberCount}
+                      </div>
+                    </div>
+                    <Link
+                      to="/dashboard/teams/$teamId"
+                      params={{ teamId: userTeam.team.id }}
+                      className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </List.Item>
+              ))}
+            </List>
+          </div>
+
+          {/* Desktop grid */}
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+            {userTeams.map((userTeam) => (
+              <TeamCard
+                key={userTeam.team.id}
+                userTeam={userTeam}
+                getCountryName={getCountryName}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

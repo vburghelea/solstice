@@ -16,6 +16,7 @@ import {
   cancelEventRegistrationSchema,
   createEventSchema,
   registerForEventSchema,
+  updateEventRegistrationStatusSchema,
   updateEventSchema,
 } from "./events.schemas";
 import type { EventOperationResult, EventWithDetails } from "./events.types";
@@ -526,6 +527,86 @@ export const registerForEvent = createServerFn({ method: "POST" })
       }
     },
   );
+
+/**
+ * Organizer: update registration status/payment
+ */
+export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
+  .validator(updateEventRegistrationStatusSchema.parse)
+  .handler(async ({ data }) => {
+    try {
+      const [{ getDb }, { getAuth }, { PermissionService }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+        import("~/features/roles/permission.server"),
+      ]);
+
+      const db = await getDb();
+      const auth = await getAuth();
+      const { getWebRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getWebRequest();
+      const session = await auth.api.getSession({ headers });
+
+      if (!session?.user?.id) {
+        return {
+          success: false as const,
+          errors: [{ code: "UNAUTHORIZED", message: "Not authenticated" }],
+        };
+      }
+
+      // Permission: global admin, event admin role, or organizerId
+      const canManage = await PermissionService.canManageEvent(
+        session.user.id,
+        data.eventId,
+      );
+      if (!canManage) {
+        const [ev] = await db
+          .select()
+          .from(events)
+          .where(eq(events.id, data.eventId))
+          .limit(1);
+        if (!ev || ev.organizerId !== session.user.id) {
+          return {
+            success: false as const,
+            errors: [{ code: "FORBIDDEN", message: "Insufficient permissions" }],
+          };
+        }
+      }
+
+      // Ensure registration belongs to event
+      const [reg] = await db
+        .select()
+        .from(eventRegistrations)
+        .where(eq(eventRegistrations.id, data.registrationId))
+        .limit(1);
+      if (!reg || reg.eventId !== data.eventId) {
+        return {
+          success: false as const,
+          errors: [{ code: "NOT_FOUND", message: "Registration not found" }],
+        };
+      }
+
+      const [updated] = await db
+        .update(eventRegistrations)
+        .set({
+          status: data.status,
+          paymentStatus: data.paymentStatus ?? reg.paymentStatus,
+          updatedAt: new Date(),
+          confirmedAt: data.status === "confirmed" ? new Date() : reg.confirmedAt,
+          cancelledAt: data.status === "cancelled" ? new Date() : reg.cancelledAt,
+        })
+        .where(eq(eventRegistrations.id, data.registrationId))
+        .returning();
+
+      return { success: true as const, data: castRegistrationJsonbFields(updated) };
+    } catch (error) {
+      console.error("Error updating registration:", error);
+      return {
+        success: false as const,
+        errors: [{ code: "DATABASE_ERROR", message: "Failed to update registration" }],
+      };
+    }
+  });
 
 /**
  * Cancel event registration

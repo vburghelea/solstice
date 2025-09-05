@@ -34,8 +34,10 @@ import type {
   GameParticipant,
   GameWithDetails,
 } from "~/features/games/games.types";
+import { getRelationshipSnapshot } from "~/features/social";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
+import { Badge } from "~/shared/ui/badge";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -91,7 +93,11 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
             </div>
             <div>
               <p className="font-semibold">Visibility</p>
-              <p className="capitalize">{game.visibility}</p>
+              {game.visibility === "protected" ? (
+                <Badge variant="secondary">Connections-only</Badge>
+              ) : (
+                <p className="capitalize">{game.visibility}</p>
+              )}
             </div>
           </div>
         </div>
@@ -163,6 +169,14 @@ export function GameDetailsPage() {
   });
 
   const isOwner = game?.owner?.id === currentUser?.id;
+  const { data: rel } = useQuery({
+    queryKey: ["relationship", game?.owner?.id],
+    queryFn: () => getRelationshipSnapshot({ data: { userId: game!.owner!.id } }),
+    enabled: !!currentUser?.id && !!game?.owner?.id,
+    refetchOnMount: "always",
+  });
+  const blockedAny = !!rel && rel.success && (rel.data.blocked || rel.data.blockedBy);
+  // const isConnection = !!rel && rel.success && rel.data.isConnection;
   const isInvited = game?.participants?.some(
     (p: GameParticipant) =>
       p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
@@ -177,6 +191,8 @@ export function GameDetailsPage() {
       (p.role === "player" || p.role === "invited") &&
       p.status !== "rejected",
   );
+
+  // Rendered inline where relevant
 
   const updateGameMutation = useMutation({
     mutationFn: updateGame,
@@ -455,6 +471,11 @@ export function GameDetailsPage() {
 
   return (
     <div className="space-y-6">
+      {blockedAny && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          You cannot interact with this organizer due to block settings.
+        </div>
+      )}
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-3">

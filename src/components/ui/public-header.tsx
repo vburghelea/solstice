@@ -9,7 +9,7 @@ export function PublicHeader() {
   const user = context?.user || null;
 
   return (
-    <header className="bg-brand-light/95 sticky top-0 z-50 shadow-sm backdrop-blur-md">
+    <header className="bg-brand-light/95 text-brand-dark sticky top-0 z-50 shadow-sm backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between sm:h-20">
           <Link to="/" className="flex items-center gap-2 sm:gap-3">
@@ -49,7 +49,7 @@ export function PublicHeader() {
               <>
                 <Link
                   to="/auth/login"
-                  className="rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
+                  className="text-brand-dark rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
                 >
                   Login
                 </Link>

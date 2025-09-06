@@ -46,7 +46,14 @@ function PublicEventDetailPage() {
     },
   });
 
-  const eventData = data?.success ? data.data : null;
+  // Only show public events that are scheduled for public consumption
+  const eventDataRaw = data?.success ? data.data : null;
+  const eventData =
+    eventDataRaw &&
+    eventDataRaw.isPublic &&
+    (eventDataRaw.status === "published" || eventDataRaw.status === "registration_open")
+      ? eventDataRaw
+      : null;
   const isOpenData =
     eventData?.isRegistrationOpen && (eventData?.availableSpots ?? 1) > 0;
   const supportsTeamData =

@@ -6,13 +6,15 @@ import { applyToGame } from "~/features/games/games.mutations";
 import { getGame } from "~/features/games/games.queries";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/game/$gameId")({
   loader: async ({ params }) => {
     const result = await getGame({ data: { id: params.gameId } });
     if (result.success && result.data) {
-      if (result.data.visibility === "public") {
+      // Public route must only show scheduled, public games
+      if (result.data.visibility === "public" && result.data.status === "scheduled") {
         return { gameDetails: result.data };
       }
       return { gameDetails: null };
@@ -73,7 +75,7 @@ function GameDetailPage() {
             {gameDetails.name}
           </h1>
           <p className="text-muted-foreground mt-2 text-center md:text-left">
-            🗓️ {new Date(gameDetails.dateTime).toLocaleString()} • 📍{" "}
+            🗓️ {formatDateAndTime(gameDetails.dateTime)} • 📍{" "}
             {gameDetails.location.address} • 🎲 {gameDetails.gameSystem?.name || "N/A"}
           </p>
         </div>
@@ -136,7 +138,7 @@ function GameDetailPage() {
             <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
               <div>
                 <p className="font-semibold">Date & Time</p>
-                <p>{new Date(gameDetails.dateTime).toLocaleString()}</p>
+                <p>{formatDateAndTime(gameDetails.dateTime)}</p>
               </div>
               <div>
                 <p className="font-semibold">Game System</p>

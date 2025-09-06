@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/card"; // Added Card imports
 import { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 
 interface CampaignGameSessionCardProps {
   game: GameListItem;
@@ -34,13 +35,7 @@ export function CampaignGameSessionCard({
   const canCancel = game.status !== "completed" && game.status !== "canceled";
   const isActionable = game.status !== "completed" && game.status !== "canceled";
 
-  const formattedDateTime = new Date(game.dateTime).toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const formattedDateTime = formatDateAndTime(game.dateTime);
 
   return (
     <Card className="transition-shadow hover:shadow-lg">

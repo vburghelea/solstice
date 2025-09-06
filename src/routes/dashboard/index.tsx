@@ -30,6 +30,7 @@ import {
 import { getUpcomingEvents } from "~/features/events/events.queries";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardIndex,
@@ -126,8 +127,7 @@ function DashboardIndex() {
                 {nextGame.name}
               </div>
               <div className="mt-1 text-sm text-gray-600">
-                🗓️ {new Date(nextGame.dateTime).toLocaleString()} •{" "}
-                {nextGame.location.address}
+                🗓️ {formatDateAndTime(nextGame.dateTime)} • {nextGame.location.address}
               </div>
               <div className="mt-1 text-xs text-gray-500">
                 {formatTimeDistance(new Date(nextGame.dateTime))}

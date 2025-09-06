@@ -36,8 +36,24 @@ export const getRelationshipSnapshot = createServerFn({ method: "GET" })
           errors: [{ code: "NOT_FOUND", message: "User not found" }],
         };
 
+      // If viewing own profile, normalize relationship booleans and flag isSelf
+      if (currentUser.id === data.userId) {
+        return {
+          success: true,
+          data: {
+            follows: false,
+            followedBy: false,
+            blocked: false,
+            blockedBy: false,
+            isConnection: false,
+            targetUser: target,
+            isSelf: true,
+          },
+        };
+      }
+
       const rel = await getRelationship(currentUser.id, data.userId);
-      return { success: true, data: { ...rel, targetUser: target } };
+      return { success: true, data: { ...rel, targetUser: target, isSelf: false } };
     } catch (error) {
       console.error("getRelationshipSnapshot error", error);
       return {

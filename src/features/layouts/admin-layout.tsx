@@ -26,8 +26,14 @@ export function AdminLayout() {
           <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col bg-white">
             <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
               <h2 className="text-lg font-bold">Menu</h2>
-              <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>
-                <X className="h-5 w-5" />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(false)}
+                className="text-gray-900 dark:text-gray-900"
+                aria-label="Close admin menu"
+              >
+                <X className="h-5 w-5 text-gray-900 dark:text-gray-900" />
               </Button>
             </div>
             <div className="flex-1 overflow-y-auto">

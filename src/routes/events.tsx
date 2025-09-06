@@ -13,7 +13,16 @@ export const Route = createFileRoute("/events")({
 function PublicEventsPage() {
   const { data } = useSuspenseQuery({
     queryKey: ["events", "public"],
-    queryFn: async () => listEvents({ data: { filters: { publicOnly: true } } }),
+    queryFn: async () =>
+      listEvents({
+        data: {
+          filters: {
+            publicOnly: true,
+            status: ["published", "registration_open"],
+            startDateFrom: new Date(),
+          },
+        },
+      }),
   });
 
   const result = data as EventListResult;

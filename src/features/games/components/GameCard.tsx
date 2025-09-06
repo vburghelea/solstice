@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/card";
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import { Badge } from "~/shared/ui/badge";
 
 interface GameCardProps {
@@ -21,13 +22,7 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProps) {
-  const formattedDateTime = new Date(game.dateTime).toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const formattedDateTime = formatDateAndTime(game.dateTime);
 
   const canCancel = game.status !== "completed" && game.status !== "canceled";
   const isActionable =

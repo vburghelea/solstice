@@ -122,6 +122,12 @@ export const unfollowUser = createServerFn({ method: "POST" })
           errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
         };
       }
+      if (currentUser.id === data.followingId) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "Cannot unfollow yourself" }],
+        };
+      }
 
       const db = await getDb();
       const { userFollows, socialAuditLogs } = await import("~/db/schema");
@@ -254,6 +260,12 @@ export const unblockUser = createServerFn({ method: "POST" })
         return {
           success: false,
           errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+        };
+      }
+      if (currentUser.id === data.userId) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "Cannot unblock yourself" }],
         };
       }
 

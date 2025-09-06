@@ -16,6 +16,7 @@ import { GameCard } from "~/features/games/components/GameCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
 import { List } from "~/shared/ui/list";
@@ -202,7 +203,7 @@ function GamesPage() {
           <div className="md:hidden">
             <List>
               {games.map((g: GameListItem) => {
-                const formattedDateTime = new Date(g.dateTime).toLocaleString();
+                const formattedDateTime = formatDateAndTime(g.dateTime);
                 const statusBadgeClass =
                   g.status === "scheduled"
                     ? "bg-blue-50 text-blue-700 border-blue-200"

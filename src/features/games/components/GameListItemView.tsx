@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, ChevronRight, MapPin, Sparkles, Users } from "lucide-react";
 import type { GameListItem } from "~/features/games/games.types";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import { List } from "~/shared/ui/list";
 
 interface GameListItemViewProps {
@@ -8,7 +9,7 @@ interface GameListItemViewProps {
 }
 
 export function GameListItemView({ game }: GameListItemViewProps) {
-  const formattedDate = new Date(game.dateTime).toLocaleString();
+  const formattedDate = formatDateAndTime(game.dateTime);
   const price = game.price ? `$${(game.price / 100).toFixed(2)}` : "Free";
 
   return (

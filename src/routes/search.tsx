@@ -3,12 +3,15 @@ import { GameListItemView } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/search")({
   loader: async () => {
     // Fetch public games from the backend
-    const result = await listGames({ data: { filters: { visibility: "public" } } });
+    const result = await listGames({
+      data: { filters: { visibility: "public", status: "scheduled" } },
+    });
     if (result.success) {
       return { games: result.data };
     } else {
@@ -56,7 +59,7 @@ function SearchPage() {
                     📍 {game.location.address}
                   </div>
                   <div className="mt-1 text-sm text-gray-600">
-                    🗓️ {new Date(game.dateTime).toLocaleString()}
+                    🗓️ {formatDateAndTime(game.dateTime)}
                   </div>
                   <Link
                     to="/game/$gameId"

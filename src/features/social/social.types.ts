@@ -2,6 +2,7 @@ import type { Relationship } from "./relationship.server";
 
 export type RelationshipSnapshot = Relationship & {
   targetUser: { id: string; name: string; email: string; image?: string | null };
+  isSelf?: boolean;
 };
 
 export interface BlocklistItem {

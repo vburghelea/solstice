@@ -36,6 +36,7 @@ import type {
 } from "~/features/games/games.types";
 import { getRelationshipSnapshot } from "~/features/social";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
 
@@ -77,7 +78,7 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
             </div>
             <div>
               <p className="font-semibold">Date & Time</p>
-              <p>{new Date(game.dateTime).toLocaleString()}</p>
+              <p>{formatDateAndTime(game.dateTime)}</p>
             </div>
             <div>
               <p className="font-semibold">Expected Duration</p>
@@ -518,8 +519,8 @@ export function GameDetailsPage() {
               ) : null}
             </div>
             <div className="text-muted-foreground text-sm">
-              🗓️ {new Date(game.dateTime).toLocaleString()} • 📍 {game.location.address} •
-              🎲 {game.gameSystem.name}
+              🗓️ {formatDateAndTime(game.dateTime)} • 📍 {game.location.address} • 🎲{" "}
+              {game.gameSystem.name}
             </div>
           </div>
         </CardHeader>

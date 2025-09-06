@@ -31,6 +31,7 @@ export const Route = createFileRoute("/dashboard/profile/$userId")({
 
 function UserProfileComponent() {
   const { userId } = Route.useLoaderData();
+  const { user: currentUser } = Route.useRouteContext();
 
   const {
     data: profileResult,
@@ -58,8 +59,10 @@ function UserProfileComponent() {
     refetchOnMount: "always",
   });
 
-  const follows = !!relResult && relResult.success && relResult.data.follows;
-  const followedBy = !!relResult && relResult.success && relResult.data.followedBy;
+  const isSelf = !!currentUser?.id && currentUser.id === userId;
+  const follows = !!relResult && relResult.success && relResult.data.follows && !isSelf;
+  const followedBy =
+    !!relResult && relResult.success && relResult.data.followedBy && !isSelf;
   const blockedAny =
     !!relResult &&
     relResult.success &&
@@ -244,22 +247,31 @@ function UserProfileComponent() {
               variant={follows ? "default" : "outline"}
               size="sm"
               onClick={() => (follows ? doUnfollow.mutate() : doFollow.mutate())}
-              disabled={blockedAny}
+              disabled={blockedAny || isSelf}
+              title={isSelf ? "You cannot follow yourself" : undefined}
+              aria-disabled={blockedAny || isSelf}
             >
               <Star className="mr-1 h-4 w-4" />
-              {follows ? "Following" : "Follow"}
+              {isSelf ? "Follow" : follows ? "Following" : "Follow"}
             </Button>
-            {/* Followed-by indicator */}
-            {followedBy && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Star className="h-3 w-3" /> Followed by them
-              </Badge>
+            {/* Self profile indicator or followed-by indicator */}
+            {isSelf ? (
+              <Badge variant="secondary">This is your profile</Badge>
+            ) : (
+              followedBy && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Star className="h-3 w-3" /> Followed by them
+                </Badge>
+              )
             )}
             {/* Block / Unblock */}
             <Button
               variant={blockedAny ? "destructive" : "outline"}
               size="sm"
               onClick={() => (blockedAny ? doUnblock.mutate() : doBlock.mutate())}
+              disabled={isSelf}
+              title={isSelf ? "You cannot block yourself" : undefined}
+              aria-disabled={isSelf}
             >
               <ShieldBan className="mr-1 h-4 w-4" />
               {blockedAny ? "Unblock" : "Block"}

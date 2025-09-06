@@ -2,13 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { listGames } from "~/features/games/games.queries";
 import { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import { buttonVariants } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
     // Fetch a limited number of public games for the homepage
-    const result = await listGames({ data: { filters: { visibility: "public" } } });
+    const result = await listGames({
+      data: { filters: { visibility: "public", status: "scheduled" } },
+    });
     if (result.success) {
       // Limit to 3 featured games
       return { featuredGames: result.data.slice(0, 3) };
@@ -83,8 +86,8 @@ function Index() {
 
         {/* Featured Games/Events Section */}
         <section className="bg-gray-50 py-16 md:py-24">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="font-heading mb-12 text-3xl md:text-4xl">
+          <div className="container mx-auto px-4 text-center text-gray-900">
+            <h2 className="font-heading mb-12 text-3xl text-gray-900 md:text-4xl">
               Featured Local Events & Games
             </h2>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -96,18 +99,21 @@ function Index() {
                 featuredGames.map((game: GameListItem) => (
                   <div
                     key={game.id}
-                    className="rounded-lg bg-white p-6 text-left shadow-md"
+                    className="rounded-lg bg-white p-6 text-left text-gray-900 shadow-md"
                   >
                     <h3 className="mb-2 text-xl font-semibold">{game.name}</h3>
                     <p className="text-muted-foreground mb-4">{game.description}</p>
                     <p className="text-sm text-gray-600">📍 {game.location.address}</p>
                     <p className="text-sm text-gray-600">
-                      🗓️ {new Date(game.dateTime).toLocaleString()}
+                      🗓️ {formatDateAndTime(game.dateTime)}
                     </p>
                     <Link
                       to="/game/$gameId"
                       params={{ gameId: game.id }}
-                      className={cn(buttonVariants({ variant: "link" }), "mt-4 p-0")}
+                      className={cn(
+                        buttonVariants({ variant: "link" }),
+                        "mt-4 p-0 text-red-700",
+                      )}
                     >
                       View Details
                     </Link>

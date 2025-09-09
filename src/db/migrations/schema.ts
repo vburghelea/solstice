@@ -1117,6 +1117,7 @@ export const user = pgTable(
         false,
       ],
     }),
+    uploadedAvatarPath: text("uploaded_avatar_path"),
   },
   (table) => [unique("user_email_unique").on(table.email)],
 );

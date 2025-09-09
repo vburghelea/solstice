@@ -26,7 +26,13 @@ export const getRelationshipSnapshot = createServerFn({ method: "GET" })
       const { eq } = await import("drizzle-orm");
 
       const [target] = await db
-        .select({ id: user.id, name: user.name, email: user.email, image: user.image })
+        .select({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          uploadedAvatarPath: user.uploadedAvatarPath,
+        })
         .from(user)
         .where(eq(user.id, data.userId))
         .limit(1);
@@ -102,6 +108,7 @@ export const getBlocklist = createServerFn({ method: "GET" })
               name: user.name,
               email: user.email,
               image: user.image,
+              uploadedAvatarPath: user.uploadedAvatarPath,
             },
           })
           .from(userBlocks)

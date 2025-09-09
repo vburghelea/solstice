@@ -28,10 +28,12 @@ import {
 import { Link } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { TagInput } from "~/shared/ui/tag-input";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 import { AvailabilityEditor } from "./availability-editor";
+import { AvatarUpload } from "./avatar-upload";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 export function ProfileView() {
@@ -469,11 +471,22 @@ export function ProfileView() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>
-                Your personal details and contact information
-              </CardDescription>
+            <div className="flex items-center gap-3">
+              {editingSection !== "basic" ? (
+                <UserAvatar
+                  className="h-10 w-10"
+                  name={profile?.name ?? null}
+                  email={profile?.email ?? null}
+                  srcUploaded={profile?.uploadedAvatarPath ?? null}
+                  srcProvider={profile?.image ?? null}
+                />
+              ) : null}
+              <div>
+                <CardTitle>Basic Information</CardTitle>
+                <CardDescription>
+                  Your personal details and contact information
+                </CardDescription>
+              </div>
             </div>
             {editingSection !== "basic" && (
               <Button
@@ -525,6 +538,16 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Avatar upload (edit-mode only) */}
+          {editingSection === "basic" ? (
+            <AvatarUpload
+              name={profile?.name ?? null}
+              email={profile?.email ?? null}
+              image={profile?.image ?? null}
+              uploadedAvatarPath={profile?.uploadedAvatarPath ?? null}
+            />
+          ) : null}
+
           {/* Email (view-only) */}
           <div>
             <Label>Email Address</Label>

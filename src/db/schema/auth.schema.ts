@@ -43,6 +43,9 @@ export const user = pgTable("user", {
     .$defaultFn(() => false)
     .notNull(),
   image: text("image"),
+  // When a user uploads an avatar, we store the local path here.
+  // This should take precedence over provider images for display.
+  uploadedAvatarPath: text("uploaded_avatar_path"),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),

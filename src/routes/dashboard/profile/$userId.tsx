@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle, ShieldBan, Star } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -21,6 +20,7 @@ import {
 } from "~/features/social";
 import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
 import { Badge } from "~/shared/ui/badge";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/profile/$userId")({
   loader: async ({ params }) => {
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/dashboard/profile/$userId")({
   component: UserProfileComponent,
 });
 
-function UserProfileComponent() {
+export function UserProfileComponent() {
   const { userId } = Route.useLoaderData();
   const { user: currentUser } = Route.useRouteContext();
 
@@ -232,12 +232,13 @@ function UserProfileComponent() {
     <div className="container mx-auto p-4">
       <Card>
         <CardHeader className="flex flex-col items-center text-center">
-          <Avatar className="mb-4 h-24 w-24">
-            <AvatarImage src={profile.image} alt={profile.name || profile.email} />
-            <AvatarFallback>
-              {(profile.name || profile.email).charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            className="mb-4 h-24 w-24"
+            name={profile.name ?? null}
+            email={profile.email ?? null}
+            srcUploaded={profile.uploadedAvatarPath ?? null}
+            srcProvider={profile.image ?? null}
+          />
           <CardTitle className="text-2xl">{profile.name || "Anonymous User"}</CardTitle>
           <CardDescription>{profile.pronouns && `(${profile.pronouns})`}</CardDescription>
           {/* Social actions */}

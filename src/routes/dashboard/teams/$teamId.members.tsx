@@ -14,7 +14,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -41,6 +40,7 @@ import {
   updateTeamMember,
 } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {
@@ -269,15 +269,13 @@ function TeamMembersPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={user.image || undefined}
-                      alt={user.name || user.email}
-                    />
-                    <AvatarFallback>
-                      {(user.name || user.email).charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    name={user.name}
+                    email={user.email}
+                    srcUploaded={user.uploadedAvatarPath}
+                    srcProvider={user.image}
+                    className="h-8 w-8"
+                  />
                   <div>
                     <div className="flex items-center gap-2">
                       <ProfileLink userId={user.id} username={user.name || user.email} />

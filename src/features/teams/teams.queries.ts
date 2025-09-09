@@ -199,6 +199,7 @@ export const getTeamMembers = createServerFn({ method: "POST" })
           name: user.name,
           email: user.email,
           image: user.image,
+          uploadedAvatarPath: user.uploadedAvatarPath,
         },
         invitedBy: {
           id: sql<string | null>`inviter.id`,

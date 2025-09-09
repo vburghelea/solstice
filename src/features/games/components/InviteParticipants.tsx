@@ -18,6 +18,7 @@ import {
 } from "~/shared/ui/card";
 import { Input } from "~/shared/ui/input";
 import { Label } from "~/shared/ui/label";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface InviteParticipantsProps {
   gameId: string;
@@ -100,7 +101,19 @@ export function InviteParticipants({
                     key={user.id}
                     className="hover:bg-accent flex items-center justify-between rounded-sm p-2"
                   >
-                    <ProfileLink userId={user.id} username={user.name || user.email} />
+                    <div className="flex items-center gap-2">
+                      <UserAvatar
+                        name={user.name}
+                        email={user.email}
+                        srcUploaded={
+                          (user as { uploadedAvatarPath?: string | null })
+                            .uploadedAvatarPath ?? null
+                        }
+                        srcProvider={(user as { image?: string | null }).image ?? null}
+                        className="h-8 w-8"
+                      />
+                      <ProfileLink userId={user.id} username={user.name || user.email} />
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"

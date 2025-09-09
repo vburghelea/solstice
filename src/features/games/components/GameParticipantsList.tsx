@@ -11,6 +11,7 @@ import {
 import { GameApplication, GameParticipant } from "~/features/games/games.types";
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface GameParticipantsListProps {
   gameId: string;
@@ -124,13 +125,22 @@ export function GameParticipantsList({
             <ul className="space-y-2">
               {approvedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
-                  <span>
-                    <ProfileLink
-                      userId={p.userId}
-                      username={p.user.name || p.user.email}
-                    />{" "}
-                    {p.userId === gameOwnerId ? "(owner)" : `(${p.role} - ${p.status})`}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <UserAvatar
+                      name={p.user.name}
+                      email={p.user.email}
+                      srcUploaded={p.user.uploadedAvatarPath ?? null}
+                      srcProvider={p.user.image ?? null}
+                      className="h-8 w-8"
+                    />
+                    <span>
+                      <ProfileLink
+                        userId={p.userId}
+                        username={p.user.name || p.user.email}
+                      />{" "}
+                      {p.userId === gameOwnerId ? "(owner)" : `(${p.role} - ${p.status})`}
+                    </span>
+                  </div>
                   {isOwner &&
                     p.role !== "applicant" &&
                     p.status !== "rejected" &&
@@ -166,13 +176,22 @@ export function GameParticipantsList({
             <ul className="space-y-2">
               {pendingApplications.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
-                  <span>
-                    <ProfileLink
-                      userId={p.userId}
-                      username={p.user.name || p.user.email}
-                    />{" "}
-                    ({p.status})
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <UserAvatar
+                      name={p.user.name}
+                      email={p.user.email}
+                      srcUploaded={p.user.uploadedAvatarPath ?? null}
+                      srcProvider={p.user.image ?? null}
+                      className="h-8 w-8"
+                    />
+                    <span>
+                      <ProfileLink
+                        userId={p.userId}
+                        username={p.user.name || p.user.email}
+                      />{" "}
+                      ({p.status})
+                    </span>
+                  </div>
                   <div className="flex space-x-2">
                     <Button
                       variant="default"
@@ -211,13 +230,22 @@ export function GameParticipantsList({
             <ul className="space-y-2">
               {rejectedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
-                  <span>
-                    <ProfileLink
-                      userId={p.userId}
-                      username={p.user.name || p.user.email}
-                    />{" "}
-                    ({p.role} - {p.status})
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <UserAvatar
+                      name={p.user.name}
+                      email={p.user.email}
+                      srcUploaded={p.user.uploadedAvatarPath ?? null}
+                      srcProvider={p.user.image ?? null}
+                      className="h-8 w-8"
+                    />
+                    <span>
+                      <ProfileLink
+                        userId={p.userId}
+                        username={p.user.name || p.user.email}
+                      />{" "}
+                      ({p.role} - {p.status})
+                    </span>
+                  </div>
                   <Button
                     variant="default"
                     size="sm"

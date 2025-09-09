@@ -48,6 +48,7 @@ import type {
   UpdateTeamMemberInput,
 } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {

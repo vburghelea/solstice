@@ -676,6 +676,7 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
         }>
       >
     > => {
+<<<<<<< HEAD
       try {
         const { getDb, user, or, ilike } = await getServerDeps();
         const db = await getDb();
@@ -881,6 +882,8 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
     async ({
       data,
     }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
+=======
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
       try {
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
@@ -890,6 +893,8 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
             id: user.id,
             name: user.name,
             email: user.email,
+            image: user.image,
+            uploadedAvatarPath: user.uploadedAvatarPath,
           })
           .from(user)
           .where(or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)))

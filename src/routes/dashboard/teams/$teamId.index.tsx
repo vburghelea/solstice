@@ -3,8 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProfileLink } from "~/components/ProfileLink";
 import { useState } from "react";
 import { ProfileLink } from "~/components/ProfileLink";
-import { TypedLink as Link } from "~/components/ui/TypedLink";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -21,6 +19,8 @@ import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import { TypedLink as Link } from "~/components/ui/TypedLink";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
   component: TeamDetailsPage,

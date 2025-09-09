@@ -196,9 +196,13 @@ import { ServerRoute as ApiSocialFollowServerRouteImport } from "./routes/api/so
 import { ServerRoute as ApiSocialBlocklistServerRouteImport } from "./routes/api/social/blocklist";
 import { ServerRoute as ApiSocialBlockServerRouteImport } from "./routes/api/social/block";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { ServerRoute as ApiAvatarsFileServerRouteImport } from "./routes/api/avatars/$file";
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+import { ServerRoute as ApiAvatarsFileServerRouteImport } from "./routes/api/avatars/$file";
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
 import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
@@ -776,13 +780,19 @@ const ApiSocialBlockServerRoute = ApiSocialBlockServerRouteImport.update({
   getParentRoute: () => rootServerRouteImport,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
 const ApiAvatarsFileServerRoute = ApiAvatarsFileServerRouteImport.update({
   id: "/api/avatars/$file",
   path: "/api/avatars/$file",
   getParentRoute: () => rootServerRouteImport,
 } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: "/api/auth/$",
   path: "/api/auth/$",
@@ -1834,9 +1844,13 @@ export interface FileServerRoutesByFullPath {
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1854,9 +1868,13 @@ export interface FileServerRoutesByTo {
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1875,9 +1893,13 @@ export interface FileServerRoutesById {
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1897,9 +1919,13 @@ export interface FileServerRouteTypes {
     | "/api/test-square"
     | "/api/auth/$"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/api/avatars/$file"
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+    | "/api/avatars/$file"
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1917,9 +1943,13 @@ export interface FileServerRouteTypes {
     | "/api/test-square"
     | "/api/auth/$"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/api/avatars/$file"
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+    | "/api/avatars/$file"
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1937,9 +1967,13 @@ export interface FileServerRouteTypes {
     | "/api/test-square"
     | "/api/auth/$"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/api/avatars/$file"
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+    | "/api/avatars/$file"
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1958,9 +1992,13 @@ export interface RootServerRouteChildren {
   ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+  ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
   ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
   ApiSocialBlocklistServerRoute: typeof ApiSocialBlocklistServerRoute;
   ApiSocialFollowServerRoute: typeof ApiSocialFollowServerRoute;
@@ -2716,6 +2754,9 @@ declare module "@tanstack/react-start/server" {
       parentRoute: typeof rootServerRouteImport;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
     "/api/avatars/$file": {
       id: "/api/avatars/$file";
       path: "/api/avatars/$file";
@@ -2723,8 +2764,11 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiAvatarsFileServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
     "/api/auth/$": {
       id: "/api/auth/$";
       path: "/api/auth/$";
@@ -3188,9 +3232,13 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiTestSquareServerRoute: ApiTestSquareServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
 <<<<<<< HEAD
+<<<<<<< HEAD
   ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
 =======
 >>>>>>> e34f9cf (feat: baseline social functions via API, follow and block, with the necessary guards for profile views, join and invites to games and campaigns and new privacySetting)
+=======
+  ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
+>>>>>>> 49fd58e (feat: added avatars to player profiles, displayed in all profile link contexts and managed in the profile view; imported by default from external auth, overriden by local uploads.)
   ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,
   ApiSocialBlocklistServerRoute: ApiSocialBlocklistServerRoute,
   ApiSocialFollowServerRoute: ApiSocialFollowServerRoute,

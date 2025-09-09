@@ -1,6 +1,19 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+
+// Mock Tooltip to render inline for JSDOM stability
+vi.mock("~/shared/ui/tooltip", () => ({
+  TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  TooltipTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tooltip-trigger">{children}</div>
+  ),
+  TooltipContent: ({ children }: { children: React.ReactNode }) => (
+    <div role="tooltip">{children}</div>
+  ),
+}));
+
 import { defaultAvailabilityData, type AvailabilityData } from "~/db/schema/auth.schema";
 import { AvailabilityEditor } from "../availability-editor";
 
@@ -133,7 +146,7 @@ describe("AvailabilityEditor", () => {
     expect(handleChange).not.toHaveBeenCalled();
   });
 
-  it.skip("displays tooltip with correct times on hover", async () => {
+  it("displays tooltip with correct times on hover", async () => {
     // This test is skipped due to persistent timing and portal-related issues
     // with Radix UI tooltips in a JSDOM environment. The trigger attributes
     // update, but the content element is not reliably found in the DOM.
@@ -148,10 +161,7 @@ describe("AvailabilityEditor", () => {
     await userEvent.hover(trigger);
 
     await waitFor(() => {
-      const tooltipId = trigger.getAttribute("aria-describedby");
-      expect(tooltipId).toBeDefined();
-      const tooltip = document.getElementById(tooltipId!);
-      expect(tooltip).toHaveTextContent("Available: 09:00 - 11:30");
+      expect(screen.getByRole("tooltip")).toHaveTextContent("Available: 09:00 - 11:30");
     });
   });
 });

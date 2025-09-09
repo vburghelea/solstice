@@ -83,12 +83,12 @@ export function CampaignGameSessionCard({
       </CardContent>
       {isOwner && isActionable && (
         <div className="p-4 pt-0">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
             {game.status !== "completed" && (
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="flex-2"
                 onClick={() => handleUpdateStatus("completed")}
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
@@ -99,7 +99,7 @@ export function CampaignGameSessionCard({
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="flex-2"
                 onClick={() => {
                   if (window.confirm("Are you sure you want to cancel this session?")) {
                     handleUpdateStatus("canceled");

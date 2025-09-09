@@ -82,12 +82,12 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
       </CardContent>
       {isActionable && onUpdateStatus && (
         <div className="p-4 pt-0">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
             {game.status !== "completed" && (
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="flex-2"
                 onClick={() =>
                   onUpdateStatus({ data: { gameId: game.id, status: "completed" } })
                 }
@@ -100,7 +100,7 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="flex-2"
                 onClick={() => {
                   if (window.confirm("Are you sure you want to cancel this session?")) {
                     onUpdateStatus({ data: { gameId: game.id, status: "canceled" } });

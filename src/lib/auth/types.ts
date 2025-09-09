@@ -35,6 +35,8 @@ export interface UserTag {
 // Extended user type that includes our custom fields
 export interface User extends BetterAuthUser {
   image: string | null;
+  // Local path to a manually uploaded avatar (takes precedence over provider image)
+  uploadedAvatarPath?: string | null;
   // Profile completion tracking
   profileComplete: boolean;
 

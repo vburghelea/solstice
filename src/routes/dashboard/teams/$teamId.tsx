@@ -10,10 +10,10 @@ import {
 import { ProfileLink } from "~/components/ProfileLink";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
-import { Avatar, AvatarFallback, AvatarImage } from "~/shared/ui/avatar";
 import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/shared/ui/card";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({
   loader: async ({ params }) => {
@@ -145,19 +145,16 @@ function TeamDetailsPage() {
                 {members.map(({ member, user }) => (
                   <div key={member.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage
-                          src={user.image || undefined}
-                          alt={user.name || ""}
-                        />
-                        <AvatarFallback>
-                          {user.name
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase() || "??"}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        className="h-10 w-10"
+                        name={user.name ?? null}
+                        email={user.email ?? null}
+                        srcUploaded={
+                          (user as { uploadedAvatarPath?: string | null })
+                            .uploadedAvatarPath ?? null
+                        }
+                        srcProvider={user.image ?? null}
+                      />
                       <div>
                         <ProfileLink
                           userId={user.id}

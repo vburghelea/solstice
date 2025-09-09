@@ -16,6 +16,7 @@ export interface UserProfile {
   name: string;
   email: string;
   image?: string;
+  uploadedAvatarPath?: string;
   profileComplete: boolean;
   gender?: string;
   pronouns?: string;

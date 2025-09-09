@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/shared/ui/card";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface ManageInvitationsProps {
   gameId: string;
@@ -60,17 +61,28 @@ export function ManageInvitations({ gameId, invitations }: ManageInvitationsProp
                 key={invitation.id}
                 className="flex items-center justify-between border-b py-2 last:border-b-0"
               >
-                <span>
+                <div className="flex items-center gap-2">
                   {invitation.user ? (
-                    <ProfileLink
-                      userId={invitation.user.id}
-                      username={invitation.user.name || invitation.user.email}
-                    />
+                    <>
+                      <UserAvatar
+                        name={invitation.user.name}
+                        email={invitation.user.email}
+                        srcUploaded={invitation.user.uploadedAvatarPath ?? null}
+                        srcProvider={invitation.user.image ?? null}
+                        className="h-8 w-8"
+                      />
+                      <span>
+                        <ProfileLink
+                          userId={invitation.user.id}
+                          username={invitation.user.name || invitation.user.email}
+                        />{" "}
+                        (Invited - {invitation.status})
+                      </span>
+                    </>
                   ) : (
-                    "Unknown User"
-                  )}{" "}
-                  (Invited - {invitation.status})
-                </span>
+                    <span>Unknown User (Invited - {invitation.status})</span>
+                  )}
+                </div>
                 <div className="flex space-x-2">
                   <Button
                     variant="destructive"

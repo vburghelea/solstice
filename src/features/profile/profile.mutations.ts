@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { z } from "zod";
+import { z } from "zod";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
 import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import {
@@ -330,6 +330,122 @@ export const completeUserProfile = createServerFn({ method: "POST" })
       };
     }
   });
+
+// Avatar upload schemas and server functions
+const uploadAvatarInputSchema = z.object({
+  // Data URL or base64 string; we will accept both but prefer data URL
+  imageData: z
+    .string()
+    .min(1)
+    .refine((s) => s.startsWith("data:image/") || /^[A-Za-z0-9+/=]+$/.test(s), {
+      message: "Invalid image data format",
+    }),
+  // Optional content type hint (e.g., image/webp, image/png)
+  contentType: z.string().optional(),
+});
+
+export const uploadAvatar = createServerFn({ method: "POST" })
+  .validator((data: unknown) => uploadAvatarInputSchema.parse(data))
+  .handler(async ({ data }) => {
+    const [{ getCurrentUser }, { getDb }] = await Promise.all([
+      import("~/features/auth/auth.queries"),
+      import("~/db/server-helpers"),
+    ]);
+
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+      } satisfies ProfileOperationResult;
+    }
+
+    try {
+      // Extract raw base64 body from data URL or raw base64
+      const isDataUrl = data.imageData.startsWith("data:image/");
+      const base64 = isDataUrl ? data.imageData.split(",", 2)[1] : data.imageData;
+      if (!base64) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "Invalid image payload" }],
+        } as ProfileOperationResult;
+      }
+
+      // Basic size guard (~1MB max)
+      const approxBytes = Math.ceil((base64.length * 3) / 4);
+      if (approxBytes > 1_000_000) {
+        return {
+          success: false,
+          errors: [{ code: "VALIDATION_ERROR", message: "Image too large (max 1MB)" }],
+        } as ProfileOperationResult;
+      }
+
+      // Persist via storage abstraction as .webp regardless of input
+      const filename = `${currentUser.id}-${Date.now()}.webp`;
+      const buf = Buffer.from(base64, "base64");
+      const { saveAvatar } = await import("~/lib/storage/avatars");
+      const stored = await saveAvatar(filename, buf);
+
+      // Update DB: set uploadedAvatarPath to stored public path
+      const [{ user }, { eq }] = await Promise.all([
+        import("~/db/schema"),
+        import("drizzle-orm"),
+      ]);
+      const db = await getDb();
+      await db
+        .update(user)
+        .set({ uploadedAvatarPath: stored.path, profileUpdatedAt: new Date() })
+        .where(eq(user.id, currentUser.id));
+
+      // We don't need to return full profile; client will refetch.
+      return { success: true } as ProfileOperationResult;
+    } catch (error) {
+      console.error("Avatar upload failed", error);
+      return {
+        success: false,
+        errors: [{ code: "DATABASE_ERROR", message: "Failed to upload avatar" }],
+      } satisfies ProfileOperationResult;
+    }
+  });
+
+export const removeUploadedAvatar = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const [{ getCurrentUser }, { getDb }] = await Promise.all([
+      import("~/features/auth/auth.queries"),
+      import("~/db/server-helpers"),
+    ]);
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+      } as ProfileOperationResult;
+    }
+    try {
+      const [{ user }, { eq }] = await Promise.all([
+        import("~/db/schema"),
+        import("drizzle-orm"),
+      ]);
+      const db = await getDb();
+      const [updated] = await db
+        .update(user)
+        .set({ uploadedAvatarPath: null, profileUpdatedAt: new Date() })
+        .where(eq(user.id, currentUser.id))
+        .returning();
+
+      return {
+        success: true,
+        data: mapDbUserToProfile(updated),
+      } as ProfileOperationResult;
+    } catch (error) {
+      console.error("Remove uploaded avatar failed", error);
+      return {
+        success: false,
+        errors: [{ code: "DATABASE_ERROR", message: "Failed to remove avatar" }],
+      } as ProfileOperationResult;
+    }
+  },
+);
 
 export const updatePrivacySettings = createServerFn({ method: "POST" })
   .validator((input: unknown) => {

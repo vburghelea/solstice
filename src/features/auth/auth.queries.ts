@@ -42,6 +42,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     return {
       ...session.user,
       image: dbUser[0].image,
+      uploadedAvatarPath: dbUser[0].uploadedAvatarPath,
       profileComplete: dbUser[0].profileComplete,
       gender: dbUser[0].gender,
       pronouns: dbUser[0].pronouns,

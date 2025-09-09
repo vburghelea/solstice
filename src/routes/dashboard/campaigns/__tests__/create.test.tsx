@@ -16,6 +16,7 @@ import {
 import { CreateCampaignPage } from "../create";
 // Make debounce immediate for tests to avoid timers
 vi.mock("~/shared/hooks/useDebounce", () => ({
+  /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
   useDebounce: <T,>(value: T) => value,
 }));
 
@@ -29,7 +30,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-router")>();
   return {
     ...actual,
-    // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
+    /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
     useNavigate: () => navigateMock,
   };
 });

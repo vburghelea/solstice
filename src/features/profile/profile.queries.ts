@@ -44,6 +44,7 @@ function mapDbUserToProfile(
     profileVersion: number;
     profileUpdatedAt: Date | null;
     image: string | null;
+    uploadedAvatarPath: string | null;
   },
   preferences?: {
     favorite: { id: number; name: string }[];
@@ -80,6 +81,9 @@ function mapDbUserToProfile(
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
     gameSystemPreferences: preferences ?? undefined,
     ...(dbUser.image !== null && { image: dbUser.image }),
+    ...(dbUser.uploadedAvatarPath !== null && {
+      uploadedAvatarPath: dbUser.uploadedAvatarPath,
+    }),
   };
 
   return userProfile as UserProfile;

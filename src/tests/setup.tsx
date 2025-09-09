@@ -119,6 +119,28 @@ vi.mock("sonner", async (importOriginal) => {
   };
 });
 
+// Mock Radix Avatar to render <img> synchronously for tests
+vi.mock("@radix-ui/react-avatar", () => {
+  // Use a basic shim so AvatarImage is always present in DOM
+  return {
+    __esModule: true,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    Root: ({ children, ...props }: any) => (
+      <span data-slot="avatar" {...props}>
+        {children}
+      </span>
+    ),
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    Image: (props: any) => <img data-slot="avatar-image" {...props} />,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    Fallback: ({ children, ...props }: any) => (
+      <span data-slot="avatar-fallback" {...props}>
+        {children}
+      </span>
+    ),
+  };
+});
+
 // Polyfill scrollIntoView for libraries that call it in JSDOM
 // Some components (e.g., cmdk) use scrollIntoView on mount/selection
 Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {

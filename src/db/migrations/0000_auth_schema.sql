@@ -32,6 +32,7 @@ CREATE TABLE "user" (
 	"email" text NOT NULL,
 	"email_verified" boolean NOT NULL,
 	"image" text,
+	"uploaded_avatar_path" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	"profile_complete" boolean NOT NULL,

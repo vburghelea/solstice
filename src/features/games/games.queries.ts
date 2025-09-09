@@ -402,7 +402,17 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
   .handler(
     async ({
       data,
-    }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
+    }): Promise<
+      OperationResult<
+        Array<{
+          id: string;
+          name: string;
+          email: string;
+          image: string | null;
+          uploadedAvatarPath: string | null;
+        }>
+      >
+    > => {
       try {
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
@@ -412,6 +422,8 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
             id: user.id,
             name: user.name,
             email: user.email,
+            image: user.image,
+            uploadedAvatarPath: user.uploadedAvatarPath,
           })
           .from(user)
           .where(or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)))

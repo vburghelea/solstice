@@ -1,13 +1,25 @@
 import type { Relationship } from "./relationship.server";
 
 export type RelationshipSnapshot = Relationship & {
-  targetUser: { id: string; name: string; email: string; image?: string | null };
+  targetUser: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+    uploadedAvatarPath?: string | null;
+  };
   isSelf?: boolean;
 };
 
 export interface BlocklistItem {
   id: string; // block id
-  user: { id: string; name: string; email: string; image?: string | null };
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+    uploadedAvatarPath?: string | null;
+  };
   reason?: string | null;
   createdAt: Date;
 }

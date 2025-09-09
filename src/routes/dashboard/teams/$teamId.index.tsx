@@ -2,8 +2,6 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProfileLink } from "~/components/ProfileLink";
-import { TypedLink as Link } from "~/components/ui/TypedLink";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -17,6 +15,7 @@ import {
 import { useAuth } from "~/features/auth";
 import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
   component: TeamDetailsPage,
@@ -177,19 +176,13 @@ function TeamDetailsPage() {
                 {members.map(({ member, user }) => (
                   <div key={member.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage
-                          src={user.image || undefined}
-                          alt={user.name || ""}
-                        />
-                        <AvatarFallback>
-                          {user.name
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase() || "??"}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        className="h-10 w-10"
+                        name={user.name ?? null}
+                        email={user.email ?? null}
+                        srcUploaded={user.uploadedAvatarPath ?? null}
+                        srcProvider={user.image ?? null}
+                      />
                       <div>
                         <ProfileLink
                           userId={user.id}

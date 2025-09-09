@@ -1,6 +1,10 @@
 import { vi } from "vitest";
 import { MOCK_APPLICATIONS, MOCK_CAMPAIGN } from "./campaigns";
-import { MOCK_GAME_SYSTEM } from "./game-systems";
+import {
+  MOCK_GAME_SYSTEM,
+  MOCK_GAME_SYSTEM_DND5E,
+  MOCK_GAME_SYSTEM_PATHFINDER2E,
+} from "./game-systems";
 import {
   MOCK_CAMPAIGN_GAME_1,
   MOCK_CAMPAIGN_GAME_2,
@@ -17,6 +21,8 @@ export const mockUseQueryUserCampaignApplication = vi.fn();
 export const mockUseQueryUserGameApplication = vi.fn();
 export const mockUseQueryCampaignGameSessions = vi.fn();
 export const mockUseQueryGameSystem = vi.fn();
+export const mockUseQuerySearchGameSystems = vi.fn();
+export const mockUseQueryRelationship = vi.fn();
 
 export const mockReactQuery = () => {
   vi.mock("@tanstack/react-query", async (importOriginal) => {
@@ -40,8 +46,14 @@ export const mockReactQuery = () => {
         if (options.queryKey[0] === "gameSystem") {
           return mockUseQueryGameSystem();
         }
+        if (options.queryKey[0] === "searchGameSystems") {
+          return mockUseQuerySearchGameSystems();
+        }
         if (options.queryKey[0] === "campaignApplications") {
           return mockUseQueryCampaignApplications();
+        }
+        if (options.queryKey[0] === "relationship") {
+          return mockUseQueryRelationship();
         }
         if (options.queryKey[0] === "gameApplications") {
           return mockUseQueryGameApplications();
@@ -80,6 +92,14 @@ export const setupReactQueryMocks = () => {
   mockUseQueryGameSystem
     .mockReset()
     .mockReturnValue({ data: MOCK_GAME_SYSTEM, isLoading: false, error: null });
+  mockUseQuerySearchGameSystems.mockReset().mockReturnValue({
+    data: {
+      success: true,
+      data: [MOCK_GAME_SYSTEM_DND5E, MOCK_GAME_SYSTEM_PATHFINDER2E],
+    },
+    isLoading: false,
+    error: null,
+  });
   mockUseQueryCampaignApplications.mockReset().mockReturnValue({
     data: { success: true, data: MOCK_APPLICATIONS },
     isLoading: false,
@@ -92,6 +112,14 @@ export const setupReactQueryMocks = () => {
   });
   mockUseQueryUserCampaignApplication.mockReset().mockReturnValue({
     data: { success: true, data: null },
+    isLoading: false,
+    error: null,
+  });
+  mockUseQueryRelationship.mockReset().mockReturnValue({
+    data: {
+      success: true,
+      data: { blocked: false, blockedBy: false, isConnection: false },
+    },
     isLoading: false,
     error: null,
   });

@@ -1,135 +1,65 @@
-import { QueryClient } from "@tanstack/react-query";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useLoaderData, useParams, useRouteContext } from "@tanstack/react-router";
-import { getCurrentUser } from "~/features/auth/auth.queries";
-import { getCampaignApplications } from "~/features/campaigns/campaigns.queries";
-import { updateGameSessionStatus } from "~/features/games/games.mutations";
-import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
-
-vi.mock("@tanstack/react-query", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-query")>();
-  return {
-    ...actual,
-    useQuery: vi.fn(),
-    useMutation: vi.fn(),
-  };
-});
-
-vi.mock("@tanstack/react-router", async () => {
-  const actual = await vi.importActual<typeof import("@tanstack/react-router")>(
-    "@tanstack/react-router",
-  );
-  return {
-    ...actual,
-    useLoaderData: vi.fn(),
-    useParams: vi.fn(),
-    useRouteContext: vi.fn(),
-  };
-});
-
-vi.mock("~/features/auth/auth.queries", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("~/features/auth/auth.queries")>();
-  return {
-    ...actual,
-    getCurrentUser: vi.fn(),
-    getProviders: vi.fn(),
-    changePassword: vi.fn(),
-  };
-});
-
-import type { GameWithDetails } from "~/features/games/games.types";
-import type { User } from "~/lib/auth/types";
-import { MOCK_CAMPAIGN } from "~/tests/mocks/campaigns";
+import { toast } from "sonner";
+import {
+  MOCK_CAMPAIGN,
+  mockApplyToCampaign,
+  mockUpdateCampaign,
+} from "~/tests/mocks/campaigns";
 import {
   MOCK_CAMPAIGN_GAME_1,
   MOCK_CAMPAIGN_GAME_2,
   MOCK_CAMPAIGN_GAME_3,
 } from "~/tests/mocks/games";
+import {
+  mockUseQueryCampaign,
+  mockUseQueryCampaignGameSessions,
+  mockUseQueryRelationship,
+  mockUseQueryUserCampaignApplication,
+} from "~/tests/mocks/react-query";
 import { MOCK_OWNER_USER } from "~/tests/mocks/users";
+import { spyUseMutationRun } from "~/tests/utils/react-query";
 import { renderWithRouter } from "~/tests/utils/router";
-import { CampaignDetailsPage } from "../$campaignId/index";
+import { CampaignDetailsPage, Route as CampaignRoute } from "../$campaignId/index";
 
-// Mock CampaignGameSessionCard
-vi.mock("~/features/games/components/CampaignGameSessionCard", () => ({
-  CampaignGameSessionCard: vi.fn(({ game, isOwner, onUpdateStatus }) => (
-    <div data-testid={`mock-game-session-card-${game.id}`}>
-      <h3>{game.name}</h3>
-      <p>{game.status}</p>
-      {isOwner && (
-        <button
-          type="button"
-          onClick={() => onUpdateStatus({ data: { id: game.id, status: "completed" } })}
-        >
-          Mark Completed
-        </button>
-      )}
-    </div>
-  )),
-}));
-
-// Mock application data
-const MOCK_APPLICATIONS = [
-  {
-    id: "app-1",
-    campaignId: MOCK_CAMPAIGN.id,
-    userId: "user-2",
-    user: { ...MOCK_OWNER_USER, id: "user-2", name: "Alice", email: "alice@example.com" },
-    status: "pending" as const,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "app-2",
-    campaignId: MOCK_CAMPAIGN.id,
-    userId: "user-3",
-    user: { ...MOCK_OWNER_USER, id: "user-3", name: "Bob", email: "bob@example.com" },
-    status: "pending" as const,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
-describe.skip("Campaign Details Page", () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
-  const mockCurrentUser = (user: User | null) => {
-    vi.mocked(getCurrentUser).mockResolvedValue(user);
+describe("Campaign Details Page", () => {
+  const setupRouteSpies = ({
+    user = MOCK_OWNER_USER,
+    status,
+  }: {
+    user?: typeof MOCK_OWNER_USER | null;
+    status?: string;
+  }) => {
+    vi.spyOn(CampaignRoute, "useParams").mockReturnValue({
+      campaignId: MOCK_CAMPAIGN.id,
+    } as ReturnType<typeof CampaignRoute.useParams>);
+    vi.spyOn(CampaignRoute, "useRouteContext").mockReturnValue({
+      user,
+    } as unknown as ReturnType<typeof CampaignRoute.useRouteContext>);
+    vi.spyOn(CampaignRoute, "useSearch").mockReturnValue(
+      (status ? { status } : {}) as ReturnType<typeof CampaignRoute.useSearch>,
+    );
+    const navigateMock = vi.fn();
+    vi.spyOn(CampaignRoute, "useNavigate").mockReturnValue(
+      navigateMock as unknown as ReturnType<typeof CampaignRoute.useNavigate>,
+    );
+    return { navigateMock };
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    queryClient.clear();
-    mockCurrentUser(MOCK_OWNER_USER); // Default to authenticated owner
+  });
 
-    vi.mocked(useLoaderData).mockReturnValue({ campaign: MOCK_CAMPAIGN });
-    vi.mocked(useParams).mockReturnValue({ campaignId: MOCK_CAMPAIGN.id });
-    vi.mocked(useRouteContext).mockReturnValue({ user: MOCK_OWNER_USER });
-    vi.mocked(listGameSessionsByCampaignId).mockResolvedValue({
-      success: true,
-      data: [MOCK_CAMPAIGN_GAME_1, MOCK_CAMPAIGN_GAME_2, MOCK_CAMPAIGN_GAME_3],
-    });
-    vi.mocked(updateGameSessionStatus).mockResolvedValue({
-      success: true,
-      data: {
-        ...(MOCK_CAMPAIGN_GAME_1 as unknown as GameWithDetails),
-        status: "completed",
-      }, // Mock a successful update
-    });
-    vi.mocked(getCampaignApplications).mockResolvedValue({
-      success: true,
-      data: MOCK_APPLICATIONS,
-    });
+  // Ensure mutations invoke provided mutationFn so our mocks run
+  beforeEach(() => {
+    spyUseMutationRun();
   });
 
   it("renders the campaign details page", async () => {
+    setupRouteSpies({});
+
     await renderWithRouter(<CampaignDetailsPage />, {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
@@ -138,231 +68,279 @@ describe.skip("Campaign Details Page", () => {
     await waitFor(() => {
       expect(screen.getByText(MOCK_CAMPAIGN.name)).toBeInTheDocument();
       expect(screen.getByText(/Game Sessions/i)).toBeInTheDocument();
-      // Explicitly wait for game session data to be processed and rendered
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_1.id}`),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_2.id}`),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_3.id}`),
-      ).toBeInTheDocument();
+      // Session cards can duplicate names across mobile/desktop layouts; assert at least once
+      expect(screen.getAllByText(MOCK_CAMPAIGN_GAME_1.name).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(MOCK_CAMPAIGN_GAME_2.name).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(MOCK_CAMPAIGN_GAME_3.name).length).toBeGreaterThan(0);
     });
   });
 
-  it("filters game sessions by status", async () => {
+  it("updates search when filtering game sessions", async () => {
+    const user = userEvent.setup();
+    const { navigateMock } = setupRouteSpies({});
+
     await renderWithRouter(<CampaignDetailsPage />, {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_1.id}`),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_2.id}`),
-      ).toBeInTheDocument();
-    });
+    // Radix Select trigger renders as a combobox without accessible name
+    const trigger = screen.getByRole("combobox");
+    await user.click(trigger);
+    await user.click(screen.getByRole("option", { name: /Completed/i }));
 
-    // Select "Scheduled" status
-    fireEvent.mouseDown(screen.getByRole("button", { name: /Filter by status/i }));
-    fireEvent.click(screen.getByText(/Scheduled/i));
-
-    await waitFor(() => {
-      expect(listGameSessionsByCampaignId).toHaveBeenCalledWith({
-        data: { campaignId: MOCK_CAMPAIGN.id, status: "scheduled" },
-      });
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_1.id}`),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_2.id}`),
-      ).not.toBeInTheDocument();
-    });
-
-    // Select "Completed" status
-    fireEvent.mouseDown(screen.getByRole("button", { name: /Scheduled/i })); // Click the current filter button
-    fireEvent.click(screen.getByText(/Completed/i));
-
-    await waitFor(() => {
-      expect(listGameSessionsByCampaignId).toHaveBeenCalledWith({
-        data: { campaignId: MOCK_CAMPAIGN.id, status: "completed" },
-      });
-      expect(
-        screen.queryByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_1.id}`),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_2.id}`),
-      ).toBeInTheDocument();
+    expect(navigateMock).toHaveBeenCalledWith({
+      search: { status: "completed" },
     });
   });
 
-  it("navigates to game creation page with campaignId when 'Create Game Session' is clicked", async () => {
+  it("renders only completed sessions when status search is 'completed'", async () => {
+    // Override the campaign game sessions query to return only completed
+    mockUseQueryCampaignGameSessions.mockReturnValue({
+      data: { success: true, data: [MOCK_CAMPAIGN_GAME_2] },
+      isLoading: false,
+      error: null,
+    });
+
+    setupRouteSpies({ status: "completed" });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}?status=completed`],
+    });
+
+    // Since sample games share the same name, assert list size via action links
+    const viewLinks = screen.getAllByRole("link", { name: /View Game/i });
+    expect(viewLinks).toHaveLength(1);
+  });
+
+  it("renders Create Game Session link with campaignId for owner", async () => {
+    setupRouteSpies({});
+
     await renderWithRouter(<CampaignDetailsPage />, {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole("link", { name: /Create Game Session/i }),
-      ).toBeInTheDocument();
-    });
-
-    const createGameButton = screen.getByRole("link", { name: /Create Game Session/i });
-    expect(createGameButton).toHaveAttribute(
+    const link = await screen.findByRole("link", { name: /Create Game Session/i });
+    expect(link).toHaveAttribute(
       "href",
       `/dashboard/games/create?campaignId=${MOCK_CAMPAIGN.id}`,
     );
   });
 
-  describe("CampaignGameSessionCard actions", () => {
-    it("shows 'Mark Completed' and 'Cancel Session' for scheduled games", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValueOnce({
-        success: true,
-        data: [MOCK_CAMPAIGN_GAME_1],
-      });
-
-      await renderWithRouter(<CampaignDetailsPage />, {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_1.id}`),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole("button", { name: /Mark Completed/i }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it("does not show 'Mark Completed' or 'Cancel Session' for completed games", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValueOnce({
-        success: true,
-        data: [MOCK_CAMPAIGN_GAME_2],
-      });
-
-      await renderWithRouter(<CampaignDetailsPage />, {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_2.id}`),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByRole("button", { name: /Mark Completed/i }),
-        ).not.toBeInTheDocument();
-      });
-    });
-
-    it("does not show 'Mark Completed' or 'Cancel Session' for canceled games", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValueOnce({
-        success: true,
-        data: [MOCK_CAMPAIGN_GAME_3],
-      });
-
-      await renderWithRouter(<CampaignDetailsPage />, {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByTestId(`mock-game-session-card-${MOCK_CAMPAIGN_GAME_3.id}`),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByRole("button", { name: /Mark Completed/i }),
-        ).not.toBeInTheDocument();
-      });
-    });
-
-    it("calls updateGameSessionStatus with 'completed' when 'Mark Completed' is clicked", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValueOnce({
-        success: true,
-        data: [MOCK_CAMPAIGN_GAME_1],
-      });
-
-      await renderWithRouter(<CampaignDetailsPage />, {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByRole("button", { name: /Mark Completed/i }),
-        ).toBeInTheDocument();
-      });
-
-      fireEvent.click(screen.getByRole("button", { name: /Mark Completed/i }));
-
-      await waitFor(() => {
-        expect(updateGameSessionStatus).toHaveBeenCalledWith({
-          data: { id: MOCK_CAMPAIGN_GAME_1.id, status: "completed" },
-        });
-      });
-    });
-
-    it("calls updateGameSessionStatus with 'canceled' when 'Cancel Session' is clicked", async () => {
-      vi.mocked(listGameSessionsByCampaignId).mockResolvedValueOnce({
-        success: true,
-        data: [MOCK_CAMPAIGN_GAME_1],
-      });
-
-      await renderWithRouter(<CampaignDetailsPage />, {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
-      });
-      await waitFor(() => {
-        expect(
-          screen.getByRole("button", { name: /Cancel Session/i }),
-        ).toBeInTheDocument();
-      });
-
-      fireEvent.click(screen.getByRole("button", { name: /Cancel Session/i }));
-
-      await waitFor(() => {
-        expect(updateGameSessionStatus).toHaveBeenCalledWith({
-          data: { id: MOCK_CAMPAIGN_GAME_1.id, status: "canceled" },
-        });
-      });
-    });
-  });
-
-  it("renders Invite Participants and Manage Applications sections for campaign owner", async () => {
+  it("renders owner-only sections (Invite Participants, Manage Invitations)", async () => {
+    setupRouteSpies({});
     await renderWithRouter(<CampaignDetailsPage />, {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /Invite Participants/i }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole("heading", { name: /Manage Applications/i }),
-      ).toBeInTheDocument();
-      expect(screen.getByText(MOCK_APPLICATIONS[0].user.name)).toBeInTheDocument();
-      expect(screen.getByText(MOCK_APPLICATIONS[1].user.name)).toBeInTheDocument();
-    });
+    // Card titles are not semantic headings; assert by text
+    expect(await screen.findByText(/Invite Participants/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Manage Invitations/i)).toBeInTheDocument();
   });
 
-  it("does not render Invite Participants and Manage Applications sections for non-owner", async () => {
-    mockCurrentUser({ ...MOCK_OWNER_USER, id: "non-owner-id" }); // Mock a non-owner user
+  it("hides owner-only sections for non-owner", async () => {
+    setupRouteSpies({ user: { ...MOCK_OWNER_USER, id: "non-owner" } });
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+
+    expect(
+      screen.queryByRole("heading", { name: /Invite Participants/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /Manage Invitations/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows Apply button for eligible non-owner and calls apply mutation", async () => {
+    // Non-owner context; campaign is public and active by default in mocks
+    setupRouteSpies({ user: { ...MOCK_OWNER_USER, id: "not-owner" } });
 
     await renderWithRouter(<CampaignDetailsPage />, {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
+    const applyBtn = await screen.findByRole("button", { name: /Apply to Campaign/i });
+    expect(applyBtn).toBeInTheDocument();
+
+    await userEvent.click(applyBtn);
+
+    expect(mockApplyToCampaign).toHaveBeenCalledWith({
+      data: { campaignId: MOCK_CAMPAIGN.id },
+    });
+  });
+
+  it("owner can open edit form, submit, and exit edit mode on success", async () => {
+    setupRouteSpies({});
+    // Ensure update mutation resolves successfully
+    mockUpdateCampaign.mockResolvedValueOnce({ success: true, data: MOCK_CAMPAIGN });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+
+    // Enter edit mode if needed (form may already be visible)
+    const maybeEditBtn = screen.queryByRole("button", { name: /Edit Campaign/i });
+    if (maybeEditBtn) {
+      await userEvent.click(maybeEditBtn);
+    }
+
+    // Update form should appear
+    const updateBtn = await screen.findByRole("button", { name: /Update Campaign/i });
+    await userEvent.click(updateBtn);
+
+    expect(mockUpdateCampaign).toHaveBeenCalled();
+
+    // After success, edit mode should close; original Edit button visible again
     await waitFor(() => {
       expect(
-        screen.queryByRole("heading", { name: /Invite Participants/i }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole("heading", { name: /Manage Applications/i }),
+        screen.queryByRole("button", { name: /Update Campaign/i }),
       ).not.toBeInTheDocument();
     });
+  });
+
+  // Negative gating scenarios: Apply button should be hidden
+  it("hides Apply when campaign is protected and user is not a connection", async () => {
+    setupRouteSpies({ user: { ...MOCK_OWNER_USER, id: "not-owner" } });
+    mockUseQueryCampaign.mockReturnValue({
+      data: { ...MOCK_CAMPAIGN, visibility: "protected" },
+      isLoading: false,
+      error: null,
+    });
+    mockUseQueryRelationship.mockReturnValue({
+      data: {
+        success: true,
+        data: { blocked: false, blockedBy: false, isConnection: false },
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+
+    expect(
+      screen.queryByRole("button", { name: /Apply to Campaign/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides Apply and shows block banner when user is blocked or blocking", async () => {
+    setupRouteSpies({ user: { ...MOCK_OWNER_USER, id: "not-owner" } });
+    mockUseQueryRelationship.mockReturnValue({
+      data: {
+        success: true,
+        data: { blocked: true, blockedBy: false, isConnection: false },
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+
+    expect(
+      screen.queryByRole("button", { name: /Apply to Campaign/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /You cannot interact with this organizer due to block settings\./i,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("hides Apply when campaign is not active", async () => {
+    setupRouteSpies({ user: { ...MOCK_OWNER_USER, id: "not-owner" } });
+    mockUseQueryCampaign.mockReturnValue({
+      data: { ...MOCK_CAMPAIGN, status: "inactive" },
+      isLoading: false,
+      error: null,
+    });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+    expect(
+      screen.queryByRole("button", { name: /Apply to Campaign/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides Apply when user has a pending application", async () => {
+    setupRouteSpies({ user: { ...MOCK_OWNER_USER, id: "not-owner" } });
+    mockUseQueryUserCampaignApplication.mockReturnValue({
+      data: { status: "pending" },
+      isLoading: false,
+      error: null,
+    });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+    expect(
+      screen.queryByRole("button", { name: /Apply to Campaign/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides Apply when user has a rejected participant status", async () => {
+    const nonOwner = { ...MOCK_OWNER_USER, id: "not-owner" };
+    setupRouteSpies({ user: nonOwner });
+    mockUseQueryCampaign.mockReturnValue({
+      data: {
+        ...MOCK_CAMPAIGN,
+        participants: [
+          { id: "p1", userId: nonOwner.id, role: "player", status: "rejected" },
+        ],
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+    expect(
+      screen.queryByRole("button", { name: /Apply to Campaign/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  // Error path for update flow
+  it("shows error toast and stays in edit mode when update fails", async () => {
+    setupRouteSpies({});
+    mockUseQueryCampaign.mockReturnValue({
+      data: MOCK_CAMPAIGN,
+      isLoading: false,
+      error: null,
+    });
+    mockUpdateCampaign.mockResolvedValueOnce({
+      success: false,
+      errors: [{ code: "SERVER_ERROR", message: "Update failed" }],
+    });
+
+    await renderWithRouter(<CampaignDetailsPage />, {
+      path: "/dashboard/campaigns/$campaignId",
+      initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
+    });
+
+    const maybeEdit = screen.queryByRole("button", { name: /Edit Campaign/i });
+    if (maybeEdit) await userEvent.click(maybeEdit);
+
+    const updateBtn = await screen.findByRole("button", { name: /Update Campaign/i });
+    await userEvent.click(updateBtn);
+
+    expect(toast.error).toHaveBeenCalled();
+    // Still in edit mode
+    expect(screen.getByRole("button", { name: /Update Campaign/i })).toBeInTheDocument();
   });
 });

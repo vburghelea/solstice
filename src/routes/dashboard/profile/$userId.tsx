@@ -1,6 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle, ShieldBan, Star } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -19,6 +30,8 @@ import {
   unfollowUser,
 } from "~/features/social";
 import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
+import { useRateLimitedServerFn } from "~/lib/pacer";
+import { strings } from "~/shared/lib/strings";
 import { Badge } from "~/shared/ui/badge";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
@@ -68,10 +81,19 @@ export function UserProfileComponent() {
     relResult.success &&
     (relResult.data.blocked || relResult.data.blockedBy);
 
+  // Client-side rate limited server functions for social actions
+  const rlFollow = useRateLimitedServerFn(followUser, { type: "social" });
+  const rlUnfollow = useRateLimitedServerFn(unfollowUser, { type: "social" });
+  const rlBlock = useRateLimitedServerFn(blockUser, { type: "social" });
+  const rlUnblock = useRateLimitedServerFn(unblockUser, { type: "social" });
+
+  // Block confirmation modal state
+  const [confirmBlockOpen, setConfirmBlockOpen] = useState(false);
+
   const doFollow = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await followUser({ data: { followingId: userId } });
+      await rlFollow({ data: { followingId: userId } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -102,7 +124,7 @@ export function UserProfileComponent() {
   const doUnfollow = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await unfollowUser({ data: { followingId: userId } });
+      await rlUnfollow({ data: { followingId: userId } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -137,7 +159,7 @@ export function UserProfileComponent() {
   const doBlock = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await blockUser({ data: { userId } });
+      await rlBlock({ data: { userId } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -168,7 +190,7 @@ export function UserProfileComponent() {
   const doUnblock = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await unblockUser({ data: { userId } });
+      await rlUnblock({ data: { userId } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -230,6 +252,25 @@ export function UserProfileComponent() {
 
   return (
     <div className="container mx-auto p-4">
+      <AlertDialog open={confirmBlockOpen} onOpenChange={setConfirmBlockOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{strings.social.confirmBlockTitle}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {strings.social.confirmBlockDescription}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => doBlock.mutate()}
+              aria-label="Confirm block user"
+            >
+              {strings.social.confirmBlockAction}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Card>
         <CardHeader className="flex flex-col items-center text-center">
           <UserAvatar
@@ -251,17 +292,28 @@ export function UserProfileComponent() {
               disabled={blockedAny || isSelf}
               title={isSelf ? "You cannot follow yourself" : undefined}
               aria-disabled={blockedAny || isSelf}
+              aria-label={
+                isSelf
+                  ? "Follow disabled on own profile"
+                  : follows
+                    ? "Unfollow user"
+                    : "Follow user"
+              }
             >
               <Star className="mr-1 h-4 w-4" />
-              {isSelf ? "Follow" : follows ? "Following" : "Follow"}
+              {isSelf
+                ? strings.social.profile.follow
+                : follows
+                  ? strings.social.profile.following
+                  : strings.social.profile.follow}
             </Button>
             {/* Self profile indicator or followed-by indicator */}
             {isSelf ? (
-              <Badge variant="secondary">This is your profile</Badge>
+              <Badge variant="secondary">{strings.social.profile.selfProfile}</Badge>
             ) : (
               followedBy && (
                 <Badge variant="secondary" className="flex items-center gap-1">
-                  <Star className="h-3 w-3" /> Followed by them
+                  <Star className="h-3 w-3" /> {strings.social.profile.followedBy}
                 </Badge>
               )
             )}
@@ -269,10 +321,13 @@ export function UserProfileComponent() {
             <Button
               variant={blockedAny ? "destructive" : "outline"}
               size="sm"
-              onClick={() => (blockedAny ? doUnblock.mutate() : doBlock.mutate())}
+              onClick={() =>
+                blockedAny ? doUnblock.mutate() : setConfirmBlockOpen(true)
+              }
               disabled={isSelf}
               title={isSelf ? "You cannot block yourself" : undefined}
               aria-disabled={isSelf}
+              aria-label={blockedAny ? "Unblock user" : "Block user"}
             >
               <ShieldBan className="mr-1 h-4 w-4" />
               {blockedAny ? "Unblock" : "Block"}
@@ -280,74 +335,89 @@ export function UserProfileComponent() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {!isSelf && blockedAny ? (
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              {strings.social.blockedProfileBanner}
+            </div>
+          ) : null}
           <Separator />
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {profile.gender && (
-              <div>
-                <h4 className="font-semibold">Gender:</h4>
-                <p>{profile.gender}</p>
-              </div>
-            )}
-            {profile.overallExperienceLevel && (
-              <div>
-                <h4 className="font-semibold">Experience Level:</h4>
-                <p>{profile.overallExperienceLevel}</p>
-              </div>
-            )}
-            {profile.isGM && (
-              <div>
-                <h4 className="font-semibold">Game Master:</h4>
-                <p>Yes</p>
-              </div>
-            )}
-            {profile.isGM && profile.gmStyle && (
-              <div>
-                <h4 className="font-semibold">GM Style:</h4>
-                <p>{profile.gmStyle}</p>
-              </div>
-            )}
-            {/* Privacy-controlled fields */}
-            {showEmail && (
-              <div>
-                <h4 className="font-semibold">Email:</h4>
-                <p>{profile.email}</p>
-              </div>
-            )}
-            {showPhone && profile.phone && (
-              <div>
-                <h4 className="font-semibold">Phone:</h4>
-                <p>{profile.phone}</p>
-              </div>
-            )}
-            {showLocation && (profile.city || profile.country) && (
-              <div>
-                <h4 className="font-semibold">Location:</h4>
-                <p>{[profile.city, profile.country].filter(Boolean).join(", ")}</p>
-              </div>
-            )}
-          </div>
-
-          {showLanguages && profile.languages && profile.languages.length > 0 && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="font-semibold">Languages:</h4>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {profile.languages.map((lang) => (
-                    <span
-                      key={lang}
-                      className="bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm"
-                    >
-                      {lang}
-                    </span>
-                  ))}
+          {/* When blocked in either direction (and not self), show minimal public view */}
+          {!isSelf && blockedAny ? (
+            <div className="text-muted-foreground text-sm">
+              {strings.social.blockedProfileDetailsHidden}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {profile.gender && (
+                <div>
+                  <h4 className="font-semibold">Gender:</h4>
+                  <p>{profile.gender}</p>
                 </div>
-              </div>
-            </>
+              )}
+              {profile.overallExperienceLevel && (
+                <div>
+                  <h4 className="font-semibold">Experience Level:</h4>
+                  <p>{profile.overallExperienceLevel}</p>
+                </div>
+              )}
+              {profile.isGM && (
+                <div>
+                  <h4 className="font-semibold">Game Master:</h4>
+                  <p>Yes</p>
+                </div>
+              )}
+              {profile.isGM && profile.gmStyle && (
+                <div>
+                  <h4 className="font-semibold">GM Style:</h4>
+                  <p>{profile.gmStyle}</p>
+                </div>
+              )}
+              {/* Privacy-controlled fields */}
+              {showEmail && (
+                <div>
+                  <h4 className="font-semibold">Email:</h4>
+                  <p>{profile.email}</p>
+                </div>
+              )}
+              {showPhone && profile.phone && (
+                <div>
+                  <h4 className="font-semibold">Phone:</h4>
+                  <p>{profile.phone}</p>
+                </div>
+              )}
+              {showLocation && (profile.city || profile.country) && (
+                <div>
+                  <h4 className="font-semibold">Location:</h4>
+                  <p>{[profile.city, profile.country].filter(Boolean).join(", ")}</p>
+                </div>
+              )}
+            </div>
           )}
 
-          {showGamePreferences &&
+          {!blockedAny &&
+            showLanguages &&
+            profile.languages &&
+            profile.languages.length > 0 && (
+              <>
+                <Separator />
+                <div>
+                  <h4 className="font-semibold">Languages:</h4>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {profile.languages.map((lang) => (
+                      <span
+                        key={lang}
+                        className="bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm"
+                      >
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+          {!blockedAny &&
+            showGamePreferences &&
             profile.gameSystemPreferences &&
             (profile.gameSystemPreferences.favorite.length > 0 ||
               profile.gameSystemPreferences.avoid.length > 0) && (

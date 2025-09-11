@@ -1,5 +1,5 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { blockUser } from "~/features/social";
 
 const bodySchema = z.object({
@@ -7,25 +7,28 @@ const bodySchema = z.object({
   reason: z.string().max(500).optional(),
 });
 
+export async function handleBlock(body: unknown): Promise<Response> {
+  try {
+    const data = bodySchema.parse(body);
+    const result = await blockUser({ data });
+    return new Response(JSON.stringify(result), {
+      status: result.success ? 200 : 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("/api/social/block error", error);
+    const status = error instanceof ZodError ? 400 : 500;
+    const message = error instanceof ZodError ? "Invalid request" : "Failed to block";
+    return new Response(
+      JSON.stringify({ success: false, errors: [{ code: "BAD_REQUEST", message }] }),
+      { status, headers: { "Content-Type": "application/json" } },
+    );
+  }
+}
+
 export const ServerRoute = createServerFileRoute("/api/social/block").methods({
   POST: async ({ request }) => {
-    try {
-      const body = await request.json();
-      const data = bodySchema.parse(body);
-      const result = await blockUser({ data });
-      return new Response(JSON.stringify(result), {
-        status: result.success ? 200 : 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (error) {
-      console.error("/api/social/block error", error);
-      return new Response(
-        JSON.stringify({
-          success: false,
-          errors: [{ code: "SERVER_ERROR", message: "Failed to block" }],
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } },
-      );
-    }
+    const body = await request.json();
+    return handleBlock(body);
   },
 });

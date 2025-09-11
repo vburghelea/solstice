@@ -14,20 +14,23 @@ mockReactQuery();
 // Provide default return values for common queries used across tests
 setupReactQueryMocks();
 
-// Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: vi.fn().mockImplementation((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+// Only perform DOM polyfills when a window object exists (jsdom)
+if (typeof window !== "undefined") {
+  // Mock window.matchMedia
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(), // deprecated
+      removeListener: vi.fn(), // deprecated
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
@@ -43,46 +46,50 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
-// Polyfill Pointer Events APIs used by Radix UI in JSDOM
-// JSDOM does not implement pointer capture helpers; provide safe no-ops
-// to avoid runtime errors when components call them during tests.
-Object.defineProperty(window.HTMLElement.prototype, "hasPointerCapture", {
-  value: () => false,
-  configurable: true,
-});
-Object.defineProperty(window.HTMLElement.prototype, "setPointerCapture", {
-  value: () => {},
-  configurable: true,
-});
-Object.defineProperty(window.HTMLElement.prototype, "releasePointerCapture", {
-  value: () => {},
-  configurable: true,
-});
-
-// Provide a minimal PointerEvent polyfill if missing
-if (typeof window.PointerEvent === "undefined") {
-  class PointerEvent extends MouseEvent {
-    pointerId: number;
-    pointerType: string;
-    isPrimary: boolean;
-    constructor(
-      type: string,
-      props?: MouseEventInit & {
-        pointerId?: number;
-        pointerType?: string;
-        isPrimary?: boolean;
-      },
-    ) {
-      super(type, props);
-      this.pointerId = props?.pointerId ?? 1;
-      this.pointerType = props?.pointerType ?? "mouse";
-      this.isPrimary = props?.isPrimary ?? true;
-    }
-  }
-  Object.defineProperty(window, "PointerEvent", {
-    value: PointerEvent,
+if (typeof window !== "undefined") {
+  // Polyfill Pointer Events APIs used by Radix UI in JSDOM
+  // JSDOM does not implement pointer capture helpers; provide safe no-ops
+  // to avoid runtime errors when components call them during tests.
+  Object.defineProperty(window.HTMLElement.prototype, "hasPointerCapture", {
+    value: () => false,
     configurable: true,
   });
+  Object.defineProperty(window.HTMLElement.prototype, "setPointerCapture", {
+    value: () => {},
+    configurable: true,
+  });
+  Object.defineProperty(window.HTMLElement.prototype, "releasePointerCapture", {
+    value: () => {},
+    configurable: true,
+  });
+}
+
+// Provide a minimal PointerEvent polyfill if missing
+if (typeof window !== "undefined") {
+  if (typeof window.PointerEvent === "undefined") {
+    class PointerEvent extends MouseEvent {
+      pointerId: number;
+      pointerType: string;
+      isPrimary: boolean;
+      constructor(
+        type: string,
+        props?: MouseEventInit & {
+          pointerId?: number;
+          pointerType?: string;
+          isPrimary?: boolean;
+        },
+      ) {
+        super(type, props);
+        this.pointerId = props?.pointerId ?? 1;
+        this.pointerType = props?.pointerType ?? "mouse";
+        this.isPrimary = props?.isPrimary ?? true;
+      }
+    }
+    Object.defineProperty(window, "PointerEvent", {
+      value: PointerEvent,
+      configurable: true,
+    });
+  }
 }
 
 // Mock environment variables for tests
@@ -141,12 +148,14 @@ vi.mock("@radix-ui/react-avatar", () => {
   };
 });
 
-// Polyfill scrollIntoView for libraries that call it in JSDOM
-// Some components (e.g., cmdk) use scrollIntoView on mount/selection
-Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {
-  value: vi.fn(),
-  configurable: true,
-});
+if (typeof window !== "undefined") {
+  // Polyfill scrollIntoView for libraries that call it in JSDOM
+  // Some components (e.g., cmdk) use scrollIntoView on mount/selection
+  Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {
+    value: vi.fn(),
+    configurable: true,
+  });
+}
 
 // Reset mocks before each test
 beforeEach(() => {

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -10,6 +11,8 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { getBlocklist, unblockUser } from "~/features/social";
+import { useRateLimitedServerFn } from "~/lib/pacer";
+import { strings } from "~/shared/lib/strings";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/profile/blocklist")({
@@ -17,33 +20,38 @@ export const Route = createFileRoute("/dashboard/profile/blocklist")({
 });
 
 function BlocklistPage() {
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["blocklist"],
-    queryFn: () => getBlocklist({ data: { page: 1, pageSize: 50 } }),
+    queryKey: ["blocklist", page, pageSize],
+    queryFn: () => getBlocklist({ data: { page, pageSize } }),
     refetchOnMount: "always",
   });
 
+  const rlUnblock = useRateLimitedServerFn(unblockUser, { type: "social" });
   const doUnblock = useMutation({
-    mutationFn: async (userId: string) => await unblockUser({ data: { userId } }),
+    mutationFn: async (userId: string) => await rlUnblock({ data: { userId } }),
     onSuccess: async () => {
       await refetch();
     },
   });
 
   const items = data?.success ? data.data.items : [];
+  const totalCount = data?.success ? data.data.totalCount : 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
     <div className="container mx-auto space-y-8 p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Blocklist</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage users you’ve blocked from interacting with you.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          {strings.social.blocklist.title}
+        </h1>
+        <p className="text-muted-foreground mt-2">{strings.social.blocklist.subtitle}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Blocked Users</CardTitle>
+          <CardTitle>{strings.social.blocklist.sectionTitle}</CardTitle>
           <CardDescription>
             Users on this list cannot follow, invite, or apply to your games/campaigns,
             and you won’t see their detailed profiles.
@@ -55,7 +63,7 @@ function BlocklistPage() {
               <LoaderCircle className="h-6 w-6 animate-spin" />
             </div>
           ) : items.length === 0 ? (
-            <p className="text-muted-foreground">Your blocklist is empty.</p>
+            <p className="text-muted-foreground">{strings.social.blocklist.empty}</p>
           ) : (
             <ul className="divide-border divide-y">
               {items.map((item) => (
@@ -82,7 +90,7 @@ function BlocklistPage() {
                         to="/dashboard/profile/$userId"
                         params={{ userId: item.user.id }}
                       >
-                        View
+                        {strings.social.blocklist.view}
                       </Link>
                     </Button>
                     <Button
@@ -90,13 +98,36 @@ function BlocklistPage() {
                       size="sm"
                       onClick={() => doUnblock.mutate(item.user.id)}
                     >
-                      Unblock
+                      {strings.social.blocklist.unblock}
                     </Button>
                   </div>
                 </li>
               ))}
             </ul>
           )}
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-muted-foreground text-sm">
+              Page {page} of {totalPages} • {totalCount} total
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+              >
+                {strings.social.blocklist.previous}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+              >
+                {strings.social.blocklist.next}
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

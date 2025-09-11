@@ -11,6 +11,7 @@ The application implements multiple layers of security:
 3. **Rate Limiting** - Protection against brute force attacks
 4. **Password Validation** - Strong password requirements
 5. **Content Security Policy (CSP)** - Protection against XSS attacks
+6. **Social Safety Controls** - Blocklist enforcement and action auditing
 
 ## Security Headers
 
@@ -99,6 +100,14 @@ The CSP is configured to:
 - Block unsafe inline styles (except where necessary)
 - Prevent object/embed elements
 - Enforce HTTPS upgrades
+
+## Social Safety Controls
+
+The platform includes social safety mechanisms across the stack:
+
+- User Blocklist: Unidirectional blocks apply symmetric interaction restrictions. When a block exists in either direction, follow, invite, apply, and acceptance actions are prevented between the two users. Blocks do not auto-remove existing confirmed participations; they cancel pending invitations/applications and freeze new actions.
+- Connections-only Visibility: For games and campaigns marked `protected`, eligibility requires a connection (either follow direction) and no active blocks between viewer and owner. Admin/mod tooling can bypass only within moderation contexts and must avoid leaking state on user-facing surfaces.
+- Auditing: All social actions (follow, unfollow, block, unblock) are recorded in `social_audit_logs` with minimal metadata (timestamp, actor, target, user agent, optional reason).
 
 ### Nonce Implementation
 

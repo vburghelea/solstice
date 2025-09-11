@@ -37,6 +37,7 @@ import type {
 import { getRelationshipSnapshot } from "~/features/social";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { strings } from "~/shared/lib/strings";
 import type { OperationResult } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
 
@@ -467,6 +468,7 @@ export function GameDetailsPage() {
     !hasPendingApplication &&
     !hasRejectedApplication &&
     !hasRejectedParticipantStatus &&
+    !blockedAny &&
     game?.status === "scheduled" && // Only allow applying to scheduled games
     (game?.visibility === "public" || game?.visibility === "protected"); // Only allow applying to public/protected games
 
@@ -474,7 +476,7 @@ export function GameDetailsPage() {
     <div className="space-y-6">
       {blockedAny && (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          You cannot interact with this organizer due to block settings.
+          {strings.social.blockedOrganizerBanner}
         </div>
       )}
       <Card>

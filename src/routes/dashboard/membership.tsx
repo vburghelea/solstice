@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import {
   clearPaymentParams,
   getPaymentErrorMessage,
@@ -202,7 +203,7 @@ function MembershipPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 pb-28 lg:pb-8">
       <h1 className="mb-8 text-3xl font-bold text-gray-900">Membership</h1>
       <p className="text-muted-foreground mb-6">
         Join Roundup Games and access exclusive member benefits
@@ -249,7 +250,7 @@ function MembershipPage() {
       </Card>
 
       {/* Available Memberships */}
-      <div>
+      <div id="plans">
         <h2 className="mb-4 text-2xl font-bold">Available Memberships</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {membershipTypes.map((type) => {
@@ -294,6 +295,25 @@ function MembershipPage() {
             );
           })}
         </div>
+      </div>
+      {/* Sticky CTA on mobile to guide selection */}
+      <div className="lg:hidden">
+        {/* Show when there is at least one purchasable plan */}
+        {membershipTypes.length > 0 && (
+          <StickyActionBar>
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+              <div className="text-sm">Choose a membership to continue</div>
+              <Button
+                onClick={() => {
+                  const el = document.getElementById("plans");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                View Options
+              </Button>
+            </div>
+          </StickyActionBar>
+        )}
       </div>
     </div>
   );

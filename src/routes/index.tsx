@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GameListItemView } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import { buttonVariants } from "~/shared/ui/button";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -32,7 +34,7 @@ function Index() {
       {/* Wrap with PublicLayout */}
       <div className="flex min-h-screen flex-col">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-red-700 to-red-900 py-20 text-center text-white md:py-32">
+        <section className="relative bg-gradient-to-r from-red-700 to-red-900 py-12 text-center text-white sm:py-20 md:py-32">
           <div className="container mx-auto px-4">
             <h1 className="font-heading mb-6 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
               Find Your Next Adventure, In Person.
@@ -90,37 +92,49 @@ function Index() {
             <h2 className="font-heading mb-12 text-3xl text-gray-900 md:text-4xl">
               Featured Local Events & Games
             </h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {featuredGames.length === 0 ? (
-                <p className="text-muted-foreground col-span-full text-center">
-                  No featured games found.
-                </p>
-              ) : (
-                featuredGames.map((game: GameListItem) => (
-                  <div
-                    key={game.id}
-                    className="rounded-lg bg-white p-6 text-left text-gray-900 shadow-md"
-                  >
-                    <h3 className="mb-2 text-xl font-semibold">{game.name}</h3>
-                    <p className="text-muted-foreground mb-4">{game.description}</p>
-                    <p className="text-sm text-gray-600">📍 {game.location.address}</p>
-                    <p className="text-sm text-gray-600">
-                      🗓️ {formatDateAndTime(game.dateTime)}
-                    </p>
-                    <Link
-                      to="/game/$gameId"
-                      params={{ gameId: game.id }}
-                      className={cn(
-                        buttonVariants({ variant: "link" }),
-                        "mt-4 p-0 text-red-700",
-                      )}
+            {featuredGames.length === 0 ? (
+              <p className="text-muted-foreground text-center">
+                No featured games found.
+              </p>
+            ) : (
+              <>
+                {/* Mobile: dense list */}
+                <div className="md:hidden">
+                  <List>
+                    {featuredGames.map((game: GameListItem) => (
+                      <GameListItemView key={game.id} game={game} />
+                    ))}
+                  </List>
+                </div>
+
+                {/* Desktop: cards */}
+                <div className="hidden grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-3">
+                  {featuredGames.map((game: GameListItem) => (
+                    <div
+                      key={game.id}
+                      className="rounded-lg bg-white p-6 text-left text-gray-900 shadow-md"
                     >
-                      View Details
-                    </Link>
-                  </div>
-                ))
-              )}
-            </div>
+                      <h3 className="mb-2 text-xl font-semibold">{game.name}</h3>
+                      <p className="text-muted-foreground mb-4">{game.description}</p>
+                      <p className="text-sm text-gray-600">📍 {game.location.address}</p>
+                      <p className="text-sm text-gray-600">
+                        🗓️ {formatDateAndTime(game.dateTime)}
+                      </p>
+                      <Link
+                        to="/game/$gameId"
+                        params={{ gameId: game.id }}
+                        className={cn(
+                          buttonVariants({ variant: "link" }),
+                          "mt-4 p-0 text-red-700",
+                        )}
+                      >
+                        View Details
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
             <Link to="/search" className={cn(buttonVariants({ size: "lg" }), "mt-12")}>
               Browse All Local Games
             </Link>

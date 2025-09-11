@@ -178,7 +178,7 @@ export function GameDetailsPage() {
     refetchOnMount: "always",
   });
   const blockedAny = !!rel && rel.success && (rel.data.blocked || rel.data.blockedBy);
-  // const isConnection = !!rel && rel.success && rel.data.isConnection;
+  const isConnection = !!rel && rel.success && rel.data.isConnection;
   const isInvited = game?.participants?.some(
     (p: GameParticipant) =>
       p.userId === currentUser?.id && p.role === "invited" && p.status === "pending",
@@ -470,7 +470,7 @@ export function GameDetailsPage() {
     !hasRejectedParticipantStatus &&
     !blockedAny &&
     game?.status === "scheduled" && // Only allow applying to scheduled games
-    (game?.visibility === "public" || game?.visibility === "protected"); // Only allow applying to public/protected games
+    (game?.visibility === "public" || (game?.visibility === "protected" && isConnection)); // Protected requires connection
 
   return (
     <div className="space-y-6">

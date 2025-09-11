@@ -87,10 +87,13 @@ export const getSocialAudits = createServerFn({ method: "GET" })
         if (data?.from) whereClauses.push(gte(socialAuditLogs.createdAt, data.from));
         if (data?.to) whereClauses.push(lte(socialAuditLogs.createdAt, data.to));
 
-        // Drizzle's typed predicates are complex to express here; build a composite condition
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // Drizzle's typed predicates are complex; build a composite condition with safe casts
         const whereExpr =
-          whereClauses.length > 0 ? (and as any)(...whereClauses) : sql`true`;
+          whereClauses.length > 0
+            ? ((and as unknown as (...args: unknown[]) => unknown)(
+                ...whereClauses,
+              ) as unknown as import("drizzle-orm").SQL)
+            : (sql`true` as import("drizzle-orm").SQL);
 
         const [{ count }] = await db
           .select({ count: sql<number>`count(*)::int` })

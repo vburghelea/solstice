@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { campaignStatusEnum } from "~/db/schema";
-import { listCampaigns } from "~/features/campaigns/campaigns.queries";
+import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
 import { List } from "~/shared/ui/list";
@@ -23,40 +23,52 @@ export const Route = createFileRoute("/dashboard/campaigns/")({
   component: CampaignsPage,
   validateSearch: z.object({
     status: z.enum(campaignStatusEnum.enumValues).optional(),
+    page: z.coerce.number().int().min(1).optional(),
+    pageSize: z.coerce.number().int().min(1).max(100).optional(),
   }),
   loader: async () => {
-    const result = await listCampaigns({
-      data: { filters: { status: "active" } },
+    const result = await listCampaignsWithCount({
+      data: { filters: { status: "active" }, page: 1, pageSize: 20 },
     });
     if (!result.success) {
       toast.error("Failed to load campaigns.");
-      return { campaigns: [] };
+      return { campaigns: [], totalCount: 0 };
     }
-    return { campaigns: result.data };
+    return { campaigns: result.data.items, totalCount: result.data.totalCount };
   },
 });
 
 export function CampaignsPage() {
-  const { status = "active" } = Route.useSearch();
+  const {
+    status = "active",
+    page: searchPage,
+    pageSize: searchPageSize,
+  } = Route.useSearch();
+  const page = Math.max(1, Number(searchPage ?? 1));
   const navigate = Route.useNavigate();
 
+  const pageSize = Math.min(100, Math.max(1, Number(searchPageSize ?? 20)));
   const { data: campaignsData } = useSuspenseQuery({
-    queryKey: ["allVisibleCampaigns", status],
+    queryKey: ["allVisibleCampaigns", status, page, pageSize],
     queryFn: async () => {
-      const result = await listCampaigns({ data: { filters: { status } } });
+      const result = await listCampaignsWithCount({
+        data: { filters: { status }, page, pageSize },
+      });
       if (!result.success) {
         toast.error("Failed to load campaigns.");
         return {
           success: false,
           errors: [{ code: "FETCH_ERROR", message: "Failed to load campaigns" }],
-          data: [],
-        };
+          data: { items: [], totalCount: 0 },
+        } as const;
       }
       return result;
     },
   });
 
-  const campaigns = campaignsData.success ? campaignsData.data : [];
+  const campaigns = campaignsData.success ? campaignsData.data.items : [];
+  const totalCount = campaignsData.success ? campaignsData.data.totalCount : 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
     <div className="container mx-auto p-4 sm:p-6">
@@ -157,6 +169,35 @@ export function CampaignsPage() {
           </div>
         </>
       )}
+      <div className="mt-6 flex items-center justify-between">
+        <div className="text-muted-foreground text-sm">
+          Page {page} of {totalPages} • {totalCount} total
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              navigate({ search: { status, page: Math.max(1, page - 1), pageSize } })
+            }
+            disabled={page <= 1}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              navigate({
+                search: { status, page: Math.min(totalPages, page + 1), pageSize },
+              })
+            }
+            disabled={page >= totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

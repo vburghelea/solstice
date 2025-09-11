@@ -11,6 +11,11 @@ import {
 import { z } from "zod";
 import { getDb } from "~/db/server-helpers";
 import { getCurrentUser } from "~/features/auth/auth.queries";
+import {
+  locationSchema,
+  minimumRequirementsSchema,
+  safetyRulesSchema,
+} from "~/shared/schemas/common";
 import { OperationResult } from "~/shared/types/common";
 import {
   findCampaignById,
@@ -48,6 +53,8 @@ type DbFromChain<R> = {
 interface DbLike {
   select: <R>(projection: unknown) => DbFromChain<R>;
 }
+
+type SqlExpr = ReturnType<typeof and>;
 
 export const getCampaign = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
@@ -92,7 +99,7 @@ export async function listCampaignsImpl(
       ? eq(campaigns.status, filters.status)
       : null;
 
-    const otherBaseConditions = [];
+    const otherBaseConditions: SqlExpr[] = [];
     if (filters?.searchTerm) {
       const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
       otherBaseConditions.push(
@@ -100,7 +107,7 @@ export async function listCampaignsImpl(
       );
     }
 
-    const visibilityConditionsForOr = [];
+    const visibilityConditionsForOr: SqlExpr[] = [];
     visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
 
     if (currentUserId) {
@@ -150,7 +157,7 @@ export async function listCampaignsImpl(
       or(...visibilityConditionsForOrWithStatus),
     );
 
-    const result = await (db as DbLike)
+    const rows = await (db as DbLike)
       .select<CampaignQueryResultRow>({
         campaign: campaigns,
         owner: { id: user.id, name: user.name, email: user.email },
@@ -166,15 +173,15 @@ export async function listCampaignsImpl(
 
     return {
       success: true,
-      data: result.map((r: CampaignQueryResultRow) => ({
+      data: rows.map((r: CampaignQueryResultRow) => ({
         ...r.campaign,
         owner: r.owner,
         participantCount: r.participantCount,
         gameSystem: r.gameSystem,
-        sessionZeroData: r.campaign.sessionZeroData ?? undefined,
-        campaignExpectations: r.campaign.campaignExpectations ?? undefined,
-        tableExpectations: r.campaign.tableExpectations ?? undefined,
-        characterCreationOutcome: r.campaign.characterCreationOutcome ?? undefined,
+        sessionZeroData: r.campaign.sessionZeroData ?? null,
+        campaignExpectations: r.campaign.campaignExpectations ?? null,
+        tableExpectations: r.campaign.tableExpectations ?? null,
+        characterCreationOutcome: r.campaign.characterCreationOutcome ?? null,
       })) as CampaignListItem[],
     };
   } catch (error) {
@@ -201,6 +208,138 @@ export async function listCampaignsInternal(
   const currentUser = await getCurrentUser();
   return listCampaignsImpl(db, currentUser?.id, data?.filters);
 }
+
+export async function listCampaignsWithCountImpl(
+  db: unknown,
+  currentUserId: string | null | undefined,
+  filters: z.infer<typeof listCampaignsSchema>["filters"] | undefined,
+  page = 1,
+  pageSize = 20,
+): Promise<OperationResult<{ items: CampaignListItem[]; totalCount: number }>> {
+  try {
+    const statusFilterCondition = filters?.status
+      ? eq(campaigns.status, filters.status)
+      : null;
+
+    const otherBaseConditions: SqlExpr[] = [];
+    // gameSystemId filter not currently exposed in schema; skip to align with types
+    if (filters?.searchTerm) {
+      const searchTerm = `%${(filters.searchTerm || "").toLowerCase()}%`;
+      otherBaseConditions.push(sql`lower(${campaigns.description}) LIKE ${searchTerm}`);
+    }
+
+    const visibilityConditionsForOr: SqlExpr[] = [];
+    visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
+
+    if (currentUserId) {
+      const { userFollows, userBlocks } = await import("~/db/schema");
+      visibilityConditionsForOr.push(eq(campaigns.ownerId, currentUserId));
+
+      const isConnectedSql = sql<boolean>`(
+        EXISTS (
+          SELECT 1 FROM ${userFollows} uf
+          WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${campaigns.ownerId}
+        ) OR EXISTS (
+          SELECT 1 FROM ${userFollows} uf2
+          WHERE uf2.follower_id = ${campaigns.ownerId} AND uf2.following_id = ${currentUserId}
+        )
+      )`;
+      const isBlockedSql = sql<boolean>`EXISTS (
+        SELECT 1 FROM ${userBlocks} ub
+        WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${campaigns.ownerId})
+           OR (ub.blocker_id = ${campaigns.ownerId} AND ub.blockee_id = ${currentUserId})
+      )`;
+      visibilityConditionsForOr.push(
+        and(
+          eq(campaigns.visibility, "protected"),
+          sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
+        ),
+      );
+    }
+
+    const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
+      (condition) =>
+        statusFilterCondition ? and(statusFilterCondition, condition) : condition,
+    );
+
+    const finalWhereClause = and(
+      ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
+      or(...visibilityConditionsForOrWithStatus),
+    );
+
+    const offset = Math.max(0, (Math.max(1, page) - 1) * Math.max(1, pageSize));
+
+    const allRows = await (db as DbLike)
+      .select<CampaignQueryResultRow>({
+        campaign: campaigns,
+        owner: { id: user.id, name: user.name, email: user.email },
+        participantCount: sql<number>`count(distinct ${campaignParticipants.userId})::int`,
+        gameSystem: gameSystems,
+      })
+      .from(campaigns)
+      .innerJoin(user, eq(campaigns.ownerId, user.id))
+      .innerJoin(gameSystems, eq(campaigns.gameSystemId, gameSystems.id))
+      .leftJoin(campaignParticipants, eq(campaignParticipants.campaignId, campaigns.id))
+      .where(finalWhereClause)
+      .groupBy(campaigns.id, user.id, gameSystems.id)
+      .then((rows) => rows as unknown as CampaignQueryResultRow[]);
+
+    const count = allRows.length;
+    const rows = allRows.slice(offset, offset + Math.max(1, pageSize));
+
+    const items: CampaignListItem[] = rows.map((r) => ({
+      ...r.campaign,
+      owner: r.owner,
+      participantCount: r.participantCount,
+      gameSystem: r.gameSystem,
+      // Ensure JSONB fields are typed correctly
+      location: r.campaign.location as z.infer<typeof locationSchema>,
+      minimumRequirements: r.campaign.minimumRequirements as z.infer<
+        typeof minimumRequirementsSchema
+      >,
+      safetyRules: r.campaign.safetyRules as z.infer<typeof safetyRulesSchema>,
+      sessionZeroData: r.campaign.sessionZeroData ?? null,
+      campaignExpectations: r.campaign.campaignExpectations ?? null,
+      tableExpectations: r.campaign.tableExpectations ?? null,
+      characterCreationOutcome: r.campaign.characterCreationOutcome ?? null,
+    }));
+
+    return { success: true, data: { items, totalCount: count } };
+  } catch (error) {
+    console.error("Error listing campaigns with count:", error);
+    return {
+      success: false,
+      errors: [{ code: "DATABASE_ERROR", message: "Failed to list campaigns" }],
+    };
+  }
+}
+
+export const listCampaignsWithCount = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      // Accept filters without relying on transformed schema shape
+      filters: z.any().optional(),
+      page: z.coerce.number().int().min(1).optional(),
+      pageSize: z.coerce.number().int().min(1).max(100).optional(),
+    }).parse,
+  )
+  .handler(
+    async ({
+      data = {},
+    }): Promise<OperationResult<{ items: CampaignListItem[]; totalCount: number }>> => {
+      const db = await getDb();
+      const currentUser = await getCurrentUser();
+      const page = Math.max(1, data.page ?? 1);
+      const pageSize = Math.min(100, Math.max(1, data.pageSize ?? 20));
+      return listCampaignsWithCountImpl(
+        db,
+        currentUser?.id,
+        data.filters,
+        page,
+        pageSize,
+      );
+    },
+  );
 
 export const getCampaignApplications = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)

@@ -207,6 +207,10 @@ export const mockGetGameSystem = vi
 export const mockSearchGameSystems = vi
   .fn()
   .mockResolvedValue({ success: true, data: [] });
+export const mockListGamesWithCount = vi.fn().mockResolvedValue({
+  success: true,
+  data: { items: [], totalCount: 0 },
+});
 
 vi.mock("~/features/games/games.mutations", async (importOriginal) => {
   const actual =
@@ -235,6 +239,7 @@ vi.mock("~/features/games/games.queries", async (importOriginal) => {
     getGameApplicationForUser: mockGetGameApplicationForUser,
     getGameParticipants: mockGetGameParticipants,
     listGames: mockListGames,
+    listGamesWithCount: mockListGamesWithCount,
     searchUsersForInvitation: mockSearchUsersForInvitation,
     listGameSessionsByCampaignId: mockListGameSessionsByCampaignId,
     getGameSystem: mockGetGameSystem,
@@ -309,6 +314,7 @@ export const setupGameMocks = () => {
     mockUpdateGameSessionStatus,
     mockGetGameParticipants,
     mockListGames,
+    mockListGamesWithCount,
     mockSearchUsersForInvitation,
     mockListGameSessionsByCampaignId,
     mockGetGameSystem,

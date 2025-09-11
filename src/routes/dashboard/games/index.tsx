@@ -14,7 +14,7 @@ import {
 import { gameStatusEnum } from "~/db/schema";
 import { GameCard } from "~/features/games/components/GameCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
-import { listGames } from "~/features/games/games.queries";
+import { listGamesWithCount } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
@@ -25,36 +25,49 @@ export const Route = createFileRoute("/dashboard/games/")({
   component: GamesPage,
   validateSearch: z.object({
     status: z.enum(gameStatusEnum.enumValues).optional(),
+    page: z.coerce.number().int().min(1).optional(),
+    pageSize: z.coerce.number().int().min(1).max(100).optional(),
   }),
   loader: async () => {
-    const result = await listGames({ data: { filters: { status: "scheduled" } } });
+    const result = await listGamesWithCount({
+      data: { filters: { status: "scheduled" }, page: 1, pageSize: 20 },
+    });
     if (!result.success) {
       toast.error("Failed to load games.");
-      return { games: [] };
+      return { games: [], totalCount: 0 };
     }
-    return { games: result.data };
+    return { games: result.data.items, totalCount: result.data.totalCount };
   },
 });
 
-function GamesPage() {
-  const { status = "scheduled" } = Route.useSearch();
+export function GamesPage() {
+  const {
+    status = "scheduled",
+    page: searchPage,
+    pageSize: searchPageSize,
+  } = Route.useSearch();
+  const page = Math.max(1, Number(searchPage ?? 1));
   const navigate = Route.useNavigate();
   const { user } = Route.useRouteContext();
   const queryClient = useQueryClient();
 
+  const pageSize = Math.min(100, Math.max(1, Number(searchPageSize ?? 20)));
   const { data: gamesData } = useSuspenseQuery({
-    queryKey: ["allVisibleGames", status],
+    queryKey: ["allVisibleGames", status, page, pageSize],
     queryFn: async () => {
-      const result = await listGames({ data: { filters: { status } } });
+      const result = await listGamesWithCount({
+        data: { filters: { status }, page, pageSize },
+      });
       if (!result.success) {
         toast.error("Failed to load games.");
-        return { success: false, data: [] };
       }
       return result;
     },
   });
 
-  const games = gamesData.success ? gamesData.data : [];
+  const games = gamesData.success ? gamesData.data.items : [];
+  const totalCount = gamesData.success ? gamesData.data.totalCount : 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   const updateStatusMutation = useMutation({
     mutationFn: updateGameSessionStatus,
@@ -263,6 +276,35 @@ function GamesPage() {
           </div>
         </>
       )}
+      <div className="mt-6 flex items-center justify-between">
+        <div className="text-muted-foreground text-sm">
+          Page {page} of {totalPages} • {totalCount} total
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              navigate({ search: { status, page: Math.max(1, page - 1), pageSize } })
+            }
+            disabled={page <= 1}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              navigate({
+                search: { status, page: Math.min(totalPages, page + 1), pageSize },
+              })
+            }
+            disabled={page >= totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

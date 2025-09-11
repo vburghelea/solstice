@@ -5,15 +5,15 @@ import {
 } from "@tanstack/react-router";
 import { screen } from "@testing-library/react";
 import { vi } from "vitest";
-import { listCampaigns } from "~/features/campaigns/campaigns.queries";
+import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { MOCK_CAMPAIGN } from "~/tests/mocks/campaigns";
 import { createTestRouteTree, renderWithRouter } from "~/tests/utils/router";
 import { CampaignsPage } from "../index"; // Import the component directly
 
-// Mock the listCampaigns query
+// Mock the listCampaignsWithCount query
 vi.mock("~/features/campaigns/campaigns.queries", () => ({
-  listCampaigns: vi.fn(),
+  listCampaignsWithCount: vi.fn(),
 }));
 
 describe("CampaignsPage", () => {
@@ -23,10 +23,10 @@ describe("CampaignsPage", () => {
 
   // Helper to render the component within a router context
   const renderCampaignsPage = async (campaignsData: CampaignListItem[] = []) => {
-    // Mock listCampaigns to return the provided data (for useSuspenseQuery)
-    vi.mocked(listCampaigns).mockResolvedValue({
+    // Mock listCampaignsWithCount to return the provided data
+    vi.mocked(listCampaignsWithCount).mockResolvedValue({
       success: true,
-      data: campaignsData,
+      data: { items: campaignsData, totalCount: campaignsData.length },
     });
 
     // Create a test route tree with a mocked loader for the campaigns route
@@ -35,7 +35,10 @@ describe("CampaignsPage", () => {
         {
           path: "/dashboard/campaigns",
           component: CampaignsPage,
-          loader: async () => ({ campaigns: campaignsData }),
+          loader: async () => ({
+            campaigns: campaignsData,
+            totalCount: campaignsData.length,
+          }),
         },
       ],
     });

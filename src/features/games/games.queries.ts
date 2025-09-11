@@ -57,6 +57,8 @@ interface DbLike {
   select: <R>(projection: unknown) => DbFromChain<R>;
 }
 
+type SqlExpr = ReturnType<typeof and>;
+
 interface GameQueryResultRow {
   id: typeof games.$inferSelect.id;
   ownerId: typeof games.$inferSelect.ownerId;
@@ -199,7 +201,7 @@ export async function listGamesImpl(
       ? eq(games.status, filters.status)
       : null;
 
-    const otherBaseConditions = [];
+    const otherBaseConditions: SqlExpr[] = [];
     if (filters?.gameSystemId)
       otherBaseConditions.push(eq(games.gameSystemId, filters.gameSystemId));
     if (filters?.dateFrom)
@@ -216,7 +218,7 @@ export async function listGamesImpl(
       );
     }
 
-    const visibilityConditionsForOr = [];
+    const visibilityConditionsForOr: SqlExpr[] = [];
     visibilityConditionsForOr.push(eq(games.visibility, "public"));
 
     if (currentUserId) {
@@ -318,6 +320,163 @@ export const listGames = createServerFn({ method: "POST" })
     const currentUser = await getCurrentUser();
     return listGamesImpl(db, currentUser?.id, data.filters);
   });
+
+export const listGamesWithCount = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      // Accept filters without relying on transformed schema shape
+      filters: z.any().optional(),
+      page: z.coerce.number().int().min(1).optional(),
+      pageSize: z.coerce.number().int().min(1).max(100).optional(),
+    }).parse,
+  )
+  .handler(
+    async ({
+      data = {},
+    }): Promise<OperationResult<{ items: GameListItem[]; totalCount: number }>> => {
+      const db = await getDb();
+      const currentUser = await getCurrentUser();
+      const page = Math.max(1, data.page ?? 1);
+      const pageSize = Math.min(100, Math.max(1, data.pageSize ?? 20));
+      return listGamesWithCountImpl(db, currentUser?.id, data.filters, page, pageSize);
+    },
+  );
+
+/**
+ * List games with pagination and total count (does not change existing listGames signature)
+ */
+export async function listGamesWithCountImpl(
+  db: unknown,
+  currentUserId: string | null | undefined,
+  filters: z.infer<typeof listGamesSchema>["filters"] | undefined,
+  page = 1,
+  pageSize = 20,
+): Promise<OperationResult<{ items: GameListItem[]; totalCount: number }>> {
+  try {
+    const statusFilterCondition = filters?.status
+      ? eq(games.status, filters.status)
+      : null;
+
+    const otherBaseConditions: SqlExpr[] = [];
+    if (filters?.gameSystemId)
+      otherBaseConditions.push(eq(games.gameSystemId, filters.gameSystemId));
+    if (filters?.dateFrom)
+      otherBaseConditions.push(gte(games.dateTime, new Date(filters.dateFrom)));
+    if (filters?.dateTo)
+      otherBaseConditions.push(lte(games.dateTime, new Date(filters.dateTo)));
+    if (filters?.searchTerm) {
+      const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
+      otherBaseConditions.push(
+        or(
+          sql`lower(${games.description}) LIKE ${searchTerm}`,
+          sql`lower(${games.language}) LIKE ${searchTerm}`,
+        ),
+      );
+    }
+
+    const visibilityConditionsForOr: SqlExpr[] = [];
+    visibilityConditionsForOr.push(eq(games.visibility, "public"));
+
+    if (currentUserId) {
+      const { userFollows, userBlocks } = await import("~/db/schema");
+      const userGames = (db as DbLike)
+        .select({ gameId: gameParticipants.gameId })
+        .from(gameParticipants)
+        .where(
+          and(
+            eq(gameParticipants.userId, currentUserId),
+            or(eq(gameParticipants.role, "player"), eq(gameParticipants.role, "invited")),
+          ),
+        );
+
+      visibilityConditionsForOr.push(
+        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`),
+      );
+      visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
+
+      const isConnectedSql = sql<boolean>`(
+        EXISTS (
+          SELECT 1 FROM ${userFollows} uf
+          WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
+        ) OR EXISTS (
+          SELECT 1 FROM ${userFollows} uf2
+          WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
+        )
+      )`;
+      const isBlockedSql = sql<boolean>`EXISTS (
+        SELECT 1 FROM ${userBlocks} ub
+        WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${games.ownerId})
+           OR (ub.blocker_id = ${games.ownerId} AND ub.blockee_id = ${currentUserId})
+      )`;
+      visibilityConditionsForOr.push(
+        and(
+          eq(games.visibility, "protected"),
+          sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
+        ),
+      );
+    }
+
+    const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
+      (condition) =>
+        statusFilterCondition ? and(statusFilterCondition, condition) : condition,
+    );
+
+    const finalWhereClause = and(
+      ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
+      or(...visibilityConditionsForOrWithStatus),
+    );
+
+    const offset = Math.max(0, (Math.max(1, page) - 1) * Math.max(1, pageSize));
+
+    // Fetch all matching rows, then compute count and slice to page
+    const allRows: GameQueryResultRow[] = await (db as DbLike)
+      .select<GameQueryResultRow>({
+        id: games.id,
+        ownerId: games.ownerId,
+        campaignId: games.campaignId,
+        gameSystemId: games.gameSystemId,
+        name: games.name,
+        dateTime: games.dateTime,
+        description: games.description,
+        expectedDuration: games.expectedDuration,
+        price: games.price,
+        language: games.language,
+        location: sql<z.infer<typeof locationSchema>>`${games.location}`,
+        status: games.status,
+        minimumRequirements: sql<
+          z.infer<typeof minimumRequirementsSchema>
+        >`${games.minimumRequirements}`,
+        visibility: games.visibility,
+        safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
+        createdAt: games.createdAt,
+        updatedAt: games.updatedAt,
+        owner: { id: user.id, name: user.name, email: user.email },
+        gameSystem: { id: gameSystems.id, name: gameSystems.name },
+        participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
+      })
+      .from(games)
+      .innerJoin(user, eq(games.ownerId, user.id))
+      .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
+      .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+      .where(finalWhereClause)
+      .groupBy(games.id, user.id, gameSystems.id)
+      .orderBy(games.dateTime)
+      .then((rows) => rows as unknown as GameQueryResultRow[]);
+
+    const count = allRows.length;
+    const paged = allRows.slice(offset, offset + Math.max(1, pageSize));
+    return {
+      success: true,
+      data: { items: paged.map((r) => ({ ...r })), totalCount: count },
+    };
+  } catch (error) {
+    console.error("Error listing games with count:", error);
+    return {
+      success: false,
+      errors: [{ code: "DATABASE_ERROR", message: "Failed to list games" }],
+    };
+  }
+}
 
 /**
  * Search games by name or description

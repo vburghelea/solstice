@@ -189,6 +189,10 @@ export const mockGetCampaignApplicationForUser = vi
   .mockResolvedValue({ success: true, data: null });
 export const mockGetCampaignParticipants = vi.fn();
 export const mockListCampaigns = vi.fn();
+export const mockListCampaignsWithCount = vi.fn().mockResolvedValue({
+  success: true,
+  data: { items: [], totalCount: 0 },
+});
 export const mockSearchUsersForInvitation = vi.fn();
 
 vi.mock("~/features/campaigns/campaigns.mutations", async (importOriginal) => {
@@ -218,6 +222,7 @@ vi.mock("~/features/campaigns/campaigns.queries", async (importOriginal) => {
     getCampaignApplicationForUser: mockGetCampaignApplicationForUser,
     getCampaignParticipants: mockGetCampaignParticipants,
     listCampaigns: mockListCampaigns,
+    listCampaignsWithCount: mockListCampaignsWithCount,
     searchUsersForInvitation: mockSearchUsersForInvitation,
   };
 });
@@ -261,6 +266,7 @@ export const setupCampaignMocks = () => {
     mockUpdateCampaignParticipant,
     mockGetCampaignParticipants,
     mockListCampaigns,
+    mockListCampaignsWithCount,
     mockSearchUsersForInvitation,
     mockRemoveCampaignParticipantBan,
   };

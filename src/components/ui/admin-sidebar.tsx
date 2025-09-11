@@ -3,6 +3,7 @@ import { useRouteContext } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
+  FileText,
   Home,
   LogOut,
   ScrollText,
@@ -33,6 +34,13 @@ const allSidebarItems = [
     icon: BarChart3,
     label: "Reports",
     href: "/dashboard/reports",
+    requiresRole: true,
+    roles: ["Platform Admin", "Games Admin"],
+  },
+  {
+    icon: FileText,
+    label: "Social Audits",
+    href: "/dashboard/social-audits",
     requiresRole: true,
     roles: ["Platform Admin", "Games Admin"],
   },

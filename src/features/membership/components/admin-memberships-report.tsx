@@ -1,14 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { DataTable } from "~/components/ui/data-table";
 import { exportToCSV, formatCurrency, formatDate } from "~/lib/utils/csv-export";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 import { getAllMemberships, type MembershipReportRow } from "../membership.admin-queries";
 
 const columns: ColumnDef<MembershipReportRow>[] = [
   {
     accessorKey: "userName",
-    header: "User Name",
+    header: "User",
+    cell: ({ row }) => {
+      const original = row.original as MembershipReportRow;
+      const display = original.userName || original.userEmail || original.userId;
+      return (
+        <Link
+          to="/dashboard/profile/$userId"
+          params={{ userId: original.userId }}
+          className="inline-flex items-center gap-2"
+        >
+          <UserAvatar
+            name={original.userName}
+            email={original.userEmail}
+            srcUploaded={original.userUploadedAvatarPath}
+            srcProvider={original.userImage}
+            className="h-6 w-6"
+          />
+          <span className="truncate">{display}</span>
+        </Link>
+      );
+    },
   },
   {
     accessorKey: "userEmail",
@@ -99,9 +128,11 @@ export function AdminMembershipsReport() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-muted-foreground">Loading memberships...</div>
-      </div>
+      <Card>
+        <CardContent className="flex h-64 items-center justify-center">
+          <div className="text-muted-foreground">Loading memberships...</div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -111,56 +142,79 @@ export function AdminMembershipsReport() {
     // Check if it's an admin access error
     if (errorMessage === "Admin access required") {
       return (
-        <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6">
-          <h3 className="text-destructive text-lg font-semibold">Access Denied</h3>
-          <p className="text-muted-foreground mt-2">
-            You do not have permission to view this report. Admin access is required.
-          </p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-destructive">Access Denied</CardTitle>
+            <CardDescription>
+              You do not have permission to view this report. Admin access is required.
+            </CardDescription>
+          </CardHeader>
+        </Card>
       );
     }
 
     return (
-      <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6">
-        <h3 className="text-destructive text-lg font-semibold">Error Loading Report</h3>
-        <p className="text-muted-foreground mt-2">{errorMessage}</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-destructive">Error Loading Report</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            {errorMessage}
+          </CardDescription>
+        </CardHeader>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Memberships Report</h2>
-          <p className="text-muted-foreground">
-            View and export all membership data across the platform
-          </p>
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle>Memberships Report</CardTitle>
+        <CardDescription>
+          View and export all membership data across the platform
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <label htmlFor="statusFilter" className="text-sm font-medium text-gray-100">
+              Status
+            </label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(
+                  e.target.value as "all" | "active" | "expired" | "cancelled",
+                )
+              }
+              className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            >
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="expired">Expired</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleExport}
+              className="btn btn-admin-secondary rounded-md px-4 py-2 text-sm"
+            >
+              Export CSV
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(
-                e.target.value as "all" | "active" | "expired" | "cancelled",
-              )
-            }
-            className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="expired">Expired</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-      </div>
 
-      <DataTable
-        columns={columns}
-        data={data.data || []}
-        pageSize={20}
-        onExport={handleExport}
-      />
-    </div>
+        <div className="w-full max-w-full overflow-x-auto">
+          <DataTable
+            columns={columns}
+            data={data.data || []}
+            pageSize={20}
+            onExport={handleExport}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

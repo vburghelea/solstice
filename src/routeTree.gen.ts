@@ -22,6 +22,7 @@ import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
+import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
 import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
@@ -124,6 +125,11 @@ const EventEventIdRoute = EventEventIdRouteImport.update({
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   id: "/teams",
   path: "/teams",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardSocialAuditsRoute = DashboardSocialAuditsRouteImport.update({
+  id: "/social-audits",
+  path: "/social-audits",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
@@ -388,6 +394,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/profile": typeof DashboardProfileRouteWithChildren;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
@@ -428,6 +435,7 @@ export interface FileRoutesByTo {
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/dashboard": typeof DashboardIndexRoute;
@@ -472,6 +480,7 @@ export interface FileRoutesById {
   "/dashboard/profile": typeof DashboardProfileRouteWithChildren;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
@@ -520,6 +529,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
+    | "/dashboard/social-audits"
     | "/dashboard/teams"
     | "/event/$eventId"
     | "/game/$gameId"
@@ -560,6 +570,7 @@ export interface FileRouteTypes {
     | "/dashboard/membership"
     | "/dashboard/reports"
     | "/dashboard/settings"
+    | "/dashboard/social-audits"
     | "/event/$eventId"
     | "/game/$gameId"
     | "/dashboard"
@@ -603,6 +614,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
+    | "/dashboard/social-audits"
     | "/dashboard/teams"
     | "/event/$eventId"
     | "/game/$gameId"
@@ -828,6 +840,13 @@ declare module "@tanstack/react-router" {
       path: "/teams";
       fullPath: "/dashboard/teams";
       preLoaderRoute: typeof DashboardTeamsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/social-audits": {
+      id: "/dashboard/social-audits";
+      path: "/social-audits";
+      fullPath: "/dashboard/social-audits";
+      preLoaderRoute: typeof DashboardSocialAuditsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
     "/dashboard/settings": {
@@ -1300,6 +1319,7 @@ interface DashboardRouteRouteChildren {
   DashboardProfileRoute: typeof DashboardProfileRouteWithChildren;
   DashboardReportsRoute: typeof DashboardReportsRoute;
   DashboardSettingsRoute: typeof DashboardSettingsRoute;
+  DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute;
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 }
@@ -1313,6 +1333,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardProfileRoute: DashboardProfileRouteWithChildren,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSocialAuditsRoute: DashboardSocialAuditsRoute,
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 };

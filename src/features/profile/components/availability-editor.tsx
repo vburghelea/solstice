@@ -161,40 +161,45 @@ export function AvailabilityEditor({
       data-testid="availability-editor"
       onMouseUp={handleMouseUp}
     >
-      <div className="grid grid-cols-[80px_1fr] gap-2 lg:grid-cols-[120px_1fr]">
-        <div className="text-muted-foreground text-sm font-medium">Time</div>
-        <div
-          className="grid gap-1"
-          style={{ gridTemplateColumns: `repeat(${TIME_INTERVALS.length}, 1fr)` }}
-        >
-          {TIME_INTERVALS.map((interval, index) => (
+      {/* Unified horizontal scroll container for header and rows on small screens */}
+      <div className="overflow-x-auto">
+        <div className="min-w-max space-y-4">
+          <div className="grid grid-cols-[80px_1fr] gap-2 lg:grid-cols-[120px_1fr]">
+            <div className="text-muted-foreground text-sm font-medium">Time</div>
             <div
-              key={interval.time}
-              className="text-muted-foreground pb-2 text-center text-xs"
+              className="grid gap-1"
+              style={{ gridTemplateColumns: `repeat(${TIME_INTERVALS.length}, 1fr)` }}
             >
-              {/* Mobile/Tablet: show only start, middle, end time labels */}
-              <span className="lg:hidden">
-                {headerLabelIndexes.includes(index) ? interval.time : ""}
-              </span>
-              {/* Desktop (lg+): show every other label as before */}
-              <span className="hidden lg:inline">
-                {index % 2 === 0 ? interval.time : ""}
-              </span>
+              {TIME_INTERVALS.map((interval, index) => (
+                <div
+                  key={interval.time}
+                  className="text-muted-foreground pb-2 text-center text-xs"
+                >
+                  {/* Mobile/Tablet: show only start, middle, end time labels */}
+                  <span className="lg:hidden">
+                    {headerLabelIndexes.includes(index) ? interval.time : ""}
+                  </span>
+                  {/* Desktop (lg+): show every other label as before */}
+                  <span className="hidden lg:inline">
+                    {index % 2 === 0 ? interval.time : ""}
+                  </span>
+                </div>
+              ))}
             </div>
+          </div>
+
+          {DAYS.map((day) => (
+            <DayRow
+              key={day}
+              day={day}
+              value={value}
+              readOnly={readOnly}
+              onMouseDown={handleMouseDown}
+              onMouseEnter={handleMouseEnter}
+            />
           ))}
         </div>
       </div>
-
-      {DAYS.map((day) => (
-        <DayRow
-          key={day}
-          day={day}
-          value={value}
-          readOnly={readOnly}
-          onMouseDown={handleMouseDown}
-          onMouseEnter={handleMouseEnter}
-        />
-      ))}
     </div>
   );
 }

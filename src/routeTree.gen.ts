@@ -66,7 +66,10 @@ import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 >>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
+<<<<<<< HEAD
 import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
 import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
@@ -338,11 +341,14 @@ const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   path: "/teams",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+<<<<<<< HEAD
 const DashboardSystemsRoute = DashboardSystemsRouteImport.update({
   id: "/systems",
   path: "/systems",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
 const DashboardSocialAuditsRoute = DashboardSocialAuditsRouteImport.update({
   id: "/social-audits",
   path: "/social-audits",
@@ -890,7 +896,10 @@ export interface FileRoutesByFullPath {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+<<<<<<< HEAD
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1048,9 +1057,13 @@ export interface FileRoutesByTo {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
 =======
 >>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+=======
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
@@ -1216,7 +1229,10 @@ export interface FileRoutesById {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+<<<<<<< HEAD
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1383,7 +1399,10 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/social-audits"
+<<<<<<< HEAD
     | "/dashboard/systems"
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1537,9 +1556,13 @@ export interface FileRouteTypes {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/dashboard/social-audits"
 =======
 >>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
+=======
+    | "/dashboard/social-audits"
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -1691,7 +1714,10 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/social-audits"
+<<<<<<< HEAD
     | "/dashboard/systems"
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -2188,6 +2214,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+<<<<<<< HEAD
     "/dashboard/systems": {
       id: "/dashboard/systems";
       path: "/systems";
@@ -2195,6 +2222,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSystemsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
     "/dashboard/social-audits": {
       id: "/dashboard/social-audits";
       path: "/social-audits";
@@ -3081,7 +3110,10 @@ interface DashboardRouteRouteChildren {
   DashboardReportsRoute: typeof DashboardReportsRoute;
   DashboardSettingsRoute: typeof DashboardSettingsRoute;
   DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute;
+<<<<<<< HEAD
   DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren;
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 <<<<<<< HEAD
@@ -3127,7 +3159,10 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSocialAuditsRoute: DashboardSocialAuditsRoute,
+<<<<<<< HEAD
   DashboardSystemsRoute: DashboardSystemsRouteWithChildren,
+=======
+>>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 <<<<<<< HEAD

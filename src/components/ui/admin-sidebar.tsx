@@ -56,7 +56,7 @@ const adminSidebarItems: SidebarItem[] = [
     label: "Event Review",
     href: "/admin/events-review",
     requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
+    roles: ["Platform Admin", "Games Admin"],
   },
   {
     icon: BarChart3,
@@ -77,7 +77,7 @@ const adminSidebarItems: SidebarItem[] = [
     label: "Roles",
     href: "/admin/roles",
     requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
+    roles: ["Platform Admin", "Games Admin"],
   },
 ];
 

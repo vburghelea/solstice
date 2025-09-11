@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {canRenderToolbar && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           {enableColumnToggle ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -104,8 +104,8 @@ export function DataTable<TData, TValue>({
           )}
         </div>
       )}
-      <div className="rounded-md border">
-        <Table>
+      <div className="overflow-hidden rounded-md border">
+        <Table className="min-w-[640px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

@@ -4,6 +4,7 @@ import {
   BarChart3,
   Calendar,
   CheckSquare,
+  FileText,
   Home,
   LogOut,
   ScrollText,
@@ -51,6 +52,13 @@ const allSidebarItems = [
     href: "/admin/roles",
     requiresRole: true,
     roles: ["Solstice Admin", "Quadball Canada Admin"],
+  },
+  {
+    icon: FileText,
+    label: "Social Audits",
+    href: "/dashboard/social-audits",
+    requiresRole: true,
+    roles: ["Platform Admin", "Games Admin"],
   },
 ];
 

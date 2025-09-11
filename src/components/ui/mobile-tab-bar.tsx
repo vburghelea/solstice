@@ -1,5 +1,5 @@
 import { useRouteContext } from "@tanstack/react-router";
-import { BarChart3, Calendar, Home, Settings, User, Users } from "lucide-react";
+import { BarChart3, Calendar, FileText, Home, Settings, User, Users } from "lucide-react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { userHasRole } from "~/features/roles/permission.service";
 import { cn } from "~/shared/lib/utils";
@@ -38,6 +38,17 @@ export function MobileTabBar() {
     // Conditionally include Reports if permitted
     ...(user && maybeReports.roles?.some((r) => userHasRole(user, r))
       ? [maybeReports]
+      : []),
+    // Conditionally include Social Audits if permitted
+    ...(user && ["Platform Admin", "Games Admin"].some((r) => userHasRole(user, r))
+      ? [
+          {
+            key: "audits",
+            label: "Audits",
+            icon: FileText,
+            to: "/dashboard/social-audits",
+          },
+        ]
       : []),
     // Always include Settings as a final tab
     { key: "settings", label: "Settings", icon: Settings, to: "/dashboard/settings" },

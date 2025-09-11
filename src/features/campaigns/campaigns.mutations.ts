@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { campaignApplications, campaignParticipants, campaigns } from "~/db/schema";
+import { canInvite, getRelationship } from "~/features/social/relationship.server";
 import { OperationResult } from "~/shared/types/common";
 import {
   findCampaignApplicationById,
@@ -477,8 +478,6 @@ export const applyToCampaign = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { getRelationship } = await import("~/features/social/relationship.server");
-
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -698,10 +697,6 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
       const { getAuth } = await import("~/lib/auth/server-helpers");
       const auth = await getAuth();
-      const [{ canInvite, getRelationship }] = await Promise.all([
-        import("~/features/social/relationship.server"),
-      ]);
-
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -990,8 +985,6 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { getRelationship } = await import("~/features/social/relationship.server");
-
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {

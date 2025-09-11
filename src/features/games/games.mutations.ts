@@ -2,13 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { gameParticipants, games } from "~/db/schema";
 import { getCampaignParticipants } from "~/features/campaigns/campaigns.queries";
-import { OperationResult } from "~/shared/types/common";
 import {
   findGameById,
   findGameParticipantByGameAndUserId,
   findGameParticipantById,
   findUserByEmail,
-} from "./games.repository";
+} from "~/features/games/games.repository";
+import { OperationResult } from "~/shared/types/common";
 import {
   addGameParticipantInputSchema,
   applyToGameInputSchema,
@@ -564,8 +564,11 @@ export const removeGameParticipant = createServerFn({ method: "POST" })
   });
 
 import { gameApplications } from "~/db/schema"; // Add gameApplications import
-import { findGameApplicationById } from "./games.repository"; // Import findGameApplicationById
+import { findGameApplicationById } from "~/features/games/games.repository"; // Import findGameApplicationById
+import { enforceApplyEligibility } from "~/features/social/enforcement.helpers";
 import { GameApplication } from "./games.types"; // Import GameApplication type
+// Import relationship helper statically for reliable testing/mocking
+import { getRelationship } from "~/features/social/relationship.server";
 
 /**
  * Player applies to join a game
@@ -576,7 +579,6 @@ export const applyToGame = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { getRelationship } = await import("~/features/social/relationship.server");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -596,23 +598,15 @@ export const applyToGame = createServerFn({ method: "POST" })
         };
       }
 
-      // Blocklist restrictions (symmetric): cannot apply if either side has blocked
-      const rel = await getRelationship(currentUser.id, game.ownerId);
-      if (rel.blocked || rel.blockedBy) {
-        return {
-          success: false,
-          errors: [
-            { code: "FORBIDDEN", message: "You cannot interact with this organizer" },
-          ],
-        };
-      }
-
-      // Connections-only gate for protected games
-      if (game.visibility === "protected" && !rel.isConnection) {
-        return {
-          success: false,
-          errors: [{ code: "FORBIDDEN", message: "Not eligible to apply to this game" }],
-        };
+      // Social enforcement: blocks and connections-only
+      const gate = await enforceApplyEligibility({
+        viewerId: currentUser.id,
+        ownerId: game.ownerId,
+        visibility: game.visibility,
+        getRelationship,
+      });
+      if (!gate.allowed) {
+        return { success: false, errors: [{ code: gate.code, message: gate.message }] };
       }
 
       // Check if user has a rejected participant entry for this game

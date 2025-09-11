@@ -3,6 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("~/features/social", () => ({
   followUser: vi.fn(),
 }));
+vi.mock("@tanstack/react-start/server", () => ({
+  getWebRequest: () => ({ headers: new Headers() }),
+  createServerFileRoute: () => ({ methods: () => ({}) }),
+}));
 
 describe("POST /api/social/follow", () => {
   it("returns 200 on success", async () => {

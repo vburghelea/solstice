@@ -5,12 +5,17 @@ import { blockUser } from "~/features/social";
 const bodySchema = z.object({
   userId: z.string().min(1),
   reason: z.string().max(500).optional(),
+  uiSurface: z.string().min(1).max(50).optional(),
 });
 
 export async function handleBlock(body: unknown): Promise<Response> {
   try {
     const data = bodySchema.parse(body);
-    const result = await blockUser({ data });
+    const { getWebRequest } = await import("@tanstack/react-start/server");
+    const uiHeader = getWebRequest().headers.get("x-ui-surface") || undefined;
+    const result = await blockUser({
+      data: { ...data, uiSurface: data.uiSurface ?? uiHeader },
+    });
     return new Response(JSON.stringify(result), {
       status: result.success ? 200 : 400,
       headers: { "Content-Type": "application/json" },

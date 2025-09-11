@@ -7,6 +7,8 @@ import {
   gameSystems,
   user,
 } from "~/db/schema";
+
+import { z } from "zod";
 import { getDb } from "~/db/server-helpers";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { OperationResult } from "~/shared/types/common";
@@ -27,6 +29,25 @@ import {
   CampaignParticipant,
   CampaignWithDetails,
 } from "./campaigns.types";
+
+type DbJoinChain<R> = {
+  innerJoin: (a: unknown, b: unknown) => DbJoinChain<R>;
+  leftJoin: (a: unknown, b: unknown) => DbJoinChain<R>;
+  where: (cond: unknown) => DbGroupChain<R>;
+};
+type DbGroupChain<R> = {
+  groupBy: (...cols: unknown[]) => Promise<R[]>;
+};
+type DbFromChain<R> = {
+  from: (t: unknown) => {
+    innerJoin: (a: unknown, b: unknown) => DbJoinChain<R>;
+    leftJoin: (a: unknown, b: unknown) => DbJoinChain<R>;
+    where: (cond: unknown) => DbGroupChain<R>;
+  };
+};
+interface DbLike {
+  select: <R>(projection: unknown) => DbFromChain<R>;
+}
 
 export const getCampaign = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
@@ -54,121 +75,132 @@ export const getCampaign = createServerFn({ method: "POST" })
     }
   });
 
+type CampaignQueryResultRow = {
+  campaign: typeof campaigns.$inferSelect;
+  owner: { id: string; name: string | null; email: string };
+  participantCount: number;
+  gameSystem: typeof gameSystems.$inferSelect;
+};
+
+export async function listCampaignsImpl(
+  db: unknown,
+  currentUserId: string | null | undefined,
+  filters: z.infer<typeof listCampaignsSchema>["filters"] | undefined,
+): Promise<OperationResult<CampaignListItem[]>> {
+  try {
+    const statusFilterCondition = filters?.status
+      ? eq(campaigns.status, filters.status)
+      : null;
+
+    const otherBaseConditions = [];
+    if (filters?.searchTerm) {
+      const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
+      otherBaseConditions.push(
+        or(ilike(campaigns.name, searchTerm), ilike(campaigns.description, searchTerm)),
+      );
+    }
+
+    const visibilityConditionsForOr = [];
+    visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
+
+    if (currentUserId) {
+      const { userFollows, userBlocks } = await import("~/db/schema");
+      const userCampaigns = (db as DbLike)
+        .select({ campaignId: campaignParticipants.campaignId })
+        .from(campaignParticipants)
+        .where(eq(campaignParticipants.userId, currentUserId));
+
+      visibilityConditionsForOr.push(
+        and(
+          eq(campaigns.visibility, "private"),
+          sql`${campaigns.id} IN ${userCampaigns}`,
+        ),
+      );
+      visibilityConditionsForOr.push(eq(campaigns.ownerId, currentUserId));
+
+      const isConnectedSql = sql<boolean>`(
+        EXISTS (
+          SELECT 1 FROM ${userFollows} uf
+          WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${campaigns.ownerId}
+        ) OR EXISTS (
+          SELECT 1 FROM ${userFollows} uf2
+          WHERE uf2.follower_id = ${campaigns.ownerId} AND uf2.following_id = ${currentUserId}
+        )
+      )`;
+      const isBlockedSql = sql<boolean>`EXISTS (
+        SELECT 1 FROM ${userBlocks} ub
+        WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${campaigns.ownerId})
+           OR (ub.blocker_id = ${campaigns.ownerId} AND ub.blockee_id = ${currentUserId})
+      )`;
+      visibilityConditionsForOr.push(
+        and(
+          eq(campaigns.visibility, "protected"),
+          sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
+        ),
+      );
+    }
+
+    const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
+      (condition) =>
+        statusFilterCondition ? and(statusFilterCondition, condition) : condition,
+    );
+
+    const finalWhereClause = and(
+      ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
+      or(...visibilityConditionsForOrWithStatus),
+    );
+
+    const result = await (db as DbLike)
+      .select<CampaignQueryResultRow>({
+        campaign: campaigns,
+        owner: { id: user.id, name: user.name, email: user.email },
+        participantCount: sql<number>`count(distinct ${campaignParticipants.userId})::int`,
+        gameSystem: gameSystems,
+      })
+      .from(campaigns)
+      .innerJoin(user, eq(campaigns.ownerId, user.id))
+      .innerJoin(gameSystems, eq(campaigns.gameSystemId, gameSystems.id))
+      .leftJoin(campaignParticipants, eq(campaignParticipants.campaignId, campaigns.id))
+      .where(finalWhereClause)
+      .groupBy(campaigns.id, user.id, gameSystems.id);
+
+    return {
+      success: true,
+      data: result.map((r: CampaignQueryResultRow) => ({
+        ...r.campaign,
+        owner: r.owner,
+        participantCount: r.participantCount,
+        gameSystem: r.gameSystem,
+        sessionZeroData: r.campaign.sessionZeroData ?? undefined,
+        campaignExpectations: r.campaign.campaignExpectations ?? undefined,
+        tableExpectations: r.campaign.tableExpectations ?? undefined,
+        characterCreationOutcome: r.campaign.characterCreationOutcome ?? undefined,
+      })) as CampaignListItem[],
+    };
+  } catch (error) {
+    console.error("Error listing campaigns:", error);
+    return {
+      success: false,
+      errors: [{ code: "DATABASE_ERROR", message: "Failed to list campaigns" }],
+    };
+  }
+}
+
 export const listCampaigns = createServerFn({ method: "POST" })
   .validator(listCampaignsSchema.parse)
   .handler(async ({ data = {} }): Promise<OperationResult<CampaignListItem[]>> => {
-    console.log("listCampaigns received filters:", data.filters);
-    try {
-      const db = await getDb();
-      const currentUser = await getCurrentUser();
-      const currentUserId = currentUser?.id;
-
-      const statusFilterCondition = data.filters?.status
-        ? eq(campaigns.status, data.filters.status)
-        : null;
-
-      const otherBaseConditions = [];
-      if (data.filters?.searchTerm) {
-        const searchTerm = `%${data.filters.searchTerm.toLowerCase()}%`;
-        otherBaseConditions.push(
-          or(ilike(campaigns.name, searchTerm), ilike(campaigns.description, searchTerm)),
-        );
-      }
-
-      const visibilityConditionsForOr = [];
-      visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
-
-      if (currentUserId) {
-        const { userFollows, userBlocks } = await import("~/db/schema");
-        const userCampaigns = db
-          .select({ campaignId: campaignParticipants.campaignId })
-          .from(campaignParticipants)
-          .where(eq(campaignParticipants.userId, currentUserId));
-
-        visibilityConditionsForOr.push(
-          and(
-            eq(campaigns.visibility, "private"),
-            sql`${campaigns.id} IN ${userCampaigns}`,
-          ),
-        );
-
-        visibilityConditionsForOr.push(eq(campaigns.ownerId, currentUserId));
-
-        // Protected (connections-only) where viewer and owner are connected and not blocked
-        const isConnectedSql = sql<boolean>`(
-          EXISTS (
-            SELECT 1 FROM ${userFollows} uf
-            WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${campaigns.ownerId}
-          ) OR EXISTS (
-            SELECT 1 FROM ${userFollows} uf2
-            WHERE uf2.follower_id = ${campaigns.ownerId} AND uf2.following_id = ${currentUserId}
-          )
-        )`;
-        const isBlockedSql = sql<boolean>`EXISTS (
-          SELECT 1 FROM ${userBlocks} ub
-          WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${campaigns.ownerId})
-             OR (ub.blocker_id = ${campaigns.ownerId} AND ub.blockee_id = ${currentUserId})
-        )`;
-        visibilityConditionsForOr.push(
-          and(
-            eq(campaigns.visibility, "protected"),
-            sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
-          ),
-        );
-      }
-
-      // Build visibility conditions, ensuring each one is ANDed with the status filter if it exists
-      const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
-        (condition) => {
-          if (statusFilterCondition) {
-            return and(statusFilterCondition, condition);
-          }
-          return condition;
-        },
-      );
-
-      // Combine all conditions: otherBaseConditions AND (OR of visibility conditions with status)
-      const finalWhereClause = and(
-        ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
-        or(...visibilityConditionsForOrWithStatus),
-      );
-
-      const result = await db
-        .select({
-          campaign: campaigns,
-          owner: { id: user.id, name: user.name, email: user.email },
-          participantCount: sql<number>`count(distinct ${campaignParticipants.userId})::int`,
-          gameSystem: gameSystems, // Include gameSystem in the select
-        })
-        .from(campaigns)
-        .innerJoin(user, eq(campaigns.ownerId, user.id))
-        .innerJoin(gameSystems, eq(campaigns.gameSystemId, gameSystems.id)) // Join with gameSystems
-        .leftJoin(campaignParticipants, eq(campaignParticipants.campaignId, campaigns.id))
-        .where(finalWhereClause)
-        .groupBy(campaigns.id, user.id, gameSystems.id); // Add gameSystems.id to groupBy
-
-      return {
-        success: true,
-        data: result.map((r) => ({
-          ...r.campaign,
-          owner: r.owner,
-          participantCount: r.participantCount,
-          gameSystem: r.gameSystem, // Include gameSystem in the mapped object
-          // Explicitly set new fields to undefined if null from DB
-          sessionZeroData: r.campaign.sessionZeroData ?? undefined,
-          campaignExpectations: r.campaign.campaignExpectations ?? undefined,
-          tableExpectations: r.campaign.tableExpectations ?? undefined,
-          characterCreationOutcome: r.campaign.characterCreationOutcome ?? undefined,
-        })) as CampaignListItem[],
-      };
-    } catch (error) {
-      console.error("Error listing campaigns:", error);
-      return {
-        success: false,
-        errors: [{ code: "DATABASE_ERROR", message: "Failed to list campaigns" }],
-      };
-    }
+    return listCampaignsInternal(data);
   });
+
+export async function listCampaignsInternal(
+  data:
+    | { filters?: z.infer<typeof listCampaignsSchema>["filters"] | undefined }
+    | undefined,
+): Promise<OperationResult<CampaignListItem[]>> {
+  const db = await getDb();
+  const currentUser = await getCurrentUser();
+  return listCampaignsImpl(db, currentUser?.id, data?.filters);
+}
 
 export const getCampaignApplications = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)

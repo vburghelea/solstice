@@ -93,7 +93,7 @@ export function UserProfileComponent() {
   const doFollow = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await rlFollow({ data: { followingId: userId } });
+      await rlFollow({ data: { followingId: userId, uiSurface: "profile" } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -124,7 +124,7 @@ export function UserProfileComponent() {
   const doUnfollow = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await rlUnfollow({ data: { followingId: userId } });
+      await rlUnfollow({ data: { followingId: userId, uiSurface: "profile" } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -159,7 +159,7 @@ export function UserProfileComponent() {
   const doBlock = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await rlBlock({ data: { userId } });
+      await rlBlock({ data: { userId, uiSurface: "profile" } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(
@@ -190,7 +190,7 @@ export function UserProfileComponent() {
   const doUnblock = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      await rlUnblock({ data: { userId } });
+      await rlUnblock({ data: { userId, uiSurface: "profile" } });
     },
     onSuccess: async () => {
       queryClient.setQueryData(

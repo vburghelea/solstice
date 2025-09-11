@@ -2,19 +2,23 @@ import { z } from "zod";
 
 export const followInputSchema = z.object({
   followingId: z.string().min(1),
+  uiSurface: z.string().min(1).max(50).optional(),
 });
 
 export const unfollowInputSchema = z.object({
   followingId: z.string().min(1),
+  uiSurface: z.string().min(1).max(50).optional(),
 });
 
 export const blockInputSchema = z.object({
   userId: z.string().min(1),
   reason: z.string().max(500).optional(),
+  uiSurface: z.string().min(1).max(50).optional(),
 });
 
 export const unblockInputSchema = z.object({
   userId: z.string().min(1),
+  uiSurface: z.string().min(1).max(50).optional(),
 });
 
 export const relationshipInputSchema = z.object({

@@ -4,6 +4,10 @@ vi.mock("~/features/social", () => ({
   blockUser: vi.fn(),
   unblockUser: vi.fn(),
 }));
+vi.mock("@tanstack/react-start/server", () => ({
+  getWebRequest: () => ({ headers: new Headers() }),
+  createServerFileRoute: () => ({ methods: () => ({}) }),
+}));
 
 describe("POST /api/social/block|unblock", () => {
   it("block returns 200 on success", async () => {

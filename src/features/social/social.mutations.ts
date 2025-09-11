@@ -89,12 +89,23 @@ export const followUser = createServerFn({ method: "POST" })
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
+      const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
+      const clientIp =
+        (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
+      const uiSurface = data.uiSurface || headers.get("x-ui-surface") || undefined;
       await db.insert(socialAuditLogs).values({
         id: crypto.randomUUID(),
         actorUserId: currentUser.id,
         targetUserId: data.followingId,
         action: "follow",
-        metadata: { userAgent: headers.get("user-agent") || undefined },
+        metadata: {
+          userAgent: headers.get("user-agent") || undefined,
+          clientIp,
+          uiSurface,
+          actorRoles: (currentUser.roles || [])
+            .map((r) => (r as { role?: { name?: string } }).role?.name)
+            .filter(Boolean),
+        },
       });
 
       return { success: true, data: true };
@@ -145,12 +156,23 @@ export const unfollowUser = createServerFn({ method: "POST" })
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
+      const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
+      const clientIp =
+        (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
+      const uiSurface = data.uiSurface || headers.get("x-ui-surface") || undefined;
       await db.insert(socialAuditLogs).values({
         id: crypto.randomUUID(),
         actorUserId: currentUser.id,
         targetUserId: data.followingId,
         action: "unfollow",
-        metadata: { userAgent: headers.get("user-agent") || undefined },
+        metadata: {
+          userAgent: headers.get("user-agent") || undefined,
+          clientIp,
+          uiSurface,
+          actorRoles: (currentUser.roles || [])
+            .map((r) => (r as { role?: { name?: string } }).role?.name)
+            .filter(Boolean),
+        },
       });
 
       return { success: true, data: true };
@@ -226,6 +248,10 @@ export const blockUser = createServerFn({ method: "POST" })
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
+      const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
+      const clientIp =
+        (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
+      const uiSurface = data.uiSurface || headers.get("x-ui-surface") || undefined;
       await db.insert(socialAuditLogs).values({
         id: crypto.randomUUID(),
         actorUserId: currentUser.id,
@@ -234,6 +260,11 @@ export const blockUser = createServerFn({ method: "POST" })
         metadata: {
           userAgent: headers.get("user-agent") || undefined,
           reason: data.reason || undefined,
+          clientIp,
+          uiSurface,
+          actorRoles: (currentUser.roles || [])
+            .map((r) => (r as { role?: { name?: string } }).role?.name)
+            .filter(Boolean),
         },
       });
 
@@ -285,12 +316,23 @@ export const unblockUser = createServerFn({ method: "POST" })
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
+      const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
+      const clientIp =
+        (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
+      const uiSurface = data.uiSurface || headers.get("x-ui-surface") || undefined;
       await db.insert(socialAuditLogs).values({
         id: crypto.randomUUID(),
         actorUserId: currentUser.id,
         targetUserId: data.userId,
         action: "unblock",
-        metadata: { userAgent: headers.get("user-agent") || undefined },
+        metadata: {
+          userAgent: headers.get("user-agent") || undefined,
+          clientIp,
+          uiSurface,
+          actorRoles: (currentUser.roles || [])
+            .map((r) => (r as { role?: { name?: string } }).role?.name)
+            .filter(Boolean),
+        },
       });
 
       return { success: true, data: true };

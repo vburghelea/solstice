@@ -30,7 +30,8 @@ function BlocklistPage() {
 
   const rlUnblock = useRateLimitedServerFn(unblockUser, { type: "social" });
   const doUnblock = useMutation({
-    mutationFn: async (userId: string) => await rlUnblock({ data: { userId } }),
+    mutationFn: async (userId: string) =>
+      await rlUnblock({ data: { userId, uiSurface: "blocklist" } }),
     onSuccess: async () => {
       await refetch();
     },

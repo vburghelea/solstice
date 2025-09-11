@@ -41,3 +41,16 @@ pnpm test
 ```
 
 For detailed setup instructions, see the main [project README](../../README.md).
+
+## Connections-only Visibility
+
+Some lists and actions are gated by social relationships to reduce unwanted interactions:
+
+- Games and Campaigns marked `protected` are presented as “Connections-only”. They are visible in lists and eligible for “apply” only when the viewer is connected to the organizer (either follow direction) and neither side has blocked the other.
+- Direct navigation to a protected item still honors block rules; if blocked, the UI renders a neutral restriction banner without leaking private state.
+- Admin/mod tooling may bypass in moderation contexts but should avoid leaking state on user-facing surfaces.
+
+Developer notes:
+
+- Back-end queries enforce “connections-only” by requiring a follower/followed-by relation and absence of blocks.
+- Client surfaces should hide or disable “Apply” when the viewer and organizer are blocked either way.

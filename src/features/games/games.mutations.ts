@@ -208,6 +208,150 @@ export const updateGame = createServerFn({ method: "POST" })
         };
       }
 
+      // Notify approved participants if key fields changed
+      try {
+        const changes: string[] = [];
+        if (typeof data.status !== "undefined" && data.status !== existingGame.status) {
+          changes.push(`Status changed to ${data.status}`);
+        }
+        if (typeof data.dateTime !== "undefined") {
+          const oldMs =
+            existingGame.dateTime instanceof Date
+              ? existingGame.dateTime.getTime()
+              : new Date(existingGame.dateTime as unknown as string).getTime();
+          const newMs = new Date(data.dateTime).getTime();
+          if (oldMs !== newMs) {
+            changes.push("Rescheduled");
+          }
+        }
+        if (typeof data.location !== "undefined") {
+          const oldLoc = JSON.stringify(existingGame.location ?? {});
+          const newLoc = JSON.stringify(data.location ?? {});
+          if (oldLoc !== newLoc) {
+            changes.push("Location updated");
+          }
+        }
+
+        if (changes.length > 0) {
+          const [{ findGameParticipantsByGameId }] = await Promise.all([
+            import("./games.repository"),
+          ]);
+          const participants = await findGameParticipantsByGameId(updatedGame.id);
+          const approved = participants.filter(
+            (p) =>
+              p.status === "approved" &&
+              p.user?.email &&
+              p.user?.notificationPreferences?.gameUpdates !== false,
+          );
+          if (approved.length > 0) {
+            const recipients = approved.map((p) => ({
+              email: p.user!.email!,
+              name: p.user!.name ?? undefined,
+            }));
+            const [{ sendGameStatusUpdate }] = await Promise.all([
+              import("~/lib/email/resend"),
+            ]);
+            const { getBaseUrl } = await import("~/lib/env.server");
+            const baseUrl = getBaseUrl();
+            const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
+            type GameLocation = { address?: string } | null;
+            const locationText =
+              (gameWithDetails.data?.location as unknown as GameLocation)?.address ||
+              "See details page";
+            await sendGameStatusUpdate({
+              to: recipients,
+              gameName: gameWithDetails.data!.name,
+              dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+              location: locationText,
+              changeSummary: changes.join(" • "),
+              detailsUrl,
+            });
+          }
+
+          // Also notify campaign participants if this is part of a campaign
+          if (existingGame.campaignId) {
+            const [{ findCampaignParticipantsByCampaignId }] = await Promise.all([
+              import("~/features/campaigns/campaigns.repository"),
+            ]);
+            const cParticipants = await findCampaignParticipantsByCampaignId(
+              existingGame.campaignId,
+            );
+            const cApproved = cParticipants.filter(
+              (p) =>
+                p.status === "approved" &&
+                p.user?.email &&
+                p.user?.notificationPreferences?.campaignUpdates !== false,
+            );
+            if (cApproved.length > 0) {
+              const cRecipients = cApproved.map((p) => ({
+                email: p.user!.email!,
+                name: p.user!.name ?? undefined,
+              }));
+              const [{ sendCampaignSessionUpdate }] = await Promise.all([
+                import("~/lib/email/resend"),
+              ]);
+              const { getBaseUrl } = await import("~/lib/env.server");
+              const baseUrl2 = getBaseUrl();
+              const detailsUrl2 = `${baseUrl2}/games/${updatedGame.id}`;
+              type GameLocation2 = { address?: string } | null;
+              const locationText2 =
+                (gameWithDetails.data?.location as unknown as GameLocation2)?.address ||
+                "See details page";
+              await sendCampaignSessionUpdate({
+                to: cRecipients,
+                sessionTitle: gameWithDetails.data!.name,
+                dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+                location: locationText2,
+                changeSummary: changes.join(" • "),
+                detailsUrl: detailsUrl2,
+              });
+            }
+          }
+        }
+      } catch (notifyError) {
+        console.error("Failed to send game update notifications:", notifyError);
+      }
+
+      // Notify approved participants of cancellation
+      try {
+        const [{ findGameParticipantsByGameId }] = await Promise.all([
+          import("./games.repository"),
+        ]);
+        const participants = await findGameParticipantsByGameId(updatedGame.id);
+        const approved = participants.filter(
+          (p) =>
+            p.status === "approved" &&
+            p.user?.email &&
+            p.user?.notificationPreferences?.gameUpdates !== false,
+        );
+        if (approved.length > 0) {
+          const recipients = approved.map((p) => ({
+            email: p.user!.email!,
+            name: p.user!.name ?? undefined,
+          }));
+          const [{ sendGameStatusUpdate }] = await Promise.all([
+            import("~/lib/email/resend"),
+          ]);
+          const { getBaseUrl } = await import("~/lib/env.server");
+          const baseUrl = getBaseUrl();
+          const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
+          type GameLocation3 = { address?: string } | null;
+          const locationText =
+            (gameWithDetails.data?.location as unknown as GameLocation3)?.address ||
+            "See details page";
+          await sendGameStatusUpdate({
+            to: recipients,
+            gameName: gameWithDetails.data!.name,
+            dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+            location: locationText,
+            changeSummary: "Cancelled",
+            detailsUrl,
+          });
+        }
+      } catch (notifyError) {
+        console.error("Failed to send game cancellation notifications:", notifyError);
+      }
+
       return {
         success: true,
         data: {
@@ -787,14 +931,18 @@ export const inviteToGame = createServerFn({ method: "POST" })
             try {
               const { sendGameInvitation } = await import("~/lib/email/resend");
               const inviteUrl = `${process.env["SITE_URL"] || "https://roundup.games"}/games/${data.gameId}?token=${newUser.user.id}`;
+              const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
               await sendGameInvitation({
                 to: {
                   email: data.email,
                   name: newUser.user.name,
                 },
-                gameName: game.name,
                 inviterName: currentUser.name || "A game organizer",
+                gameName: game.name,
+                gameDescription: game.description,
+                gameSystem: game.gameSystem?.name || "",
                 inviteUrl,
+                expiresAt,
               });
             } catch (emailError) {
               console.error("Failed to send email invitation:", emailError);
@@ -1032,11 +1180,67 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
           };
         }
 
+        // Notify inviter (game owner)
+        try {
+          const [{ findGameById }] = await Promise.all([import("./games.repository")]);
+          const gameFull = await findGameById(existingParticipant.gameId);
+          if (
+            gameFull?.owner?.email &&
+            gameFull.owner?.notificationPreferences?.socialNotifications !== false
+          ) {
+            const [{ sendGameInviteResponse }] = await Promise.all([
+              import("~/lib/email/resend"),
+            ]);
+            const { getBaseUrl } = await import("~/lib/env.server");
+            const baseUrl = getBaseUrl();
+            const rosterUrl = `${baseUrl}/games/${existingParticipant.gameId}#roster`;
+            await sendGameInviteResponse({
+              to: { email: gameFull.owner.email, name: gameFull.owner.name ?? undefined },
+              inviterName: gameFull.owner.name || "Organizer",
+              inviteeName: currentUser.name || "Player",
+              gameName: gameFull.name,
+              response: "accepted",
+              time: new Date(),
+              rosterUrl,
+            });
+          }
+        } catch (notifyError) {
+          console.error("Failed to notify inviter of acceptance:", notifyError);
+        }
+
         return { success: true, data: participantWithUser as GameParticipant };
       } else if (data.action === "reject") {
         await db
           .delete(gameParticipants)
           .where(eq(gameParticipants.id, data.participantId));
+
+        // Notify inviter (game owner)
+        try {
+          const [{ findGameById }] = await Promise.all([import("./games.repository")]);
+          const gameFull = await findGameById(existingParticipant.gameId);
+          if (
+            gameFull?.owner?.email &&
+            gameFull.owner?.notificationPreferences?.socialNotifications !== false
+          ) {
+            const [{ sendGameInviteResponse }] = await Promise.all([
+              import("~/lib/email/resend"),
+            ]);
+            const { getBaseUrl } = await import("~/lib/env.server");
+            const baseUrl = getBaseUrl();
+            const rosterUrl = `${baseUrl}/games/${existingParticipant.gameId}#roster`;
+            await sendGameInviteResponse({
+              to: { email: gameFull.owner.email, name: gameFull.owner.name ?? undefined },
+              inviterName: gameFull.owner.name || "Organizer",
+              inviteeName: currentUser.name || "Player",
+              gameName: gameFull.name,
+              response: "declined",
+              time: new Date(),
+              rosterUrl,
+            });
+          }
+        } catch (notifyError) {
+          console.error("Failed to notify inviter of decline:", notifyError);
+        }
         return { success: true, data: true };
       }
 
@@ -1145,6 +1349,53 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
         };
       }
 
+      // Notify campaign participants that a new session is scheduled
+      try {
+        if (newGame.campaignId) {
+          const [{ findCampaignParticipantsByCampaignId }] = await Promise.all([
+            import("~/features/campaigns/campaigns.repository"),
+          ]);
+          const participants = await findCampaignParticipantsByCampaignId(
+            newGame.campaignId,
+          );
+          const approved = participants.filter(
+            (p) =>
+              p.status === "approved" &&
+              p.user?.email &&
+              p.user?.notificationPreferences?.campaignUpdates !== false,
+          );
+          if (approved.length > 0) {
+            const recipients = approved.map((p) => ({
+              email: p.user!.email!,
+              name: p.user!.name ?? undefined,
+            }));
+            const [{ sendCampaignSessionUpdate }] = await Promise.all([
+              import("~/lib/email/resend"),
+            ]);
+            const { getBaseUrl } = await import("~/lib/env.server");
+            const baseUrl = getBaseUrl();
+            const detailsUrl = `${baseUrl}/games/${newGame.id}`;
+            type GameLocation4 = { address?: string } | null;
+            const locationText =
+              (gameWithDetails.data?.location as unknown as GameLocation4)?.address ||
+              "See details page";
+            await sendCampaignSessionUpdate({
+              to: recipients,
+              sessionTitle: gameWithDetails.data!.name,
+              dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+              location: locationText,
+              changeSummary: "Scheduled",
+              detailsUrl,
+            });
+          }
+        }
+      } catch (notifyError) {
+        console.error(
+          "Failed to send campaign session scheduled notifications:",
+          notifyError,
+        );
+      }
+
       return { success: true, data: gameWithDetails.data };
     } catch (error) {
       console.error("Error creating game session:", error);
@@ -1226,6 +1477,43 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
             { code: "DATABASE_ERROR", message: "Failed to fetch updated game session" },
           ],
         };
+      }
+
+      // Notify approved participants of status change
+      try {
+        const [{ findGameParticipantsByGameId }] = await Promise.all([
+          import("./games.repository"),
+        ]);
+        const participants = await findGameParticipantsByGameId(updatedGame.id);
+        const approved = participants.filter(
+          (p) => p.status === "approved" && p.user?.email,
+        );
+        if (approved.length > 0) {
+          const recipients = approved.map((p) => ({
+            email: p.user!.email!,
+            name: p.user!.name ?? undefined,
+          }));
+          const [{ sendGameStatusUpdate }] = await Promise.all([
+            import("~/lib/email/resend"),
+          ]);
+          const { getBaseUrl } = await import("~/lib/env.server");
+          const baseUrl = getBaseUrl();
+          const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
+          type GameLocation5 = { address?: string } | null;
+          const locationText =
+            (gameWithDetails.data?.location as unknown as GameLocation5)?.address ||
+            "See details page";
+          await sendGameStatusUpdate({
+            to: recipients,
+            gameName: gameWithDetails.data!.name,
+            dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+            location: locationText,
+            changeSummary: `Status changed to ${data.status}`,
+            detailsUrl,
+          });
+        }
+      } catch (notifyError) {
+        console.error("Failed to send game status notifications:", notifyError);
       }
 
       return { success: true, data: gameWithDetails.data };

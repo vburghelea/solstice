@@ -40,6 +40,7 @@ CREATE TABLE "user" (
 	"pronouns" text,
 	"phone" text,
 	"privacy_settings" text,
+	"notification_preferences" jsonb DEFAULT '{"gameReminders":true,"campaignDigests":true,"gameUpdates": true,"campaignUpdates":true,"reviewReminders":true,"socialNotifications":false}'::jsonb,
 	"profile_version" integer NOT NULL,
 	"profile_updated_at" timestamp,
   "city" text,

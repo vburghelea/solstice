@@ -121,6 +121,9 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       if (inputData.privacySettings !== undefined) {
         updateData["privacySettings"] = JSON.stringify(inputData.privacySettings);
       }
+      if (inputData.notificationPreferences !== undefined) {
+        updateData["notificationPreferences"] = inputData.notificationPreferences;
+      }
       if (inputData.city !== undefined) {
         updateData["city"] = inputData.city;
       }

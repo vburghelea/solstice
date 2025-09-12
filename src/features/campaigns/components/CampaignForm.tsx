@@ -625,7 +625,9 @@ export function CampaignForm({
                   {visibilityEnum.enumValues.map(
                     (v: (typeof visibilityEnum.enumValues)[number]) => (
                       <SelectItem key={v} value={v}>
-                        {v.charAt(0).toUpperCase() + v.slice(1)}
+                        {v === "protected"
+                          ? "Connections-only"
+                          : v.charAt(0).toUpperCase() + v.slice(1)}
                       </SelectItem>
                     ),
                   )}
@@ -647,8 +649,9 @@ export function CampaignForm({
         </form.Field>
       </div>
       <p className="text-muted-foreground mt-2 text-sm">
-        Visibility options: Public (visible to everyone), Protected (visible to logged-in
-        users), Private (visible only to invited players)
+        Visibility options: Public (visible to everyone), Connections-only (visible to
+        your followers and the people whom you follow), Private (visible only to invited
+        players)
       </p>
 
       <fieldset className="space-y-4 rounded-md border p-4">

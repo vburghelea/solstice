@@ -793,6 +793,28 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
               };
             }
 
+            // Send (re)invitation email
+            try {
+              const [{ sendCampaignInvitation }] = await Promise.all([
+                import("~/lib/email/resend"),
+              ]);
+              const { getBaseUrl } = await import("~/lib/env.server");
+              const baseUrl = getBaseUrl();
+              const inviteUrl = `${baseUrl}/campaigns/${data.campaignId}`;
+              const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+              await sendCampaignInvitation({
+                to: { email: invitedUser.email, name: invitedUser.name ?? undefined },
+                inviterName: currentUser.name || "Campaign Owner",
+                campaignName: campaign.name,
+                campaignDescription: campaign.description,
+                gameSystem: campaign.gameSystem?.name || "",
+                inviteUrl,
+                expiresAt,
+              });
+            } catch (emailError) {
+              console.error("Failed to send campaign (re)invitation email:", emailError);
+            }
+
             return { success: true, data: participantWithUser as CampaignParticipant };
           } else {
             return {
@@ -836,6 +858,28 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
                 { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
               ],
             };
+          }
+
+          // Send invitation email
+          try {
+            const [{ sendCampaignInvitation }] = await Promise.all([
+              import("~/lib/email/resend"),
+            ]);
+            const { getBaseUrl } = await import("~/lib/env.server");
+            const baseUrl = getBaseUrl();
+            const inviteUrl = `${baseUrl}/campaigns/${data.campaignId}`;
+            const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            await sendCampaignInvitation({
+              to: { email: invitedUser.email, name: invitedUser.name ?? undefined },
+              inviterName: currentUser.name || "Campaign Owner",
+              campaignName: campaign.name,
+              campaignDescription: campaign.description,
+              gameSystem: campaign.gameSystem?.name || "",
+              inviteUrl,
+              expiresAt,
+            });
+          } catch (emailError) {
+            console.error("Failed to send campaign invitation email:", emailError);
           }
 
           return { success: true, data: participantWithUser as CampaignParticipant };
@@ -883,6 +927,28 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
                   { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
                 ],
               };
+            }
+
+            // Send invitation email
+            try {
+              const [{ sendCampaignInvitation }] = await Promise.all([
+                import("~/lib/email/resend"),
+              ]);
+              const { getBaseUrl } = await import("~/lib/env.server");
+              const baseUrl = getBaseUrl();
+              const inviteUrl = `${baseUrl}/campaigns/${data.campaignId}`;
+              const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+              await sendCampaignInvitation({
+                to: { email: data.email, name: signUpData.user.name ?? undefined },
+                inviterName: currentUser.name || "Campaign Owner",
+                campaignName: campaign.name,
+                campaignDescription: campaign.description,
+                gameSystem: campaign.gameSystem?.name || "",
+                inviteUrl,
+                expiresAt,
+              });
+            } catch (emailError) {
+              console.error("Failed to send campaign invitation email:", emailError);
             }
 
             return { success: true, data: participantWithUser as CampaignParticipant };
@@ -1077,6 +1143,37 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
             { code: "DATABASE_ERROR", message: "Failed to fetch updated participant" },
           ],
         };
+      }
+
+      // Notify campaign owner of response
+      try {
+        const campaignFull = await findCampaignById(existingParticipant.campaignId);
+        if (
+          campaignFull?.owner?.email &&
+          campaignFull.owner?.notificationPreferences?.socialNotifications !== false
+        ) {
+          const [{ sendCampaignInviteResponse }] = await Promise.all([
+            import("~/lib/email/resend"),
+          ]);
+          const { getBaseUrl } = await import("~/lib/env.server");
+          const baseUrl = getBaseUrl();
+          const detailsUrl = `${baseUrl}/campaigns/${existingParticipant.campaignId}`;
+          await sendCampaignInviteResponse({
+            to: {
+              email: campaignFull.owner.email,
+              name: campaignFull.owner.name ?? undefined,
+            },
+            ownerName: campaignFull.owner.name || "Owner",
+            inviterName: campaignFull.owner.name || "Owner",
+            inviteeName: currentUser.name || "User",
+            campaignName: campaignFull.name,
+            response: newStatus === "approved" ? "accepted" : "declined",
+            time: new Date(),
+            detailsUrl,
+          });
+        }
+      } catch (notifyError) {
+        console.error("Failed to notify owner of campaign invite response:", notifyError);
       }
 
       return { success: true, data: participantWithUser as CampaignParticipant };

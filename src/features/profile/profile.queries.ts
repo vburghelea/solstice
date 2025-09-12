@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { AvailabilityData } from "~/db/schema/auth.schema";
+import { user as userTable } from "~/db/schema/auth.schema";
 import { gameSystems, userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import type {
   PrivacySettings,
@@ -41,6 +42,7 @@ function mapDbUserToProfile(
     gmStyle: string | null;
     gmRating: number | null;
     privacySettings: string | null;
+    notificationPreferences: unknown; // JSONB
     profileVersion: number;
     profileUpdatedAt: Date | null;
     image: string | null;
@@ -77,6 +79,10 @@ function mapDbUserToProfile(
     gmStyle: dbUser.gmStyle ?? undefined,
     gmRating: dbUser.gmRating ?? undefined,
     privacySettings: parseJsonField<PrivacySettings>(dbUser.privacySettings) ?? undefined,
+    notificationPreferences:
+      dbUser.notificationPreferences && typeof dbUser.notificationPreferences === "object"
+        ? (dbUser.notificationPreferences as (typeof userTable.$inferSelect)["notificationPreferences"])
+        : undefined,
     profileVersion: dbUser.profileVersion,
     profileUpdatedAt: dbUser.profileUpdatedAt ?? undefined,
     gameSystemPreferences: preferences ?? undefined,

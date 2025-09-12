@@ -10,13 +10,22 @@ import { serverOnly } from "@tanstack/react-start";
 import { Resend } from "resend";
 import {
   generateTextFromHtml,
+  renderCampaignDigestEmail,
+  renderCampaignInvitationEmail,
+  renderCampaignInviteResponseEmail,
+  renderCampaignSessionUpdateEmail,
   renderEmailVerificationEmail,
   renderEmailVerificationOTP,
   renderGameInvitationEmail,
+  renderGameInviteResponseEmail,
+  renderGameReminderEmail,
+  renderGameStatusUpdateEmail,
   renderMembershipReceiptEmail,
   renderPasswordResetEmail,
   renderPasswordResetOTP,
+  renderReviewReminderEmail,
   renderSignInOTP,
+  renderWelcomeEmail,
 } from "~/shared/email-templates";
 
 // Define types for better type safety
@@ -174,7 +183,7 @@ export const sendEmailVerification = serverOnly(
     const htmlContent = await renderEmailVerificationEmail({
       recipientName: params.to.name || "there",
       verificationUrl: params.verificationUrl,
-      expiresAt: params.expiresAt.toLocaleDateString("en-CA", {
+      expiresAt: params.expiresAt.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -214,7 +223,7 @@ export const sendMembershipPurchaseReceipt = serverOnly(
       membershipType: params.membershipType,
       amount: `$${(params.amount / 100).toFixed(2)}`,
       paymentId: params.paymentId,
-      expiresAt: params.expiresAt.toLocaleDateString("en-CA"),
+      expiresAt: params.expiresAt.toLocaleDateString("en-US"),
     });
 
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
@@ -237,9 +246,12 @@ export const sendMembershipPurchaseReceipt = serverOnly(
 export const sendGameInvitation = serverOnly(
   async (params: {
     to: EmailRecipient;
-    gameName: string;
-    inviteUrl: string;
     inviterName: string;
+    gameName: string;
+    gameDescription: string;
+    gameSystem: string;
+    inviteUrl: string;
+    expiresAt: Date;
   }) => {
     const service = await getEmailService();
     const htmlContent = await renderGameInvitationEmail({
@@ -247,9 +259,15 @@ export const sendGameInvitation = serverOnly(
       inviterName: params.inviterName,
       gameName: params.gameName,
       inviteUrl: params.inviteUrl,
-      gameDescription: "", // Placeholder, as it's not provided in params
-      gameSystem: "", // Placeholder, as it's not provided in params
-      expiresAt: "", // Placeholder, as it's not provided in params
+      gameDescription: params.gameDescription,
+      gameSystem: params.gameSystem,
+      expiresAt: params.expiresAt.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     });
 
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
@@ -262,6 +280,394 @@ export const sendGameInvitation = serverOnly(
         name: fromName,
       },
       subject: `Game Invitation: ${params.gameName} - Roundup Games`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Game: invitation response notification (to inviter)
+export const sendGameInviteResponse = serverOnly(
+  async (params: {
+    to: EmailRecipient; // inviter
+    inviterName: string;
+    inviteeName: string;
+    gameName: string;
+    response: "accepted" | "declined";
+    time: Date;
+    rosterUrl: string;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderGameInviteResponseEmail({
+      inviterName: params.inviterName,
+      inviteeName: params.inviteeName,
+      gameName: params.gameName,
+      response: params.response,
+      time: params.time.toLocaleString("en-US"),
+      rosterUrl: params.rosterUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Invite ${params.response}: ${params.gameName}`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Game: status update to participants
+export const sendGameStatusUpdate = serverOnly(
+  async (params: {
+    to: EmailRecipient | EmailRecipient[];
+    recipientName?: string; // optional when sending to many
+    gameName: string;
+    dateTime: Date;
+    location: string;
+    changeSummary: string;
+    detailsUrl: string;
+  }) => {
+    const service = await getEmailService();
+    // Preference gate: filter recipients by user.notificationPreferences.gameUpdates
+    let recipients: EmailRecipient[] = Array.isArray(params.to) ? params.to : [params.to];
+    try {
+      const emails = recipients.map((r) => r.email).filter(Boolean);
+      if (emails.length > 0) {
+        const [{ inArray }] = await Promise.all([import("drizzle-orm")]);
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const db = await getDb();
+        const { user } = await import("~/db/schema");
+        const rows = await db
+          .select({ email: user.email, prefs: user.notificationPreferences })
+          .from(user)
+          .where(inArray(user.email, emails));
+        const allowed = new Set(
+          rows.filter((r) => r.prefs?.gameUpdates !== false).map((r) => r.email || ""),
+        );
+        recipients = recipients.filter((r) => !r.email || allowed.has(r.email));
+      }
+    } catch (e) {
+      // On any failure, fall back to provided list (do not block)
+      console.error("Preference gate (gameUpdates) failed:", e);
+    }
+
+    if (recipients.length === 0) {
+      return { success: true } as SendEmailResult;
+    }
+    const htmlContent = await renderGameStatusUpdateEmail({
+      recipientName: params.recipientName || "there",
+      gameName: params.gameName,
+      dateTime: params.dateTime.toLocaleString("en-US"),
+      location: params.location,
+      changeSummary: params.changeSummary,
+      detailsUrl: params.detailsUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    if (recipients.length <= 1) {
+      return service.send({
+        to: recipients,
+        from: { email: fromEmail, name: fromName },
+        subject: `Game Update: ${params.gameName}`,
+        html: htmlContent,
+        text: generateTextFromHtml(htmlContent),
+      });
+    }
+
+    const chunks: EmailRecipient[][] = [];
+    for (let i = 0; i < recipients.length; i += 15) {
+      chunks.push(recipients.slice(i, i + 15));
+    }
+    const { paceBatch } = await import("~/lib/pacer/server");
+    let anySuccess = false;
+    await paceBatch(chunks, { batchSize: 1, delayMs: 1000 }, async (chunk) => {
+      const res = await service.send({
+        to: chunk,
+        from: { email: fromEmail, name: fromName },
+        subject: `Game Update: ${params.gameName}`,
+        html: htmlContent,
+        text: generateTextFromHtml(htmlContent),
+      });
+      anySuccess ||= res.success;
+    });
+    return { success: anySuccess };
+  },
+);
+
+// Game: reminder
+export const sendGameReminder = serverOnly(
+  async (params: {
+    to: EmailRecipient | EmailRecipient[];
+    recipientName?: string;
+    gameName: string;
+    dateTime: Date;
+    location: string;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderGameReminderEmail({
+      recipientName: params.recipientName || "there",
+      gameName: params.gameName,
+      dateTime: params.dateTime.toLocaleString("en-US"),
+      location: params.location,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Reminder: ${params.gameName}`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Campaign: invitation (to invitee)
+export const sendCampaignInvitation = serverOnly(
+  async (params: {
+    to: EmailRecipient;
+    inviterName: string;
+    campaignName: string;
+    campaignDescription: string;
+    gameSystem: string;
+    inviteUrl: string;
+    expiresAt: Date;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderCampaignInvitationEmail({
+      recipientName: params.to.name || "there",
+      inviterName: params.inviterName,
+      campaignName: params.campaignName,
+      campaignDescription: params.campaignDescription,
+      gameSystem: params.gameSystem,
+      inviteUrl: params.inviteUrl,
+      expiresAt: params.expiresAt.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Campaign Invitation: ${params.campaignName}`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Campaign: invite response (to owner)
+export const sendCampaignInviteResponse = serverOnly(
+  async (params: {
+    to: EmailRecipient; // owner
+    ownerName: string;
+    inviterName: string;
+    inviteeName: string;
+    campaignName: string;
+    response: "accepted" | "declined";
+    time: Date;
+    detailsUrl: string;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderCampaignInviteResponseEmail({
+      ownerName: params.ownerName,
+      inviterName: params.inviterName,
+      inviteeName: params.inviteeName,
+      campaignName: params.campaignName,
+      response: params.response,
+      time: params.time.toLocaleString("en-US"),
+      detailsUrl: params.detailsUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Campaign ${params.response}: ${params.campaignName}`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Campaign: session update
+export const sendCampaignSessionUpdate = serverOnly(
+  async (params: {
+    to: EmailRecipient | EmailRecipient[];
+    recipientName?: string;
+    sessionTitle: string;
+    dateTime: Date;
+    location: string;
+    changeSummary: string;
+    detailsUrl: string;
+  }) => {
+    const service = await getEmailService();
+    // Preference gate: filter recipients by user.notificationPreferences.campaignUpdates
+    let recipients: EmailRecipient[] = Array.isArray(params.to) ? params.to : [params.to];
+    try {
+      const emails = recipients.map((r) => r.email).filter(Boolean);
+      if (emails.length > 0) {
+        const [{ inArray }] = await Promise.all([import("drizzle-orm")]);
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const db = await getDb();
+        const { user } = await import("~/db/schema");
+        const rows = await db
+          .select({ email: user.email, prefs: user.notificationPreferences })
+          .from(user)
+          .where(inArray(user.email, emails));
+        const allowed = new Set(
+          rows
+            .filter((r) => r.prefs?.campaignUpdates !== false)
+            .map((r) => r.email || ""),
+        );
+        recipients = recipients.filter((r) => !r.email || allowed.has(r.email));
+      }
+    } catch (e) {
+      console.error("Preference gate (campaignUpdates) failed:", e);
+    }
+
+    if (recipients.length === 0) {
+      return { success: true } as SendEmailResult;
+    }
+    const htmlContent = await renderCampaignSessionUpdateEmail({
+      recipientName: params.recipientName || "there",
+      sessionTitle: params.sessionTitle,
+      dateTime: params.dateTime.toLocaleString("en-US"),
+      location: params.location,
+      changeSummary: params.changeSummary,
+      detailsUrl: params.detailsUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    if (recipients.length <= 1) {
+      return service.send({
+        to: recipients,
+        from: { email: fromEmail, name: fromName },
+        subject: `Session Update: ${params.sessionTitle}`,
+        html: htmlContent,
+        text: generateTextFromHtml(htmlContent),
+      });
+    }
+
+    const chunks: EmailRecipient[][] = [];
+    for (let i = 0; i < recipients.length; i += 15) {
+      chunks.push(recipients.slice(i, i + 15));
+    }
+    const { paceBatch } = await import("~/lib/pacer/server");
+    let anySuccess = false;
+    await paceBatch(chunks, { batchSize: 1, delayMs: 1000 }, async (chunk) => {
+      const res = await service.send({
+        to: chunk,
+        from: { email: fromEmail, name: fromName },
+        subject: `Session Update: ${params.sessionTitle}`,
+        html: htmlContent,
+        text: generateTextFromHtml(htmlContent),
+      });
+      anySuccess ||= res.success;
+    });
+    return { success: anySuccess };
+  },
+);
+
+// Campaign: weekly digest
+export const sendCampaignDigest = serverOnly(
+  async (params: {
+    to: EmailRecipient;
+    recipientName?: string;
+    itemsHtml: string;
+    manageUrl: string;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderCampaignDigestEmail({
+      recipientName: params.recipientName || params.to.name || "there",
+      itemsHtml: params.itemsHtml,
+      manageUrl: params.manageUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Your Campaign Digest`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Reviews: review reminder
+export const sendReviewReminder = serverOnly(
+  async (params: {
+    to: EmailRecipient;
+    recipientName?: string;
+    gmName: string;
+    gameName: string;
+    dateTime: Date;
+    reviewUrl: string;
+  }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderReviewReminderEmail({
+      recipientName: params.recipientName || params.to.name || "there",
+      gmName: params.gmName,
+      gameName: params.gameName,
+      dateTime: params.dateTime.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      reviewUrl: params.reviewUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Review Your GM: ${params.gmName}`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+    });
+  },
+);
+
+// Auth: welcome email
+export const sendWelcomeEmail = serverOnly(
+  async (params: { to: EmailRecipient; profileUrl: string }) => {
+    const service = await getEmailService();
+    const htmlContent = await renderWelcomeEmail({
+      recipientName: params.to.name || "there",
+      profileUrl: params.profileUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `Welcome to Roundup Games`,
       html: htmlContent,
       text: generateTextFromHtml(htmlContent),
     });
@@ -329,7 +735,7 @@ export const sendPasswordResetEmail = serverOnly(
     const htmlContent = await renderPasswordResetEmail({
       recipientName: params.to.name || "there",
       resetUrl: params.resetUrl,
-      expiresAt: params.expiresAt.toLocaleDateString("en-CA", {
+      expiresAt: params.expiresAt.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",

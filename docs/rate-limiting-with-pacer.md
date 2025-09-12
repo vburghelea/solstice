@@ -222,3 +222,37 @@ Rate limiting events can be monitored through:
 2. **Analytics Integration**: Track rate limit events for monitoring
 3. **Dynamic Limits**: Adjust limits based on user tier or permissions
 4. **Retry Queue**: Automatically retry rejected requests when the window resets
+
+## Server-Side Pacing for Bulk Sends
+
+While TanStack Pacer is focused on client-side UX, server-side bulk tasks (like scheduled email sends or multi-recipient update notifications) should also be paced to respect provider quotas.
+
+- Helper: `src/lib/pacer/server.ts` exports `paceBatch(items, { batchSize, delayMs }, fn)`
+  - Processes items in bursts (batchSize) with a delay (delayMs) between bursts
+  - Catches per-item errors to avoid aborting the whole run
+  - Easy to compose for arrays of recipients or chunks
+
+Recommended usage
+
+```
+import { paceBatch } from "~/lib/pacer/server";
+
+// Example: email to many recipients in chunks of 15, 1s apart
+const chunks = [] as EmailRecipient[][];
+for (let i = 0; i < recipients.length; i += 15) {
+  chunks.push(recipients.slice(i, i + 15));
+}
+await paceBatch(chunks, { batchSize: 1, delayMs: 1000 }, async (chunk) => {
+  await emailService.send({ to: chunk, subject, html });
+});
+```
+
+Where to use it
+
+- Scheduled jobs: reminders, digests, bulk messages
+- Sender functions that accept arrays (multi-recipient notifications)
+
+Notes
+
+- Keep batch sizes and delays conservative unless you have strong provider quotas
+- Combine with idempotency (e.g., `email_events` table) to avoid duplicates

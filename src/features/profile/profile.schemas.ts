@@ -41,6 +41,16 @@ export const profileInputSchema = z.object({
     .optional(),
   calendarAvailability: availabilityDataSchema.optional(),
   privacySettings: privacySettingsSchema.optional(),
+  notificationPreferences: z
+    .object({
+      gameReminders: z.boolean(),
+      gameUpdates: z.boolean(),
+      campaignDigests: z.boolean(),
+      campaignUpdates: z.boolean(),
+      reviewReminders: z.boolean(),
+      socialNotifications: z.boolean(),
+    })
+    .optional(),
   isGM: z.boolean().optional(),
   gmStyle: z.string().optional(),
 });

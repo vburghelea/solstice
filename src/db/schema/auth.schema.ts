@@ -81,6 +81,17 @@ export const user = pgTable("user", {
   // Privacy and preferences
   privacySettings: text("privacy_settings"), // JSON string
 
+  // Notification preferences (non-critical emails)
+  // Note: JSONB shape is application-defined; new keys default to true in migrations
+  notificationPreferences: jsonb("notification_preferences").$type<{
+    gameReminders: boolean;
+    gameUpdates: boolean;
+    campaignDigests: boolean;
+    campaignUpdates: boolean;
+    reviewReminders: boolean;
+    socialNotifications: boolean;
+  }>(),
+
   // GM-specific fields
   isGM: boolean("is_gm").default(false),
   gamesHosted: integer("games_hosted").default(0),

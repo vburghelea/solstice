@@ -65,6 +65,74 @@ export interface SignInOTPData {
   otp: string;
 }
 
+// New templates — Games
+export interface GameInviteResponseData {
+  inviterName: string;
+  inviteeName: string;
+  gameName: string;
+  response: "accepted" | "declined";
+  time: string;
+  rosterUrl: string;
+}
+
+export interface GameStatusUpdateData {
+  recipientName: string;
+  gameName: string;
+  dateTime: string;
+  location: string;
+  changeSummary: string;
+  detailsUrl: string;
+}
+
+export interface GameReminderData {
+  recipientName: string;
+  gameName: string;
+  dateTime: string;
+  location: string;
+}
+
+// New templates — Campaigns
+export interface CampaignInviteResponseData {
+  ownerName: string;
+  inviterName: string;
+  inviteeName: string;
+  campaignName: string;
+  response: "accepted" | "declined";
+  time: string;
+  detailsUrl: string;
+}
+
+export interface CampaignSessionUpdateData {
+  recipientName: string;
+  sessionTitle: string;
+  dateTime: string;
+  location: string;
+  changeSummary: string;
+  detailsUrl: string;
+}
+
+export interface CampaignDigestItem {
+  title: string;
+  dateTime: string;
+  location: string;
+  detailsUrl: string;
+}
+
+export interface CampaignDigestData {
+  recipientName: string;
+  itemsHtml: string; // pre-rendered list items HTML
+  manageUrl: string;
+}
+
+// New templates — Reviews
+export interface ReviewReminderData {
+  recipientName: string;
+  gmName: string;
+  gameName: string;
+  dateTime: string;
+  reviewUrl: string;
+}
+
 /**
  * Load and render a campaign invitation email template
  */
@@ -258,4 +326,151 @@ export function generateTextFromHtml(html: string): string {
     .replace(/>/g, ">") // Replace greater than
     .replace(/\s+/g, " ") // Normalize whitespace
     .trim();
+}
+
+/**
+ * Load and render: Game invitation response (notify inviter)
+ */
+export async function renderGameInviteResponseEmail(
+  data: GameInviteResponseData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/game-invite-response.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{inviterName}}/g, data.inviterName);
+  template = template.replace(/{{inviteeName}}/g, data.inviteeName);
+  template = template.replace(/{{gameName}}/g, data.gameName);
+  template = template.replace(/{{response}}/g, data.response);
+  template = template.replace(/{{time}}/g, data.time);
+  template = template.replace(/{{rosterUrl}}/g, data.rosterUrl);
+
+  return template;
+}
+
+/**
+ * Load and render: Game status update (scheduled/updated/cancelled)
+ */
+export async function renderGameStatusUpdateEmail(
+  data: GameStatusUpdateData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/game-status-update.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{gameName}}/g, data.gameName);
+  template = template.replace(/{{dateTime}}/g, data.dateTime);
+  template = template.replace(/{{location}}/g, data.location);
+  template = template.replace(/{{changeSummary}}/g, data.changeSummary);
+  template = template.replace(/{{detailsUrl}}/g, data.detailsUrl);
+
+  return template;
+}
+
+/**
+ * Load and render: Game reminder
+ */
+export async function renderGameReminderEmail(data: GameReminderData): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/game-reminder.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{gameName}}/g, data.gameName);
+  template = template.replace(/{{dateTime}}/g, data.dateTime);
+  template = template.replace(/{{location}}/g, data.location);
+
+  return template;
+}
+
+/**
+ * Load and render: Campaign invitation response (notify owner)
+ */
+export async function renderCampaignInviteResponseEmail(
+  data: CampaignInviteResponseData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/campaign-invite-response.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{ownerName}}/g, data.ownerName);
+  template = template.replace(/{{inviterName}}/g, data.inviterName);
+  template = template.replace(/{{inviteeName}}/g, data.inviteeName);
+  template = template.replace(/{{campaignName}}/g, data.campaignName);
+  template = template.replace(/{{response}}/g, data.response);
+  template = template.replace(/{{time}}/g, data.time);
+  template = template.replace(/{{detailsUrl}}/g, data.detailsUrl);
+
+  return template;
+}
+
+/**
+ * Load and render: Campaign session update (scheduled/updated/cancelled)
+ */
+export async function renderCampaignSessionUpdateEmail(
+  data: CampaignSessionUpdateData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/campaign-session-update.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{sessionTitle}}/g, data.sessionTitle);
+  template = template.replace(/{{dateTime}}/g, data.dateTime);
+  template = template.replace(/{{location}}/g, data.location);
+  template = template.replace(/{{changeSummary}}/g, data.changeSummary);
+  template = template.replace(/{{detailsUrl}}/g, data.detailsUrl);
+
+  return template;
+}
+
+/**
+ * Load and render: Campaign weekly digest
+ */
+export async function renderCampaignDigestEmail(
+  data: CampaignDigestData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/campaign-digest.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{itemsHtml}}/g, data.itemsHtml);
+  template = template.replace(/{{manageUrl}}/g, data.manageUrl);
+
+  return template;
+}
+
+/**
+ * Load and render: Review reminder (review your GM)
+ */
+export async function renderReviewReminderEmail(
+  data: ReviewReminderData,
+): Promise<string> {
+  const templatePath = resolve(
+    process.cwd(),
+    "src/shared/email-templates/review-reminder.html",
+  );
+  let template = await readFile(templatePath, "utf-8");
+
+  template = template.replace(/{{recipientName}}/g, data.recipientName);
+  template = template.replace(/{{gmName}}/g, data.gmName);
+  template = template.replace(/{{gameName}}/g, data.gameName);
+  template = template.replace(/{{dateTime}}/g, data.dateTime);
+  template = template.replace(/{{reviewUrl}}/g, data.reviewUrl);
+
+  return template;
 }

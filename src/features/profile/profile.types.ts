@@ -11,6 +11,15 @@ export interface PrivacySettings {
 
 import type { AvailabilityData } from "~/db/schema/auth.schema";
 
+export interface NotificationPreferences {
+  gameReminders: boolean;
+  gameUpdates: boolean;
+  campaignDigests: boolean;
+  campaignUpdates: boolean;
+  reviewReminders: boolean;
+  socialNotifications: boolean;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -33,6 +42,7 @@ export interface UserProfile {
   };
   calendarAvailability?: AvailabilityData;
   privacySettings?: PrivacySettings;
+  notificationPreferences?: NotificationPreferences;
   isGM: boolean;
   gamesHosted: number;
   averageResponseTime?: number;
@@ -60,6 +70,7 @@ export interface ProfileInput {
   };
   calendarAvailability?: AvailabilityData;
   privacySettings?: PrivacySettings;
+  notificationPreferences?: NotificationPreferences;
   isGM?: boolean;
   gmStyle?: string;
 }
@@ -132,4 +143,13 @@ export const defaultPrivacySettings: PrivacySettings = {
   allowTeamInvitations: true,
   allowFollows: true,
   allowInvitesOnlyFromConnections: false,
+};
+
+export const defaultNotificationPreferences: NotificationPreferences = {
+  gameReminders: true,
+  gameUpdates: true,
+  campaignDigests: true,
+  campaignUpdates: true,
+  reviewReminders: true,
+  socialNotifications: false,
 };

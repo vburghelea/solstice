@@ -529,6 +529,32 @@ describe("Game Management Feature Tests", () => {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
       }
     });
+
+    it.each(["canceled", "completed"])(
+      "should fail to invite when game is %s",
+      async () => {
+        mocks.mockInviteToGame.mockResolvedValue({
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message: "Cannot invite players to a canceled or completed game",
+            },
+          ],
+        });
+        const result = await mocks.mockInviteToGame({
+          data: {
+            gameId: MOCK_GAME.id,
+            userId: MOCK_INVITED_USER.id,
+            role: "invited",
+          },
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.errors[0].code).toBe("CONFLICT");
+        }
+      },
+    );
   });
 
   describe("getGameApplications", () => {

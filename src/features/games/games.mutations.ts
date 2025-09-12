@@ -899,6 +899,19 @@ export const inviteToGame = createServerFn({ method: "POST" })
         };
       }
 
+      // Only scheduled games can accept invitations
+      if (game.status !== "scheduled") {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message: "Cannot invite players to a canceled or completed game",
+            },
+          ],
+        };
+      }
+
       let targetUserId: string;
 
       if (data.userId) {
@@ -1415,7 +1428,7 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq, sql } = await import("drizzle-orm");
+      const { and, eq, sql } = await import("drizzle-orm");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -1455,6 +1468,20 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
             { code: "DATABASE_ERROR", message: "Failed to update game session status" },
           ],
         };
+      }
+
+      // Revoke any pending invitations when game is canceled or completed
+      if (data.status === "canceled" || data.status === "completed") {
+        await db
+          .update(gameParticipants)
+          .set({ status: "rejected", updatedAt: new Date() })
+          .where(
+            and(
+              eq(gameParticipants.gameId, data.gameId),
+              eq(gameParticipants.role, "invited"),
+              eq(gameParticipants.status, "pending"),
+            ),
+          );
       }
 
       // If newly marked as completed (and was not previously), increment owner's gamesHosted

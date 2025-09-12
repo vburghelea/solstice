@@ -54,6 +54,7 @@ import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.re
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardReviewsPendingRouteImport } from "./routes/dashboard/reviews/pending";
 import { Route as DashboardProfileBlocklistRouteImport } from "./routes/dashboard/profile/blocklist";
 import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
 import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
@@ -277,6 +278,11 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardReviewsPendingRoute = DashboardReviewsPendingRouteImport.update({
+  id: "/reviews/pending",
+  path: "/reviews/pending",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
 const DashboardProfileBlocklistRoute =
   DashboardProfileBlocklistRouteImport.update({
     id: "/blocklist",
@@ -485,6 +491,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -542,6 +549,7 @@ export interface FileRoutesByTo {
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
@@ -604,6 +612,7 @@ export interface FileRoutesById {
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -668,6 +677,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -725,6 +735,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
@@ -786,6 +797,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1211,6 +1223,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/reviews/pending": {
+      id: "/dashboard/reviews/pending";
+      path: "/reviews/pending";
+      fullPath: "/dashboard/reviews/pending";
+      preLoaderRoute: typeof DashboardReviewsPendingRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
     "/dashboard/profile/blocklist": {
       id: "/dashboard/profile/blocklist";
       path: "/blocklist";
@@ -1580,6 +1599,7 @@ interface DashboardRouteRouteChildren {
   DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute;
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
+  DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute;
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -1594,6 +1614,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardSocialAuditsRoute: DashboardSocialAuditsRoute,
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardReviewsPendingRoute: DashboardReviewsPendingRoute,
 };
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

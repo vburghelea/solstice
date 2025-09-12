@@ -6,11 +6,12 @@ CREATE TABLE "gm_reviews" (
 	"id" text PRIMARY KEY NOT NULL,
 	"reviewer_id" text NOT NULL,
 	"gm_id" text NOT NULL,
+	"game_id" uuid NOT NULL,
 	"rating" integer NOT NULL,
 	"selected_strengths" jsonb DEFAULT '[]'::jsonb,
 	"comment" text,
-	"created_at" timestamp NOT NULL,
-	"updated_at" timestamp NOT NULL
+	"created_at" timestamp NOT NULL DEFAULT now(),
+	"updated_at" timestamp NOT NULL DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "user_follows" (
@@ -45,8 +46,11 @@ CREATE INDEX "social_audit_logs_action_idx" ON "public"."social_audit_logs" ("ac
 
 ALTER TABLE "gm_reviews" ADD CONSTRAINT "gm_reviews_reviewer_id_user_id_fk" FOREIGN KEY ("reviewer_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "gm_reviews" ADD CONSTRAINT "gm_reviews_gm_id_user_id_fk" FOREIGN KEY ("gm_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "gm_reviews" ADD CONSTRAINT "gm_reviews_game_id_games_id_fk" FOREIGN KEY ("game_id") REFERENCES "public"."games"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "gm_reviews" ADD CONSTRAINT "gm_review_unique_reviewer_per_game" UNIQUE (reviewer_id, game_id);--> statement-breakpoint
 ALTER TABLE "user_follows" ADD CONSTRAINT "user_follows_follower_id_user_id_fk" FOREIGN KEY ("follower_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_follows" ADD CONSTRAINT "user_follows_following_id_user_id_fk" FOREIGN KEY ("following_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_follows" ADD CONSTRAINT "unique_follow" UNIQUE (follower_id, following_id);--> statement-breakpoint
 ALTER TABLE "user_blocks" ADD CONSTRAINT "user_blocks_unique" UNIQUE (blocker_id, blockee_id);--> statement-breakpoint
 ALTER TABLE "user_blocks" ADD CONSTRAINT "user_blocks_blocker_id_user_id_fk" FOREIGN KEY ("blocker_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_blocks" ADD CONSTRAINT "user_blocks_blockee_id_user_id_fk" FOREIGN KEY ("blockee_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

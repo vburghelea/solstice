@@ -180,9 +180,33 @@ export const getUserProfile = createServerFn({ method: "GET" })
         return { favorite, avoid };
       })();
 
+      // If GM, compute top strengths from reviews
+      let gmTopStrengths: string[] | undefined = undefined;
+      if (dbUser.isGM) {
+        const { gmReviews } = await import("~/db/schema");
+        const { eq } = await import("drizzle-orm");
+        const reviews = await db
+          .select({ selectedStrengths: gmReviews.selectedStrengths })
+          .from(gmReviews)
+          .where(eq(gmReviews.gmId, targetUserId));
+
+        const counts = new Map<string, number>();
+        for (const r of reviews) {
+          const arr = (r.selectedStrengths || []) as string[];
+          for (const s of arr) {
+            counts.set(s, (counts.get(s) || 0) + 1);
+          }
+        }
+        gmTopStrengths = Array.from(counts.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([k]) => k);
+      }
+
+      const base = mapDbUserToProfile(dbUser, preferencesResult);
       return {
         success: true,
-        data: mapDbUserToProfile(dbUser, preferencesResult),
+        data: { ...base, ...(gmTopStrengths ? { gmTopStrengths } : {}) },
       };
     } catch (error) {
       console.error("Error fetching user profile:", error);

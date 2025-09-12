@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"; // Added Link import
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
+import { ProfileLink } from "~/components/ProfileLink";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -11,6 +12,8 @@ import {
 import { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface CampaignGameSessionCardProps {
   game: GameListItem;
@@ -53,6 +56,24 @@ export function CampaignGameSessionCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-2 text-sm">
+          {game.owner && (
+            <div className="flex items-center gap-2">
+              <UserAvatar
+                name={game.owner.name}
+                email={game.owner.email}
+                srcUploaded={game.owner.uploadedAvatarPath ?? null}
+                srcProvider={game.owner.image ?? null}
+                className="h-6 w-6"
+              />
+              <ProfileLink
+                userId={game.owner.id}
+                username={game.owner.name || game.owner.email}
+                className="font-medium"
+              />
+              <span className="text-muted-foreground">•</span>
+              <ThumbsScore value={game.owner.gmRating ?? null} />
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Players</span>
             <span className="font-medium">

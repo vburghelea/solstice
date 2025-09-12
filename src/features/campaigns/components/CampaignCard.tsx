@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar } from "lucide-react";
+import { ProfileLink } from "~/components/ProfileLink";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -10,6 +11,8 @@ import {
 } from "~/components/ui/card";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { Badge } from "~/shared/ui/badge";
+import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface CampaignCardProps {
   campaign: CampaignListItem;
@@ -32,6 +35,24 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-2 text-sm">
+          {campaign.owner && (
+            <div className="flex items-center gap-2">
+              <UserAvatar
+                name={campaign.owner.name}
+                email={campaign.owner.email}
+                srcUploaded={campaign.owner.uploadedAvatarPath ?? null}
+                srcProvider={campaign.owner.image ?? null}
+                className="h-6 w-6"
+              />
+              <ProfileLink
+                userId={campaign.owner.id}
+                username={campaign.owner.name || campaign.owner.email}
+                className="font-medium"
+              />
+              <span className="text-muted-foreground">•</span>
+              <ThumbsScore value={campaign.owner.gmRating ?? null} />
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Game System</span>
             <span className="font-medium">{campaign.gameSystem.name}</span>

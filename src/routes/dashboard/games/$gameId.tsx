@@ -16,6 +16,8 @@ import { GameForm } from "~/features/games/components/GameForm";
 import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 
+import { ProfileLink } from "~/components/ProfileLink";
+import { GMReviewForm } from "~/features/games/components/GMReviewForm";
 import { ManageInvitations } from "~/features/games/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
 import {
@@ -40,6 +42,8 @@ import { formatDateAndTime } from "~/shared/lib/datetime";
 import { strings } from "~/shared/lib/strings";
 import type { OperationResult } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
+import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -192,6 +196,12 @@ export function GameDetailsPage() {
       p.userId === currentUser?.id &&
       (p.role === "player" || p.role === "invited") &&
       p.status !== "rejected",
+  );
+  const isApprovedParticipant = game?.participants?.some(
+    (p: GameParticipant) =>
+      p.userId === currentUser?.id &&
+      (p.role === "player" || p.role === "invited") &&
+      p.status === "approved",
   );
 
   // Rendered inline where relevant
@@ -390,9 +400,23 @@ export function GameDetailsPage() {
       }
       toast.error(error.message || "An unexpected error occurred");
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.success) {
         toast.success("Game marked as completed");
+        // If owner completed the game, refresh profile stats to reflect gamesHosted increment
+        try {
+          if (isOwner && currentUser?.id && data.data?.status === "completed") {
+            await Promise.all([
+              queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+              queryClient.invalidateQueries({
+                queryKey: ["userProfile", currentUser.id],
+              }),
+            ]);
+          }
+        } catch (_err) {
+          void _err;
+          // ignore cache invalidation errors
+        }
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to update status");
       }
@@ -524,6 +548,26 @@ export function GameDetailsPage() {
               🗓️ {formatDateAndTime(game.dateTime)} • 📍 {game.location.address} • 🎲{" "}
               {game.gameSystem.name}
             </div>
+            {game.owner ? (
+              <div className="text-sm">
+                <div className="flex items-center gap-2">
+                  <UserAvatar
+                    name={game.owner.name}
+                    email={game.owner.email}
+                    srcUploaded={game.owner.uploadedAvatarPath ?? null}
+                    srcProvider={game.owner.image ?? null}
+                    className="h-6 w-6"
+                  />
+                  <ProfileLink
+                    userId={game.owner.id}
+                    username={game.owner.name || game.owner.email}
+                    className="font-medium"
+                  />
+                  <span className="text-muted-foreground">•</span>
+                  <ThumbsScore value={game.owner.gmRating ?? null} />
+                </div>
+              </div>
+            ) : null}
           </div>
         </CardHeader>
         <CardContent>
@@ -551,6 +595,14 @@ export function GameDetailsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* GM Review prompt for approved participants after completion */}
+      {game?.status === "completed" &&
+        isApprovedParticipant &&
+        currentUser?.id &&
+        currentUser.id !== game.owner?.id && (
+          <GMReviewGate gameId={gameId} gmId={game.owner!.id} />
+        )}
 
       {canApply && (
         <StickyActionBar>
@@ -618,6 +670,32 @@ export function GameDetailsPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function GMReviewGate({ gameId, gmId }: { gameId: string; gmId: string }) {
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["myGMReviewForGame", gameId],
+    queryFn: async () => {
+      const { getMyGMReviewForGame } = await import("~/features/profile/profile.social");
+      return getMyGMReviewForGame({ data: { gameId } });
+    },
+  });
+
+  if (isLoading) return null;
+  if (data && data.success && data.data) return null;
+
+  return (
+    <div className="my-4">
+      <GMReviewForm
+        gameId={gameId}
+        gmId={gmId}
+        onSubmitted={() => {
+          queryClient.invalidateQueries({ queryKey: ["myGMReviewForGame", gameId] });
+        }}
+      />
     </div>
   );
 }

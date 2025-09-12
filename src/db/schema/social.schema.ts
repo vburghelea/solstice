@@ -1,6 +1,15 @@
 // src/db/schema/social.schema.ts
-import { integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
+import { games } from "./games.schema";
 
 export const gmStrengthEnum = pgEnum("gm_strength", [
   "creativity",
@@ -72,24 +81,36 @@ export const userBlocks = pgTable(
 );
 
 // GM Reviews
-export const gmReviews = pgTable("gm_reviews", {
-  id: text("id").primaryKey(),
-  reviewerId: text("reviewer_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  gmId: text("gm_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  rating: integer("rating").notNull(), // 1-5 scale
-  selectedStrengths: jsonb("selected_strengths").$type<string[]>().default([]),
-  comment: text("comment"),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => new Date())
-    .notNull(),
-});
+export const gmReviews = pgTable(
+  "gm_reviews",
+  {
+    id: text("id").primaryKey(),
+    reviewerId: text("reviewer_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    gmId: text("gm_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    gameId: uuid("game_id")
+      .notNull()
+      .references(() => games.id, { onDelete: "cascade" }),
+    rating: integer("rating").notNull(), // stored 1-5 scale (thumbs -2..2 mapped to 1..5)
+    selectedStrengths: jsonb("selected_strengths").$type<string[]>().default([]),
+    comment: text("comment"),
+    createdAt: timestamp("created_at")
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: timestamp("updated_at")
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    uniqueReviewerPerGame: {
+      name: "gm_review_unique_reviewer_per_game",
+      columns: [table.reviewerId, table.gameId],
+    },
+  }),
+);
 
 // Social audit logs
 export const socialAuditLogs = pgTable("social_audit_logs", {

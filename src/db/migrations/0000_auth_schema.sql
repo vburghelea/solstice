@@ -54,7 +54,7 @@ CREATE TABLE "user" (
   "average_response_time" integer,
   "response_rate" integer DEFAULT 0,
   "gm_style" text,
-  "gm_rating" integer,
+  "gm_rating" real,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

@@ -191,7 +191,6 @@ export const updateCampaign = createServerFn({ method: "POST" })
           .where(
             and(
               eq(campaignParticipants.campaignId, data.id),
-              eq(campaignParticipants.role, "invited"),
               eq(campaignParticipants.status, "pending"),
             ),
           );

@@ -12,7 +12,11 @@ export const followUser = createServerFn({ method: "POST" })
   .validator(followInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
-      const [{ getCurrentUser }, { getDb }, { getRelationship }] = await Promise.all([
+      const [
+        { getCurrentUser },
+        { getDb },
+        { getRelationship, invalidateRelationshipCache },
+      ] = await Promise.all([
         import("~/features/auth/auth.queries"),
         import("~/db/server-helpers"),
         import("./relationship.server"),
@@ -86,6 +90,8 @@ export const followUser = createServerFn({ method: "POST" })
         followingId: data.followingId,
       });
 
+      invalidateRelationshipCache(currentUser.id, data.followingId);
+
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -122,10 +128,12 @@ export const unfollowUser = createServerFn({ method: "POST" })
   .validator(unfollowInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
-      const [{ getCurrentUser }, { getDb }] = await Promise.all([
-        import("~/features/auth/auth.queries"),
-        import("~/db/server-helpers"),
-      ]);
+      const [{ getCurrentUser }, { getDb }, { invalidateRelationshipCache }] =
+        await Promise.all([
+          import("~/features/auth/auth.queries"),
+          import("~/db/server-helpers"),
+          import("./relationship.server"),
+        ]);
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -152,6 +160,8 @@ export const unfollowUser = createServerFn({ method: "POST" })
       if (existing) {
         await db.delete(userFollows).where(eq(userFollows.id, existing.id));
       }
+
+      invalidateRelationshipCache(currentUser.id, data.followingId);
 
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
@@ -189,10 +199,12 @@ export const blockUser = createServerFn({ method: "POST" })
   .validator(blockInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
-      const [{ getCurrentUser }, { getDb }] = await Promise.all([
-        import("~/features/auth/auth.queries"),
-        import("~/db/server-helpers"),
-      ]);
+      const [{ getCurrentUser }, { getDb }, { invalidateRelationshipCache }] =
+        await Promise.all([
+          import("~/features/auth/auth.queries"),
+          import("~/db/server-helpers"),
+          import("./relationship.server"),
+        ]);
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -245,6 +257,8 @@ export const blockUser = createServerFn({ method: "POST" })
         await cancelPendingBetweenUsers(currentUser.id, data.userId);
       }
 
+      invalidateRelationshipCache(currentUser.id, data.userId);
+
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");
       const { headers } = getWebRequest();
@@ -282,10 +296,12 @@ export const unblockUser = createServerFn({ method: "POST" })
   .validator(unblockInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
-      const [{ getCurrentUser }, { getDb }] = await Promise.all([
-        import("~/features/auth/auth.queries"),
-        import("~/db/server-helpers"),
-      ]);
+      const [{ getCurrentUser }, { getDb }, { invalidateRelationshipCache }] =
+        await Promise.all([
+          import("~/features/auth/auth.queries"),
+          import("~/db/server-helpers"),
+          import("./relationship.server"),
+        ]);
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -312,6 +328,8 @@ export const unblockUser = createServerFn({ method: "POST" })
             eq(userBlocks.blockeeId, data.userId),
           ),
         );
+
+      invalidateRelationshipCache(currentUser.id, data.userId);
 
       // Audit
       const { getWebRequest } = await import("@tanstack/react-start/server");

@@ -38,6 +38,11 @@ function getCache(viewerId: string, targetId: string): Relationship | null {
   return entry.value;
 }
 
+export function invalidateRelationshipCache(viewerId: string, targetId: string): void {
+  relCache.delete(cacheKey(viewerId, targetId));
+  relCache.delete(cacheKey(targetId, viewerId));
+}
+
 export const getRelationship = serverOnly(
   async (viewerId: string, targetId: string): Promise<Relationship> => {
     if (!viewerId || !targetId) {

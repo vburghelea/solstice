@@ -36,7 +36,10 @@ export const followUser = createServerFn({ method: "POST" })
   .validator(followInputSchema)
   .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
     try {
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const [{ getCurrentUser }, { invalidateRelationshipCache }] = await Promise.all([
+        import("~/features/auth/auth.queries"),
+        import("~/features/social/relationship.server"),
+      ]);
       const currentUser = await getCurrentUser();
 
       if (!currentUser) {
@@ -70,6 +73,8 @@ export const followUser = createServerFn({ method: "POST" })
         followingId: data.followingId,
       });
 
+      invalidateRelationshipCache(currentUser.id, data.followingId);
+
       return { success: true, message: "Successfully followed user" };
     } catch (error) {
       console.error("Error following user:", error);
@@ -82,7 +87,10 @@ export const unfollowUser = createServerFn({ method: "POST" })
   .validator(followInputSchema)
   .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
     try {
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
+      const [{ getCurrentUser }, { invalidateRelationshipCache }] = await Promise.all([
+        import("~/features/auth/auth.queries"),
+        import("~/features/social/relationship.server"),
+      ]);
       const currentUser = await getCurrentUser();
 
       if (!currentUser) {
@@ -107,6 +115,8 @@ export const unfollowUser = createServerFn({ method: "POST" })
       }
 
       await db.delete(userFollows).where(eq(userFollows.id, existingFollow.id));
+
+      invalidateRelationshipCache(currentUser.id, data.followingId);
 
       return { success: true, message: "Successfully unfollowed user" };
     } catch (error) {

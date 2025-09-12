@@ -7,6 +7,7 @@ vi.mock("~/features/auth/auth.queries", () => ({
 }));
 vi.mock("~/features/social/relationship.server", () => ({
   getRelationship: vi.fn(async () => ({ blocked: false, blockedBy: false })),
+  invalidateRelationshipCache: vi.fn(),
 }));
 vi.mock("~/db/server-helpers", () => ({
   getDb: vi.fn(async () => makeDb()),

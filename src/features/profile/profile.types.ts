@@ -50,6 +50,7 @@ export interface UserProfile {
   responseRate: number;
   gmStyle?: string;
   gmRating?: number;
+  gmTopStrengths?: string[];
   profileVersion: number;
   profileUpdatedAt?: Date;
 }

@@ -131,6 +131,7 @@ import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.re
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardReviewsPendingRouteImport } from "./routes/dashboard/reviews/pending";
 import { Route as DashboardProfileBlocklistRouteImport } from "./routes/dashboard/profile/blocklist";
 import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
 import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
@@ -543,19 +544,25 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
     id: "/$systemId",
     path: "/$systemId",
     getParentRoute: () => DashboardSystemsRoute,
   } as any);
+=======
+>>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
 const DashboardReviewsPendingRoute = DashboardReviewsPendingRouteImport.update({
   id: "/reviews/pending",
   path: "/reviews/pending",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
+=======
+>>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
 const DashboardProfileBlocklistRoute =
   DashboardProfileBlocklistRouteImport.update({
     id: "/blocklist",
@@ -964,6 +971,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1116,6 +1124,7 @@ export interface FileRoutesByTo {
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
@@ -1297,6 +1306,7 @@ export interface FileRoutesById {
   "/dashboard/games/create": typeof DashboardGamesCreateRoute;
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1463,6 +1473,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1615,6 +1626,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
     | "/events/$slug/register"
@@ -1778,6 +1790,7 @@ export interface FileRouteTypes {
     | "/dashboard/games/create"
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -2482,6 +2495,7 @@ declare module "@tanstack/react-router" {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dashboard/systems/$systemId": {
       id: "/dashboard/systems/$systemId";
       path: "/$systemId";
@@ -2489,6 +2503,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSystemsSystemIdRouteImport;
       parentRoute: typeof DashboardSystemsRoute;
     };
+=======
+>>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
     "/dashboard/reviews/pending": {
       id: "/dashboard/reviews/pending";
       path: "/reviews/pending";
@@ -2496,8 +2512,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardReviewsPendingRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> 957a783 (feat: added the follow function in profile-view and badges that mark games/campaigns in connections-only status. as well as the blocklist display in /dashboard/profile)
+=======
+>>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
     "/dashboard/profile/blocklist": {
       id: "/dashboard/profile/blocklist";
       path: "/blocklist";
@@ -3118,6 +3137,7 @@ interface DashboardRouteRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute;
 =======
   DashboardGamesGameIdRouteRoute: typeof DashboardGamesGameIdRouteRouteWithChildren;
@@ -3126,6 +3146,9 @@ interface DashboardRouteRouteChildren {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+  DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute;
+>>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -3167,6 +3190,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   DashboardReviewsPendingRoute: DashboardReviewsPendingRoute,
 =======
   DashboardGamesGameIdRouteRoute: DashboardGamesGameIdRouteRouteWithChildren,
@@ -3175,6 +3199,9 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
 >>>>>>> add2f43 (feat: baseline UI/UX for the games functionality)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
+=======
+  DashboardReviewsPendingRoute: DashboardReviewsPendingRoute,
+>>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
 };
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

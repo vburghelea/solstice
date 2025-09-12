@@ -37,6 +37,7 @@ import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 
+import { ProfileLink } from "~/components/ProfileLink";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { ManageInvitations } from "~/features/campaigns/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation";
@@ -48,6 +49,8 @@ import { getRelationshipSnapshot } from "~/features/social";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
+import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 import { z } from "zod";
 
@@ -217,12 +220,26 @@ export function CampaignDetailsPage() {
 
   const updateGameSessionStatusMutation = useMutation({
     mutationFn: updateGameSessionStatus,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.success) {
         toast.success("Game session status updated successfully!");
         queryClient.invalidateQueries({
           queryKey: ["campaignGameSessions", campaignId, statusFilter],
         });
+        // If organizer is current user and completed, refresh profile (gamesHosted)
+        try {
+          if (currentUser?.id && isOwner && data.data?.status === "completed") {
+            await Promise.all([
+              queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+              queryClient.invalidateQueries({
+                queryKey: ["userProfile", currentUser.id],
+              }),
+            ]);
+          }
+        } catch (_err) {
+          void _err;
+          // ignore cache invalidation errors
+        }
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to update game session status");
       }
@@ -386,6 +403,26 @@ export function CampaignDetailsPage() {
               🗓️ {campaign.recurrence} • 🕒 {campaign.timeOfDay} • 🎲{" "}
               {campaign.gameSystem.name}
             </div>
+            {campaign.owner ? (
+              <div className="text-sm">
+                <div className="flex items-center gap-2">
+                  <UserAvatar
+                    name={campaign.owner.name}
+                    email={campaign.owner.email}
+                    srcUploaded={campaign.owner.uploadedAvatarPath ?? null}
+                    srcProvider={campaign.owner.image ?? null}
+                    className="h-6 w-6"
+                  />
+                  <ProfileLink
+                    userId={campaign.owner.id}
+                    username={campaign.owner.name || campaign.owner.email}
+                    className="font-medium"
+                  />
+                  <span className="text-muted-foreground">•</span>
+                  <ThumbsScore value={campaign.owner.gmRating ?? null} />
+                </div>
+              </div>
+            ) : null}
           </div>
         </CardHeader>
         <CardContent>

@@ -29,6 +29,7 @@ import {
 } from "~/features/dashboard/dashboard.queries";
 import { getUpcomingEvents } from "~/features/events/events.queries";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
+import { listPendingGMReviews } from "~/features/reviews/reviews.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 
@@ -93,6 +94,16 @@ function DashboardIndex() {
     ? upcomingEventsRes.length
     : 0;
 
+  // Pending GM reviews count
+  const { data: pendingReviewsCount = 0 } = useQuery({
+    queryKey: ["pending-gm-reviews-count"],
+    queryFn: async () => {
+      const res = await listPendingGMReviews({ data: { days: 365 } });
+      return res.success ? res.data.length : 0;
+    },
+    refetchOnMount: "always",
+  });
+
   function formatTimeDistance(date: Date) {
     const now = new Date().getTime();
     const diff = new Date(date).getTime() - now;
@@ -154,6 +165,28 @@ function DashboardIndex() {
 
       {/* Stats Cards (mobile 1-col, desktop grid) */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Pending GM Reviews */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-900">
+              Pending Reviews
+            </CardTitle>
+            <ScrollText className="text-muted-foreground h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{pendingReviewsCount}</div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {pendingReviewsCount === 0
+                ? "You're all caught up"
+                : "Reviews awaiting your feedback"}
+            </p>
+            <div className="mt-3">
+              <Button asChild variant="outline" size="sm">
+                <Link to="/dashboard/reviews/pending">Review Now</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         {/* Membership Status Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

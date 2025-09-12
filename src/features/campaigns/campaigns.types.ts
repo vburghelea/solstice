@@ -70,7 +70,14 @@ export type CampaignApplication = typeof campaignApplications.$inferSelect & {
 };
 
 export type CampaignListItem = Campaign & {
-  owner: { id: string; name: string | null; email: string } | null;
+  owner: {
+    id: string;
+    name: string | null;
+    email: string;
+    image?: string | null;
+    uploadedAvatarPath?: string | null;
+    gmRating?: number | null;
+  } | null;
   participantCount: number;
   gameSystem: { id: number; name: string };
   // New fields for Session Zero

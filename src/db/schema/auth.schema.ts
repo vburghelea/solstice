@@ -4,6 +4,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  real,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -86,7 +87,7 @@ export const user = pgTable("user", {
   averageResponseTime: integer("average_response_time"), // in minutes
   responseRate: integer("response_rate").default(0), // percentage 0-100
   gmStyle: text("gm_style"),
-  gmRating: integer("gm_rating"), // average rating out of 5
+  gmRating: real("gm_rating"), // average rating out of 5 (one decimal)
 
   // Audit and versioning
   profileVersion: integer("profile_version")

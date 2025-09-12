@@ -1164,7 +1164,7 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
     try {
       const { getDb } = await import("~/db/server-helpers");
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
-      const { eq } = await import("drizzle-orm");
+      const { eq, sql } = await import("drizzle-orm");
 
       const currentUser = await getCurrentUser();
       if (!currentUser) {
@@ -1204,6 +1204,15 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
             { code: "DATABASE_ERROR", message: "Failed to update game session status" },
           ],
         };
+      }
+
+      // If newly marked as completed (and was not previously), increment owner's gamesHosted
+      if (data.status === "completed" && existingGame.status !== "completed") {
+        const { user } = await import("~/db/schema");
+        await db
+          .update(user)
+          .set({ gamesHosted: sql`${user.gamesHosted} + 1` })
+          .where(eq(user.id, existingGame.ownerId));
       }
 
       // Fetch the updated game with details

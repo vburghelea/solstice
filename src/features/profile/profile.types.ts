@@ -39,6 +39,7 @@ export interface UserProfile {
   responseRate: number;
   gmStyle?: string;
   gmRating?: number;
+  gmTopStrengths?: string[];
   profileVersion: number;
   profileUpdatedAt?: Date;
 }
@@ -75,6 +76,7 @@ export interface GMReview {
   id: string;
   reviewerId: string;
   gmId: string;
+  gameId: string;
   rating: number; // 1-5 scale
   selectedStrengths: string[];
   comment?: string;
@@ -88,7 +90,8 @@ export interface FollowInput {
 
 export interface GMReviewInput {
   gmId: string;
-  rating: number;
+  gameId: string;
+  rating: number; // thumbs -2..2 on input (mapped server-side to 1..5)
   selectedStrengths: string[];
   comment?: string;
 }

@@ -84,7 +84,14 @@ export const getCampaign = createServerFn({ method: "POST" })
 
 type CampaignQueryResultRow = {
   campaign: typeof campaigns.$inferSelect;
-  owner: { id: string; name: string | null; email: string };
+  owner: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+    uploadedAvatarPath: string | null;
+    gmRating: number | null;
+  };
   participantCount: number;
   gameSystem: typeof gameSystems.$inferSelect;
 };
@@ -160,7 +167,14 @@ export async function listCampaignsImpl(
     const rows = await (db as DbLike)
       .select<CampaignQueryResultRow>({
         campaign: campaigns,
-        owner: { id: user.id, name: user.name, email: user.email },
+        owner: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          uploadedAvatarPath: user.uploadedAvatarPath,
+          gmRating: user.gmRating,
+        },
         participantCount: sql<number>`count(distinct ${campaignParticipants.userId})::int`,
         gameSystem: gameSystems,
       })
@@ -272,7 +286,14 @@ export async function listCampaignsWithCountImpl(
     const allRows = await (db as DbLike)
       .select<CampaignQueryResultRow>({
         campaign: campaigns,
-        owner: { id: user.id, name: user.name, email: user.email },
+        owner: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          uploadedAvatarPath: user.uploadedAvatarPath,
+          gmRating: user.gmRating,
+        },
         participantCount: sql<number>`count(distinct ${campaignParticipants.userId})::int`,
         gameSystem: gameSystems,
       })

@@ -32,6 +32,7 @@ import {
 import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { strings } from "~/shared/lib/strings";
+import { gmStrengthIcons, gmStrengthLabels } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
@@ -370,6 +371,67 @@ export function UserProfileComponent() {
                 <div>
                   <h4 className="font-semibold">GM Style:</h4>
                   <p>{profile.gmStyle}</p>
+                </div>
+              )}
+              {profile.isGM && (
+                <div className="md:col-span-2">
+                  <h4 className="font-semibold">GM Stats:</h4>
+                  <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <div>
+                      <span className="text-muted-foreground block text-xs">Rating</span>
+                      <span className="font-medium">
+                        {typeof profile.gmRating === "number"
+                          ? `${Math.ceil(profile.gmRating * 10) / 10}/5`
+                          : "No ratings yet"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground block text-xs">
+                        Games Hosted
+                      </span>
+                      <span className="font-medium">{profile.gamesHosted}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground block text-xs">
+                        Response Rate
+                      </span>
+                      <span className="font-medium">
+                        {typeof profile.responseRate === "number"
+                          ? `${profile.responseRate}%`
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground block text-xs">
+                        Avg Response
+                      </span>
+                      <span className="font-medium">
+                        {typeof profile.averageResponseTime === "number"
+                          ? `${profile.averageResponseTime} min`
+                          : "N/A"}
+                      </span>
+                    </div>
+                    {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 && (
+                      <div className="sm:col-span-2 md:col-span-3">
+                        <span className="text-muted-foreground block text-xs">
+                          Top Strengths
+                        </span>
+                        <div className="mt-1 flex flex-wrap gap-2">
+                          {profile.gmTopStrengths.map((s) => (
+                            <span
+                              key={s}
+                              className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
+                            >
+                              <span className="mr-1" aria-hidden>
+                                {gmStrengthIcons[s] ?? "✨"}
+                              </span>
+                              {gmStrengthLabels[s] ?? s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
               {/* Privacy-controlled fields */}

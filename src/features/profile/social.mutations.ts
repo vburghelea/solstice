@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { gmStrengthOptions } from "~/shared/types/common";
 
 // Validation schemas
 const followInputSchema = (input: unknown) => {
@@ -11,15 +12,21 @@ const followInputSchema = (input: unknown) => {
 };
 
 const gmReviewInputSchema = (input: unknown) => {
+  // Accept thumbs-scale rating from -2..2 and exactly 3 strengths
+  // Enforce valid strength values from shared options
   return z
     .object({
       gmId: z.string().min(1, "GM ID is required"),
-      rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
+      gameId: z.string().min(1, "Game ID is required"),
+      rating: z
+        .number()
+        .int()
+        .gte(-2, "Rating must be between -2 and 2")
+        .lte(2, "Rating must be between -2 and 2"),
       selectedStrengths: z
-        .array(z.string())
-        .min(1, "Select at least 1 strength")
-        .max(3, "Select at most 3 strengths"),
-      comment: z.string().optional(),
+        .array(z.enum(gmStrengthOptions as unknown as [string, ...string[]]))
+        .max(3, "Select up to 3 strengths"),
+      comment: z.string().max(2000).optional(),
     })
     .parse(input);
 };
@@ -125,18 +132,46 @@ export const submitGMReview = createServerFn({ method: "POST" })
       }
 
       const { getDb } = await import("~/db/server-helpers");
-      const { gmReviews, user } = await import("~/db/schema");
-      const { eq } = await import("drizzle-orm");
+      const { gmReviews, user, games, gameParticipants } = await import("~/db/schema");
+      const { eq, and } = await import("drizzle-orm");
       const db = await getDb();
 
-      // Check if user has already reviewed this GM
+      // Validate game exists and is completed
+      const game = await db.query.games.findFirst({ where: eq(games.id, data.gameId) });
+      if (!game) {
+        return { success: false, message: "Game not found" };
+      }
+      if (game.status !== "completed") {
+        return { success: false, message: "Reviews are available after game completion" };
+      }
+
+      // Validate GM matches game owner
+      if (game.ownerId !== data.gmId) {
+        return { success: false, message: "Invalid GM for this game" };
+      }
+
+      // Validate reviewer participated (approved) in this specific game
+      const participant = await db.query.gameParticipants.findFirst({
+        where: and(
+          eq(gameParticipants.gameId, data.gameId),
+          eq(gameParticipants.userId, currentUser.id),
+          eq(gameParticipants.status, "approved"),
+        ),
+      });
+      if (!participant) {
+        return { success: false, message: "Only confirmed participants can review" };
+      }
+
+      // Check if user has already reviewed this GM for this game
       const existingReview = await db.query.gmReviews.findFirst({
-        where: (review, { eq, and }) =>
-          and(eq(review.reviewerId, currentUser.id), eq(review.gmId, data.gmId)),
+        where: and(
+          eq(gmReviews.reviewerId, currentUser.id),
+          eq(gmReviews.gameId, data.gameId),
+        ),
       });
 
       if (existingReview) {
-        return { success: false, message: "Already reviewed this GM" };
+        return { success: false, message: "You already reviewed this session" };
       }
 
       // Verify the GM exists and is actually a GM
@@ -148,16 +183,20 @@ export const submitGMReview = createServerFn({ method: "POST" })
         return { success: false, message: "User is not a GM" };
       }
 
+      // Map thumbs rating (-2..2) to stored 1..5 scale
+      const storedRating = data.rating + 3; // -2→1, -1→2, 0→3, 1→4, 2→5
+
       await db.insert(gmReviews).values({
         id: crypto.randomUUID(),
         reviewerId: currentUser.id,
         gmId: data.gmId,
-        rating: data.rating,
+        gameId: data.gameId,
+        rating: storedRating,
         selectedStrengths: data.selectedStrengths,
         comment: data.comment || null,
       });
 
-      // Update GM's rating average
+      // Update GM's rating average (store to 1 decimal place)
       const gmReviewsResult = await db.query.gmReviews.findMany({
         where: eq(gmReviews.gmId, data.gmId),
       });
@@ -171,7 +210,8 @@ export const submitGMReview = createServerFn({ method: "POST" })
       await db
         .update(user)
         .set({
-          gmRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+          // Persist to one decimal place using standard rounding (e.g., 4.45 -> 4.5)
+          gmRating: Math.round(averageRating * 10) / 10,
         })
         .where(eq(user.id, data.gmId));
 
@@ -214,7 +254,7 @@ export const deleteGMReview = createServerFn({ method: "POST" })
       // Delete the review
       await db.delete(gmReviews).where(eq(gmReviews.id, data.reviewId));
 
-      // Update GM's rating average
+      // Update GM's rating average (store to 1 decimal place)
       const gmReviewsResult = await db.query.gmReviews.findMany({
         where: eq(gmReviews.gmId, review.gmId),
       });

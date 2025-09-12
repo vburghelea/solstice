@@ -21,6 +21,8 @@ import { SecuritySettings } from "~/features/auth/components/security-settings";
 import {
   experienceLevelOptions,
   gameThemeOptions,
+  gmStrengthIcons,
+  gmStrengthLabels,
   identityTagOptions,
   languageOptions,
 } from "~/shared/types/common";
@@ -28,6 +30,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { TagInput } from "~/shared/ui/tag-input";
+import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
@@ -553,6 +556,56 @@ export function ProfileView() {
             <Label>Email Address</Label>
             <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
           </div>
+
+          {/* GM Stats (view-only) */}
+          {profile?.isGM ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <Label>Games Hosted</Label>
+                <p className="mt-1 text-sm font-medium">{profile.gamesHosted}</p>
+              </div>
+              <div>
+                <Label>GM Rating</Label>
+                <p className="mt-1 text-sm font-medium">
+                  <ThumbsScore value={profile.gmRating ?? null} />
+                </p>
+              </div>
+              <div>
+                <Label>Response Rate</Label>
+                <p className="mt-1 text-sm font-medium">
+                  {typeof profile.responseRate === "number"
+                    ? `${profile.responseRate}%`
+                    : "N/A"}
+                </p>
+              </div>
+              <div>
+                <Label>Avg Response Time</Label>
+                <p className="mt-1 text-sm font-medium">
+                  {typeof profile.averageResponseTime === "number"
+                    ? `${profile.averageResponseTime} min`
+                    : "N/A"}
+                </p>
+              </div>
+              {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 && (
+                <div className="sm:col-span-2">
+                  <Label>Top Strengths</Label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {profile.gmTopStrengths.map((s) => (
+                      <span
+                        key={s}
+                        className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
+                      >
+                        <span className="mr-1" aria-hidden>
+                          {gmStrengthIcons[s] ?? "✨"}
+                        </span>
+                        {gmStrengthLabels[s] ?? s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
 
           {editingSection === "basic" ? (
             <form.Field name="gender">

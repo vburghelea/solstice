@@ -1,4 +1,3 @@
-import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { cn } from "~/shared/lib/utils";
 
 interface ProfileLinkProps {
@@ -8,13 +7,10 @@ interface ProfileLinkProps {
 }
 
 export function ProfileLink({ userId, username, className }: ProfileLinkProps) {
+  const href = `/dashboard/profile/${encodeURIComponent(userId)}`;
   return (
-    <Link
-      to="/dashboard/profile/$userId"
-      params={{ userId }}
-      className={cn("text-primary font-medium hover:underline", className)}
-    >
+    <a href={href} className={cn("text-primary font-medium hover:underline", className)}>
       {username}
-    </Link>
+    </a>
   );
 }

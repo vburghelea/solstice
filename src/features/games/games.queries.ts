@@ -81,6 +81,9 @@ interface GameQueryResultRow {
     id: typeof user.$inferSelect.id;
     name: typeof user.$inferSelect.name;
     email: typeof user.$inferSelect.email;
+    image: typeof user.$inferSelect.image;
+    uploadedAvatarPath: typeof user.$inferSelect.uploadedAvatarPath;
+    gmRating: typeof user.$inferSelect.gmRating;
   };
   gameSystem: {
     id: typeof gameSystems.$inferSelect.id;
@@ -291,7 +294,14 @@ export async function listGamesImpl(
         safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
         createdAt: games.createdAt,
         updatedAt: games.updatedAt,
-        owner: { id: user.id, name: user.name, email: user.email },
+        owner: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          uploadedAvatarPath: user.uploadedAvatarPath,
+          gmRating: user.gmRating,
+        },
         gameSystem: { id: gameSystems.id, name: gameSystems.name },
         participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
       })
@@ -450,7 +460,14 @@ export async function listGamesWithCountImpl(
         safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
         createdAt: games.createdAt,
         updatedAt: games.updatedAt,
-        owner: { id: user.id, name: user.name, email: user.email },
+        owner: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          uploadedAvatarPath: user.uploadedAvatarPath,
+          gmRating: user.gmRating,
+        },
         gameSystem: { id: gameSystems.id, name: gameSystems.name },
         participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
       })
@@ -512,7 +529,14 @@ export const searchGames = createServerFn({ method: "POST" })
           safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
           createdAt: games.createdAt,
           updatedAt: games.updatedAt,
-          owner: { id: user.id, name: user.name, email: user.email },
+          owner: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            uploadedAvatarPath: user.uploadedAvatarPath,
+            gmRating: user.gmRating,
+          },
           gameSystem: { id: gameSystems.id, name: gameSystems.name },
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
         })
@@ -634,7 +658,14 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
           safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
           createdAt: games.createdAt,
           updatedAt: games.updatedAt,
-          owner: { id: user.id, name: user.name, email: user.email },
+          owner: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            uploadedAvatarPath: user.uploadedAvatarPath,
+            gmRating: user.gmRating,
+          },
           gameSystem: { id: gameSystems.id, name: gameSystems.name },
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
         })

@@ -117,6 +117,20 @@ export const gmStrengthLabels: Record<string, string> = {
   visual_aid: "Visual Aid",
 };
 
+// Fun, relevant icons for each GM strength
+export const gmStrengthIcons: Record<string, string> = {
+  creativity: "🎨",
+  world_builder: "🏗️",
+  inclusive: "🫶",
+  rule_of_cool: "😎",
+  storytelling: "📖",
+  voices: "🎭",
+  sets_the_mood: "🕯️",
+  teacher: "🧑‍🏫",
+  knows_the_rules: "📚",
+  visual_aid: "🖼️",
+};
+
 // Availability editor configuration
 export const AVAILABILITY_CONFIG = {
   startHour: 9, // 09:00

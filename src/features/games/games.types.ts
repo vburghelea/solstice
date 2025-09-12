@@ -38,7 +38,14 @@ export type GameParticipant = BaseParticipantWithUser & {
 };
 
 export type GameListItem = Game & {
-  owner: { id: string; name: string | null; email: string } | null;
+  owner: {
+    id: string;
+    name: string | null;
+    email: string;
+    image?: string | null;
+    uploadedAvatarPath?: string | null;
+    gmRating?: number | null;
+  } | null;
   gameSystem: { id: number; name: string } | null;
   participantCount: number;
   minimumRequirements: z.infer<typeof minimumRequirementsSchema> | null;

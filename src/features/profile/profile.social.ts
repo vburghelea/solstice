@@ -119,6 +119,7 @@ export const getGMReviews = createServerFn({ method: "GET" })
           id: review.id,
           reviewerId: review.reviewerId,
           gmId: review.gmId,
+          gameId: review.gameId,
           rating: review.rating,
           selectedStrengths: review.selectedStrengths ?? [],
           ...(review.comment !== null && review.comment !== undefined
@@ -137,6 +138,74 @@ export const getGMReviews = createServerFn({ method: "GET" })
         return {
           success: false,
           errors: [{ code: "DATABASE_ERROR", message: "Failed to fetch GM reviews" }],
+        };
+      }
+    },
+  );
+
+// Check if current user has a GM review for a specific game
+export const getMyGMReviewForGame = createServerFn({ method: "GET" })
+  .validator((input: unknown) => {
+    if (
+      !input ||
+      typeof input !== "object" ||
+      !("gameId" in input) ||
+      typeof input.gameId !== "string"
+    ) {
+      throw new Error("Invalid input: gameId is required");
+    }
+    return { gameId: input.gameId };
+  })
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      success: boolean;
+      data?: GMReview | null;
+      errors?: Array<{ code: string; message: string }>;
+    }> => {
+      try {
+        const { getCurrentUser } = await import("~/features/auth/auth.queries");
+        const currentUser = await getCurrentUser();
+        if (!currentUser) {
+          return {
+            success: false,
+            errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
+          };
+        }
+        const { getDb } = await import("~/db/server-helpers");
+        const { gmReviews } = await import("~/db/schema");
+        const { eq, and } = await import("drizzle-orm");
+        const db = await getDb();
+
+        const review = await db.query.gmReviews.findFirst({
+          where: and(
+            eq(gmReviews.reviewerId, currentUser.id),
+            eq(gmReviews.gameId, data.gameId),
+          ),
+        });
+        if (!review) {
+          return { success: true, data: null };
+        }
+        const mapped: GMReview = {
+          id: review.id,
+          reviewerId: review.reviewerId,
+          gmId: review.gmId,
+          gameId: review.gameId,
+          rating: review.rating,
+          selectedStrengths: review.selectedStrengths ?? [],
+          ...(review.comment !== null && review.comment !== undefined
+            ? { comment: review.comment }
+            : {}),
+          createdAt: review.createdAt,
+          updatedAt: review.updatedAt,
+        };
+        return { success: true, data: mapped };
+      } catch (error) {
+        console.error("Error checking GM review for game:", error);
+        return {
+          success: false,
+          errors: [{ code: "DATABASE_ERROR", message: "Failed to check GM review" }],
         };
       }
     },

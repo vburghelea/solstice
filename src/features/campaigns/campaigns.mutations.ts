@@ -179,6 +179,24 @@ export const updateCampaign = createServerFn({ method: "POST" })
         };
       }
 
+      // Revoke pending invitations if campaign is cancelled or completed
+      if (
+        typeof data.status !== "undefined" &&
+        data.status !== existingCampaign.status &&
+        (data.status === "cancelled" || data.status === "completed")
+      ) {
+        await db
+          .update(campaignParticipants)
+          .set({ status: "rejected", updatedAt: new Date() })
+          .where(
+            and(
+              eq(campaignParticipants.campaignId, data.id),
+              eq(campaignParticipants.role, "invited"),
+              eq(campaignParticipants.status, "pending"),
+            ),
+          );
+      }
+
       const campaignWithDetails = await findCampaignById(updatedCampaign.id);
 
       if (!campaignWithDetails) {
@@ -714,6 +732,19 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
           success: false,
           errors: [
             { code: "AUTH_ERROR", message: "Not authorized to invite participants" },
+          ],
+        };
+      }
+
+      // Only active campaigns can accept invitations
+      if (campaign.status !== "active") {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message: "Cannot invite players to a cancelled or completed campaign",
+            },
           ],
         };
       }

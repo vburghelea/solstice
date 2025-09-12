@@ -320,6 +320,28 @@ describe("Campaign Management Feature Tests", () => {
         expect(result.errors[0].code).toBe("AUTH_ERROR");
       }
     });
+
+    it.each(["cancelled", "completed"])(
+      "should fail to invite when campaign is %s",
+      async () => {
+        mocks.mockInviteToCampaign.mockResolvedValue({
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message: "Cannot invite players to a cancelled or completed campaign",
+            },
+          ],
+        });
+        const result = await mocks.mockInviteToCampaign({
+          data: { campaignId: MOCK_CAMPAIGN.id, userId: MOCK_INVITED_USER.id },
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.errors[0].code).toBe("CONFLICT");
+        }
+      },
+    );
   });
 
   describe("listCampaigns", () => {

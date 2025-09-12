@@ -589,7 +589,7 @@ export function GameForm({
       </div>
       <p className="text-muted-foreground mt-2 text-sm">
         Visibility options: Public (visible to everyone), Connections-only (visible to
-        your followers and the people who follow you), Private (visible only to invited
+        your followers and the people whom you follow), Private (visible only to invited
         players)
       </p>
 

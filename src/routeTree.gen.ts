@@ -92,6 +92,7 @@ import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-passw
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -116,18 +117,28 @@ import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 =======
 =======
+=======
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 >>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as authLoginRouteImport } from "./routes/(auth)/login";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
 import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
+=======
+import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
+import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
+<<<<<<< HEAD
 import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
+=======
+import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$template";
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
@@ -463,6 +474,11 @@ const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
   path: "/",
   getParentRoute: () => EventsSlugRoute,
 } as any);
+const DevEmailIndexRoute = DevEmailIndexRouteImport.update({
+  id: "/dev/email/",
+  path: "/dev/email/",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -512,6 +528,7 @@ const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
   getParentRoute: () => DashboardCampaignsRoute,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
 const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
   id: "/dev/email/$template",
   path: "/dev/email/$template",
@@ -519,11 +536,22 @@ const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
 =======
 =======
 >>>>>>> 2c22514 (feat: added baseline campaign functionality, based on games)
+=======
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 const EventsSlugRegisterRoute = EventsSlugRegisterRouteImport.update({
   id: "/register",
   path: "/register",
   getParentRoute: () => EventsSlugRoute,
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+=======
+const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
+  id: "/dev/email/$template",
+  path: "/dev/email/$template",
+  getParentRoute: () => rootRouteImport,
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 } as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
   id: "/create",
@@ -975,12 +1003,17 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+<<<<<<< HEAD
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
+=======
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
@@ -998,6 +1031,9 @@ export interface FileRoutesByFullPath {
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 =======
+=======
+  "/dev/email": typeof DevEmailIndexRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -1127,12 +1163,17 @@ export interface FileRoutesByTo {
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+<<<<<<< HEAD
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
+=======
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/profile": typeof DashboardProfileIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   "/events/$slug": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
@@ -1150,6 +1191,9 @@ export interface FileRoutesByTo {
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 =======
+=======
+  "/dev/email": typeof DevEmailIndexRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -1310,12 +1354,17 @@ export interface FileRoutesById {
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+<<<<<<< HEAD
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
+=======
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
@@ -1333,6 +1382,9 @@ export interface FileRoutesById {
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 =======
+=======
+  "/dev/email/": typeof DevEmailIndexRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -1477,12 +1529,17 @@ export interface FileRouteTypes {
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+<<<<<<< HEAD
     | "/events/$slug/register"
+=======
+    | "/dev/email/$template"
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
     | "/dashboard/teams/"
+<<<<<<< HEAD
 <<<<<<< HEAD
     | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
@@ -1500,6 +1557,9 @@ export interface FileRouteTypes {
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 =======
+=======
+    | "/dev/email"
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     | "/dashboard/campaigns/$campaignId/zero"
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/teams/$teamId/manage"
@@ -1629,12 +1689,17 @@ export interface FileRouteTypes {
     | "/dashboard/reviews/pending"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+<<<<<<< HEAD
     | "/events/$slug/register"
+=======
+    | "/dev/email/$template"
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     | "/dashboard/campaigns"
     | "/dashboard/events"
     | "/dashboard/games"
     | "/dashboard/profile"
     | "/dashboard/teams"
+<<<<<<< HEAD
 <<<<<<< HEAD
     | "/events/$slug"
     | "/dashboard/events/$eventId/manage"
@@ -1652,6 +1717,9 @@ export interface FileRouteTypes {
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 =======
+=======
+    | "/dev/email"
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     | "/dashboard/campaigns/$campaignId/zero"
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/teams/$teamId/manage"
@@ -1794,12 +1862,17 @@ export interface FileRouteTypes {
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+<<<<<<< HEAD
     | "/events/$slug/register"
+=======
+    | "/dev/email/$template"
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
     | "/dashboard/teams/"
+<<<<<<< HEAD
 <<<<<<< HEAD
     | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
@@ -1817,6 +1890,9 @@ export interface FileRouteTypes {
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 =======
+=======
+    | "/dev/email/"
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     | "/dashboard/campaigns/$campaignId/zero"
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
     | "/dashboard/teams/$teamId/manage"
@@ -1874,8 +1950,16 @@ export interface RootRouteChildren {
   EventEventIdRoute: typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: typeof GameGameIdRoute;
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+<<<<<<< HEAD
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+=======
+  DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
+  DevEmailIndexRoute: typeof DevEmailIndexRoute;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 }
 export interface FileServerRoutesByFullPath {
   "/api/debug-square": typeof ApiDebugSquareServerRoute;
@@ -2390,6 +2474,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EventsSlugIndexRouteImport;
       parentRoute: typeof EventsSlugRoute;
     };
+    "/dev/email/": {
+      id: "/dev/email/";
+      path: "/dev/email";
+      fullPath: "/dev/email";
+      preLoaderRoute: typeof DevEmailIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
       path: "/";
@@ -2453,6 +2544,7 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof DashboardCampaignsRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/dev/email/$template": {
       id: "/dev/email/$template";
       path: "/dev/email/$template";
@@ -2462,13 +2554,26 @@ declare module "@tanstack/react-router" {
 =======
 =======
 >>>>>>> 2c22514 (feat: added baseline campaign functionality, based on games)
+=======
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     "/events/$slug/register": {
       id: "/events/$slug/register";
       path: "/register";
       fullPath: "/events/$slug/register";
       preLoaderRoute: typeof EventsSlugRegisterRouteImport;
       parentRoute: typeof EventsSlugRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+=======
+    "/dev/email/$template": {
+      id: "/dev/email/$template";
+      path: "/dev/email/$template";
+      fullPath: "/dev/email/$template";
+      preLoaderRoute: typeof DevEmailTemplateRouteImport;
+      parentRoute: typeof rootRouteImport;
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
     };
     "/dashboard/teams/create": {
       id: "/dashboard/teams/create";
@@ -3282,8 +3387,16 @@ const rootRouteChildren: RootRouteChildren = {
   EventEventIdRoute: EventEventIdRoute,
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: GameGameIdRoute,
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+<<<<<<< HEAD
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+=======
+  DevEmailTemplateRoute: DevEmailTemplateRoute,
+  DevEmailIndexRoute: DevEmailIndexRoute,
+>>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
+>>>>>>> bbe4c00 (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

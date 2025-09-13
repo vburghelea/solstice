@@ -240,6 +240,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
         const { sendMembershipPurchaseReceipt } = await import("~/lib/email/resend");
 
         await sendMembershipPurchaseReceipt({
+          membershipId: newMembership.id,
           to: {
             email: session.user.email,
             name: session.user.name,

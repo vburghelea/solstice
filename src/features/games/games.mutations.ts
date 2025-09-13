@@ -8,6 +8,7 @@ import {
   findGameParticipantById,
   findUserByEmail,
 } from "~/features/games/games.repository";
+import { summarizeEventChanges } from "~/shared/lib/change-summary";
 import { OperationResult } from "~/shared/types/common";
 import {
   addGameParticipantInputSchema,
@@ -210,27 +211,26 @@ export const updateGame = createServerFn({ method: "POST" })
 
       // Notify approved participants if key fields changed
       try {
-        const changes: string[] = [];
-        if (typeof data.status !== "undefined" && data.status !== existingGame.status) {
-          changes.push(`Status changed to ${data.status}`);
+        const previousSnapshot = {
+          status: existingGame.status,
+          dateTime: existingGame.dateTime as Date | string | null,
+          location: existingGame.location,
+        };
+        const updatedSnapshot: {
+          status?: string | null;
+          dateTime?: Date | string | null;
+          location?: unknown;
+        } = {};
+        if (typeof data.status !== "undefined") {
+          updatedSnapshot.status = data.status;
         }
         if (typeof data.dateTime !== "undefined") {
-          const oldMs =
-            existingGame.dateTime instanceof Date
-              ? existingGame.dateTime.getTime()
-              : new Date(existingGame.dateTime as unknown as string).getTime();
-          const newMs = new Date(data.dateTime).getTime();
-          if (oldMs !== newMs) {
-            changes.push("Rescheduled");
-          }
+          updatedSnapshot.dateTime = data.dateTime;
         }
         if (typeof data.location !== "undefined") {
-          const oldLoc = JSON.stringify(existingGame.location ?? {});
-          const newLoc = JSON.stringify(data.location ?? {});
-          if (oldLoc !== newLoc) {
-            changes.push("Location updated");
-          }
+          updatedSnapshot.location = data.location;
         }
+        const changes = summarizeEventChanges(previousSnapshot, updatedSnapshot);
 
         if (changes.length > 0) {
           const [{ findGameParticipantsByGameId }] = await Promise.all([
@@ -953,26 +953,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
 
             targetUserId = newUser.user.id;
 
-            // Send email invitation immediately after creating the user
-            try {
-              const { sendGameInvitation } = await import("~/lib/email/resend");
-              const inviteUrl = `${process.env["SITE_URL"] || "https://roundup.games"}/games/${data.gameId}?token=${newUser.user.id}`;
-              const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-              await sendGameInvitation({
-                to: {
-                  email: data.email,
-                  name: newUser.user.name,
-                },
-                inviterName: currentUser.name || "A game organizer",
-                gameName: game.name,
-                gameDescription: game.description,
-                gameSystem: game.gameSystem?.name || "",
-                inviteUrl,
-                expiresAt,
-              });
-            } catch (emailError) {
-              console.error("Failed to send email invitation:", emailError);
-            }
+            // Email will be sent after participant record is created
           } catch (signUpError) {
             console.error("Failed to create user account:", signUpError);
             return {
@@ -1102,6 +1083,30 @@ export const inviteToGame = createServerFn({ method: "POST" })
             { code: "DATABASE_ERROR", message: "Failed to fetch new participant" },
           ],
         };
+      }
+
+      // Send email invitation
+      try {
+        const { sendGameInvitation } = await import("~/lib/email/resend");
+        const inviteUrl = `${
+          process.env["SITE_URL"] || "https://roundup.games"
+        }/games/${data.gameId}?token=${targetUserId}`;
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await sendGameInvitation({
+          invitationId: newParticipant.id,
+          to: {
+            email: participantWithUser.user.email,
+            name: participantWithUser.user.name ?? undefined,
+          },
+          inviterName: currentUser.name || "A game organizer",
+          gameName: game.name,
+          gameDescription: game.description,
+          gameSystem: game.gameSystem?.name || "",
+          inviteUrl,
+          expiresAt,
+        });
+      } catch (emailError) {
+        console.error("Failed to send email invitation:", emailError);
       }
 
       return { success: true, data: participantWithUser as GameParticipant };

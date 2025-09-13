@@ -70,7 +70,7 @@ export const Route = createFileRoute("/posts")({
 
 The `loader` function receives a single object with the following properties:
 
-- `abortController` - The route's abortController. Its signal is cancelled when the route is unloaded or when the Route is no longer relevant and the current invocation of the `loader` function becomes outdated.
+- `abortController` - The route's abortController. Its signal is canceled when the route is unloaded or when the Route is no longer relevant and the current invocation of the `loader` function becomes outdated.
 - `cause` - The cause of the current route match. Can be either one of the following:
   - `enter` - When the route is matched and loaded after not being matched in the previous location.
   - `preload` - When the route is being preloaded.
@@ -373,7 +373,7 @@ export const Route = createFileRoute("/posts")({
 
 ## Using the Abort Signal
 
-The `abortController` property of the `loader` function is an [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). Its signal is cancelled when the route is unloaded or when the `loader` call becomes outdated. This is useful for cancelling network requests when the route is unloaded or when the route's params change. Here is an example using it with a fetch call:
+The `abortController` property of the `loader` function is an [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). Its signal is canceled when the route is unloaded or when the `loader` call becomes outdated. This is useful for canceling network requests when the route is unloaded or when the route's params change. Here is an example using it with a fetch call:
 
 ```tsx
 // routes/posts.tsx

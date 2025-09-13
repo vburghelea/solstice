@@ -321,7 +321,7 @@ describe("Campaign Management Feature Tests", () => {
       }
     });
 
-    it.each(["cancelled", "completed"])(
+    it.each(["canceled", "completed"])(
       "should fail to invite when campaign is %s",
       async () => {
         mocks.mockInviteToCampaign.mockResolvedValue({
@@ -329,7 +329,7 @@ describe("Campaign Management Feature Tests", () => {
           errors: [
             {
               code: "CONFLICT",
-              message: "Cannot invite players to a cancelled or completed campaign",
+              message: "Cannot invite players to a canceled or completed campaign",
             },
           ],
         });

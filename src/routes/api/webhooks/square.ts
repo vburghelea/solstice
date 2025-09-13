@@ -93,7 +93,7 @@ export const ServerRoute = createServerFileRoute("/api/webhooks/square").methods
           });
 
           // TODO: Update membership status based on refund
-          // Mark membership as cancelled/refunded
+          // Mark membership as canceled/refunded
 
           break;
         }

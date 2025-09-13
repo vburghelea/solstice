@@ -38,7 +38,7 @@ export const MOCK_GAME: GameWithDetails = {
 
 export const MOCK_GAME_CANCELED: GameWithDetails = {
   ...MOCK_GAME,
-  id: "game-cancelled",
+  id: "game-canceled",
   campaignId: null,
   status: "canceled",
   participants: [],

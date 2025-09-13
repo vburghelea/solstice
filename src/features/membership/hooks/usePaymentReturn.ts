@@ -46,7 +46,7 @@ export function getPaymentErrorMessage(error: string | null): string | null {
   if (!error) return null;
 
   const errorMessages: Record<string, string> = {
-    cancelled: "Payment was cancelled",
+    canceled: "Payment was canceled",
     verification_failed: "Payment verification failed",
     processing_error: "An error occurred while processing your payment",
   };

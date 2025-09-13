@@ -1,5 +1,5 @@
 -- Create event enums
-CREATE TYPE "public"."event_status" AS ENUM('draft', 'published', 'registration_open', 'registration_closed', 'in_progress', 'completed', 'cancelled');
+CREATE TYPE "public"."event_status" AS ENUM('draft', 'published', 'registration_open', 'registration_closed', 'in_progress', 'completed', 'canceled');
 CREATE TYPE "public"."event_type" AS ENUM('tournament', 'league', 'camp', 'clinic', 'social', 'other');
 CREATE TYPE "public"."registration_type" AS ENUM('team', 'individual', 'both');
 
@@ -66,7 +66,7 @@ CREATE TABLE "event_registrations" (
 	"notes" text,
 	"internal_notes" text,
 	"confirmed_at" timestamp,
-	"cancelled_at" timestamp
+    "canceled_at" timestamp
 );
 
 -- Create event_announcements table

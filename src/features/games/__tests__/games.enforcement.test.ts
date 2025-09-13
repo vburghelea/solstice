@@ -150,4 +150,29 @@ describe("games social enforcement", () => {
       expect(result.errors?.[0]?.code).toBe("FORBIDDEN");
     }
   });
+
+  it.each(["canceled", "completed"])(
+    "addGameParticipant rejects for %s games",
+    async (status) => {
+      const auth = await import("~/features/auth/auth.queries");
+      (auth.getCurrentUser as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        id: "owner",
+      });
+      const repo = await import("~/features/games/games.repository");
+      (repo.findGameById as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        id: "g5",
+        ownerId: "owner",
+        visibility: "public",
+        status,
+      });
+      const { addGameParticipant } = await import("../games.mutations");
+      const result = await addGameParticipant({
+        data: { gameId: "g5", userId: "target", role: "invited", status: "pending" },
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.errors?.[0]?.code).toBe("CONFLICT");
+      }
+    },
+  );
 });

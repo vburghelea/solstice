@@ -351,7 +351,7 @@ export async function renderGameInviteResponseEmail(
 }
 
 /**
- * Load and render: Game status update (scheduled/updated/cancelled)
+ * Load and render: Game status update (scheduled/updated/canceled)
  */
 export async function renderGameStatusUpdateEmail(
   data: GameStatusUpdateData,
@@ -414,7 +414,7 @@ export async function renderCampaignInviteResponseEmail(
 }
 
 /**
- * Load and render: Campaign session update (scheduled/updated/cancelled)
+ * Load and render: Campaign session update (scheduled/updated/canceled)
  */
 export async function renderCampaignSessionUpdateEmail(
   data: CampaignSessionUpdateData,

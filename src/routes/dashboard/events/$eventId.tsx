@@ -20,7 +20,7 @@ const STATUS_ACTIONS = [
   { label: "Close Registration", status: "registration_closed" },
   { label: "Start", status: "in_progress" },
   { label: "Complete", status: "completed" },
-  { label: "Cancel", status: "cancelled", variant: "destructive" as const },
+  { label: "Cancel", status: "canceled", variant: "destructive" as const },
 ] as const;
 
 function DashboardEventDetailPage() {
@@ -103,9 +103,7 @@ function DashboardEventDetailPage() {
           <div className="flex flex-wrap gap-2">
             {STATUS_ACTIONS.map((a) => {
               const variant =
-                a.status === "cancelled"
-                  ? ("destructive" as const)
-                  : ("outline" as const);
+                a.status === "canceled" ? ("destructive" as const) : ("outline" as const);
               return (
                 <Button
                   key={a.status}
@@ -178,7 +176,7 @@ function DashboardEventDetailPage() {
                       variant="destructive"
                       onClick={() =>
                         regMutation.mutate({
-                          data: { eventId, registrationId: r.id, status: "cancelled" },
+                          data: { eventId, registrationId: r.id, status: "canceled" },
                         })
                       }
                       disabled={regMutation.isPending}

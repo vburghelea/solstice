@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { MembershipOperationResult } from "./membership.types";
 
 const getAllMembershipsSchema = z.object({
-  status: z.enum(["all", "active", "expired", "cancelled"]).optional().default("all"),
+  status: z.enum(["all", "active", "expired", "canceled"]).optional().default("all"),
   limit: z.number().optional().default(100),
   offset: z.number().optional().default(0),
 });
@@ -18,7 +18,7 @@ export interface MembershipReportRow {
   membershipType: string;
   startDate: string;
   endDate: string;
-  status: "active" | "expired" | "cancelled";
+  status: "active" | "expired" | "canceled";
   priceCents: number;
   paymentId: string | null;
   createdAt: Date;

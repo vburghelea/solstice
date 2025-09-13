@@ -96,7 +96,7 @@ const columns: ColumnDef<MembershipReportRow>[] = [
 
 export function AdminMembershipsReport() {
   const [statusFilter, setStatusFilter] = useState<
-    "all" | "active" | "expired" | "cancelled"
+    "all" | "active" | "expired" | "canceled"
   >("all");
 
   const { data, isLoading, error } = useQuery({
@@ -184,7 +184,7 @@ export function AdminMembershipsReport() {
               value={statusFilter}
               onChange={(e) =>
                 setStatusFilter(
-                  e.target.value as "all" | "active" | "expired" | "cancelled",
+                  e.target.value as "all" | "active" | "expired" | "canceled",
                 )
               }
               className="border-input bg-background ring-offset-background focus-visible:ring-ring rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
@@ -192,7 +192,7 @@ export function AdminMembershipsReport() {
               <option value="all">All</option>
               <option value="active">Active</option>
               <option value="expired">Expired</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="canceled">Canceled</option>
             </select>
           </div>
           <div className="flex justify-end">

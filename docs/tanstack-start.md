@@ -878,7 +878,7 @@ console.error(error)
 }
 }
 Cancellation
-On the client, server function calls can be cancelled via an AbortSignal.
+On the client, server function calls can be canceled via an AbortSignal.
 On the server, an AbortSignal will notify if the request closed before execution finished.
 
 import { createServerFn } from '@tanstack/react-start'

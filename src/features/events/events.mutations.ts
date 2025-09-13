@@ -593,7 +593,7 @@ export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
           paymentStatus: data.paymentStatus ?? reg.paymentStatus,
           updatedAt: new Date(),
           confirmedAt: data.status === "confirmed" ? new Date() : reg.confirmedAt,
-          cancelledAt: data.status === "cancelled" ? new Date() : reg.cancelledAt,
+          canceledAt: data.status === "canceled" ? new Date() : reg.canceledAt,
         })
         .where(eq(eventRegistrations.id, data.registrationId))
         .returning();
@@ -704,11 +704,11 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
         }
 
         // Update registration
-        const [cancelledRegistration] = await db
+        const [canceledRegistration] = await db
           .update(eventRegistrations)
           .set({
-            status: "cancelled",
-            cancelledAt: new Date(),
+            status: "canceled",
+            canceledAt: new Date(),
             internalNotes: data.reason,
             updatedAt: new Date(),
           })
@@ -717,10 +717,10 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
 
         return {
           success: true,
-          data: castRegistrationJsonbFields(cancelledRegistration),
+          data: castRegistrationJsonbFields(canceledRegistration),
         };
       } catch (error) {
-        console.error("Error cancelling registration:", error);
+        console.error("Error canceling registration:", error);
         return {
           success: false,
           errors: [

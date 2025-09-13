@@ -22,7 +22,7 @@ import { gameSystems as gameSystem } from "./game-systems.schema";
 
 export const campaignStatusEnum = pgEnum("campaign_status", [
   "active",
-  "cancelled",
+  "canceled",
   "completed",
 ]);
 export const campaignRecurrenceEnum = pgEnum("campaign_recurrence", [

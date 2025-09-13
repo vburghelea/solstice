@@ -178,7 +178,7 @@ export const listEvents = createServerFn({ method: "GET" })
           SELECT COUNT(*)::int 
           FROM ${eventRegistrations} 
           WHERE ${eventRegistrations.eventId} = ${events.id}
-          AND ${eventRegistrations.status} != 'cancelled'
+          AND ${eventRegistrations.status} != 'canceled'
         )`,
       })
       .from(events)
@@ -249,7 +249,7 @@ export const getEvent = createServerFn({ method: "GET" })
             SELECT COUNT(*)::int 
             FROM ${eventRegistrations} 
             WHERE ${eventRegistrations.eventId} = ${events.id}
-            AND ${eventRegistrations.status} != 'cancelled'
+            AND ${eventRegistrations.status} != 'canceled'
           )`,
         })
         .from(events)

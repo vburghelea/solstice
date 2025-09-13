@@ -851,7 +851,7 @@ See /docs/development-backlog.md for prioritized feature implementation tickets
 - **Context:** Access server request context using utilities from `@tanstack/react-start/server`.
 - **Returning Values:** Primitives, JSON-serializable objects, redirect errors, notFound errors, raw Response objects.
 - **Error Handling:** Server functions throw errors (serialized to client with 500 status).
-- **Cancellation:** Client-side server function calls can be cancelled via `AbortSignal`.
+- **Cancellation:** Client-side server function calls can be canceled via `AbortSignal`.
 - **Calling Server Functions:** From route lifecycles, hooks/components (`useServerFn`), other server functions.
 - **No-JS Server Functions:** Form submission with `action={yourFn.url}`.
 - **Static Server Functions:** Executed at build time, cached as static assets (`type: 'static'`).

@@ -998,7 +998,7 @@ export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
           paymentStatus: data.paymentStatus ?? reg.paymentStatus,
           updatedAt: new Date(),
           confirmedAt: data.status === "confirmed" ? new Date() : reg.confirmedAt,
-          cancelledAt: data.status === "cancelled" ? new Date() : reg.cancelledAt,
+          canceledAt: data.status === "canceled" ? new Date() : reg.canceledAt,
         })
         .where(eq(eventRegistrations.id, data.registrationId))
         .returning();

@@ -132,7 +132,7 @@ export const markEtransferReminderSchema = z.object({
 export const updateEventRegistrationStatusSchema = z.object({
   eventId: z.string(),
   registrationId: z.string(),
-  status: z.enum(["pending", "confirmed", "waitlisted", "cancelled"]),
+  status: z.enum(["pending", "confirmed", "waitlisted", "canceled"]),
   paymentStatus: z.enum(["pending", "paid", "refunded"]).optional(),
 });
 export type UpdateEventRegistrationStatusInput = z.infer<

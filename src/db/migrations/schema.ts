@@ -2035,7 +2035,7 @@ export const eventRegistrations = pgTable(
     notes: text(),
     internalNotes: text("internal_notes"),
     confirmedAt: timestamp("confirmed_at", { mode: "string" }),
-    cancelledAt: timestamp("cancelled_at", { mode: "string" }),
+    canceledAt: timestamp("canceled_at", { mode: "string" }),
   },
   (table) => [
     foreignKey({

@@ -21,7 +21,10 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
         const checkoutId = params.get("checkoutId");
         const transactionId = params.get("transactionId");
 
-        if (!checkoutId) {
+        // Check if payment was canceled
+        if (!checkoutId || !transactionId) {
+          console.log("Payment canceled or missing data");
+          // Redirect back to membership page with error
           return redirect({
             to: "/dashboard/membership",
             search: {

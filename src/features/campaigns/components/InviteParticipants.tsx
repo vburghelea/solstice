@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { inviteToCampaign } from "~/features/campaigns/campaigns.mutations";
 import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
 import { searchUsersForInvitation } from "~/features/games/games.queries"; // Re-using games query for user search
+import { useRateLimitedServerFn } from "~/lib/pacer";
 import { useDebounce } from "~/shared/hooks/useDebounce";
 
 import { ProfileLink } from "~/components/ProfileLink";
@@ -41,8 +42,12 @@ export function InviteParticipants({
     enabled: debouncedSearchTerm.length >= 4,
   });
 
+  const rlInviteToCampaign = useRateLimitedServerFn(inviteToCampaign, {
+    type: "social",
+  });
+
   const inviteMutation = useMutation({
-    mutationFn: inviteToCampaign,
+    mutationFn: rlInviteToCampaign,
     onSuccess: () => {
       toast.success("Participant invited successfully!");
       setSearchTerm("");

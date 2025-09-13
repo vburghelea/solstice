@@ -10,6 +10,14 @@ import { setupCampaignMocks } from "~/tests/mocks/campaigns";
 import { setupGameMocks } from "~/tests/mocks/games";
 import { mockReactQuery, setupReactQueryMocks } from "~/tests/mocks/react-query";
 
+// Polyfill Web Crypto for environments where it is missing
+import { webcrypto } from "node:crypto";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+if (!(global as any).crypto) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (global as any).crypto = webcrypto;
+}
+
 mockReactQuery();
 // Provide default return values for common queries used across tests
 setupReactQueryMocks();
@@ -100,6 +108,8 @@ vi.mock("~/lib/env.server", () => ({
     DATABASE_URL_UNPOOLED: "postgresql://test",
     BETTER_AUTH_SECRET: "test-secret",
     VITE_BASE_URL: "http://localhost:3000",
+    WELCOME_EMAIL_ENABLED: false,
+    INVITE_EMAIL_ENABLED: false,
   },
   isServerless: () => false,
 }));

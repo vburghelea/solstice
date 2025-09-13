@@ -4,10 +4,15 @@
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
 import { emailOTP } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { sendEmailVerificationOTP, sendSignInOTP } from "~/lib/email/otp-emails";
-import { sendEmailVerification, sendPasswordResetEmail } from "~/lib/email/resend";
+import {
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  sendWelcomeEmail,
+} from "~/lib/email/resend";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | null = null;
@@ -94,27 +99,6 @@ const createAuth = async () => {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: isProduction,
-      sendVerificationEmail: async (
-        user: { email: string; name?: string },
-        url: string,
-      ) => {
-        try {
-          const result = await sendEmailVerification({
-            to: { email: user.email, name: user.name },
-            verificationUrl: url,
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-          });
-
-          if (!result.success) {
-            console.error("Failed to send verification email:", result.error);
-          }
-
-          return result.success;
-        } catch (error) {
-          console.error("Error sending verification email:", error);
-          return false;
-        }
-      },
       sendResetPassword: async (params: {
         user: { email: string; name?: string };
         url: string;
@@ -139,12 +123,59 @@ const createAuth = async () => {
       },
     },
 
+    emailVerification: {
+      sendVerificationEmail: async ({
+        user,
+        url,
+      }: {
+        user: { email: string; name?: string };
+        url: string;
+        token: string;
+      }) => {
+        try {
+          const result = await sendEmailVerification({
+            to: { email: user.email, name: user.name },
+            verificationUrl: url,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          });
+
+          if (!result.success) {
+            console.error("Failed to send verification email:", result.error);
+          }
+        } catch (error) {
+          console.error("Error sending verification email:", error);
+        }
+      },
+      sendOnSignUp: true,
+    },
+
     // Account linking configuration
     account: {
       accountLinking: {
         enabled: true,
         trustedProviders: ["google"], // Auto-link these providers
       },
+    },
+
+    hooks: {
+      after: createAuthMiddleware(async (ctx) => {
+        if (env.WELCOME_EMAIL_ENABLED && ctx.path.startsWith("/sign-up")) {
+          const newUser = ctx.context.newSession?.user;
+          if (newUser) {
+            try {
+              await sendWelcomeEmail({
+                to: {
+                  email: newUser.email,
+                  name: newUser.name || undefined,
+                },
+                profileUrl: `${baseUrl}/dashboard/profile`,
+              });
+            } catch (error) {
+              console.error("Error sending welcome email:", error);
+            }
+          }
+        }
+      }),
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips

@@ -54,6 +54,12 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     NETLIFY: z.string().optional(),
     VERCEL_ENV: z.string().optional(),
+    WELCOME_EMAIL_ENABLED: z.coerce
+      .boolean()
+      .default(process.env["NODE_ENV"] === "production"),
+    INVITE_EMAIL_ENABLED: z.coerce
+      .boolean()
+      .default(process.env["NODE_ENV"] === "production"),
 
     // Client vars are also available on server
     // In production, Netlify provides URL env var

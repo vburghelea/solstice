@@ -37,6 +37,7 @@ import type {
   GameWithDetails,
 } from "~/features/games/games.types";
 import { getRelationshipSnapshot } from "~/features/social";
+import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { strings } from "~/shared/lib/strings";
@@ -159,6 +160,12 @@ export function GameDetailsPage() {
 
   const [isEditing, setIsEditing] = useState(false);
 
+  const rlUpdateGame = useRateLimitedServerFn(updateGame, { type: "mutation" });
+  const rlCancelGame = useRateLimitedServerFn(cancelGame, { type: "mutation" });
+  const rlUpdateGameStatus = useRateLimitedServerFn(updateGameSessionStatus, {
+    type: "mutation",
+  });
+
   const { data: game, isLoading } = useQuery({
     queryKey: ["game", gameId], // Simplified queryKey
     queryFn: async () => {
@@ -207,7 +214,8 @@ export function GameDetailsPage() {
   // Rendered inline where relevant
 
   const updateGameMutation = useMutation({
-    mutationFn: updateGame,
+    mutationFn: async (vars: Parameters<typeof rlUpdateGame>[0]) =>
+      await rlUpdateGame(vars),
     onSuccess: async (data) => {
       if (data.success) {
         toast.success("Game updated successfully");
@@ -223,7 +231,8 @@ export function GameDetailsPage() {
   });
 
   const cancelGameMutation = useMutation({
-    mutationFn: cancelGame,
+    mutationFn: async (vars: Parameters<typeof rlCancelGame>[0]) =>
+      await rlCancelGame(vars),
     onMutate: async () => {
       // Cancel queries for detail and lists
       await Promise.all([
@@ -320,7 +329,8 @@ export function GameDetailsPage() {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: updateGameSessionStatus,
+    mutationFn: async (vars: Parameters<typeof rlUpdateGameStatus>[0]) =>
+      await rlUpdateGameStatus(vars),
     onMutate: async (variables: {
       data: { gameId: string; status: "scheduled" | "completed" | "canceled" };
     }) => {

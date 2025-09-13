@@ -26,7 +26,7 @@ export const eventStatusEnum = pgEnum("event_status", [
   "registration_closed", // No more registrations
   "in_progress", // Event is currently happening
   "completed", // Event finished
-  "cancelled", // Event was cancelled
+  "canceled", // Event was canceled
 ]);
 
 /**
@@ -143,7 +143,7 @@ export const eventRegistrations = pgTable("event_registrations", {
   division: varchar("division", { length: 100 }), // Which division they're in
 
   // Status
-  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, confirmed, waitlisted, cancelled
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, confirmed, waitlisted, canceled
   paymentStatus: varchar("payment_status", { length: 50 }).notNull().default("pending"), // pending, paid, refunded
   paymentId: text("payment_id"), // Reference to payment record
 
@@ -156,7 +156,7 @@ export const eventRegistrations = pgTable("event_registrations", {
 
   // Timestamps
   confirmedAt: timestamp("confirmed_at"),
-  cancelledAt: timestamp("cancelled_at"),
+  canceledAt: timestamp("canceled_at"),
 });
 
 /**

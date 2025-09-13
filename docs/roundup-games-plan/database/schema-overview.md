@@ -181,7 +181,7 @@ Critical data will never be hard deleted:
 
 ```typescript
 // Status fields instead of deletion
-status: 'active' | 'inactive' | 'cancelled' | 'expired'
+status: 'active' | 'inactive' | 'canceled' | 'expired'
 
 // Temporal data
 deactivatedAt?: Date;

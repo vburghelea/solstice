@@ -62,7 +62,7 @@ export const updateEventSchema = z.object({
         "registration_closed",
         "in_progress",
         "completed",
-        "cancelled",
+        "canceled",
       ])
       .optional(),
   }),
@@ -94,7 +94,7 @@ export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistratio
 export const updateEventRegistrationStatusSchema = z.object({
   eventId: z.string(),
   registrationId: z.string(),
-  status: z.enum(["pending", "confirmed", "waitlisted", "cancelled"]),
+  status: z.enum(["pending", "confirmed", "waitlisted", "canceled"]),
   paymentStatus: z.enum(["pending", "paid", "refunded"]).optional(),
 });
 export type UpdateEventRegistrationStatusInput = z.infer<

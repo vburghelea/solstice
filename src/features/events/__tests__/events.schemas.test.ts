@@ -195,7 +195,7 @@ describe("Events Schemas", () => {
         const result = updateEventSchema.safeParse({
           eventId: "event-123",
           data: {
-            status: "cancelled",
+            status: "canceled",
           },
         });
         expect(result.success).toBe(true);
@@ -209,7 +209,7 @@ describe("Events Schemas", () => {
           "registration_closed",
           "in_progress",
           "completed",
-          "cancelled",
+          "canceled",
         ];
 
         statuses.forEach((status) => {

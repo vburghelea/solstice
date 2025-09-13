@@ -941,8 +941,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "cancelled_at": {
-          "name": "cancelled_at",
+        "canceled_at": {
+          "name": "canceled_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -3152,7 +3152,7 @@
     "public.campaign_status": {
       "name": "campaign_status",
       "schema": "public",
-      "values": ["active", "cancelled", "completed"]
+      "values": ["active", "canceled", "completed"]
     },
     "public.event_status": {
       "name": "event_status",
@@ -3164,7 +3164,7 @@
         "registration_closed",
         "in_progress",
         "completed",
-        "cancelled"
+        "canceled"
       ]
     },
     "public.event_type": {

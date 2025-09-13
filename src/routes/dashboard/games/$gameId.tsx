@@ -308,7 +308,7 @@ export function GameDetailsPage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast.success("Game cancelled successfully");
+        toast.success("Game canceled successfully");
       } else {
         toast.error(data.errors?.[0]?.message || "Failed to cancel game");
       }

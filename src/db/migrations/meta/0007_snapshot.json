@@ -532,8 +532,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "cancelled_at": {
-          "name": "cancelled_at",
+        "canceled_at": {
+          "name": "canceled_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -2507,7 +2507,7 @@
         "registration_closed",
         "in_progress",
         "completed",
-        "cancelled"
+        "canceled"
       ]
     },
     "public.event_type": {

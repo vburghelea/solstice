@@ -179,11 +179,11 @@ export const updateCampaign = createServerFn({ method: "POST" })
         };
       }
 
-      // Revoke pending invitations if campaign is cancelled or completed
+      // Revoke pending invitations if campaign is canceled or completed
       if (
         typeof data.status !== "undefined" &&
         data.status !== existingCampaign.status &&
-        (data.status === "cancelled" || data.status === "completed")
+        (data.status === "canceled" || data.status === "completed")
       ) {
         await db
           .update(campaignParticipants)
@@ -557,7 +557,7 @@ export const applyToCampaign = createServerFn({ method: "POST" })
       }
 
       // Check if campaign is open for applications (e.g., not canceled or completed)
-      if (campaign.status === "cancelled" || campaign.status === "completed") {
+      if (campaign.status === "canceled" || campaign.status === "completed") {
         return {
           success: false,
           errors: [
@@ -742,7 +742,7 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
           errors: [
             {
               code: "CONFLICT",
-              message: "Cannot invite players to a cancelled or completed campaign",
+              message: "Cannot invite players to a canceled or completed campaign",
             },
           ],
         };

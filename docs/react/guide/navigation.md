@@ -106,7 +106,7 @@ export type LinkOptions<
   };
   // If set, will preload the linked route on hover and cache it for this many milliseconds in hopes that the user will eventually navigate there.
   preload?: false | "intent";
-  // Delay intent preloading by this many milliseconds. If the intent exits before this delay, the preload will be cancelled.
+  // Delay intent preloading by this many milliseconds. If the intent exits before this delay, the preload will be canceled.
   preloadDelay?: number;
   // If true, will render the link without the href attribute
   disabled?: boolean;

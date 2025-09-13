@@ -67,7 +67,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           return redirect({
             to: "/dashboard/membership",
             search: {
-              error: "cancelled",
+              error: "canceled",
             },
           });
         }

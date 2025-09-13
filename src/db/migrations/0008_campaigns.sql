@@ -1,5 +1,5 @@
 CREATE TYPE "public"."campaign_recurrence" AS ENUM('weekly', 'bi-weekly', 'monthly');--> statement-breakpoint
-CREATE TYPE "public"."campaign_status" AS ENUM('active', 'cancelled', 'completed');--> statement-breakpoint
+CREATE TYPE "public"."campaign_status" AS ENUM('active', 'canceled', 'completed');--> statement-breakpoint
 
 CREATE TABLE "campaign_applications" (
 	"id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,

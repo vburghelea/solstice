@@ -127,7 +127,7 @@ describe("Membership Server Function Validation", () => {
         membershipTypeId: expect.any(String),
         startDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
         endDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
-        status: expect.stringMatching(/active|expired|cancelled/),
+        status: expect.stringMatching(/active|expired|canceled/),
         paymentProvider: expect.stringMatching(/square|etransfer|cash|other/),
       });
     });

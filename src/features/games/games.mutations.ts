@@ -344,7 +344,7 @@ export const updateGame = createServerFn({ method: "POST" })
             gameName: gameWithDetails.data!.name,
             dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
             location: locationText,
-            changeSummary: "Cancelled",
+            changeSummary: "Canceled",
             detailsUrl,
           });
         }
@@ -477,7 +477,7 @@ export const cancelGame = createServerFn({ method: "POST" })
         },
       };
     } catch (error) {
-      console.error("Error cancelling game:", error);
+      console.error("Error canceling game:", error);
       return {
         success: false,
         errors: [{ code: "SERVER_ERROR", message: "Failed to cancel game" }],
@@ -515,6 +515,19 @@ export const addGameParticipant = createServerFn({ method: "POST" })
         return {
           success: false,
           errors: [{ code: "AUTH_ERROR", message: "Not authorized to add participants" }],
+        };
+      }
+
+      // Only scheduled games can accept new participants
+      if (game.status !== "scheduled") {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "CONFLICT",
+              message: "Cannot invite players to a canceled or completed game",
+            },
+          ],
         };
       }
 

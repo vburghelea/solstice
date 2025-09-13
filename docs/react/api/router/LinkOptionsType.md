@@ -42,7 +42,7 @@ The `LinkOptions` object accepts/contains the following properties:
 
 - Type: `number`
 - Optional
-- Delay intent preloading by this many milliseconds. If the intent exits before this delay, the preload will be cancelled.
+- Delay intent preloading by this many milliseconds. If the intent exits before this delay, the preload will be canceled.
 
 ### `disabled`
 

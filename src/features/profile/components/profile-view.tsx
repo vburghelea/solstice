@@ -864,7 +864,7 @@ export function ProfileView() {
                 <ValidatedCheckbox
                   field={field}
                   label="Game Updates"
-                  description="Emails when a game you’re attending is scheduled/updated/cancelled."
+                  description="Emails when a game you’re attending is scheduled/updated/canceled."
                   disabled={editingSection !== "notifications"}
                 />
               )}
@@ -884,7 +884,7 @@ export function ProfileView() {
                 <ValidatedCheckbox
                   field={field}
                   label="Campaign Session Updates"
-                  description="Emails when a campaign session is scheduled/updated/cancelled."
+                  description="Emails when a campaign session is scheduled/updated/canceled."
                   disabled={editingSection !== "notifications"}
                 />
               )}

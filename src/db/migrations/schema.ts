@@ -31,7 +31,7 @@ export const campaignRecurrence = pgEnum("campaign_recurrence", [
 ]);
 export const campaignStatus = pgEnum("campaign_status", [
   "active",
-  "cancelled",
+  "canceled",
   "completed",
 ]);
 export const eventStatus = pgEnum("event_status", [
@@ -41,7 +41,7 @@ export const eventStatus = pgEnum("event_status", [
   "registration_closed",
   "in_progress",
   "completed",
-  "cancelled",
+  "canceled",
 ]);
 export const eventType = pgEnum("event_type", [
   "tournament",
@@ -1324,7 +1324,7 @@ export const eventRegistrations = pgTable(
     notes: text(),
     internalNotes: text("internal_notes"),
     confirmedAt: timestamp("confirmed_at", { mode: "string" }),
-    cancelledAt: timestamp("cancelled_at", { mode: "string" }),
+    canceledAt: timestamp("canceled_at", { mode: "string" }),
   },
   (table) => [
     foreignKey({

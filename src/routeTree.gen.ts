@@ -35,11 +35,13 @@ import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
+import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
+import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$template";
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
@@ -193,6 +195,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: "/forgot-password",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const DevEmailIndexRoute = DevEmailIndexRouteImport.update({
+  id: "/dev/email/",
+  path: "/dev/email/",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -217,6 +224,11 @@ const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardCampaignsRoute,
+} as any);
+const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
+  id: "/dev/email/$template",
+  path: "/dev/email/$template",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
   id: "/create",
@@ -418,11 +430,13 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -457,11 +471,13 @@ export interface FileRoutesByTo {
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/profile": typeof DashboardProfileIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -506,11 +522,13 @@ export interface FileRoutesById {
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dev/email/": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -556,11 +574,13 @@ export interface FileRouteTypes {
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/dev/email/$template"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
     | "/dashboard/teams/"
+    | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -595,11 +615,13 @@ export interface FileRouteTypes {
     | "/dashboard/reviews/pending"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/dev/email/$template"
     | "/dashboard/campaigns"
     | "/dashboard/events"
     | "/dashboard/games"
     | "/dashboard/profile"
     | "/dashboard/teams"
+    | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -643,11 +665,13 @@ export interface FileRouteTypes {
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/dev/email/$template"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
     | "/dashboard/teams/"
+    | "/dev/email/"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -664,6 +688,8 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
   GameGameIdRoute: typeof GameGameIdRoute;
+  DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
+  DevEmailIndexRoute: typeof DevEmailIndexRoute;
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
@@ -945,6 +971,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/dev/email/": {
+      id: "/dev/email/";
+      path: "/dev/email";
+      fullPath: "/dev/email";
+      preLoaderRoute: typeof DevEmailIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
       path: "/";
@@ -979,6 +1012,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/campaigns/";
       preLoaderRoute: typeof DashboardCampaignsIndexRouteImport;
       parentRoute: typeof DashboardCampaignsRoute;
+    };
+    "/dev/email/$template": {
+      id: "/dev/email/$template";
+      path: "/dev/email/$template";
+      fullPath: "/dev/email/$template";
+      preLoaderRoute: typeof DevEmailTemplateRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams/create": {
       id: "/dashboard/teams/create";
@@ -1384,6 +1424,8 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   EventEventIdRoute: EventEventIdRoute,
   GameGameIdRoute: GameGameIdRoute,
+  DevEmailTemplateRoute: DevEmailTemplateRoute,
+  DevEmailIndexRoute: DevEmailIndexRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

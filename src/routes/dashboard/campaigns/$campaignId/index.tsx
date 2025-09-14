@@ -46,6 +46,7 @@ import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { getRelationshipSnapshot } from "~/features/social";
+import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
 import { Badge } from "~/shared/ui/badge";
@@ -165,6 +166,10 @@ export function CampaignDetailsPage() {
 
   const [isEditing, setIsEditing] = useState(false);
 
+  const rlUpdateGameSessionStatus = useRateLimitedServerFn(updateGameSessionStatus, {
+    type: "mutation",
+  });
+
   const { data: campaign, isLoading } = useQuery({
     queryKey: ["campaign", campaignId], // Simplified queryKey
     queryFn: async () => {
@@ -219,7 +224,8 @@ export function CampaignDetailsPage() {
   );
 
   const updateGameSessionStatusMutation = useMutation({
-    mutationFn: updateGameSessionStatus,
+    mutationFn: async (vars: Parameters<typeof rlUpdateGameSessionStatus>[0]) =>
+      await rlUpdateGameSessionStatus(vars),
     onSuccess: async (data) => {
       if (data.success) {
         toast.success("Game session status updated successfully!");

@@ -7,7 +7,6 @@
  */
 
 import { serverOnly } from "@tanstack/react-start";
-import { Resend } from "resend";
 import {
   generateTextFromHtml,
   renderCampaignDigestEmail,
@@ -34,6 +33,11 @@ interface EmailRecipient {
   name?: string | undefined;
 }
 
+interface EmailMetadata {
+  entity: string;
+  entityId: string;
+}
+
 interface EmailData {
   to: EmailRecipient | EmailRecipient[];
   from: EmailRecipient;
@@ -41,6 +45,7 @@ interface EmailData {
   text?: string;
   html?: string;
   replyTo?: EmailRecipient;
+  metadata?: EmailMetadata;
 }
 
 interface SendEmailResult {
@@ -60,22 +65,42 @@ export const EMAIL_TEMPLATES = {
 
 export type EmailTemplateId = (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES];
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  return `${local[0]}***@${domain}`;
+}
+
 // Mock email service for development
 class MockEmailService {
   async send(data: EmailData): Promise<SendEmailResult> {
-    console.log("📧 Mock Email Service - Sending email:", {
-      to: data.to,
+    const recipients = Array.isArray(data.to) ? data.to : [data.to];
+    const masked = recipients.map((r) => maskEmail(r.email));
+
+    console.log("email.send.attempt", {
+      entity: data.metadata?.entity,
+      entityId: data.metadata?.entityId,
+      to: masked,
       subject: data.subject,
     });
 
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Simulate success
-    return {
+    const result = {
       success: true,
       messageId: `mock-${Date.now()}`,
     };
+
+    console.log("email.send.success", {
+      entity: data.metadata?.entity,
+      entityId: data.metadata?.entityId,
+      to: masked,
+      subject: data.subject,
+      messageId: result.messageId,
+    });
+
+    return result;
   }
 
   setApiKey(): void {
@@ -85,7 +110,7 @@ class MockEmailService {
 
 // Real Resend service
 class ResendEmailService {
-  private client: Resend | null = null;
+  private client: InstanceType<typeof import("resend").Resend> | null = null;
   private initialized = false;
 
   async initialize(): Promise<void> {
@@ -97,6 +122,9 @@ class ResendEmailService {
         throw new Error("RESEND_API_KEY environment variable is not set");
       }
 
+      const { Resend } = (await import(
+        /* @vite-ignore */ "resend"
+      )) as typeof import("resend");
       this.client = new Resend(apiKey);
       this.initialized = true;
     } catch (error) {
@@ -106,6 +134,16 @@ class ResendEmailService {
   }
 
   async send(data: EmailData): Promise<SendEmailResult> {
+    const recipients = Array.isArray(data.to) ? data.to : [data.to];
+    const masked = recipients.map((r) => maskEmail(r.email));
+
+    console.log("email.send.attempt", {
+      entity: data.metadata?.entity,
+      entityId: data.metadata?.entityId,
+      to: masked,
+      subject: data.subject,
+    });
+
     try {
       await this.initialize();
 
@@ -113,20 +151,15 @@ class ResendEmailService {
         throw new Error("Resend client not initialized");
       }
 
-      // Convert to Resend format
       const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
       const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
 
-      // Build email data object
       const emailData: Record<string, unknown> = {
         from: fromName ? `${fromName} <${fromEmail}>` : fromEmail,
-        to: Array.isArray(data.to)
-          ? data.to.map((r: EmailRecipient) => r.email)
-          : [data.to.email],
+        to: recipients.map((r) => r.email),
         subject: data.subject,
       };
 
-      // Add content (Resend requires either html or text)
       if (data.html) {
         emailData["html"] = data.html;
       }
@@ -137,17 +170,28 @@ class ResendEmailService {
         emailData["reply_to"] = data.replyTo.email;
       }
 
-      // Send email using Resend
       const response = await this.client.emails.send(emailData as never);
 
-      console.log("Resend API call successful:", response);
+      console.log("email.send.success", {
+        entity: data.metadata?.entity,
+        entityId: data.metadata?.entityId,
+        to: masked,
+        subject: data.subject,
+        messageId: response.data?.id,
+      });
 
       return {
         success: true,
         messageId: response.data?.id,
       };
     } catch (error) {
-      console.error("Resend error:", error);
+      console.error("email.send.failure", {
+        entity: data.metadata?.entity,
+        entityId: data.metadata?.entityId,
+        to: masked,
+        subject: data.subject,
+        error: error instanceof Error ? error.message : "Failed to send email",
+      });
       return {
         success: false,
         error: error instanceof Error ? error.message : "Failed to send email",
@@ -216,6 +260,7 @@ export const sendMembershipPurchaseReceipt = serverOnly(
     amount: number;
     paymentId: string;
     expiresAt: Date;
+    membershipId: string;
   }) => {
     const service = await getEmailService();
     const htmlContent = await renderMembershipReceiptEmail({
@@ -238,6 +283,10 @@ export const sendMembershipPurchaseReceipt = serverOnly(
       subject: "Membership Purchase Confirmation - Roundup Games",
       html: htmlContent,
       text: generateTextFromHtml(htmlContent),
+      metadata: {
+        entity: "membership_receipt",
+        entityId: params.membershipId,
+      },
     });
   },
 );
@@ -252,6 +301,7 @@ export const sendGameInvitation = serverOnly(
     gameSystem: string;
     inviteUrl: string;
     expiresAt: Date;
+    invitationId: string;
   }) => {
     const service = await getEmailService();
     const htmlContent = await renderGameInvitationEmail({
@@ -282,6 +332,10 @@ export const sendGameInvitation = serverOnly(
       subject: `Game Invitation: ${params.gameName} - Roundup Games`,
       html: htmlContent,
       text: generateTextFromHtml(htmlContent),
+      metadata: {
+        entity: "game_invitation",
+        entityId: params.invitationId,
+      },
     });
   },
 );

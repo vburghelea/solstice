@@ -11,6 +11,7 @@ export default async function handler() {
       import("drizzle-orm"),
       import("~/db/server-helpers"),
     ]);
+    const { buildCampaignDigestItemsHtml } = await import("~/shared/lib/campaign-digest");
     const db = await getDb();
     const { campaigns } = await import("~/db/schema/campaigns.schema");
     const { games, gameParticipants } = await import("~/db/schema/games.schema");
@@ -43,20 +44,20 @@ export default async function handler() {
 
       if (sessions.length === 0) continue;
 
-      // Build itemsHtml (simple list)
-      const itemsHtml = sessions
-        .map((s) => {
+      // Build itemsHtml (safe escaping)
+      const itemsHtml = buildCampaignDigestItemsHtml(
+        sessions.map((s) => {
           const dt = new Date(s.dateTime as unknown as string).toLocaleString("en-US");
           type GameLocation = { address?: string } | null;
           const loc = (s.location as unknown as GameLocation)?.address || "See details";
-          const url = `${baseUrl}/games/${s.id}`;
-          return `<div style="margin:12px 0;padding:12px;border-radius:8px;background:#f3f4f6">
-            <div style="font-weight:600">${s.name}</div>
-            <div style="font-size:12px;color:#4b5563">${dt} • ${loc}</div>
-            <div style="margin-top:6px"><a href="${url}" style="color:#10b981;text-decoration:none">Details</a></div>
-          </div>`;
-        })
-        .join("\n");
+          return {
+            name: s.name,
+            dateTime: dt,
+            location: loc,
+            url: `${baseUrl}/games/${s.id}`,
+          };
+        }),
+      );
 
       // Recipients: approved campaign participants
       const participants = await db

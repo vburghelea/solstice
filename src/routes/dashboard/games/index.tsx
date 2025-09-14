@@ -29,7 +29,10 @@ export const Route = createFileRoute("/dashboard/games/")({
     pageSize: z.coerce.number().int().min(1).max(100).optional(),
   }),
   loader: async () => {
-    const result = await listGamesWithCount({
+    const result: OperationResult<{
+      items: GameListItem[];
+      totalCount: number;
+    }> = await listGamesWithCount({
       data: { filters: { status: "scheduled" }, page: 1, pageSize: 20 },
     });
     if (!result.success) {
@@ -52,10 +55,15 @@ export function GamesPage() {
   const queryClient = useQueryClient();
 
   const pageSize = Math.min(100, Math.max(1, Number(searchPageSize ?? 20)));
-  const { data: gamesData } = useSuspenseQuery({
+  const { data: gamesData } = useSuspenseQuery<
+    OperationResult<{ items: GameListItem[]; totalCount: number }>
+  >({
     queryKey: ["allVisibleGames", status, page, pageSize],
     queryFn: async () => {
-      const result = await listGamesWithCount({
+      const result: OperationResult<{
+        items: GameListItem[];
+        totalCount: number;
+      }> = await listGamesWithCount({
         data: { filters: { status }, page, pageSize },
       });
       if (!result.success) {

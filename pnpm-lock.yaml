@@ -228,12 +228,6 @@ importers:
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.2
-      cheerio:
-        specifier: ^1.1.2
-        version: 1.1.2
-      cloudinary:
-        specifier: ^2.7.0
-        version: 2.7.0
       dotenv:
         specifier: ^17.2.2
         version: 17.2.2
@@ -251,9 +245,6 @@ importers:
         version: 10.1.8(eslint@9.34.0(jiti@2.5.1))
       eslint-plugin-react-hooks:
         specifier: 6.0.0-rc.1
-        version: 6.0.0-rc.1(eslint@9.30.1(jiti@2.4.2))
-      fast-xml-parser:
-        specifier: ^5.2.5
         version: 6.0.0-rc.1(eslint@9.34.0(jiti@2.5.1))
       husky:
         specifier: ^9.1.7
@@ -6139,13 +6130,6 @@ packages:
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
-<<<<<<< HEAD
-  qs@6.14.0:
-    resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
-    engines: {node: '>=0.6'}
-
-=======
->>>>>>> 424d6e3 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), baseline implementation)
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
@@ -6669,44 +6653,10 @@ packages:
   strnum@2.1.1:
     resolution: {integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==}
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
->>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
-=======
-<<<<<<< HEAD
-=======
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   strtok3@9.1.1:
     resolution: {integrity: sha512-FhwotcEqjr241ZbjFzjlIYg6c5/L/s4yBGWSMvJ9UoExiSqL+FnFA/CaeZx17WGaZMS/4SOZp8wH18jSS4R4lw==}
     engines: {node: '>=16'}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   stylis@4.3.6:
     resolution: {integrity: sha512-yQ3rwFWRfwNUY7H5vpU0wfdkNSnvnJinhF9830Swlaxl03zsOjCfmX0ugac+3LtK0lYSgwL/KXc8oYL3mG4YFQ==}
 
@@ -6987,8 +6937,8 @@ packages:
   undici-types@7.10.0:
     resolution: {integrity: sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag==}
 
-  undici@7.16.0:
-    resolution: {integrity: sha512-QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==}
+  undici@7.15.0:
+    resolution: {integrity: sha512-7oZJCPvvMvTd0OlqWsIxTuItTpJBpU1tcbVl24FMn3xt3+VSunwUasmfPJRE57oNO1KsZ4PgA1xTdAX4hq8NyQ==}
     engines: {node: '>=20.18.1'}
 
   unenv@1.10.0:
@@ -11175,7 +11125,7 @@ snapshots:
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
       parse5-parser-stream: 7.1.2
-      undici: 7.16.0
+      undici: 7.15.0
       whatwg-mimetype: 4.0.0
 
   chevrotain-allstar@0.3.1(chevrotain@11.0.3):
@@ -13927,13 +13877,6 @@ snapshots:
 
   q@1.5.1: {}
 
-<<<<<<< HEAD
-  qs@6.14.0:
-    dependencies:
-      side-channel: 1.1.0
-
-=======
->>>>>>> 424d6e3 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), baseline implementation)
   quansync@0.2.11: {}
 
   querystringify@2.2.0: {}
@@ -14497,45 +14440,11 @@ snapshots:
 
   strnum@2.1.1: {}
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
->>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
-=======
-<<<<<<< HEAD
-=======
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   strtok3@9.1.1:
     dependencies:
       '@tokenizer/token': 0.3.0
       peek-readable: 5.4.2
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
->>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   stylis@4.3.6: {}
 
   sucrase@3.35.0:
@@ -14817,7 +14726,7 @@ snapshots:
 
   undici-types@7.10.0: {}
 
-  undici@7.16.0: {}
+  undici@7.15.0: {}
 
   unenv@1.10.0:
     dependencies:

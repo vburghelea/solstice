@@ -6673,22 +6673,40 @@ packages:
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 =======
 >>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+=======
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   strtok3@9.1.1:
     resolution: {integrity: sha512-FhwotcEqjr241ZbjFzjlIYg6c5/L/s4yBGWSMvJ9UoExiSqL+FnFA/CaeZx17WGaZMS/4SOZp8wH18jSS4R4lw==}
     engines: {node: '>=16'}
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 >>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 =======
 >>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 >>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+=======
+>>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   stylis@4.3.6:
     resolution: {integrity: sha512-yQ3rwFWRfwNUY7H5vpU0wfdkNSnvnJinhF9830Swlaxl03zsOjCfmX0ugac+3LtK0lYSgwL/KXc8oYL3mG4YFQ==}
 
@@ -14483,10 +14501,18 @@ snapshots:
 =======
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 =======
 >>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+=======
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   strtok3@9.1.1:
     dependencies:
       '@tokenizer/token': 0.3.0
@@ -14494,12 +14520,22 @@ snapshots:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 >>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 =======
 >>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
 >>>>>>> facb355 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+=======
+>>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> 83ec51f (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> c3d590b (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   stylis@4.3.6: {}
 
   sucrase@3.35.0:

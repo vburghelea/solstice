@@ -4,14 +4,18 @@ import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { useAuth } from "~/features/auth/hooks/useAuth";
 import { applyToGame } from "~/features/games/games.mutations";
 import { getGame } from "~/features/games/games.queries";
+import type { GameApplication, GameWithDetails } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import type { OperationResult } from "~/shared/types/common";
 import { Button } from "~/shared/ui/button";
 
 export const Route = createFileRoute("/game/$gameId")({
   loader: async ({ params }) => {
-    const result = await getGame({ data: { id: params.gameId } });
+    const result: OperationResult<GameWithDetails | null> = await getGame({
+      data: { id: params.gameId },
+    });
     if (result.success && result.data) {
       // Public route must only show scheduled, public games
       if (result.data.visibility === "public" && result.data.status === "scheduled") {
@@ -35,13 +39,14 @@ function GameDetailPage() {
   const { user, isAuthenticated } = useAuth();
   const { gameDetails } = Route.useLoaderData();
 
-  // Define hooks before any early returns to satisfy lint rules
-  const applyMutation = useMutation({
-    mutationFn: applyToGame,
+  const applyMutation = useMutation<
+    OperationResult<GameApplication>,
+    Error,
+    { data: { gameId: string; message?: string } }
+  >({
+    mutationFn: (variables) => applyToGame(variables),
     onSuccess: (res) => {
       if (res.success) {
-        // Navigate to a lightweight confirmation (or stay)
-        // For now, just toast via console; UI uses StickyActionBar state
         console.info("Application submitted");
       }
     },

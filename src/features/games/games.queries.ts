@@ -59,6 +59,8 @@ interface DbLike {
 
 type SqlExpr = ReturnType<typeof and>;
 
+type GameSystem = typeof gameSystems.$inferSelect;
+
 interface GameQueryResultRow {
   id: typeof games.$inferSelect.id;
   ownerId: typeof games.$inferSelect.ownerId;
@@ -94,12 +96,20 @@ interface GameQueryResultRow {
 
 export const getGameSystem = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.number() }).parse)
-  .handler(async ({ data }) => {
-    const db = await getDb();
-    const result = await db.query.gameSystems.findFirst({
-      where: eq(gameSystems.id, data.id),
-    });
-    return { success: true, data: result };
+  .handler(async ({ data }): Promise<OperationResult<GameSystem | null>> => {
+    try {
+      const db = await getDb();
+      const result = await db.query.gameSystems.findFirst({
+        where: eq(gameSystems.id, data.id),
+      });
+      return { success: true, data: result ?? null };
+    } catch (error) {
+      console.error("Error fetching game system:", error);
+      return {
+        success: false,
+        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch game system" }],
+      };
+    }
   });
 
 /**

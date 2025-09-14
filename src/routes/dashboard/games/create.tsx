@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { getCampaign } from "~/features/campaigns/campaigns.queries";
+import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { GameForm } from "~/features/games/components/GameForm";
 import {
   createGame,
@@ -29,6 +30,8 @@ import {
   gameFormSchema,
   updateGameInputSchema,
 } from "~/features/games/games.schemas";
+import type { GameWithDetails } from "~/features/games/games.types";
+import type { OperationResult } from "~/shared/types/common";
 
 const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),
@@ -49,7 +52,7 @@ export function CreateGamePage() {
     data: campaignData,
     isPending: isCampaignDataPending,
     isSuccess: isCampaignDataSuccess,
-  } = useQuery({
+  } = useQuery<OperationResult<CampaignWithDetails | null>>({
     queryKey: ["campaign", campaignId],
     queryFn: () => getCampaign({ data: { id: campaignId! } }),
     enabled: !!campaignId,
@@ -114,9 +117,12 @@ export function CreateGamePage() {
     return {};
   }, [isCampaignDataSuccess, campaignData, campaignId]);
 
-  const createGameMutation = useMutation({
-    mutationFn: async (args: { data: z.infer<typeof createGameInputSchema> }) => {
-      // If creating within a campaign, leverage the campaign-aware server fn
+  const createGameMutation = useMutation<
+    OperationResult<GameWithDetails>,
+    Error,
+    { data: z.infer<typeof createGameInputSchema> }
+  >({
+    mutationFn: async (args) => {
       if (campaignId) {
         return await createGameSessionForCampaign({
           data: args.data as z.infer<typeof createGameInputSchema>,

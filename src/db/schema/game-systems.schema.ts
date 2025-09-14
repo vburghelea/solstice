@@ -34,7 +34,7 @@ export const gameSystems = pgTable("game_systems", {
   releaseDate: date("release_date"),
   publisherId: integer("publisher_id").references(() => publishers.id),
   publisherUrl: varchar("publisher_url", { length: 255 }),
-  heroImageId: integer("hero_image_id"),
+  heroImageId: integer("hero_image_id").references(() => mediaAssets.id),
   sourceOfTruth: text("source_of_truth"),
   externalRefs: jsonb("external_refs").$type<ExternalRefs>(),
   crawlStatus: varchar("crawl_status", { length: 50 }),

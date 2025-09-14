@@ -2,9 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useMemo, useRef, useState } from "react";
 import { GameSystem } from "~/db/schema/game-systems.schema";
+import { getGameSystems } from "~/features/profile/profile.queries";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
-import { getGameSystems } from "../../features/profile/profile.queries";
+import type { OperationResult, OptionalFetcher } from "~/shared/types/common";
 import { Button } from "./button";
 import { Input } from "./input";
 
@@ -15,10 +16,6 @@ interface GameTagInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   placeholder?: string;
   isDestructive?: boolean;
 }
-
-type GetGameSystemsFn = (params?: {
-  data?: { searchTerm?: string } | undefined;
-}) => Promise<{ success: boolean; data: GameSystem[]; errors?: unknown[] }>;
 
 export function GameTagInput({
   tags,
@@ -31,15 +28,23 @@ export function GameTagInput({
   const [inputValue, setInputValue] = useState("");
   const debouncedInputValue = useDebounce(inputValue, 500);
 
-  const { data: gameSystems } = useQuery({
-    queryKey: ["gameSystems", debouncedInputValue],
+  const getGameSystemsQuery: OptionalFetcher<
+    { searchTerm?: string },
+    OperationResult<GameSystem[]>
+  > = getGameSystems;
+
+  const { data: gameSystems } = useQuery<
+    OperationResult<GameSystem[]>,
+    Error,
+    OperationResult<GameSystem[]>,
+    readonly [string, string]
+  >({
+    queryKey: ["gameSystems", debouncedInputValue] as const,
     queryFn: ({ queryKey }) => {
       const [, currentSearchTerm] = queryKey;
       const data =
-        currentSearchTerm && currentSearchTerm.length >= 3
-          ? { searchTerm: currentSearchTerm as string }
-          : undefined;
-      return (getGameSystems as GetGameSystemsFn)({ data });
+        currentSearchTerm.length >= 3 ? { searchTerm: currentSearchTerm } : undefined;
+      return data ? getGameSystemsQuery({ data }) : getGameSystemsQuery();
     },
   });
 
@@ -48,15 +53,15 @@ export function GameTagInput({
 
   // Calculate derived state using useMemo
   const memoizedFilteredSuggestions = useMemo(() => {
-    const allGameSystems = gameSystems?.data || [];
+    const allGameSystems = gameSystems && gameSystems.success ? gameSystems.data : [];
     return inputValue
       ? allGameSystems.filter(
-          (suggestion) =>
+          (suggestion: GameSystem) =>
             !tags.some((tag) => tag.id === suggestion.id) &&
             suggestion.name.toLowerCase().includes(inputValue.toLowerCase()),
         )
       : [];
-  }, [inputValue, gameSystems?.data, tags]);
+  }, [inputValue, gameSystems, tags]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -119,7 +124,7 @@ export function GameTagInput({
             props.className, // Allow external classNames to be applied
           )}
         >
-          {memoizedFilteredSuggestions.map((suggestion) => (
+          {memoizedFilteredSuggestions.map((suggestion: GameSystem) => (
             <li
               key={suggestion.id}
               className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-4 py-2"

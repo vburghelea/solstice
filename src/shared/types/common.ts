@@ -2,6 +2,10 @@ export type OperationResult<T> =
   | { success: true; data: T }
   | { success: false; errors: { code: string; message: string; field?: string }[] };
 
+export type OptionalFetcher<TData, TResult> = (options?: {
+  data?: TData;
+}) => Promise<TResult>;
+
 export interface SelectOption {
   value: string;
   label: string;

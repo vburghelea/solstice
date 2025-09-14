@@ -344,6 +344,7 @@ describe("Profile Queries", () => {
 
       const result = await getGameSystems({ data: { searchTerm: "ab" } });
       expect(result.success).toBe(true);
+      if (!result.success) throw new Error("expected success");
       expect(result.data).toEqual([]);
     });
 
@@ -395,6 +396,7 @@ describe("Profile Queries", () => {
 
       const result = await getGameSystems({ data: { searchTerm: "cat" } });
       expect(result.success).toBe(true);
+      if (!result.success) throw new Error("expected success");
       expect(result.data).toEqual(mockGameSystems);
     });
 
@@ -406,7 +408,8 @@ describe("Profile Queries", () => {
 
       const result = await getGameSystems({ data: { searchTerm: "test" } });
       expect(result.success).toBe(false);
-      expect(result.errors?.[0].message).toBe("Failed to fetch game systems");
+      if (result.success) throw new Error("expected failure");
+      expect(result.errors[0].message).toBe("Failed to fetch game systems");
     });
   });
 

@@ -3,7 +3,12 @@ import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { AvailabilityData } from "~/db/schema/auth.schema";
 import { user as userTable } from "~/db/schema/auth.schema";
-import { gameSystems, userGameSystemPreferences } from "~/db/schema/game-systems.schema";
+import {
+  gameSystems,
+  userGameSystemPreferences,
+  type GameSystem,
+} from "~/db/schema/game-systems.schema";
+import type { OperationResult } from "~/shared/types/common";
 import type {
   PrivacySettings,
   ProfileOperationResult,
@@ -281,7 +286,7 @@ export const getGameSystems = createServerFn({ method: "GET" })
     if (!("searchTerm" in data) || typeof data.searchTerm !== "string") return undefined;
     return { searchTerm: data.searchTerm };
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<OperationResult<GameSystem[]>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();

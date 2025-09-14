@@ -2,6 +2,10 @@ import { and, eq } from "drizzle-orm";
 import { campaignApplications, campaignParticipants, campaigns, user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 
+type CampaignParticipantWithUser = typeof campaignParticipants.$inferSelect & {
+  user: typeof user.$inferSelect;
+};
+
 export async function findCampaignById(campaignId: string) {
   const db = await getDb();
   return db.query.campaigns.findFirst({
@@ -19,21 +23,30 @@ export async function findCampaignById(campaignId: string) {
   });
 }
 
-export async function findCampaignParticipantById(participantId: string) {
+type ParticipantWithRelations = typeof campaignParticipants.$inferSelect & {
+  campaign: typeof campaigns.$inferSelect;
+  user: typeof user.$inferSelect;
+};
+
+export async function findCampaignParticipantById(
+  participantId: string,
+): Promise<ParticipantWithRelations | null> {
   const db = await getDb();
-  return db.query.campaignParticipants.findFirst({
-    where: eq(campaignParticipants.id, participantId),
-    with: { campaign: true, user: true },
-    columns: {
-      id: true,
-      campaignId: true,
-      userId: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+  return (
+    (await db.query.campaignParticipants.findFirst({
+      where: eq(campaignParticipants.id, participantId),
+      with: { campaign: true, user: true },
+      columns: {
+        id: true,
+        campaignId: true,
+        userId: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })) ?? null
+  );
 }
 
 export async function findCampaignParticipantByCampaignAndUserId(
@@ -50,12 +63,15 @@ export async function findCampaignParticipantByCampaignAndUserId(
   });
 }
 
-export async function findCampaignParticipantsByCampaignId(campaignId: string) {
+export async function findCampaignParticipantsByCampaignId(
+  campaignId: string,
+): Promise<CampaignParticipantWithUser[]> {
   const db = await getDb();
-  return db.query.campaignParticipants.findMany({
+  const result = await db.query.campaignParticipants.findMany({
     where: eq(campaignParticipants.campaignId, campaignId),
     with: { user: true },
   });
+  return result as CampaignParticipantWithUser[];
 }
 
 export async function findPendingCampaignApplicationsByCampaignId(campaignId: string) {

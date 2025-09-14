@@ -1178,9 +1178,14 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
       // Notify campaign owner of response
       try {
         const campaignFull = await findCampaignById(existingParticipant.campaignId);
+        const owner = campaignFull?.owner as {
+          email?: string;
+          name?: string;
+          notificationPreferences?: { socialNotifications?: boolean };
+        };
         if (
-          campaignFull?.owner?.email &&
-          campaignFull.owner?.notificationPreferences?.socialNotifications !== false
+          owner?.email &&
+          owner.notificationPreferences?.socialNotifications !== false
         ) {
           const [{ sendCampaignInviteResponse }] = await Promise.all([
             import("~/lib/email/resend"),
@@ -1190,13 +1195,13 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
           const detailsUrl = `${baseUrl}/campaigns/${existingParticipant.campaignId}`;
           await sendCampaignInviteResponse({
             to: {
-              email: campaignFull.owner.email,
-              name: campaignFull.owner.name ?? undefined,
+              email: owner.email,
+              name: owner.name ?? undefined,
             },
-            ownerName: campaignFull.owner.name || "Owner",
-            inviterName: campaignFull.owner.name || "Owner",
+            ownerName: owner.name || "Owner",
+            inviterName: owner.name || "Owner",
             inviteeName: currentUser.name || "User",
-            campaignName: campaignFull.name,
+            campaignName: campaignFull?.name || "",
             response: newStatus === "approved" ? "accepted" : "declined",
             time: new Date(),
             detailsUrl,
@@ -1206,7 +1211,10 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
         console.error("Failed to notify owner of campaign invite response:", notifyError);
       }
 
-      return { success: true, data: participantWithUser as CampaignParticipant };
+      return {
+        success: true,
+        data: participantWithUser as unknown as CampaignParticipant,
+      };
     } catch (error) {
       console.error("Error responding to campaign invitation:", error);
       return {

@@ -1,13 +1,31 @@
 import { and, eq } from "drizzle-orm";
-import { gameParticipants, games, user } from "~/db/schema";
+import { gameApplications, gameParticipants, games, user } from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
+
+type GameParticipantWithUser = typeof gameParticipants.$inferSelect & {
+  user: typeof user.$inferSelect;
+};
+
+type GameParticipantWithGameUser = typeof gameParticipants.$inferSelect & {
+  game: typeof games.$inferSelect;
+  user: typeof user.$inferSelect;
+};
+
+type GameApplicationWithDetails = typeof gameApplications.$inferSelect & {
+  game: typeof games.$inferSelect;
+  user: typeof user.$inferSelect;
+};
 
 /**
  * Finds a game by its ID.
  */
-export async function findGameById(gameId: string) {
+type GameWithOwner = typeof games.$inferSelect & {
+  owner: typeof user.$inferSelect;
+};
+
+export async function findGameById(gameId: string): Promise<GameWithOwner | undefined> {
   const db = await getDb();
-  return db.query.games.findFirst({
+  const result = await db.query.games.findFirst({
     where: eq(games.id, gameId),
     with: {
       owner: true,
@@ -17,66 +35,81 @@ export async function findGameById(gameId: string) {
       },
     },
   });
+  return result as GameWithOwner | undefined;
 }
 
 /**
  * Finds a game participant by their ID.
  */
-export async function findGameParticipantById(participantId: string) {
+export async function findGameParticipantById(
+  participantId: string,
+): Promise<GameParticipantWithGameUser | undefined> {
   const db = await getDb();
-  return db.query.gameParticipants.findFirst({
+  const result = await db.query.gameParticipants.findFirst({
     where: eq(gameParticipants.id, participantId),
     with: { game: true, user: true },
   });
+  return result as GameParticipantWithGameUser | undefined;
 }
 
 /**
  * Finds a game participant by game ID and user ID.
  */
-export async function findGameParticipantByGameAndUserId(gameId: string, userId: string) {
+export async function findGameParticipantByGameAndUserId(
+  gameId: string,
+  userId: string,
+): Promise<GameParticipantWithUser | undefined> {
   const db = await getDb();
-  return db.query.gameParticipants.findFirst({
+  const result = await db.query.gameParticipants.findFirst({
     where: and(eq(gameParticipants.gameId, gameId), eq(gameParticipants.userId, userId)),
     with: { user: true },
   });
+  return result as GameParticipantWithUser | undefined;
 }
 
 /**
  * Finds all participants for a given game ID.
  */
-export async function findGameParticipantsByGameId(gameId: string) {
+export async function findGameParticipantsByGameId(
+  gameId: string,
+): Promise<GameParticipantWithUser[]> {
   const db = await getDb();
-  return db.query.gameParticipants.findMany({
+  const result = await db.query.gameParticipants.findMany({
     where: eq(gameParticipants.gameId, gameId),
     with: { user: true },
   });
+  return result as GameParticipantWithUser[];
 }
-
-import { gameApplications } from "~/db/schema"; // Add gameApplications import
 
 /**
  * Finds pending applications for a given game ID.
  */
-export async function findPendingGameApplicationsByGameId(gameId: string) {
+export async function findPendingGameApplicationsByGameId(
+  gameId: string,
+): Promise<GameApplicationWithDetails[]> {
   const db = await getDb();
-  return db.query.gameApplications.findMany({
+  const result = await db.query.gameApplications.findMany({
     where: and(
       eq(gameApplications.gameId, gameId),
       eq(gameApplications.status, "pending"),
     ),
     with: { user: true },
   });
+  return result as GameApplicationWithDetails[];
 }
 
 /**
  * Finds a game application by its ID.
  */
-export async function findGameApplicationById(applicationId: string) {
+export async function findGameApplicationById(
+  applicationId: string,
+): Promise<GameApplicationWithDetails | undefined> {
   const db = await getDb();
-  return db.query.gameApplications.findFirst({
+  const result = await db.query.gameApplications.findFirst({
     where: eq(gameApplications.id, applicationId),
     with: { game: true, user: true }, // Renamed from gameSession
   });
+  return result as GameApplicationWithDetails | undefined;
 }
 
 /**

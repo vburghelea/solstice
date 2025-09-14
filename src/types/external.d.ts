@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
-
 declare module "cloudinary" {
   export interface UploadApiOptions {
     resource_type?: string;
@@ -38,16 +36,3 @@ declare module "resend" {
 }
 
 declare module "@radix-ui/react-tooltip";
-
-declare module "cheerio" {
-  export function load(html: string): unknown;
-  export type CheerioAPI = unknown;
-  export interface Element {}
-}
-
-declare module "crawlee" {
-  export class CheerioCrawler {
-    constructor(options: unknown);
-    run(inputs: string[]): Promise<void>;
-  }
-}

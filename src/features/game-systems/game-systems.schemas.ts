@@ -54,12 +54,3 @@ export const triggerRecrawlSchema = z.object({
   source: z.enum(["startplaying", "bgg", "wikipedia"]).optional(),
 });
 export type TriggerRecrawlInput = z.infer<typeof triggerRecrawlSchema>;
-
-export const uploadImageSchema = z.object({
-  systemId: z.number().int(),
-  url: z.string().url(),
-  kind: z.enum(["hero", "gallery"]).default("gallery"),
-  license: z.string().optional(),
-  licenseUrl: z.string().url().optional(),
-});
-export type UploadImageInput = z.infer<typeof uploadImageSchema>;

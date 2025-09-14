@@ -1,100 +1,22 @@
 import { describe, expect, it } from "vitest";
 import {
-  emergencyContactSchema,
-  privacySettingsSchema,
-  profileInputSchema,
-} from "../profile.schemas";
+  experienceLevelOptions,
+  gameThemeOptions,
+  identityTagOptions,
+} from "~/shared/types/common";
+import { privacySettingsSchema, profileInputSchema } from "../profile.schemas";
 
 describe("Profile Schemas", () => {
-  describe("emergencyContactSchema", () => {
-    it("validates valid emergency contact with phone", () => {
-      const validContact = {
-        name: "John Doe",
-        relationship: "Friend",
-        phone: "123-456-7890",
-      };
-
-      const result = emergencyContactSchema.safeParse(validContact);
-      expect(result.success).toBe(true);
-    });
-
-    it("validates valid emergency contact with email", () => {
-      const validContact = {
-        name: "Jane Doe",
-        relationship: "Mother",
-        email: "jane@example.com",
-      };
-
-      const result = emergencyContactSchema.safeParse(validContact);
-      expect(result.success).toBe(true);
-    });
-
-    it("validates valid emergency contact with both phone and email", () => {
-      const validContact = {
-        name: "John Doe",
-        relationship: "Friend",
-        phone: "123-456-7890",
-        email: "john@example.com",
-      };
-
-      const result = emergencyContactSchema.safeParse(validContact);
-      expect(result.success).toBe(true);
-    });
-
-    it("fails when name is missing", () => {
-      const invalidContact = {
-        relationship: "Friend",
-        phone: "123-456-7890",
-      };
-
-      const result = emergencyContactSchema.safeParse(invalidContact);
-      expect(result.success).toBe(false);
-    });
-
-    it("fails when relationship is missing", () => {
-      const invalidContact = {
-        name: "John Doe",
-        phone: "123-456-7890",
-      };
-
-      const result = emergencyContactSchema.safeParse(invalidContact);
-      expect(result.success).toBe(false);
-    });
-
-    it("fails when neither phone nor email is provided", () => {
-      const invalidContact = {
-        name: "John Doe",
-        relationship: "Friend",
-      };
-
-      const result = emergencyContactSchema.safeParse(invalidContact);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Please provide at least one contact method (phone or email)",
-        );
-      }
-    });
-
-    it("fails with invalid email format", () => {
-      const invalidContact = {
-        name: "John Doe",
-        relationship: "Friend",
-        email: "not-an-email",
-      };
-
-      const result = emergencyContactSchema.safeParse(invalidContact);
-      expect(result.success).toBe(false);
-    });
-  });
-
   describe("privacySettingsSchema", () => {
     it("validates valid privacy settings", () => {
       const validSettings = {
         showEmail: true,
         showPhone: false,
-        showBirthYear: true,
+        showLocation: false,
+        showLanguages: false,
+        showGamePreferences: false,
         allowTeamInvitations: true,
+        allowFollows: true,
       };
 
       const result = privacySettingsSchema.safeParse(validSettings);
@@ -105,7 +27,6 @@ describe("Profile Schemas", () => {
       const invalidSettings = {
         showEmail: true,
         showPhone: false,
-        // Missing showBirthYear and allowTeamInvitations
       };
 
       const result = privacySettingsSchema.safeParse(invalidSettings);
@@ -114,22 +35,45 @@ describe("Profile Schemas", () => {
   });
 
   describe("profileInputSchema", () => {
-    it("validates valid profile input", () => {
+    it("validates valid profile input with all fields including gameSystemPreferences", () => {
       const validInput = {
-        dateOfBirth: new Date("1990-01-01"),
-        emergencyContact: {
-          name: "John Doe",
-          relationship: "Friend",
-          phone: "123-456-7890",
-        },
         gender: "Male",
         pronouns: "he/him",
         phone: "987-654-3210",
+        gameSystemPreferences: {
+          favorite: [
+            { id: 1, name: "System 1" },
+            { id: 2, name: "System 2" },
+          ],
+          avoid: [{ id: 3, name: "System 3" }],
+        },
         privacySettings: {
           showEmail: true,
           showPhone: false,
-          showBirthYear: true,
+          showLocation: false,
+          showLanguages: false,
+          showGamePreferences: false,
           allowTeamInvitations: true,
+          allowFollows: true,
+        },
+        overallExperienceLevel: "intermediate",
+        identityTags: ["LGBTQ+", "Artist"],
+        preferredGameThemes: ["Fantasy", "Scifi"],
+        languages: ["en", "es"],
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates profile input with only gameSystemPreferences", () => {
+      const validInput = {
+        gameSystemPreferences: {
+          favorite: [{ id: 10, name: "System 10" }],
+          avoid: [
+            { id: 20, name: "System 20" },
+            { id: 30, name: "System 30" },
+          ],
         },
       };
 
@@ -137,75 +81,202 @@ describe("Profile Schemas", () => {
       expect(result.success).toBe(true);
     });
 
-    it("validates profile input with only required fields", () => {
-      const minimalInput = {
-        dateOfBirth: new Date("1990-01-01"),
-        emergencyContact: {
-          name: "John Doe",
-          relationship: "Friend",
-          phone: "123-456-7890",
+    it("fails when gameSystemPreferences contains non-numeric IDs", () => {
+      const invalidInput = {
+        gameSystemPreferences: {
+          favorite: [
+            { id: 1, name: "System 1" },
+            { id: "invalid", name: "Invalid System" },
+          ],
+          avoid: [{ id: 3, name: "System 3" }],
         },
       };
+
+      const result = profileInputSchema.safeParse(invalidInput);
+      expect(result.success).toBe(false);
+      expect(result.error?.issues[0].message).toContain(
+        "Expected number, received string",
+      );
+    });
+
+    it("validates profile input with only required fields", () => {
+      const minimalInput = {};
 
       const result = profileInputSchema.safeParse(minimalInput);
       expect(result.success).toBe(true);
     });
 
-    it("fails with age less than 13", () => {
-      const tooYoung = new Date();
-      tooYoung.setFullYear(tooYoung.getFullYear() - 10);
-
-      const invalidInput = {
-        dateOfBirth: tooYoung,
-        emergencyContact: {
-          name: "John Doe",
-          relationship: "Parent",
-          phone: "123-456-7890",
-        },
+    it("validates valid experience level", () => {
+      const validInput = {
+        overallExperienceLevel: "advanced",
       };
 
-      const result = profileInputSchema.safeParse(invalidInput);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "You must be between 13 and 120 years old",
-        );
-      }
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
     });
 
-    it("fails with age greater than 120", () => {
-      const tooOld = new Date("1800-01-01");
-
+    it("fails with invalid experience level", () => {
       const invalidInput = {
-        dateOfBirth: tooOld,
-        emergencyContact: {
-          name: "John Doe",
-          relationship: "Descendant",
-          phone: "123-456-7890",
-        },
+        overallExperienceLevel: "invalid-level",
       };
 
       const result = profileInputSchema.safeParse(invalidInput);
       expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "You must be between 13 and 120 years old",
-        );
-      }
     });
 
-    it("fails with invalid emergency contact", () => {
-      const invalidInput = {
-        dateOfBirth: new Date("1990-01-01"),
-        emergencyContact: {
-          name: "John Doe",
-          relationship: "Friend",
-          // Missing phone and email
+    it("validates valid identity tags", () => {
+      const validInput = {
+        identityTags: ["LGBTQ+", "Artist"],
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("allows any identity tags (no validation on contents)", () => {
+      const validInput = {
+        identityTags: ["InvalidTag"],
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates valid preferred game themes", () => {
+      const validInput = {
+        preferredGameThemes: ["Fantasy", "Scifi"],
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("allows any preferred game themes (no validation on contents)", () => {
+      const validInput = {
+        preferredGameThemes: ["InvalidTheme"],
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates valid languages", () => {
+      const validInput = {
+        languages: ["en", "es"],
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates valid city and country", () => {
+      const validInput = {
+        city: "Test City",
+        country: "Test Country",
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates GM-specific fields", () => {
+      const validInput = {
+        isGM: true,
+        gmStyle: "Narrative",
+      };
+
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+
+    it("validates calendar availability", () => {
+      const validInput = {
+        calendarAvailability: {
+          monday: Array(96).fill(false),
+          tuesday: Array(96).fill(false),
+          wednesday: Array(96).fill(false),
+          thursday: Array(96).fill(false),
+          friday: Array(96).fill(false),
+          saturday: Array(96).fill(false),
+          sunday: Array(96).fill(false),
         },
       };
 
-      const result = profileInputSchema.safeParse(invalidInput);
-      expect(result.success).toBe(false);
+      const result = profileInputSchema.safeParse(validInput);
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe("Experience Level Validation", () => {
+    it("validates all valid experience levels", () => {
+      experienceLevelOptions.forEach((level) => {
+        const validInput = {
+          overallExperienceLevel: level,
+        };
+
+        const result = profileInputSchema.safeParse(validInput);
+        expect(result.success).toBe(true);
+      });
+
+      describe("Complete Profile Validation", () => {
+        it("validates complete profile with all required fields", () => {
+          const validInput = {
+            gender: "Male",
+            pronouns: "he/him",
+            phone: "1234567890",
+            privacySettings: {
+              showEmail: true,
+              showPhone: false,
+              showLocation: false,
+              showLanguages: false,
+              showGamePreferences: false,
+              allowTeamInvitations: true,
+              allowFollows: true,
+            },
+            overallExperienceLevel: "intermediate",
+            identityTags: ["LGBTQ+", "Artist"],
+            preferredGameThemes: ["Fantasy", "Scifi"],
+            languages: ["en", "es"],
+            city: "Test City",
+            country: "Test Country",
+            isGM: true,
+            gmStyle: "Narrative",
+          };
+
+          const result = profileInputSchema.safeParse(validInput);
+          expect(result.success).toBe(true);
+        });
+      });
+    });
+  });
+
+  describe("Identity Tags Validation", () => {
+    it("validates all valid identity tags", () => {
+      // Test a few identity tags
+      const validTags = identityTagOptions.slice(0, 3);
+      validTags.forEach((tag) => {
+        const validInput = {
+          identityTags: [tag],
+        };
+
+        const result = profileInputSchema.safeParse(validInput);
+        expect(result.success).toBe(true);
+      });
+    });
+  });
+
+  describe("Game Themes Validation", () => {
+    it("validates all valid game themes", () => {
+      // Test a few game themes
+      const validThemes = gameThemeOptions.slice(0, 3);
+      validThemes.forEach((theme) => {
+        const validInput = {
+          preferredGameThemes: [theme],
+        };
+
+        const result = profileInputSchema.safeParse(validInput);
+        expect(result.success).toBe(true);
+      });
     });
   });
 });

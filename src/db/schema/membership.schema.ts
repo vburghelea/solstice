@@ -48,7 +48,7 @@ export const memberships = pgTable(
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),
     status: varchar("status", { length: 50 })
-      .$type<"active" | "expired" | "cancelled">()
+      .$type<"active" | "expired" | "canceled">()
       .notNull()
       .default("active"),
     paymentProvider: varchar("payment_provider", { length: 100 }),

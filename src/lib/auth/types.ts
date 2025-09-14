@@ -34,24 +34,23 @@ export interface UserTag {
 
 // Extended user type that includes our custom fields
 export interface User extends BetterAuthUser {
+  image: string | null;
+  // Local path to a manually uploaded avatar (takes precedence over provider image)
+  uploadedAvatarPath?: string | null;
   // Profile completion tracking
   profileComplete: boolean;
 
-  // Required profile fields
-  dateOfBirth?: Date | null;
-  emergencyContact?: string | null; // JSON string
-
   // Optional profile fields
-  gender?: string | null;
-  pronouns?: string | null;
-  phone?: string | null;
+  gender: string | null;
+  pronouns: string | null;
+  phone: string | null;
 
   // Privacy and preferences
-  privacySettings?: string | null; // JSON string
+  privacySettings: string | null; // JSON string
 
   // Audit and versioning
   profileVersion: number;
-  profileUpdatedAt?: Date | null;
+  profileUpdatedAt: Date | null;
 
   // Roles and permissions
   roles?: UserRole[];

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Teams feature allows Quadball Canada members to create and manage teams, invite members, and prepare for event registrations. This document covers the complete implementation including database schema, server functions, UI components, and known issues.
+The Teams feature allows Roundup Games members to create and manage teams, invite members, and prepare for event registrations. This document covers the complete implementation including database schema, server functions, UI components, and known issues.
 
 ## Implementation Status
 
@@ -23,7 +23,7 @@ CREATE TABLE teams (
   description TEXT,
   created_by TEXT NOT NULL REFERENCES user(id),
   city TEXT,
-  province TEXT,
+  country TEXT,
   primary_color TEXT DEFAULT '#000000',
   secondary_color TEXT DEFAULT '#ffffff',
   founded_year INTEGER,
@@ -187,15 +187,15 @@ See `/docs/teams-typescript-errors.md` for detailed explanation.
 import { createTeam } from "~/features/teams/teams.mutations";
 
 const team = await createTeam({
-  name: "Toronto Titans",
-  slug: "toronto-titans",
-  description: "Competitive team based in Toronto",
-  city: "Toronto",
-  province: "ON",
+  name: "Berlin Raiders",
+  slug: "berlin-raiders",
+  description: "Competitive team based in Berlin",
+  city: "Berlin",
+  country: "DEU",
   primaryColor: "#FF0000",
-  secondaryColor: "#FFFFFF",
+  secondaryColor: "#0000FF",
   foundedYear: 2024,
-  website: "https://torontotitans.com",
+  website: "https://raiders.berlin",
 });
 ```
 
@@ -235,10 +235,10 @@ pnpm db:migrate
 Create test teams in development:
 
 ```sql
-INSERT INTO teams (id, name, slug, created_by, city, province)
+INSERT INTO teams (id, name, slug, created_by, city, country)
 VALUES
-  ('test-1', 'Test Team 1', 'test-team-1', 'user-id', 'Toronto', 'ON'),
-  ('test-2', 'Test Team 2', 'test-team-2', 'user-id', 'Vancouver', 'BC');
+  ('test-1', 'Test Team 1', 'test-team-1', 'user-id', 'Toronto', 'CAN'),
+  ('test-2', 'Test Team 2', 'test-team-2', 'user-id', 'Berlin', 'DEU');
 ```
 
 ### UI Testing

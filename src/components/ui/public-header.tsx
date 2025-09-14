@@ -9,15 +9,17 @@ export function PublicHeader() {
   const user = context?.user || null;
 
   return (
-    <header className="bg-brand-light/95 sticky top-0 z-50 shadow-sm backdrop-blur-md">
+    <header className="bg-brand-light/95 text-brand-dark sticky top-0 z-50 shadow-sm backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between sm:h-20">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3">
+            {" "}
+            {/* Added Link wrapper */}
             <div className="maple-leaf-logo h-8 w-8 sm:h-10 sm:w-10"></div>
             <h1 className="text-brand-dark text-lg font-extrabold tracking-tight sm:text-xl">
-              Quadball Canada
+              Roundup Games
             </h1>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden items-center gap-6 text-sm font-medium lg:flex lg:gap-8">
@@ -47,7 +49,7 @@ export function PublicHeader() {
               <>
                 <Link
                   to="/auth/login"
-                  className="rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
+                  className="text-brand-dark rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
                 >
                   Login
                 </Link>

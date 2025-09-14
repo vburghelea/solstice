@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: "20"
 
 jobs:
   lint-and-type-check:
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -39,15 +39,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['20']
-    
+        node-version: ["20"]
+
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: solstice_test
+          POSTGRES_DB: platform_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -74,13 +74,13 @@ jobs:
       - name: Run database migrations
         run: pnpm db push --force
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/platform_test
 
       - name: Run tests with coverage
         run: pnpm test:coverage
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/solstice_test
-          VITE_BASE_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/platform_test
+          VITE_BASE_URL: http://localhost:5173
           NODE_ENV: test
           BETTER_AUTH_SECRET: test-secret-for-ci
 
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -116,8 +116,8 @@ jobs:
       - name: Build application
         run: pnpm build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/solstice_test' }}
-          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL || 'http://localhost:3000' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/platform_test' }}
+          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL || 'http://localhost:5173' }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'build-secret-for-ci' }}
 
       - name: Upload build artifacts

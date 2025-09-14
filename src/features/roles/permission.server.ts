@@ -21,7 +21,7 @@ export class PermissionService {
       .where(
         and(
           eq(userRoles.userId, userId),
-          inArray(roles.name, ["Solstice Admin", "Quadball Canada Admin"]),
+          inArray(roles.name, ["Super Admin", "Roundup Games Admin"]),
         ),
       )
       .limit(1);

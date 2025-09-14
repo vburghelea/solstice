@@ -12,6 +12,11 @@ export const rateLimitPresets = {
     window: 60 * 1000, // 1 minute
     windowType: "sliding" as const,
   },
+  social: {
+    limit: 10,
+    window: 60 * 1000, // 1 minute
+    windowType: "fixed" as const,
+  },
   search: {
     limit: 10,
     window: 10 * 1000, // 10 seconds

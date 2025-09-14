@@ -29,9 +29,6 @@ export const createTeam = createServerFn({ method: "POST" })
     }
 
     // Debug logging for E2E tests
-    if (process.env["NODE_ENV"] === "development") {
-      console.log("Creating team with user ID:", currentUser.id);
-    }
 
     const db = await getDb();
 
@@ -46,7 +43,7 @@ export const createTeam = createServerFn({ method: "POST" })
           slug: data.slug.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
           description: data.description,
           city: data.city,
-          province: data.province,
+          country: data.country,
           primaryColor: data.primaryColor,
           secondaryColor: data.secondaryColor,
           foundedYear: data.foundedYear,
@@ -122,7 +119,7 @@ export const updateTeam = createServerFn({ method: "POST" })
         name: data.data.name,
         description: data.data.description,
         city: data.data.city,
-        province: data.data.province,
+        country: data.data.country,
         primaryColor: data.data.primaryColor,
         secondaryColor: data.data.secondaryColor,
         foundedYear: data.data.foundedYear,

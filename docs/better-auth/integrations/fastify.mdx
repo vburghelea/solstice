@@ -6,7 +6,8 @@ description: Learn how to seamlessly integrate Better Auth with your Fastify app
 This guide provides step-by-step instructions for configuring both essential handlers and CORS settings.
 
 <Callout type="important">
-A configured Better Auth instance is required before proceeding. If you haven't set this up yet, please consult our [Installation Guide](/docs/installation).
+  A configured Better Auth instance is required before proceeding. If you haven't set this
+  up yet, please consult our [Installation Guide](/docs/installation).
 </Callout>
 
 ### Prerequisites
@@ -22,7 +23,11 @@ Verify the following requirements before integration:
   fastify @fastify/cors
   ```
 
-<Callout type="tip"> For TypeScript: Ensure your `tsconfig.json` includes `"esModuleInterop": true` for optimal compatibility. </Callout>
+<Callout type="tip">
+  {" "}
+  For TypeScript: Ensure your `tsconfig.json` includes `"esModuleInterop": true` for
+  optimal compatibility.{" "}
+</Callout>
 
 ### Authentication Handler Setup
 
@@ -42,7 +47,7 @@ fastify.route({
     try {
       // Construct request URL
       const url = new URL(request.url, `http://${request.headers.host}`);
-      
+
       // Convert Fastify headers to standard Headers object
       const headers = new Headers();
       Object.entries(request.headers).forEach(([key, value]) => {
@@ -63,15 +68,14 @@ fastify.route({
       reply.status(response.status);
       response.headers.forEach((value, key) => reply.header(key, value));
       reply.send(response.body ? await response.text() : null);
-
     } catch (error) {
       fastify.log.error("Authentication Error:", error);
-      reply.status(500).send({ 
+      reply.status(500).send({
         error: "Internal authentication error",
-        code: "AUTH_FAILURE"
+        code: "AUTH_FAILURE",
       });
     }
-  }
+  },
 });
 
 // Initialize server
@@ -105,17 +109,17 @@ import fastifyCors from "@fastify/cors";
 fastify.register(fastifyCors, {
   origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "X-Requested-With"
-  ],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true,
-  maxAge: 86400
+  maxAge: 86400,
 });
 
 // Mount authentication handler after CORS registration
 // (Use previous handler configuration here)
 ```
 
-<Callout type="warning"> Always restrict CORS origins in production environments. Use environment variables for dynamic configuration. </Callout>
+<Callout type="warning">
+  {" "}
+  Always restrict CORS origins in production environments. Use environment variables for
+  dynamic configuration.{" "}
+</Callout>

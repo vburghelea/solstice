@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { ProfileLink } from "~/components/ProfileLink";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +14,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -40,6 +40,7 @@ import {
   updateTeamMember,
 } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {
@@ -126,7 +127,7 @@ function TeamMembersPage() {
 
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{team.name} Members</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{team.name} Members</h1>
           <p className="text-muted-foreground">
             Manage your team roster and member roles
           </p>
@@ -140,7 +141,7 @@ function TeamMembersPage() {
       {showAddMember && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Add New Member</CardTitle>
+            <CardTitle className="text-gray-900">Add New Member</CardTitle>
             <CardDescription>Invite a new member to join your team</CardDescription>
           </CardHeader>
           <CardContent>
@@ -268,18 +269,16 @@ function TeamMembersPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={user.image || undefined}
-                      alt={user.name || user.email}
-                    />
-                    <AvatarFallback>
-                      {(user.name || user.email).charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar
+                    name={user.name}
+                    email={user.email}
+                    srcUploaded={user.uploadedAvatarPath}
+                    srcProvider={user.image}
+                    className="h-8 w-8"
+                  />
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{user.name || user.email}</h3>
+                      <ProfileLink userId={user.id} username={user.name || user.email} />
                       <Badge
                         variant={member.status === "active" ? "default" : "secondary"}
                       >

@@ -3,9 +3,12 @@ import { useRouteContext } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
+  FileText,
   Home,
   LogOut,
+  ScrollText,
   Settings,
+  Swords,
   User,
   UserCheck,
   Users,
@@ -17,6 +20,13 @@ import { auth } from "~/lib/auth-client";
 
 const allSidebarItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard", requiresRole: false },
+  { icon: Swords, label: "Games", href: "/dashboard/games", requiresRole: false },
+  {
+    icon: ScrollText,
+    label: "Campaigns",
+    href: "/dashboard/campaigns",
+    requiresRole: false,
+  },
   { icon: Users, label: "Teams", href: "/dashboard/teams", requiresRole: false },
   { icon: Calendar, label: "Events", href: "/dashboard/events", requiresRole: false },
   { icon: UserCheck, label: "Members", href: "/dashboard/members", requiresRole: false },
@@ -25,7 +35,14 @@ const allSidebarItems = [
     label: "Reports",
     href: "/dashboard/reports",
     requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
+    roles: ["Platform Admin", "Games Admin"],
+  },
+  {
+    icon: FileText,
+    label: "Social Audits",
+    href: "/dashboard/social-audits",
+    requiresRole: true,
+    roles: ["Platform Admin", "Games Admin"],
   },
 ];
 
@@ -74,7 +91,7 @@ export function AdminSidebar() {
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="p-6">
         <Link to="/" className="transition-opacity hover:opacity-80">
-          <h1 className="text-admin-text-primary text-xl font-bold">Quadball Canada</h1>
+          <h1 className="text-admin-text-primary text-xl font-bold">Roundup Games</h1>
           <p className="text-admin-text-secondary text-sm">Dashboard</p>
         </Link>
       </div>
@@ -86,7 +103,6 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
-              activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",
@@ -107,7 +123,6 @@ export function AdminSidebar() {
               key={item.href}
               to={item.href}
               className="nav-item"
-              activeOptions={{ exact: true }}
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",

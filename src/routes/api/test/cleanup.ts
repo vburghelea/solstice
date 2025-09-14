@@ -98,11 +98,9 @@ export const ServerRoute = createServerFileRoute("/api/test/cleanup").methods({
                 .update(user)
                 .set({
                   profileComplete: false,
-                  dateOfBirth: null,
                   phone: null,
                   gender: null,
                   pronouns: null,
-                  emergencyContact: null,
                   privacySettings: null,
                   profileUpdatedAt: null,
                 })

@@ -1,6 +1,6 @@
 # Testing Guide
 
-This directory contains the testing infrastructure for Solstice, using Vitest as the test runner.
+This directory contains the testing infrastructure for Roundup Games, using Vitest as the test runner.
 
 ## Running Tests
 

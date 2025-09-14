@@ -165,14 +165,14 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
       ).toBeVisible({ timeout: 15000 });
     });
 
-    test("should filter teams by province", async ({ page }) => {
-      // If province filter exists
-      const provinceFilter = page.getByLabel("Province");
-      if (await provinceFilter.isVisible()) {
-        await provinceFilter.click();
-        await page.getByRole("option", { name: "Ontario" }).click();
+    test("should filter teams by country", async ({ page }) => {
+      // If country filter exists
+      const countryFilter = page.getByLabel("Country");
+      if (await countryFilter.isVisible()) {
+        await countryFilter.click();
+        await page.getByRole("option", { name: "Germany" }).click();
 
-        // Should only show Ontario teams
+        // Should only show Germany teams
         await expect(page.getByText("Test Thunder")).toBeVisible();
         await expect(page.getByText("Test Lightning")).not.toBeVisible();
       }

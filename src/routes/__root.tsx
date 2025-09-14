@@ -62,11 +62,11 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Solstice",
+        title: "Roundup Games",
       },
       {
         name: "description",
-        content: "Sports management platform for clubs and leagues",
+        content: "Tabletop and board game platform for players all over the world!",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
@@ -92,14 +92,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       <body>
         <ScriptOnce>
           {`
-            // Minimal process shim for TanStack server functions
-            if (typeof globalThis.process === 'undefined') {
-              globalThis.process = {
-                env: { NODE_ENV: 'development' },
-                versions: { node: '20.0.0' }
-              };
-            }
-            
             // Theme toggle
             document.documentElement.classList.toggle(
               'dark',

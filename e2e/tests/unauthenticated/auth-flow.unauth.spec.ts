@@ -25,7 +25,7 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     await expect(sidebar).toBeVisible();
 
     // Check for specific sidebar links with exact matching to avoid strict mode violations
-    // The sidebar has both "Quadball Canada Dashboard" and "Dashboard" links
+    // The sidebar has both "Roundup Games Dashboard" and "Dashboard" links
     await expect(
       sidebar.getByRole("link", { name: "Dashboard", exact: true }),
     ).toBeVisible();

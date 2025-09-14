@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: "jsdom",
       globals: true,
-      setupFiles: ["./src/tests/setup.ts"],
+      setupFiles: ["./src/tests/setup.tsx"],
       include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
       exclude: ["node_modules", "dist", ".next", ".cache", "build"],
       coverage: {
@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
       env: {
         ...env,
         // Override with test-specific env vars if needed
-        VITE_BASE_URL: "http://localhost:3000",
+        VITE_BASE_URL: "http://localhost:5173",
         SKIP_ENV_VALIDATION: "true",
       },
     },

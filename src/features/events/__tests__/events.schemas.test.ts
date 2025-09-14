@@ -20,8 +20,8 @@ describe("Events Schemas", () => {
             organizerId: "org-123",
             startDateFrom: new Date("2025-01-01"),
             startDateTo: new Date("2025-12-31"),
-            city: "Toronto",
-            province: "ON",
+            city: "Berlin",
+            country: "DEY",
             featured: true,
             publicOnly: true,
           },
@@ -43,7 +43,7 @@ describe("Events Schemas", () => {
         const result = listEventsSchema.safeParse({
           filters: {
             type: ["tournament", "league"],
-            city: "Vancouver",
+            city: "Berlin",
           },
           sortBy: "name",
         });
@@ -195,7 +195,7 @@ describe("Events Schemas", () => {
         const result = updateEventSchema.safeParse({
           eventId: "event-123",
           data: {
-            status: "cancelled",
+            status: "canceled",
           },
         });
         expect(result.success).toBe(true);
@@ -209,7 +209,7 @@ describe("Events Schemas", () => {
           "registration_closed",
           "in_progress",
           "completed",
-          "cancelled",
+          "canceled",
         ];
 
         statuses.forEach((status) => {

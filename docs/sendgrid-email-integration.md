@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains the SendGrid transactional email integration for the Quadball Canada platform, including setup instructions, templates, and usage examples.
+This document explains the SendGrid transactional email integration for the Roundup Games platform, including setup instructions, templates, and usage examples.
 
 ## Implementation Status
 
@@ -17,14 +17,14 @@ This document explains the SendGrid transactional email integration for the Quad
 
 - `SENDGRID_API_KEY` - Your SendGrid API key
 - `SENDGRID_FROM_EMAIL` - Verified sender email address
-- `SENDGRID_FROM_NAME` - Sender display name (default: "Quadball Canada")
+- `SENDGRID_FROM_NAME` - Sender display name (default: "Roundup Games")
 
 ### Example Configuration
 
 ```env
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxx
-SENDGRID_FROM_EMAIL=noreply@quadballcanada.com
-SENDGRID_FROM_NAME=Quadball Canada
+SENDGRID_FROM_EMAIL=noreply@roundup.games
+SENDGRID_FROM_NAME=Roundup Games
 ```
 
 ## Code Architecture
@@ -143,9 +143,9 @@ Example console output:
 
 ```
 [Mock Email Service] Would send email:
-From: Quadball Canada <noreply@quadballcanada.com>
+From: Roundup Games <noreply@roundup.games>
 To: user@example.com
-Subject: Welcome to Quadball Canada!
+Subject: Welcome to Roundup Games!
 [HTML and text content displayed]
 ```
 
@@ -182,8 +182,8 @@ pnpm test src/lib/email/__tests__/
 ```bash
 # Add to .env.local or Netlify environment
 SENDGRID_API_KEY=your-api-key
-SENDGRID_FROM_EMAIL=verified-email@yourdomain.com
-SENDGRID_FROM_NAME=Quadball Canada
+SENDGRID_FROM_EMAIL=verified-email@roundup.games
+SENDGRID_FROM_NAME=Roundup Games
 ```
 
 ## Best Practices

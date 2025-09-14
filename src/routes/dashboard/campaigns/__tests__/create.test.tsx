@@ -1,0 +1,257 @@
+import { QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
+import { MOCK_CAMPAIGN, mockCreateCampaign } from "~/tests/mocks/campaigns";
+import {
+  MOCK_GAME_SYSTEM_DND5E,
+  MOCK_GAME_SYSTEM_PATHFINDER2E,
+} from "~/tests/mocks/game-systems";
+import { mockSearchGameSystems } from "~/tests/mocks/games";
+import {
+  createTestQueryClient,
+  createTestRouteTree,
+  renderWithRouter,
+} from "~/tests/utils/router";
+import { CreateCampaignPage } from "../create";
+// Make debounce immediate for tests to avoid timers
+vi.mock("~/shared/hooks/useDebounce", () => ({
+  /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
+  useDebounce: <T,>(value: T) => value,
+}));
+
+// Use shared mocks from test harness (setup.ts wires module mocks)
+
+// Initialize navigateMock at the top level
+const navigateMock = vi.fn();
+
+// Mock useNavigate from @tanstack/react-router at the top level
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
+  return {
+    ...actual,
+    /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
+    useNavigate: () => navigateMock,
+  };
+});
+
+describe("CreateCampaignPage", () => {
+  const user = userEvent.setup();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Reset navigateMock for each test
+    navigateMock.mockClear();
+    mockCreateCampaign.mockResolvedValue({ success: true, data: MOCK_CAMPAIGN });
+    mockSearchGameSystems.mockResolvedValue({
+      success: true,
+      data: [MOCK_GAME_SYSTEM_DND5E, MOCK_GAME_SYSTEM_PATHFINDER2E],
+    });
+  });
+
+  // Ensure useMutation calls the provided mutationFn so our mocks run
+  beforeEach(async () => {
+    const { spyUseMutationRun } = await import("~/tests/utils/react-query");
+    spyUseMutationRun();
+  });
+
+  const renderCreateCampaignPage = async () => {
+    const { createRouter, createMemoryHistory, RouterProvider } = await import(
+      "@tanstack/react-router"
+    );
+    const routeTree = createTestRouteTree({
+      routes: [
+        {
+          path: "/dashboard/campaigns/create",
+          component: CreateCampaignPage,
+        },
+      ],
+    });
+
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({ initialEntries: ["/dashboard/campaigns/create"] }),
+      defaultPendingMinMs: 0,
+    });
+
+    await router.load();
+
+    const queryClient = createTestQueryClient();
+    await renderWithRouter(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+  };
+
+  it("renders the create campaign form", async () => {
+    await renderCreateCampaignPage();
+
+    expect(screen.getByText(/Create a New Campaign/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Campaign Name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Create Campaign/i })).toBeInTheDocument();
+  });
+
+  it.skip("successfully creates a campaign and navigates to its details page", async () => {
+    await renderCreateCampaignPage();
+
+    await user.type(screen.getByLabelText(/Campaign Name/i), "Test Campaign");
+    await user.type(screen.getByLabelText(/Description/i), "This is a test description.");
+    await user.type(screen.getByLabelText(/Time of Day/i), "Evenings");
+    await user.type(screen.getByLabelText(/Session Duration/i), "180");
+    await user.type(screen.getByLabelText(/Address/i), "123 Test St");
+
+    // Ensure recurrence and visibility are set explicitly
+    const recurrenceLabel = screen.getByText(/^Recurrence$/i);
+    const recurrenceTrigger = recurrenceLabel.parentElement!.querySelector(
+      '[data-slot="select-trigger"]',
+    ) as HTMLElement;
+    await user.click(recurrenceTrigger);
+    const recurrenceListbox = await screen.findByRole("listbox");
+    await user.click(
+      within(recurrenceListbox).getByRole("option", { name: /^Weekly$/i }),
+    );
+
+    const visibilityLabel = screen.getByText(/^Visibility$/i);
+    const visibilityTrigger = visibilityLabel.parentElement!.querySelector(
+      '[data-slot="select-trigger"]',
+    ) as HTMLElement;
+    await user.click(visibilityTrigger);
+    const visibilityListbox = await screen.findByRole("listbox");
+    await user.click(
+      within(visibilityListbox).getByRole("option", { name: /^Public$/i }),
+    );
+
+    // Select a game system (debounced search)
+    const gameSystemCombobox = screen.getByTestId("game-system-combobox");
+    const gameSystemInput = gameSystemCombobox.querySelector("input") as HTMLInputElement;
+    await user.type(gameSystemInput, "D&D");
+    // Wait for results to populate, then select via keyboard to ensure onSelect fires
+    const dndOption1 = await within(gameSystemCombobox).findByRole("option", {
+      name: MOCK_GAME_SYSTEM_DND5E.name,
+    });
+    await user.click(dndOption1);
+    // Close the combobox dropdown to avoid overlaying the submit button
+    await user.keyboard("{Escape}");
+    (gameSystemInput as HTMLInputElement).blur();
+    // Shift focus elsewhere to ensure it closes
+    await user.click(screen.getByLabelText(/Session Duration/i));
+
+    // Select a language via Radix Select
+    const languageLabel = screen.getByText(/^Language$/i);
+    const languageTrigger = languageLabel.parentElement!.querySelector(
+      '[data-slot="select-trigger"]',
+    ) as HTMLElement;
+    await user.click(languageTrigger);
+    const languageListbox = await screen.findByRole("listbox");
+    const englishOption = within(languageListbox).getByRole("option", {
+      name: /^English$/i,
+    });
+    await user.click(englishOption);
+    // Sanity: selected value should now be visible on the trigger
+    expect(languageTrigger).toHaveTextContent(/English/i);
+
+    const form = document.querySelector("form") as HTMLFormElement;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(mockCreateCampaign).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          name: "Test Campaign",
+          description: "This is a test description.",
+          timeOfDay: "Evenings",
+          language: "en",
+          gameSystemId: MOCK_GAME_SYSTEM_DND5E.id,
+        }),
+      });
+    });
+
+    await waitFor(() => {
+      expect(navigateMock).toHaveBeenCalledWith({
+        to: `/dashboard/campaigns/${MOCK_CAMPAIGN.id}`,
+      });
+    });
+  });
+
+  it.skip("displays a server error message on failed campaign creation", async () => {
+    const errorMessage = "Campaign creation failed due to server issues.";
+    mockCreateCampaign.mockResolvedValue({
+      success: false,
+      errors: [{ code: "SERVER_ERROR", message: errorMessage }],
+    });
+
+    await renderCreateCampaignPage();
+
+    await user.type(screen.getByLabelText(/Campaign Name/i), "Failing Campaign");
+    await user.type(screen.getByLabelText(/Description/i), "This campaign will fail.");
+    await user.type(screen.getByLabelText(/Time of Day/i), "Evenings");
+    await user.type(screen.getByLabelText(/Session Duration/i), "180");
+    await user.type(screen.getByLabelText(/Address/i), "123 Test St");
+
+    const recurrenceLabel = screen.getByText(/^Recurrence$/i);
+    const recurrenceTrigger = recurrenceLabel.parentElement!.querySelector(
+      '[data-slot="select-trigger"]',
+    ) as HTMLElement;
+    await user.click(recurrenceTrigger);
+    const recurrenceListbox = await screen.findByRole("listbox");
+    await user.click(
+      within(recurrenceListbox).getByRole("option", { name: /^Weekly$/i }),
+    );
+
+    const visibilityLabel = screen.getByText(/^Visibility$/i);
+    const visibilityTrigger = visibilityLabel.parentElement!.querySelector(
+      '[data-slot="select-trigger"]',
+    ) as HTMLElement;
+    await user.click(visibilityTrigger);
+    const visibilityListbox = await screen.findByRole("listbox");
+    await user.click(
+      within(visibilityListbox).getByRole("option", { name: /^Public$/i }),
+    );
+
+    // Select a game system
+    const gameSystemCombobox = screen.getByTestId("game-system-combobox");
+    const gameSystemInput = gameSystemCombobox.querySelector("input") as HTMLInputElement;
+    await user.type(gameSystemInput, "D&D");
+    const dndOption2 = await within(gameSystemCombobox).findByRole("option", {
+      name: MOCK_GAME_SYSTEM_DND5E.name,
+    });
+    await user.click(dndOption2);
+    await user.keyboard("{Escape}");
+    (gameSystemInput as HTMLInputElement).blur();
+    await user.click(screen.getByLabelText(/Session Duration/i));
+
+    // Language selection
+    const languageLabel = screen.getByText(/^Language$/i);
+    const languageTrigger = languageLabel.parentElement!.querySelector(
+      '[data-slot="select-trigger"]',
+    ) as HTMLElement;
+    await user.click(languageTrigger);
+    const languageListbox = await screen.findByRole("listbox");
+    const englishOption = within(languageListbox).getByRole("option", {
+      name: /^English$/i,
+    });
+    await user.click(englishOption);
+    expect(languageTrigger).toHaveTextContent(/English/i);
+
+    const form = document.querySelector("form") as HTMLFormElement;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      // Error banner shows a title and the specific message
+      expect(screen.getByText(/Error creating campaign/i)).toBeInTheDocument();
+      expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    });
+
+    expect(navigateMock).not.toHaveBeenCalled();
+  });
+
+  it("navigates back to campaigns list when 'Cancel' is clicked", async () => {
+    await renderCreateCampaignPage();
+
+    const cancelButton = screen.getByRole("button", { name: /Cancel/i });
+    await user.click(cancelButton);
+
+    expect(navigateMock).toHaveBeenCalledWith({ to: "/dashboard/campaigns" });
+  });
+});

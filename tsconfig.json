@@ -16,11 +16,19 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["vite/client", "@types/node"],
+    "types": ["vite/client", "@types/node", "vitest/globals"],
     "paths": {
       "~/*": ["./src/*"]
     }
   },
-  "include": ["src", "scripts", "app.config.ts", "*.config.ts", "netlify/**/*.ts", "e2e"],
+  "include": [
+    "src",
+    "scripts",
+    "app.config.ts",
+    "*.config.ts",
+    "netlify/**/*.ts",
+    "e2e",
+    "src/tests"
+  ],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,10 +1,10 @@
 # Database Connection Guide
 
-This guide explains how to use Neon database connections with proper pooling in Solstice.
+This guide explains how to use Neon database connections with proper pooling in Roundup Games.
 
 ## Overview
 
-Solstice uses [Neon](https://neon.tech) for PostgreSQL hosting and provides two types of database connections:
+Roundup Games uses [Neon](https://neon.tech) for PostgreSQL hosting and provides two types of database connections:
 
 1. **Pooled Connection** - For serverless functions and API routes
 2. **Unpooled Connection** - For migrations and long-running operations

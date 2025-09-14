@@ -32,6 +32,8 @@ export const env = createEnv({
       .default("dev-secret-change-in-production"),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    DISCORD_CLIENT_ID: z.string().optional(),
+    DISCORD_CLIENT_SECRET: z.string().optional(),
 
     // Square Payment Integration
     SQUARE_ENV: z.enum(["sandbox", "production"]).optional(),
@@ -52,6 +54,12 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     NETLIFY: z.string().optional(),
     VERCEL_ENV: z.string().optional(),
+    WELCOME_EMAIL_ENABLED: z.coerce
+      .boolean()
+      .default(process.env["NODE_ENV"] === "production"),
+    INVITE_EMAIL_ENABLED: z.coerce
+      .boolean()
+      .default(process.env["NODE_ENV"] === "production"),
 
     // Client vars are also available on server
     // In production, Netlify provides URL env var

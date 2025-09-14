@@ -32,9 +32,9 @@ npx @better-auth/cli generate
 See the [CLI](/docs/concepts/cli) documentation for more information on the CLI.
 
 <Callout>
-  If you prefer adding tables manually, you can do that as well. The core schema
-  required by Better Auth is described below and you can find additional schema
-  required by plugins in the plugin documentation.
+  If you prefer adding tables manually, you can do that as well. The core schema required
+  by Better Auth is described below and you can find additional schema required by plugins
+  in the plugin documentation.
 </Callout>
 
 ## Secondary Storage
@@ -76,22 +76,22 @@ const redis = createClient();
 await redis.connect();
 
 export const auth = betterAuth({
-	// ... other options
-	secondaryStorage: {
-		get: async (key) => {
-			const value = await redis.get(key);
-			return value ? value : null;
-		},
-		set: async (key, value, ttl) => {
-			if (ttl) await redis.set(key, value, { EX: ttl });
-			// or for ioredis:
-			// if (ttl) await redis.set(key, value, 'EX', ttl)
-			else await redis.set(key, value);
-		},
-		delete: async (key) => {
-			await redis.del(key);
-		}
-	}
+  // ... other options
+  secondaryStorage: {
+    get: async (key) => {
+      const value = await redis.get(key);
+      return value ? value : null;
+    },
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, { EX: ttl });
+      // or for ioredis:
+      // if (ttl) await redis.set(key, value, 'EX', ttl)
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+  },
 });
 ```
 
@@ -353,8 +353,8 @@ export const auth = betterAuth({
 ```
 
 <Callout>
-  Type inference in your code will still use the original field names (e.g.,
-  `user.name`, not `user.full_name`).
+  Type inference in your code will still use the original field names (e.g., `user.name`,
+  not `user.full_name`).
 </Callout>
 
 To customize table names and column name for plugins, you can use the `schema` property in the plugin config:
@@ -431,10 +431,8 @@ res.user.lang; // > "fr"
 ```
 
 <Callout>
-  See the
-  [TypeScript](/docs/concepts/typescript#inferring-additional-fields-on-client)
-  documentation for more information on how to infer additional fields on the
-  client side.
+  See the [TypeScript](/docs/concepts/typescript#inferring-additional-fields-on-client)
+  documentation for more information on how to infer additional fields on the client side.
 </Callout>
 
 If you're using social / OAuth providers, you may want to provide `mapProfileToUser` to map the profile data to the user object. So, you can populate additional fields from the provider's profile.

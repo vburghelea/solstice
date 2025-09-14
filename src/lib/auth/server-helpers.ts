@@ -4,7 +4,15 @@
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
+import { emailOTP } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
+import { sendEmailVerificationOTP, sendSignInOTP } from "~/lib/email/otp-emails";
+import {
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  sendWelcomeEmail,
+} from "~/lib/email/resend";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | null = null;
@@ -21,16 +29,10 @@ const createAuth = async () => {
   const cookieDomain = env.COOKIE_DOMAIN;
 
   // Debug OAuth configuration
-  console.log("Auth config loading...");
-  console.log("Base URL:", baseUrl);
   const googleClientId = env.GOOGLE_CLIENT_ID || "";
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
-
-  console.log(
-    "Google Client ID:",
-    googleClientId ? `Set (${googleClientId.substring(0, 10)}...)` : "Missing",
-  );
-  console.log("Google Client Secret:", googleClientSecret ? "Set" : "Missing");
+  const discordClientId = env.DISCORD_CLIENT_ID || "";
+  const discordClientSecret = env.DISCORD_CLIENT_SECRET || "";
 
   // Get database connection
   const dbConnection = await db();
@@ -63,7 +65,7 @@ const createAuth = async () => {
 
     // Secure cookie configuration
     advanced: {
-      cookiePrefix: "solstice",
+      cookiePrefix: "roundup",
       useSecureCookies: isProduction,
       defaultCookieAttributes: cookieDomain
         ? {
@@ -87,12 +89,64 @@ const createAuth = async () => {
         clientId: googleClientId,
         clientSecret: googleClientSecret,
       },
+      discord: {
+        clientId: discordClientId,
+        clientSecret: discordClientSecret,
+      },
     },
 
     // Email and password authentication
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: isProduction,
+      sendResetPassword: async (params: {
+        user: { email: string; name?: string };
+        url: string;
+        token: string;
+      }): Promise<void> => {
+        const baseUrl = getBaseUrl();
+        const resetClientUrl = `${baseUrl}/auth/reset-password?token=${params.token}`;
+
+        try {
+          const result = await sendPasswordResetEmail({
+            to: { email: params.user.email, name: params.user.name },
+            resetUrl: resetClientUrl,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Assuming 24 hours expiry for reset links
+          });
+
+          if (!result.success) {
+            console.error("Failed to send password reset email:", result.error);
+          }
+        } catch (error) {
+          console.error("Error sending password reset email:", error);
+        }
+      },
+    },
+
+    emailVerification: {
+      sendVerificationEmail: async ({
+        user,
+        url,
+      }: {
+        user: { email: string; name?: string };
+        url: string;
+        token: string;
+      }) => {
+        try {
+          const result = await sendEmailVerification({
+            to: { email: user.email, name: user.name },
+            verificationUrl: url,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          });
+
+          if (!result.success) {
+            console.error("Failed to send verification email:", result.error);
+          }
+        } catch (error) {
+          console.error("Error sending verification email:", error);
+        }
+      },
+      sendOnSignUp: true,
     },
 
     // Account linking configuration
@@ -103,8 +157,40 @@ const createAuth = async () => {
       },
     },
 
+    hooks: {
+      after: createAuthMiddleware(async (ctx) => {
+        if (env.WELCOME_EMAIL_ENABLED && ctx.path.startsWith("/sign-up")) {
+          const newUser = ctx.context.newSession?.user;
+          if (newUser) {
+            try {
+              await sendWelcomeEmail({
+                to: {
+                  email: newUser.email,
+                  name: newUser.name || undefined,
+                },
+                profileUrl: `${baseUrl}/dashboard/profile`,
+              });
+            } catch (error) {
+              console.error("Error sending welcome email:", error);
+            }
+          }
+        }
+      }),
+    },
+
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
-    plugins: [reactStartCookies()], // MUST be the last plugin
+    plugins: [
+      emailOTP({
+        async sendVerificationOTP({ email, otp, type }) {
+          if (type === "email-verification") {
+            await sendEmailVerificationOTP({ to: { email }, otp });
+          } else if (type === "sign-in") {
+            await sendSignInOTP({ to: { email }, otp });
+          }
+        },
+      }),
+      reactStartCookies(), // MUST be the last plugin
+    ],
   });
 };
 

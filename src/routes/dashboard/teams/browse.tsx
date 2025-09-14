@@ -13,6 +13,8 @@ import { ArrowLeftIcon, SearchIcon, UsersIcon } from "~/components/ui/icons";
 import { Input } from "~/components/ui/input";
 import type { TeamListItem } from "~/features/teams/teams.queries";
 import { listTeams, searchTeams } from "~/features/teams/teams.queries";
+import { useCountries } from "~/shared/hooks/useCountries";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/teams/browse")({
   loader: async () => {
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/dashboard/teams/browse")({
 function BrowseTeamsPage() {
   const { teams: initialTeams } = Route.useLoaderData();
   const [searchQuery, setSearchQuery] = useState("");
+  const { getCountryName } = useCountries();
 
   const { data: allTeams } = useSuspenseQuery({
     queryKey: ["allTeams"],
@@ -56,7 +59,7 @@ function BrowseTeamsPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Browse Teams</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Browse Teams</h1>
         <p className="text-muted-foreground">Discover and join teams in your area</p>
       </div>
 
@@ -68,7 +71,7 @@ function BrowseTeamsPage() {
             placeholder="Search teams by name or city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="text-muted-foreground pl-10"
           />
         </div>
       </div>
@@ -86,17 +89,63 @@ function BrowseTeamsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {teams.map((teamItem) => (
-            <PublicTeamCard key={teamItem.team.id} teamItem={teamItem} />
-          ))}
-        </div>
+        <>
+          {/* Mobile list */}
+          <div className="md:hidden">
+            <List>
+              {teams.map((teamItem) => (
+                <List.Item key={teamItem.team.id} className="group">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-base font-semibold text-gray-900">
+                        {teamItem.team.name}
+                      </div>
+                      <div className="text-muted-foreground mt-1 text-xs">
+                        {teamItem.team.city}
+                        {teamItem.team.country
+                          ? `, ${getCountryName(teamItem.team.country)}`
+                          : ""}
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        Members: {teamItem.memberCount}
+                      </div>
+                    </div>
+                    <Link
+                      to="/dashboard/teams/$teamId"
+                      params={{ teamId: teamItem.team.id }}
+                      className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </List.Item>
+              ))}
+            </List>
+          </div>
+
+          {/* Desktop grid */}
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+            {teams.map((teamItem) => (
+              <PublicTeamCard
+                key={teamItem.team.id}
+                teamItem={teamItem}
+                getCountryName={getCountryName}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-function PublicTeamCard({ teamItem }: { teamItem: TeamListItem }) {
+function PublicTeamCard({
+  teamItem,
+  getCountryName,
+}: {
+  teamItem: TeamListItem;
+  getCountryName: (isoCode: string | null | undefined) => string;
+}) {
   const { team, memberCount, creator } = teamItem;
 
   return (
@@ -104,11 +153,11 @@ function PublicTeamCard({ teamItem }: { teamItem: TeamListItem }) {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">{team.name}</CardTitle>
+            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.province ? `, ${team.province}` : ""}
+                {team.country ? `, ${getCountryName(team.country)}` : ""}
               </CardDescription>
             )}
           </div>

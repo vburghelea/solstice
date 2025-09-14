@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { TypedLink as Link } from "~/components/ui/TypedLink";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { ProfileLink } from "~/components/ProfileLink";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -12,7 +11,9 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "~/components/ui/icons";
+import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
   component: TeamDetailsPage,
@@ -54,12 +55,12 @@ function TeamDetailsPage() {
       <div className="mb-8">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold">{team.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{team.name}</h1>
             {team.city && (
               <p className="text-muted-foreground mt-1 flex items-center">
                 <MapPinIcon className="mr-1 h-4 w-4" />
                 {team.city}
-                {team.province ? `, ${team.province}` : ""}
+                {team.country ? `, ${team.country}` : ""}
               </p>
             )}
           </div>
@@ -84,7 +85,7 @@ function TeamDetailsPage() {
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>About</CardTitle>
+              <CardTitle className="text-gray-900">About</CardTitle>
             </CardHeader>
             <CardContent>
               {team.description ? (
@@ -121,7 +122,7 @@ function TeamDetailsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-gray-900">
                 Members
                 <Badge variant="secondary">{memberCount}</Badge>
               </CardTitle>
@@ -131,21 +132,18 @@ function TeamDetailsPage() {
                 {members.map(({ member, user }) => (
                   <div key={member.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage
-                          src={user.image || undefined}
-                          alt={user.name || ""}
-                        />
-                        <AvatarFallback>
-                          {user.name
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase() || "??"}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        className="h-10 w-10"
+                        name={user.name ?? null}
+                        email={user.email ?? null}
+                        srcUploaded={user.uploadedAvatarPath ?? null}
+                        srcProvider={user.image ?? null}
+                      />
                       <div>
-                        <p className="font-medium">{user.name || user.email}</p>
+                        <ProfileLink
+                          userId={user.id}
+                          username={user.name || user.email}
+                        />
                         <div className="text-muted-foreground flex items-center gap-2 text-sm">
                           <Badge variant="outline" className="capitalize">
                             {member.role}
@@ -168,7 +166,7 @@ function TeamDetailsPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Team Stats</CardTitle>
+              <CardTitle className="text-gray-900">Team Stats</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -194,7 +192,7 @@ function TeamDetailsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle className="text-gray-900">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button className="w-full" variant="outline" asChild>

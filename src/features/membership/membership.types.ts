@@ -18,7 +18,7 @@ export interface Membership {
   membershipTypeId: string;
   startDate: string | Date;
   endDate: string | Date;
-  status: "active" | "cancelled" | "expired";
+  status: "active" | "canceled" | "expired";
   paymentId: string | null;
   metadata: MembershipMetadata | null;
   createdAt: Date;

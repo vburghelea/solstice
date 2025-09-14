@@ -10,6 +10,7 @@ import {
 import { act, render, RenderOptions } from "@testing-library/react";
 import { ReactElement, ReactNode } from "react";
 import type { User } from "~/lib/auth/types";
+import { MOCK_OWNER_USER } from "~/tests/mocks/users";
 
 // Create a test query client with optimized settings
 export function createTestQueryClient() {
@@ -27,39 +28,11 @@ export function createTestQueryClient() {
   });
 }
 
-// Mock user for route context
-export const mockUser: User = {
-  id: "test-user-id",
-  email: "test@example.com",
-  name: "Test User",
-  emailVerified: true,
-  image: null,
-  createdAt: new Date("2024-01-01"),
-  updatedAt: new Date("2024-01-01"),
-  profileComplete: true,
-  dateOfBirth: new Date("1990-01-01"),
-  phone: "+1234567890",
-  gender: "male",
-  pronouns: "he/him",
-  emergencyContact: JSON.stringify({
-    name: "Emergency Contact",
-    phone: "+0987654321",
-    relationship: "spouse",
-  }),
-  privacySettings: JSON.stringify({
-    showEmail: false,
-    showPhone: false,
-    showDateOfBirth: false,
-  }),
-  profileVersion: 1,
-  profileUpdatedAt: new Date("2024-01-01"),
-};
-
 // Create test routes
 export function createTestRouter({
   children,
   initialEntries = ["/"],
-  user = mockUser,
+  user = MOCK_OWNER_USER,
 }: {
   children: ReactNode;
   initialEntries?: string[];
@@ -100,6 +73,7 @@ interface RenderWithRouterOptions extends Omit<RenderOptions, "wrapper"> {
   initialEntries?: string[];
   user?: User | null;
   includeQueryClient?: boolean;
+  path?: string;
 }
 
 // Main render function with router - based on TanStack Router best practices
@@ -107,8 +81,9 @@ export async function renderWithRouter(
   ui: ReactElement,
   {
     initialEntries = ["/"],
-    user = mockUser,
+    user = MOCK_OWNER_USER,
     includeQueryClient = true,
+    path = "/",
     ...renderOptions
   }: RenderWithRouterOptions = {},
 ) {
@@ -122,7 +97,7 @@ export async function renderWithRouter(
   // Create a test route that renders our component
   const testRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/",
+    path: path,
     component: () => ui,
     beforeLoad: () => ({
       user,
@@ -170,7 +145,7 @@ export async function renderWithRouter(
 // Utility to create a full route tree for integration tests
 export function createTestRouteTree({
   routes = [],
-  user = mockUser,
+  user = MOCK_OWNER_USER,
 }: {
   routes?: Array<{
     path: string;

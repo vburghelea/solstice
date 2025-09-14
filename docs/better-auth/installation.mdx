@@ -158,8 +158,8 @@ Alternatively, if you prefer to use an ORM, you can use one of the built-in adap
 
 <Callout>
   If your database is not listed above, check out our other supported
-  [databases](/docs/adapters/other-relational-databases) for more information,
-  or use one of the supported ORMs.
+  [databases](/docs/adapters/other-relational-databases) for more information, or use one
+  of the supported ORMs.
 </Callout>
 
 </Step>
@@ -230,8 +230,8 @@ To handle API requests, you need to set up a route handler on your server.
 Create a new file or route in your framework's designated catch-all route handler. This route should handle requests for the path `/api/auth/*` (unless you've configured a different base path).
 
 <Callout>
-  Better Auth supports any backend framework with standard Request and Response
-  objects and offers helper functions for popular frameworks.
+  Better Auth supports any backend framework with standard Request and Response objects
+  and offers helper functions for popular frameworks.
 </Callout>
 
 <Tabs items={["next-js", "nuxt", "svelte-kit", "remix", "solid-start", "hono", "express", "elysia", "tanstack-start", "expo"]} defaultValue="react">
@@ -406,9 +406,8 @@ The client-side library helps you interact with the auth server. Better Auth com
 3. Pass the base URL of your auth server. (If the auth server is running on the same domain as your client, you can skip this step.)
 
 <Callout type="info">
-  If you're using a different base path other than `/api/auth` make sure to pass
-  the whole URL including the path. (e.g.
-  `http://localhost:3000/custom-path/auth`)
+  If you're using a different base path other than `/api/auth` make sure to pass the whole
+  URL including the path. (e.g. `http://localhost:3000/custom-path/auth`)
 </Callout>
 
 <Tabs items={["react", "vue", "svelte", "solid",

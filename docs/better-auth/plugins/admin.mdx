@@ -162,7 +162,6 @@ type listUsers = {
 ```
 </APIMethod>
 
-
 #### Query Filtering
 
 The `listUsers` function supports various filter operators including `eq`, `contains`, `starts_with`, and `ends_with`.
@@ -198,14 +197,14 @@ const pageSize = 10;
 const currentPage = 2;
 
 const users = await authClient.admin.listUsers({
-    query: {
-        limit: pageSize,
-        offset: (currentPage - 1) * pageSize
-    }
+  query: {
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize,
+  },
 });
 
 const totalUsers = users.total;
-const totalPages = Math.ceil(totalUsers / limit)
+const totalPages = Math.ceil(totalUsers / limit);
 ```
 
 ### Set User Role
@@ -257,7 +256,6 @@ type setUserPassword = {
 ### Ban User
 
 Bans a user, preventing them from signing in and revokes all of their existing sessions.
-
 
 <APIMethod
   path="/admin/ban-user"
@@ -326,7 +324,6 @@ type listUserSessions = {
 
 Revokes a specific session for a user.
 
-
 <APIMethod
   path="/admin/revoke-user-session"
   method="POST"
@@ -385,10 +382,8 @@ type impersonateUser = {
 To stop impersonating a user and continue with the admin account, you can use `stopImpersonating`
 
 <APIMethod path="/admin/stop-impersonating" method="POST" noResult requireSession>
-```ts
-type stopImpersonating = {
-}
-```
+  ```ts type stopImpersonating = {}
+  ```
 </APIMethod>
 
 ### Remove User
@@ -424,7 +419,8 @@ By default, there are two roles:
 `user`: Users with the user role have no control over other users.
 
 <Callout>
-  A user can have multiple roles. Multiple roles are stored as string separated by comma (",").
+  A user can have multiple roles. Multiple roles are stored as string separated by comma
+  (",").
 </Callout>
 
 ### Permissions
@@ -432,10 +428,10 @@ By default, there are two roles:
 By default, there are two resources with up to six permissions.
 
 **user**:
-  `create` `list` `set-role` `ban` `impersonate` `delete` `set-password`
+`create` `list` `set-role` `ban` `impersonate` `delete` `set-password`
 
 **session**:
-  `list` `revoke` `delete`
+`list` `revoke` `delete`
 
 Users with the admin role have full control over all the resources and actions. Users with the user role have no control over any of those actions.
 
@@ -480,9 +476,10 @@ The plugin provides an easy way to define your own set of permissions for each r
         project: ["create"], // [!code highlight]
     }); // [!code highlight]
 
-   export const admin = ac.newRole({ // [!code highlight]
-        project: ["create", "update"], // [!code highlight]
-    }); // [!code highlight]
+export const admin = ac.newRole({
+  // [!code highlight]
+  project: ["create", "update"], // [!code highlight]
+}); // [!code highlight]
 
     export const myCustomRole = ac.newRole({ // [!code highlight]
         project: ["create", "update", "delete"], // [!code highlight]
@@ -565,7 +562,6 @@ The plugin provides an easy way to define your own set of permissions for each r
 
 To check a user's permissions, you can use the `hasPermission` function provided by the client.
 
-
 <APIMethod path="/admin/has-permission" method="POST">
 ```ts
 type userHasPermission = {
@@ -603,21 +599,19 @@ const canCreateProject = await authClient.admin.hasPermission({
 const canCreateProjectAndCreateSale = await authClient.admin.hasPermission({
   permissions: {
     project: ["create"],
-    sale: ["create"]
+    sale: ["create"],
   },
 });
 ```
 
 If you want to check a user's permissions server-side, you can use the `userHasPermission` action provided by the `api` to check the user's permissions.
 
-
-
 ```ts title="api.ts"
 import { auth } from "@/auth";
 
 await auth.api.userHasPermission({
   body: {
-    userId: 'id', //the user id
+    userId: "id", //the user id
     permissions: {
       project: ["create"], // This must match the structure in your access control
     },
@@ -627,7 +621,7 @@ await auth.api.userHasPermission({
 // You can also just pass the role directly
 await auth.api.userHasPermission({
   body: {
-   role: "admin",
+    role: "admin",
     permissions: {
       project: ["create"], // This must match the structure in your access control
     },
@@ -637,15 +631,14 @@ await auth.api.userHasPermission({
 // You can also check multiple resource permissions at the same time
 await auth.api.userHasPermission({
   body: {
-   role: "admin",
+    role: "admin",
     permissions: {
       project: ["create"], // This must match the structure in your access control
-      sale: ["create"]
+      sale: ["create"],
     },
   },
 });
 ```
-
 
 **Check Role Permission**:
 
@@ -665,7 +658,7 @@ const canCreateProject = authClient.admin.checkRolePermission({
 const canDeleteUserAndRevokeSession = authClient.admin.checkRolePermission({
   permissions: {
     user: ["delete"],
-    session: ["revoke"]
+    session: ["revoke"],
   },
   role: "admin",
 });
@@ -729,6 +722,7 @@ admin({
   defaultRole: "regular",
 });
 ```
+
 ### Admin Roles
 
 The roles that are considered admin roles. Defaults to `["admin"]`.
@@ -740,8 +734,8 @@ admin({
 ```
 
 <Callout type="warning">
-  Any role that isn't in the `adminRoles` list, even if they have the permission,
-  will not be considered an admin.
+  Any role that isn't in the `adminRoles` list, even if they have the permission, will not
+  be considered an admin.
 </Callout>
 
 ### Admin userIds
@@ -750,8 +744,8 @@ You can pass an array of userIds that should be considered as admin. Default to 
 
 ```ts title="auth.ts"
 admin({
-    adminUserIds: ["user_id_1", "user_id_2"]
-})
+  adminUserIds: ["user_id_1", "user_id_2"],
+});
 ```
 
 If a user is in the `adminUserIds` list, they will be able to perform any admin operation.

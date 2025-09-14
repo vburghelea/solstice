@@ -12,6 +12,8 @@ import {
 import { PlusIcon, UsersIcon } from "~/components/ui/icons";
 import type { UserTeam } from "~/features/teams/teams.queries";
 import { getUserTeams } from "~/features/teams/teams.queries";
+import { useCountries } from "~/shared/hooks/useCountries";
+import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/dashboard/teams/")({
   loader: async () => {
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/dashboard/teams/")({
 
 function TeamsIndexPage() {
   const { userTeams: initialTeams } = Route.useLoaderData();
+  const { getCountryName } = useCountries();
 
   const { data: userTeams } = useSuspenseQuery({
     queryKey: ["userTeams"],
@@ -35,7 +38,7 @@ function TeamsIndexPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Teams</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Teams</h1>
           <p className="text-muted-foreground">Manage your teams and memberships</p>
         </div>
         <Button asChild>
@@ -50,7 +53,7 @@ function TeamsIndexPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">No teams yet</h3>
+            <h3 className="mb-2 text-lg font-semibold text-gray-900">No teams yet</h3>
             <p className="text-muted-foreground mb-4 text-center">
               Join an existing team or create your own to get started
             </p>
@@ -68,17 +71,65 @@ function TeamsIndexPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {userTeams.map((userTeam) => (
-            <TeamCard key={userTeam.team.id} userTeam={userTeam} />
-          ))}
-        </div>
+        <>
+          {/* Mobile list */}
+          <div className="md:hidden">
+            <List>
+              {userTeams.map((userTeam) => (
+                <List.Item key={userTeam.team.id} className="group">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-base font-semibold text-gray-900">
+                        {userTeam.team.name}
+                      </div>
+                      <div className="text-muted-foreground mt-1 text-xs">
+                        {userTeam.team.city}
+                        {userTeam.team.country
+                          ? `, ${getCountryName(userTeam.team.country)}`
+                          : ""}
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600">
+                        Role:{" "}
+                        <span className="capitalize">{userTeam.membership.role}</span> •
+                        Members: {userTeam.memberCount}
+                      </div>
+                    </div>
+                    <Link
+                      to="/dashboard/teams/$teamId"
+                      params={{ teamId: userTeam.team.id }}
+                      className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </List.Item>
+              ))}
+            </List>
+          </div>
+
+          {/* Desktop grid */}
+          <div className="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
+            {userTeams.map((userTeam) => (
+              <TeamCard
+                key={userTeam.team.id}
+                userTeam={userTeam}
+                getCountryName={getCountryName}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
 }
 
-function TeamCard({ userTeam }: { userTeam: UserTeam }) {
+function TeamCard({
+  userTeam,
+  getCountryName,
+}: {
+  userTeam: UserTeam;
+  getCountryName: (isoCode: string | null | undefined) => string;
+}) {
   const { team, membership, memberCount } = userTeam;
 
   return (
@@ -86,11 +137,11 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl">{team.name}</CardTitle>
+            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}
-                {team.province ? `, ${team.province}` : ""}
+                {team.country ? `, ${getCountryName(team.country)}` : ""}
               </CardDescription>
             )}
           </div>

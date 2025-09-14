@@ -7,7 +7,6 @@ let authClientInstance: ReturnType<typeof createAuthClient> | null = null;
 function getAuthClient() {
   if (!authClientInstance) {
     const baseURL = getBaseUrl();
-    console.log("Auth client created with baseURL:", baseURL);
     authClientInstance = createAuthClient({ baseURL });
   }
   return authClientInstance;

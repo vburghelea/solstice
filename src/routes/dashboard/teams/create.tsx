@@ -19,22 +19,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { createTeam } from "~/features/teams/teams.mutations";
 
-// Canadian provinces and territories
-const PROVINCES = [
-  { value: "AB", label: "Alberta" },
-  { value: "BC", label: "British Columbia" },
-  { value: "MB", label: "Manitoba" },
-  { value: "NB", label: "New Brunswick" },
-  { value: "NL", label: "Newfoundland and Labrador" },
-  { value: "NT", label: "Northwest Territories" },
-  { value: "NS", label: "Nova Scotia" },
-  { value: "NU", label: "Nunavut" },
-  { value: "ON", label: "Ontario" },
-  { value: "PE", label: "Prince Edward Island" },
-  { value: "QC", label: "Quebec" },
-  { value: "SK", label: "Saskatchewan" },
-  { value: "YT", label: "Yukon" },
-];
+import { COUNTRIES } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/create")({
   component: CreateTeamPage,
@@ -60,7 +45,7 @@ function CreateTeamPage() {
       slug: "",
       description: "",
       city: "",
-      province: "",
+      country: "",
       primaryColor: "#000000",
       secondaryColor: "#ffffff",
       foundedYear: new Date().getFullYear().toString(),
@@ -85,7 +70,7 @@ function CreateTeamPage() {
             slug,
             description: value.description || undefined,
             city: value.city || undefined,
-            province: value.province || undefined,
+            country: value.country || undefined,
             primaryColor: value.primaryColor || undefined,
             secondaryColor: value.secondaryColor || undefined,
             foundedYear: value.foundedYear || undefined,
@@ -112,7 +97,7 @@ function CreateTeamPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Create a New Team</CardTitle>
+          <CardTitle className="text-gray-900">Create a New Team</CardTitle>
           <CardDescription>
             Set up your team profile and start inviting members
           </CardDescription>
@@ -198,11 +183,11 @@ function CreateTeamPage() {
                 </form.Field>
 
                 <form.Field
-                  name="province"
+                  name="country"
                   validators={{
                     onChange: ({ value }) => {
-                      if (value && !PROVINCES.some((p) => p.value === value)) {
-                        return "Please select a valid province";
+                      if (value && !COUNTRIES.some((p) => p.value === value)) {
+                        return "Please select a valid country";
                       }
                       return undefined;
                     },
@@ -211,11 +196,11 @@ function CreateTeamPage() {
                   {(field) => (
                     <ValidatedCombobox
                       field={field}
-                      label="Province"
-                      placeholder="Select a province..."
-                      options={PROVINCES}
-                      searchPlaceholder="Search provinces..."
-                      emptyText="No province found."
+                      label="Country"
+                      placeholder="Select a country..."
+                      options={COUNTRIES}
+                      searchPlaceholder="Search countries..."
+                      emptyText="No country found."
                     />
                   )}
                 </form.Field>

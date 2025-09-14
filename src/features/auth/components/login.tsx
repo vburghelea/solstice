@@ -17,8 +17,10 @@ export default function LoginForm() {
   const router = useRouter();
 
   // Get redirect parameter from URL, default to dashboard
-  const searchParams = new URLSearchParams(window.location.search);
-  const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  const redirectUrl =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("redirect") || "/dashboard"
+      : "/dashboard";
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -70,9 +72,9 @@ export default function LoginForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Quadball Canada</span>
+              <span className="sr-only">Roundup Games</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome back to Quadball Canada</h1>
+            <h1 className="text-xl font-bold">Welcome back to Roundup Games</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field
@@ -128,6 +130,11 @@ export default function LoginForm() {
                 />
               )}
             </form.Field>
+            <div className="text-right text-sm">
+              <Link to="/auth/forgot-password" className="underline underline-offset-4">
+                Forgot Password?
+              </Link>
+            </div>
             <FormSubmitButton
               isSubmitting={form.state.isSubmitting || isLoading}
               className="mt-2 w-full"
@@ -172,6 +179,52 @@ export default function LoginForm() {
           >
             <GoogleIcon />
             Login with Google
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            type="button"
+            disabled={isLoading || form.state.isSubmitting}
+            onClick={() =>
+              auth.signInWithOAuth(
+                {
+                  provider: "discord",
+                  callbackURL: redirectUrl,
+                },
+                {
+                  onRequest: () => {
+                    setIsLoading(true);
+                    setErrorMessage("");
+                  },
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onError: (ctx: any) => {
+                    setIsLoading(false);
+                    setErrorMessage(ctx.error?.message || "OAuth login failed");
+                  },
+                },
+              )
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-discord mr-2 h-4 w-4"
+            >
+              <path d="M10.5 11.5c-.98-.98-2.52-.98-3.5 0-.98.98-.98 2.52 0 3.5.98.98 2.52.98 3.5 0 .98-.98.98-2.52 0-3.5Z" />
+              <path d="M17 11.5c-.98-.98-2.52-.98-3.5 0-.98.98-.98 2.52 0 3.5.98.98 2.52.98 3.5 0 .98-.98.98-2.52 0-3.5Z" />
+              <path d="M8 17.5s1.5 2 4 2 4-2 4-2" />
+              <path d="M19.5 10c.98-.98.98-2.52 0-3.5-.98-.98-2.52-.98-3.5 0-.98.98-.98 2.52 0 3.5.98.98 2.52.98 3.5 0Z" />
+              <path d="M4.5 10c.98-.98.98-2.52 0-3.5-.98-.98-2.52-.98-3.5 0-.98.98-.98 2.52 0 3.5.98.98 2.52.98 3.5 0Z" />
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" />
+            </svg>
+            Login with Discord
           </Button>
         </div>
       </form>

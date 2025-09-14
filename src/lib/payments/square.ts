@@ -15,7 +15,7 @@ export interface CheckoutSession {
   userId: string;
   amount: number;
   currency: string;
-  status: "pending" | "completed" | "cancelled";
+  status: "pending" | "completed" | "canceled";
   expiresAt: Date;
 }
 

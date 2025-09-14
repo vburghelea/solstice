@@ -26,7 +26,7 @@ export const eventStatusEnum = pgEnum("event_status", [
   "registration_closed", // No more registrations
   "in_progress", // Event is currently happening
   "completed", // Event finished
-  "cancelled", // Event was cancelled
+  "canceled", // Event was canceled
 ]);
 
 /**
@@ -72,7 +72,7 @@ export const events = pgTable("events", {
   venueName: varchar("venue_name", { length: 255 }),
   venueAddress: text("venue_address"),
   city: varchar("city", { length: 100 }),
-  province: varchar("province", { length: 50 }),
+  country: varchar("country", { length: 50 }),
   postalCode: varchar("postal_code", { length: 10 }),
   locationNotes: text("location_notes"), // Parking info, directions, etc.
 
@@ -143,7 +143,7 @@ export const eventRegistrations = pgTable("event_registrations", {
   division: varchar("division", { length: 100 }), // Which division they're in
 
   // Status
-  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, confirmed, waitlisted, cancelled
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, confirmed, waitlisted, canceled
   paymentStatus: varchar("payment_status", { length: 50 }).notNull().default("pending"), // pending, paid, refunded
   paymentId: text("payment_id"), // Reference to payment record
 
@@ -156,7 +156,7 @@ export const eventRegistrations = pgTable("event_registrations", {
 
   // Timestamps
   confirmedAt: timestamp("confirmed_at"),
-  cancelledAt: timestamp("cancelled_at"),
+  canceledAt: timestamp("canceled_at"),
 });
 
 /**
@@ -242,7 +242,7 @@ export const createEventInputSchema = z.object({
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
   city: z.string().optional(),
-  province: z.string().optional(),
+  country: z.string().optional(),
   postalCode: z.string().optional(),
   startDate: z.string(), // Will be converted to Date
   endDate: z.string(), // Will be converted to Date

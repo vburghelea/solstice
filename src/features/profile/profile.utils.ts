@@ -1,6 +1,10 @@
 import type { UserProfile } from "./profile.types";
 
 export function isProfileComplete(profile: UserProfile): boolean {
-  // Only date of birth is required for profile completion
-  return !!profile.dateOfBirth;
+  return (
+    profile.gender !== undefined &&
+    profile.pronouns !== undefined &&
+    profile.phone !== undefined &&
+    profile.privacySettings !== undefined
+  );
 }

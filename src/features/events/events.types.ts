@@ -23,7 +23,7 @@ export type EventFilters = {
   startDateFrom?: Date;
   startDateTo?: Date;
   city?: string;
-  province?: string;
+  country?: string;
   featured?: boolean;
   publicOnly?: boolean;
 };
@@ -51,7 +51,7 @@ export interface EventWithDetails
   amenities: EventAmenities;
   requirements: EventRequirements;
   metadata: EventMetadata;
-  organizer: {
+  organizer?: {
     id: string;
     name: string;
     email: string;

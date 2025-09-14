@@ -67,6 +67,7 @@ export const myAdapter = (config: CustomAdapterConfig = {}) =>
     // ...
   });
 ```
+
 </Step>
 
 <Step>
@@ -157,6 +158,7 @@ then it's expected that the `id` is provided in the `data` object. Otherwise, th
 
 Additionally, it's possible to pass `forceAllowId` as a parameter to the `create` method, which allows `id` to be provided in the `data` object.
 We handle `forceAllowId` internally, so you don't need to worry about it.
+
 </Callout>
 
 parameters:
@@ -165,9 +167,7 @@ parameters:
 - `data`: The data to insert into the database.
 - `select`: An array of fields to return from the database.
 
-<Callout>
-  Make sure to return the data that is inserted into the database.
-</Callout>
+<Callout>Make sure to return the data that is inserted into the database.</Callout>
 
 ```ts title="Example"
 create: async ({ model, data, select }) => {
@@ -187,8 +187,8 @@ parameters:
 - `update`: The data to update the record with.
 
 <Callout>
-  Make sure to return the data in the row which is updated. This includes any
-  fields that were not updated.
+  Make sure to return the data in the row which is updated. This includes any fields that
+  were not updated.
 </Callout>
 
 ```ts title="Example"
@@ -282,9 +282,7 @@ parameters:
 - `sortBy`: The `sortBy` clause to sort the records by.
 - `offset`: The offset of records to return.
 
-<Callout>
-  Make sure to return the array of data that is found in the database.
-</Callout>
+<Callout>Make sure to return the array of data that is found in the database.</Callout>
 
 ```ts title="Example"
 findMany: async ({ model, where, limit, sortBy, offset }) => {
@@ -523,9 +521,8 @@ mapKeysTransformOutput: () => {
 If you need to transform the input data before it is saved to the database, you can use this option to transform the data.
 
 <Callout type="warn">
-  If you're using `supportsJSON`, `supportsDates`, or `supportsBooleans`, then
-  the transformations will be applied before your `customTransformInput`
-  function is called.
+  If you're using `supportsJSON`, `supportsDates`, or `supportsBooleans`, then the
+  transformations will be applied before your `customTransformInput` function is called.
 </Callout>
 The `customTransformInput` function receives the following arguments:
 

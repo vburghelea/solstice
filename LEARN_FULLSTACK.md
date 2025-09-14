@@ -1,6 +1,6 @@
-# 🚀 Solstice – Full-Stack Development Guide
+# 🚀 Roundup Games – Full-Stack Development Guide
 
-Welcome to the Solstice project! This guide teaches modern full-stack web development through a real-world application while serving as a complete technical reference.
+Welcome to the Roundup Games project! This guide teaches modern full-stack web development through a real-world application while serving as a complete technical reference.
 
 ## 📚 Table of Contents
 
@@ -235,7 +235,7 @@ _Figure 2: End-to-end flow for adding a new feature with type safety preserved a
 
 | Task                 | Command                | Description                   |
 | -------------------- | ---------------------- | ----------------------------- |
-| **Start dev server** | `pnpm dev`             | Runs app locally on port 3000 |
+| **Start dev server** | `pnpm dev`             | Runs app locally on port 5173 |
 | **Run tests**        | `pnpm test`            | Executes all test suites      |
 | **Type check**       | `pnpm check-types`     | Verifies TypeScript types     |
 | **Lint code**        | `pnpm lint`            | Checks code style             |
@@ -454,7 +454,7 @@ You now understand:
 - ✅ Where to find and modify code
 - ✅ How to contribute effectively
 
-_Solstice follows the mantra "simple, typed, secure by default."_  
+_Roundup Games follows the mantra "simple, typed, secure by default."_  
 _If you keep those three goals in mind, your contributions will fit right in._
 
 Happy coding! 🎉

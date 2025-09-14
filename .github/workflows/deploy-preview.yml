@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: "20"
 
 jobs:
   deploy-preview:
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -42,7 +42,7 @@ jobs:
         id: netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
-          publish-dir: './dist'
+          publish-dir: "./dist"
           production-deploy: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
@@ -61,27 +61,27 @@ jobs:
           script: |
             const deployUrl = '${{ steps.netlify.outputs.deploy-url }}';
             const comment = `### 🚀 Deploy Preview
-            
+
             | Name | Link |
             |------|------|
             | 🔨 Latest commit | ${context.sha} |
             | 🔍 Latest deploy log | ${{ steps.netlify.outputs.logs-url }} |
             | 😎 Deploy Preview | [Visit Preview](${deployUrl}) |
-            
+
             ---
-            
+
             _This comment is automatically updated on each push_`;
-            
+
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            
+
             const botComment = comments.find(comment => {
               return comment.user.type === 'Bot' && comment.body.includes('Deploy Preview');
             });
-            
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,

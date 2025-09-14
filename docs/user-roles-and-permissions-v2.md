@@ -40,12 +40,12 @@ Roles determine what users can do in the system. Users can have multiple roles.
 
 #### Role Types
 
-| Role                      | Scope          | Description                                                      |
-| ------------------------- | -------------- | ---------------------------------------------------------------- |
-| **Solstice Admin**        | Global         | Full system access, can manage infrastructure, all organizations |
-| **Quadball Canada Admin** | Organization   | Manage all Quadball Canada operations (teams, events, members)   |
-| **Team Admin**            | Team-specific  | Manage specific team(s) - roster, registration, team details     |
-| **Event Admin**           | Event-specific | Manage specific event(s) - registration, scheduling, results     |
+| Role               | Scope          | Description                                                      |
+| ------------------ | -------------- | ---------------------------------------------------------------- |
+| **Platform Admin** | Global         | Full system access, can manage infrastructure, all organizations |
+| **Games Admin**    | Organization   | Manage all Roundup Games operations (teams, events, members)     |
+| **Team Admin**     | Team-specific  | Manage specific team(s) - roster, registration, team details     |
+| **Event Admin**    | Event-specific | Manage specific event(s) - registration, scheduling, results     |
 
 ### 2. Tags (Categorization)
 
@@ -120,7 +120,7 @@ CREATE TABLE user_roles (
   notes TEXT,
   -- Constraints
   CONSTRAINT valid_scope CHECK (
-    (role_id IN (SELECT id FROM roles WHERE name IN ('Solstice Admin', 'Quadball Canada Admin'))
+    (role_id IN (SELECT id FROM roles WHERE name IN ('Platform Admin', 'Games Admin'))
      AND team_id IS NULL AND event_id IS NULL)
     OR
     (role_id IN (SELECT id FROM roles WHERE name = 'Team Admin')
@@ -177,8 +177,8 @@ CREATE INDEX idx_user_tags_expires_at ON user_tags(expires_at) WHERE expires_at 
 ```sql
 -- Insert default roles
 INSERT INTO roles (name, description, permissions) VALUES
-  ('Solstice Admin', 'Platform administrator with full system access', '{"*": true}'),
-  ('Quadball Canada Admin', 'Quadball Canada organization administrator', '{"quadball_canada.*": true}'),
+  ('Platform Admin', 'Platform administrator with full system access', '{"*": true}'),
+  ('Games Admin', 'Roundup Games organization administrator', '{"roundup_games.*": true}'),
   ('Team Admin', 'Team-specific administrator', '{"team.*": true}'),
   ('Event Admin', 'Event-specific administrator', '{"event.*": true}');
 
@@ -206,7 +206,7 @@ INSERT INTO tags (name, category, description, color) VALUES
 // src/lib/auth/roles.types.ts
 export interface Role {
   id: string;
-  name: "Solstice Admin" | "Quadball Canada Admin" | "Team Admin" | "Event Admin";
+  name: "Platform Admin" | "Games Admin" | "Team Admin" | "Event Admin";
   description: string;
   permissions: Record<string, boolean>;
 }
@@ -263,7 +263,7 @@ export class PermissionService {
       .where(
         and(
           eq(userRoles.userId, userId),
-          inArray(roles.name, ["Solstice Admin", "Quadball Canada Admin"]),
+          inArray(roles.name, ["Platform Admin", "Games Admin"]),
         ),
       )
       .limit(1);
@@ -299,7 +299,7 @@ export class PermissionService {
       .where(
         and(
           eq(userRoles.userId, userId),
-          inArray(roles.name, ["Solstice Admin", "Quadball Canada Admin"]),
+          inArray(roles.name, ["Platform Admin", "Games Admin"]),
         ),
       )
       .limit(1);
@@ -536,8 +536,8 @@ export const searchUsers = createServerFn({ method: "POST" })
 // Make someone a Team Admin
 await assignRole(userId, "Team Admin", { teamId: "team-123" });
 
-// Make someone a Quadball Canada Admin
-await assignRole(userId, "Quadball Canada Admin");
+// Make someone a Games Admin
+await assignRole(userId, "Games Admin");
 ```
 
 ### 2. Checking Permissions
@@ -568,7 +568,7 @@ await TagService.updateRefereeTagsAfterCertification(userId, "head");
 ```typescript
 // Show Reports tab only for global admins
 {user.roles?.some(r =>
-  ['Solstice Admin', 'Quadball Canada Admin'].includes(r.role.name)
+  ['Platform Admin', 'Games Admin'].includes(r.role.name)
 ) && (
   <Link to="/reports">Reports</Link>
 )}
@@ -629,7 +629,7 @@ This design provides the flexibility you need while keeping the concepts clearly
 
 7. **Create seed script for default roles** (~20 min)
    - CLI script to insert default roles
-   - Assign yourself Solstice Admin role
+   - Assign yourself Platform Admin role
 
 8. **Write tests for PermissionService** (~45 min)
    - Unit tests with Vitest

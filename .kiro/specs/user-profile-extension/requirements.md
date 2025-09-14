@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature extends the current user authentication system to include comprehensive profile data required for membership management, team roster functionality, and age verification. Currently, the system only captures basic user information (name, email) during signup, but many downstream features require additional profile fields such as date of birth, emergency contact information, and privacy preferences.
+This feature extends the current user authentication system to include comprehensive profile data required for membership management, team roster functionality, and age verification. Currently, the system only captures basic user information (name, email) during signup, but many downstream features require additional profile fields such as privacy preferences.
 
 The user profile extension will serve as the foundation for the member onboarding flow, membership purchase validation, and team management features that follow in the development roadmap.
 
@@ -10,14 +10,13 @@ The user profile extension will serve as the foundation for the member onboardin
 
 ### Requirement 1
 
-**User Story:** As a platform user, I want to provide comprehensive profile information during registration, so that I can participate in memberships, teams, and events that require age verification and emergency contact details.
+**User Story:** As a platform user, I want to provide comprehensive profile information during registration, so that I can participate in memberships, teams, and events.
 
 #### Acceptance Criteria
 
-1. WHEN a user completes signup THEN the system SHALL capture additional profile fields including date of birth, gender, emergency contact, pronouns, and privacy settings
-2. WHEN profile data is stored THEN the system SHALL validate date of birth format and ensure emergency contact information is complete
-3. WHEN a user updates their profile THEN the system SHALL maintain an audit trail with timestamps and version tracking
-4. IF a user provides privacy settings THEN the system SHALL store these preferences in a structured JSONB format
+1. WHEN a user completes signup THEN the system SHALL capture additional profile fields including gender, pronouns, and privacy settings
+2. WHEN a user updates their profile THEN the system SHALL maintain an audit trail with timestamps and version tracking
+3. IF a user provides privacy settings THEN the system SHALL store these preferences in a structured JSONB format
 
 ### Requirement 2
 
@@ -28,7 +27,6 @@ The user profile extension will serve as the foundation for the member onboardin
 1. WHEN profile data is stored THEN the system SHALL use appropriate database constraints and indexes for performance
 2. WHEN sensitive data is handled THEN the system SHALL implement soft-delete patterns to prevent data loss
 3. WHEN profile updates occur THEN the system SHALL track modification timestamps and maintain data versioning
-4. IF emergency contact data is stored THEN the system SHALL ensure it includes name, relationship, and contact information
 
 ### Requirement 3
 

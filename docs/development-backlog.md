@@ -1,36 +1,40 @@
 # Development Backlog
 
-**Last Updated**: January 2025
+Below is a **prioritized ticket backlog** that will take the current codebase from an auth-only skeleton to a thin, end-to-end **Member → Dashboard** slice and lay the foundation for Teams and Events. Each ticket lists:
 
-This is the prioritized development roadmap for Solstice, Quadball Canada's league management platform. Each ticket includes priority (P0 = highest), status, dependencies, and key implementation details.
+- **Priority** (P0 = must ship next; P1 = after P0 etc.)
+- **Status** (✅ Complete, 🚧 In Progress, ❌ Not Started)
+- **Depends on** (other tickets or existing code)
+- **Key code/doc references** (files you will touch or read)
+- **Technical notes / first-implementation thoughts**
 
 ---
 
-## 🚨 Critical Issues (Address First)
+## Completed Work
 
-These are production-critical issues that should be addressed before new feature development:
+### ✅ DONE: Roundup Games Design System Integration
 
-### CRIT-1: Fix Payment Webhook Verification
+|               |                                                                                                                                                                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **What**      | Integrated Roundup Games branding, created public/admin layouts, responsive navigation                                                                                                                                               |
+| **Code refs** | `src/features/layouts/*`, `src/shared/ui/*`, auth pages styling                                                                                                                                                                      |
+| **Delivered** | <ul><li>Public layout with header/footer</li><li>Admin dashboard layout with sidebar</li><li>Hero section, event cards</li><li>Mobile-responsive navigation</li><li>Consistent auth page styling</li><li>Dark mode support</li></ul> |
 
-|                |                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| **Priority**   | 🔴 Critical (Security/Money handling)                                                                                                                                                                                                                                                                                                                                                                                          |
-| **Issue**      | Payment verification is mocked (line 160-165 in square-real.ts). This means we're not actually verifying payments in production.                                                                                                                                                                                                                                                                                               |
-| **Code refs**  | `src/lib/payments/square-real.ts:160-165`, `src/routes/api/webhooks/square.ts`                                                                                                                                                                                                                                                                                                                                                 |
-| **Tasks**      | <ul><li>Replace mocked payment verification with real Square API calls</li><li>Store checkout sessions in database when created</li><li>Update webhook handler to create membership records on payment.updated COMPLETED status</li><li>Implement polling fallback for confirmMembershipPurchase</li><li>Add database migration for payment_sessions table</li><li>Test webhook signature verification in production</li></ul> |
-| **Why urgent** | Current implementation accepts any payment as valid. Real money is at risk.                                                                                                                                                                                                                                                                                                                                                    |
+### ✅ DONE: Profile Schema Extension
 
-### CRIT-2: Remove Obsolete Rate Limiting Code ✅
+|               |                                                                                                                                                                                           |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **What**      | Extended user table with profile fields needed for membership/teams                                                                                                                       |
+| **Code refs** | `src/db/schema/auth.schema.ts`, `src/features/profile/*`                                                                                                                                  |
+| **Delivered** | <ul><li>Profile columns: gender, pronouns, phone, privacy_settings</li><li>Profile feature module structure</li><li>isProfileComplete utility</li><li>Profile schemas and tests</li></ul> |
 
-|                |                                                                                                                                                                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ✅ Completed                                                                                                                                                                                                                                |
-| **Priority**   | 🟡 High (Quick win, removes confusion)                                                                                                                                                                                                      |
-| **Issue**      | Old in-memory rate limiting code exists alongside TanStack Pacer implementation                                                                                                                                                             |
-| **Code refs**  | `src/lib/security/middleware/rate-limit.ts` (DELETED), `src/lib/pacer/*` (KEPT)                                                                                                                                                             |
-| **Tasks**      | <ul><li>✅ Delete `src/lib/security/middleware/rate-limit.ts`</li><li>✅ Remove any imports of the old rate limiter</li><li>✅ Update CLAUDE.md to remove references to old system</li><li>✅ Verify all rate limiting uses Pacer</li></ul> |
-| **Completion** | Removed obsolete server-side rate limiting, updated auth route to use direct handler, cleaned up documentation                                                                                                                              |
+### ✅ DONE: Complete Profile Onboarding Flow (P0-2)
+
+|               |                                                                                                                                                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **What**      | Multi-step profile completion form with route guards to ensure required data before membership purchase                                                                                                               |
+| **Code refs** | `src/routes/onboarding/*`, `src/features/profile/components/*`, `src/features/profile/profile-guard.ts`, `src/shared/ui/*`                                                                                            |
+| **Delivered** | <ul><li>2-step onboarding form (Personal Info, Privacy)</li><li>Route guards with `requireCompleteProfile()`</li><li>shadcn/ui components integration</li><li>Mobile-responsive UI with progress indicators</li></ul> |
 
 ---
 
@@ -67,7 +71,7 @@ These are production-critical issues that should be addressed before new feature
 
 ### Phase 1: Foundation (Auth, Profile, Design System)
 
-- ✅ **Quadball Canada Design System** - Public/admin layouts, responsive navigation, dark mode
+- ✅ **Roundup Games Design System** - Public/admin layouts, responsive navigation, dark mode
 - ✅ **Profile Schema & Onboarding** - Extended user table, 3-step onboarding flow, profile guards
 - ✅ **Profile Server Functions** - Complete CRUD operations with validation
 - ✅ **Form Component Library** - ValidatedInput, ValidatedDatePicker, ValidatedSelect with TanStack Form
@@ -157,14 +161,14 @@ These are production-critical issues that should be addressed before new feature
 
 ### FE-2: Public Pages Content & Polish
 
-|                |                                                                                                                                                                                                                                                                                |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                 |
-| **Why now**    | Public site needs real content; currently using placeholder text/images                                                                                                                                                                                                        |
-| **Depends on** | None (frontend only)                                                                                                                                                                                                                                                           |
-| **Code refs**  | `src/routes/index.tsx`, `src/shared/ui/hero-section.tsx`, `src/shared/ui/event-card.tsx`                                                                                                                                                                                       |
-| **Tasks**      | <ul><li>Replace placeholder images with Quadball-specific imagery</li><li>Update hero section copy to match brand voice</li><li>Create About, Teams, Resources static pages</li><li>Add loading states for event cards</li><li>Implement 404 page with brand styling</li></ul> |
-| **Thoughts**   | Work with stakeholders for copy/images; can use Unsplash API for temp Quadball images                                                                                                                                                                                          |
+|                |                                                                                                                                                                                                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                      |
+| **Why now**    | Public site needs real content; currently using placeholder text/images                                                                                                                                                                                                             |
+| **Depends on** | None (frontend only)                                                                                                                                                                                                                                                                |
+| **Code refs**  | `src/routes/index.tsx`, `src/shared/ui/hero-section.tsx`, `src/shared/ui/event-card.tsx`                                                                                                                                                                                            |
+| **Tasks**      | <ul><li>Replace placeholder images with tabletop game-specific imagery</li><li>Update hero section copy to match brand voice</li><li>Create About, Teams, Resources static pages</li><li>Add loading states for event cards</li><li>Implement 404 page with brand styling</li></ul> |
+| **Thoughts**   | Work with stakeholders for copy/images; can use Unsplash API for temp ones images                                                                                                                                                                                                   |
 
 ---
 
@@ -172,14 +176,14 @@ These are production-critical issues that should be addressed before new feature
 
 ### FE-4: Mobile PWA Optimization
 
-|                |                                                                                                                                                                                                                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                    |
-| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                                          |
-| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                                          |
-| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                                              |
-| **Tasks**      | <ul><li>Add PWA manifest with Quadball Canada branding</li><li>Implement service worker for offline support</li><li>Add install prompt for mobile users</li><li>Optimize touch targets for mobile</li><li>Add pull-to-refresh on dashboard</li><li>Test on real devices</li></ul> |
-| **Thoughts**   | Vite has PWA plugin; focus on offline-first for event days with poor connectivity                                                                                                                                                                                                 |
+|                |                                                                                                                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                  |
+| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                                        |
+| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                                        |
+| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                                            |
+| **Tasks**      | <ul><li>Add PWA manifest with Roundup Games branding</li><li>Implement service worker for offline support</li><li>Add install prompt for mobile users</li><li>Optimize touch targets for mobile</li><li>Add pull-to-refresh on dashboard</li><li>Test on real devices</li></ul> |
+| **Thoughts**   | Vite has PWA plugin; focus on offline-first for event days with poor connectivity                                                                                                                                                                                               |
 
 ---
 

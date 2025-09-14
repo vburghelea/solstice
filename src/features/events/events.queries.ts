@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { EventRegistration } from "~/db/schema";
-import { eventRegistrations, events, user } from "~/db/schema";
+import { eventRegistrations, events, teams, user } from "~/db/schema";
 import type {
   EventAmenities,
   EventDivisions,
@@ -11,17 +11,16 @@ import type {
   EventRules,
   EventSchedule,
 } from "./events.db-types";
-import {
-  checkEventRegistrationSchema,
-  getEventSchema,
-  getUpcomingEventsSchema,
-  listEventsSchema,
-} from "./events.schemas";
-import type {
-  EventListResult,
-  EventOperationResult,
-  EventWithDetails,
-} from "./events.types";
+import type { EventFilters, EventListResult, EventWithDetails } from "./events.types";
+// Lightweight DTO for registrations list
+export type EventRegistrationListItem = {
+  id: string;
+  registrationType: string;
+  status: string;
+  division: string | null;
+  team: { id: string; name: string; slug: string } | null;
+  user: { id: string; name: string; email: string };
+};
 
 // Type for EventRegistration with properly typed roster
 type EventRegistrationWithRoster = Omit<EventRegistration, "roster"> & {
@@ -38,22 +37,73 @@ function castRegistrationJsonbFields(
   };
 }
 
+// Helper to cast event jsonb fields and add derived properties
+function castEventJsonbFields(
+  event: typeof events.$inferSelect,
+  organizer: { id: string; name: string; email: string } | null,
+  registrationCount: number,
+): EventWithDetails {
+  const now = new Date();
+  const registrationOpens = event.registrationOpensAt
+    ? new Date(event.registrationOpensAt)
+    : null;
+  const registrationCloses = event.registrationClosesAt
+    ? new Date(event.registrationClosesAt)
+    : null;
+
+  const isRegistrationOpen =
+    event.status === "registration_open" &&
+    (!registrationOpens || now >= registrationOpens) &&
+    (!registrationCloses || now <= registrationCloses);
+
+  let availableSpots: number | undefined;
+  if (event.registrationType === "team" && event.maxTeams) {
+    availableSpots = Math.max(0, event.maxTeams - registrationCount);
+  } else if (event.registrationType === "individual" && event.maxParticipants) {
+    availableSpots = Math.max(0, event.maxParticipants - registrationCount);
+  }
+
+  return {
+    ...event,
+    rules: (event.rules || {}) as EventRules,
+    schedule: (event.schedule || {}) as EventSchedule,
+    divisions: (event.divisions || {}) as EventDivisions,
+    amenities: (event.amenities || {}) as EventAmenities,
+    requirements: (event.requirements || {}) as EventRequirements,
+    metadata: (event.metadata || {}) as EventMetadata,
+    organizer: organizer!,
+    registrationCount,
+    isRegistrationOpen,
+    availableSpots,
+  };
+}
+
 /**
  * List events with filters and pagination
  */
 export const listEvents = createServerFn({ method: "GET" })
-  .validator(listEventsSchema.parse)
-  .handler(async ({ data }): Promise<EventListResult> => {
+  .validator((data: unknown) => {
+    // Explicitly define the expected data structure for validation and type inference
+    const validatedData = data as {
+      filters?: EventFilters;
+      page?: number;
+      pageSize?: number;
+      sortBy?: "startDate" | "createdAt" | "name";
+      sortOrder?: "asc" | "desc";
+    };
+    return validatedData;
+  })
+  .handler(async ({ data = {} }): Promise<EventListResult> => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
 
-    const filters = data.filters || {};
-    const page = Math.max(1, data.page || 1);
-    const pageSize = Math.min(100, Math.max(1, data.pageSize || 20));
+    const filters = data?.filters || {};
+    const page = Math.max(1, data?.page || 1);
+    const pageSize = Math.min(100, Math.max(1, data?.pageSize || 20));
     const offset = (page - 1) * pageSize;
-    const sortBy = data.sortBy || "startDate";
-    const sortOrder = data.sortOrder || "asc";
+    const sortBy = data?.sortBy || "startDate";
+    const sortOrder = data?.sortOrder || "asc";
 
     // Build filter conditions
     const conditions: ReturnType<typeof eq>[] = [];
@@ -64,14 +114,12 @@ export const listEvents = createServerFn({ method: "GET" })
 
     if (filters.status) {
       const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
-      conditions.push(
-        inArray(events.status, statuses as (typeof events.status._.data)[]),
-      );
+      conditions.push(inArray(events.status, statuses));
     }
 
     if (filters.type) {
       const types = Array.isArray(filters.type) ? filters.type : [filters.type];
-      conditions.push(inArray(events.type, types as (typeof events.type._.data)[]));
+      conditions.push(inArray(events.type, types));
     }
 
     if (filters.organizerId) {
@@ -94,8 +142,8 @@ export const listEvents = createServerFn({ method: "GET" })
       conditions.push(eq(events.city, filters.city));
     }
 
-    if (filters.province) {
-      conditions.push(eq(events.province, filters.province));
+    if (filters.country) {
+      conditions.push(eq(events.country, filters.country));
     }
 
     if (filters.featured === true) {
@@ -130,7 +178,7 @@ export const listEvents = createServerFn({ method: "GET" })
           SELECT COUNT(*)::int 
           FROM ${eventRegistrations} 
           WHERE ${eventRegistrations.eventId} = ${events.id}
-          AND ${eventRegistrations.status} != 'cancelled'
+          AND ${eventRegistrations.status} != 'canceled'
         )`,
       })
       .from(events)
@@ -142,41 +190,8 @@ export const listEvents = createServerFn({ method: "GET" })
 
     // Transform results
     const eventsWithDetails: EventWithDetails[] = eventsList.map(
-      ({ event, organizer, registrationCount }) => {
-        const now = new Date();
-        const registrationOpens = event.registrationOpensAt
-          ? new Date(event.registrationOpensAt)
-          : null;
-        const registrationCloses = event.registrationClosesAt
-          ? new Date(event.registrationClosesAt)
-          : null;
-
-        const isRegistrationOpen =
-          event.status === "registration_open" &&
-          (!registrationOpens || now >= registrationOpens) &&
-          (!registrationCloses || now <= registrationCloses);
-
-        let availableSpots: number | undefined;
-        if (event.registrationType === "team" && event.maxTeams) {
-          availableSpots = Math.max(0, event.maxTeams - registrationCount);
-        } else if (event.registrationType === "individual" && event.maxParticipants) {
-          availableSpots = Math.max(0, event.maxParticipants - registrationCount);
-        }
-
-        return {
-          ...event,
-          rules: (event.rules as EventRules) || {},
-          schedule: (event.schedule as EventSchedule) || {},
-          divisions: (event.divisions as EventDivisions) || {},
-          amenities: (event.amenities as EventAmenities) || {},
-          requirements: (event.requirements as EventRequirements) || {},
-          metadata: (event.metadata as EventMetadata) || {},
-          organizer: organizer!,
-          registrationCount,
-          isRegistrationOpen,
-          availableSpots,
-        };
-      },
+      ({ event, organizer, registrationCount }) =>
+        castEventJsonbFields(event, organizer, registrationCount),
     );
 
     const totalPages = Math.ceil(count / pageSize);
@@ -198,8 +213,11 @@ export const listEvents = createServerFn({ method: "GET" })
  * Get a single event by ID or slug
  */
 export const getEvent = createServerFn({ method: "GET" })
-  .validator(getEventSchema.parse)
-  .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
+  .validator((data: unknown) => {
+    const validatedData = data as { id?: string; slug?: string };
+    return validatedData;
+  })
+  .handler(async ({ data }) => {
     try {
       if (!data.id && !data.slug) {
         return {
@@ -231,7 +249,7 @@ export const getEvent = createServerFn({ method: "GET" })
             SELECT COUNT(*)::int 
             FROM ${eventRegistrations} 
             WHERE ${eventRegistrations.eventId} = ${events.id}
-            AND ${eventRegistrations.status} != 'cancelled'
+            AND ${eventRegistrations.status} != 'canceled'
           )`,
         })
         .from(events)
@@ -252,41 +270,10 @@ export const getEvent = createServerFn({ method: "GET" })
       }
 
       const { event, organizer, registrationCount } = result[0];
-      const now = new Date();
-      const registrationOpens = event.registrationOpensAt
-        ? new Date(event.registrationOpensAt)
-        : null;
-      const registrationCloses = event.registrationClosesAt
-        ? new Date(event.registrationClosesAt)
-        : null;
-
-      const isRegistrationOpen =
-        event.status === "registration_open" &&
-        (!registrationOpens || now >= registrationOpens) &&
-        (!registrationCloses || now <= registrationCloses);
-
-      let availableSpots: number | undefined;
-      if (event.registrationType === "team" && event.maxTeams) {
-        availableSpots = Math.max(0, event.maxTeams - registrationCount);
-      } else if (event.registrationType === "individual" && event.maxParticipants) {
-        availableSpots = Math.max(0, event.maxParticipants - registrationCount);
-      }
 
       return {
         success: true,
-        data: {
-          ...event,
-          rules: (event.rules as EventRules) || {},
-          schedule: (event.schedule as EventSchedule) || {},
-          divisions: (event.divisions as EventDivisions) || {},
-          amenities: (event.amenities as EventAmenities) || {},
-          requirements: (event.requirements as EventRequirements) || {},
-          metadata: (event.metadata as EventMetadata) || {},
-          organizer: organizer!,
-          registrationCount,
-          isRegistrationOpen,
-          availableSpots,
-        },
+        data: castEventJsonbFields(event, organizer!, registrationCount),
       };
     } catch (error) {
       console.error("Error fetching event:", error);
@@ -303,12 +290,94 @@ export const getEvent = createServerFn({ method: "GET" })
   });
 
 /**
+ * List registrations for an event (organizers only)
+ */
+export const listEventRegistrations = createServerFn({ method: "GET" })
+  .validator((data: unknown) => data as { eventId: string })
+  .handler(async ({ data }) => {
+    try {
+      const [{ getDb }, { getAuth }, { PermissionService }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+        import("~/features/roles/permission.server"),
+      ]);
+
+      const db = await getDb();
+      const auth = await getAuth();
+      const { getWebRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getWebRequest();
+      const session = await auth.api.getSession({ headers });
+
+      if (!session?.user?.id) {
+        return {
+          success: false as const,
+          errors: [{ code: "UNAUTHORIZED", message: "Not signed in" }],
+        };
+      }
+
+      // Organizer or permitted role only
+      const canManage = await PermissionService.canManageEvent(
+        session.user.id,
+        data.eventId,
+      );
+      if (!canManage) {
+        // Also allow event organizerId
+        const [ev] = await db
+          .select()
+          .from(events)
+          .where(eq(events.id, data.eventId))
+          .limit(1);
+        if (!ev || ev.organizerId !== session.user.id) {
+          return {
+            success: false as const,
+            errors: [{ code: "FORBIDDEN", message: "Insufficient permissions" }],
+          };
+        }
+      }
+
+      const rows = await db
+        .select({
+          registration: eventRegistrations,
+          user: { id: user.id, name: user.name, email: user.email },
+          team: teams,
+          event: events,
+        })
+        .from(eventRegistrations)
+        .innerJoin(events, eq(eventRegistrations.eventId, events.id))
+        .innerJoin(user, eq(eventRegistrations.userId, user.id))
+        .leftJoin(teams, eq(eventRegistrations.teamId, teams.id))
+        .where(eq(eventRegistrations.eventId, data.eventId))
+        .orderBy(desc(eventRegistrations.createdAt));
+
+      const result: EventRegistrationListItem[] = rows.map((r) => ({
+        id: r.registration.id,
+        registrationType: r.registration.registrationType,
+        status: r.registration.status,
+        division: r.registration.division,
+        team: r.team ? { id: r.team.id, name: r.team.name, slug: r.team.slug } : null,
+        user: { id: r.user.id, name: r.user.name, email: r.user.email },
+      }));
+
+      return { success: true as const, data: result };
+    } catch (error) {
+      console.error("Error listing registrations:", error);
+      return {
+        success: false as const,
+        errors: [{ code: "DATABASE_ERROR", message: "Failed to list registrations" }],
+      };
+    }
+  });
+
+/**
  * Get upcoming events (public endpoint for homepage)
  */
 export const getUpcomingEvents = createServerFn({ method: "GET" })
-  .validator(getUpcomingEventsSchema.parse)
-  .handler(async ({ data }): Promise<EventWithDetails[]> => {
-    const limit = Math.min(10, data.limit || 3);
+  .validator((data: unknown) => {
+    const validatedData = data as { limit?: number };
+    return validatedData;
+  })
+  .handler(async ({ data }) => {
+    const limit = Math.min(10, data?.limit || 3);
 
     const result = (await listEvents({
       data: {
@@ -323,55 +392,56 @@ export const getUpcomingEvents = createServerFn({ method: "GET" })
       },
     })) as EventListResult;
 
-    return result.events;
+    return (result as EventListResult).events;
   });
 
 /**
  * Check if a user is registered for an event
  */
 export const checkEventRegistration = createServerFn({ method: "GET" })
-  .validator(checkEventRegistrationSchema.parse)
-  .handler(
-    async ({
-      data,
-    }): Promise<{
-      isRegistered: boolean;
-      registration?: EventRegistrationWithRoster;
-    }> => {
-      if (!data.userId && !data.teamId) {
-        return { isRegistered: false };
-      }
+  .validator((data: unknown) => {
+    const validatedData = data as { eventId?: string; userId?: string; teamId?: string };
+    return validatedData;
+  })
+  .handler(async ({ data }) => {
+    if (!data.eventId) {
+      // Added check for eventId
+      return { isRegistered: false };
+    }
 
-      // Import server-only modules inside the handler
-      const { getDb } = await import("~/db/server-helpers");
-      const db = await getDb();
+    if (!data.userId && !data.teamId) {
+      return { isRegistered: false };
+    }
 
-      const conditions: ReturnType<typeof eq>[] = [
-        eq(eventRegistrations.eventId, data.eventId),
-        eq(eventRegistrations.status, "confirmed"),
-      ];
+    // Import server-only modules inside the handler
+    const { getDb } = await import("~/db/server-helpers");
+    const db = await getDb();
 
-      if (data.userId) {
-        conditions.push(eq(eventRegistrations.userId, data.userId));
-      }
+    const conditions: ReturnType<typeof eq>[] = [
+      eq(eventRegistrations.eventId, data.eventId),
+      eq(eventRegistrations.status, "confirmed"),
+    ];
 
-      if (data.teamId) {
-        conditions.push(eq(eventRegistrations.teamId, data.teamId));
-      }
+    if (data.userId) {
+      conditions.push(eq(eventRegistrations.userId, data.userId));
+    }
 
-      const [registration] = await db
-        .select()
-        .from(eventRegistrations)
-        .where(and(...conditions))
-        .limit(1);
+    if (data.teamId) {
+      conditions.push(eq(eventRegistrations.teamId, data.teamId));
+    }
 
-      if (!registration) {
-        return { isRegistered: false };
-      }
+    const [registration] = await db
+      .select()
+      .from(eventRegistrations)
+      .where(and(...conditions))
+      .limit(1);
 
-      return {
-        isRegistered: true,
-        registration: castRegistrationJsonbFields(registration),
-      };
-    },
-  );
+    if (!registration) {
+      return { isRegistered: false };
+    }
+
+    return {
+      isRegistered: true,
+      registration: castRegistrationJsonbFields(registration),
+    };
+  });

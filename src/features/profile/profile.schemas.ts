@@ -1,60 +1,90 @@
 import { z } from "zod";
-
-export const emergencyContactSchema = z
-  .object({
-    name: z.string().min(1, "Emergency contact name is required"),
-    relationship: z.string().min(1, "Relationship is required"),
-    phone: z.string().optional(),
-    email: z.string().email("Invalid emergency contact email").optional(),
-  })
-  .refine((data) => data.phone || data.email, {
-    message: "Please provide at least one contact method (phone or email)",
-    path: ["phone"], // This will show the error on the phone field
-  });
+import { experienceLevelOptions } from "~/shared/types/common";
 
 export const privacySettingsSchema = z.object({
   showEmail: z.boolean(),
   showPhone: z.boolean(),
-  showBirthYear: z.boolean(),
+  showLocation: z.boolean(),
+  showLanguages: z.boolean(),
+  showGamePreferences: z.boolean(),
   allowTeamInvitations: z.boolean(),
+  allowFollows: z.boolean(),
+  allowInvitesOnlyFromConnections: z.boolean().optional(),
+});
+
+export const dayAvailabilitySchema = z.array(z.boolean()).length(96);
+export const availabilityDataSchema = z.object({
+  monday: dayAvailabilitySchema,
+  tuesday: dayAvailabilitySchema,
+  wednesday: dayAvailabilitySchema,
+  thursday: dayAvailabilitySchema,
+  friday: dayAvailabilitySchema,
+  saturday: dayAvailabilitySchema,
+  sunday: dayAvailabilitySchema,
 });
 
 export const profileInputSchema = z.object({
-  dateOfBirth: z
-    .preprocess((arg) => {
-      if (typeof arg === "string" && !arg.includes("T")) {
-        return new Date(`${arg}T00:00:00.000Z`);
-      }
-      return typeof arg === "string" ? new Date(arg) : arg;
-    }, z.date())
-    .refine(
-      (date) => {
-        const today = new Date();
-        let age = today.getUTCFullYear() - date.getUTCFullYear();
-        const m = today.getUTCMonth() - date.getUTCMonth();
-        if (m < 0 || (m === 0 && today.getUTCDate() < date.getUTCDate())) {
-          age--;
-        }
-        return age >= 13 && age <= 120;
-      },
-      { message: "You must be between 13 and 120 years old" },
-    ),
-  emergencyContact: emergencyContactSchema.optional(),
   gender: z.string().optional(),
   pronouns: z.string().optional(),
   phone: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  languages: z.array(z.string()).optional(),
+  identityTags: z.array(z.string()).optional(),
+  preferredGameThemes: z.array(z.string()).optional(),
+  overallExperienceLevel: z.enum(experienceLevelOptions).optional(),
+  gameSystemPreferences: z
+    .object({
+      favorite: z.array(z.object({ id: z.number(), name: z.string() })),
+      avoid: z.array(z.object({ id: z.number(), name: z.string() })),
+    })
+    .optional(),
+  calendarAvailability: availabilityDataSchema.optional(),
   privacySettings: privacySettingsSchema.optional(),
+  notificationPreferences: z
+    .object({
+      gameReminders: z.boolean(),
+      gameUpdates: z.boolean(),
+      campaignDigests: z.boolean(),
+      campaignUpdates: z.boolean(),
+      reviewReminders: z.boolean(),
+      socialNotifications: z.boolean(),
+    })
+    .optional(),
+  isGM: z.boolean().optional(),
+  gmStyle: z.string().optional(),
+});
+
+export const completeProfileInputSchema = z.object({
+  gender: z.string(),
+  pronouns: z.string(),
+  phone: z.string(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  languages: z.array(z.string()).optional(),
+  identityTags: z.array(z.string()).optional(),
+  preferredGameThemes: z.array(z.string()).optional(),
+  overallExperienceLevel: z.enum(experienceLevelOptions).optional(),
+  gameSystemPreferences: z
+    .object({
+      favorite: z.array(z.object({ id: z.number(), name: z.string() })),
+      avoid: z.array(z.object({ id: z.number(), name: z.string() })),
+    })
+    .optional(),
+  calendarAvailability: availabilityDataSchema.optional(),
+  privacySettings: privacySettingsSchema,
+  isGM: z.boolean().optional(),
+  gmStyle: z.string().optional(),
 });
 
 export const partialProfileInputSchema = profileInputSchema.partial();
 
 export type ProfileInputType = z.infer<typeof profileInputSchema>;
+export type CompleteProfileInputType = z.infer<typeof completeProfileInputSchema>;
 export type PartialProfileInputType = z.infer<typeof partialProfileInputSchema>;
 
 // Server function input schemas
-export const updateUserProfileInputSchema = z.object({
-  data: partialProfileInputSchema,
-});
+export const updateUserProfileInputSchema = partialProfileInputSchema;
 
 export const completeUserProfileInputSchema = z.object({
   data: profileInputSchema,

@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Join Our Game!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body
+    style="
+      font-family:
+        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9fafb;
+    "
+  >
+    <div
+      style="
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin: 20px 0;
+      "
+    >
+      <!-- Header with game-themed design -->
+      <div
+        style="
+          background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+          padding: 40px 30px;
+          text-align: center;
+          position: relative;
+        "
+      >
+        <div
+          style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url(&quot;data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0010020&quot;><defs><pattern id=&quot;cards&quot; x=&quot;0&quot; y=&quot;0&quot; width=&quot;20&quot; height=&quot;20&quot; patternUnits=&quot;userSpaceOnUse&quot;><rect x=&quot;8&quot; y=&quot;8&quot; width=&quot;4&quot; height=&quot;4&quot; fill=&quot;rgba(
+                  255,
+                  255,
+                  255,
+                  0.1
+                )&quot;/></pattern></defs><rect width=&quot;100&quot; height=&quot;20&quot; fill=&quot;url(%23cards)&quot;/></svg>&quot;)
+              repeat;
+          "
+        ></div>
+        <div style="position: relative; z-index: 2">
+          <h1
+            style="
+              color: white;
+              margin: 0;
+              font-size: 32px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            "
+          >
+            🃏
+          </h1>
+          <h2
+            style="
+              color: white;
+              margin: 10px 0 0 0;
+              font-size: 28px;
+              font-weight: 700;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            "
+          >
+            Game Invitation
+          </h2>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div style="padding: 40px 30px">
+        <h3 style="color: #1f2937; margin-top: 0; font-size: 24px">Ready to Play?</h3>
+
+        <div
+          style="
+            background-color: #f3f4f6;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 4px solid #10b981;
+          "
+        >
+          <p style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937">
+            {{inviterName}} invites you to join:
+          </p>
+          <h4 style="margin: 10px 0; color: #10b981; font-size: 22px">"{{gameName}}"</h4>
+          <p style="margin: 5px 0; color: #6b7280; font-style: italic">
+            {{gameSystem}} Game
+          </p>
+        </div>
+
+        <p>Hello {{recipientName}},</p>
+
+        <div
+          style="
+            background-color: #eff6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border: 1px solid #3b82f6;
+          "
+        >
+          <p style="margin: 0; font-size: 16px"><strong>🔐 Account Created:</strong></p>
+          <p style="margin: 10px 0 0 0; color: #1e40af">
+            We've created a Roundup Games account for you! You can claim it after joining
+            the game by setting your password.
+          </p>
+        </div>
+
+        <p style="font-size: 16px; line-height: 1.8">
+          You've been personally invited to join an exciting tabletop gaming session!
+          {{inviterName}} thinks you'd be a great addition to their game night.
+        </p>
+
+        <div
+          style="
+            background-color: #d1fae5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border: 1px solid #10b981;
+          "
+        >
+          <p style="margin: 0; font-size: 16px"><strong>🎮 Game Description:</strong></p>
+          <p style="margin: 10px 0 0 0; color: #065f46">{{gameDescription}}</p>
+        </div>
+
+        <div style="text-align: center; margin: 35px 0">
+          <a
+            href="{{inviteUrl}}"
+            style="
+              background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+              color: white;
+              padding: 18px 36px;
+              text-decoration: none;
+              border-radius: 12px;
+              font-weight: 700;
+              font-size: 18px;
+              display: inline-block;
+              box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+              transition: all 0.3s ease;
+            "
+          >
+            🃏 Join the Game!
+          </a>
+        </div>
+
+        <p style="color: #6b7280; font-size: 14px; margin-top: 25px">
+          If the button doesn't work, copy and paste this link into your browser:<br />
+          <span style="word-break: break-all; color: #10b981">{{inviteUrl}}</span>
+        </p>
+
+        <p style="color: #6b7280; font-size: 14px; margin-top: 20px">
+          This invitation will expire on {{expiresAt}}.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div
+        style="background-color: #f9fafb; padding: 30px; border-top: 1px solid #e5e7eb"
+      >
+        <div style="text-align: center">
+          <p style="color: #6b7280; font-size: 14px; margin: 0">
+            Game on!<br />
+            <strong>The Roundup Games Team</strong>
+          </p>
+          <div style="margin-top: 20px">
+            <a
+              href="https://roundup.games"
+              style="color: #10b981; text-decoration: none; margin: 0 10px"
+              >🌐 Website</a
+            >
+            <a
+              href="mailto:staff@roundup.games"
+              style="color: #10b981; text-decoration: none; margin: 0 10px"
+              >📧 Contact</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional spacing -->
+    <div style="height: 40px"></div>
+
+    <!-- Bottom note -->
+    <div style="text-align: center; color: #9ca3af; font-size: 12px">
+      <p>If you didn't expect this invitation, you can safely ignore this email.</p>
+    </div>
+  </body>
+</html>

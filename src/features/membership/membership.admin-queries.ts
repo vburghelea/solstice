@@ -3,19 +3,22 @@ import { z } from "zod";
 import type { MembershipOperationResult } from "./membership.types";
 
 const getAllMembershipsSchema = z.object({
-  status: z.enum(["all", "active", "expired", "cancelled"]).optional().default("all"),
+  status: z.enum(["all", "active", "expired", "canceled"]).optional().default("all"),
   limit: z.number().optional().default(100),
   offset: z.number().optional().default(0),
 });
 
 export interface MembershipReportRow {
   id: string;
+  userId: string;
   userName: string;
   userEmail: string;
+  userImage: string | null;
+  userUploadedAvatarPath: string | null;
   membershipType: string;
   startDate: string;
   endDate: string;
-  status: "active" | "expired" | "cancelled";
+  status: "active" | "expired" | "canceled";
   priceCents: number;
   paymentId: string | null;
   createdAt: Date;
@@ -52,9 +55,33 @@ export const getAllMemberships = createServerFn({ method: "GET" })
           };
         }
 
-        // Check admin access
-        const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-        await requireAdmin(session.user.email);
+        // Check admin access via role service
+        const { getCurrentUser } = await import("~/features/auth/auth.queries");
+        const currentUser = await getCurrentUser();
+        if (!currentUser) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "User not authenticated",
+              },
+            ],
+          };
+        }
+        const { PermissionService } = await import("~/features/roles/permission.service");
+        const isAdmin = await PermissionService.isGlobalAdmin(currentUser.id);
+        if (!isAdmin) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "Admin access required",
+              },
+            ],
+          };
+        }
 
         // Import database dependencies inside handler
         const { and, eq, sql } = await import("drizzle-orm");
@@ -70,8 +97,11 @@ export const getAllMemberships = createServerFn({ method: "GET" })
         const query = db
           .select({
             id: memberships.id,
+            userId: user.id,
             userName: user.name,
             userEmail: user.email,
+            userImage: user.image,
+            userUploadedAvatarPath: user.uploadedAvatarPath,
             membershipType: membershipTypes.name,
             startDate: memberships.startDate,
             endDate: memberships.endDate,

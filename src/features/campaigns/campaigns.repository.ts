@@ -32,21 +32,20 @@ export async function findCampaignParticipantById(
   participantId: string,
 ): Promise<ParticipantWithRelations | null> {
   const db = await getDb();
-  return (
-    (await db.query.campaignParticipants.findFirst({
-      where: eq(campaignParticipants.id, participantId),
-      with: { campaign: true, user: true },
-      columns: {
-        id: true,
-        campaignId: true,
-        userId: true,
-        role: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    })) ?? null
-  );
+  const result = await db.query.campaignParticipants.findFirst({
+    where: eq(campaignParticipants.id, participantId),
+    with: { campaign: true, user: true },
+    columns: {
+      id: true,
+      campaignId: true,
+      userId: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return (result as ParticipantWithRelations) ?? null;
 }
 
 export async function findCampaignParticipantByCampaignAndUserId(

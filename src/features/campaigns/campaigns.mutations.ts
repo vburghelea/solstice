@@ -28,6 +28,13 @@ import {
   CampaignWithDetails,
 } from "./campaigns.types";
 
+interface CampaignSummary {
+  ownerId?: string;
+  name?: string;
+  description?: string;
+  gameSystem?: { name?: string } | null;
+}
+
 export const createCampaign = createServerFn({ method: "POST" })
   .validator(createCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails>> => {
@@ -285,7 +292,9 @@ export const addCampaignParticipant = createServerFn({ method: "POST" })
 
         const db = await getDb();
 
-        const campaign = await findCampaignById(data.campaignId);
+        const campaign = (await findCampaignById(
+          data.campaignId,
+        )) as CampaignSummary | null;
 
         if (!campaign || campaign.ownerId !== currentUser.id) {
           return {
@@ -379,7 +388,7 @@ export const updateCampaignParticipant = createServerFn({ method: "POST" })
 
         if (
           !existingParticipant ||
-          (existingParticipant.campaign.ownerId !== currentUser.id &&
+          ((existingParticipant.campaign as CampaignSummary).ownerId !== currentUser.id &&
             existingParticipant.userId !== currentUser.id)
         ) {
           return {
@@ -460,7 +469,7 @@ export const removeCampaignParticipant = createServerFn({ method: "POST" })
 
         if (
           !existingParticipant ||
-          (existingParticipant.campaign.ownerId !== currentUser.id &&
+          ((existingParticipant.campaign as CampaignSummary).ownerId !== currentUser.id &&
             existingParticipant.userId !== currentUser.id)
         ) {
           return {
@@ -505,7 +514,9 @@ export const applyToCampaign = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      const campaign = await findCampaignById(data.campaignId);
+      const campaign = (await findCampaignById(
+        data.campaignId,
+      )) as CampaignSummary | null;
       if (!campaign) {
         return {
           success: false,
@@ -593,7 +604,10 @@ export const applyToCampaign = createServerFn({ method: "POST" })
         };
       }
 
-      return { success: true, data: applicationWithUser as CampaignApplication };
+      return {
+        success: true,
+        data: applicationWithUser as unknown as CampaignApplication,
+      };
     } catch (error) {
       console.error("Error applying to campaign:", error);
       return {
@@ -629,7 +643,7 @@ export const respondToCampaignApplication = createServerFn({ method: "POST" })
 
         if (
           !existingApplication ||
-          existingApplication.campaign.ownerId !== currentUser.id
+          (existingApplication.campaign as CampaignSummary).ownerId !== currentUser.id
         ) {
           return {
             success: false,
@@ -695,7 +709,10 @@ export const respondToCampaignApplication = createServerFn({ method: "POST" })
           };
         }
 
-        return { success: true, data: applicationWithUser as CampaignApplication };
+        return {
+          success: true,
+          data: applicationWithUser as unknown as CampaignApplication,
+        };
       } catch (error) {
         console.error("Error responding to application:", error);
         return {
@@ -724,7 +741,9 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
 
       const db = await getDb();
 
-      const campaign = await findCampaignById(data.campaignId);
+      const campaign = (await findCampaignById(
+        data.campaignId,
+      )) as CampaignSummary | null;
 
       if (!campaign || campaign.ownerId !== currentUser.id) {
         return {
@@ -835,9 +854,9 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
               await sendCampaignInvitation({
                 to: { email: invitedUser.email, name: invitedUser.name ?? undefined },
                 inviterName: currentUser.name || "Campaign Owner",
-                campaignName: campaign.name,
-                campaignDescription: campaign.description,
-                gameSystem: campaign.gameSystem?.name || "",
+                campaignName: campaign?.name ?? "",
+                campaignDescription: campaign?.description ?? "",
+                gameSystem: campaign?.gameSystem?.name || "",
                 inviteUrl,
                 expiresAt,
               });
@@ -902,9 +921,9 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
             await sendCampaignInvitation({
               to: { email: invitedUser.email, name: invitedUser.name ?? undefined },
               inviterName: currentUser.name || "Campaign Owner",
-              campaignName: campaign.name,
-              campaignDescription: campaign.description,
-              gameSystem: campaign.gameSystem?.name || "",
+              campaignName: campaign?.name ?? "",
+              campaignDescription: campaign?.description ?? "",
+              gameSystem: campaign?.gameSystem?.name || "",
               inviteUrl,
               expiresAt,
             });
@@ -971,9 +990,9 @@ export const inviteToCampaign = createServerFn({ method: "POST" })
               await sendCampaignInvitation({
                 to: { email: data.email, name: signUpData.user.name ?? undefined },
                 inviterName: currentUser.name || "Campaign Owner",
-                campaignName: campaign.name,
-                campaignDescription: campaign.description,
-                gameSystem: campaign.gameSystem?.name || "",
+                campaignName: campaign?.name ?? "",
+                campaignDescription: campaign?.description ?? "",
+                gameSystem: campaign?.gameSystem?.name || "",
                 inviteUrl,
                 expiresAt,
               });
@@ -1033,7 +1052,7 @@ export const removeCampaignParticipantBan = createServerFn({ method: "POST" })
 
       if (
         !existingParticipant ||
-        existingParticipant.campaign.ownerId !== currentUser.id
+        (existingParticipant.campaign as CampaignSummary).ownerId !== currentUser.id
       ) {
         return {
           success: false,
@@ -1132,7 +1151,7 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
         // Blocklist restriction: invitee cannot accept if blocked any direction with owner
         const rel = await getRelationship(
           currentUser.id,
-          existingParticipant.campaign.ownerId,
+          (existingParticipant.campaign as CampaignSummary).ownerId,
         );
         if (rel.blocked || rel.blockedBy) {
           return {

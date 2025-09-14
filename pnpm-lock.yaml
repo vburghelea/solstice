@@ -6669,10 +6669,19 @@ packages:
   strnum@2.1.1:
     resolution: {integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==}
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   strtok3@9.1.1:
     resolution: {integrity: sha512-FhwotcEqjr241ZbjFzjlIYg6c5/L/s4yBGWSMvJ9UoExiSqL+FnFA/CaeZx17WGaZMS/4SOZp8wH18jSS4R4lw==}
     engines: {node: '>=16'}
 
+<<<<<<< HEAD
+=======
+>>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   stylis@4.3.6:
     resolution: {integrity: sha512-yQ3rwFWRfwNUY7H5vpU0wfdkNSnvnJinhF9830Swlaxl03zsOjCfmX0ugac+3LtK0lYSgwL/KXc8oYL3mG4YFQ==}
 
@@ -14463,11 +14472,20 @@ snapshots:
 
   strnum@2.1.1: {}
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   strtok3@9.1.1:
     dependencies:
       '@tokenizer/token': 0.3.0
       peek-readable: 5.4.2
 
+<<<<<<< HEAD
+=======
+>>>>>>> 28a4d6d (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
+>>>>>>> e492a73 (feat: game system overhaul based on crawling for data from external sources (SPG, BGG, Wikipedia), improved implementation)
   stylis@4.3.6: {}
 
   sucrase@3.35.0:

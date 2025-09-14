@@ -3,6 +3,7 @@ import {
   mapExternalTagHandler,
   reorderImagesHandler,
   triggerRecrawlHandler,
+  uploadImageHandler,
   upsertCmsContentHandler,
 } from "../game-systems.mutations";
 
@@ -25,10 +26,17 @@ const fakeDb = {
     },
   })),
   insert: vi.fn((table: unknown) => ({
-    values: (vals: unknown) => {
+    values: (vals: Record<string, unknown>) => {
       insertCalls.push({ table, values: vals });
-      return {};
+      return {
+        returning: () => [vals],
+      };
     },
+  })),
+  select: vi.fn(() => ({
+    from: vi.fn(() => ({
+      where: vi.fn(() => [{ count: 0 }]),
+    })),
   })),
   query: {
     gameSystemCategories: { findFirst: vi.fn() },
@@ -53,7 +61,15 @@ vi.mock("~/db/schema", () => ({
   },
   mediaAssets: {
     id: "id",
+    gameSystemId: "game_system_id",
+    publicId: "public_id",
+    secureUrl: "secure_url",
+    width: "width",
+    height: "height",
+    format: "format",
+    checksum: "checksum",
     orderIndex: "order_index",
+    moderated: "moderated",
   },
   systemCrawlEvents: {
     gameSystemId: "game_system_id",
@@ -81,6 +97,18 @@ vi.mock("drizzle-orm", () => ({
   eq: (...args: unknown[]) => ({ eq: args }),
   and: (...args: unknown[]) => ({ and: args }),
   sql: (strings: TemplateStringsArray, ...vals: unknown[]) => ({ sql: [strings, vals] }),
+}));
+vi.mock("../services/cloudinary", () => ({
+  uploadImage: vi.fn(async () => ({
+    publicId: "pid",
+    secureUrl: "https://img",
+    width: 100,
+    height: 100,
+    format: "jpg",
+    checksum: "abc",
+    moderated: false,
+  })),
+  computeChecksum: vi.fn(() => "abc"),
 }));
 
 describe("game system mutations", () => {
@@ -127,5 +155,20 @@ describe("game system mutations", () => {
       categoryId: 2,
       confidence: 50,
     });
+  });
+
+  it("uploads image and stores asset", async () => {
+    const result = await uploadImageHandler({
+      data: { systemId: 1, url: "http://img.test", kind: "hero" },
+    });
+    expect(result.asset.publicId).toBe("pid");
+    const last = insertCalls[insertCalls.length - 1];
+    expect(last?.values).toEqual(
+      expect.objectContaining({
+        gameSystemId: 1,
+        publicId: "pid",
+        orderIndex: 0,
+      }),
+    );
   });
 });

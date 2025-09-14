@@ -3,6 +3,7 @@ import {
   mapExternalTagSchema,
   reorderImagesSchema,
   triggerRecrawlSchema,
+  uploadImageSchema,
   upsertCmsContentSchema,
 } from "./game-systems.schemas";
 
@@ -162,3 +163,39 @@ export const triggerRecrawlHandler = async ({
 export const triggerRecrawl = createServerFn({ method: "POST" })
   .validator(triggerRecrawlSchema.parse)
   .handler(triggerRecrawlHandler);
+
+export const uploadImageHandler = async ({
+  data,
+}: {
+  data: import("./game-systems.schemas").UploadImageInput;
+}) => {
+  const [{ getDb }, { mediaAssets }, cloudinary] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("~/db/schema"),
+    import("./services/cloudinary"),
+  ]);
+  type MediaAsset = typeof mediaAssets.$inferSelect;
+  const db = await getDb();
+
+  const uploaded = await cloudinary.uploadImage(data.url, {
+    checksum: cloudinary.computeChecksum(data.url),
+    ...(data.license ? { license: data.license } : {}),
+    ...(data.licenseUrl ? { licenseUrl: data.licenseUrl } : {}),
+    kind: data.kind,
+  });
+
+  const [asset] = (await db
+    .insert(mediaAssets)
+    .values({
+      gameSystemId: data.systemId,
+      orderIndex: 0,
+      ...uploaded,
+    })
+    .returning()) as MediaAsset[];
+
+  return { asset };
+};
+
+export const uploadImage = createServerFn({ method: "POST" })
+  .validator(uploadImageSchema.parse)
+  .handler(uploadImageHandler);

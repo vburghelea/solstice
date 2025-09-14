@@ -1,10 +1,12 @@
 import { GameSystem } from "~/db/schema/game-systems.schema";
 
-export const MOCK_GAME_SYSTEM: GameSystem = {
+export const MOCK_GAME_SYSTEM = {
   id: 1,
   name: "Test System",
   slug: "test-system",
-  description: "A test game system",
+  descriptionCms: "A test game system",
+  publisherId: 1,
+  heroImageId: 1,
   images: [],
   minPlayers: 1,
   maxPlayers: 10,
@@ -15,13 +17,15 @@ export const MOCK_GAME_SYSTEM: GameSystem = {
   yearReleased: 2020,
   createdAt: new Date(),
   updatedAt: new Date(),
-};
+} as unknown as GameSystem;
 
-export const MOCK_GAME_SYSTEM_2: GameSystem = {
+export const MOCK_GAME_SYSTEM_2 = {
   id: 2,
   name: "Fantasy RPG",
   slug: "fantasy-rpg",
-  description: "A classic fantasy role-playing game system.",
+  descriptionCms: "A classic fantasy role-playing game system.",
+  publisherId: 2,
+  heroImageId: 2,
   images: [],
   minPlayers: 2,
   maxPlayers: 6,
@@ -32,13 +36,15 @@ export const MOCK_GAME_SYSTEM_2: GameSystem = {
   yearReleased: 1980,
   createdAt: new Date(),
   updatedAt: new Date(),
-};
+} as unknown as GameSystem;
 
-export const MOCK_GAME_SYSTEM_3: GameSystem = {
+export const MOCK_GAME_SYSTEM_3 = {
   id: 3,
   name: "Sci-Fi Skirmish",
   slug: "sci-fi-skirmish",
-  description: "A fast-paced science fiction skirmish game.",
+  descriptionScraped: "A fast-paced science fiction skirmish game.",
+  publisherId: 3,
+  heroImageId: 3,
   images: [],
   minPlayers: 2,
   maxPlayers: 4,
@@ -49,13 +55,15 @@ export const MOCK_GAME_SYSTEM_3: GameSystem = {
   yearReleased: 2022,
   createdAt: new Date(),
   updatedAt: new Date(),
-};
+} as unknown as GameSystem;
 
-export const MOCK_GAME_SYSTEM_DND5E: GameSystem = {
+export const MOCK_GAME_SYSTEM_DND5E = {
   id: 100,
   name: "D&D 5e",
   slug: "dnd-5e",
-  description: "Dungeons & Dragons Fifth Edition",
+  descriptionScraped: "Dungeons & Dragons Fifth Edition",
+  publisherId: 100,
+  heroImageId: 100,
   images: [],
   minPlayers: 2,
   maxPlayers: 7,
@@ -66,13 +74,15 @@ export const MOCK_GAME_SYSTEM_DND5E: GameSystem = {
   yearReleased: 2014,
   createdAt: new Date(),
   updatedAt: new Date(),
-};
+} as unknown as GameSystem;
 
-export const MOCK_GAME_SYSTEM_PATHFINDER2E: GameSystem = {
+export const MOCK_GAME_SYSTEM_PATHFINDER2E = {
   id: 101,
   name: "Pathfinder 2e",
   slug: "pathfinder-2e",
-  description: "Pathfinder Second Edition",
+  descriptionScraped: "Pathfinder Second Edition",
+  publisherId: 101,
+  heroImageId: 101,
   images: [],
   minPlayers: 3,
   maxPlayers: 6,
@@ -83,4 +93,4 @@ export const MOCK_GAME_SYSTEM_PATHFINDER2E: GameSystem = {
   yearReleased: 2019,
   createdAt: new Date(),
   updatedAt: new Date(),
-};
+} as unknown as GameSystem;

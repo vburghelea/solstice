@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, serverOnly } from "@tanstack/react-start";
 import {
   getGameApplicationForUserInputSchema,
   getGameSchema,
@@ -9,6 +9,7 @@ import {
   searchUsersForInvitationSchema,
 } from "./games.schemas";
 
+import type { and } from "drizzle-orm";
 import { z } from "zod";
 import {
   locationSchema,
@@ -23,21 +24,22 @@ import {
   GameWithDetails,
 } from "./games.types";
 
-import { and, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-import {
-  gameApplications,
-  gameParticipants,
-  games,
-  gameSystems,
-  user,
+import type {
+  games as gamesTable,
+  gameSystems as gameSystemsTable,
+  user as userTable,
 } from "~/db/schema";
-import { getDb } from "~/db/server-helpers";
-import { getCurrentUser } from "~/features/auth/auth.queries";
-import {
-  findGameById,
-  findGameParticipantsByGameId,
-  findPendingGameApplicationsByGameId,
-} from "./games.repository";
+
+const getServerDeps = serverOnly(async () => {
+  const [drizzle, schema, serverHelpers, authQueries, gameRepo] = await Promise.all([
+    import("drizzle-orm"),
+    import("~/db/schema"),
+    import("~/db/server-helpers"),
+    import("~/features/auth/auth.queries"),
+    import("./games.repository"),
+  ]);
+  return { ...drizzle, ...schema, ...serverHelpers, ...authQueries, ...gameRepo };
+});
 
 type DbLimitChain<R> = { limit: (n: number) => Promise<R[]> };
 type DbOrderChain<R> = Promise<R[]> & DbLimitChain<R>;
@@ -59,37 +61,37 @@ interface DbLike {
 
 type SqlExpr = ReturnType<typeof and>;
 
-type GameSystem = typeof gameSystems.$inferSelect;
+type GameSystem = typeof gameSystemsTable.$inferSelect;
 
 interface GameQueryResultRow {
-  id: typeof games.$inferSelect.id;
-  ownerId: typeof games.$inferSelect.ownerId;
-  campaignId: typeof games.$inferSelect.campaignId;
-  gameSystemId: typeof games.$inferSelect.gameSystemId;
-  name: typeof games.$inferSelect.name;
-  dateTime: typeof games.$inferSelect.dateTime;
-  description: typeof games.$inferSelect.description;
-  expectedDuration: typeof games.$inferSelect.expectedDuration;
-  price: typeof games.$inferSelect.price;
-  language: typeof games.$inferSelect.language;
+  id: typeof gamesTable.$inferSelect.id;
+  ownerId: typeof gamesTable.$inferSelect.ownerId;
+  campaignId: typeof gamesTable.$inferSelect.campaignId;
+  gameSystemId: typeof gamesTable.$inferSelect.gameSystemId;
+  name: typeof gamesTable.$inferSelect.name;
+  dateTime: typeof gamesTable.$inferSelect.dateTime;
+  description: typeof gamesTable.$inferSelect.description;
+  expectedDuration: typeof gamesTable.$inferSelect.expectedDuration;
+  price: typeof gamesTable.$inferSelect.price;
+  language: typeof gamesTable.$inferSelect.language;
   location: z.infer<typeof locationSchema>;
-  status: typeof games.$inferSelect.status;
+  status: typeof gamesTable.$inferSelect.status;
   minimumRequirements: z.infer<typeof minimumRequirementsSchema>;
-  visibility: typeof games.$inferSelect.visibility;
+  visibility: typeof gamesTable.$inferSelect.visibility;
   safetyRules: z.infer<typeof safetyRulesSchema>;
-  createdAt: typeof games.$inferSelect.createdAt;
-  updatedAt: typeof games.$inferSelect.updatedAt;
+  createdAt: typeof gamesTable.$inferSelect.createdAt;
+  updatedAt: typeof gamesTable.$inferSelect.updatedAt;
   owner: {
-    id: typeof user.$inferSelect.id;
-    name: typeof user.$inferSelect.name;
-    email: typeof user.$inferSelect.email;
-    image: typeof user.$inferSelect.image;
-    uploadedAvatarPath: typeof user.$inferSelect.uploadedAvatarPath;
-    gmRating: typeof user.$inferSelect.gmRating;
+    id: typeof userTable.$inferSelect.id;
+    name: typeof userTable.$inferSelect.name;
+    email: typeof userTable.$inferSelect.email;
+    image: typeof userTable.$inferSelect.image;
+    uploadedAvatarPath: typeof userTable.$inferSelect.uploadedAvatarPath;
+    gmRating: typeof userTable.$inferSelect.gmRating;
   };
   gameSystem: {
-    id: typeof gameSystems.$inferSelect.id;
-    name: typeof gameSystems.$inferSelect.name;
+    id: typeof gameSystemsTable.$inferSelect.id;
+    name: typeof gameSystemsTable.$inferSelect.name;
   };
   participantCount: number;
 }
@@ -98,6 +100,7 @@ export const getGameSystem = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.number() }).parse)
   .handler(async ({ data }): Promise<OperationResult<GameSystem | null>> => {
     try {
+      const { getDb, eq, gameSystems } = await getServerDeps();
       const db = await getDb();
       const result = await db.query.gameSystems.findFirst({
         where: eq(gameSystems.id, data.id),
@@ -132,6 +135,7 @@ export const searchGameSystems = createServerFn({ method: "POST" })
       >
     > => {
       try {
+        const { getDb, ilike, gameSystems } = await getServerDeps();
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -175,6 +179,7 @@ export const getGame = createServerFn({ method: "POST" })
         };
       }
 
+      const { findGameById } = await getServerDeps();
       const game = await findGameById(data.id);
 
       if (!game) {
@@ -210,6 +215,8 @@ export async function listGamesImpl(
   filters: z.infer<typeof listGamesSchema>["filters"] | undefined,
 ): Promise<OperationResult<GameListItem[]>> {
   try {
+    const { and, eq, gte, lte, or, sql, gameParticipants, games, gameSystems, user } =
+      await getServerDeps();
     const statusFilterCondition = filters?.status
       ? eq(games.status, filters.status)
       : null;
@@ -336,6 +343,7 @@ export async function listGamesImpl(
 export const listGames = createServerFn({ method: "POST" })
   .validator(listGamesSchema.parse)
   .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
+    const { getDb, getCurrentUser } = await getServerDeps();
     const db = await getDb();
     const currentUser = await getCurrentUser();
     return listGamesImpl(db, currentUser?.id, data.filters);
@@ -354,6 +362,7 @@ export const listGamesWithCount = createServerFn({ method: "POST" })
     async ({
       data = {},
     }): Promise<OperationResult<{ items: GameListItem[]; totalCount: number }>> => {
+      const { getDb, getCurrentUser } = await getServerDeps();
       const db = await getDb();
       const currentUser = await getCurrentUser();
       const page = Math.max(1, data.page ?? 1);
@@ -373,6 +382,8 @@ export async function listGamesWithCountImpl(
   pageSize = 20,
 ): Promise<OperationResult<{ items: GameListItem[]; totalCount: number }>> {
   try {
+    const { and, eq, gte, lte, or, sql, gameParticipants, games, gameSystems, user } =
+      await getServerDeps();
     const statusFilterCondition = filters?.status
       ? eq(games.status, filters.status)
       : null;
@@ -512,10 +523,22 @@ export const searchGames = createServerFn({ method: "POST" })
   .validator(searchGamesSchema.parse)
   .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
     try {
+      const {
+        getDb,
+        getCurrentUser,
+        userBlocks,
+        games,
+        user,
+        gameSystems,
+        gameParticipants,
+        and,
+        eq,
+        ilike,
+        sql,
+      } = await getServerDeps();
       const db = await getDb();
       const currentUser = await getCurrentUser();
       const currentUserId = currentUser?.id;
-      const { userBlocks } = await import("~/db/schema");
       const searchTerm = `%${data.query}%`;
 
       const result: GameQueryResultRow[] = await (db as DbLike)
@@ -606,6 +629,7 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       >
     > => {
       try {
+        const { getDb, user, or, ilike } = await getServerDeps();
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -639,6 +663,8 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
   .validator(listGameSessionsByCampaignIdSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
     try {
+      const { getDb, eq, sql, and, gameParticipants, games, gameSystems, user } =
+        await getServerDeps();
       const db = await getDb();
 
       const conditions = [eq(games.campaignId, data.campaignId)];
@@ -709,6 +735,8 @@ export const getGameApplications = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameApplication[]>> => {
     try {
+      const { getCurrentUser, findGameById, findPendingGameApplicationsByGameId } =
+        await getServerDeps();
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -751,6 +779,7 @@ export const getGameApplicationForUser = createServerFn({ method: "POST" })
   .validator(getGameApplicationForUserInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameApplication | null>> => {
     try {
+      const { getDb, and, eq, gameApplications } = await getServerDeps();
       const db = await getDb();
       const application = await db.query.gameApplications.findFirst({
         where: and(
@@ -782,6 +811,7 @@ export const getGameParticipants = createServerFn({ method: "POST" })
   .validator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
     try {
+      const { findGameParticipantsByGameId } = await getServerDeps();
       const participants = await findGameParticipantsByGameId(data.id);
 
       return { success: true, data: participants as GameParticipant[] };

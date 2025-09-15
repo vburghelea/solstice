@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 // Instead, override the react-query useQuery return values directly for this test case.
 import { mockUseQueryGame, mockUseQueryRelationship } from "~/tests/mocks/react-query";
 
-function setupRoute(mod: unknown, currentUserId: string, gameId = "g1") {
+function setupRoute(mod: unknown, currentUserId: string, gameId = "g1", loaderData = {}) {
   const m = mod as { Route: unknown };
   (m.Route as unknown as { useParams: () => { gameId: string } }).useParams = () => ({
     gameId,
@@ -16,6 +16,8 @@ function setupRoute(mod: unknown, currentUserId: string, gameId = "g1") {
   ).useRouteContext = () => ({
     user: { id: currentUserId },
   });
+  (m.Route as unknown as { useLoaderData: () => unknown }).useLoaderData = () =>
+    loaderData;
 }
 
 function qc() {
@@ -68,7 +70,34 @@ describe("GameDetailsPage apply eligibility (connections-only)", () => {
     });
 
     const mod = await import("../$gameId");
-    setupRoute(mod, "viewer");
+    setupRoute(mod, "viewer", "g1", {
+      game: {
+        id: "g1",
+        owner: { id: "owner", name: "Owner", email: "o@x" },
+        gameSystem: { id: 1, name: "Test System" },
+        dateTime: new Date().toISOString(),
+        description: "A test game session",
+        expectedDuration: 120,
+        price: 0,
+        language: "English",
+        location: { address: "Test Location" },
+        status: "scheduled",
+        minimumRequirements: null,
+        safetyRules: {
+          basicRules: {
+            noAlcohol: false,
+            safeWordRequired: false,
+            encourageOpenCommunication: false,
+          },
+          safetyTools: [{ id: "tool1", label: "Safety Tool", enabled: false }],
+        },
+        visibility: "protected",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        participants: [],
+      },
+      error: null,
+    });
 
     render(
       <QueryClientProvider client={qc()}>
@@ -125,7 +154,34 @@ describe("GameDetailsPage apply eligibility (connections-only)", () => {
     });
 
     const mod = await import("../$gameId");
-    setupRoute(mod, "viewer", "g2");
+    setupRoute(mod, "viewer", "g2", {
+      game: {
+        id: "g2",
+        owner: { id: "owner", name: "Owner", email: "o@x" },
+        gameSystem: { id: 1, name: "Test System" },
+        dateTime: new Date().toISOString(),
+        description: "A test game session",
+        expectedDuration: 120,
+        price: 0,
+        language: "English",
+        location: { address: "Test Location" },
+        status: "scheduled",
+        minimumRequirements: null,
+        safetyRules: {
+          basicRules: {
+            noAlcohol: false,
+            safeWordRequired: false,
+            encourageOpenCommunication: false,
+          },
+          safetyTools: [{ id: "tool1", label: "Safety Tool", enabled: false }],
+        },
+        visibility: "protected",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        participants: [],
+      },
+      error: null,
+    });
 
     render(
       <QueryClientProvider client={qc()}>

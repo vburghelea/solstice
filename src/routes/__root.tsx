@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import { lazy, Suspense } from "react";
+import { PostHogProvider } from "~/app/posthog-provider";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import type { AuthUser } from "~/lib/auth/types";
 import appCss from "~/styles.css?url";
@@ -75,9 +76,12 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const { user } = Route.useRouteContext();
   return (
     <RootDocument>
-      <Outlet />
+      <PostHogProvider user={user}>
+        <Outlet />
+      </PostHogProvider>
     </RootDocument>
   );
 }

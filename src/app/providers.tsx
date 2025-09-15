@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { initializePostHogClient } from "~/lib/analytics/posthog";
 
 interface ProvidersProps {
   readonly children: ReactNode;
@@ -19,6 +20,10 @@ export function Providers({ children, queryClient }: ProvidersProps) {
         },
       }),
   );
+
+  useEffect(() => {
+    initializePostHogClient();
+  }, []);
 
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }

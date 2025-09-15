@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import posthog from "posthog-js";
+import { useEffect, useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import {
@@ -39,6 +41,13 @@ export const Route = createFileRoute("/dashboard/")({
 
 function DashboardIndex() {
   const { user } = Route.useRouteContext();
+  const [isNewCardEnabled, setIsNewCardEnabled] = useState(false);
+
+  useEffect(() => {
+    posthog.onFeatureFlags(() => {
+      setIsNewCardEnabled(posthog.isFeatureEnabled("dashboard-new-card") ?? false);
+    });
+  }, []);
 
   const { data: dashboardStats } = useQuery({
     queryKey: ["dashboard-stats"],
@@ -303,6 +312,22 @@ function DashboardIndex() {
 
         {/* Desktop: Cards */}
         <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3">
+          {isNewCardEnabled && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <Trophy className="h-5 w-5" />
+                  New Feature
+                </CardTitle>
+                <CardDescription>
+                  This is a new feature behind a feature flag.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">Check it out</Button>
+              </CardContent>
+            </Card>
+          )}
           {/* Complete Profile - always shown since profile is complete to access dashboard */}
           <Card>
             <CardHeader>

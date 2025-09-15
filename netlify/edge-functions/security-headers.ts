@@ -14,7 +14,7 @@ export default async function handler(req: Request, context: Context) {
   const headers = {
     "Content-Security-Policy": [
       "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' 'sha256-NatFdn9qa3ivEDVSUujTj3/04jf+6XsuTh7hTdyWQdE=' 'sha256-KlDLetaHs3jydugAFrZVquz1h6i4vHS3ohIh0sfZqC4=' https://challenges.cloudflare.com https://eu-assets.i.posthog.com`,
+      `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'sha256-NatFdn9qa3ivEDVSUujTj3/04jf+6XsuTh7hTdyWQdE=' 'sha256-KlDLetaHs3jydugAFrZVquz1h6i4vHS3ohIh0sfZqC4=' https://challenges.cloudflare.com https://eu-assets.i.posthog.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: blob:",

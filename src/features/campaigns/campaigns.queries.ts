@@ -1,27 +1,17 @@
-import { createServerFn } from "@tanstack/react-start";
-import { and, eq, ilike, or, sql } from "drizzle-orm";
-import {
-  campaignApplications,
-  campaignParticipants,
-  campaigns,
-  gameSystems,
-  user,
+import { createServerFn, serverOnly } from "@tanstack/react-start";
+import type { and } from "drizzle-orm";
+import type {
+  campaigns as campaignsTable,
+  gameSystems as gameSystemsTable,
 } from "~/db/schema";
 
 import { z } from "zod";
-import { getDb } from "~/db/server-helpers";
-import { getCurrentUser } from "~/features/auth/auth.queries";
 import {
   locationSchema,
   minimumRequirementsSchema,
   safetyRulesSchema,
 } from "~/shared/schemas/common";
 import { OperationResult } from "~/shared/types/common";
-import {
-  findCampaignById,
-  findCampaignParticipantsByCampaignId,
-  findPendingCampaignApplicationsByCampaignId,
-} from "./campaigns.repository";
 import {
   getCampaignApplicationForUserInputSchema,
   getCampaignSchema,
@@ -34,6 +24,17 @@ import {
   CampaignParticipant,
   CampaignWithDetails,
 } from "./campaigns.types";
+
+const getServerDeps = serverOnly(async () => {
+  const [drizzle, schema, serverHelpers, authQueries, campaignRepo] = await Promise.all([
+    import("drizzle-orm"),
+    import("~/db/schema"),
+    import("~/db/server-helpers"),
+    import("~/features/auth/auth.queries"),
+    import("./campaigns.repository"),
+  ]);
+  return { ...drizzle, ...schema, ...serverHelpers, ...authQueries, ...campaignRepo };
+});
 
 type DbJoinChain<R> = {
   innerJoin: (a: unknown, b: unknown) => DbJoinChain<R>;
@@ -60,6 +61,7 @@ export const getCampaign = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails | null>> => {
     try {
+      const { findCampaignById } = await getServerDeps();
       const campaign = await findCampaignById(data.id);
 
       if (!campaign) {
@@ -83,7 +85,7 @@ export const getCampaign = createServerFn({ method: "POST" })
   });
 
 type CampaignQueryResultRow = {
-  campaign: typeof campaigns.$inferSelect;
+  campaign: typeof campaignsTable.$inferSelect;
   owner: {
     id: string;
     name: string | null;
@@ -93,7 +95,7 @@ type CampaignQueryResultRow = {
     gmRating: number | null;
   };
   participantCount: number;
-  gameSystem: typeof gameSystems.$inferSelect;
+  gameSystem: typeof gameSystemsTable.$inferSelect;
 };
 
 export async function listCampaignsImpl(
@@ -102,6 +104,19 @@ export async function listCampaignsImpl(
   filters: z.infer<typeof listCampaignsSchema>["filters"] | undefined,
 ): Promise<OperationResult<CampaignListItem[]>> {
   try {
+    const {
+      and,
+      eq,
+      ilike,
+      or,
+      sql,
+      campaignParticipants,
+      campaigns,
+      gameSystems,
+      user,
+      userFollows,
+      userBlocks,
+    } = await getServerDeps();
     const statusFilterCondition = filters?.status
       ? eq(campaigns.status, filters.status)
       : null;
@@ -118,7 +133,6 @@ export async function listCampaignsImpl(
     visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
 
     if (currentUserId) {
-      const { userFollows, userBlocks } = await import("~/db/schema");
       const userCampaigns = (db as DbLike)
         .select({ campaignId: campaignParticipants.campaignId })
         .from(campaignParticipants)
@@ -218,6 +232,7 @@ export async function listCampaignsInternal(
     | { filters?: z.infer<typeof listCampaignsSchema>["filters"] | undefined }
     | undefined,
 ): Promise<OperationResult<CampaignListItem[]>> {
+  const { getDb, getCurrentUser } = await getServerDeps();
   const db = await getDb();
   const currentUser = await getCurrentUser();
   return listCampaignsImpl(db, currentUser?.id, data?.filters);
@@ -231,6 +246,18 @@ export async function listCampaignsWithCountImpl(
   pageSize = 20,
 ): Promise<OperationResult<{ items: CampaignListItem[]; totalCount: number }>> {
   try {
+    const {
+      and,
+      eq,
+      or,
+      sql,
+      campaignParticipants,
+      campaigns,
+      gameSystems,
+      user,
+      userFollows,
+      userBlocks,
+    } = await getServerDeps();
     const statusFilterCondition = filters?.status
       ? eq(campaigns.status, filters.status)
       : null;
@@ -246,7 +273,6 @@ export async function listCampaignsWithCountImpl(
     visibilityConditionsForOr.push(eq(campaigns.visibility, "public"));
 
     if (currentUserId) {
-      const { userFollows, userBlocks } = await import("~/db/schema");
       visibilityConditionsForOr.push(eq(campaigns.ownerId, currentUserId));
 
       const isConnectedSql = sql<boolean>`(
@@ -348,6 +374,7 @@ export const listCampaignsWithCount = createServerFn({ method: "POST" })
     async ({
       data = {},
     }): Promise<OperationResult<{ items: CampaignListItem[]; totalCount: number }>> => {
+      const { getDb, getCurrentUser } = await getServerDeps();
       const db = await getDb();
       const currentUser = await getCurrentUser();
       const page = Math.max(1, data.page ?? 1);
@@ -366,6 +393,11 @@ export const getCampaignApplications = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication[]>> => {
     try {
+      const {
+        getCurrentUser,
+        findCampaignById,
+        findPendingCampaignApplicationsByCampaignId,
+      } = await getServerDeps();
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -404,6 +436,7 @@ export const getCampaignParticipants = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignParticipant[]>> => {
     try {
+      const { findCampaignParticipantsByCampaignId } = await getServerDeps();
       const participants = await findCampaignParticipantsByCampaignId(data.id);
       return { success: true, data: participants as CampaignParticipant[] };
     } catch (error) {
@@ -422,6 +455,7 @@ export const getCampaignApplicationForUser = createServerFn({ method: "POST" })
   .validator(getCampaignApplicationForUserInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication | null>> => {
     try {
+      const { getDb, and, eq, campaignApplications } = await getServerDeps();
       const db = await getDb();
       const application = await db.query.campaignApplications.findFirst({
         where: and(
@@ -453,6 +487,7 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       data,
     }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
       try {
+        const { getDb, user, or, ilike } = await getServerDeps();
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 

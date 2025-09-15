@@ -1,4 +1,3 @@
-import { useRouter } from "@tanstack/react-router";
 import { ReactNode, useEffect } from "react";
 import { initializePostHogClient } from "~/lib/analytics/posthog";
 import { AuthUser } from "~/lib/auth/types";
@@ -11,8 +10,6 @@ export const PostHogProvider = ({
   children: ReactNode;
   user: AuthUser;
 }) => {
-  const router = useRouter();
-
   // Initialize PostHog client when provider mounts
   useEffect(() => {
     if (isAnalyticsEnabled()) {
@@ -44,28 +41,5 @@ export const PostHogProvider = ({
         console.error("Failed to load PostHog client for user identification:", error);
       });
   }, [user]);
-
-  // Handle pageview tracking
-  useEffect(() => {
-    // Only track pageviews if analytics is enabled
-    if (!isAnalyticsEnabled()) {
-      return;
-    }
-
-    const unsubscribe = router.subscribe("onResolved", () => {
-      // Load PostHog client instance and capture pageview
-      import("posthog-js")
-        .then((ph) => {
-          if (ph.default.__loaded) {
-            ph.default.capture("$pageview");
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to load PostHog client for pageview tracking:", error);
-        });
-    });
-    return unsubscribe;
-  }, [router]);
-
   return <>{children}</>;
 };

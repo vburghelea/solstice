@@ -26,16 +26,18 @@ export const PostHogProvider = ({
 
   // Handle user identification
   useEffect(() => {
-    // Dynamically import posthog-js to avoid server-side issues
+    if (!isAnalyticsEnabled() || !user) {
+      return;
+    }
+
+    // Load PostHog client instance and identify user
     import("posthog-js")
-      .then((posthog) => {
-        if (user) {
-          posthog.default.identify(user.id, {
+      .then((ph) => {
+        if (ph.default.__loaded) {
+          ph.default.identify(user.id, {
             email: user.email,
             name: user.name,
           });
-        } else {
-          posthog.default.reset();
         }
       })
       .catch((error) => {
@@ -51,10 +53,12 @@ export const PostHogProvider = ({
     }
 
     const unsubscribe = router.subscribe("onResolved", () => {
-      // Dynamically import posthog-js to avoid server-side issues
+      // Load PostHog client instance and capture pageview
       import("posthog-js")
-        .then((posthog) => {
-          posthog.default.capture("$pageview");
+        .then((ph) => {
+          if (ph.default.__loaded) {
+            ph.default.capture("$pageview");
+          }
         })
         .catch((error) => {
           console.error("Failed to load PostHog client for pageview tracking:", error);

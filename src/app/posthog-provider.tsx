@@ -1,3 +1,4 @@
+import { useRouter } from "@tanstack/react-router";
 import { ReactNode, useEffect } from "react";
 import {
   captureEvent,
@@ -14,6 +15,8 @@ export const PostHogProvider = ({
   children: ReactNode;
   user: AuthUser | null; // Allow null user
 }) => {
+  const router = useRouter();
+
   // Initialize PostHog client when provider mounts
   useEffect(() => {
     console.debug("PostHogProvider: Initializing PostHog client");

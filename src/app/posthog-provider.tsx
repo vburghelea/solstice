@@ -1,10 +1,6 @@
 import { useRouter } from "@tanstack/react-router";
 import { ReactNode, useEffect } from "react";
-import {
-  captureEvent,
-  getPostHogInstance,
-  initializePostHogClient,
-} from "~/lib/analytics/posthog";
+import { getPostHogInstance, initializePostHogClient } from "~/lib/analytics/posthog";
 import { AuthUser } from "~/lib/auth/types";
 import { isAnalyticsEnabled } from "~/lib/env.client";
 
@@ -80,7 +76,21 @@ export const PostHogProvider = ({
     console.debug("PostHogProvider: Setting up pageview tracking");
     const unsubscribe = router.subscribe("onResolved", () => {
       console.debug("PostHogProvider: Page resolved, capturing pageview");
-      captureEvent("$pageview");
+      // Load PostHog client instance and capture pageview
+      getPostHogInstance()
+        .then((posthog) => {
+          if (posthog) {
+            console.debug("PostHogProvider: PostHog instance found, capturing pageview");
+            posthog.capture("$pageview");
+          } else {
+            console.debug(
+              "PostHogProvider: No PostHog instance found for pageview capture",
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to load PostHog client for pageview capture:", error);
+        });
     });
 
     return unsubscribe;

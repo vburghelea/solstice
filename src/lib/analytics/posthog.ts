@@ -1,3 +1,4 @@
+import type { PostHog } from "posthog-js";
 import { env } from "~/lib/env.client";
 
 // Client-side PostHog initialization
@@ -68,18 +69,55 @@ export function initializePostHogClient(): void {
     });
 }
 
+// Type guard to check if PostHog is properly loaded
+function isPostHogLoaded(posthog: unknown): posthog is PostHog {
+  return (
+    posthog !== null &&
+    posthog !== undefined &&
+    typeof posthog === "object" &&
+    "__loaded" in posthog &&
+    (posthog as { __loaded: boolean }).__loaded === true
+  );
+}
+
 // Helper function to get PostHog instance safely
-export async function getPostHogInstance() {
+export async function getPostHogInstance(): Promise<PostHog | null> {
   if (typeof window === "undefined") {
     console.debug("PostHog: Cannot get instance in server environment");
     return null;
   }
 
   try {
-    const posthog = await import("posthog-js");
-    const instance = posthog.default.__loaded ? posthog.default : null;
-    console.debug("PostHog: Got instance:", !!instance);
-    return instance;
+    const posthogModule = await import("posthog-js");
+    const posthog = posthogModule.default;
+
+    // If PostHog is already loaded, return it immediately
+    if (isPostHogLoaded(posthog)) {
+      console.debug("PostHog: Got instance immediately");
+      return posthog;
+    }
+
+    // Wait for PostHog to be loaded if it's not already
+    // This can happen if the initialization is still in progress
+    return new Promise((resolve) => {
+      let attempts = 0;
+      const maxAttempts = 50; // Max 5 seconds (50 * 100ms)
+
+      const checkLoaded = () => {
+        attempts++;
+        if (isPostHogLoaded(posthog)) {
+          console.debug("PostHog: Got instance after waiting");
+          resolve(posthog);
+        } else if (attempts < maxAttempts) {
+          // Check again in 100ms
+          setTimeout(checkLoaded, 100);
+        } else {
+          console.debug("PostHog: Timeout waiting for instance");
+          resolve(null);
+        }
+      };
+      checkLoaded();
+    });
   } catch (error) {
     console.error("Failed to get PostHog instance:", error);
     return null;
@@ -87,7 +125,10 @@ export async function getPostHogInstance() {
 }
 
 // Helper function to capture events with debugging
-export async function captureEvent(event: string, properties?: Record<string, unknown>) {
+export async function captureEvent(
+  event: string,
+  properties?: Record<string, unknown>,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }

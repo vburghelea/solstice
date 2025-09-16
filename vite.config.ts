@@ -43,6 +43,33 @@ export default defineConfig(({ mode }) => {
         target: "netlify",
       }),
     ],
+
+    // Development-only CSP to allow PostHog & Vite HMR while keeping other defaults strict.
+    // Note: We allow 'unsafe-inline' in dev because TanStack Router's <ScriptOnce> renders
+    // an inline script. Production CSP is handled by Netlify Edge with nonces/hashes.
+    server: {
+      headers: {
+        "Content-Security-Policy": [
+          "default-src 'self'",
+          "base-uri 'self'",
+          "frame-ancestors 'none'",
+          "img-src 'self' https: data: blob:",
+          "style-src 'self' 'unsafe-inline'",
+          "font-src 'self' https: data:",
+          "connect-src 'self' ws://localhost:* https://eu.i.posthog.com https://eu-assets.i.posthog.com wss://eu.i.posthog.com",
+          "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://eu-assets.i.posthog.com https://eu.i.posthog.com",
+          "worker-src 'self' blob:",
+          "media-src 'self' blob:",
+        ].join("; "),
+      },
+    },
+
+    // Vite will attach this nonce to its own injected tags. Our inline scripts from
+    // React SSR (e.g., <ScriptOnce>) are allowed in dev via 'unsafe-inline' above.
+    html: {
+      cspNonce: "dev-nonce",
+    },
+
     optimizeDeps: {
       // Avoid prebundling Start internals that reference AsyncLocalStorage
       exclude: [

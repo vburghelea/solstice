@@ -96,11 +96,25 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       <body>
         <ScriptOnce>
           {`
-            // Theme toggle
-            document.documentElement.classList.toggle(
-              'dark',
-              localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            );
+            try {
+              var theme = null;
+              try {
+                theme = localStorage.getItem('theme');
+              } catch (_e) {
+                theme = null;
+              }
+              var prefersDark = false;
+              try {
+                prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              } catch (_e) {
+                prefersDark = false;
+              }
+              var isDark = theme ? theme === 'dark' : prefersDark;
+              var root = document.documentElement;
+              if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
+            } catch (_e) {
+              // no-op: never break hydration due to theme script
+            }
           `}
         </ScriptOnce>
 

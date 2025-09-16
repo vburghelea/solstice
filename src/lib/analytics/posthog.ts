@@ -75,6 +75,79 @@ export function initializePostHogClient(): void {
               console.debug("PostHog client initialized successfully");
               // Debug: Log the posthog instance
               console.debug("PostHog instance:", posthogInstance);
+
+              // Register global error handlers to capture uncaught exceptions
+              try {
+                // Avoid overwriting existing handlers; chain them
+                const previousOnError = window.onerror;
+                window.onerror = function (
+                  message: string | Event,
+                  source?: string,
+                  lineno?: number,
+                  colno?: number,
+                  error?: Error,
+                ) {
+                  try {
+                    const ph = posthog.default;
+                    if (ph && ph.__loaded) {
+                      ph.capture("$exception", {
+                        message: error?.message ?? String(message),
+                        stack: error?.stack,
+                        source,
+                        lineno,
+                        colno,
+                      });
+                    }
+                  } catch (e) {
+                    console.error("PostHog: failed to capture window.onerror", e);
+                  }
+
+                  if (typeof previousOnError === "function") {
+                    try {
+                      return (
+                        previousOnError as unknown as (...args: unknown[]) => unknown
+                      )(message, source, lineno, colno, error);
+                    } catch {
+                      /* ignore */
+                    }
+                  }
+                  return false;
+                };
+
+                const prevUnhandled = (
+                  window as Window & {
+                    onunhandledrejection?:
+                      | ((ev: PromiseRejectionEvent) => unknown)
+                      | null;
+                  }
+                ).onunhandledrejection;
+
+                window.onunhandledrejection = function (ev: PromiseRejectionEvent) {
+                  try {
+                    const ph = posthog.default;
+                    const reason = ev?.reason;
+                    if (ph && ph.__loaded) {
+                      ph.capture("$exception", {
+                        message: reason?.message ?? String(reason),
+                        stack: reason?.stack,
+                        unhandled: true,
+                      });
+                    }
+                  } catch (e) {
+                    console.error("PostHog: failed to capture onunhandledrejection", e);
+                  }
+
+                  if (typeof prevUnhandled === "function") {
+                    try {
+                      return (prevUnhandled as (...args: unknown[]) => unknown)(ev);
+                    } catch {
+                      /* ignore */
+                    }
+                  }
+                };
+              } catch (e) {
+                console.debug("PostHog: failed to register global error handlers", e);
+              }
             },
           });
         } catch (error) {

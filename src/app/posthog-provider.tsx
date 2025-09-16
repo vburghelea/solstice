@@ -1,6 +1,10 @@
 import { useRouter } from "@tanstack/react-router";
 import { ReactNode, useEffect } from "react";
-import { getPostHogInstance, initializePostHogClient } from "~/lib/analytics/posthog";
+import {
+  captureEvent,
+  getPostHogInstance,
+  initializePostHogClient,
+} from "~/lib/analytics/posthog";
 import { AuthUser } from "~/lib/auth/types";
 import { isAnalyticsEnabled } from "~/lib/env.client";
 
@@ -9,7 +13,7 @@ export const PostHogProvider = ({
   user,
 }: {
   children: ReactNode;
-  user: AuthUser;
+  user: AuthUser | null; // Allow null user
 }) => {
   const router = useRouter();
 
@@ -35,10 +39,30 @@ export const PostHogProvider = ({
   // Handle user identification
   useEffect(() => {
     console.debug("PostHogProvider: User effect triggered", user);
-    if (typeof window === "undefined" || !isAnalyticsEnabled() || !user) {
+    if (typeof window === "undefined" || !isAnalyticsEnabled()) {
       console.debug(
-        "PostHogProvider: Skipping user identification - window undefined, analytics disabled, or no user",
+        "PostHogProvider: Skipping user identification - window undefined or analytics disabled",
       );
+      return;
+    }
+
+    // If user is null or undefined, reset PostHog
+    if (!user) {
+      console.debug("PostHogProvider: No user, resetting PostHog");
+      getPostHogInstance()
+        .then((posthog) => {
+          if (posthog) {
+            console.debug("PostHogProvider: PostHog instance found, resetting");
+            try {
+              posthog.reset();
+            } catch (error) {
+              console.error("Failed to reset PostHog:", error);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to load PostHog client for reset:", error);
+        });
       return;
     }
 
@@ -48,10 +72,14 @@ export const PostHogProvider = ({
       .then((posthog) => {
         if (posthog) {
           console.debug("PostHogProvider: PostHog instance found, identifying user");
-          posthog.identify(user.id, {
-            email: user.email,
-            name: user.name,
-          });
+          try {
+            posthog.identify(user.id, {
+              email: user.email,
+              name: user.name,
+            });
+          } catch (error) {
+            console.error("Failed to identify user in PostHog:", error);
+          }
         } else {
           console.debug(
             "PostHogProvider: No PostHog instance found for user identification",
@@ -73,24 +101,19 @@ export const PostHogProvider = ({
       return;
     }
 
+    // Capture initial pageview when component mounts
+    console.debug("PostHogProvider: Capturing initial pageview");
+    captureEvent("$pageview").catch((error) => {
+      console.error("Failed to capture initial pageview event:", error);
+    });
+
     console.debug("PostHogProvider: Setting up pageview tracking");
     const unsubscribe = router.subscribe("onResolved", () => {
       console.debug("PostHogProvider: Page resolved, capturing pageview");
-      // Load PostHog client instance and capture pageview
-      getPostHogInstance()
-        .then((posthog) => {
-          if (posthog) {
-            console.debug("PostHogProvider: PostHog instance found, capturing pageview");
-            posthog.capture("$pageview");
-          } else {
-            console.debug(
-              "PostHogProvider: No PostHog instance found for pageview capture",
-            );
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to load PostHog client for pageview capture:", error);
-        });
+      // Use the captureEvent helper function
+      captureEvent("$pageview").catch((error) => {
+        console.error("Failed to capture pageview event:", error);
+      });
     });
 
     return unsubscribe;

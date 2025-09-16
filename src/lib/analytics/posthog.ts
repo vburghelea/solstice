@@ -4,6 +4,19 @@ import { env } from "~/lib/env.client";
 // Client-side PostHog initialization
 let postHogInitialized = false;
 
+function resolveCookieDomain(hostname: string): string | undefined {
+  // Never set cookie_domain for local dev or single-label hosts
+  const isLocal =
+    hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
+  if (isLocal) return undefined;
+
+  // If host already an apex/subdomain (contains a dot), use it as-is.
+  // This avoids invalid domain errors on platforms like Netlify previews.
+  if (hostname.includes(".")) return hostname;
+
+  return undefined;
+}
+
 export function initializePostHogClient(): void {
   // Only initialize in browser environment
   if (typeof window === "undefined") {
@@ -38,14 +51,24 @@ export function initializePostHogClient(): void {
     .then((posthog) => {
       if (!posthog.default.__loaded && env.VITE_POSTHOG_HOST) {
         try {
+          const cookieDomain =
+            typeof window !== "undefined"
+              ? resolveCookieDomain(window.location.hostname)
+              : undefined;
+
           console.debug("PostHog: Initializing PostHog client");
           posthog.default.init(env.VITE_POSTHOG_KEY!, {
             api_host: env.VITE_POSTHOG_HOST,
-            capture_pageview: true,
+            // Disable automatic pageview capture since we're handling it manually
+            capture_pageview: false,
             capture_pageleave: true,
             disable_session_recording: false,
             // Enable autocapture for automatic event tracking
             autocapture: true,
+            // Persist to both localStorage and cookies for robustness
+            persistence: "localStorage+cookie",
+            // Avoid invalid cookie domain warnings by scoping to the current host
+            ...(cookieDomain ? { cookie_domain: cookieDomain } : {}),
             // Add additional configuration to prevent SSR issues
             loaded: (posthogInstance) => {
               postHogInitialized = true;

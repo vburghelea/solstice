@@ -93,46 +93,74 @@ test.describe("Team Member Management (Authenticated)", () => {
       });
 
       // Check for edit form with extended timeout
-      await expect(page.getByLabel("Team Name")).toBeVisible({ timeout: 10000 });
-      await expect(page.getByLabel("Description")).toBeVisible({ timeout: 10000 });
+      const nameField = page.getByLabel("Team Name");
+      const descriptionField = page.getByLabel("Description");
+      await expect(nameField).toBeVisible({ timeout: 10000 });
+      await expect(descriptionField).toBeVisible({ timeout: 10000 });
 
       // Generate a unique name for this test run to avoid conflicts
       const timestamp = Date.now();
       const newTeamName = `Thunder ${timestamp}`; // Shorter name to avoid "Test Thunder" matching
+      const newDescription = `Updated E2E test team - ${timestamp}`;
 
-      // Update team name
-      await page.getByLabel("Team Name").clear();
-      await page.getByLabel("Team Name").fill(newTeamName);
+      const originalTeamName = "Test Thunder";
+      const originalDescription = "E2E test team";
 
-      // Also update description to ensure we're making changes
-      await page.getByLabel("Description").clear();
-      await page.getByLabel("Description").fill(`Updated E2E test team - ${timestamp}`);
+      try {
+        // Update team name
+        await nameField.clear();
+        await nameField.fill(newTeamName);
 
-      // Save changes
-      await page.getByRole("button", { name: "Save Changes" }).click();
+        // Also update description to ensure we're making changes
+        await descriptionField.clear();
+        await descriptionField.fill(newDescription);
 
-      // Wait for navigation back to team details page after successful save
-      await page.waitForURL("/dashboard/teams/test-team-1", { timeout: 10000 });
+        // Save changes
+        await page.getByRole("button", { name: "Save Changes" }).click();
 
-      // Verify the updated team name is displayed
-      // Look for the heading in the main content area
-      const mainContent = page.locator("main");
+        // Wait for navigation back to team details page after successful save
+        await page.waitForURL("/dashboard/teams/test-team-1", { timeout: 10000 });
 
-      // Wait for the heading to contain the new team name
-      // React Query should refetch the data after invalidation
-      await expect(mainContent.getByRole("heading", { level: 1 })).toHaveText(
-        newTeamName,
-        {
+        // Verify the updated team name is displayed
+        const mainContent = page.locator("main");
+        await expect(mainContent.getByRole("heading", { level: 1 })).toHaveText(
+          newTeamName,
+          {
+            timeout: 10000,
+          },
+        );
+
+        // Also verify the description was updated
+        await expect(mainContent.getByText(newDescription)).toBeVisible({
           timeout: 10000,
-        },
-      );
+        });
+      } finally {
+        // Reset the team information so subsequent tests continue to work with seeded data
+        await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+          email: "test@example.com",
+          password: "testpassword123",
+        });
 
-      // Also verify the description was updated
-      await expect(
-        mainContent.getByText(`Updated E2E test team - ${timestamp}`),
-      ).toBeVisible({
-        timeout: 10000,
-      });
+        await expect(nameField).toBeVisible({ timeout: 10000 });
+        await expect(descriptionField).toBeVisible({ timeout: 10000 });
+
+        await nameField.clear();
+        await nameField.fill(originalTeamName);
+
+        await descriptionField.clear();
+        await descriptionField.fill(originalDescription);
+
+        await page.getByRole("button", { name: "Save Changes" }).click();
+        await page.waitForURL("/dashboard/teams/test-team-1", { timeout: 10000 });
+
+        const mainContent = page.locator("main");
+        await expect(mainContent.getByRole("heading", { level: 1 })).toHaveText(
+          originalTeamName,
+          {
+            timeout: 10000,
+          },
+        );
+      }
     });
   });
 

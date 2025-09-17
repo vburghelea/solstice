@@ -13,6 +13,7 @@ import { cn } from "~/shared/lib/utils";
 interface ValidatedSelectProps extends FieldComponentProps {
   options: Array<{ value: string; label: string }>;
   placeholderText?: string;
+  required?: boolean;
 }
 
 export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
@@ -22,6 +23,7 @@ export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
     options,
     placeholderText = "Select an option",
     className,
+    required,
   } = props;
 
   if (!isFieldApi(field)) {
@@ -43,6 +45,7 @@ export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
         <SelectTrigger
           id={selectId}
           aria-invalid={!!meta.errors.length}
+          aria-required={required}
           aria-describedby={meta.errors.length ? `${selectId}-errors` : undefined}
         >
           <SelectValue placeholder={placeholderText} />

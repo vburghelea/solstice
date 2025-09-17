@@ -5,3 +5,4 @@ onlyBuiltDependencies:
   - "@tailwindcss/oxide"
   - bufferutil
   - esbuild
+  - puppeteer

@@ -4,6 +4,7 @@ import {
   BarChart3,
   Calendar,
   FileText,
+  CheckSquare,
   Home,
   Layers3,
   LogOut,
@@ -47,6 +48,13 @@ const adminSidebarItems: SidebarItem[] = [
     href: "/dashboard/systems",
     requiresRole: true,
     roles: ["Platform Admin", "Games Admin"],
+  },
+  {
+    icon: CheckSquare,
+    label: "Event Review",
+    href: "/admin/events-review",
+    requiresRole: true,
+    roles: ["Solstice Admin", "Quadball Canada Admin"],
   },
   {
     icon: BarChart3,

@@ -122,19 +122,18 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     // Should redirect to login
     await page.waitForURL(/\/auth\/login/, { timeout: 10_000 });
 
-    // Login
-    await page.getByLabel("Email").fill(process.env["E2E_TEST_EMAIL"]!);
-    await page.getByLabel("Password").fill(process.env["E2E_TEST_PASSWORD"]!);
-    await page.getByRole("button", { name: "Login", exact: true }).click();
+    // Login using the helper so we wait for the redirect away from auth
+    await uiLogin(
+      page,
+      process.env["E2E_TEST_EMAIL"]!,
+      process.env["E2E_TEST_PASSWORD"]!,
+      "/dashboard/profile",
+    );
 
-    // Should redirect to dashboard after login
-    await page.waitForURL("/dashboard", { timeout: 30_000 });
-
-    // Wait for page to stabilize before navigating
-    await page.waitForLoadState("networkidle");
-
-    // Now manually navigate to profile
-    await page.goto("/dashboard/profile");
+    // The redirect parameter may be stripped, so ensure we land on profile
+    if (!page.url().includes("/dashboard/profile")) {
+      await page.goto("/dashboard/profile");
+    }
 
     // Verify we can access the profile page after login
     await expect(page.getByRole("heading", { name: /Profile/ })).toBeVisible({

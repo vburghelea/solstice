@@ -3,16 +3,17 @@ import { z } from "zod";
 import LoginForm from "~/features/auth/components/login";
 import { redirectIfAuthenticated } from "~/lib/auth/guards/route-guards";
 
-export const Route = createFileRoute("/auth/login")({
-  validateSearch: z.object({
-    redirect: z.string().optional(),
-  }),
-  beforeLoad: async ({ context }) => {
-    redirectIfAuthenticated({ user: context.user });
-  },
-  component: LoginPage,
+const searchSchema = z.object({
+  redirect: z.string().optional(),
 });
 
-function LoginPage() {
-  return <LoginForm />;
+export const Route = createFileRoute("/auth/login")({
+  validateSearch: (search) => searchSchema.parse(search),
+  component: LoginRoute,
+});
+
+function LoginRoute() {
+  const { redirect } = Route.useSearch();
+
+  return <LoginForm redirectPath={redirect} />;
 }

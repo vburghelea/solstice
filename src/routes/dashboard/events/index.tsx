@@ -1,55 +1,35 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
+import { PlusIcon } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { EventListItem } from "~/features/events/components/EventListItem";
-import { listEvents } from "~/features/events/events.queries";
-import type { EventListResult } from "~/features/events/events.types";
-import { List } from "~/shared/ui/list";
+import { EventList } from "~/features/events/components/event-list";
 
 export const Route = createFileRoute("/dashboard/events/")({
   component: EventsPage,
 });
 
 function EventsPage() {
-  const { data } = useSuspenseQuery({
-    queryKey: ["events", "dashboard"],
-    queryFn: async () => listEvents({ data: { filters: { publicOnly: true } } }),
-  });
-
-  const result = data as EventListResult;
+  const { user } = useRouteContext({ from: "/dashboard/events" });
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
-      <div className="flex items-center justify-between gap-3">
+    <div className="container mx-auto space-y-8 p-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">Events</h1>
-          <p className="text-muted-foreground">Browse and register for upcoming events</p>
+          <h1 className="text-3xl font-bold tracking-tight">Events</h1>
+          <p className="text-muted-foreground">
+            Browse and manage Quadball events across Canada
+          </p>
         </div>
-        <Button asChild>
-          <Link to="/dashboard/events/create">Create Event</Link>
-        </Button>
+        {user && (
+          <Button asChild>
+            <Link to="/dashboard/events/create">
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Create Event
+            </Link>
+          </Button>
+        )}
       </div>
 
-      {result.events.length === 0 ? (
-        <p className="text-muted-foreground">No events found.</p>
-      ) : (
-        <List>
-          {result.events.map((event) => (
-            <EventListItem
-              key={event.id}
-              event={event}
-              cta={
-                <Button
-                  size="sm"
-                  disabled={!event.isRegistrationOpen || (event.availableSpots ?? 1) <= 0}
-                >
-                  {event.isRegistrationOpen ? "Register" : "View"}
-                </Button>
-              }
-            />
-          ))}
-        </List>
-      )}
+      <EventList />
     </div>
   );
 }

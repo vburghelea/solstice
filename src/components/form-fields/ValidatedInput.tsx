@@ -17,6 +17,8 @@ interface ValidatedInputProps extends FieldComponentProps {
   required?: boolean;
   readOnly?: boolean;
   disabled?: boolean;
+  description?: string;
+  onValueChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 // Correctly define the component receiving props
@@ -27,6 +29,8 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
     type = "text",
     placeholder,
     className,
+    description,
+    onValueChange,
     ...rest // Collect rest of props here
   } = props;
 
@@ -48,10 +52,13 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
         type={type}
         value={field.state.value ?? ""}
         onBlur={field.handleBlur}
-        // Explicitly type the event object
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          field.handleChange(e.target.value)
-        }
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          if (onValueChange) {
+            onValueChange(event.target.value, event);
+            return;
+          }
+          field.handleChange(event.target.value);
+        }}
         placeholder={placeholder}
         disabled={field.form.state.isSubmitting || props.disabled}
         // Add aria-invalid for accessibility based on errors
@@ -59,6 +66,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
         aria-describedby={meta.errors.length ? `${inputId}-errors` : undefined}
         {...rest}
       />
+      {description && <p className="text-muted-foreground text-sm">{description}</p>}
       {/* Show errors only if the field has been touched and has errors */}
       {meta.isTouched && meta.errors.length > 0 && (
         <div id={`${inputId}-errors`} className="text-destructive text-sm font-medium">

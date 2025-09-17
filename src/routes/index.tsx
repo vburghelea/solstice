@@ -43,24 +43,69 @@ function Index() {
 
   return (
     <PublicLayout>
-      <div className="bg-background text-foreground flex min-h-screen flex-col">
-        <section className="relative isolate overflow-hidden">
-          <div className="from-primary/20 via-background to-background dark:from-primary/25 absolute inset-0 -z-10 bg-gradient-to-b" />
-          <div
-            aria-hidden
-            className="bg-primary/15 dark:bg-primary/25 absolute top-[-8rem] left-1/2 -z-10 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full blur-3xl"
-          />
-          <div className="container mx-auto px-4 py-16 sm:py-20 lg:py-28">
-            <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-              <span className="text-muted-foreground text-sm font-medium">
-                In-person tabletop discovery
-              </span>
-              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl">
-                Find your next adventure, in person.
-              </h1>
-              <p className="text-muted-foreground max-w-2xl text-base sm:text-lg">
-                Discover local tabletop and board game events, connect with Game Masters,
-                and play in your city.
+      <HeroSection
+        title="Welcome to Quadball Canada"
+        subtitle="Your hub for all things Quadball in Canada. Stay updated on events, teams, and resources."
+        backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
+        ctaText="Explore Events"
+        ctaLink="/"
+        secondaryCta={{
+          text: "Register Now",
+          link: "/auth/signup",
+        }}
+      />
+
+      <section className="bg-gray-50 py-8 sm:py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+          <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl">
+            Upcoming Events
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+            <EventCard
+              title="National Championship"
+              description="Join us for the biggest Quadball event of the year!"
+              image="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1740"
+              link="/"
+            />
+            <EventCard
+              title="Regional Training Camp"
+              description="Improve your skills with top coaches in the region."
+              image="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1740"
+              link="/"
+            />
+            <EventCard
+              title="Community Meetup"
+              description="Connect with fellow Quadball enthusiasts in your area."
+              image="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=1674"
+              link="/"
+            />
+          </div>
+          <div className="mt-8 text-center sm:mt-12">
+            <Link to="/" className="text-brand-red font-semibold hover:underline">
+              View all events →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-8 sm:py-12 lg:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="order-2 lg:order-1">
+              <img
+                src="https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?q=80&w=1740"
+                alt="Team celebrating"
+                className="w-full rounded-lg shadow-xl"
+              />
+            </div>
+            <div className="order-1 text-center lg:order-2 lg:text-left">
+              <h2 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">Latest News</h2>
+              <h3 className="mb-3 text-lg font-semibold sm:text-xl">
+                New Team Registration Opens
+              </h3>
+              <p className="mb-6 px-4 text-gray-600 sm:px-0">
+                Register your team for the upcoming season and compete for the
+                championship.
               </p>
               <div className="flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
                 <label className="sr-only" htmlFor="home-city">

@@ -20,9 +20,13 @@ import { Route as IndexRouteImport } from "./routes/index";
 import { Route as SystemsIndexRouteImport } from "./routes/systems/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+<<<<<<< HEAD
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
+=======
+import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
 import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
@@ -37,6 +41,7 @@ import { Route as DashboardCampaignsRouteImport } from "./routes/dashboard/campa
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+<<<<<<< HEAD
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -59,11 +64,25 @@ import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/ev
 import { Route as DashboardEventsEventIdRouteImport } from "./routes/dashboard/events/$eventId";
 import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard/campaigns/create";
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
+=======
+import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
+import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
+import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
+import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
+import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
+import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from "./routes/dashboard/campaigns/$campaignId/index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+<<<<<<< HEAD
 import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from "./routes/dashboard/campaigns/$campaignId/zero";
+=======
+import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
@@ -125,6 +144,7 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+<<<<<<< HEAD
 const SystemsSlugRoute = SystemsSlugRouteImport.update({
   id: "/systems/$slug",
   path: "/systems/$slug",
@@ -138,6 +158,11 @@ const GameGameIdRoute = GameGameIdRouteImport.update({
 const EventEventIdRoute = EventEventIdRouteImport.update({
   id: "/event/$eventId",
   path: "/event/$eventId",
+=======
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: "/events/$slug",
+  path: "/events/$slug",
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
@@ -210,6 +235,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+<<<<<<< HEAD
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: "/forgot-password",
   path: "/forgot-password",
@@ -218,6 +244,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const DevEmailIndexRoute = DevEmailIndexRouteImport.update({
   id: "/dev/email/",
   path: "/dev/email/",
+=======
+const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
+  id: "/admin/events-review",
+  path: "/admin/events-review",
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
@@ -225,6 +256,7 @@ const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+<<<<<<< HEAD
 const DashboardSystemsIndexRoute = DashboardSystemsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -240,11 +272,14 @@ const DashboardGamesIndexRoute = DashboardGamesIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardGamesRoute,
 } as any);
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 const DashboardEventsIndexRoute = DashboardEventsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardEventsRoute,
 } as any);
+<<<<<<< HEAD
 const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -254,6 +289,12 @@ const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
   id: "/dev/email/$template",
   path: "/dev/email/$template",
   getParentRoute: () => rootRouteImport,
+=======
+const EventsSlugRegisterRoute = EventsSlugRegisterRouteImport.update({
+  id: "/register",
+  path: "/register",
+  getParentRoute: () => EventsSlugRoute,
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 } as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
   id: "/create",
@@ -270,6 +311,7 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+<<<<<<< HEAD
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
     id: "/$systemId",
@@ -302,11 +344,14 @@ const DashboardGamesGameIdRoute = DashboardGamesGameIdRouteImport.update({
   path: "/$gameId",
   getParentRoute: () => DashboardGamesRoute,
 } as any);
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
   id: "/create",
   path: "/create",
   getParentRoute: () => DashboardEventsRoute,
 } as any);
+<<<<<<< HEAD
 const DashboardEventsEventIdRoute = DashboardEventsEventIdRouteImport.update({
   id: "/$eventId",
   path: "/$eventId",
@@ -324,6 +369,8 @@ const DashboardCampaignsCampaignIdRoute =
     path: "/$campaignId",
     getParentRoute: () => DashboardCampaignsRoute,
   } as any);
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 const DashboardTeamsTeamIdIndexRoute =
   DashboardTeamsTeamIdIndexRouteImport.update({
     id: "/",
@@ -348,11 +395,19 @@ const DashboardTeamsTeamIdManageRoute =
     path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
   } as any);
+<<<<<<< HEAD
 const DashboardCampaignsCampaignIdZeroRoute =
   DashboardCampaignsCampaignIdZeroRouteImport.update({
     id: "/zero",
     path: "/zero",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
+=======
+const DashboardEventsEventIdManageRoute =
+  DashboardEventsEventIdManageRouteImport.update({
+    id: "/$eventId/manage",
+    path: "/$eventId/manage",
+    getParentRoute: () => DashboardEventsRoute,
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   } as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
@@ -429,15 +484,23 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+=======
+  "/admin/events-review": typeof AdminEventsReviewRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
+<<<<<<< HEAD
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
   "/dashboard/games": typeof DashboardGamesRouteWithChildren;
+=======
+  "/dashboard/events": typeof DashboardEventsRouteWithChildren;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRouteWithChildren;
@@ -446,6 +509,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+<<<<<<< HEAD
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
@@ -474,6 +538,19 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+=======
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/dashboard/": typeof DashboardIndexRoute;
+  "/onboarding/": typeof OnboardingIndexRoute;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
+  "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
+  "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
   "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
@@ -482,9 +559,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+=======
+  "/admin/events-review": typeof AdminEventsReviewRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
@@ -492,6 +573,7 @@ export interface FileRoutesByTo {
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+<<<<<<< HEAD
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
@@ -519,6 +601,18 @@ export interface FileRoutesByTo {
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+=======
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/dashboard": typeof DashboardIndexRoute;
+  "/onboarding": typeof OnboardingIndexRoute;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
+  "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/events": typeof DashboardEventsIndexRoute;
+  "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdIndexRoute;
@@ -530,15 +624,23 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+=======
+  "/admin/events-review": typeof AdminEventsReviewRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
+<<<<<<< HEAD
   "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
   "/dashboard/games": typeof DashboardGamesRouteWithChildren;
+=======
+  "/dashboard/events": typeof DashboardEventsRouteWithChildren;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRouteWithChildren;
@@ -547,6 +649,7 @@ export interface FileRoutesById {
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+<<<<<<< HEAD
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
@@ -575,6 +678,19 @@ export interface FileRoutesById {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email/": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+=======
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/dashboard/": typeof DashboardIndexRoute;
+  "/onboarding/": typeof OnboardingIndexRoute;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
+  "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
+  "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
   "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
@@ -587,9 +703,13 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
+=======
+    | "/admin/events-review"
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
@@ -604,6 +724,7 @@ export interface FileRouteTypes {
     | "/dashboard/social-audits"
     | "/dashboard/systems"
     | "/dashboard/teams"
+<<<<<<< HEAD
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -632,6 +753,19 @@ export interface FileRouteTypes {
     | "/dashboard/teams/"
     | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
+=======
+    | "/events/$slug"
+    | "/dashboard/"
+    | "/onboarding/"
+    | "/dashboard/events/create"
+    | "/dashboard/teams/$teamId"
+    | "/dashboard/teams/browse"
+    | "/dashboard/teams/create"
+    | "/events/$slug/register"
+    | "/dashboard/events/"
+    | "/dashboard/teams/"
+    | "/dashboard/events/$eventId/manage"
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
     | "/dashboard/campaigns/$campaignId/"
@@ -640,9 +774,13 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/auth"
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
+=======
+    | "/admin/events-review"
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
@@ -650,6 +788,7 @@ export interface FileRouteTypes {
     | "/dashboard/membership"
     | "/dashboard/reports"
     | "/dashboard/settings"
+<<<<<<< HEAD
     | "/dashboard/social-audits"
     | "/event/$eventId"
     | "/game/$gameId"
@@ -677,6 +816,18 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
     | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
+=======
+    | "/events/$slug"
+    | "/dashboard"
+    | "/onboarding"
+    | "/dashboard/events/create"
+    | "/dashboard/teams/browse"
+    | "/dashboard/teams/create"
+    | "/events/$slug/register"
+    | "/dashboard/events"
+    | "/dashboard/teams"
+    | "/dashboard/events/$eventId/manage"
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
     | "/dashboard/campaigns/$campaignId"
@@ -687,9 +838,13 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
+=======
+    | "/admin/events-review"
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
@@ -704,6 +859,7 @@ export interface FileRouteTypes {
     | "/dashboard/social-audits"
     | "/dashboard/systems"
     | "/dashboard/teams"
+<<<<<<< HEAD
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
@@ -732,6 +888,19 @@ export interface FileRouteTypes {
     | "/dashboard/teams/"
     | "/dev/email/"
     | "/dashboard/campaigns/$campaignId/zero"
+=======
+    | "/events/$slug"
+    | "/dashboard/"
+    | "/onboarding/"
+    | "/dashboard/events/create"
+    | "/dashboard/teams/$teamId"
+    | "/dashboard/teams/browse"
+    | "/dashboard/teams/create"
+    | "/events/$slug/register"
+    | "/dashboard/events/"
+    | "/dashboard/teams/"
+    | "/dashboard/events/$eventId/manage"
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
     | "/dashboard/campaigns/$campaignId/"
@@ -743,6 +912,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+<<<<<<< HEAD
   EventsRoute: typeof EventsRoute;
   SearchRoute: typeof SearchRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
@@ -751,6 +921,10 @@ export interface RootRouteChildren {
   SystemsIndexRoute: typeof SystemsIndexRoute;
   DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
+=======
+  AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  EventsSlugRoute: typeof EventsSlugRouteWithChildren;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
@@ -927,6 +1101,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+<<<<<<< HEAD
     "/systems/$slug": {
       id: "/systems/$slug";
       path: "/systems/$slug";
@@ -946,6 +1121,13 @@ declare module "@tanstack/react-router" {
       path: "/event/$eventId";
       fullPath: "/event/$eventId";
       preLoaderRoute: typeof EventEventIdRouteImport;
+=======
+    "/events/$slug": {
+      id: "/events/$slug";
+      path: "/events/$slug";
+      fullPath: "/events/$slug";
+      preLoaderRoute: typeof EventsSlugRouteImport;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams": {
@@ -1046,6 +1228,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+<<<<<<< HEAD
     "/auth/forgot-password": {
       id: "/auth/forgot-password";
       path: "/forgot-password";
@@ -1058,6 +1241,13 @@ declare module "@tanstack/react-router" {
       path: "/dev/email";
       fullPath: "/dev/email";
       preLoaderRoute: typeof DevEmailIndexRouteImport;
+=======
+    "/admin/events-review": {
+      id: "/admin/events-review";
+      path: "/admin/events-review";
+      fullPath: "/admin/events-review";
+      preLoaderRoute: typeof AdminEventsReviewRouteImport;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard/teams/": {
@@ -1067,6 +1257,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsIndexRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+<<<<<<< HEAD
     "/dashboard/systems/": {
       id: "/dashboard/systems/";
       path: "/";
@@ -1088,6 +1279,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardGamesIndexRouteImport;
       parentRoute: typeof DashboardGamesRoute;
     };
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     "/dashboard/events/": {
       id: "/dashboard/events/";
       path: "/";
@@ -1095,6 +1288,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsIndexRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
+<<<<<<< HEAD
     "/dashboard/campaigns/": {
       id: "/dashboard/campaigns/";
       path: "/";
@@ -1108,6 +1302,14 @@ declare module "@tanstack/react-router" {
       fullPath: "/dev/email/$template";
       preLoaderRoute: typeof DevEmailTemplateRouteImport;
       parentRoute: typeof rootRouteImport;
+=======
+    "/events/$slug/register": {
+      id: "/events/$slug/register";
+      path: "/register";
+      fullPath: "/events/$slug/register";
+      preLoaderRoute: typeof EventsSlugRegisterRouteImport;
+      parentRoute: typeof EventsSlugRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     };
     "/dashboard/teams/create": {
       id: "/dashboard/teams/create";
@@ -1130,6 +1332,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+<<<<<<< HEAD
     "/dashboard/systems/$systemId": {
       id: "/dashboard/systems/$systemId";
       path: "/$systemId";
@@ -1172,6 +1375,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardGamesGameIdRouteImport;
       parentRoute: typeof DashboardGamesRoute;
     };
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     "/dashboard/events/create": {
       id: "/dashboard/events/create";
       path: "/create";
@@ -1179,6 +1384,7 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsCreateRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
+<<<<<<< HEAD
     "/dashboard/events/$eventId": {
       id: "/dashboard/events/$eventId";
       path: "/$eventId";
@@ -1200,6 +1406,8 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardCampaignsCampaignIdRouteImport;
       parentRoute: typeof DashboardCampaignsRoute;
     };
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     "/dashboard/teams/$teamId/": {
       id: "/dashboard/teams/$teamId/";
       path: "/";
@@ -1228,12 +1436,21 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdManageRouteImport;
       parentRoute: typeof DashboardTeamsTeamIdRoute;
     };
+<<<<<<< HEAD
     "/dashboard/campaigns/$campaignId/zero": {
       id: "/dashboard/campaigns/$campaignId/zero";
       path: "/zero";
       fullPath: "/dashboard/campaigns/$campaignId/zero";
       preLoaderRoute: typeof DashboardCampaignsCampaignIdZeroRouteImport;
       parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+=======
+    "/dashboard/events/$eventId/manage": {
+      id: "/dashboard/events/$eventId/manage";
+      path: "/$eventId/manage";
+      fullPath: "/dashboard/events/$eventId/manage";
+      preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     };
   }
 }
@@ -1351,6 +1568,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 );
 
+<<<<<<< HEAD
 interface DashboardCampaignsCampaignIdRouteChildren {
   DashboardCampaignsCampaignIdZeroRoute: typeof DashboardCampaignsCampaignIdZeroRoute;
   DashboardCampaignsCampaignIdIndexRoute: typeof DashboardCampaignsCampaignIdIndexRoute;
@@ -1395,12 +1613,25 @@ const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
   DashboardEventsEventIdRoute: DashboardEventsEventIdRoute,
   DashboardEventsCreateRoute: DashboardEventsCreateRoute,
   DashboardEventsIndexRoute: DashboardEventsIndexRoute,
+=======
+interface DashboardEventsRouteChildren {
+  DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
+  DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
+  DashboardEventsEventIdManageRoute: typeof DashboardEventsEventIdManageRoute;
+}
+
+const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
+  DashboardEventsCreateRoute: DashboardEventsCreateRoute,
+  DashboardEventsIndexRoute: DashboardEventsIndexRoute,
+  DashboardEventsEventIdManageRoute: DashboardEventsEventIdManageRoute,
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 };
 
 const DashboardEventsRouteWithChildren = DashboardEventsRoute._addFileChildren(
   DashboardEventsRouteChildren,
 );
 
+<<<<<<< HEAD
 interface DashboardGamesRouteChildren {
   DashboardGamesGameIdRoute: typeof DashboardGamesGameIdRoute;
   DashboardGamesCreateRoute: typeof DashboardGamesCreateRoute;
@@ -1445,6 +1676,8 @@ const DashboardSystemsRouteChildren: DashboardSystemsRouteChildren = {
 const DashboardSystemsRouteWithChildren =
   DashboardSystemsRoute._addFileChildren(DashboardSystemsRouteChildren);
 
+=======
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
@@ -1479,9 +1712,13 @@ const DashboardTeamsRouteWithChildren = DashboardTeamsRoute._addFileChildren(
 );
 
 interface DashboardRouteRouteChildren {
+<<<<<<< HEAD
   DashboardCampaignsRoute: typeof DashboardCampaignsRouteWithChildren;
   DashboardEventsRoute: typeof DashboardEventsRouteWithChildren;
   DashboardGamesRoute: typeof DashboardGamesRouteWithChildren;
+=======
+  DashboardEventsRoute: typeof DashboardEventsRouteWithChildren;
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   DashboardMembersRoute: typeof DashboardMembersRoute;
   DashboardMembershipRoute: typeof DashboardMembershipRoute;
   DashboardProfileRoute: typeof DashboardProfileRouteWithChildren;
@@ -1495,9 +1732,13 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+<<<<<<< HEAD
   DashboardCampaignsRoute: DashboardCampaignsRouteWithChildren,
   DashboardEventsRoute: DashboardEventsRouteWithChildren,
   DashboardGamesRoute: DashboardGamesRouteWithChildren,
+=======
+  DashboardEventsRoute: DashboardEventsRouteWithChildren,
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   DashboardMembersRoute: DashboardMembersRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
   DashboardProfileRoute: DashboardProfileRouteWithChildren,
@@ -1526,11 +1767,24 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
   OnboardingRouteRouteChildren,
 );
 
+interface EventsSlugRouteChildren {
+  EventsSlugRegisterRoute: typeof EventsSlugRegisterRoute;
+}
+
+const EventsSlugRouteChildren: EventsSlugRouteChildren = {
+  EventsSlugRegisterRoute: EventsSlugRegisterRoute,
+};
+
+const EventsSlugRouteWithChildren = EventsSlugRoute._addFileChildren(
+  EventsSlugRouteChildren,
+);
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+<<<<<<< HEAD
   EventsRoute: EventsRoute,
   SearchRoute: SearchRoute,
   EventEventIdRoute: EventEventIdRoute,
@@ -1539,6 +1793,10 @@ const rootRouteChildren: RootRouteChildren = {
   SystemsIndexRoute: SystemsIndexRoute,
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
+=======
+  AdminEventsReviewRoute: AdminEventsReviewRoute,
+  EventsSlugRoute: EventsSlugRouteWithChildren,
+>>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

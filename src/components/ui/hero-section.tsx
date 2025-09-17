@@ -7,6 +7,10 @@ interface HeroSectionProps {
   backgroundImage?: string;
   ctaText?: string;
   ctaLink?: string;
+  secondaryCta?: {
+    text: string;
+    link: string;
+  };
 }
 
 export function HeroSection({
@@ -15,6 +19,7 @@ export function HeroSection({
   backgroundImage,
   ctaText,
   ctaLink = "/",
+  secondaryCta,
 }: HeroSectionProps) {
   const backgroundStyle = backgroundImage
     ? {
@@ -35,12 +40,23 @@ export function HeroSection({
           <p className="mx-auto mt-4 max-w-2xl px-4 text-base text-gray-200 sm:px-0 sm:text-lg">
             {subtitle}
           </p>
-          {ctaText && (
-            <Link to={ctaLink}>
-              <Button className="btn-brand-primary mt-6 inline-block rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:mt-8 sm:px-8 sm:py-3 sm:text-base">
-                {ctaText}
-              </Button>
-            </Link>
+          {(ctaText || secondaryCta) && (
+            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:justify-center">
+              {ctaText && (
+                <Link to={ctaLink}>
+                  <Button className="btn-brand-primary rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base">
+                    {ctaText}
+                  </Button>
+                </Link>
+              )}
+              {secondaryCta && (
+                <Link to={secondaryCta.link}>
+                  <Button className="btn-brand-secondary rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base">
+                    {secondaryCta.text}
+                  </Button>
+                </Link>
+              )}
+            </div>
           )}
         </div>
       </div>

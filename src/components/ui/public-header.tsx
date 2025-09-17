@@ -2,6 +2,7 @@ import { Link, useRouteContext } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./button";
+import { Logo } from "./logo";
 
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

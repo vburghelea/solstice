@@ -14,7 +14,11 @@ import type {
 // Input types
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 
-export type UpdateEventInput = Partial<CreateEventInput>;
+export type UpdateEventInput = Partial<CreateEventInput> & {
+  status?: EventStatus;
+  isPublic?: boolean;
+  isFeatured?: boolean;
+};
 
 export type EventFilters = {
   status?: Event["status"] | Event["status"][];

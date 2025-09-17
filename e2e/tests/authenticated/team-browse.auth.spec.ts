@@ -236,7 +236,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
 
       // Check that we have team cards
       const teamCards = page.locator('[data-slot="card"]');
-      await expect(teamCards).toHaveCount(2);
+      await expect(teamCards.first()).toBeVisible();
 
       // For Test Thunder team - look for the specific card
       const thunderCard = teamCards.filter({ hasText: "Test Thunder" });

@@ -1,13 +1,15 @@
 import { expect, test } from "@playwright/test";
 import { gotoWithAuth } from "../../utils/auth";
 
+const PROFILE_USER = {
+  email: "profile-edit@example.com",
+  password: "testpassword123",
+};
+
 test.describe("Profile Edit", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to profile page with authentication
-    await gotoWithAuth(page, "/dashboard/profile", {
-      email: process.env["E2E_TEST_EMAIL"]!,
-      password: process.env["E2E_TEST_PASSWORD"]!,
-    });
+    await gotoWithAuth(page, "/dashboard/profile", PROFILE_USER);
 
     // Wait for the page to be ready
     await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({
@@ -26,7 +28,7 @@ test.describe("Profile Edit", () => {
     // Check basic information card
     await expect(page.getByText("Basic Information")).toBeVisible();
     await expect(page.getByText("Email", { exact: true })).toBeVisible();
-    await expect(page.getByText("test@example.com")).toBeVisible();
+    await expect(page.getByText(PROFILE_USER.email)).toBeVisible();
   });
 
   test("should toggle edit mode", async ({ page }) => {
@@ -151,7 +153,7 @@ test.describe("Profile Edit", () => {
 
   test("should update privacy settings", async ({ page }) => {
     // First ensure the profile data is loaded
-    await expect(page.getByText("test@example.com")).toBeVisible();
+    await expect(page.getByText(PROFILE_USER.email)).toBeVisible();
 
     // Wait for privacy settings to be visible to ensure data is loaded
     await expect(page.getByText("Email visibility:")).toBeVisible();

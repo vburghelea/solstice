@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
@@ -11,17 +11,28 @@ import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 import { loginFormSchema } from "../auth.schemas";
 
-export default function LoginForm() {
+type LoginFormProps = {
+  redirectPath?: string | undefined;
+};
+
+export default function LoginForm(props?: LoginFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
 
-  // Get redirect parameter from URL, default to dashboard
-  const searchParams = new URLSearchParams(window.location.search);
-  const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  const safeRedirectPath = props?.redirectPath?.startsWith("/")
+    ? props.redirectPath
+    : "/dashboard";
 
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    // Form handlers need to wait for hydration; setting state here is intentional.
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setIsHydrated(true);
+  }, []);
 
   const form = useAppForm({
     defaultValues: {
@@ -42,7 +53,7 @@ export default function LoginForm() {
         // Success path
         await queryClient.invalidateQueries({ queryKey: ["user"] });
         await router.invalidate();
-        await navigate({ to: redirectUrl });
+        await navigate({ to: safeRedirectPath });
       } catch (error) {
         // Error handling
         setErrorMessage((error as Error)?.message || "Invalid email or password");
@@ -58,6 +69,8 @@ export default function LoginForm() {
   return (
     <div className="flex flex-col gap-6">
       <form
+        data-testid="login-form"
+        data-hydrated={isHydrated ? "true" : "false"}
         onSubmit={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -154,7 +167,7 @@ export default function LoginForm() {
               auth.signInWithOAuth(
                 {
                   provider: "google",
-                  callbackURL: redirectUrl,
+                  callbackURL: safeRedirectPath,
                 },
                 {
                   onRequest: () => {

@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { z } from "zod";
 import type { EventRegistration } from "~/db/schema";
-import { eventRegistrations, events, user } from "~/db/schema";
+import { eventRegistrations, events, teams, user } from "~/db/schema";
 import type {
   EventAmenities,
   EventDivisions,
@@ -37,6 +38,21 @@ function castRegistrationJsonbFields(
     roster: (registration.roster || {}) as EventRegistrationRoster,
   };
 }
+
+export type EventRegistrationSummary = {
+  id: string;
+  userId: string | null;
+  teamId: string | null;
+  eventId: string;
+  registrationType: EventRegistration["registrationType"];
+  status: EventRegistration["status"];
+  paymentStatus: string;
+  paymentId: string | null;
+  createdAt: Date;
+  userName: string | null;
+  userEmail: string | null;
+  teamName: string | null;
+};
 
 /**
  * List events with filters and pagination
@@ -324,6 +340,44 @@ export const getUpcomingEvents = createServerFn({ method: "GET" })
     })) as EventListResult;
 
     return result.events;
+  });
+
+/**
+ * Get all registrations for an event (organizer only)
+ */
+export const getEventRegistrations = createServerFn({ method: "GET" })
+  .validator(z.object({ eventId: z.string().uuid() }).parse)
+  .handler(async ({ data }): Promise<EventRegistrationSummary[]> => {
+    const { getDb } = await import("~/db/server-helpers");
+    const db = await getDb();
+
+    const registrations = await db
+      .select({
+        id: eventRegistrations.id,
+        userId: eventRegistrations.userId,
+        teamId: eventRegistrations.teamId,
+        eventId: eventRegistrations.eventId,
+        registrationType: eventRegistrations.registrationType,
+        status: eventRegistrations.status,
+        paymentStatus: eventRegistrations.paymentStatus,
+        paymentId: eventRegistrations.paymentId,
+        createdAt: eventRegistrations.createdAt,
+        userName: user.name,
+        userEmail: user.email,
+        teamName: teams.name,
+      })
+      .from(eventRegistrations)
+      .leftJoin(user, eq(eventRegistrations.userId, user.id))
+      .leftJoin(teams, eq(eventRegistrations.teamId, teams.id))
+      .where(eq(eventRegistrations.eventId, data.eventId))
+      .orderBy(desc(eventRegistrations.createdAt));
+
+    return registrations.map((registration) => ({
+      ...registration,
+      userName: registration.userName ?? null,
+      userEmail: registration.userEmail ?? null,
+      teamName: registration.teamName ?? null,
+    }));
   });
 
 /**

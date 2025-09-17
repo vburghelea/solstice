@@ -68,11 +68,18 @@ function TeamsIndexPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {userTeams.map((userTeam) => (
-            <TeamCard key={userTeam.team.id} userTeam={userTeam} />
-          ))}
-        </div>
+        <>
+          <div className="mb-4 flex justify-end">
+            <Button asChild variant="outline">
+              <Link to="/dashboard/teams/browse">Browse All Teams</Link>
+            </Button>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {userTeams.map((userTeam) => (
+              <TeamCard key={userTeam.team.id} userTeam={userTeam} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

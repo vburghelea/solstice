@@ -1,7 +1,9 @@
 packages:
-  - '.'
+  - .
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - '@tailwindcss/oxide'
   - bufferutil
   - esbuild
+  - puppeteer

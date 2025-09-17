@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, or, sql } from "drizzle-orm";
+import { z } from "zod";
 import type { Event as DbEvent, EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teamMembers } from "~/db/schema";
 import { createEventInputSchema } from "~/db/schema/events.schema";
@@ -32,6 +33,97 @@ function castEventJsonbFields(event: DbEvent): EventWithDetails {
     metadata: (event.metadata || {}) as EventMetadata,
   } as EventWithDetails;
 }
+
+/**
+ * Cancel an event
+ */
+export const cancelEvent = createServerFn({ method: "POST" })
+  .validator(z.object({ eventId: z.string().uuid() }).parse)
+  .handler(async ({ data }): Promise<EventOperationResult<null>> => {
+    try {
+      // Import server-only modules inside the handler
+      const [{ getDb }, { getAuth }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/lib/auth/server-helpers"),
+      ]);
+
+      const db = await getDb();
+      const auth = await getAuth();
+      const { getWebRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getWebRequest();
+      const session = await auth.api.getSession({ headers });
+
+      if (!session?.user?.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "UNAUTHORIZED",
+              message: "User not authenticated",
+            },
+          ],
+        };
+      }
+
+      // Check if user owns the event
+      const [event] = await db
+        .select({ organizerId: events.organizerId })
+        .from(events)
+        .where(eq(events.id, data.eventId))
+        .limit(1);
+
+      if (!event) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "NOT_FOUND",
+              message: "Event not found",
+            },
+          ],
+        };
+      }
+
+      if (event.organizerId !== session.user.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "FORBIDDEN",
+              message: "You don't have permission to cancel this event",
+            },
+          ],
+        };
+      }
+
+      // Update event status to cancelled
+      await db
+        .update(events)
+        .set({
+          status: "cancelled",
+          updatedAt: new Date(),
+        })
+        .where(eq(events.id, data.eventId));
+
+      // TODO: Send cancellation emails to registered participants
+
+      return {
+        success: true,
+        data: null,
+      };
+    } catch (error) {
+      console.error("Error cancelling event:", error);
+      return {
+        success: false,
+        errors: [
+          {
+            code: "DATABASE_ERROR",
+            message: "Failed to cancel event",
+          },
+        ],
+      };
+    }
+  });
 
 /**
  * Create a new event

@@ -3,6 +3,7 @@ import { useRouteContext } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
+  CheckSquare,
   Home,
   LogOut,
   Settings,
@@ -20,6 +21,13 @@ const allSidebarItems = [
   { icon: Users, label: "Teams", href: "/dashboard/teams", requiresRole: false },
   { icon: Calendar, label: "Events", href: "/dashboard/events", requiresRole: false },
   { icon: UserCheck, label: "Members", href: "/dashboard/members", requiresRole: false },
+  {
+    icon: CheckSquare,
+    label: "Event Review",
+    href: "/admin/events-review",
+    requiresRole: true,
+    roles: ["Solstice Admin", "Quadball Canada Admin"],
+  },
   {
     icon: BarChart3,
     label: "Reports",

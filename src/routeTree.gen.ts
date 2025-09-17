@@ -17,6 +17,7 @@ import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
@@ -26,13 +27,18 @@ import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members
 import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
+import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
@@ -71,6 +77,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
+} as any);
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: "/events/$slug",
+  path: "/events/$slug",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   id: "/teams",
@@ -117,10 +128,25 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
+  id: "/admin/events-review",
+  path: "/admin/events-review",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardTeamsRoute,
+} as any);
+const DashboardEventsIndexRoute = DashboardEventsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => DashboardEventsRoute,
+} as any);
+const EventsSlugRegisterRoute = EventsSlugRegisterRouteImport.update({
+  id: "/register",
+  path: "/register",
+  getParentRoute: () => EventsSlugRoute,
 } as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
   id: "/create",
@@ -136,6 +162,11 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   id: "/$teamId",
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
+} as any);
+const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => DashboardEventsRoute,
 } as any);
 const DashboardTeamsTeamIdIndexRoute =
   DashboardTeamsTeamIdIndexRouteImport.update({
@@ -154,6 +185,12 @@ const DashboardTeamsTeamIdManageRoute =
     id: "/manage",
     path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
+  } as any);
+const DashboardEventsEventIdManageRoute =
+  DashboardEventsEventIdManageRouteImport.update({
+    id: "/$eventId/manage",
+    path: "/$eventId/manage",
+    getParentRoute: () => DashboardEventsRoute,
   } as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
@@ -193,21 +230,27 @@ export interface FileRoutesByFullPath {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/admin/events-review": typeof AdminEventsReviewRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
-  "/dashboard/events": typeof DashboardEventsRoute;
+  "/dashboard/events": typeof DashboardEventsRouteWithChildren;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
@@ -215,19 +258,24 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
+  "/admin/events-review": typeof AdminEventsReviewRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
-  "/dashboard/events": typeof DashboardEventsRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
@@ -238,21 +286,27 @@ export interface FileRoutesById {
   "/auth": typeof AuthRouteRouteWithChildren;
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/admin/events-review": typeof AdminEventsReviewRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
-  "/dashboard/events": typeof DashboardEventsRoute;
+  "/dashboard/events": typeof DashboardEventsRouteWithChildren;
   "/dashboard/members": typeof DashboardMembersRoute;
   "/dashboard/membership": typeof DashboardMembershipRoute;
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
@@ -264,6 +318,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/admin/events-review"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/events"
@@ -273,12 +328,17 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/teams"
+    | "/events/$slug"
     | "/dashboard/"
     | "/onboarding/"
+    | "/dashboard/events/create"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/events/$slug/register"
+    | "/dashboard/events/"
     | "/dashboard/teams/"
+    | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
     | "/dashboard/teams/$teamId/";
@@ -286,19 +346,24 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/auth"
+    | "/admin/events-review"
     | "/auth/login"
     | "/auth/signup"
-    | "/dashboard/events"
     | "/dashboard/members"
     | "/dashboard/membership"
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
+    | "/events/$slug"
     | "/dashboard"
     | "/onboarding"
+    | "/dashboard/events/create"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/events/$slug/register"
+    | "/dashboard/events"
     | "/dashboard/teams"
+    | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
     | "/dashboard/teams/$teamId";
@@ -308,6 +373,7 @@ export interface FileRouteTypes {
     | "/auth"
     | "/dashboard"
     | "/onboarding"
+    | "/admin/events-review"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/events"
@@ -317,12 +383,17 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/teams"
+    | "/events/$slug"
     | "/dashboard/"
     | "/onboarding/"
+    | "/dashboard/events/create"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
+    | "/events/$slug/register"
+    | "/dashboard/events/"
     | "/dashboard/teams/"
+    | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
     | "/dashboard/teams/$teamId/";
@@ -333,6 +404,8 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren;
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  EventsSlugRoute: typeof EventsSlugRouteWithChildren;
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
@@ -439,6 +512,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/events/$slug": {
+      id: "/events/$slug";
+      path: "/events/$slug";
+      fullPath: "/events/$slug";
+      preLoaderRoute: typeof EventsSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/dashboard/teams": {
       id: "/dashboard/teams";
       path: "/teams";
@@ -502,12 +582,33 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/admin/events-review": {
+      id: "/admin/events-review";
+      path: "/admin/events-review";
+      fullPath: "/admin/events-review";
+      preLoaderRoute: typeof AdminEventsReviewRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
       path: "/";
       fullPath: "/dashboard/teams/";
       preLoaderRoute: typeof DashboardTeamsIndexRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/events/": {
+      id: "/dashboard/events/";
+      path: "/";
+      fullPath: "/dashboard/events/";
+      preLoaderRoute: typeof DashboardEventsIndexRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+    };
+    "/events/$slug/register": {
+      id: "/events/$slug/register";
+      path: "/register";
+      fullPath: "/events/$slug/register";
+      preLoaderRoute: typeof EventsSlugRegisterRouteImport;
+      parentRoute: typeof EventsSlugRoute;
     };
     "/dashboard/teams/create": {
       id: "/dashboard/teams/create";
@@ -530,6 +631,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/events/create": {
+      id: "/dashboard/events/create";
+      path: "/create";
+      fullPath: "/dashboard/events/create";
+      preLoaderRoute: typeof DashboardEventsCreateRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+    };
     "/dashboard/teams/$teamId/": {
       id: "/dashboard/teams/$teamId/";
       path: "/";
@@ -550,6 +658,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/teams/$teamId/manage";
       preLoaderRoute: typeof DashboardTeamsTeamIdManageRouteImport;
       parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
+    "/dashboard/events/$eventId/manage": {
+      id: "/dashboard/events/$eventId/manage";
+      path: "/$eventId/manage";
+      fullPath: "/dashboard/events/$eventId/manage";
+      preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
     };
   }
 }
@@ -614,6 +729,22 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 );
 
+interface DashboardEventsRouteChildren {
+  DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
+  DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
+  DashboardEventsEventIdManageRoute: typeof DashboardEventsEventIdManageRoute;
+}
+
+const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
+  DashboardEventsCreateRoute: DashboardEventsCreateRoute,
+  DashboardEventsIndexRoute: DashboardEventsIndexRoute,
+  DashboardEventsEventIdManageRoute: DashboardEventsEventIdManageRoute,
+};
+
+const DashboardEventsRouteWithChildren = DashboardEventsRoute._addFileChildren(
+  DashboardEventsRouteChildren,
+);
+
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
@@ -648,7 +779,7 @@ const DashboardTeamsRouteWithChildren = DashboardTeamsRoute._addFileChildren(
 );
 
 interface DashboardRouteRouteChildren {
-  DashboardEventsRoute: typeof DashboardEventsRoute;
+  DashboardEventsRoute: typeof DashboardEventsRouteWithChildren;
   DashboardMembersRoute: typeof DashboardMembersRoute;
   DashboardMembershipRoute: typeof DashboardMembershipRoute;
   DashboardProfileRoute: typeof DashboardProfileRoute;
@@ -659,7 +790,7 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardEventsRoute: DashboardEventsRoute,
+  DashboardEventsRoute: DashboardEventsRouteWithChildren,
   DashboardMembersRoute: DashboardMembersRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
   DashboardProfileRoute: DashboardProfileRoute,
@@ -685,11 +816,25 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
   OnboardingRouteRouteChildren,
 );
 
+interface EventsSlugRouteChildren {
+  EventsSlugRegisterRoute: typeof EventsSlugRegisterRoute;
+}
+
+const EventsSlugRouteChildren: EventsSlugRouteChildren = {
+  EventsSlugRegisterRoute: EventsSlugRegisterRoute,
+};
+
+const EventsSlugRouteWithChildren = EventsSlugRoute._addFileChildren(
+  EventsSlugRouteChildren,
+);
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
+  AdminEventsReviewRoute: AdminEventsReviewRoute,
+  EventsSlugRoute: EventsSlugRouteWithChildren,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

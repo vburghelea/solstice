@@ -151,8 +151,12 @@
 
   /* Button Variants */
   .btn-brand-primary {
-    background-color: var(--color-brand-red);
-    color: white;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--color-brand-red) !important;
+    color: white !important;
+    border: none !important;
     box-shadow:
       0 4px 6px -1px rgb(0 0 0 / 0.1),
       0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -162,11 +166,37 @@
   }
 
   .btn-brand-primary:hover {
-    background-color: var(--color-brand-red-dark);
+    background-color: var(--color-brand-red-dark) !important;
     transform: translateY(-1px);
   }
 
   .btn-brand-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-brand-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: white !important;
+    color: var(--color-brand-red) !important;
+    border: none !important;
+    box-shadow:
+      0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition:
+      background-color 200ms,
+      color 200ms,
+      transform 100ms;
+  }
+
+  .btn-brand-secondary:hover {
+    background-color: rgba(220, 38, 38, 0.1) !important;
+    color: var(--color-brand-red) !important;
+    transform: translateY(-1px);
+  }
+
+  .btn-brand-secondary:active {
     transform: translateY(0);
   }
 

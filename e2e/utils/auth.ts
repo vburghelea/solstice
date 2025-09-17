@@ -25,6 +25,9 @@ export async function uiLogin(
 
   // Wait for page to be fully loaded
   await page.waitForLoadState("domcontentloaded");
+  await expect(page.getByTestId("login-form")).toHaveAttribute("data-hydrated", "true", {
+    timeout: 10_000,
+  });
 
   // Wait for email field to be visible and enabled
   const emailField = page.getByLabel("Email");
@@ -34,6 +37,9 @@ export async function uiLogin(
   // Click and fill email field
   await emailField.click();
   await emailField.fill(email);
+  await expect(emailField).toHaveValue(email, { timeout: 5_000 });
+  const filledEmail = await emailField.inputValue();
+  console.log(`[uiLogin] Filled email: ${filledEmail}`);
 
   // Wait for password field to be enabled
   const passwordField = page.getByLabel("Password");
@@ -42,14 +48,32 @@ export async function uiLogin(
   // Click and fill password field
   await passwordField.click();
   await passwordField.fill(password);
+  const filledPasswordLength = (await passwordField.inputValue()).length;
+  console.log(`[uiLogin] Filled password length: ${filledPasswordLength}`);
 
   // Ensure button is enabled before clicking
   const btn = page.getByRole("button", { name: "Login", exact: true });
   await expect(btn).toBeEnabled({ timeout: 10_000 });
-  await btn.click();
+  try {
+    await Promise.all([
+      page.waitForURL(
+        (url) => {
+          const currentUrl = typeof url === "string" ? url : url.toString();
+          return !currentUrl.includes("/auth/login");
+        },
+        { timeout: 30_000, waitUntil: "commit" },
+      ),
+      btn.click(),
+    ]);
 
-  // Wait for navigation - but don't expect specific URL due to redirect stripping
-  await page.waitForURL(/\/(dashboard|auth)/, { timeout: 30_000 });
+    // SPA navigation might keep background requests alive; don't block forever waiting for network idle
+    await page.waitForLoadState("networkidle", { timeout: 5_000 }).catch(() => undefined);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown navigation failure";
+    throw new Error(
+      `Login did not navigate away from the auth page: ${message}. Current URL: ${page.url()}`,
+    );
+  }
 }
 
 export async function login(page: Page, email: string, password: string) {

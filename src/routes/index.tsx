@@ -17,6 +17,10 @@ function Home() {
         backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
         ctaText="Explore Events"
         ctaLink="/"
+        secondaryCta={{
+          text: "Register Now",
+          link: "/auth/signup",
+        }}
       />
 
       <section className="bg-gray-50 py-8 sm:py-12 lg:py-16">

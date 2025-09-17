@@ -2,6 +2,7 @@ import { Link, useRouteContext } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./button";
+import { Logo } from "./logo";
 
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,7 +14,7 @@ export function PublicHeader() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between sm:h-20">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="maple-leaf-logo h-8 w-8 sm:h-10 sm:w-10"></div>
+            <Logo className="h-8 w-8 sm:h-10 sm:w-10" />
             <h1 className="text-brand-dark text-lg font-extrabold tracking-tight sm:text-xl">
               Quadball Canada
             </h1>

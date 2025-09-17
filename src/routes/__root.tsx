@@ -5,10 +5,10 @@ import {
   HeadContent,
   Outlet,
   ScriptOnce,
+  Scripts,
 } from "@tanstack/react-router";
 
 import { lazy, Suspense } from "react";
-import { CspScripts } from "~/app/csp-scripts";
 import { PostHogProvider } from "~/app/posthog-provider";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import type { AuthUser } from "~/lib/auth/types";
@@ -128,7 +128,7 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
           <TanStackRouterDevtools position="bottom-right" />
         </Suspense>
 
-        <CspScripts />
+        <Scripts />
       </body>
     </html>
   );

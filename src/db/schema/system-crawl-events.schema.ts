@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { gameSystems } from "./game-systems.schema";
 
 export const systemCrawlEvents = pgTable("system_crawl_events", {
@@ -13,6 +21,8 @@ export const systemCrawlEvents = pgTable("system_crawl_events", {
   finishedAt: timestamp("finished_at").notNull(),
   httpStatus: integer("http_status"),
   errorMessage: text("error_message"),
+  severity: varchar("severity", { length: 50 }).notNull().default("info"),
+  details: jsonb("details"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

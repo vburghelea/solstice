@@ -135,14 +135,26 @@ async function recordEvent(event: CrawlEventLog) {
     finishedAt: event.finishedAt,
     httpStatus: event.httpStatus,
     errorMessage: event.errorMessage,
+    severity: event.severity,
+    details: event.details ?? null,
   });
+}
+
+interface UpsertDetailResult {
+  systemId: number;
+  created: boolean;
+  updatedFields: string[];
+  uploadedAssets: number;
+  linkedCategories: number;
+  linkedMechanics: number;
+  unmapped: Record<string, number>;
 }
 
 export async function upsertDetail(
   detail: SystemDetail,
   maps: TagMaps,
   unmappedCounts: Record<string, number>,
-) {
+): Promise<UpsertDetailResult> {
   const { db, gameSystems, mediaAssets, gameSystemToCategory, gameSystemToMechanics } =
     await getDb();
   const { uploadImage, computeChecksum } = await getCloudinary();
@@ -150,6 +162,10 @@ export async function upsertDetail(
   const existing = await db
     .select({
       id: gameSystems.id,
+      descriptionScraped: gameSystems.descriptionScraped,
+      minPlayers: gameSystems.minPlayers,
+      maxPlayers: gameSystems.maxPlayers,
+      publisherUrl: gameSystems.publisherUrl,
       externalRefs: gameSystems.externalRefs,
       heroImageId: gameSystems.heroImageId,
     })
@@ -159,6 +175,10 @@ export async function upsertDetail(
 
   const now = new Date();
   let systemId: number;
+  let created = false;
+  const updatedFields: string[] = [];
+  const heroImageId: number | null = existing[0]?.heroImageId ?? null;
+
   if (existing.length === 0) {
     const inserted = (await db
       .insert(gameSystems)
@@ -176,24 +196,47 @@ export async function upsertDetail(
       })
       .returning()) as { id: number }[];
     systemId = inserted[0]!.id;
+    created = true;
   } else {
-    systemId = existing[0].id;
-    await db
-      .update(gameSystems)
-      .set({
-        descriptionScraped: detail.description,
-        minPlayers: detail.minPlayers,
-        maxPlayers: detail.maxPlayers,
-        publisherUrl: detail.publisherUrl,
-        crawlStatus: "success",
-        lastCrawledAt: now,
-        lastSuccessAt: now,
-        externalRefs: {
-          ...(existing[0].externalRefs ?? {}),
-          startplaying: detail.slug,
-        },
-      })
-      .where(eq(gameSystems.id, systemId));
+    const existingRow = existing[0];
+    systemId = existingRow.id;
+    const updates: Record<string, unknown> = {
+      crawlStatus: "success",
+      lastCrawledAt: now,
+    };
+
+    const applyChange = <T>(field: keyof typeof existingRow, value: T) => {
+      const previous = (existingRow as Record<string, unknown>)[field] ?? null;
+      const next = (value as unknown) ?? null;
+      if (previous !== next) {
+        updates[field as string] = value;
+        updatedFields.push(field as string);
+      }
+    };
+
+    applyChange("descriptionScraped", detail.description ?? null);
+    applyChange("minPlayers", detail.minPlayers ?? null);
+    applyChange("maxPlayers", detail.maxPlayers ?? null);
+    applyChange("publisherUrl", detail.publisherUrl ?? null);
+
+    const mergedRefs = {
+      ...(existingRow.externalRefs ?? {}),
+      startplaying: detail.slug,
+    };
+    if ((existingRow.externalRefs?.startplaying ?? null) !== detail.slug) {
+      updates["externalRefs"] = mergedRefs;
+      updatedFields.push("externalRefs");
+    }
+
+    if (updatedFields.length > 0) {
+      updates["lastSuccessAt"] = now;
+      await db.update(gameSystems).set(updates).where(eq(gameSystems.id, systemId));
+    } else {
+      await db
+        .update(gameSystems)
+        .set({ crawlStatus: "success", lastCrawledAt: now })
+        .where(eq(gameSystems.id, systemId));
+    }
   }
 
   const { categoryIds, mechanicIds, unmapped } = partitionTags(detail.tags, maps);
@@ -201,25 +244,45 @@ export async function upsertDetail(
     unmappedCounts[tag] = (unmappedCounts[tag] ?? 0) + unmapped[tag];
   }
 
+  let linkedCategories = 0;
   if (categoryIds.length) {
-    await db
+    const inserted = await db
       .insert(gameSystemToCategory)
       .values(categoryIds.map((id) => ({ gameSystemId: systemId, categoryId: id })))
-      .onConflictDoNothing();
-  }
-  if (mechanicIds.length) {
-    await db
-      .insert(gameSystemToMechanics)
-      .values(mechanicIds.map((id) => ({ gameSystemId: systemId, mechanicsId: id })))
-      .onConflictDoNothing();
+      .onConflictDoNothing()
+      .returning();
+    linkedCategories = inserted.length;
   }
 
+  let linkedMechanics = 0;
+  if (mechanicIds.length) {
+    const inserted = await db
+      .insert(gameSystemToMechanics)
+      .values(mechanicIds.map((id) => ({ gameSystemId: systemId, mechanicsId: id })))
+      .onConflictDoNothing()
+      .returning();
+    linkedMechanics = inserted.length;
+  }
+
+  const existingAssets = await db
+    .select({ checksum: mediaAssets.checksum })
+    .from(mediaAssets)
+    .where(eq(mediaAssets.gameSystemId, systemId));
+  const existingChecksums = new Set(
+    existingAssets.map((asset) => asset.checksum).filter(Boolean),
+  );
+
+  let uploadedAssets = 0;
   if (detail.imageUrls.length) {
     const uploadedIds: number[] = [];
     for (let i = 0; i < detail.imageUrls.length; i++) {
       const url = detail.imageUrls[i];
+      const checksum = computeChecksum(url);
+      if (existingChecksums.has(checksum)) {
+        continue;
+      }
       const asset = await uploadImage(url, {
-        checksum: computeChecksum(url),
+        checksum,
         kind: i === 0 ? "hero" : "gallery",
         moderated: false,
       });
@@ -241,14 +304,28 @@ export async function upsertDetail(
         })
         .returning()) as { id: number }[];
       uploadedIds.push(inserted[0]!.id);
+      if (asset.checksum) {
+        existingChecksums.add(asset.checksum);
+      }
     }
-    if (uploadedIds.length && !existing[0]?.heroImageId) {
+    uploadedAssets = uploadedIds.length;
+    if (uploadedIds.length && !heroImageId) {
       await db
         .update(gameSystems)
         .set({ heroImageId: uploadedIds[0] })
         .where(eq(gameSystems.id, systemId));
     }
   }
+
+  return {
+    systemId,
+    created,
+    updatedFields,
+    uploadedAssets,
+    linkedCategories,
+    linkedMechanics,
+    unmapped,
+  };
 }
 
 export async function crawlStartPlayingSystems(
@@ -298,7 +375,24 @@ export async function crawlStartPlayingSystems(
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           const detail = parseDetailPage($, request.url);
-          await upsertDetail(detail, maps, unmappedCounts);
+          const result = await upsertDetail(detail, maps, unmappedCounts);
+          const noop =
+            !result.created &&
+            result.updatedFields.length === 0 &&
+            result.uploadedAssets === 0 &&
+            result.linkedCategories === 0 &&
+            result.linkedMechanics === 0;
+          const details: Record<string, unknown> = {
+            created: result.created,
+            updatedFields: result.updatedFields,
+            uploadedAssets: result.uploadedAssets,
+            linkedCategories: result.linkedCategories,
+            linkedMechanics: result.linkedMechanics,
+            noop,
+          };
+          if (Object.keys(result.unmapped).length > 0) {
+            details["unmapped"] = result.unmapped;
+          }
           await recordEvent({
             systemSlug: detail.slug,
             source: "startplaying",
@@ -306,6 +400,7 @@ export async function crawlStartPlayingSystems(
             startedAt,
             finishedAt: new Date(),
             severity: CrawlSeverity.INFO,
+            details,
           });
           log.info(`crawled ${detail.slug}`);
           return;
@@ -319,6 +414,7 @@ export async function crawlStartPlayingSystems(
               finishedAt: new Date(),
               errorMessage: error instanceof Error ? error.message : String(error),
               severity: CrawlSeverity.ERROR,
+              details: { attempts: attempt + 1 },
             });
             return;
           }

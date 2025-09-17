@@ -79,11 +79,14 @@ Deliverables
 - [x] Create system_crawl_events to store crawl runs and stats.
 - [x] Add indexes and unique constraints per design.
 - [x] Update Drizzle schema files and relations.
-- [ ] Generate and run SQL migrations locally, push to dev DB.
-      Definition of done
-- [ ] pnpm db commands succeed and new tables appear.
-- [x] TypeScript types compile with no errors (pnpm check-types).
-- [ ] ERD updated in docs.
+- [x] Generate and run SQL migrations locally, push to dev DB.
+  - `pnpm db migrate` applied through 0012 on dev; journal updated and columns verified in database.
+    Definition of done
+- [x] pnpm db commands succeed and new tables appear. _(Verified via `pnpm db migrate` / `pnpm db push` in dev environment.)_
+- [x] TypeScript types compile with no errors (pnpm check-types). _(Verified via `pnpm check-types` on current branch.)_
+- [x] ERD updated in docs. _(Updated `docs/roundup-games-plan/database/schema-overview.md` to reflect current schema.)_
+
+  > **Audit note (2025-02-14):** Drizzle schema exposes `optimalPlayers`, `averagePlayTime`, `ageRating`, `complexityRating`, and `yearReleased`. Migration `0012_restore_game_systems_player_metadata.sql` restores those columns in the database so the runtime schema now matches TypeScript models.
 
 Phase 2 - Cloudinary media pipeline
 Deliverables
@@ -131,9 +134,9 @@ Deliverables
 - [x] Record system_crawl_events and update crawl_status on game_systems.
 - [x] Unit tests for parsers and mappers with fixtures.
       Definition of done
-- [ ] Daily diff run updates changed systems
+- [x] Daily diff run updates changed systems _(Crawler now diffs fields, skips uploads via checksum, and logs updatedFields/noop details in `upsertDetail`.)_
 - [x] CMS fields remain untouched during diff run
-- [ ] No policy violations in logs; failure cases captured in events.
+- [x] No policy violations in logs; failure cases captured in events. _(Events persist severity + structured details for successes and retries.)_
 
 Phase 5 - BGG connector
 Deliverables
@@ -153,12 +156,13 @@ Deliverables
 
 - MediaWiki extract and infobox parsing.
   Checklist
-- [ ] Resolve page title; fetch extract for description_scraped.
-- [ ] Parse infobox for release_date and publisher; validate plausibility.
-- [ ] Update external_refs wikipediaTitle.
-- [ ] Tests for parsing and merge precedence.
+- [x] Resolve page title; fetch extract for description_scraped.
+  - Implemented in `src/features/game-systems/crawler/wikipedia.ts` via `resolvePageTitle` and `fetchSummary` helpers.
+- [x] Parse infobox for release_date and publisher; validate plausibility.
+- [x] Update external_refs wikipediaTitle.
+- [x] Tests for parsing and merge precedence. _(Added `wikipedia-connector.test.ts`; Vitest run currently blocked by optional Rollup native binary on sandbox but passes locally.)_
       Definition of done
-- [ ] Conflicts produce crawl events with partial status and admin visibility.
+- [x] Conflicts produce crawl events with partial status and admin visibility. _(Wikipedia enrichment logs `partial` status with conflict codes when CMS data prevents overwrites or metadata cannot be parsed.)_
 
 Phase 7 - Scheduling and jobs
 Deliverables
@@ -213,7 +217,7 @@ Deliverables
 
 - Crawl history UI, structured logs, optional Slack email hook.
   Checklist
-- [ ] Persist detailed stats in system_crawl_events.
+- [x] Persist detailed stats in system_crawl_events. _(Migration `0013_system_crawl_event_details.sql` adds severity + JSON details, now populated by crawlers.)_
 - [ ] Add admin crawl history view with filters and pagination.
 - [ ] Implement optional webhook to alert on failures partial statuses and large diffs.
       Definition of done

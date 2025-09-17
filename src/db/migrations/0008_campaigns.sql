@@ -34,7 +34,7 @@ CREATE TABLE "campaigns" (
 	"location" jsonb,
 	"status" "campaign_status" DEFAULT 'active' NOT NULL,
 	"minimum_requirements" jsonb,
-	"visibility" "campaign_visibility" DEFAULT 'public' NOT NULL,
+	"visibility" "visibility" DEFAULT 'public' NOT NULL,
 	"safety_rules" jsonb,
 	"owner_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -46,4 +46,5 @@ ALTER TABLE "campaign_applications" ADD CONSTRAINT "campaign_applications_user_i
 ALTER TABLE "campaign_participants" ADD CONSTRAINT "campaign_participants_campaign_id_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."campaigns"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "campaign_participants" ADD CONSTRAINT "campaign_participants_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_game_system_id_game_systems_id_fk" FOREIGN KEY ("game_system_id") REFERENCES "public"."game_systems"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "games" ADD CONSTRAINT "games_campaign_id_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."campaigns"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint

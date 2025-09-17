@@ -13,4 +13,5 @@ export interface CrawlEventLog {
   httpStatus?: number;
   errorMessage?: string;
   severity: CrawlSeverity;
+  details?: Record<string, unknown>;
 }

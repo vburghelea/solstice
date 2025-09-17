@@ -106,6 +106,60 @@ export const teamMemberStatus = pgEnum("team_member_status", [
 ]);
 export const visibility = pgEnum("visibility", ["public", "protected", "private"]);
 
+export const teamMembers = pgTable(
+  "team_members",
+  {
+    id: text().primaryKey().notNull(),
+    teamId: text("team_id").notNull(),
+    userId: text("user_id").notNull(),
+    role: teamMemberRole().default("player").notNull(),
+    status: teamMemberStatus().default("pending").notNull(),
+    jerseyNumber: varchar("jersey_number", { length: 3 }),
+    position: varchar({ length: 50 }),
+    joinedAt: timestamp("joined_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    leftAt: timestamp("left_at", { withTimezone: true, mode: "string" }),
+    invitedBy: text("invited_by"),
+    notes: text(),
+  },
+  (table) => [
+    uniqueIndex("team_members_active_user_idx")
+      .using("btree", table.userId.asc().nullsLast().op("text_ops"))
+      .where(sql`(status = 'active'::team_member_status)`),
+    index("team_members_team_status_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("text_ops"),
+      table.status.asc().nullsLast().op("enum_ops"),
+    ),
+    uniqueIndex("team_members_team_user_idx").using(
+      "btree",
+      table.teamId.asc().nullsLast().op("text_ops"),
+      table.userId.asc().nullsLast().op("text_ops"),
+    ),
+    index("team_members_user_status_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("enum_ops"),
+      table.status.asc().nullsLast().op("text_ops"),
+    ),
+    foreignKey({
+      columns: [table.teamId],
+      foreignColumns: [teams.id],
+      name: "team_members_team_id_teams_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "team_members_user_id_user_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.invitedBy],
+      foreignColumns: [user.id],
+      name: "team_members_invited_by_user_id_fk",
+    }),
+  ],
+);
+
 export const campaigns = pgTable(
   "campaigns",
   {
@@ -146,30 +200,6 @@ export const campaigns = pgTable(
   ],
 );
 
-export const campaignApplications = pgTable(
-  "campaign_applications",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    campaignId: uuid("campaign_id").notNull(),
-    userId: text("user_id").notNull(),
-    status: applicationStatus().default("pending").notNull(),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
-  },
-  (table) => [
-    foreignKey({
-      columns: [table.campaignId],
-      foreignColumns: [campaigns.id],
-      name: "campaign_applications_campaign_id_campaigns_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "campaign_applications_user_id_user_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
 export const campaignParticipants = pgTable(
   "campaign_participants",
   {
@@ -191,6 +221,28 @@ export const campaignParticipants = pgTable(
       columns: [table.userId],
       foreignColumns: [user.id],
       name: "campaign_participants_user_id_user_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const userFollows = pgTable(
+  "user_follows",
+  {
+    id: text().primaryKey().notNull(),
+    followerId: text("follower_id").notNull(),
+    followingId: text("following_id").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.followerId],
+      foreignColumns: [user.id],
+      name: "user_follows_follower_id_user_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.followingId],
+      foreignColumns: [user.id],
+      name: "user_follows_following_id_user_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -231,6 +283,38 @@ export const games = pgTable(
       columns: [table.gameSystemId],
       foreignColumns: [gameSystems.id],
       name: "games_game_system_id_game_systems_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const gmReviews = pgTable(
+  "gm_reviews",
+  {
+    id: text().primaryKey().notNull(),
+    reviewerId: text("reviewer_id").notNull(),
+    gmId: text("gm_id").notNull(),
+    rating: integer().notNull(),
+    selectedStrengths: jsonb("selected_strengths").default([]),
+    comment: text(),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+    gameId: uuid("game_id").notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.reviewerId],
+      foreignColumns: [user.id],
+      name: "gm_reviews_reviewer_id_user_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.gmId],
+      foreignColumns: [user.id],
+      name: "gm_reviews_gm_id_user_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.gameId],
+      foreignColumns: [games.id],
+      name: "gm_reviews_game_id_games_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -284,50 +368,49 @@ export const gameParticipants = pgTable(
   ],
 );
 
-export const gmReviews = pgTable(
-  "gm_reviews",
+export const campaignApplications = pgTable(
+  "campaign_applications",
   {
-    id: text().primaryKey().notNull(),
-    reviewerId: text("reviewer_id").notNull(),
-    gmId: text("gm_id").notNull(),
-    rating: integer().notNull(),
-    selectedStrengths: jsonb("selected_strengths").default([]),
-    comment: text(),
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    campaignId: uuid("campaign_id").notNull(),
+    userId: text("user_id").notNull(),
+    status: applicationStatus().default("pending").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
   },
   (table) => [
     foreignKey({
-      columns: [table.reviewerId],
-      foreignColumns: [user.id],
-      name: "gm_reviews_reviewer_id_user_id_fk",
+      columns: [table.campaignId],
+      foreignColumns: [campaigns.id],
+      name: "campaign_applications_campaign_id_campaigns_id_fk",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [table.gmId],
+      columns: [table.userId],
       foreignColumns: [user.id],
-      name: "gm_reviews_gm_id_user_id_fk",
+      name: "campaign_applications_user_id_user_id_fk",
     }).onDelete("cascade"),
   ],
 );
 
-export const userFollows = pgTable(
-  "user_follows",
+export const userBlocks = pgTable(
+  "user_blocks",
   {
     id: text().primaryKey().notNull(),
-    followerId: text("follower_id").notNull(),
-    followingId: text("following_id").notNull(),
+    blockerId: text("blocker_id").notNull(),
+    blockeeId: text("blockee_id").notNull(),
+    reason: text(),
     createdAt: timestamp("created_at", { mode: "string" }).notNull(),
   },
   (table) => [
     foreignKey({
-      columns: [table.followerId],
+      columns: [table.blockerId],
       foreignColumns: [user.id],
-      name: "user_follows_follower_id_user_id_fk",
+      name: "user_blocks_blocker_id_user_id_fk",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [table.followingId],
+      columns: [table.blockeeId],
       foreignColumns: [user.id],
-      name: "user_follows_following_id_user_id_fk",
+      name: "user_blocks_blockee_id_user_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -340,21 +423,9 @@ export const socialAuditLogs = pgTable(
     targetUserId: text("target_user_id"),
     action: socialAction().notNull(),
     metadata: jsonb(),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
   },
   (table) => [
-    index("social_audit_logs_action_idx").using(
-      "btree",
-      table.action.asc().nullsLast().op("enum_ops"),
-    ),
-    index("social_audit_logs_actor_idx").using(
-      "btree",
-      table.actorUserId.asc().nullsLast().op("text_ops"),
-    ),
-    index("social_audit_logs_target_idx").using(
-      "btree",
-      table.targetUserId.asc().nullsLast().op("text_ops"),
-    ),
     foreignKey({
       columns: [table.actorUserId],
       foreignColumns: [user.id],
@@ -368,35 +439,25 @@ export const socialAuditLogs = pgTable(
   ],
 );
 
-export const userBlocks = pgTable(
-  "user_blocks",
+export const session = pgTable(
+  "session",
   {
     id: text().primaryKey().notNull(),
-    blockerId: text("blocker_id").notNull(),
-    blockeeId: text("blockee_id").notNull(),
-    reason: text(),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+    token: text().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id").notNull(),
   },
   (table) => [
-    index("user_blocks_blockee_idx").using(
-      "btree",
-      table.blockeeId.asc().nullsLast().op("text_ops"),
-    ),
-    index("user_blocks_blocker_idx").using(
-      "btree",
-      table.blockerId.asc().nullsLast().op("text_ops"),
-    ),
     foreignKey({
-      columns: [table.blockerId],
+      columns: [table.userId],
       foreignColumns: [user.id],
-      name: "user_blocks_blocker_id_user_id_fk",
+      name: "session_user_id_user_id_fk",
     }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.blockeeId],
-      foreignColumns: [user.id],
-      name: "user_blocks_blockee_id_user_id_fk",
-    }).onDelete("cascade"),
-    unique("user_blocks_unique").on(table.blockerId, table.blockeeId),
+    unique("session_token_unique").on(table.token),
   ],
 );
 
@@ -428,7 +489,7 @@ export const user = pgTable(
     averageResponseTime: integer("average_response_time"),
     responseRate: integer("response_rate").default(0),
     gmStyle: text("gm_style"),
-    gmRating: integer("gm_rating"),
+    gmRating: real("gm_rating"),
     calendarAvailability: jsonb("calendar_availability").default({
       friday: [
         false,
@@ -1118,18 +1179,10 @@ export const user = pgTable(
       ],
     }),
     uploadedAvatarPath: text("uploaded_avatar_path"),
+    notificationPreferences: jsonb("notification_preferences"),
   },
   (table) => [unique("user_email_unique").on(table.email)],
 );
-
-export const verification = pgTable("verification", {
-  id: text().primaryKey().notNull(),
-  identifier: text().notNull(),
-  value: text().notNull(),
-  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
-  createdAt: timestamp("created_at", { mode: "string" }),
-  updatedAt: timestamp("updated_at", { mode: "string" }),
-});
 
 export const account = pgTable(
   "account",
@@ -1157,51 +1210,14 @@ export const account = pgTable(
   ],
 );
 
-export const session = pgTable(
-  "session",
-  {
-    id: text().primaryKey().notNull(),
-    expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
-    token: text().notNull(),
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    userId: text("user_id").notNull(),
-  },
-  (table) => [
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "session_user_id_user_id_fk",
-    }).onDelete("cascade"),
-    unique("session_token_unique").on(table.token),
-  ],
-);
-
-export const gameSystems = pgTable(
-  "game_systems",
-  {
-    id: serial().primaryKey().notNull(),
-    name: varchar({ length: 255 }).notNull(),
-    slug: varchar({ length: 255 }),
-    descriptionCms: text("description_cms"),
-    galleryImages: text("gallery_images").array(),
-    minPlayers: integer("min_players"),
-    maxPlayers: integer("max_players"),
-    optimalPlayers: integer("optimal_players"),
-    averagePlayTime: integer("average_play_time"),
-    ageRating: varchar("age_rating", { length: 50 }),
-    complexityRating: varchar("complexity_rating", { length: 50 }),
-    yearReleased: integer("year_released"),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
-  },
-  (table) => [
-    unique("game_systems_name_unique").on(table.name),
-    unique("game_systems_slug_unique").on(table.slug),
-  ],
-);
+export const verification = pgTable("verification", {
+  id: text().primaryKey().notNull(),
+  identifier: text().notNull(),
+  value: text().notNull(),
+  expiresAt: timestamp("expires_at", { mode: "string" }).notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }),
+  updatedAt: timestamp("updated_at", { mode: "string" }),
+});
 
 export const gameSystemCategories = pgTable(
   "game_system_categories",
@@ -1211,6 +1227,56 @@ export const gameSystemCategories = pgTable(
     description: text(),
   },
   (table) => [unique("game_system_categories_name_unique").on(table.name)],
+);
+
+export const gameSystems = pgTable(
+  "game_systems",
+  {
+    id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    slug: varchar({ length: 255 }),
+    descriptionCms: text("description_cms"),
+    minPlayers: integer("min_players"),
+    maxPlayers: integer("max_players"),
+    optimalPlayers: integer("optimal_players"),
+    averagePlayTime: integer("average_play_time"),
+    ageRating: varchar("age_rating", { length: 50 }),
+    complexityRating: varchar("complexity_rating", { length: 50 }),
+    yearReleased: integer("year_released"),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+    galleryImages: text("gallery_images").array(),
+    descriptionScraped: text("description_scraped"),
+    releaseDate: date("release_date"),
+    publisherId: integer("publisher_id"),
+    publisherUrl: varchar("publisher_url", { length: 255 }),
+    heroImageId: integer("hero_image_id"),
+    sourceOfTruth: text("source_of_truth"),
+    externalRefs: jsonb("external_refs"),
+    crawlStatus: varchar("crawl_status", { length: 50 }),
+    lastCrawledAt: timestamp("last_crawled_at", { mode: "string" }),
+    lastSuccessAt: timestamp("last_success_at", { mode: "string" }),
+    errorMessage: text("error_message"),
+    isPublished: boolean("is_published").default(false).notNull(),
+    cmsVersion: integer("cms_version").default(1),
+    cmsApproved: boolean("cms_approved").default(false).notNull(),
+    lastApprovedAt: timestamp("last_approved_at", { mode: "string" }),
+    lastApprovedBy: text("last_approved_by"),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.publisherId],
+      foreignColumns: [publishers.id],
+      name: "game_systems_publisher_id_publishers_id_fk",
+    }),
+    foreignKey({
+      columns: [table.lastApprovedBy],
+      foreignColumns: [user.id],
+      name: "game_systems_last_approved_by_user_id_fk",
+    }),
+    unique("game_systems_name_unique").on(table.name),
+    unique("game_systems_slug_unique").on(table.slug),
+  ],
 );
 
 export const gameSystemMechanics = pgTable(
@@ -1223,59 +1289,152 @@ export const gameSystemMechanics = pgTable(
   (table) => [unique("game_system_mechanics_name_unique").on(table.name)],
 );
 
-export const events = pgTable(
-  "events",
+export const emailEvents = pgTable(
+  "email_events",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
+    dedupeKey: text("dedupe_key").notNull(),
+    type: varchar({ length: 100 }).notNull(),
+    entityId: text("entity_id"),
+    recipientEmail: text("recipient_email").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [unique("email_events_dedupe_key_unique").on(table.dedupeKey)],
+);
+
+export const externalMechanicMap = pgTable(
+  "external_mechanic_map",
+  {
+    id: serial().primaryKey().notNull(),
+    source: varchar({ length: 50 }).notNull(),
+    externalTag: varchar("external_tag", { length: 255 }).notNull(),
+    mechanicId: integer("mechanic_id").notNull(),
+    confidence: integer().default(0).notNull(),
+  },
+  (table) => [
+    uniqueIndex("external_mechanic_map_source_tag_unique").using(
+      "btree",
+      table.source.asc().nullsLast().op("text_ops"),
+      table.externalTag.asc().nullsLast().op("text_ops"),
+    ),
+    foreignKey({
+      columns: [table.mechanicId],
+      foreignColumns: [gameSystemMechanics.id],
+      name: "external_mechanic_map_mechanic_id_game_system_mechanics_id_fk",
+    }),
+  ],
+);
+
+export const faqs = pgTable(
+  "faqs",
+  {
+    id: serial().primaryKey().notNull(),
+    gameSystemId: integer("game_system_id").notNull(),
+    question: text().notNull(),
+    answer: text().notNull(),
+    source: text(),
+    isCmsOverride: boolean("is_cms_override").default(false).notNull(),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
-    name: varchar({ length: 255 }).notNull(),
-    slug: varchar({ length: 255 }).notNull(),
-    description: text(),
-    shortDescription: varchar("short_description", { length: 500 }),
-    type: eventType().default("tournament").notNull(),
-    status: eventStatus().default("draft").notNull(),
-    venueName: varchar("venue_name", { length: 255 }),
-    venueAddress: text("venue_address"),
-    city: varchar({ length: 100 }),
-    country: varchar({ length: 50 }),
-    postalCode: varchar("postal_code", { length: 10 }),
-    locationNotes: text("location_notes"),
-    startDate: date("start_date").notNull(),
-    endDate: date("end_date").notNull(),
-    registrationOpensAt: timestamp("registration_opens_at", { mode: "string" }),
-    registrationClosesAt: timestamp("registration_closes_at", { mode: "string" }),
-    registrationType: registrationType("registration_type").default("team").notNull(),
-    maxTeams: integer("max_teams"),
-    maxParticipants: integer("max_participants"),
-    minPlayersPerTeam: integer("min_players_per_team").default(7),
-    maxPlayersPerTeam: integer("max_players_per_team").default(21),
-    teamRegistrationFee: integer("team_registration_fee").default(0),
-    individualRegistrationFee: integer("individual_registration_fee").default(0),
-    earlyBirdDiscount: integer("early_bird_discount").default(0),
-    earlyBirdDeadline: timestamp("early_bird_deadline", { mode: "string" }),
-    organizerId: text("organizer_id").notNull(),
-    contactEmail: varchar("contact_email", { length: 255 }),
-    contactPhone: varchar("contact_phone", { length: 20 }),
-    rules: jsonb(),
-    schedule: jsonb(),
-    divisions: jsonb(),
-    amenities: jsonb(),
-    requirements: jsonb(),
-    logoUrl: text("logo_url"),
-    bannerUrl: text("banner_url"),
-    isPublic: boolean("is_public").default(false).notNull(),
-    isFeatured: boolean("is_featured").default(false).notNull(),
-    metadata: jsonb(),
   },
   (table) => [
     foreignKey({
-      columns: [table.organizerId],
-      foreignColumns: [user.id],
-      name: "events_organizer_id_user_id_fk",
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "faqs_game_system_id_game_systems_id_fk",
     }),
-    unique("events_slug_unique").on(table.slug),
   ],
+);
+
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: serial().primaryKey().notNull(),
+    gameSystemId: integer("game_system_id").notNull(),
+    publicId: varchar("public_id", { length: 255 }).notNull(),
+    secureUrl: text("secure_url").notNull(),
+    width: integer(),
+    height: integer(),
+    format: varchar({ length: 50 }),
+    license: varchar({ length: 255 }),
+    licenseUrl: varchar("license_url", { length: 255 }),
+    kind: varchar({ length: 50 }),
+    orderIndex: integer("order_index").default(0),
+    moderated: boolean().default(false).notNull(),
+    checksum: varchar({ length: 64 }),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "media_assets_game_system_id_game_systems_id_fk",
+    }),
+  ],
+);
+
+export const systemCrawlEvents = pgTable(
+  "system_crawl_events",
+  {
+    id: serial().primaryKey().notNull(),
+    gameSystemId: integer("game_system_id").notNull(),
+    source: varchar({ length: 50 }).notNull(),
+    status: varchar({ length: 50 }).notNull(),
+    startedAt: timestamp("started_at", { mode: "string" }).notNull(),
+    finishedAt: timestamp("finished_at", { mode: "string" }).notNull(),
+    httpStatus: integer("http_status"),
+    errorMessage: text("error_message"),
+    severity: varchar({ length: 50 }).default("info").notNull(),
+    details: jsonb(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "system_crawl_events_game_system_id_game_systems_id_fk",
+    }),
+  ],
+);
+
+export const externalCategoryMap = pgTable(
+  "external_category_map",
+  {
+    id: serial().primaryKey().notNull(),
+    source: varchar({ length: 50 }).notNull(),
+    externalTag: varchar("external_tag", { length: 255 }).notNull(),
+    categoryId: integer("category_id").notNull(),
+    confidence: integer().default(0).notNull(),
+  },
+  (table) => [
+    uniqueIndex("external_category_map_source_tag_unique").using(
+      "btree",
+      table.source.asc().nullsLast().op("text_ops"),
+      table.externalTag.asc().nullsLast().op("text_ops"),
+    ),
+    foreignKey({
+      columns: [table.categoryId],
+      foreignColumns: [gameSystemCategories.id],
+      name: "external_category_map_category_id_game_system_categories_id_fk",
+    }),
+  ],
+);
+
+export const publishers = pgTable(
+  "publishers",
+  {
+    id: serial().primaryKey().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    websiteUrl: varchar("website_url", { length: 255 }),
+    wikipediaUrl: varchar("wikipedia_url", { length: 255 }),
+    bggPublisherId: integer("bgg_publisher_id"),
+    verified: boolean().default(false).notNull(),
+    notes: text(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [unique("publishers_name_unique").on(table.name)],
 );
 
 export const eventAnnouncements = pgTable(
@@ -1391,51 +1550,6 @@ export const teams = pgTable(
   ],
 );
 
-export const memberships = pgTable(
-  "memberships",
-  {
-    id: varchar({ length: 255 }).primaryKey().notNull(),
-    userId: varchar("user_id", { length: 255 }).notNull(),
-    membershipTypeId: varchar("membership_type_id", { length: 255 }).notNull(),
-    startDate: date("start_date").notNull(),
-    endDate: date("end_date").notNull(),
-    status: varchar({ length: 50 }).default("active").notNull(),
-    paymentProvider: varchar("payment_provider", { length: 100 }),
-    paymentId: varchar("payment_id", { length: 255 }),
-    metadata: jsonb(),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
-  },
-  (table) => [
-    index("memberships_end_date_idx").using(
-      "btree",
-      table.endDate.asc().nullsLast().op("date_ops"),
-    ),
-    index("memberships_payment_id_idx").using(
-      "btree",
-      table.paymentId.asc().nullsLast().op("text_ops"),
-    ),
-    index("memberships_status_idx").using(
-      "btree",
-      table.status.asc().nullsLast().op("text_ops"),
-    ),
-    index("memberships_user_id_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("text_ops"),
-    ),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "memberships_user_id_user_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.membershipTypeId],
-      foreignColumns: [membershipTypes.id],
-      name: "memberships_membership_type_id_membership_types_id_fk",
-    }),
-  ],
-);
-
 export const membershipTypes = pgTable(
   "membership_types",
   {
@@ -1454,60 +1568,6 @@ export const membershipTypes = pgTable(
       "btree",
       table.status.asc().nullsLast().op("text_ops"),
     ),
-  ],
-);
-
-export const teamMembers = pgTable(
-  "team_members",
-  {
-    id: text().primaryKey().notNull(),
-    teamId: text("team_id").notNull(),
-    userId: text("user_id").notNull(),
-    role: teamMemberRole().default("player").notNull(),
-    status: teamMemberStatus().default("pending").notNull(),
-    jerseyNumber: varchar("jersey_number", { length: 3 }),
-    position: varchar({ length: 50 }),
-    joinedAt: timestamp("joined_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    leftAt: timestamp("left_at", { withTimezone: true, mode: "string" }),
-    invitedBy: text("invited_by"),
-    notes: text(),
-  },
-  (table) => [
-    uniqueIndex("team_members_active_user_idx")
-      .using("btree", table.userId.asc().nullsLast().op("text_ops"))
-      .where(sql`(status = 'active'::team_member_status)`),
-    index("team_members_team_status_idx").using(
-      "btree",
-      table.teamId.asc().nullsLast().op("text_ops"),
-      table.status.asc().nullsLast().op("enum_ops"),
-    ),
-    uniqueIndex("team_members_team_user_idx").using(
-      "btree",
-      table.teamId.asc().nullsLast().op("text_ops"),
-      table.userId.asc().nullsLast().op("text_ops"),
-    ),
-    index("team_members_user_status_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("enum_ops"),
-      table.status.asc().nullsLast().op("text_ops"),
-    ),
-    foreignKey({
-      columns: [table.teamId],
-      foreignColumns: [teams.id],
-      name: "team_members_team_id_teams_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.userId],
-      foreignColumns: [user.id],
-      name: "team_members_user_id_user_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.invitedBy],
-      foreignColumns: [user.id],
-      name: "team_members_invited_by_user_id_fk",
-    }),
   ],
 );
 
@@ -1647,27 +1707,103 @@ export const userRoles = pgTable(
   ],
 );
 
-export const gameSystemToCategory = pgTable(
-  "game_system_to_category",
+export const memberships = pgTable(
+  "memberships",
   {
-    gameSystemId: integer("game_system_id").notNull(),
-    categoryId: integer("category_id").notNull(),
+    id: varchar({ length: 255 }).primaryKey().notNull(),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    membershipTypeId: varchar("membership_type_id", { length: 255 }).notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    status: varchar({ length: 50 }).default("active").notNull(),
+    paymentProvider: varchar("payment_provider", { length: 100 }),
+    paymentId: varchar("payment_id", { length: 255 }),
+    metadata: jsonb(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("memberships_end_date_idx").using(
+      "btree",
+      table.endDate.asc().nullsLast().op("date_ops"),
+    ),
+    index("memberships_payment_id_idx").using(
+      "btree",
+      table.paymentId.asc().nullsLast().op("text_ops"),
+    ),
+    index("memberships_status_idx").using(
+      "btree",
+      table.status.asc().nullsLast().op("text_ops"),
+    ),
+    index("memberships_user_id_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("text_ops"),
+    ),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: "memberships_user_id_user_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.membershipTypeId],
+      foreignColumns: [membershipTypes.id],
+      name: "memberships_membership_type_id_membership_types_id_fk",
+    }),
+  ],
+);
+
+export const events = pgTable(
+  "events",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    slug: varchar({ length: 255 }).notNull(),
+    description: text(),
+    shortDescription: varchar("short_description", { length: 500 }),
+    type: eventType().default("tournament").notNull(),
+    status: eventStatus().default("draft").notNull(),
+    venueName: varchar("venue_name", { length: 255 }),
+    venueAddress: text("venue_address"),
+    city: varchar({ length: 100 }),
+    country: varchar({ length: 50 }),
+    postalCode: varchar("postal_code", { length: 10 }),
+    locationNotes: text("location_notes"),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    registrationOpensAt: timestamp("registration_opens_at", { mode: "string" }),
+    registrationClosesAt: timestamp("registration_closes_at", { mode: "string" }),
+    registrationType: registrationType("registration_type").default("team").notNull(),
+    maxTeams: integer("max_teams"),
+    maxParticipants: integer("max_participants"),
+    minPlayersPerTeam: integer("min_players_per_team").default(7),
+    maxPlayersPerTeam: integer("max_players_per_team").default(21),
+    teamRegistrationFee: integer("team_registration_fee").default(0),
+    individualRegistrationFee: integer("individual_registration_fee").default(0),
+    earlyBirdDiscount: integer("early_bird_discount").default(0),
+    earlyBirdDeadline: timestamp("early_bird_deadline", { mode: "string" }),
+    organizerId: text("organizer_id").notNull(),
+    contactEmail: varchar("contact_email", { length: 255 }),
+    contactPhone: varchar("contact_phone", { length: 20 }),
+    rules: jsonb(),
+    schedule: jsonb(),
+    divisions: jsonb(),
+    amenities: jsonb(),
+    requirements: jsonb(),
+    logoUrl: text("logo_url"),
+    bannerUrl: text("banner_url"),
+    isPublic: boolean("is_public").default(false).notNull(),
+    isFeatured: boolean("is_featured").default(false).notNull(),
+    metadata: jsonb(),
   },
   (table) => [
     foreignKey({
-      columns: [table.gameSystemId],
-      foreignColumns: [gameSystems.id],
-      name: "game_system_to_category_game_system_id_game_systems_id_fk",
+      columns: [table.organizerId],
+      foreignColumns: [user.id],
+      name: "events_organizer_id_user_id_fk",
     }),
-    foreignKey({
-      columns: [table.categoryId],
-      foreignColumns: [gameSystemCategories.id],
-      name: "game_system_to_category_category_id_game_system_categories_id_f",
-    }),
-    primaryKey({
-      columns: [table.gameSystemId, table.categoryId],
-      name: "game_system_to_category_game_system_id_category_id_pk",
-    }),
+    unique("events_slug_unique").on(table.slug),
   ],
 );
 
@@ -1691,6 +1827,30 @@ export const gameSystemToMechanics = pgTable(
     primaryKey({
       columns: [table.gameSystemId, table.mechanicsId],
       name: "game_system_to_mechanics_game_system_id_mechanics_id_pk",
+    }),
+  ],
+);
+
+export const gameSystemToCategory = pgTable(
+  "game_system_to_category",
+  {
+    gameSystemId: integer("game_system_id").notNull(),
+    categoryId: integer("category_id").notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.gameSystemId],
+      foreignColumns: [gameSystems.id],
+      name: "game_system_to_category_game_system_id_game_systems_id_fk",
+    }),
+    foreignKey({
+      columns: [table.categoryId],
+      foreignColumns: [gameSystemCategories.id],
+      name: "game_system_to_category_category_id_game_system_categories_id_f",
+    }),
+    primaryKey({
+      columns: [table.gameSystemId, table.categoryId],
+      name: "game_system_to_category_game_system_id_category_id_pk",
     }),
   ],
 );

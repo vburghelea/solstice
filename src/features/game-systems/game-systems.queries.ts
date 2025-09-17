@@ -19,7 +19,7 @@ export const listSystemsHandler = async ({
   const perPage = data.perPage ?? 20;
   const offset = (page - 1) * perPage;
 
-  const heroImage = alias(mediaAssets, "heroImage") as typeof mediaAssets;
+  const heroImage = alias(mediaAssets, "heroImage");
 
   const items = await db
     .select({ system: gameSystems, hero: heroImage })

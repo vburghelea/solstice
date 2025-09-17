@@ -286,7 +286,7 @@ export const getGameSystems = createServerFn({ method: "GET" })
     if (!("searchTerm" in data) || typeof data.searchTerm !== "string") return undefined;
     return { searchTerm: data.searchTerm };
   })
-  .handler(async ({ data }): Promise<OperationResult<GameSystem[]>> => {
+  .handler(async ({ data }): Promise<OperationResult<GameSystemSummary[]>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();
@@ -300,7 +300,7 @@ export const getGameSystems = createServerFn({ method: "GET" })
       }
 
       const systems = await db
-        .select()
+        .select({ id: gameSystems.id, name: gameSystems.name })
         .from(gameSystems)
         .where(ilike(gameSystems.name, `%${data.searchTerm}%`));
       return {
@@ -401,3 +401,4 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
 
 // Re-export utility function
 export { isProfileComplete } from "./profile.utils";
+export type GameSystemSummary = Pick<GameSystem, "id" | "name">;

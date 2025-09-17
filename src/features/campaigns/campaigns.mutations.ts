@@ -25,13 +25,17 @@ import {
 import {
   CampaignApplication,
   CampaignParticipant,
+  CampaignStatus,
+  CampaignVisibility,
   CampaignWithDetails,
 } from "./campaigns.types";
 
 interface CampaignSummary {
-  ownerId?: string;
-  name?: string;
-  description?: string;
+  ownerId: string;
+  name: string;
+  description?: string | null;
+  visibility: CampaignVisibility;
+  status: CampaignStatus;
   gameSystem?: { name?: string } | null;
 }
 

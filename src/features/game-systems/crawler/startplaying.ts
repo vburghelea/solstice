@@ -1,6 +1,6 @@
 import { asyncRateLimit } from "@tanstack/pacer";
 import { serverOnly } from "@tanstack/react-start";
-import type { CheerioAPI, Element as CheerioElement } from "cheerio";
+import type { CheerioAPI } from "cheerio";
 import type { CheerioCrawlingContext } from "crawlee";
 import { CheerioCrawler } from "crawlee";
 import { eq } from "drizzle-orm";
@@ -42,12 +42,12 @@ export function partitionTags(tags: string[], maps: TagMaps) {
 
 export function parseIndexPage($: CheerioAPI): string[] {
   const links: string[] = [];
-  $("a[href^='/play/game-system']").each((_: number, el: CheerioElement) => {
+  for (const el of $("a[href^='/play/game-system']").toArray()) {
     const href = $(el).attr("href");
     if (href) {
       links.push(new URL(href, "https://startplaying.games").toString());
     }
-  });
+  }
   return Array.from(new Set(links));
 }
 
@@ -63,17 +63,17 @@ export function parseDetailPage($: CheerioAPI, url: string): SystemDetail {
     maxPlayers = Number(match[2]);
   }
   const imageUrls: string[] = [];
-  $("img").each((_: number, img: CheerioElement) => {
+  for (const img of $("img").toArray()) {
     const src = $(img).attr("src");
     if (src && src.startsWith("http")) {
       imageUrls.push(src);
     }
-  });
+  }
   const tags: string[] = [];
-  $(".tag").each((_: number, tag: CheerioElement) => {
+  for (const tag of $(".tag").toArray()) {
     const text = $(tag).text().trim();
     if (text) tags.push(text);
-  });
+  }
   const publisherUrl = $("a.publisher").attr("href") || undefined;
   const slug = new URL(url).pathname.split("/").pop() || "";
   const detail: SystemDetail = {

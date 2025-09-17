@@ -1,5 +1,11 @@
 import { and, eq } from "drizzle-orm";
-import { gameApplications, gameParticipants, games, user } from "~/db/schema";
+import {
+  gameApplications,
+  gameParticipants,
+  gameSystems,
+  games,
+  user,
+} from "~/db/schema";
 import { getDb } from "~/db/server-helpers";
 
 type GameParticipantWithUser = typeof gameParticipants.$inferSelect & {
@@ -21,6 +27,7 @@ type GameApplicationWithDetails = typeof gameApplications.$inferSelect & {
  */
 type GameWithOwner = typeof games.$inferSelect & {
   owner: typeof user.$inferSelect;
+  gameSystem: typeof gameSystems.$inferSelect | null;
 };
 
 export async function findGameById(gameId: string): Promise<GameWithOwner | undefined> {

@@ -19,7 +19,7 @@ export type ExternalRefs = {
   startplaying?: string;
   bgg?: string;
   wikipedia?: string;
-  [key: string]: unknown;
+  [key: string]: string | undefined;
 };
 
 export const gameSystems = pgTable("game_systems", {
@@ -31,6 +31,11 @@ export const gameSystems = pgTable("game_systems", {
   descriptionScraped: text("description_scraped"),
   minPlayers: integer("min_players"),
   maxPlayers: integer("max_players"),
+  optimalPlayers: integer("optimal_players"),
+  averagePlayTime: integer("average_play_time"),
+  ageRating: varchar("age_rating", { length: 50 }),
+  complexityRating: varchar("complexity_rating", { length: 50 }),
+  yearReleased: integer("year_released"),
   releaseDate: date("release_date"),
   publisherId: integer("publisher_id").references(() => publishers.id),
   publisherUrl: varchar("publisher_url", { length: 255 }),

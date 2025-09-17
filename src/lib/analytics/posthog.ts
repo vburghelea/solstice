@@ -1,5 +1,6 @@
 import type { PostHog } from "posthog-js";
 import { env } from "~/lib/env.client";
+import { getCspNonce } from "~/shared/lib/csp";
 
 // Client-side PostHog initialization
 let postHogInitialized = false;
@@ -148,6 +149,13 @@ export function initializePostHogClient(): void {
               } catch (e) {
                 console.debug("PostHog: failed to register global error handlers", e);
               }
+            },
+            prepare_external_dependency_script: (script) => {
+              const nonce = getCspNonce();
+              if (nonce) {
+                script.setAttribute("nonce", nonce);
+              }
+              return script;
             },
           });
         } catch (error) {

@@ -31,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   pageSize?: number;
   onExport?: () => void;
+  enableColumnToggle?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,6 +39,7 @@ export function DataTable<TData, TValue>({
   data,
   pageSize = 10,
   onExport,
+  enableColumnToggle = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -61,39 +63,47 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const canRenderToolbar = enableColumnToggle || Boolean(onExport);
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
+      {canRenderToolbar && (
+        <div className="flex items-center justify-between">
+          {enableColumnToggle ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <span />
+          )}
+          {onExport && (
+            <Button onClick={onExport} variant="outline">
+              Export CSV
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {onExport && (
-          <Button onClick={onExport} variant="outline">
-            Export CSV
-          </Button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

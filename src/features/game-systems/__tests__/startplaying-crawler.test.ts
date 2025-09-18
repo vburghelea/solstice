@@ -21,14 +21,78 @@ describe("startplaying crawler parsers", () => {
   });
 
   it("parses system detail fields", () => {
+    const nextData = JSON.stringify({
+      props: {
+        pageProps: {
+          initialCache: {
+            "SeoPage:test": {
+              __typename: "SeoPage",
+              heroSection: {
+                __typename: "SeoPageHeroSection",
+                title: "Dungeons & Dragons 5e",
+                descriptionPrimary: "Fantasy roleplaying game",
+                image: "https://img.example/hero.jpg",
+                metadata: [
+                  {
+                    __typename: "SeoPageHeroSectionMetadata",
+                    title: "Details",
+                    items: [
+                      {
+                        __typename: "SeoPageHeroSectionMetadataItem",
+                        text: "2-6 Players",
+                        url: null,
+                      },
+                    ],
+                  },
+                  {
+                    __typename: "SeoPageHeroSectionMetadata",
+                    title: "Themes",
+                    items: [
+                      {
+                        __typename: "SeoPageHeroSectionMetadataItem",
+                        text: "High Fantasy",
+                        url: "https://example.com/high-fantasy",
+                      },
+                    ],
+                  },
+                  {
+                    __typename: "SeoPageHeroSectionMetadata",
+                    title: "Publisher",
+                    items: [
+                      {
+                        __typename: "SeoPageHeroSectionMetadataItem",
+                        text: "Wizards of the Coast",
+                        url: "https://wizards.com",
+                      },
+                    ],
+                  },
+                  {
+                    __typename: "SeoPageHeroSectionMetadata",
+                    title: "Release Date",
+                    items: [
+                      {
+                        __typename: "SeoPageHeroSectionMetadataItem",
+                        text: "2014",
+                        url: null,
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    });
     const html = `
-      <h1>Dungeons & Dragons 5e</h1>
-      <div class="description">Fantasy roleplaying game</div>
-      <div class="players">2 - 6 Players</div>
-      <img src="https://img.example/hero.jpg" />
-      <a class="publisher" href="https://wizards.com">Wizards</a>
-      <span class="tag">Fantasy</span>
+      <script id="__NEXT_DATA__" type="application/json">${nextData}</script>
       <span class="tag">d20</span>
+      <div class="themes">
+        <div>Themes</div>
+        <a href="https://example.com/d20">d20</a>
+      </div>
+      <div class="description">fallback description</div>
+      <a class="publisher" href="https://alt.example">Alt Publisher</a>
     `;
     const $ = load(html);
     const detail = parseDetailPage(
@@ -42,8 +106,10 @@ describe("startplaying crawler parsers", () => {
       minPlayers: 2,
       maxPlayers: 6,
       imageUrls: ["https://img.example/hero.jpg"],
-      tags: ["Fantasy", "d20"],
-      publisherUrl: "https://wizards.com",
+      tags: ["High Fantasy", "d20"],
+      publisherUrl: "https://wizards.com/",
+      publisherName: "Wizards of the Coast",
+      releaseYear: 2014,
     });
   });
 });

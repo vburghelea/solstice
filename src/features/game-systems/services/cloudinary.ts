@@ -47,16 +47,27 @@ export async function uploadImage(
   options: UploadOptions,
 ): Promise<UploadedAsset> {
   const cloudinary = await getCloudinary();
+  const context: Record<string, string> = {
+    moderated: String(options.moderated ?? false),
+    checksum: options.checksum,
+  };
+
+  if (options.license) {
+    context["license"] = options.license;
+  }
+
+  if (options.licenseUrl) {
+    context["license_url"] = options.licenseUrl;
+  }
+
+  if (options.kind) {
+    context["kind"] = options.kind;
+  }
+
   const uploadOptions: UploadApiOptions = {
     resource_type: "image",
     transformation: options.kind === "hero" ? heroTransformation : thumbTransformation,
-    context: {
-      license: options.license,
-      license_url: options.licenseUrl,
-      kind: options.kind,
-      moderated: String(options.moderated ?? false),
-      checksum: options.checksum,
-    },
+    context,
   };
 
   const result = await cloudinary.uploader.upload(file, uploadOptions);

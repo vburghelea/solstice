@@ -1,0 +1,54 @@
+name: Check sourcemaps
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  check-sourcemaps:
+    name: Build and check sourcemaps
+    runs-on: ubuntu-latest
+    environment: build
+    env:
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET != '' && secrets.BETTER_AUTH_SECRET || vars.BETTER_AUTH_SECRET }}
+      VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
+      VITE_POSTHOG_ENV_ID: ${{ vars.VITE_POSTHOG_ENV_ID }}
+      VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm build
+
+      - name: List generated source maps
+        run: |
+          echo "Looking for .map files under dist/ and build/ directories"
+          find ./dist ./build 2>/dev/null | grep -E "\.js(\.map)?$|\.map$" || echo "No source maps found"
+          echo "Listing asset files with .map extension (if any):"
+          find ./dist ./build -type f -name "*.map" -print || echo "No .map files found"
+
+      - name: Fail if no source maps (optional)
+        if: ${{ always() }}
+        run: |
+          MAP_COUNT=$(find ./dist ./build -type f -name "*.map" 2>/dev/null | wc -l)
+          echo "Found $MAP_COUNT .map files"
+          if [ "$MAP_COUNT" -eq "0" ]; then
+            echo "Warning: No source maps detected. If you expect source maps to be uploaded to PostHog, ensure your production build generates .map files."
+            # Do not fail the job — this step only warns. Uncomment to fail CI instead:
+            # exit 1
+          fi

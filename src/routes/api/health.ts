@@ -1,6 +1,16 @@
+import { createServerFn } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { sql } from "drizzle-orm";
 import { membershipTypes } from "~/db/schema";
+
+export const healthCheck = createServerFn({
+  method: "GET",
+}).handler(() => {
+  return {
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  };
+});
 
 export const ServerRoute = createServerFileRoute("/api/health").methods({
   GET: async () => {

@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle, Edit2, LoaderCircle, XCircle } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -48,19 +47,22 @@ import { UserAvatar } from "~/shared/ui/user-avatar";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+async function showToast(type: "success" | "error", message: string) {
+  const { toast } = await import("sonner");
+  toast[type](message);
+}
+
 export const Route = createFileRoute("/dashboard/games/$gameId")({
   loader: async ({ params }) => {
     if (!UUID_REGEX.test(params.gameId)) {
-      toast.error("Invalid game ID format.");
-      throw new Error("Invalid game ID");
+      return { game: null, error: "Invalid game ID format." };
     }
 
     const result = await getGame({ data: { id: params.gameId } });
     if (!result.success || !result.data) {
-      toast.error("Failed to load game details.");
-      throw new Error("Game not found");
+      return { game: null, error: "Failed to load game details." };
     }
-    return { game: result.data };
+    return { game: result.data, error: null };
   },
   component: GameDetailsPage,
 });
@@ -157,6 +159,10 @@ export function GameDetailsPage() {
   const queryClient = useQueryClient();
   const { gameId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
+  const { game: initialGame, error: loaderError } = Route.useLoaderData() as {
+    game: GameWithDetails | null;
+    error: string | null;
+  };
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -179,7 +185,14 @@ export function GameDetailsPage() {
       return result.data;
     },
     enabled: !!gameId,
+    initialData: initialGame ?? undefined,
   });
+
+  useEffect(() => {
+    if (loaderError) {
+      void showToast("error", loaderError);
+    }
+  }, [loaderError]);
 
   const isOwner = game?.owner?.id === currentUser?.id;
   const { data: rel } = useQuery({
@@ -218,15 +231,15 @@ export function GameDetailsPage() {
       await rlUpdateGame(vars),
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("Game updated successfully");
+        void showToast("success", "Game updated successfully");
         await queryClient.invalidateQueries({ queryKey: ["game", gameId] });
         setIsEditing(false);
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to update game");
+        void showToast("error", data.errors?.[0]?.message || "Failed to update game");
       }
     },
     onError: (error) => {
-      toast.error(error.message || "An unexpected error occurred");
+      void showToast("error", error.message || "An unexpected error occurred");
     },
   });
 
@@ -313,13 +326,13 @@ export function GameDetailsPage() {
           },
         );
       }
-      toast.error(error.message || "An unexpected error occurred");
+      void showToast("error", error.message || "An unexpected error occurred");
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast.success("Game canceled successfully");
+        void showToast("success", "Game canceled successfully");
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to cancel game");
+        void showToast("error", data.errors?.[0]?.message || "Failed to cancel game");
       }
     },
     onSettled: async () => {
@@ -408,11 +421,11 @@ export function GameDetailsPage() {
           },
         );
       }
-      toast.error(error.message || "An unexpected error occurred");
+      void showToast("error", error.message || "An unexpected error occurred");
     },
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("Game marked as completed");
+        void showToast("success", "Game marked as completed");
         // If owner completed the game, refresh profile stats to reflect gamesHosted increment
         try {
           if (isOwner && currentUser?.id && data.data?.status === "completed") {
@@ -428,7 +441,7 @@ export function GameDetailsPage() {
           // ignore cache invalidation errors
         }
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to update status");
+        void showToast("error", data.errors?.[0]?.message || "Failed to update status");
       }
     },
     onSettled: async () => {
@@ -451,7 +464,8 @@ export function GameDetailsPage() {
         data: { gameId, userId: currentUser.id },
       });
       if (!result.success) {
-        toast.error(
+        void showToast(
+          "error",
           result.errors?.[0]?.message || "Failed to fetch your application status.",
         );
         return null;
@@ -465,18 +479,24 @@ export function GameDetailsPage() {
     mutationFn: applyToGame,
     onSuccess: (data) => {
       if (data.success) {
-        toast.success("Application submitted successfully!");
+        void showToast("success", "Application submitted successfully!");
         queryClient.invalidateQueries({
           queryKey: ["userGameApplication", gameId, currentUser?.id],
         });
         queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] }); // Invalidate owner's view
         queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] }); // Invalidate participants list
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to submit application.");
+        void showToast(
+          "error",
+          data.errors?.[0]?.message || "Failed to submit application.",
+        );
       }
     },
     onError: (error) => {
-      toast.error(error.message || "An unexpected error occurred while applying.");
+      void showToast(
+        "error",
+        error.message || "An unexpected error occurred while applying.",
+      );
     },
   });
 

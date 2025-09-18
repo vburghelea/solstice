@@ -13,6 +13,7 @@ export const env = createEnv({
     VITE_ENABLE_ANALYTICS: z.coerce.boolean().default(false),
     VITE_ENABLE_SENTRY: z.coerce.boolean().default(false),
     VITE_POSTHOG_KEY: z.string().optional(),
+    VITE_POSTHOG_HOST: z.string().optional(),
     VITE_SENTRY_DSN: z.string().optional(),
   },
   runtimeEnv: import.meta.env,

@@ -33,13 +33,27 @@ export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
 
   const selectId = `${field.name}-select`;
   const meta = field.state.meta;
+  const EMPTY_OPTION_VALUE = "__empty_option__";
+  const placeholderOption = options.find((option) => option.value === "");
+  const normalizedOptions = options.map((option) =>
+    option.value === "" ? { ...option, value: EMPTY_OPTION_VALUE } : option,
+  );
+  const selectValue = placeholderOption
+    ? field.state.value === "" || field.state.value === undefined
+      ? EMPTY_OPTION_VALUE
+      : (field.state.value as string)
+    : ((field.state.value as string | undefined) ?? undefined);
 
   return (
     <div className={cn("space-y-2", className)}>
       <Label htmlFor={selectId}>{label}</Label>
       <Select
-        value={field.state.value || ""}
-        onValueChange={(value) => field.handleChange(value)}
+        {...(selectValue !== undefined ? { value: selectValue } : {})}
+        onValueChange={(value) => {
+          const normalizedValue =
+            placeholderOption && value === EMPTY_OPTION_VALUE ? "" : value;
+          field.handleChange(normalizedValue);
+        }}
         disabled={field.form.state.isSubmitting}
       >
         <SelectTrigger
@@ -48,10 +62,10 @@ export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
           aria-required={required}
           aria-describedby={meta.errors.length ? `${selectId}-errors` : undefined}
         >
-          <SelectValue placeholder={placeholderText} />
+          <SelectValue placeholder={placeholderOption?.label ?? placeholderText} />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
+          {normalizedOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

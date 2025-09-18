@@ -1,4 +1,4 @@
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useRouteContext } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
@@ -194,18 +194,20 @@ export function EventCreateForm() {
     },
   });
 
-  useEffect(() => {
-    const generatedSlug = generateSlug(form.state.values.name);
-    if (!slugManuallyEditedRef.current && form.state.values.slug !== generatedSlug) {
-      form.setFieldValue("slug", generatedSlug);
-    }
-  }, [form, form.state.values.name, form.state.values.slug]);
+  const formState = useStore(form.store, (state) => state);
 
   useEffect(() => {
-    if (!form.state.values.slug) {
+    const generatedSlug = generateSlug(formState.values.name ?? "");
+    if (!slugManuallyEditedRef.current && formState.values.slug !== generatedSlug) {
+      form.setFieldValue("slug", generatedSlug);
+    }
+  }, [form, formState.values.name, formState.values.slug]);
+
+  useEffect(() => {
+    if (!formState.values.slug) {
       slugManuallyEditedRef.current = false;
     }
-  }, [form.state.values.slug]);
+  }, [formState.values.slug]);
 
   const createMutation = useMutation({
     mutationFn: (data: EventFormData) => createEvent({ data }),
@@ -216,7 +218,7 @@ export function EventCreateForm() {
         return;
       }
 
-      if (!isAdminUser && form.state.values.isPublic) {
+      if (!isAdminUser && formState.values.isPublic) {
         toast.success(
           "Event created! It will be reviewed by an admin before becoming public.",
         );
@@ -242,9 +244,9 @@ export function EventCreateForm() {
   const canProceedToNext = () => {
     switch (currentStep) {
       case 0:
-        return Boolean(form.state.values.name && form.state.values.slug);
+        return Boolean(formState.values.name?.trim() && formState.values.slug?.trim());
       case 1:
-        return Boolean(form.state.values.startDate && form.state.values.endDate);
+        return Boolean(formState.values.startDate && formState.values.endDate);
       default:
         return true;
     }
@@ -282,8 +284,8 @@ export function EventCreateForm() {
                     {index + 1}
                   </div>
                   <div className="ml-3 hidden md:block">
-                    <div className="text-sm font-medium">{step.title}</div>
-                    <div className="text-muted-foreground text-xs">
+                    <div className="text-sm leading-tight font-medium">{step.title}</div>
+                    <div className="text-muted-foreground mt-0.5 text-xs">
                       {step.description}
                     </div>
                   </div>
@@ -338,7 +340,7 @@ export function EventCreateForm() {
                     required
                     onValueChange={(value) => {
                       field.handleChange(value);
-                      const generated = generateSlug(form.state.values.name);
+                      const generated = generateSlug(formState.values.name ?? "");
                       slugManuallyEditedRef.current =
                         Boolean(value) && value !== generated;
                     }}
@@ -492,7 +494,7 @@ export function EventCreateForm() {
                       required
                       onValueChange={(value) => {
                         field.handleChange(value);
-                        if (!form.state.values.endDate) {
+                        if (!formState.values.endDate) {
                           form.setFieldValue("endDate", value);
                         }
                       }}
@@ -672,7 +674,7 @@ export function EventCreateForm() {
                         field={field}
                         label="Early Bird Deadline"
                         type="date"
-                        disabled={!form.state.values.earlyBirdDiscount}
+                        disabled={!formState.values.earlyBirdDiscount}
                       />
                     )}
                   </form.Field>
@@ -826,7 +828,7 @@ export function EventCreateForm() {
               <FormSubmitButton
                 isSubmitting={createMutation.isPending}
                 loadingText="Creating..."
-                disabled={!form.state.canSubmit}
+                disabled={!formState.canSubmit}
               >
                 Create Event
               </FormSubmitButton>

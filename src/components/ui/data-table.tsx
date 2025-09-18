@@ -35,16 +35,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   pageSize?: number;
   onExport?: () => void;
-  manualPagination?: boolean;
-  pageIndex?: number;
-  pageCount?: number;
-  onPageChange?: (pageIndex: number) => void;
-  isLoading?: boolean;
-  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
-  enableRowSelection?: boolean;
-  rowSelection?: RowSelectionState;
-  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
-  toolbarContent?: ReactNode;
+  enableColumnToggle?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,16 +43,7 @@ export function DataTable<TData, TValue>({
   data,
   pageSize = 10,
   onExport,
-  manualPagination = false,
-  pageIndex = 0,
-  pageCount,
-  onPageChange,
-  isLoading = false,
-  getRowId,
-  enableRowSelection = false,
-  rowSelection,
-  onRowSelectionChange,
-  toolbarContent,
+  enableColumnToggle = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -107,81 +89,49 @@ export function DataTable<TData, TValue>({
         }),
   });
 
-  const canPreviousPage = manualPagination ? pageIndex > 0 : table.getCanPreviousPage();
-  const canNextPage = manualPagination
-    ? pageCount != null && pageCount > 0
-      ? pageIndex < pageCount - 1
-      : data.length === pageSize
-    : table.getCanNextPage();
-
-  const handlePrevious = () => {
-    if (manualPagination) {
-      if (onPageChange && pageIndex > 0) {
-        onPageChange(pageIndex - 1);
-      }
-      return;
-    }
-
-    table.previousPage();
-  };
-
-  const handleNext = () => {
-    if (manualPagination) {
-      if (onPageChange && (!pageCount || pageIndex < pageCount - 1)) {
-        onPageChange(pageIndex + 1);
-      }
-      return;
-    }
-
-    table.nextPage();
-  };
+  const canRenderToolbar = enableColumnToggle || Boolean(onExport);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {toolbarContent ? (
-          <div className="flex flex-wrap items-center gap-2">{toolbarContent}</div>
-        ) : enableRowSelection ? (
-          <span className="text-muted-foreground text-xs">
-            Select rows to enable bulk actions.
-          </span>
-        ) : (
-          <div />
-        )}
-        <div className="flex items-center gap-2">
+      {canRenderToolbar && (
+        <div className="flex items-center justify-between">
+          {enableColumnToggle ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <span />
+          )}
           {onExport && (
             <Button onClick={onExport} variant="outline">
               Export CSV
             </Button>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
-      </div>
-      <div className="bg-card text-card-foreground overflow-hidden rounded-xl border shadow-sm">
-        <Table className="w-full min-w-full">
+      )}
+      <div className="rounded-md border">
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

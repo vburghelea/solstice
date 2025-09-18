@@ -90,6 +90,7 @@ describe("startplaying crawler parsers", () => {
       <div class="themes">
         <div>Themes</div>
         <a href="https://example.com/d20">d20</a>
+        <span>Themes</span>
       </div>
       <div class="description">fallback description</div>
       <a class="publisher" href="https://alt.example">Alt Publisher</a>

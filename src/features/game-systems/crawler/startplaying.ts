@@ -185,13 +185,42 @@ function getHeroMetadataItems(
 }
 
 function extractHeroImage(value: unknown): string | null {
-  if (typeof value === "string" && value.trim()) return value.trim();
-  if (isRecord(value)) {
-    const url = value["url"];
-    if (typeof url === "string" && url.trim()) {
-      return url.trim();
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+  if (!isRecord(value)) return null;
+
+  const directKeys = ["url", "src", "href"] as const;
+  for (const key of directKeys) {
+    const candidate = value[key];
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
     }
   }
+
+  const image = value["image"];
+  if (image) {
+    const nested = extractHeroImage(image);
+    if (nested) return nested;
+  }
+
+  const sources = value["sources"];
+  if (Array.isArray(sources)) {
+    for (const source of sources) {
+      const nested = extractHeroImage(source);
+      if (nested) return nested;
+    }
+  }
+
+  const images = value["images"];
+  if (Array.isArray(images)) {
+    for (const img of images) {
+      const nested = extractHeroImage(img);
+      if (nested) return nested;
+    }
+  }
+
   return null;
 }
 
@@ -250,6 +279,28 @@ interface SystemDetail {
 export interface TagMaps {
   categories: Record<string, number>;
   mechanics: Record<string, number>;
+}
+
+function parseTagValues(raw: string): string[] {
+  return raw
+    .split(/[•|/,]|\s{2,}/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+}
+
+function addTags(
+  detail: SystemDetail,
+  fieldSources: Record<string, "hero" | "dom" | "missing">,
+  source: "hero" | "dom",
+  values: string[],
+) {
+  const filtered = values.map((value) => value.trim()).filter(Boolean);
+  if (!filtered.length) return;
+  const before = detail.tags.length;
+  detail.tags = Array.from(new Set([...detail.tags, ...filtered]));
+  if (detail.tags.length > before || fieldSources["tags"] === "missing") {
+    fieldSources["tags"] = source;
+  }
 }
 
 export function partitionTags(tags: string[], maps: TagMaps) {
@@ -383,16 +434,24 @@ export function parseDetailPage(
       }
     }
 
-    const themeItems = getHeroMetadataItems(heroSection, "Themes");
-    const themes = themeItems
+    const detailTagValues = detailsItems
       .map((item) => (typeof item["text"] === "string" ? item["text"].trim() : ""))
-      .filter(Boolean);
-    if (themes.length) {
-      const before = detail.tags.length;
-      detail.tags = Array.from(new Set([...detail.tags, ...themes]));
-      if (detail.tags.length > before || fieldSources.tags === "missing") {
-        fieldSources.tags = "hero";
-      }
+      .filter((text) => text.length > 0)
+      .filter((text) => !/\b\d+\s*-\s*\d+\s*Players\b/i.test(text))
+      .flatMap((text) => parseTagValues(text));
+    addTags(detail, fieldSources, "hero", detailTagValues);
+
+    const metadataTagTitles = ["Themes", "Tags", "Genres", "Mechanics", "Game Mechanics"];
+
+    for (const title of metadataTagTitles) {
+      const normalizedTitle = title.toLowerCase();
+      const items = getHeroMetadataItems(heroSection, title);
+      const values = items
+        .map((item) => (typeof item["text"] === "string" ? item["text"].trim() : ""))
+        .filter(Boolean)
+        .flatMap((text) => parseTagValues(text))
+        .filter((value) => value.toLowerCase() !== normalizedTitle);
+      addTags(detail, fieldSources, "hero", values);
     }
 
     const publisherItems = getHeroMetadataItems(heroSection, "Publisher");
@@ -495,25 +554,36 @@ export function parseDetailPage(
     }
   }
 
-  const themesSection = $("div")
-    .filter((_, el) => $(el).children().first().text().trim().toLowerCase() === "themes")
-    .first();
-  if (themesSection.length) {
-    const themeAnchors = themesSection.find("a");
-    if (themeAnchors.length) {
-      const themes = themeAnchors
-        .map((_, anchor) => $(anchor).text().trim())
-        .get()
-        .filter(Boolean);
-      if (themes.length) {
-        const before = detail.tags.length;
-        detail.tags = Array.from(new Set([...detail.tags, ...themes]));
-        if (fieldSources.tags === "missing" && detail.tags.length > before) {
-          fieldSources.tags = "dom";
-        }
-      }
-    }
-  }
+  const metadataSectionTitles = new Set([
+    "themes",
+    "tags",
+    "genres",
+    "mechanics",
+    "game mechanics",
+    "systems",
+  ]);
+
+  $("div").each((_, el) => {
+    const label = $(el).children().first().text().trim().toLowerCase();
+    if (!metadataSectionTitles.has(label)) return;
+
+    const anchorValues = $(el)
+      .find("a")
+      .map((__, anchor) => $(anchor).text().trim())
+      .get();
+    const chipValues = $(el)
+      .find("span,div")
+      .map((__, node) => $(node).text().trim())
+      .get();
+
+    const combined = [...anchorValues, ...chipValues]
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .flatMap((text) => parseTagValues(text))
+      .filter((value) => value.toLowerCase() !== label);
+
+    addTags(detail, fieldSources, "dom", combined);
+  });
 
   detail.tags = Array.from(new Set(detail.tags));
 

@@ -133,7 +133,8 @@ Deliverables
 - [x] Ingest images through Cloudinary with metadata and moderation default false unless license allows.
 - [x] Record system_crawl_events and update crawl_status on game_systems.
 - [x] Unit tests for parsers and mappers with fixtures.
-      Definition of done
+  - Added runner at `scripts/run-startplaying-crawler.ts` to orchestrate diff crawls and resume from a specific StartPlaying page when debugging.
+    Definition of done
 - [x] Daily diff run updates changed systems _(Crawler now diffs fields, skips uploads via checksum, and logs updatedFields/noop details in `upsertDetail`.)_
 - [x] CMS fields remain untouched during diff run
 - [x] No policy violations in logs; failure cases captured in events. _(Events persist severity + structured details for successes and retries.)_
@@ -148,8 +149,9 @@ Deliverables
 - [x] Update external_refs and taxonomy mapping tables.
 - [x] Cross check without overwriting CMS protected fields.
 - [x] Tests for ID resolution and enrichment merge.
-      Definition of done
-- [ ] At least 70 percent of popular systems receive cross checked fields.
+  - Added runner at `scripts/run-bgg-crawler.ts` that batches the top 200 BGG systems by voter count, hydrates hero imagery, and attaches BGG categories/mechanics to our canonical taxonomy.
+    Definition of done
+- [ ] At least 70 percent of popular systems receive cross checked fields _(batch crawler in place; next step is to measure coverage and backfill gaps beyond the current top 200 set)._
 
 Phase 6 - Wikipedia connector
 Deliverables
@@ -164,17 +166,19 @@ Deliverables
       Definition of done
 - [x] Conflicts produce crawl events with partial status and admin visibility. _(Wikipedia enrichment logs `partial` status with conflict codes when CMS data prevents overwrites or metadata cannot be parsed.)_
 
-Phase 7 - Scheduling and jobs
+Phase 7 - Scheduling and jobs _(deprioritized)_
 Deliverables
 
-- Netlify scheduled functions and manual recrawl.
-  Checklist
+- Optional automation for recurring crawls.
+  Checklist _(scoped out for now)_
 - [ ] Create daily diff function file and monthly full function file.
 - [ ] Configure netlify.toml schedules for daily and monthly crons.
 - [ ] Implement manual recrawl mutation restricted to admins.
 - [ ] Smoke test jobs with dry run mode.
       Definition of done
 - [ ] Schedules visible in Netlify and logs confirm execution.
+
+> **Status:** With both StartPlaying and BGG crawlers callable via runner scripts, we can operate manual refreshes as needed. Scheduling will remain paused unless future operations require hands-off updates.
 
 Phase 8 - Public UI
 Deliverables
@@ -217,7 +221,7 @@ Deliverables
 
 - Crawl history UI, structured logs, optional Slack email hook.
   Checklist
-- [x] Persist detailed stats in system_crawl_events. _(Migration `0013_system_crawl_event_details.sql` adds severity + JSON details, now populated by crawlers.)_
+- [x] Persist detailed stats in system*crawl_events. *(Migration `0013_system_crawl_event_details.sql` adds severity + JSON details, now populated by crawlers.)\_
 - [ ] Add admin crawl history view with filters and pagination.
 - [ ] Implement optional webhook to alert on failures partial statuses and large diffs.
       Definition of done

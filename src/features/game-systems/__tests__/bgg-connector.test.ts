@@ -34,4 +34,26 @@ describe("bgg connector parsers", () => {
       mechanics: ["Dice"],
     });
   });
+
+  it("captures review statistics", () => {
+    const xml = `
+      <items>
+        <item id="789">
+          <statistics>
+            <ratings>
+              <usersrated value="12345" />
+              <numcomments value="678" />
+            </ratings>
+          </statistics>
+        </item>
+      </items>
+    `;
+    expect(parseThing(xml)).toEqual({
+      publishers: [],
+      categories: [],
+      mechanics: [],
+      numComments: 678,
+      usersRated: 12345,
+    });
+  });
 });

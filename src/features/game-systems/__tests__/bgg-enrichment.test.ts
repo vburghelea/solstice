@@ -3,6 +3,7 @@ import * as bgg from "../crawler/bgg";
 
 const updateCalls: unknown[] = [];
 const insertCalls: { table: unknown; values: unknown }[] = [];
+const onConflictDoNothing = vi.fn(() => ({}));
 
 const categoryMapFind = vi.fn<(_?: unknown) => Promise<{ categoryId: number } | null>>();
 const mechanicMapFind = vi.fn<(_?: unknown) => Promise<{ mechanicId: number } | null>>();
@@ -17,7 +18,7 @@ const fakeDb = {
   insert: vi.fn((table: unknown) => ({
     values: (vals: unknown) => {
       insertCalls.push({ table, values: vals });
-      return {};
+      return { onConflictDoNothing };
     },
   })),
   query: {
@@ -71,6 +72,7 @@ describe("bgg enrichment", () => {
   it("updates external refs and maps taxonomy", async () => {
     categoryMapFind.mockResolvedValue({ categoryId: 1 });
     mechanicMapFind.mockResolvedValue({ mechanicId: 2 });
+    onConflictDoNothing.mockClear();
 
     await enrichFromBgg(fakeDb as unknown as Parameters<typeof enrichFromBgg>[0], {
       id: 1,
@@ -96,6 +98,7 @@ describe("bgg enrichment", () => {
     insertCalls.length = 0;
     categoryMapFind.mockResolvedValue(null);
     mechanicMapFind.mockResolvedValue(null);
+    onConflictDoNothing.mockClear();
 
     await enrichFromBgg(fakeDb as unknown as Parameters<typeof enrichFromBgg>[0], {
       id: 2,

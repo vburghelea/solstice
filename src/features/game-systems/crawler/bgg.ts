@@ -37,6 +37,8 @@ export interface BggThing {
   publishers: string[];
   categories: string[];
   mechanics: string[];
+  numComments?: number;
+  usersRated?: number;
 }
 
 interface ThingLink {
@@ -44,9 +46,15 @@ interface ThingLink {
   "@_value": string;
 }
 
+interface ThingRatings {
+  usersrated?: { "@_value": string };
+  numcomments?: { "@_value": string };
+}
+
 interface ThingItem {
   yearpublished?: { "@_value": string };
   link?: ThingLink | ThingLink[];
+  statistics?: { ratings?: ThingRatings };
 }
 
 interface ThingResponse {
@@ -61,26 +69,42 @@ export function parseThing(xml: string): BggThing {
   const getValues = (type: string) =>
     links.filter((l) => l["@_type"] === type).map((l) => l["@_value"]);
   const year = item?.yearpublished?.["@_value"];
+  const ratings = item?.statistics?.ratings;
+  const numCommentsRaw = ratings?.numcomments?.["@_value"];
+  const usersRatedRaw = ratings?.usersrated?.["@_value"];
   return {
     ...(year ? { yearPublished: Number(year) } : {}),
     publishers: getValues("boardgamepublisher"),
     categories: getValues("boardgamecategory"),
     mechanics: getValues("boardgamemechanic"),
+    ...(numCommentsRaw ? { numComments: Number(numCommentsRaw) } : {}),
+    ...(usersRatedRaw ? { usersRated: Number(usersRatedRaw) } : {}),
   };
 }
 
 export async function searchBggId(name: string) {
+  const userAgent = process.env["CRAWLER_USER_AGENT"] ?? "SolsticeGameCrawler/1.0";
   const res = await fetch(
     `https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=${encodeURIComponent(
       name,
     )}`,
+    {
+      headers: {
+        "User-Agent": userAgent,
+      },
+    },
   );
   const text = await res.text();
   return parseSearch(text, name);
 }
 
 export async function fetchBggThing(id: number) {
-  const res = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${id}&stats=1`);
+  const userAgent = process.env["CRAWLER_USER_AGENT"] ?? "SolsticeGameCrawler/1.0";
+  const res = await fetch(`https://boardgamegeek.com/xmlapi2/thing?id=${id}&stats=1`, {
+    headers: {
+      "User-Agent": userAgent,
+    },
+  });
   const text = await res.text();
   return parseThing(text);
 }
@@ -94,11 +118,15 @@ interface EnrichParams {
   releaseDate?: Date | null;
 }
 
-export async function enrichFromBgg(database: Db, system: EnrichParams) {
+export async function enrichFromBgg(
+  database: Db,
+  system: EnrichParams,
+  preloadedThing?: BggThing | null,
+) {
   const existingId = system.externalRefs?.bgg;
   const bggId = existingId ? Number(existingId) : await searchBggId(system.name);
   if (!bggId) return null;
-  const thing = await fetchBggThing(bggId);
+  const thing = preloadedThing ?? (await fetchBggThing(bggId));
   const externalRefs = { ...(system.externalRefs ?? {}), bgg: String(bggId) };
   const update: Record<string, unknown> = { externalRefs };
   if (!system.releaseDate && thing.yearPublished) {
@@ -116,7 +144,8 @@ export async function enrichFromBgg(database: Db, system: EnrichParams) {
     if (mapping) {
       await database
         .insert(gameSystemToCategory)
-        .values({ gameSystemId: system.id, categoryId: mapping.categoryId });
+        .values({ gameSystemId: system.id, categoryId: mapping.categoryId })
+        .onConflictDoNothing();
     }
   }
 
@@ -128,10 +157,13 @@ export async function enrichFromBgg(database: Db, system: EnrichParams) {
       ),
     });
     if (mapping) {
-      await database.insert(gameSystemToMechanics).values({
-        gameSystemId: system.id,
-        mechanicsId: mapping.mechanicId,
-      });
+      await database
+        .insert(gameSystemToMechanics)
+        .values({
+          gameSystemId: system.id,
+          mechanicsId: mapping.mechanicId,
+        })
+        .onConflictDoNothing();
     }
   }
 

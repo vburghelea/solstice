@@ -35,9 +35,6 @@ export interface UploadedAsset {
   moderated: boolean;
 }
 
-export const heroTransformation = "c_fill,w_1600,h_900";
-export const thumbTransformation = "c_fill,w_300,h_300";
-
 export function computeChecksum(data: Buffer | string): string {
   return createHash("md5").update(data).digest("hex");
 }
@@ -66,7 +63,6 @@ export async function uploadImage(
 
   const uploadOptions: UploadApiOptions = {
     resource_type: "image",
-    transformation: options.kind === "hero" ? heroTransformation : thumbTransformation,
     context,
   };
 

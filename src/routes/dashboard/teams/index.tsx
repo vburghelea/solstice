@@ -38,7 +38,7 @@ function TeamsIndexPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Teams</h1>
+          <h1 className="text-foreground text-3xl font-bold">My Teams</h1>
           <p className="text-muted-foreground">Manage your teams and memberships</p>
         </div>
         <Button asChild>
@@ -53,7 +53,7 @@ function TeamsIndexPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">No teams yet</h3>
+            <h3 className="text-foreground mb-2 text-lg font-semibold">No teams yet</h3>
             <p className="text-muted-foreground mb-4 text-center">
               Join an existing team or create your own to get started
             </p>
@@ -79,7 +79,7 @@ function TeamsIndexPage() {
                 <List.Item key={userTeam.team.id} className="group">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-base font-semibold text-gray-900">
+                      <div className="text-foreground truncate text-base font-semibold">
                         {userTeam.team.name}
                       </div>
                       <div className="text-muted-foreground mt-1 text-xs">
@@ -88,7 +88,7 @@ function TeamsIndexPage() {
                           ? `, ${getCountryName(userTeam.team.country)}`
                           : ""}
                       </div>
-                      <div className="mt-1 text-xs text-gray-600">
+                      <div className="text-muted-foreground mt-1 text-xs">
                         Role:{" "}
                         <span className="capitalize">{userTeam.membership.role}</span> •
                         Members: {userTeam.memberCount}
@@ -137,7 +137,7 @@ function TeamCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
+            <CardTitle className="text-foreground text-xl">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}

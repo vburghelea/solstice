@@ -127,7 +127,7 @@ function TeamMembersPage() {
 
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{team.name} Members</h1>
+          <h1 className="text-foreground text-3xl font-bold">{team.name} Members</h1>
           <p className="text-muted-foreground">
             Manage your team roster and member roles
           </p>
@@ -141,7 +141,7 @@ function TeamMembersPage() {
       {showAddMember && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-gray-900">Add New Member</CardTitle>
+            <CardTitle className="text-foreground">Add New Member</CardTitle>
             <CardDescription>Invite a new member to join your team</CardDescription>
           </CardHeader>
           <CardContent>

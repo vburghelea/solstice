@@ -3,17 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle, Edit2, LoaderCircle, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { StickyActionBar } from "~/components/ui/sticky-action-bar";
+import { GameForm } from "~/features/games/components/GameForm";
+import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
+import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card";
-import { StickyActionBar } from "~/components/ui/sticky-action-bar";
-import { GameForm } from "~/features/games/components/GameForm";
-import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
-import { InviteParticipants } from "~/features/games/components/InviteParticipants";
+} from "~/shared/ui/card";
 
 import { ProfileLink } from "~/components/ProfileLink";
 import { GMReviewForm } from "~/features/games/components/GMReviewForm";
@@ -72,13 +72,13 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
     <div className="space-y-4">
       <details
         id="general"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
         open
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           General
         </summary>
-        <div className="px-4 pt-2 pb-4 text-gray-900">
+        <div className="text-foreground px-4 pt-2 pb-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <p className="font-semibold">Game System</p>
@@ -114,24 +114,24 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
 
       <details
         id="location"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           Location
         </summary>
-        <div className="px-4 pt-2 pb-4 text-gray-900">
+        <div className="text-foreground px-4 pt-2 pb-4">
           <p>{game.location.address}</p>
         </div>
       </details>
 
       <details
         id="requirements"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           Minimum Requirements
         </summary>
-        <div className="px-4 pt-2 pb-4 text-gray-900">
+        <div className="text-foreground px-4 pt-2 pb-4">
           <p>
             Players: {game.minimumRequirements?.minPlayers} -{" "}
             {game.minimumRequirements?.maxPlayers}
@@ -142,12 +142,12 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
 
       <details
         id="safety"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           Safety Rules
         </summary>
-        <div className="px-4 pt-2 pb-4 text-gray-900">
+        <div className="text-foreground px-4 pt-2 pb-4">
           <SafetyRulesView safetyRules={game.safetyRules} />
         </div>
       </details>
@@ -569,7 +569,7 @@ export function GameDetailsPage() {
               </div>
             ) : null}
             <div>
-              <CardTitle className="text-gray-900">{game.name}</CardTitle>
+              <CardTitle className="text-foreground">{game.name}</CardTitle>
               {game.description ? (
                 <CardDescription className="mt-1">{game.description}</CardDescription>
               ) : null}

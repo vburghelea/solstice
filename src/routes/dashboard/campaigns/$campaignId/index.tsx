@@ -5,13 +5,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -36,6 +29,13 @@ import type {
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/shared/ui/card";
 
 import { ProfileLink } from "~/components/ProfileLink";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
@@ -67,13 +67,13 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
     <div className="space-y-3">
       <details
         id="general"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
         open
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           General
         </summary>
-        <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
+        <div className="text-foreground grid gap-4 px-4 pt-2 pb-4 md:grid-cols-2">
           <div>
             <p className="font-semibold">Game System</p>
             <p>{campaign.gameSystem?.name || "Not specified"}</p>
@@ -111,24 +111,24 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
 
       <details
         id="location"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           Location
         </summary>
-        <div className="px-4 pt-2 pb-4 text-gray-900">
+        <div className="text-foreground px-4 pt-2 pb-4">
           <p>{campaign.location?.address || "Not specified"}</p>
         </div>
       </details>
 
       <details
         id="requirements"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           Minimum Requirements
         </summary>
-        <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
+        <div className="text-foreground grid gap-4 px-4 pt-2 pb-4 md:grid-cols-2">
           <div>
             <p className="font-semibold">Players</p>
             <p>
@@ -145,12 +145,12 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
 
       <details
         id="safety"
-        className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
       >
-        <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
           Safety Rules
         </summary>
-        <div className="px-4 pt-2 pb-4 text-gray-900">
+        <div className="text-foreground px-4 pt-2 pb-4">
           <SafetyRulesView safetyRules={campaign.safetyRules} />
         </div>
       </details>
@@ -400,7 +400,7 @@ export function CampaignDetailsPage() {
               </div>
             ) : null}
             <div>
-              <CardTitle className="text-gray-900">{campaign.name}</CardTitle>
+              <CardTitle className="text-foreground">{campaign.name}</CardTitle>
               {campaign.description ? (
                 <CardDescription className="mt-1">{campaign.description}</CardDescription>
               ) : null}
@@ -495,7 +495,7 @@ export function CampaignDetailsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-gray-900">Game Sessions</CardTitle>
+            <CardTitle className="text-foreground">Game Sessions</CardTitle>
             <div className="flex items-center gap-4">
               <Select
                 value={statusFilter}

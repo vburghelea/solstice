@@ -22,7 +22,7 @@ function EventsPage() {
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Events</h1>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">Events</h1>
           <p className="text-muted-foreground">Browse and register for upcoming events</p>
         </div>
         <Button asChild>

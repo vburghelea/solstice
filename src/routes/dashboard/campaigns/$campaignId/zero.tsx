@@ -75,7 +75,7 @@ function SessionZeroPage() {
   if (!canView) {
     return (
       <div className="container mx-auto max-w-4xl space-y-6 p-6">
-        <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
+        <h1 className="text-destructive text-2xl font-bold">Access Denied</h1>
         <p>You do not have permission to view this page.</p>
         <Link to="/dashboard/campaigns">
           <Button variant="outline">Back to Campaigns</Button>

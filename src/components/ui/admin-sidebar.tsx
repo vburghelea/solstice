@@ -11,6 +11,7 @@ import {
   ScrollText,
   Settings,
   Swords,
+  ShieldCheck,
   User,
   UserCheck,
   Users,
@@ -69,6 +70,13 @@ const adminSidebarItems: SidebarItem[] = [
     href: "/dashboard/social-audits",
     requiresRole: true,
     roles: ["Platform Admin", "Games Admin"],
+  },
+  {
+    icon: ShieldCheck,
+    label: "Roles",
+    href: "/admin/roles",
+    requiresRole: true,
+    roles: ["Solstice Admin", "Quadball Canada Admin"],
   },
 ];
 

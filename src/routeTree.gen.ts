@@ -42,6 +42,7 @@ import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -65,6 +66,9 @@ import { Route as DashboardEventsEventIdRouteImport } from "./routes/dashboard/e
 import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard/campaigns/create";
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 =======
+=======
+import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
@@ -241,6 +245,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: "/forgot-password",
   path: "/forgot-password",
@@ -250,6 +255,13 @@ const DevEmailIndexRoute = DevEmailIndexRouteImport.update({
   id: "/dev/email/",
   path: "/dev/email/",
 =======
+=======
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: "/admin/roles",
+  path: "/admin/roles",
+  getParentRoute: () => rootRouteImport,
+} as any);
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
 const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
   id: "/admin/events-review",
   path: "/admin/events-review",
@@ -505,7 +517,11 @@ export interface FileRoutesByFullPath {
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
   "/admin/events-review": typeof AdminEventsReviewRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+  "/admin/roles": typeof AdminRolesRoute;
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
@@ -580,7 +596,11 @@ export interface FileRoutesByTo {
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
   "/admin/events-review": typeof AdminEventsReviewRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+  "/admin/roles": typeof AdminRolesRoute;
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
@@ -645,7 +665,11 @@ export interface FileRoutesById {
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
   "/admin/events-review": typeof AdminEventsReviewRoute;
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+  "/admin/roles": typeof AdminRolesRoute;
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
   "/auth/signup": typeof AuthSignupRoute;
@@ -724,7 +748,11 @@ export interface FileRouteTypes {
     | "/auth/forgot-password"
 =======
     | "/admin/events-review"
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+    | "/admin/roles"
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
@@ -795,7 +823,11 @@ export interface FileRouteTypes {
     | "/auth/forgot-password"
 =======
     | "/admin/events-review"
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+    | "/admin/roles"
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
@@ -859,7 +891,11 @@ export interface FileRouteTypes {
     | "/auth/forgot-password"
 =======
     | "/admin/events-review"
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+    | "/admin/roles"
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
     | "/auth/login"
     | "/auth/reset-password"
     | "/auth/signup"
@@ -938,6 +974,7 @@ export interface RootRouteChildren {
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
 =======
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 }
@@ -1258,6 +1295,7 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof AuthRouteRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/auth/forgot-password": {
       id: "/auth/forgot-password";
       path: "/forgot-password";
@@ -1271,6 +1309,15 @@ declare module "@tanstack/react-router" {
       fullPath: "/dev/email";
       preLoaderRoute: typeof DevEmailIndexRouteImport;
 =======
+=======
+    "/admin/roles": {
+      id: "/admin/roles";
+      path: "/admin/roles";
+      fullPath: "/admin/roles";
+      preLoaderRoute: typeof AdminRolesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+>>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
     "/admin/events-review": {
       id: "/admin/events-review";
       path: "/admin/events-review";
@@ -1838,6 +1885,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevEmailIndexRoute: DevEmailIndexRoute,
 =======
   AdminEventsReviewRoute: AdminEventsReviewRoute,
+  AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 };

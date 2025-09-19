@@ -530,6 +530,17 @@ export const searchUsers = createServerFn({ method: "POST" })
 
 ## Usage Examples
 
+### 0. Bootstrapping Roles and Global Admins
+
+```bash
+# Ensure default roles exist and assign global admins from CLI
+pnpm tsx scripts/seed-global-admins.ts --solstice admin@example.com --quadball another.admin@example.com
+
+# You can also drive assignments via environment variables:
+#   SOLSTICE_ADMIN_EMAILS="alice@example.com,bob@example.com"
+#   QUADBALL_ADMIN_EMAILS="carol@example.com"
+```
+
 ### 1. Assigning Roles
 
 ```typescript

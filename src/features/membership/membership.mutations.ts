@@ -22,6 +22,17 @@ function castMembershipJsonbFields(
   } as Membership;
 }
 
+const RETRYABLE_PAYMENT_ERROR_PATTERNS = [/pending/i, /not available/i, /processing/i];
+
+function isRetryablePaymentError(message: string | undefined): boolean {
+  if (!message) return false;
+  return RETRYABLE_PAYMENT_ERROR_PATTERNS.some((pattern) => pattern.test(message));
+}
+
+async function wait(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Server-only helper to get Square payment service
  * This ensures the Square module is never included in the client bundle
@@ -266,12 +277,52 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
 
       // Verify payment with Square
       const squarePaymentService = await getSquarePaymentService();
-      const paymentResult = await squarePaymentService.verifyPayment(
+      let paymentResult = await squarePaymentService.verifyPayment(
         paymentSession.squareCheckoutId,
         data.paymentId ?? paymentSession.squarePaymentId ?? undefined,
       );
 
+      let retryAttempts = 0;
+      const maxRetryAttempts = 2;
+
+      while (
+        !paymentResult.success &&
+        retryAttempts < maxRetryAttempts &&
+        isRetryablePaymentError(paymentResult.error)
+      ) {
+        retryAttempts += 1;
+        await wait(750 * retryAttempts);
+
+        const [latestSession] = await db
+          .select()
+          .from(membershipPaymentSessions)
+          .where(eq(membershipPaymentSessions.id, paymentSession.id))
+          .limit(1);
+
+        if (
+          latestSession &&
+          latestSession.status === "completed" &&
+          latestSession.squarePaymentId
+        ) {
+          paymentResult = {
+            success: true,
+            paymentId: latestSession.squarePaymentId,
+            orderId: latestSession.squareOrderId,
+            status: "COMPLETED",
+            amount: latestSession.amountCents,
+            currency: latestSession.currency,
+          };
+          break;
+        }
+
+        paymentResult = await squarePaymentService.verifyPayment(
+          paymentSession.squareCheckoutId,
+          data.paymentId ?? paymentSession.squarePaymentId ?? undefined,
+        );
+      }
+
       if (!paymentResult.success) {
+        const now = new Date();
         await db
           .update(membershipPaymentSessions)
           .set({
@@ -279,9 +330,10 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
             metadata: {
               ...(paymentSession.metadata ?? {}),
               lastError: paymentResult.error || "Payment verification failed",
-              lastErrorAt: new Date().toISOString(),
+              lastErrorAt: now.toISOString(),
+              retryAttempts,
             },
-            updatedAt: new Date(),
+            updatedAt: now,
           })
           .where(eq(membershipPaymentSessions.id, paymentSession.id));
 

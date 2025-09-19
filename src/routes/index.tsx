@@ -408,26 +408,32 @@ function Index() {
                 Become a host
               </Link>
             </div>
-            <p className="mt-4 text-sm opacity-80">
-              (We'll try to infer your city from your GeoIP)
-            </p>
           </div>
         </section>
 
-        {/* Featured Games/Events Section */}
-        <section className="bg-gray-50 py-16 md:py-24">
-          <div className="container mx-auto px-4 text-center text-gray-900">
-            <h2 className="font-heading mb-12 text-3xl text-gray-900 md:text-4xl">
-              Featured Local Events & Games
-            </h2>
-            {featuredGames.length === 0 ? (
-              <p className="text-muted-foreground text-center">
-                No featured games found.
+        <section className="border-border/60 bg-muted/40 border-y py-16 sm:py-20">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-2xl space-y-3 text-center">
+              <h2 className="font-heading text-3xl md:text-4xl">
+                Featured local events & games
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Hand-picked sessions from community hosts happening soon in your city.
               </p>
+            </div>
+            {featuredGames.length === 0 ? (
+              <div className="border-border/70 bg-card/50 mt-12 flex flex-col items-center gap-3 rounded-3xl border border-dashed px-6 py-12 text-center">
+                <p className="text-muted-foreground text-base font-medium">
+                  No featured games yet.
+                </p>
+                <p className="text-muted-foreground/80 text-sm">
+                  Check back shortly or explore the full listing to find a group that
+                  fits.
+                </p>
+              </div>
             ) : (
               <>
-                {/* Mobile: dense list */}
-                <div className="md:hidden">
+                <div className="mt-12 md:hidden">
                   <List>
                     {featuredGames.map((game: GameListItem) => (
                       <GameListItemView key={game.id} game={game} />
@@ -435,84 +441,105 @@ function Index() {
                   </List>
                 </div>
 
-                {/* Desktop: cards */}
-                <div className="hidden grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-12 hidden grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-3">
                   {featuredGames.map((game: GameListItem) => (
-                    <div
+                    <article
                       key={game.id}
-                      className="rounded-lg bg-white p-6 text-left text-gray-900 shadow-md"
+                      className="border-border/70 bg-card/80 hover:border-primary/50 flex h-full flex-col justify-between gap-4 rounded-3xl border p-6 text-left shadow-sm transition"
                     >
-                      <h3 className="mb-2 text-xl font-semibold">{game.name}</h3>
-                      <p className="text-muted-foreground mb-4">{game.description}</p>
-                      <p className="text-sm text-gray-600">📍 {game.location.address}</p>
-                      <p className="text-sm text-gray-600">
-                        🗓️ {formatDateAndTime(game.dateTime)}
-                      </p>
+                      <div className="space-y-3">
+                        <h3 className="text-xl font-semibold">{game.name}</h3>
+                        {game.description ? (
+                          <p className="text-muted-foreground line-clamp-3 text-sm">
+                            {game.description}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="text-muted-foreground space-y-2 text-sm">
+                        <p className="flex items-start gap-2">
+                          <span aria-hidden>📍</span>
+                          <span className="flex-1">{game.location.address}</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span aria-hidden>🗓️</span>
+                          <span className="flex-1">
+                            {formatDateAndTime(game.dateTime)}
+                          </span>
+                        </p>
+                      </div>
                       <Link
                         to="/game/$gameId"
                         params={{ gameId: game.id }}
                         className={cn(
-                          buttonVariants({ variant: "link" }),
-                          "mt-4 p-0 text-red-700",
+                          buttonVariants({ size: "sm", variant: "outline" }),
+                          "mt-2 self-start rounded-full",
                         )}
                       >
-                        View Details
+                        View details
                       </Link>
-                    </div>
+                    </article>
                   ))}
                 </div>
               </>
             )}
-            <Link to="/search" className={cn(buttonVariants({ size: "lg" }), "mt-12")}>
-              Browse All Local Games
-            </Link>
+            <div className="mt-12 flex justify-center">
+              <Link
+                to="/search"
+                className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
+              >
+                Browse all local games
+              </Link>
+            </div>
           </div>
         </section>
 
-        {/* Popular Game Systems */}
-        <section className="bg-slate-900 py-16 text-white">
+        <section className="py-16 sm:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="space-y-2">
                 <h2 className="font-heading text-3xl sm:text-4xl">
-                  Popular Game Systems
+                  Popular game systems
                 </h2>
-                <p className="mt-2 text-sm text-slate-300 sm:text-base">
-                  Based on the number of active game sessions across the community.
+                <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
+                  Sessions most frequently booked by the community over the past few
+                  weeks.
                 </p>
               </div>
               <Link
                 to="/systems"
-                className="text-sm font-medium text-slate-200 underline-offset-4 hover:text-white hover:underline"
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "ghost" }),
+                  "self-start rounded-full px-5",
+                )}
               >
                 Browse all systems
               </Link>
             </div>
 
             {popularSystems.length === 0 ? (
-              <p className="mt-8 text-center text-sm text-slate-300">
+              <p className="text-muted-foreground/80 mt-10 text-center text-sm">
                 We’ll highlight popular systems once more sessions are scheduled.
               </p>
             ) : (
-              <div className="mt-8 overflow-x-auto pb-4">
+              <div className="mt-10 overflow-x-auto pb-4">
                 <div className="flex gap-6 pb-2">
                   {popularSystems.map((system) => (
                     <Link
                       key={system.id}
                       to="/systems/$slug"
                       params={{ slug: system.slug }}
-                      className="focus-visible:ring-offset-brand w-64 flex-shrink-0 rounded-2xl bg-white/10 px-3 pt-3 pb-4 shadow-md transition hover:bg-white/15 sm:w-72 sm:px-4 sm:pt-4 sm:pb-5"
+                      className="focus-visible:ring-offset-background group border-border/70 bg-card/80 hover:border-primary/50 hover:bg-card/90 w-64 flex-shrink-0 rounded-3xl border px-3 pt-3 pb-4 shadow-sm transition sm:w-72 sm:px-4 sm:pt-4 sm:pb-5"
                     >
-                      <div className="h-40 w-full overflow-hidden rounded-xl bg-slate-800">
+                      <div className="bg-muted h-40 w-full overflow-hidden rounded-2xl">
                         {system.heroUrl ? (
                           <img
                             src={system.heroUrl}
                             alt={`${system.name} cover art`}
                             loading="lazy"
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm text-slate-200">
+                          <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">
                             Hero art pending moderation
                           </div>
                         )}
@@ -520,16 +547,16 @@ function Index() {
                       <div className="mt-4 space-y-2">
                         <div className="flex items-baseline justify-between gap-2">
                           <h3 className="text-lg font-semibold">{system.name}</h3>
-                          <span className="text-xs font-medium tracking-wide text-slate-300 uppercase">
+                          <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                             {system.gameCount} sessions
                           </span>
                         </div>
                         {system.summary ? (
-                          <p className="line-clamp-3 text-sm text-slate-200/80">
+                          <p className="text-muted-foreground/90 line-clamp-3 text-sm">
                             {system.summary}
                           </p>
                         ) : (
-                          <p className="text-sm text-slate-200/60">
+                          <p className="text-muted-foreground/70 text-sm">
                             Description coming soon.
                           </p>
                         )}
@@ -542,63 +569,59 @@ function Index() {
           </div>
         </section>
 
-        {/* How it Works Section */}
-        <section className="py-16 md:py-24">
+        <section className="border-border/60 bg-muted/30 border-t py-16 sm:py-20">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="font-heading mb-12 text-3xl md:text-4xl">How It Works</h2>
+            <h2 className="font-heading mb-12 text-3xl md:text-4xl">How it works</h2>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              <div className="flex flex-col items-center p-4 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-2xl font-bold text-red-700">
-                  1
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">Find a Local Game</h3>
-                <p className="text-muted-foreground">
-                  Search for tabletop RPGs, board game meetups, and events happening near
-                  you.
-                </p>
-              </div>
-              <div className="flex flex-col items-center p-4 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-2xl font-bold text-red-700">
-                  2
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">Join a Session</h3>
-                <p className="text-muted-foreground">
-                  Connect with Game Masters and fellow players. RSVP or book your spot
-                  directly.
-                </p>
-              </div>
-              <div className="flex flex-col items-center p-4 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-2xl font-bold text-red-700">
-                  3
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">Play In Person</h3>
-                <p className="text-muted-foreground">
-                  Enjoy immersive gaming experiences and build a local gaming community.
-                </p>
-              </div>
+              {["Find a local game", "Join a session", "Play in person"].map(
+                (title, index) => {
+                  const descriptions = [
+                    "Search for tabletop RPGs, board game meetups, and events happening near you.",
+                    "Connect with Game Masters and fellow players. RSVP or book your spot directly.",
+                    "Enjoy immersive gaming experiences and build a local gaming community.",
+                  ];
+
+                  return (
+                    <div
+                      key={title}
+                      className="border-border/60 bg-card/60 flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm"
+                    >
+                      <div className="bg-primary/15 text-primary mb-4 flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold">
+                        {index + 1}
+                      </div>
+                      <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {descriptions[index]}
+                      </p>
+                    </div>
+                  );
+                },
+              )}
             </div>
           </div>
         </section>
 
-        {/* Call to Action: Become a Host/GM */}
-        <section className="bg-red-800 py-16 text-center text-white md:py-24">
+        <section className="relative isolate overflow-hidden py-16 text-center sm:py-20">
+          <div className="from-primary/80 via-primary to-primary/80 absolute inset-0 -z-10 bg-gradient-to-r" />
           <div className="container mx-auto px-4">
-            <h2 className="font-heading mb-6 text-3xl md:text-4xl">
-              Ready to Host Your Own Game?
-            </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-lg sm:text-xl">
-              Share your passion! Become a Game Master or host a board game meetup in your
-              area.
-            </p>
-            <Link
-              to="/auth/signup"
-              className={cn(
-                buttonVariants({ size: "lg", variant: "secondary" }),
-                "rounded-full",
-              )}
-            >
-              Become a Host
-            </Link>
+            <div className="text-primary-foreground mx-auto max-w-2xl space-y-6">
+              <h2 className="font-heading text-3xl md:text-4xl">
+                Ready to host your own game?
+              </h2>
+              <p className="text-lg sm:text-xl">
+                Share your passion! Become a Game Master or host a board game meetup in
+                your area.
+              </p>
+              <Link
+                to="/auth/signup"
+                className={cn(
+                  buttonVariants({ size: "lg", variant: "secondary" }),
+                  "rounded-full px-8",
+                )}
+              >
+                Become a host
+              </Link>
+            </div>
           </div>
         </section>
       </div>

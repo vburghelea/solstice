@@ -14,10 +14,8 @@ function EventsPage() {
     <div className="container mx-auto space-y-8 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Events</h1>
-          <p className="text-muted-foreground">
-            Browse and manage Quadball events across Canada
-          </p>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">Events</h1>
+          <p className="text-muted-foreground">Browse and register for upcoming events</p>
         </div>
         {user && (
           <Button asChild>

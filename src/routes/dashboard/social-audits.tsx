@@ -15,7 +15,7 @@ export const Route = createFileRoute("/dashboard/social-audits")({
 function SocialAuditsPage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">Social Audits</h1>
+      <h1 className="text-foreground text-3xl font-bold tracking-tight">Social Audits</h1>
       <p className="text-muted-foreground">
         Admin-only: view recent follow/block actions for moderation.
       </p>

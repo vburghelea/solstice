@@ -129,7 +129,7 @@ function DashboardIndex() {
     <div className="container mx-auto space-y-8 p-4 sm:p-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+        <h1 className="text-foreground text-2xl font-bold tracking-tight sm:text-3xl">
           Welcome back, {user?.name || "Player"}!
         </h1>
         <p className="text-muted-foreground mt-1 sm:mt-2">
@@ -138,18 +138,18 @@ function DashboardIndex() {
       </div>
 
       {/* Now & Next (Mobile-first) */}
-      <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-5">
+      <div className="bg-card rounded-xl border p-4 shadow-sm sm:p-5">
         {nextGame ? (
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xs font-medium text-gray-500">Next up</div>
-              <div className="mt-1 text-base font-semibold text-gray-900">
+              <div className="text-muted-foreground text-xs font-medium">Next up</div>
+              <div className="text-foreground mt-1 text-base font-semibold">
                 {nextGame.name}
               </div>
-              <div className="mt-1 text-sm text-gray-600">
+              <div className="text-muted-foreground mt-1 text-sm">
                 🗓️ {formatDateAndTime(nextGame.dateTime)} • {nextGame.location.address}
               </div>
-              <div className="mt-1 text-xs text-gray-500">
+              <div className="text-muted-foreground mt-1 text-xs">
                 {formatTimeDistance(new Date(nextGame.dateTime))}
               </div>
             </div>
@@ -160,10 +160,12 @@ function DashboardIndex() {
         ) : (
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-base font-semibold text-gray-900">
+              <div className="text-foreground text-base font-semibold">
                 No upcoming games
               </div>
-              <div className="text-sm text-gray-600">Discover and join a new session</div>
+              <div className="text-muted-foreground text-sm">
+                Discover and join a new session
+              </div>
             </div>
             <Button asChild variant="secondary">
               <Link to="/search">Find games</Link>
@@ -177,7 +179,7 @@ function DashboardIndex() {
         {/* Pending GM Reviews */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">
+            <CardTitle className="text-foreground text-sm font-medium">
               Pending Reviews
             </CardTitle>
             <ScrollText className="text-muted-foreground h-4 w-4" />
@@ -199,11 +201,11 @@ function DashboardIndex() {
         {/* Membership Status Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">
+            <CardTitle className="text-foreground text-sm font-medium">
               Membership Status
             </CardTitle>
             {membershipStatus?.hasMembership ? (
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="text-admin-status-active-text h-4 w-4" />
             ) : (
               <XCircle className="text-muted-foreground h-4 w-4" />
             )}
@@ -230,7 +232,9 @@ function DashboardIndex() {
         {/* Teams Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">My Teams</CardTitle>
+            <CardTitle className="text-foreground text-sm font-medium">
+              My Teams
+            </CardTitle>
             <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -246,7 +250,7 @@ function DashboardIndex() {
         {/* Upcoming Events Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">
+            <CardTitle className="text-foreground text-sm font-medium">
               Upcoming Events
             </CardTitle>
             <Calendar className="text-muted-foreground h-4 w-4" />
@@ -262,7 +266,9 @@ function DashboardIndex() {
         {/* Campaigns Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">Campaigns</CardTitle>
+            <CardTitle className="text-foreground text-sm font-medium">
+              Campaigns
+            </CardTitle>
             <ScrollText className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -279,7 +285,7 @@ function DashboardIndex() {
         {/* Games Card */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-900">Games</CardTitle>
+            <CardTitle className="text-foreground text-sm font-medium">Games</CardTitle>
             <Swords className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
@@ -315,7 +321,7 @@ function DashboardIndex() {
           {isNewCardEnabled && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900">
+                <CardTitle className="text-foreground flex items-center gap-2">
                   <Trophy className="h-5 w-5" />
                   New Feature
                 </CardTitle>
@@ -331,7 +337,7 @@ function DashboardIndex() {
           {/* Complete Profile - always shown since profile is complete to access dashboard */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <User className="h-5 w-5" />
                 View Profile
               </CardTitle>
@@ -349,7 +355,7 @@ function DashboardIndex() {
           {/* Buy/Renew Membership */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
                 {membershipStatus?.hasMembership ? "Renew Membership" : "Buy Membership"}
               </CardTitle>
@@ -371,7 +377,7 @@ function DashboardIndex() {
           {/* Join Team */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <UserPlus className="h-5 w-5" />
                 Join a Team
               </CardTitle>

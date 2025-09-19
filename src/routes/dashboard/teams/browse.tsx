@@ -59,7 +59,7 @@ function BrowseTeamsPage() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Browse Teams</h1>
+        <h1 className="text-foreground text-3xl font-bold">Browse Teams</h1>
         <p className="text-muted-foreground">Discover and join teams in your area</p>
       </div>
 
@@ -97,7 +97,7 @@ function BrowseTeamsPage() {
                 <List.Item key={teamItem.team.id} className="group">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-base font-semibold text-gray-900">
+                      <div className="text-foreground truncate text-base font-semibold">
                         {teamItem.team.name}
                       </div>
                       <div className="text-muted-foreground mt-1 text-xs">
@@ -106,7 +106,7 @@ function BrowseTeamsPage() {
                           ? `, ${getCountryName(teamItem.team.country)}`
                           : ""}
                       </div>
-                      <div className="mt-1 text-xs text-gray-600">
+                      <div className="text-muted-foreground mt-1 text-xs">
                         Members: {teamItem.memberCount}
                       </div>
                     </div>
@@ -153,7 +153,7 @@ function PublicTeamCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xl text-gray-900">{team.name}</CardTitle>
+            <CardTitle className="text-foreground text-xl">{team.name}</CardTitle>
             {team.city && (
               <CardDescription>
                 {team.city}

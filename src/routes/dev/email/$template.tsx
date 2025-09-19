@@ -184,5 +184,6 @@ export const Route = createFileRoute("/dev/email/$template")({
 
 function EmailPreview() {
   const { html } = Route.useLoaderData();
+  /* eslint-disable @eslint-react/dom/no-dangerously-set-innerhtml */
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }

@@ -93,10 +93,10 @@ function SystemsBrowsePage() {
 
   return (
     <PublicLayout>
-      <section className="bg-slate-950 py-16 text-white">
+      <section className="bg-secondary text-secondary-foreground py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold sm:text-4xl">Explore Game Systems</h1>
-          <p className="mt-4 max-w-2xl text-sm text-slate-200 sm:text-base">
+          <p className="text-secondary-foreground/80 mt-4 max-w-2xl text-sm sm:text-base">
             Browse tabletop rulesets with curated hero art, taxonomy, and key details. Use
             the search box or pick a category to narrow the catalog.
           </p>

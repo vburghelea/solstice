@@ -28,6 +28,7 @@ import {
   languageOptions,
 } from "~/shared/types/common";
 import { Checkbox } from "~/shared/ui/checkbox";
+import { FormSection } from "~/shared/ui/form-section";
 import { Label } from "~/shared/ui/label";
 import {
   Select,
@@ -182,306 +183,15 @@ export function GameForm({
         e.stopPropagation();
         form.handleSubmit();
       }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      <form.Field
-        name="name"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null || value === "") {
-                return undefined;
-              }
-            }
-            try {
-              const schema = initialValues
-                ? updateGameInputSchema
-                : createGameInputSchema;
-              schema.shape.name.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
+      <FormSection
+        title="Session overview"
+        description="Share the essentials players need before they RSVP."
+        contentClassName="space-y-6"
       >
-        {(field) => (
-          <div>
-            <Label htmlFor={field.name}>Game Session Name</Label>
-            <input
-              id={field.name}
-              name={field.name}
-              type="text"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Enter a compelling name for your planned game session"
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            {field.state.meta.errors?.length > 0 && (
-              <p className="text-destructive mt-1 text-sm">
-                {field.state.meta.errors
-                  .map((error) =>
-                    typeof error === "string"
-                      ? error
-                      : "The game session name is what most players see first when looking for adventure, make sure it's compelling.",
-                  )
-                  .join(", ")}
-              </p>
-            )}
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field
-        name="description"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null || value === "") {
-                return undefined;
-              }
-            }
-            try {
-              createGameInputSchema.shape.description.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
-      >
-        {(field) => (
-          <div>
-            <Label htmlFor={field.name}>Description</Label>
-            <Textarea
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                field.handleChange(e.target.value)
-              }
-              className="mt-1"
-            />
-            {field.state.meta.errors?.length > 0 && (
-              <p className="text-destructive mt-1 text-sm">
-                {field.state.meta.errors
-                  .map((error) =>
-                    typeof error === "string"
-                      ? error
-                      : "Please add a game session description that sets the tone for what players should expect.",
-                  )
-                  .join(", ")}
-              </p>
-            )}
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field
-        name="gameSystemId"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-            }
-            try {
-              createGameInputSchema.shape.gameSystemId.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
-      >
-        {(field) => (
-          <div>
-            <Label htmlFor={field.name}>Game System Used</Label>
-            {isCampaignGame ? (
-              <p className="text-muted-foreground mt-1 text-sm">
-                {gameSystemName && gameSystemName.trim().length > 0
-                  ? gameSystemName
-                  : effectiveGameSystem?.name || ""}
-              </p>
-            ) : (
-              <GameSystemCombobox
-                label="" // Label is already rendered above
-                options={gameSystemOptions}
-                placeholder="Search and select the game system you want to use"
-                value={field.state.value?.toString() ?? ""}
-                onValueChange={(value) => {
-                  field.handleChange(parseInt(value));
-                  // Find and store the selected game system details
-                  const selected =
-                    gameSystemSearchResults?.success && gameSystemSearchResults.data
-                      ? gameSystemSearchResults.data.find(
-                          (gs) => gs.id === parseInt(value),
-                        )
-                      : null;
-                  setSelectedGameSystem(selected || null);
-                }}
-                onSearchChange={setGameSystemSearchTerm}
-                isLoading={isLoadingGameSystems}
-                disabled={!!isCampaignGame}
-                error={
-                  field.state.meta.errors?.filter(Boolean).map((e) => {
-                    if (typeof e === "string") {
-                      return e;
-                    } else if (e && typeof e === "object" && "message" in e) {
-                      return (e as z.ZodIssue).message;
-                    }
-                    return ""; // Fallback for unexpected types
-                  }) || []
-                }
-              />
-            )}
-            {field.state.meta.errors?.length > 0 && (
-              <p className="text-destructive mt-1 text-sm">
-                {field.state.meta.errors
-                  .map((error) =>
-                    typeof error === "string"
-                      ? error
-                      : "Please select a game system for your session.",
-                  )
-                  .join(", ")}
-              </p>
-            )}
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field
-        name="dateTime"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null || value === "") {
-                return undefined;
-              }
-            }
-            try {
-              createGameInputSchema.shape.dateTime.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
-      >
-        {(field) => <DateTimePicker field={field} label="Date and Time" />}
-      </form.Field>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <form.Field
-          name="expectedDuration"
-          validators={{
-            onChange: ({ value }) => {
-              if (initialValues) {
-                // For update form, field is optional
-                if (value === undefined || value === null) {
-                  return undefined;
-                }
-              }
-              try {
-                createGameInputSchema.shape.expectedDuration.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Expected Duration (minutes)</Label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="number"
-                value={field.state.value ?? effectiveGameSystem?.averagePlayTime ?? 1}
-                onBlur={field.handleBlur}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
-                }
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              />
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Enter a game duration in minutes to let others know how much time to reserve for this.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-
-        <form.Field
-          name="price"
-          validators={{
-            onChange: ({ value }) => {
-              try {
-                // Allow undefined or valid price values (including zero)
-                if (value === undefined || value === null) {
-                  return undefined;
-                }
-                createGameInputSchema.shape.price.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Price (EUR) (optional)</Label>
-              <div className="relative mt-1">
-                <span className="text-muted-foreground absolute inset-y-0 left-0 flex items-center pl-3">
-                  €
-                </span>
-                <input
-                  id={field.name}
-                  name={field.name}
-                  type="number"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
-                  }
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "If you want to add a cover charge for the game, specify it here.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <form.Field
-          name="language"
+          name="name"
           validators={{
             onChange: ({ value }) => {
               if (initialValues) {
@@ -491,7 +201,10 @@ export function GameForm({
                 }
               }
               try {
-                createGameInputSchema.shape.language.parse(value);
+                const schema = initialValues
+                  ? updateGameInputSchema
+                  : createGameInputSchema;
+                schema.shape.name.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -501,18 +214,530 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Language</Label>
+              <Label htmlFor={field.name}>Game Session Name</Label>
+              <input
+                id={field.name}
+                name={field.name}
+                type="text"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Enter a compelling name for your planned game session"
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              {field.state.meta.errors?.length > 0 && (
+                <p className="text-destructive mt-1 text-sm">
+                  {field.state.meta.errors
+                    .map((error) =>
+                      typeof error === "string"
+                        ? error
+                        : "The game session name is what most players see first when looking for adventure, make sure it's compelling.",
+                    )
+                    .join(", ")}
+                </p>
+              )}
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field
+          name="description"
+          validators={{
+            onChange: ({ value }) => {
+              if (initialValues) {
+                // For update form, field is optional
+                if (value === undefined || value === null || value === "") {
+                  return undefined;
+                }
+              }
+              try {
+                createGameInputSchema.shape.description.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div>
+              <Label htmlFor={field.name}>Description</Label>
+              <Textarea
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(e.target.value)
+                }
+                className="mt-1"
+              />
+              {field.state.meta.errors?.length > 0 && (
+                <p className="text-destructive mt-1 text-sm">
+                  {field.state.meta.errors
+                    .map((error) =>
+                      typeof error === "string"
+                        ? error
+                        : "Please add a game session description that sets the tone for what players should expect.",
+                    )
+                    .join(", ")}
+                </p>
+              )}
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field
+          name="gameSystemId"
+          validators={{
+            onChange: ({ value }) => {
+              if (initialValues) {
+                // For update form, field is optional
+                if (value === undefined || value === null) {
+                  return undefined;
+                }
+              }
+              try {
+                createGameInputSchema.shape.gameSystemId.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div>
+              <Label htmlFor={field.name}>Game System Used</Label>
+              {isCampaignGame ? (
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {gameSystemName && gameSystemName.trim().length > 0
+                    ? gameSystemName
+                    : effectiveGameSystem?.name || ""}
+                </p>
+              ) : (
+                <GameSystemCombobox
+                  label="" // Label is already rendered above
+                  options={gameSystemOptions}
+                  placeholder="Search and select the game system you want to use"
+                  value={field.state.value?.toString() ?? ""}
+                  onValueChange={(value) => {
+                    field.handleChange(parseInt(value));
+                    // Find and store the selected game system details
+                    const selected =
+                      gameSystemSearchResults?.success && gameSystemSearchResults.data
+                        ? gameSystemSearchResults.data.find(
+                            (gs) => gs.id === parseInt(value),
+                          )
+                        : null;
+                    setSelectedGameSystem(selected || null);
+                  }}
+                  onSearchChange={setGameSystemSearchTerm}
+                  isLoading={isLoadingGameSystems}
+                  disabled={!!isCampaignGame}
+                  error={
+                    field.state.meta.errors?.filter(Boolean).map((e) => {
+                      if (typeof e === "string") {
+                        return e;
+                      } else if (e && typeof e === "object" && "message" in e) {
+                        return (e as z.ZodIssue).message;
+                      }
+                      return ""; // Fallback for unexpected types
+                    }) || []
+                  }
+                />
+              )}
+              {field.state.meta.errors?.length > 0 && (
+                <p className="text-destructive mt-1 text-sm">
+                  {field.state.meta.errors
+                    .map((error) =>
+                      typeof error === "string"
+                        ? error
+                        : "Please select a game system for your session.",
+                    )
+                    .join(", ")}
+                </p>
+              )}
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field
+          name="dateTime"
+          validators={{
+            onChange: ({ value }) => {
+              if (initialValues) {
+                // For update form, field is optional
+                if (value === undefined || value === null || value === "") {
+                  return undefined;
+                }
+              }
+              try {
+                createGameInputSchema.shape.dateTime.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => <DateTimePicker field={field} label="Date and Time" />}
+        </form.Field>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field
+            name="expectedDuration"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                }
+                try {
+                  createGameInputSchema.shape.expectedDuration.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Expected Duration (minutes)</Label>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  type="number"
+                  value={field.state.value ?? effectiveGameSystem?.averagePlayTime ?? 1}
+                  onBlur={field.handleBlur}
+                  onChange={(e) =>
+                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                  }
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Enter a game duration in minutes to let others know how much time to reserve for this.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="price"
+            validators={{
+              onChange: ({ value }) => {
+                try {
+                  // Allow undefined or valid price values (including zero)
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                  createGameInputSchema.shape.price.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Price (EUR) (optional)</Label>
+                <div className="relative mt-1">
+                  <span className="text-muted-foreground absolute inset-y-0 left-0 flex items-center pl-3">
+                    €
+                  </span>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    type="number"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) =>
+                      field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                    }
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "If you want to add a cover charge for the game, specify it here.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field
+            name="language"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null || value === "") {
+                    return undefined;
+                  }
+                }
+                try {
+                  createGameInputSchema.shape.language.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Language</Label>
+                <Select
+                  value={field.state.value as string}
+                  onValueChange={(value) => field.handleChange(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languageOptions.map((lang) => (
+                      <SelectItem key={lang.value} value={lang.value}>
+                        {lang.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Choose the language that the game system you chose will be played in.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="visibility"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                }
+                try {
+                  createGameInputSchema.shape.visibility.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Visibility</Label>
+                <Select
+                  value={field.state.value as string}
+                  onValueChange={(value: "public" | "protected" | "private") =>
+                    field.handleChange(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select visibility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {visibilityEnum.enumValues.map(
+                      (v: (typeof visibilityEnum.enumValues)[number]) => (
+                        <SelectItem key={v} value={v}>
+                          {v === "protected"
+                            ? "Connections-only"
+                            : v.charAt(0).toUpperCase() + v.slice(1)}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Pick a visibility value that allows you to find the right people efficiently.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+        <p className="text-muted-foreground text-sm">
+          Visibility options: Public (visible to everyone), Connections-only (visible to
+          your followers and the people whom you follow), Private (visible only to invited
+          players)
+        </p>
+      </FormSection>
+
+      {/* Minimum and Maximum Players */}
+      <FormSection
+        title="Participant requirements"
+        description="Optional guidelines that help players self-select into the right tables."
+        contentClassName="space-y-6"
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field
+            name="minimumRequirements.minPlayers"
+            validators={{
+              onChange: ({ value }) => {
+                // This field is optional, so undefined/null values are valid
+                if (value === undefined || value === null) {
+                  return undefined;
+                }
+                try {
+                  minimumRequirementsSchema.shape.minPlayers.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Minimum Players</Label>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  type="number"
+                  value={field.state.value ?? selectedGameSystem?.minPlayers ?? 1}
+                  onBlur={field.handleBlur}
+                  onChange={(e) =>
+                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                  }
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "We need to know how many people are expected to participate.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="minimumRequirements.maxPlayers"
+            validators={{
+              onChange: ({ value }) => {
+                // This field is optional, so undefined/null values are valid
+                if (value === undefined || value === null) {
+                  return undefined;
+                }
+                try {
+                  minimumRequirementsSchema.shape.maxPlayers.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Maximum Players</Label>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  type="number"
+                  value={field.state.value ?? selectedGameSystem?.maxPlayers ?? 1}
+                  onBlur={field.handleBlur}
+                  onChange={(e) =>
+                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                  }
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "We need to know how many people are expected to participate.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        <form.Field
+          name="minimumRequirements.languageLevel"
+          validators={{
+            onChange: ({ value }) => {
+              // This field is optional, so undefined/null values are valid
+              if (value === undefined || value === null) {
+                return undefined;
+              }
+              try {
+                minimumRequirementsSchema.shape.languageLevel.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div>
+              <Label htmlFor={field.name}>Language Level</Label>
               <Select
-                value={field.state.value as string}
-                onValueChange={(value) => field.handleChange(value)}
+                value={
+                  field.state.value === undefined || field.state.value === null
+                    ? ""
+                    : (field.state.value as LanguageLevel)
+                }
+                onValueChange={(value) => field.handleChange(value as LanguageLevel)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a language" />
+                  <SelectValue placeholder="Select a language level" />
                 </SelectTrigger>
                 <SelectContent>
-                  {languageOptions.map((lang) => (
-                    <SelectItem key={lang.value} value={lang.value}>
-                      {lang.label}
+                  {languageLevelOptions.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -523,7 +748,7 @@ export function GameForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Choose the language that the game system you chose will be played in.",
+                        : "Players should speak the game session language at least at this level to fit in.",
                     )
                     .join(", ")}
                 </p>
@@ -533,73 +758,7 @@ export function GameForm({
         </form.Field>
 
         <form.Field
-          name="visibility"
-          validators={{
-            onChange: ({ value }) => {
-              if (initialValues) {
-                // For update form, field is optional
-                if (value === undefined || value === null) {
-                  return undefined;
-                }
-              }
-              try {
-                createGameInputSchema.shape.visibility.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Visibility</Label>
-              <Select
-                value={field.state.value as string}
-                onValueChange={(value: "public" | "protected" | "private") =>
-                  field.handleChange(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select visibility" />
-                </SelectTrigger>
-                <SelectContent>
-                  {visibilityEnum.enumValues.map(
-                    (v: (typeof visibilityEnum.enumValues)[number]) => (
-                      <SelectItem key={v} value={v}>
-                        {v === "protected"
-                          ? "Connections-only"
-                          : v.charAt(0).toUpperCase() + v.slice(1)}
-                      </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Pick a visibility value that allows you to find the right people efficiently.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      </div>
-      <p className="text-muted-foreground mt-2 text-sm">
-        Visibility options: Public (visible to everyone), Connections-only (visible to
-        your followers and the people whom you follow), Private (visible only to invited
-        players)
-      </p>
-
-      {/* Minimum and Maximum Players */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <form.Field
-          name="minimumRequirements.minPlayers"
+          name="minimumRequirements.playerRadiusKm"
           validators={{
             onChange: ({ value }) => {
               // This field is optional, so undefined/null values are valid
@@ -607,7 +766,7 @@ export function GameForm({
                 return undefined;
               }
               try {
-                minimumRequirementsSchema.shape.minPlayers.parse(value);
+                minimumRequirementsSchema.shape.playerRadiusKm.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -617,25 +776,31 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Minimum Players</Label>
+              <Label htmlFor={field.name}>Player Distance Radius (km)</Label>
               <input
                 id={field.name}
                 name={field.name}
-                type="number"
-                value={field.state.value ?? selectedGameSystem?.minPlayers ?? 1}
-                onBlur={field.handleBlur}
+                type="range"
+                min="1"
+                max="10"
+                value={field.state.value ?? 5}
                 onChange={(e) =>
                   field.handleChange(e.target.value ? Number(e.target.value) : 0)
                 }
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full"
               />
+              <div className="text-muted-foreground flex justify-between text-sm">
+                <span>1 km</span>
+                <span className="text-center">Selected: {field.state.value ?? 5} km</span>
+                <span>10 km</span>
+              </div>
               {field.state.meta.errors?.length > 0 && (
                 <p className="text-destructive mt-1 text-sm">
                   {field.state.meta.errors
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "We need to know how many people are expected to participate.",
+                        : "How far should players be from the location to be able to see this game?",
                     )
                     .join(", ")}
                 </p>
@@ -643,56 +808,13 @@ export function GameForm({
             </div>
           )}
         </form.Field>
+      </FormSection>
 
-        <form.Field
-          name="minimumRequirements.maxPlayers"
-          validators={{
-            onChange: ({ value }) => {
-              // This field is optional, so undefined/null values are valid
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                minimumRequirementsSchema.shape.maxPlayers.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Maximum Players</Label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="number"
-                value={field.state.value ?? selectedGameSystem?.maxPlayers ?? 1}
-                onBlur={field.handleBlur}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
-                }
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              />
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "We need to know how many people are expected to participate.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      </div>
-
-      <fieldset className="space-y-4 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Location</legend>
+      <FormSection
+        title="Location"
+        description="Let players know where the session will take place."
+        contentClassName="space-y-4"
+      >
         <form.Field
           name="location.address"
           validators={{
@@ -789,120 +911,13 @@ export function GameForm({
             />
           )}
         </form.Field>
-      </fieldset>
+      </FormSection>
 
-      <fieldset className="space-y-2 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Minimum Requirements (Optional)</legend>
-        <form.Field
-          name="minimumRequirements.languageLevel"
-          validators={{
-            onChange: ({ value }) => {
-              // This field is optional, so undefined/null values are valid
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                minimumRequirementsSchema.shape.languageLevel.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Language Level</Label>
-              <Select
-                value={
-                  field.state.value === undefined || field.state.value === null
-                    ? ""
-                    : (field.state.value as LanguageLevel)
-                }
-                onValueChange={(value) => field.handleChange(value as LanguageLevel)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a language level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {languageLevelOptions.map((level) => (
-                    <SelectItem key={level.value} value={level.value}>
-                      {level.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Players should speak the game session language at least at this level to fit in.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-        <div className="mt-4"></div>
-        <form.Field
-          name="minimumRequirements.playerRadiusKm"
-          validators={{
-            onChange: ({ value }) => {
-              // This field is optional, so undefined/null values are valid
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                minimumRequirementsSchema.shape.playerRadiusKm.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Player Distance Radius (km)</Label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="range"
-                min="1"
-                max="10"
-                value={field.state.value ?? 5}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
-                }
-                className="w-full"
-              />
-              <div className="text-muted-foreground flex justify-between text-sm">
-                <span>1 km</span>
-                <span className="text-center">Selected: {field.state.value ?? 5} km</span>
-                <span>10 km</span>
-              </div>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "How far should players be from the location to be able to see this game?",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      </fieldset>
-
-      <fieldset className="space-y-3 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Safety Rules (Optional)</legend>
-        {/* This is a simple example, a more robust solution would involve dynamic fields */}
+      <FormSection
+        title="Safety & table culture"
+        description="Optional expectations that set the tone for how you'll play together."
+        contentClassName="space-y-4"
+      >
         <form.Field
           name="safetyRules.no-alcohol"
           validators={{
@@ -1089,9 +1104,9 @@ export function GameForm({
             </div>
           )}
         </form.Field>
-      </fieldset>
+      </FormSection>
 
-      <div className="flex justify-end gap-4">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         {onCancelEdit ? (
           <Button variant="outline" onClick={onCancelEdit}>
             Cancel

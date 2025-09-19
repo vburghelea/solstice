@@ -30,6 +30,7 @@ import {
   languageOptions,
 } from "~/shared/types/common";
 import { Checkbox } from "~/shared/ui/checkbox";
+import { FormSection } from "~/shared/ui/form-section";
 import { Label } from "~/shared/ui/label";
 import {
   Select,
@@ -154,191 +155,28 @@ export function CampaignForm({
         e.stopPropagation();
         await form.handleSubmit();
       }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      <form.Field
-        name="name"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null || value === "") {
-                return undefined;
-              }
-            }
-            try {
-              const schema = initialValues
-                ? updateCampaignInputSchema
-                : createCampaignInputSchema;
-              schema.shape.name.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
+      <FormSection
+        title="Campaign overview"
+        description="Share the essentials players need to understand your ongoing story."
+        contentClassName="space-y-6"
       >
-        {(field) => (
-          <div>
-            <Label htmlFor={field.name}>Campaign Name</Label>
-            <input
-              id={field.name}
-              name={field.name}
-              type="text"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Enter a compelling name for your planned campaign"
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            {field.state.meta.errors?.length > 0 && (
-              <p className="text-destructive mt-1 text-sm">
-                {field.state.meta.errors
-                  .map((error) =>
-                    typeof error === "string"
-                      ? error
-                      : "The campaign name is what most players see first when looking for adventure, make sure it's compelling.",
-                  )
-                  .join(", ")}
-              </p>
-            )}
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field
-        name="description"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null || value === "") {
-                return undefined;
-              }
-            }
-            try {
-              createCampaignInputSchema.shape.description.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
-      >
-        {(field) => (
-          <div>
-            <Label htmlFor={field.name}>Description</Label>
-            <Textarea
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                field.handleChange(e.target.value)
-              }
-              className="mt-1"
-            />
-            {field.state.meta.errors?.length > 0 && (
-              <p className="text-destructive mt-1 text-sm">
-                {field.state.meta.errors
-                  .map((error) =>
-                    typeof error === "string"
-                      ? error
-                      : "Please add a campaign description that sets the tone for what players should expect.",
-                  )
-                  .join(", ")}
-              </p>
-            )}
-          </div>
-        )}
-      </form.Field>
-
-      <form.Field
-        name="gameSystemId"
-        validators={{
-          onChange: ({ value }) => {
-            if (initialValues) {
-              // For update form, field is optional
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-            }
-            try {
-              createCampaignInputSchema.shape.gameSystemId.parse(value);
-              return undefined;
-            } catch (error: unknown) {
-              return (error as z.ZodError).errors[0]?.message;
-            }
-          },
-        }}
-      >
-        {(field) => (
-          <div>
-            <Label htmlFor={field.name}>Game System Used</Label>
-            {isGameSystemReadOnly ? (
-              <p className="text-muted-foreground mt-1 text-sm">{gameSystemName}</p>
-            ) : (
-              <GameSystemCombobox
-                label="" // Label is already rendered above
-                options={gameSystemOptions}
-                placeholder="Search and select the game system you want to use"
-                value={field.state.value?.toString() ?? ""}
-                onValueChange={(value) => {
-                  const parsedValue = parseInt(value);
-                  field.handleChange(isNaN(parsedValue) ? undefined : parsedValue);
-                  // Find and store the selected game system details
-                  const selectedId = isNaN(parsedValue) ? undefined : parsedValue;
-                  const selected =
-                    gameSystemSearchResults?.success &&
-                    gameSystemSearchResults.data &&
-                    selectedId !== undefined
-                      ? gameSystemSearchResults.data.find((gs) => gs.id === selectedId)
-                      : null;
-                  setSelectedGameSystem(selected || null);
-                }}
-                onSearchChange={setGameSystemSearchTerm}
-                isLoading={isLoadingGameSystems}
-                error={
-                  field.state.meta.errors?.filter(Boolean).map((e) => {
-                    if (typeof e === "string") {
-                      return e;
-                    } else if (e && typeof e === "object" && "message" in e) {
-                      return (e as z.ZodIssue).message;
-                    }
-                    return ""; // Fallback for unexpected types
-                  }) || []
-                }
-                data-testid="game-system-combobox"
-              />
-            )}
-            {field.state.meta.errors?.length > 0 && (
-              <p className="text-destructive mt-1 text-sm">
-                {field.state.meta.errors
-                  .map((error) =>
-                    typeof error === "string"
-                      ? error
-                      : "Please select a game system for your campaign.",
-                  )
-                  .join(", ")}
-              </p>
-            )}
-          </div>
-        )}
-      </form.Field>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <form.Field
-          name="recurrence"
+          name="name"
           validators={{
             onChange: ({ value }) => {
               if (initialValues) {
                 // For update form, field is optional
-                if (value === undefined || value === null) {
+                if (value === undefined || value === null || value === "") {
                   return undefined;
                 }
               }
               try {
-                createCampaignInputSchema.shape.recurrence.parse(value);
+                const schema = initialValues
+                  ? updateCampaignInputSchema
+                  : createCampaignInputSchema;
+                schema.shape.name.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -348,61 +186,7 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Recurrence</Label>
-              <Select
-                value={field.state.value as string}
-                onValueChange={(value: "weekly" | "bi-weekly" | "monthly") =>
-                  field.handleChange(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select recurrence" />
-                </SelectTrigger>
-                <SelectContent>
-                  {campaignRecurrenceEnum.enumValues.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Choose the recurrence for your campaign.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-
-        <form.Field
-          name="timeOfDay"
-          validators={{
-            onChange: ({ value }) => {
-              if (initialValues) {
-                // For update form, field is optional
-                if (value === undefined || value === null) {
-                  return undefined;
-                }
-              }
-              try {
-                createCampaignInputSchema.shape.timeOfDay.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Time of Day</Label>
+              <Label htmlFor={field.name}>Campaign Name</Label>
               <input
                 id={field.name}
                 name={field.name}
@@ -410,7 +194,7 @@ export function CampaignForm({
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="e.g., Evenings, Afternoons"
+                placeholder="Enter a compelling name for your planned campaign"
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {field.state.meta.errors?.length > 0 && (
@@ -419,7 +203,7 @@ export function CampaignForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Specify the general time of day for your campaign sessions.",
+                        : "The campaign name is what most players see first when looking for adventure, make sure it's compelling.",
                     )
                     .join(", ")}
                 </p>
@@ -427,11 +211,56 @@ export function CampaignForm({
             </div>
           )}
         </form.Field>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <form.Field
-          name="sessionDuration"
+          name="description"
+          validators={{
+            onChange: ({ value }) => {
+              if (initialValues) {
+                // For update form, field is optional
+                if (value === undefined || value === null || value === "") {
+                  return undefined;
+                }
+              }
+              try {
+                createCampaignInputSchema.shape.description.parse(value);
+                return undefined;
+              } catch (error: unknown) {
+                return (error as z.ZodError).errors[0]?.message;
+              }
+            },
+          }}
+        >
+          {(field) => (
+            <div>
+              <Label htmlFor={field.name}>Description</Label>
+              <Textarea
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(e.target.value)
+                }
+                className="mt-1"
+              />
+              {field.state.meta.errors?.length > 0 && (
+                <p className="text-destructive mt-1 text-sm">
+                  {field.state.meta.errors
+                    .map((error) =>
+                      typeof error === "string"
+                        ? error
+                        : "Please add a campaign description that sets the tone for what players should expect.",
+                    )
+                    .join(", ")}
+                </p>
+              )}
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field
+          name="gameSystemId"
           validators={{
             onChange: ({ value }) => {
               if (initialValues) {
@@ -441,7 +270,7 @@ export function CampaignForm({
                 }
               }
               try {
-                createCampaignInputSchema.shape.sessionDuration.parse(value);
+                createCampaignInputSchema.shape.gameSystemId.parse(value);
                 return undefined;
               } catch (error: unknown) {
                 return (error as z.ZodError).errors[0]?.message;
@@ -451,30 +280,50 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Session Duration (minutes)</Label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="number"
-                value={
-                  field.state.value
-                    ? field.state.value
-                    : (selectedGameSystem?.averagePlayTime ?? "")
-                }
-                onBlur={field.handleBlur}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : undefined)
-                }
-                placeholder="e.g., 180, 240"
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              />
+              <Label htmlFor={field.name}>Game System Used</Label>
+              {isGameSystemReadOnly ? (
+                <p className="text-muted-foreground mt-1 text-sm">{gameSystemName}</p>
+              ) : (
+                <GameSystemCombobox
+                  label="" // Label is already rendered above
+                  options={gameSystemOptions}
+                  placeholder="Search and select the game system you want to use"
+                  value={field.state.value?.toString() ?? ""}
+                  onValueChange={(value) => {
+                    const parsedValue = parseInt(value);
+                    field.handleChange(isNaN(parsedValue) ? undefined : parsedValue);
+                    // Find and store the selected game system details
+                    const selectedId = isNaN(parsedValue) ? undefined : parsedValue;
+                    const selected =
+                      gameSystemSearchResults?.success &&
+                      gameSystemSearchResults.data &&
+                      selectedId !== undefined
+                        ? gameSystemSearchResults.data.find((gs) => gs.id === selectedId)
+                        : null;
+                    setSelectedGameSystem(selected || null);
+                  }}
+                  onSearchChange={setGameSystemSearchTerm}
+                  isLoading={isLoadingGameSystems}
+                  error={
+                    field.state.meta.errors?.filter(Boolean).map((e) => {
+                      if (typeof e === "string") {
+                        return e;
+                      } else if (e && typeof e === "object" && "message" in e) {
+                        return (e as z.ZodIssue).message;
+                      }
+                      return ""; // Fallback for unexpected types
+                    }) || []
+                  }
+                  data-testid="game-system-combobox"
+                />
+              )}
               {field.state.meta.errors?.length > 0 && (
                 <p className="text-destructive mt-1 text-sm">
                   {field.state.meta.errors
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Specify the typical duration of a single session within the campaign.",
+                        : "Please select a game system for your campaign.",
                     )
                     .join(", ")}
                 </p>
@@ -483,179 +332,342 @@ export function CampaignForm({
           )}
         </form.Field>
 
-        <form.Field
-          name="pricePerSession"
-          validators={{
-            onChange: ({ value }) => {
-              try {
-                // Allow undefined or valid pricePerSession values (including zero)
-                if (value === undefined || value === null) {
-                  return undefined;
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field
+            name="recurrence"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
                 }
-                createCampaignInputSchema.shape.pricePerSession.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Price per session (EUR) (optional)</Label>
-              <div className="relative mt-1">
-                <span className="text-muted-foreground absolute inset-y-0 left-0 flex items-center pl-3">
-                  €
-                </span>
+                try {
+                  createCampaignInputSchema.shape.recurrence.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Recurrence</Label>
+                <Select
+                  value={field.state.value as string}
+                  onValueChange={(value: "weekly" | "bi-weekly" | "monthly") =>
+                    field.handleChange(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select recurrence" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campaignRecurrenceEnum.enumValues.map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v.charAt(0).toUpperCase() + v.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Choose the recurrence for your campaign.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="timeOfDay"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                }
+                try {
+                  createCampaignInputSchema.shape.timeOfDay.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Time of Day</Label>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  type="text"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="e.g., Evenings, Afternoons"
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Specify the general time of day for your campaign sessions.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field
+            name="sessionDuration"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                }
+                try {
+                  createCampaignInputSchema.shape.sessionDuration.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Session Duration (minutes)</Label>
                 <input
                   id={field.name}
                   name={field.name}
                   type="number"
-                  value={field.state.value ?? ""}
+                  value={
+                    field.state.value
+                      ? field.state.value
+                      : (selectedGameSystem?.averagePlayTime ?? "")
+                  }
                   onBlur={field.handleBlur}
                   onChange={(e) =>
                     field.handleChange(
                       e.target.value ? Number(e.target.value) : undefined,
                     )
                   }
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder="e.g., 180, 240"
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Specify the typical duration of a single session within the campaign.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
               </div>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "If you want to add a cover charge for the campaign session, specify it here.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      </div>
+            )}
+          </form.Field>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <form.Field
-          name="language"
-          validators={{
-            onChange: ({ value }) => {
-              if (initialValues) {
-                // For update form, field is optional
-                if (value === undefined || value === null) {
+          <form.Field
+            name="pricePerSession"
+            validators={{
+              onChange: ({ value }) => {
+                try {
+                  // Allow undefined or valid pricePerSession values (including zero)
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                  createCampaignInputSchema.shape.pricePerSession.parse(value);
                   return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
                 }
-              }
-              try {
-                createCampaignInputSchema.shape.language.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Language</Label>
-              <Select
-                value={field.state.value ?? ""}
-                onValueChange={(value) => field.handleChange(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {languageOptions.map((lang) => (
-                    <SelectItem key={lang.value} value={lang.value}>
-                      {lang.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Choose the primary language for communication within the campaign.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Price per session (EUR) (optional)</Label>
+                <div className="relative mt-1">
+                  <span className="text-muted-foreground absolute inset-y-0 left-0 flex items-center pl-3">
+                    €
+                  </span>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    type="number"
+                    value={field.state.value ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) =>
+                      field.handleChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "If you want to add a cover charge for the campaign session, specify it here.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
 
-        <form.Field
-          name="visibility"
-          validators={{
-            onChange: ({ value }) => {
-              if (initialValues) {
-                // For update form, field is optional
-                if (value === undefined || value === null) {
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field
+            name="language"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                }
+                try {
+                  createCampaignInputSchema.shape.language.parse(value);
                   return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
                 }
-              }
-              try {
-                createCampaignInputSchema.shape.visibility.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Visibility</Label>
-              <Select
-                value={field.state.value as string}
-                onValueChange={(value: "public" | "protected" | "private") =>
-                  field.handleChange(value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select visibility" />
-                </SelectTrigger>
-                <SelectContent>
-                  {visibilityEnum.enumValues.map(
-                    (v: (typeof visibilityEnum.enumValues)[number]) => (
-                      <SelectItem key={v} value={v}>
-                        {v === "protected"
-                          ? "Connections-only"
-                          : v.charAt(0).toUpperCase() + v.slice(1)}
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Language</Label>
+                <Select
+                  value={field.state.value ?? ""}
+                  onValueChange={(value) => field.handleChange(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languageOptions.map((lang) => (
+                      <SelectItem key={lang.value} value={lang.value}>
+                        {lang.label}
                       </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Pick a visibility value that allows you to find the right people efficiently.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Choose the primary language for communication within the campaign.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field
+            name="visibility"
+            validators={{
+              onChange: ({ value }) => {
+                if (initialValues) {
+                  // For update form, field is optional
+                  if (value === undefined || value === null) {
+                    return undefined;
+                  }
+                }
+                try {
+                  createCampaignInputSchema.shape.visibility.parse(value);
+                  return undefined;
+                } catch (error: unknown) {
+                  return (error as z.ZodError).errors[0]?.message;
+                }
+              },
+            }}
+          >
+            {(field) => (
+              <div>
+                <Label htmlFor={field.name}>Visibility</Label>
+                <Select
+                  value={field.state.value as string}
+                  onValueChange={(value: "public" | "protected" | "private") =>
+                    field.handleChange(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select visibility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {visibilityEnum.enumValues.map(
+                      (v: (typeof visibilityEnum.enumValues)[number]) => (
+                        <SelectItem key={v} value={v}>
+                          {v === "protected"
+                            ? "Connections-only"
+                            : v.charAt(0).toUpperCase() + v.slice(1)}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors?.length > 0 && (
+                  <p className="text-destructive mt-1 text-sm">
+                    {field.state.meta.errors
+                      .map((error) =>
+                        typeof error === "string"
+                          ? error
+                          : "Pick a visibility value that allows you to find the right people efficiently.",
+                      )
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+      </FormSection>
       <p className="text-muted-foreground mt-2 text-sm">
         Visibility options: Public (visible to everyone), Connections-only (visible to
         your followers and the people whom you follow), Private (visible only to invited
         players)
       </p>
 
-      <fieldset className="space-y-4 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Location</legend>
+      <FormSection
+        title="Location"
+        description="Let players know where your group will gather."
+        contentClassName="space-y-4"
+      >
         <form.Field
           name="location.address"
           validators={{
@@ -756,10 +768,13 @@ export function CampaignForm({
             />
           )}
         </form.Field>
-      </fieldset>
+      </FormSection>
 
-      <fieldset className="space-y-2 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Minimum Requirements (Optional)</legend>
+      <FormSection
+        title="Participant requirements"
+        description="Optional guidelines that help players gauge whether the campaign is a fit."
+        contentClassName="space-y-6"
+      >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <form.Field
             name="minimumRequirements.minPlayers"
@@ -905,7 +920,6 @@ export function CampaignForm({
             </div>
           )}
         </form.Field>
-        <div className="mt-4"></div>
         <form.Field
           name="minimumRequirements.playerRadiusKm"
           validators={{
@@ -956,10 +970,13 @@ export function CampaignForm({
             </div>
           )}
         </form.Field>
-      </fieldset>
+      </FormSection>
 
-      <fieldset className="space-y-3 rounded-md border p-4">
-        <legend className="text-lg font-semibold">Safety Rules (Optional)</legend>
+      <FormSection
+        title="Safety & table culture"
+        description="Optional expectations to set the tone for how you'll play together."
+        contentClassName="space-y-4"
+      >
         <form.Field
           name="safetyRules.no-alcohol"
           validators={{
@@ -1146,9 +1163,9 @@ export function CampaignForm({
             </div>
           )}
         </form.Field>
-      </fieldset>
+      </FormSection>
 
-      <div className="flex justify-end gap-4">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         {onCancelEdit ? (
           <Button variant="outline" onClick={onCancelEdit}>
             Cancel

@@ -3,16 +3,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { useState } from "react";
+import { createCampaign } from "~/features/campaigns/campaigns.mutations";
+import { createCampaignInputSchema } from "~/features/campaigns/campaigns.schemas";
+import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card";
-import { createCampaign } from "~/features/campaigns/campaigns.mutations";
-import { createCampaignInputSchema } from "~/features/campaigns/campaigns.schemas";
-import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
+} from "~/shared/ui/card";
 
 export const Route = createFileRoute("/dashboard/campaigns/create")({
   component: CreateCampaignPage,
@@ -40,7 +40,7 @@ export function CreateCampaignPage() {
     <div className="container mx-auto max-w-2xl p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-gray-900">Create a New Campaign</CardTitle>
+          <CardTitle className="text-foreground">Create a New Campaign</CardTitle>
           <CardDescription>
             Set up your campaign and start inviting players
           </CardDescription>

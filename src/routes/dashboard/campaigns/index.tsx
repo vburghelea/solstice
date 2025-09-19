@@ -74,7 +74,7 @@ export function CampaignsPage() {
     <div className="container mx-auto p-4 sm:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">My Campaigns</h1>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Campaigns</h1>
           <p className="text-muted-foreground">Manage your campaign sessions</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
@@ -88,7 +88,7 @@ export function CampaignsPage() {
               });
             }}
           >
-            <SelectTrigger className="w-[160px] border border-gray-300 bg-white text-gray-900 sm:w-[180px]">
+            <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -133,16 +133,16 @@ export function CampaignsPage() {
                 <List.Item key={c.id} className="group">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-base font-semibold text-gray-900">
+                      <div className="text-foreground truncate text-base font-semibold">
                         {c.name}
                       </div>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
+                      <div className="text-muted-foreground mt-1 flex items-center gap-3 text-xs">
                         <span className="inline-flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" /> {c.recurrence}
                         </span>
                         <span className="truncate">{c.gameSystem.name}</span>
                       </div>
-                      <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                      <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
                         <Users className="h-3.5 w-3.5" /> {c.participantCount}{" "}
                         participants
                       </div>

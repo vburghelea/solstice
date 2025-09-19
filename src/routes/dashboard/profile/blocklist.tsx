@@ -44,7 +44,7 @@ function BlocklistPage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-foreground text-3xl font-bold tracking-tight">
           {strings.social.blocklist.title}
         </h1>
         <p className="text-muted-foreground mt-2">{strings.social.blocklist.subtitle}</p>

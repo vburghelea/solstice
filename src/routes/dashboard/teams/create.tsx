@@ -97,7 +97,7 @@ function CreateTeamPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-gray-900">Create a New Team</CardTitle>
+          <CardTitle className="text-foreground">Create a New Team</CardTitle>
           <CardDescription>
             Set up your team profile and start inviting members
           </CardDescription>

@@ -9,7 +9,7 @@ function MyProfilePage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">My Profile</h1>
+        <h1 className="text-foreground text-3xl font-bold tracking-tight">My Profile</h1>
         <p className="text-muted-foreground mt-2">
           View and manage your personal information, preferences, security settings, and
           linked accounts.

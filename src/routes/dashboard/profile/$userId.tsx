@@ -492,12 +492,9 @@ export function UserProfileComponent() {
                       <h5 className="font-medium">Favorite:</h5>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {profile.gameSystemPreferences.favorite.map((game) => (
-                          <span
-                            key={game.id}
-                            className="rounded-md bg-green-100 px-2 py-1 text-sm text-green-800"
-                          >
+                          <Badge key={game.id} variant="secondary" className="text-xs">
                             {game.name}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     </div>
@@ -507,12 +504,9 @@ export function UserProfileComponent() {
                       <h5 className="font-medium">Avoid:</h5>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {profile.gameSystemPreferences.avoid.map((game) => (
-                          <span
-                            key={game.id}
-                            className="rounded-md bg-red-100 px-2 py-1 text-sm text-red-800"
-                          >
+                          <Badge key={game.id} variant="destructive" className="text-xs">
                             {game.name}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     </div>

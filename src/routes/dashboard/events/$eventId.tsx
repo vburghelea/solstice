@@ -82,10 +82,10 @@ function DashboardEventDetailPage() {
     <div className="container mx-auto space-y-6 p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-gray-900">{event.name}</CardTitle>
+          <CardTitle className="text-foreground">{event.name}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-muted-foreground text-sm">
             <p>
               Dates: {new Date(event.startDate).toLocaleDateString()} —{" "}
               {new Date(event.endDate).toLocaleDateString()}
@@ -124,7 +124,7 @@ function DashboardEventDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-gray-900">Registrations</CardTitle>
+          <CardTitle className="text-foreground">Registrations</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {registrations.length === 0 ? (
@@ -137,14 +137,16 @@ function DashboardEventDetailPage() {
                   className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-foreground text-sm font-medium">
                       {r.team ? r.team.name : r.user.name}
                       <span className="text-muted-foreground ml-2 font-normal">
                         {r.registrationType} • {r.status}
                         {r.division ? ` • ${r.division}` : ""}
                       </span>
                     </div>
-                    <div className="truncate text-xs text-gray-600">{r.user.email}</div>
+                    <div className="text-muted-foreground truncate text-xs">
+                      {r.user.email}
+                    </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button

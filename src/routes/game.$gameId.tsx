@@ -125,7 +125,7 @@ function GameDetailPage() {
 
         {/* Description card */}
         {gameDetails.description ? (
-          <div className="mb-4 rounded-lg bg-white p-4 text-gray-800 shadow-sm">
+          <div className="bg-card text-foreground mb-4 rounded-lg p-4 shadow-sm">
             <p className="text-base leading-relaxed">{gameDetails.description}</p>
           </div>
         ) : null}
@@ -134,13 +134,13 @@ function GameDetailPage() {
         <div className="space-y-3">
           <details
             id="general"
-            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+            className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
             open
           >
-            <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+            <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
               General
             </summary>
-            <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
+            <div className="text-foreground grid gap-4 px-4 pt-2 pb-4 md:grid-cols-2">
               <div>
                 <p className="font-semibold">Date & Time</p>
                 <p>{formatDateAndTime(gameDetails.dateTime)}</p>
@@ -170,24 +170,24 @@ function GameDetailPage() {
 
           <details
             id="location"
-            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+            className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
           >
-            <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+            <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
               Location
             </summary>
-            <div className="px-4 pt-2 pb-4 text-gray-900">
+            <div className="text-foreground px-4 pt-2 pb-4">
               <p>{gameDetails.location.address}</p>
             </div>
           </details>
 
           <details
             id="requirements"
-            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+            className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
           >
-            <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+            <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
               Minimum Requirements
             </summary>
-            <div className="grid gap-4 px-4 pt-2 pb-4 text-gray-900 md:grid-cols-2">
+            <div className="text-foreground grid gap-4 px-4 pt-2 pb-4 md:grid-cols-2">
               <div>
                 <p className="font-semibold">Players</p>
                 <p>
@@ -204,12 +204,12 @@ function GameDetailPage() {
 
           <details
             id="safety"
-            className="scroll-mt-24 rounded-lg border bg-white open:shadow-sm"
+            className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
           >
-            <summary className="cursor-pointer px-4 py-3 font-medium text-gray-900 select-none">
+            <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
               Safety Rules
             </summary>
-            <div className="px-4 pt-2 pb-4 text-gray-900">
+            <div className="text-foreground px-4 pt-2 pb-4">
               <SafetyRulesView safetyRules={gameDetails.safetyRules} />
             </div>
           </details>

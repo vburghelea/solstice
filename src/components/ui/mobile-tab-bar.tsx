@@ -57,9 +57,11 @@ export function MobileTabBar() {
   return (
     <nav
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 lg:hidden",
+        "border-border bg-background/95 supports-[backdrop-filter]:bg-background/75 fixed inset-x-0 bottom-0 z-40 border-t shadow-lg backdrop-blur lg:hidden",
       )}
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{
+        paddingBottom: "calc(var(--admin-mobile-safe-area, env(safe-area-inset-bottom)))",
+      }}
       aria-label="Primary"
     >
       <ul className="flex items-stretch justify-between">
@@ -68,7 +70,7 @@ export function MobileTabBar() {
             <Link
               to={to}
               className={cn(
-                "flex h-14 flex-col items-center justify-center gap-1 text-xs text-gray-600",
+                "text-muted-foreground flex h-[var(--admin-mobile-nav-height,3.5rem)] flex-col items-center justify-center gap-1 text-xs font-medium",
                 "data-[status=active]:text-primary",
               )}
               activeProps={{

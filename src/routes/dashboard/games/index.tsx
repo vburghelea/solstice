@@ -17,9 +17,22 @@ import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGamesWithCount } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
+import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
-import { List } from "~/shared/ui/list";
+
+function getStatusBadgeVariant(status: GameListItem["status"]) {
+  switch (status) {
+    case "completed":
+      return "default" as const;
+    case "canceled":
+      return "destructive" as const;
+    case "scheduled":
+    default:
+      return "secondary" as const;
+  }
+}
 
 export const Route = createFileRoute("/dashboard/games/")({
   component: GamesPage,
@@ -170,7 +183,7 @@ export function GamesPage() {
     <div className="container mx-auto p-4 sm:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">My Games</h1>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Games</h1>
           <p className="text-muted-foreground">Manage your game sessions</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
@@ -182,7 +195,7 @@ export function GamesPage() {
               });
             }}
           >
-            <SelectTrigger className="w-[160px] border border-gray-300 bg-white text-gray-900 sm:w-[180px]">
+            <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -222,53 +235,64 @@ export function GamesPage() {
         <>
           {/* Mobile list */}
           <div className="md:hidden">
-            <List>
+            <ul className="space-y-3">
               {games.map((g: GameListItem) => {
                 const formattedDateTime = formatDateAndTime(g.dateTime);
-                const statusBadgeClass =
-                  g.status === "scheduled"
-                    ? "bg-blue-50 text-blue-700 border-blue-200"
-                    : g.status === "completed"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-red-50 text-red-700 border-red-200";
                 return (
-                  <List.Item key={g.id} className="group">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize ${statusBadgeClass}`}
-                          >
-                            {g.status}
+                  <li key={g.id}>
+                    <article
+                      className={cn(
+                        "bg-card text-card-foreground border-border rounded-xl border p-4 shadow-sm transition-shadow hover:shadow-md",
+                        "focus-within:ring-ring/70 focus-within:ring-offset-background focus-within:ring-2 focus-within:ring-offset-2 focus-within:outline-none",
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge
+                              variant={getStatusBadgeVariant(g.status)}
+                              className="px-2 py-0 text-[11px] capitalize"
+                            >
+                              {g.status}
+                            </Badge>
+                            <h3 className="truncate text-base leading-6 font-semibold">
+                              {g.name}
+                            </h3>
                           </div>
-                          <div className="truncate text-base font-semibold text-gray-900">
-                            {g.name}
+                          <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                            <span className="inline-flex items-center gap-1">
+                              <Calendar
+                                className="h-3.5 w-3.5 flex-shrink-0"
+                                aria-hidden
+                              />
+                              <span className="truncate">{formattedDateTime}</span>
+                            </span>
+                            <span className="inline-flex min-w-0 items-center gap-1">
+                              <span className="truncate">
+                                {g.gameSystem?.name || "N/A"}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                            <Users className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
+                            <span>
+                              {g.participantCount} participant
+                              {g.participantCount === 1 ? "" : "s"}
+                            </span>
                           </div>
                         </div>
-                        <div className="mt-1 flex items-center gap-3 text-xs text-gray-600">
-                          <span className="inline-flex items-center gap-1">
-                            <Calendar className="h-3.5 w-3.5" /> {formattedDateTime}
-                          </span>
-                          <span className="truncate">{g.gameSystem?.name || "N/A"}</span>
-                        </div>
-                        <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                          <Users className="h-3.5 w-3.5" /> {g.participantCount}{" "}
-                          participants
-                        </div>
+                        <Button asChild variant="outline" size="sm" className="shrink-0">
+                          <Link to="/dashboard/games/$gameId" params={{ gameId: g.id }}>
+                            View
+                            <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
+                          </Link>
+                        </Button>
                       </div>
-                      <Link
-                        to="/dashboard/games/$gameId"
-                        params={{ gameId: g.id }}
-                        className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
-                      >
-                        View
-                        <ChevronRight className="h-4 w-4" />
-                      </Link>
-                    </div>
-                  </List.Item>
+                    </article>
+                  </li>
                 );
               })}
-            </List>
+            </ul>
           </div>
 
           {/* Desktop grid */}

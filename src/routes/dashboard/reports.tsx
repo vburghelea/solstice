@@ -15,7 +15,7 @@ export const Route = createFileRoute("/dashboard/reports")({
 function ReportsPage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">Reports</h1>
+      <h1 className="text-foreground text-3xl font-bold tracking-tight">Reports</h1>
 
       <Suspense
         fallback={

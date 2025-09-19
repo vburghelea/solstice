@@ -2,36 +2,31 @@
 
 ## Test Date: 2025-09-19
 
-## ⚠️ Test Status: Pending Deployment
+## ✅ Test Status: Production Verified
 
-The callback + membership activation flow now passes locally, but the hosted Netlify build has not
-been updated yet. Live tests still reflect the pre-fix behaviour (payment session completes without
-activating the membership).
+The Netlify deployment dated 2025‑09‑19 now completes the full Square sandbox flow end‑to‑end.
 
-## Local Validation
+## Test Summary (Production)
+
+- **Site**: https://snazzy-twilight-39e1e9.netlify.app
+- **Checkout ID**: `LUJO45SIIB655EEP`
+- **Payment ID**: `Hd3J4zVKfMdLXNXalzSO94b6upOZY`
+- **Metadata**: redirect received `membership_id=qibe9dnckx7juwbn4pzl7vj3`
+- **Result**: Dashboard shows “Active Membership” and “Current Plan” is disabled; receipt email sent
+  once.
+
+## Validation Steps
+
+1. Triggered sandbox payment via Square testing panel (`Test Payment` button)
+2. Callback redirected to `/dashboard/membership?success=true&payment_id=...&session=...`
+3. Verified membership session stored with `status=completed`, linked membership id, payment id
+4. Confirmed UI reflects active membership state after redirect
+
+## Local Safeguards
 
 - `pnpm lint`
 - `pnpm check-types`
-- Manual callback simulation against the updated code confirms that:
-  - Square payment verification succeeds and writes `square_payment_id`
-  - `finalizeMembershipForSession` creates the membership + links the payment session
-  - The callback redirects with `success=true&payment_id=<id>&session=<checkout>`
-
-## Remote Sandbox Check (current production build)
-
-- Site: https://snazzy-twilight-39e1e9.netlify.app
-- Membership: Annual Player Membership 2025 ($45.00 CAD)
-- Checkout + Square payment succeed (order id `HfMIffMHq40kCXQZph5dStNTXd4F`)
-- Callback currently returns with `success="true"` (quoted) and the membership remains inactive
-  because the site is still running the old build.
-
-## Next Steps Once Deployed
-
-1. Re-run the purchase flow on Netlify.
-2. Confirm the redirect URL looks like
-   `...?success=true&payment_id=...&session=...&type=annual-player-2025`.
-3. Verify the dashboard shows "Active Membership" and the receipt email is delivered once.
-4. Confirm `membership_payment_sessions.metadata` now contains `membershipId`.
+- Manual callback simulation to ensure URL parsing still works when query values are JSON encoded
 
 ## Test Environment
 

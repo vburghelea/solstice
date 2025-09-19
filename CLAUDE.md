@@ -27,6 +27,19 @@ export const myServerFn = createServerFn({ method: "POST" })
 - Create proper type definitions
 - See [TanStack Start Best Practices](./docs/TANSTACK-START-BEST-PRACTICES.md) for details
 
+### Square Payments Checklist
+
+- Use `~/features/membership/membership.finalize.ts` whenever a Square payment session should create or
+  reuse a membership. This helper ensures membership + payment session updates happen in a single
+  transaction and stays idempotent.
+- Client redirects expect plain query params (`success=true`, `payment_id=<id>`, `session=<checkout>`).
+  The React hook `usePaymentReturn` already handles JSON-encoded values produced by TanStack.
+- The Square callback (`src/routes/api/payments/square/callback.ts`) is the source of truth: it verifies
+  the payment, writes metadata, finalizes memberships, and sends the receipt email once. Avoid adding
+  duplicate email logic elsewhere.
+- Production verification (2025‑09‑19): checkout `LUJO45SIIB655EEP`, payment `Hd3J4zVKfMdLXNXalzSO94b6upOZY`.
+  Use this as a baseline when debugging future regressions.
+
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173, default to use)

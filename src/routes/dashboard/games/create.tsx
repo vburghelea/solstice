@@ -3,13 +3,6 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 import { ArrowLeftIcon } from "~/components/ui/icons";
 import {
   Select,
@@ -32,6 +25,13 @@ import {
 } from "~/features/games/games.schemas";
 import type { GameWithDetails } from "~/features/games/games.types";
 import type { OperationResult } from "~/shared/types/common";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/shared/ui/card";
 
 const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),
@@ -155,7 +155,7 @@ export function CreateGamePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-gray-900">Create a New Game</CardTitle>
+          <CardTitle className="text-foreground">Create a New Game</CardTitle>
           <CardDescription>
             Set up your game session and start inviting players
           </CardDescription>

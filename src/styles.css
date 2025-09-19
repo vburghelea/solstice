@@ -194,10 +194,10 @@
 
   /* Admin Sidebar Navigation */
   .nav-item {
-    @apply flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100;
+    @apply text-muted-foreground hover:bg-muted focus-visible:ring-ring focus-visible:ring-offset-background flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
   }
 
   .nav-item-active {
-    @apply bg-admin-secondary text-admin-primary flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-semibold;
+    @apply text-secondary-foreground bg-secondary flex items-center gap-3 rounded-md px-4 py-2.5 text-sm font-semibold;
   }
 }

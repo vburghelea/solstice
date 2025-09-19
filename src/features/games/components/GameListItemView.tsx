@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Calendar, ChevronRight, MapPin, Sparkles, Users } from "lucide-react";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { Button } from "~/shared/ui/button";
 import { List } from "~/shared/ui/list";
 
 interface GameListItemViewProps {
@@ -13,48 +14,63 @@ export function GameListItemView({ game }: GameListItemViewProps) {
   const price = game.price ? `$${(game.price / 100).toFixed(2)}` : "Free";
 
   return (
-    <List.Item className="group">
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-base font-semibold text-gray-900">
-            {game.name}
+    <List.Item className="group px-4 py-4 sm:px-5 sm:py-5">
+      <article className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div>
+            <h3 className="text-foreground truncate text-base font-semibold sm:text-lg">
+              {game.name}
+            </h3>
+            {game.description ? (
+              <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                {game.description}
+              </p>
+            ) : null}
           </div>
-          {game.description ? (
-            <div className="text-muted-foreground mt-0.5 line-clamp-1 text-sm">
-              {game.description}
-            </div>
-          ) : null}
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
-            <span className="inline-flex items-center gap-1">
-              <Calendar className="h-3.5 w-3.5" /> {formattedDate}
+          <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm">
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="text-muted-foreground size-4" />
+              <span className="truncate">{formattedDate}</span>
             </span>
             {game.location?.address ? (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" /> {game.location.address}
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="text-muted-foreground size-4" />
+                <span className="truncate">{game.location.address}</span>
               </span>
             ) : null}
             {game.gameSystem?.name ? (
-              <span className="inline-flex items-center gap-1">
-                <Sparkles className="h-3.5 w-3.5" /> {game.gameSystem.name}
+              <span className="inline-flex items-center gap-1.5">
+                <Sparkles className="text-muted-foreground size-4" />
+                <span className="truncate">{game.gameSystem.name}</span>
               </span>
             ) : null}
-            <span className="inline-flex items-center gap-1">{price}</span>
+            <span className="text-foreground inline-flex items-center gap-1.5 font-medium">
+              {price}
+            </span>
             {typeof game.participantCount === "number" ? (
-              <span className="inline-flex items-center gap-1">
-                <Users className="h-3.5 w-3.5" /> {game.participantCount}
+              <span className="inline-flex items-center gap-1.5">
+                <Users className="text-muted-foreground size-4" />
+                <span>{game.participantCount}</span>
               </span>
             ) : null}
           </div>
         </div>
-        <Link
-          to="/game/$gameId"
-          params={{ gameId: game.id }}
-          className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="w-full shrink-0 gap-1.5 sm:w-auto"
         >
-          View
-          <ChevronRight className="h-4 w-4" />
-        </Link>
-      </div>
+          <Link
+            to="/game/$gameId"
+            params={{ gameId: game.id }}
+            className="flex items-center justify-center"
+          >
+            View
+            <ChevronRight className="size-4" />
+          </Link>
+        </Button>
+      </article>
     </List.Item>
   );
 }

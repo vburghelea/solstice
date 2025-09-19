@@ -27,6 +27,10 @@ type SidebarItem = {
   roles?: string[];
 };
 
+type AdminSidebarProps = {
+  onNavigate?: () => void;
+};
+
 const primarySidebarItems: SidebarItem[] = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: Swords, label: "Games", href: "/dashboard/games" },
@@ -65,7 +69,7 @@ const bottomItems = [
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ onNavigate }: AdminSidebarProps = {}) {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const context = useRouteContext({ strict: false });
@@ -104,14 +108,14 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
-      <div className="p-6">
+    <aside className="border-border bg-sidebar text-sidebar-foreground flex h-full w-full max-w-[var(--admin-sidebar-width,16rem)] flex-col border-r">
+      <div className="px-6 pt-8 pb-6">
         <Link to="/" className="transition-opacity hover:opacity-80">
-          <h1 className="text-admin-text-primary text-xl font-bold">Roundup Games</h1>
-          <p className="text-admin-text-secondary text-sm">Dashboard</p>
+          <h1 className="text-lg font-semibold">Roundup Games</h1>
+          <p className="text-muted-foreground text-sm">Dashboard</p>
         </Link>
       </div>
-      <nav className="flex-1 space-y-6 px-4 py-2">
+      <nav className="flex-1 space-y-6 px-4 py-2" aria-label="Admin navigation">
         <div className="space-y-2">
           {primaryItems.map((item) => {
             const Icon = item.icon;
@@ -125,6 +129,7 @@ export function AdminSidebar() {
                   "aria-current": "page",
                   "data-status": "active",
                 }}
+                onClick={onNavigate}
               >
                 <Icon className="pointer-events-none h-5 w-5" />
                 <span>{item.label}</span>
@@ -135,7 +140,7 @@ export function AdminSidebar() {
 
         {adminItems.length > 0 && (
           <div className="space-y-2">
-            <p className="px-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+            <p className="text-muted-foreground/80 px-2 text-xs font-semibold tracking-wide uppercase">
               Admin tools
             </p>
             {adminItems.map((item) => {
@@ -150,6 +155,7 @@ export function AdminSidebar() {
                     "aria-current": "page",
                     "data-status": "active",
                   }}
+                  onClick={onNavigate}
                 >
                   <Icon className="pointer-events-none h-5 w-5" />
                   <span>{item.label}</span>
@@ -159,7 +165,7 @@ export function AdminSidebar() {
           </div>
         )}
       </nav>
-      <div className="space-y-2 border-t border-gray-200 px-4 py-4">
+      <div className="border-border space-y-2 border-t px-4 py-4">
         {bottomItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -172,6 +178,7 @@ export function AdminSidebar() {
                 "aria-current": "page",
                 "data-status": "active",
               }}
+              onClick={onNavigate}
             >
               <Icon className="pointer-events-none h-5 w-5" />
               <span>{item.label}</span>
@@ -181,7 +188,7 @@ export function AdminSidebar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="nav-item w-full text-left hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
+          className="nav-item hover:bg-destructive/10 hover:text-destructive w-full text-left disabled:opacity-60"
           disabled={isLoggingOut}
         >
           <LogOut className="h-5 w-5" />

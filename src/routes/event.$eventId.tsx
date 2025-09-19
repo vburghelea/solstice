@@ -104,7 +104,7 @@ function PublicEventDetailPage() {
               </p>
             ) : null}
 
-            <div className="rounded-lg border bg-white p-6 text-gray-900 shadow-sm">
+            <div className="bg-card text-foreground rounded-lg border p-6 shadow-sm">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="font-semibold">Dates</p>

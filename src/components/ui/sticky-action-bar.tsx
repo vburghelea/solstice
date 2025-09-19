@@ -21,11 +21,17 @@ export function StickyActionBar({
     <div
       className={cn(
         mobileOnly ? "lg:hidden" : undefined,
-        "fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur",
-        "px-4 py-3",
+        "border-border bg-background/95 supports-[backdrop-filter]:bg-background/75 fixed inset-x-0 z-50 border-t px-4 py-3 shadow-lg backdrop-blur",
+        mobileOnly
+          ? undefined
+          : "lg:bg-background/95 lg:bottom-6 lg:left-1/2 lg:max-w-2xl lg:-translate-x-1/2 lg:rounded-full lg:border lg:px-6 lg:py-4 lg:shadow-xl",
         className,
       )}
-      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)" }}
+      style={{
+        paddingBottom:
+          "calc(var(--admin-mobile-safe-area, env(safe-area-inset-bottom)) + 0.75rem)",
+        bottom: "var(--admin-sticky-offset, calc(env(safe-area-inset-bottom) + 4.25rem))",
+      }}
       {...props}
     />
   );

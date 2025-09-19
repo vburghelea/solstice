@@ -54,7 +54,7 @@ function CreateEventPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-gray-900">Create a New Event</CardTitle>
+          <CardTitle className="text-foreground">Create a New Event</CardTitle>
           <CardDescription>Set up your event and open registration</CardDescription>
         </CardHeader>
         <CardContent>

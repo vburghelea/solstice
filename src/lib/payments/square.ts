@@ -17,12 +17,17 @@ export interface CheckoutSession {
   currency: string;
   status: "pending" | "completed" | "cancelled";
   expiresAt: Date;
+  orderId?: string | null;
 }
 
 export interface PaymentResult {
   success: boolean;
   paymentId?: string;
   error?: string;
+  orderId?: string | null;
+  status?: string | null;
+  amount?: number | null;
+  currency?: string | null;
 }
 
 /**
@@ -63,6 +68,7 @@ export class MockSquarePaymentService {
       currency: "CAD",
       status: "pending",
       expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
+      orderId: null,
     };
 
     // In production, we would store this session in the database
@@ -93,6 +99,10 @@ export class MockSquarePaymentService {
     return {
       success: true,
       paymentId: paymentId || `mock_payment_${createId()}`,
+      orderId: sessionId,
+      status: "COMPLETED",
+      amount: null,
+      currency: "CAD",
     };
   }
 

@@ -63,29 +63,30 @@ function MembershipPage() {
     },
   });
 
-  const handleMockPaymentReturn = useCallback(
-    async (sessionId: string, membershipTypeId: string) => {
+  type ConfirmMembershipFn = (params: {
+    data: { membershipTypeId: string; sessionId: string; paymentId: string };
+  }) => Promise<{
+    success: boolean;
+    errors?: Array<{ code: string; message: string }>;
+  }>;
+
+  const confirmPurchase = useCallback(
+    async (sessionId: string, membershipTypeId: string, paymentId: string) => {
       setProcessingPayment(true);
       try {
         const result = await (
-          confirmMembershipPurchase as unknown as (params: {
-            data: { membershipTypeId: string; sessionId: string; paymentId: string };
-          }) => Promise<{
-            success: boolean;
-            errors?: Array<{ code: string; message: string }>;
-          }>
+          confirmMembershipPurchase as unknown as ConfirmMembershipFn
         )({
           data: {
             membershipTypeId,
             sessionId,
-            paymentId: `mock_payment_${Date.now()}`,
+            paymentId,
           },
         });
 
         if (result.success) {
           toast.success("Membership purchased successfully!");
           clearPaymentParams();
-          // Refetch membership status
           await refetchMembershipStatus();
         } else {
           toast.error(result.errors?.[0]?.message || "Failed to confirm membership");
@@ -100,12 +101,26 @@ function MembershipPage() {
     [refetchMembershipStatus],
   );
 
+  const handleMockPaymentReturn = useCallback(
+    async (sessionId: string, membershipTypeId: string) => {
+      await confirmPurchase(sessionId, membershipTypeId, `mock_payment_${Date.now()}`);
+    },
+    [confirmPurchase],
+  );
+
   // Process payment return if needed
   const processPaymentReturn = useCallback(async () => {
     if (hasProcessedReturn) return;
 
     // Handle mock checkout
     if (paymentReturn.isMockCheckout && paymentReturn.sessionId) {
+      if (!paymentReturn.membershipTypeId) {
+        setHasProcessedReturn(true);
+        toast.error("Missing membership type for checkout session");
+        clearPaymentParams();
+        return;
+      }
+
       setHasProcessedReturn(true);
       await handleMockPaymentReturn(
         paymentReturn.sessionId,
@@ -114,10 +129,19 @@ function MembershipPage() {
     }
     // Handle real Square success
     else if (paymentReturn.success && paymentReturn.paymentId) {
+      if (!paymentReturn.sessionId || !paymentReturn.membershipTypeId) {
+        setHasProcessedReturn(true);
+        toast.error("Missing checkout information. Please contact support.");
+        clearPaymentParams();
+        return;
+      }
+
       setHasProcessedReturn(true);
-      toast.success("Membership purchased successfully!");
-      clearPaymentParams();
-      refetchMembershipStatus();
+      await confirmPurchase(
+        paymentReturn.sessionId,
+        paymentReturn.membershipTypeId,
+        paymentReturn.paymentId,
+      );
     }
     // Handle errors
     else if (paymentReturn.error) {
@@ -126,12 +150,7 @@ function MembershipPage() {
       if (errorMessage) toast.error(errorMessage);
       clearPaymentParams();
     }
-  }, [
-    hasProcessedReturn,
-    paymentReturn,
-    handleMockPaymentReturn,
-    refetchMembershipStatus,
-  ]);
+  }, [hasProcessedReturn, paymentReturn, handleMockPaymentReturn, confirmPurchase]);
 
   // Process payment return using useEffect
   useEffect(() => {

@@ -47,6 +47,7 @@ async function seed() {
   const profileEditUserId = "clxpfz4jn000308l8d5i6c4m5"; // User for profile editing tests
   const membershipPurchaseUserId = "clxpfz4jn000408l8e6j7d5n6"; // User for membership purchase tests
   const teamJoinUserId = "clxpfz4jn000508l8f7k8e6o7"; // User for team joining tests
+  const squareTestUserId = "clxpfz4jn000608l8g8l9f7p8"; // User for Square sandbox testing
 
   try {
     // Clear existing test data in correct order due to foreign key constraints
@@ -232,6 +233,29 @@ async function seed() {
           showEmail: true,
           showPhone: true,
           showBirthYear: false,
+          allowTeamInvitations: true,
+        }),
+        profileVersion: 1,
+      },
+      {
+        id: squareTestUserId,
+        email: "squaretest@example.com",
+        name: "Square Test User",
+        emailVerified: true,
+        profileComplete: true,
+        dateOfBirth: new Date("1991-03-15"),
+        phone: "+1234567896",
+        gender: "non-binary",
+        pronouns: "they/them",
+        emergencyContact: JSON.stringify({
+          name: "Square Emergency",
+          phone: "+0987654327",
+          relationship: "partner",
+        }),
+        privacySettings: JSON.stringify({
+          showEmail: true,
+          showPhone: false,
+          showBirthYear: true,
           allowTeamInvitations: true,
         }),
         profileVersion: 1,

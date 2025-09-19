@@ -1,6 +1,6 @@
 import { createServerFn, serverOnly } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
-import { memberships, membershipTypes } from "~/db/schema";
+import { membershipPaymentSessions, memberships, membershipTypes } from "~/db/schema";
 import type { MembershipMetadata } from "./membership.db-types";
 import {
   confirmMembershipPurchaseSchema,
@@ -120,6 +120,39 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           membershipType.priceCents,
         );
 
+        await db
+          .insert(membershipPaymentSessions)
+          .values({
+            userId: session.user.id,
+            membershipTypeId: membershipType.id,
+            squareCheckoutId: checkoutSession.id,
+            squarePaymentLinkUrl: checkoutSession.checkoutUrl,
+            squareOrderId: checkoutSession.orderId || null,
+            amountCents: membershipType.priceCents,
+            currency: checkoutSession.currency,
+            expiresAt: checkoutSession.expiresAt ?? null,
+            metadata: {
+              membershipName: membershipType.name,
+              squareOrderId: checkoutSession.orderId || null,
+            },
+          })
+          .onConflictDoUpdate({
+            target: membershipPaymentSessions.squareCheckoutId,
+            set: {
+              membershipTypeId: membershipType.id,
+              squarePaymentLinkUrl: checkoutSession.checkoutUrl,
+              squareOrderId: checkoutSession.orderId || null,
+              amountCents: membershipType.priceCents,
+              currency: checkoutSession.currency,
+              expiresAt: checkoutSession.expiresAt ?? null,
+              metadata: {
+                membershipName: membershipType.name,
+                squareOrderId: checkoutSession.orderId || null,
+              },
+              updatedAt: new Date(),
+            },
+          });
+
         return {
           success: true,
           data: {
@@ -173,20 +206,106 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
         };
       }
 
+      // Look up the stored payment session
+      const [paymentSession] = await db
+        .select()
+        .from(membershipPaymentSessions)
+        .where(eq(membershipPaymentSessions.squareCheckoutId, data.sessionId))
+        .limit(1);
+
+      if (!paymentSession) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "NOT_FOUND",
+              message: "Checkout session not found",
+            },
+          ],
+        };
+      }
+
+      if (paymentSession.userId !== session.user.id) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "VALIDATION_ERROR",
+              message: "Payment session does not belong to user",
+            },
+          ],
+        };
+      }
+
+      if (data.membershipTypeId !== paymentSession.membershipTypeId) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "VALIDATION_ERROR",
+              message: "Membership type mismatch",
+            },
+          ],
+        };
+      }
+
+      if (paymentSession.status === "completed" && paymentSession.squarePaymentId) {
+        const [existingMembershipByPayment] = await db
+          .select()
+          .from(memberships)
+          .where(eq(memberships.paymentId, paymentSession.squarePaymentId))
+          .limit(1);
+
+        if (existingMembershipByPayment) {
+          return {
+            success: true,
+            data: castMembershipJsonbFields(existingMembershipByPayment),
+          };
+        }
+      }
+
       // Verify payment with Square
       const squarePaymentService = await getSquarePaymentService();
       const paymentResult = await squarePaymentService.verifyPayment(
-        data.sessionId,
-        data.paymentId,
+        paymentSession.squareCheckoutId,
+        data.paymentId ?? paymentSession.squarePaymentId ?? undefined,
       );
 
       if (!paymentResult.success) {
+        await db
+          .update(membershipPaymentSessions)
+          .set({
+            status: paymentSession.status === "completed" ? "completed" : "failed",
+            metadata: {
+              ...(paymentSession.metadata ?? {}),
+              lastError: paymentResult.error || "Payment verification failed",
+              lastErrorAt: new Date().toISOString(),
+            },
+            updatedAt: new Date(),
+          })
+          .where(eq(membershipPaymentSessions.id, paymentSession.id));
+
         return {
           success: false,
           errors: [
             {
               code: "PAYMENT_ERROR",
               message: paymentResult.error || "Payment verification failed",
+            },
+          ],
+        };
+      }
+
+      const squarePaymentId =
+        paymentResult.paymentId ?? data.paymentId ?? paymentSession.squarePaymentId;
+
+      if (!squarePaymentId) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "PAYMENT_ERROR",
+              message: "Missing payment identifier",
             },
           ],
         };
@@ -212,28 +331,101 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
         };
       }
 
-      // Calculate membership dates
-      const startDate = new Date();
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
+      if (
+        typeof paymentResult.amount === "number" &&
+        paymentResult.amount !== membershipType.priceCents
+      ) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "PAYMENT_ERROR",
+              message: "Payment amount does not match membership price",
+            },
+          ],
+        };
+      }
 
-      // Create membership record
-      const [newMembership] = await db
-        .insert(memberships)
-        .values({
-          userId: session.user.id,
-          membershipTypeId: membershipType.id,
-          startDate: startDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
-          endDate: endDate.toISOString().split("T")[0],
-          status: "active",
-          paymentProvider: "square",
-          paymentId: paymentResult.paymentId,
-          metadata: {
-            sessionId: data.sessionId,
-            purchasedAt: new Date().toISOString(),
-          },
-        })
-        .returning();
+      if (paymentResult.currency && paymentResult.currency !== "CAD") {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "PAYMENT_ERROR",
+              message: "Payment currency is not supported",
+            },
+          ],
+        };
+      }
+
+      const confirmedMembership = await db.transaction(async (tx) => {
+        const [existingMembershipByPayment] = await tx
+          .select()
+          .from(memberships)
+          .where(eq(memberships.paymentId, squarePaymentId))
+          .limit(1);
+
+        if (existingMembershipByPayment) {
+          await tx
+            .update(membershipPaymentSessions)
+            .set({
+              status: "completed",
+              squarePaymentId,
+              squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
+              metadata: {
+                ...(paymentSession.metadata ?? {}),
+                membershipId: existingMembershipByPayment.id,
+                paymentConfirmedAt: new Date().toISOString(),
+                squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
+              },
+              updatedAt: new Date(),
+            })
+            .where(eq(membershipPaymentSessions.id, paymentSession.id));
+
+          return existingMembershipByPayment;
+        }
+
+        // Calculate membership dates
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
+
+        const [newMembership] = await tx
+          .insert(memberships)
+          .values({
+            userId: session.user.id,
+            membershipTypeId: membershipType.id,
+            startDate: startDate.toISOString().split("T")[0],
+            endDate: endDate.toISOString().split("T")[0],
+            status: "active",
+            paymentProvider: "square",
+            paymentId: squarePaymentId,
+            metadata: {
+              ...(paymentSession.metadata ?? {}),
+              sessionId: data.sessionId,
+              purchasedAt: new Date().toISOString(),
+            },
+          })
+          .returning();
+
+        await tx
+          .update(membershipPaymentSessions)
+          .set({
+            status: "completed",
+            squarePaymentId,
+            squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
+            metadata: {
+              ...(paymentSession.metadata ?? {}),
+              membershipId: newMembership.id,
+              paymentConfirmedAt: new Date().toISOString(),
+              squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
+            },
+            updatedAt: new Date(),
+          })
+          .where(eq(membershipPaymentSessions.id, paymentSession.id));
+
+        return newMembership;
+      });
 
       // Send confirmation email
       try {
@@ -246,8 +438,8 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
           },
           membershipType: membershipType.name,
           amount: membershipType.priceCents,
-          paymentId: paymentResult.paymentId || "unknown",
-          expiresAt: endDate,
+          paymentId: squarePaymentId,
+          expiresAt: new Date(confirmedMembership.endDate),
         });
       } catch (emailError) {
         // Log error but don't fail the purchase
@@ -256,7 +448,9 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
 
       return {
         success: true,
-        data: castMembershipJsonbFields(newMembership),
+        data: castMembershipJsonbFields(
+          confirmedMembership as typeof memberships.$inferSelect,
+        ),
       };
     } catch (error) {
       console.error("Error confirming membership purchase:", error);

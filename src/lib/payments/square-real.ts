@@ -4,8 +4,10 @@
  */
 
 import { createId } from "@paralleldrive/cuid2";
+import { eq } from "drizzle-orm";
 import type { Square } from "square";
 import { SquareClient, SquareEnvironment, SquareError, WebhooksHelper } from "square";
+import { membershipPaymentSessions, memberships } from "~/db/schema";
 
 // This module should only be imported in server-side code
 
@@ -18,12 +20,17 @@ export interface CheckoutSession {
   currency: string;
   status: "pending" | "completed" | "cancelled";
   expiresAt: Date;
+  orderId?: string | null;
 }
 
 export interface PaymentResult {
   success: boolean;
   paymentId?: string;
   error?: string;
+  orderId?: string | null;
+  status?: string | null;
+  amount?: number | null;
+  currency?: string | null;
 }
 
 /**
@@ -123,6 +130,7 @@ export class SquarePaymentService {
         currency: "CAD",
         status: "pending",
         expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
+        orderId: result.paymentLink.orderId || null,
       };
 
       // In a real implementation, we would store this session in the database
@@ -145,7 +153,7 @@ export class SquarePaymentService {
    * @param checkoutId - The checkout ID from Square
    * @returns Payment verification result
    */
-  async verifyPayment(checkoutId: string): Promise<PaymentResult> {
+  async verifyPayment(checkoutId: string, paymentId?: string): Promise<PaymentResult> {
     try {
       if (!checkoutId) {
         return {
@@ -154,44 +162,119 @@ export class SquarePaymentService {
         };
       }
 
-      // With Square v43, we need to track payments via Orders API or Payments API
-      // Since checkout doesn't have a retrieve method, we'll need to redesign this flow
-      // For now, we'll return a mock result
-      // TODO: Implement proper payment tracking via Orders or Payments API
-      const result = {
-        checkout: {
-          order: { state: "COMPLETED", tenders: [{ id: "payment_" + createId() }] },
-        },
-      };
+      const paymentLinkResponse = await this.client.checkout.paymentLinks.get({
+        id: checkoutId,
+      });
+      const paymentLink = paymentLinkResponse.paymentLink;
 
-      if (!result.checkout) {
+      if (!paymentLink) {
         return {
           success: false,
-          error: "Checkout not found",
+          error: "Checkout session not found",
         };
       }
 
-      // Check if payment was completed
-      const order = result.checkout.order;
-      if (!order?.state || order.state !== "COMPLETED") {
+      let resolvedPaymentId = paymentId ?? null;
+      const paymentLinkOrderId = paymentLink.orderId;
+
+      let order: Square.Order | null = null;
+
+      if (paymentLinkOrderId) {
+        try {
+          const orderResponse = await this.client.orders.get({
+            orderId: paymentLinkOrderId,
+          });
+          order = orderResponse.order ?? null;
+        } catch (orderError) {
+          console.warn("Failed to fetch order for payment verification", orderError);
+        }
+      }
+
+      if (!resolvedPaymentId && order) {
+        resolvedPaymentId =
+          order.tenders?.find((tender) => tender.paymentId)?.paymentId ?? null;
+      }
+
+      if (!resolvedPaymentId) {
         return {
           success: false,
-          error: "Payment not completed",
+          error: "Payment still pending or not available",
         };
       }
 
-      // Get the payment ID from tenders
-      const paymentId = order.tenders?.[0]?.id;
-      if (!paymentId) {
+      let paymentResponse = await this.client.payments.get({
+        paymentId: resolvedPaymentId,
+      });
+      let payment = paymentResponse.payment;
+
+      if (!payment) {
         return {
           success: false,
-          error: "Payment ID not found",
+          error: "Payment not found",
         };
       }
+
+      if (
+        payment.orderId &&
+        paymentLinkOrderId &&
+        payment.orderId !== paymentLinkOrderId
+      ) {
+        return {
+          success: false,
+          error: "Payment does not match checkout session",
+        };
+      }
+
+      if (payment.status === "APPROVED") {
+        try {
+          await this.client.payments.complete({ paymentId: resolvedPaymentId });
+          paymentResponse = await this.client.payments.get({
+            paymentId: resolvedPaymentId,
+          });
+          payment = paymentResponse.payment;
+        } catch (completeError) {
+          console.warn("Failed to capture approved payment", completeError);
+        }
+      }
+
+      if (!payment?.status || payment.status !== "COMPLETED") {
+        return {
+          success: false,
+          error: `Payment status is ${payment?.status ?? "unknown"}`,
+        };
+      }
+
+      const expectedAmount = order?.totalMoney?.amount ?? null;
+
+      const actualAmount =
+        payment.amountMoney?.amount ?? payment.totalMoney?.amount ?? null;
+
+      if (
+        expectedAmount !== null &&
+        actualAmount !== null &&
+        actualAmount !== expectedAmount
+      ) {
+        console.warn("Payment amount does not match checkout amount", {
+          paymentAmount: actualAmount?.toString(),
+          expectedAmount: expectedAmount.toString(),
+          paymentId: payment.id,
+          checkoutId,
+        });
+      }
+
+      const amountBigint =
+        payment.amountMoney?.amount ?? payment.totalMoney?.amount ?? null;
+      const normalizedAmount = amountBigint !== null ? Number(amountBigint) : null;
+      const currency =
+        payment.amountMoney?.currency ?? payment.totalMoney?.currency ?? null;
 
       return {
         success: true,
-        paymentId,
+        paymentId: payment.id ?? resolvedPaymentId,
+        orderId: payment.orderId ?? paymentLinkOrderId ?? null,
+        status: payment.status ?? null,
+        amount: normalizedAmount,
+        currency: currency ?? null,
       };
     } catch (error) {
       console.error("Payment verification error:", error);
@@ -206,7 +289,7 @@ export class SquarePaymentService {
 
       return {
         success: false,
-        error: "Failed to verify payment",
+        error: error instanceof Error ? error.message : "Failed to verify payment",
       };
     }
   }
@@ -250,20 +333,157 @@ export class SquarePaymentService {
       // Process webhook based on type
       const event = payload as { type: string; data: unknown };
       const eventType = event.type;
+      const eventTimestamp = new Date().toISOString();
 
       switch (eventType) {
         case "payment.created":
         case "payment.updated":
           // Handle payment events
-          console.log("Payment event received:", eventType, event.data);
-          // In production, update membership status in database
+          {
+            const eventData = event.data as Record<string, unknown> | undefined;
+            const paymentObj = eventData?.["object"] as
+              | Record<string, unknown>
+              | undefined;
+            const payment = paymentObj?.["payment"] as
+              | Record<string, unknown>
+              | undefined;
+
+            if (!payment) break;
+
+            const paymentId = payment["id"] as string | undefined;
+            const orderId = payment["order_id"] as string | undefined;
+            const status = (payment["status"] as string | undefined)?.toUpperCase();
+
+            try {
+              const { getDb } = await import("~/db/server-helpers");
+              const db = await getDb();
+
+              let session: typeof membershipPaymentSessions.$inferSelect | null = null;
+
+              if (paymentId) {
+                const [foundByPayment] = await db
+                  .select()
+                  .from(membershipPaymentSessions)
+                  .where(eq(membershipPaymentSessions.squarePaymentId, paymentId))
+                  .limit(1);
+
+                session = foundByPayment ?? null;
+              }
+
+              if (!session && orderId) {
+                const [foundByOrder] = await db
+                  .select()
+                  .from(membershipPaymentSessions)
+                  .where(eq(membershipPaymentSessions.squareOrderId, orderId))
+                  .limit(1);
+
+                session = foundByOrder ?? null;
+              }
+
+              if (session) {
+                const statusMap: Record<string, typeof session.status> = {
+                  COMPLETED: "completed",
+                  APPROVED: "completed",
+                  FAILED: "failed",
+                  CANCELED: "cancelled",
+                  CANCELED_BY_CUSTOMER: "cancelled",
+                };
+
+                const nextStatus = statusMap[status ?? ""] ?? session.status;
+                const nextPaymentId = paymentId ?? session.squarePaymentId ?? undefined;
+
+                await db
+                  .update(membershipPaymentSessions)
+                  .set({
+                    status: nextStatus,
+                    squarePaymentId: nextPaymentId ?? session.squarePaymentId,
+                    squareOrderId: orderId ?? session.squareOrderId,
+                    metadata: {
+                      ...(session.metadata ?? {}),
+                      lastWebhookEvent: eventType,
+                      lastWebhookAt: eventTimestamp,
+                      squarePaymentStatus: status,
+                    },
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(membershipPaymentSessions.id, session.id));
+              }
+            } catch (dbError) {
+              console.error("Failed to update payment session from webhook:", dbError);
+            }
+          }
           break;
 
         case "refund.created":
         case "refund.updated":
           // Handle refund events
-          console.log("Refund event received:", eventType, event.data);
-          // In production, update membership status and send notification
+          {
+            const eventData = event.data as Record<string, unknown> | undefined;
+            const refundObj = eventData?.["object"] as
+              | Record<string, unknown>
+              | undefined;
+            const refund = refundObj?.["refund"] as Record<string, unknown> | undefined;
+            if (!refund) break;
+
+            const refundId = refund["id"] as string | undefined;
+            const paymentId = refund["payment_id"] as string | undefined;
+            const status = (refund["status"] as string | undefined)?.toUpperCase();
+
+            if (!paymentId) break;
+
+            try {
+              const { getDb } = await import("~/db/server-helpers");
+              const db = await getDb();
+
+              const [session] = await db
+                .select()
+                .from(membershipPaymentSessions)
+                .where(eq(membershipPaymentSessions.squarePaymentId, paymentId))
+                .limit(1);
+
+              if (session) {
+                await db
+                  .update(membershipPaymentSessions)
+                  .set({
+                    metadata: {
+                      ...(session.metadata ?? {}),
+                      lastRefundStatus: status,
+                      lastRefundId: refundId,
+                      lastRefundAt: eventTimestamp,
+                    },
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(membershipPaymentSessions.id, session.id));
+              }
+
+              const [membershipRecord] = await db
+                .select()
+                .from(memberships)
+                .where(eq(memberships.paymentId, paymentId))
+                .limit(1);
+
+              if (membershipRecord) {
+                const targetStatus =
+                  status === "COMPLETED" ? "cancelled" : membershipRecord.status;
+
+                await db
+                  .update(memberships)
+                  .set({
+                    status: targetStatus,
+                    metadata: {
+                      ...(membershipRecord.metadata ?? {}),
+                      refundId,
+                      refundStatus: status,
+                      refundUpdatedAt: eventTimestamp,
+                    },
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(memberships.id, membershipRecord.id));
+              }
+            } catch (dbError) {
+              console.error("Failed to update records from refund webhook:", dbError);
+            }
+          }
           break;
 
         default:

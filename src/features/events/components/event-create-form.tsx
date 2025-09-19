@@ -20,7 +20,7 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { isAdmin as checkIsAdmin } from "~/lib/auth/utils/admin-check";
+import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { createEvent } from "../events.mutations";
 
 const EVENT_TYPE_OPTIONS = [
@@ -109,7 +109,7 @@ type EventFormData = z.infer<typeof eventFormSchema>;
 export function EventCreateForm() {
   const navigate = useNavigate();
   const { user } = useRouteContext({ from: "/dashboard/events/create" });
-  const isAdminUser = useMemo(() => checkIsAdmin(user?.email ?? null), [user?.email]);
+  const isAdminUser = useMemo(() => isAdminClient(user), [user]);
   const [currentStep, setCurrentStep] = useState(0);
   const slugManuallyEditedRef = useRef(false);
 

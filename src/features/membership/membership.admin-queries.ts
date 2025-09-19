@@ -43,7 +43,7 @@ export const getAllMemberships = createServerFn({ method: "GET" })
         const { headers } = getWebRequest();
         const session = await auth.api.getSession({ headers });
 
-        if (!session?.user?.email) {
+        if (!session?.user?.id) {
           return {
             success: false,
             errors: [
@@ -55,33 +55,9 @@ export const getAllMemberships = createServerFn({ method: "GET" })
           };
         }
 
-        // Check admin access via role service
-        const { getCurrentUser } = await import("~/features/auth/auth.queries");
-        const currentUser = await getCurrentUser();
-        if (!currentUser) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "VALIDATION_ERROR",
-                message: "User not authenticated",
-              },
-            ],
-          };
-        }
-        const { PermissionService } = await import("~/features/roles/permission.service");
-        const isAdmin = await PermissionService.isGlobalAdmin(currentUser.id);
-        if (!isAdmin) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "VALIDATION_ERROR",
-                message: "Admin access required",
-              },
-            ],
-          };
-        }
+        // Check admin access
+        const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
+        await requireAdmin(session.user.id);
 
         // Import database dependencies inside handler
         const { and, eq, sql } = await import("drizzle-orm");

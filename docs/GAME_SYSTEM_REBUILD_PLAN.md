@@ -134,6 +134,7 @@ Deliverables
 - [x] Record system_crawl_events and update crawl_status on game_systems.
 - [x] Unit tests for parsers and mappers with fixtures.
   - Added runner at `scripts/run-startplaying-crawler.ts` to orchestrate diff crawls and resume from a specific StartPlaying page when debugging.
+  - Updated detail parser to capture nested hero imagery and to normalize mechanics/themes chips from both hero metadata and DOM fallbacks.
     Definition of done
 - [x] Daily diff run updates changed systems _(Crawler now diffs fields, skips uploads via checksum, and logs updatedFields/noop details in `upsertDetail`.)_
 - [x] CMS fields remain untouched during diff run
@@ -166,6 +167,10 @@ Deliverables
       Definition of done
 - [x] Conflicts produce crawl events with partial status and admin visibility. _(Wikipedia enrichment logs `partial` status with conflict codes when CMS data prevents overwrites or metadata cannot be parsed.)_
 
+Coverage & Reporting
+
+- Manual coverage report script at `scripts/report-game-system-coverage.ts` generates CSV + console summary. Latest snapshot (`storage/coverage/game-systems-coverage-2025-09-18T22-05-58-388Z.csv`) shows StartPlaying + BGG enrichment meeting readiness thresholds for hero imagery, taxonomy, and core metadata. No further coverage work required before UI phases.
+
 Phase 7 - Scheduling and jobs _(deprioritized)_
 Deliverables
 
@@ -185,10 +190,12 @@ Deliverables
 
 - /systems browse and /system slug detail pages.
   Checklist
-- [ ] Create systems browse route with filters for mechanics, genres, players, publisher, year and search.
-- [ ] Create system detail route with hero, chips, details, description, gallery, FAQs, reviews aggregate.
-- [ ] Add loading and empty states and fallbacks when moderated images unavailable.
-- [ ] Accessibility pass on images alt text and keyboard navigation.
+- [x] Create systems browse route with name search and category tag filters.
+- [x] Create system detail route with hero, metadata, description, gallery, FAQ placeholder (reviews aggregate deferred).
+- [x] Add loading and empty states and fallbacks when moderated images unavailable.
+- [x] Accessibility pass on images alt text and keyboard navigation.
+- [x] Surface popular systems carousel on homepage sourced from session counts.
+- [x] Expose game systems link in public header footer navigation.
       Definition of done
 - [ ] Lighthouse performance and accessibility 90 plus in dev.
 
@@ -246,11 +253,11 @@ Checklist
 Data contracts summary
 listSystems request
 
-- filters mechanicsIds number[], genreIds number[], playersMin number, playersMax number, publisherIds number[], releasedFrom date, releasedTo date, q string, page number, perPage number
+- filters genreIds number[], q string, page number, perPage number
   listSystems response
 - items array of SystemCard, page number, perPage number, total number
   SystemCard
-- id number, slug string, name string, heroUrl string nullable, minPlayers number, maxPlayers number, yearReleased number nullable, mechanics array of string, genres array of string
+- id number, slug string, name string, heroUrl string nullable, minPlayers number nullable, maxPlayers number nullable, yearReleased number nullable, genres array of string
   getSystemBySlug response
 - system with fields and relations hero media gallery media tags arrays faqs array reviews aggregate
 

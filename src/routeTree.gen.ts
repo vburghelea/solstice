@@ -17,8 +17,10 @@ import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
+import { Route as SystemsIndexRouteImport } from "./routes/systems/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
@@ -105,6 +107,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
+const SystemsIndexRoute = SystemsIndexRouteImport.update({
+  id: "/systems/",
+  path: "/systems/",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -114,6 +121,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
+} as any);
+const SystemsSlugRoute = SystemsSlugRouteImport.update({
+  id: "/systems/$slug",
+  path: "/systems/$slug",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const GameGameIdRoute = GameGameIdRouteImport.update({
   id: "/game/$gameId",
@@ -416,8 +428,10 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/systems": typeof SystemsIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
@@ -459,8 +473,10 @@ export interface FileRoutesByTo {
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
+  "/systems": typeof SystemsIndexRoute;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
@@ -508,8 +524,10 @@ export interface FileRoutesById {
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/systems/": typeof SystemsIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/$eventId": typeof DashboardEventsEventIdRoute;
@@ -560,8 +578,10 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
     | "/event/$eventId"
     | "/game/$gameId"
+    | "/systems/$slug"
     | "/dashboard/"
     | "/onboarding/"
+    | "/systems"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
     | "/dashboard/events/$eventId"
@@ -603,8 +623,10 @@ export interface FileRouteTypes {
     | "/dashboard/social-audits"
     | "/event/$eventId"
     | "/game/$gameId"
+    | "/systems/$slug"
     | "/dashboard"
     | "/onboarding"
+    | "/systems"
     | "/dashboard/campaigns/create"
     | "/dashboard/events/$eventId"
     | "/dashboard/events/create"
@@ -651,8 +673,10 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
     | "/event/$eventId"
     | "/game/$gameId"
+    | "/systems/$slug"
     | "/dashboard/"
     | "/onboarding/"
+    | "/systems/"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
     | "/dashboard/events/$eventId"
@@ -688,6 +712,8 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
   GameGameIdRoute: typeof GameGameIdRoute;
+  SystemsSlugRoute: typeof SystemsSlugRoute;
+  SystemsIndexRoute: typeof SystemsIndexRoute;
   DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
 }
@@ -845,6 +871,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/systems/": {
+      id: "/systems/";
+      path: "/systems";
+      fullPath: "/systems";
+      preLoaderRoute: typeof SystemsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/onboarding/": {
       id: "/onboarding/";
       path: "/";
@@ -858,6 +891,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/";
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
+    };
+    "/systems/$slug": {
+      id: "/systems/$slug";
+      path: "/systems/$slug";
+      fullPath: "/systems/$slug";
+      preLoaderRoute: typeof SystemsSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/game/$gameId": {
       id: "/game/$gameId";
@@ -1424,6 +1464,8 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   EventEventIdRoute: EventEventIdRoute,
   GameGameIdRoute: GameGameIdRoute,
+  SystemsSlugRoute: SystemsSlugRoute,
+  SystemsIndexRoute: SystemsIndexRoute,
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
 };

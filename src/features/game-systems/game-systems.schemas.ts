@@ -2,13 +2,7 @@ import { z } from "zod";
 
 // Query schemas
 export const listSystemsSchema = z.object({
-  mechanicsIds: z.array(z.number()).optional(),
   genreIds: z.array(z.number()).optional(),
-  playersMin: z.number().int().optional(),
-  playersMax: z.number().int().optional(),
-  publisherIds: z.array(z.number()).optional(),
-  releasedFrom: z.coerce.date().optional(),
-  releasedTo: z.coerce.date().optional(),
   q: z.string().optional(),
   page: z.number().int().min(1).optional().default(1),
   perPage: z.number().int().min(1).max(50).optional().default(20),

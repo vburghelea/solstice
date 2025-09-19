@@ -39,6 +39,7 @@ import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboar
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
@@ -192,6 +193,11 @@ const DashboardEventsEventIdManageRoute =
     path: "/$eventId/manage",
     getParentRoute: () => DashboardEventsRoute,
   } as any);
+const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
+  id: "/api/test-square",
+  path: "/api/test-square",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
   path: "/api/health",
@@ -409,6 +415,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
@@ -417,6 +424,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
@@ -426,6 +434,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
   "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
@@ -436,6 +445,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
   fullPaths:
     | "/api/health"
+    | "/api/test-square"
     | "/api/auth/$"
     | "/api/test/cleanup"
     | "/api/webhooks/square"
@@ -444,6 +454,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo;
   to:
     | "/api/health"
+    | "/api/test-square"
     | "/api/auth/$"
     | "/api/test/cleanup"
     | "/api/webhooks/square"
@@ -452,6 +463,7 @@ export interface FileServerRouteTypes {
   id:
     | "__root__"
     | "/api/health"
+    | "/api/test-square"
     | "/api/auth/$"
     | "/api/test/cleanup"
     | "/api/webhooks/square"
@@ -461,6 +473,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiHealthServerRoute: typeof ApiHealthServerRoute;
+  ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
   ApiTestCleanupServerRoute: typeof ApiTestCleanupServerRoute;
   ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
@@ -670,6 +683,13 @@ declare module "@tanstack/react-router" {
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
+    "/api/test-square": {
+      id: "/api/test-square";
+      path: "/api/test-square";
+      fullPath: "/api/test-square";
+      preLoaderRoute: typeof ApiTestSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/health": {
       id: "/api/health";
       path: "/api/health";
@@ -841,6 +861,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHealthServerRoute: ApiHealthServerRoute,
+  ApiTestSquareServerRoute: ApiTestSquareServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiTestCleanupServerRoute: ApiTestCleanupServerRoute,
   ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,

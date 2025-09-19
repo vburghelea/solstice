@@ -108,9 +108,7 @@ export class SquarePaymentService {
           merchantSupportEmail:
             process.env["SUPPORT_EMAIL"] || "support@quadballcanada.com",
         },
-        prePopulatedData: {
-          buyerEmail: null, // Will be set from user data in the future
-        },
+        // Note: prePopulatedData.buyerEmail will be added when we have user email
         paymentNote: `Membership purchase for user ${userId}`,
       };
 
@@ -140,7 +138,16 @@ export class SquarePaymentService {
       console.error("Square checkout error:", error);
 
       if (error instanceof SquareError) {
-        const errorDetail = error.errors?.[0]?.detail || error.message || "Unknown error";
+        // Log all Square API errors for debugging
+        for (const err of error.errors ?? []) {
+          console.error(
+            `[Square] ${err.category} / ${err.code} @ ${err.field}: ${err.detail}`,
+          );
+        }
+        const errorDetail =
+          error.errors?.map((e) => e.detail).join("; ") ||
+          error.message ||
+          "Unknown error";
         throw new Error(`Square API error: ${errorDetail}`);
       }
 

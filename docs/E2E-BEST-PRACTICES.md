@@ -97,6 +97,15 @@ test.describe("Team Management", () => {
 });
 ```
 
+### 5. Feature Journeys Catalog
+
+- `e2e/tests/authenticated/events-flow.auth.spec.ts` covers the full events journey:
+  admin creates an event, a member registers, and an admin manages the resulting
+  registration. Run the spec with `pnpm test:e2e e2e/tests/authenticated/events-
+flow.auth.spec.ts` while iterating on events.
+- `scripts/seed-e2e-data.ts` now seeds sample events plus a confirmed registration;
+  rerun the seed script after resetting the database so event flows stay predictable.
+
 ## Common Pitfalls & Solutions
 
 ### 1. Strict Mode Violations

@@ -1,11 +1,21 @@
 import { load } from "cheerio";
-import { describe, expect, it } from "vitest";
-import {
-  parseDetailPage,
-  parseIndexPage,
-  partitionTags,
-  type TagMaps,
-} from "~/features/game-systems/crawler/startplaying";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import type { TagMaps } from "~/features/game-systems/crawler/startplaying";
+
+vi.mock("crawlee", () => ({
+  CheerioCrawler: class {},
+}));
+
+let parseDetailPage: typeof import("~/features/game-systems/crawler/startplaying").parseDetailPage;
+let parseIndexPage: typeof import("~/features/game-systems/crawler/startplaying").parseIndexPage;
+let partitionTags: typeof import("~/features/game-systems/crawler/startplaying").partitionTags;
+
+beforeAll(async () => {
+  const module = await import("~/features/game-systems/crawler/startplaying");
+  parseDetailPage = module.parseDetailPage;
+  parseIndexPage = module.parseIndexPage;
+  partitionTags = module.partitionTags;
+});
 
 describe("startplaying crawler parsers", () => {
   it("collects system links from index page", () => {

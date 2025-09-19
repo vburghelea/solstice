@@ -48,7 +48,7 @@ export function AdminLayout() {
         <MobileAdminHeader onMenuClick={() => setSidebarOpen(true)} />
         {/* Add bottom padding to avoid overlap with mobile tab bar */}
         <main className="flex-1 p-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-screen-2xl">
             <Outlet />
           </div>
         </main>

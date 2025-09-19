@@ -5,6 +5,7 @@ import {
   Calendar,
   FileText,
   Home,
+  Layers3,
   LogOut,
   ScrollText,
   Settings,
@@ -18,18 +19,31 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { userHasRole } from "~/features/roles/permission.service";
 import { auth } from "~/lib/auth-client";
 
-const allSidebarItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard", requiresRole: false },
-  { icon: Swords, label: "Games", href: "/dashboard/games", requiresRole: false },
+type SidebarItem = {
+  icon: typeof Home;
+  label: string;
+  href: string;
+  requiresRole?: boolean;
+  roles?: string[];
+};
+
+const primarySidebarItems: SidebarItem[] = [
+  { icon: Home, label: "Dashboard", href: "/dashboard" },
+  { icon: Swords, label: "Games", href: "/dashboard/games" },
+  { icon: ScrollText, label: "Campaigns", href: "/dashboard/campaigns" },
+  { icon: Users, label: "Teams", href: "/dashboard/teams" },
+  { icon: Calendar, label: "Events", href: "/dashboard/events" },
+  { icon: UserCheck, label: "Members", href: "/dashboard/members" },
+];
+
+const adminSidebarItems: SidebarItem[] = [
   {
-    icon: ScrollText,
-    label: "Campaigns",
-    href: "/dashboard/campaigns",
-    requiresRole: false,
+    icon: Layers3,
+    label: "Systems",
+    href: "/dashboard/systems",
+    requiresRole: true,
+    roles: ["Platform Admin", "Games Admin"],
   },
-  { icon: Users, label: "Teams", href: "/dashboard/teams", requiresRole: false },
-  { icon: Calendar, label: "Events", href: "/dashboard/events", requiresRole: false },
-  { icon: UserCheck, label: "Members", href: "/dashboard/members", requiresRole: false },
   {
     icon: BarChart3,
     label: "Reports",
@@ -57,14 +71,16 @@ export function AdminSidebar() {
   const context = useRouteContext({ strict: false });
   const user = context?.user || null;
 
-  // Filter sidebar items based on user roles
-  const sidebarItems = allSidebarItems.filter((item) => {
-    if (!item.requiresRole) return true;
-    if (!user || !item.roles) return false;
+  const filterItemsForUser = (items: SidebarItem[]) =>
+    items.filter((item) => {
+      if (!item.requiresRole) return true;
+      if (!user || !item.roles) return false;
 
-    // Check if user has any of the required roles
-    return item.roles.some((roleName) => userHasRole(user, roleName));
-  });
+      return item.roles.some((roleName) => userHasRole(user, roleName));
+    });
+
+  const primaryItems = filterItemsForUser(primarySidebarItems);
+  const adminItems = filterItemsForUser(adminSidebarItems);
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -95,25 +111,53 @@ export function AdminSidebar() {
           <p className="text-admin-text-secondary text-sm">Dashboard</p>
         </Link>
       </div>
-      <nav className="flex-1 space-y-2 px-4 py-2">
-        {sidebarItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className="nav-item"
-              activeProps={{
-                className: "nav-item-active",
-                "aria-current": "page",
-                "data-status": "active",
-              }}
-            >
-              <Icon className="pointer-events-none h-5 w-5" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+      <nav className="flex-1 space-y-6 px-4 py-2">
+        <div className="space-y-2">
+          {primaryItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="nav-item"
+                activeProps={{
+                  className: "nav-item-active",
+                  "aria-current": "page",
+                  "data-status": "active",
+                }}
+              >
+                <Icon className="pointer-events-none h-5 w-5" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {adminItems.length > 0 && (
+          <div className="space-y-2">
+            <p className="px-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              Admin tools
+            </p>
+            {adminItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="nav-item"
+                  activeProps={{
+                    className: "nav-item-active",
+                    "aria-current": "page",
+                    "data-status": "active",
+                  }}
+                >
+                  <Icon className="pointer-events-none h-5 w-5" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </nav>
       <div className="space-y-2 border-t border-gray-200 px-4 py-4">
         {bottomItems.map((item) => {

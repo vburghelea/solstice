@@ -29,13 +29,16 @@ const fakeDb = {
     values: (vals: Record<string, unknown>) => {
       insertCalls.push({ table, values: vals });
       return {
+        onConflictDoUpdate: vi.fn(async () => [vals]),
         returning: () => [vals],
       };
     },
   })),
   select: vi.fn(() => ({
     from: vi.fn(() => ({
-      where: vi.fn(() => [{ count: 0 }]),
+      where: vi.fn(() => ({
+        limit: vi.fn(() => Promise.resolve([] as unknown as never[])),
+      })),
     })),
   })),
   query: {
@@ -92,6 +95,14 @@ vi.mock("~/db/schema", () => ({
   },
   gameSystemCategories: { id: "id" },
   gameSystemMechanics: { id: "id" },
+  gameSystemToCategory: {
+    gameSystemId: "game_system_id",
+    categoryId: "category_id",
+  },
+  gameSystemToMechanics: {
+    gameSystemId: "game_system_id",
+    mechanicsId: "mechanics_id",
+  },
 }));
 vi.mock("drizzle-orm", () => ({
   eq: (...args: unknown[]) => ({ eq: args }),
@@ -141,10 +152,23 @@ describe("game system mutations", () => {
   });
 
   it("maps external tags to categories", async () => {
-    fakeDb.query.gameSystemCategories.findFirst.mockResolvedValue({ id: 2 });
+    fakeDb.select.mockReturnValueOnce({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([{ categoryId: 2 }] as unknown as never[])),
+        })),
+      })),
+    });
     const initialInserts = insertCalls.length;
     await mapExternalTagHandler({
-      data: { systemId: 2, source: "bgg", externalId: "x1", confidence: 0.5 },
+      data: {
+        systemId: 1,
+        targetType: "category",
+        targetId: 2,
+        source: "bgg",
+        externalTag: "x1",
+        confidence: 0.5,
+      },
     });
     expect(insertCalls.length).toBe(initialInserts + 1);
     const last = insertCalls[insertCalls.length - 1];
@@ -154,6 +178,35 @@ describe("game system mutations", () => {
       externalTag: "x1",
       categoryId: 2,
       confidence: 50,
+    });
+  });
+
+  it("maps external tags to mechanics", async () => {
+    fakeDb.select.mockReturnValueOnce({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([{ mechanicsId: 5 }] as unknown as never[])),
+        })),
+      })),
+    });
+    const initialInserts = insertCalls.length;
+    await mapExternalTagHandler({
+      data: {
+        systemId: 1,
+        targetType: "mechanic",
+        targetId: 5,
+        source: "startplaying",
+        externalTag: "combat",
+        confidence: 1,
+      },
+    });
+    expect(insertCalls.length).toBe(initialInserts + 1);
+    const last = insertCalls[insertCalls.length - 1];
+    expect(last?.values).toEqual({
+      source: "startplaying",
+      externalTag: "combat",
+      mechanicId: 5,
+      confidence: 100,
     });
   });
 

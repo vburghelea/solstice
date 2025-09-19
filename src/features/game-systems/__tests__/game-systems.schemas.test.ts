@@ -45,8 +45,10 @@ describe("Game Systems Schemas", () => {
     it("validates mapping", () => {
       const result = mapExternalTagSchema.safeParse({
         systemId: 1,
+        targetType: "category",
+        targetId: 2,
         source: "bgg",
-        externalId: "123",
+        externalTag: "123",
         confidence: 0.9,
       });
       expect(result.success).toBe(true);

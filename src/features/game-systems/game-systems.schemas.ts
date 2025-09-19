@@ -37,8 +37,10 @@ export type ReorderImagesInput = z.infer<typeof reorderImagesSchema>;
 
 export const mapExternalTagSchema = z.object({
   systemId: z.number().int(),
+  targetType: z.enum(["category", "mechanic"]),
+  targetId: z.number().int(),
   source: z.enum(["startplaying", "bgg", "wikipedia"]),
-  externalId: z.string(),
+  externalTag: z.string().min(1),
   confidence: z.number().min(0).max(1).default(1),
 });
 export type MapExternalTagInput = z.infer<typeof mapExternalTagSchema>;
@@ -49,6 +51,18 @@ export const triggerRecrawlSchema = z.object({
 });
 export type TriggerRecrawlInput = z.infer<typeof triggerRecrawlSchema>;
 
+export const updatePublishStatusSchema = z.object({
+  systemId: z.number().int(),
+  isPublished: z.boolean(),
+});
+export type UpdatePublishStatusInput = z.infer<typeof updatePublishStatusSchema>;
+
+export const updateCmsApprovalSchema = z.object({
+  systemId: z.number().int(),
+  approved: z.boolean(),
+});
+export type UpdateCmsApprovalInput = z.infer<typeof updateCmsApprovalSchema>;
+
 export const uploadImageSchema = z.object({
   systemId: z.number().int(),
   url: z.string().url(),
@@ -57,3 +71,16 @@ export const uploadImageSchema = z.object({
   licenseUrl: z.string().url().optional(),
 });
 export type UploadImageInput = z.infer<typeof uploadImageSchema>;
+
+export const moderateImageSchema = z.object({
+  systemId: z.number().int(),
+  mediaId: z.number().int(),
+  moderated: z.boolean(),
+});
+export type ModerateImageInput = z.infer<typeof moderateImageSchema>;
+
+export const selectHeroImageSchema = z.object({
+  systemId: z.number().int(),
+  mediaId: z.number().int(),
+});
+export type SelectHeroImageInput = z.infer<typeof selectHeroImageSchema>;

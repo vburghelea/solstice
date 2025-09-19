@@ -1,8 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
   mapExternalTagSchema,
+  moderateImageSchema,
   reorderImagesSchema,
+  selectHeroImageSchema,
   triggerRecrawlSchema,
+  updateCmsApprovalSchema,
+  updatePublishStatusSchema,
   uploadImageSchema,
   upsertCmsContentSchema,
 } from "./game-systems.schemas";
@@ -91,41 +95,81 @@ export const mapExternalTagHandler = async ({
     {
       externalCategoryMap,
       externalMechanicMap,
-      gameSystemCategories,
-      gameSystemMechanics,
+      gameSystemToCategory,
+      gameSystemToMechanics,
     },
   ] = await Promise.all([import("~/db/server-helpers"), import("~/db/schema")]);
-  const { eq } = await import("drizzle-orm");
+  const { and, eq } = await import("drizzle-orm");
   const db = await getDb();
   const confidence = Math.round(data.confidence * 100);
 
-  const category = await db.query.gameSystemCategories.findFirst({
-    where: eq(gameSystemCategories.id, data.systemId),
-  });
-  if (category) {
-    await db.insert(externalCategoryMap).values({
-      source: data.source,
-      externalTag: data.externalId,
-      categoryId: category.id,
-      confidence,
-    });
+  if (data.targetType === "category") {
+    const categoryLink = await db
+      .select({ categoryId: gameSystemToCategory.categoryId })
+      .from(gameSystemToCategory)
+      .where(
+        and(
+          eq(gameSystemToCategory.gameSystemId, data.systemId),
+          eq(gameSystemToCategory.categoryId, data.targetId),
+        ),
+      )
+      .limit(1);
+
+    if (categoryLink.length === 0) {
+      throw new Error("Category is not associated with this system.");
+    }
+
+    await db
+      .insert(externalCategoryMap)
+      .values({
+        source: data.source,
+        externalTag: data.externalTag,
+        categoryId: data.targetId,
+        confidence,
+      })
+      .onConflictDoUpdate({
+        target: [externalCategoryMap.source, externalCategoryMap.externalTag],
+        set: {
+          categoryId: data.targetId,
+          confidence,
+        },
+      });
+
     return { mapped: "category" as const };
   }
 
-  const mechanic = await db.query.gameSystemMechanics.findFirst({
-    where: eq(gameSystemMechanics.id, data.systemId),
-  });
-  if (mechanic) {
-    await db.insert(externalMechanicMap).values({
-      source: data.source,
-      externalTag: data.externalId,
-      mechanicId: mechanic.id,
-      confidence,
-    });
-    return { mapped: "mechanic" as const };
+  const mechanicLink = await db
+    .select({ mechanicsId: gameSystemToMechanics.mechanicsId })
+    .from(gameSystemToMechanics)
+    .where(
+      and(
+        eq(gameSystemToMechanics.gameSystemId, data.systemId),
+        eq(gameSystemToMechanics.mechanicsId, data.targetId),
+      ),
+    )
+    .limit(1);
+
+  if (mechanicLink.length === 0) {
+    throw new Error("Mechanic is not associated with this system.");
   }
 
-  return { mapped: false as const };
+  await db
+    .insert(externalMechanicMap)
+    .values({
+      source: data.source,
+      externalTag: data.externalTag,
+      mechanicId: data.targetId,
+      confidence,
+    })
+    .onConflictDoUpdate({
+      target: [externalMechanicMap.source, externalMechanicMap.externalTag],
+      set: {
+        mechanicId: data.targetId,
+        confidence,
+      },
+    });
+
+  return { mapped: "mechanic" as const };
 };
 
 export const mapExternalTag = createServerFn({ method: "POST" })
@@ -164,6 +208,86 @@ export const triggerRecrawl = createServerFn({ method: "POST" })
   .validator(triggerRecrawlSchema.parse)
   .handler(triggerRecrawlHandler);
 
+export const updatePublishStatusHandler = async ({
+  data,
+}: {
+  data: import("./game-systems.schemas").UpdatePublishStatusInput;
+}) => {
+  const [{ getDb }, { gameSystems }] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("~/db/schema"),
+  ]);
+  const { eq } = await import("drizzle-orm");
+  const db = await getDb();
+
+  const [updated] = await db
+    .update(gameSystems)
+    .set({
+      isPublished: data.isPublished,
+      updatedAt: new Date(),
+    })
+    .where(eq(gameSystems.id, data.systemId))
+    .returning();
+
+  if (!updated) {
+    throw new Error("Game system not found.");
+  }
+
+  return { ok: true };
+};
+
+export const updatePublishStatus = createServerFn({ method: "POST" })
+  .validator(updatePublishStatusSchema.parse)
+  .handler(updatePublishStatusHandler);
+
+export const updateCmsApprovalHandler = async ({
+  data,
+}: {
+  data: import("./game-systems.schemas").UpdateCmsApprovalInput;
+}) => {
+  const [{ getDb }, { gameSystems }, { getAuth }] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("~/db/schema"),
+    import("~/lib/auth/server-helpers"),
+  ]);
+  const { eq } = await import("drizzle-orm");
+  const { getWebRequest } = await import("@tanstack/react-start/server");
+
+  const db = await getDb();
+  const auth = await getAuth();
+  const { headers } = getWebRequest();
+  const session = await auth.api.getSession({ headers });
+
+  if (!session?.user?.id) {
+    throw new Error("You must be signed in to manage CMS approval.");
+  }
+
+  type GameSystemUpdate = typeof gameSystems.$inferInsert;
+  const now = new Date();
+  const updatePayload: Partial<GameSystemUpdate> = {
+    cmsApproved: data.approved,
+    updatedAt: now,
+    lastApprovedAt: data.approved ? now : null,
+    lastApprovedBy: data.approved ? session.user.id : null,
+  };
+
+  const [updated] = await db
+    .update(gameSystems)
+    .set(updatePayload)
+    .where(eq(gameSystems.id, data.systemId))
+    .returning();
+
+  if (!updated) {
+    throw new Error("Game system not found.");
+  }
+
+  return { ok: true };
+};
+
+export const updateCmsApproval = createServerFn({ method: "POST" })
+  .validator(updateCmsApprovalSchema.parse)
+  .handler(updateCmsApprovalHandler);
+
 export const uploadImageHandler = async ({
   data,
 }: {
@@ -199,3 +323,70 @@ export const uploadImageHandler = async ({
 export const uploadImage = createServerFn({ method: "POST" })
   .validator(uploadImageSchema.parse)
   .handler(uploadImageHandler);
+
+export const moderateImageHandler = async ({
+  data,
+}: {
+  data: import("./game-systems.schemas").ModerateImageInput;
+}) => {
+  const [{ getDb }, { mediaAssets }] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("~/db/schema"),
+  ]);
+  const { and, eq } = await import("drizzle-orm");
+  const db = await getDb();
+
+  const [updated] = await db
+    .update(mediaAssets)
+    .set({ moderated: data.moderated })
+    .where(
+      and(eq(mediaAssets.id, data.mediaId), eq(mediaAssets.gameSystemId, data.systemId)),
+    )
+    .returning();
+
+  if (!updated) {
+    throw new Error("Media asset not found for this system.");
+  }
+
+  return { assetId: updated.id, moderated: updated.moderated };
+};
+
+export const moderateImage = createServerFn({ method: "POST" })
+  .validator(moderateImageSchema.parse)
+  .handler(moderateImageHandler);
+
+export const selectHeroImageHandler = async ({
+  data,
+}: {
+  data: import("./game-systems.schemas").SelectHeroImageInput;
+}) => {
+  const [{ getDb }, { gameSystems, mediaAssets }] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("~/db/schema"),
+  ]);
+  const { and, eq } = await import("drizzle-orm");
+  const db = await getDb();
+
+  const asset = await db
+    .select({ id: mediaAssets.id })
+    .from(mediaAssets)
+    .where(
+      and(eq(mediaAssets.id, data.mediaId), eq(mediaAssets.gameSystemId, data.systemId)),
+    )
+    .limit(1);
+
+  if (asset.length === 0) {
+    throw new Error("Media asset not found for this system.");
+  }
+
+  await db
+    .update(gameSystems)
+    .set({ heroImageId: data.mediaId })
+    .where(eq(gameSystems.id, data.systemId));
+
+  return { heroImageId: data.mediaId };
+};
+
+export const selectHeroImage = createServerFn({ method: "POST" })
+  .validator(selectHeroImageSchema.parse)
+  .handler(selectHeroImageHandler);

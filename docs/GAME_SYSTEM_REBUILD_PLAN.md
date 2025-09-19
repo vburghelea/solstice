@@ -196,19 +196,29 @@ Deliverables
 - [x] Accessibility pass on images alt text and keyboard navigation.
 - [x] Surface popular systems carousel on homepage sourced from session counts.
 - [x] Expose game systems link in public header footer navigation.
+- [x] Implement category autosuggest server function for tag input search.
+- [x] Normalize external reference links (StartPlaying /play/, BGG /boardgame/).
       Definition of done
 - [ ] Lighthouse performance and accessibility 90 plus in dev.
+
+### Current status
+
+- `/systems` route ships with debounced category tagging and pagination, backed by `searchCategories` server fn.
+- Homepage highlights top 10 systems by scheduled sessions via `listPopularSystems` and clickable carousel cards.
+- Public navigation now clearly surfaces the systems catalogue; hero art click-throughs improve card affordance.
+- Detail page external references are stable against mismatched IDs/URLs.
 
 Phase 9 - Admin UI
 Deliverables
 
 - Systems dashboard pages for curation.
   Checklist
-- [ ] Create dashboard list with completeness and crawl status, filters for needs curation and errors.
-- [ ] Create system editor with tabs for Overview, Content, Media, Taxonomy, Crawl.
-- [ ] Implement image moderation toggles and hero selection.
-- [ ] Implement external tag mapping UI with search and assignment to canonical items.
-- [ ] Implement recrawl button with source selection and status feedback.
+- [x] Create dashboard list with completeness and crawl status, filters for needs curation and errors. _(Route `/dashboard/systems/` with server-backed filters and summary badges delivered in Phase 9.A.)_
+- [x] Create system editor with tabs for Overview, Content, Media, Taxonomy, Crawl. _(Route `/dashboard/systems/$systemId` renders tab scaffold with read-only data; actions follow in Phase 9.C.)_
+- [x] Implement image moderation toggles and hero selection. _(Media tab supports moderation toggles and hero assignment backed by new server functions.)_
+- [x] Implement external tag mapping UI with search and assignment to canonical items. _(Taxonomy tab now supports per-category/mechanic mapping with source + confidence inputs.)_
+- [x] Implement publish/draft toggles and CMS approval controls. _(Overview tab surfaces publish + approval actions backed by new server mutations with audit metadata refresh.)_
+- [x] Implement recrawl button with source selection and status feedback. _(Crawl tab exposes manual/source-specific recrawl controls with optimistic refresh.)_
       Definition of done
 - [ ] Content manager can publish a system end to end without developer intervention.
 
@@ -260,6 +270,47 @@ listSystems request
 - id number, slug string, name string, heroUrl string nullable, minPlayers number nullable, maxPlayers number nullable, yearReleased number nullable, genres array of string
   getSystemBySlug response
 - system with fields and relations hero media gallery media tags arrays faqs array reviews aggregate
+
+`searchCategories` response
+
+- array of { id number, name string }
+
+`listPopularSystems` response
+
+- array of { id number, name string, slug string, summary string nullable, heroUrl string nullable, gameCount number }
+
+`listAdminGameSystems` request
+
+- q string optional, status "all" | "needs_curation" | "errors" | "published" | "unpublished" optional, sort "updated-desc" | "name-asc" | "crawl-status" optional
+  `listAdminGameSystems` response
+- items array of `AdminGameSystemListItem`, total number, stats { total number, needsCuration number, errors number, published number }
+  AdminGameSystemListItem
+- id number, name string, slug string, isPublished boolean, cmsApproved boolean, crawlStatus string nullable, lastCrawledAt string nullable ISO, lastSuccessAt string nullable ISO, updatedAt string ISO, heroSelected boolean, heroModerated boolean, hasSummary boolean, summarySource "cms" | "scraped" | null, categoryCount number, unmoderatedMediaCount number, needsCuration boolean, hasErrors boolean, statusFlags array of status identifiers, errorMessage string nullable
+
+`getAdminGameSystem` request
+
+- systemId number
+  `getAdminGameSystem` response
+- AdminGameSystemDetail (extends AdminGameSystemListItem with descriptionCms string nullable, descriptionScraped string nullable, externalRefs record, sourceOfTruth string nullable, lastApprovedAt string nullable ISO, lastApprovedBy string nullable, heroImage GameSystemMediaAsset nullable, gallery array of GameSystemMediaAsset, categories array of GameSystemTag, mechanics array of GameSystemTag, crawlEvents array of { id number, source string, status string, severity string, startedAt string ISO, finishedAt string ISO, httpStatus number nullable, errorMessage string nullable, details record<string, record<string, never>> nullable })
+- categoryMappings record<number, AdminExternalTagMapping[]>; mechanicMappings record<number, AdminExternalTagMapping[]>
+
+`mapExternalTag` request
+
+- systemId number, targetType "category" | "mechanic", targetId number, source "startplaying" | "bgg" | "wikipedia", externalTag string, confidence number (0-1)
+  `mapExternalTag` response
+- { mapped: "category" | "mechanic" }
+
+`updatePublishStatus` request
+
+- systemId number, isPublished boolean
+  `updatePublishStatus` response
+- { ok: true }
+
+`updateCmsApproval` request
+
+- systemId number, approved boolean
+  `updateCmsApproval` response
+- { ok: true }
 
 Crawler rate limits and timeouts
 

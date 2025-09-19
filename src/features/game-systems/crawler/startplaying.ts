@@ -2,13 +2,17 @@ import { asyncRateLimit } from "@tanstack/pacer";
 import { serverOnly } from "@tanstack/react-start";
 import type { CheerioAPI } from "cheerio";
 import type { CheerioCrawlingContext } from "crawlee";
-import { CheerioCrawler } from "crawlee";
 import { eq } from "drizzle-orm";
 import { CRAWLER_USER_AGENT } from "./config";
 import { CrawlSeverity, type CrawlEventLog } from "./logging";
 
 const START_PLAYING_BASE = "https://startplaying.games";
 const START_PLAYING_GRAPHQL = `${START_PLAYING_BASE}/api/graphql`;
+
+const getCheerioCrawler = serverOnly(async () => {
+  const { CheerioCrawler } = await import("crawlee");
+  return CheerioCrawler;
+});
 
 async function fetchSeoGameSystemLinks(): Promise<string[]> {
   try {
@@ -982,6 +986,7 @@ export async function crawlStartPlayingSystems(
 
   const unmappedCounts: Record<string, number> = {};
 
+  const CheerioCrawler = await getCheerioCrawler();
   const crawler = new CheerioCrawler({
     maxConcurrency: 1,
     async requestHandler({ request, $, enqueueLinks, log }: CheerioCrawlingContext) {

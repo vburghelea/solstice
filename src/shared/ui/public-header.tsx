@@ -7,28 +7,31 @@ export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-brand-light/95 sticky top-0 z-50 shadow-sm backdrop-blur-md">
+    <header className="sticky top-0 z-50 bg-white/95 text-gray-900 shadow-sm backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between sm:h-20">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3">
             <div className="maple-leaf-logo h-8 w-8 sm:h-10 sm:w-10"></div>
             <h1 className="text-brand-dark text-lg font-extrabold tracking-tight sm:text-xl">
               Roundup Games
             </h1>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-6 text-sm font-medium lg:flex lg:gap-8">
-            <Link to="/" className="hover:text-brand-red transition">
+          <nav className="hidden items-center gap-6 text-sm font-semibold lg:flex lg:gap-8">
+            <Link to="/" className="hover:text-brand-red text-gray-700 transition">
               Events
             </Link>
-            <Link to="/" className="hover:text-brand-red transition">
+            <Link to="/systems" className="hover:text-brand-red text-gray-700 transition">
+              Game Systems
+            </Link>
+            <Link to="/" className="hover:text-brand-red text-gray-700 transition">
               Teams
             </Link>
-            <Link to="/" className="hover:text-brand-red transition">
+            <Link to="/" className="hover:text-brand-red text-gray-700 transition">
               Resources
             </Link>
-            <Link to="/" className="hover:text-brand-red transition">
+            <Link to="/" className="hover:text-brand-red text-gray-700 transition">
               About Us
             </Link>
           </nav>
@@ -37,7 +40,7 @@ export function PublicHeader() {
           <div className="hidden items-center gap-3 lg:flex">
             <Link
               to="/auth/login"
-              className="rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
             >
               Login
             </Link>
@@ -71,6 +74,13 @@ export function PublicHeader() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Events
+              </Link>
+              <Link
+                to="/systems"
+                className="hover:text-brand-red text-base font-medium text-gray-900 transition"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Game Systems
               </Link>
               <Link
                 to="/"

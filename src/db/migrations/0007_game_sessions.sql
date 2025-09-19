@@ -6,7 +6,7 @@ CREATE TYPE "public"."game_status" AS ENUM('scheduled', 'canceled', 'completed')
 
 CREATE TABLE "game_applications" (
 	"id" uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
-	"game_id" text NOT NULL,
+	"game_id" uuid,
 	"user_id" text NOT NULL,
 	"status" "application_status" DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE "games" (
 	"location" jsonb NOT NULL,
 	"status" "game_status" DEFAULT 'scheduled' NOT NULL,
 	"minimum_requirements" jsonb,
-	"visibility" "game_visibility" DEFAULT 'public' NOT NULL,
+	"visibility" "visibility" DEFAULT 'public' NOT NULL,
 	"safety_rules" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
@@ -50,5 +50,4 @@ ALTER TABLE "game_participants" ALTER COLUMN "game_id" TYPE uuid USING game_id::
 ALTER TABLE "game_participants" ADD CONSTRAINT "game_participants_game_id_games_id_fk" FOREIGN KEY ("game_id") REFERENCES "public"."games"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "game_participants" ADD CONSTRAINT "game_participants_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "games" ADD CONSTRAINT "games_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "games" ADD CONSTRAINT "games_campaign_id_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."campaigns"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "games" ADD CONSTRAINT "games_game_system_id_game_systems_id_fk" FOREIGN KEY ("game_system_id") REFERENCES "public"."game_systems"("id") ON DELETE cascade ON UPDATE no action;

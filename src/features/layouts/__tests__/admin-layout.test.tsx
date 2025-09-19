@@ -93,4 +93,52 @@ describe("AdminLayout with Router", () => {
     expect(teamsLink).toBeTruthy();
     expect(eventsLink).toBeTruthy();
   });
+
+  it("shows admin tools navigation for platform admins", async () => {
+    const adminUser = {
+      id: "admin-platform-user",
+      name: "Platform Admin",
+      email: "platform-admin@example.com",
+      emailVerified: true,
+      image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      profileComplete: true,
+      phone: "+1234567890",
+      gender: "female" as const,
+      pronouns: "she/her",
+      privacySettings: JSON.stringify({
+        showEmail: false,
+        showPhone: false,
+      }),
+      profileVersion: 1,
+      profileUpdatedAt: new Date(),
+      roles: [
+        {
+          id: "role-platform-admin",
+          userId: "admin-platform-user",
+          roleId: "platform-admin",
+          role: {
+            id: "platform-admin",
+            name: "Platform Admin",
+            description: "Platform administrator",
+            permissions: {},
+          },
+          teamId: null,
+          eventId: null,
+          assignedBy: "system",
+          assignedAt: new Date(),
+          expiresAt: null,
+          notes: null,
+        },
+      ],
+    };
+
+    await renderWithRouter(<AdminLayout />, { user: adminUser });
+
+    expect(screen.getByText("Admin tools")).toBeInTheDocument();
+
+    const systemsLink = screen.getByRole("link", { name: /systems/i });
+    expect(systemsLink).toHaveAttribute("href", "/dashboard/systems");
+  });
 });

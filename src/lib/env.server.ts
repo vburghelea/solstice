@@ -7,7 +7,12 @@
 
 // Load dotenv synchronously before createEnv is called
 import dotenv from "dotenv";
-if (import.meta.env.SSR && import.meta.env.DEV) {
+
+const hasImportMetaEnv = typeof import.meta !== "undefined" && !!import.meta.env;
+const shouldLoadDotenv =
+  !hasImportMetaEnv || (import.meta.env.SSR && import.meta.env.DEV);
+
+if (shouldLoadDotenv) {
   dotenv.config();
   dotenv.config({ path: ".env", override: true });
 }

@@ -15,6 +15,7 @@ vi.mock("../profile.queries", async (importOriginal) => {
 });
 
 // Import the mocked functions and the unmocked utility
+import type { GameSystemSummary } from "../profile.queries";
 import {
   getGameSystems,
   getProfileCompletionStatus,
@@ -349,45 +350,9 @@ describe("Profile Queries", () => {
     });
 
     it("should return game systems matching the search term", async () => {
-      const mockGameSystems = [
-        {
-          id: 1,
-          name: "Catan",
-          slug: "catan",
-          descriptionCms: null,
-          galleryImages: null,
-          minPlayers: null,
-          maxPlayers: null,
-          optimalPlayers: null,
-          playTime: null,
-          complexity: null,
-          tags: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          averagePlayTime: null,
-          ageRating: null,
-          complexityRating: null,
-          yearReleased: null,
-        },
-        {
-          id: 2,
-          name: "Carcassonne",
-          slug: "carcassonne",
-          descriptionCms: null,
-          galleryImages: null,
-          minPlayers: null,
-          maxPlayers: null,
-          optimalPlayers: null,
-          playTime: null,
-          complexity: null,
-          tags: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          averagePlayTime: null,
-          ageRating: null,
-          complexityRating: null,
-          yearReleased: null,
-        },
+      const mockGameSystems: GameSystemSummary[] = [
+        { id: 1, name: "Catan" },
+        { id: 2, name: "Carcassonne" },
       ];
       vi.mocked(getGameSystems).mockResolvedValue({
         success: true,

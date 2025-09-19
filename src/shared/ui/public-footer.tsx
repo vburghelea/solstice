@@ -23,6 +23,12 @@ export function PublicFooter() {
               <Link className="block text-gray-400 transition hover:text-white" to="/">
                 Events
               </Link>
+              <Link
+                className="block text-gray-400 transition hover:text-white"
+                to="/systems"
+              >
+                Game Systems
+              </Link>
               <Link className="block text-gray-400 transition hover:text-white" to="/">
                 Teams
               </Link>

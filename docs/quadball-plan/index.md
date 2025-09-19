@@ -4,17 +4,17 @@ The Quadball Canada platform is a comprehensive sports league management system 
 
 ## Current Features
 
-| Feature            | Status         | Description                                    |
-| ------------------ | -------------- | ---------------------------------------------- |
-| **Authentication** | ✅ Complete    | Email/password and OAuth login via Better Auth |
-| **User Profiles**  | ✅ Complete    | Member profiles with privacy settings          |
-| **Dashboard**      | ✅ Complete    | Authenticated user dashboard                   |
-| **Theme Support**  | ✅ Complete    | Light/dark mode with system preference         |
-| **Teams**          | 🚧 In Progress | Team creation and management                   |
-| **Events**         | ⏳ Planned     | Tournament and event system                    |
-| **Payments**       | ⏳ Planned     | Square integration for fees                    |
-| **Email**          | ⏳ Planned     | SendGrid notifications                         |
-| **Analytics**      | ⏳ Planned     | Admin reporting dashboard                      |
+| Feature            | Status         | Description                                               |
+| ------------------ | -------------- | --------------------------------------------------------- |
+| **Authentication** | ✅ Complete    | Email/password and OAuth login via Better Auth            |
+| **User Profiles**  | ✅ Complete    | Member profiles with privacy settings                     |
+| **Dashboard**      | ✅ Complete    | Authenticated user dashboard                              |
+| **Theme Support**  | ✅ Complete    | Light/dark mode with system preference                    |
+| **Teams**          | ✅ Complete    | Team creation and management                              |
+| **Events**         | 🚧 In Progress | Organizers UI shipped; E2E coverage + invites pending     |
+| **Payments**       | 🚧 In Progress | Square checkout live; webhook reconciliation outstanding  |
+| **Email**          | 🚧 In Progress | SendGrid service ready; invitations/notifications missing |
+| **Analytics**      | ⏳ Planned     | Admin reporting dashboard                                 |
 
 ## Project Documentation
 

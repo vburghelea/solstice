@@ -1,5 +1,7 @@
 # AGENTS.md - Coding Agent Guidelines for Solstice
 
+# Immediately also read CLAUDE.md
+
 ## Build/Lint/Test Commands
 
 - `pnpm dev` - Start Vite dev server (port 5173, default to use)
@@ -24,6 +26,8 @@
 - **Architecture**: Features in `src/features/`, shared code in `src/shared/`, thin route files
 
 ## Important Notes
+
+- MCP Playwright browser tool is available for both local and external URLs; use it to verify UI flows when needed.
 
 - Read Better Auth docs at https://www.better-auth.com/llms.txt when working with auth
 - Always run `pnpm lint` and `pnpm check-types` before completing tasks

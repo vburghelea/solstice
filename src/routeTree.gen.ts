@@ -27,6 +27,7 @@ import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members
 import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
@@ -129,6 +130,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   id: "/login",
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
+} as any);
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: "/admin/roles",
+  path: "/admin/roles",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
   id: "/admin/events-review",
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
+  "/admin/roles": typeof AdminRolesRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -271,6 +278,7 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
+  "/admin/roles": typeof AdminRolesRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/members": typeof DashboardMembersRoute;
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
+  "/admin/roles": typeof AdminRolesRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
     | "/admin/events-review"
+    | "/admin/roles"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/events"
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | "/"
     | "/auth"
     | "/admin/events-review"
+    | "/admin/roles"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/members"
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
     | "/admin/events-review"
+    | "/admin/roles"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/events"
@@ -417,6 +429,7 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
 }
 export interface FileServerRoutesByFullPath {
@@ -607,6 +620,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/auth/login";
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
+    };
+    "/admin/roles": {
+      id: "/admin/roles";
+      path: "/admin/roles";
+      fullPath: "/admin/roles";
+      preLoaderRoute: typeof AdminRolesRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/admin/events-review": {
       id: "/admin/events-review";
@@ -874,6 +894,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
+  AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
 };
 export const routeTree = rootRouteImport

@@ -82,7 +82,11 @@ import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboa
 import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from "./routes/dashboard/campaigns/$campaignId/zero";
 =======
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+<<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
+>>>>>>> 9097c81 (fix: remove null buyerEmail from Square payment link request)
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
 import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
@@ -409,6 +413,11 @@ const DashboardEventsEventIdManageRoute =
     getParentRoute: () => DashboardEventsRoute,
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   } as any);
+const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
+  id: "/api/test-square",
+  path: "/api/test-square",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
 const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
   id: "/api/health",
   path: "/api/health",
@@ -928,6 +937,7 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
   "/api/social/block": typeof ApiSocialBlockServerRoute;
@@ -943,6 +953,7 @@ export interface FileServerRoutesByFullPath {
 }
 export interface FileServerRoutesByTo {
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
   "/api/social/block": typeof ApiSocialBlockServerRoute;
@@ -959,6 +970,7 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport;
   "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
   "/api/social/block": typeof ApiSocialBlockServerRoute;
@@ -976,6 +988,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath;
   fullPaths:
     | "/api/health"
+    | "/api/test-square"
     | "/api/auth/$"
     | "/api/avatars/$file"
     | "/api/social/block"
@@ -991,6 +1004,7 @@ export interface FileServerRouteTypes {
   fileServerRoutesByTo: FileServerRoutesByTo;
   to:
     | "/api/health"
+    | "/api/test-square"
     | "/api/auth/$"
     | "/api/avatars/$file"
     | "/api/social/block"
@@ -1006,6 +1020,7 @@ export interface FileServerRouteTypes {
   id:
     | "__root__"
     | "/api/health"
+    | "/api/test-square"
     | "/api/auth/$"
     | "/api/avatars/$file"
     | "/api/social/block"
@@ -1022,6 +1037,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiHealthServerRoute: typeof ApiHealthServerRoute;
+  ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
   ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
   ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
@@ -1456,6 +1472,13 @@ declare module "@tanstack/react-router" {
 }
 declare module "@tanstack/react-start/server" {
   interface ServerFileRoutesByPath {
+    "/api/test-square": {
+      id: "/api/test-square";
+      path: "/api/test-square";
+      fullPath: "/api/test-square";
+      preLoaderRoute: typeof ApiTestSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/health": {
       id: "/api/health";
       path: "/api/health";
@@ -1803,6 +1826,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>();
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiHealthServerRoute: ApiHealthServerRoute,
+  ApiTestSquareServerRoute: ApiTestSquareServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
   ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,

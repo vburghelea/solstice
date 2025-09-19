@@ -32,9 +32,8 @@ no membership created. The callback endpoint now:
 - ✅ Square sandbox checkout + callback data persists in `membership_payment_sessions`
 - ✅ Membership creation + receipt email triggered by server-side callback
 - ✅ Client-side confirm mutation remains compatible (no duplicate work)
-
-> NOTE: The hosted Netlify site still runs the previous build, so production tests must run after
-> deploying these changes.
+- ✅ Netlify deployment verified 2025‑09‑19 @ 16:58 UTC (checkout `LUJO45SIIB655EEP`, payment
+  `Hd3J4zVKfMdLXNXalzSO94b6upOZY`, membership id `qibe9dnckx7juwbn4pzl7vj3`)
 
 ## Suggested Follow-Up
 

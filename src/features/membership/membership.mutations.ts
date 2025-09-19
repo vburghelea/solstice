@@ -358,92 +358,40 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
         };
       }
 
-      const confirmedMembership = await db.transaction(async (tx) => {
-        const [existingMembershipByPayment] = await tx
-          .select()
-          .from(memberships)
-          .where(eq(memberships.paymentId, squarePaymentId))
-          .limit(1);
-
-        if (existingMembershipByPayment) {
-          await tx
-            .update(membershipPaymentSessions)
-            .set({
-              status: "completed",
-              squarePaymentId,
-              squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
-              metadata: {
-                ...(paymentSession.metadata ?? {}),
-                membershipId: existingMembershipByPayment.id,
-                paymentConfirmedAt: new Date().toISOString(),
-                squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
-              },
-              updatedAt: new Date(),
-            })
-            .where(eq(membershipPaymentSessions.id, paymentSession.id));
-
-          return existingMembershipByPayment;
-        }
-
-        // Calculate membership dates
-        const startDate = new Date();
-        const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + membershipType.durationMonths);
-
-        const [newMembership] = await tx
-          .insert(memberships)
-          .values({
-            userId: session.user.id,
-            membershipTypeId: membershipType.id,
-            startDate: startDate.toISOString().split("T")[0],
-            endDate: endDate.toISOString().split("T")[0],
-            status: "active",
-            paymentProvider: "square",
-            paymentId: squarePaymentId,
-            metadata: {
-              ...(paymentSession.metadata ?? {}),
-              sessionId: data.sessionId,
-              purchasedAt: new Date().toISOString(),
-            },
-          })
-          .returning();
-
-        await tx
-          .update(membershipPaymentSessions)
-          .set({
-            status: "completed",
-            squarePaymentId,
-            squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
-            metadata: {
-              ...(paymentSession.metadata ?? {}),
-              membershipId: newMembership.id,
-              paymentConfirmedAt: new Date().toISOString(),
-              squareOrderId: paymentResult.orderId ?? paymentSession.squareOrderId,
-            },
-            updatedAt: new Date(),
-          })
-          .where(eq(membershipPaymentSessions.id, paymentSession.id));
-
-        return newMembership;
+      const now = new Date();
+      const { finalizeMembershipForSession } = await import("./membership.finalize");
+      const finalizeResult = await finalizeMembershipForSession({
+        db,
+        paymentSession,
+        membershipType,
+        paymentId: squarePaymentId,
+        orderId: paymentResult.orderId ?? paymentSession.squareOrderId ?? null,
+        sessionId: data.sessionId,
+        now,
       });
 
-      // Send confirmation email
-      try {
-        const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
+      const confirmedMembership = finalizeResult.membership;
+      const membershipWasCreated = finalizeResult.wasCreated;
 
-        await sendMembershipPurchaseReceipt({
-          to: {
-            email: session.user.email,
-            name: session.user.name || undefined,
-          },
-          membershipType: membershipType.name,
-          amount: membershipType.priceCents,
-          paymentId: squarePaymentId,
-          expiresAt: new Date(confirmedMembership.endDate),
-        });
-      } catch (emailError) {
-        // Log error but don't fail the purchase
-        console.error("Failed to send confirmation email:", emailError);
+      // Send confirmation email
+      if (membershipWasCreated) {
+        try {
+          const { sendMembershipPurchaseReceipt } = await import("~/lib/email/sendgrid");
+
+          await sendMembershipPurchaseReceipt({
+            to: {
+              email: session.user.email,
+              name: session.user.name || undefined,
+            },
+            membershipType: membershipType.name,
+            amount: membershipType.priceCents,
+            paymentId: squarePaymentId,
+            expiresAt: new Date(confirmedMembership.endDate),
+          });
+        } catch (emailError) {
+          // Log error but don't fail the purchase
+          console.error("Failed to send confirmation email:", emailError);
+        }
       }
 
       return {

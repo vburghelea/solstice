@@ -4,6 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Quick Reference
 
+### MCP Browser Access
+
+- Use the Playwright MCP browser tool to open local or external sites when manual
+  verification or UI capture is needed; it is available in this repo's toolchain.
+
 ### Server Functions - Always Use Zod Validation
 
 ```typescript

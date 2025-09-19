@@ -48,6 +48,9 @@ async function seed() {
   const membershipPurchaseUserId = "clxpfz4jn000408l8e6j7d5n6"; // User for membership purchase tests
   const teamJoinUserId = "clxpfz4jn000508l8f7k8e6o7"; // User for team joining tests
   const squareTestUserId = "clxpfz4jn000608l8g8l9f7p8"; // User for Square sandbox testing
+  const individualEventId = "00000000-0000-0000-0000-00000000e201";
+  const teamEventId = "00000000-0000-0000-0000-00000000e202";
+  const individualRegistrationId = "00000000-0000-0000-0000-00000000e211";
 
   try {
     // Clear existing test data in correct order due to foreign key constraints
@@ -443,6 +446,90 @@ async function seed() {
 
     // Create memberships for test users
     console.log("Creating memberships for test users...");
+
+    console.log("Creating sample events...");
+    const now = new Date();
+    const firstEventStart = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+    const firstEventEnd = new Date(now.getFullYear(), now.getMonth() + 1, 16);
+    const secondEventStart = new Date(now.getFullYear(), now.getMonth() + 2, 5);
+    const secondEventEnd = new Date(now.getFullYear(), now.getMonth() + 2, 6);
+
+    const formatDateOnly = (date: Date) => date.toISOString().slice(0, 10);
+
+    const sampleEvents: (typeof events.$inferInsert)[] = [
+      {
+        id: individualEventId,
+        name: "E2E Open Showcase",
+        slug: "e2e-open-showcase",
+        shortDescription: "Seeded event for automated individual registration flows",
+        type: "tournament",
+        status: "registration_open",
+        city: "Toronto",
+        province: "ON",
+        startDate: formatDateOnly(firstEventStart),
+        endDate: formatDateOnly(firstEventEnd),
+        registrationOpensAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+        registrationClosesAt: new Date(
+          firstEventStart.getTime() + 7 * 24 * 60 * 60 * 1000,
+        ),
+        registrationType: "individual",
+        maxParticipants: 200,
+        individualRegistrationFee: 2500,
+        organizerId: adminUserId,
+        contactEmail: "events@quadballcanada.com",
+        contactPhone: "+1 (555) 987-0001",
+        isPublic: true,
+        isFeatured: false,
+        metadata: { seeded: true, category: "individual" },
+      },
+      {
+        id: teamEventId,
+        name: "E2E Invitational Cup",
+        slug: "e2e-invitational-cup",
+        shortDescription: "Draft event used to exercise admin approval flows",
+        type: "tournament",
+        status: "draft",
+        city: "Ottawa",
+        province: "ON",
+        startDate: formatDateOnly(secondEventStart),
+        endDate: formatDateOnly(secondEventEnd),
+        registrationOpensAt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+        registrationClosesAt: new Date(
+          secondEventStart.getTime() - 2 * 24 * 60 * 60 * 1000,
+        ),
+        registrationType: "team",
+        maxTeams: 16,
+        teamRegistrationFee: 6000,
+        organizerId: teamCreatorUserId,
+        contactEmail: "teams@quadballcanada.com",
+        contactPhone: "+1 (555) 987-0002",
+        isPublic: false,
+        isFeatured: false,
+        metadata: { seeded: true, category: "team" },
+      },
+    ];
+
+    await db.insert(events).values(sampleEvents);
+
+    console.log("✅ Created sample events");
+
+    console.log("Creating sample event registrations...");
+    await db.insert(eventRegistrations).values([
+      {
+        id: individualRegistrationId,
+        eventId: individualEventId,
+        userId: testUserId,
+        registrationType: "individual",
+        status: "confirmed",
+        paymentStatus: "paid",
+        createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+        confirmedAt: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+        notes: "Seeded via scripts/seed-e2e-data.ts",
+      },
+    ]);
+
+    console.log("✅ Created sample event registrations");
 
     // Create active memberships for both test and admin users
     await db.insert(memberships).values([

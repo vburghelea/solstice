@@ -90,26 +90,26 @@
       "idx": 3,
       "version": "7",
       "when": 1753877458967,
-      "tag": "0003_add_events_system",
+      "tag": "0003_add_teams",
       "breakpoints": true
     },
     {
       "idx": 4,
-      "version": "7",
+      "version": "1",
       "when": 1754050764776,
-      "tag": "0004_teams_rename_province_to_country",
+      "tag": "0004_add_events_system",
       "breakpoints": true
     },
     {
       "idx": 5,
-      "version": "7",
+      "version": "1",
       "when": 1754214319845,
       "tag": "0005_user_entity_updates",
       "breakpoints": true
     },
     {
       "idx": 6,
-      "version": "7",
+      "version": "1",
       "when": 1754296052796,
       "tag": "0006_events_rename_province_to_country",
       "breakpoints": true

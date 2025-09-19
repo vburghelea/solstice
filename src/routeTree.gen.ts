@@ -46,6 +46,7 @@ import { Route as EventsIndexRouteImport } from "./routes/events/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
@@ -53,8 +54,13 @@ import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 =======
+=======
+import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
+>>>>>>> 04a1974 (Game system overhaul (#10))
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 <<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
@@ -67,9 +73,13 @@ import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 >>>>>>> d95987d (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
+>>>>>>> bee1602 (Game system overhaul (#10))
 import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
@@ -130,6 +140,7 @@ import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-pas
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 >>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardSystemsIndexRouteImport } from "./routes/dashboard/systems/index";
 import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
@@ -142,6 +153,7 @@ import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$templa
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardSystemsSystemIdRouteImport } from "./routes/dashboard/systems/$systemId";
 import { Route as DashboardReviewsPendingRouteImport } from "./routes/dashboard/reviews/pending";
 import { Route as DashboardProfileBlocklistRouteImport } from "./routes/dashboard/profile/blocklist";
 import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
@@ -313,6 +325,7 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 } as any);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const SystemsSlugRoute = SystemsSlugRouteImport.update({
   id: "/systems/$slug",
   path: "/systems/$slug",
@@ -332,10 +345,19 @@ const EventsSlugRoute = EventsSlugRouteImport.update({
   path: "/events/$slug",
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const EventsSlugRoute = EventsSlugRouteImport.update({
   id: "/events/$slug",
   path: "/events/$slug",
 =======
+=======
+const SystemsSlugRoute = SystemsSlugRouteImport.update({
+  id: "/systems/$slug",
+  path: "/systems/$slug",
+  getParentRoute: () => rootRouteImport,
+} as any);
+>>>>>>> 04a1974 (Game system overhaul (#10))
 const GameGameIdRoute = GameGameIdRouteImport.update({
   id: "/game/$gameId",
   path: "/game/$gameId",
@@ -354,13 +376,19 @@ const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const DashboardSystemsRoute = DashboardSystemsRouteImport.update({
   id: "/systems",
   path: "/systems",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const DashboardSocialAuditsRoute = DashboardSocialAuditsRouteImport.update({
   id: "/social-audits",
   path: "/social-audits",
@@ -487,13 +515,19 @@ const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const DashboardSystemsIndexRoute = DashboardSystemsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardSystemsRoute,
 } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -573,14 +607,20 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
     id: "/$systemId",
     path: "/$systemId",
     getParentRoute: () => DashboardSystemsRoute,
   } as any);
+<<<<<<< HEAD
 =======
 >>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 const DashboardReviewsPendingRoute = DashboardReviewsPendingRouteImport.update({
   id: "/reviews/pending",
   path: "/reviews/pending",
@@ -932,9 +972,13 @@ export interface FileRoutesByFullPath {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+  "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
+>>>>>>> bee1602 (Game system overhaul (#10))
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -978,15 +1022,23 @@ export interface FileRoutesByFullPath {
   "/event/$eventId": typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+  "/systems/$slug": typeof SystemsSlugRoute;
+>>>>>>> 04a1974 (Game system overhaul (#10))
   "/dashboard/": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
 =======
+=======
+  "/systems": typeof SystemsIndexRoute;
+>>>>>>> 04a1974 (Game system overhaul (#10))
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
@@ -1000,6 +1052,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1012,6 +1065,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems/": typeof DashboardSystemsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1111,6 +1165,7 @@ export interface FileRoutesByTo {
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
+<<<<<<< HEAD
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
   "/systems": typeof SystemsIndexRoute;
@@ -1141,15 +1196,21 @@ export interface FileRoutesByTo {
 =======
   "/game/$gameId": typeof GameGameIdRoute;
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
 =======
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+=======
+  "/systems": typeof SystemsIndexRoute;
+>>>>>>> 04a1974 (Game system overhaul (#10))
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
 <<<<<<< HEAD
 =======
@@ -1161,6 +1222,7 @@ export interface FileRoutesByTo {
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
 <<<<<<< HEAD
@@ -1172,6 +1234,7 @@ export interface FileRoutesByTo {
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/profile": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems": typeof DashboardSystemsIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1283,9 +1346,13 @@ export interface FileRoutesById {
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+  "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
+>>>>>>> bee1602 (Game system overhaul (#10))
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1329,15 +1396,23 @@ export interface FileRoutesById {
   "/event/$eventId": typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+  "/systems/$slug": typeof SystemsSlugRoute;
+>>>>>>> 04a1974 (Game system overhaul (#10))
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+<<<<<<< HEAD
 <<<<<<< HEAD
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRoute;
 =======
+=======
+  "/systems/": typeof SystemsIndexRoute;
+>>>>>>> 04a1974 (Game system overhaul (#10))
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
@@ -1351,6 +1426,7 @@ export interface FileRoutesById {
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -1363,6 +1439,7 @@ export interface FileRoutesById {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems/": typeof DashboardSystemsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1462,9 +1539,13 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard/social-audits"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/dashboard/systems"
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+    | "/dashboard/systems"
+>>>>>>> bee1602 (Game system overhaul (#10))
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1508,12 +1589,20 @@ export interface FileRouteTypes {
     | "/event/$eventId"
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+    | "/systems/$slug"
+>>>>>>> 04a1974 (Game system overhaul (#10))
     | "/dashboard/"
     | "/events"
     | "/onboarding/"
+<<<<<<< HEAD
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
+=======
+    | "/systems"
+>>>>>>> 04a1974 (Game system overhaul (#10))
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
 <<<<<<< HEAD
@@ -1526,6 +1615,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
     | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1538,6 +1628,7 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
+    | "/dashboard/systems/"
     | "/dashboard/teams/"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1637,6 +1728,7 @@ export interface FileRouteTypes {
     | "/event/$eventId"
     | "/game/$gameId"
     | "/systems/$slug"
+<<<<<<< HEAD
     | "/dashboard"
     | "/onboarding"
     | "/systems"
@@ -1667,15 +1759,21 @@ export interface FileRouteTypes {
 =======
     | "/game/$gameId"
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     | "/dashboard"
     | "/events"
     | "/onboarding"
+<<<<<<< HEAD
 <<<<<<< HEAD
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/$campaignId"
 =======
 >>>>>>> e0ec3e8 (feat: added session zero tracking for campaigns in the campaign details page and fixed some minor UI/UX and test setup issues)
+=======
+    | "/systems"
+>>>>>>> 04a1974 (Game system overhaul (#10))
     | "/dashboard/campaigns/create"
 <<<<<<< HEAD
 =======
@@ -1687,6 +1785,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
     | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
 <<<<<<< HEAD
@@ -1698,6 +1797,7 @@ export interface FileRouteTypes {
     | "/dashboard/events"
     | "/dashboard/games"
     | "/dashboard/profile"
+    | "/dashboard/systems"
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1795,9 +1895,13 @@ export interface FileRouteTypes {
     | "/dashboard/settings"
     | "/dashboard/social-audits"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/dashboard/systems"
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+    | "/dashboard/systems"
+>>>>>>> bee1602 (Game system overhaul (#10))
     | "/dashboard/teams"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1841,12 +1945,20 @@ export interface FileRouteTypes {
     | "/event/$eventId"
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+    | "/systems/$slug"
+>>>>>>> 04a1974 (Game system overhaul (#10))
     | "/dashboard/"
     | "/events/"
     | "/onboarding/"
+<<<<<<< HEAD
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
+=======
+    | "/systems/"
+>>>>>>> 04a1974 (Game system overhaul (#10))
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
 <<<<<<< HEAD
@@ -1859,6 +1971,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
     | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -1871,6 +1984,7 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
+    | "/dashboard/systems/"
     | "/dashboard/teams/"
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1951,11 +2065,16 @@ export interface RootRouteChildren {
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: typeof GameGameIdRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 <<<<<<< HEAD
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 =======
 =======
+=======
+  SystemsSlugRoute: typeof SystemsSlugRoute;
+  SystemsIndexRoute: typeof SystemsIndexRoute;
+>>>>>>> 04a1974 (Game system overhaul (#10))
   DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
 >>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
@@ -2257,6 +2376,7 @@ declare module "@tanstack/react-router" {
     };
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     "/systems/$slug": {
       id: "/systems/$slug";
       path: "/systems/$slug";
@@ -2279,6 +2399,8 @@ declare module "@tanstack/react-router" {
 =======
 =======
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/events/$slug": {
       id: "/events/$slug";
       path: "/events/$slug";
@@ -2288,6 +2410,15 @@ declare module "@tanstack/react-router" {
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
 =======
+=======
+    "/systems/$slug": {
+      id: "/systems/$slug";
+      path: "/systems/$slug";
+      fullPath: "/systems/$slug";
+      preLoaderRoute: typeof SystemsSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+>>>>>>> 04a1974 (Game system overhaul (#10))
     "/game/$gameId": {
       id: "/game/$gameId";
       path: "/game/$gameId";
@@ -2312,6 +2443,9 @@ declare module "@tanstack/react-router" {
       parentRoute: typeof DashboardRouteRoute;
     };
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/dashboard/systems": {
       id: "/dashboard/systems";
       path: "/systems";
@@ -2319,8 +2453,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSystemsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/dashboard/social-audits": {
       id: "/dashboard/social-audits";
       path: "/social-audits";
@@ -2491,6 +2628,9 @@ declare module "@tanstack/react-router" {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/dashboard/systems/": {
       id: "/dashboard/systems/";
       path: "/";
@@ -2498,8 +2638,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSystemsIndexRouteImport;
       parentRoute: typeof DashboardSystemsRoute;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/dashboard/profile/": {
       id: "/dashboard/profile/";
       path: "/";
@@ -2601,6 +2744,9 @@ declare module "@tanstack/react-router" {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/dashboard/systems/$systemId": {
       id: "/dashboard/systems/$systemId";
       path: "/$systemId";
@@ -2608,8 +2754,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardSystemsSystemIdRouteImport;
       parentRoute: typeof DashboardSystemsRoute;
     };
+<<<<<<< HEAD
 =======
 >>>>>>> 9bdedfd (feat: add end‑to‑end GM reviews, pending list, and GM stats; fix rating + gamesHosted)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
     "/dashboard/reviews/pending": {
       id: "/dashboard/reviews/pending";
       path: "/reviews/pending";
@@ -3151,6 +3300,9 @@ const DashboardProfileRouteWithChildren =
   DashboardProfileRoute._addFileChildren(DashboardProfileRouteChildren);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 interface DashboardSystemsRouteChildren {
   DashboardSystemsSystemIdRoute: typeof DashboardSystemsSystemIdRoute;
   DashboardSystemsIndexRoute: typeof DashboardSystemsIndexRoute;
@@ -3164,12 +3316,15 @@ const DashboardSystemsRouteChildren: DashboardSystemsRouteChildren = {
 const DashboardSystemsRouteWithChildren =
   DashboardSystemsRoute._addFileChildren(DashboardSystemsRouteChildren);
 
+<<<<<<< HEAD
 =======
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
 =======
 >>>>>>> 7854119 (feat: completed game view/create/edit baseline and improved games listing)
 =======
 >>>>>>> c93f2dc (feat: added baseline viewing other player's profile, added GM reviews and user following as social features)
+=======
+>>>>>>> bee1602 (Game system overhaul (#10))
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
@@ -3235,9 +3390,13 @@ interface DashboardRouteRouteChildren {
   DashboardSettingsRoute: typeof DashboardSettingsRoute;
   DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren;
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+  DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren;
+>>>>>>> bee1602 (Game system overhaul (#10))
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
 <<<<<<< HEAD
@@ -3288,9 +3447,13 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSocialAuditsRoute: DashboardSocialAuditsRoute,
 <<<<<<< HEAD
+<<<<<<< HEAD
   DashboardSystemsRoute: DashboardSystemsRouteWithChildren,
 =======
 >>>>>>> 32a05a1 (feat: add social audits, admin nav, and role-based guards; improve reports UX; improved tests related to guards and enforcement)
+=======
+  DashboardSystemsRoute: DashboardSystemsRouteWithChildren,
+>>>>>>> bee1602 (Game system overhaul (#10))
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 <<<<<<< HEAD
@@ -3388,11 +3551,16 @@ const rootRouteChildren: RootRouteChildren = {
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: GameGameIdRoute,
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> be21cee (feat: changed front page to be more dynamic and board game/tabletop specific)
 <<<<<<< HEAD
 >>>>>>> cbd5911 (feat: changed front page to be more dynamic and board game/tabletop specific)
 =======
 =======
+=======
+  SystemsSlugRoute: SystemsSlugRoute,
+  SystemsIndexRoute: SystemsIndexRoute,
+>>>>>>> 04a1974 (Game system overhaul (#10))
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
 >>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)

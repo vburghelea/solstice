@@ -132,6 +132,33 @@ export function DataTable<TData, TValue>({
       )}
       <div className="rounded-md border">
         <Table>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {onExport && (
+          <Button onClick={onExport} variant="outline">
+            Export CSV
+          </Button>
+        )}
+      </div>
+      <div className="bg-card text-card-foreground overflow-hidden rounded-xl border shadow-sm">
+        <Table className="w-full min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

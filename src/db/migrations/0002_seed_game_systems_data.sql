@@ -1,7 +1,7 @@
 -- Custom SQL migration file, put your code below!
 
 -- Seed Game Systems
-INSERT INTO game_systems (name, slug, description, min_players, max_players, optimal_players, average_play_time, age_rating, complexity_rating) VALUES
+INSERT INTO game_systems (name, slug, description_cms, min_players, max_players, optimal_players, average_play_time, age_rating, complexity_rating) VALUES
     ('Dungeons & Dragons 5e', 'dnd-5e', 'High Fantasy', 2, 6, 4, 240, '12+', 'Medium'),
     ('Pathfinder 2e', 'pathfinder-2e', 'High Fantasy', 2, 5, 4, 240, '10+', 'Complex'),
     ('Vampire: The Masquerade 5th Edition', 'vampire-the-masquerade-5th-edition', 'Personal and Political Horror', 2, 5, 3, 240, '18+', 'Moderate'),

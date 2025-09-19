@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useMemo, useRef, useState } from "react";
-import { GameSystem } from "~/db/schema/game-systems.schema";
-import { getGameSystems } from "~/features/profile/profile.queries";
+import {
+  getGameSystems,
+  type GameSystemSummary,
+} from "~/features/profile/profile.queries";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult, OptionalFetcher } from "~/shared/types/common";
@@ -30,13 +32,13 @@ export function GameTagInput({
 
   const getGameSystemsQuery: OptionalFetcher<
     { searchTerm?: string },
-    OperationResult<GameSystem[]>
+    OperationResult<GameSystemSummary[]>
   > = getGameSystems;
 
   const { data: gameSystems } = useQuery<
-    OperationResult<GameSystem[]>,
+    OperationResult<GameSystemSummary[]>,
     Error,
-    OperationResult<GameSystem[]>,
+    OperationResult<GameSystemSummary[]>,
     readonly [string, string]
   >({
     queryKey: ["gameSystems", debouncedInputValue] as const,
@@ -56,7 +58,7 @@ export function GameTagInput({
     const allGameSystems = gameSystems && gameSystems.success ? gameSystems.data : [];
     return inputValue
       ? allGameSystems.filter(
-          (suggestion: GameSystem) =>
+          (suggestion: GameSystemSummary) =>
             !tags.some((tag) => tag.id === suggestion.id) &&
             suggestion.name.toLowerCase().includes(inputValue.toLowerCase()),
         )
@@ -124,7 +126,7 @@ export function GameTagInput({
             props.className, // Allow external classNames to be applied
           )}
         >
-          {memoizedFilteredSuggestions.map((suggestion: GameSystem) => (
+          {memoizedFilteredSuggestions.map((suggestion: GameSystemSummary) => (
             <li
               key={suggestion.id}
               className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-4 py-2"

@@ -17,8 +17,10 @@ import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
+import { Route as SystemsIndexRouteImport } from "./routes/systems/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 <<<<<<< HEAD
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
@@ -26,6 +28,7 @@ import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
 import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
+import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
 import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
 import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
 import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
@@ -50,6 +53,7 @@ import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-pas
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 >>>>>>> 8d6dcae (feat: finalizes the email notification system by adding rate-limited invites, welcome/invite email feature flags, structured logging with masked PII, digest item and change-summary helpers, developer preview/resend utilities, comprehensive unit tests, and detailed Resend usage documentation.)
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardSystemsIndexRouteImport } from "./routes/dashboard/systems/index";
 import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
@@ -62,6 +66,7 @@ import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$templa
 import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
 import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
 import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardSystemsSystemIdRouteImport } from "./routes/dashboard/systems/$systemId";
 import { Route as DashboardReviewsPendingRouteImport } from "./routes/dashboard/reviews/pending";
 import { Route as DashboardProfileBlocklistRouteImport } from "./routes/dashboard/profile/blocklist";
 import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
@@ -128,6 +133,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
+const SystemsIndexRoute = SystemsIndexRouteImport.update({
+  id: "/systems/",
+  path: "/systems/",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -137,6 +147,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardRouteRoute,
+} as any);
+const SystemsSlugRoute = SystemsSlugRouteImport.update({
+  id: "/systems/$slug",
+  path: "/systems/$slug",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const GameGameIdRoute = GameGameIdRouteImport.update({
   id: "/game/$gameId",
@@ -157,6 +172,11 @@ const EventEventIdRoute = EventEventIdRouteImport.update({
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   id: "/teams",
   path: "/teams",
+  getParentRoute: () => DashboardRouteRoute,
+} as any);
+const DashboardSystemsRoute = DashboardSystemsRouteImport.update({
+  id: "/systems",
+  path: "/systems",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
 const DashboardSocialAuditsRoute = DashboardSocialAuditsRouteImport.update({
@@ -251,6 +271,11 @@ const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardSystemsIndexRoute = DashboardSystemsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => DashboardSystemsRoute,
+} as any);
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -298,6 +323,12 @@ const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
   path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
 } as any);
+const DashboardSystemsSystemIdRoute =
+  DashboardSystemsSystemIdRouteImport.update({
+    id: "/$systemId",
+    path: "/$systemId",
+    getParentRoute: () => DashboardSystemsRoute,
+  } as any);
 const DashboardReviewsPendingRoute = DashboardReviewsPendingRouteImport.update({
   id: "/reviews/pending",
   path: "/reviews/pending",
@@ -491,6 +522,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+  "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
   "/events/$slug": typeof EventsSlugRouteWithChildren;
@@ -498,8 +530,10 @@ export interface FileRoutesByFullPath {
   "/event/$eventId": typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/systems": typeof SystemsIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
 <<<<<<< HEAD
@@ -512,6 +546,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -524,6 +559,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems/": typeof DashboardSystemsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
@@ -562,8 +598,10 @@ export interface FileRoutesByTo {
   "/event/$eventId": typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
+  "/systems": typeof SystemsIndexRoute;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
 <<<<<<< HEAD
 =======
@@ -575,6 +613,7 @@ export interface FileRoutesByTo {
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
 <<<<<<< HEAD
@@ -586,6 +625,7 @@ export interface FileRoutesByTo {
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
   "/dashboard/profile": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems": typeof DashboardSystemsIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
@@ -622,6 +662,7 @@ export interface FileRoutesById {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+  "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
   "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
 <<<<<<< HEAD
   "/events/$slug": typeof EventsSlugRouteWithChildren;
@@ -629,8 +670,10 @@ export interface FileRoutesById {
   "/event/$eventId": typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/systems/": typeof SystemsIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
 <<<<<<< HEAD
@@ -643,6 +686,7 @@ export interface FileRoutesById {
   "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
   "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
   "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
   "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
@@ -655,6 +699,7 @@ export interface FileRoutesById {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
   "/dashboard/profile/": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems/": typeof DashboardSystemsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email/": typeof DevEmailIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
@@ -692,6 +737,7 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/social-audits"
+    | "/dashboard/systems"
     | "/dashboard/teams"
 <<<<<<< HEAD
     | "/events/$slug"
@@ -699,8 +745,10 @@ export interface FileRouteTypes {
     | "/event/$eventId"
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
+    | "/systems/$slug"
     | "/dashboard/"
     | "/onboarding/"
+    | "/systems"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
 <<<<<<< HEAD
@@ -713,6 +761,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
     | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -725,6 +774,7 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
+    | "/dashboard/systems/"
     | "/dashboard/teams/"
     | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
@@ -763,8 +813,10 @@ export interface FileRouteTypes {
     | "/event/$eventId"
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
+    | "/systems/$slug"
     | "/dashboard"
     | "/onboarding"
+    | "/systems"
     | "/dashboard/campaigns/create"
 <<<<<<< HEAD
 =======
@@ -776,6 +828,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
     | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
 <<<<<<< HEAD
@@ -787,6 +840,7 @@ export interface FileRouteTypes {
     | "/dashboard/events"
     | "/dashboard/games"
     | "/dashboard/profile"
+    | "/dashboard/systems"
     | "/dashboard/teams"
     | "/dev/email"
     | "/dashboard/campaigns/$campaignId/zero"
@@ -822,6 +876,7 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
     | "/dashboard/social-audits"
+    | "/dashboard/systems"
     | "/dashboard/teams"
 <<<<<<< HEAD
     | "/events/$slug"
@@ -829,8 +884,10 @@ export interface FileRouteTypes {
     | "/event/$eventId"
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
     | "/game/$gameId"
+    | "/systems/$slug"
     | "/dashboard/"
     | "/onboarding/"
+    | "/systems/"
     | "/dashboard/campaigns/$campaignId"
     | "/dashboard/campaigns/create"
 <<<<<<< HEAD
@@ -843,6 +900,7 @@ export interface FileRouteTypes {
     | "/dashboard/profile/$userId"
     | "/dashboard/profile/blocklist"
     | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
     | "/dashboard/teams/$teamId"
     | "/dashboard/teams/browse"
     | "/dashboard/teams/create"
@@ -855,6 +913,7 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/games/"
     | "/dashboard/profile/"
+    | "/dashboard/systems/"
     | "/dashboard/teams/"
     | "/dev/email/"
     | "/dashboard/campaigns/$campaignId/zero"
@@ -884,6 +943,8 @@ export interface RootRouteChildren {
   EventEventIdRoute: typeof EventEventIdRoute;
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: typeof GameGameIdRoute;
+  SystemsSlugRoute: typeof SystemsSlugRoute;
+  SystemsIndexRoute: typeof SystemsIndexRoute;
   DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
 }
@@ -1055,6 +1116,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/systems/": {
+      id: "/systems/";
+      path: "/systems";
+      fullPath: "/systems";
+      preLoaderRoute: typeof SystemsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/onboarding/": {
       id: "/onboarding/";
       path: "/";
@@ -1068,6 +1136,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/";
       preLoaderRoute: typeof DashboardIndexRouteImport;
       parentRoute: typeof DashboardRouteRoute;
+    };
+    "/systems/$slug": {
+      id: "/systems/$slug";
+      path: "/systems/$slug";
+      fullPath: "/systems/$slug";
+      preLoaderRoute: typeof SystemsSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/game/$gameId": {
       id: "/game/$gameId";
@@ -1096,6 +1171,13 @@ declare module "@tanstack/react-router" {
       path: "/teams";
       fullPath: "/dashboard/teams";
       preLoaderRoute: typeof DashboardTeamsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/systems": {
+      id: "/dashboard/systems";
+      path: "/systems";
+      fullPath: "/dashboard/systems";
+      preLoaderRoute: typeof DashboardSystemsRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
     "/dashboard/social-audits": {
@@ -1226,6 +1308,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardTeamsIndexRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
     };
+    "/dashboard/systems/": {
+      id: "/dashboard/systems/";
+      path: "/";
+      fullPath: "/dashboard/systems/";
+      preLoaderRoute: typeof DashboardSystemsIndexRouteImport;
+      parentRoute: typeof DashboardSystemsRoute;
+    };
     "/dashboard/profile/": {
       id: "/dashboard/profile/";
       path: "/";
@@ -1290,6 +1379,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/teams/$teamId";
       preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
       parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/systems/$systemId": {
+      id: "/dashboard/systems/$systemId";
+      path: "/$systemId";
+      fullPath: "/dashboard/systems/$systemId";
+      preLoaderRoute: typeof DashboardSystemsSystemIdRouteImport;
+      parentRoute: typeof DashboardSystemsRoute;
     };
     "/dashboard/reviews/pending": {
       id: "/dashboard/reviews/pending";
@@ -1622,6 +1718,19 @@ const DashboardProfileRouteChildren: DashboardProfileRouteChildren = {
 const DashboardProfileRouteWithChildren =
   DashboardProfileRoute._addFileChildren(DashboardProfileRouteChildren);
 
+interface DashboardSystemsRouteChildren {
+  DashboardSystemsSystemIdRoute: typeof DashboardSystemsSystemIdRoute;
+  DashboardSystemsIndexRoute: typeof DashboardSystemsIndexRoute;
+}
+
+const DashboardSystemsRouteChildren: DashboardSystemsRouteChildren = {
+  DashboardSystemsSystemIdRoute: DashboardSystemsSystemIdRoute,
+  DashboardSystemsIndexRoute: DashboardSystemsIndexRoute,
+};
+
+const DashboardSystemsRouteWithChildren =
+  DashboardSystemsRoute._addFileChildren(DashboardSystemsRouteChildren);
+
 interface DashboardTeamsTeamIdRouteChildren {
   DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
   DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
@@ -1665,6 +1774,7 @@ interface DashboardRouteRouteChildren {
   DashboardReportsRoute: typeof DashboardReportsRoute;
   DashboardSettingsRoute: typeof DashboardSettingsRoute;
   DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute;
+  DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren;
   DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
   DashboardIndexRoute: typeof DashboardIndexRoute;
   DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute;
@@ -1680,6 +1790,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSocialAuditsRoute: DashboardSocialAuditsRoute,
+  DashboardSystemsRoute: DashboardSystemsRouteWithChildren,
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardReviewsPendingRoute: DashboardReviewsPendingRoute,
@@ -1732,6 +1843,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventEventIdRoute: EventEventIdRoute,
 >>>>>>> 607a3b4 (feat: added baseline event creation and registration functionality, refactored List contexts to components, improved mobile layouts)
   GameGameIdRoute: GameGameIdRoute,
+  SystemsSlugRoute: SystemsSlugRoute,
+  SystemsIndexRoute: SystemsIndexRoute,
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
 };

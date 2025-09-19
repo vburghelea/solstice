@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
+import type { PopularGameSystem } from "~/features/game-systems/game-systems.types";
 import { GameListItemView } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import { GameListItem } from "~/features/games/games.types";
@@ -8,25 +10,36 @@ import { cn } from "~/shared/lib/utils";
 import { buttonVariants } from "~/shared/ui/button";
 import { List } from "~/shared/ui/list";
 
+type HomeLoaderData = {
+  featuredGames: GameListItem[];
+  popularSystems: PopularGameSystem[];
+};
+
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    // Fetch a limited number of public games for the homepage
-    const result = await listGames({
-      data: { filters: { visibility: "public", status: "scheduled" } },
-    });
-    if (result.success) {
-      // Limit to 3 featured games
-      return { featuredGames: result.data.slice(0, 3) };
-    } else {
-      console.error("Failed to fetch featured games:", result.errors);
-      return { featuredGames: [] };
+  loader: async (): Promise<HomeLoaderData> => {
+    const [gamesResult, popularSystemsResult] = await Promise.all([
+      listGames({ data: { filters: { visibility: "public", status: "scheduled" } } }),
+      listPopularSystems().catch((error) => {
+        console.error("Failed to fetch popular systems:", error);
+        return [] as PopularGameSystem[];
+      }),
+    ]);
+
+    if (gamesResult.success) {
+      return {
+        featuredGames: gamesResult.data.slice(0, 3),
+        popularSystems: popularSystemsResult,
+      };
     }
+
+    console.error("Failed to fetch featured games:", gamesResult.errors);
+    return { featuredGames: [], popularSystems: popularSystemsResult };
   },
   component: Index,
 });
 
 function Index() {
-  const { featuredGames } = Route.useLoaderData(); // Get featuredGames from loader
+  const { featuredGames, popularSystems } = Route.useLoaderData() as HomeLoaderData;
 
   return (
     <PublicLayout>
@@ -138,6 +151,79 @@ function Index() {
             <Link to="/search" className={cn(buttonVariants({ size: "lg" }), "mt-12")}>
               Browse All Local Games
             </Link>
+          </div>
+        </section>
+
+        {/* Popular Game Systems */}
+        <section className="bg-slate-900 py-16 text-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="font-heading text-3xl sm:text-4xl">
+                  Popular Game Systems
+                </h2>
+                <p className="mt-2 text-sm text-slate-300 sm:text-base">
+                  Based on the number of active game sessions across the community.
+                </p>
+              </div>
+              <Link
+                to="/systems"
+                className="text-sm font-medium text-slate-200 underline-offset-4 hover:text-white hover:underline"
+              >
+                Browse all systems
+              </Link>
+            </div>
+
+            {popularSystems.length === 0 ? (
+              <p className="mt-8 text-center text-sm text-slate-300">
+                We’ll highlight popular systems once more sessions are scheduled.
+              </p>
+            ) : (
+              <div className="mt-8 overflow-x-auto pb-4">
+                <div className="flex gap-6 pb-2">
+                  {popularSystems.map((system) => (
+                    <Link
+                      key={system.id}
+                      to="/systems/$slug"
+                      params={{ slug: system.slug }}
+                      className="focus-visible:ring-offset-brand w-64 flex-shrink-0 rounded-2xl bg-white/10 px-3 pt-3 pb-4 shadow-md transition hover:bg-white/15 sm:w-72 sm:px-4 sm:pt-4 sm:pb-5"
+                    >
+                      <div className="h-40 w-full overflow-hidden rounded-xl bg-slate-800">
+                        {system.heroUrl ? (
+                          <img
+                            src={system.heroUrl}
+                            alt={`${system.name} cover art`}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm text-slate-200">
+                            Hero art pending moderation
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-4 space-y-2">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <h3 className="text-lg font-semibold">{system.name}</h3>
+                          <span className="text-xs font-medium tracking-wide text-slate-300 uppercase">
+                            {system.gameCount} sessions
+                          </span>
+                        </div>
+                        {system.summary ? (
+                          <p className="line-clamp-3 text-sm text-slate-200/80">
+                            {system.summary}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-slate-200/60">
+                            Description coming soon.
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

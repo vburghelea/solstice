@@ -1,6 +1,9 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
+  date,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   serial,
@@ -9,6 +12,15 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
+import { mediaAssets } from "./media-assets.schema";
+import { publishers } from "./publishers.schema";
+
+export type ExternalRefs = {
+  startplaying?: string;
+  bgg?: string;
+  wikipedia?: string;
+  [key: string]: string | undefined;
+};
 
 export const gameSystems = pgTable("game_systems", {
   id: serial("id").primaryKey(),
@@ -16,6 +28,7 @@ export const gameSystems = pgTable("game_systems", {
   slug: varchar("slug", { length: 255 }).unique(),
   descriptionCms: text("description_cms"),
   galleryImages: text("gallery_images").array(),
+  descriptionScraped: text("description_scraped"),
   minPlayers: integer("min_players"),
   maxPlayers: integer("max_players"),
   optimalPlayers: integer("optimal_players"),
@@ -23,6 +36,21 @@ export const gameSystems = pgTable("game_systems", {
   ageRating: varchar("age_rating", { length: 50 }),
   complexityRating: varchar("complexity_rating", { length: 50 }),
   yearReleased: integer("year_released"),
+  releaseDate: date("release_date"),
+  publisherId: integer("publisher_id").references(() => publishers.id),
+  publisherUrl: varchar("publisher_url", { length: 255 }),
+  heroImageId: integer("hero_image_id"),
+  sourceOfTruth: text("source_of_truth"),
+  externalRefs: jsonb("external_refs").$type<ExternalRefs>(),
+  crawlStatus: varchar("crawl_status", { length: 50 }),
+  lastCrawledAt: timestamp("last_crawled_at"),
+  lastSuccessAt: timestamp("last_success_at"),
+  errorMessage: text("error_message"),
+  isPublished: boolean("is_published").notNull().default(false),
+  cmsVersion: integer("cms_version").default(1),
+  cmsApproved: boolean("cms_approved").notNull().default(false),
+  lastApprovedAt: timestamp("last_approved_at"),
+  lastApprovedBy: text("last_approved_by").references(() => user.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -86,9 +114,17 @@ export const userGameSystemPreferences = pgTable(
   }),
 );
 
-export const gameSystemRelations = relations(gameSystems, ({ many }) => ({
+export const gameSystemRelations = relations(gameSystems, ({ many, one }) => ({
   categories: many(gameSystemToCategory),
   mechanics: many(gameSystemToMechanics),
+  publisher: one(publishers, {
+    fields: [gameSystems.publisherId],
+    references: [publishers.id],
+  }),
+  heroImage: one(mediaAssets, {
+    fields: [gameSystems.heroImageId],
+    references: [mediaAssets.id],
+  }),
 }));
 
 export const gameSystemCategoryRelations = relations(

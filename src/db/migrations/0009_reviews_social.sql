@@ -1,4 +1,3 @@
-CREATE TYPE "public"."experience_level" AS ENUM('beginner', 'intermediate', 'advanced', 'expert');--> statement-breakpoint
 CREATE TYPE "public"."gm_strength" AS ENUM('creativity', 'world_builder', 'inclusive', 'rule_of_cool', 'storytelling', 'voices', 'sets_the_mood', 'teacher', 'knows_the_rules', 'visual_aid');--> statement-breakpoint
 CREATE TYPE "public"."social_action" AS ENUM ('follow','unfollow','block','unblock');--> statement-breakpoint
 

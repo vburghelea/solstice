@@ -233,9 +233,7 @@ export const updateGame = createServerFn({ method: "POST" })
         const changes = summarizeEventChanges(previousSnapshot, updatedSnapshot);
 
         if (changes.length > 0) {
-          const [{ findGameParticipantsByGameId }] = await Promise.all([
-            import("./games.repository"),
-          ]);
+          const { findGameParticipantsByGameId } = await import("./games.repository");
           const participants = await findGameParticipantsByGameId(updatedGame.id);
           const approved = participants.filter(
             (p) =>
@@ -248,9 +246,7 @@ export const updateGame = createServerFn({ method: "POST" })
               email: p.user!.email!,
               name: p.user!.name ?? undefined,
             }));
-            const [{ sendGameStatusUpdate }] = await Promise.all([
-              import("~/lib/email/resend"),
-            ]);
+            const { sendGameStatusUpdate } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
             const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
@@ -270,9 +266,9 @@ export const updateGame = createServerFn({ method: "POST" })
 
           // Also notify campaign participants if this is part of a campaign
           if (existingGame.campaignId) {
-            const [{ findCampaignParticipantsByCampaignId }] = await Promise.all([
-              import("~/features/campaigns/campaigns.repository"),
-            ]);
+            const { findCampaignParticipantsByCampaignId } = await import(
+              "~/features/campaigns/campaigns.repository"
+            );
             const cParticipants = await findCampaignParticipantsByCampaignId(
               existingGame.campaignId,
             );
@@ -287,9 +283,7 @@ export const updateGame = createServerFn({ method: "POST" })
                 email: p.user!.email!,
                 name: p.user!.name ?? undefined,
               }));
-              const [{ sendCampaignSessionUpdate }] = await Promise.all([
-                import("~/lib/email/resend"),
-              ]);
+              const { sendCampaignSessionUpdate } = await import("~/lib/email/resend");
               const { getBaseUrl } = await import("~/lib/env.server");
               const baseUrl2 = getBaseUrl();
               const detailsUrl2 = `${baseUrl2}/games/${updatedGame.id}`;
@@ -314,9 +308,7 @@ export const updateGame = createServerFn({ method: "POST" })
 
       // Notify approved participants of cancellation
       try {
-        const [{ findGameParticipantsByGameId }] = await Promise.all([
-          import("./games.repository"),
-        ]);
+        const { findGameParticipantsByGameId } = await import("./games.repository");
         const participants = await findGameParticipantsByGameId(updatedGame.id);
         const approved = participants.filter(
           (p) =>
@@ -329,9 +321,7 @@ export const updateGame = createServerFn({ method: "POST" })
             email: p.user!.email!,
             name: p.user!.name ?? undefined,
           }));
-          const [{ sendGameStatusUpdate }] = await Promise.all([
-            import("~/lib/email/resend"),
-          ]);
+          const { sendGameStatusUpdate } = await import("~/lib/email/resend");
           const { getBaseUrl } = await import("~/lib/env.server");
           const baseUrl = getBaseUrl();
           const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
@@ -1213,15 +1203,13 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
 
         // Notify inviter (game owner)
         try {
-          const [{ findGameById }] = await Promise.all([import("./games.repository")]);
+          const { findGameById } = await import("./games.repository");
           const gameFull = await findGameById(existingParticipant.gameId);
           if (
             gameFull?.owner?.email &&
             gameFull.owner?.notificationPreferences?.socialNotifications !== false
           ) {
-            const [{ sendGameInviteResponse }] = await Promise.all([
-              import("~/lib/email/resend"),
-            ]);
+            const { sendGameInviteResponse } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
             const rosterUrl = `${baseUrl}/games/${existingParticipant.gameId}#roster`;
@@ -1247,15 +1235,13 @@ export const respondToGameInvitation = createServerFn({ method: "POST" })
 
         // Notify inviter (game owner)
         try {
-          const [{ findGameById }] = await Promise.all([import("./games.repository")]);
+          const { findGameById } = await import("./games.repository");
           const gameFull = await findGameById(existingParticipant.gameId);
           if (
             gameFull?.owner?.email &&
             gameFull.owner?.notificationPreferences?.socialNotifications !== false
           ) {
-            const [{ sendGameInviteResponse }] = await Promise.all([
-              import("~/lib/email/resend"),
-            ]);
+            const { sendGameInviteResponse } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
             const rosterUrl = `${baseUrl}/games/${existingParticipant.gameId}#roster`;
@@ -1383,9 +1369,9 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
       // Notify campaign participants that a new session is scheduled
       try {
         if (newGame.campaignId) {
-          const [{ findCampaignParticipantsByCampaignId }] = await Promise.all([
-            import("~/features/campaigns/campaigns.repository"),
-          ]);
+          const { findCampaignParticipantsByCampaignId } = await import(
+            "~/features/campaigns/campaigns.repository"
+          );
           const participants = await findCampaignParticipantsByCampaignId(
             newGame.campaignId,
           );
@@ -1400,9 +1386,7 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
               email: p.user!.email!,
               name: p.user!.name ?? undefined,
             }));
-            const [{ sendCampaignSessionUpdate }] = await Promise.all([
-              import("~/lib/email/resend"),
-            ]);
+            const { sendCampaignSessionUpdate } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
             const detailsUrl = `${baseUrl}/games/${newGame.id}`;
@@ -1526,9 +1510,7 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
 
       // Notify approved participants of status change
       try {
-        const [{ findGameParticipantsByGameId }] = await Promise.all([
-          import("./games.repository"),
-        ]);
+        const { findGameParticipantsByGameId } = await import("./games.repository");
         const participants = await findGameParticipantsByGameId(updatedGame.id);
         const approved = participants.filter(
           (p) => p.status === "approved" && p.user?.email,
@@ -1538,9 +1520,7 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
             email: p.user!.email!,
             name: p.user!.name ?? undefined,
           }));
-          const [{ sendGameStatusUpdate }] = await Promise.all([
-            import("~/lib/email/resend"),
-          ]);
+          const { sendGameStatusUpdate } = await import("~/lib/email/resend");
           const { getBaseUrl } = await import("~/lib/env.server");
           const baseUrl = getBaseUrl();
           const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;

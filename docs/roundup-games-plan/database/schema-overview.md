@@ -89,11 +89,11 @@ erDiagram
     gameSystemMechanics ||--o{ gameSystem_to_mechanics : "mechanics"
 
     gameSystem {
-        string id PK
+        integer id PK
         string name
         string slug UK
-        string description
-        string[] images
+        text descriptionScraped
+        text descriptionCms
         integer minPlayers
         integer maxPlayers
         integer optimalPlayers
@@ -101,6 +101,21 @@ erDiagram
         string ageRating
         string complexityRating
         integer yearReleased
+        date releaseDate
+        integer publisherId FK
+        string publisherUrl
+        integer heroImageId FK
+        text sourceOfTruth
+        jsonb externalRefs
+        string crawlStatus
+        timestamp lastCrawledAt
+        timestamp lastSuccessAt
+        text errorMessage
+        boolean isPublished
+        integer cmsVersion
+        boolean cmsApproved
+        timestamp lastApprovedAt
+        string lastApprovedBy FK
         timestamp createdAt
         timestamp updatedAt
     }

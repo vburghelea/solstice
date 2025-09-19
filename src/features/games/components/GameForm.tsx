@@ -9,6 +9,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
 import { visibilityEnum } from "~/db/schema/shared.schema";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
+import type { getGameSystem } from "~/features/games/games.queries";
 import { searchGameSystems } from "~/features/games/games.queries";
 import {
   createGameInputSchema,
@@ -119,7 +120,9 @@ export function GameForm({
 
   // When creating within a campaign, fetch the game system details by ID to ensure
   // the name and defaults are available immediately without requiring reload
-  const { data: campaignGameSystemData } = useQuery({
+  const { data: campaignGameSystemData } = useQuery<
+    Awaited<ReturnType<typeof getGameSystem>>
+  >({
     queryKey: ["gameSystemById", defaults.gameSystemId],
     queryFn: async () => {
       const { getGameSystem } = await import("~/features/games/games.queries");
@@ -137,11 +140,11 @@ export function GameForm({
     ) {
       const gs = campaignGameSystemData.data;
       return {
-        id: gs.id,
-        name: gs.name,
-        averagePlayTime: gs.averagePlayTime,
-        minPlayers: gs.minPlayers,
-        maxPlayers: gs.maxPlayers,
+        id: gs["id"],
+        name: gs["name"],
+        averagePlayTime: gs["averagePlayTime"],
+        minPlayers: gs["minPlayers"],
+        maxPlayers: gs["maxPlayers"],
       } as typeof selectedGameSystem;
     }
     return selectedGameSystem;

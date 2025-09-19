@@ -22,6 +22,13 @@
       "when": 1753825710888,
       "tag": "0002_wealthy_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758270273511,
+      "tag": "0003_tiny_the_captain",
+      "breakpoints": true
     }
   ]
 }

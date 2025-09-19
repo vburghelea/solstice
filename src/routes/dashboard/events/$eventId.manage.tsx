@@ -57,7 +57,7 @@ import type {
   RegistrationType,
   UpdateEventInput,
 } from "~/features/events/events.types";
-import { isAdmin } from "~/lib/auth/utils/admin-check";
+import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { cn } from "~/shared/lib/utils";
 
 type ManagementTab = "overview" | "registrations" | "settings";
@@ -65,14 +65,14 @@ type ManagementTab = "overview" | "registrations" | "settings";
 export const Route = createFileRoute("/dashboard/events/$eventId/manage")({
   beforeLoad: async ({ context, location }) => {
     const { user } = context;
-    if (!user?.email) {
+    if (!user) {
       throw redirect({
         to: "/auth/login",
         search: { redirect: location.pathname },
       });
     }
 
-    if (!isAdmin(user.email)) {
+    if (!isAdminClient(user)) {
       throw redirect({ to: "/dashboard/events" });
     }
   },

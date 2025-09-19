@@ -1,34 +1,35 @@
-/**
- * Simple admin check utility
- * In a production app, this would check against a proper role/permission system
- */
+import { serverOnly } from "@tanstack/react-start";
+import type { AuthUser } from "~/lib/auth/types";
 
-// For demo purposes, we'll use a simple email-based check
-// In production, this should be replaced with proper RBAC
-const ADMIN_EMAILS = [
-  "admin@solstice.com",
-  "admin@example.com",
-  // Add more admin emails as needed
-];
+const GLOBAL_ADMIN_ROLE_NAMES = ["Solstice Admin", "Quadball Canada Admin"];
 
-export function isAdmin(email: string | undefined | null): boolean {
-  if (!email) return false;
+const getPermissionService = serverOnly(async () => {
+  const { PermissionService } = await import("~/features/roles/permission.service");
+  return PermissionService;
+});
 
-  // Check if email is in admin list
-  if (ADMIN_EMAILS.includes(email.toLowerCase())) {
-    return true;
+function hasGlobalAdminRole(user: AuthUser): boolean {
+  if (!user?.roles || user.roles.length === 0) {
+    return false;
   }
 
-  // Check if email domain is admin domain (for development)
-  if (email.endsWith("@solstice.com")) {
-    return true;
-  }
-
-  return false;
+  return user.roles.some(({ role }) => GLOBAL_ADMIN_ROLE_NAMES.includes(role.name));
 }
 
-export async function requireAdmin(email: string | undefined | null): Promise<void> {
-  if (!isAdmin(email)) {
+export async function isAdmin(userId: string | undefined | null): Promise<boolean> {
+  if (!userId) return false;
+  const PermissionService = await getPermissionService();
+  return PermissionService.isGlobalAdmin(userId);
+}
+
+export async function requireAdmin(userId: string | undefined | null): Promise<void> {
+  if (!(await isAdmin(userId))) {
     throw new Error("Unauthorized: Admin access required");
   }
 }
+
+export function isAdminClient(user: AuthUser): boolean {
+  return hasGlobalAdminRole(user);
+}
+
+export { GLOBAL_ADMIN_ROLE_NAMES };

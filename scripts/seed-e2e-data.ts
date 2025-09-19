@@ -11,6 +11,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
   account,
+  eventAnnouncements,
+  eventRegistrations,
+  events,
   memberships,
   membershipTypes,
   roles,
@@ -52,6 +55,11 @@ async function seed() {
     );
 
     // 1. First clear tables that reference other tables
+    console.log("Clearing event data...");
+    await db.delete(eventAnnouncements);
+    await db.delete(eventRegistrations);
+    await db.delete(events);
+
     console.log("Clearing team members...");
     await db.delete(teamMembers);
 
@@ -336,6 +344,18 @@ async function seed() {
 
       console.log(`✅ Created user: ${userData.email}`);
     }
+
+    console.log("Assigning roles to users...");
+    await db.insert(userRoles).values([
+      {
+        id: "admin-global-role",
+        userId: adminUserId,
+        roleId: "solstice-admin",
+        assignedBy: adminUserId,
+        notes: "Seeded global admin access",
+      },
+    ]);
+    console.log("✅ Assigned global admin role to admin@example.com");
 
     // Create test teams
     console.log("Creating test teams...");

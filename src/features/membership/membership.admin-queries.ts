@@ -40,7 +40,7 @@ export const getAllMemberships = createServerFn({ method: "GET" })
         const { headers } = getWebRequest();
         const session = await auth.api.getSession({ headers });
 
-        if (!session?.user?.email) {
+        if (!session?.user?.id) {
           return {
             success: false,
             errors: [
@@ -54,7 +54,7 @@ export const getAllMemberships = createServerFn({ method: "GET" })
 
         // Check admin access
         const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-        await requireAdmin(session.user.email);
+        await requireAdmin(session.user.id);
 
         // Import database dependencies inside handler
         const { and, eq, sql } = await import("drizzle-orm");

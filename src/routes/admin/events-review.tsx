@@ -45,19 +45,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { updateEvent } from "~/features/events/events.mutations";
 import { listEvents } from "~/features/events/events.queries";
 import type { EventListResult } from "~/features/events/events.types";
-import { isAdmin } from "~/lib/auth/utils/admin-check";
+import { isAdminClient } from "~/lib/auth/utils/admin-check";
 
 export const Route = createFileRoute("/admin/events-review")({
   beforeLoad: async ({ context, location }) => {
     const { user } = context;
-    if (!user?.email) {
+    if (!user) {
       throw redirect({
         to: "/auth/login",
         search: { redirect: location.pathname },
       });
     }
 
-    if (!isAdmin(user.email)) {
+    if (!isAdminClient(user)) {
       throw redirect({ to: "/dashboard" });
     }
   },

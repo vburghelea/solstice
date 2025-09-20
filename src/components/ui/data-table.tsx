@@ -4,12 +4,15 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  OnChangeFn,
   Row,
+  RowSelectionState,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import {
   Table,
@@ -38,6 +41,10 @@ interface DataTableProps<TData, TValue> {
   onPageChange?: (pageIndex: number) => void;
   isLoading?: boolean;
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  toolbarContent?: ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -51,12 +58,22 @@ export function DataTable<TData, TValue>({
   onPageChange,
   isLoading = false,
   getRowId,
+  enableRowSelection = false,
+  rowSelection,
+  onRowSelectionChange,
+  toolbarContent,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({});
 
   const paginationState = manualPagination ? { pageIndex, pageSize } : undefined;
   const resolvedPageCount = manualPagination ? (pageCount ?? -1) : undefined;
+  const resolvedRowSelection = enableRowSelection
+    ? (rowSelection ?? internalRowSelection)
+    : undefined;
+  const handleRowSelectionChange: OnChangeFn<RowSelectionState> | undefined =
+    enableRowSelection ? (onRowSelectionChange ?? setInternalRowSelection) : undefined;
 
   const table = useReactTable({
     data,
@@ -67,10 +84,15 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    ...(enableRowSelection ? { enableRowSelection: true } : {}),
+    ...(handleRowSelectionChange
+      ? { onRowSelectionChange: handleRowSelectionChange }
+      : {}),
     state: {
       sorting,
       columnVisibility,
       ...(paginationState ? { pagination: paginationState } : {}),
+      ...(resolvedRowSelection ? { rowSelection: resolvedRowSelection } : {}),
     },
     manualPagination,
     ...(resolvedPageCount == null ? {} : { pageCount: resolvedPageCount }),
@@ -117,35 +139,46 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {onExport && (
-          <Button onClick={onExport} variant="outline">
-            Export CSV
-          </Button>
+        {toolbarContent ? (
+          <div className="flex flex-wrap items-center gap-2">{toolbarContent}</div>
+        ) : enableRowSelection ? (
+          <span className="text-muted-foreground text-xs">
+            Select rows to enable bulk actions.
+          </span>
+        ) : (
+          <div />
         )}
+        <div className="flex items-center gap-2">
+          {onExport && (
+            <Button onClick={onExport} variant="outline">
+              Export CSV
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="bg-card text-card-foreground overflow-hidden rounded-xl border shadow-sm">
         <Table className="w-full min-w-full">

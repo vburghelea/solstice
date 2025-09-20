@@ -229,6 +229,19 @@ Deliverables
 - Bulk actions remain blocked on a new server mutation that can accept an array of system IDs for approval/publish state changes plus moderation toggles. Need to spec `bulkUpdateGameSystems` with audit metadata to satisfy CMS requirements.
 - External tag re-mapping in bulk still requires a batching endpoint (current UI is per-system). Capture requirements in Phase 9.C and plan tests once server contract exists. Coordinate with Phase 12 to add vitest coverage for pagination schema once new bulk endpoints land.
 
+**Progress 2025-02-21**
+
+- Fixed the dashboard query wiring so pagination, search, and sort now trigger fresh table rows instead of holding onto stale data. Query keys flatten the params (`q`, `status`, `sort`, `page`, `perPage`) and disable structural sharing so the React Table instance remounts with the new dataset immediately after "Apply".
+- Added row selection, toolbar messaging, and bulk publish/approval controls to the systems list. A new `bulkUpdateAdminSystems` server mutation accepts `{ systemIds: number[]; updates: { isPublished?: boolean; cmsApproved?: boolean } }` and stamps `updatedAt`, `lastApprovedAt`, and `lastApprovedBy` when approvals flip. The React Query cache invalidates after mutations so the list refreshes without a manual reload.
+- Hardened access control by layering the `/dashboard/systems/` route behind `requireRole` for `Games Admin` and `Platform Admin` roles. Non-admin users will be redirected back to the dashboard shell before the list mounts.
+- Remaining gaps: bulk taxonomy/tag reconciliation still lacks a server contract, and the new bulk update endpoint does not yet cover media moderation or recrawl queueing. Capture these in a follow-up spec so content ops can clear larger backlogs without repeated single-item edits.
+
+**Progress 2025-02-22**
+
+- Patched the admin systems dashboard so query params derived from the router search state now drive the React Query key directly. Filters, keyword search, sort changes, and pagination navigations all refetch the dataset instead of leaving stale rows in the table body.
+- Extracted the bulk selection reducer/initializers into a shared helper with fresh unit tests to guard signature resets and clearing logic. This keeps the selection state predictable as more bulk workflows (taxonomy/media) come online.
+- Documented the need for additional bulk mutations (taxonomy remap, media moderation) and a recrawl queue API before Phase 12 test expansion, ensuring backend gaps stay visible to the team.
+
 Phase 10 - Reviews aggregation
 Deliverables
 

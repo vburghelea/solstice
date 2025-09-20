@@ -157,6 +157,22 @@ function AdminSystemsPage() {
     });
   };
 
+  const handlePageChange = (nextPage: number) => {
+    const safePage = Number.isFinite(nextPage) ? Math.max(Math.floor(nextPage), 1) : 1;
+
+    navigate({
+      search: (previous) => {
+        const nextSearch = { ...previous };
+        if (safePage <= 1) {
+          delete nextSearch.page;
+        } else {
+          nextSearch.page = safePage;
+        }
+        return nextSearch;
+      },
+    });
+  };
+
   const data: AdminGameSystemListResponse | undefined = systemsQuery.data;
   const systems = data?.items ?? [];
   const stats = data?.stats;

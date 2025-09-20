@@ -36,6 +36,12 @@ interface DataTableProps<TData, TValue> {
   pageSize?: number;
   onExport?: () => void;
   enableColumnToggle?: boolean;
+  manualPagination?: boolean;
+  pageIndex?: number;
+  pageCount?: number;
+  onPageChange?: (pageIndex: number) => void;
+  isLoading?: boolean;
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +50,12 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   onExport,
   enableColumnToggle = true,
+  manualPagination = false,
+  pageIndex = 0,
+  pageCount,
+  onPageChange,
+  isLoading = false,
+  getRowId,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -56,6 +68,9 @@ export function DataTable<TData, TValue>({
     : undefined;
   const handleRowSelectionChange: OnChangeFn<RowSelectionState> | undefined =
     enableRowSelection ? (onRowSelectionChange ?? setInternalRowSelection) : undefined;
+
+  const paginationState = manualPagination ? { pageIndex, pageSize } : undefined;
+  const resolvedPageCount = manualPagination ? (pageCount ?? -1) : undefined;
 
   const table = useReactTable({
     data,
@@ -90,6 +105,34 @@ export function DataTable<TData, TValue>({
   });
 
   const canRenderToolbar = enableColumnToggle || Boolean(onExport);
+  const canPreviousPage = manualPagination ? pageIndex > 0 : table.getCanPreviousPage();
+  const canNextPage = manualPagination
+    ? pageCount != null && pageCount > 0
+      ? pageIndex < pageCount - 1
+      : data.length === pageSize
+    : table.getCanNextPage();
+
+  const handlePrevious = () => {
+    if (manualPagination) {
+      if (onPageChange && pageIndex > 0) {
+        onPageChange(pageIndex - 1);
+      }
+      return;
+    }
+
+    table.previousPage();
+  };
+
+  const handleNext = () => {
+    if (manualPagination) {
+      if (onPageChange && (!pageCount || pageIndex < pageCount - 1)) {
+        onPageChange(pageIndex + 1);
+      }
+      return;
+    }
+
+    table.nextPage();
+  };
 
   return (
     <div className="space-y-4">

@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
@@ -53,6 +53,7 @@ const bottomItems = [
 export function AdminSidebar() {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
   const context = useRouteContext({ strict: false });
   const user = context?.user || null;
 
@@ -70,18 +71,21 @@ export function AdminSidebar() {
     setIsLoggingOut(true);
 
     try {
-      // Use Better Auth's signOut
-      await auth.signOut();
-
-      // Clear client state
-      queryClient.clear();
-
-      // Force hard navigation to login page
-      window.location.href = "/auth/login";
+      const result = await auth.signOut();
+      if (result?.error) {
+        throw result.error;
+      }
     } catch (error) {
       console.error("Logout failed:", error);
-      // Even on error, clear state and navigate to login
+    } finally {
+      // Clear all cached state first
       queryClient.clear();
+
+      // Await router invalidation to ensure completion
+      await router.invalidate();
+
+      // Use window.location.href for a complete page refresh
+      // This ensures clean state and is more reliable for logout
       window.location.href = "/auth/login";
     }
   };

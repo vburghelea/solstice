@@ -9,7 +9,8 @@ const LOGOUT_USER = {
 // Opt out of shared auth state for now until we fix the root issue
 test.use({ storageState: undefined });
 
-test.describe.configure({ mode: "serial" });
+// Remove serial mode to allow tests to run in isolation
+// test.describe.configure({ mode: "serial" });
 
 test.describe("Logout Flow (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
@@ -35,9 +36,17 @@ test.describe("Logout Flow (Authenticated)", () => {
   test("should clear session on logout", async ({ page }) => {
     // Already on dashboard from beforeEach
 
-    // Perform logout
-    await page.getByRole("button", { name: "Logout" }).click();
-    await page.waitForURL(/\/auth\/login/, { timeout: 10000 });
+    // Perform logout - this will cause a hard navigation
+    await Promise.all([
+      page.waitForURL(/\/auth\/login/, { timeout: 10000 }),
+      page.getByRole("button", { name: "Logout" }).click(),
+    ]);
+
+    // Verify we're on the login page
+    await expect(page).toHaveURL(/\/auth\/login/);
+
+    // Wait a moment for the logout to fully complete
+    await page.waitForTimeout(500);
 
     // Try to access protected route - don't use authenticatedGoto here
     // because we're testing that we should NOT be authenticated
@@ -49,16 +58,29 @@ test.describe("Logout Flow (Authenticated)", () => {
 
   test("should handle logout from profile page", async ({ page }) => {
     // Navigate to profile page - already authenticated from beforeEach
-    await page.goto("/dashboard/profile");
+    await page.goto("/dashboard/profile", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({
       timeout: 15000,
     });
 
-    // Perform logout
-    await page.getByRole("button", { name: "Logout" }).click();
+    // Wait a moment to ensure the page is fully interactive
+    await page.waitForTimeout(1000);
 
-    // Wait for redirect back to login
-    await page.waitForURL(/\/auth\/login/, { timeout: 15000 });
+    // Click logout and wait for navigation
+    const logoutButton = page.getByRole("button", { name: "Logout" });
+
+    // Use Promise.all to handle the navigation properly
+    await Promise.all([
+      page.waitForNavigation({
+        url: /\/auth\/login/,
+        waitUntil: "domcontentloaded",
+        timeout: 20000,
+      }),
+      logoutButton.click(),
+    ]);
+
+    // Verify we're on the login page
+    await expect(page).toHaveURL(/\/auth\/login/);
 
     // Try to access a protected route to verify logout worked
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
@@ -67,16 +89,29 @@ test.describe("Logout Flow (Authenticated)", () => {
 
   test("should handle logout from teams page", async ({ page }) => {
     // Navigate to teams page - already authenticated from beforeEach
-    await page.goto("/dashboard/teams");
+    await page.goto("/dashboard/teams", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible({
       timeout: 15000,
     });
 
-    // Perform logout
-    await page.getByRole("button", { name: "Logout" }).click();
+    // Wait a moment to ensure the page is fully interactive
+    await page.waitForTimeout(1000);
 
-    // Wait for redirect back to login
-    await page.waitForURL(/\/auth\/login/, { timeout: 15000 });
+    // Click logout and wait for navigation
+    const logoutButton = page.getByRole("button", { name: "Logout" });
+
+    // Use Promise.all to handle the navigation properly
+    await Promise.all([
+      page.waitForNavigation({
+        url: /\/auth\/login/,
+        waitUntil: "domcontentloaded",
+        timeout: 20000,
+      }),
+      logoutButton.click(),
+    ]);
+
+    // Verify we're on the login page
+    await expect(page).toHaveURL(/\/auth\/login/);
 
     // Try to access a protected route to verify logout worked
     await page.goto("/dashboard", { waitUntil: "domcontentloaded" });

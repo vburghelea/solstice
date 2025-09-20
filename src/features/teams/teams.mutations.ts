@@ -14,6 +14,27 @@ import {
 /**
  * Create a new team
  */
+const ACTIVE_TEAM_MEMBERSHIP_CONSTRAINT = "team_members_active_user_idx";
+
+const isActiveMembershipConstraintError = (error: unknown): boolean => {
+  if (!error || typeof error !== "object") return false;
+
+  const constraint =
+    (error as { constraint?: string }).constraint ??
+    (error as { constraint_name?: string }).constraint_name;
+  const code = (error as { code?: string }).code;
+
+  if (constraint === ACTIVE_TEAM_MEMBERSHIP_CONSTRAINT && code === "23505") {
+    return true;
+  }
+
+  if ("cause" in error) {
+    return isActiveMembershipConstraintError((error as { cause?: unknown }).cause);
+  }
+
+  return false;
+};
+
 export const createTeam = createServerFn({ method: "POST" })
   .validator(createTeamSchema.parse)
   .handler(async ({ data }) => {
@@ -59,14 +80,24 @@ export const createTeam = createServerFn({ method: "POST" })
         .returning();
 
       // Add the creator as captain
-      await tx.insert(teamMembers).values({
-        id: createId(),
-        teamId: newTeam.id,
-        userId: currentUser.id,
-        role: "captain" as TeamMemberRole,
-        status: "active" as TeamMemberStatus,
-        invitedBy: currentUser.id,
-      });
+      try {
+        await tx.insert(teamMembers).values({
+          id: createId(),
+          teamId: newTeam.id,
+          userId: currentUser.id,
+          role: "captain" as TeamMemberRole,
+          status: "active" as TeamMemberStatus,
+          invitedBy: currentUser.id,
+        });
+      } catch (error) {
+        if (isActiveMembershipConstraintError(error)) {
+          throw new Error(
+            "You already have an active team membership. Leave or deactivate your existing team before creating a new one.",
+          );
+        }
+
+        throw error;
+      }
 
       return newTeam;
     });
@@ -161,31 +192,41 @@ export const deactivateTeam = createServerFn({ method: "POST" })
 
     const db = await getDb();
 
-    // Check if user is captain
-    const [memberCheck] = await db
-      .select({ role: teamMembers.role })
-      .from(teamMembers)
-      .where(
-        and(
-          eq(teamMembers.teamId, data.teamId),
-          eq(teamMembers.userId, currentUser.id),
-          eq(teamMembers.status, "active"),
-        ),
-      )
-      .limit(1);
+    return await db.transaction(async (tx) => {
+      // Check if user is captain
+      const [memberCheck] = await tx
+        .select({ role: teamMembers.role })
+        .from(teamMembers)
+        .where(
+          and(
+            eq(teamMembers.teamId, data.teamId),
+            eq(teamMembers.userId, currentUser.id),
+            eq(teamMembers.status, "active"),
+          ),
+        )
+        .limit(1);
 
-    if (!memberCheck || memberCheck.role !== "captain") {
-      throw new Error("Only team captains can deactivate teams");
-    }
+      if (!memberCheck || memberCheck.role !== "captain") {
+        throw new Error("Only team captains can deactivate teams");
+      }
 
-    // Deactivate team
-    const [deactivatedTeam] = await db
-      .update(teams)
-      .set({ isActive: "false" })
-      .where(eq(teams.id, data.teamId))
-      .returning();
+      const now = new Date();
 
-    return deactivatedTeam;
+      await tx
+        .update(teamMembers)
+        .set({ status: "inactive", leftAt: now })
+        .where(
+          and(eq(teamMembers.teamId, data.teamId), eq(teamMembers.status, "active")),
+        );
+
+      const [deactivatedTeam] = await tx
+        .update(teams)
+        .set({ isActive: "false" })
+        .where(eq(teams.id, data.teamId))
+        .returning();
+
+      return deactivatedTeam;
+    });
   });
 
 /**

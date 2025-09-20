@@ -30,6 +30,8 @@ import {
 
 const DEFAULT_STATUS: AdminSystemStatusFilter = "all";
 const DEFAULT_SORT: AdminSystemSortOption = "updated-desc";
+const DEFAULT_PAGE = 1;
+const DEFAULT_PER_PAGE = 20;
 
 const rawSearchSchema = z.object({
   q: z.string().optional(),
@@ -37,6 +39,8 @@ const rawSearchSchema = z.object({
     .enum(["all", "needs_curation", "errors", "published", "unpublished"])
     .optional(),
   sort: z.enum(["updated-desc", "name-asc", "crawl-status"]).optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  perPage: z.coerce.number().int().min(5).max(100).optional(),
 });
 
 type AdminSystemsSearchParams = z.infer<typeof rawSearchSchema>;
@@ -45,6 +49,7 @@ interface AdminSystemsFormState {
   q: string;
   status: AdminSystemStatusFilter;
   sort: AdminSystemSortOption;
+  perPage: number;
 }
 
 export const Route = createFileRoute("/dashboard/systems/")({
@@ -81,15 +86,40 @@ function AdminSystemsPage() {
   };
 
   const handleReset = () => {
-    setFormState({ q: "", status: DEFAULT_STATUS, sort: DEFAULT_SORT });
+    setFormState({
+      q: "",
+      status: DEFAULT_STATUS,
+      sort: DEFAULT_SORT,
+      perPage: DEFAULT_PER_PAGE,
+    });
     navigate({ search: {} });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    const safePage = Number.isFinite(nextPage) ? Math.max(Math.floor(nextPage), 1) : 1;
+
+    navigate({
+      search: (previous) => {
+        const nextSearch = { ...previous };
+        if (safePage <= 1) {
+          delete nextSearch.page;
+        } else {
+          nextSearch.page = safePage;
+        }
+        return nextSearch;
+      },
+    });
   };
 
   const data: AdminGameSystemListResponse | undefined = systemsQuery.data;
   const systems = data?.items ?? [];
   const stats = data?.stats;
+  const total = data?.total ?? 0;
+  const page = data?.page ?? DEFAULT_PAGE;
+  const perPage = data?.perPage ?? DEFAULT_PER_PAGE;
+  const pageCount = data?.pageCount ?? 0;
 
-  const filteredTotal = data?.total ?? systems.length;
+  const filteredTotal = total;
   const summaryStats = buildSummaryStats(stats, filteredTotal);
   const isPristine =
     formState.q.trim() === "" &&
@@ -189,6 +219,30 @@ function AdminSystemsPage() {
               </Select>
             </div>
 
+            <div className="flex flex-col gap-2 sm:w-40">
+              <label className="text-foreground text-xs font-medium">Per page</label>
+              <Select
+                value={String(formState.perPage)}
+                onValueChange={(value) =>
+                  setFormState((previous) => ({
+                    ...previous,
+                    perPage: Number(value),
+                  }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Results per page" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PER_PAGE_OPTIONS.map((option) => (
+                    <SelectItem key={option} value={String(option)}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex gap-2 pt-2 sm:pt-0">
               <Button type="submit" disabled={systemsQuery.isFetching}>
                 Apply
@@ -213,7 +267,15 @@ function AdminSystemsPage() {
           </CardContent>
         </Card>
       ) : systems.length > 0 ? (
-        <SystemsDashboardTable systems={systems} />
+        <SystemsDashboardTable
+          systems={systems}
+          page={page}
+          perPage={perPage}
+          pageCount={pageCount}
+          total={total}
+          isLoading={systemsQuery.isFetching}
+          onPageChange={handlePageChange}
+        />
       ) : (
         <Card className="border-dashed">
           <CardHeader>
@@ -241,6 +303,8 @@ const SORT_OPTIONS: Array<{ value: AdminSystemSortOption; label: string }> = [
   { value: "name-asc", label: "Name" },
   { value: "crawl-status", label: "Crawl status" },
 ];
+
+const PER_PAGE_OPTIONS = [10, 20, 50] as const;
 
 function SummaryBadges({
   summaryStats,
@@ -281,6 +345,8 @@ function buildListInputFromSearch(
     q: search.q,
     status: (search.status as AdminSystemStatusFilter | undefined) ?? DEFAULT_STATUS,
     sort: (search.sort as AdminSystemSortOption | undefined) ?? DEFAULT_SORT,
+    page: search.page ?? DEFAULT_PAGE,
+    perPage: search.perPage ?? DEFAULT_PER_PAGE,
   };
 }
 
@@ -291,11 +357,14 @@ function buildFormStateFromSearch(
     q: search.q ?? "",
     status: (search.status as AdminSystemStatusFilter | undefined) ?? DEFAULT_STATUS,
     sort: (search.sort as AdminSystemSortOption | undefined) ?? DEFAULT_SORT,
+    perPage: search.perPage ?? DEFAULT_PER_PAGE,
   };
 }
 
 function formStatesEqual(a: AdminSystemsFormState, b: AdminSystemsFormState) {
-  return a.q === b.q && a.status === b.status && a.sort === b.sort;
+  return (
+    a.q === b.q && a.status === b.status && a.sort === b.sort && a.perPage === b.perPage
+  );
 }
 
 function buildSearchFromForm(form: AdminSystemsFormState): AdminSystemsSearchParams {
@@ -312,6 +381,10 @@ function buildSearchFromForm(form: AdminSystemsFormState): AdminSystemsSearchPar
 
   if (form.sort !== DEFAULT_SORT) {
     nextSearch.sort = form.sort;
+  }
+
+  if (form.perPage !== DEFAULT_PER_PAGE) {
+    nextSearch.perPage = form.perPage;
   }
 
   return nextSearch;

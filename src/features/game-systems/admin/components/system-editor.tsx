@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { FormEvent } from "react";
 import { Fragment, useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -84,6 +84,7 @@ export function SystemEditor({
   onTabChange,
   onSystemChange,
 }: SystemEditorProps) {
+  const queryClient = useQueryClient();
   const updatedRelative = formatRelativeTime(system.updatedAt);
   const statusPills =
     system.statusFlags.length === 0 ? (
@@ -98,8 +99,9 @@ export function SystemEditor({
       throw new Error("System not found after update.");
     }
     onSystemChange(next);
+    await queryClient.invalidateQueries({ queryKey: ["admin-game-systems"] });
     return next;
-  }, [system.id, onSystemChange]);
+  }, [system.id, onSystemChange, queryClient]);
 
   const moderateMutation = useMutation({
     mutationFn: async ({

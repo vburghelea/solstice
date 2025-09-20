@@ -10,6 +10,8 @@ export const listAdminGameSystemsSchema = z.object({
     .enum(["updated-desc", "name-asc", "crawl-status"])
     .optional()
     .default("updated-desc"),
+  page: z.coerce.number().int().min(1).max(500).default(1),
+  perPage: z.coerce.number().int().min(5).max(100).default(20),
 });
 
 export type ListAdminGameSystemsInput = z.infer<typeof listAdminGameSystemsSchema>;

@@ -4,6 +4,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  Row,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -32,6 +33,12 @@ interface DataTableProps<TData, TValue> {
   pageSize?: number;
   onExport?: () => void;
   enableColumnToggle?: boolean;
+  manualPagination?: boolean;
+  pageIndex?: number;
+  pageCount?: number;
+  onPageChange?: (pageIndex: number) => void;
+  isLoading?: boolean;
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,30 +47,76 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   onExport,
   enableColumnToggle = true,
+  manualPagination = false,
+  pageIndex = 0,
+  pageCount,
+  onPageChange,
+  isLoading = false,
+  getRowId,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+
+  const paginationState = manualPagination ? { pageIndex, pageSize } : undefined;
+  const resolvedPageCount = manualPagination ? (pageCount ?? -1) : undefined;
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    ...(getRowId ? { getRowId } : {}),
+    ...(manualPagination ? {} : { getPaginationRowModel: getPaginationRowModel() }),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnVisibility,
+      ...(paginationState ? { pagination: paginationState } : {}),
     },
-    initialState: {
-      pagination: {
-        pageSize,
-      },
-    },
+    manualPagination,
+    ...(resolvedPageCount == null ? {} : { pageCount: resolvedPageCount }),
+    ...(manualPagination
+      ? {}
+      : {
+          initialState: {
+            pagination: {
+              pageSize,
+            },
+          },
+        }),
   });
 
   const canRenderToolbar = enableColumnToggle || Boolean(onExport);
+
+  const canPreviousPage = manualPagination ? pageIndex > 0 : table.getCanPreviousPage();
+  const canNextPage = manualPagination
+    ? pageCount != null && pageCount > 0
+      ? pageIndex < pageCount - 1
+      : data.length === pageSize
+    : table.getCanNextPage();
+
+  const handlePrevious = () => {
+    if (manualPagination) {
+      if (onPageChange && pageIndex > 0) {
+        onPageChange(pageIndex - 1);
+      }
+      return;
+    }
+
+    table.previousPage();
+  };
+
+  const handleNext = () => {
+    if (manualPagination) {
+      if (onPageChange && (!pageCount || pageIndex < pageCount - 1)) {
+        onPageChange(pageIndex + 1);
+      }
+      return;
+    }
+
+    table.nextPage();
+  };
 
   return (
     <div className="space-y-4">
@@ -161,16 +214,16 @@ export function DataTable<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={handlePrevious}
+          disabled={!canPreviousPage || isLoading}
         >
           Previous
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={handleNext}
+          disabled={!canNextPage || isLoading}
         >
           Next
         </Button>

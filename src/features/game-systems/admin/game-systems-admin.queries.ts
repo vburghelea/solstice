@@ -67,6 +67,8 @@ interface ListRow {
 
 const DEFAULT_SORT: AdminSystemSortOption = "updated-desc";
 const DEFAULT_STATUS: AdminSystemStatusFilter = "all";
+const DEFAULT_PAGE = 1;
+const DEFAULT_PER_PAGE = 20;
 
 const toIsoString = (value: Date | string | null | undefined) => {
   if (!value) return null;
@@ -352,9 +354,28 @@ const listAdminGameSystemsHandler = async ({
 
   const filteredItems = applyStatusFilter(mappedRows, status);
 
+  const requestedPage = Number.isFinite(data.page) ? Number(data.page) : DEFAULT_PAGE;
+  const requestedPerPage = Number.isFinite(data.perPage)
+    ? Number(data.perPage)
+    : DEFAULT_PER_PAGE;
+
+  const perPage = Math.min(Math.max(requestedPerPage, 5), 100);
+  const total = filteredItems.length;
+  const pageCount = total === 0 ? 0 : Math.ceil(total / perPage);
+  const safePage =
+    total === 0
+      ? DEFAULT_PAGE
+      : Math.min(Math.max(requestedPage, DEFAULT_PAGE), pageCount);
+  const startIndex = total === 0 ? 0 : (safePage - 1) * perPage;
+  const endIndex = total === 0 ? 0 : startIndex + perPage;
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
+
   return {
-    items: filteredItems,
-    total: filteredItems.length,
+    items: paginatedItems,
+    total,
+    page: safePage,
+    perPage,
+    pageCount,
     stats,
   };
 };

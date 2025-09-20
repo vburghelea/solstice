@@ -193,8 +193,52 @@ function formatRelativeTime(isoString: string) {
 
 interface SystemsDashboardTableProps {
   systems: AdminGameSystemListItem[];
+  page: number;
+  perPage: number;
+  pageCount: number;
+  total: number;
+  isLoading?: boolean;
+  onPageChange: (page: number) => void;
 }
 
-export function SystemsDashboardTable({ systems }: SystemsDashboardTableProps) {
-  return <DataTable columns={columns} data={systems} pageSize={20} />;
+export function SystemsDashboardTable({
+  systems,
+  page,
+  perPage,
+  pageCount,
+  total,
+  isLoading = false,
+  onPageChange,
+}: SystemsDashboardTableProps) {
+  const pageIndex = Math.max(page - 1, 0);
+  const hasResults = total > 0;
+  const startLabel = hasResults ? pageIndex * perPage + 1 : 0;
+  const endLabel = hasResults ? startLabel + systems.length - 1 : 0;
+
+  return (
+    <div className="space-y-3">
+      <div className="text-muted-foreground flex items-center justify-between gap-3 text-xs">
+        <span>
+          Showing {hasResults ? `${startLabel}–${endLabel}` : 0} of {total}
+          {total === 1 ? " system" : " systems"}
+        </span>
+        {pageCount > 0 ? (
+          <span>
+            Page {hasResults ? page : 1} of {Math.max(pageCount, 1)}
+          </span>
+        ) : null}
+      </div>
+      <DataTable
+        columns={columns}
+        data={systems}
+        pageSize={perPage}
+        manualPagination
+        pageIndex={pageIndex}
+        pageCount={pageCount}
+        onPageChange={(nextPageIndex) => onPageChange(nextPageIndex + 1)}
+        isLoading={isLoading}
+        getRowId={(original) => String(original.id)}
+      />
+    </div>
+  );
 }

@@ -222,6 +222,13 @@ Deliverables
       Definition of done
 - [ ] Content manager can publish a system end to end without developer intervention.
 
+**Progress 2025-02-19**
+
+- Dashboard list now wires `listAdminGameSystems` through status-aware pagination. Filters for publish state, CMS approval, crawl errors, hero/summary gaps, and taxonomy coverage now reflect the server-derived readiness flags used by content ops. The UI exposes keyword search, sort, and page-size controls while rendering manual pagination state (`page`, `perPage`, `pageCount`, `total`) returned by the server function.
+- `listAdminGameSystems` input now accepts `{ page, perPage }` alongside search, status, and sort parameters, and the response returns `{ page, perPage, pageCount, total }` so the admin dashboard can render accurate navigation + summary badges. Existing consumers remain unaffected because defaults (page=1, perPage=20) mirror earlier behavior.
+- Bulk actions remain blocked on a new server mutation that can accept an array of system IDs for approval/publish state changes plus moderation toggles. Need to spec `bulkUpdateGameSystems` with audit metadata to satisfy CMS requirements.
+- External tag re-mapping in bulk still requires a batching endpoint (current UI is per-system). Capture requirements in Phase 9.C and plan tests once server contract exists. Coordinate with Phase 12 to add vitest coverage for pagination schema once new bulk endpoints land.
+
 Phase 10 - Reviews aggregation
 Deliverables
 

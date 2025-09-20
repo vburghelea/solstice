@@ -52,6 +52,9 @@ export interface AdminGameSystemListStats {
 export interface AdminGameSystemListResponse {
   items: AdminGameSystemListItem[];
   total: number;
+  page: number;
+  perPage: number;
+  pageCount: number;
   stats: AdminGameSystemListStats;
 }
 

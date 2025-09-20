@@ -1,5 +1,6 @@
-import { PublicFooter } from "~/shared/ui/public-footer";
-import { PublicHeader } from "~/shared/ui/public-header";
+import { InstallPrompt } from "~/components/ui/install-prompt";
+import { PublicFooter } from "~/components/ui/public-footer";
+import { PublicHeader } from "~/components/ui/public-header";
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
       <PublicHeader />
       <main className="flex-grow">{children}</main>
       <PublicFooter />
+      <InstallPrompt />
     </div>
   );
 }

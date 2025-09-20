@@ -11,14 +11,22 @@
 import { createServerRootRoute } from "@tanstack/react-start/server";
 
 import { Route as rootRouteImport } from "./routes/__root";
+<<<<<<< HEAD
 import { Route as SearchRouteImport } from "./routes/search";
 import { Route as EventsRouteImport } from "./routes/events";
+=======
+import { Route as TeamsRouteImport } from "./routes/teams";
+import { Route as ResourcesRouteImport } from "./routes/resources";
+import { Route as DesignSystemRouteImport } from "./routes/design-system";
+import { Route as AboutRouteImport } from "./routes/about";
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
 import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
 import { Route as AuthRouteRouteImport } from "./routes/auth/route";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as SystemsIndexRouteImport } from "./routes/systems/index";
 import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
+import { Route as EventsIndexRouteImport } from "./routes/events/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 <<<<<<< HEAD
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
@@ -108,6 +116,7 @@ import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/
 
 const rootServerRouteImport = createServerRootRoute();
 
+<<<<<<< HEAD
 const SearchRoute = SearchRouteImport.update({
   id: "/search",
   path: "/search",
@@ -116,6 +125,26 @@ const SearchRoute = SearchRouteImport.update({
 const EventsRoute = EventsRouteImport.update({
   id: "/events",
   path: "/events",
+=======
+const TeamsRoute = TeamsRouteImport.update({
+  id: "/teams",
+  path: "/teams",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: "/resources",
+  path: "/resources",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const DesignSystemRoute = DesignSystemRouteImport.update({
+  id: "/design-system",
+  path: "/design-system",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const AboutRoute = AboutRouteImport.update({
+  id: "/about",
+  path: "/about",
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
   getParentRoute: () => rootRouteImport,
 } as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
@@ -147,6 +176,11 @@ const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => OnboardingRouteRoute,
+} as any);
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: "/events/",
+  path: "/events/",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: "/",
@@ -512,10 +546,17 @@ export interface FileRoutesByFullPath {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
+=======
+  "/about": typeof AboutRoute;
+  "/design-system": typeof DesignSystemRoute;
+  "/resources": typeof ResourcesRoute;
+  "/teams": typeof TeamsRoute;
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
   "/admin/events-review": typeof AdminEventsReviewRoute;
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -572,6 +613,7 @@ export interface FileRoutesByFullPath {
 =======
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
+  "/events": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
@@ -591,10 +633,17 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
+=======
+  "/about": typeof AboutRoute;
+  "/design-system": typeof DesignSystemRoute;
+  "/resources": typeof ResourcesRoute;
+  "/teams": typeof TeamsRoute;
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
   "/admin/events-review": typeof AdminEventsReviewRoute;
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -639,6 +688,7 @@ export interface FileRoutesByTo {
 =======
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard": typeof DashboardIndexRoute;
+  "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
@@ -660,10 +710,17 @@ export interface FileRoutesById {
   "/dashboard": typeof DashboardRouteRouteWithChildren;
   "/onboarding": typeof OnboardingRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/events": typeof EventsRoute;
   "/search": typeof SearchRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
 =======
+=======
+  "/about": typeof AboutRoute;
+  "/design-system": typeof DesignSystemRoute;
+  "/resources": typeof ResourcesRoute;
+  "/teams": typeof TeamsRoute;
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
   "/admin/events-review": typeof AdminEventsReviewRoute;
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -720,6 +777,7 @@ export interface FileRoutesById {
 =======
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard/": typeof DashboardIndexRoute;
+  "/events/": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
@@ -743,10 +801,17 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
 =======
+=======
+    | "/about"
+    | "/design-system"
+    | "/resources"
+    | "/teams"
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
     | "/admin/events-review"
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -799,6 +864,7 @@ export interface FileRouteTypes {
 =======
     | "/events/$slug"
     | "/dashboard/"
+    | "/events"
     | "/onboarding/"
     | "/dashboard/events/create"
     | "/dashboard/teams/$teamId"
@@ -818,10 +884,17 @@ export interface FileRouteTypes {
     | "/"
     | "/auth"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
 =======
+=======
+    | "/about"
+    | "/design-system"
+    | "/resources"
+    | "/teams"
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
     | "/admin/events-review"
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -866,6 +939,7 @@ export interface FileRouteTypes {
 =======
     | "/events/$slug"
     | "/dashboard"
+    | "/events"
     | "/onboarding"
     | "/dashboard/events/create"
     | "/dashboard/teams/browse"
@@ -886,10 +960,17 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/onboarding"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/events"
     | "/search"
     | "/auth/forgot-password"
 =======
+=======
+    | "/about"
+    | "/design-system"
+    | "/resources"
+    | "/teams"
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
     | "/admin/events-review"
 <<<<<<< HEAD
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
@@ -942,6 +1023,7 @@ export interface FileRouteTypes {
 =======
     | "/events/$slug"
     | "/dashboard/"
+    | "/events/"
     | "/onboarding/"
     | "/dashboard/events/create"
     | "/dashboard/teams/$teamId"
@@ -964,6 +1046,7 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
   OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
 <<<<<<< HEAD
+<<<<<<< HEAD
   EventsRoute: typeof EventsRoute;
   SearchRoute: typeof SearchRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
@@ -977,6 +1060,16 @@ export interface RootRouteChildren {
   AdminRolesRoute: typeof AdminRolesRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+  AboutRoute: typeof AboutRoute;
+  DesignSystemRoute: typeof DesignSystemRoute;
+  ResourcesRoute: typeof ResourcesRoute;
+  TeamsRoute: typeof TeamsRoute;
+  AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  AdminRolesRoute: typeof AdminRolesRoute;
+  EventsSlugRoute: typeof EventsSlugRouteWithChildren;
+  EventsIndexRoute: typeof EventsIndexRoute;
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 }
 export interface FileServerRoutesByFullPath {
   "/api/debug-square": typeof ApiDebugSquareServerRoute;
@@ -1104,6 +1197,7 @@ export interface RootServerRouteChildren {
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+<<<<<<< HEAD
     "/search": {
       id: "/search";
       path: "/search";
@@ -1116,6 +1210,34 @@ declare module "@tanstack/react-router" {
       path: "/events";
       fullPath: "/events";
       preLoaderRoute: typeof EventsRouteImport;
+=======
+    "/teams": {
+      id: "/teams";
+      path: "/teams";
+      fullPath: "/teams";
+      preLoaderRoute: typeof TeamsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/resources": {
+      id: "/resources";
+      path: "/resources";
+      fullPath: "/resources";
+      preLoaderRoute: typeof ResourcesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/design-system": {
+      id: "/design-system";
+      path: "/design-system";
+      fullPath: "/design-system";
+      preLoaderRoute: typeof DesignSystemRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/about": {
+      id: "/about";
+      path: "/about";
+      fullPath: "/about";
+      preLoaderRoute: typeof AboutRouteImport;
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
       parentRoute: typeof rootRouteImport;
     };
     "/onboarding": {
@@ -1159,6 +1281,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/onboarding/";
       preLoaderRoute: typeof OnboardingIndexRouteImport;
       parentRoute: typeof OnboardingRouteRoute;
+    };
+    "/events/": {
+      id: "/events/";
+      path: "/events";
+      fullPath: "/events";
+      preLoaderRoute: typeof EventsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/dashboard/": {
       id: "/dashboard/";
@@ -1875,6 +2004,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   OnboardingRouteRoute: OnboardingRouteRouteWithChildren,
 <<<<<<< HEAD
+<<<<<<< HEAD
   EventsRoute: EventsRoute,
   SearchRoute: SearchRoute,
   EventEventIdRoute: EventEventIdRoute,
@@ -1888,6 +2018,16 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRolesRoute: AdminRolesRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
+=======
+  AboutRoute: AboutRoute,
+  DesignSystemRoute: DesignSystemRoute,
+  ResourcesRoute: ResourcesRoute,
+  TeamsRoute: TeamsRoute,
+  AdminEventsReviewRoute: AdminEventsReviewRoute,
+  AdminRolesRoute: AdminRolesRoute,
+  EventsSlugRoute: EventsSlugRouteWithChildren,
+  EventsIndexRoute: EventsIndexRoute,
+>>>>>>> 6c60748 (feat: integrate Vite PWA plugin and enhance app manifest)
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

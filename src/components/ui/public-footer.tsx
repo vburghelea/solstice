@@ -20,21 +20,36 @@ export function PublicFooter() {
               Quick Links
             </h3>
             <nav className="mt-3 space-y-2 text-sm sm:mt-4">
-              <Link className="block text-gray-400 transition hover:text-white" to="/">
+              <Link
+                className="block text-gray-400 transition hover:text-white"
+                to="/events"
+              >
                 Events
               </Link>
-              <Link className="block text-gray-400 transition hover:text-white" to="/">
+              <Link
+                className="block text-gray-400 transition hover:text-white"
+                to="/teams"
+              >
                 Teams
               </Link>
-              <Link className="block text-gray-400 transition hover:text-white" to="/">
+              <Link
+                className="block text-gray-400 transition hover:text-white"
+                to="/resources"
+              >
                 Resources
               </Link>
-              <Link className="block text-gray-400 transition hover:text-white" to="/">
-                About Us
+              <Link
+                className="block text-gray-400 transition hover:text-white"
+                to="/about"
+              >
+                About Quadball Canada
               </Link>
-              <Link className="block text-gray-400 transition hover:text-white" to="/">
-                Contact
-              </Link>
+              <a
+                className="block text-gray-400 transition hover:text-white"
+                href="mailto:info@quadball.ca"
+              >
+                Contact Us
+              </a>
             </nav>
           </div>
           <div className="sm:text-right lg:text-left">

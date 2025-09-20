@@ -62,7 +62,7 @@ export const securityConfig = {
   oauth: {
     // Allowed email domains for OAuth sign-ups (comma-separated in env)
     // Example: OAUTH_ALLOWED_DOMAINS=company.com,partner.com
-    allowedDomains: [], // TODO: Add OAUTH_ALLOWED_DOMAINS to env.server.ts if needed
+    allowedDomains: env.OAUTH_ALLOWED_DOMAINS,
   },
 } as const;
 

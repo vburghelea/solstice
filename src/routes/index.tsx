@@ -1,9 +1,18 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
 import type { PopularGameSystem } from "~/features/game-systems/game-systems.types";
 import { GameListItemView } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import { GameListItem } from "~/features/games/games.types";
+import { ShieldCheck, Sparkles } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { DataErrorState } from "~/components/ui/data-state";
+import { EventCard, EventCardSkeleton } from "~/components/ui/event-card";
+import { HeroSection } from "~/components/ui/hero-section";
+import { CalendarIcon, Trophy, UsersIcon } from "~/components/ui/icons";
+import { getUpcomingEvents } from "~/features/events/events.queries";
+import type { EventWithDetails } from "~/features/events/events.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
@@ -14,6 +23,8 @@ type HomeLoaderData = {
   featuredGames: GameListItem[];
   popularSystems: PopularGameSystem[];
 };
+
+const UPCOMING_EVENTS_LIMIT = 6;
 
 export const Route = createFileRoute("/")({
   loader: async (): Promise<HomeLoaderData> => {
@@ -44,68 +55,39 @@ function Index() {
   return (
     <PublicLayout>
       <HeroSection
-        title="Welcome to Quadball Canada"
-        subtitle="Your hub for all things Quadball in Canada. Stay updated on events, teams, and resources."
-        backgroundImage="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1893"
-        ctaText="Explore Events"
-        ctaLink="/"
+        eyebrow="Play. Compete. Grow."
+        title="Fueling the growth of Quadball across Canada"
+        subtitle="Quadball Canada connects clubs, athletes, and volunteers coast-to-coast—from grassroots programs to high-performance teams—so everyone can experience the magic of the sport."
+        backgroundImage="https://images.unsplash.com/photo-1502810190503-8303352d0dd1?auto=format&fit=crop&w=2000&q=80"
+        ctaText="Find Your Next Event"
+        ctaLink="/events"
         secondaryCta={{
-          text: "Register Now",
-          link: "/auth/signup",
+          text: "Connect With a Team",
+          link: "/teams",
         }}
       />
 
-      <section className="bg-gray-50 py-8 sm:py-12 lg:py-16">
+      <section className="bg-white py-10 sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <h2 className="mb-8 text-center text-2xl font-bold sm:mb-12 sm:text-3xl">
-            Upcoming Events
-          </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
-            <EventCard
-              title="National Championship"
-              description="Join us for the biggest Quadball event of the year!"
-              image="https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1740"
-              link="/"
-            />
-            <EventCard
-              title="Regional Training Camp"
-              description="Improve your skills with top coaches in the region."
-              image="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1740"
-              link="/"
-            />
-            <EventCard
-              title="Community Meetup"
-              description="Connect with fellow Quadball enthusiasts in your area."
-              image="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?q=80&w=1674"
-              link="/"
-            />
-          </div>
-          <div className="mt-8 text-center sm:mt-12">
-            <Link to="/" className="text-brand-red font-semibold hover:underline">
-              View all events →
-            </Link>
+          <div className="grid gap-6 rounded-2xl bg-gray-50 p-6 text-center shadow-sm sm:grid-cols-3 sm:p-8">
+            {highlights.map((item) => (
+              <div key={item.label} className="space-y-2">
+                <p className="text-brand-red text-3xl font-bold sm:text-4xl">
+                  {item.value}
+                </p>
+                <p className="text-sm font-medium text-gray-600">{item.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-8 sm:py-12 lg:py-16">
+      <section className="bg-gray-50 py-10 sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
-            <div className="order-2 lg:order-1">
-              <img
-                src="https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?q=80&w=1740"
-                alt="Team celebrating"
-                className="w-full rounded-lg shadow-xl"
-              />
-            </div>
-            <div className="order-1 text-center lg:order-2 lg:text-left">
-              <h2 className="mb-4 text-2xl font-bold sm:mb-6 sm:text-3xl">Latest News</h2>
-              <h3 className="mb-3 text-lg font-semibold sm:text-xl">
-                New Team Registration Opens
-              </h3>
-              <p className="mb-6 px-4 text-gray-600 sm:px-0">
-                Register your team for the upcoming season and compete for the
-                championship.
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
+                Upcoming Competitions
               </p>
               <div className="flex w-full flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
                 <label className="sr-only" htmlFor="home-city">

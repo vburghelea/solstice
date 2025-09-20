@@ -1,6 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { defineConfig, loadEnv } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(({ mode }) => {
@@ -18,6 +19,70 @@ export default defineConfig(({ mode }) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as any,
       tailwindcss(),
+      VitePWA({
+        registerType: "autoUpdate",
+        includeAssets: [
+          "favicon.ico",
+          "icons/quadball-icon.svg",
+          "icons/quadball-icon-maskable.svg",
+        ],
+        manifest: {
+          id: "/",
+          name: "Quadball Canada",
+          short_name: "Quadball CA",
+          description:
+            "Official Quadball Canada platform for national events, club resources, and membership tools.",
+          theme_color: "#d82929",
+          background_color: "#ffffff",
+          start_url: "/",
+          display: "standalone",
+          icons: [
+            {
+              src: "/icons/quadball-icon.svg",
+              sizes: "512x512",
+              type: "image/svg+xml",
+              purpose: "any",
+            },
+            {
+              src: "/icons/quadball-icon-maskable.svg",
+              sizes: "512x512",
+              type: "image/svg+xml",
+              purpose: "maskable",
+            },
+          ],
+        },
+        workbox: {
+          runtimeCaching: [
+            {
+              urlPattern: ({ request }) => request.destination === "document",
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "qc-pages",
+                expiration: { maxEntries: 20, maxAgeSeconds: 60 * 30 },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.pathname.startsWith("/events"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "qc-events",
+                expiration: { maxEntries: 60, maxAgeSeconds: 60 * 30 },
+              },
+            },
+            {
+              urlPattern: ({ request }) => request.destination === "image",
+              handler: "CacheFirst",
+              options: {
+                cacheName: "qc-images",
+                expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              },
+            },
+          ],
+        },
+        devOptions: {
+          enabled: true,
+        },
+      }),
       tanstackStart({
         // https://react.dev/learn/react-compiler
         react: {

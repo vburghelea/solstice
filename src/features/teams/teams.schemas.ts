@@ -11,12 +11,13 @@ export const getTeamBySlugSchema = z.object({
 });
 export type GetTeamBySlugInput = z.infer<typeof getTeamBySlugSchema>;
 
-export const listTeamsSchema = z
-  .object({
-    includeInactive: z.boolean().optional().default(false),
-  })
-  .optional()
-  .default({ includeInactive: false });
+const listTeamsInputSchema = z.object({
+  includeInactive: z.boolean().optional().default(false),
+});
+
+export const listTeamsSchema = listTeamsInputSchema
+  .nullish()
+  .transform((value) => value ?? { includeInactive: false });
 export type ListTeamsInput = z.infer<typeof listTeamsSchema>;
 
 export const getTeamMembersSchema = z.object({

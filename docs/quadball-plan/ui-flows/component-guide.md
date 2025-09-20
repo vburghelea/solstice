@@ -6,7 +6,7 @@ The Quadball Canada platform uses shadcn/ui components built on Radix UI primiti
 
 ## Component System
 
-We use shadcn/ui for foundational components. See `src/shared/ui/README.md` for the list of available base components.
+We use shadcn/ui for foundational components. See `src/components/ui/README.md` for the list of available base components.
 
 ## Project-Specific Components
 
@@ -218,7 +218,7 @@ Consider using GitHub Discussions or a project board to track planned components
 
 ```
 src/
-├── shared/ui/          # Base shadcn/ui components
+├── components/ui/      # Base shadcn/ui components
 │   ├── button.tsx
 │   ├── card.tsx
 │   └── README.md       # Component list

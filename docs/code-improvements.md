@@ -207,7 +207,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 ### After
 
 ```typescript
-import { GitHubIcon, GoogleIcon, MoonIcon, SunIcon } from "~/shared/ui/icons";
+import { GitHubIcon, GoogleIcon, MoonIcon, SunIcon } from "~/components/ui/icons";
 
 // Usage
 <GitHubIcon />
@@ -294,7 +294,7 @@ import { LoaderCircle } from "lucide-react";
 <LoaderCircle className="animate-spin" />
 
 // New
-import { LoaderIcon } from "~/shared/ui/icons";
+import { LoaderIcon } from "~/components/ui/icons";
 <LoaderIcon className="animate-spin" />
 ```
 

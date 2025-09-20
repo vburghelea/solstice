@@ -19,7 +19,7 @@
 - **Imports**: Use `~/` alias for src imports, organize with prettier-plugin-organize-imports
 - **Formatting**: 2 spaces, semicolons, double quotes, trailing commas, 90 char line width
 - **Types**: Strict TypeScript, avoid `any`, use type inference where possible
-- **Components**: Function components only, use shadcn/ui from `~/shared/ui/`
+- **Components**: Function components only, use shadcn/ui from `~/components/ui/`
 - **Naming**: PascalCase components, camelCase functions/variables, kebab-case files
 - **Error Handling**: Use try-catch with proper error types, display user-friendly messages
 - **Testing**: Vitest + Testing Library, mock external deps, test user behavior not implementation

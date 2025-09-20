@@ -7,6 +7,7 @@ import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedDatePicker } from "~/components/form-fields/ValidatedDatePicker";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,7 +17,6 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
-import { Button } from "~/shared/ui/button";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";

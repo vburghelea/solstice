@@ -135,7 +135,7 @@ export const searchGameSystems = createServerFn({ method: "POST" })
       >
     > => {
       try {
-        const { getDb, ilike, gameSystems } = await getServerDeps();
+        const { getDb, and, eq, ilike, gameSystems } = await getServerDeps();
         const db = await getDb();
         const searchTerm = `%${data.query}%`;
 
@@ -148,7 +148,9 @@ export const searchGameSystems = createServerFn({ method: "POST" })
             maxPlayers: gameSystems.maxPlayers,
           })
           .from(gameSystems)
-          .where(ilike(gameSystems.name, searchTerm))
+          .where(
+            and(ilike(gameSystems.name, searchTerm), eq(gameSystems.isPublished, true)),
+          )
           .limit(10);
 
         return { success: true, data: systems };

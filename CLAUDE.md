@@ -197,7 +197,7 @@ See `docs/database-connections.md` for detailed usage guide.
 
 - **Auth Facade**: Clean API wrapper around Better Auth client
 - **Theme Hook**: Reactive theme management with system preference support
-- **Centralized Icons**: Reusable icon components in shared/ui/icons
+- **Centralized Icons**: Reusable icon components in components/ui/icons
 - **Auth Guards**: Flexible authentication protection for routes
 - **Profile Guards**: Ensure users complete profile before accessing features
 - **Environment Config**: Type-safe environment variable access
@@ -465,8 +465,8 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
 - **Add profile completion guard**: Use `requireCompleteProfile()` from profile feature
 - **Access user data**: Use `useRouteContext()` to get user from context
 - **Make API calls**: Use React Query with proper error handling
-- **Add UI components**: Check `src/shared/ui/` for existing components first
-- **Install shadcn components**: `npx shadcn@latest add <component>` (auto-installs to `src/shared/ui/`)
+- **Add UI components**: Check `src/components/ui/` for existing components first
+- **Install shadcn components**: `npx shadcn@latest add <component>` (installs to `src/components/ui/`)
 - **Update documentation**: Run `pnpm docs:all` after significant changes
 - **Add a new server function**:
   1. Create schema in `[feature].schemas.ts`

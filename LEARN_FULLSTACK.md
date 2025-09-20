@@ -156,7 +156,7 @@ solstice/
 └── scripts/              # One-off maintenance utilities
 ```
 
-> **Tip:** Each directory has its own `index.ts` barrel export to keep import paths short (`@/lib`, `@/shared/ui`, etc).
+> **Tip:** Each directory has its own `index.ts` barrel export to keep import paths short (`@/lib`, `@/components/ui`, etc).
 
 ### Configuration Files
 

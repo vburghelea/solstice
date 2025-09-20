@@ -32,7 +32,7 @@ Use the custom `render` function from `~/tests/utils` which includes providers:
 
 ```tsx
 import { render, screen } from "~/tests/utils";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 
 describe("Button", () => {
   it("renders correctly", () => {

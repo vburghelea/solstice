@@ -99,6 +99,7 @@ export const listPopularSystemsHandler = async (): Promise<PopularGameSystem[]> 
     .leftJoin(counts, eq(counts.gameSystemId, gameSystems.id))
     .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
     .leftJoin(publishers, eq(gameSystems.publisherId, publishers.id))
+    .where(eq(gameSystems.isPublished, true))
     .orderBy(desc(sql`coalesce(${counts.sessionCount}, 0)`), asc(gameSystems.name))
     .limit(POPULAR_SYSTEM_LIMIT);
 
@@ -246,7 +247,7 @@ export const listSystemsHandler = async ({
     };
   }
 
-  const conditions: SQL[] = [];
+  const conditions: SQL[] = [eq(gameSystems.isPublished, true)];
 
   if (filteredIds && filteredIds.length > 0) {
     conditions.push(inArray(gameSystems.id, filteredIds));

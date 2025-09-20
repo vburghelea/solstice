@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -89,6 +90,12 @@ export const teamMembers = pgTable(
     leftAt: timestamp("left_at", { withTimezone: true }),
     invitedBy: text("invited_by").references(() => user.id),
     notes: text("notes"),
+    invitedAt: timestamp("invited_at", { withTimezone: true }),
+    lastInvitationReminderAt: timestamp("last_invitation_reminder_at", {
+      withTimezone: true,
+    }),
+    invitationReminderCount: integer("invitation_reminder_count").notNull().default(0),
+    requestedAt: timestamp("requested_at", { withTimezone: true }),
   },
   (table) => ({
     teamUserIdx: uniqueIndex("team_members_team_user_idx").on(table.teamId, table.userId),

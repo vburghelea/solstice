@@ -136,10 +136,23 @@ deactivateTeam({ teamId: string }): Promise<void>
    - Only captains and coaches can manage
 
 3. **Member Management**
-   - Invite by email
-   - Assign roles and jersey numbers
-   - Remove members
-   - Role-based permissions
+
+- Invite by email
+- Assign roles and jersey numbers
+- Remove members
+- Role-based permissions
+- Track pending invitations with email notifications and dashboard actions
+- Support member-initiated "ask to join" requests for public teams
+
+## Invitations Workflow
+
+- Team managers invite members from the dashboard; invites trigger SendGrid emails using the
+  `TEAM_INVITATION` template and are logged in development.
+- Pending invitations surface on the Teams home page with accept/decline controls and status badges.
+- Non-members can request to join a team directly from the team detail page using the "Ask to Join"
+  button; requests are tracked alongside traditional invitations.
+- Invitation metadata (invited/ requested timestamps, reminder counters, inviter) is recorded on
+  the `team_members` table for auditing and reminder automation.
 
 4. **Team Discovery**
    - Browse all active teams
@@ -215,12 +228,11 @@ const member = await addTeamMember({
 
 ## Future Enhancements
 
-1. **Email Invitations**: Send actual invite emails via SendGrid
-2. **Team Applications**: Allow users to apply to join teams
-3. **Team Statistics**: Track game history and stats
-4. **Media Upload**: Team logos and photos via Cloudinary
-5. **Event Registration**: Register teams for tournaments
-6. **Team Announcements**: Internal team communication
+1. **Invitation Reminders**: Automated follow-ups to pending invites
+2. **Team Statistics**: Track game history and performance metrics
+3. **Media Upload**: Team logos and photos via Cloudinary
+4. **Event Registration**: Register teams for tournaments
+5. **Team Announcements**: Internal team communication
 
 ## Testing
 

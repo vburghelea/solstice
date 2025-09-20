@@ -1,5 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -12,6 +13,8 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "~/components/ui/icons";
+import { useAuth } from "~/features/auth";
+import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
@@ -20,6 +23,13 @@ export const Route = createFileRoute("/dashboard/teams/$teamId/")({
 
 function TeamDetailsPage() {
   const { teamId } = Route.useParams();
+
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [requestState, setRequestState] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const { data: teamData } = useSuspenseQuery({
     queryKey: ["team", teamId],
@@ -33,6 +43,41 @@ function TeamDetailsPage() {
     queryFn: async () => getTeamMembers({ data: { teamId } }),
     // Don't pass stale data - let React Query fetch fresh data when invalidated
   });
+
+  const membershipRecord = members.find((member) => member.user.id === user?.id);
+  const membershipStatus = membershipRecord?.member.status;
+  const isActiveMember = membershipStatus === "active";
+  const pendingInviteFromTeam =
+    membershipStatus === "pending" && Boolean(membershipRecord?.invitedBy?.id);
+  const pendingJoinRequest =
+    membershipStatus === "pending" && !membershipRecord?.invitedBy?.id;
+
+  const requestMembershipMutation = useMutation({
+    mutationFn: () => requestTeamMembership({ data: { teamId } }),
+    onSuccess: () => {
+      setRequestState({
+        type: "success",
+        message: "Join request sent to the team captains.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["pendingTeamInvites"] });
+      queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
+      queryClient.invalidateQueries({ queryKey: ["userTeams"] });
+    },
+    onError: (error) => {
+      setRequestState({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to send join request right now.",
+      });
+    },
+  });
+
+  const handleRequestToJoin = () => {
+    setRequestState(null);
+    requestMembershipMutation.mutate();
+  };
 
   if (!teamData) {
     return <div>Team not found</div>;
@@ -150,13 +195,22 @@ function TeamDetailsPage() {
                           <Badge variant="outline" className="capitalize">
                             {member.role}
                           </Badge>
+                          {member.status === "pending" && (
+                            <Badge variant="secondary">Pending</Badge>
+                          )}
                           {member.jerseyNumber && <span>#{member.jerseyNumber}</span>}
                           {member.position && <span>{member.position}</span>}
                         </div>
                       </div>
                     </div>
                     <div className="text-muted-foreground text-sm">
-                      Joined {new Date(member.joinedAt).toLocaleDateString()}
+                      {member.status === "pending"
+                        ? member.invitedAt
+                          ? `Invited ${new Date(member.invitedAt).toLocaleDateString()}`
+                          : member.requestedAt
+                            ? `Requested ${new Date(member.requestedAt).toLocaleDateString()}`
+                            : "Pending"
+                        : `Joined ${new Date(member.joinedAt).toLocaleDateString()}`}
                     </div>
                   </div>
                 ))}
@@ -196,12 +250,49 @@ function TeamDetailsPage() {
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Button className="w-full" variant="outline" asChild>
-                <Link to="/dashboard/teams/$teamId/members" params={{ teamId }}>
-                  <UsersIcon className="mr-2 h-4 w-4" />
-                  Manage Members
-                </Link>
+            <CardContent className="space-y-3">
+              {requestState && (
+                <div
+                  className={
+                    requestState.type === "success"
+                      ? "border-primary/40 bg-primary/5 text-primary rounded-md border px-3 py-2 text-sm"
+                      : "border-destructive/40 bg-destructive/10 text-destructive rounded-md border px-3 py-2 text-sm"
+                  }
+                >
+                  {requestState.message}
+                </div>
+              )}
+
+              {isActiveMember ? (
+                <Button className="w-full" variant="outline" asChild>
+                  <Link to="/dashboard/teams/$teamId/members" params={{ teamId }}>
+                    <UsersIcon className="mr-2 h-4 w-4" />
+                    Manage Members
+                  </Link>
+                </Button>
+              ) : pendingInviteFromTeam ? (
+                <div className="text-muted-foreground text-sm">
+                  You have a pending invitation for this team. Visit the Teams dashboard
+                  to accept or decline.
+                </div>
+              ) : pendingJoinRequest ? (
+                <div className="text-muted-foreground text-sm">
+                  Your join request is awaiting approval from the team captains.
+                </div>
+              ) : user ? (
+                <Button
+                  className="w-full"
+                  onClick={handleRequestToJoin}
+                  disabled={requestMembershipMutation.isPending}
+                >
+                  {requestMembershipMutation.isPending
+                    ? "Sending request..."
+                    : "Ask to Join"}
+                </Button>
+              ) : null}
+
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/dashboard/teams/browse">Browse Teams</Link>
               </Button>
             </CardContent>
           </Card>

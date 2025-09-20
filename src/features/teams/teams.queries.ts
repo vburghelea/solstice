@@ -172,14 +172,15 @@ export const getTeamMembers = createServerFn({ method: "POST" })
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { teamMembers, user } = await import("~/db/schema");
-    const { and, eq, sql } = await import("drizzle-orm");
+    const { and, eq, inArray, sql } = await import("drizzle-orm");
 
     const db = await getDb();
 
-    const conditions = and(
-      eq(teamMembers.teamId, data.teamId),
-      data.includeInactive ? undefined : eq(teamMembers.status, "active"),
-    );
+    const statusCondition = data.includeInactive
+      ? undefined
+      : inArray(teamMembers.status, ["active", "pending"]);
+
+    const conditions = and(eq(teamMembers.teamId, data.teamId), statusCondition);
 
     const result = await db
       .select({
@@ -192,6 +193,10 @@ export const getTeamMembers = createServerFn({ method: "POST" })
           joinedAt: teamMembers.joinedAt,
           leftAt: teamMembers.leftAt,
           notes: teamMembers.notes,
+          invitedAt: teamMembers.invitedAt,
+          requestedAt: teamMembers.requestedAt,
+          invitationReminderCount: teamMembers.invitationReminderCount,
+          lastInvitationReminderAt: teamMembers.lastInvitationReminderAt,
         },
         user: {
           id: user.id,
@@ -202,6 +207,7 @@ export const getTeamMembers = createServerFn({ method: "POST" })
         invitedBy: {
           id: sql<string | null>`inviter.id`,
           name: sql<string | null>`inviter.name`,
+          email: sql<string | null>`inviter.email`,
         },
       })
       .from(teamMembers)
@@ -220,6 +226,55 @@ export const getTeamMembers = createServerFn({ method: "POST" })
 
     return result;
   });
+
+export const getPendingTeamInvites = createServerFn({ method: "POST" }).handler(
+  async () => {
+    const [{ getCurrentUser }, { getDb }, { and, eq, sql }] = await Promise.all([
+      import("~/features/auth/auth.queries"),
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+    ]);
+    const { teamMembers, teams, user } = await import("~/db/schema");
+
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      throw new Error("Not authenticated");
+    }
+
+    const db = await getDb();
+
+    const invites = await db
+      .select({
+        membership: {
+          id: teamMembers.id,
+          teamId: teamMembers.teamId,
+          role: teamMembers.role,
+          invitedAt: teamMembers.invitedAt,
+          requestedAt: teamMembers.requestedAt,
+          invitedBy: teamMembers.invitedBy,
+        },
+        team: {
+          id: teams.id,
+          name: teams.name,
+          slug: teams.slug,
+        },
+        inviter: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      })
+      .from(teamMembers)
+      .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+      .leftJoin(user, eq(teamMembers.invitedBy, user.id))
+      .where(
+        and(eq(teamMembers.userId, currentUser.id), eq(teamMembers.status, "pending")),
+      )
+      .orderBy(sql`COALESCE(${teamMembers.invitedAt}, ${teamMembers.requestedAt}) DESC`);
+
+    return invites;
+  },
+);
 
 /**
  * Check if a user is a member of a team
@@ -295,3 +350,4 @@ export type TeamWithMemberCount = Awaited<ReturnType<typeof getTeam>>;
 export type TeamListItem = Awaited<ReturnType<typeof listTeams>>[number];
 export type UserTeam = Awaited<ReturnType<typeof getUserTeams>>[number];
 export type TeamMemberDetails = Awaited<ReturnType<typeof getTeamMembers>>[number];
+export type PendingTeamInvite = Awaited<ReturnType<typeof getPendingTeamInvites>>[number];

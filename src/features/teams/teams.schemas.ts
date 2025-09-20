@@ -93,3 +93,13 @@ export const removeTeamMemberSchema = z.object({
   memberId: z.string(),
 });
 export type RemoveTeamMemberInput = z.infer<typeof removeTeamMemberSchema>;
+
+export const teamInviteActionSchema = z.object({
+  teamId: z.string(),
+});
+export type TeamInviteActionInput = z.infer<typeof teamInviteActionSchema>;
+
+export const requestTeamMembershipSchema = z.object({
+  teamId: z.string(),
+});
+export type RequestTeamMembershipInput = z.infer<typeof requestTeamMembershipSchema>;

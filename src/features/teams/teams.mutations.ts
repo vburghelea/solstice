@@ -5,6 +5,8 @@ import {
   addTeamMemberSchema,
   createTeamSchema,
   removeTeamMemberSchema,
+  requestTeamMembershipSchema,
+  teamInviteActionSchema,
   updateTeamMemberSchema,
   updateTeamSchema,
 } from "./teams.schemas";
@@ -199,7 +201,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
       import("drizzle-orm"),
       import("@paralleldrive/cuid2"),
     ]);
-    const { teamMembers, user } = await import("~/db/schema");
+    const { teamMembers, teams, user } = await import("~/db/schema");
 
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -227,7 +229,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
 
     // Find user by email
     const [targetUser] = await db
-      .select({ id: user.id })
+      .select({ id: user.id, email: user.email, name: user.name })
       .from(user)
       .where(eq(user.email, data.email))
       .limit(1);
@@ -259,6 +261,10 @@ export const addTeamMember = createServerFn({ method: "POST" })
           jerseyNumber: data.jerseyNumber,
           position: data.position,
           leftAt: null,
+          invitedAt: new Date(),
+          invitationReminderCount: 0,
+          lastInvitationReminderAt: null,
+          requestedAt: null,
         })
         .where(
           and(eq(teamMembers.teamId, data.teamId), eq(teamMembers.userId, targetUser.id)),
@@ -279,8 +285,38 @@ export const addTeamMember = createServerFn({ method: "POST" })
         jerseyNumber: data.jerseyNumber,
         position: data.position,
         invitedBy: currentUser.id,
+        invitedAt: new Date(),
+        invitationReminderCount: 0,
+        lastInvitationReminderAt: null,
+        requestedAt: null,
       })
       .returning();
+
+    // Send invitation email in the background; failure shouldn't block flow
+    const { sendTeamInvitationEmail } = await import("~/lib/email/sendgrid");
+    if (targetUser?.email) {
+      try {
+        const [teamInfo] = await db
+          .select({ name: teams.name, slug: teams.slug })
+          .from(teams)
+          .where(eq(teams.id, data.teamId))
+          .limit(1);
+
+        await sendTeamInvitationEmail({
+          to: {
+            email: targetUser.email,
+            name: targetUser.name ?? undefined,
+          },
+          teamName: teamInfo?.name ?? "Quadball Canada Team",
+          teamSlug: teamInfo?.slug ?? data.teamId,
+          role: data.role,
+          invitedByName: currentUser.name ?? undefined,
+          invitedByEmail: currentUser.email ?? undefined,
+        });
+      } catch (error) {
+        console.error("Failed to send team invitation email", error);
+      }
+    }
 
     return newMember;
   });
@@ -441,9 +477,7 @@ export const removeTeamMember = createServerFn({ method: "POST" })
  * Accept a team invite
  */
 export const acceptTeamInvite = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string };
-  })
+  .validator(teamInviteActionSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
@@ -466,6 +500,7 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
       .set({
         status: "active" as TeamMemberStatus,
         joinedAt: new Date(),
+        requestedAt: null,
       })
       .where(
         and(
@@ -487,9 +522,7 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
  * Decline a team invite
  */
 export const declineTeamInvite = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string };
-  })
+  .validator(teamInviteActionSchema.parse)
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
@@ -512,6 +545,7 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
       .set({
         status: "inactive" as TeamMemberStatus,
         leftAt: new Date(),
+        requestedAt: null,
       })
       .where(
         and(
@@ -527,6 +561,94 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
     }
 
     return declinedMember;
+  });
+
+export const requestTeamMembership = createServerFn({ method: "POST" })
+  .validator(requestTeamMembershipSchema.parse)
+  .handler(async ({ data }) => {
+    const [{ getCurrentUser }, { getDb }, { and, eq }, { createId }] = await Promise.all([
+      import("~/features/auth/auth.queries"),
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+      import("@paralleldrive/cuid2"),
+    ]);
+    const { teamMembers } = await import("~/db/schema");
+
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      throw new Error("Not authenticated");
+    }
+
+    const db = await getDb();
+
+    const [existingMember] = await db
+      .select({
+        id: teamMembers.id,
+        status: teamMembers.status,
+        invitedBy: teamMembers.invitedBy,
+      })
+      .from(teamMembers)
+      .where(
+        and(eq(teamMembers.teamId, data.teamId), eq(teamMembers.userId, currentUser.id)),
+      )
+      .limit(1);
+
+    if (existingMember) {
+      if (existingMember.status === "active") {
+        throw new Error("You are already an active member of this team");
+      }
+
+      if (existingMember.status === "pending") {
+        if (existingMember.invitedBy) {
+          throw new Error("You already have a pending invitation for this team");
+        }
+
+        const [refreshedMember] = await db
+          .update(teamMembers)
+          .set({
+            requestedAt: new Date(),
+            invitationReminderCount: 0,
+            lastInvitationReminderAt: null,
+          })
+          .where(eq(teamMembers.id, existingMember.id))
+          .returning();
+
+        return refreshedMember;
+      }
+
+      const [reactivatedMember] = await db
+        .update(teamMembers)
+        .set({
+          status: "pending" as TeamMemberStatus,
+          invitedBy: null,
+          requestedAt: new Date(),
+          invitedAt: null,
+          invitationReminderCount: 0,
+          lastInvitationReminderAt: null,
+          leftAt: null,
+        })
+        .where(eq(teamMembers.id, existingMember.id))
+        .returning();
+
+      return reactivatedMember;
+    }
+
+    const [newRequest] = await db
+      .insert(teamMembers)
+      .values({
+        id: createId(),
+        teamId: data.teamId,
+        userId: currentUser.id,
+        role: "player" as TeamMemberRole,
+        status: "pending" as TeamMemberStatus,
+        invitedBy: null,
+        requestedAt: new Date(),
+        invitationReminderCount: 0,
+        lastInvitationReminderAt: null,
+      })
+      .returning();
+
+    return newRequest;
   });
 
 /**

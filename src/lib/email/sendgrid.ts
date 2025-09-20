@@ -246,6 +246,62 @@ Quadball Canada Team`,
   },
 );
 
+export const sendTeamInvitationEmail = serverOnly(
+  async (params: {
+    to: EmailRecipient;
+    teamName: string;
+    teamSlug: string;
+    role: string;
+    invitedByName?: string;
+    invitedByEmail?: string;
+  }) => {
+    const service = await getEmailService();
+
+    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
+    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+
+    const siteUrl =
+      process.env["SITE_URL"] ||
+      process.env["URL"] ||
+      process.env["VITE_BASE_URL"] ||
+      "http://localhost:5173";
+    const normalizedSiteUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
+    const dashboardUrl = `${normalizedSiteUrl}/dashboard/teams`;
+    const invitationUrl = `${dashboardUrl}/${params.teamSlug}`;
+
+    const inviterDisplay =
+      params.invitedByName ||
+      params.invitedByEmail ||
+      "a Quadball Canada team representative";
+
+    const textBody = `You've been invited to join ${params.teamName} as a ${params.role}.
+
+Accept or decline your invitation here: ${dashboardUrl}
+
+If the link above doesn't work, copy and paste this URL into your browser: ${invitationUrl}
+
+Invitation sent by ${inviterDisplay}.`;
+
+    return service.send({
+      to: params.to,
+      from: {
+        email: fromEmail,
+        name: fromName,
+      },
+      subject: `${params.teamName} team invitation`,
+      templateId: EMAIL_TEMPLATES.TEAM_INVITATION,
+      dynamicTemplateData: {
+        teamName: params.teamName,
+        role: params.role,
+        inviterName: inviterDisplay,
+        dashboardUrl,
+        invitationUrl,
+      },
+      text: textBody,
+    });
+  },
+);
+
 // Convenience function for sending welcome emails
 export const sendWelcomeEmail = serverOnly(
   async (params: { to: EmailRecipient; profileUrl: string }) => {

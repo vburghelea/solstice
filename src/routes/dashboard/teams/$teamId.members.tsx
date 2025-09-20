@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -67,6 +68,8 @@ function TeamMembersPage() {
     initialData: initialMembers,
   });
 
+  const pendingMembers = members.filter((entry) => entry.member.status === "pending");
+
   const addMemberMutation = useMutation({
     mutationFn: addTeamMember,
     onSuccess: () => {
@@ -130,6 +133,12 @@ function TeamMembersPage() {
           <p className="text-muted-foreground">
             Manage your team roster and member roles
           </p>
+          {pendingMembers.length > 0 && (
+            <Badge variant="secondary" className="mt-2 text-xs uppercase">
+              {pendingMembers.length} pending invite
+              {pendingMembers.length > 1 ? "s" : ""}
+            </Badge>
+          )}
         </div>
         <Button onClick={() => setShowAddMember(!showAddMember)}>
           <UserPlus className="mr-2 h-4 w-4" />
@@ -263,7 +272,7 @@ function TeamMembersPage() {
       )}
 
       <div className="space-y-4">
-        {members.map(({ member, user }) => (
+        {members.map(({ member, user, invitedBy }) => (
           <Card key={member.id}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -291,6 +300,21 @@ function TeamMembersPage() {
                       {member.jerseyNumber && <span>#{member.jerseyNumber}</span>}
                       {member.position && <span>{member.position}</span>}
                     </div>
+                    {member.status === "pending" && (
+                      <p className="text-muted-foreground mt-2 text-sm">
+                        {member.requestedAt
+                          ? `Join request received ${formatDistanceToNow(
+                              new Date(member.requestedAt),
+                              { addSuffix: true },
+                            )}.`
+                          : member.invitedAt
+                            ? `Invitation sent ${formatDistanceToNow(
+                                new Date(member.invitedAt),
+                                { addSuffix: true },
+                              )}${invitedBy?.name ? ` by ${invitedBy.name}` : ""}.`
+                            : "Pending response."}
+                      </p>
+                    )}
                   </div>
                 </div>
 

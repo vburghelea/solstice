@@ -47,6 +47,7 @@ async function seed() {
   const profileEditUserId = "clxpfz4jn000308l8d5i6c4m5"; // User for profile editing tests
   const membershipPurchaseUserId = "clxpfz4jn000408l8e6j7d5n6"; // User for membership purchase tests
   const teamJoinUserId = "clxpfz4jn000508l8f7k8e6o7"; // User for team joining tests
+  const teamInviteDeclineUserId = "clxpfz4jn000608l8g8l9f7p9"; // User for declining invites tests
   const squareTestUserId = "clxpfz4jn000608l8g8l9f7p8"; // User for Square sandbox testing
   const individualEventId = "00000000-0000-0000-0000-00000000e201";
   const teamEventId = "00000000-0000-0000-0000-00000000e202";
@@ -235,6 +236,29 @@ async function seed() {
         privacySettings: JSON.stringify({
           showEmail: true,
           showPhone: true,
+          showBirthYear: false,
+          allowTeamInvitations: true,
+        }),
+        profileVersion: 1,
+      },
+      {
+        id: teamInviteDeclineUserId,
+        email: "team-invite-decline@example.com",
+        name: "Team Invite Decline User",
+        emailVerified: true,
+        profileComplete: true,
+        dateOfBirth: new Date("1993-02-20"),
+        phone: "+1234567897",
+        gender: "female",
+        pronouns: "she/her",
+        emergencyContact: JSON.stringify({
+          name: "Invite Decline Emergency",
+          phone: "+1987654328",
+          relationship: "partner",
+        }),
+        privacySettings: JSON.stringify({
+          showEmail: true,
+          showPhone: false,
           showBirthYear: false,
           allowTeamInvitations: true,
         }),
@@ -440,6 +464,28 @@ async function seed() {
         jerseyNumber: "1",
         position: "Keeper",
         invitedBy: adminUserId,
+        joinedAt: new Date(),
+      },
+      {
+        id: "test-member-invite-1",
+        teamId: "test-team-1",
+        userId: teamJoinUserId,
+        role: "player" as const,
+        status: "pending" as const,
+        invitedBy: testUserId,
+        invitedAt: new Date(),
+        invitationReminderCount: 0,
+        joinedAt: new Date(),
+      },
+      {
+        id: "test-member-invite-2",
+        teamId: "test-team-1",
+        userId: teamInviteDeclineUserId,
+        role: "player" as const,
+        status: "pending" as const,
+        invitedBy: testUserId,
+        invitedAt: new Date(),
+        invitationReminderCount: 0,
         joinedAt: new Date(),
       },
     ]);

@@ -272,19 +272,46 @@ test.describe("Team Member Management (Authenticated)", () => {
   });
 
   test.describe("Team Invitations", () => {
-    test("should display pending invitations", async () => {
-      // This would need test data with pending invitations
-      test.skip();
+    test("should display pending invitations", async ({ page }) => {
+      await clearAuthState(page);
+      await gotoWithAuth(page, "/dashboard/teams", {
+        email: "team-join@example.com",
+        password: "testpassword123",
+      });
+
+      await expect(page.getByText("Pending Team Invitations")).toBeVisible();
+      await expect(page.getByText("Test Thunder")).toBeVisible();
+      await expect(page.getByRole("button", { name: /Accept/i })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Decline/i })).toBeVisible();
     });
 
-    test("should accept team invitation", async () => {
-      // This would need test data with pending invitations
-      test.skip();
+    test("should accept team invitation", async ({ page }) => {
+      await clearAuthState(page);
+      await gotoWithAuth(page, "/dashboard/teams", {
+        email: "team-join@example.com",
+        password: "testpassword123",
+      });
+
+      await page.getByRole("button", { name: /Accept/i }).click();
+
+      await expect(page.getByText(/Invitation accepted/i)).toBeVisible();
+      await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible();
+      await expect(page.getByText("Test Thunder")).toBeVisible();
+      await expect(page.locator("text=Pending Team Invitations")).toHaveCount(0);
     });
 
-    test("should decline team invitation", async () => {
-      // This would need test data with pending invitations
-      test.skip();
+    test("should decline team invitation", async ({ page }) => {
+      await clearAuthState(page);
+      await gotoWithAuth(page, "/dashboard/teams", {
+        email: "team-invite-decline@example.com",
+        password: "testpassword123",
+      });
+
+      await page.getByRole("button", { name: /Decline/i }).click();
+
+      await expect(page.getByText(/Invitation declined/i)).toBeVisible();
+      await expect(page.locator("text=Test Thunder")).toHaveCount(0);
+      await expect(page.locator("text=Pending Team Invitations")).toHaveCount(0);
     });
   });
 

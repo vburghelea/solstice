@@ -29,6 +29,13 @@
       "when": 1758270273511,
       "tag": "0003_tiny_the_captain",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758327667987,
+      "tag": "0004_team_invitation_metadata",
+      "breakpoints": true
     }
   ]
 }

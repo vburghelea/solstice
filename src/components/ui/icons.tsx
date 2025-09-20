@@ -22,6 +22,7 @@ export {
   ChevronsUpDown as ChevronsUpDownIcon,
   Clock,
   CreditCard,
+  Download as DownloadIcon,
   Link as LinkIcon,
   Loader2,
   LoaderCircle as LoaderIcon,

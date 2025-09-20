@@ -21,29 +21,63 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
 
   const acceptInviteMutation = useMutation({
     mutationFn: (teamId: string) => acceptTeamInvite({ data: { teamId } }),
-    onSuccess: (_, teamId) => {
-      setFeedback({ type: "success", message: "Invitation accepted." });
-      invalidateTeamQueries(teamId);
+    onMutate: async (teamId: string) => {
+      await queryClient.cancelQueries({ queryKey: ["pendingTeamInvites"] });
+      const previousInvites = queryClient.getQueryData<PendingTeamInvite[]>([
+        "pendingTeamInvites",
+      ]);
+      queryClient.setQueryData<PendingTeamInvite[]>(
+        ["pendingTeamInvites"],
+        (current = []) => current.filter((invite) => invite.membership.teamId !== teamId),
+      );
+
+      return { previousInvites, teamId };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      setFeedback({ type: "success", message: "Invitation accepted." });
+    },
+    onError: (error, _teamId, context) => {
       setFeedback({
         type: "error",
         message: error instanceof Error ? error.message : "Failed to accept invitation.",
       });
+      if (context?.previousInvites) {
+        queryClient.setQueryData(["pendingTeamInvites"], context.previousInvites);
+      }
+    },
+    onSettled: (_, __, teamId) => {
+      invalidateTeamQueries(teamId ?? "");
     },
   });
 
   const declineInviteMutation = useMutation({
     mutationFn: (teamId: string) => declineTeamInvite({ data: { teamId } }),
-    onSuccess: (_, teamId) => {
-      setFeedback({ type: "success", message: "Invitation declined." });
-      invalidateTeamQueries(teamId);
+    onMutate: async (teamId: string) => {
+      await queryClient.cancelQueries({ queryKey: ["pendingTeamInvites"] });
+      const previousInvites = queryClient.getQueryData<PendingTeamInvite[]>([
+        "pendingTeamInvites",
+      ]);
+      queryClient.setQueryData<PendingTeamInvite[]>(
+        ["pendingTeamInvites"],
+        (current = []) => current.filter((invite) => invite.membership.teamId !== teamId),
+      );
+
+      return { previousInvites, teamId };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      setFeedback({ type: "success", message: "Invitation declined." });
+    },
+    onError: (error, _teamId, context) => {
       setFeedback({
         type: "error",
         message: error instanceof Error ? error.message : "Failed to decline invitation.",
       });
+      if (context?.previousInvites) {
+        queryClient.setQueryData(["pendingTeamInvites"], context.previousInvites);
+      }
+    },
+    onSettled: (_, __, teamId) => {
+      invalidateTeamQueries(teamId ?? "");
     },
   });
 

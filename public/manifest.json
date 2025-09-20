@@ -1,0 +1,25 @@
+{
+  "name": "Quadball Canada",
+  "short_name": "Quadball CA",
+  "description": "Official destination for Quadball Canada events, memberships, and club resources.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#d82929",
+  "icons": [
+    {
+      "src": "/icons/quadball-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/quadball-icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

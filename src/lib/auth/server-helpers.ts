@@ -2,7 +2,7 @@
  * Server-only auth helpers
  * This module contains auth configuration that requires server-side environment variables
  */
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { reactStartCookies } from "better-auth/react-start";
 
@@ -19,6 +19,7 @@ const createAuth = async () => {
   const baseUrl = getBaseUrl();
   const isProduction = baseUrl?.startsWith("https://") ?? false;
   const cookieDomain = env.COOKIE_DOMAIN;
+  const allowedOAuthDomains = env.OAUTH_ALLOWED_DOMAINS;
 
   // Debug OAuth configuration
   console.log("Auth config loading...");
@@ -31,6 +32,9 @@ const createAuth = async () => {
     googleClientId ? `Set (${googleClientId.substring(0, 10)}...)` : "Missing",
   );
   console.log("Google Client Secret:", googleClientSecret ? "Set" : "Missing");
+  if (allowedOAuthDomains.length > 0) {
+    console.log("OAuth allowed domains:", allowedOAuthDomains.join(", "));
+  }
 
   // Get database connection
   const dbConnection = await db();
@@ -86,6 +90,34 @@ const createAuth = async () => {
       google: {
         clientId: googleClientId,
         clientSecret: googleClientSecret,
+        ...(allowedOAuthDomains.length > 0
+          ? {
+              mapProfileToUser: (profile: {
+                email?: string | null;
+                hd?: string | null;
+              }) => {
+                const email = profile.email?.toLowerCase();
+                const domain = email?.split("@")[1];
+                const hostedDomain = profile.hd?.toLowerCase();
+
+                const isAllowed = [domain, hostedDomain]
+                  .filter((value): value is string => Boolean(value))
+                  .some((value) => allowedOAuthDomains.includes(value));
+
+                if (!isAllowed) {
+                  const allowedList =
+                    allowedOAuthDomains.length === 1
+                      ? allowedOAuthDomains[0]
+                      : allowedOAuthDomains.join(", ");
+                  throw new APIError("UNAUTHORIZED", {
+                    message: `Access restricted. Please sign in with an approved domain (${allowedList}).`,
+                  });
+                }
+
+                return {};
+              },
+            }
+          : {}),
       },
     },
 

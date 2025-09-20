@@ -136,13 +136,13 @@ These are production-critical issues that should be addressed before new feature
 
 ### Team Invitations Flow
 
-|               |                                                                                                                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**    | ❌ Not Started                                                                                                                                                                                                                            |
-| **Priority**  | 🟢 Medium                                                                                                                                                                                                                                 |
-| **Why**       | Backend exists but no UI for pending invitations                                                                                                                                                                                          |
-| **Code refs** | `src/features/teams/components/team-invitations.tsx` (create)                                                                                                                                                                             |
-| **Tasks**     | <ul><li>Show pending status in team members list</li><li>Create invitations dashboard section</li><li>Add accept/decline buttons</li><li>Send invitation emails via SendGrid</li><li>Add notification badge for pending invites</li></ul> |
+|               |                                                                                                                                                                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**    | ✅ Completed                                                                                                                                                                                                                  |
+| **Priority**  | 🟢 Medium                                                                                                                                                                                                                     |
+| **Why**       | Backend exists but no UI for pending invitations                                                                                                                                                                              |
+| **Code refs** | `src/features/teams/components/team-invitations.tsx` (create)                                                                                                                                                                 |
+| **Notes**     | Pending invites surface on `/dashboard/teams`, roster views show `pending` badges with inviter context, and invitation emails fire through SendGrid mocks in dev. Playwright + Vitest coverage protects accept/decline flows. |
 
 ---
 
@@ -169,64 +169,55 @@ These are production-critical issues that should be addressed before new feature
 
 ---
 
-## Frontend Enhancement Tickets
+## 🚀 Active Backlog Focus
 
 ### FE-2: Public Pages Content & Polish
 
-|                |                                                                                                                                                                                                                                                                                |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                 |
-| **Why now**    | Public site needs real content; currently using placeholder text/images                                                                                                                                                                                                        |
-| **Depends on** | None (frontend only)                                                                                                                                                                                                                                                           |
-| **Code refs**  | `src/components/ui/hero-section.tsx`, `src/components/ui/icons.tsx`, `components.json`, `src/features/profile/components/profile-view.tsx`                                                                                                                                     |
-| **Tasks**      | <ul><li>Replace placeholder images with Quadball-specific imagery</li><li>Update hero section copy to match brand voice</li><li>Create About, Teams, Resources static pages</li><li>Add loading states for event cards</li><li>Implement 404 page with brand styling</li></ul> |
-| **Thoughts**   | Work with stakeholders for copy/images; can use Unsplash API for temp Quadball images                                                                                                                                                                                          |
-
----
-
----
-
-### FE-4: Mobile PWA Optimization
-
-|                |                                                                                                                                                                                                                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                    |
-| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                                          |
-| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                                          |
-| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                                              |
-| **Tasks**      | <ul><li>Add PWA manifest with Quadball Canada branding</li><li>Implement service worker for offline support</li><li>Add install prompt for mobile users</li><li>Optimize touch targets for mobile</li><li>Add pull-to-refresh on dashboard</li><li>Test on real devices</li></ul> |
-| **Thoughts**   | Vite has PWA plugin; focus on offline-first for event days with poor connectivity                                                                                                                                                                                                 |
-
----
+|                |                                                                                                                                                                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ✅ Completed                                                                                                                                                                                                                                                                                                                    |
+| **Why now**    | Public site needs real content; currently using placeholder text/images                                                                                                                                                                                                                                                         |
+| **Depends on** | None (frontend only)                                                                                                                                                                                                                                                                                                            |
+| **Code refs**  | `src/components/ui/hero-section.tsx`, `src/components/ui/icons.tsx`, `components.json`, `src/features/profile/components/profile-view.tsx`                                                                                                                                                                                      |
+| **Tasks**      | <ul><li>✅ Replaced placeholder imagery with Quadball-focused art direction</li><li>✅ Updated public landing hero copy and CTA flows</li><li>✅ Added new About, Teams, and Resources static pages</li><li>✅ Added loading + error states to event cards and listings</li><li>✅ Implemented branded 404 experience</li></ul> |
+| **Notes**      | Homepage now pulls live event data with skeleton fallbacks, and the new static pages live under `/about`, `/teams`, `/resources`, and `/events`.                                                                                                                                                                                |
 
 ### FE-3: Loading & Error States Polish
 
-|                |                                                                                                                                                                                                                                                          |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                           |
-| **Why now**    | Current error handling is basic; need consistent UX across app                                                                                                                                                                                           |
-| **Depends on** | None                                                                                                                                                                                                                                                     |
-| **Code refs**  | `src/components/DefaultCatchBoundary.tsx`, existing components                                                                                                                                                                                           |
-| **Tasks**      | <ul><li>Create consistent error boundary UI with retry actions</li><li>Add skeleton loaders for all data-fetching components</li><li>Add optimistic updates for better perceived performance</li><li>Implement retry logic for failed requests</li></ul> |
-| **Thoughts**   | Already using Sonner for toasts; focus on skeleton loaders and error boundaries                                                                                                                                                                          |
+|                |                                                                                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ✅ Completed                                                                                                                                                                                                                                                  |
+| **Why now**    | Current error handling is basic; need consistent UX across app                                                                                                                                                                                                |
+| **Depends on** | None                                                                                                                                                                                                                                                          |
+| **Code refs**  | `src/components/DefaultCatchBoundary.tsx`, data-fetching components in `src/features/*`                                                                                                                                                                       |
+| **Tasks**      | <ul><li>✅ Unified error boundary with retry + fallback messaging</li><li>✅ Added skeleton states to key dashboards (teams browse, events) with refresh indicators</li><li>✅ Added optimistic invite mutations and retry affordances for searches</li></ul> |
+| **Notes**      | Shared `DataErrorState` component standardizes inline failures; mutations now optimistically update pending team invites.                                                                                                                                     |
 
----
+### FE-4: Mobile PWA Optimization
 
-## Form Component Library (Remaining Tasks)
+|                |                                                                                                                                                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ✅ Completed                                                                                                                                                                                                                                                |
+| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                    |
+| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                    |
+| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                        |
+| **Tasks**      | <ul><li>✅ Added branded web manifest + icons</li><li>✅ Configured Vite PWA plugin with offline caching strategies</li><li>✅ Added home-screen install prompt component</li><li>✅ Tuned mobile nav/touch targets with refreshed header actions</li></ul> |
+| **Notes**      | Service worker caches public pages/events, and mobile install prompts surface via `InstallPrompt`.                                                                                                                                                          |
 
-|               |                                                                                                                                                                                                                   |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**    | 🚧 Partially Complete                                                                                                                                                                                             |
-| **Completed** | ValidatedDatePicker, ValidatedSelect, ValidatedInput, Sonner toasts, shadcn components                                                                                                                            |
-| **Remaining** | <ul><li>Create PhoneInput with formatting</li><li>Create FileUpload component (for future profile pics)</li><li>Add Storybook or demo page for component library</li><li>Unit tests for form components</li></ul> |
-| **Code refs** | `src/components/form-fields/*`                                                                                                                                                                                    |
+### Form Component Library (Remaining Tasks)
+
+|               |                                                                                                                                                                                        |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**    | ✅ Completed                                                                                                                                                                           |
+| **Completed** | PhoneInput with E.164 storage + Canadian formatting, FileUpload with preview/size guard, component demo page, unit tests for new controls                                              |
+| **Notes**     | Components live in `src/components/form-fields/`, demo available at `/design-system`, with tests under `src/components/form-fields/__tests__/` covering formatting + validation logic. |
 
 ### Security Hardening: OAuth Domain Allowlist
 
-|               |                                                                                                                                                                                                                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**    | ❌ Not Started                                                                                                                                                                                                                                                                     |
-| **Priority**  | 🟢 Medium (Security hygiene)                                                                                                                                                                                                                                                       |
-| **Issue**     | `securityConfig.oauth.allowedDomains` is still an empty placeholder with a TODO. Production should enforce an allowlist for organizational SSO domains to prevent rogue sign-ups on OAuth identity providers.                                                                      |
-| **Code refs** | `src/lib/security/config.ts:60-70`, `docs/SECURITY.md`                                                                                                                                                                                                                             |
-| **Tasks**     | <ul><li>Add `OAUTH_ALLOWED_DOMAINS` parsing to `env.server.ts` with validation</li><li>Wire the env-driven list into the security config and OAuth guard rails</li><li>Document deployment guidance in `SECURITY.md`</li><li>Add unit coverage for configuration parsing</li></ul> |
+|               |                                                                                                                                                                                                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**    | ✅ Completed                                                                                                                                                                                                                                                         |
+| **Priority**  | 🟢 Medium (Security hygiene)                                                                                                                                                                                                                                         |
+| **Issue**     | `securityConfig.oauth.allowedDomains` is still an empty placeholder with a TODO. Production should enforce an allowlist for organizational SSO domains to prevent rogue sign-ups on OAuth identity providers.                                                        |
+| **Code refs** | `src/lib/env.server.ts`, `src/lib/env/oauth-domain.ts`, `src/lib/auth/server-helpers.ts`, `docs/SECURITY.md`                                                                                                                                                         |
+| **Notes**     | OAuth sign-ins now honor the `OAUTH_ALLOWED_DOMAINS` env var, rejecting unapproved domains with a clear error. Parsing is centralized in `parseOAuthAllowedDomains` (covered by `src/lib/__tests__/oauth-domain.test.ts`), and deployment guidance has been updated. |

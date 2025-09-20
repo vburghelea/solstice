@@ -120,6 +120,8 @@ COOKIE_DOMAIN=.yourdomain.com
 OAUTH_ALLOWED_DOMAINS=yourdomain.com,trusted-partner.com
 ```
 
+When `OAUTH_ALLOWED_DOMAINS` is set, Google OAuth sign-ins are limited to the specified domains. Users attempting to authenticate with an email outside the allowlist receive a friendly error explaining that an approved organizational address is required. Leave this variable unset to allow OAuth sign-ins from any domain during testing.
+
 ## Development vs Production
 
 Security features that differ between environments:

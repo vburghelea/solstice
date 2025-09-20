@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { PlusIcon, UsersIcon } from "~/components/ui/icons";
+import { LoaderIcon, PlusIcon, UsersIcon } from "~/components/ui/icons";
 import { TeamInvitationsSection } from "~/features/teams/components/team-invitations";
 import type { PendingTeamInvite, UserTeam } from "~/features/teams/teams.queries";
 import { getPendingTeamInvites, getUserTeams } from "~/features/teams/teams.queries";
@@ -32,19 +32,22 @@ function TeamsIndexPage() {
   const initialTeams = loaderData.userTeams as UserTeam[];
   const initialInvites = loaderData.pendingInvites as PendingTeamInvite[];
 
-  const { data: userTeams } = useSuspenseQuery<UserTeam[]>({
+  const { data: userTeams, isFetching: isFetchingTeams } = useSuspenseQuery<UserTeam[]>({
     queryKey: ["userTeams"],
     queryFn: async () => getUserTeams() as Promise<UserTeam[]>,
     initialData: () => initialTeams,
   });
 
-  const { data: pendingInvites } = useSuspenseQuery<PendingTeamInvite[]>({
+  const { data: pendingInvites, isFetching: isFetchingInvites } = useSuspenseQuery<
+    PendingTeamInvite[]
+  >({
     queryKey: ["pendingTeamInvites"],
     queryFn: async () => getPendingTeamInvites() as Promise<PendingTeamInvite[]>,
     initialData: () => initialInvites,
   });
 
   const pendingCount = pendingInvites.length;
+  const isRefreshing = isFetchingTeams || isFetchingInvites;
 
   return (
     <div className="container mx-auto p-6">
@@ -69,6 +72,12 @@ function TeamsIndexPage() {
       </div>
 
       <div className="space-y-6">
+        {isRefreshing && (
+          <div className="bg-brand-red/5 text-brand-red flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold tracking-wider uppercase">
+            <LoaderIcon className="h-4 w-4 animate-spin" /> Refreshing team data…
+          </div>
+        )}
+
         {pendingCount > 0 && <TeamInvitationsSection invites={pendingInvites} />}
 
         {userTeams.length === 0 ? (

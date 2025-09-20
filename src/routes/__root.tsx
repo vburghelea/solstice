@@ -62,11 +62,12 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Solstice",
+        title: "Quadball Canada",
       },
       {
         name: "description",
-        content: "Sports management platform for clubs and leagues",
+        content:
+          "Official hub for Quadball Canada competitions, club resources, and national team updates.",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

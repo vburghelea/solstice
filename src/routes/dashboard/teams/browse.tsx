@@ -9,8 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { DataErrorState } from "~/components/ui/data-state";
 import { ArrowLeftIcon, SearchIcon, UsersIcon } from "~/components/ui/icons";
 import { Input } from "~/components/ui/input";
+import { Skeleton } from "~/components/ui/skeleton";
 import type { TeamListItem } from "~/features/teams/teams.queries";
 import { listTeams, searchTeams } from "~/features/teams/teams.queries";
 
@@ -27,22 +29,32 @@ function BrowseTeamsPage() {
   const { teams: initialTeams } = Route.useLoaderData();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: allTeams } = useSuspenseQuery({
+  const { data: allTeams, isFetching: isFetchingAll } = useSuspenseQuery({
     queryKey: ["allTeams"],
     queryFn: async () => listTeams({ data: { includeInactive: false } }),
     initialData: initialTeams,
   });
 
-  const { data: searchResults } = useQuery({
+  const {
+    data: searchResults = [],
+    isFetching: isSearching,
+    isError: searchErrored,
+    refetch: retrySearch,
+  } = useQuery({
     queryKey: ["searchTeams", searchQuery],
     queryFn: async () =>
       searchQuery ? searchTeams({ data: { query: searchQuery } }) : [],
     enabled: searchQuery.length > 0,
+    initialData: [],
   });
 
   const teams = searchQuery
-    ? (searchResults || []).map((item) => ({ ...item, creator: null }))
+    ? searchResults.map((item) => ({ ...item, creator: null }))
     : allTeams;
+
+  const showSkeletons =
+    (searchQuery ? isSearching : isFetchingAll) && (teams?.length ?? 0) === 0;
+  const skeletonKeys = ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot"];
 
   return (
     <div className="container mx-auto p-6">
@@ -73,7 +85,19 @@ function BrowseTeamsPage() {
         </div>
       </div>
 
-      {teams.length === 0 ? (
+      {searchQuery && searchErrored ? (
+        <DataErrorState
+          title="We couldn’t find teams matching that search"
+          description="Please try again or adjust your search filters."
+          onRetry={() => retrySearch()}
+        />
+      ) : showSkeletons ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {skeletonKeys.map((key) => (
+            <TeamCardSkeleton key={key} />
+          ))}
+        </div>
+      ) : teams.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
@@ -148,6 +172,25 @@ function PublicTeamCard({ teamItem }: { teamItem: TeamListItem }) {
             </Link>
           </Button>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TeamCardSkeleton() {
+  return (
+    <Card className="shadow-sm">
+      <CardHeader>
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-1/3" />
+        <Skeleton className="mt-6 h-9 w-full" />
       </CardContent>
     </Card>
   );

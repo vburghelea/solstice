@@ -15,6 +15,8 @@ if (import.meta.env.SSR && import.meta.env.DEV) {
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
+import { parseOAuthAllowedDomains } from "./env/oauth-domain";
+
 export const env = createEnv({
   server: {
     // Database
@@ -32,6 +34,24 @@ export const env = createEnv({
       .default("dev-secret-change-in-production"),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    OAUTH_ALLOWED_DOMAINS: z
+      .string()
+      .optional()
+      .transform((value, ctx) => {
+        try {
+          return parseOAuthAllowedDomains(value);
+        } catch (error) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              error instanceof Error
+                ? error.message
+                : "Invalid OAuth allowed domains configuration",
+            path: ["OAUTH_ALLOWED_DOMAINS"],
+          });
+          return z.NEVER;
+        }
+      }),
 
     // Square Payment Integration
     SQUARE_ENV: z.enum(["sandbox", "production"]).optional(),

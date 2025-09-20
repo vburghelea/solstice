@@ -1,6 +1,7 @@
-import { Link, useRouteContext } from "@tanstack/react-router";
+import { Link, useRouteContext, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { cn } from "~/shared/lib/utils";
 import { Button } from "./button";
 import { Logo } from "./logo";
 
@@ -8,6 +9,18 @@ export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const context = useRouteContext({ strict: false });
   const user = context?.user || null;
+  const { location } = useRouterState();
+
+  const navLinks = [
+    { label: "Events", to: "/events" },
+    { label: "Teams", to: "/teams" },
+    { label: "Resources", to: "/resources" },
+    { label: "About", to: "/about" },
+  ];
+
+  const isActivePath = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   return (
     <header className="bg-brand-light/95 sticky top-0 z-50 shadow-sm backdrop-blur-md">
@@ -22,18 +35,18 @@ export function PublicHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden items-center gap-6 text-sm font-medium lg:flex lg:gap-8">
-            <Link to="/" className="hover:text-brand-red transition">
-              Events
-            </Link>
-            <Link to="/" className="hover:text-brand-red transition">
-              Teams
-            </Link>
-            <Link to="/" className="hover:text-brand-red transition">
-              Resources
-            </Link>
-            <Link to="/" className="hover:text-brand-red transition">
-              About Us
-            </Link>
+            {navLinks.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  "hover:text-brand-red text-gray-700 transition",
+                  isActivePath(item.to) && "text-brand-red font-semibold",
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Desktop Actions */}
@@ -78,34 +91,19 @@ export function PublicHeader() {
         <div className="border-t border-gray-200 bg-white lg:hidden">
           <div className="container mx-auto space-y-4 px-4 py-4">
             <nav className="flex flex-col space-y-3">
-              <Link
-                to="/"
-                className="hover:text-brand-red text-base font-medium text-gray-900 transition"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Events
-              </Link>
-              <Link
-                to="/"
-                className="hover:text-brand-red text-base font-medium text-gray-900 transition"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Teams
-              </Link>
-              <Link
-                to="/"
-                className="hover:text-brand-red text-base font-medium text-gray-900 transition"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Resources
-              </Link>
-              <Link
-                to="/"
-                className="hover:text-brand-red text-base font-medium text-gray-900 transition"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About Us
-              </Link>
+              {navLinks.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "hover:text-brand-red text-base font-medium text-gray-900 transition",
+                    isActivePath(item.to) && "text-brand-red font-semibold",
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
             <div className="flex flex-col space-y-3 border-t border-gray-200 pt-4">
               {user ? (

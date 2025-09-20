@@ -10,6 +10,7 @@ import type {
   AdminSystemSortOption,
   AdminSystemStatusFilter,
 } from "~/features/game-systems/admin/game-systems-admin.types";
+import { requireRole } from "~/lib/auth/middleware/role-guard";
 import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
 import {
@@ -54,6 +55,13 @@ interface AdminSystemsFormState {
 
 export const Route = createFileRoute("/dashboard/systems/")({
   validateSearch: rawSearchSchema.parse,
+  beforeLoad: async ({ context }) => {
+    await requireRole({
+      user: context.user,
+      requiredRoles: ["Games Admin", "Platform Admin"],
+      redirectTo: "/dashboard",
+    });
+  },
   component: AdminSystemsPage,
 });
 
@@ -61,15 +69,49 @@ function AdminSystemsPage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
-  const listInput = useMemo(() => buildListInputFromSearch(search), [search]);
+  const { q, status, sort, page: searchPage, perPage: searchPerPage } = search;
 
-  const systemsQuery = useQuery({
-    queryKey: ["admin-game-systems", listInput],
-    queryFn: async () => listAdminGameSystems({ data: listInput }),
+  const listInput = useMemo(() => {
+    const params: AdminSystemsSearchParams = {
+      q: q ?? undefined,
+      status,
+      sort,
+      page: searchPage,
+      perPage: searchPerPage,
+    };
+    return buildListInputFromSearch(params);
+  }, [q, searchPage, searchPerPage, sort, status]);
+  const queryKey = useMemo(
+    () =>
+      [
+        "admin-game-systems",
+        listInput.q ?? "",
+        listInput.status,
+        listInput.sort,
+        listInput.page,
+        listInput.perPage,
+        listInput,
+      ] as const,
+    [listInput],
+  );
+
+  const systemsQuery = useQuery<AdminGameSystemListResponse>({
+    queryKey,
+    queryFn: async ({ queryKey: [, , , , , , input] }) =>
+      listAdminGameSystems({ data: input }),
     placeholderData: (previous) => previous,
+    structuralSharing: false,
   });
 
-  const derivedFormState = useMemo(() => buildFormStateFromSearch(search), [search]);
+  const derivedFormState = useMemo(() => {
+    const params: AdminSystemsSearchParams = {
+      q: q ?? undefined,
+      status,
+      sort,
+      perPage: searchPerPage,
+    };
+    return buildFormStateFromSearch(params);
+  }, [q, searchPerPage, sort, status]);
   const [formState, setFormState] = useState<AdminSystemsFormState>(derivedFormState);
 
   useEffect(() => {
@@ -82,7 +124,9 @@ function AdminSystemsPage() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextSearch = buildSearchFromForm(formState);
-    navigate({ search: nextSearch });
+    navigate({
+      search: () => ({ ...nextSearch }),
+    });
   };
 
   const handleReset = () => {
@@ -92,7 +136,9 @@ function AdminSystemsPage() {
       sort: DEFAULT_SORT,
       perPage: DEFAULT_PER_PAGE,
     });
-    navigate({ search: {} });
+    navigate({
+      search: () => ({}),
+    });
   };
 
   const handlePageChange = (nextPage: number) => {
@@ -115,8 +161,8 @@ function AdminSystemsPage() {
   const systems = data?.items ?? [];
   const stats = data?.stats;
   const total = data?.total ?? 0;
-  const page = data?.page ?? DEFAULT_PAGE;
-  const perPage = data?.perPage ?? DEFAULT_PER_PAGE;
+  const currentPage = data?.page ?? DEFAULT_PAGE;
+  const currentPerPage = data?.perPage ?? DEFAULT_PER_PAGE;
   const pageCount = data?.pageCount ?? 0;
 
   const filteredTotal = total;
@@ -269,8 +315,8 @@ function AdminSystemsPage() {
       ) : systems.length > 0 ? (
         <SystemsDashboardTable
           systems={systems}
-          page={page}
-          perPage={perPage}
+          page={currentPage}
+          perPage={currentPerPage}
           pageCount={pageCount}
           total={total}
           isLoading={systemsQuery.isFetching}

@@ -1,14 +1,53 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 import { ArrowRight } from "lucide-react";
+import { useEffect, useMemo, useReducer } from "react";
+import { toast } from "sonner";
+import { Checkbox } from "~/components/ui/checkbox";
 import { DataTable } from "~/components/ui/data-table";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { Badge } from "~/shared/ui/badge";
 import { Button } from "~/shared/ui/button";
+import { bulkUpdateAdminSystems } from "../game-systems-admin.mutations";
 import type { AdminGameSystemListItem } from "../game-systems-admin.types";
 import { SystemStatusPill } from "./system-status-pill";
+import {
+  clearSelectionAction,
+  createInitialSelectionState,
+  resolveSelectionForSignature,
+  selectionReducer,
+} from "./systems-dashboard-selection";
 
-const columns: ColumnDef<AdminGameSystemListItem>[] = [
+const selectionColumn: ColumnDef<AdminGameSystemListItem> = {
+  id: "select",
+  header: ({ table }) => (
+    <Checkbox
+      aria-label="Select all systems on this page"
+      checked={
+        table.getIsAllPageRowsSelected()
+          ? true
+          : table.getIsSomePageRowsSelected()
+            ? "indeterminate"
+            : false
+      }
+      onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    />
+  ),
+  cell: ({ row }) => (
+    <Checkbox
+      aria-label={`Select ${row.original.name}`}
+      checked={row.getIsSelected()}
+      disabled={!row.getCanSelect()}
+      onCheckedChange={(value) => row.toggleSelected(!!value)}
+    />
+  ),
+  enableSorting: false,
+  enableHiding: false,
+  size: 32,
+};
+
+const baseColumns: ColumnDef<AdminGameSystemListItem>[] = [
   {
     accessorKey: "name",
     header: "System",
@@ -127,6 +166,8 @@ const columns: ColumnDef<AdminGameSystemListItem>[] = [
   },
 ];
 
+const columns: ColumnDef<AdminGameSystemListItem>[] = [selectionColumn, ...baseColumns];
+
 function getCrawlVariant(
   status: string,
 ): "default" | "secondary" | "destructive" | "outline" {
@@ -210,10 +251,87 @@ export function SystemsDashboardTable({
   isLoading = false,
   onPageChange,
 }: SystemsDashboardTableProps) {
+  const queryClient = useQueryClient();
+
+  const datasetSignature = useMemo(
+    () => `${page}-${systems.map((system) => system.id).join(":")}`,
+    [page, systems],
+  );
+
+  const [selectionState, dispatchSelection] = useReducer(
+    selectionReducer,
+    datasetSignature,
+    createInitialSelectionState,
+  );
+
+  useEffect(() => {
+    dispatchSelection({ type: "reset", signature: datasetSignature });
+  }, [datasetSignature]);
+
+  const rowSelection = useMemo<RowSelectionState>(
+    () => resolveSelectionForSignature(selectionState, datasetSignature),
+    [datasetSignature, selectionState],
+  );
+
+  const handleRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
+    dispatchSelection({ type: "update", signature: datasetSignature, updater });
+  };
+
+  const clearSelection = () => {
+    dispatchSelection(clearSelectionAction(datasetSignature));
+  };
+
+  const selectedIds = useMemo(() => {
+    return Object.entries(rowSelection)
+      .filter(([, value]) => Boolean(value))
+      .map(([rowId]) => Number.parseInt(rowId, 10))
+      .filter((id) => Number.isFinite(id));
+  }, [rowSelection]);
+
+  const selectedCount = selectedIds.length;
+
+  const bulkMutation = useMutation({
+    mutationFn: async (action: BulkAction) => {
+      if (selectedIds.length === 0) return;
+
+      await bulkUpdateAdminSystems({
+        data: {
+          systemIds: selectedIds,
+          updates: buildBulkUpdatePayload(action),
+        },
+      });
+    },
+    onSuccess: (_, action) => {
+      toast.success(bulkActionLabels[action].successMessage);
+      clearSelection();
+      void queryClient.invalidateQueries({ queryKey: ["admin-game-systems"] });
+    },
+    onError: (error: unknown, action) => {
+      const label = bulkActionLabels[action];
+      const message =
+        error instanceof Error ? error.message : "Failed to apply bulk action";
+      toast.error(`${label.errorPrefix}: ${message}`);
+    },
+  });
+
+  const handleBulkAction = (action: BulkAction) => {
+    if (bulkMutation.isPending || selectedIds.length === 0) return;
+    bulkMutation.mutate(action);
+  };
+
   const pageIndex = Math.max(page - 1, 0);
   const hasResults = total > 0;
   const startLabel = hasResults ? pageIndex * perPage + 1 : 0;
   const endLabel = hasResults ? startLabel + systems.length - 1 : 0;
+
+  const toolbarContent =
+    selectedCount > 0 ? (
+      <BulkActionsToolbar
+        selectedCount={selectedCount}
+        isBusy={bulkMutation.isPending}
+        onAction={handleBulkAction}
+      />
+    ) : null;
 
   return (
     <div className="space-y-3">
@@ -229,6 +347,7 @@ export function SystemsDashboardTable({
         ) : null}
       </div>
       <DataTable
+        key={datasetSignature}
         columns={columns}
         data={systems}
         pageSize={perPage}
@@ -238,7 +357,102 @@ export function SystemsDashboardTable({
         onPageChange={(nextPageIndex) => onPageChange(nextPageIndex + 1)}
         isLoading={isLoading}
         getRowId={(original) => String(original.id)}
+        enableRowSelection
+        rowSelection={rowSelection}
+        onRowSelectionChange={handleRowSelectionChange}
+        toolbarContent={toolbarContent ?? undefined}
       />
+    </div>
+  );
+}
+
+type BulkAction = "publish" | "unpublish" | "approve" | "revoke-approval";
+
+const bulkActionLabels: Record<
+  BulkAction,
+  { successMessage: string; errorPrefix: string }
+> = {
+  publish: {
+    successMessage: "Selected systems published",
+    errorPrefix: "Could not publish selected systems",
+  },
+  unpublish: {
+    successMessage: "Selected systems reverted to draft",
+    errorPrefix: "Could not revert publish status",
+  },
+  approve: {
+    successMessage: "Selected systems approved",
+    errorPrefix: "Could not approve selected systems",
+  },
+  "revoke-approval": {
+    successMessage: "Selected systems marked for review",
+    errorPrefix: "Could not update approval status",
+  },
+};
+
+function buildBulkUpdatePayload(action: BulkAction) {
+  switch (action) {
+    case "publish":
+      return { isPublished: true } as const;
+    case "unpublish":
+      return { isPublished: false } as const;
+    case "approve":
+      return { cmsApproved: true } as const;
+    case "revoke-approval":
+      return { cmsApproved: false } as const;
+    default:
+      return {} as const;
+  }
+}
+
+function BulkActionsToolbar({
+  selectedCount,
+  isBusy,
+  onAction,
+}: {
+  selectedCount: number;
+  isBusy: boolean;
+  onAction: (action: BulkAction) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-semibold">
+        {selectedCount} selected
+      </Badge>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          onClick={() => onAction("publish")}
+          disabled={isBusy}
+          variant="secondary"
+        >
+          Publish
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onAction("unpublish")}
+          disabled={isBusy}
+          variant="outline"
+        >
+          Revert to draft
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onAction("approve")}
+          disabled={isBusy}
+          variant="default"
+        >
+          Approve
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onAction("revoke-approval")}
+          disabled={isBusy}
+          variant="ghost"
+        >
+          Mark for review
+        </Button>
+      </div>
     </div>
   );
 }

@@ -16,6 +16,23 @@ export const listAdminGameSystemsSchema = z.object({
 
 export type ListAdminGameSystemsInput = z.infer<typeof listAdminGameSystemsSchema>;
 
+export const bulkUpdateAdminSystemsSchema = z.object({
+  systemIds: z.array(z.number().int().positive()).min(1),
+  updates: z
+    .object({
+      isPublished: z.boolean().optional(),
+      cmsApproved: z.boolean().optional(),
+    })
+    .refine(
+      (value) => value.isPublished !== undefined || value.cmsApproved !== undefined,
+      {
+        message: "At least one update field must be provided.",
+      },
+    ),
+});
+
+export type BulkUpdateAdminSystemsInput = z.infer<typeof bulkUpdateAdminSystemsSchema>;
+
 export const getAdminGameSystemSchema = z.object({
   systemId: z.number().int().positive(),
 });

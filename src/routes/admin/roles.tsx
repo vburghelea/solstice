@@ -1,18 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { RoleManagementDashboard } from "~/features/roles/components/role-management-dashboard";
-import { requireGlobalAdmin } from "~/lib/auth/middleware/role-guard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/roles")({
-  beforeLoad: async ({ context }) => {
-    await requireGlobalAdmin(context.user);
+  beforeLoad: () => {
+    throw redirect({ to: "/dashboard/admin/roles" });
   },
-  component: AdminRolesPage,
 });
-
-function AdminRolesPage() {
-  return (
-    <div className="container mx-auto space-y-8 p-6">
-      <RoleManagementDashboard />
-    </div>
-  );
-}

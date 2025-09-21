@@ -1,0 +1,24 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/app1-router-types.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "src/client.tsx",
+    "src/router.tsx",
+    "src/routeTree.gen.ts",
+    "src/app/providers.tsx",
+    "tsconfig.json",
+    "vite.config.ts",
+    "docs/development-backlog.md"
+  ],
+  "ignore": {
+    "patterns": ["**/node_modules/**", "**/dist/**", "**/build/**"]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

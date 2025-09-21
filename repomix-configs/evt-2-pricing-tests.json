@@ -1,0 +1,28 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/evt2-pricing-tests.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "src/features/events/events.mutations.ts",
+    "src/features/events/events.schemas.ts",
+    "src/features/events/events.db-types.ts",
+    "src/features/events/__tests__/*.test.ts",
+    "src/db/schema/events.schema.ts",
+    "src/db/schema/index.ts",
+    "src/lib/payments/square.ts",
+    "src/tests/utils.tsx",
+    "src/tests/setup.ts",
+    "src/tests/mocks/auth.ts",
+    "docs/development-backlog.md"
+  ],
+  "ignore": {
+    "patterns": ["**/node_modules/**", "**/dist/**", "**/build/**", "**/*.spec.ts"]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

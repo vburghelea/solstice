@@ -114,6 +114,14 @@ export const updateEventRegistrationStatusSchema = z.object({
 export type UpdateEventRegistrationStatusInput = z.infer<
   typeof updateEventRegistrationStatusSchema
 >;
+export const cancelEntireEventSchema = z.object({
+  eventId: z.string().uuid(),
+  reason: z.string().optional(),
+  notify: z.boolean().optional().default(true),
+  refundMode: z.enum(["auto", "manual", "none"]).optional().default("auto"),
+});
+export type CancelEntireEventInput = z.infer<typeof cancelEntireEventSchema>;
+
 export const markEtransferPaidSchema = z.object({
   registrationId: z.string(),
 });

@@ -16,32 +16,40 @@ import {
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | null = null;
+let authInitPromise: Promise<ReturnType<typeof betterAuth>> | null = null;
 
 // Create and export the auth instance with server configuration
 const createAuth = async () => {
   // Import server modules when auth is created
   const { db } = await import("~/db");
   const schema = await import("~/db/schema");
-  const { env, getAuthSecret, getBaseUrl } = await import("~/lib/env.server");
+  const { env, getAuthSecret, getBaseUrl, isProduction } = await import(
+    "~/lib/env.server"
+  );
 
   const baseUrl = getBaseUrl();
-  const isProduction = baseUrl?.startsWith("https://") ?? false;
+  const isHttpsDeployment = baseUrl?.startsWith("https://") ?? false;
   const cookieDomain = env.COOKIE_DOMAIN;
-  const allowedOAuthDomains = env.OAUTH_ALLOWED_DOMAINS;
-
-  // Debug OAuth configuration
+  const allowedOAuthDomains = Array.isArray(env.OAUTH_ALLOWED_DOMAINS)
+    ? env.OAUTH_ALLOWED_DOMAINS
+    : [];
   const googleClientId = env.GOOGLE_CLIENT_ID || "";
   const googleClientSecret = env.GOOGLE_CLIENT_SECRET || "";
   const discordClientId = env.DISCORD_CLIENT_ID || "";
   const discordClientSecret = env.DISCORD_CLIENT_SECRET || "";
 
-  console.log(
-    "Google Client ID:",
-    googleClientId ? `Set (${googleClientId.substring(0, 10)}...)` : "Missing",
-  );
-  console.log("Google Client Secret:", googleClientSecret ? "Set" : "Missing");
-  if (allowedOAuthDomains.length > 0) {
-    console.log("OAuth allowed domains:", allowedOAuthDomains.join(", "));
+  if (process.env["NODE_ENV"] !== "production") {
+    console.log("Auth config loading...");
+    console.log("Base URL:", baseUrl);
+
+    console.log(
+      "Google Client ID:",
+      googleClientId ? `Set (${googleClientId.substring(0, 10)}...)` : "Missing",
+    );
+    console.log("Google Client Secret:", googleClientSecret ? "Set" : "Missing");
+    if (allowedOAuthDomains.length > 0) {
+      console.log("OAuth allowed domains:", allowedOAuthDomains.join(", "));
+    }
   }
 
   // Get database connection
@@ -50,9 +58,14 @@ const createAuth = async () => {
   return betterAuth({
     baseURL: baseUrl,
     secret: getAuthSecret(),
-    trustedOrigins: isProduction
+    trustedOrigins: isProduction()
       ? [baseUrl]
-      : ["http://localhost:5173", "http://localhost:5174", "http://localhost:8888"],
+      : [
+          baseUrl,
+          "http://localhost:5173",
+          "http://localhost:5174",
+          "http://localhost:8888",
+        ],
     database: drizzleAdapter(dbConnection, {
       provider: "pg",
       schema: {
@@ -76,17 +89,17 @@ const createAuth = async () => {
     // Secure cookie configuration
     advanced: {
       cookiePrefix: "roundup",
-      useSecureCookies: isProduction,
+      useSecureCookies: isHttpsDeployment,
       defaultCookieAttributes: cookieDomain
         ? {
-            secure: isProduction,
+            secure: isHttpsDeployment,
             sameSite: "lax",
             httpOnly: true,
             path: "/",
             domain: cookieDomain,
           }
         : {
-            secure: isProduction,
+            secure: isHttpsDeployment,
             sameSite: "lax",
             httpOnly: true,
             path: "/",
@@ -244,8 +257,16 @@ export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
 
 // Export async getter for auth
 export const getAuth = async () => {
-  if (!authInstance) {
-    authInstance = await createAuth();
+  if (authInstance) {
+    return authInstance;
   }
-  return authInstance;
+
+  if (!authInitPromise) {
+    authInitPromise = createAuth().then((instance) => {
+      authInstance = instance;
+      return instance;
+    });
+  }
+
+  return authInitPromise;
 };

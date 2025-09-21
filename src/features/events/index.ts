@@ -8,6 +8,7 @@ export {
 
 // Event mutations
 export {
+  cancelEvent,
   cancelEventRegistration,
   createEvent,
   registerForEvent,

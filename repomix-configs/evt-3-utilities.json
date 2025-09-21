@@ -1,0 +1,24 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/evt3-utilities.xml",
+    "style": "xml",
+    "showLineNumbers": false,
+    "removeComments": true,
+    "removeEmptyLines": true
+  },
+  "include": [
+    "src/features/events/events.mutations.ts",
+    "src/features/events/events.types.ts",
+    "src/features/events/events.db-types.ts",
+    "src/features/events/events.schemas.ts",
+    "src/lib/server/fn-utils.ts",
+    "src/tests/utils.tsx",
+    "docs/development-backlog.md"
+  ],
+  "ignore": {
+    "patterns": ["**/node_modules/**", "**/dist/**", "**/build/**", "**/__tests__/**"]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

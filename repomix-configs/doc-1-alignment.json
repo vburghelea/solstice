@@ -1,0 +1,22 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/doc1-alignment.xml",
+    "style": "xml",
+    "showLineNumbers": false,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "docs/development-backlog.md",
+    "docs/SECURITY.md",
+    "docs/README.md",
+    "src/lib/env.server.ts",
+    "src/lib/auth/server-helpers.ts"
+  ],
+  "ignore": {
+    "patterns": ["**/node_modules/**", "**/dist/**", "**/build/**", "docs/reference/**"]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

@@ -2,6 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useState, type CSSProperties } from "react";
 import { AdminSidebar } from "~/components/ui/admin-sidebar";
+import { Breadcrumbs } from "~/components/ui/breadcrumbs";
 import { Button } from "~/components/ui/button";
 import { MobileAdminHeader } from "~/components/ui/mobile-admin-header";
 import { MobileTabBar } from "~/components/ui/mobile-tab-bar";
@@ -60,6 +61,7 @@ export function AdminLayout() {
         {/* Add bottom padding to avoid overlap with mobile tab bar */}
         <main className="flex-1 px-4 pt-4 pb-[var(--admin-mobile-main-padding)] sm:px-6 sm:pt-6 lg:px-8 lg:pb-10">
           <div className="mx-auto w-full max-w-screen-2xl">
+            <Breadcrumbs />
             <Outlet />
           </div>
         </main>

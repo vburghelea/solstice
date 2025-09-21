@@ -18,6 +18,8 @@ export function SafeLink(props: Props) {
   if (isWebKit) {
     // For WebKit, manually handle active state
     const { activeProps, ...restProps } = props;
+    const linkProps = { ...restProps } as Record<string, unknown> & Props;
+    delete linkProps.activeOptions;
     const isActive = routerState.location.pathname === props.to;
 
     const activeAttributes = isActive && activeProps ? activeProps : {};
@@ -26,7 +28,7 @@ export function SafeLink(props: Props) {
     return (
       <a
         href={props.to as string}
-        {...restProps}
+        {...(linkProps as Props)}
         {...activeAttributes}
         onClick={(e) => {
           e.preventDefault();

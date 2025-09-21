@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { zod$ } from "~/lib/server/fn-utils";
 import type { MembershipOperationResult } from "./membership.types";
 
 const getAllMembershipsSchema = z.object({
@@ -25,7 +26,7 @@ export interface MembershipReportRow {
  * Admin-only: Get all memberships with user information
  */
 export const getAllMemberships = createServerFn({ method: "GET" })
-  .validator(getAllMembershipsSchema.parse)
+  .validator(zod$(getAllMembershipsSchema))
   .handler(
     async ({ data }): Promise<MembershipOperationResult<MembershipReportRow[]>> => {
       try {

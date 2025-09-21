@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { TeamMemberRole, TeamMemberStatus } from "~/db/schema";
+import { requireUser, getAuthMiddleware } from "~/lib/server/auth";
+import { forbidden, notFound, validationError } from "~/lib/server/errors";
+import { zod$ } from "~/lib/server/fn-utils";
 import {
   addTeamMemberSchema,
   createTeamSchema,
@@ -36,24 +39,21 @@ const isActiveMembershipConstraintError = (error: unknown): boolean => {
 };
 
 export const createTeam = createServerFn({ method: "POST" })
-  .validator(createTeamSchema.parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(createTeamSchema))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { createId }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
       import("@paralleldrive/cuid2"),
     ]);
     const { teams, teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const user = requireUser(context);
 
     // Debug logging for E2E tests
     if (process.env["NODE_ENV"] === "development") {
-      console.log("Creating team with user ID:", currentUser.id);
+      console.log("Creating team with user ID:", user.id);
     }
 
     const db = await getDb();
@@ -75,7 +75,7 @@ export const createTeam = createServerFn({ method: "POST" })
           foundedYear: data.foundedYear,
           website: data.website,
           socialLinks: data.socialLinks ? JSON.stringify(data.socialLinks) : null,
-          createdBy: currentUser.id,
+          createdBy: user.id,
         })
         .returning();
 
@@ -84,14 +84,14 @@ export const createTeam = createServerFn({ method: "POST" })
         await tx.insert(teamMembers).values({
           id: createId(),
           teamId: newTeam.id,
-          userId: currentUser.id,
+          userId: user.id,
           role: "captain" as TeamMemberRole,
           status: "active" as TeamMemberStatus,
-          invitedBy: currentUser.id,
+          invitedBy: user.id,
         });
       } catch (error) {
         if (isActiveMembershipConstraintError(error)) {
-          throw new Error(
+          throw validationError(
             "You already have an active team membership. Leave or deactivate your existing team before creating a new one.",
           );
         }
@@ -107,27 +107,26 @@ export const createTeam = createServerFn({ method: "POST" })
  * Update team details
  */
 export const updateTeam = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
   .validator(
-    updateTeamSchema.extend({
-      data: updateTeamSchema.shape.data.extend({
-        socialLinks: z.record(z.string()).optional(),
-        logoUrl: z.string().optional(),
+    zod$(
+      updateTeamSchema.extend({
+        data: updateTeamSchema.shape.data.extend({
+          socialLinks: z.record(z.string()).optional(),
+          logoUrl: z.string().optional(),
+        }),
       }),
-    }).parse,
+    ),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teams, teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const user = requireUser(context);
 
     const db = await getDb();
 
@@ -138,14 +137,14 @@ export const updateTeam = createServerFn({ method: "POST" })
       .where(
         and(
           eq(teamMembers.teamId, data.teamId),
-          eq(teamMembers.userId, currentUser.id),
+          eq(teamMembers.userId, user.id),
           eq(teamMembers.status, "active"),
         ),
       )
       .limit(1);
 
     if (!memberCheck || !["captain", "coach"].includes(memberCheck.role)) {
-      throw new Error("Insufficient permissions");
+      throw forbidden("Only captains or coaches can update team details");
     }
 
     // Update team
@@ -175,20 +174,17 @@ export const updateTeam = createServerFn({ method: "POST" })
  * Deactivate a team (soft delete)
  */
 export const deactivateTeam = createServerFn({ method: "POST" })
-  .validator(z.object({ teamId: z.string() }).parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(z.object({ teamId: z.string() })))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teams, teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const user = requireUser(context);
 
     const db = await getDb();
 
@@ -200,14 +196,14 @@ export const deactivateTeam = createServerFn({ method: "POST" })
         .where(
           and(
             eq(teamMembers.teamId, data.teamId),
-            eq(teamMembers.userId, currentUser.id),
+            eq(teamMembers.userId, user.id),
             eq(teamMembers.status, "active"),
           ),
         )
         .limit(1);
 
       if (!memberCheck || memberCheck.role !== "captain") {
-        throw new Error("Only team captains can deactivate teams");
+        throw forbidden("Only team captains can deactivate teams");
       }
 
       const now = new Date();
@@ -233,21 +229,18 @@ export const deactivateTeam = createServerFn({ method: "POST" })
  * Add a member to a team
  */
 export const addTeamMember = createServerFn({ method: "POST" })
-  .validator(addTeamMemberSchema.parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(addTeamMemberSchema))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }, { createId }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
       import("@paralleldrive/cuid2"),
     ]);
     const { teamMembers, teams, user } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -265,7 +258,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
       .limit(1);
 
     if (!memberCheck || !["captain", "coach"].includes(memberCheck.role)) {
-      throw new Error("Only captains and coaches can add team members");
+      throw forbidden("Only captains and coaches can add team members");
     }
 
     // Find user by email
@@ -276,7 +269,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
       .limit(1);
 
     if (!targetUser) {
-      throw new Error("User not found with that email address");
+      throw notFound("User not found with that email address");
     }
 
     // Check if user is already a member
@@ -290,7 +283,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
 
     if (existingMember) {
       if (existingMember.status === "active") {
-        throw new Error("User is already an active member of this team");
+        throw validationError("User is already an active member of this team");
       }
       // Reactivate if they were previously removed
       const [reactivated] = await db
@@ -366,20 +359,17 @@ export const addTeamMember = createServerFn({ method: "POST" })
  * Update team member details
  */
 export const updateTeamMember = createServerFn({ method: "POST" })
-  .validator(updateTeamMemberSchema.parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(updateTeamMemberSchema))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq, sql }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -397,7 +387,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
       .limit(1);
 
     if (!memberCheck || !["captain", "coach"].includes(memberCheck.role)) {
-      throw new Error("Only captains and coaches can update team members");
+      throw forbidden("Only captains and coaches can update team members");
     }
 
     // Don't allow demoting the last captain
@@ -409,8 +399,8 @@ export const updateTeamMember = createServerFn({ method: "POST" })
         .limit(1);
 
       if (targetMember?.role === "captain") {
-        const captainCount = await db
-          .select({ count: teamMembers.id })
+        const [captainCount] = await db
+          .select({ count: sql<number>`count(*)::int` })
           .from(teamMembers)
           .where(
             and(
@@ -419,8 +409,9 @@ export const updateTeamMember = createServerFn({ method: "POST" })
               eq(teamMembers.status, "active"),
             ),
           );
-        if (captainCount.length <= 1) {
-          throw new Error("Cannot demote the last captain");
+        const totalCaptains = captainCount?.count ?? 0;
+        if (totalCaptains <= 1) {
+          throw validationError("Cannot demote the last captain");
         }
       }
     }
@@ -444,20 +435,17 @@ export const updateTeamMember = createServerFn({ method: "POST" })
  * Remove a member from team
  */
 export const removeTeamMember = createServerFn({ method: "POST" })
-  .validator(removeTeamMemberSchema.parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(removeTeamMemberSchema))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq, sql }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -475,7 +463,7 @@ export const removeTeamMember = createServerFn({ method: "POST" })
       .limit(1);
 
     if (!memberCheck || !["captain", "coach"].includes(memberCheck.role)) {
-      throw new Error("Only captains and coaches can remove team members");
+      throw forbidden("Only captains and coaches can remove team members");
     }
 
     // Don't allow removing the last captain
@@ -486,8 +474,8 @@ export const removeTeamMember = createServerFn({ method: "POST" })
       .limit(1);
 
     if (targetMember?.role === "captain") {
-      const captainCount = await db
-        .select({ count: teamMembers.id })
+      const [captainCount] = await db
+        .select({ count: sql<number>`count(*)::int` })
         .from(teamMembers)
         .where(
           and(
@@ -496,8 +484,9 @@ export const removeTeamMember = createServerFn({ method: "POST" })
             eq(teamMembers.status, "active"),
           ),
         );
-      if (captainCount.length <= 1) {
-        throw new Error("Cannot remove the last captain");
+      const totalCaptains = captainCount?.count ?? 0;
+      if (totalCaptains <= 1) {
+        throw validationError("Cannot remove the last captain");
       }
     }
 
@@ -518,20 +507,17 @@ export const removeTeamMember = createServerFn({ method: "POST" })
  * Accept a team invite
  */
 export const acceptTeamInvite = createServerFn({ method: "POST" })
-  .validator(teamInviteActionSchema.parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(teamInviteActionSchema))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -553,7 +539,7 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
       .returning();
 
     if (!updatedMember) {
-      throw new Error("No pending invite found for this team");
+      throw notFound("No pending invite found for this team");
     }
 
     return updatedMember;
@@ -563,20 +549,17 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
  * Decline a team invite
  */
 export const declineTeamInvite = createServerFn({ method: "POST" })
-  .validator(teamInviteActionSchema.parse)
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(teamInviteActionSchema))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -598,27 +581,24 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
       .returning();
 
     if (!declinedMember) {
-      throw new Error("No pending invite found for this team");
+      throw notFound("No pending invite found for this team");
     }
 
     return declinedMember;
   });
 
 export const requestTeamMembership = createServerFn({ method: "POST" })
-  .validator(requestTeamMembershipSchema.parse)
-  .handler(async ({ data }) => {
-    const [{ getCurrentUser }, { getDb }, { and, eq }, { createId }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+  .middleware(getAuthMiddleware())
+  .validator(zod$(requestTeamMembershipSchema))
+  .handler(async ({ data, context }) => {
+    const [{ getDb }, { and, eq }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
       import("@paralleldrive/cuid2"),
     ]);
     const { teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -636,12 +616,12 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
 
     if (existingMember) {
       if (existingMember.status === "active") {
-        throw new Error("You are already an active member of this team");
+        throw validationError("You are already an active member of this team");
       }
 
       if (existingMember.status === "pending") {
         if (existingMember.invitedBy) {
-          throw new Error("You already have a pending invitation for this team");
+          throw validationError("You already have a pending invitation for this team");
         }
 
         const [refreshedMember] = await db
@@ -696,22 +676,17 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
  * Leave a team voluntarily
  */
 export const leaveTeam = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
-    return data as { teamId: string };
-  })
-  .handler(async ({ data }) => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(z.object({ teamId: z.string() })))
+  .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
-    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
-      import("~/features/auth/auth.queries"),
+    const [{ getDb }, { and, eq, sql }] = await Promise.all([
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
     const { teamMembers } = await import("~/db/schema");
 
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      throw new Error("Not authenticated");
-    }
+    const currentUser = requireUser(context);
 
     const db = await getDb();
 
@@ -729,13 +704,13 @@ export const leaveTeam = createServerFn({ method: "POST" })
       .limit(1);
 
     if (!member) {
-      throw new Error("You are not an active member of this team");
+      throw notFound("You are not an active member of this team");
     }
 
     // Don't allow the last captain to leave
     if (member.role === "captain") {
-      const captainCount = await db
-        .select({ count: teamMembers.id })
+      const [captainCount] = await db
+        .select({ count: sql<number>`count(*)::int` })
         .from(teamMembers)
         .where(
           and(
@@ -744,8 +719,9 @@ export const leaveTeam = createServerFn({ method: "POST" })
             eq(teamMembers.status, "active"),
           ),
         );
-      if (captainCount.length <= 1) {
-        throw new Error(
+      const totalCaptains = captainCount?.count ?? 0;
+      if (totalCaptains <= 1) {
+        throw validationError(
           "Cannot leave team as the last captain. Promote another member first.",
         );
       }

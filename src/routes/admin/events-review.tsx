@@ -43,8 +43,13 @@ import {
 } from "~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { updateEvent } from "~/features/events/events.mutations";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { listEvents } from "~/features/events/events.queries";
-import type { EventListResult } from "~/features/events/events.types";
+import type {
+  EventListResult,
+  EventOperationResult,
+  EventWithDetails,
+} from "~/features/events/events.types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 
 export const Route = createFileRoute("/admin/events-review")({
@@ -112,15 +117,23 @@ function EventsReviewPage() {
   });
 
   // Approve event mutation
-  const approveMutation = useMutation({
-    mutationFn: ({ eventId, approve }: { eventId: string; approve: boolean }) =>
-      updateEvent({
-        data: {
-          id: eventId,
-          isPublic: approve,
-          status: approve ? "published" : "draft",
-        },
-      }),
+  const approveMutation = useMutation<
+    EventOperationResult<EventWithDetails>,
+    Error,
+    { eventId: string; approve: boolean }
+  >({
+    mutationFn: async ({ eventId, approve }) =>
+      unwrapServerFnResult(
+        updateEvent({
+          data: {
+            eventId,
+            data: {
+              isPublic: approve,
+              status: approve ? "published" : "draft",
+            },
+          },
+        }),
+      ),
     onSuccess: (result, { approve }) => {
       if (result.success) {
         toast.success(approve ? "Event approved and made public!" : "Event rejected");

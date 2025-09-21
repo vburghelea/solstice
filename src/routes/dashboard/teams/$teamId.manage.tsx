@@ -29,6 +29,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
 import { getTeam } from "~/features/teams/teams.queries";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 // Canadian provinces and territories
 const PROVINCES = [
@@ -66,7 +67,8 @@ function ManageTeamPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const updateTeamMutation = useMutation({
-    mutationFn: updateTeam,
+    mutationFn: (payload: { teamId: string; data: any }) =>
+      unwrapServerFnResult(updateTeam({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["team", teamId] });
       navigate({ to: "/dashboard/teams/$teamId", params: { teamId } });
@@ -77,7 +79,8 @@ function ManageTeamPage() {
   });
 
   const deactivateTeamMutation = useMutation({
-    mutationFn: deactivateTeam,
+    mutationFn: (teamId: string) =>
+      unwrapServerFnResult(deactivateTeam({ data: { teamId } })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userTeams"] });
       navigate({ to: "/dashboard/teams" });
@@ -101,22 +104,20 @@ function ManageTeamPage() {
     onSubmit: async ({ value }) => {
       setServerError(null);
       await updateTeamMutation.mutateAsync({
+        teamId,
         data: {
-          teamId,
-          data: {
-            ...value,
-            description: value.description || undefined,
-            city: value.city || undefined,
-            province: value.province || undefined,
-            website: value.website || undefined,
-          },
+          ...value,
+          description: value.description || undefined,
+          city: value.city || undefined,
+          province: value.province || undefined,
+          website: value.website || undefined,
         },
       });
     },
   });
 
   const handleDeactivate = async () => {
-    await deactivateTeamMutation.mutateAsync({ data: { teamId } });
+    await deactivateTeamMutation.mutateAsync(teamId);
   };
 
   if (!team) {

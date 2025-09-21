@@ -3,7 +3,6 @@
  * Provides type-safe methods for sending transactional emails
  */
 
-import { serverOnly } from "@tanstack/react-start";
 import { z } from "zod";
 
 // Email configuration schemas
@@ -146,54 +145,55 @@ class SendGridEmailService {
 }
 
 // Factory function to get the appropriate email service
-const getEmailServiceInternal = serverOnly(async () => {
+type EmailService = MockEmailService | SendGridEmailService;
+
+let cachedEmailService: EmailService | null = null;
+
+const resolveEmailService = async (): Promise<EmailService> => {
+  if (cachedEmailService) {
+    return cachedEmailService;
+  }
+
   const useSendGrid =
     process.env["SENDGRID_API_KEY"] && process.env["NODE_ENV"] !== "test";
 
-  if (useSendGrid) {
-    return new SendGridEmailService();
-  }
+  cachedEmailService = useSendGrid ? new SendGridEmailService() : new MockEmailService();
+  return cachedEmailService;
+};
 
-  return new MockEmailService();
-});
-
-// Exported wrapper functions
-export const getEmailService = serverOnly(async () => {
-  return getEmailServiceInternal();
-});
+export const getEmailService = async (): Promise<EmailService> => resolveEmailService();
 
 // Convenience function for sending membership purchase receipts
-export const sendMembershipPurchaseReceipt = serverOnly(
-  async (params: {
-    to: EmailRecipient;
-    membershipType: string;
-    amount: number;
-    paymentId: string;
-    expiresAt: Date;
-  }) => {
-    const service = await getEmailService();
+export const sendMembershipPurchaseReceipt = async (params: {
+  to: EmailRecipient;
+  membershipType: string;
+  amount: number;
+  paymentId: string;
+  expiresAt: Date;
+}) => {
+  const service = await getEmailService();
 
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+  const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
+  const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
 
-    return service.send({
-      to: params.to,
-      from: {
-        email: fromEmail,
-        name: fromName,
-      },
-      subject: "Membership Purchase Confirmation - Quadball Canada",
-      templateId: EMAIL_TEMPLATES.MEMBERSHIP_PURCHASE_RECEIPT,
-      dynamicTemplateData: {
-        memberName: params.to.name || "Member",
-        membershipType: params.membershipType,
-        amount: `$${(params.amount / 100).toFixed(2)}`,
-        paymentId: params.paymentId,
-        expiresAt: params.expiresAt.toLocaleDateString("en-CA"),
-        year: new Date().getFullYear(),
-      },
-      // Fallback plain text version
-      text: `Thank you for purchasing a ${params.membershipType} membership!
+  return service.send({
+    to: params.to,
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    subject: "Membership Purchase Confirmation - Quadball Canada",
+    templateId: EMAIL_TEMPLATES.MEMBERSHIP_PURCHASE_RECEIPT,
+    dynamicTemplateData: {
+      memberName: params.to.name || "Member",
+      membershipType: params.membershipType,
+      amount: `$${(params.amount / 100).toFixed(2)}`,
+      paymentId: params.paymentId,
+      expiresAt: params.expiresAt.toLocaleDateString("en-CA"),
+      year: new Date().getFullYear(),
+    },
+    // Fallback plain text version
+    text: `Thank you for purchasing a ${params.membershipType} membership!
 
 Amount paid: $${(params.amount / 100).toFixed(2)}
 Payment ID: ${params.paymentId}
@@ -205,8 +205,8 @@ If you have any questions, please contact us at support@quadballcanada.com.
 
 Best regards,
 Quadball Canada Team`,
-      // HTML version (used if no template ID is configured)
-      html: `
+    // HTML version (used if no template ID is configured)
+    html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -241,40 +241,38 @@ Quadball Canada Team`,
   </div>
 </body>
 </html>
-      `,
-    });
-  },
-);
+    `,
+  });
+};
 
-export const sendTeamInvitationEmail = serverOnly(
-  async (params: {
-    to: EmailRecipient;
-    teamName: string;
-    teamSlug: string;
-    role: string;
-    invitedByName?: string;
-    invitedByEmail?: string;
-  }) => {
-    const service = await getEmailService();
+export const sendTeamInvitationEmail = async (params: {
+  to: EmailRecipient;
+  teamName: string;
+  teamSlug: string;
+  role: string;
+  invitedByName?: string;
+  invitedByEmail?: string;
+}) => {
+  const service = await getEmailService();
 
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+  const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
+  const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
 
-    const siteUrl =
-      process.env["SITE_URL"] ||
-      process.env["URL"] ||
-      process.env["VITE_BASE_URL"] ||
-      "http://localhost:5173";
-    const normalizedSiteUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
-    const dashboardUrl = `${normalizedSiteUrl}/dashboard/teams`;
-    const invitationUrl = `${dashboardUrl}/${params.teamSlug}`;
+  const siteUrl =
+    process.env["SITE_URL"] ||
+    process.env["URL"] ||
+    process.env["VITE_BASE_URL"] ||
+    "http://localhost:5173";
+  const normalizedSiteUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
+  const dashboardUrl = `${normalizedSiteUrl}/dashboard/teams`;
+  const invitationUrl = `${dashboardUrl}/${params.teamSlug}`;
 
-    const inviterDisplay =
-      params.invitedByName ||
-      params.invitedByEmail ||
-      "a Quadball Canada team representative";
+  const inviterDisplay =
+    params.invitedByName ||
+    params.invitedByEmail ||
+    "a Quadball Canada team representative";
 
-    const textBody = `You've been invited to join ${params.teamName} as a ${params.role}.
+  const textBody = `You've been invited to join ${params.teamName} as a ${params.role}.
 
 Accept or decline your invitation here: ${dashboardUrl}
 
@@ -282,48 +280,49 @@ If the link above doesn't work, copy and paste this URL into your browser: ${inv
 
 Invitation sent by ${inviterDisplay}.`;
 
-    return service.send({
-      to: params.to,
-      from: {
-        email: fromEmail,
-        name: fromName,
-      },
-      subject: `${params.teamName} team invitation`,
-      templateId: EMAIL_TEMPLATES.TEAM_INVITATION,
-      dynamicTemplateData: {
-        teamName: params.teamName,
-        role: params.role,
-        inviterName: inviterDisplay,
-        dashboardUrl,
-        invitationUrl,
-      },
-      text: textBody,
-    });
-  },
-);
+  return service.send({
+    to: params.to,
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    subject: `${params.teamName} team invitation`,
+    templateId: EMAIL_TEMPLATES.TEAM_INVITATION,
+    dynamicTemplateData: {
+      teamName: params.teamName,
+      role: params.role,
+      inviterName: inviterDisplay,
+      dashboardUrl,
+      invitationUrl,
+    },
+    text: textBody,
+  });
+};
 
 // Convenience function for sending welcome emails
-export const sendWelcomeEmail = serverOnly(
-  async (params: { to: EmailRecipient; profileUrl: string }) => {
-    const service = await getEmailService();
+export const sendWelcomeEmail = async (params: {
+  to: EmailRecipient;
+  profileUrl: string;
+}) => {
+  const service = await getEmailService();
 
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+  const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
+  const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
 
-    return service.send({
-      to: params.to,
-      from: {
-        email: fromEmail,
-        name: fromName,
-      },
-      subject: "Welcome to Quadball Canada!",
-      templateId: EMAIL_TEMPLATES.WELCOME,
-      dynamicTemplateData: {
-        memberName: params.to.name || "New Member",
-        profileUrl: params.profileUrl,
-        year: new Date().getFullYear(),
-      },
-      text: `Welcome to Quadball Canada!
+  return service.send({
+    to: params.to,
+    from: {
+      email: fromEmail,
+      name: fromName,
+    },
+    subject: "Welcome to Quadball Canada!",
+    templateId: EMAIL_TEMPLATES.WELCOME,
+    dynamicTemplateData: {
+      memberName: params.to.name || "New Member",
+      profileUrl: params.profileUrl,
+      year: new Date().getFullYear(),
+    },
+    text: `Welcome to Quadball Canada!
 
 We're thrilled to have you join our community.
 
@@ -333,6 +332,5 @@ If you have any questions, feel free to reach out to us at support@quadballcanad
 
 Best regards,
 Quadball Canada Team`,
-    });
-  },
-);
+  });
+};

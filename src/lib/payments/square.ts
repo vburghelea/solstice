@@ -4,7 +4,6 @@
  */
 
 import { createId } from "@paralleldrive/cuid2";
-import { serverOnly } from "@tanstack/react-start";
 
 // This module should only be imported in server-side code
 
@@ -174,11 +173,15 @@ export class MockSquarePaymentService {
   }
 }
 
-// Type for the payment service interface
 export type ISquarePaymentService = MockSquarePaymentService;
 
-// Server-only function to get the appropriate payment service
-const getSquarePaymentServiceInternal = serverOnly(async () => {
+let cachedSquareService: ISquarePaymentService | null = null;
+
+const resolveSquarePaymentService = async (): Promise<ISquarePaymentService> => {
+  if (cachedSquareService) {
+    return cachedSquareService;
+  }
+
   const useRealSquare =
     process.env["SQUARE_ENV"] === "production" || process.env["SQUARE_ENV"] === "sandbox";
 
@@ -188,21 +191,20 @@ const getSquarePaymentServiceInternal = serverOnly(async () => {
       const realService = getRealService();
       if (realService) {
         console.log("Using REAL Square payment service");
-        return realService;
+        cachedSquareService = realService;
+        return cachedSquareService;
       }
     } catch (error) {
       console.error("Failed to load real Square service:", error);
     }
   }
 
-  // Fall back to mock service
-  return new MockSquarePaymentService();
-});
-
-// Export singleton instance getter
-export const getSquarePaymentService = async (): Promise<ISquarePaymentService> => {
-  return getSquarePaymentServiceInternal();
+  cachedSquareService = new MockSquarePaymentService();
+  return cachedSquareService;
 };
+
+export const getSquarePaymentService = async (): Promise<ISquarePaymentService> =>
+  resolveSquarePaymentService();
 
 // For backward compatibility
 export const squarePaymentService = {

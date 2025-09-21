@@ -44,8 +44,10 @@ import { Textarea } from "~/components/ui/textarea";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { registerForEvent } from "~/features/events/events.mutations";
 import { checkEventRegistration, getEvent } from "~/features/events/events.queries";
+import { callServerFn } from "~/lib/server/fn-utils";
 import type {
   EventOperationResult,
+  EventRegistrationWithDetails,
   EventWithDetails,
 } from "~/features/events/events.types";
 import { getUserTeams } from "~/features/teams/teams.queries";
@@ -103,7 +105,7 @@ function EventRegistrationPage() {
     Error
   >({
     queryKey: ["event", slug],
-    queryFn: () => getEvent({ data: { slug } }),
+    queryFn: () => callServerFn(getEvent, { slug }),
   });
 
   const eventData = eventResult?.success ? eventResult.data : null;
@@ -114,11 +116,9 @@ function EventRegistrationPage() {
   >({
     queryKey: ["event-registration", eventData?.id, user?.id],
     queryFn: () =>
-      checkEventRegistration({
-        data: {
-          eventId: eventData!.id,
-          userId: user?.id,
-        },
+      callServerFn(checkEventRegistration, {
+        eventId: eventData!.id,
+        userId: user?.id,
       }),
     enabled: Boolean(eventData?.id && user?.id),
   });
@@ -131,18 +131,20 @@ function EventRegistrationPage() {
 
   const { data: userTeams } = useQuery<UserTeamEntry[] | undefined, Error>({
     queryKey: ["user-teams", user?.id],
-    queryFn: () => getUserTeams({ data: { includeInactive: false } }),
+    queryFn: () => callServerFn(getUserTeams, { includeInactive: false }),
     enabled: Boolean(user?.id && registrationType === "team"),
   });
 
   const registrationMutation = useMutation({
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       eventId: string;
-      registrationType: "team" | "individual";
       teamId?: string;
-      additionalInfo?: string;
-      emergencyContact?: EmergencyContact;
-    }) => registerForEvent({ data: payload }),
+      notes?: string;
+      roster?: { emergencyContact?: EmergencyContact };
+    }) =>
+      registerForEvent({ data: payload }) as Promise<
+        EventOperationResult<EventRegistrationWithDetails>
+      >,
     onSuccess: (result) => {
       if (result.success) {
         toast.success("Registration successful!");
@@ -233,13 +235,11 @@ function EventRegistrationPage() {
 
     const payload: {
       eventId: string;
-      registrationType: "team" | "individual";
       teamId?: string;
-      additionalInfo?: string;
-      emergencyContact?: EmergencyContact;
+      notes?: string;
+      roster?: { emergencyContact?: EmergencyContact };
     } = {
       eventId: event.id,
-      registrationType,
     };
 
     if (registrationType === "team" && selectedTeamId) {
@@ -247,11 +247,11 @@ function EventRegistrationPage() {
     }
 
     if (additionalInfo.trim().length > 0) {
-      payload.additionalInfo = additionalInfo.trim();
+      payload.notes = additionalInfo.trim();
     }
 
     if (emergencyContact.name.trim().length > 0) {
-      payload.emergencyContact = emergencyContact;
+      payload.roster = { emergencyContact };
     }
 
     registrationMutation.mutate(payload);

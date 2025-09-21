@@ -1,4 +1,5 @@
-import { createServerFn, serverOnly } from "@tanstack/react-start";
+import { createServerFn } from "@tanstack/react-start";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { and, eq } from "drizzle-orm";
 import { membershipPaymentSessions, memberships, membershipTypes } from "~/db/schema";
 import type { MembershipMetadata } from "./membership.db-types";
@@ -6,6 +7,7 @@ import {
   confirmMembershipPurchaseSchema,
   purchaseMembershipSchema,
 } from "./membership.schemas";
+import { zod$ } from "~/lib/server/fn-utils";
 import type {
   CheckoutSessionResult,
   Membership,
@@ -33,46 +35,25 @@ async function wait(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Server-only helper to get Square payment service
- * This ensures the Square module is never included in the client bundle
- */
-const getSquarePaymentService = serverOnly(async () => {
+const getSquarePaymentService = async () => {
   const { squarePaymentService } = await import("~/lib/payments/square");
   return squarePaymentService;
-});
+};
 
 /**
  * Create a checkout session for membership purchase
  */
 export const createCheckoutSession = createServerFn({ method: "POST" })
-  .validator(purchaseMembershipSchema.omit({ autoRenew: true }).parse)
+  .middleware(getAuthMiddleware())
+  .validator(zod$(purchaseMembershipSchema.omit({ autoRenew: true })))
   .handler(
-    async ({ data }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
+    async ({ data, context }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
       try {
         // Import server-only modules inside the handler
-        const [{ getDb }, { getAuth }] = await Promise.all([
-          import("~/db/server-helpers"),
-          import("~/lib/auth/server-helpers"),
-        ]);
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
         const db = await getDb();
-        const auth = await getAuth();
-        const { getWebRequest } = await import("@tanstack/react-start/server");
-        const { headers } = getWebRequest();
-        const session = await auth.api.getSession({ headers });
-
-        if (!session?.user?.id) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "VALIDATION_ERROR",
-                message: "User not authenticated",
-              },
-            ],
-          };
-        }
+        const user = requireUser(context);
 
         // Verify membership type exists and is active
 
@@ -105,7 +86,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           .from(memberships)
           .where(
             and(
-              eq(memberships.userId, session.user.id),
+              eq(memberships.userId, user.id),
               eq(memberships.status, "active"),
             ),
           )
@@ -127,14 +108,14 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         const squarePaymentService = await getSquarePaymentService();
         const checkoutSession = await squarePaymentService.createCheckoutSession(
           membershipType.id,
-          session.user.id,
+          user.id,
           membershipType.priceCents,
         );
 
         await db
           .insert(membershipPaymentSessions)
           .values({
-            userId: session.user.id,
+            userId: user.id,
             membershipTypeId: membershipType.id,
             squareCheckoutId: checkoutSession.id,
             squarePaymentLinkUrl: checkoutSession.checkoutUrl,
@@ -190,32 +171,15 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
  * Confirm membership purchase after payment
  */
 export const confirmMembershipPurchase = createServerFn({ method: "POST" })
-  .validator(confirmMembershipPurchaseSchema.parse)
-  .handler(async ({ data }): Promise<MembershipOperationResult<Membership>> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(confirmMembershipPurchaseSchema))
+  .handler(async ({ data, context }): Promise<MembershipOperationResult<Membership>> => {
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
       const db = await getDb();
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "VALIDATION_ERROR",
-              message: "User not authenticated",
-            },
-          ],
-        };
-      }
+      const user = requireUser(context);
 
       // Look up the stored payment session
       const [paymentSession] = await db
@@ -236,7 +200,7 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
         };
       }
 
-      if (paymentSession.userId !== session.user.id) {
+      if (paymentSession.userId !== user.id) {
         return {
           success: false,
           errors: [
@@ -432,8 +396,8 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
 
           await sendMembershipPurchaseReceipt({
             to: {
-              email: session.user.email,
-              name: session.user.name || undefined,
+              email: user.email,
+              name: user.name || undefined,
             },
             membershipType: membershipType.name,
             amount: membershipType.priceCents,

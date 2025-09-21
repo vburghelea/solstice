@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { zod$ } from "~/lib/server/fn-utils";
 import {
   changePasswordInputSchema,
   revokeSessionInputSchema,
@@ -7,7 +8,7 @@ import {
 import type { ApiResult } from "./settings.types";
 
 export const changePassword = createServerFn({ method: "POST" })
-  .validator(changePasswordInputSchema.parse)
+  .validator(zod$(changePasswordInputSchema))
   .handler(async ({ data }) => {
     try {
       const [{ getAuth }, { getWebRequest }] = await Promise.all([
@@ -49,7 +50,7 @@ export const changePassword = createServerFn({ method: "POST" })
   });
 
 export const revokeSession = createServerFn({ method: "POST" })
-  .validator(revokeSessionInputSchema.parse)
+  .validator(zod$(revokeSessionInputSchema))
   .handler(async ({ data }) => {
     try {
       const [{ getAuth }, { getWebRequest }] = await Promise.all([
@@ -122,7 +123,7 @@ export const revokeOtherSessions = createServerFn({ method: "POST" }).handler(
 );
 
 export const unlinkAccount = createServerFn({ method: "POST" })
-  .validator(unlinkAccountInputSchema.parse)
+  .validator(zod$(unlinkAccountInputSchema))
   .handler(async ({ data }) => {
     try {
       const [{ getAuth }, { getWebRequest }] = await Promise.all([

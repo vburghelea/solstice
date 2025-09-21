@@ -20,7 +20,8 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
   const queryClient = useQueryClient();
 
   const acceptInviteMutation = useMutation({
-    mutationFn: (teamId: string) => acceptTeamInvite({ data: { teamId } }),
+    mutationFn: async (teamId: string) =>
+      acceptTeamInvite({ data: { teamId } }),
     onMutate: async (teamId: string) => {
       await queryClient.cancelQueries({ queryKey: ["pendingTeamInvites"] });
       const previousInvites = queryClient.getQueryData<PendingTeamInvite[]>([
@@ -51,7 +52,8 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
   });
 
   const declineInviteMutation = useMutation({
-    mutationFn: (teamId: string) => declineTeamInvite({ data: { teamId } }),
+    mutationFn: async (teamId: string) =>
+      declineTeamInvite({ data: { teamId } }),
     onMutate: async (teamId: string) => {
       await queryClient.cancelQueries({ queryKey: ["pendingTeamInvites"] });
       const previousInvites = queryClient.getQueryData<PendingTeamInvite[]>([
@@ -83,7 +85,7 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
 
   function invalidateTeamQueries(teamId: string) {
     queryClient.invalidateQueries({ queryKey: ["pendingTeamInvites"] });
-    queryClient.invalidateQueries({ queryKey: ["userTeams"] });
+    queryClient.invalidateQueries({ queryKey: ["user-teams"] });
     queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
   }
 

@@ -1,8 +1,22 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
+
+// Browser-safe alias for node:async_hooks to prevent client-side crashes
+const aliasNodeAsyncHooksForClient = (): Plugin => ({
+  name: "alias-node-async_hooks-browser",
+  enforce: "pre",
+  resolveId(source, _importer, options) {
+    if (source === "node:async_hooks" && !options?.ssr) {
+      // Map only client-side imports to the shim
+      return new URL("./src/shims/async-local-storage.browser.ts", import.meta.url).pathname;
+    }
+    return null;
+  },
+});
 
 export default defineConfig(({ mode }) => {
   // Ensure .env variables are loaded into process.env for server-side code
@@ -14,11 +28,47 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
+      // Browser shim for node:async_hooks - prevents client crashes
+      aliasNodeAsyncHooksForClient(),
+
+      // Keep path aliasing & tailwind first
       tsConfigPaths({
         projects: ["./tsconfig.json"],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as any,
       tailwindcss(),
+
+      // IMPORTANT: TanStack Start before react(), and tell it you're supplying the React plugin
+      tanstackStart({
+        customViteReactPlugin: true, // Tell Start we're providing React plugin
+        // https://react.dev/learn/react-compiler
+        react: {
+          babel: {
+            plugins: [
+              [
+                "babel-plugin-react-compiler",
+                {
+                  target: "19",
+                },
+              ],
+            ],
+          },
+        },
+
+        tsr: {
+          quoteStyle: "double",
+          semicolons: true,
+          // verboseFileRoutes: false,
+        },
+
+        // Netlify deployment target
+        target: "netlify",
+      }),
+
+      // React plugin explicitly provided
+      react(),
+
+      // Keep PWA after the app framework plugins
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: [
@@ -83,30 +133,6 @@ export default defineConfig(({ mode }) => {
           enabled: true,
         },
       }),
-      tanstackStart({
-        // https://react.dev/learn/react-compiler
-        react: {
-          babel: {
-            plugins: [
-              [
-                "babel-plugin-react-compiler",
-                {
-                  target: "19",
-                },
-              ],
-            ],
-          },
-        },
-
-        tsr: {
-          quoteStyle: "double",
-          semicolons: true,
-          // verboseFileRoutes: false,
-        },
-
-        // Netlify deployment target
-        target: "netlify",
-      }),
     ],
     optimizeDeps: {
       include: [
@@ -115,13 +141,13 @@ export default defineConfig(({ mode }) => {
         "@tanstack/react-start",
         "@tanstack/react-query",
         "@tanstack/react-router",
-        "@tanstack/react-router-with-query",
+        "@tanstack/react-router-ssr-query",
+        // Removed: "@tanstack/react-start/server-functions-client" - can drag server bits into client
         "@radix-ui/react-slot",
         "@radix-ui/react-label",
         "class-variance-authority",
         "@tanstack/react-query-devtools",
         "@tanstack/react-router-devtools",
-        "@tanstack/react-start/server-functions-client",
         "clsx",
         "tailwind-merge",
         "better-auth/react",
@@ -129,6 +155,8 @@ export default defineConfig(({ mode }) => {
         "zod",
         "lucide-react",
       ],
+      // Don't prebundle these to avoid server code leaking
+      exclude: ["@tanstack/start-storage-context", "node:async_hooks"],
     },
   };
 });

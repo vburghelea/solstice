@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { z } from "zod";
+import { zod$ } from "~/lib/server/fn-utils";
 import type { EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teams, user } from "~/db/schema";
 import type {
@@ -58,7 +59,7 @@ export type EventRegistrationSummary = {
  * List events with filters and pagination
  */
 export const listEvents = createServerFn({ method: "GET" })
-  .validator(listEventsSchema.parse)
+  .validator(zod$(listEventsSchema))
   .handler(async ({ data }): Promise<EventListResult> => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -214,7 +215,7 @@ export const listEvents = createServerFn({ method: "GET" })
  * Get a single event by ID or slug
  */
 export const getEvent = createServerFn({ method: "GET" })
-  .validator(getEventSchema.parse)
+  .validator(zod$(getEventSchema))
   .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       if (!data.id && !data.slug) {
@@ -322,7 +323,7 @@ export const getEvent = createServerFn({ method: "GET" })
  * Get upcoming events (public endpoint for homepage)
  */
 export const getUpcomingEvents = createServerFn({ method: "GET" })
-  .validator(getUpcomingEventsSchema.parse)
+  .validator(zod$(getUpcomingEventsSchema))
   .handler(async ({ data }): Promise<EventWithDetails[]> => {
     const limit = Math.min(10, data.limit || 3);
 
@@ -384,7 +385,7 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
  * Check if a user is registered for an event
  */
 export const checkEventRegistration = createServerFn({ method: "GET" })
-  .validator(checkEventRegistrationSchema.parse)
+  .validator(zod$(checkEventRegistrationSchema))
   .handler(
     async ({
       data,

@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+import { zod$ } from "~/lib/server/fn-utils";
 import { isProfileComplete } from "./profile.queries";
 import {
   partialProfileInputSchema,
@@ -53,27 +55,14 @@ function mapDbUserToProfile(dbUser: {
 }
 
 export const updateUserProfile = createServerFn({ method: "POST" })
-  .validator(partialProfileInputSchema.parse)
-  .handler(async ({ data: inputData }): Promise<ProfileOperationResult> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(partialProfileInputSchema))
+  .handler(async ({ data: inputData, context }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
-      // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
-
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
-      }
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const db = await getDb();
+      const currentUser = requireUser(context);
 
       // Input is already validated by .validator(), just check if it's empty
       if (!inputData || Object.keys(inputData).length === 0) {
@@ -114,13 +103,10 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       if (inputData.privacySettings !== undefined) {
         updateData["privacySettings"] = JSON.stringify(inputData.privacySettings);
       }
-
-      const db = await getDb();
-
       const [updatedUser] = await db
         .update(user)
         .set(updateData)
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, currentUser.id))
         .returning();
 
       if (!updatedUser) {
@@ -135,11 +121,10 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       const profileComplete = isProfileComplete(profile);
 
       if (profileComplete !== updatedUser.profileComplete) {
-        const db = await getDb();
         const [finalUser] = await db
           .update(user)
           .set({ profileComplete })
-          .where(eq(user.id, session.user.id))
+          .where(eq(user.id, currentUser.id))
           .returning();
 
         return {
@@ -167,33 +152,14 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   });
 
 export const completeUserProfile = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    // The validator receives the raw data passed to the server function
-    return profileInputSchema.parse(input);
-  })
-  .handler(async ({ data }): Promise<ProfileOperationResult> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(profileInputSchema))
+  .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
-      // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const db = await getDb();
+      const currentUser = requireUser(context);
 
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
-      }
-
-      // Input is already validated by .validator()
-
-      // Import database dependencies inside handler
       const { eq, sql } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 
@@ -209,12 +175,10 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         profileVersion: sql`${user.profileVersion} + 1`,
       };
 
-      const db = await getDb();
-
       const [updatedUser] = await db
         .update(user)
         .set(updateData)
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, currentUser.id))
         .returning();
 
       if (!updatedUser) {
@@ -243,37 +207,16 @@ export const completeUserProfile = createServerFn({ method: "POST" })
   });
 
 export const updatePrivacySettings = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    // The validator receives the raw data passed to the server function
-    return privacySettingsSchema.parse(input);
-  })
-  .handler(async ({ data }): Promise<ProfileOperationResult> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(privacySettingsSchema))
+  .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
-      // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const db = await getDb();
+      const currentUser = requireUser(context);
 
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "User not authenticated" }],
-        };
-      }
-
-      // Input is already validated by .validator()
-
-      // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
-
-      const db = await getDb();
 
       const [updatedUser] = await db
         .update(user)
@@ -281,7 +224,7 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
           privacySettings: JSON.stringify(data),
           profileUpdatedAt: new Date(),
         })
-        .where(eq(user.id, session.user.id))
+        .where(eq(user.id, currentUser.id))
         .returning();
 
       if (!updatedUser) {

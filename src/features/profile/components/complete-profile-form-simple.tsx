@@ -17,6 +17,8 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import type { ProfileOperationResult } from "../profile.types";
 import type { ProfileInputType } from "../profile.schemas";
 import type { ProfileInput } from "../profile.types";
 
@@ -106,7 +108,11 @@ export function CompleteProfileForm() {
           dataToSubmit.emergencyContact = emergencyContact;
         }
 
-        const result = await completeUserProfile({ data: dataToSubmit });
+        const result = await unwrapServerFnResult(
+          completeUserProfile({
+            data: dataToSubmit,
+          }),
+        ) as ProfileOperationResult;
 
         if (result.success) {
           await queryClient.invalidateQueries({ queryKey: ["user"] });

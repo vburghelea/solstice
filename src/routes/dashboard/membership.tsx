@@ -21,6 +21,7 @@ import {
   confirmMembershipPurchase,
   createCheckoutSession,
 } from "~/features/membership/membership.mutations";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import {
   getUserMembershipStatus,
   listMembershipTypes,
@@ -63,26 +64,19 @@ function MembershipPage() {
     },
   });
 
-  type ConfirmMembershipFn = (params: {
-    data: { membershipTypeId: string; sessionId: string; paymentId: string };
-  }) => Promise<{
-    success: boolean;
-    errors?: Array<{ code: string; message: string }>;
-  }>;
-
   const confirmPurchase = useCallback(
     async (sessionId: string, membershipTypeId: string, paymentId: string) => {
       setProcessingPayment(true);
       try {
-        const result = await (
-          confirmMembershipPurchase as unknown as ConfirmMembershipFn
-        )({
-          data: {
-            membershipTypeId,
-            sessionId,
-            paymentId,
-          },
-        });
+        const result = await unwrapServerFnResult(
+          confirmMembershipPurchase({
+            data: {
+              membershipTypeId,
+              sessionId,
+              paymentId,
+            },
+          }),
+        );
 
         if (result.success) {
           toast.success("Membership purchased successfully!");
@@ -165,7 +159,11 @@ function MembershipPage() {
 
   const handlePurchase = async (membershipTypeId: string) => {
     try {
-      const result = await createCheckoutSession({ data: { membershipTypeId } });
+      const result = await unwrapServerFnResult(
+        createCheckoutSession({
+          data: { membershipTypeId },
+        }),
+      );
       if (result.success && result.data) {
         // Redirect to checkout URL
         window.location.href = result.data.checkoutUrl;

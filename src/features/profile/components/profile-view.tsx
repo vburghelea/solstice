@@ -18,6 +18,7 @@ import {
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { updateUserProfile } from "../profile.mutations";
+import type { ProfileOperationResult } from "../profile.types";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 
@@ -126,13 +127,12 @@ export function ProfileView() {
           return;
         }
 
-        // For server functions with validators expecting { data: ... },
-        // we pass the object directly and TanStack Start wraps it
         console.log("Sending to server function:", JSON.stringify(dataToSubmit, null, 2));
         console.log("Data type:", typeof dataToSubmit);
 
-        // Pass the data wrapped in { data: ... } as expected by TanStack Start
-        const result = await updateUserProfile({ data: dataToSubmit });
+        const result = await updateUserProfile({
+          data: dataToSubmit as PartialProfileInputType
+        }) as ProfileOperationResult;
 
         if (result.success) {
           toast.success("Profile updated successfully");

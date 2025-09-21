@@ -10,6 +10,7 @@ export default tseslint.config(
   {
     ignores: [
       "dist",
+      "dev-dist",
       ".wrangler",
       ".vercel",
       ".netlify",

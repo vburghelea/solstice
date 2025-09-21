@@ -22,6 +22,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { createEvent } from "../events.mutations";
+import type { EventOperationResult, EventWithDetails } from "../events.types";
 
 const EVENT_TYPE_OPTIONS = [
   { value: "tournament", label: "Tournament" },
@@ -209,8 +210,13 @@ export function EventCreateForm() {
     }
   }, [formState.values.slug]);
 
-  const createMutation = useMutation({
-    mutationFn: (data: EventFormData) => createEvent({ data }),
+  const createMutation = useMutation<
+    EventOperationResult<EventWithDetails>,
+    Error,
+    EventFormData
+  >({
+    mutationFn: async (data: EventFormData) =>
+      createEvent({ data }) as Promise<EventOperationResult<EventWithDetails>>,
     onSuccess: (result) => {
       if (!result.success) {
         const errorMessage = result.errors[0]?.message ?? "Failed to create event";

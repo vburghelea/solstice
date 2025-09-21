@@ -1,43 +1,83 @@
-# Deployment investigation: event registration page
+# Deployment Investigation: Event Registration Page
 
-## Goal
+## ✅ RESOLVED - September 21, 2025
 
-Deliver the new event registration form (Square + e-transfer options, terms checkboxes, “Complete Registration” button) on `https://snazzy-twilight-39e1e9.netlify.app/events/e2e-open-showcase/register`, as introduced in commit `93fd1a8`.
+All deployment issues have been successfully resolved. The event registration page at https://snazzy-twilight-39e1e9.netlify.app/events/e2e-open-showcase/register is now fully functional.
 
-## What we changed locally
+## Issues Resolved
 
-- Ran `pnpm db:migrate` and committed the new payment-session schema + front-end form (`chore: apply event payment migrations`, 93fd1a8).
-- Added the missing CSP hash to `netlify/edge-functions/security-headers.ts` so the inline module loader is allowed (`fix: update security headers…`, 045fbee).
+### 1. Registration Route Not Rendering (FIXED)
 
-## Deploy attempts
+**Problem**: The `/events/{slug}/register` route showed event detail content instead of the registration form.
 
-- Triggered multiple Netlify deploys (including “Clear cache and deploy”).
-- Latest production deploy shows SHA `main@HEAD` (post-CSP fix).
+**Root Cause**: TanStack Router requires parent routes to have an `<Outlet />` component for child routes to render properly.
 
-## Observations in production
+**Solution**:
 
-- The JS asset served at `/_slug.register-DHkfY7sG.js` is the new bundle; it contains `Register for {event.name}`, payment radio markup, and “Complete Registration”.
-- Despite the correct client bundle, the rendered page still shows the old summary view:
-  - DOM/innerText only includes the `Event Details` / `Registration` cards and a `Register Now` link.
-  - No payment radios, checkboxes, or submit button are present.
-- Hydration doesn’t replace the HTML, indicating the SSR output being sent by Netlify is still the legacy markup.
-- CSP warnings are gone; no runtime JS errors.
+- Created layout route at `/events/$slug.tsx` with `<Outlet />` component
+- Moved event detail page to index route `/events/$slug.index.tsx`
+- This allows child routes like `/events/$slug/register` to render correctly
 
-## Evidence
+### 2. SSR Cache Issue (FIXED)
 
-- `curl -s https://snazzy-twilight-39e1e9.netlify.app/assets/_slug.register-DHkfY7sG.js | rg "Register for"` → matches found.
-- `document.body.innerText` on the live page has only the old content.
-- Query client shows the seeded event data (`allowEtransfer: false`), so the client is fetching correctly.
+**Problem**: Netlify served stale server-rendered HTML despite having updated client bundles.
 
-## Conclusion
+**Solution**: Manual deployment using `netlify deploy --prod --dir=dist` to bypass Netlify's build cache.
 
-The client bundle is updated, but the server-rendered HTML (and cached response) is stale. We need Netlify to rebuild the SSR/HTML portion so the new markup is sent.
+### 3. UI/UX Issues (FIXED)
 
-## Suggested next steps
+- Removed duplicate "Register" button from event cards
+- Fixed button width overflow
+- Added loading states to prevent registration status flickering
 
-1. Confirm the production deploy’s build log is using commit `93fd1a8`.
-2. Run `pnpm build` locally and inspect the generated SSR output (`dist`) to ensure it contains the new registration form.
-3. If local build is correct, deploy that bundle directly (`netlify deploy --prod --dir=dist`) or otherwise ensure Netlify rebuilds SSR output from the new commit.
-4. After deploy, purge/force-refresh the URL to invalidate any cached HTML.
+### 4. CSP Violations (FIXED)
 
-Once the SSR is refreshed, re-test: the page should hydrate to the new form and allow full Square/e-transfer flows.
+Added required hashes to `netlify/edge-functions/security-headers.ts`:
+
+- `sha256-gHUVPg/ygmuHop+u65qJwyip1pg0/k2Ch2Va8wmwlgY=`
+
+## Current Status
+
+✅ **Event Detail Page**: `/events/e2e-open-showcase` - Working correctly
+✅ **Registration Page**: `/events/e2e-open-showcase/register` - Fully functional
+✅ **Payment Options**: Both Square and e-transfer options available (when enabled)
+✅ **Loading States**: No flickering or UI issues
+
+## Deployment Commands
+
+### Standard Deploy
+
+```bash
+git push  # Triggers Netlify auto-deploy
+```
+
+### Force Fresh Deploy (if cache issues occur)
+
+```bash
+pnpm build
+netlify deploy --prod --dir=dist
+```
+
+## Test Accounts
+
+- `test@example.com` / `testpassword123` - Already registered for E2E Open Showcase
+- `teamcreator@example.com` / `testpassword123` - Not registered (use for testing)
+
+## Key Learnings
+
+1. **TanStack Router Requirements**: Parent routes must have `<Outlet />` for child routes to render
+2. **Netlify Cache Issues**: Can be bypassed with manual CLI deployment
+3. **CSP Hashes**: Must be added proactively when inline scripts are detected
+
+## Original Investigation Notes
+
+The original issue involved the client bundle being updated correctly but the server-rendered HTML remaining stale. The JS asset at `/_slug.register-DHkfY7sG.js` contained the new registration form code, but the SSR output wasn't being refreshed by Netlify's build process.
+
+Evidence gathered:
+
+- Client bundle contained `Register for {event.name}` and payment radio markup
+- Server HTML only showed old summary view
+- No hydration occurred to replace the stale HTML
+- CSP warnings were resolved after adding hashes
+
+The solution involved both fixing the routing structure and forcing a fresh deployment to bypass cache issues.

@@ -1,14 +1,65 @@
 # TanStack Start Best Practices
 
-This document outlines best practices for working with TanStack Start server functions, based on lessons learned from migrating away from `@ts-expect-error` suppressions.
+This document outlines best practices for working with TanStack Start server functions and routing, based on lessons learned from migrations and production deployments.
 
 ## Table of Contents
 
-1. [Server Function Best Practices](#server-function-best-practices)
-2. [Type Safety Guidelines](#type-safety-guidelines)
-3. [File Organization](#file-organization)
-4. [Common Pitfalls](#common-pitfalls)
-5. [Migration Guide](#migration-guide)
+1. [Routing Best Practices](#routing-best-practices)
+2. [Server Function Best Practices](#server-function-best-practices)
+3. [Type Safety Guidelines](#type-safety-guidelines)
+4. [File Organization](#file-organization)
+5. [Common Pitfalls](#common-pitfalls)
+6. [Migration Guide](#migration-guide)
+
+## Routing Best Practices
+
+### Parent Routes Must Have Outlet Components
+
+TanStack Router requires parent routes to render an `<Outlet />` component for child routes to display properly.
+
+#### ✅ Good: Layout Route with Outlet
+
+```typescript
+// src/routes/events/$slug.tsx (parent route)
+import { Outlet, createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/events/$slug")({
+  component: EventLayout,
+});
+
+function EventLayout() {
+  return <Outlet />;  // REQUIRED for child routes to render
+}
+```
+
+```typescript
+// src/routes/events/$slug.index.tsx (index child route)
+export const Route = createFileRoute("/events/$slug/")({
+  component: EventDetailPage,
+});
+
+// src/routes/events/$slug.register.tsx (named child route)
+export const Route = createFileRoute("/events/$slug/register")({
+  component: EventRegistrationPage,
+});
+```
+
+#### ❌ Bad: Parent Route Without Outlet
+
+```typescript
+// THIS WILL CAUSE CHILD ROUTES TO NOT RENDER
+// src/routes/events/$slug.tsx
+export const Route = createFileRoute("/events/$slug")({
+  component: EventDetailPage, // No outlet = child routes won't show
+});
+```
+
+**Symptoms of Missing Outlet**:
+
+- URL changes but content doesn't update
+- Parent route content shows instead of child route
+- No routing errors in console
+- Works in development but may fail in production
 
 ## Server Function Best Practices
 

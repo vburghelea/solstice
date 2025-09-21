@@ -62,3 +62,14 @@ export interface EventRegistrationRoster {
   players?: EventRegistrationRosterPlayer[];
   [key: string]: any;
 }
+
+export interface EventPaymentMetadata {
+  instructionsSnapshot?: string;
+  recipient?: string;
+  lastReminderAt?: string;
+  lastReminderBy?: string;
+  markedPaidAt?: string;
+  markedPaidBy?: string;
+  notes?: string;
+  [key: string]: any;
+}

@@ -44,14 +44,14 @@ import { Textarea } from "~/components/ui/textarea";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { registerForEvent } from "~/features/events/events.mutations";
 import { checkEventRegistration, getEvent } from "~/features/events/events.queries";
-import { callServerFn } from "~/lib/server/fn-utils";
 import type {
   EventOperationResult,
-  EventRegistrationWithDetails,
+  EventRegistrationResultPayload,
   EventWithDetails,
 } from "~/features/events/events.types";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import type { User } from "~/lib/auth/types";
+import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 type EmergencyContact = {
   name: string;
@@ -99,6 +99,10 @@ function EventRegistrationPage() {
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [waiverAccepted, setWaiverAccepted] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"square" | "etransfer">("square");
+  const [confirmation, setConfirmation] = useState<
+    EventRegistrationResultPayload["payment"] | null
+  >(null);
 
   const { data: eventResult, isLoading: eventLoading } = useQuery<
     EventOperationResult<EventWithDetails>,
@@ -135,23 +139,44 @@ function EventRegistrationPage() {
     enabled: Boolean(user?.id && registrationType === "team"),
   });
 
-  const registrationMutation = useMutation({
-    mutationFn: async (payload: {
+  const registrationMutation = useMutation<
+    EventOperationResult<EventRegistrationResultPayload>,
+    Error,
+    {
       eventId: string;
       teamId?: string;
+      division?: string;
       notes?: string;
       roster?: { emergencyContact?: EmergencyContact };
-    }) =>
-      registerForEvent({ data: payload }) as Promise<
-        EventOperationResult<EventRegistrationWithDetails>
-      >,
+      paymentMethod: "square" | "etransfer";
+    }
+  >({
+    mutationFn: (payload) =>
+      unwrapServerFnResult(callServerFn(registerForEvent, payload)),
     onSuccess: (result) => {
-      if (result.success) {
-        toast.success("Registration successful!");
-        navigate({ to: "/dashboard/events" });
-      } else {
+      if (!result.success) {
         toast.error(result.errors?.[0]?.message || "Registration failed");
+        return;
       }
+
+      const payment = result.data.payment;
+
+      if (payment?.method === "square") {
+        toast.success("Redirecting to Square checkout...");
+        window.location.assign(payment.checkoutUrl);
+        return;
+      }
+
+      if (payment?.method === "etransfer") {
+        setConfirmation(payment);
+        toast.success(
+          "Registration submitted! Follow the e-transfer instructions below.",
+        );
+        return;
+      }
+
+      toast.success("Registration completed!");
+      navigate({ to: "/dashboard/events" });
     },
     onError: (error) => {
       toast.error("An error occurred during registration");
@@ -197,6 +222,8 @@ function EventRegistrationPage() {
     };
   }, [eventData, registrationType]);
 
+  const requiresPayment = fee.discounted > 0;
+
   if (eventLoading) {
     return <RegistrationSkeleton />;
   }
@@ -221,8 +248,17 @@ function EventRegistrationPage() {
   }
 
   const event = eventData;
+  const effectivePaymentMethod =
+    event.allowEtransfer && requiresPayment ? paymentMethod : "square";
+  const submitDisabled =
+    registrationMutation.isPending || confirmation?.method === "etransfer";
 
   const handleSubmit = () => {
+    if (confirmation?.method === "etransfer") {
+      toast.info("You've already submitted this registration.");
+      return;
+    }
+
     if (!termsAccepted || !waiverAccepted) {
       toast.error("Please accept all terms and conditions");
       return;
@@ -238,8 +274,10 @@ function EventRegistrationPage() {
       teamId?: string;
       notes?: string;
       roster?: { emergencyContact?: EmergencyContact };
+      paymentMethod: "square" | "etransfer";
     } = {
       eventId: event.id,
+      paymentMethod: effectivePaymentMethod,
     };
 
     if (registrationType === "team" && selectedTeamId) {
@@ -254,6 +292,7 @@ function EventRegistrationPage() {
       payload.roster = { emergencyContact };
     }
 
+    setConfirmation(null);
     registrationMutation.mutate(payload);
   };
 
@@ -458,6 +497,85 @@ function EventRegistrationPage() {
 
               <Separator />
 
+              {requiresPayment ? (
+                <div className="space-y-3">
+                  <h3 className="font-semibold">Payment Method</h3>
+                  <RadioGroup
+                    value={effectivePaymentMethod}
+                    onValueChange={(value) =>
+                      setPaymentMethod(value as "square" | "etransfer")
+                    }
+                    className="space-y-2"
+                  >
+                    <div className="flex items-start space-x-2">
+                      <RadioGroupItem value="square" id="payment-square" />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label
+                          htmlFor="payment-square"
+                          className="cursor-pointer font-normal"
+                        >
+                          Square Checkout
+                          <span className="text-muted-foreground ml-2 text-sm">
+                            ${fee.discounted.toFixed(2)}
+                          </span>
+                        </Label>
+                        <p className="text-muted-foreground text-sm">
+                          Pay securely online with credit or debit card.
+                        </p>
+                      </div>
+                    </div>
+
+                    {event.allowEtransfer && (
+                      <div className="flex items-start space-x-2">
+                        <RadioGroupItem value="etransfer" id="payment-etransfer" />
+                        <div className="grid gap-1.5 leading-none">
+                          <Label
+                            htmlFor="payment-etransfer"
+                            className="cursor-pointer font-normal"
+                          >
+                            Interac e-Transfer
+                            <span className="text-muted-foreground ml-2 text-sm">
+                              ${fee.discounted.toFixed(2)}
+                            </span>
+                          </Label>
+                          <p className="text-muted-foreground text-sm">
+                            Submit now and send payment manually after this form.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </RadioGroup>
+
+                  {effectivePaymentMethod === "etransfer" && event.allowEtransfer && (
+                    <Alert>
+                      <AlertTitle>E-transfer Instructions</AlertTitle>
+                      <AlertDescription className="space-y-2">
+                        <p>
+                          Send payment to
+                          <span className="font-semibold">
+                            {" "}
+                            {event.etransferRecipient ?? "the designated email"}
+                          </span>
+                          . Include your name and the event in the message.
+                        </p>
+                        {event.etransferInstructions && (
+                          <p>{event.etransferInstructions}</p>
+                        )}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              ) : (
+                <Alert>
+                  <AlertTitle>No Payment Required</AlertTitle>
+                  <AlertDescription>
+                    This registration does not require payment. Submit the form to finish.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <Separator />
+
               <div className="space-y-3">
                 <h3 className="font-semibold">Terms and Conditions</h3>
 
@@ -499,10 +617,12 @@ function EventRegistrationPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handleSubmit} disabled={registrationMutation.isPending}>
+                <Button onClick={handleSubmit} disabled={submitDisabled}>
                   {registrationMutation.isPending
                     ? "Submitting..."
-                    : "Complete Registration"}
+                    : confirmation?.method === "etransfer"
+                      ? "Awaiting E-Transfer"
+                      : "Complete Registration"}
                 </Button>
               </div>
             </CardContent>
@@ -510,6 +630,41 @@ function EventRegistrationPage() {
         </div>
 
         <aside className="space-y-6">
+          {confirmation?.method === "etransfer" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Finish Your E-transfer</CardTitle>
+                <CardDescription>
+                  Send your payment to finalize the registration.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                <div>
+                  <p className="font-medium">Recipient Email</p>
+                  <p className="text-muted-foreground">
+                    {event.etransferRecipient ?? "See event instructions"}
+                  </p>
+                </div>
+                {event.etransferInstructions && (
+                  <div>
+                    <p className="font-medium">Instructions</p>
+                    <p className="text-muted-foreground whitespace-pre-line">
+                      {event.etransferInstructions}
+                    </p>
+                  </div>
+                )}
+                <Alert>
+                  <AlertDescription>
+                    Once the payment is received, an administrator will mark your
+                    registration as paid.
+                  </AlertDescription>
+                </Alert>
+                <Button asChild variant="outline">
+                  <Link to="/dashboard/events">Return to Dashboard</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
           <Card>
             <CardHeader>
               <CardTitle>Event Overview</CardTitle>

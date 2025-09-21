@@ -1,7 +1,13 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
-import { membershipPaymentSessions, membershipTypes } from "~/db/schema";
+import {
+  eventPaymentSessions,
+  eventRegistrations,
+  events,
+  membershipPaymentSessions,
+  membershipTypes,
+} from "~/db/schema";
 import { user } from "~/db/schema/auth.schema";
 
 export const ServerRoute = createServerFileRoute("/api/payments/square/callback").methods(
@@ -27,6 +33,142 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
         const { getDb } = await import("~/db/server-helpers");
         const db = await getDb();
 
+        const handleEventSession = async (): Promise<Response | null> => {
+          const eventSessionResult = await db
+            .select({
+              session: eventPaymentSessions,
+              registration: eventRegistrations,
+              event: events,
+            })
+            .from(eventPaymentSessions)
+            .innerJoin(
+              eventRegistrations,
+              eq(eventPaymentSessions.registrationId, eventRegistrations.id),
+            )
+            .innerJoin(events, eq(eventPaymentSessions.eventId, events.id))
+            .where(eq(eventPaymentSessions.squareCheckoutId, checkoutId))
+            .limit(1);
+
+          if (eventSessionResult.length === 0) {
+            return null;
+          }
+
+          const [{ session, registration, event }] = eventSessionResult;
+          const now = new Date();
+          const nowIso = now.toISOString();
+
+          if (!transactionId) {
+            await db
+              .update(eventPaymentSessions)
+              .set({
+                status: "cancelled",
+                metadata: {
+                  ...(session.metadata ?? {}),
+                  cancelledAt: nowIso,
+                },
+                updatedAt: now,
+              })
+              .where(eq(eventPaymentSessions.id, session.id));
+
+            await db
+              .update(eventRegistrations)
+              .set({
+                paymentStatus: "pending",
+                updatedAt: now,
+                paymentMetadata: {
+                  ...(registration.paymentMetadata ?? {}),
+                  cancelledAt: nowIso,
+                },
+              })
+              .where(eq(eventRegistrations.id, registration.id));
+
+            return redirect({
+              to: "/dashboard/events",
+              search: {
+                payment: "cancelled",
+                eventId: event.id,
+              },
+            });
+          }
+
+          const { getSquarePaymentService } = await import("~/lib/payments/square");
+          const paymentService = await getSquarePaymentService();
+          const result = await paymentService.verifyPayment(checkoutId, transactionId);
+
+          if (!result.success) {
+            await db
+              .update(eventPaymentSessions)
+              .set({
+                status: "failed",
+                metadata: {
+                  ...(session.metadata ?? {}),
+                  lastError: result.error || "Payment verification failed",
+                  lastErrorAt: nowIso,
+                  squareTransactionId: transactionId,
+                },
+                updatedAt: now,
+              })
+              .where(eq(eventPaymentSessions.id, session.id));
+
+            return redirect({
+              to: "/dashboard/events",
+              search: {
+                payment: "verification_failed",
+                eventId: event.id,
+              },
+            });
+          }
+
+          const paymentIdentifier = result.paymentId || transactionId;
+          const amountCents =
+            typeof result.amount === "number" ? result.amount : session.amountCents;
+
+          await db
+            .update(eventPaymentSessions)
+            .set({
+              status: "completed",
+              squarePaymentId: paymentIdentifier,
+              metadata: {
+                ...(session.metadata ?? {}),
+                squareTransactionId: paymentIdentifier,
+                paymentVerifiedAt: nowIso,
+              },
+              updatedAt: now,
+            })
+            .where(eq(eventPaymentSessions.id, session.id));
+
+          const existingMetadata = (registration.paymentMetadata ?? {}) as Record<
+            string,
+            unknown
+          >;
+
+          await db
+            .update(eventRegistrations)
+            .set({
+              paymentStatus: "paid",
+              status:
+                registration.status === "cancelled" ? registration.status : "confirmed",
+              paymentCompletedAt: now,
+              paymentId: paymentIdentifier,
+              amountPaidCents: amountCents,
+              paymentMetadata: {
+                ...existingMetadata,
+                squareTransactionId: paymentIdentifier,
+                markedPaidAt: nowIso,
+              },
+              updatedAt: now,
+            })
+            .where(eq(eventRegistrations.id, registration.id));
+
+          return redirect({
+            to: "/dashboard/events",
+            search: {
+              payment: "success",
+              eventId: event.id,
+            },
+          });
+        };
+
         const [paymentSession] = await db
           .select()
           .from(membershipPaymentSessions)
@@ -34,6 +176,11 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           .limit(1);
 
         if (!paymentSession) {
+          const eventRedirect = await handleEventSession();
+          if (eventRedirect) {
+            return eventRedirect;
+          }
+
           console.error("Membership payment session not found for Square callback", {
             checkoutId,
             transactionId,

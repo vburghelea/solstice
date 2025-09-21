@@ -1,15 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { and, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { zod$ } from "~/lib/server/fn-utils";
 import type { Event as DbEvent, EventRegistration } from "~/db/schema";
-import { eventRegistrations, events, teamMembers } from "~/db/schema";
+import {
+  eventPaymentSessions,
+  eventRegistrations,
+  events,
+  teamMembers,
+} from "~/db/schema";
 import { createEventInputSchema } from "~/db/schema/events.schema";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+import { zod$ } from "~/lib/server/fn-utils";
 import type {
   EventAmenities,
   EventDivisions,
   EventMetadata,
+  EventPaymentMetadata,
   EventRegistrationRoster,
   EventRequirements,
   EventRules,
@@ -18,10 +24,17 @@ import type {
 import {
   cancelEventRegistrationSchema,
   createEventSchema,
+  markEtransferPaidSchema,
+  markEtransferReminderSchema,
   registerForEventSchema,
   updateEventSchema,
 } from "./events.schemas";
-import type { EventOperationResult, EventWithDetails } from "./events.types";
+import type {
+  EventOperationResult,
+  EventRegistrationResultPayload,
+  EventRegistrationWithDetails,
+  EventWithDetails,
+} from "./events.types";
 
 // Helper to cast database event to properly typed event
 function castEventJsonbFields(event: DbEvent): EventWithDetails {
@@ -321,8 +334,12 @@ export const updateEvent = createServerFn({ method: "POST" })
  * Register for an event
  */
 // Type for EventRegistration with properly typed roster
-type EventRegistrationWithRoster = Omit<EventRegistration, "roster"> & {
+type EventRegistrationWithRoster = Omit<
+  EventRegistration,
+  "roster" | "paymentMetadata"
+> & {
   roster: EventRegistrationRoster;
+  paymentMetadata: EventPaymentMetadata;
 };
 
 // Helper to cast registration jsonb fields
@@ -332,21 +349,55 @@ function castRegistrationJsonbFields(
   return {
     ...registration,
     roster: (registration.roster || {}) as EventRegistrationRoster,
+    paymentMetadata: (registration.paymentMetadata ?? {}) as EventPaymentMetadata,
   };
 }
+
+function calculateRegistrationAmountCents(
+  event: DbEvent,
+  registrationType: "team" | "individual",
+  now: Date,
+): number {
+  const baseFee =
+    registrationType === "team"
+      ? (event.teamRegistrationFee ?? 0)
+      : (event.individualRegistrationFee ?? 0);
+
+  if (!baseFee || baseFee <= 0) {
+    return 0;
+  }
+
+  const discountPercentage = event.earlyBirdDiscount ?? 0;
+  const deadline = event.earlyBirdDeadline ? new Date(event.earlyBirdDeadline) : null;
+
+  if (discountPercentage > 0 && deadline && now <= deadline) {
+    const clampedDiscount = Math.min(100, Math.max(0, discountPercentage));
+    const discounted = Math.round(baseFee - (baseFee * clampedDiscount) / 100);
+    return Math.max(0, discounted);
+  }
+
+  return baseFee;
+}
+
+const getSquarePaymentService = async () => {
+  const { squarePaymentService } = await import("~/lib/payments/square");
+  return squarePaymentService;
+};
 
 export const registerForEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(registerForEventSchema))
   .handler(
-    async ({ data, context }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+    async ({
+      data,
+      context,
+    }): Promise<EventOperationResult<EventRegistrationResultPayload>> => {
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
         const db = await getDb();
         const user = requireUser(context);
 
-        // Get event details
         const [event] = await db
           .select()
           .from(events)
@@ -365,7 +416,6 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        // Check if registration is open
         if (event.status !== "registration_open") {
           return {
             success: false,
@@ -379,7 +429,10 @@ export const registerForEvent = createServerFn({ method: "POST" })
         }
 
         const now = new Date();
-        if (event.registrationOpensAt && now < event.registrationOpensAt) {
+        const registrationOpens = event.registrationOpensAt;
+        const registrationCloses = event.registrationClosesAt;
+
+        if (registrationOpens && now < registrationOpens) {
           return {
             success: false,
             errors: [
@@ -391,7 +444,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        if (event.registrationClosesAt && now > event.registrationClosesAt) {
+        if (registrationCloses && now > registrationCloses) {
           return {
             success: false,
             errors: [
@@ -403,7 +456,50 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        // Check if already registered
+        const paymentMethod = data.paymentMethod ?? "square";
+        if (paymentMethod === "etransfer" && !event.allowEtransfer) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "E-transfer is not available for this event",
+              },
+            ],
+          };
+        }
+
+        const registrationType: EventRegistration["registrationType"] = data.teamId
+          ? "team"
+          : "individual";
+
+        if (event.registrationType === "team" && registrationType !== "team") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "Only team registrations are allowed for this event",
+              },
+            ],
+          };
+        }
+
+        if (
+          event.registrationType === "individual" &&
+          registrationType !== "individual"
+        ) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "Only individual registrations are allowed for this event",
+              },
+            ],
+          };
+        }
+
         const existingRegistration = await db
           .select()
           .from(eventRegistrations)
@@ -431,7 +527,6 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        // Check capacity
         const registrationCount = await db
           .select({ count: sql<number>`count(*)::int` })
           .from(eventRegistrations)
@@ -442,12 +537,12 @@ export const registerForEvent = createServerFn({ method: "POST" })
             ),
           );
 
-        const currentCount = registrationCount[0].count;
+        const confirmedCount = registrationCount[0].count;
 
         if (
           event.registrationType === "team" &&
           event.maxTeams &&
-          currentCount >= event.maxTeams
+          confirmedCount >= event.maxTeams
         ) {
           return {
             success: false,
@@ -463,7 +558,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
         if (
           event.registrationType === "individual" &&
           event.maxParticipants &&
-          currentCount >= event.maxParticipants
+          confirmedCount >= event.maxParticipants
         ) {
           return {
             success: false,
@@ -476,7 +571,6 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        // If team registration, verify user is team member
         if (data.teamId) {
           const [membership] = await db
             .select()
@@ -502,7 +596,6 @@ export const registerForEvent = createServerFn({ method: "POST" })
             };
           }
 
-          // Only captains and coaches can register teams
           if (membership.role !== "captain" && membership.role !== "coach") {
             return {
               success: false,
@@ -517,25 +610,138 @@ export const registerForEvent = createServerFn({ method: "POST" })
           }
         }
 
-        // Create registration
+        const amountDueCents = calculateRegistrationAmountCents(
+          event,
+          registrationType,
+          now,
+        );
+
+        let paymentStatus: EventRegistration["paymentStatus"] = "pending";
+        let amountPaidCents: number | null = null;
+        let paymentCompletedAt: Date | null = null;
+
+        if (amountDueCents === 0) {
+          paymentStatus = "paid";
+          amountPaidCents = 0;
+          paymentCompletedAt = now;
+        } else if (paymentMethod === "etransfer") {
+          paymentStatus = "awaiting_etransfer";
+        }
+
+        const paymentMetadata: EventPaymentMetadata | null =
+          paymentMethod === "etransfer"
+            ? {
+                ...(event.etransferInstructions
+                  ? { instructionsSnapshot: event.etransferInstructions }
+                  : {}),
+                ...(event.etransferRecipient
+                  ? { recipient: event.etransferRecipient }
+                  : {}),
+              }
+            : null;
+
         const [registration] = await db
           .insert(eventRegistrations)
           .values({
             eventId: data.eventId,
             userId: user.id,
             teamId: data.teamId,
-            registrationType: data.teamId ? "team" : "individual",
+            registrationType,
             division: data.division,
             notes: data.notes,
             roster: data.roster ? JSON.stringify(data.roster) : null,
-            status: "pending", // Will be confirmed after payment
-            paymentStatus: "pending",
+            status: amountDueCents === 0 ? "confirmed" : "pending",
+            paymentStatus,
+            paymentMethod,
+            paymentId: null,
+            amountDueCents,
+            amountPaidCents,
+            paymentCompletedAt,
+            paymentMetadata,
           })
           .returning();
 
+        let paymentResponse: EventRegistrationResultPayload["payment"];
+
+        if (paymentMethod === "square" && amountDueCents > 0) {
+          const squareService = await getSquarePaymentService();
+          const checkoutSession = await squareService.createEventCheckoutSession({
+            eventId: event.id,
+            registrationId: registration.id,
+            userId: user.id,
+            amount: amountDueCents,
+            eventName: event.name,
+          });
+
+          await db
+            .insert(eventPaymentSessions)
+            .values({
+              registrationId: registration.id,
+              eventId: event.id,
+              userId: user.id,
+              squareCheckoutId: checkoutSession.id,
+              squarePaymentLinkUrl: checkoutSession.checkoutUrl,
+              squareOrderId: checkoutSession.orderId ?? null,
+              amountCents: amountDueCents,
+              currency: checkoutSession.currency,
+              metadata: {
+                eventName: event.name,
+                registrationType,
+                paymentMethod,
+              },
+            })
+            .onConflictDoUpdate({
+              target: eventPaymentSessions.squareCheckoutId,
+              set: {
+                registrationId: registration.id,
+                eventId: event.id,
+                userId: user.id,
+                squarePaymentLinkUrl: checkoutSession.checkoutUrl,
+                squareOrderId: checkoutSession.orderId ?? null,
+                amountCents: amountDueCents,
+                currency: checkoutSession.currency,
+                metadata: {
+                  eventName: event.name,
+                  registrationType,
+                  paymentMethod,
+                },
+                updatedAt: new Date(),
+              },
+            });
+
+          paymentResponse = {
+            method: "square",
+            checkoutUrl: checkoutSession.checkoutUrl,
+            sessionId: checkoutSession.id,
+          };
+        } else if (amountDueCents === 0) {
+          paymentResponse = { method: "free" };
+        } else {
+          paymentResponse = {
+            method: "etransfer",
+            instructions: event.etransferInstructions ?? null,
+            recipient: event.etransferRecipient ?? null,
+          };
+        }
+
+        const parsedRegistration = castRegistrationJsonbFields(registration);
+
+        const registrationWithDetails: EventRegistrationWithDetails = {
+          ...parsedRegistration,
+          event: castEventJsonbFields(event),
+          user: {
+            id: user.id,
+            name: user.name ?? user.email ?? "",
+            email: user.email ?? "",
+          },
+        };
+
         return {
           success: true,
-          data: castRegistrationJsonbFields(registration),
+          data: {
+            registration: registrationWithDetails,
+            payment: paymentResponse,
+          },
         };
       } catch (error) {
         console.error("Error registering for event:", error);
@@ -552,6 +758,223 @@ export const registerForEvent = createServerFn({ method: "POST" })
     },
   );
 
+export const markEventEtransferPaid = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(markEtransferPaidSchema))
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+      try {
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+
+        const db = await getDb();
+        const user = requireUser(context);
+
+        const registrationWithEvent = await db
+          .select({
+            registration: eventRegistrations,
+            event: events,
+          })
+          .from(eventRegistrations)
+          .innerJoin(events, eq(eventRegistrations.eventId, events.id))
+          .where(eq(eventRegistrations.id, data.registrationId))
+          .limit(1);
+
+        if (registrationWithEvent.length === 0) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "NOT_FOUND",
+                message: "Registration not found",
+              },
+            ],
+          };
+        }
+
+        const [{ registration, event }] = registrationWithEvent;
+
+        const isOrganizer = event.organizerId === user.id;
+        let isGlobalAdmin = false;
+        if (!isOrganizer) {
+          const { isAdmin } = await import("~/lib/auth/utils/admin-check");
+          isGlobalAdmin = await isAdmin(user.id);
+        }
+
+        if (!isOrganizer && !isGlobalAdmin) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "You do not have permission to update this registration",
+              },
+            ],
+          };
+        }
+
+        if (registration.paymentMethod !== "etransfer") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "Only e-transfer registrations can be marked as paid manually",
+              },
+            ],
+          };
+        }
+
+        const now = new Date();
+        const existingMetadata = (registration.paymentMetadata ||
+          {}) as EventPaymentMetadata;
+        const updatedMetadata: EventPaymentMetadata = {
+          ...existingMetadata,
+          markedPaidAt: now.toISOString(),
+          markedPaidBy: user.id,
+        };
+
+        const [updatedRegistration] = await db
+          .update(eventRegistrations)
+          .set({
+            paymentStatus: "paid",
+            status:
+              registration.status === "cancelled" ? registration.status : "confirmed",
+            paymentCompletedAt: now,
+            amountPaidCents: registration.amountDueCents,
+            paymentMetadata: updatedMetadata,
+            updatedAt: now,
+          })
+          .where(eq(eventRegistrations.id, data.registrationId))
+          .returning();
+
+        return {
+          success: true,
+          data: castRegistrationJsonbFields(updatedRegistration),
+        };
+      } catch (error) {
+        console.error("Error marking e-transfer as paid:", error);
+        return {
+          success: false,
+          errors: [
+            {
+              code: "DATABASE_ERROR",
+              message: "Failed to update registration",
+            },
+          ],
+        };
+      }
+    },
+  );
+
+export const markEventEtransferReminder = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(markEtransferReminderSchema))
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+      try {
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+
+        const db = await getDb();
+        const user = requireUser(context);
+
+        const registrationWithEvent = await db
+          .select({
+            registration: eventRegistrations,
+            event: events,
+          })
+          .from(eventRegistrations)
+          .innerJoin(events, eq(eventRegistrations.eventId, events.id))
+          .where(eq(eventRegistrations.id, data.registrationId))
+          .limit(1);
+
+        if (registrationWithEvent.length === 0) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "NOT_FOUND",
+                message: "Registration not found",
+              },
+            ],
+          };
+        }
+
+        const [{ registration, event }] = registrationWithEvent;
+
+        const isOrganizer = event.organizerId === user.id;
+        let isGlobalAdmin = false;
+        if (!isOrganizer) {
+          const { isAdmin } = await import("~/lib/auth/utils/admin-check");
+          isGlobalAdmin = await isAdmin(user.id);
+        }
+
+        if (!isOrganizer && !isGlobalAdmin) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "You do not have permission to update this registration",
+              },
+            ],
+          };
+        }
+
+        if (registration.paymentMethod !== "etransfer") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "Only e-transfer registrations can receive reminders",
+              },
+            ],
+          };
+        }
+
+        const now = new Date();
+        const existingMetadata = (registration.paymentMetadata ||
+          {}) as EventPaymentMetadata;
+        const updatedMetadata: EventPaymentMetadata = {
+          ...existingMetadata,
+          lastReminderAt: now.toISOString(),
+          lastReminderBy: user.id,
+        };
+
+        const [updatedRegistration] = await db
+          .update(eventRegistrations)
+          .set({
+            paymentMetadata: updatedMetadata,
+            updatedAt: now,
+          })
+          .where(eq(eventRegistrations.id, data.registrationId))
+          .returning();
+
+        return {
+          success: true,
+          data: castRegistrationJsonbFields(updatedRegistration),
+        };
+      } catch (error) {
+        console.error("Error marking e-transfer reminder:", error);
+        return {
+          success: false,
+          errors: [
+            {
+              code: "DATABASE_ERROR",
+              message: "Failed to update registration",
+            },
+          ],
+        };
+      }
+    },
+  );
+
 /**
  * Cancel event registration
  */
@@ -559,7 +982,10 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(cancelEventRegistrationSchema))
   .handler(
-    async ({ data, context }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+    async ({
+      data,
+      context,
+    }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
       try {
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 

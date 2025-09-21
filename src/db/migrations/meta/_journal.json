@@ -36,6 +36,13 @@
       "when": 1758327667987,
       "tag": "0004_team_invitation_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1758417064402,
+      "tag": "0005_event_payments",
+      "breakpoints": true
     }
   ]
 }

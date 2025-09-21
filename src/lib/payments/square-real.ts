@@ -14,13 +14,16 @@ import { membershipPaymentSessions, memberships } from "~/db/schema";
 export interface CheckoutSession {
   id: string;
   checkoutUrl: string;
-  membershipTypeId: string;
   userId: string;
   amount: number;
   currency: string;
   status: "pending" | "completed" | "cancelled";
   expiresAt: Date;
   orderId?: string | null;
+  membershipTypeId?: string;
+  eventId?: string;
+  registrationId?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PaymentResult {
@@ -151,6 +154,79 @@ export class SquarePaymentService {
         throw new Error(`Square API error: ${errorDetail}`);
       }
 
+      throw error;
+    }
+  }
+
+  async createEventCheckoutSession(params: {
+    eventId: string;
+    registrationId: string;
+    userId: string;
+    amount: number;
+    eventName: string;
+  }): Promise<CheckoutSession> {
+    try {
+      const { getBaseUrl } = await import("~/lib/env.server");
+      const baseUrl = getBaseUrl();
+
+      const idempotencyKey = createId();
+
+      const paymentLinkRequest: Square.checkout.CreatePaymentLinkRequest = {
+        idempotencyKey,
+        description: `Event registration for ${params.eventName}`,
+        quickPay: {
+          name: `Event Registration - ${params.eventName}`,
+          priceMoney: {
+            amount: BigInt(params.amount),
+            currency: "CAD",
+          },
+          locationId: this.locationId,
+        },
+        checkoutOptions: {
+          allowTipping: false,
+          redirectUrl: `${baseUrl}/api/payments/square/callback`,
+          askForShippingAddress: false,
+          merchantSupportEmail:
+            process.env["SUPPORT_EMAIL"] || "support@quadballcanada.com",
+        },
+        paymentNote: `Event registration ${params.registrationId} for event ${params.eventId}`,
+      };
+
+      const result = await this.client.checkout.paymentLinks.create(paymentLinkRequest);
+
+      if (!result.paymentLink?.id || !result.paymentLink?.url) {
+        throw new Error("Failed to create payment link for event registration");
+      }
+
+      return {
+        id: result.paymentLink.id,
+        checkoutUrl: result.paymentLink.url,
+        userId: params.userId,
+        amount: params.amount,
+        currency: "CAD",
+        status: "pending",
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+        orderId: result.paymentLink.orderId || null,
+        eventId: params.eventId,
+        registrationId: params.registrationId,
+        metadata: {
+          eventName: params.eventName,
+        },
+      };
+    } catch (error) {
+      console.error("Square event checkout error:", error);
+      if (error instanceof SquareError) {
+        for (const err of error.errors ?? []) {
+          console.error(
+            `[Square] ${err.category} / ${err.code} @ ${err.field}: ${err.detail}`,
+          );
+        }
+        const errorDetail =
+          error.errors?.map((e) => e.detail).join("; ") ||
+          error.message ||
+          "Unknown error";
+        throw new Error(`Square API error: ${errorDetail}`);
+      }
       throw error;
     }
   }

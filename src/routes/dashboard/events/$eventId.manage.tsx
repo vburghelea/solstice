@@ -47,21 +47,34 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { cancelEvent, updateEvent } from "~/features/events/events.mutations";
-import { unwrapServerFnResult } from "~/lib/server/fn-utils";
+import {
+  cancelEvent,
+  markEventEtransferPaid,
+  markEventEtransferReminder,
+  updateEvent,
+} from "~/features/events/events.mutations";
 import type { EventRegistrationSummary } from "~/features/events/events.queries";
 import { getEvent, getEventRegistrations } from "~/features/events/events.queries";
 import type {
   EventOperationResult,
   EventStatus,
   EventWithDetails,
-  RegistrationType,
   UpdateEventInput,
 } from "~/features/events/events.types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
 type ManagementTab = "overview" | "registrations" | "settings";
+
+const currencyFormatter = new Intl.NumberFormat("en-CA", {
+  style: "currency",
+  currency: "CAD",
+});
+
+function formatCurrency(cents: number): string {
+  return currencyFormatter.format(cents / 100);
+}
 
 export const Route = createFileRoute("/dashboard/events/$eventId/manage")({
   beforeLoad: async ({ context, location }) => {
@@ -96,10 +109,11 @@ function EventManagementPage() {
   });
 
   // Fetch registrations
-  const { data: registrations, isLoading: registrationsLoading } = useQuery<
-    EventRegistrationSummary[],
-    Error
-  >({
+  const {
+    data: registrations,
+    isLoading: registrationsLoading,
+    refetch: refetchRegistrations,
+  } = useQuery<EventRegistrationSummary[], Error>({
     queryKey: ["event-registrations", eventId],
     queryFn: () => getEventRegistrations({ data: { eventId } }),
     enabled: !!eventId,
@@ -126,12 +140,55 @@ function EventManagementPage() {
     },
   });
 
+  const markEtransferPaidMutation = useMutation({
+    mutationFn: (registrationId: string) =>
+      unwrapServerFnResult(
+        markEventEtransferPaid({
+          data: { registrationId },
+        }),
+      ),
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Registration marked as paid");
+        refetchRegistrations();
+        refetchEvent();
+      } else {
+        toast.error(result.errors?.[0]?.message || "Failed to update registration");
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update registration");
+      console.error(error);
+    },
+  });
+
+  const markEtransferReminderMutation = useMutation({
+    mutationFn: (registrationId: string) =>
+      unwrapServerFnResult(
+        markEventEtransferReminder({
+          data: { registrationId },
+        }),
+      ),
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Reminder logged");
+        refetchRegistrations();
+      } else {
+        toast.error(result.errors?.[0]?.message || "Failed to update registration");
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update registration");
+      console.error(error);
+    },
+  });
+
   // Cancel event mutation
   const cancelMutation = useMutation({
     mutationFn: () =>
-      unwrapServerFnResult(
-        cancelEvent({ data: { eventId } }),
-      ) as Promise<EventOperationResult<null>>,
+      unwrapServerFnResult(cancelEvent({ data: { eventId } })) as Promise<
+        EventOperationResult<null>
+      >,
     onSuccess: (result) => {
       if (result.success) {
         toast.success("Event cancelled successfully");
@@ -177,14 +234,20 @@ function EventManagementPage() {
     registrations?.filter((registration) => registration.status === "confirmed") ?? [];
   const pendingRegistrations =
     registrations?.filter((registration) => registration.status === "pending") ?? [];
+  const paidRegistrations =
+    registrations?.filter((registration) => registration.paymentStatus === "paid") ?? [];
+  const outstandingEtransferRegistrations =
+    registrations?.filter(
+      (registration) =>
+        registration.paymentMethod === "etransfer" &&
+        registration.paymentStatus !== "paid" &&
+        registration.status !== "cancelled",
+    ) ?? [];
 
-  const totalRevenueCents = confirmedRegistrations.reduce((sum, registration) => {
-    if (registration.paymentStatus !== "paid") {
-      return sum;
-    }
-
-    return sum + getRegistrationFeeInCents(registration.registrationType, event);
-  }, 0);
+  const totalRevenueCents = paidRegistrations.reduce(
+    (sum, registration) => sum + (registration.amountPaidCents ?? 0),
+    0,
+  );
 
   const handleStatusChange = (newStatus: EventStatus) => {
     updateMutation.mutate({ status: newStatus });
@@ -204,6 +267,9 @@ function EventManagementPage() {
       "Team",
       "Status",
       "Payment Status",
+      "Payment Method",
+      "Amount Due (CAD)",
+      "Amount Paid (CAD)",
       "Registered At",
     ];
     const rows = registrations.map((registration) => [
@@ -213,6 +279,9 @@ function EventManagementPage() {
       registration.teamName || "N/A",
       registration.status,
       registration.paymentStatus,
+      registration.paymentMethod,
+      (registration.amountDueCents / 100).toFixed(2),
+      ((registration.amountPaidCents ?? 0) / 100).toFixed(2),
       format(new Date(registration.createdAt), "yyyy-MM-dd HH:mm"),
     ]);
 
@@ -277,7 +346,7 @@ function EventManagementPage() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
@@ -303,6 +372,23 @@ function EventManagementPage() {
                 </div>
                 <p className="text-muted-foreground text-xs">
                   From {confirmedRegistrations.length} registrations
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Outstanding E-Transfers
+                </CardTitle>
+                <MailIcon className="text-muted-foreground h-4 w-4" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {outstandingEtransferRegistrations.length}
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  Awaiting manual confirmation
                 </p>
               </CardContent>
             </Card>
@@ -359,6 +445,8 @@ function EventManagementPage() {
                       <TableHead>Type</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Payment Status</TableHead>
+                      <TableHead>Payment Method</TableHead>
+                      <TableHead>Amount</TableHead>
                       <TableHead>Date</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -383,6 +471,14 @@ function EventManagementPage() {
                           </TableCell>
                           <TableCell className="capitalize">
                             {registration.paymentStatus}
+                          </TableCell>
+                          <TableCell className="capitalize">
+                            {registration.paymentMethod}
+                          </TableCell>
+                          <TableCell>
+                            {registration.paymentStatus === "paid"
+                              ? formatCurrency(registration.amountPaidCents ?? 0)
+                              : formatCurrency(registration.amountDueCents)}
                           </TableCell>
                           <TableCell>
                             {format(new Date(registration.createdAt), "MMM d")}
@@ -504,6 +600,9 @@ function EventManagementPage() {
                       <TableHead>Team</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Payment Status</TableHead>
+                      <TableHead>Payment Method</TableHead>
+                      <TableHead>Amount Due</TableHead>
+                      <TableHead>Amount Paid</TableHead>
                       <TableHead>Registered</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -532,13 +631,57 @@ function EventManagementPage() {
                           <TableCell className="capitalize">
                             {registration.paymentStatus}
                           </TableCell>
+                          <TableCell className="capitalize">
+                            {registration.paymentMethod}
+                          </TableCell>
+                          <TableCell>
+                            {formatCurrency(registration.amountDueCents)}
+                          </TableCell>
+                          <TableCell>
+                            {registration.paymentStatus === "paid"
+                              ? formatCurrency(registration.amountPaidCents ?? 0)
+                              : "—"}
+                          </TableCell>
                           <TableCell>
                             {format(new Date(registration.createdAt), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="sm">
-                              View
-                            </Button>
+                            <div className="flex flex-wrap gap-2">
+                              {registration.paymentMethod === "etransfer" &&
+                              registration.paymentStatus !== "paid" ? (
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      markEtransferPaidMutation.mutate(registration.id)
+                                    }
+                                    disabled={markEtransferPaidMutation.isPending}
+                                  >
+                                    {markEtransferPaidMutation.isPending
+                                      ? "Marking..."
+                                      : "Mark Paid"}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      markEtransferReminderMutation.mutate(
+                                        registration.id,
+                                      )
+                                    }
+                                    disabled={markEtransferReminderMutation.isPending}
+                                  >
+                                    {markEtransferReminderMutation.isPending
+                                      ? "Sending..."
+                                      : "Send Reminder"}
+                                  </Button>
+                                </>
+                              ) : null}
+                              <Button variant="ghost" size="sm">
+                                View
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       );
@@ -758,22 +901,4 @@ function getRegistrationStatusBadge(status: EventRegistrationSummary["status"]):
     default:
       return { variant: "default" };
   }
-}
-
-function getRegistrationFeeInCents(
-  registrationType: RegistrationType,
-  event: EventWithDetails,
-): number {
-  if (registrationType === "team") {
-    return event.teamRegistrationFee ?? 0;
-  }
-
-  if (registrationType === "individual") {
-    return event.individualRegistrationFee ?? 0;
-  }
-
-  // Fallback for unexpected values
-  return event.registrationType === "team"
-    ? (event.teamRegistrationFee ?? 0)
-    : (event.individualRegistrationFee ?? 0);
 }

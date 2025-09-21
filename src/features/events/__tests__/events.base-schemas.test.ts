@@ -39,6 +39,9 @@ describe("Event Base Schemas", () => {
           foodAvailable: true,
           livestream: false,
         },
+        allowEtransfer: true,
+        etransferRecipient: "payments@example.com",
+        etransferInstructions: "Send with answer 'quadball'.",
       };
 
       const result = createEventInputSchema.safeParse(validInput);
@@ -150,6 +153,22 @@ describe("Event Base Schemas", () => {
         endDate: "2025-08-01",
         registrationType: "team",
         teamRegistrationFee: -100,
+      };
+
+      const result = createEventInputSchema.safeParse(invalidInput);
+      expect(result.success).toBe(false);
+    });
+
+    it("fails with invalid e-transfer email when enabled", () => {
+      const invalidInput = {
+        name: "Test Event",
+        slug: "test-event",
+        type: "tournament",
+        startDate: "2025-08-01",
+        endDate: "2025-08-01",
+        registrationType: "team",
+        allowEtransfer: true,
+        etransferRecipient: "not-an-email",
       };
 
       const result = createEventInputSchema.safeParse(invalidInput);

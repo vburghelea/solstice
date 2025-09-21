@@ -10,13 +10,16 @@ import { createId } from "@paralleldrive/cuid2";
 export interface CheckoutSession {
   id: string;
   checkoutUrl: string;
-  membershipTypeId: string;
   userId: string;
   amount: number;
   currency: string;
   status: "pending" | "completed" | "cancelled";
   expiresAt: Date;
   orderId?: string | null;
+  membershipTypeId?: string;
+  eventId?: string;
+  registrationId?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PaymentResult {
@@ -73,6 +76,34 @@ export class MockSquarePaymentService {
     // In production, we would store this session in the database
     // For now, we'll just return it
     return checkoutSession;
+  }
+
+  async createEventCheckoutSession(params: {
+    eventId: string;
+    registrationId: string;
+    userId: string;
+    amount: number;
+    eventName: string;
+  }): Promise<CheckoutSession> {
+    const sessionId = createId();
+    const { getBaseUrl } = await import("~/lib/env.server");
+    const baseUrl = getBaseUrl();
+
+    return {
+      id: sessionId,
+      checkoutUrl: `${baseUrl}/dashboard/events?mock_event_checkout=true&session=${sessionId}&event=${params.eventId}&amount=${params.amount}`,
+      userId: params.userId,
+      amount: params.amount,
+      currency: "CAD",
+      status: "pending",
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      orderId: null,
+      eventId: params.eventId,
+      registrationId: params.registrationId,
+      metadata: {
+        eventName: params.eventName,
+      },
+    };
   }
 
   /**
@@ -213,6 +244,12 @@ export const squarePaymentService = {
   ) => {
     const service = await getSquarePaymentService();
     return service.createCheckoutSession(...args);
+  },
+  createEventCheckoutSession: async (
+    ...args: Parameters<ISquarePaymentService["createEventCheckoutSession"]>
+  ) => {
+    const service = await getSquarePaymentService();
+    return service.createEventCheckoutSession(...args);
   },
   verifyPayment: async (...args: Parameters<ISquarePaymentService["verifyPayment"]>) => {
     const service = await getSquarePaymentService();

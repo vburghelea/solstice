@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createEventInputSchema } from "~/db/schema/events.schema";
+import { baseCreateEventSchema, createEventInputSchema } from "~/db/schema/events.schema";
 
 // Query schemas
 export const listEventsSchema = z
@@ -53,7 +53,7 @@ export type CreateEventInput = z.infer<typeof createEventSchema>;
 
 export const updateEventSchema = z.object({
   eventId: z.string(),
-  data: createEventInputSchema.partial().extend({
+  data: baseCreateEventSchema.partial().extend({
     status: z
       .enum([
         "draft",
@@ -95,6 +95,7 @@ export const registerForEventSchema = z.object({
   division: z.string().optional(),
   notes: z.string().optional(),
   roster: z.union([z.array(rosterPlayerSchema), rosterObjectSchema]).optional(),
+  paymentMethod: z.enum(["square", "etransfer"]).default("square"),
 });
 export type RegisterForEventInput = z.infer<typeof registerForEventSchema>;
 
@@ -103,3 +104,11 @@ export const cancelEventRegistrationSchema = z.object({
   reason: z.string().optional(),
 });
 export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistrationSchema>;
+
+export const markEtransferPaidSchema = z.object({
+  registrationId: z.string(),
+});
+
+export const markEtransferReminderSchema = z.object({
+  registrationId: z.string(),
+});

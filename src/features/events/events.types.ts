@@ -5,6 +5,7 @@ import type {
   EventAmenities,
   EventDivisions,
   EventMetadata,
+  EventPaymentMetadata,
   EventRegistrationRoster,
   EventRequirements,
   EventRules,
@@ -65,9 +66,11 @@ export interface EventWithDetails
   availableSpots: number | undefined;
 }
 
-export interface EventRegistrationWithDetails extends Omit<EventRegistration, "roster"> {
+export interface EventRegistrationWithDetails
+  extends Omit<EventRegistration, "roster" | "paymentMetadata"> {
   roster: EventRegistrationRoster;
-  event: Event;
+  paymentMetadata: EventPaymentMetadata;
+  event: EventWithDetails;
   team?: {
     id: string;
     name: string;
@@ -78,6 +81,29 @@ export interface EventRegistrationWithDetails extends Omit<EventRegistration, "r
     name: string;
     email: string;
   };
+}
+
+export type EventPaymentMethod = EventRegistration["paymentMethod"];
+export type EventPaymentStatus = EventRegistration["paymentStatus"];
+
+export type EventRegistrationPaymentInfo =
+  | {
+      method: "square";
+      checkoutUrl: string;
+      sessionId: string;
+    }
+  | {
+      method: "etransfer";
+      instructions?: string | null;
+      recipient?: string | null;
+    }
+  | {
+      method: "free";
+    };
+
+export interface EventRegistrationResultPayload {
+  registration: EventRegistrationWithDetails;
+  payment?: EventRegistrationPaymentInfo;
 }
 
 // Operation result types

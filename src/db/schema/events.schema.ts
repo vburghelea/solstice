@@ -1,13 +1,16 @@
+import { createId } from "@paralleldrive/cuid2";
 import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
+  index,
   integer,
   jsonb,
   pgEnum,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -119,6 +122,9 @@ export const events = pgTable("events", {
 
   // Metadata
   metadata: jsonb("metadata"), // Flexible field for additional data
+  allowEtransfer: boolean("allow_etransfer").notNull().default(false),
+  etransferInstructions: text("etransfer_instructions"),
+  etransferRecipient: varchar("etransfer_recipient", { length: 255 }),
 });
 
 /**
@@ -146,6 +152,11 @@ export const eventRegistrations = pgTable("event_registrations", {
   status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, confirmed, waitlisted, cancelled
   paymentStatus: varchar("payment_status", { length: 50 }).notNull().default("pending"), // pending, paid, refunded
   paymentId: text("payment_id"), // Reference to payment record
+  paymentMethod: varchar("payment_method", { length: 50 }).notNull().default("square"),
+  amountDueCents: integer("amount_due_cents").notNull().default(0),
+  amountPaidCents: integer("amount_paid_cents"),
+  paymentCompletedAt: timestamp("payment_completed_at"),
+  paymentMetadata: jsonb("payment_metadata"),
 
   // Team roster (for team registrations)
   roster: jsonb("roster"), // Array of player IDs and roles
@@ -158,6 +169,46 @@ export const eventRegistrations = pgTable("event_registrations", {
   confirmedAt: timestamp("confirmed_at"),
   cancelledAt: timestamp("cancelled_at"),
 });
+
+export const eventPaymentSessions = pgTable(
+  "event_payment_sessions",
+  {
+    id: varchar("id", { length: 255 })
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    registrationId: uuid("registration_id")
+      .notNull()
+      .references(() => eventRegistrations.id, { onDelete: "cascade" }),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    squareCheckoutId: varchar("square_checkout_id", { length: 255 }).notNull(),
+    squarePaymentLinkUrl: varchar("square_payment_link_url", { length: 2048 }).notNull(),
+    squareOrderId: varchar("square_order_id", { length: 255 }),
+    squarePaymentId: varchar("square_payment_id", { length: 255 }),
+    status: varchar("status", { length: 50 }).notNull().default("pending"),
+    amountCents: integer("amount_cents").notNull(),
+    currency: varchar("currency", { length: 10 }).notNull().default("CAD"),
+    expiresAt: timestamp("expires_at"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => ({
+    checkoutIdx: uniqueIndex("event_payment_sessions_checkout_idx").on(
+      table.squareCheckoutId,
+    ),
+    paymentIdx: index("event_payment_sessions_payment_idx").on(table.squarePaymentId),
+    registrationIdx: index("event_payment_sessions_registration_idx").on(
+      table.registrationId,
+    ),
+    eventIdx: index("event_payment_sessions_event_idx").on(table.eventId),
+    userIdx: index("event_payment_sessions_user_idx").on(table.userId),
+  }),
+);
 
 /**
  * Event announcements/updates
@@ -191,23 +242,28 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
     references: [user.id],
   }),
   registrations: many(eventRegistrations),
+  paymentSessions: many(eventPaymentSessions),
   announcements: many(eventAnnouncements),
 }));
 
-export const eventRegistrationsRelations = relations(eventRegistrations, ({ one }) => ({
-  event: one(events, {
-    fields: [eventRegistrations.eventId],
-    references: [events.id],
+export const eventRegistrationsRelations = relations(
+  eventRegistrations,
+  ({ one, many }) => ({
+    event: one(events, {
+      fields: [eventRegistrations.eventId],
+      references: [events.id],
+    }),
+    team: one(teams, {
+      fields: [eventRegistrations.teamId],
+      references: [teams.id],
+    }),
+    user: one(user, {
+      fields: [eventRegistrations.userId],
+      references: [user.id],
+    }),
+    paymentSessions: many(eventPaymentSessions),
   }),
-  team: one(teams, {
-    fields: [eventRegistrations.teamId],
-    references: [teams.id],
-  }),
-  user: one(user, {
-    fields: [eventRegistrations.userId],
-    references: [user.id],
-  }),
-}));
+);
 
 export const eventAnnouncementsRelations = relations(eventAnnouncements, ({ one }) => ({
   event: one(events, {
@@ -220,6 +276,24 @@ export const eventAnnouncementsRelations = relations(eventAnnouncements, ({ one 
   }),
 }));
 
+export const eventPaymentSessionsRelations = relations(
+  eventPaymentSessions,
+  ({ one }) => ({
+    event: one(events, {
+      fields: [eventPaymentSessions.eventId],
+      references: [events.id],
+    }),
+    registration: one(eventRegistrations, {
+      fields: [eventPaymentSessions.registrationId],
+      references: [eventRegistrations.id],
+    }),
+    user: one(user, {
+      fields: [eventPaymentSessions.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
 // Zod schemas
 export const insertEventSchema = createInsertSchema(events);
 export const selectEventSchema = createSelectSchema(events);
@@ -227,9 +301,15 @@ export const insertEventRegistrationSchema = createInsertSchema(eventRegistratio
 export const selectEventRegistrationSchema = createSelectSchema(eventRegistrations);
 export const insertEventAnnouncementSchema = createInsertSchema(eventAnnouncements);
 export const selectEventAnnouncementSchema = createSelectSchema(eventAnnouncements);
+export const insertEventPaymentSessionSchema = createInsertSchema(eventPaymentSessions);
+export const selectEventPaymentSessionSchema = createSelectSchema(eventPaymentSessions);
+
+// Inferred types
+export type EventPaymentSession = typeof eventPaymentSessions.$inferSelect;
+export type NewEventPaymentSession = typeof eventPaymentSessions.$inferInsert;
 
 // Custom validation schemas
-export const createEventInputSchema = z.object({
+export const baseCreateEventSchema = z.object({
   name: z.string().min(3).max(255),
   slug: z
     .string()
@@ -253,6 +333,28 @@ export const createEventInputSchema = z.object({
   individualRegistrationFee: z.number().int().min(0).optional(),
   contactEmail: z.string().email().optional(),
   contactPhone: z.string().optional(),
+  allowWaitlist: z.boolean().optional(),
+  requireMembership: z.boolean().optional(),
+  allowEtransfer: z.boolean().optional(),
+  etransferRecipient: z
+    .string()
+    .email("Enter a valid e-transfer email")
+    .optional()
+    .or(z.literal("")),
+  etransferInstructions: z.string().max(2000).optional(),
+});
+
+export const createEventInputSchema = baseCreateEventSchema.superRefine((values, ctx) => {
+  if (values.allowEtransfer) {
+    const recipient = values.etransferRecipient?.trim() ?? "";
+    if (!recipient) {
+      ctx.addIssue({
+        path: ["etransferRecipient"],
+        code: z.ZodIssueCode.custom,
+        message: "E-transfer recipient email is required when e-transfer is enabled",
+      });
+    }
+  }
 });
 
 export type Event = typeof events.$inferSelect;

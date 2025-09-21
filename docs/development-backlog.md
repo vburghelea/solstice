@@ -103,6 +103,7 @@
 - ✅ **SendGrid Email Service** - Transactional emails with templates, environment switching
 - ✅ **Rate Limiting** - TanStack Pacer client-side implementation
 - ✅ **Events Backend** - Complete schema, queries, mutations (no UI yet)
+- ✅ **Event Registration Payments** - Square checkout, e-transfer workflows, and admin reconciliation tools
 
 ### Phase 4: Polish (Dashboard, Forms, Testing)
 
@@ -152,8 +153,6 @@
 
 ## 🔮 Future Roadmap
 
-- **Event Registration Payment Flow** - Integrate Square for event fees
-- **E-transfer Payment Option** - Alternative payment method
 - **Image Uploads** - Profile pictures and team logos via Cloudinary
 - **Advanced Permissions** - Event-specific and team-specific roles
 - **Bulk Operations** - Import/export members, batch email sending

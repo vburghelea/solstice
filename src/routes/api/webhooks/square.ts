@@ -1,7 +1,14 @@
 import { json } from "@tanstack/react-start";
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
-import { membershipPaymentSessions, membershipTypes, memberships } from "~/db/schema";
+import {
+  eventPaymentSessions,
+  eventRegistrations,
+  events,
+  membershipPaymentSessions,
+  membershipTypes,
+  memberships,
+} from "~/db/schema";
 import { user } from "~/db/schema/auth.schema";
 import { getSquarePaymentService } from "~/lib/payments/square";
 
@@ -151,6 +158,119 @@ async function finalizeMembershipFromWebhook({
     .where(eq(membershipPaymentSessions.id, session.id));
 }
 
+async function finalizeEventRegistrationFromWebhook({
+  paymentId,
+  orderId,
+  eventType,
+  amount,
+}: {
+  paymentId: string | undefined;
+  orderId: string | undefined;
+  eventType: string;
+  amount: number | undefined;
+}) {
+  if (!paymentId && !orderId) {
+    return;
+  }
+
+  const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+  const db = await getDb();
+
+  let session = null as typeof eventPaymentSessions.$inferSelect | null;
+
+  if (paymentId) {
+    const [byPaymentId] = await db
+      .select()
+      .from(eventPaymentSessions)
+      .where(eq(eventPaymentSessions.squarePaymentId, paymentId))
+      .limit(1);
+    session = byPaymentId ?? session;
+  }
+
+  if (!session && orderId) {
+    const [byOrderId] = await db
+      .select()
+      .from(eventPaymentSessions)
+      .where(eq(eventPaymentSessions.squareOrderId, orderId))
+      .limit(1);
+    session = byOrderId ?? session;
+  }
+
+  if (!session) {
+    return;
+  }
+
+  const [registrationResult] = await db
+    .select({
+      registration: eventRegistrations,
+      event: events,
+    })
+    .from(eventRegistrations)
+    .innerJoin(events, eq(eventRegistrations.eventId, events.id))
+    .where(eq(eventRegistrations.id, session.registrationId))
+    .limit(1);
+
+  if (!registrationResult) {
+    console.warn("[Square webhook] Event registration not found for payment", {
+      registrationId: session.registrationId,
+      paymentId,
+      orderId,
+    });
+    return;
+  }
+
+  const { registration, event } = registrationResult;
+
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const paymentIdentifier = paymentId ?? session.squarePaymentId ?? "";
+  const resolvedAmount = typeof amount === "number" ? amount : session.amountCents;
+
+  await db
+    .update(eventPaymentSessions)
+    .set({
+      status: "completed",
+      squarePaymentId: paymentIdentifier,
+      metadata: {
+        ...(session.metadata ?? {}),
+        lastWebhookFinalizeAt: nowIso,
+        lastWebhookEvent: eventType,
+      },
+      updatedAt: now,
+    })
+    .where(eq(eventPaymentSessions.id, session.id));
+
+  const existingMetadata = (registration.paymentMetadata ?? {}) as Record<
+    string,
+    unknown
+  >;
+
+  await db
+    .update(eventRegistrations)
+    .set({
+      paymentStatus: "paid",
+      status: registration.status === "cancelled" ? registration.status : "confirmed",
+      paymentCompletedAt: now,
+      paymentId: paymentIdentifier,
+      amountPaidCents: resolvedAmount,
+      paymentMetadata: {
+        ...existingMetadata,
+        squareTransactionId: paymentIdentifier,
+        lastWebhookFinalizeAt: nowIso,
+        lastWebhookEvent: eventType,
+      },
+      updatedAt: now,
+    })
+    .where(eq(eventRegistrations.id, registration.id));
+
+  console.log("[Square webhook] Event registration finalized", {
+    registrationId: registration.id,
+    eventId: event.id,
+    paymentId: paymentIdentifier,
+    amount: resolvedAmount,
+  });
+}
+
 async function handleRefundEvent({
   paymentId,
   refundId,
@@ -238,6 +358,7 @@ Processed At: ${nowIso}
 
 export const __squareWebhookTestUtils = {
   finalizeMembershipFromWebhook,
+  finalizeEventRegistrationFromWebhook,
   handleRefundEvent,
   normalizeSquareStatus,
 };
@@ -310,6 +431,12 @@ export const ServerRoute = createServerFileRoute("/api/webhooks/square").methods
               paymentId,
               orderId,
               eventType,
+            });
+            await finalizeEventRegistrationFromWebhook({
+              paymentId,
+              orderId,
+              eventType,
+              amount,
             });
           } else if (PAYMENT_CANCELLED_STATUSES.has(status)) {
             console.warn("[Square webhook] Payment moved to cancelled state", {

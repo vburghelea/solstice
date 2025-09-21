@@ -1,19 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { z } from "zod";
-import { zod$ } from "~/lib/server/fn-utils";
 import type { EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teams, user } from "~/db/schema";
+import { zod$ } from "~/lib/server/fn-utils";
 import type {
   EventAmenities,
   EventDivisions,
   EventMetadata,
+  EventPaymentMetadata,
   EventRegistrationRoster,
   EventRequirements,
   EventRules,
   EventSchedule,
 } from "./events.db-types";
-import type { EventFilters, EventListResult, EventWithDetails } from "./events.types";
+
 // Lightweight DTO for registrations list
 export type EventRegistrationListItem = {
   id: string;
@@ -23,10 +24,27 @@ export type EventRegistrationListItem = {
   team: { id: string; name: string; slug: string } | null;
   user: { id: string; name: string; email: string };
 };
+import {
+  checkEventRegistrationSchema,
+  getEventSchema,
+  getUpcomingEventsSchema,
+  listEventsSchema,
+} from "./events.schemas";
+import type {
+  EventListResult,
+  EventOperationResult,
+  EventPaymentMethod,
+  EventPaymentStatus,
+  EventWithDetails,
+} from "./events.types";
 
-// Type for EventRegistration with properly typed roster
-type EventRegistrationWithRoster = Omit<EventRegistration, "roster"> & {
+// Type for EventRegistration with properly typed roster + metadata
+type EventRegistrationWithRoster = Omit<
+  EventRegistration,
+  "roster" | "paymentMetadata"
+> & {
   roster: EventRegistrationRoster;
+  paymentMetadata: EventPaymentMetadata | null;
 };
 
 // Helper to cast registration jsonb fields
@@ -36,6 +54,9 @@ function castRegistrationJsonbFields(
   return {
     ...registration,
     roster: (registration.roster || {}) as EventRegistrationRoster,
+    paymentMetadata: registration.paymentMetadata
+      ? (registration.paymentMetadata as EventPaymentMetadata)
+      : null,
   };
 }
 
@@ -86,8 +107,13 @@ export type EventRegistrationSummary = {
   eventId: string;
   registrationType: EventRegistration["registrationType"];
   status: EventRegistration["status"];
-  paymentStatus: string;
+  paymentStatus: EventPaymentStatus;
+  paymentMethod: EventPaymentMethod;
   paymentId: string | null;
+  amountDueCents: number;
+  amountPaidCents: number | null;
+  paymentCompletedAt: Date | null;
+  paymentMetadata: EventPaymentMetadata | null;
   createdAt: Date;
   userName: string | null;
   userEmail: string | null;
@@ -413,7 +439,12 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
         registrationType: eventRegistrations.registrationType,
         status: eventRegistrations.status,
         paymentStatus: eventRegistrations.paymentStatus,
+        paymentMethod: eventRegistrations.paymentMethod,
         paymentId: eventRegistrations.paymentId,
+        amountDueCents: eventRegistrations.amountDueCents,
+        amountPaidCents: eventRegistrations.amountPaidCents,
+        paymentCompletedAt: eventRegistrations.paymentCompletedAt,
+        paymentMetadata: eventRegistrations.paymentMetadata,
         createdAt: eventRegistrations.createdAt,
         userName: user.name,
         userEmail: user.email,
@@ -430,6 +461,9 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
       userName: registration.userName ?? null,
       userEmail: registration.userEmail ?? null,
       teamName: registration.teamName ?? null,
+      paymentMetadata: registration.paymentMetadata
+        ? (registration.paymentMetadata as EventPaymentMetadata)
+        : null,
     }));
   });
 

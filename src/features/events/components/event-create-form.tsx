@@ -63,47 +63,67 @@ function Separator() {
   return <div className="border-t" />;
 }
 
-const eventFormSchema = z.object({
-  name: z.string().min(1, "Event name is required").max(255),
-  slug: z
-    .string()
-    .min(1, "URL slug is required")
-    .max(255)
-    .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
-  description: z.string().optional(),
-  shortDescription: z
-    .string()
-    .max(500, "Short description must be under 500 characters")
-    .optional(),
-  type: z.enum(["tournament", "league", "camp", "clinic", "social", "other"]),
-  status: z.enum(["draft", "published", "registration_open"]),
-  venueName: z.string().max(255).optional(),
-  venueAddress: z.string().optional(),
-  city: z.string().max(100).optional(),
-  province: z.string().max(50).optional(),
-  postalCode: z.string().max(10).optional(),
-  locationNotes: z.string().optional(),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-  registrationOpensAt: z.string().optional(),
-  registrationClosesAt: z.string().optional(),
-  registrationType: z.enum(["team", "individual", "both"]),
-  maxTeams: z.number().min(1).optional(),
-  maxParticipants: z.number().min(1).optional(),
-  minPlayersPerTeam: z.number().min(1).default(7),
-  maxPlayersPerTeam: z.number().min(1).default(21),
-  teamRegistrationFee: z.number().min(0).default(0),
-  individualRegistrationFee: z.number().min(0).default(0),
-  earlyBirdDiscount: z.number().min(0).max(100).default(0),
-  earlyBirdDeadline: z.string().optional(),
-  contactEmail: z.string().email().optional(),
-  contactPhone: z.string().optional(),
-  websiteUrl: z.string().url().optional().or(z.literal("")),
-  isPublic: z.boolean().default(true),
-  isFeatured: z.boolean().default(false),
-  allowWaitlist: z.boolean().default(false),
-  requireMembership: z.boolean().default(false),
-});
+const eventFormSchema = z
+  .object({
+    name: z.string().min(1, "Event name is required").max(255),
+    slug: z
+      .string()
+      .min(1, "URL slug is required")
+      .max(255)
+      .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
+    description: z.string().optional(),
+    shortDescription: z
+      .string()
+      .max(500, "Short description must be under 500 characters")
+      .optional(),
+    type: z.enum(["tournament", "league", "camp", "clinic", "social", "other"]),
+    status: z.enum(["draft", "published", "registration_open"]),
+    venueName: z.string().max(255).optional(),
+    venueAddress: z.string().optional(),
+    city: z.string().max(100).optional(),
+    province: z.string().max(50).optional(),
+    postalCode: z.string().max(10).optional(),
+    locationNotes: z.string().optional(),
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+    registrationOpensAt: z.string().optional(),
+    registrationClosesAt: z.string().optional(),
+    registrationType: z.enum(["team", "individual", "both"]),
+    maxTeams: z.number().min(1).optional(),
+    maxParticipants: z.number().min(1).optional(),
+    minPlayersPerTeam: z.number().min(1).default(7),
+    maxPlayersPerTeam: z.number().min(1).default(21),
+    teamRegistrationFee: z.number().min(0).default(0),
+    individualRegistrationFee: z.number().min(0).default(0),
+    earlyBirdDiscount: z.number().min(0).max(100).default(0),
+    earlyBirdDeadline: z.string().optional(),
+    contactEmail: z.string().email().optional(),
+    contactPhone: z.string().optional(),
+    websiteUrl: z.string().url().optional().or(z.literal("")),
+    isPublic: z.boolean().default(true),
+    isFeatured: z.boolean().default(false),
+    allowWaitlist: z.boolean().default(false),
+    requireMembership: z.boolean().default(false),
+    allowEtransfer: z.boolean().default(false),
+    etransferRecipient: z
+      .string()
+      .email("Enter a valid e-transfer email")
+      .optional()
+      .or(z.literal("")),
+    etransferInstructions: z.string().max(2000).optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.allowEtransfer) {
+      const recipient = values.etransferRecipient?.trim() ?? "";
+      if (!recipient) {
+        ctx.addIssue({
+          path: ["etransferRecipient"],
+          code: z.ZodIssueCode.custom,
+          message: "E-transfer recipient email is required when e-transfer is enabled",
+        });
+      }
+    }
+  });
 
 type EventFormData = z.infer<typeof eventFormSchema>;
 
@@ -147,6 +167,9 @@ export function EventCreateForm() {
     isFeatured: false,
     allowWaitlist: false,
     requireMembership: false,
+    allowEtransfer: false,
+    etransferRecipient: "",
+    etransferInstructions: "",
   };
 
   const form = useForm({
@@ -189,6 +212,13 @@ export function EventCreateForm() {
         isPublic: isAdminUser ? parsed.isPublic : false,
         isFeatured: isAdminUser ? parsed.isFeatured : false,
         status: !isAdminUser && parsed.isPublic ? "draft" : parsed.status,
+        allowEtransfer: parsed.allowEtransfer ?? false,
+        etransferRecipient: parsed.etransferRecipient?.trim()
+          ? parsed.etransferRecipient.trim()
+          : undefined,
+        etransferInstructions: parsed.etransferInstructions?.trim()
+          ? parsed.etransferInstructions.trim()
+          : undefined,
       };
 
       createMutation.mutate(formData);
@@ -685,6 +715,60 @@ export function EventCreateForm() {
                     )}
                   </form.Field>
                 </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Alternate Payment Options</h3>
+                <form.Field name="allowEtransfer">
+                  {(field) => (
+                    <ValidatedCheckbox
+                      field={field}
+                      label="Allow Interac e-Transfer"
+                      description="Let registrants choose e-transfer instead of Square checkout"
+                    />
+                  )}
+                </form.Field>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <form.Field name="etransferRecipient">
+                    {(field) => (
+                      <ValidatedInput
+                        field={field}
+                        label="E-transfer Recipient Email"
+                        type="email"
+                        disabled={!formState.values.allowEtransfer}
+                        onValueChange={(value) => field.handleChange(value ?? "")}
+                        description="Where e-transfer payments should be sent"
+                      />
+                    )}
+                  </form.Field>
+                </div>
+
+                <form.Field name="etransferInstructions">
+                  {(field) => (
+                    <div className="space-y-2">
+                      <Label htmlFor="etransferInstructions">
+                        E-transfer Instructions
+                      </Label>
+                      <Textarea
+                        id="etransferInstructions"
+                        placeholder="Include the security question, expected password, or any other notes for e-transfer payments."
+                        value={field.state.value ?? ""}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        onBlur={field.handleBlur}
+                        disabled={!formState.values.allowEtransfer}
+                        className="min-h-[120px]"
+                      />
+                      {field.state.meta.errors?.length ? (
+                        <p className="text-destructive text-sm">
+                          {field.state.meta.errors[0]}
+                        </p>
+                      ) : null}
+                    </div>
+                  )}
+                </form.Field>
               </div>
 
               <div className="space-y-4">

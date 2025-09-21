@@ -101,27 +101,29 @@ export const getUnpooledDbUrl = () =>
   env.DATABASE_URL;
 
 export const getBaseUrl = () => {
-  // Check if we have any Netlify-provided URLs (indicates we're in Netlify environment)
+  const explicit = env.VITE_BASE_URL;
   const netlifyUrl = env.URL || env.SITE_URL || env.DEPLOY_PRIME_URL || env.DEPLOY_URL;
+  const vercelCandidate = process.env["NEXT_PUBLIC_VERCEL_URL"];
+  const vercelUrl = vercelCandidate
+    ? vercelCandidate.startsWith("http")
+      ? vercelCandidate
+      : `https://${vercelCandidate}`
+    : undefined;
 
-  // Check if we're in a Netlify environment by looking for Netlify-specific env vars
-  const isNetlifyEnv = !!(env.NETLIFY || env.NETLIFY_DATABASE_URL || netlifyUrl);
+  const candidate = explicit || netlifyUrl || vercelUrl;
 
-  // In production, Netlify environment, or when we have a URL, use it
-  if (isProduction() || isNetlifyEnv) {
-    // If we have a Netlify URL, use it; otherwise fall back to VITE_BASE_URL or a default
-    return netlifyUrl || env.VITE_BASE_URL || "https://app.netlify.com";
+  if (!candidate) {
+    throw new Error(
+      "Base URL is unknown. Set VITE_BASE_URL or rely on Netlify/Vercel provided URLs.",
+    );
   }
 
-  // In development/test, require VITE_BASE_URL
-  if (!env.VITE_BASE_URL) {
-    throw new Error("VITE_BASE_URL is required in development");
-  }
-  return env.VITE_BASE_URL;
+  return candidate;
 };
 export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
 
 export const isProduction = () => env.NODE_ENV === "production";
 export const isDevelopment = () => env.NODE_ENV === "development";
 export const isTest = () => env.NODE_ENV === "test";
-export const isServerless = () => !!(env.NETLIFY || env.VERCEL_ENV);
+export const isServerless = () =>
+  !!(env.NETLIFY || env.VERCEL_ENV || process.env["VERCEL"] === "1");

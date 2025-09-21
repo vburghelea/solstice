@@ -1,54 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
-import {
-  BarChart3,
-  Calendar,
-  CheckSquare,
-  Home,
-  LogOut,
-  Settings,
-  ShieldCheck,
-  User,
-  UserCheck,
-  Users,
-} from "lucide-react";
-import { useState } from "react";
+import { LogOut } from "lucide-react";
+import { useMemo, useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { ADMIN_PRIMARY_NAV, ADMIN_SECONDARY_NAV } from "~/features/layouts/admin-nav";
 import { userHasRole } from "~/features/roles/permission.service";
 import { auth } from "~/lib/auth-client";
-
-const allSidebarItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard", requiresRole: false },
-  { icon: Users, label: "Teams", href: "/dashboard/teams", requiresRole: false },
-  { icon: Calendar, label: "Events", href: "/dashboard/events", requiresRole: false },
-  { icon: UserCheck, label: "Members", href: "/dashboard/members", requiresRole: false },
-  {
-    icon: CheckSquare,
-    label: "Event Review",
-    href: "/admin/events-review",
-    requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
-  },
-  {
-    icon: BarChart3,
-    label: "Reports",
-    href: "/dashboard/reports",
-    requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
-  },
-  {
-    icon: ShieldCheck,
-    label: "Roles",
-    href: "/admin/roles",
-    requiresRole: true,
-    roles: ["Solstice Admin", "Quadball Canada Admin"],
-  },
-];
-
-const bottomItems = [
-  { icon: User, label: "Profile", href: "/dashboard/profile" },
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
-];
 
 export function AdminSidebar() {
   const queryClient = useQueryClient();
@@ -58,13 +15,21 @@ export function AdminSidebar() {
   const user = context?.user || null;
 
   // Filter sidebar items based on user roles
-  const sidebarItems = allSidebarItems.filter((item) => {
-    if (!item.requiresRole) return true;
-    if (!user || !item.roles) return false;
+  const sidebarItems = useMemo(
+    () =>
+      ADMIN_PRIMARY_NAV.filter((item) => {
+        if (!item.roles || item.roles.length === 0) {
+          return true;
+        }
+        if (!user) {
+          return false;
+        }
+        return item.roles.some((roleName) => userHasRole(user, roleName));
+      }),
+    [user],
+  );
 
-    // Check if user has any of the required roles
-    return item.roles.some((roleName) => userHasRole(user, roleName));
-  });
+  const secondaryItems = ADMIN_SECONDARY_NAV;
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -103,10 +68,10 @@ export function AdminSidebar() {
           const Icon = item.icon;
           return (
             <Link
-              key={item.href}
-              to={item.href}
+              key={item.to}
+              to={item.to}
               className="nav-item"
-              activeOptions={{ exact: true }}
+              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",
@@ -120,14 +85,14 @@ export function AdminSidebar() {
         })}
       </nav>
       <div className="space-y-2 border-t border-gray-200 px-4 py-4">
-        {bottomItems.map((item) => {
+        {secondaryItems.map((item) => {
           const Icon = item.icon;
           return (
             <Link
-              key={item.href}
-              to={item.href}
+              key={item.to}
+              to={item.to}
               className="nav-item"
-              activeOptions={{ exact: true }}
+              {...(item.exact ? { activeOptions: { exact: true as const } } : {})}
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",

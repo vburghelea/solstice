@@ -50,3 +50,7 @@ docs/reference/database/*
 
 # Stitch design files
 stitch/
+
+# Repomix generated outputs
+repomix-configs/outputs/
+repomix-output.xml

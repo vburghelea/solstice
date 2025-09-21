@@ -18,11 +18,11 @@ Security headers are automatically applied to all responses via a Netlify Edge F
 
 ### Applied Headers:
 
-- **Content-Security-Policy**: Restricts resource loading with nonce-based script validation
+- **Content-Security-Policy**: Restricts resource loading with nonce-based script validation and `strict-dynamic`
 - **X-Frame-Options**: DENY - Prevents clickjacking attacks
 - **X-Content-Type-Options**: nosniff - Prevents MIME type sniffing
 - **Referrer-Policy**: strict-origin-when-cross-origin - Controls referrer information
-- **X-XSS-Protection**: 1; mode=block - Legacy XSS protection
+- **Frame-Ancestors**: `'none'` (via CSP) - Blocks embedding in iframes
 - **Permissions-Policy**: Restricts browser features
 - **Strict-Transport-Security**: Enforces HTTPS with preloading
 
@@ -94,11 +94,11 @@ const strength = getPasswordStrength(password);
 The CSP is configured to:
 
 - Allow self-hosted resources by default
-- Use nonces for inline scripts
-- Allow specific external resources (Google Fonts, OAuth providers)
-- Block unsafe inline styles (except where necessary)
+- Use nonces for inline scripts together with `'strict-dynamic'`
+- Explicitly block embedding via `frame-ancestors 'none'`
+- Allow only the external origins required for Square, Google OAuth, and analytics
 - Prevent object/embed elements
-- Enforce HTTPS upgrades
+- Enforce HTTPS upgrades and optionally report violations via `report-uri`
 
 ### Nonce Implementation
 
@@ -120,7 +120,7 @@ COOKIE_DOMAIN=.yourdomain.com
 OAUTH_ALLOWED_DOMAINS=yourdomain.com,trusted-partner.com
 ```
 
-When `OAUTH_ALLOWED_DOMAINS` is set, Google OAuth sign-ins are limited to the specified domains. Users attempting to authenticate with an email outside the allowlist receive a friendly error explaining that an approved organizational address is required. Leave this variable unset to allow OAuth sign-ins from any domain during testing.
+When `OAUTH_ALLOWED_DOMAINS` is set, Google OAuth sign-ins are limited to the specified domains. Users attempting to authenticate with an email outside the allowlist receive a friendly error explaining that an approved organizational address is required. Leave this variable unset (the parser returns an empty array) to allow OAuth sign-ins from any domain during testing.
 
 ## Development vs Production
 

@@ -106,6 +106,30 @@ export interface EventRegistrationResultPayload {
   payment?: EventRegistrationPaymentInfo;
 }
 
+export type CancelEventErrorCode =
+  | "REFUND_FAILED"
+  | "NO_PAYMENT_SESSION"
+  | "NOT_PAID"
+  | "UNAUTHORIZED";
+
+export interface CancelEventResult {
+  eventId: string;
+  affected: {
+    totalRegistrations: number;
+    cancelled: number;
+    alreadyCancelled: number;
+    squareRefunded: number;
+    etransferMarkedForRefund: number;
+    freeOrUnpaid: number;
+  };
+  errors: Array<{
+    registrationId: string;
+    code: CancelEventErrorCode;
+    message: string;
+    paymentId?: string;
+  }>;
+}
+
 // Operation result types
 export type EventOperationResult<T = Event> =
   | { success: true; data: T }

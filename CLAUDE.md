@@ -45,6 +45,96 @@ export const myServerFn = createServerFn({ method: "POST" })
 - Production verification (2025‑09‑19): checkout `LUJO45SIIB655EEP`, payment `Hd3J4zVKfMdLXNXalzSO94b6upOZY`.
   Use this as a baseline when debugging future regressions.
 
+## Using Repomix for AI Context Management
+
+Repomix helps create focused context bundles for AI assistants like Claude. The goal is to pack relevant files while staying under the 60,000 token limit.
+
+### Quick Start
+
+```bash
+# Basic usage - pack specific files for a feature
+npx repomix@latest --include "src/features/events/**,src/db/schema/events*" --output evt-context.xml
+
+# Check token counts before generating
+npx repomix@latest --token-count-tree 100 --include "src/features/events/**"
+
+# Include git context for recent changes
+npx repomix@latest --include "src/features/events/**" --include-diffs --include-logs --include-logs-count 20
+```
+
+### Token Optimization Strategies
+
+1. **Start with token counting** to understand your budget:
+
+   ```bash
+   npx repomix@latest --token-count-tree --include "src/features/**/*.ts"
+   ```
+
+2. **Use targeted includes** rather than broad patterns:
+
+   ```bash
+   # Good: Specific to the task
+   --include "src/features/events/*.ts,src/db/schema/events*,src/lib/payments/square*"
+
+   # Bad: Too broad
+   --include "src/**/*.ts"
+   ```
+
+3. **Remove noise** with compression and comment removal:
+
+   ```bash
+   npx repomix@latest --compress --remove-comments --include "src/features/events/**"
+   ```
+
+4. **Leverage configuration files** for complex setups:
+   ```bash
+   npx repomix@latest --init  # Creates repomix.config.json
+   ```
+
+### Ticket-Specific Context Bundles
+
+For development tickets, create focused bundles that include:
+
+- Core feature files
+- Related schemas and types
+- Relevant test files
+- Dependencies (auth, database, utilities)
+- Documentation snippets
+
+See `repomix-configs/` directory for pre-configured bundles for each development ticket.
+
+### Best Practices
+
+1. **Always check token counts first** with `--token-count-tree`
+2. **Include test files** for understanding expected behavior
+3. **Add git context** when working on bug fixes or recent changes
+4. **Use output formats wisely**:
+   - XML (default): Best for Claude
+   - Markdown: Human-readable documentation
+   - JSON: Structured processing
+5. **Keep bundles under 50k tokens** to leave room for conversation
+
+### Example: Creating Context for Event Cancellation (EVT-1)
+
+```bash
+# First, check what we're including
+npx repomix@latest \
+  --token-count-tree \
+  --include "src/features/events/**/*.ts" \
+  --include "src/db/schema/events*.ts,src/db/schema/teams*.ts,src/db/schema/membership*.ts" \
+  --include "src/lib/payments/square*.ts" \
+  --include "src/lib/server/auth.ts,src/lib/server/fn-utils.ts"
+
+# If under 60k tokens, generate the bundle
+npx repomix@latest \
+  --include "src/features/events/**/*.ts" \
+  --include "src/db/schema/events*.ts,src/db/schema/teams*.ts,src/db/schema/membership*.ts" \
+  --include "src/lib/payments/square*.ts" \
+  --include "src/lib/server/auth.ts,src/lib/server/fn-utils.ts" \
+  --include-diffs \
+  --output repomix-evt1.xml
+```
+
 ## Development Commands
 
 - `pnpm dev` - Start development server (Vite on port 5173, default to use)

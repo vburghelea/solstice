@@ -1,0 +1,36 @@
+{
+  "output": {
+    "filePath": "repomix-configs/outputs/evt1-cancellation.xml",
+    "style": "xml",
+    "showLineNumbers": false,
+    "removeComments": false,
+    "removeEmptyLines": false
+  },
+  "include": [
+    "src/features/events/**/*.ts",
+    "src/features/events/**/*.tsx",
+    "src/db/schema/events.schema.ts",
+    "src/db/schema/teams.schema.ts",
+    "src/db/schema/membership.schema.ts",
+    "src/db/schema/index.ts",
+    "src/lib/payments/square.ts",
+    "src/lib/payments/square-real.ts",
+    "src/lib/server/auth.ts",
+    "src/lib/server/fn-utils.ts",
+    "src/lib/server/errors.ts",
+    "src/lib/env.server.ts",
+    "docs/development-backlog.md"
+  ],
+  "ignore": {
+    "patterns": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

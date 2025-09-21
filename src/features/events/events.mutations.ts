@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, or, sql } from "drizzle-orm";
-import { z } from "zod";
-import type { Event as DbEvent, EventRegistration } from "~/db/schema";
+import type { EventRegistration } from "~/db/schema";
 import {
   eventPaymentSessions,
   eventRegistrations,
@@ -11,17 +10,9 @@ import {
 import { createEventInputSchema } from "~/db/schema/events.schema";
 import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
-import type {
-  EventAmenities,
-  EventDivisions,
-  EventMetadata,
-  EventPaymentMetadata,
-  EventRegistrationRoster,
-  EventRequirements,
-  EventRules,
-  EventSchedule,
-} from "./events.db-types";
+import type { EventPaymentMetadata } from "./events.db-types";
 import {
+  cancelEntireEventSchema,
   cancelEventRegistrationSchema,
   createEventSchema,
   markEtransferPaidSchema,
@@ -30,98 +21,325 @@ import {
   updateEventSchema,
 } from "./events.schemas";
 import type {
+  CancelEventResult,
   EventOperationResult,
   EventRegistrationResultPayload,
   EventRegistrationWithDetails,
   EventWithDetails,
 } from "./events.types";
-
-// Helper to cast database event to properly typed event
-function castEventJsonbFields(event: DbEvent): EventWithDetails {
-  return {
-    ...event,
-    rules: (event.rules || {}) as EventRules,
-    schedule: (event.schedule || {}) as EventSchedule,
-    divisions: (event.divisions || {}) as EventDivisions,
-    amenities: (event.amenities || {}) as EventAmenities,
-    requirements: (event.requirements || {}) as EventRequirements,
-    metadata: (event.metadata || {}) as EventMetadata,
-  } as EventWithDetails;
-}
+import type { EventRegistrationWithRoster } from "./utils";
+import {
+  appendCancellationNote,
+  buildEtransferSnapshot,
+  calculateRegistrationAmountCents,
+  castEventJsonbFields,
+  castRegistrationJsonbFields,
+  currentTimestamp,
+  getClockFromContext,
+  isoTimestamp,
+  markEtransferPaidMetadata,
+  markEtransferReminderMetadata,
+} from "./utils";
 
 /**
- * Cancel an event
+ * Cancel an entire event and cascade updates to registrations & payments.
  */
 export const cancelEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(z.object({ eventId: z.string().uuid() })))
-  .handler(async ({ data, context }): Promise<EventOperationResult<null>> => {
-    try {
-      // Import server-only modules inside the handler
-      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+  .validator(zod$(cancelEntireEventSchema))
+  .handler(
+    async ({ data, context }): Promise<EventOperationResult<CancelEventResult>> => {
+      const clock = getClockFromContext(context);
+      const now = currentTimestamp(clock);
+      const nowIso = isoTimestamp(clock);
 
-      const db = await getDb();
-      const user = requireUser(context);
+      try {
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+        const db = await getDb();
+        const user = requireUser(context);
 
-      // Check if user owns the event
-      const [event] = await db
-        .select({ organizerId: events.organizerId })
-        .from(events)
-        .where(eq(events.id, data.eventId))
-        .limit(1);
+        const [eventRecord] = await db
+          .select()
+          .from(events)
+          .where(eq(events.id, data.eventId))
+          .limit(1);
 
-      if (!event) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "NOT_FOUND",
-              message: "Event not found",
-            },
-          ],
-        };
-      }
+        if (!eventRecord) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "NOT_FOUND",
+                message: "Event not found",
+              },
+            ],
+          };
+        }
 
-      if (event.organizerId !== user.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "FORBIDDEN",
-              message: "You don't have permission to cancel this event",
-            },
-          ],
-        };
-      }
+        let authorized = eventRecord.organizerId === user.id;
+        if (!authorized) {
+          const { isAdmin } = await import("~/lib/auth/utils/admin-check");
+          authorized = await isAdmin(user.id);
+        }
 
-      // Update event status to cancelled
-      await db
-        .update(events)
-        .set({
-          status: "cancelled",
-          updatedAt: new Date(),
-        })
-        .where(eq(events.id, data.eventId));
+        if (!authorized) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "You cannot cancel this event",
+              },
+            ],
+          };
+        }
 
-      // TODO: Send cancellation emails to registered participants
+        const updatedEventMetadata = {
+          ...(eventRecord.metadata ?? {}),
+          cancelledAt: nowIso,
+          cancelledBy: user.id,
+          cancellationReason: data.reason ?? null,
+        } as Record<string, unknown>;
 
-      return {
-        success: true,
-        data: null,
-      };
-    } catch (error) {
-      console.error("Error cancelling event:", error);
-      return {
-        success: false,
-        errors: [
-          {
-            code: "DATABASE_ERROR",
-            message: "Failed to cancel event",
+        await db
+          .update(events)
+          .set({
+            status: "cancelled",
+            updatedAt: now,
+            metadata: updatedEventMetadata,
+          })
+          .where(eq(events.id, data.eventId));
+
+        const registrations = await db
+          .select()
+          .from(eventRegistrations)
+          .where(eq(eventRegistrations.eventId, data.eventId));
+
+        const paymentSessions = await db
+          .select()
+          .from(eventPaymentSessions)
+          .where(eq(eventPaymentSessions.eventId, data.eventId));
+
+        const latestSessionByRegistration = new Map<
+          string,
+          (typeof paymentSessions)[number]
+        >();
+        for (const session of paymentSessions) {
+          const current = latestSessionByRegistration.get(session.registrationId);
+          if (!current || (session.createdAt ?? now) > (current.createdAt ?? now)) {
+            latestSessionByRegistration.set(session.registrationId, session);
+          }
+        }
+
+        const result: CancelEventResult = {
+          eventId: data.eventId,
+          affected: {
+            totalRegistrations: registrations.length,
+            cancelled: 0,
+            alreadyCancelled: 0,
+            squareRefunded: 0,
+            etransferMarkedForRefund: 0,
+            freeOrUnpaid: 0,
           },
-        ],
-      };
-    }
-  });
+          errors: [],
+        };
+
+        const squareService =
+          data.refundMode === "auto" ? await getSquarePaymentService() : null;
+
+        for (const registration of registrations) {
+          if (registration.status === "cancelled") {
+            result.affected.alreadyCancelled += 1;
+            continue;
+          }
+
+          const existingMetadata = (registration.paymentMetadata ??
+            {}) as EventPaymentMetadata;
+          const noteParts = [`Event cancelled by ${user.id} at ${nowIso}`];
+          if (data.reason) {
+            noteParts.push(`Reason: ${data.reason}`);
+          }
+          const cancellationNote = noteParts.join(" — ");
+
+          const paymentMetadata = appendCancellationNote(
+            existingMetadata,
+            cancellationNote,
+          );
+          const existingNotes = registration.internalNotes ?? "";
+          const hasNoteAlready = existingNotes.split("\n").includes(cancellationNote);
+          const internalNotes = hasNoteAlready
+            ? existingNotes
+            : [cancellationNote, existingNotes].filter(Boolean).join("\n");
+
+          const baseUpdate: Partial<typeof eventRegistrations.$inferInsert> = {
+            status: "cancelled",
+            cancelledAt: now,
+            updatedAt: now,
+            internalNotes,
+            paymentMetadata,
+          };
+
+          let finalPaymentStatus = registration.paymentStatus;
+          let sessionUpdated = false;
+          const session = latestSessionByRegistration.get(registration.id);
+          const amountPaid = registration.amountPaidCents ?? 0;
+          const amountDue = registration.amountDueCents ?? 0;
+          const amountToRefund = amountPaid > 0 ? amountPaid : amountDue;
+
+          if (registration.paymentMethod === "square" && amountToRefund > 0) {
+            if (data.refundMode === "none") {
+              result.affected.freeOrUnpaid += 1;
+            } else if (!squareService || data.refundMode === "manual") {
+              finalPaymentStatus = "refund_required";
+              result.affected.etransferMarkedForRefund += 1;
+            } else {
+              let paymentId = session?.squarePaymentId ?? null;
+
+              if (!paymentId && session?.squareCheckoutId) {
+                const verification = await squareService.verifyPayment(
+                  session.squareCheckoutId,
+                );
+                if (verification.success && verification.paymentId) {
+                  paymentId = verification.paymentId;
+                  await db
+                    .update(eventPaymentSessions)
+                    .set({
+                      squarePaymentId: paymentId,
+                      updatedAt: now,
+                    })
+                    .where(eq(eventPaymentSessions.id, session.id));
+                }
+              }
+
+              if (!paymentId) {
+                finalPaymentStatus = "refund_required";
+                result.affected.etransferMarkedForRefund += 1;
+                result.errors.push({
+                  registrationId: registration.id,
+                  code: "NO_PAYMENT_SESSION",
+                  message:
+                    "Square payment could not be resolved; flagged for manual refund.",
+                });
+              } else {
+                try {
+                  const refund = await squareService.createRefund(
+                    paymentId,
+                    amountToRefund,
+                    "Event cancelled",
+                  );
+
+                  if (refund.success) {
+                    finalPaymentStatus = "refunded";
+                    result.affected.squareRefunded += 1;
+                    if (session) {
+                      await db
+                        .update(eventPaymentSessions)
+                        .set({
+                          status: "refunded",
+                          metadata: {
+                            ...(session.metadata ?? {}),
+                            refundedAt: nowIso,
+                            refundId: refund.refundId ?? null,
+                            cancelledBy: user.id,
+                          },
+                          updatedAt: now,
+                        })
+                        .where(eq(eventPaymentSessions.id, session.id));
+                      sessionUpdated = true;
+                    }
+                  } else {
+                    finalPaymentStatus = "refund_required";
+                    result.affected.etransferMarkedForRefund += 1;
+                    result.errors.push({
+                      registrationId: registration.id,
+                      code: "REFUND_FAILED",
+                      message: refund.error ?? "Square refund failed",
+                      paymentId,
+                    });
+                  }
+                } catch (refundError) {
+                  finalPaymentStatus = "refund_required";
+                  result.affected.etransferMarkedForRefund += 1;
+                  result.errors.push({
+                    registrationId: registration.id,
+                    code: "REFUND_FAILED",
+                    message:
+                      refundError instanceof Error
+                        ? refundError.message
+                        : "Square refund threw an unexpected error",
+                    paymentId,
+                  });
+                }
+              }
+            }
+          } else if (registration.paymentMethod === "etransfer" && amountToRefund > 0) {
+            finalPaymentStatus = "refund_required";
+            result.affected.etransferMarkedForRefund += 1;
+          } else {
+            result.affected.freeOrUnpaid += 1;
+          }
+
+          const update = {
+            ...baseUpdate,
+            paymentStatus: finalPaymentStatus,
+          } satisfies Partial<typeof eventRegistrations.$inferInsert>;
+
+          await db
+            .update(eventRegistrations)
+            .set(update)
+            .where(eq(eventRegistrations.id, registration.id));
+
+          if (session && !sessionUpdated) {
+            await db
+              .update(eventPaymentSessions)
+              .set({
+                status: "cancelled",
+                metadata: {
+                  ...(session.metadata ?? {}),
+                  cancelledAt: nowIso,
+                  cancelledBy: user.id,
+                },
+                updatedAt: now,
+              })
+              .where(eq(eventPaymentSessions.id, session.id));
+          }
+
+          result.affected.cancelled += 1;
+        }
+
+        if (data.notify !== false) {
+          try {
+            const { sendEventCancellationNotifications } = await import(
+              "~/lib/server/notifications/events/cancellation"
+            );
+            await sendEventCancellationNotifications({
+              db,
+              event: eventRecord,
+              ...(data.reason ? { reason: data.reason } : {}),
+            });
+          } catch (notificationError) {
+            console.warn("Failed to send cancellation notifications:", notificationError);
+          }
+        }
+
+        return {
+          success: true,
+          data: result,
+        };
+      } catch (error) {
+        console.error("Error cancelling event:", error);
+        return {
+          success: false,
+          errors: [
+            {
+              code: "DATABASE_ERROR",
+              message: "Failed to cancel event",
+            },
+          ],
+        };
+      }
+    },
+  );
 
 /**
  * Create a new event
@@ -330,60 +548,16 @@ export const updateEvent = createServerFn({ method: "POST" })
     }
   });
 
+const getSquarePaymentService = async () => {
+  const { getSquarePaymentService: loadSquareService } = await import(
+    "~/lib/payments/square"
+  );
+  return loadSquareService();
+};
+
 /**
  * Register for an event
  */
-// Type for EventRegistration with properly typed roster
-type EventRegistrationWithRoster = Omit<
-  EventRegistration,
-  "roster" | "paymentMetadata"
-> & {
-  roster: EventRegistrationRoster;
-  paymentMetadata: EventPaymentMetadata;
-};
-
-// Helper to cast registration jsonb fields
-function castRegistrationJsonbFields(
-  registration: EventRegistration,
-): EventRegistrationWithRoster {
-  return {
-    ...registration,
-    roster: (registration.roster || {}) as EventRegistrationRoster,
-    paymentMetadata: (registration.paymentMetadata ?? {}) as EventPaymentMetadata,
-  };
-}
-
-function calculateRegistrationAmountCents(
-  event: DbEvent,
-  registrationType: "team" | "individual",
-  now: Date,
-): number {
-  const baseFee =
-    registrationType === "team"
-      ? (event.teamRegistrationFee ?? 0)
-      : (event.individualRegistrationFee ?? 0);
-
-  if (!baseFee || baseFee <= 0) {
-    return 0;
-  }
-
-  const discountPercentage = event.earlyBirdDiscount ?? 0;
-  const deadline = event.earlyBirdDeadline ? new Date(event.earlyBirdDeadline) : null;
-
-  if (discountPercentage > 0 && deadline && now <= deadline) {
-    const clampedDiscount = Math.min(100, Math.max(0, discountPercentage));
-    const discounted = Math.round(baseFee - (baseFee * clampedDiscount) / 100);
-    return Math.max(0, discounted);
-  }
-
-  return baseFee;
-}
-
-const getSquarePaymentService = async () => {
-  const { squarePaymentService } = await import("~/lib/payments/square");
-  return squarePaymentService;
-};
-
 export const registerForEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(registerForEventSchema))
@@ -397,6 +571,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
         const db = await getDb();
         const user = requireUser(context);
+        const clock = getClockFromContext(context);
 
         const [event] = await db
           .select()
@@ -428,7 +603,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
-        const now = new Date();
+        const now = currentTimestamp(clock);
         const registrationOpens = event.registrationOpensAt;
         const registrationCloses = event.registrationClosesAt;
 
@@ -628,16 +803,12 @@ export const registerForEvent = createServerFn({ method: "POST" })
           paymentStatus = "awaiting_etransfer";
         }
 
-        const paymentMetadata: EventPaymentMetadata | null =
+        const paymentMetadata =
           paymentMethod === "etransfer"
-            ? {
-                ...(event.etransferInstructions
-                  ? { instructionsSnapshot: event.etransferInstructions }
-                  : {}),
-                ...(event.etransferRecipient
-                  ? { recipient: event.etransferRecipient }
-                  : {}),
-              }
+            ? buildEtransferSnapshot(
+                event.etransferInstructions,
+                event.etransferRecipient,
+              )
             : null;
 
         const [registration] = await db
@@ -705,7 +876,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
                   registrationType,
                   paymentMethod,
                 },
-                updatedAt: new Date(),
+                updatedAt: currentTimestamp(clock),
               },
             });
 
@@ -771,6 +942,7 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
 
         const db = await getDb();
         const user = requireUser(context);
+        const clock = getClockFromContext(context);
 
         const registrationWithEvent = await db
           .select({
@@ -827,14 +999,14 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
           };
         }
 
-        const now = new Date();
+        const now = currentTimestamp(clock);
         const existingMetadata = (registration.paymentMetadata ||
           {}) as EventPaymentMetadata;
-        const updatedMetadata: EventPaymentMetadata = {
-          ...existingMetadata,
-          markedPaidAt: now.toISOString(),
-          markedPaidBy: user.id,
-        };
+        const updatedMetadata = markEtransferPaidMetadata(
+          existingMetadata,
+          user.id,
+          clock,
+        );
 
         const [updatedRegistration] = await db
           .update(eventRegistrations)
@@ -882,6 +1054,7 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
 
         const db = await getDb();
         const user = requireUser(context);
+        const clock = getClockFromContext(context);
 
         const registrationWithEvent = await db
           .select({
@@ -938,14 +1111,14 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
           };
         }
 
-        const now = new Date();
+        const now = currentTimestamp(clock);
         const existingMetadata = (registration.paymentMetadata ||
           {}) as EventPaymentMetadata;
-        const updatedMetadata: EventPaymentMetadata = {
-          ...existingMetadata,
-          lastReminderAt: now.toISOString(),
-          lastReminderBy: user.id,
-        };
+        const updatedMetadata = markEtransferReminderMetadata(
+          existingMetadata,
+          user.id,
+          clock,
+        );
 
         const [updatedRegistration] = await db
           .update(eventRegistrations)

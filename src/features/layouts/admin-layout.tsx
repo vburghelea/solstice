@@ -2,6 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { AdminSidebar } from "~/components/ui/admin-sidebar";
+import { Breadcrumbs } from "~/components/ui/breadcrumbs";
 import { Button } from "~/components/ui/button";
 import { MobileAdminHeader } from "~/components/ui/mobile-admin-header";
 
@@ -40,7 +41,8 @@ export function AdminLayout() {
       <div className="flex flex-1 flex-col">
         <MobileAdminHeader onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto flex max-w-7xl flex-col gap-6">
+            <Breadcrumbs />
             <Outlet />
           </div>
         </main>

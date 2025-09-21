@@ -19,6 +19,7 @@ import { useAuth } from "~/features/auth";
 import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { UserAvatar } from "~/shared/ui/user-avatar";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
   component: TeamDetailsPage,
@@ -56,7 +57,8 @@ function TeamDetailsPage() {
     membershipStatus === "pending" && !membershipRecord?.invitedBy?.id;
 
   const requestMembershipMutation = useMutation({
-    mutationFn: () => requestTeamMembership({ data: { teamId } }),
+    mutationFn: () =>
+      unwrapServerFnResult(requestTeamMembership({ data: { teamId } })),
     onSuccess: () => {
       setRequestState({
         type: "success",

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getMembershipTypeSchema } from "./membership.schemas";
+import { zod$ } from "~/lib/server/fn-utils";
 import type {
   MembershipOperationResult,
   MembershipStatus,
@@ -52,7 +53,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
  * Get a specific membership type by ID
  */
 export const getMembershipType = createServerFn({ method: "GET" })
-  .validator(getMembershipTypeSchema.parse)
+  .validator(zod$(getMembershipTypeSchema))
   .handler(
     async ({
       data,

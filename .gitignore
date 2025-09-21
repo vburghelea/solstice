@@ -21,6 +21,7 @@ node_modules
 .netlify
 .sst
 dist
+dev-dist
 /build/
 /api/
 /server/build

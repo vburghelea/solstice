@@ -48,6 +48,7 @@ import {
 } from "~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cancelEvent, updateEvent } from "~/features/events/events.mutations";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import type { EventRegistrationSummary } from "~/features/events/events.queries";
 import { getEvent, getEventRegistrations } from "~/features/events/events.queries";
 import type {
@@ -107,7 +108,14 @@ function EventManagementPage() {
   // Update event mutation
   const updateMutation = useMutation({
     mutationFn: (payload: UpdateEventInput) =>
-      updateEvent({ data: { eventId, data: payload } }),
+      unwrapServerFnResult(
+        updateEvent({
+          data: {
+            eventId,
+            data: payload,
+          },
+        }),
+      ),
     onSuccess: (result) => {
       if (result.success) {
         toast.success("Event updated successfully");
@@ -120,7 +128,10 @@ function EventManagementPage() {
 
   // Cancel event mutation
   const cancelMutation = useMutation({
-    mutationFn: () => cancelEvent({ data: { eventId } }),
+    mutationFn: () =>
+      unwrapServerFnResult(
+        cancelEvent({ data: { eventId } }),
+      ) as Promise<EventOperationResult<null>>,
     onSuccess: (result) => {
       if (result.success) {
         toast.success("Event cancelled successfully");

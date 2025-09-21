@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
 import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+import { zod$ } from "~/lib/server/fn-utils";
 import {
   partialProfileInputSchema,
   privacySettingsSchema,
@@ -78,19 +80,14 @@ function mapDbUserToProfile(
 }
 
 export const updateUserProfile = createServerFn({ method: "POST" })
-  .validator(partialProfileInputSchema.parse)
-  .handler(async ({ data: inputData }): Promise<ProfileOperationResult> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(partialProfileInputSchema))
+  .handler(async ({ data: inputData, context }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        return {
-          success: false,
-          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
-        };
-      }
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+      const db = await getDb();
+      const currentUser = requireUser(context);
 
       // Input is already validated by .validator(), just check if it's empty
       if (!inputData || Object.keys(inputData).length === 0) {
@@ -234,29 +231,14 @@ export const updateUserProfile = createServerFn({ method: "POST" })
   });
 
 export const completeUserProfile = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    // The validator receives the raw data passed to the server function
-    return profileInputSchema.parse(input);
-  })
-  .handler(async ({ data }): Promise<ProfileOperationResult> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(profileInputSchema))
+  .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
-      // Import server-only modules inside the handler
-      const { getDb } = await import("~/db/server-helpers");
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
       const db = await getDb();
+      const currentUser = requireUser(context);
 
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        return {
-          success: false,
-          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
-        };
-      }
-
-      // Input is already validated by .validator()
-
-      // Import database dependencies inside handler
       const { eq, sql } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 
@@ -451,44 +433,14 @@ export const removeUploadedAvatar = createServerFn({ method: "POST" }).handler(
 );
 
 export const updatePrivacySettings = createServerFn({ method: "POST" })
-  .validator((input: unknown) => {
-    // The validator receives the raw data passed to the server function
-    return privacySettingsSchema.parse(input);
-  })
-  .handler(async ({ data }): Promise<ProfileOperationResult> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(privacySettingsSchema))
+  .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
-      // Import server-only modules inside the handler
-      const { getDb } = await import("~/db/server-helpers");
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
       const db = await getDb();
+      const currentUser = requireUser(context);
 
-      const { getCurrentUser } = await import("~/features/auth/auth.queries");
-
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        throw new Error("Not authenticated");
-      }
-
-      if (!data) {
-        return {
-          success: false,
-          errors: [{ code: "VALIDATION_ERROR", message: "No data provided" }],
-        };
-      }
-
-      // Validate input
-      const validation = privacySettingsSchema.safeParse(data);
-      if (!validation.success) {
-        return {
-          success: false,
-          errors: validation.error.errors.map((err: z.ZodIssue) => ({
-            code: "VALIDATION_ERROR" as const,
-            field: err.path.join("."),
-            message: err.message,
-          })),
-        };
-      }
-
-      // Import database dependencies inside handler
       const { eq } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 

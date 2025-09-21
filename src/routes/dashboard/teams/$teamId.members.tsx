@@ -42,6 +42,7 @@ import {
 } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { UserAvatar } from "~/shared/ui/user-avatar";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {
@@ -72,7 +73,8 @@ function TeamMembersPage() {
   const pendingMembers = members.filter((entry) => entry.member.status === "pending");
 
   const addMemberMutation = useMutation({
-    mutationFn: addTeamMember,
+    mutationFn: (payload: any) =>
+      unwrapServerFnResult(addTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
       setShowAddMember(false);
@@ -84,14 +86,16 @@ function TeamMembersPage() {
   });
 
   const updateMemberMutation = useMutation({
-    mutationFn: updateTeamMember,
+    mutationFn: (payload: any) =>
+      unwrapServerFnResult(updateTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
     },
   });
 
   const removeMemberMutation = useMutation({
-    mutationFn: removeTeamMember,
+    mutationFn: (payload: any) =>
+      unwrapServerFnResult(removeTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
     },
@@ -107,12 +111,10 @@ function TeamMembersPage() {
     onSubmit: async ({ value }) => {
       setServerError(null);
       await addMemberMutation.mutateAsync({
-        data: {
-          teamId,
-          ...value,
-          jerseyNumber: value.jerseyNumber || undefined,
-          position: value.position || undefined,
-        },
+        teamId,
+        ...value,
+        jerseyNumber: value.jerseyNumber || undefined,
+        position: value.position || undefined,
       });
     },
   });
@@ -322,11 +324,9 @@ function TeamMembersPage() {
                     value={member.role}
                     onValueChange={(value) =>
                       updateMemberMutation.mutate({
-                        data: {
-                          teamId,
-                          memberId: member.id,
-                          role: value as TeamMemberRole,
-                        },
+                        teamId,
+                        memberId: member.id,
+                        role: value as TeamMemberRole,
                       })
                     }
                   >
@@ -360,10 +360,8 @@ function TeamMembersPage() {
                         <AlertDialogAction
                           onClick={() =>
                             removeMemberMutation.mutate({
-                              data: {
-                                teamId,
-                                memberId: member.id,
-                              },
+                              teamId,
+                              memberId: member.id,
                             })
                           }
                         >

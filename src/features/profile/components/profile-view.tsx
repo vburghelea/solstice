@@ -34,6 +34,7 @@ import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 import { updateUserProfile } from "../profile.mutations";
+import type { ProfileOperationResult } from "../profile.types";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 import { AvailabilityEditor } from "./availability-editor";

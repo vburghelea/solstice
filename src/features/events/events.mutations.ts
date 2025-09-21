@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { and, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { zod$ } from "~/lib/server/fn-utils";
 import type { Event as DbEvent, EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teamMembers } from "~/db/schema";
 import { createEventInputSchema } from "~/db/schema/events.schema";
@@ -39,32 +41,15 @@ function castEventJsonbFields(event: DbEvent): EventWithDetails {
  * Cancel an event
  */
 export const cancelEvent = createServerFn({ method: "POST" })
-  .validator(z.object({ eventId: z.string().uuid() }).parse)
-  .handler(async ({ data }): Promise<EventOperationResult<null>> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(z.object({ eventId: z.string().uuid() })))
+  .handler(async ({ data, context }): Promise<EventOperationResult<null>> => {
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
       const db = await getDb();
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "UNAUTHORIZED",
-              message: "User not authenticated",
-            },
-          ],
-        };
-      }
+      const user = requireUser(context);
 
       // Check if user owns the event
       const [event] = await db
@@ -85,7 +70,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
         };
       }
 
-      if (event.organizerId !== session.user.id) {
+      if (event.organizerId !== user.id) {
         return {
           success: false,
           errors: [
@@ -130,32 +115,15 @@ export const cancelEvent = createServerFn({ method: "POST" })
  * Create a new event
  */
 export const createEvent = createServerFn({ method: "POST" })
-  .validator(createEventSchema.parse)
-  .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(createEventSchema))
+  .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
       const db = await getDb();
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "UNAUTHORIZED",
-              message: "User not authenticated",
-            },
-          ],
-        };
-      }
+      const user = requireUser(context);
 
       // Validate input
       const validationResult = createEventInputSchema.safeParse(data);
@@ -211,7 +179,7 @@ export const createEvent = createServerFn({ method: "POST" })
         .insert(events)
         .values({
           ...data,
-          organizerId: session.user.id,
+          organizerId: user.id,
           startDate: data.startDate,
           endDate: data.endDate,
         })
@@ -239,32 +207,15 @@ export const createEvent = createServerFn({ method: "POST" })
  * Update an event
  */
 export const updateEvent = createServerFn({ method: "POST" })
-  .validator(updateEventSchema.parse)
-  .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
+  .middleware(getAuthMiddleware())
+  .validator(zod$(updateEventSchema))
+  .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       // Import server-only modules inside the handler
-      const [{ getDb }, { getAuth }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-      ]);
+      const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
       const db = await getDb();
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "UNAUTHORIZED",
-              message: "User not authenticated",
-            },
-          ],
-        };
-      }
+      const user = requireUser(context);
 
       // Check if event exists and user is organizer
       const [existingEvent] = await db
@@ -285,7 +236,7 @@ export const updateEvent = createServerFn({ method: "POST" })
         };
       }
 
-      if (existingEvent.organizerId !== session.user.id) {
+      if (existingEvent.organizerId !== user.id) {
         return {
           success: false,
           errors: [
@@ -386,33 +337,15 @@ function castRegistrationJsonbFields(
 }
 
 export const registerForEvent = createServerFn({ method: "POST" })
-  .validator(registerForEventSchema.parse)
+  .middleware(getAuthMiddleware())
+  .validator(zod$(registerForEventSchema))
   .handler(
-    async ({ data }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+    async ({ data, context }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
       try {
-        // Import server-only modules inside the handler
-        const [{ getDb }, { getAuth }] = await Promise.all([
-          import("~/db/server-helpers"),
-          import("~/lib/auth/server-helpers"),
-        ]);
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
         const db = await getDb();
-        const auth = await getAuth();
-        const { getWebRequest } = await import("@tanstack/react-start/server");
-        const { headers } = getWebRequest();
-        const session = await auth.api.getSession({ headers });
-
-        if (!session?.user?.id) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "UNAUTHORIZED",
-                message: "User not authenticated",
-              },
-            ],
-          };
-        }
+        const user = requireUser(context);
 
         // Get event details
         const [event] = await db
@@ -479,7 +412,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
             and(
               eq(eventRegistrations.eventId, data.eventId),
               or(
-                eq(eventRegistrations.userId, session.user.id),
+                eq(eventRegistrations.userId, user.id),
                 data.teamId ? eq(eventRegistrations.teamId, data.teamId) : undefined,
               ),
               eq(eventRegistrations.status, "confirmed"),
@@ -552,7 +485,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
             .where(
               and(
                 eq(teamMembers.teamId, data.teamId),
-                eq(teamMembers.userId, session.user.id),
+                eq(teamMembers.userId, user.id),
                 eq(teamMembers.status, "active"),
               ),
             )
@@ -590,7 +523,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
           .insert(eventRegistrations)
           .values({
             eventId: data.eventId,
-            userId: session.user.id,
+            userId: user.id,
             teamId: data.teamId,
             registrationType: data.teamId ? "team" : "individual",
             division: data.division,
@@ -704,33 +637,15 @@ export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
  * Cancel event registration
  */
 export const cancelEventRegistration = createServerFn({ method: "POST" })
-  .validator(cancelEventRegistrationSchema.parse)
+  .middleware(getAuthMiddleware())
+  .validator(zod$(cancelEventRegistrationSchema))
   .handler(
-    async ({ data }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+    async ({ data, context }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
       try {
-        // Import server-only modules inside the handler
-        const [{ getDb }, { getAuth }] = await Promise.all([
-          import("~/db/server-helpers"),
-          import("~/lib/auth/server-helpers"),
-        ]);
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
 
         const db = await getDb();
-        const auth = await getAuth();
-        const { getWebRequest } = await import("@tanstack/react-start/server");
-        const { headers } = getWebRequest();
-        const session = await auth.api.getSession({ headers });
-
-        if (!session?.user?.id) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "UNAUTHORIZED",
-                message: "User not authenticated",
-              },
-            ],
-          };
-        }
+        const user = requireUser(context);
 
         // Get registration
         const [registration] = await db
@@ -752,7 +667,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
         }
 
         // Check if user can cancel
-        if (registration.userId !== session.user.id) {
+        if (registration.userId !== user.id) {
           // Check if user is team captain/coach
           if (registration.teamId) {
             const [membership] = await db
@@ -761,7 +676,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
               .where(
                 and(
                   eq(teamMembers.teamId, registration.teamId),
-                  eq(teamMembers.userId, session.user.id),
+                  eq(teamMembers.userId, user.id),
                   eq(teamMembers.status, "active"),
                 ),
               )

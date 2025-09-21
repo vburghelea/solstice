@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { zod$ } from "~/lib/server/fn-utils";
 import type {
   RoleManagementData,
   RoleOperationResult,
@@ -119,7 +120,7 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
 );
 
 export const searchRoleEligibleUsers = createServerFn({ method: "POST" })
-  .validator(searchUsersSchema.parse)
+  .validator(zod$(searchUsersSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleUserSearchResult[]>> => {
     try {
       const [{ getDb }, { getAuth }] = await Promise.all([

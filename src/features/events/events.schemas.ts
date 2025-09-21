@@ -69,19 +69,32 @@ export const updateEventSchema = z.object({
 });
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 
+const rosterPlayerSchema = z.object({
+  userId: z.string(),
+  role: z.string().optional(),
+  name: z.string().optional(),
+  jerseyNumber: z.string().optional(),
+});
+
+const rosterObjectSchema = z
+  .object({
+    players: z.array(rosterPlayerSchema).optional(),
+    emergencyContact: z
+      .object({
+        name: z.string().optional(),
+        phone: z.string().optional(),
+        relationship: z.string().optional(),
+      })
+      .optional(),
+  })
+  .passthrough();
+
 export const registerForEventSchema = z.object({
   eventId: z.string(),
   teamId: z.string().optional(),
   division: z.string().optional(),
   notes: z.string().optional(),
-  roster: z
-    .array(
-      z.object({
-        userId: z.string(),
-        role: z.string(),
-      }),
-    )
-    .optional(),
+  roster: z.union([z.array(rosterPlayerSchema), rosterObjectSchema]).optional(),
 });
 export type RegisterForEventInput = z.infer<typeof registerForEventSchema>;
 

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { zod$ } from "~/lib/server/fn-utils";
 import type { RoleAssignmentRow, RoleOperationResult } from "./roles.types";
 
 const assignRoleSchema = z
@@ -32,7 +33,7 @@ function normalizeNotes(notes?: string) {
 }
 
 export const assignRoleToUser = createServerFn({ method: "POST" })
-  .validator(assignRoleSchema.parse)
+  .validator(zod$(assignRoleSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleAssignmentRow>> => {
     try {
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -275,7 +276,7 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
   });
 
 export const removeRoleAssignment = createServerFn({ method: "POST" })
-  .validator(removeRoleSchema.parse)
+  .validator(zod$(removeRoleSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleAssignmentRow>> => {
     try {
       const [{ getDb }, { getAuth }] = await Promise.all([

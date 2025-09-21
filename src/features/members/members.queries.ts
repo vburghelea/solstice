@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { listMembersSchema } from "./members.schemas";
+import { zod$ } from "~/lib/server/fn-utils";
 import type {
   MemberDirectoryMember,
   MemberDirectoryMembershipSummary,
@@ -60,7 +61,7 @@ function parsePrivacySettings(
 }
 
 export const listMembers = createServerFn({ method: "POST" })
-  .validator(listMembersSchema.parse)
+  .validator(zod$(listMembersSchema))
   .handler(async ({ data }): Promise<ListMembersResult> => {
     try {
       const searchTerm = data.search?.trim();

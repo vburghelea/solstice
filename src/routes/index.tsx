@@ -49,8 +49,8 @@ function Home() {
 
   const highlights = [
     { label: "Registered Members", value: "200+" },
-    { label: "Active Clubs Nationwide", value: "10" },
-    { label: "Youth Programs", value: "5 Cities" },
+    { label: "Active Clubs Nationwide", value: "10+" },
+    { label: "Cities WithYouth Programs", value: "5+" },
   ];
 
   const pillars = [

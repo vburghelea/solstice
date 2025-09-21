@@ -15,7 +15,7 @@ export default async function handler(req: Request, context: Context) {
     "Content-Security-Policy": [
       "default-src 'self'",
       // Allow trusted scripts + PostHog CDN + blob: for worker bootstraps. Prefer nonce/hashes; no generic inline allowed.
-      `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'sha256-NatFdn9qa3ivEDVSUujTj3/04jf+6XsuTh7hTdyWQdE=' 'sha256-KlDLetaHs3jydugAFrZVquz1h6i4vHS3ohIh0sfZqC4=' 'sha256-xqOjbNm60mQzEVYVjZCljL+3FDPBOA1akQuoSdPNNtw=' https://challenges.cloudflare.com https://eu-assets.i.posthog.com https://eu.i.posthog.com blob:`,
+      `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'sha256-NatFdn9qa3ivEDVSUujTj3/04jf+6XsuTh7hTdyWQdE=' 'sha256-KlDLetaHs3jydugAFrZVquz1h6i4vHS3ohIh0sfZqC4=' 'sha256-xqOjbNm60mQzEVYVjZCljL+3FDPBOA1akQuoSdPNNtw=' 'sha256-5JedoFHPMD1o/9fNxPf7aN8DGXTYs9UJC2bTfRPBFxY=' https://challenges.cloudflare.com https://eu-assets.i.posthog.com https://eu.i.posthog.com blob:`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: blob:",

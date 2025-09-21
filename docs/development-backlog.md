@@ -155,8 +155,6 @@
 - **Event Registration Payment Flow** - Integrate Square for event fees
 - **E-transfer Payment Option** - Alternative payment method
 - **Image Uploads** - Profile pictures and team logos via Cloudinary
-- **Mobile PWA** - Offline support for event day check-ins
-- **Public Content Pages** - About, Resources, Contact pages
 - **Advanced Permissions** - Event-specific and team-specific roles
 - **Bulk Operations** - Import/export members, batch email sending
 - **Analytics Dashboard** - Membership trends, event attendance stats

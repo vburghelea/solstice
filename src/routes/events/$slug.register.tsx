@@ -114,7 +114,7 @@ function EventRegistrationPage() {
 
   const eventData = eventResult?.success ? eventResult.data : null;
 
-  const { data: registrationStatus } = useQuery<
+  const { data: registrationStatus, isLoading: registrationLoading } = useQuery<
     { isRegistered: boolean } | undefined,
     Error
   >({
@@ -224,7 +224,7 @@ function EventRegistrationPage() {
 
   const requiresPayment = fee.discounted > 0;
 
-  if (eventLoading) {
+  if (eventLoading || registrationLoading) {
     return <RegistrationSkeleton />;
   }
 

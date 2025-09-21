@@ -404,19 +404,12 @@ function EventCard({ event }: { event: EventWithDetails }) {
           </div>
         </div>
 
-        <div className="flex gap-2 pt-2">
+        <div className="pt-2">
           <Button asChild className="w-full" size="sm">
             <Link to="/events/$slug" params={{ slug: event.slug }}>
               View Details
             </Link>
           </Button>
-          {event.isRegistrationOpen ? (
-            <Button asChild variant="outline" className="w-full" size="sm">
-              <Link to="/events/$slug/register" params={{ slug: event.slug }}>
-                Register
-              </Link>
-            </Button>
-          ) : null}
         </div>
       </CardContent>
     </Card>

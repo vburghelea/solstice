@@ -50,7 +50,7 @@ function EventDetailPage() {
 
   const eventData = eventResult?.success ? eventResult.data : null;
 
-  const { data: registrationStatus } = useQuery<
+  const { data: registrationStatus, isLoading: registrationLoading } = useQuery<
     { isRegistered: boolean } | undefined,
     Error
   >({
@@ -408,7 +408,11 @@ function EventDetailPage() {
               <Separator />
 
               {/* Action Buttons */}
-              {registrationStatus?.isRegistered ? (
+              {user && registrationLoading ? (
+                <div className="w-full">
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ) : registrationStatus?.isRegistered ? (
                 <Alert>
                   <CheckCircleIcon className="h-4 w-4" />
                   <AlertTitle>You're Registered!</AlertTitle>

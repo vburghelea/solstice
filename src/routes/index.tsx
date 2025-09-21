@@ -48,9 +48,9 @@ function Home() {
   const skeletonKeys = ["home-a", "home-b", "home-c"];
 
   const highlights = [
-    { label: "Registered Members", value: "2,300+" },
-    { label: "Active Clubs Nationwide", value: "48" },
-    { label: "Youth Programs Supported", value: "17" },
+    { label: "Registered Members", value: "200+" },
+    { label: "Active Clubs Nationwide", value: "10" },
+    { label: "Youth Programs", value: "5 Cities" },
   ];
 
   const pillars = [

@@ -526,6 +526,10 @@ async function seed() {
         contactPhone: "+1 (555) 987-0001",
         isPublic: true,
         isFeatured: false,
+        allowEtransfer: true,
+        etransferRecipient: "payments@quadballcanada.com",
+        etransferInstructions:
+          "Please include the event name 'E2E Open Showcase' and your team name in the e-transfer message. Security question: What sport? Answer: quadball",
         metadata: { seeded: true, category: "individual" },
       },
       {

@@ -1,11 +1,26 @@
 // Minimal browser-safe stand-in for Node's AsyncLocalStorage
 export class AsyncLocalStorage<T = unknown> {
-  run<R>(_: T, fn: () => R): R {
-    return fn();
+  private store: T | undefined;
+
+  run<R>(store: T, fn: () => R): R {
+    const previous = this.store;
+    this.store = store;
+    try {
+      return fn();
+    } finally {
+      this.store = previous;
+    }
   }
+
   getStore(): T | undefined {
-    return undefined;
+    return this.store;
   }
-  enterWith(_: T) {}
-  disable() {}
+
+  enterWith(store: T) {
+    this.store = store;
+  }
+
+  disable() {
+    this.store = undefined;
+  }
 }

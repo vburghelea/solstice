@@ -18,6 +18,7 @@ import { AlertCircle, ArrowLeftIcon } from "~/components/ui/icons";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { createTeam } from "~/features/teams/teams.mutations";
+import type { CreateTeamInput } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 // Canadian provinces and territories
@@ -46,7 +47,7 @@ function CreateTeamPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const createTeamMutation = useMutation({
-    mutationFn: (payload: any) =>
+    mutationFn: (payload: CreateTeamInput) =>
       unwrapServerFnResult(createTeam({ data: payload })),
     onSuccess: (team) => {
       navigate({ to: "/dashboard/teams/$teamId", params: { teamId: team.id } });

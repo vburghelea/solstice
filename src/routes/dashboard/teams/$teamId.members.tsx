@@ -41,6 +41,11 @@ import {
   updateTeamMember,
 } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import type {
+  AddTeamMemberInput,
+  RemoveTeamMemberInput,
+  UpdateTeamMemberInput,
+} from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
@@ -72,7 +77,7 @@ function TeamMembersPage() {
   const pendingMembers = members.filter((entry) => entry.member.status === "pending");
 
   const addMemberMutation = useMutation({
-    mutationFn: (payload: any) =>
+    mutationFn: (payload: AddTeamMemberInput) =>
       unwrapServerFnResult(addTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
@@ -85,7 +90,7 @@ function TeamMembersPage() {
   });
 
   const updateMemberMutation = useMutation({
-    mutationFn: (payload: any) =>
+    mutationFn: (payload: UpdateTeamMemberInput) =>
       unwrapServerFnResult(updateTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
@@ -93,7 +98,7 @@ function TeamMembersPage() {
   });
 
   const removeMemberMutation = useMutation({
-    mutationFn: (payload: any) =>
+    mutationFn: (payload: RemoveTeamMemberInput) =>
       unwrapServerFnResult(removeTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });

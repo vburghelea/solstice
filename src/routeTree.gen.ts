@@ -78,6 +78,7 @@ import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashb
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 >>>>>>> 6d449f5 (feat: implement role management dashboard and associated functionality)
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
+import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
@@ -301,6 +302,11 @@ const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
   path: "/admin/events-review",
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   getParentRoute: () => rootRouteImport,
+} as any);
+const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EventsSlugRoute,
 } as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
@@ -622,6 +628,7 @@ export interface FileRoutesByFullPath {
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -658,6 +665,7 @@ export interface FileRoutesByTo {
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
@@ -687,6 +695,8 @@ export interface FileRoutesByTo {
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
 =======
   "/events/$slug": typeof EventsSlugRouteWithChildren;
+=======
+>>>>>>> 877a7a5 (fix: resolve registration route not rendering in production)
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
@@ -696,6 +706,7 @@ export interface FileRoutesByTo {
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/events/$slug": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -786,6 +797,7 @@ export interface FileRoutesById {
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -873,6 +885,7 @@ export interface FileRouteTypes {
     | "/events/$slug/register"
     | "/dashboard/events/"
     | "/dashboard/teams/"
+    | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
@@ -909,6 +922,7 @@ export interface FileRouteTypes {
     | "/dashboard/reports"
     | "/dashboard/settings"
 <<<<<<< HEAD
+<<<<<<< HEAD
     | "/dashboard/social-audits"
     | "/event/$eventId"
     | "/game/$gameId"
@@ -938,6 +952,8 @@ export interface FileRouteTypes {
     | "/dashboard/campaigns/$campaignId/zero"
 =======
     | "/events/$slug"
+=======
+>>>>>>> 877a7a5 (fix: resolve registration route not rendering in production)
     | "/dashboard"
     | "/events"
     | "/onboarding"
@@ -947,6 +963,7 @@ export interface FileRouteTypes {
     | "/events/$slug/register"
     | "/dashboard/events"
     | "/dashboard/teams"
+    | "/events/$slug"
     | "/dashboard/events/$eventId/manage"
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
@@ -1032,6 +1049,7 @@ export interface FileRouteTypes {
     | "/events/$slug/register"
     | "/dashboard/events/"
     | "/dashboard/teams/"
+    | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
     | "/dashboard/teams/$teamId/manage"
@@ -1454,6 +1472,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminEventsReviewRouteImport;
 >>>>>>> d59af27 (chore: update dependencies and enhance event management features)
       parentRoute: typeof rootRouteImport;
+    };
+    "/events/$slug/": {
+      id: "/events/$slug/";
+      path: "/";
+      fullPath: "/events/$slug/";
+      preLoaderRoute: typeof EventsSlugIndexRouteImport;
+      parentRoute: typeof EventsSlugRoute;
     };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
@@ -1988,10 +2013,12 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
 
 interface EventsSlugRouteChildren {
   EventsSlugRegisterRoute: typeof EventsSlugRegisterRoute;
+  EventsSlugIndexRoute: typeof EventsSlugIndexRoute;
 }
 
 const EventsSlugRouteChildren: EventsSlugRouteChildren = {
   EventsSlugRegisterRoute: EventsSlugRegisterRoute,
+  EventsSlugIndexRoute: EventsSlugIndexRoute,
 };
 
 const EventsSlugRouteWithChildren = EventsSlugRoute._addFileChildren(

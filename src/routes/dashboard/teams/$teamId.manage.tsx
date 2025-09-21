@@ -29,6 +29,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
 import { getTeam } from "~/features/teams/teams.queries";
+import type { UpdateTeamInput } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 import { useCountries } from "~/shared/hooks/useCountries";
@@ -52,7 +53,7 @@ function ManageTeamPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const updateTeamMutation = useMutation({
-    mutationFn: (payload: { teamId: string; data: any }) =>
+    mutationFn: (payload: UpdateTeamInput) =>
       unwrapServerFnResult(updateTeam({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["team", teamId] });

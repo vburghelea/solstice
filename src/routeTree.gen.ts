@@ -34,6 +34,7 @@ import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
+import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
@@ -171,6 +172,11 @@ const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
   path: "/admin/events-review",
   getParentRoute: () => rootRouteImport,
 } as any);
+const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EventsSlugRoute,
+} as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -304,6 +310,7 @@ export interface FileRoutesByFullPath {
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -325,7 +332,6 @@ export interface FileRoutesByTo {
   "/dashboard/profile": typeof DashboardProfileRoute;
   "/dashboard/reports": typeof DashboardReportsRoute;
   "/dashboard/settings": typeof DashboardSettingsRoute;
-  "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
@@ -335,6 +341,7 @@ export interface FileRoutesByTo {
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/events/$slug": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -372,6 +379,7 @@ export interface FileRoutesById {
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/events/$slug/": typeof EventsSlugIndexRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -410,6 +418,7 @@ export interface FileRouteTypes {
     | "/events/$slug/register"
     | "/dashboard/events/"
     | "/dashboard/teams/"
+    | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -431,7 +440,6 @@ export interface FileRouteTypes {
     | "/dashboard/profile"
     | "/dashboard/reports"
     | "/dashboard/settings"
-    | "/events/$slug"
     | "/dashboard"
     | "/events"
     | "/onboarding"
@@ -441,6 +449,7 @@ export interface FileRouteTypes {
     | "/events/$slug/register"
     | "/dashboard/events"
     | "/dashboard/teams"
+    | "/events/$slug"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -477,6 +486,7 @@ export interface FileRouteTypes {
     | "/events/$slug/register"
     | "/dashboard/events/"
     | "/dashboard/teams/"
+    | "/events/$slug/"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -735,6 +745,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminEventsReviewRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/events/$slug/": {
+      id: "/events/$slug/";
+      path: "/";
+      fullPath: "/events/$slug/";
+      preLoaderRoute: typeof EventsSlugIndexRouteImport;
+      parentRoute: typeof EventsSlugRoute;
+    };
     "/dashboard/teams/": {
       id: "/dashboard/teams/";
       path: "/";
@@ -978,10 +995,12 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
 
 interface EventsSlugRouteChildren {
   EventsSlugRegisterRoute: typeof EventsSlugRegisterRoute;
+  EventsSlugIndexRoute: typeof EventsSlugIndexRoute;
 }
 
 const EventsSlugRouteChildren: EventsSlugRouteChildren = {
   EventsSlugRegisterRoute: EventsSlugRegisterRoute,
+  EventsSlugIndexRoute: EventsSlugIndexRoute,
 };
 
 const EventsSlugRouteWithChildren = EventsSlugRoute._addFileChildren(

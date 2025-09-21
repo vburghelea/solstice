@@ -51,6 +51,56 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { featuredGames, popularSystems } = Route.useLoaderData() as HomeLoaderData;
+  const { events: initialEvents } = Route.useLoaderData() as {
+    events: EventWithDetails[];
+  };
+
+  const {
+    data: events = [],
+    isPending,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["upcoming-events", { limit: UPCOMING_EVENTS_LIMIT }],
+    queryFn: async () =>
+      (await getUpcomingEvents({
+        data: { limit: UPCOMING_EVENTS_LIMIT },
+      })) as EventWithDetails[],
+    initialData: initialEvents,
+    staleTime: 1000 * 60,
+  });
+
+  const isLoading = (isPending || isFetching) && events.length === 0;
+  const skeletonKeys = ["home-a", "home-b", "home-c"];
+
+  const highlights = [
+    { label: "Registered Members", value: "200+" },
+    { label: "Active Clubs Nationwide", value: "10" },
+    { label: "Youth Programs", value: "5 Cities" },
+  ];
+
+  const pillars = [
+    {
+      title: "National Competitions",
+      description:
+        "From regional qualifiers to the Canadian Cup, we deliver a schedule that challenges elite athletes and welcomes new competitors alike.",
+      icon: Trophy,
+    },
+    {
+      title: "Club Development",
+      description:
+        "We provide toolkits, grants, and mentorship so every program—from university clubs to community leagues—can thrive year-round.",
+      icon: UsersIcon,
+    },
+    {
+      title: "Safe & Inclusive Play",
+      description:
+        "Certified officials, safeguarding training, and rule adaptations ensure Quadball is accessible for athletes of every identity and ability.",
+      icon: ShieldCheck,
+    },
+  ];
 
   return (
     <PublicLayout>

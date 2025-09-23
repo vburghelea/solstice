@@ -22,11 +22,7 @@ import {
   safetyRulesSchema,
   xCardSystemEnum,
 } from "~/shared/schemas/common";
-import {
-  LanguageLevel,
-  languageLevelOptions,
-  languageOptions,
-} from "~/shared/types/common";
+import { LanguageLevel, languageLevelOptions } from "~/shared/types/common";
 import { Checkbox } from "~/shared/ui/checkbox";
 import { FormSection } from "~/shared/ui/form-section";
 import { Label } from "~/shared/ui/label";
@@ -165,21 +161,6 @@ export function GameForm({
   React.useEffect(() => {
     if (effectiveGameSystem) {
       form.setFieldValue("expectedDuration", effectiveGameSystem.averagePlayTime ?? 1);
-      form.setFieldValue(
-        "minimumRequirements.minPlayers",
-        effectiveGameSystem.minPlayers ?? 1,
-      );
-      form.setFieldValue(
-        "minimumRequirements.maxPlayers",
-        effectiveGameSystem.maxPlayers ?? 1,
-      );
-    }
-  }, [form, effectiveGameSystem]);
-
-  // Update form fields when game system changes
-  React.useEffect(() => {
-    if (selectedGameSystem) {
-      form.setFieldValue("expectedDuration", selectedGameSystem.averagePlayTime ?? 1);
       form.setFieldValue(
         "minimumRequirements.minPlayers",
         effectiveGameSystem.minPlayers ?? 1,

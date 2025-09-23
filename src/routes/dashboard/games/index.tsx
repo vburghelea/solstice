@@ -34,18 +34,6 @@ function getStatusBadgeVariant(status: GameListItem["status"]) {
   }
 }
 
-function getStatusBadgeVariant(status: GameListItem["status"]) {
-  switch (status) {
-    case "completed":
-      return "default" as const;
-    case "canceled":
-      return "destructive" as const;
-    case "scheduled":
-    default:
-      return "secondary" as const;
-  }
-}
-
 export const Route = createFileRoute("/dashboard/games/")({
   component: GamesPage,
   validateSearch: z.object({

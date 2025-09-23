@@ -41,7 +41,6 @@ import {
   updateTeamMember,
 } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 import type {
   AddTeamMemberInput,
   RemoveTeamMemberInput,

@@ -81,7 +81,7 @@ function mapDbUserToProfile(
 export const updateUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(partialProfileInputSchema))
-  .handler(async ({ data: inputData, context }): Promise<ProfileOperationResult> => {
+  .handler(async ({ data: inputData }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
       const { getCurrentUser } = await import("~/features/auth/auth.queries");

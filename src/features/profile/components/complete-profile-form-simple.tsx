@@ -66,34 +66,6 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<ProfileInputType>({
-    gender: "",
-    pronouns: "",
-    phone: "",
-    city: "",
-    country: "",
-    languages: [],
-    identityTags: [],
-    preferredGameThemes: [],
-    overallExperienceLevel: undefined,
-    calendarAvailability: defaultAvailabilityData,
-    isGM: false,
-    gmStyle: "",
-    gameSystemPreferences: {
-      favorite: [],
-      avoid: [],
-    },
-    privacySettings: {
-      showEmail: false,
-      showPhone: false,
-      showLocation: false,
-      showLanguages: false,
-      showGamePreferences: false,
-      allowTeamInvitations: true,
-      allowFollows: true,
-    },
-  });
-
   // Merge initial data with default privacy settings to ensure all required fields are present
   const formDefaultValues = {
     ...initialData,

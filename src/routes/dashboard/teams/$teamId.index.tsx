@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ProfileLink } from "~/components/ProfileLink";
 import { useState } from "react";
 import { ProfileLink } from "~/components/ProfileLink";
 import { Badge } from "~/components/ui/badge";
@@ -17,9 +16,7 @@ import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { useAuth } from "~/features/auth";
 import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
-import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId/")({
@@ -58,8 +55,7 @@ function TeamDetailsPage() {
     membershipStatus === "pending" && !membershipRecord?.invitedBy?.id;
 
   const requestMembershipMutation = useMutation({
-    mutationFn: () =>
-      unwrapServerFnResult(requestTeamMembership({ data: { teamId } })),
+    mutationFn: () => unwrapServerFnResult(requestTeamMembership({ data: { teamId } })),
     onSuccess: () => {
       setRequestState({
         type: "success",

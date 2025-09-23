@@ -1,5 +1,4 @@
 import { redirect } from "@tanstack/react-router";
-import { userHasRole } from "~/features/roles/permission.service";
 import type { User } from "~/lib/auth/types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 
@@ -11,10 +10,46 @@ interface RoleGuardOptions {
   redirectTo?: string;
 }
 
-/**
- * Role-based access control guard for routes
- * Use this in route beforeLoad to protect pages based on user roles
- */
+function hasClientAccess({
+  user,
+  requiredRoles,
+  teamId,
+  eventId,
+}: {
+  user: User;
+  requiredRoles: string[];
+  teamId?: string;
+  eventId?: string;
+}): boolean {
+  return requiredRoles.some((roleName) => {
+    if (roleName === "Platform Admin" || roleName === "Games Admin") {
+      return isAdminClient(user);
+    }
+
+    return (
+      user.roles?.some((assignment) => {
+        if (assignment.role.name !== roleName) {
+          return false;
+        }
+
+        if (roleName === "Team Admin" && teamId) {
+          return assignment.teamId === teamId;
+        }
+
+        if (roleName === "Event Admin" && eventId) {
+          return assignment.eventId === eventId;
+        }
+
+        if (roleName === "Team Admin" || roleName === "Event Admin") {
+          return true;
+        }
+
+        return !assignment.teamId && !assignment.eventId;
+      }) ?? false
+    );
+  });
+}
+
 export async function requireRole({
   user,
   requiredRoles,
@@ -30,56 +65,53 @@ export async function requireRole({
     return;
   }
 
-  // Only perform role checking on the server to avoid client-side bundle pollution
-  if (typeof window === "undefined") {
-    // Import PermissionService dynamically to avoid client-side bundling
-    const { PermissionService } = await import("~/features/roles/permission.service");
+  if (typeof window !== "undefined") {
+    if (!hasClientAccess({ user, requiredRoles, teamId, eventId })) {
+      throw redirect({ to: redirectTo });
+    }
+    return;
+  }
 
-    // Check if user has any of the required roles
-    let hasAccess = false;
+  const { PermissionService } = await import("~/features/roles/permission.service");
 
-    for (const roleName of requiredRoles) {
-      if (roleName === "Platform Admin" || roleName === "Games Admin") {
-        // Global admin check
-        hasAccess = await PermissionService.isGlobalAdmin(user.id);
-      } else if (roleName === "Team Admin" && teamId) {
-        // Team-specific admin check
-        hasAccess = await PermissionService.canManageTeam(user.id, teamId);
-      } else if (roleName === "Event Admin" && eventId) {
-        // Event-specific admin check
-        hasAccess = await PermissionService.canManageEvent(user.id, eventId);
-      }
+  let hasAccess = false;
 
-      if (hasAccess) break;
+  for (const roleName of requiredRoles) {
+    if (roleName === "Platform Admin" || roleName === "Games Admin") {
+      hasAccess = await PermissionService.isGlobalAdmin(user.id);
+    } else if (roleName === "Team Admin" && teamId) {
+      hasAccess = await PermissionService.canManageTeam(user.id, teamId);
+    } else if (roleName === "Event Admin" && eventId) {
+      hasAccess = await PermissionService.canManageEvent(user.id, eventId);
+    } else if (user.roles) {
+      hasAccess = user.roles.some((assignment) => assignment.role.name === roleName);
     }
 
-    if (roleName === "Event Admin" && eventId) {
-      return userHasRole(user, roleName, { eventId });
+    if (hasAccess) {
+      break;
     }
-
-    return userHasRole(user, roleName);
-  });
+  }
 
   if (!hasAccess) {
     throw redirect({ to: redirectTo });
   }
 }
 
-/**
- * Convenience function for requiring global admin access
- */
 export async function requireGlobalAdmin(user: User | null, redirectTo = "/dashboard") {
   if (!user) {
     throw redirect({ to: "/auth/login" });
   }
 
-  // Only perform admin check on the server to avoid client-side bundle pollution
-  if (typeof window === "undefined") {
-    // Import PermissionService dynamically to avoid client-side bundling
-    const { PermissionService } = await import("~/features/roles/permission.service");
-    const isAdmin = await PermissionService.isGlobalAdmin(user.id);
-    if (!isAdmin) {
+  if (typeof window !== "undefined") {
+    if (!isAdminClient(user)) {
       throw redirect({ to: redirectTo });
     }
+    return;
+  }
+
+  const { PermissionService } = await import("~/features/roles/permission.service");
+  const isAdmin = await PermissionService.isGlobalAdmin(user.id);
+  if (!isAdmin) {
+    throw redirect({ to: redirectTo });
   }
 }

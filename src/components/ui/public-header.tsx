@@ -3,7 +3,6 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "~/shared/lib/utils";
 import { Button } from "./button";
-import { Logo } from "./logo";
 
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

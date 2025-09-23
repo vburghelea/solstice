@@ -37,7 +37,7 @@ import type {
   EventPaymentStatus,
   EventWithDetails,
 } from "./events.types";
-import type { EventFilters, EventListResult, EventWithDetails } from "./events.types";
+import type { EventListResult, EventWithDetails } from "./events.types";
 // Lightweight DTO for registrations list
 export type EventRegistrationListItem = {
   id: string;

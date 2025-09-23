@@ -7,6 +7,7 @@ import { searchUsersForInvitation } from "~/features/games/games.queries";
 import type { GameParticipant } from "~/features/games/games.types";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { useDebounce } from "~/shared/hooks/useDebounce";
+import type { OperationResult } from "~/shared/types/common";
 
 import { ProfileLink } from "~/components/ProfileLink";
 import { Button } from "~/shared/ui/button";
@@ -196,6 +197,47 @@ export function InviteParticipants({
             </Button>
           </div>
         </div>
+
+        {pendingInvites.length > 0 && (
+          <div className="space-y-3">
+            <Label>Pending invitations</Label>
+            <div className="space-y-2">
+              {pendingInvites.map((participant) => {
+                const participantName =
+                  participant.user?.name ??
+                  participant.user?.email ??
+                  "Pending participant";
+
+                return (
+                  <div
+                    key={participant.id}
+                    className="border-border flex items-center justify-between rounded-md border p-3"
+                  >
+                    <div>
+                      <p className="font-medium">{participantName}</p>
+                      {participant.user?.email ? (
+                        <p className="text-muted-foreground text-xs">
+                          {participant.user.email}
+                        </p>
+                      ) : null}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRevokeInvitation(participant.id)}
+                      disabled={revokeMutation.isPending}
+                    >
+                      {revokeMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      Revoke
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

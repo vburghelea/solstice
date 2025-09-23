@@ -29,12 +29,10 @@ import {
 } from "~/shared/types/common";
 //
 import { Link } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
 import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 import { updateUserProfile } from "../profile.mutations";
-import type { ProfileOperationResult } from "../profile.types";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 import { AvailabilityEditor } from "./availability-editor";
@@ -637,7 +635,6 @@ export function ProfileView() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Avatar upload (edit-mode only) */}
           {editingSection === "basic" ? (
             <AvatarUpload
               name={profile?.name ?? null}
@@ -647,13 +644,11 @@ export function ProfileView() {
             />
           ) : null}
 
-          {/* Email (view-only) */}
           <div>
             <Label>Email Address</Label>
             <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
           </div>
 
-          {/* GM Stats (view-only) */}
           {profile?.isGM ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
@@ -682,7 +677,7 @@ export function ProfileView() {
                     : "N/A"}
                 </p>
               </div>
-              {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 && (
+              {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 ? (
                 <div className="sm:col-span-2">
                   <Label>Top Strengths</Label>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -699,14 +694,7 @@ export function ProfileView() {
                     ))}
                   </div>
                 </div>
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Pronouns</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.pronouns || "Not specified"}
-              </p>
+              ) : null}
             </div>
           ) : null}
 

@@ -8,9 +8,7 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/auth/login")({
-  validateSearch: z.object({
-    redirect: z.string().optional(),
-  }),
+  validateSearch: searchSchema,
   beforeLoad: async ({ context }) => {
     redirectIfAuthenticated({ user: context.user });
   },

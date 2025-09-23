@@ -77,14 +77,6 @@ export function DataTable<TData, TValue>({
   const handleRowSelectionChange: OnChangeFn<RowSelectionState> | undefined =
     enableRowSelection ? (onRowSelectionChange ?? setInternalRowSelection) : undefined;
 
-  const paginationState = manualPagination ? { pageIndex, pageSize } : undefined;
-  const resolvedPageCount = manualPagination ? (pageCount ?? -1) : undefined;
-  const resolvedRowSelection = enableRowSelection
-    ? (rowSelection ?? internalRowSelection)
-    : undefined;
-  const handleRowSelectionChange: OnChangeFn<RowSelectionState> | undefined =
-    enableRowSelection ? (onRowSelectionChange ?? setInternalRowSelection) : undefined;
-
   const table = useReactTable({
     data,
     columns,
@@ -117,7 +109,8 @@ export function DataTable<TData, TValue>({
         }),
   });
 
-  const canRenderToolbar = enableColumnToggle || Boolean(onExport);
+  const canRenderToolbar =
+    enableColumnToggle || Boolean(onExport) || Boolean(toolbarContent);
   const canPreviousPage = manualPagination ? pageIndex > 0 : table.getCanPreviousPage();
   const canNextPage = manualPagination
     ? pageCount != null && pageCount > 0
@@ -150,101 +143,42 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {canRenderToolbar && (
-        <div className="flex items-center justify-between">
-          {enableColumnToggle ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto">
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={column.id}
-                        className="capitalize"
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                      >
-                        {column.id}
-                      </DropdownMenuCheckboxItem>
-                    );
-                  })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <span />
-          )}
-          {onExport && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {enableColumnToggle ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">Columns</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {table
+                    .getAllColumns()
+                    .filter((column) => column.getCanHide())
+                    .map((column) => {
+                      return (
+                        <DropdownMenuCheckboxItem
+                          key={column.id}
+                          className="capitalize"
+                          checked={column.getIsVisible()}
+                          onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                        >
+                          {column.id}
+                        </DropdownMenuCheckboxItem>
+                      );
+                    })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
+            {toolbarContent}
+          </div>
+          {onExport ? (
             <Button onClick={onExport} variant="outline">
               Export CSV
             </Button>
-          )}
+          ) : null}
         </div>
       )}
       <div className="rounded-md border">
-        <Table>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {onExport && (
-          <Button onClick={onExport} variant="outline">
-            Export CSV
-          </Button>
-        )}
-        <div className="flex items-center gap-2">
-          {onExport && (
-            <Button onClick={onExport} variant="outline">
-              Export CSV
-            </Button>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-      <div className="bg-card text-card-foreground overflow-hidden rounded-xl border shadow-sm">
         <Table className="w-full min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -258,7 +192,7 @@ export function DataTable<TData, TValue>({
                             header.column.columnDef.header,
                             header.getContext(),
                           )}
-                          {header.column.getCanSort() && (
+                          {header.column.getCanSort() ? (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -267,7 +201,7 @@ export function DataTable<TData, TValue>({
                             >
                               <ArrowUpDown className="h-4 w-4" />
                             </Button>
-                          )}
+                          ) : null}
                         </div>
                       )}
                     </TableHead>

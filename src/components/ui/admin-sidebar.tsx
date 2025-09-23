@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
-import { ADMIN_PRIMARY_NAV, ADMIN_SECONDARY_NAV } from "~/features/layouts/admin-nav";
 import { userHasRole } from "~/features/roles/permission.service";
 import { auth } from "~/lib/auth-client";
 

@@ -10,12 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { PlusIcon, UsersIcon } from "~/components/ui/icons";
-import { useCountries } from "~/shared/hooks/useCountries";
-import { List } from "~/shared/ui/list";
+import { LoaderIcon, PlusIcon, UsersIcon } from "~/components/ui/icons";
 import { TeamInvitationsSection } from "~/features/teams/components/team-invitations";
 import type { PendingTeamInvite, UserTeam } from "~/features/teams/teams.queries";
 import { getPendingTeamInvites, getUserTeams } from "~/features/teams/teams.queries";
+import { useCountries } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/dashboard/teams/")({
   loader: async () => {
@@ -27,7 +26,6 @@ export const Route = createFileRoute("/dashboard/teams/")({
 });
 
 function TeamsIndexPage() {
-  const { getCountryName } = useCountries();
   const loaderData = Route.useLoaderData() as {
     userTeams: UserTeam[];
     pendingInvites: PendingTeamInvite[];
@@ -123,14 +121,9 @@ function TeamsIndexPage() {
   );
 }
 
-function TeamCard({
-  userTeam,
-  getCountryName,
-}: {
-  userTeam: UserTeam;
-  getCountryName: (isoCode: string | null | undefined) => string;
-}) {
+function TeamCard({ userTeam }: { userTeam: UserTeam }) {
   const { team, membership, memberCount } = userTeam;
+  const { getCountryName } = useCountries();
 
   return (
     <Card className="transition-shadow hover:shadow-lg">

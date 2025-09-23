@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { UserProfile } from "../profile.types";
+import { defaultPrivacySettings } from "../profile.types";
 import { isProfileComplete } from "../profile.utils";
 
 describe("profile.utils", () => {
@@ -14,13 +15,9 @@ describe("profile.utils", () => {
       pronouns: "he/him",
       phone: "1234567890",
       privacySettings: {
+        ...defaultPrivacySettings,
         showEmail: true,
-        showPhone: false,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
         allowTeamInvitations: true,
-        allowFollows: true,
       },
       // Add missing required properties with default values
       languages: ["en", "es"],
@@ -48,13 +45,9 @@ describe("profile.utils", () => {
       pronouns: "he/him",
       phone: "1234567890",
       privacySettings: {
+        ...defaultPrivacySettings,
         showEmail: true,
-        showPhone: false,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
         allowTeamInvitations: true,
-        allowFollows: true,
       },
       // Add missing required properties with default values
       languages: ["en", "es"],
@@ -81,13 +74,9 @@ describe("profile.utils", () => {
       gender: "Male",
       phone: "1234567890",
       privacySettings: {
+        ...defaultPrivacySettings,
         showEmail: true,
-        showPhone: false,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
         allowTeamInvitations: true,
-        allowFollows: true,
       },
       // Add missing required properties with default values
       languages: ["en", "es"],
@@ -114,13 +103,9 @@ describe("profile.utils", () => {
       gender: "Male",
       pronouns: "he/him",
       privacySettings: {
+        ...defaultPrivacySettings,
         showEmail: true,
-        showPhone: false,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
         allowTeamInvitations: true,
-        allowFollows: true,
       },
       // Add missing required properties with default values
       languages: ["en", "es"],

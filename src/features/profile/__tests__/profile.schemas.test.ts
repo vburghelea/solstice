@@ -5,18 +5,15 @@ import {
   identityTagOptions,
 } from "~/shared/types/common";
 import { privacySettingsSchema, profileInputSchema } from "../profile.schemas";
+import { defaultPrivacySettings } from "../profile.types";
 
 describe("Profile Schemas", () => {
   describe("privacySettingsSchema", () => {
     it("validates valid privacy settings", () => {
       const validSettings = {
+        ...defaultPrivacySettings,
         showEmail: true,
-        showPhone: false,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
         allowTeamInvitations: true,
-        allowFollows: true,
       };
 
       const result = privacySettingsSchema.safeParse(validSettings);
@@ -48,13 +45,9 @@ describe("Profile Schemas", () => {
           avoid: [{ id: 3, name: "System 3" }],
         },
         privacySettings: {
+          ...defaultPrivacySettings,
           showEmail: true,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: true,
-          allowFollows: true,
         },
         overallExperienceLevel: "intermediate",
         identityTags: ["LGBTQ+", "Artist"],

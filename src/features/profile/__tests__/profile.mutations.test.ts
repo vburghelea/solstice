@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultAvailabilityData, type AvailabilityData } from "~/db/schema/auth.schema";
 import type { CompleteProfileInputType, ProfileInputType } from "../profile.schemas";
 import type { PrivacySettings, UserProfile } from "../profile.types";
+import { defaultPrivacySettings } from "../profile.types";
 
 // Mock the entire profile.mutations module
 vi.mock("../profile.mutations", async (importOriginal) => {
@@ -252,13 +253,9 @@ describe("Profile Mutations", () => {
         pronouns: "he/him",
         phone: "9876543210",
         privacySettings: {
+          ...defaultPrivacySettings,
           showEmail: true,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: true,
-          allowFollows: true,
         },
         gameSystemPreferences: {
           favorite: [{ id: 3, name: "Wingspan" }],
@@ -297,13 +294,9 @@ describe("Profile Mutations", () => {
         pronouns: "she/her",
         phone: "9876543210",
         privacySettings: {
+          ...defaultPrivacySettings,
           showEmail: true,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: true,
-          allowFollows: true,
         },
         overallExperienceLevel: "intermediate" as const,
         identityTags: ["LGBTQ+", "Artist"],
@@ -332,13 +325,9 @@ describe("Profile Mutations", () => {
         pronouns: "she/her",
         phone: "9876543210",
         privacySettings: {
+          ...defaultPrivacySettings,
           showEmail: true,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: true,
-          allowFollows: true,
         },
         overallExperienceLevel: "intermediate" as const,
         identityTags: ["LGBTQ+", "Artist"],
@@ -375,13 +364,10 @@ describe("Profile Mutations", () => {
   describe("updatePrivacySettings", () => {
     it("should update privacy settings", async () => {
       const privacySettings: PrivacySettings = {
+        ...defaultPrivacySettings,
         showEmail: false,
         showPhone: true,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
         allowTeamInvitations: false,
-        allowFollows: true,
       };
       const updatedProfile = { ...mockUser, privacySettings };
       vi.mocked(updatePrivacySettings).mockResolvedValue({

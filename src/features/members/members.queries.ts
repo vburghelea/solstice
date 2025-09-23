@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { listMembersSchema } from "./members.schemas";
 import { zod$ } from "~/lib/server/fn-utils";
+import { listMembersSchema } from "./members.schemas";
 import type {
   MemberDirectoryMember,
   MemberDirectoryMembershipSummary,
@@ -48,12 +48,7 @@ function parsePrivacySettings(
 
   try {
     const parsed = JSON.parse(value) as Partial<PrivacySettings>;
-    return {
-      showEmail: parsed.showEmail ?? fallback.showEmail,
-      showPhone: parsed.showPhone ?? fallback.showPhone,
-      showBirthYear: parsed.showBirthYear ?? fallback.showBirthYear,
-      allowTeamInvitations: parsed.allowTeamInvitations ?? fallback.allowTeamInvitations,
-    };
+    return { ...fallback, ...parsed };
   } catch (error) {
     console.warn("Failed to parse privacy settings", error);
     return fallback;

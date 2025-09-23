@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultAvailabilityData } from "~/db";
 import type { PrivacySettings, UserProfile } from "../profile.types";
+import { defaultPrivacySettings } from "../profile.types";
 
 // Mock the entire profile.queries module
 vi.mock("../profile.queries", async (importOriginal) => {
@@ -78,13 +79,9 @@ describe("Profile Queries", () => {
         pronouns: "he/him",
         phone: "1234567890",
         privacySettings: {
+          ...defaultPrivacySettings,
           showEmail: true,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: true,
-          allowFollows: true,
         },
         overallExperienceLevel: "intermediate",
         identityTags: ["LGBTQ+", "Artist"],
@@ -106,13 +103,9 @@ describe("Profile Queries", () => {
         pronouns: "he/him",
         phone: "1234567890",
         privacySettings: {
+          ...defaultPrivacySettings,
           showEmail: true,
-          showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: true,
-          allowFollows: true,
         },
       };
 

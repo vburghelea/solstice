@@ -50,12 +50,7 @@ export const MOCK_OWNER_USER: DbUser = {
   id: "test-user-id",
   name: "Owner User",
   email: "owner@example.com",
-  emailVerified: true,
-  image: null,
-  uploadedAvatarPath: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  profileComplete: true,
+  ...BASE_USER_PROPS,
   phone: "+1234567890",
   gender: "male",
   pronouns: "he/him",
@@ -65,15 +60,9 @@ export const MOCK_OWNER_USER: DbUser = {
   identityTags: ["gamer"],
   preferredGameThemes: ["fantasy"],
   overallExperienceLevel: "intermediate",
-  calendarAvailability: null,
   privacySettings: JSON.stringify({
-    showEmail: false,
-    showPhone: false,
-    showLocation: false,
-    showLanguages: false,
-    showGamePreferences: false,
+    ...defaultPrivacySettings,
     allowTeamInvitations: true,
-    allowFollows: true,
   }),
   notificationPreferences: {
     gameReminders: true,
@@ -90,7 +79,6 @@ export const MOCK_OWNER_USER: DbUser = {
   gmStyle: "storytelling",
   gmRating: 4,
   profileUpdatedAt: new Date(),
-  profileVersion: 1,
 };
 
 export const MOCK_PLAYER_USER: DbUser = {

@@ -9,7 +9,7 @@ import {
   searchUsersForInvitationSchema,
 } from "./games.schemas";
 
-import type { and } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { z } from "zod";
 import {
   locationSchema,
@@ -59,7 +59,7 @@ interface DbLike {
   select: <R>(projection: unknown) => DbFromChain<R>;
 }
 
-type SqlExpr = ReturnType<typeof and>;
+type SqlExpr = SQL<unknown>;
 
 type GameSystem = typeof gameSystemsTable.$inferSelect;
 
@@ -860,165 +860,6 @@ export const getGameParticipants = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
     try {
       const { findGameParticipantsByGameId } = await getServerDeps();
-      const participants = await findGameParticipantsByGameId(data.id);
-
-      return { success: true, data: participants as GameParticipant[] };
-    } catch (error) {
-      console.error("Error fetching game participants:", error);
-      return {
-        success: false,
-        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch participants" }],
-      };
-    }
-  });
-
-/**
- * Search users for invitation by name or email
- */
-export const searchUsersForInvitation = createServerFn({ method: "POST" })
-  .validator(searchUsersForInvitationSchema.parse)
-  .handler(
-    async ({
-      data,
-    }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
-      try {
-        const db = await getDb();
-        const searchTerm = `%${data.query}%`;
-
-        const users = await db
-          .select({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            image: user.image,
-            uploadedAvatarPath: user.uploadedAvatarPath,
-          })
-          .from(user)
-          .where(or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)))
-          .limit(10);
-
-        return { success: true, data: users };
-      } catch (error) {
-        console.error("Error searching users for invitation:", error);
-        return {
-          success: false,
-          errors: [{ code: "SERVER_ERROR", message: "Failed to search users" }],
-        };
-      }
-    },
-  );
-
-/**
- * List game sessions by campaign ID
- */
-export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
-  .validator(listGameSessionsByCampaignIdSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
-    try {
-      const db = await getDb();
-
-      const conditions = [eq(games.campaignId, data.campaignId)];
-
-      if (data.status) {
-        conditions.push(eq(games.status, data.status));
-      }
-
-      const result: GameQueryResultRow[] = await db
-        .select({
-          id: games.id,
-          ownerId: games.ownerId,
-          campaignId: games.campaignId,
-          gameSystemId: games.gameSystemId,
-          name: games.name,
-          dateTime: games.dateTime,
-          description: games.description,
-          expectedDuration: games.expectedDuration,
-          price: games.price,
-          language: games.language,
-          location: sql<z.infer<typeof locationSchema>>`${games.location}`,
-          status: games.status,
-          minimumRequirements: sql<
-            z.infer<typeof minimumRequirementsSchema>
-          >`${games.minimumRequirements}`,
-          visibility: games.visibility,
-          safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
-          createdAt: games.createdAt,
-          updatedAt: games.updatedAt,
-          owner: { id: user.id, name: user.name, email: user.email },
-          gameSystem: { id: gameSystems.id, name: gameSystems.name },
-          participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
-        })
-        .from(games)
-        .innerJoin(user, eq(games.ownerId, user.id))
-        .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
-        .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
-        .where(and(...conditions))
-        .groupBy(games.id, user.id, gameSystems.id);
-
-      return {
-        success: true,
-        data: result.map((r) => ({
-          ...r,
-        })),
-      };
-    } catch (error) {
-      console.error("Error listing game sessions by campaign ID:", error);
-      return {
-        success: false,
-        errors: [{ code: "DATABASE_ERROR", message: "Failed to list game sessions" }],
-      };
-    }
-  });
-
-/**
- * Get pending applications for a specific game
- */
-export const getGameApplications = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
-    try {
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        return {
-          success: false,
-          errors: [{ code: "AUTH_ERROR", message: "Not authenticated" }],
-        };
-      }
-
-      // Check if current user is the owner of the game
-      const game = await findGameById(data.id);
-
-      if (!game || game.ownerId !== currentUser.id) {
-        return {
-          success: false,
-          errors: [
-            {
-              code: "AUTH_ERROR",
-              message: "Not authorized to view applications for this game",
-            },
-          ],
-        };
-      }
-
-      const applications = await findPendingGameApplicationsByGameId(data.id);
-
-      return { success: true, data: applications as GameParticipant[] };
-    } catch (error) {
-      console.error("Error fetching game applications:", error);
-      return {
-        success: false,
-        errors: [{ code: "SERVER_ERROR", message: "Failed to fetch applications" }],
-      };
-    }
-  });
-
-/**
- * Get participants for a specific game
- */
-export const getGameParticipants = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
-  .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
-    try {
       const participants = await findGameParticipantsByGameId(data.id);
 
       return { success: true, data: participants as GameParticipant[] };

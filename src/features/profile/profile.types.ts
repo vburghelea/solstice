@@ -1,3 +1,6 @@
+import type { AvailabilityData } from "~/db/schema/auth.schema";
+import type { ProfileInputType } from "~/features/profile/profile.schemas";
+
 export interface PrivacySettings {
   showEmail: boolean;
   showPhone: boolean;
@@ -9,8 +12,6 @@ export interface PrivacySettings {
   allowInvitesOnlyFromConnections?: boolean;
 }
 
-import type { AvailabilityData } from "~/db/schema/auth.schema";
-
 export interface NotificationPreferences {
   gameReminders: boolean;
   gameUpdates: boolean;
@@ -19,8 +20,6 @@ export interface NotificationPreferences {
   reviewReminders: boolean;
   socialNotifications: boolean;
 }
-
-import type { AvailabilityData } from "~/db/schema/auth.schema";
 
 export interface UserProfile {
   id: string;
@@ -44,33 +43,6 @@ export interface UserProfile {
   };
   calendarAvailability?: AvailabilityData;
   privacySettings?: PrivacySettings;
-  isGM: boolean;
-  gamesHosted: number;
-  averageResponseTime?: number;
-  responseRate: number;
-  gmStyle?: string;
-  gmRating?: number;
-  gmTopStrengths?: string[];
-  profileVersion: number;
-  profileUpdatedAt?: Date;
-}
-
-export interface ProfileInput {
-  gender?: string;
-  pronouns?: string;
-  phone?: string;
-  city?: string;
-  country?: string;
-  languages: string[];
-  identityTags: string[];
-  preferredGameThemes: string[];
-  overallExperienceLevel?: "beginner" | "intermediate" | "advanced" | "expert";
-  gameSystemPreferences?: {
-    favorite: { id: number; name: string }[];
-    avoid: { id: number; name: string }[];
-  };
-  calendarAvailability?: AvailabilityData;
-  privacySettings?: PrivacySettings;
   notificationPreferences?: NotificationPreferences;
   isGM: boolean;
   gamesHosted: number;
@@ -83,26 +55,7 @@ export interface ProfileInput {
   profileUpdatedAt?: Date;
 }
 
-export interface ProfileInput {
-  gender?: string;
-  pronouns?: string;
-  phone?: string;
-  city?: string;
-  country?: string;
-  languages?: string[];
-  identityTags?: string[];
-  preferredGameThemes?: string[];
-  overallExperienceLevel?: "beginner" | "intermediate" | "advanced" | "expert";
-  gameSystemPreferences?: {
-    favorite: { id: number; name: string }[];
-    avoid: { id: number; name: string }[];
-  };
-  calendarAvailability?: AvailabilityData;
-  privacySettings?: PrivacySettings;
-  notificationPreferences?: NotificationPreferences;
-  isGM?: boolean;
-  gmStyle?: string;
-}
+export type ProfileInput = ProfileInputType;
 
 // Social Feature Types
 export interface UserFollow {
@@ -117,7 +70,7 @@ export interface GMReview {
   reviewerId: string;
   gmId: string;
   gameId: string;
-  rating: number; // 1-5 scale
+  rating: number;
   selectedStrengths: string[];
   comment?: string;
   createdAt: Date;
@@ -131,7 +84,7 @@ export interface FollowInput {
 export interface GMReviewInput {
   gmId: string;
   gameId: string;
-  rating: number; // thumbs -2..2 on input (mapped server-side to 1..5)
+  rating: number;
   selectedStrengths: string[];
   comment?: string;
 }

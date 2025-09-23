@@ -12,7 +12,8 @@ const aliasNodeAsyncHooksForClient = (): Plugin => ({
   resolveId(source, _importer, options) {
     if (source === "node:async_hooks" && !options?.ssr) {
       // Map only client-side imports to the shim
-      return new URL("./src/shims/async-local-storage.browser.ts", import.meta.url).pathname;
+      return new URL("./src/shims/async-local-storage.browser.ts", import.meta.url)
+        .pathname;
     }
     return null;
   },
@@ -104,7 +105,8 @@ export default defineConfig(({ mode }) => {
         workbox: {
           runtimeCaching: [
             {
-              urlPattern: ({ request }) => request.destination === "document",
+              urlPattern: ({ request }: { request: Request }) =>
+                request.destination === "document",
               handler: "NetworkFirst",
               options: {
                 cacheName: "qc-pages",
@@ -112,7 +114,7 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: ({ url }) => url.pathname.startsWith("/events"),
+              urlPattern: ({ url }: { url: URL }) => url.pathname.startsWith("/events"),
               handler: "NetworkFirst",
               options: {
                 cacheName: "qc-events",
@@ -120,7 +122,8 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: ({ request }) => request.destination === "image",
+              urlPattern: ({ request }: { request: Request }) =>
+                request.destination === "image",
               handler: "CacheFirst",
               options: {
                 cacheName: "qc-images",
@@ -167,6 +170,7 @@ export default defineConfig(({ mode }) => {
         "@tanstack/react-store",
         "@tanstack/react-start",
         "@tanstack/start-storage-context",
+        "node:async_hooks",
       ],
       include: [
         "react",
@@ -187,8 +191,6 @@ export default defineConfig(({ mode }) => {
         "zod",
         "lucide-react",
       ],
-      // Don't prebundle these to avoid server code leaking
-      exclude: ["@tanstack/start-storage-context", "node:async_hooks"],
     },
   };
 });

@@ -4,6 +4,7 @@ import {
   updatePrivacySettingsInputSchema,
   updateUserProfileInputSchema,
 } from "../profile.schemas";
+import { defaultPrivacySettings } from "../profile.types";
 
 describe("Profile Server Function Input Schemas", () => {
   describe("updateUserProfileInputSchema", () => {
@@ -32,6 +33,7 @@ describe("Profile Server Function Input Schemas", () => {
       const validInput = {
         data: {
           privacySettings: {
+            ...defaultPrivacySettings,
             showEmail: true,
             showPhone: false,
             allowTeamInvitations: true,
@@ -61,13 +63,9 @@ describe("Profile Server Function Input Schemas", () => {
           pronouns: "she/her",
           phone: "555-987-6543",
           privacySettings: {
+            ...defaultPrivacySettings,
             showEmail: true,
-            showPhone: false,
-            showLocation: false,
-            showLanguages: false,
-            showGamePreferences: false,
             allowTeamInvitations: true,
-            allowFollows: true,
           },
         },
       };
@@ -81,11 +79,9 @@ describe("Profile Server Function Input Schemas", () => {
     it("validates valid privacy settings", () => {
       const validInput = {
         data: {
+          ...defaultPrivacySettings,
           showEmail: false,
           showPhone: false,
-          showLocation: false,
-          showLanguages: false,
-          showGamePreferences: false,
           allowTeamInvitations: false,
           allowFollows: true,
         },

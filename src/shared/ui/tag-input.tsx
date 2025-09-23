@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useMemo, useRef, useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
-import { Button } from "./button";
-import { Input } from "./input";
 
 interface Tag {
   id: string;
@@ -78,6 +78,13 @@ export function TagInput({
     onRemoveTag(id);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleAddTag();
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="mb-2 flex flex-wrap gap-2">
@@ -117,12 +124,7 @@ export function TagInput({
           placeholder={placeholder}
           onFocus={() => setShowSuggestions(true)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 100)} // Delay to allow click on suggestions
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAddTag();
-            }
-          }}
+          onKeyDown={handleKeyDown}
           {...props}
         />
         <Button type="button" onClick={handleAddTag}>

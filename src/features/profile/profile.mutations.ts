@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
 import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
-import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+import { getAuthMiddleware } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import {
   partialProfileInputSchema,
@@ -238,11 +238,10 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 export const completeUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(profileInputSchema))
-  .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
+  .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
       const db = await getDb();
-      const currentUser = requireUser(context);
 
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
 
@@ -453,11 +452,10 @@ export const removeUploadedAvatar = createServerFn({ method: "POST" }).handler(
 export const updatePrivacySettings = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(privacySettingsSchema))
-  .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
+  .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
       const db = await getDb();
-      const currentUser = requireUser(context);
 
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
 

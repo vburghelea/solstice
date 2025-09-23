@@ -249,7 +249,7 @@ async function finalizeEventRegistrationFromWebhook({
     .update(eventRegistrations)
     .set({
       paymentStatus: "paid",
-      status: registration.status === "cancelled" ? registration.status : "confirmed",
+      status: registration.status === "canceled" ? registration.status : "confirmed",
       paymentCompletedAt: now,
       paymentId: paymentIdentifier,
       amountPaidCents: resolvedAmount,
@@ -310,7 +310,7 @@ async function handleRefundEvent({
   await db
     .update(memberships)
     .set({
-      status: "cancelled",
+      status: "canceled",
       metadata: {
         ...(membershipRecord.metadata ?? {}),
         lastRefundStatus: status,

@@ -562,7 +562,7 @@ function getEventStatusBadge(status: EventWithDetails["status"]): {
         variant: "outline",
         className: "border-sky-200 bg-sky-50 text-sky-700",
       };
-    case "cancelled":
+    case "canceled":
       return { variant: "destructive" };
     case "completed":
     default:

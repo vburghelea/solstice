@@ -108,7 +108,7 @@ function MembersPage() {
             ? "bg-green-100 text-green-800"
             : membershipStatus === "expired"
               ? "bg-amber-100 text-amber-800"
-              : membershipStatus === "cancelled"
+              : membershipStatus === "canceled"
                 ? "bg-red-100 text-red-800"
                 : "bg-gray-200 text-gray-700";
           const label = hasActiveMembership
@@ -221,8 +221,6 @@ function MembersPage() {
         ? formatDate(member.membershipEndDate)
         : "",
       "Open to Invites": member.allowTeamInvitations ? "Yes" : "No",
-      "Birth Year":
-        member.birthYearVisible && member.birthYear ? String(member.birthYear) : "Hidden",
     }));
 
     const filename = `members-directory-${new Date().toISOString().split("T")[0]}.csv`;
@@ -357,7 +355,7 @@ function MemberDetailDialog({ member, onClose }: MemberDetailDialogProps) {
                           ? "bg-green-100 text-green-800"
                           : member.membershipStatus === "expired"
                             ? "bg-amber-100 text-amber-800"
-                            : member.membershipStatus === "cancelled"
+                            : member.membershipStatus === "canceled"
                               ? "bg-red-100 text-red-800"
                               : "bg-gray-200 text-gray-700"
                       }
@@ -432,16 +430,6 @@ function MemberDetailDialog({ member, onClose }: MemberDetailDialogProps) {
                       Open to Team Invitations
                     </p>
                     <p>{member.allowTeamInvitations ? "Yes" : "No"}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                      Birth Year
-                    </p>
-                    <p>
-                      {member.birthYearVisible && member.birthYear
-                        ? member.birthYear
-                        : "Hidden (privacy settings)"}
-                    </p>
                   </div>
                 </div>
               </InfoBlock>

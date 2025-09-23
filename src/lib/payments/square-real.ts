@@ -467,8 +467,8 @@ export class SquarePaymentService {
                   COMPLETED: "completed",
                   APPROVED: "completed",
                   FAILED: "failed",
-                  CANCELED: "cancelled",
-                  CANCELED_BY_CUSTOMER: "cancelled",
+                  CANCELED: "canceled",
+                  CANCELED_BY_CUSTOMER: "canceled",
                 };
 
                 const nextStatus = statusMap[status ?? ""] ?? session.status;
@@ -546,7 +546,7 @@ export class SquarePaymentService {
 
               if (membershipRecord) {
                 const targetStatus =
-                  status === "COMPLETED" ? "cancelled" : membershipRecord.status;
+                  status === "COMPLETED" ? "canceled" : membershipRecord.status;
 
                 await db
                   .update(memberships)

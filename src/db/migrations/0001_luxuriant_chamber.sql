@@ -11,7 +11,7 @@ BEGIN
       'registration_closed',
       'in_progress',
       'completed',
-      'cancelled'
+      'canceled'
     );
   END IF;
 END $$;
@@ -25,7 +25,7 @@ DECLARE
     'registration_closed',
     'in_progress',
     'completed',
-    'cancelled'
+    'canceled'
   ];
   value text;
 BEGIN
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS "event_registrations" (
   "notes" text,
   "internal_notes" text,
   "confirmed_at" timestamp,
-  "cancelled_at" timestamp,
+  "canceled_at" timestamp,
   CONSTRAINT "event_registrations_event_id_events_id_fk"
     FOREIGN KEY ("event_id") REFERENCES "public"."events"("id"),
   CONSTRAINT "event_registrations_team_id_teams_id_fk"

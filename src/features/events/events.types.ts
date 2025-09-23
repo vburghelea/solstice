@@ -116,8 +116,8 @@ export interface CancelEventResult {
   eventId: string;
   affected: {
     totalRegistrations: number;
-    cancelled: number;
-    alreadyCancelled: number;
+    canceled: number;
+    alreadyCanceled: number;
     squareRefunded: number;
     etransferMarkedForRefund: number;
     freeOrUnpaid: number;

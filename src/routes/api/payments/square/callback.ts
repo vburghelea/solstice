@@ -64,10 +64,10 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             await db
               .update(eventPaymentSessions)
               .set({
-                status: "cancelled",
+                status: "canceled",
                 metadata: {
                   ...(session.metadata ?? {}),
-                  cancelledAt: nowIso,
+                  canceledAt: nowIso,
                 },
                 updatedAt: now,
               })
@@ -80,7 +80,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
                 updatedAt: now,
                 paymentMetadata: {
                   ...(registration.paymentMetadata ?? {}),
-                  cancelledAt: nowIso,
+                  canceledAt: nowIso,
                 },
               })
               .where(eq(eventRegistrations.id, registration.id));
@@ -88,7 +88,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             return redirect({
               to: "/dashboard/events",
               search: {
-                payment: "cancelled",
+                payment: "canceled",
                 eventId: event.id,
               },
             });
@@ -150,7 +150,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .set({
               paymentStatus: "paid",
               status:
-                registration.status === "cancelled" ? registration.status : "confirmed",
+                registration.status === "canceled" ? registration.status : "confirmed",
               paymentCompletedAt: now,
               paymentId: paymentIdentifier,
               amountPaidCents: amountCents,
@@ -205,10 +205,10 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           await db
             .update(membershipPaymentSessions)
             .set({
-              status: "cancelled",
+              status: "canceled",
               metadata: {
                 ...(sessionRecord.metadata ?? {}),
-                cancelledAt: nowIso,
+                canceledAt: nowIso,
               },
               updatedAt: now,
             })
@@ -217,7 +217,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           return redirect({
             to: "/dashboard/membership",
             search: {
-              error: "cancelled",
+              error: "canceled",
             },
           });
         }

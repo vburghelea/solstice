@@ -121,8 +121,6 @@ CREATE TABLE IF NOT EXISTS "user" (
   "created_at" timestamp NOT NULL,
   "updated_at" timestamp NOT NULL,
   "profile_complete" boolean NOT NULL,
-  "date_of_birth" timestamp,
-  "emergency_contact" text,
   "gender" text,
   "pronouns" text,
   "phone" text,

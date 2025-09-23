@@ -24,7 +24,7 @@ export async function sendEventCancellationNotifications(params: {
     .where(eq(eventRegistrations.eventId, event.id));
 
   console.log(
-    `[Notifications] Event "${event.name}" cancelled${
+    `[Notifications] Event "${event.name}" canceled${
       reason ? ` — Reason: ${reason}` : ""
     }. Notifying ${registrants.length} registrants.`,
   );

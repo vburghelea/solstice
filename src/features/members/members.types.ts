@@ -6,7 +6,7 @@ export interface MemberDirectoryError {
 }
 
 export interface MemberDirectoryMembershipSummary {
-  status: "active" | "expired" | "cancelled";
+  status: "active" | "expired" | "canceled";
   membershipType: string | null;
   startDate: string | null;
   endDate: string | null;
@@ -21,13 +21,11 @@ export interface MemberDirectoryMember {
   phoneVisible: boolean;
   pronouns: string | null;
   teams: string[];
-  membershipStatus: "active" | "expired" | "cancelled" | "none";
+  membershipStatus: "active" | "expired" | "canceled" | "none";
   membershipType: string | null;
   membershipEndDate: string | null;
   hasActiveMembership: boolean;
   allowTeamInvitations: boolean;
-  birthYear: number | null;
-  birthYearVisible: boolean;
   profileUpdatedAt: string | null;
   membershipHistory: MemberDirectoryMembershipSummary[];
 }

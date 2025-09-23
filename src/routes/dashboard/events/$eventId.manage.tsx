@@ -241,7 +241,7 @@ function EventManagementPage() {
       (registration) =>
         registration.paymentMethod === "etransfer" &&
         registration.paymentStatus !== "paid" &&
-        registration.status !== "cancelled",
+        registration.status !== "canceled",
     ) ?? [];
 
   const totalRevenueCents = paidRegistrations.reduce(
@@ -534,7 +534,7 @@ function EventManagementPage() {
                 </Button>
               )}
 
-              {event.status !== "cancelled" && (
+              {event.status !== "canceled" && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive">
@@ -868,7 +868,7 @@ function getEventStatusBadge(status: EventWithDetails["status"]): {
         variant: "outline",
         className: "border-sky-200 bg-sky-50 text-sky-700",
       };
-    case "cancelled":
+    case "canceled":
       return { variant: "destructive" };
     case "completed":
     default:
@@ -891,7 +891,7 @@ function getRegistrationStatusBadge(status: EventRegistrationSummary["status"]):
         variant: "outline",
         className: "border-amber-200 bg-amber-50 text-amber-700",
       };
-    case "cancelled":
+    case "canceled":
       return { variant: "destructive" };
     case "waitlisted":
       return {

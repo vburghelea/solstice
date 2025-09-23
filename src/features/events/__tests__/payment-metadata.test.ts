@@ -31,7 +31,7 @@ describe("payment metadata utilities", () => {
   });
 
   it("appends cancellation notes only once", () => {
-    const note = "Event cancelled by admin";
+    const note = "Event canceled by admin";
     const first = appendCancellationNote({}, note);
     const second = appendCancellationNote(first, note);
     expect(second.notes).toBe(note);

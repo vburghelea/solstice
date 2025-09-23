@@ -180,7 +180,7 @@ describe("square webhook helpers", () => {
 
     expect(updateRecords.length).toBe(1);
     expect(updateRecords[0].values).toMatchObject({
-      status: "cancelled",
+      status: "canceled",
       metadata: expect.objectContaining({ lastRefundId: "refund-1" }),
     });
 

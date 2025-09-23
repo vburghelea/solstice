@@ -79,13 +79,6 @@ const rosterPlayerSchema = z.object({
 const rosterObjectSchema = z
   .object({
     players: z.array(rosterPlayerSchema).optional(),
-    emergencyContact: z
-      .object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        relationship: z.string().optional(),
-      })
-      .optional(),
   })
   .passthrough();
 

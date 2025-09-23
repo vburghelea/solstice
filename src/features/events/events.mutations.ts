@@ -97,15 +97,15 @@ export const cancelEvent = createServerFn({ method: "POST" })
 
         const updatedEventMetadata = {
           ...(eventRecord.metadata ?? {}),
-          cancelledAt: nowIso,
-          cancelledBy: user.id,
-          cancellationReason: data.reason ?? null,
+          canceledAt: nowIso,
+          canceledBy: user.id,
+          cancelationReason: data.reason ?? null,
         } as Record<string, unknown>;
 
         await db
           .update(events)
           .set({
-            status: "cancelled",
+            status: "canceled",
             updatedAt: now,
             metadata: updatedEventMetadata,
           })
@@ -136,8 +136,8 @@ export const cancelEvent = createServerFn({ method: "POST" })
           eventId: data.eventId,
           affected: {
             totalRegistrations: registrations.length,
-            cancelled: 0,
-            alreadyCancelled: 0,
+            canceled: 0,
+            alreadyCanceled: 0,
             squareRefunded: 0,
             etransferMarkedForRefund: 0,
             freeOrUnpaid: 0,
@@ -149,32 +149,32 @@ export const cancelEvent = createServerFn({ method: "POST" })
           data.refundMode === "auto" ? await getSquarePaymentService() : null;
 
         for (const registration of registrations) {
-          if (registration.status === "cancelled") {
-            result.affected.alreadyCancelled += 1;
+          if (registration.status === "canceled") {
+            result.affected.alreadyCanceled += 1;
             continue;
           }
 
           const existingMetadata = (registration.paymentMetadata ??
             {}) as EventPaymentMetadata;
-          const noteParts = [`Event cancelled by ${user.id} at ${nowIso}`];
+          const noteParts = [`Event canceled by ${user.id} at ${nowIso}`];
           if (data.reason) {
             noteParts.push(`Reason: ${data.reason}`);
           }
-          const cancellationNote = noteParts.join(" — ");
+          const cancelationNote = noteParts.join(" — ");
 
           const paymentMetadata = appendCancellationNote(
             existingMetadata,
-            cancellationNote,
+            cancelationNote,
           );
           const existingNotes = registration.internalNotes ?? "";
-          const hasNoteAlready = existingNotes.split("\n").includes(cancellationNote);
+          const hasNoteAlready = existingNotes.split("\n").includes(cancelationNote);
           const internalNotes = hasNoteAlready
             ? existingNotes
-            : [cancellationNote, existingNotes].filter(Boolean).join("\n");
+            : [cancelationNote, existingNotes].filter(Boolean).join("\n");
 
           const baseUpdate: Partial<typeof eventRegistrations.$inferInsert> = {
-            status: "cancelled",
-            cancelledAt: now,
+            status: "canceled",
+            canceledAt: now,
             updatedAt: now,
             internalNotes,
             paymentMetadata,
@@ -226,7 +226,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
                   const refund = await squareService.createRefund(
                     paymentId,
                     amountToRefund,
-                    "Event cancelled",
+                    "Event canceled",
                   );
 
                   if (refund.success) {
@@ -241,7 +241,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
                             ...(session.metadata ?? {}),
                             refundedAt: nowIso,
                             refundId: refund.refundId ?? null,
-                            cancelledBy: user.id,
+                            canceledBy: user.id,
                           },
                           updatedAt: now,
                         })
@@ -294,18 +294,18 @@ export const cancelEvent = createServerFn({ method: "POST" })
             await db
               .update(eventPaymentSessions)
               .set({
-                status: "cancelled",
+                status: "canceled",
                 metadata: {
                   ...(session.metadata ?? {}),
-                  cancelledAt: nowIso,
-                  cancelledBy: user.id,
+                  canceledAt: nowIso,
+                  canceledBy: user.id,
                 },
                 updatedAt: now,
               })
               .where(eq(eventPaymentSessions.id, session.id));
           }
 
-          result.affected.cancelled += 1;
+          result.affected.canceled += 1;
         }
 
         if (data.notify !== false) {
@@ -1099,7 +1099,7 @@ export const cancelEventRegistration = createServerFn({ method: "POST" })
           .set({
             paymentStatus: "paid",
             status:
-              registration.status === "cancelled" ? registration.status : "confirmed",
+              registration.status === "canceled" ? registration.status : "confirmed",
             paymentCompletedAt: now,
             amountPaidCents: registration.amountDueCents,
             paymentMetadata: updatedMetadata,

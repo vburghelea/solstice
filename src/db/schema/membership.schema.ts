@@ -87,7 +87,7 @@ export const membershipPaymentSessions = pgTable(
     squareOrderId: varchar("square_order_id", { length: 255 }),
     squarePaymentId: varchar("square_payment_id", { length: 255 }),
     status: varchar("status", { length: 50 })
-      .$type<"pending" | "completed" | "cancelled" | "failed">()
+      .$type<"pending" | "completed" | "canceled" | "failed">()
       .notNull()
       .default("pending"),
     amountCents: integer("amount_cents").notNull(),

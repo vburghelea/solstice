@@ -442,7 +442,7 @@ function getStatusBadgeAppearance(status: EventWithDetails["status"]): {
       };
     case "completed":
       return { variant: "default" };
-    case "cancelled":
+    case "canceled":
       return { variant: "destructive" };
     default:
       return { variant: "default" };

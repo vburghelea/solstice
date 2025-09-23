@@ -53,12 +53,6 @@ import { getUserTeams } from "~/features/teams/teams.queries";
 import type { User } from "~/lib/auth/types";
 import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
 
-type EmergencyContact = {
-  name: string;
-  phone: string;
-  relationship: string;
-};
-
 type UserTeamEntry = {
   team: {
     id: string;
@@ -92,11 +86,6 @@ function EventRegistrationPage() {
   );
   const [selectedTeamId, setSelectedTeamId] = useState<string>("");
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const [emergencyContact, setEmergencyContact] = useState<EmergencyContact>({
-    name: "",
-    phone: "",
-    relationship: "",
-  });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [waiverAccepted, setWaiverAccepted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"square" | "etransfer">("square");
@@ -147,7 +136,7 @@ function EventRegistrationPage() {
       teamId?: string;
       division?: string;
       notes?: string;
-      roster?: { emergencyContact?: EmergencyContact };
+      roster?: {};
       paymentMethod: "square" | "etransfer";
     }
   >({
@@ -273,7 +262,7 @@ function EventRegistrationPage() {
       eventId: string;
       teamId?: string;
       notes?: string;
-      roster?: { emergencyContact?: EmergencyContact };
+      roster?: {};
       paymentMethod: "square" | "etransfer";
     } = {
       eventId: event.id,
@@ -286,10 +275,6 @@ function EventRegistrationPage() {
 
     if (additionalInfo.trim().length > 0) {
       payload.notes = additionalInfo.trim();
-    }
-
-    if (emergencyContact.name.trim().length > 0) {
-      payload.roster = { emergencyContact };
     }
 
     setConfirmation(null);
@@ -431,56 +416,6 @@ function EventRegistrationPage() {
                   )}
                 </div>
               )}
-
-              <Separator />
-
-              <div className="space-y-3">
-                <h3 className="font-semibold">Emergency Contact</h3>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="emergency-name">Name</Label>
-                    <Input
-                      id="emergency-name"
-                      value={emergencyContact.name}
-                      onChange={(event) =>
-                        setEmergencyContact((prev) => ({
-                          ...prev,
-                          name: event.target.value,
-                        }))
-                      }
-                      placeholder="Contact name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="emergency-phone">Phone</Label>
-                    <Input
-                      id="emergency-phone"
-                      value={emergencyContact.phone}
-                      onChange={(event) =>
-                        setEmergencyContact((prev) => ({
-                          ...prev,
-                          phone: event.target.value,
-                        }))
-                      }
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="emergency-relationship">Relationship</Label>
-                    <Input
-                      id="emergency-relationship"
-                      value={emergencyContact.relationship}
-                      onChange={(event) =>
-                        setEmergencyContact((prev) => ({
-                          ...prev,
-                          relationship: event.target.value,
-                        }))
-                      }
-                      placeholder="Parent, spouse, etc."
-                    />
-                  </div>
-                </div>
-              </div>
 
               <Separator />
 

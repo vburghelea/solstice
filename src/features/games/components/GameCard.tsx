@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,7 +13,6 @@ import {
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
-import { Badge } from "~/shared/ui/badge";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 

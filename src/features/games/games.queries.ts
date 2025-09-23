@@ -165,52 +165,6 @@ export const searchGameSystems = createServerFn({ method: "POST" })
   );
 
 /**
- * Search game systems by name
- */
-export const searchGameSystems = createServerFn({ method: "POST" })
-  .validator(searchGameSystemsSchema.parse)
-  .handler(
-    async ({
-      data,
-    }): Promise<
-      OperationResult<
-        Array<{
-          id: number;
-          name: string;
-          averagePlayTime: number | null;
-          minPlayers: number | null;
-          maxPlayers: number | null;
-        }>
-      >
-    > => {
-      try {
-        const db = await getDb();
-        const searchTerm = `%${data.query}%`;
-
-        const systems = await db
-          .select({
-            id: gameSystems.id,
-            name: gameSystems.name,
-            averagePlayTime: gameSystems.averagePlayTime,
-            minPlayers: gameSystems.minPlayers,
-            maxPlayers: gameSystems.maxPlayers,
-          })
-          .from(gameSystems)
-          .where(ilike(gameSystems.name, searchTerm))
-          .limit(10);
-
-        return { success: true, data: systems };
-      } catch (error) {
-        console.error("Error searching game systems:", error);
-        return {
-          success: false,
-          errors: [{ code: "SERVER_ERROR", message: "Failed to search game systems" }],
-        };
-      }
-    },
-  );
-
-/**
  * Get a single game by ID with all details
  */
 export const getGame = createServerFn({ method: "POST" })
@@ -265,8 +219,8 @@ export async function listGamesImpl(
   try {
     const { and, eq, gte, lte, or, sql, gameParticipants, games, gameSystems, user } =
       await getServerDeps();
-    const statusFilterCondition = filters?.status
-      ? eq(games.status, filters.status)
+    const statusFilterCondition: SqlExpr | null = filters?.status
+      ? (eq(games.status, filters.status) as SqlExpr)
       : null;
 
     const otherBaseConditions: SqlExpr[] = [];
@@ -282,7 +236,7 @@ export async function listGamesImpl(
         or(
           sql`lower(${games.description}) LIKE ${searchTerm}`,
           sql`lower(${games.language}) LIKE ${searchTerm}`,
-        ),
+        ) as SqlExpr,
       );
     }
 
@@ -302,7 +256,7 @@ export async function listGamesImpl(
         );
 
       visibilityConditionsForOr.push(
-        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`),
+        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`) as SqlExpr,
       );
       visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
 
@@ -324,13 +278,15 @@ export async function listGamesImpl(
         and(
           eq(games.visibility, "protected"),
           sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
-        ),
+        ) as SqlExpr,
       );
     }
 
     const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
       (condition) =>
-        statusFilterCondition ? and(statusFilterCondition, condition) : condition,
+        statusFilterCondition
+          ? (and(statusFilterCondition, condition) as SqlExpr)
+          : condition,
     );
 
     const finalWhereClause = and(
@@ -432,8 +388,8 @@ export async function listGamesWithCountImpl(
   try {
     const { and, eq, gte, lte, or, sql, gameParticipants, games, gameSystems, user } =
       await getServerDeps();
-    const statusFilterCondition = filters?.status
-      ? eq(games.status, filters.status)
+    const statusFilterCondition: SqlExpr | null = filters?.status
+      ? (eq(games.status, filters.status) as SqlExpr)
       : null;
 
     const otherBaseConditions: SqlExpr[] = [];
@@ -449,7 +405,7 @@ export async function listGamesWithCountImpl(
         or(
           sql`lower(${games.description}) LIKE ${searchTerm}`,
           sql`lower(${games.language}) LIKE ${searchTerm}`,
-        ),
+        ) as SqlExpr,
       );
     }
 
@@ -469,7 +425,7 @@ export async function listGamesWithCountImpl(
         );
 
       visibilityConditionsForOr.push(
-        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`),
+        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`) as SqlExpr,
       );
       visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
 
@@ -491,13 +447,15 @@ export async function listGamesWithCountImpl(
         and(
           eq(games.visibility, "protected"),
           sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
-        ),
+        ) as SqlExpr,
       );
     }
 
     const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
       (condition) =>
-        statusFilterCondition ? and(statusFilterCondition, condition) : condition,
+        statusFilterCondition
+          ? (and(statusFilterCondition, condition) as SqlExpr)
+          : condition,
     );
 
     const finalWhereClause = and(

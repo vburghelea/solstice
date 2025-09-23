@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, ChevronRight, MapPin, Sparkles, Users } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
-import { Button } from "~/shared/ui/button";
 import { List } from "~/shared/ui/list";
 
 interface GameListItemViewProps {

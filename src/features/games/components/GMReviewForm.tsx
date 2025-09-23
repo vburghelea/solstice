@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ChangeEvent } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -114,7 +115,9 @@ export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
           <Label className="mb-2 block">Comments (optional)</Label>
           <Textarea
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+              setComment(event.target.value)
+            }
             placeholder="What stood out in this session?"
           />
         </div>

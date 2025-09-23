@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import type { ChangeEvent } from "react";
 import React, { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +8,16 @@ import { z } from "zod";
 import { DateTimePicker } from "~/components/form-fields/DateTimePicker";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 import { visibilityEnum } from "~/db/schema/shared.schema";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import type { getGameSystem } from "~/features/games/games.queries";
@@ -23,17 +34,7 @@ import {
   xCardSystemEnum,
 } from "~/shared/schemas/common";
 import { LanguageLevel, languageLevelOptions } from "~/shared/types/common";
-import { Checkbox } from "~/shared/ui/checkbox";
 import { FormSection } from "~/shared/ui/form-section";
-import { Label } from "~/shared/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/shared/ui/select";
-import { Textarea } from "~/shared/ui/textarea";
 
 interface GameFormProps {
   initialValues?: Partial<z.infer<typeof updateGameInputSchema>>;
@@ -229,7 +230,9 @@ export function GameForm({
                 type="text"
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 placeholder="Enter a compelling name for your planned game session"
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
@@ -421,8 +424,10 @@ export function GameForm({
                   type="number"
                   value={field.state.value ?? effectiveGameSystem?.averagePlayTime ?? 1}
                   onBlur={field.handleBlur}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(
+                      event.target.value ? Number(event.target.value) : 0,
+                    )
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -471,8 +476,10 @@ export function GameForm({
                     type="number"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) =>
-                      field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      field.handleChange(
+                        event.target.value ? Number(event.target.value) : 0,
+                      )
                     }
                     className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   />
@@ -644,8 +651,10 @@ export function GameForm({
                   type="number"
                   value={field.state.value ?? selectedGameSystem?.minPlayers ?? 1}
                   onBlur={field.handleBlur}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(
+                      event.target.value ? Number(event.target.value) : 0,
+                    )
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -690,8 +699,10 @@ export function GameForm({
                   type="number"
                   value={field.state.value ?? selectedGameSystem?.maxPlayers ?? 1}
                   onBlur={field.handleBlur}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(
+                      event.target.value ? Number(event.target.value) : 0,
+                    )
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -792,8 +803,8 @@ export function GameForm({
                 min="1"
                 max="10"
                 value={field.state.value ?? 5}
-                onChange={(e) =>
-                  field.handleChange(e.target.value ? Number(e.target.value) : 0)
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  field.handleChange(event.target.value ? Number(event.target.value) : 0)
                 }
                 className="w-full"
               />
@@ -851,7 +862,9 @@ export function GameForm({
                 type="text"
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {field.state.meta.errors?.length > 0 && (
@@ -890,7 +903,9 @@ export function GameForm({
             <input
               type="hidden"
               value={field.state.value || 0}
-              onChange={(e) => field.handleChange(Number(e.target.value))}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                field.handleChange(Number(event.target.value))
+              }
             />
           )}
         </form.Field>
@@ -915,7 +930,9 @@ export function GameForm({
             <input
               type="hidden"
               value={field.state.value || 0}
-              onChange={(e) => field.handleChange(Number(e.target.value))}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                field.handleChange(Number(event.target.value))
+              }
             />
           )}
         </form.Field>
@@ -1075,7 +1092,9 @@ export function GameForm({
                 <Label>Safety Tool Details (optional)</Label>
                 <Textarea
                   value={(field.state.value as string | null) ?? ""}
-                  onChange={(e) => field.handleChange(e.target.value || null)}
+                  onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                    field.handleChange(event.target.value || null)
+                  }
                   onBlur={field.handleBlur}
                   placeholder="Any specifics about the chosen safety tool"
                   rows={3}
@@ -1104,7 +1123,9 @@ export function GameForm({
               <Label>Player Boundaries / Consent Notes (optional)</Label>
               <Textarea
                 value={(field.state.value as string | null) ?? ""}
-                onChange={(e) => field.handleChange(e.target.value || null)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value || null)
+                }
                 onBlur={field.handleBlur}
                 placeholder="Any boundaries or consent notes players should be aware of"
                 rows={3}

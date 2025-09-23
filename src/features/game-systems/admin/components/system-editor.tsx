@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { Fragment, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
@@ -12,6 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import {
   Table,
   TableBody,
@@ -31,14 +39,6 @@ import {
 import type { GameSystemTag } from "~/features/game-systems/game-systems.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
-import { Input } from "~/shared/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/shared/ui/select";
 import { getAdminGameSystem } from "../game-systems-admin.queries";
 import type {
   AdminExternalTagMapping,
@@ -637,7 +637,9 @@ function TaxonomyTab({
             {system.categories.length > 0 ? (
               <Input
                 value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setCategoryFilter(event.target.value)
+                }
                 placeholder="Filter categories"
                 className="w-full max-w-xs"
               />
@@ -686,7 +688,9 @@ function TaxonomyTab({
             {system.mechanics.length > 0 ? (
               <Input
                 value={mechanicFilter}
-                onChange={(event) => setMechanicFilter(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setMechanicFilter(event.target.value)
+                }
                 placeholder="Filter mechanics"
                 className="w-full max-w-xs"
               />
@@ -808,7 +812,9 @@ function CanonicalMappingCard({
           </Select>
           <Input
             value={externalTag}
-            onChange={(event) => setExternalTag(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setExternalTag(event.target.value)
+            }
             placeholder="External tag"
             className="flex-1"
           />
@@ -817,7 +823,7 @@ function CanonicalMappingCard({
             min={0}
             max={100}
             value={confidence}
-            onChange={(event) => {
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const value = Number(event.target.value);
               setConfidence(Number.isNaN(value) ? 0 : value);
             }}

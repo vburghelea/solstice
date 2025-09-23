@@ -1,4 +1,4 @@
-import { HeroSection } from "~/shared/ui/hero-section";
+import { HeroSection } from "~/components/ui/hero-section";
 
 interface SystemHeroProps {
   name: string;

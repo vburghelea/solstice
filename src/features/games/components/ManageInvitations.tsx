@@ -2,16 +2,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileLink } from "~/components/ProfileLink";
-import { removeGameParticipant } from "~/features/games/games.mutations";
-import { GameParticipant } from "~/features/games/games.types";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
+import { removeGameParticipant } from "~/features/games/games.mutations";
+import { GameParticipant } from "~/features/games/games.types";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface ManageInvitationsProps {

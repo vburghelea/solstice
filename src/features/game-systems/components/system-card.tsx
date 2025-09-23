@@ -1,9 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
-import type { GameSystemListItem } from "~/features/game-systems/game-systems.types";
-import { cn } from "~/shared/lib/utils";
-import { Badge } from "~/shared/ui/badge";
-import { buttonVariants } from "~/shared/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { buttonVariants } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,7 +9,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
+import type { GameSystemListItem } from "~/features/game-systems/game-systems.types";
+import { cn } from "~/shared/lib/utils";
 
 interface SystemCardProps {
   system: GameSystemListItem;

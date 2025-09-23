@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { searchCategories } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemCategoryTag } from "~/features/game-systems/game-systems.types";
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
-import { Button } from "~/shared/ui/button";
-import { Input } from "~/shared/ui/input";
 
 interface CategoryTagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   tags: GameSystemCategoryTag[];

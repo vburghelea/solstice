@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import type { ChangeEvent } from "react";
 import React, { useEffect, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
@@ -6,6 +7,16 @@ import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 import { campaignRecurrenceEnum } from "~/db/schema/campaigns.schema";
 import { visibilityEnum } from "~/db/schema/shared.schema"; // Added visibilityEnum
 import {
@@ -29,17 +40,7 @@ import {
   languageLevelOptions,
   languageOptions,
 } from "~/shared/types/common";
-import { Checkbox } from "~/shared/ui/checkbox";
 import { FormSection } from "~/shared/ui/form-section";
-import { Label } from "~/shared/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/shared/ui/select";
-import { Textarea } from "~/shared/ui/textarea";
 
 interface CampaignFormProps {
   initialValues?: Partial<z.infer<typeof updateCampaignInputSchema>> & {
@@ -193,7 +194,9 @@ export function CampaignForm({
                 type="text"
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 placeholder="Enter a compelling name for your planned campaign"
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
@@ -415,7 +418,9 @@ export function CampaignForm({
                   type="text"
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(event.target.value)
+                  }
                   placeholder="e.g., Evenings, Afternoons"
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -468,9 +473,9 @@ export function CampaignForm({
                       : (selectedGameSystem?.averagePlayTime ?? "")
                   }
                   onBlur={field.handleBlur}
-                  onChange={(e) =>
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     field.handleChange(
-                      e.target.value ? Number(e.target.value) : undefined,
+                      event.target.value ? Number(event.target.value) : undefined,
                     )
                   }
                   placeholder="e.g., 180, 240"
@@ -521,9 +526,9 @@ export function CampaignForm({
                     type="number"
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
-                    onChange={(e) =>
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
                       field.handleChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        event.target.value ? Number(event.target.value) : undefined,
                       )
                     }
                     className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 pl-8 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
@@ -696,7 +701,9 @@ export function CampaignForm({
                 type="text"
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {field.state.meta.errors?.length > 0 && (
@@ -735,8 +742,8 @@ export function CampaignForm({
             <input
               type="hidden"
               value={field.state.value || 0}
-              onChange={(e) =>
-                field.handleChange(e.target.value ? Number(e.target.value) : 0)
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                field.handleChange(event.target.value ? Number(event.target.value) : 0)
               }
             />
           )}
@@ -762,8 +769,8 @@ export function CampaignForm({
             <input
               type="hidden"
               value={field.state.value || 0}
-              onChange={(e) =>
-                field.handleChange(e.target.value ? Number(e.target.value) : 0)
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                field.handleChange(event.target.value ? Number(event.target.value) : 0)
               }
             />
           )}
@@ -802,8 +809,10 @@ export function CampaignForm({
                   type="number"
                   value={field.state.value ?? selectedGameSystem?.minPlayers ?? ""}
                   onBlur={field.handleBlur}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value === "" ? 0 : Number(e.target.value))
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(
+                      event.target.value === "" ? 0 : Number(event.target.value),
+                    )
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -848,8 +857,10 @@ export function CampaignForm({
                   type="number"
                   value={field.state.value ?? selectedGameSystem?.maxPlayers ?? ""}
                   onBlur={field.handleBlur}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value === "" ? 0 : Number(e.target.value))
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(
+                      event.target.value === "" ? 0 : Number(event.target.value),
+                    )
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
@@ -946,8 +957,10 @@ export function CampaignForm({
                 min="1"
                 max="10"
                 value={field.state.value ?? 5}
-                onChange={(e) =>
-                  field.handleChange(e.target.value === "" ? 0 : Number(e.target.value))
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  field.handleChange(
+                    event.target.value === "" ? 0 : Number(event.target.value),
+                  )
                 }
                 className="w-full"
               />
@@ -1126,7 +1139,9 @@ export function CampaignForm({
                 <Label>Safety Tool Details (optional)</Label>
                 <Textarea
                   value={(field.state.value as string | null) ?? ""}
-                  onChange={(e) => field.handleChange(e.target.value || null)}
+                  onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                    field.handleChange(event.target.value || null)
+                  }
                   onBlur={field.handleBlur}
                   placeholder="Any specifics about the chosen safety tool"
                   rows={3}
@@ -1155,7 +1170,9 @@ export function CampaignForm({
               <Label>Player Boundaries / Consent Notes (optional)</Label>
               <Textarea
                 value={(field.state.value as string | null) ?? ""}
-                onChange={(e) => field.handleChange(e.target.value || null)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value || null)
+                }
                 onBlur={field.handleBlur}
                 placeholder="Any boundaries or consent notes players should be aware of"
                 rows={3}

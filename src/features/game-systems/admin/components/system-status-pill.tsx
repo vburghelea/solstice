@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
-import { Badge } from "~/shared/ui/badge";
-import { AlertCircle, XCircle } from "~/shared/ui/icons";
+import { Badge } from "~/components/ui/badge";
+import { AlertCircle, XCircle } from "~/components/ui/icons";
 import type { AdminSystemStatusFlag } from "../game-systems-admin.types";
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";

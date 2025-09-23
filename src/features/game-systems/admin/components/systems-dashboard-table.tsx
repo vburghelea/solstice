@@ -4,11 +4,11 @@ import type { ColumnDef, OnChangeFn, RowSelectionState } from "@tanstack/react-t
 import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useReducer } from "react";
 import { toast } from "sonner";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { DataTable } from "~/components/ui/data-table";
 import { formatDateAndTime } from "~/shared/lib/datetime";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
 import { bulkUpdateAdminSystems } from "../game-systems-admin.mutations";
 import type { AdminGameSystemListItem } from "../game-systems-admin.types";
 import { SystemStatusPill } from "./system-status-pill";

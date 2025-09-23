@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -10,7 +11,6 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
-import { Badge } from "~/shared/ui/badge";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 

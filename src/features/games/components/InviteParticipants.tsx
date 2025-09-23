@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import type { ChangeEvent } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { inviteToGame, removeGameParticipant } from "~/features/games/games.mutations";
@@ -10,16 +11,16 @@ import { useDebounce } from "~/shared/hooks/useDebounce";
 import type { OperationResult } from "~/shared/types/common";
 
 import { ProfileLink } from "~/components/ProfileLink";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface InviteParticipantsProps {
@@ -111,7 +112,9 @@ export function InviteParticipants({
             id="user-search"
             placeholder="Search by name or email (4+ chars)"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setSearchTerm(event.target.value)
+            }
           />
           {isSearchingUsers && debouncedSearchTerm.length >= 4 && (
             <p className="text-muted-foreground flex items-center text-sm">
@@ -172,14 +175,18 @@ export function InviteParticipants({
               id="invitee-name"
               placeholder="Enter name"
               value={inviteeName}
-              onChange={(e) => setInviteeName(e.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setInviteeName(event.target.value)
+              }
             />
             <Input
               id="email-invite"
               type="email"
               placeholder="Enter email address"
               value={emailInvite}
-              onChange={(e) => setEmailInvite(e.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setEmailInvite(event.target.value)
+              }
             />
             <Button
               onClick={handleInviteEmail}

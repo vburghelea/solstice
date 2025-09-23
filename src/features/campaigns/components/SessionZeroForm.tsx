@@ -1,10 +1,11 @@
 import { useForm } from "@tanstack/react-form";
+import type { ChangeEvent } from "react";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
+import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { sessionZeroSchema } from "~/features/campaigns/campaigns.schemas";
-import { Checkbox } from "~/shared/ui/checkbox";
 import { type SessionZeroDataType } from "../campaigns.types";
 
 interface SessionZeroFormProps {
@@ -56,7 +57,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -72,7 +75,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -86,7 +91,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -100,7 +107,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -116,7 +125,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -137,7 +148,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -153,7 +166,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -167,7 +182,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -181,7 +198,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -195,7 +214,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -209,7 +230,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -256,7 +279,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -270,7 +295,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -293,7 +320,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -323,7 +352,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -337,7 +368,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
@@ -358,7 +391,9 @@ export function SessionZeroForm({
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  field.handleChange(event.target.value)
+                }
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
                 rows={6}

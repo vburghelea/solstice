@@ -28,7 +28,10 @@ export function PublicHeader() {
           <Link to="/" className="flex items-center gap-2 sm:gap-3">
             {" "}
             {/* Added Link wrapper */}
-            <div className="maple-leaf-logo h-8 w-8 sm:h-10 sm:w-10"></div>
+            <div
+              className="roundup-star-logo h-8 w-8 sm:h-10 sm:w-10"
+              aria-hidden="true"
+            ></div>
             <h1 className="text-brand-dark text-lg font-extrabold tracking-tight sm:text-xl">
               Roundup Games
             </h1>

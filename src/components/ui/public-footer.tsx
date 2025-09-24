@@ -8,7 +8,10 @@ export function PublicFooter() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="maple-leaf-logo h-8 w-8 sm:h-10 sm:w-10"></div>
+              <div
+                className="roundup-star-logo h-8 w-8 sm:h-10 sm:w-10"
+                aria-hidden="true"
+              ></div>
               <h2 className="text-base font-bold sm:text-lg">Roundup Games</h2>
             </div>
             <p className="mt-3 text-sm text-gray-400 sm:mt-4">

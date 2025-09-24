@@ -2,6 +2,10 @@
   "name": "tanstarter",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -57,10 +61,10 @@
     "@tanstack/react-pacer": "^0.14.0",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-query-devtools": "^5.81.5",
-    "@tanstack/react-router": "^1.131.49",
-    "@tanstack/react-router-devtools": "^1.131.49",
-    "@tanstack/react-router-ssr-query": "^1.131.49",
-    "@tanstack/react-start": "1.131.49",
+    "@tanstack/react-router": "^1.132.2",
+    "@tanstack/react-router-devtools": "^1.132.2",
+    "@tanstack/react-router-ssr-query": "^1.132.2",
+    "@tanstack/react-start": "^1.132.2",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "@vercel/postgres": "^0.10.0",
@@ -83,6 +87,7 @@
     "sonner": "^2.0.6",
     "square": "^43.0.1",
     "tailwind-merge": "^3.3.1",
+    "@tanstack/start-static-server-functions": "^1.132.2",
     "vite": "^7.1.6",
     "zod": "^3.25.67"
   },

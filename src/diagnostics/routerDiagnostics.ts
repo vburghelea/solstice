@@ -1,12 +1,12 @@
 import type { RouterEvents } from "@tanstack/react-router";
-import type { createRouter } from "~/router";
+import type { AppRouter } from "~/router";
 
 /**
  * Subscribe to a few router events for simple, typed diagnostics.
  * No-ops unless VITE_ROUTER_DEBUG === "true". Returns an unsubscribe function.
  */
 export function subscribeToRouterDiagnostics(
-  router: ReturnType<typeof createRouter>,
+  router: AppRouter,
   opts?: {
     logger?: (message: string, evt?: RouterEvents[keyof RouterEvents]) => void;
   },

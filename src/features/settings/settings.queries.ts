@@ -10,13 +10,13 @@ const AVAILABLE_PROVIDERS = ["email", "google"] as const;
 export const getSessionsOverview = createServerFn({ method: "GET" }).handler(
   async (): Promise<ApiResult<SessionsOverview>> => {
     try {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
 
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
 
       const [sessionResult, sessions] = await Promise.all([
         auth.api.getSession({ headers }),
@@ -73,13 +73,13 @@ export const getAccountOverview = createServerFn({ method: "GET" }).handler(
     >
   > => {
     try {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
 
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
 
       const sessionResult = await auth.api.getSession({ headers });
       if (!sessionResult?.user?.id) {

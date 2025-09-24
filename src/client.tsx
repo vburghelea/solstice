@@ -1,10 +1,10 @@
-import { StartClient } from "@tanstack/react-start";
+import { StartClient } from "@tanstack/react-start/client";
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { subscribeToRouterDiagnostics } from "./diagnostics/routerDiagnostics";
-import { createRouter } from "./router";
+import { getRouter } from "./router";
 
-const router = createRouter();
+const router = getRouter();
 
 const unsubscribeRouterDiagnostics = subscribeToRouterDiagnostics(router);
 
@@ -20,6 +20,6 @@ if (import.meta.hot) {
 hydrateRoot(
   document,
   <StrictMode>
-    <StartClient router={router} />
+    <StartClient />
   </StrictMode>,
 );

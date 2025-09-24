@@ -1,9 +1,9 @@
-import { createServerFn, serverOnly } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { zod$ } from "~/lib/server/fn-utils";
 
-const getDb = serverOnly(async () => {
+const getDb = createServerOnlyFn(async () => {
   const { getDb } = await import("~/db/server-helpers");
   return getDb();
 });
@@ -13,7 +13,7 @@ const clearUserTeamsSchema = z.object({
 });
 
 export const clearUserTeamsForTesting = createServerFn({ method: "POST" })
-  .validator(zod$(clearUserTeamsSchema))
+  .inputValidator(zod$(clearUserTeamsSchema))
   .handler(async ({ data }) => {
     // Only allow in test environments
     if (process.env["NODE_ENV"] === "production" && !process.env["E2E_TEST_EMAIL"]) {

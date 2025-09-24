@@ -46,7 +46,7 @@ import {
  */
 export const cancelEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(cancelEntireEventSchema))
+  .inputValidator(zod$(cancelEntireEventSchema))
   .handler(
     async ({ data, context }): Promise<EventOperationResult<CancelEventResult>> => {
       const clock = getClockFromContext(context);
@@ -346,7 +346,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
  */
 export const createEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(createEventSchema))
+  .inputValidator(zod$(createEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       // Import server-only modules inside the handler
@@ -438,7 +438,7 @@ export const createEvent = createServerFn({ method: "POST" })
  */
 export const updateEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(updateEventSchema))
+  .inputValidator(zod$(updateEventSchema))
   .handler(async ({ data, context }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       // Import server-only modules inside the handler
@@ -560,7 +560,7 @@ const getSquarePaymentService = async () => {
  */
 export const registerForEvent = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(registerForEventSchema))
+  .inputValidator(zod$(registerForEventSchema))
   .handler(
     async ({
       data,
@@ -931,7 +931,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
 export const markEventEtransferPaid = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(markEtransferPaidSchema))
+  .inputValidator(zod$(markEtransferPaidSchema))
   .handler(
     async ({
       data,
@@ -1043,7 +1043,7 @@ export const markEventEtransferPaid = createServerFn({ method: "POST" })
 
 export const markEventEtransferReminder = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(markEtransferReminderSchema))
+  .inputValidator(zod$(markEtransferReminderSchema))
   .handler(
     async ({
       data,
@@ -1153,7 +1153,7 @@ export const markEventEtransferReminder = createServerFn({ method: "POST" })
  */
 export const cancelEventRegistration = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(cancelEventRegistrationSchema))
+  .inputValidator(zod$(cancelEventRegistrationSchema))
   .handler(
     async ({
       data,

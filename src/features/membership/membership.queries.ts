@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getMembershipTypeSchema } from "./membership.schemas";
 import { zod$ } from "~/lib/server/fn-utils";
+import { getMembershipTypeSchema } from "./membership.schemas";
 import type {
   MembershipOperationResult,
   MembershipStatus,
@@ -53,7 +53,7 @@ export const listMembershipTypes = createServerFn({ method: "GET" }).handler(
  * Get a specific membership type by ID
  */
 export const getMembershipType = createServerFn({ method: "GET" })
-  .validator(zod$(getMembershipTypeSchema))
+  .inputValidator(zod$(getMembershipTypeSchema))
   .handler(
     async ({
       data,
@@ -120,8 +120,8 @@ export const getUserMembershipStatus = createServerFn({ method: "GET" }).handler
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {

@@ -40,6 +40,10 @@ import {
   removeTeamMember,
   updateTeamMember,
 } from "~/features/teams/teams.mutations";
+import type {
+  TeamMemberDetails,
+  TeamWithMemberCount,
+} from "~/features/teams/teams.queries";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import type {
   AddTeamMemberInput,
@@ -48,6 +52,11 @@ import type {
 } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
+type TeamMembersLoaderData = {
+  team: NonNullable<TeamWithMemberCount>;
+  members: TeamMemberDetails[];
+};
+
 export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
   loader: async ({ params }) => {
     const [team, members] = await Promise.all([
@@ -55,7 +64,7 @@ export const Route = createFileRoute("/dashboard/teams/$teamId/members")({
       getTeamMembers({ data: { teamId: params.teamId } }),
     ]);
     if (!team) throw new Error("Team not found");
-    return { team, members };
+    return { team, members } satisfies TeamMembersLoaderData;
   },
   component: TeamMembersPage,
 });
@@ -68,7 +77,7 @@ function TeamMembersPage() {
   const [showAddMember, setShowAddMember] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { data: members } = useSuspenseQuery({
+  const { data: members } = useSuspenseQuery<TeamMemberDetails[]>({
     queryKey: ["teamMembers", teamId],
     queryFn: async () => getTeamMembers({ data: { teamId } }),
     initialData: initialMembers,

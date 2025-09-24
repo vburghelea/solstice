@@ -175,7 +175,6 @@ export function createTestRouteTree({
   routes?: Array<{
     path: string;
     component: () => ReactElement;
-    loader?: () => Promise<unknown>;
   }>;
   user?: User | null;
 }) {
@@ -192,14 +191,6 @@ export function createTestRouteTree({
         user,
       }),
     };
-
-    // Only add loader if it exists
-    if (route.loader) {
-      return createRoute({
-        ...baseOptions,
-        loader: route.loader,
-      });
-    }
 
     return createRoute(baseOptions);
   });

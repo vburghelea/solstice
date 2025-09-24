@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import react from "@vitejs/plugin-react";
+import viteReact from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
@@ -12,7 +12,8 @@ const aliasNodeAsyncHooksForClient = (): Plugin => ({
   resolveId(source, _importer, options) {
     if (source === "node:async_hooks" && !options?.ssr) {
       // Map only client-side imports to the shim
-      return new URL("./src/shims/async-local-storage.browser.ts", import.meta.url).pathname;
+      return new URL("./src/shims/async-local-storage.browser.ts", import.meta.url)
+        .pathname;
     }
     return null;
   },
@@ -38,35 +39,27 @@ export default defineConfig(({ mode }) => {
       }) as any,
       tailwindcss(),
 
-      // IMPORTANT: TanStack Start before react(), and tell it you're supplying the React plugin
       tanstackStart({
-        customViteReactPlugin: true, // Tell Start we're providing React plugin
-        // https://react.dev/learn/react-compiler
-        react: {
-          babel: {
-            plugins: [
-              [
-                "babel-plugin-react-compiler",
-                {
-                  target: "19",
-                },
-              ],
-            ],
-          },
-        },
-
-        tsr: {
+        router: {
           quoteStyle: "double",
           semicolons: true,
           // verboseFileRoutes: false,
         },
-
-        // Netlify deployment target
-        target: "netlify",
       }),
 
-      // React plugin explicitly provided
-      react(),
+      viteReact({
+        // https://react.dev/learn/react-compiler
+        babel: {
+          plugins: [
+            [
+              "babel-plugin-react-compiler",
+              {
+                target: "19",
+              },
+            ],
+          ],
+        },
+      }),
 
       // Keep PWA after the app framework plugins
       VitePWA({

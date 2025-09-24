@@ -10,8 +10,8 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     const { getDb } = await import("~/db/server-helpers");
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
 
     if (!session?.user) {

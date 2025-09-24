@@ -11,7 +11,7 @@ vi.mock("~/lib/auth", () => ({
 
 // Mock TanStack Start server functions
 vi.mock("@tanstack/react-start/server", () => ({
-  getWebRequest: vi.fn(() => ({ headers: new Headers() })),
+  getRequest: vi.fn(() => new Request("http://localhost", { headers: new Headers() })),
   setResponseStatus: vi.fn(),
 }));
 

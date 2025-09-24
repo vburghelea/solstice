@@ -29,9 +29,7 @@ export const membershipTypes = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
-    statusIdx: index("membership_types_status_idx").on(table.status),
-  }),
+  (table) => [index("membership_types_status_idx").on(table.status)],
 );
 
 export const memberships = pgTable(
@@ -62,12 +60,12 @@ export const memberships = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
-    userIdIdx: index("memberships_user_id_idx").on(table.userId),
-    statusIdx: index("memberships_status_idx").on(table.status),
-    endDateIdx: index("memberships_end_date_idx").on(table.endDate),
-    paymentIdIdx: index("memberships_payment_id_idx").on(table.paymentId),
-  }),
+  (table) => [
+    index("memberships_user_id_idx").on(table.userId),
+    index("memberships_status_idx").on(table.status),
+    index("memberships_end_date_idx").on(table.endDate),
+    index("memberships_payment_id_idx").on(table.paymentId),
+  ],
 );
 
 export const membershipPaymentSessions = pgTable(
@@ -97,19 +95,13 @@ export const membershipPaymentSessions = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
-    userIdx: index("membership_payment_sessions_user_idx").on(table.userId),
-    checkoutIdx: uniqueIndex("membership_payment_sessions_checkout_idx").on(
-      table.squareCheckoutId,
-    ),
-    orderIdx: index("membership_payment_sessions_order_idx").on(table.squareOrderId),
-    paymentIdx: index("membership_payment_sessions_payment_idx").on(
-      table.squarePaymentId,
-    ),
-    membershipTypeIdx: index("membership_payment_sessions_type_idx").on(
-      table.membershipTypeId,
-    ),
-  }),
+  (table) => [
+    index("membership_payment_sessions_user_idx").on(table.userId),
+    uniqueIndex("membership_payment_sessions_checkout_idx").on(table.squareCheckoutId),
+    index("membership_payment_sessions_order_idx").on(table.squareOrderId),
+    index("membership_payment_sessions_payment_idx").on(table.squarePaymentId),
+    index("membership_payment_sessions_type_idx").on(table.membershipTypeId),
+  ],
 );
 
 // Export inferred types

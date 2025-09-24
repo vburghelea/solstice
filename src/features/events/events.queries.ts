@@ -362,7 +362,7 @@ export const getUpcomingEvents = createServerFn({ method: "GET" })
  * Get all registrations for an event (organizer only)
  */
 export const getEventRegistrations = createServerFn({ method: "GET" })
-  .inputValidator(z.object({ eventId: z.string().uuid() }).parse)
+  .inputValidator(z.object({ eventId: z.uuid() }).parse)
   .handler(async ({ data }): Promise<EventRegistrationSummary[]> => {
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();

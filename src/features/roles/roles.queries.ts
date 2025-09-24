@@ -13,7 +13,7 @@ function escapeLike(term: string) {
 
 const searchUsersSchema = z.object({
   query: z.string().min(2, "Enter at least 2 characters"),
-  limit: z.number().int().positive().max(25).optional().default(10),
+  limit: z.int().positive().max(25).optional().prefault(10),
 });
 
 export const getRoleManagementData = createServerFn({ method: "GET" }).handler(

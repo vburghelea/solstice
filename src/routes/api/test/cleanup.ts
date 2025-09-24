@@ -11,7 +11,7 @@ const cleanupSchema = z.object({
   ]),
   userId: z.string().optional(),
   teamId: z.string().optional(),
-  userEmail: z.string().email().optional(),
+  userEmail: z.email().optional(),
 });
 
 export const Route = createFileRoute("/api/test/cleanup")({

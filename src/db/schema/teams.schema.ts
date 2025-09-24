@@ -59,11 +59,11 @@ export const teams = pgTable(
       .notNull()
       .references(() => user.id),
   },
-  (table) => ({
-    slugIdx: uniqueIndex("teams_slug_idx").on(table.slug),
-    createdByIdx: index("teams_created_by_idx").on(table.createdBy),
-    isActiveIdx: index("teams_is_active_idx").on(table.isActive),
-  }),
+  (table) => [
+    uniqueIndex("teams_slug_idx").on(table.slug),
+    index("teams_created_by_idx").on(table.createdBy),
+    index("teams_is_active_idx").on(table.isActive),
+  ],
 );
 
 /**
@@ -97,15 +97,14 @@ export const teamMembers = pgTable(
     invitationReminderCount: integer("invitation_reminder_count").notNull().default(0),
     requestedAt: timestamp("requested_at", { withTimezone: true }),
   },
-  (table) => ({
-    teamUserIdx: uniqueIndex("team_members_team_user_idx").on(table.teamId, table.userId),
-    teamStatusIdx: index("team_members_team_status_idx").on(table.teamId, table.status),
-    userStatusIdx: index("team_members_user_status_idx").on(table.userId, table.status),
-    // Ensure only one active team membership per user
-    activeUserConstraint: uniqueIndex("team_members_active_user_idx")
+  (table) => [
+    uniqueIndex("team_members_team_user_idx").on(table.teamId, table.userId),
+    index("team_members_team_status_idx").on(table.teamId, table.status),
+    index("team_members_user_status_idx").on(table.userId, table.status),
+    uniqueIndex("team_members_active_user_idx")
       .on(table.userId)
       .where(sql`status = 'active'`),
-  }),
+  ],
 );
 
 // Relations

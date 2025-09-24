@@ -10,12 +10,12 @@ const assignRoleSchema = z
     teamId: z.string().min(1).optional().nullable(),
     eventId: z.string().min(1).optional().nullable(),
     notes: z.string().trim().max(500, "Notes must be 500 characters or fewer").optional(),
-    expiresAt: z.string().datetime().optional(),
+    expiresAt: z.iso.datetime().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.teamId && data.eventId) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Choose either a team scope or an event scope—not both.",
         path: ["teamId"],
       });

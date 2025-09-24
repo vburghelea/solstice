@@ -360,10 +360,10 @@ export const createEvent = createServerFn({ method: "POST" })
       if (!validationResult.success) {
         return {
           success: false,
-          errors: validationResult.error.errors.map((err) => ({
+          errors: validationResult.error.issues.map((issue) => ({
             code: "VALIDATION_ERROR" as const,
-            message: err.message,
-            field: err.path.join("."),
+            message: issue.message,
+            field: issue.path.join("."),
           })),
         };
       }

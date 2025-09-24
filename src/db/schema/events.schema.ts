@@ -197,17 +197,13 @@ export const eventPaymentSessions = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
-    checkoutIdx: uniqueIndex("event_payment_sessions_checkout_idx").on(
-      table.squareCheckoutId,
-    ),
-    paymentIdx: index("event_payment_sessions_payment_idx").on(table.squarePaymentId),
-    registrationIdx: index("event_payment_sessions_registration_idx").on(
-      table.registrationId,
-    ),
-    eventIdx: index("event_payment_sessions_event_idx").on(table.eventId),
-    userIdx: index("event_payment_sessions_user_idx").on(table.userId),
-  }),
+  (table) => [
+    uniqueIndex("event_payment_sessions_checkout_idx").on(table.squareCheckoutId),
+    index("event_payment_sessions_payment_idx").on(table.squarePaymentId),
+    index("event_payment_sessions_registration_idx").on(table.registrationId),
+    index("event_payment_sessions_event_idx").on(table.eventId),
+    index("event_payment_sessions_user_idx").on(table.userId),
+  ],
 );
 
 /**
@@ -327,17 +323,16 @@ export const baseCreateEventSchema = z.object({
   startDate: z.string(), // Will be converted to Date
   endDate: z.string(), // Will be converted to Date
   registrationType: z.enum(["team", "individual", "both"]),
-  maxTeams: z.number().int().positive().optional(),
-  maxParticipants: z.number().int().positive().optional(),
-  teamRegistrationFee: z.number().int().min(0).optional(),
-  individualRegistrationFee: z.number().int().min(0).optional(),
-  contactEmail: z.string().email().optional(),
+  maxTeams: z.int().positive().optional(),
+  maxParticipants: z.int().positive().optional(),
+  teamRegistrationFee: z.int().min(0).optional(),
+  individualRegistrationFee: z.int().min(0).optional(),
+  contactEmail: z.email().optional(),
   contactPhone: z.string().optional(),
   allowWaitlist: z.boolean().optional(),
   requireMembership: z.boolean().optional(),
   allowEtransfer: z.boolean().optional(),
   etransferRecipient: z
-    .string()
     .email("Enter a valid e-transfer email")
     .optional()
     .or(z.literal("")),
@@ -350,7 +345,7 @@ export const createEventInputSchema = baseCreateEventSchema.superRefine((values,
     if (!recipient) {
       ctx.addIssue({
         path: ["etransferRecipient"],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "E-transfer recipient email is required when e-transfer is enabled",
       });
     }

@@ -179,7 +179,7 @@ describe("Teams Schemas", () => {
         });
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error.errors[0].message).toContain(
+          expect(result.error.issues[0]?.message).toContain(
             "Slug can only contain lowercase letters, numbers, and hyphens",
           );
         }
@@ -284,7 +284,7 @@ describe("Teams Schemas", () => {
         });
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error.errors[0].message).toContain("valid email");
+          expect(result.error.issues[0]?.message).toContain("valid email");
         }
       });
 

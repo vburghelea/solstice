@@ -17,13 +17,13 @@ export const listEventsSchema = z
         publicOnly: z.boolean().optional(),
       })
       .optional(),
-    page: z.number().int().positive().optional(),
-    pageSize: z.number().int().positive().optional(),
+    page: z.int().positive().optional(),
+    pageSize: z.int().positive().optional(),
     sortBy: z.enum(["startDate", "createdAt", "name"]).optional(),
     sortOrder: z.enum(["asc", "desc"]).optional(),
   })
   .optional()
-  .default({});
+  .prefault({});
 export type ListEventsInput = z.infer<typeof listEventsSchema>;
 
 export const getEventSchema = z.object({
@@ -34,10 +34,10 @@ export type GetEventInput = z.infer<typeof getEventSchema>;
 
 export const getUpcomingEventsSchema = z
   .object({
-    limit: z.number().int().positive().max(10).optional(),
+    limit: z.int().positive().max(10).optional(),
   })
   .optional()
-  .default({});
+  .prefault({});
 export type GetUpcomingEventsInput = z.infer<typeof getUpcomingEventsSchema>;
 
 export const checkEventRegistrationSchema = z.object({
@@ -76,18 +76,16 @@ const rosterPlayerSchema = z.object({
   jerseyNumber: z.string().optional(),
 });
 
-const rosterObjectSchema = z
-  .object({
-    players: z.array(rosterPlayerSchema).optional(),
-    emergencyContact: z
-      .object({
-        name: z.string().optional(),
-        phone: z.string().optional(),
-        relationship: z.string().optional(),
-      })
-      .optional(),
-  })
-  .passthrough();
+const rosterObjectSchema = z.looseObject({
+  players: z.array(rosterPlayerSchema).optional(),
+  emergencyContact: z
+    .looseObject({
+      name: z.string().optional(),
+      phone: z.string().optional(),
+      relationship: z.string().optional(),
+    })
+    .optional(),
+});
 
 export const registerForEventSchema = z.object({
   eventId: z.string(),
@@ -95,7 +93,7 @@ export const registerForEventSchema = z.object({
   division: z.string().optional(),
   notes: z.string().optional(),
   roster: z.union([z.array(rosterPlayerSchema), rosterObjectSchema]).optional(),
-  paymentMethod: z.enum(["square", "etransfer"]).default("square"),
+  paymentMethod: z.enum(["square", "etransfer"]).prefault("square"),
 });
 export type RegisterForEventInput = z.infer<typeof registerForEventSchema>;
 
@@ -106,10 +104,10 @@ export const cancelEventRegistrationSchema = z.object({
 export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistrationSchema>;
 
 export const cancelEntireEventSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.uuid(),
   reason: z.string().optional(),
-  notify: z.boolean().optional().default(true),
-  refundMode: z.enum(["auto", "manual", "none"]).optional().default("auto"),
+  notify: z.boolean().optional().prefault(true),
+  refundMode: z.enum(["auto", "manual", "none"]).optional().prefault("auto"),
 });
 export type CancelEntireEventInput = z.infer<typeof cancelEntireEventSchema>;
 

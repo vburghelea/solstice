@@ -4,9 +4,9 @@ import { zod$ } from "~/lib/server/fn-utils";
 import type { MembershipOperationResult } from "./membership.types";
 
 const getAllMembershipsSchema = z.object({
-  status: z.enum(["all", "active", "expired", "cancelled"]).optional().default("all"),
-  limit: z.number().optional().default(100),
-  offset: z.number().optional().default(0),
+  status: z.enum(["all", "active", "expired", "cancelled"]).optional().prefault("all"),
+  limit: z.number().optional().prefault(100),
+  offset: z.number().optional().prefault(0),
 });
 
 export interface MembershipReportRow {

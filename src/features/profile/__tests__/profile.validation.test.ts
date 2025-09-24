@@ -49,7 +49,7 @@ describe("Profile Server Function Input Schemas", () => {
       const result = updateUserProfileInputSchema.safeParse(invalidInput);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors[0].message).toContain(
+        expect(result.error.issues[0]?.message).toContain(
           "You must be between 13 and 120 years old",
         );
       }
@@ -168,7 +168,7 @@ describe("Profile Server Function Input Schemas", () => {
       const result = completeUserProfileInputSchema.safeParse(invalidInput);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors[0].message).toContain(
+        expect(result.error.issues[0]?.message).toContain(
           "You must be between 13 and 120 years old",
         );
       }

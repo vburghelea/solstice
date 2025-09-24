@@ -9,7 +9,7 @@ const getDb = createServerOnlyFn(async () => {
 });
 
 const clearUserTeamsSchema = z.object({
-  userEmail: z.string().email(),
+  userEmail: z.email(),
 });
 
 export const clearUserTeamsForTesting = createServerFn({ method: "POST" })

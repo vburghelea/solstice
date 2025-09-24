@@ -20,18 +20,18 @@ import { parseOAuthAllowedDomains } from "./env/oauth-domain";
 export const env = createEnv({
   server: {
     // Database
-    DATABASE_URL: z.string().url(),
-    DATABASE_URL_UNPOOLED: z.string().url().optional(),
-    DATABASE_POOLED_URL: z.string().url().optional(),
-    DATABASE_UNPOOLED_URL: z.string().url().optional(),
-    NETLIFY_DATABASE_URL: z.string().url().optional(),
-    NETLIFY_DATABASE_URL_UNPOOLED: z.string().url().optional(),
+    DATABASE_URL: z.url(),
+    DATABASE_URL_UNPOOLED: z.url().optional(),
+    DATABASE_POOLED_URL: z.url().optional(),
+    DATABASE_UNPOOLED_URL: z.url().optional(),
+    NETLIFY_DATABASE_URL: z.url().optional(),
+    NETLIFY_DATABASE_URL_UNPOOLED: z.url().optional(),
 
     // Auth
     BETTER_AUTH_SECRET: z
       .string()
       .min(1, "BETTER_AUTH_SECRET must be set")
-      .default("dev-secret-change-in-production"),
+      .prefault("dev-secret-change-in-production"),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     OAUTH_ALLOWED_DOMAINS: z
@@ -42,7 +42,7 @@ export const env = createEnv({
           return parseOAuthAllowedDomains(value);
         } catch (error) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message:
               error instanceof Error
                 ? error.message
@@ -59,29 +59,29 @@ export const env = createEnv({
     SQUARE_ACCESS_TOKEN: z.string().optional(),
     SQUARE_LOCATION_ID: z.string().optional(),
     SQUARE_WEBHOOK_SIGNATURE_KEY: z.string().optional(),
-    SQUARE_WEBHOOK_URL: z.string().url().optional(),
-    SUPPORT_EMAIL: z.string().email().optional(),
+    SQUARE_WEBHOOK_URL: z.url().optional(),
+    SUPPORT_EMAIL: z.email().optional(),
 
     // SendGrid Email Integration
     SENDGRID_API_KEY: z.string().optional(),
-    SENDGRID_FROM_EMAIL: z.string().email().optional(),
+    SENDGRID_FROM_EMAIL: z.email().optional(),
     SENDGRID_FROM_NAME: z.string().optional(),
 
     // Other
     COOKIE_DOMAIN: z.string().optional(),
-    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    NODE_ENV: z.enum(["development", "production", "test"]).prefault("development"),
     NETLIFY: z.string().optional(),
     VERCEL_ENV: z.string().optional(),
 
     // Client vars are also available on server
     // In production, Netlify provides URL env var
-    VITE_BASE_URL: z.string().url().optional(),
+    VITE_BASE_URL: z.url().optional(),
 
     // Netlify automatically provides these
-    URL: z.string().url().optional(), // The main URL of the site
-    SITE_URL: z.string().url().optional(), // The site's URL
-    DEPLOY_URL: z.string().url().optional(), // The specific deploy URL
-    DEPLOY_PRIME_URL: z.string().url().optional(), // The prime URL for the deploy
+    URL: z.url().optional(), // The main URL of the site
+    SITE_URL: z.url().optional(), // The site's URL
+    DEPLOY_URL: z.url().optional(), // The specific deploy URL
+    DEPLOY_PRIME_URL: z.url().optional(), // The prime URL for the deploy
   },
   // Use process.env since we've just loaded .env
   runtimeEnv: process.env,

@@ -91,22 +91,21 @@ const eventFormSchema = z
     registrationType: z.enum(["team", "individual", "both"]),
     maxTeams: z.number().min(1).optional(),
     maxParticipants: z.number().min(1).optional(),
-    minPlayersPerTeam: z.number().min(1).default(7),
-    maxPlayersPerTeam: z.number().min(1).default(21),
-    teamRegistrationFee: z.number().min(0).default(0),
-    individualRegistrationFee: z.number().min(0).default(0),
-    earlyBirdDiscount: z.number().min(0).max(100).default(0),
+    minPlayersPerTeam: z.number().min(1).prefault(7),
+    maxPlayersPerTeam: z.number().min(1).prefault(21),
+    teamRegistrationFee: z.number().min(0).prefault(0),
+    individualRegistrationFee: z.number().min(0).prefault(0),
+    earlyBirdDiscount: z.number().min(0).max(100).prefault(0),
     earlyBirdDeadline: z.string().optional(),
-    contactEmail: z.string().email().optional(),
+    contactEmail: z.email().optional(),
     contactPhone: z.string().optional(),
-    websiteUrl: z.string().url().optional().or(z.literal("")),
-    isPublic: z.boolean().default(true),
-    isFeatured: z.boolean().default(false),
-    allowWaitlist: z.boolean().default(false),
-    requireMembership: z.boolean().default(false),
-    allowEtransfer: z.boolean().default(false),
+    websiteUrl: z.url().optional().or(z.literal("")),
+    isPublic: z.boolean().prefault(true),
+    isFeatured: z.boolean().prefault(false),
+    allowWaitlist: z.boolean().prefault(false),
+    requireMembership: z.boolean().prefault(false),
+    allowEtransfer: z.boolean().prefault(false),
     etransferRecipient: z
-      .string()
       .email("Enter a valid e-transfer email")
       .optional()
       .or(z.literal("")),
@@ -118,7 +117,7 @@ const eventFormSchema = z
       if (!recipient) {
         ctx.addIssue({
           path: ["etransferRecipient"],
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "E-transfer recipient email is required when e-transfer is enabled",
         });
       }

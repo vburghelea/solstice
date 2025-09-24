@@ -112,7 +112,7 @@ export const updateTeam = createServerFn({ method: "POST" })
     zod$(
       updateTeamSchema.extend({
         data: updateTeamSchema.shape.data.extend({
-          socialLinks: z.record(z.string()).optional(),
+          socialLinks: z.record(z.string(), z.string()).optional(),
           logoUrl: z.string().optional(),
         }),
       }),

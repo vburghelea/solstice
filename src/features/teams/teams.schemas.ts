@@ -12,7 +12,7 @@ export const getTeamBySlugSchema = z.object({
 export type GetTeamBySlugInput = z.infer<typeof getTeamBySlugSchema>;
 
 const listTeamsInputSchema = z.object({
-  includeInactive: z.boolean().optional().default(false),
+  includeInactive: z.boolean().optional().prefault(false),
 });
 
 export const listTeamsSchema = listTeamsInputSchema
@@ -59,8 +59,8 @@ export const createTeamSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/)
     .optional(),
   foundedYear: z.string().length(4).optional(),
-  website: z.string().url().optional(),
-  socialLinks: z.record(z.string()).optional(),
+  website: z.url().optional(),
+  socialLinks: z.record(z.string(), z.string()).optional(),
 });
 export type CreateTeamInput = z.infer<typeof createTeamSchema>;
 
@@ -72,7 +72,7 @@ export type UpdateTeamInput = z.infer<typeof updateTeamSchema>;
 
 export const addTeamMemberSchema = z.object({
   teamId: z.string(),
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email("Please enter a valid email address"),
   role: z.enum(["captain", "coach", "player", "substitute"]),
   jerseyNumber: z.string().optional(),
   position: z.string().optional(),

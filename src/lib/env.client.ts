@@ -9,9 +9,9 @@ import { z } from "zod";
 export const env = createEnv({
   clientPrefix: "VITE_",
   client: {
-    VITE_BASE_URL: z.string().url().optional(),
-    VITE_ENABLE_ANALYTICS: z.coerce.boolean().default(false),
-    VITE_ENABLE_SENTRY: z.coerce.boolean().default(false),
+    VITE_BASE_URL: z.url().optional(),
+    VITE_ENABLE_ANALYTICS: z.coerce.boolean().prefault(false),
+    VITE_ENABLE_SENTRY: z.coerce.boolean().prefault(false),
     VITE_POSTHOG_KEY: z.string().optional(),
     VITE_SENTRY_DSN: z.string().optional(),
   },

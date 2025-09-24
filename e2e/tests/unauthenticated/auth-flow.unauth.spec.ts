@@ -51,21 +51,21 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
 
     // Type slowly to ensure the form registers the input
     await nameField.click();
-    await nameField.type("New Test User", { delay: 50 });
+    await nameField.fill("New Test User");
 
     const emailField = page.getByLabel("Email");
     await emailField.click();
-    await emailField.type(testEmail, { delay: 50 });
+    await emailField.fill(testEmail);
 
     // Fill password field
     const passwordField = page.getByLabel("Password", { exact: true });
     await passwordField.click();
-    await passwordField.type("testpassword123", { delay: 50 });
+    await passwordField.fill("testpassword123");
 
     // Fill confirm password
     const confirmField = page.getByLabel("Confirm Password");
     await confirmField.click();
-    await confirmField.type("testpassword123", { delay: 50 });
+    await confirmField.fill("testpassword123");
 
     // Tab out to trigger final validation
     await page.keyboard.press("Tab");

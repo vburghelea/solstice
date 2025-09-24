@@ -71,8 +71,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Use Promise.all to handle the navigation properly
     await Promise.all([
-      page.waitForNavigation({
-        url: /\/auth\/login/,
+      page.waitForURL(/\/auth\/login/, {
         waitUntil: "domcontentloaded",
         timeout: 20000,
       }),
@@ -102,8 +101,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Use Promise.all to handle the navigation properly
     await Promise.all([
-      page.waitForNavigation({
-        url: /\/auth\/login/,
+      page.waitForURL(/\/auth\/login/, {
         waitUntil: "domcontentloaded",
         timeout: 20000,
       }),

@@ -45,23 +45,21 @@ export const userRoles = pgTable(
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     notes: text("notes"),
   },
-  (table) => ({
-    // Indexes for performance
-    userIdIdx: index("idx_user_roles_user_id").on(table.userId),
-    teamIdIdx: index("idx_user_roles_team_id")
+  (table) => [
+    index("idx_user_roles_user_id").on(table.userId),
+    index("idx_user_roles_team_id")
       .on(table.teamId)
       .where(sql`${table.teamId} IS NOT NULL`),
-    eventIdIdx: index("idx_user_roles_event_id")
+    index("idx_user_roles_event_id")
       .on(table.eventId)
       .where(sql`${table.eventId} IS NOT NULL`),
-    // Unique constraint to prevent duplicate role assignments
-    uniqueUserRole: index("idx_user_roles_unique").on(
+    index("idx_user_roles_unique").on(
       table.userId,
       table.roleId,
       table.teamId,
       table.eventId,
     ),
-  }),
+  ],
 );
 
 /**
@@ -101,15 +99,14 @@ export const userTags = pgTable(
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     notes: text("notes"),
   },
-  (table) => ({
-    userIdIdx: index("idx_user_tags_user_id").on(table.userId),
-    tagIdIdx: index("idx_user_tags_tag_id").on(table.tagId),
-    expiresAtIdx: index("idx_user_tags_expires_at")
+  (table) => [
+    index("idx_user_tags_user_id").on(table.userId),
+    index("idx_user_tags_tag_id").on(table.tagId),
+    index("idx_user_tags_expires_at")
       .on(table.expiresAt)
       .where(sql`${table.expiresAt} IS NOT NULL`),
-    // Prevent duplicate tag assignments
-    uniqueUserTag: index("idx_user_tags_unique").on(table.userId, table.tagId),
-  }),
+    index("idx_user_tags_unique").on(table.userId, table.tagId),
+  ],
 );
 
 // Type exports for TypeScript

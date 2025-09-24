@@ -1,5 +1,4 @@
 import { useForm } from "@tanstack/react-form";
-import type { ZodSchema } from "zod";
 
 /**
  * Custom hook that wraps TanStack Form's useForm with sensible defaults
@@ -22,8 +21,3 @@ export function useAppForm<TFormData>(options: {
     ...options,
   });
 }
-
-/**
- * Type helper to infer form data type from Zod schema
- */
-export type InferFormData<T extends ZodSchema> = T extends ZodSchema<infer U> ? U : never;

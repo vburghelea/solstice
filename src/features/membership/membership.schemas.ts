@@ -9,14 +9,14 @@ export type GetMembershipTypeInput = z.infer<typeof getMembershipTypeSchema>;
 // Mutation schemas
 export const purchaseMembershipSchema = z.object({
   membershipTypeId: z.string(),
-  autoRenew: z.boolean().default(false),
+  autoRenew: z.boolean().prefault(false),
 });
 export type PurchaseMembershipInput = z.infer<typeof purchaseMembershipSchema>;
 
 export const cancelMembershipSchema = z.object({
   membershipId: z.string(),
   reason: z.string().optional(),
-  immediate: z.boolean().default(false),
+  immediate: z.boolean().prefault(false),
 });
 export type CancelMembershipInput = z.infer<typeof cancelMembershipSchema>;
 

@@ -41,6 +41,6 @@ export const callServerFn = <TData, TResult>(
 
 // Typed Zod adapter - but note: you can pass schemas directly to .inputValidator()
 export const zod$ =
-  <T extends z.ZodTypeAny>(schema: T) =>
+  <T extends z.ZodType>(schema: T) =>
   (input: unknown) =>
     schema.parse(input) as z.infer<T>;

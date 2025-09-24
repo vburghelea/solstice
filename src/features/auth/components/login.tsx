@@ -98,7 +98,7 @@ export default function LoginForm(props?: LoginFormProps) {
                     return undefined;
                   } catch (error) {
                     if (error instanceof z.ZodError) {
-                      return error.errors?.[0]?.message || "Invalid email";
+                      return error.issues[0]?.message || "Invalid email";
                     }
                     return "Invalid email";
                   }
@@ -125,7 +125,7 @@ export default function LoginForm(props?: LoginFormProps) {
                     return undefined;
                   } catch (error) {
                     if (error instanceof z.ZodError) {
-                      return error.errors?.[0]?.message || "Password is required";
+                      return error.issues[0]?.message || "Password is required";
                     }
                     return "Password is required";
                   }

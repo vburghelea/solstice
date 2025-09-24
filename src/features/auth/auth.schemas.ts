@@ -4,7 +4,7 @@ import { z } from "zod";
  * Login form validation schema
  */
 export const loginFormSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+  email: z.email("Please enter a valid email").min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -18,7 +18,7 @@ export const signupFormFieldSchemas = {
     .string()
     .min(1, "Name is required")
     .min(2, "Name must be at least 2 characters"),
-  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+  email: z.email("Please enter a valid email").min(1, "Email is required"),
   password: z
     .string()
     .min(1, "Password is required")
@@ -36,7 +36,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Invalid name";
+        return error.issues[0]?.message || "Invalid name";
       }
       return "Invalid name";
     }
@@ -47,7 +47,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Invalid email";
+        return error.issues[0]?.message || "Invalid email";
       }
       return "Invalid email";
     }
@@ -58,7 +58,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Invalid password";
+        return error.issues[0]?.message || "Invalid password";
       }
       return "Invalid password";
     }
@@ -69,7 +69,7 @@ export const signupFormFields = {
       return undefined;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return error.errors?.[0]?.message || "Please confirm your password";
+        return error.issues[0]?.message || "Please confirm your password";
       }
       return "Please confirm your password";
     }
@@ -82,8 +82,8 @@ export const signupFormFields = {
 export const signupFormSchema = z
   .object(signupFormFieldSchemas)
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
     path: ["confirmPassword"],
+    error: "Passwords do not match",
   });
 
 export type SignupFormData = z.infer<typeof signupFormSchema>;

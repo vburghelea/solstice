@@ -7,7 +7,7 @@ import { z } from "zod";
 
 // Email configuration schemas
 export const EmailRecipientSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   name: z.string().optional(),
 });
 
@@ -18,7 +18,7 @@ export const EmailDataSchema = z.object({
   text: z.string().optional(),
   html: z.string().optional(),
   templateId: z.string().optional(),
-  dynamicTemplateData: z.record(z.unknown()).optional(),
+  dynamicTemplateData: z.record(z.string(), z.unknown()).optional(),
   replyTo: EmailRecipientSchema.optional(),
   attachments: z
     .array(

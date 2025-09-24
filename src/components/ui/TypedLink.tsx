@@ -5,6 +5,7 @@ import {
   useRouterState,
   type LinkComponentProps,
 } from "@tanstack/react-router";
+import type { AnchorHTMLAttributes } from "react";
 
 // Properly typed Link component that preserves generic type parameters
 export function TypedLink<
@@ -22,27 +23,32 @@ export function TypedLink<
 
   if (isWebKit) {
     // For WebKit, manually handle active state
-    const { activeProps, to, ...restProps } = props;
+    const { activeProps, to, children, ...restProps } = props;
     const isActive = routerState.location.pathname === to;
 
     const activeAttributes = isActive && activeProps ? activeProps : {};
+    const anchorProps = restProps as AnchorHTMLAttributes<HTMLAnchorElement>;
+    const activeAnchorProps = activeAttributes as AnchorHTMLAttributes<HTMLAnchorElement>;
 
     // Fallback to a real <a> so Safari's click semantics are 100% reliable
     return (
       <a
-        href={to as string}
-        dsf
-        {...restProps}
-        {...activeAttributes}
+        href={(to as string) ?? routerState.location.pathname}
+        {...anchorProps}
+        {...activeAnchorProps}
         onClick={(e) => {
+          anchorProps.onClick?.(e);
+          if (e.defaultPrevented) {
+            return;
+          }
           e.preventDefault();
           // Use navigate with proper typing
           navigate({ to: to as string });
         }}
       >
-        {typeof props.children === "function"
-          ? props.children({ isActive, isTransitioning: false })
-          : props.children}
+        {typeof children === "function"
+          ? children({ isActive, isTransitioning: false })
+          : children}
       </a>
     );
   }

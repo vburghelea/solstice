@@ -8,8 +8,6 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from "@tanstack/react-start/server";
-
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as TeamsRouteImport } from "./routes/teams";
 import { Route as ResourcesRouteImport } from "./routes/resources";
@@ -33,6 +31,9 @@ import { Route as DashboardForbiddenRouteImport } from "./routes/dashboard/forbi
 import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
 import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+import { Route as ApiTestSquareRouteImport } from "./routes/api/test-square";
+import { Route as ApiHealthRouteImport } from "./routes/api/health";
+import { Route as ApiDebugSquareRouteImport } from "./routes/api/debug-square";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
@@ -46,20 +47,15 @@ import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/tea
 import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
 import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
 import { Route as DashboardAdminEventsReviewRouteImport } from "./routes/dashboard/admin/events-review";
+import { Route as ApiWebhooksSquareRouteImport } from "./routes/api/webhooks/square";
+import { Route as ApiTestCleanupRouteImport } from "./routes/api/test/cleanup";
+import { Route as ApiAuthSplatRouteImport } from "./routes/api/auth/$";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
-import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
-import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
-import { ServerRoute as ApiDebugSquareServerRouteImport } from "./routes/api/debug-square";
-import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
-import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
-import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
-import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
-import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
-
-const rootServerRouteImport = createServerRootRoute();
+import { Route as ApiPaymentsSquareCallbackRouteImport } from "./routes/api/payments/square/callback";
+import { Route as ApiAuthActionProviderRouteImport } from "./routes/api/auth/$action/$provider";
 
 const TeamsRoute = TeamsRouteImport.update({
   id: "/teams",
@@ -171,6 +167,21 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const ApiTestSquareRoute = ApiTestSquareRouteImport.update({
+  id: "/api/test-square",
+  path: "/api/test-square",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: "/api/health",
+  path: "/api/health",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiDebugSquareRoute = ApiDebugSquareRouteImport.update({
+  id: "/api/debug-square",
+  path: "/api/debug-square",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const AdminRolesRoute = AdminRolesRouteImport.update({
   id: "/admin/roles",
   path: "/admin/roles",
@@ -237,6 +248,21 @@ const DashboardAdminEventsReviewRoute =
     path: "/events-review",
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any);
+const ApiWebhooksSquareRoute = ApiWebhooksSquareRouteImport.update({
+  id: "/api/webhooks/square",
+  path: "/api/webhooks/square",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiTestCleanupRoute = ApiTestCleanupRouteImport.update({
+  id: "/api/test/cleanup",
+  path: "/api/test/cleanup",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: "/api/auth/$",
+  path: "/api/auth/$",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DashboardTeamsTeamIdIndexRoute =
   DashboardTeamsTeamIdIndexRouteImport.update({
     id: "/",
@@ -261,48 +287,17 @@ const DashboardEventsEventIdManageRoute =
     path: "/$eventId/manage",
     getParentRoute: () => DashboardEventsRoute,
   } as any);
-const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
-  id: "/api/test-square",
-  path: "/api/test-square",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
-  id: "/api/health",
-  path: "/api/health",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiDebugSquareServerRoute = ApiDebugSquareServerRouteImport.update({
-  id: "/api/debug-square",
-  path: "/api/debug-square",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiWebhooksSquareServerRoute = ApiWebhooksSquareServerRouteImport.update({
-  id: "/api/webhooks/square",
-  path: "/api/webhooks/square",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiTestCleanupServerRoute = ApiTestCleanupServerRouteImport.update({
-  id: "/api/test/cleanup",
-  path: "/api/test/cleanup",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
-  id: "/api/auth/$",
-  path: "/api/auth/$",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiPaymentsSquareCallbackServerRoute =
-  ApiPaymentsSquareCallbackServerRouteImport.update({
+const ApiPaymentsSquareCallbackRoute =
+  ApiPaymentsSquareCallbackRouteImport.update({
     id: "/api/payments/square/callback",
     path: "/api/payments/square/callback",
-    getParentRoute: () => rootServerRouteImport,
+    getParentRoute: () => rootRouteImport,
   } as any);
-const ApiAuthActionProviderServerRoute =
-  ApiAuthActionProviderServerRouteImport.update({
-    id: "/api/auth/$action/$provider",
-    path: "/api/auth/$action/$provider",
-    getParentRoute: () => rootServerRouteImport,
-  } as any);
+const ApiAuthActionProviderRoute = ApiAuthActionProviderRouteImport.update({
+  id: "/api/auth/$action/$provider",
+  path: "/api/auth/$action/$provider",
+  getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
@@ -316,6 +311,9 @@ export interface FileRoutesByFullPath {
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
+  "/api/debug-square": typeof ApiDebugSquareRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/api/test-square": typeof ApiTestSquareRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -330,6 +328,9 @@ export interface FileRoutesByFullPath {
   "/dashboard/": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
@@ -340,6 +341,8 @@ export interface FileRoutesByFullPath {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -355,6 +358,9 @@ export interface FileRoutesByTo {
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
+  "/api/debug-square": typeof ApiDebugSquareRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/api/test-square": typeof ApiTestSquareRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/forbidden": typeof DashboardForbiddenRoute;
@@ -366,6 +372,9 @@ export interface FileRoutesByTo {
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
   "/onboarding": typeof OnboardingIndexRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
@@ -375,6 +384,8 @@ export interface FileRoutesByTo {
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/events/$slug": typeof EventsSlugIndexRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -393,6 +404,9 @@ export interface FileRoutesById {
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
+  "/api/debug-square": typeof ApiDebugSquareRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/api/test-square": typeof ApiTestSquareRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/signup": typeof AuthSignupRoute;
   "/dashboard/events": typeof DashboardEventsRouteWithChildren;
@@ -407,6 +421,9 @@ export interface FileRoutesById {
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
   "/onboarding/": typeof OnboardingIndexRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/events/create": typeof DashboardEventsCreateRoute;
@@ -417,6 +434,8 @@ export interface FileRoutesById {
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
@@ -436,6 +455,9 @@ export interface FileRouteTypes {
     | "/dashboard/admin"
     | "/admin/events-review"
     | "/admin/roles"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/events"
@@ -450,6 +472,9 @@ export interface FileRouteTypes {
     | "/dashboard/"
     | "/events"
     | "/onboarding/"
+    | "/api/auth/$"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/events/create"
@@ -460,6 +485,8 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/teams/"
     | "/events/$slug/"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -475,6 +502,9 @@ export interface FileRouteTypes {
     | "/dashboard/admin"
     | "/admin/events-review"
     | "/admin/roles"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/forbidden"
@@ -486,6 +516,9 @@ export interface FileRouteTypes {
     | "/dashboard"
     | "/events"
     | "/onboarding"
+    | "/api/auth/$"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/events/create"
@@ -495,6 +528,8 @@ export interface FileRouteTypes {
     | "/dashboard/events"
     | "/dashboard/teams"
     | "/events/$slug"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -512,6 +547,9 @@ export interface FileRouteTypes {
     | "/dashboard/admin"
     | "/admin/events-review"
     | "/admin/roles"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
     | "/auth/login"
     | "/auth/signup"
     | "/dashboard/events"
@@ -526,6 +564,9 @@ export interface FileRouteTypes {
     | "/dashboard/"
     | "/events/"
     | "/onboarding/"
+    | "/api/auth/$"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/events/create"
@@ -536,6 +577,8 @@ export interface FileRouteTypes {
     | "/dashboard/events/"
     | "/dashboard/teams/"
     | "/events/$slug/"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
@@ -553,82 +596,16 @@ export interface RootRouteChildren {
   TeamsRoute: typeof TeamsRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
+  ApiDebugSquareRoute: typeof ApiDebugSquareRoute;
+  ApiHealthRoute: typeof ApiHealthRoute;
+  ApiTestSquareRoute: typeof ApiTestSquareRoute;
   EventsSlugRoute: typeof EventsSlugRouteWithChildren;
   EventsIndexRoute: typeof EventsIndexRoute;
-}
-export interface FileServerRoutesByFullPath {
-  "/api/debug-square": typeof ApiDebugSquareServerRoute;
-  "/api/health": typeof ApiHealthServerRoute;
-  "/api/test-square": typeof ApiTestSquareServerRoute;
-  "/api/auth/$": typeof ApiAuthSplatServerRoute;
-  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
-  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
-  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
-  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
-}
-export interface FileServerRoutesByTo {
-  "/api/debug-square": typeof ApiDebugSquareServerRoute;
-  "/api/health": typeof ApiHealthServerRoute;
-  "/api/test-square": typeof ApiTestSquareServerRoute;
-  "/api/auth/$": typeof ApiAuthSplatServerRoute;
-  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
-  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
-  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
-  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
-}
-export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport;
-  "/api/debug-square": typeof ApiDebugSquareServerRoute;
-  "/api/health": typeof ApiHealthServerRoute;
-  "/api/test-square": typeof ApiTestSquareServerRoute;
-  "/api/auth/$": typeof ApiAuthSplatServerRoute;
-  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
-  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
-  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
-  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
-}
-export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths:
-    | "/api/debug-square"
-    | "/api/health"
-    | "/api/test-square"
-    | "/api/auth/$"
-    | "/api/test/cleanup"
-    | "/api/webhooks/square"
-    | "/api/auth/$action/$provider"
-    | "/api/payments/square/callback";
-  fileServerRoutesByTo: FileServerRoutesByTo;
-  to:
-    | "/api/debug-square"
-    | "/api/health"
-    | "/api/test-square"
-    | "/api/auth/$"
-    | "/api/test/cleanup"
-    | "/api/webhooks/square"
-    | "/api/auth/$action/$provider"
-    | "/api/payments/square/callback";
-  id:
-    | "__root__"
-    | "/api/debug-square"
-    | "/api/health"
-    | "/api/test-square"
-    | "/api/auth/$"
-    | "/api/test/cleanup"
-    | "/api/webhooks/square"
-    | "/api/auth/$action/$provider"
-    | "/api/payments/square/callback";
-  fileServerRoutesById: FileServerRoutesById;
-}
-export interface RootServerRouteChildren {
-  ApiDebugSquareServerRoute: typeof ApiDebugSquareServerRoute;
-  ApiHealthServerRoute: typeof ApiHealthServerRoute;
-  ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
-  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
-  ApiTestCleanupServerRoute: typeof ApiTestCleanupServerRoute;
-  ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
-  ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
-  ApiPaymentsSquareCallbackServerRoute: typeof ApiPaymentsSquareCallbackServerRoute;
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute;
+  ApiTestCleanupRoute: typeof ApiTestCleanupRoute;
+  ApiWebhooksSquareRoute: typeof ApiWebhooksSquareRoute;
+  ApiAuthActionProviderRoute: typeof ApiAuthActionProviderRoute;
+  ApiPaymentsSquareCallbackRoute: typeof ApiPaymentsSquareCallbackRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -787,6 +764,27 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthLoginRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/api/test-square": {
+      id: "/api/test-square";
+      path: "/api/test-square";
+      fullPath: "/api/test-square";
+      preLoaderRoute: typeof ApiTestSquareRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/health": {
+      id: "/api/health";
+      path: "/api/health";
+      fullPath: "/api/health";
+      preLoaderRoute: typeof ApiHealthRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/debug-square": {
+      id: "/api/debug-square";
+      path: "/api/debug-square";
+      fullPath: "/api/debug-square";
+      preLoaderRoute: typeof ApiDebugSquareRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/admin/roles": {
       id: "/admin/roles";
       path: "/admin/roles";
@@ -878,6 +876,27 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardAdminEventsReviewRouteImport;
       parentRoute: typeof DashboardAdminRouteRoute;
     };
+    "/api/webhooks/square": {
+      id: "/api/webhooks/square";
+      path: "/api/webhooks/square";
+      fullPath: "/api/webhooks/square";
+      preLoaderRoute: typeof ApiWebhooksSquareRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/test/cleanup": {
+      id: "/api/test/cleanup";
+      path: "/api/test/cleanup";
+      fullPath: "/api/test/cleanup";
+      preLoaderRoute: typeof ApiTestCleanupRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/auth/$": {
+      id: "/api/auth/$";
+      path: "/api/auth/$";
+      fullPath: "/api/auth/$";
+      preLoaderRoute: typeof ApiAuthSplatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/dashboard/teams/$teamId/": {
       id: "/dashboard/teams/$teamId/";
       path: "/";
@@ -906,65 +925,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
       parentRoute: typeof DashboardEventsRoute;
     };
-  }
-}
-declare module "@tanstack/react-start/server" {
-  interface ServerFileRoutesByPath {
-    "/api/test-square": {
-      id: "/api/test-square";
-      path: "/api/test-square";
-      fullPath: "/api/test-square";
-      preLoaderRoute: typeof ApiTestSquareServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/health": {
-      id: "/api/health";
-      path: "/api/health";
-      fullPath: "/api/health";
-      preLoaderRoute: typeof ApiHealthServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/debug-square": {
-      id: "/api/debug-square";
-      path: "/api/debug-square";
-      fullPath: "/api/debug-square";
-      preLoaderRoute: typeof ApiDebugSquareServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/webhooks/square": {
-      id: "/api/webhooks/square";
-      path: "/api/webhooks/square";
-      fullPath: "/api/webhooks/square";
-      preLoaderRoute: typeof ApiWebhooksSquareServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/test/cleanup": {
-      id: "/api/test/cleanup";
-      path: "/api/test/cleanup";
-      fullPath: "/api/test/cleanup";
-      preLoaderRoute: typeof ApiTestCleanupServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/auth/$": {
-      id: "/api/auth/$";
-      path: "/api/auth/$";
-      fullPath: "/api/auth/$";
-      preLoaderRoute: typeof ApiAuthSplatServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
     "/api/payments/square/callback": {
       id: "/api/payments/square/callback";
       path: "/api/payments/square/callback";
       fullPath: "/api/payments/square/callback";
-      preLoaderRoute: typeof ApiPaymentsSquareCallbackServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
+      preLoaderRoute: typeof ApiPaymentsSquareCallbackRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/api/auth/$action/$provider": {
       id: "/api/auth/$action/$provider";
       path: "/api/auth/$action/$provider";
       fullPath: "/api/auth/$action/$provider";
-      preLoaderRoute: typeof ApiAuthActionProviderServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
+      preLoaderRoute: typeof ApiAuthActionProviderRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
   }
 }
@@ -1112,22 +1085,25 @@ const rootRouteChildren: RootRouteChildren = {
   TeamsRoute: TeamsRoute,
   AdminEventsReviewRoute: AdminEventsReviewRoute,
   AdminRolesRoute: AdminRolesRoute,
+  ApiDebugSquareRoute: ApiDebugSquareRoute,
+  ApiHealthRoute: ApiHealthRoute,
+  ApiTestSquareRoute: ApiTestSquareRoute,
   EventsSlugRoute: EventsSlugRouteWithChildren,
   EventsIndexRoute: EventsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiTestCleanupRoute: ApiTestCleanupRoute,
+  ApiWebhooksSquareRoute: ApiWebhooksSquareRoute,
+  ApiAuthActionProviderRoute: ApiAuthActionProviderRoute,
+  ApiPaymentsSquareCallbackRoute: ApiPaymentsSquareCallbackRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
-const rootServerRouteChildren: RootServerRouteChildren = {
-  ApiDebugSquareServerRoute: ApiDebugSquareServerRoute,
-  ApiHealthServerRoute: ApiHealthServerRoute,
-  ApiTestSquareServerRoute: ApiTestSquareServerRoute,
-  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
-  ApiTestCleanupServerRoute: ApiTestCleanupServerRoute,
-  ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
-  ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,
-  ApiPaymentsSquareCallbackServerRoute: ApiPaymentsSquareCallbackServerRoute,
-};
-export const serverRouteTree = rootServerRouteImport
-  ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>();
+
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
+  interface Register {
+    router: Awaited<ReturnType<typeof getRouter>>;
+  }
+}

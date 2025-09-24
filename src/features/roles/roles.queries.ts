@@ -25,8 +25,8 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -120,7 +120,7 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
 );
 
 export const searchRoleEligibleUsers = createServerFn({ method: "POST" })
-  .validator(zod$(searchUsersSchema))
+  .inputValidator(zod$(searchUsersSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleUserSearchResult[]>> => {
     try {
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -129,8 +129,8 @@ export const searchRoleEligibleUsers = createServerFn({ method: "POST" })
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {

@@ -8,16 +8,16 @@ import {
 import type { ApiResult } from "./settings.types";
 
 export const changePassword = createServerFn({ method: "POST" })
-  .validator(zod$(changePasswordInputSchema))
+  .inputValidator(zod$(changePasswordInputSchema))
   .handler(async ({ data }) => {
     try {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
 
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
 
       await auth.api.changePassword({
         headers,
@@ -50,16 +50,16 @@ export const changePassword = createServerFn({ method: "POST" })
   });
 
 export const revokeSession = createServerFn({ method: "POST" })
-  .validator(zod$(revokeSessionInputSchema))
+  .inputValidator(zod$(revokeSessionInputSchema))
   .handler(async ({ data }) => {
     try {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
 
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
 
       await auth.api.revokeSession({
         headers,
@@ -90,13 +90,13 @@ export const revokeSession = createServerFn({ method: "POST" })
 export const revokeOtherSessions = createServerFn({ method: "POST" }).handler(
   async () => {
     try {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
 
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
 
       await auth.api.revokeOtherSessions({ headers });
 
@@ -123,16 +123,16 @@ export const revokeOtherSessions = createServerFn({ method: "POST" }).handler(
 );
 
 export const unlinkAccount = createServerFn({ method: "POST" })
-  .validator(zod$(unlinkAccountInputSchema))
+  .inputValidator(zod$(unlinkAccountInputSchema))
   .handler(async ({ data }) => {
     try {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
 
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
 
       await auth.api.unlinkAccount({
         headers,

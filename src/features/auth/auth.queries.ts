@@ -1,17 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
+import { staticFunctionMiddleware } from "@tanstack/start-static-server-functions";
 import type { User } from "~/lib/auth/types";
 
 /**
  * Server function to get the current user with all custom fields
  */
-export const getCurrentUser = createServerFn({ method: "GET" }).handler(
-  async (): Promise<User | null> => {
+export const getCurrentUser = createServerFn({ method: "GET" })
+  .middleware([staticFunctionMiddleware])
+  .handler(async (): Promise<User | null> => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
 
     if (!session?.user) {
@@ -52,5 +54,4 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
       profileUpdatedAt: dbUser[0].profileUpdatedAt,
       roles: userRoles,
     };
-  },
-);
+  });

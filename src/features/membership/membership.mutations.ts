@@ -1,13 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { and, eq } from "drizzle-orm";
 import { membershipPaymentSessions, memberships, membershipTypes } from "~/db/schema";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+import { zod$ } from "~/lib/server/fn-utils";
 import type { MembershipMetadata } from "./membership.db-types";
 import {
   confirmMembershipPurchaseSchema,
   purchaseMembershipSchema,
 } from "./membership.schemas";
-import { zod$ } from "~/lib/server/fn-utils";
 import type {
   CheckoutSessionResult,
   Membership,
@@ -45,9 +45,12 @@ const getSquarePaymentService = async () => {
  */
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(purchaseMembershipSchema.omit({ autoRenew: true })))
+  .inputValidator(zod$(purchaseMembershipSchema.omit({ autoRenew: true })))
   .handler(
-    async ({ data, context }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
+    async ({
+      data,
+      context,
+    }): Promise<MembershipOperationResult<CheckoutSessionResult>> => {
       try {
         // Import server-only modules inside the handler
         const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -84,12 +87,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         const [existingMembership] = await db
           .select()
           .from(memberships)
-          .where(
-            and(
-              eq(memberships.userId, user.id),
-              eq(memberships.status, "active"),
-            ),
-          )
+          .where(and(eq(memberships.userId, user.id), eq(memberships.status, "active")))
           .limit(1);
 
         if (existingMembership) {
@@ -172,7 +170,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
  */
 export const confirmMembershipPurchase = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(confirmMembershipPurchaseSchema))
+  .inputValidator(zod$(confirmMembershipPurchaseSchema))
   .handler(async ({ data, context }): Promise<MembershipOperationResult<Membership>> => {
     try {
       // Import server-only modules inside the handler

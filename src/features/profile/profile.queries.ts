@@ -55,8 +55,8 @@ export const getUserProfile = createServerFn({ method: "GET" }).handler(
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -113,8 +113,8 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {

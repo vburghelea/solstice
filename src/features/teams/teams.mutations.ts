@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { TeamMemberRole, TeamMemberStatus } from "~/db/schema";
-import { requireUser, getAuthMiddleware } from "~/lib/server/auth";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { forbidden, notFound, validationError } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import {
@@ -40,7 +40,7 @@ const isActiveMembershipConstraintError = (error: unknown): boolean => {
 
 export const createTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(createTeamSchema))
+  .inputValidator(zod$(createTeamSchema))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { createId }] = await Promise.all([
@@ -108,7 +108,7 @@ export const createTeam = createServerFn({ method: "POST" })
  */
 export const updateTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(
+  .inputValidator(
     zod$(
       updateTeamSchema.extend({
         data: updateTeamSchema.shape.data.extend({
@@ -175,7 +175,7 @@ export const updateTeam = createServerFn({ method: "POST" })
  */
 export const deactivateTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(z.object({ teamId: z.string() })))
+  .inputValidator(zod$(z.object({ teamId: z.string() })))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
@@ -230,7 +230,7 @@ export const deactivateTeam = createServerFn({ method: "POST" })
  */
 export const addTeamMember = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(addTeamMemberSchema))
+  .inputValidator(zod$(addTeamMemberSchema))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }, { createId }] = await Promise.all([
@@ -360,7 +360,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
  */
 export const updateTeamMember = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(updateTeamMemberSchema))
+  .inputValidator(zod$(updateTeamMemberSchema))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq, sql }] = await Promise.all([
@@ -436,7 +436,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
  */
 export const removeTeamMember = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(removeTeamMemberSchema))
+  .inputValidator(zod$(removeTeamMemberSchema))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq, sql }] = await Promise.all([
@@ -508,7 +508,7 @@ export const removeTeamMember = createServerFn({ method: "POST" })
  */
 export const acceptTeamInvite = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(teamInviteActionSchema))
+  .inputValidator(zod$(teamInviteActionSchema))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
@@ -550,7 +550,7 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
  */
 export const declineTeamInvite = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(teamInviteActionSchema))
+  .inputValidator(zod$(teamInviteActionSchema))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq }] = await Promise.all([
@@ -589,7 +589,7 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
 
 export const requestTeamMembership = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(requestTeamMembershipSchema))
+  .inputValidator(zod$(requestTeamMembershipSchema))
   .handler(async ({ data, context }) => {
     const [{ getDb }, { and, eq }, { createId }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -677,7 +677,7 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
  */
 export const leaveTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(z.object({ teamId: z.string() })))
+  .inputValidator(zod$(z.object({ teamId: z.string() })))
   .handler(async ({ data, context }) => {
     // Import server-only modules inside the handler
     const [{ getDb }, { and, eq, sql }] = await Promise.all([

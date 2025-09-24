@@ -56,7 +56,7 @@ function mapDbUserToProfile(dbUser: {
 
 export const updateUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(partialProfileInputSchema))
+  .inputValidator(zod$(partialProfileInputSchema))
   .handler(async ({ data: inputData, context }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
@@ -64,7 +64,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       const db = await getDb();
       const currentUser = requireUser(context);
 
-      // Input is already validated by .validator(), just check if it's empty
+      // Input is already validated by .inputValidator(), just check if it's empty
       if (!inputData || Object.keys(inputData).length === 0) {
         return {
           success: false,
@@ -153,7 +153,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
 export const completeUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(profileInputSchema))
+  .inputValidator(zod$(profileInputSchema))
   .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -208,7 +208,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
 
 export const updatePrivacySettings = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(privacySettingsSchema))
+  .inputValidator(zod$(privacySettingsSchema))
   .handler(async ({ data, context }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);

@@ -9,8 +9,11 @@ import {
 } from "@tanstack/react-router";
 
 import { lazy, Suspense } from "react";
-import { getCurrentUser } from "~/features/auth/auth.queries";
-import type { AuthUser } from "~/lib/auth/types";
+import {
+  authQueryOptions,
+  getCurrentUser,
+  type AuthQueryResult,
+} from "~/features/auth/auth.queries";
 import appCss from "~/styles.css?url";
 
 // Lazy load devtools to avoid hydration issues
@@ -30,7 +33,7 @@ const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaste
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  user: AuthUser;
+  user: AuthQueryResult;
 }>()({
   beforeLoad: async ({ context }) => {
     try {
@@ -41,10 +44,7 @@ export const Route = createRootRouteWithContext<{
         return { user };
       } else {
         // Client: fetch the full user data
-        const user = await context.queryClient.fetchQuery({
-          queryKey: ["user"],
-          queryFn: getCurrentUser,
-        });
+        const user = await context.queryClient.fetchQuery(authQueryOptions());
         return { user };
       }
     } catch (error) {

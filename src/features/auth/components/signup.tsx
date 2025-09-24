@@ -8,6 +8,7 @@ import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
+import { authQueryKey } from "../auth.queries";
 import { signupFormFields } from "../auth.schemas";
 
 export default function SignupForm() {
@@ -43,7 +44,7 @@ export default function SignupForm() {
         }
 
         // Success path
-        await queryClient.invalidateQueries({ queryKey: ["user"] });
+        await queryClient.invalidateQueries({ queryKey: authQueryKey });
         await router.invalidate();
         await navigate({ to: redirectUrl });
       } catch (error) {

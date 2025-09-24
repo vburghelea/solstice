@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { authQueryKey } from "../auth.queries";
 
 interface UseAuthFormOptions {
   redirectUrl?: string;
@@ -47,7 +48,7 @@ export function useAuthForm(options: UseAuthFormOptions = {}) {
   };
 
   const handleAuthSuccess = async () => {
-    queryClient.invalidateQueries({ queryKey: ["user"] });
+    queryClient.invalidateQueries({ queryKey: authQueryKey });
     await router.invalidate();
     navigate({ to: redirectUrl });
   };

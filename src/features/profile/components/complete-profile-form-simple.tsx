@@ -15,12 +15,12 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
+import { authQueryKey } from "~/features/auth/auth.queries";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 import { completeUserProfile } from "../profile.mutations";
-import { unwrapServerFnResult } from "~/lib/server/fn-utils";
-import type { ProfileOperationResult } from "../profile.types";
 import type { ProfileInputType } from "../profile.schemas";
-import type { ProfileInput } from "../profile.types";
+import type { ProfileInput, ProfileOperationResult } from "../profile.types";
 
 const STEPS = [
   {
@@ -108,14 +108,14 @@ export function CompleteProfileForm() {
           dataToSubmit.emergencyContact = emergencyContact;
         }
 
-        const result = await unwrapServerFnResult(
+        const result = (await unwrapServerFnResult(
           completeUserProfile({
             data: dataToSubmit,
           }),
-        ) as ProfileOperationResult;
+        )) as ProfileOperationResult;
 
         if (result.success) {
-          await queryClient.invalidateQueries({ queryKey: ["user"] });
+          await queryClient.invalidateQueries({ queryKey: authQueryKey });
           router.navigate({ to: "/dashboard" });
         } else {
           const errorMessage = result.errors?.[0]?.message || "Failed to save profile";

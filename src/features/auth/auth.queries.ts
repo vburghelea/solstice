@@ -1,3 +1,4 @@
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { staticFunctionMiddleware } from "@tanstack/start-static-server-functions";
 import type { User } from "~/lib/auth/types";
@@ -54,4 +55,14 @@ export const getCurrentUser = createServerFn({ method: "GET" })
       profileUpdatedAt: dbUser[0].profileUpdatedAt,
       roles: userRoles,
     };
+  });
+
+export type AuthQueryResult = Awaited<ReturnType<typeof getCurrentUser>>;
+
+export const authQueryKey = ["user"] as const;
+
+export const authQueryOptions = () =>
+  queryOptions({
+    queryKey: authQueryKey,
+    queryFn: ({ signal }) => getCurrentUser({ signal }),
   });

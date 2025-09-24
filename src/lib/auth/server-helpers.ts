@@ -7,11 +7,18 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { reactStartCookies } from "better-auth/react-start";
 
 // Lazy-loaded auth instance
-let authInstance: ReturnType<typeof betterAuth> | null = null;
-let authInitPromise: Promise<ReturnType<typeof betterAuth>> | null = null;
+let authInstance: ReturnType<typeof betterAuth> | undefined;
+let authInitPromise: Promise<ReturnType<typeof betterAuth>> | undefined;
+
+const assertServerOnly = () => {
+  if (typeof window !== "undefined") {
+    throw new Error("Auth helpers can only be used on the server.");
+  }
+};
 
 // Create and export the auth instance with server configuration
-const createAuth = async () => {
+const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
+  assertServerOnly();
   // Import server modules when auth is created
   const { db } = await import("~/db");
   const schema = await import("~/db/schema");
@@ -162,7 +169,9 @@ export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
 });
 
 // Export async getter for auth
-export const getAuth = async () => {
+export const getAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
+  assertServerOnly();
+
   if (authInstance) {
     return authInstance;
   }

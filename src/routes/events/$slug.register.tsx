@@ -41,7 +41,6 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Textarea } from "~/components/ui/textarea";
-import { getCurrentUser } from "~/features/auth/auth.queries";
 import { registerForEvent } from "~/features/events/events.mutations";
 import { checkEventRegistration, getEvent } from "~/features/events/events.queries";
 import type {
@@ -50,7 +49,6 @@ import type {
   EventWithDetails,
 } from "~/features/events/events.types";
 import { getUserTeams } from "~/features/teams/teams.queries";
-import type { User } from "~/lib/auth/types";
 import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 type EmergencyContact = {
@@ -127,11 +125,7 @@ function EventRegistrationPage() {
     enabled: Boolean(eventData?.id && user?.id),
   });
 
-  const { data: userProfile } = useQuery<User | null, Error>({
-    queryKey: ["current-user"],
-    queryFn: () => getCurrentUser(),
-    enabled: Boolean(user?.id),
-  });
+  const userProfile = user;
 
   const { data: userTeams } = useQuery<UserTeamEntry[] | undefined, Error>({
     queryKey: ["user-teams", user?.id],

@@ -1,8 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
+import { useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { useMemo, useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { authQueryKey } from "~/features/auth/auth.queries";
 import { ADMIN_PRIMARY_NAV, ADMIN_SECONDARY_NAV } from "~/features/layouts/admin-nav";
 import { userHasRole } from "~/features/roles/permission.service";
 import { auth } from "~/lib/auth-client";
@@ -11,6 +12,7 @@ export function AdminSidebar() {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
+  const navigate = useNavigate();
   const context = useRouteContext({ strict: false });
   const user = context?.user || null;
 
@@ -36,23 +38,23 @@ export function AdminSidebar() {
     setIsLoggingOut(true);
 
     try {
-      const result = await auth.signOut();
-      if (result?.error) {
-        throw result.error;
-      }
+      await auth.signOut({
+        fetchOptions: {
+          onResponse: async () => {
+            queryClient.setQueryData(authQueryKey, null);
+            await router.invalidate();
+          },
+        },
+      });
+
+      await navigate({ to: "/auth/login" });
     } catch (error) {
       console.error("Logout failed:", error);
-    } finally {
-      // Clear all cached state first
-      queryClient.clear();
-
-      // Await router invalidation to ensure completion
-      await router.invalidate();
-
-      // Use window.location.href for a complete page refresh
-      // This ensures clean state and is more reliable for logout
-      window.location.href = "/auth/login";
+      setIsLoggingOut(false);
+      return;
     }
+
+    setIsLoggingOut(false);
   };
 
   return (

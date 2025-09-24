@@ -12,16 +12,16 @@ import type {
   GameSystemListItem,
 } from "~/features/game-systems/game-systems.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { Input } from "~/shared/ui/input";
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 
 const SYSTEMS_PER_PAGE = 20;
 

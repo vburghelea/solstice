@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/shared/ui/select";
+} from "~/components/ui/select";
 
 interface DateTimePickerProps extends FieldComponentProps {
   minDate?: Date;

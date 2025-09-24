@@ -12,7 +12,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
 
 export const Route = createFileRoute("/dashboard/campaigns/create")({
   component: CreateCampaignPage,

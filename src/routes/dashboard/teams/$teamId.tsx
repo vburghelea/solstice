@@ -8,11 +8,11 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/shared/ui/card";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({

@@ -109,7 +109,7 @@ async function finalizeMembershipFromWebhook({
   const sessionMetadata = freshSession?.metadata ?? session.metadata ?? {};
 
   const [{ sendMembershipPurchaseReceipt }] = await Promise.all([
-    import("~/lib/email/sendgrid"),
+    import("~/lib/email/resend"),
   ]);
 
   if (finalizeResult.wasCreated) {

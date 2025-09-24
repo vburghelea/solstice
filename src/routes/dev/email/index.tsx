@@ -4,9 +4,9 @@ import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { templateNames } from "~/routes/dev/email/templates";
-import { Button } from "~/shared/ui/button";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
 export const resendMembershipReceipt = createServerFn({ method: "POST" })
   .validator(z.object({ membershipId: z.string().min(1) }).parse)

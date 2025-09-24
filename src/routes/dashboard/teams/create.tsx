@@ -68,17 +68,15 @@ function CreateTeamPage() {
         const slug = value.slug || value.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
         await createTeamMutation.mutateAsync({
-          data: {
-            name: value.name,
-            slug,
-            description: value.description || undefined,
-            city: value.city || undefined,
-            country: value.country || undefined,
-            primaryColor: value.primaryColor || undefined,
-            secondaryColor: value.secondaryColor || undefined,
-            foundedYear: value.foundedYear || undefined,
-            website: value.website || undefined,
-          },
+          name: value.name,
+          slug,
+          description: value.description || undefined,
+          city: value.city || undefined,
+          country: value.country || undefined,
+          primaryColor: value.primaryColor || undefined,
+          secondaryColor: value.secondaryColor || undefined,
+          foundedYear: value.foundedYear || undefined,
+          website: value.website || undefined,
         });
       } catch (error) {
         console.error("Form submission error:", error);

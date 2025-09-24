@@ -92,7 +92,6 @@ function ManageTeamPage() {
       await updateTeamMutation.mutateAsync({
         teamId,
         data: {
-          teamId,
           ...value,
           description: value.description || undefined,
           city: value.city || undefined,

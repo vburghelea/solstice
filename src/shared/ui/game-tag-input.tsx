@@ -8,8 +8,8 @@ import {
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult, OptionalFetcher } from "~/shared/types/common";
-import { Button } from "./button";
-import { Input } from "./input";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 interface GameTagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   tags: { id: number; name: string }[];

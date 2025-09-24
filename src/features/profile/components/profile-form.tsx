@@ -4,14 +4,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
 
 import { updateUserProfile } from "../profile.mutations";
 import { getUserGameSystemPreferences } from "../profile.queries";

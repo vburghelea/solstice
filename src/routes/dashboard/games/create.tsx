@@ -31,7 +31,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
 
 const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),

@@ -19,8 +19,8 @@ import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 
 function getStatusBadgeVariant(status: GameListItem["status"]) {
   switch (status) {

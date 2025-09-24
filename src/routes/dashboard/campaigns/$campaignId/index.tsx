@@ -35,7 +35,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
 
 import { ProfileLink } from "~/components/ProfileLink";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
@@ -49,7 +49,7 @@ import { getRelationshipSnapshot } from "~/features/social";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
-import { Badge } from "~/shared/ui/badge";
+import { Badge } from "~/components/ui/badge";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 

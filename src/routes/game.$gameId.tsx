@@ -9,7 +9,7 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
-import { Button } from "~/shared/ui/button";
+import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/game/$gameId")({
   loader: async ({ params }) => {

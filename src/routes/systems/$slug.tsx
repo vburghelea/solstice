@@ -4,17 +4,17 @@ import { SystemHero } from "~/features/game-systems/components/system-hero";
 import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { ArrowLeftIcon, CalendarIcon, LinkIcon, UsersIcon } from "~/shared/ui/icons";
-import { Separator } from "~/shared/ui/separator";
+} from "~/components/ui/card";
+import { ArrowLeftIcon, CalendarIcon, LinkIcon, UsersIcon } from "~/components/ui/icons";
+import { Separator } from "~/components/ui/separator";
 
 export const Route = createFileRoute("/systems/$slug")({
   loader: async ({ params }) => {

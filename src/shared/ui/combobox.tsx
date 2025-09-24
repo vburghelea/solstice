@@ -9,8 +9,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "~/shared/ui/command";
-import { Label } from "~/shared/ui/label";
+} from "~/components/ui/command";
+import { Label } from "~/components/ui/label";
 
 export interface ComboboxProps {
   options: { value: string; label: string }[];

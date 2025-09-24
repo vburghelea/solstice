@@ -11,23 +11,23 @@ import type {
   AdminSystemStatusFilter,
 } from "~/features/game-systems/admin/game-systems-admin.types";
 import { requireRole } from "~/lib/auth/middleware/role-guard";
-import { Badge } from "~/shared/ui/badge";
-import { Button } from "~/shared/ui/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
-import { Input } from "~/shared/ui/input";
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/shared/ui/select";
+} from "~/components/ui/select";
 
 const DEFAULT_STATUS: AdminSystemStatusFilter = "all";
 const DEFAULT_SORT: AdminSystemSortOption = "updated-desc";

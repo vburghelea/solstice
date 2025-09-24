@@ -33,7 +33,7 @@ import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { strings } from "~/shared/lib/strings";
 import { gmStrengthIcons, gmStrengthLabels } from "~/shared/types/common";
-import { Badge } from "~/shared/ui/badge";
+import { Badge } from "~/components/ui/badge";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/profile/$userId")({

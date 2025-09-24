@@ -3,17 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle, Edit2, LoaderCircle, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { StickyActionBar } from "~/components/ui/sticky-action-bar";
-import { GameForm } from "~/features/games/components/GameForm";
-import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
-import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/shared/ui/card";
+} from "~/components/ui/card";
+import { StickyActionBar } from "~/components/ui/sticky-action-bar";
+import { GameForm } from "~/features/games/components/GameForm";
+import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
+import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 
 import { ProfileLink } from "~/components/ProfileLink";
 import { GMReviewForm } from "~/features/games/components/GMReviewForm";
@@ -41,7 +41,7 @@ import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { strings } from "~/shared/lib/strings";
 import type { OperationResult } from "~/shared/types/common";
-import { Badge } from "~/shared/ui/badge";
+import { Badge } from "~/components/ui/badge";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
@@ -341,12 +341,24 @@ export function GameDetailsPage() {
     },
   });
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async (vars: Parameters<typeof rlUpdateGameStatus>[0]) =>
-      await rlUpdateGameStatus(vars),
-    onMutate: async (variables: {
-      data: { gameId: string; status: "scheduled" | "completed" | "canceled" };
-    }) => {
+  type UpdateGameStatusVariables = {
+    data: { gameId: string; status: "scheduled" | "completed" | "canceled" };
+  };
+
+  type UpdateGameStatusContext = {
+    prevGame?: GameWithDetails;
+    previousLists: Record<string, OperationResult<GameListItem[]> | undefined>;
+  };
+
+  const updateStatusMutation = useMutation<
+    Awaited<ReturnType<typeof updateGameSessionStatus>>,
+    Error,
+    UpdateGameStatusVariables,
+    UpdateGameStatusContext
+  >({
+    mutationFn: async (vars) =>
+      await rlUpdateGameStatus(vars as Parameters<typeof rlUpdateGameStatus>[0]),
+    onMutate: async (variables) => {
       const { gameId: gid, status: newStatus } = variables.data;
       await Promise.all([
         queryClient.cancelQueries({ queryKey: ["game", gid] }),
@@ -405,7 +417,10 @@ export function GameDetailsPage() {
         });
       }
 
-      return { prevGame, previousLists };
+      const context: UpdateGameStatusContext = prevGame
+        ? { prevGame, previousLists }
+        : { previousLists };
+      return context;
     },
     onError: (error, _vars, context) => {
       if (context?.prevGame) {

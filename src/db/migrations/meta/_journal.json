@@ -5,113 +5,57 @@
     {
       "idx": 0,
       "version": "1",
-      "when": 1753377886091,
-      "tag": "0000_auth_schema",
+      "when": 1758717449265,
+      "tag": "0000_core_enums",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "1",
-      "when": 1753378019054,
-      "tag": "0001_game_systems",
+      "when": 1758717449266,
+      "tag": "0001_auth_and_roles",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "1",
-      "when": 1753378788293,
-      "tag": "0002_seed_game_systems_data",
+      "when": 1758717449267,
+      "tag": "0002_publishers_and_game_systems",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "1",
-      "when": 1753877458967,
-      "tag": "0003_add_teams",
+      "when": 1758717449268,
+      "tag": "0003_campaigns_and_games",
       "breakpoints": true
     },
     {
       "idx": 4,
       "version": "1",
-      "when": 1754050764776,
-      "tag": "0004_add_events_system",
+      "when": 1758717449269,
+      "tag": "0004_teams",
       "breakpoints": true
     },
     {
       "idx": 5,
       "version": "1",
-      "when": 1754214319845,
-      "tag": "0005_user_entity_updates",
+      "when": 1758717449270,
+      "tag": "0005_events",
       "breakpoints": true
     },
     {
       "idx": 6,
       "version": "1",
-      "when": 1754296052796,
-      "tag": "0006_events_rename_province_to_country",
+      "when": 1758717449271,
+      "tag": "0006_membership",
       "breakpoints": true
     },
     {
       "idx": 7,
       "version": "1",
-      "when": 1754320839729,
-      "tag": "0007_game_sessions",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "1",
-      "when": 1754555841548,
-      "tag": "0008_campaigns",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "1",
-      "when": 1754555841548,
-      "tag": "0009_reviews_social",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "1",
-      "when": 1754555841548,
-      "tag": "0010_notifications_email_events",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "1",
-      "when": 1755790603256,
-      "tag": "0011_game_systems_expansion",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1753877458967,
-      "tag": "0003_add_teams",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "1",
-      "when": 1754050764776,
-      "tag": "0004_add_events_system",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "1",
-      "when": 1754214319845,
-      "tag": "0005_user_entity_updates",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "1",
-      "when": 1754296052796,
-      "tag": "0006_events_rename_province_to_country",
+      "when": 1758717449272,
+      "tag": "0007_social_and_notifications",
       "breakpoints": true
     }
   ]

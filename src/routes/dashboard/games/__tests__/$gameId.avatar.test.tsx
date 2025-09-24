@@ -68,9 +68,10 @@ describe.skip("GameDetailsPage avatars", () => {
     });
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc}>
-        <mod.GameDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 
@@ -139,9 +140,10 @@ describe.skip("GameDetailsPage avatars", () => {
     });
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc}>
-        <mod.GameDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 

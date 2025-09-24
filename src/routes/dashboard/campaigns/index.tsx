@@ -38,7 +38,7 @@ export const Route = createFileRoute("/dashboard/campaigns/")({
   },
 });
 
-export function CampaignsPage() {
+function CampaignsPage() {
   const {
     status = "active",
     page: searchPage,

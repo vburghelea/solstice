@@ -42,7 +42,7 @@ export const Route = createFileRoute("/dashboard/games/create")({
   validateSearch: (search) => createGameSearchSchema.parse(search),
 });
 
-export function CreateGamePage() {
+function CreateGamePage() {
   const navigate = useNavigate();
   const { campaignId } = useSearch({ from: Route.id });
   const [serverError, setServerError] = useState<string | null>(null);

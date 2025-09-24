@@ -158,7 +158,7 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
   );
 }
 
-export function CampaignDetailsPage() {
+function CampaignDetailsPage() {
   const queryClient = useQueryClient();
   const { campaignId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();

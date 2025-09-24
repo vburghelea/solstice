@@ -13,7 +13,9 @@ import {
   createTestRouteTree,
   renderWithRouter,
 } from "~/tests/utils/router";
-import { CreateCampaignPage } from "../create";
+import { Route as CreateCampaignRoute } from "../create";
+
+const CreateCampaignPage = CreateCampaignRoute.options.component!;
 // Make debounce immediate for tests to avoid timers
 vi.mock("~/shared/hooks/useDebounce", () => ({
   /* eslint-disable @eslint-react/hooks-extra/no-unnecessary-use-prefix */
@@ -63,7 +65,7 @@ describe("CreateCampaignPage", () => {
       routes: [
         {
           path: "/dashboard/campaigns/create",
-          component: CreateCampaignPage,
+          component: () => <CreateCampaignPage />,
         },
       ],
     });

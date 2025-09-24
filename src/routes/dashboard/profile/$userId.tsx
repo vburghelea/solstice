@@ -43,7 +43,7 @@ export const Route = createFileRoute("/dashboard/profile/$userId")({
   component: UserProfileComponent,
 });
 
-export function UserProfileComponent() {
+function UserProfileComponent() {
   const { userId } = Route.useLoaderData();
   const { user: currentUser } = Route.useRouteContext();
 

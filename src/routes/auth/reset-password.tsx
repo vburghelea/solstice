@@ -12,7 +12,7 @@ export const Route = createFileRoute("/auth/reset-password")({
   validateSearch: (search: { token?: string }) => search,
 });
 
-export function ResetPasswordForm() {
+function ResetPasswordForm() {
   const navigate = useNavigate();
   const { token = null } = Route.useSearch();
   const [errorMessage, setErrorMessage] = useState("");

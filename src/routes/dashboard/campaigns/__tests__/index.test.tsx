@@ -9,7 +9,9 @@ import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { MOCK_CAMPAIGN } from "~/tests/mocks/campaigns";
 import { createTestRouteTree, renderWithRouter } from "~/tests/utils/router";
-import { CampaignsPage } from "../index"; // Import the component directly
+import { Route as CampaignsRoute } from "../index";
+
+const CampaignsPage = CampaignsRoute.options.component!;
 
 // Mock the listCampaignsWithCount query
 vi.mock("~/features/campaigns/campaigns.queries", () => ({
@@ -34,7 +36,7 @@ describe("CampaignsPage", () => {
       routes: [
         {
           path: "/dashboard/campaigns",
-          component: CampaignsPage,
+          component: () => <CampaignsPage />,
           loader: async () => ({
             campaigns: campaignsData,
             totalCount: campaignsData.length,

@@ -56,7 +56,7 @@ export const Route = createFileRoute("/dashboard/games/")({
   },
 });
 
-export function GamesPage() {
+function GamesPage() {
   const {
     status = "scheduled",
     page: searchPage,

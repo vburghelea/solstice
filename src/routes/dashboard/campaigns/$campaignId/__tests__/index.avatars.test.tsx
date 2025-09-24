@@ -73,9 +73,10 @@ describe.skip("CampaignDetailsPage avatars", () => {
     });
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc}>
-        <mod.CampaignDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 
@@ -147,9 +148,10 @@ describe.skip("CampaignDetailsPage avatars", () => {
     });
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc}>
-        <mod.CampaignDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 

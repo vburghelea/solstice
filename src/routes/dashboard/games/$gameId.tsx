@@ -155,7 +155,7 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
   );
 }
 
-export function GameDetailsPage() {
+function GameDetailsPage() {
   const queryClient = useQueryClient();
   const { gameId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();

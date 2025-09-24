@@ -11,7 +11,7 @@ export const Route = createFileRoute("/auth/forgot-password")({
   component: ForgotPasswordForm,
 });
 
-export function ForgotPasswordForm() {
+function ForgotPasswordForm() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const form = useAppForm({

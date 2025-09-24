@@ -78,9 +78,10 @@ describe("CampaignDetailsPage apply eligibility (connections-only)", () => {
     const mod = await import("../index");
     setupRoute(mod, "viewer");
 
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc()}>
-        <mod.CampaignDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 
@@ -136,9 +137,10 @@ describe("CampaignDetailsPage apply eligibility (connections-only)", () => {
     const mod = await import("../index");
     setupRoute(mod, "viewer", "c2");
 
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc()}>
-        <mod.CampaignDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 

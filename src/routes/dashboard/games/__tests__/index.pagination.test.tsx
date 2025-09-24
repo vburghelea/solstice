@@ -49,7 +49,8 @@ describe("GamesPage pagination", () => {
       });
 
     const mod = await import("../index");
-    await renderWithRouter(<mod.GamesPage />, {
+    const GamesPage = mod.Route.options.component!;
+    await renderWithRouter(<GamesPage />, {
       path: "/dashboard/games",
       initialEntries: ["/dashboard/games?status=scheduled&page=1&pageSize=2"],
     });

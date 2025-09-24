@@ -6,7 +6,9 @@ import { MOCK_GAME, mockCreateGame } from "~/tests/mocks/games";
 import { mockUseQueryCampaign, setupReactQueryMocks } from "~/tests/mocks/react-query";
 import { spyUseMutationRun } from "~/tests/utils/react-query";
 import { renderWithRouter } from "~/tests/utils/router";
-import { CreateGamePage } from "../create";
+import { Route as CreateGameRoute } from "../create";
+
+const CreateGamePage = CreateGameRoute.options.component!;
 
 describe("CreateGamePage", () => {
   beforeEach(() => {

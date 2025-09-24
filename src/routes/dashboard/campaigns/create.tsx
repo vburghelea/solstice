@@ -18,7 +18,7 @@ export const Route = createFileRoute("/dashboard/campaigns/create")({
   component: CreateCampaignPage,
 });
 
-export function CreateCampaignPage() {
+function CreateCampaignPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
 

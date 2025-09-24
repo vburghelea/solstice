@@ -48,9 +48,10 @@ describe.skip("Other user's profile avatar", () => {
     });
 
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc}>
-        <mod.UserProfileComponent />
+        <Component />
       </QueryClientProvider>,
     );
 

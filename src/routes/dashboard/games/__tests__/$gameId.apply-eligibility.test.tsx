@@ -99,9 +99,10 @@ describe("GameDetailsPage apply eligibility (connections-only)", () => {
       error: null,
     });
 
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc()}>
-        <mod.GameDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 
@@ -183,9 +184,10 @@ describe("GameDetailsPage apply eligibility (connections-only)", () => {
       error: null,
     });
 
+    const Component = mod.Route.options.component!;
     render(
       <QueryClientProvider client={qc()}>
-        <mod.GameDetailsPage />
+        <Component />
       </QueryClientProvider>,
     );
 

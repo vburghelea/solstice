@@ -53,9 +53,10 @@ describe("CampaignsPage pagination", () => {
       });
 
     const mod = await import("../index");
+    const CampaignsPage = mod.Route.options.component!;
 
     const { MOCK_OWNER_USER } = await import("~/tests/mocks/users");
-    await renderWithRouter(<mod.CampaignsPage />, {
+    await renderWithRouter(<CampaignsPage />, {
       path: "/dashboard/campaigns",
       initialEntries: ["/dashboard/campaigns?status=active&page=1&pageSize=2"],
       user: MOCK_OWNER_USER ?? null,

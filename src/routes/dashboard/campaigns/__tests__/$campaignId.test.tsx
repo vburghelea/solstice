@@ -22,7 +22,9 @@ import {
 import { MOCK_OWNER_USER } from "~/tests/mocks/users";
 import { spyUseMutationRun } from "~/tests/utils/react-query";
 import { renderWithRouter } from "~/tests/utils/router";
-import { CampaignDetailsPage, Route as CampaignRoute } from "../$campaignId/index";
+import { Route as CampaignRoute } from "../$campaignId/index";
+
+const CampaignDetailsPage = CampaignRoute.options.component!;
 
 describe("Campaign Details Page", () => {
   const setupRouteSpies = ({

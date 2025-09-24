@@ -12,7 +12,7 @@ export const healthCheck = createServerFn({
   };
 });
 
-export const ServerRoute = createServerFileRoute("/api/health").methods({
+export const ServerRoute = createServerFileRoute().methods({
   GET: async () => {
     const checks = {
       status: "healthy",

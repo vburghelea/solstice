@@ -132,6 +132,7 @@ async function finalizeMembershipFromWebhook({
           membershipType: membershipType.name,
           amount: membershipType.priceCents,
           paymentId: finalizeResult.membership.paymentId ?? paymentId ?? "",
+          membershipId: finalizeResult.membership.id,
           expiresAt: new Date(finalizeResult.membership.endDate),
         });
       } catch (emailError) {
@@ -363,8 +364,8 @@ export const __squareWebhookTestUtils = {
   normalizeSquareStatus,
 };
 
-export const ServerRoute = createServerFileRoute("/api/webhooks/square").methods({
-  POST: async ({ request }) => {
+export const ServerRoute = createServerFileRoute().methods({
+  POST: async ({ request }: { request: Request }) => {
     try {
       // Get the raw body for signature verification
       const body = await request.text();

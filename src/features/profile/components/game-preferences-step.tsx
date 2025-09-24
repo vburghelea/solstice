@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameTagInput } from "~/shared/ui/game-tag-input";
 
 const EMPTY_GAME_SYSTEM_ARRAY: { id: number; name: string }[] = [];
@@ -19,10 +19,14 @@ export function GamePreferencesStep({
   const [toAvoid, setToAvoid] = useState(initialToAvoid);
 
   useEffect(() => {
+    // Sync favorites when the initial values change (e.g. after fetching profile data)
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
     setFavorites(initialFavorites || []);
   }, [initialFavorites]);
 
   useEffect(() => {
+    // Sync avoid list when the initial values change (e.g. after fetching profile data)
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
     setToAvoid(initialToAvoid || []);
   }, [initialToAvoid]);
 

@@ -215,8 +215,9 @@ interface DayRowProps {
 function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps) {
   const dayAvailability = value[day];
 
-  const segments = [];
-  let currentSegment = null;
+  type Segment = { start: number; end: number; isAvailable: boolean };
+  const segments: Segment[] = [];
+  let currentSegment: Segment | null = null;
 
   for (let i = 0; i < TIME_INTERVALS.length; i++) {
     const isAvailable = isSlotAvailable(dayAvailability, TIME_INTERVALS[i].dataSlots);
@@ -272,90 +273,6 @@ function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps
 
           return (
             <TooltipProvider key={`${day}-${startTime}-${endTime}`}>
-              <Tooltip>
-                <TooltipTrigger asChild>{segmentElement}</TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    Available: {startTime} - {endTime}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-interface DayRowProps {
-  day: (typeof DAYS)[number];
-  value: AvailabilityData;
-  readOnly?: boolean;
-  onMouseDown: (day: string, intervalIndex: number) => void;
-  onMouseEnter: (day: string, intervalIndex: number) => void;
-}
-
-function DayRow({ day, value, readOnly, onMouseDown, onMouseEnter }: DayRowProps) {
-  const dayAvailability = value[day];
-
-  const segments = [];
-  let currentSegment = null;
-
-  for (let i = 0; i < TIME_INTERVALS.length; i++) {
-    const isAvailable = isSlotAvailable(dayAvailability, TIME_INTERVALS[i].dataSlots);
-    if (currentSegment && currentSegment.isAvailable === isAvailable) {
-      currentSegment.end = i;
-    } else {
-      if (currentSegment) segments.push(currentSegment);
-      currentSegment = { start: i, end: i, isAvailable };
-    }
-  }
-  if (currentSegment) segments.push(currentSegment);
-
-  return (
-    <div className="grid grid-cols-[120px_1fr] items-center gap-2">
-      <div className="text-sm font-medium capitalize">{day.slice(0, 3)}</div>
-      <div
-        className="grid w-full"
-        style={{ gridTemplateColumns: `repeat(${TIME_INTERVALS.length}, 1fr)` }}
-      >
-        {segments.map((segment, segIndex) => {
-          const startTime = TIME_INTERVALS[segment.start].time;
-          const endTime = TIME_INTERVALS[segment.end].endTime;
-          const segmentWidth = segment.end - segment.start + 1;
-
-          const segmentElement = (
-            <div
-              key={segIndex}
-              className="flex h-8"
-              style={{ gridColumn: `span ${segmentWidth}` }}
-            >
-              {Array.from({ length: segmentWidth }).map((_, i) => {
-                const intervalIndex = segment.start + i;
-                return (
-                  <div
-                    key={intervalIndex}
-                    className={cn(
-                      "h-full flex-1 border-y border-r first:border-l",
-                      segment.isAvailable ? "bg-primary" : "bg-background",
-                      !readOnly && "cursor-pointer",
-                      segment.isAvailable ? "hover:bg-primary/90" : "hover:bg-muted",
-                    )}
-                    onMouseDown={() => onMouseDown(day, intervalIndex)}
-                    onMouseEnter={() => onMouseEnter(day, intervalIndex)}
-                  />
-                );
-              })}
-            </div>
-          );
-
-          if (!segment.isAvailable) {
-            return segmentElement;
-          }
-
-          return (
-            <TooltipProvider key={`${day}-${startTime}`}>
               <Tooltip>
                 <TooltipTrigger asChild>{segmentElement}</TooltipTrigger>
                 <TooltipContent>

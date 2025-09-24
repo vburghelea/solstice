@@ -1,7 +1,7 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
 import { getSquarePaymentService } from "~/lib/payments/square";
 
-export const ServerRoute = createServerFileRoute("/api/debug-square").methods({
+export const ServerRoute = createServerFileRoute().methods({
   GET: async () => {
     try {
       // Test if we can get the Square service and what type it is

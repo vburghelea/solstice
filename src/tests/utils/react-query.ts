@@ -17,20 +17,40 @@ export function spyUseMutationRun() {
         mutate: async (variables: unknown) => {
           try {
             const result = await fn(variables);
-            await opts?.onSuccess?.(result, variables, undefined);
+            await opts?.onSuccess?.(
+              result,
+              variables,
+              undefined,
+              undefined as unknown as rq.MutationFunctionContext,
+            );
             return result as unknown as void;
           } catch (err) {
-            await opts?.onError?.(err, variables, undefined);
+            await opts?.onError?.(
+              err,
+              variables,
+              undefined,
+              undefined as unknown as rq.MutationFunctionContext,
+            );
             throw err;
           }
         },
         mutateAsync: async (variables: unknown) => {
           try {
             const result = await fn(variables);
-            await opts?.onSuccess?.(result, variables, undefined);
+            await opts?.onSuccess?.(
+              result,
+              variables,
+              undefined,
+              undefined as unknown as rq.MutationFunctionContext,
+            );
             return result as unknown as unknown;
           } catch (err) {
-            await opts?.onError?.(err, variables, undefined);
+            await opts?.onError?.(
+              err,
+              variables,
+              undefined,
+              undefined as unknown as rq.MutationFunctionContext,
+            );
             throw err;
           }
         },

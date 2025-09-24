@@ -291,6 +291,53 @@ export const sendMembershipPurchaseReceipt = serverOnly(
   },
 );
 
+export const sendTeamInvitationEmail = serverOnly(
+  async (params: {
+    to: EmailRecipient;
+    teamName: string;
+    teamSlug: string;
+    role: string;
+    invitedByName?: string;
+    invitedByEmail?: string;
+  }) => {
+    const service = await getEmailService();
+    const appUrl = (
+      process.env["APP_ORIGIN"] ||
+      process.env["APP_URL"] ||
+      "https://app.roundup.games"
+    ).replace(/\/$/, "");
+    const invitationUrl = `${appUrl}/dashboard/teams/${params.teamSlug}`;
+
+    const inviterName = params.invitedByName ?? "A Roundup Games member";
+    const htmlContent = `
+      <p>Hello ${params.to.name ?? "there"},</p>
+      <p>${inviterName} has invited you to join <strong>${params.teamName}</strong> as a <strong>${params.role}</strong>.</p>
+      <p>You can review this invitation by visiting <a href="${invitationUrl}">${invitationUrl}</a>.</p>
+      <p>If you weren't expecting this email, you can safely ignore it.</p>
+    `;
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    const replyTo = params.invitedByEmail
+      ? { email: params.invitedByEmail, name: params.invitedByName }
+      : undefined;
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject: `You're invited to join ${params.teamName}`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+      ...(replyTo ? { replyTo } : {}),
+      metadata: {
+        entity: "team_invitation",
+        entityId: params.teamSlug,
+      },
+    });
+  },
+);
+
 // Convenience function for sending game invitations
 export const sendGameInvitation = serverOnly(
   async (params: {

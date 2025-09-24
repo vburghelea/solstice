@@ -28,7 +28,6 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import {
@@ -136,7 +135,7 @@ function EventRegistrationPage() {
       teamId?: string;
       division?: string;
       notes?: string;
-      roster?: {};
+      roster?: Record<string, unknown>;
       paymentMethod: "square" | "etransfer";
     }
   >({
@@ -262,7 +261,7 @@ function EventRegistrationPage() {
       eventId: string;
       teamId?: string;
       notes?: string;
-      roster?: {};
+      roster?: Record<string, unknown>;
       paymentMethod: "square" | "etransfer";
     } = {
       eventId: event.id,

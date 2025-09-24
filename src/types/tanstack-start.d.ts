@@ -1,4 +1,4 @@
-import type { AnyServerRouteWithTypes } from "@tanstack/start-server-core";
+import type { AnyServerRouteWithTypes, ServerRoute } from "@tanstack/start-server-core";
 
 declare module "@tanstack/start-server-core" {
   interface ServerFileRoutesByPath {
@@ -10,4 +10,14 @@ declare module "@tanstack/start-server-core" {
       children: unknown;
     };
   }
+}
+
+declare module "@tanstack/react-start/server" {
+  export function createServerFileRoute(): ServerRoute<
+    AnyServerRouteWithTypes,
+    string,
+    string,
+    string,
+    unknown
+  >;
 }

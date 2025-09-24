@@ -14,8 +14,8 @@ const cleanupSchema = z.object({
   userEmail: z.string().email().optional(),
 });
 
-export const ServerRoute = createServerFileRoute("/api/test/cleanup").methods({
-  POST: async ({ request }) => {
+export const ServerRoute = createServerFileRoute().methods({
+  POST: async ({ request }: { request: Request }) => {
     // Only allow in non-production environments
     // The server seems to be setting NODE_ENV=production even in test runs
     const isProduction =

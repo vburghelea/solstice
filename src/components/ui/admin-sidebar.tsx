@@ -3,15 +3,15 @@ import { useRouteContext, useRouter } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
-  FileText,
   CheckSquare,
+  FileText,
   Home,
   Layers3,
   LogOut,
   ScrollText,
   Settings,
-  Swords,
   ShieldCheck,
+  Swords,
   User,
   UserCheck,
   Users,
@@ -190,8 +190,8 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps = {}) {
           const Icon = item.icon;
           return (
             <Link
-              key={item.to}
-              to={item.to}
+              key={item.href}
+              to={item.href}
               className="nav-item"
               activeProps={{
                 className: "nav-item-active",

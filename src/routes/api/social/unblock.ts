@@ -30,8 +30,8 @@ export async function handleUnblock(body: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute("/api/social/unblock").methods({
-  POST: async ({ request }) => {
+export const ServerRoute = createServerFileRoute().methods({
+  POST: async ({ request }: { request: Request }) => {
     const body = await request.json();
     return handleUnblock(body);
   },

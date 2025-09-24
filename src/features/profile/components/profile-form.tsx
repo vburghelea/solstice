@@ -1,7 +1,7 @@
 import { useAppForm } from "~/lib/form";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -18,7 +18,6 @@ import { getUserGameSystemPreferences } from "../profile.queries";
 import { profileInputSchema, ProfileInputType } from "../profile.schemas";
 import type { ProfileOperationResult } from "../profile.types";
 
-import { useRouteContext } from "@tanstack/react-router";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 const defaultProfile: ProfileInputType = {
@@ -32,7 +31,12 @@ const defaultProfile: ProfileInputType = {
   privacySettings: {
     showEmail: false,
     showPhone: false,
+    showLocation: false,
+    showLanguages: false,
+    showGamePreferences: false,
     allowTeamInvitations: true,
+    allowFollows: true,
+    allowInvitesOnlyFromConnections: false,
   },
 };
 
@@ -62,7 +66,12 @@ export function ProfileForm() {
         avoid: { id: number; name: string }[];
       },
       privacySettings: user?.privacySettings
-        ? JSON.parse(user.privacySettings as string)
+        ? {
+            ...defaultProfile.privacySettings,
+            ...(JSON.parse(
+              user.privacySettings as string,
+            ) as ProfileInputType["privacySettings"]),
+          }
         : defaultProfile.privacySettings,
     },
     validators: {
@@ -81,12 +90,40 @@ export function ProfileForm() {
       setIsSubmitting(true);
       setError(null);
       try {
+        const basePrivacy = defaultProfile.privacySettings!;
+        const sanitizedPrivacy = value.privacySettings
+          ? {
+              showEmail: value.privacySettings.showEmail ?? basePrivacy.showEmail,
+              showPhone: value.privacySettings.showPhone ?? basePrivacy.showPhone,
+              showLocation:
+                value.privacySettings.showLocation ?? basePrivacy.showLocation,
+              showLanguages:
+                value.privacySettings.showLanguages ?? basePrivacy.showLanguages,
+              showGamePreferences:
+                value.privacySettings.showGamePreferences ??
+                basePrivacy.showGamePreferences,
+              allowTeamInvitations:
+                value.privacySettings.allowTeamInvitations ??
+                basePrivacy.allowTeamInvitations,
+              allowFollows:
+                value.privacySettings.allowFollows ?? basePrivacy.allowFollows,
+              allowInvitesOnlyFromConnections:
+                value.privacySettings.allowInvitesOnlyFromConnections ??
+                basePrivacy.allowInvitesOnlyFromConnections,
+            }
+          : undefined;
+
+        const payload: Partial<ProfileInputType> = {
+          ...value,
+          privacySettings: sanitizedPrivacy,
+        };
+
         const result = await (
           updateUserProfile as unknown as (params: {
             data: Partial<ProfileInputType>;
           }) => Promise<ProfileOperationResult>
         )({
-          data: value,
+          data: payload,
         });
 
         if (result.success) {
@@ -110,17 +147,42 @@ export function ProfileForm() {
       const parsedPrivacySettings = user.privacySettings
         ? JSON.parse(user.privacySettings)
         : {};
+      const defaults = defaultProfile.privacySettings;
+      if (!defaults) {
+        return;
+      }
       form.setFieldValue(
         "privacySettings.showEmail",
-        parsedPrivacySettings.showEmail || false,
+        parsedPrivacySettings.showEmail ?? defaults.showEmail,
       );
       form.setFieldValue(
         "privacySettings.showPhone",
-        parsedPrivacySettings.showPhone || false,
+        parsedPrivacySettings.showPhone ?? defaults.showPhone,
+      );
+      form.setFieldValue(
+        "privacySettings.showLocation",
+        parsedPrivacySettings.showLocation ?? defaults.showLocation,
+      );
+      form.setFieldValue(
+        "privacySettings.showLanguages",
+        parsedPrivacySettings.showLanguages ?? defaults.showLanguages,
+      );
+      form.setFieldValue(
+        "privacySettings.showGamePreferences",
+        parsedPrivacySettings.showGamePreferences ?? defaults.showGamePreferences,
       );
       form.setFieldValue(
         "privacySettings.allowTeamInvitations",
-        parsedPrivacySettings.allowTeamInvitations || true,
+        parsedPrivacySettings.allowTeamInvitations ?? defaults.allowTeamInvitations,
+      );
+      form.setFieldValue(
+        "privacySettings.allowFollows",
+        parsedPrivacySettings.allowFollows ?? defaults.allowFollows,
+      );
+      form.setFieldValue(
+        "privacySettings.allowInvitesOnlyFromConnections",
+        parsedPrivacySettings.allowInvitesOnlyFromConnections ??
+          defaults.allowInvitesOnlyFromConnections,
       );
     }
   }, [user, gamePreferences, form]);

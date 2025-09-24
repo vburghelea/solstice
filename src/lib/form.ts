@@ -1,9 +1,6 @@
-import {
-  AnyFieldApi,
-  createFormHook,
-  createFormHookContexts,
-} from "@tanstack/react-form";
+import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import React from "react";
+import type { FieldComponentProps, FormSubmitButtonProps } from "./form-shared";
 
 // Import the actual component implementations
 
@@ -73,30 +70,5 @@ export const { useAppForm } = createFormHook({
   },
 });
 
-// ---=== Helper Types ===---
-
-// Base props for field components
-export interface FieldComponentProps {
-  field: AnyFieldApi;
-  label: string;
-  placeholder?: string;
-  className?: string;
-}
-
-// Props for form submit button components
-export interface FormSubmitButtonProps
-  extends Omit<React.ComponentProps<"button">, "type" | "children"> {
-  children?: React.ReactNode;
-}
-
-// Type guard to check if an object is a FieldApi instance
-export function isFieldApi(obj: unknown): obj is AnyFieldApi {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "getValue" in obj &&
-    "setValue" in obj &&
-    "name" in obj &&
-    "getMeta" in obj
-  );
-}
+export { isFieldApi } from "./form-shared";
+export type { FieldComponentProps, FormSubmitButtonProps } from "./form-shared";

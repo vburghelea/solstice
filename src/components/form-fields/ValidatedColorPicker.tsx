@@ -1,6 +1,6 @@
 import React from "react";
 import { Label } from "~/components/ui/label";
-import { FieldComponentProps, isFieldApi } from "~/lib/form";
+import { FieldComponentProps, isFieldApi } from "~/lib/form-shared";
 import { cn } from "~/shared/lib/utils";
 
 interface ValidatedColorPickerProps extends FieldComponentProps {

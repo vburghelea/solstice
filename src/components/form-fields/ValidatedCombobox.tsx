@@ -11,7 +11,7 @@ import {
 import { CheckIcon, ChevronsUpDownIcon } from "~/components/ui/icons";
 import { Label } from "~/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { FieldComponentProps, isFieldApi } from "~/lib/form";
+import { FieldComponentProps, isFieldApi } from "~/lib/form-shared";
 import { cn } from "~/shared/lib/utils";
 
 interface ValidatedComboboxProps extends FieldComponentProps {

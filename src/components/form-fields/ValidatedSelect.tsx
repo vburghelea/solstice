@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { FieldComponentProps, isFieldApi } from "~/lib/form";
+import { FieldComponentProps, isFieldApi } from "~/lib/form-shared";
 import { cn } from "~/shared/lib/utils";
 
 interface ValidatedSelectProps extends FieldComponentProps {

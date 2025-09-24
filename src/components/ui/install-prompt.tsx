@@ -58,7 +58,7 @@ export function InstallPrompt() {
           <DownloadIcon className="h-5 w-5" />
         </div>
         <div className="space-y-1 text-left">
-          <p className="text-sm font-semibold text-gray-900">Install Quadball Canada</p>
+          <p className="text-sm font-semibold text-gray-900">Install Roundup Games</p>
           <p className="text-xs text-gray-600">
             Add the app to your home screen for quick access to schedules, resources, and
             updates—no browser tab required.

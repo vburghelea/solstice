@@ -50,8 +50,8 @@ describe("RoleManagementDashboard", () => {
     const sampleData: RoleManagementData = {
       roles: [
         {
-          id: "solstice-admin",
-          name: "Solstice Admin",
+          id: "platform-admin",
+          name: "Platform Admin",
           description: "Platform administrator",
           permissions: { "system:*": true },
           assignmentCount: 2,
@@ -62,8 +62,8 @@ describe("RoleManagementDashboard", () => {
       assignments: [
         {
           id: "assignment-1",
-          roleId: "solstice-admin",
-          roleName: "Solstice Admin",
+          roleId: "platform-admin",
+          roleName: "Platform Admin",
           roleDescription: "Platform administrator",
           userId: "user-1",
           userName: "Admin User",
@@ -85,7 +85,7 @@ describe("RoleManagementDashboard", () => {
     renderDashboard();
 
     await waitFor(() => {
-      expect(screen.getAllByText("Solstice Admin").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Platform Admin").length).toBeGreaterThan(0);
     });
 
     expect(screen.getAllByText("Platform administrator").length).toBeGreaterThan(0);

@@ -31,7 +31,7 @@ function EventsIndex() {
   const { events: initialEvents } = Route.useLoaderData() as {
     events: EventWithDetails[];
   };
-  const [provinceFilter, setProvinceFilter] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
 
   const {
     data: events = [],
@@ -50,24 +50,24 @@ function EventsIndex() {
     staleTime: 1000 * 60,
   });
 
-  const provinces = useMemo(() => {
+  const countries = useMemo(() => {
     const set = new Set<string>();
     events.forEach((event) => {
-      if (event.province) {
-        set.add(event.province);
+      if (event.country) {
+        set.add(event.country);
       }
     });
     return Array.from(set).sort();
   }, [events]);
 
   const filteredEvents = useMemo(() => {
-    if (provinceFilter === "all") {
+    if (countryFilter === "all") {
       return events;
     }
     return events.filter(
-      (event) => (event.province || "").toLowerCase() === provinceFilter,
+      (event) => (event.country || "").toLowerCase() === countryFilter,
     );
-  }, [events, provinceFilter]);
+  }, [events, countryFilter]);
 
   const isLoading = (isPending || isFetching) && events.length === 0;
   const skeletonKeys = ["north", "south", "east", "west", "central", "prairie"];
@@ -77,13 +77,13 @@ function EventsIndex() {
       <HeroSection
         eyebrow="Events"
         title="Tournaments, training camps, and community festivals"
-        subtitle="Quadball Canada sanctions competitions year-round so athletes at every level can compete, learn, and connect."
+        subtitle="Roundup Games sanctions competitions year-round so athletes at every level can compete, learn, and connect."
         backgroundImage="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=2000&q=80"
         ctaText="Register your team"
         ctaLink="/auth/signup"
         secondaryCta={{
           text: "Submit an event",
-          link: "mailto:events@quadball.ca",
+          link: "mailto:events@roundup.games",
         }}
       />
 
@@ -98,15 +98,15 @@ function EventsIndex() {
                 Upcoming events calendar
               </h2>
             </div>
-            <Select value={provinceFilter} onValueChange={setProvinceFilter}>
+            <Select value={countryFilter} onValueChange={setCountryFilter}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Province" />
+                <SelectValue placeholder="Country" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All provinces</SelectItem>
-                {provinces.map((province) => (
-                  <SelectItem key={province} value={province.toLowerCase()}>
-                    {province}
+                <SelectItem value="all">All countries</SelectItem>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country.toLowerCase()}>
+                    {country}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -127,7 +127,7 @@ function EventsIndex() {
             {!isLoading && !isError && filteredEvents.length === 0 && (
               <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-600 sm:col-span-2 lg:col-span-3">
                 No events match this filter right now. Submit your club details to
-                events@quadball.ca and we’ll add your tournament to the national calendar.
+                events@roundup.games and we’ll add your tournament to the national calendar.
               </div>
             )}
             {!isLoading &&

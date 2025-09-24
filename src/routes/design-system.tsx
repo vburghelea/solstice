@@ -39,7 +39,7 @@ function DesignSystemPage() {
       <HeroSection
         eyebrow="Component demo"
         title="Reusable form elements & loading states"
-        subtitle="Preview the design system building blocks used across Quadball Canada user flows."
+        subtitle="Preview the design system building blocks used across Roundup Games user flows."
         backgroundImage="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
         ctaText="View source documentation"
         ctaLink="https://github.com/quadball-canada"
@@ -74,7 +74,7 @@ function DesignSystemPage() {
                     <ValidatedInput
                       field={field}
                       label="Organization name"
-                      placeholder="Vancouver Valkyries"
+                      placeholder="Berlin Bandits"
                       description="Used across event listings and billing."
                       required
                     />
@@ -87,7 +87,7 @@ function DesignSystemPage() {
                       field={field}
                       type="email"
                       label="Contact email"
-                      placeholder="captain@quadball.ca"
+                      placeholder="info@roundup.games"
                       required
                     />
                   )}
@@ -98,7 +98,7 @@ function DesignSystemPage() {
                     <ValidatedPhoneInput
                       field={field}
                       label="Contact phone"
-                      description="Canadian format auto-applies for event communications"
+                      description="German format auto-applies for event communications"
                     />
                   )}
                 </form.Field>

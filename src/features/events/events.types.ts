@@ -28,6 +28,7 @@ export type EventFilters = {
   startDateFrom?: Date;
   startDateTo?: Date;
   city?: string;
+  province?: string;
   country?: string;
   featured?: boolean;
   publicOnly?: boolean;
@@ -64,12 +65,13 @@ export interface EventWithDetails
   registrationCount: number;
   isRegistrationOpen: boolean;
   availableSpots: number | undefined;
+  province: Event["province"];
 }
 
 export interface EventRegistrationWithDetails
   extends Omit<EventRegistration, "roster" | "paymentMetadata"> {
   roster: EventRegistrationRoster;
-  paymentMetadata: EventPaymentMetadata;
+  paymentMetadata: EventPaymentMetadata | null;
   event: EventWithDetails;
   team?: {
     id: string;

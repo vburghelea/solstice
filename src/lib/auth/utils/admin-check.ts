@@ -1,7 +1,7 @@
 import { serverOnly } from "@tanstack/react-start";
 import type { AuthUser } from "~/lib/auth/types";
 
-const GLOBAL_ADMIN_ROLE_NAMES = ["Solstice Admin", "Quadball Canada Admin"];
+const GLOBAL_ADMIN_ROLE_NAMES = ["Platform Admin", "Roundup Games Admin"];
 
 const getPermissionService = serverOnly(async () => {
   const { PermissionService } = await import("~/features/roles/permission.service");

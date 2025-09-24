@@ -151,7 +151,7 @@ const createAuth = async () => {
     // Email and password authentication
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: isProduction,
+      requireEmailVerification: isProduction(),
       sendResetPassword: async (params: {
         user: { email: string; name?: string };
         url: string;

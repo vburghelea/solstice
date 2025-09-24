@@ -207,7 +207,7 @@ function EventDetailPage() {
                         {event.city && (
                           <div>
                             {event.city}
-                            {event.province && `, ${event.province}`}
+                            {event.country && `, ${event.country}`}
                             {event.postalCode && ` ${event.postalCode}`}
                           </div>
                         )}
@@ -464,9 +464,9 @@ function EventDetailPage() {
                   <UserIcon className="text-primary h-5 w-5" />
                 </div>
                 <div>
-                  <div className="font-medium">{event.organizer.name}</div>
+                  <div className="font-medium">{event.organizer?.name ?? "Unknown"}</div>
                   <div className="text-muted-foreground text-sm">
-                    {event.contactEmail || event.organizer.email}
+                    {event.contactEmail || event.organizer?.email || "Not provided"}
                   </div>
                 </div>
               </div>

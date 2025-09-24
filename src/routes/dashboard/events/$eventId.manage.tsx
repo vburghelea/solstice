@@ -61,11 +61,20 @@ import type {
   EventWithDetails,
   UpdateEventInput,
 } from "~/features/events/events.types";
+import type { EventRegistrationWithRoster } from "~/features/events/utils";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
 type ManagementTab = "overview" | "registrations" | "settings";
+
+const markEtransferPaidCaller = markEventEtransferPaid as unknown as (options: {
+  data: { registrationId: string };
+}) => Promise<EventOperationResult<EventRegistrationWithRoster>>;
+
+const markEtransferReminderCaller = markEventEtransferReminder as unknown as (options: {
+  data: { registrationId: string };
+}) => Promise<EventOperationResult<EventRegistrationWithRoster>>;
 
 const currencyFormatter = new Intl.NumberFormat("en-CA", {
   style: "currency",
@@ -142,10 +151,8 @@ function EventManagementPage() {
 
   const markEtransferPaidMutation = useMutation({
     mutationFn: (registrationId: string) =>
-      unwrapServerFnResult(
-        markEventEtransferPaid({
-          data: { registrationId },
-        }),
+      unwrapServerFnResult<EventOperationResult<EventRegistrationWithRoster>>(
+        markEtransferPaidCaller({ data: { registrationId } }),
       ),
     onSuccess: (result) => {
       if (result.success) {
@@ -164,10 +171,8 @@ function EventManagementPage() {
 
   const markEtransferReminderMutation = useMutation({
     mutationFn: (registrationId: string) =>
-      unwrapServerFnResult(
-        markEventEtransferReminder({
-          data: { registrationId },
-        }),
+      unwrapServerFnResult<EventOperationResult<EventRegistrationWithRoster>>(
+        markEtransferReminderCaller({ data: { registrationId } }),
       ),
     onSuccess: (result) => {
       if (result.success) {
@@ -191,7 +196,7 @@ function EventManagementPage() {
       >,
     onSuccess: (result) => {
       if (result.success) {
-        toast.success("Event cancelled successfully");
+        toast.success("Event canceled successfully");
         refetchEvent();
       } else {
         toast.error(result.errors?.[0]?.message || "Failed to cancel event");
@@ -329,7 +334,7 @@ function EventManagementPage() {
 
       <Tabs
         value={activeTab}
-        onValueChange={(value) => setActiveTab(value as ManagementTab)}
+        onValueChange={(value: string) => setActiveTab(value as ManagementTab)}
       >
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>

@@ -15,7 +15,7 @@ test.describe("Team Member Management (Authenticated)", () => {
     test("should display team information", async ({ page }) => {
       // Team header
       await expect(page.getByRole("heading", { name: "Test Thunder" })).toBeVisible();
-      await expect(page.getByText("Toronto, ON")).toBeVisible();
+      await expect(page.getByText("Berlin, Germany")).toBeVisible();
       await expect(page.getByText("E2E test team")).toBeVisible();
 
       // Team colors - look for color indicator elements

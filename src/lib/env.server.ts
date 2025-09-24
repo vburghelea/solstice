@@ -59,8 +59,6 @@ export const env = createEnv({
           return z.NEVER;
         }
       }),
-    DISCORD_CLIENT_ID: z.string().optional(),
-    DISCORD_CLIENT_SECRET: z.string().optional(),
 
     // Square Payment Integration
     SQUARE_ENV: z.enum(["sandbox", "production"]).optional(),

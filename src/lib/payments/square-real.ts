@@ -186,7 +186,7 @@ export class SquarePaymentService {
           redirectUrl: `${baseUrl}/api/payments/square/callback`,
           askForShippingAddress: false,
           merchantSupportEmail:
-            process.env["SUPPORT_EMAIL"] || "support@quadballcanada.com",
+            process.env["SUPPORT_EMAIL"] || "support@roundup.games",
         },
         paymentNote: `Event registration ${params.registrationId} for event ${params.eventId}`,
       };

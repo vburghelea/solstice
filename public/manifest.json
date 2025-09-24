@@ -1,7 +1,7 @@
 {
-  "name": "Quadball Canada",
-  "short_name": "Quadball CA",
-  "description": "Official destination for Quadball Canada events, memberships, and club resources.",
+  "name": "Roundup Games",
+  "short_name": "Roundup Games",
+  "description": "Roundup Games, a platform for local-first gatherings around tabletop and board games.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

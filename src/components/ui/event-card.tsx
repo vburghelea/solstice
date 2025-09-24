@@ -28,7 +28,7 @@ export function EventCard({
   }
 
   const coverImage = event?.bannerUrl || image || FALLBACK_IMAGE;
-  const eventTitle = event?.name || title || "Upcoming Quadball Event";
+  const eventTitle = event?.name || title || "Upcoming Roundup Games Event";
   const eventDescription =
     event?.shortDescription ||
     description ||
@@ -45,7 +45,7 @@ export function EventCard({
       ? `${startDate} - ${endDate}`
       : startDate
     : undefined;
-  const locationLabel = [event?.city, event?.province].filter(Boolean).join(", ");
+  const locationLabel = [event?.city, event?.country].filter(Boolean).join(", ");
   const spotsRemaining =
     typeof event?.availableSpots === "number" && event.availableSpots >= 0
       ? `${event.availableSpots} spots left`

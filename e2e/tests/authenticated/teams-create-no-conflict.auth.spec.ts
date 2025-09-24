@@ -76,9 +76,9 @@ test.describe("Team Creation Without Conflict", () => {
     await page.getByLabel("Country").click();
     await page.getByRole("option", { name: "Germany" }).click();
 
-      // Select province from combobox
-      await page.getByLabel("Province").click();
-      await page.getByRole("option", { name: "British Columbia" }).click();
+      // Select country from combobox
+      await page.getByLabel("Country").click();
+      await page.getByRole("option", { name: "Germany" }).click();
 
       const yearField = page.getByLabel("Founded Year");
       await yearField.click();

@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS "teams" (
   "slug" varchar(255) NOT NULL,
   "description" text,
   "city" varchar(255),
-  "province" varchar(2),
+  "country" varchar(2),
   "logo_url" text,
   "primary_color" varchar(7),
   "secondary_color" varchar(7),

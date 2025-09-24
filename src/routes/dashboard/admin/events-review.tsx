@@ -235,9 +235,11 @@ function EventsReviewPage() {
                           <div className="flex items-center gap-2">
                             <UserIcon className="text-muted-foreground h-4 w-4" />
                             <div>
-                              <div className="text-sm">{event.organizer.name}</div>
+                              <div className="text-sm">
+                                {event.organizer?.name ?? "Unknown"}
+                              </div>
                               <div className="text-muted-foreground text-xs">
-                                {event.organizer.email}
+                                {event.organizer?.email ?? "Not provided"}
                               </div>
                             </div>
                           </div>
@@ -261,7 +263,7 @@ function EventsReviewPage() {
                               <MapPinIcon className="text-muted-foreground h-3 w-3" />
                               <span className="text-sm">
                                 {event.city}
-                                {event.province && `, ${event.province}`}
+                                {event.country && `, ${event.country}`}
                               </span>
                             </div>
                           )}
@@ -340,7 +342,9 @@ function EventsReviewPage() {
                       <TableRow key={event.id}>
                         <TableCell className="font-medium">{event.name}</TableCell>
                         <TableCell>
-                          <div className="text-sm">{event.organizer.name}</div>
+                          <div className="text-sm">
+                            {event.organizer?.name ?? "Unknown"}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="capitalize">

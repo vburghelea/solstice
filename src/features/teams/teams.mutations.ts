@@ -338,7 +338,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
             email: targetUser.email,
             name: targetUser.name ?? undefined,
           },
-          teamName: teamInfo?.name ?? "Quadball Canada Team",
+          teamName: teamInfo?.name ?? "Roundup Games Team",
           teamSlug: teamInfo?.slug ?? data.teamId,
           role: data.role,
           invitedByName: currentUser.name ?? undefined,

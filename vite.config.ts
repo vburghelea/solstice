@@ -79,10 +79,10 @@ export default defineConfig(({ mode }) => {
         ],
         manifest: {
           id: "/",
-          name: "Quadball Canada",
-          short_name: "Quadball CA",
+          name: "Roundup Games",
+          short_name: "Roundup Games",
           description:
-            "Official Quadball Canada platform for national events, club resources, and membership tools.",
+            "Roundup Games, a platform for local-first gatherings around tabletop and board games.",
           theme_color: "#d82929",
           background_color: "#ffffff",
           start_url: "/",

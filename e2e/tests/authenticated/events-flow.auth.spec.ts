@@ -51,9 +51,9 @@ test.describe("Events flow", () => {
 
       await page.getByLabel("Start Date").fill(startDate);
       await page.getByLabel("End Date").fill(endDate);
-      await page.getByLabel("City").fill("Toronto");
-      await page.getByLabel("Province").click();
-      await page.getByRole("option", { name: "Ontario" }).click();
+      await page.getByLabel("City").fill("Berlin");
+      await page.getByLabel("Country").click();
+      await page.getByRole("option", { name: "Germany" }).click();
       await page.getByRole("button", { name: "Next" }).click();
 
       await page.getByLabel("Registration Type").click();
@@ -61,7 +61,7 @@ test.describe("Events flow", () => {
       await page.getByLabel("Individual Registration Fee ($)").fill("25");
       await page.getByRole("button", { name: "Next" }).click();
 
-      await page.getByLabel("Contact Email").fill("events@quadballcanada.com");
+      await page.getByLabel("Contact Email").fill("events@roundup.games");
       await page.getByLabel("Contact Phone").fill("+1 (555) 987-0003");
       await page.getByRole("button", { name: "Create Event" }).click();
 

@@ -12,6 +12,7 @@ export const listEventsSchema = z
         startDateFrom: z.date().optional(),
         startDateTo: z.date().optional(),
         city: z.string().optional(),
+        province: z.string().optional(),
         country: z.string().optional(),
         featured: z.boolean().optional(),
         publicOnly: z.boolean().optional(),
@@ -98,15 +99,6 @@ export const cancelEventRegistrationSchema = z.object({
 });
 export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistrationSchema>;
 
-export const updateEventRegistrationStatusSchema = z.object({
-  eventId: z.string(),
-  registrationId: z.string(),
-  status: z.enum(["pending", "confirmed", "waitlisted", "canceled"]),
-  paymentStatus: z.enum(["pending", "paid", "refunded"]).optional(),
-});
-export type UpdateEventRegistrationStatusInput = z.infer<
-  typeof updateEventRegistrationStatusSchema
->;
 export const cancelEntireEventSchema = z.object({
   eventId: z.string().uuid(),
   reason: z.string().optional(),

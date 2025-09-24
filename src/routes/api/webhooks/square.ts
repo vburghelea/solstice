@@ -327,10 +327,10 @@ async function handleRefundEvent({
   }
 
   try {
-    const [{ getEmailService }] = await Promise.all([import("~/lib/email/sendgrid")]);
+    const [{ getEmailService }] = await Promise.all([import("~/lib/email/resend")]);
     const emailService = await getEmailService();
-    const fromEmail = process.env["SENDGRID_FROM_EMAIL"] || "noreply@quadballcanada.com";
-    const fromName = process.env["SENDGRID_FROM_NAME"] || "Quadball Canada";
+    const fromEmail = process.env["SUPPORT_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["SUPPORT_EMAIL_NAME"] || "Roundup Games";
 
     await emailService.send({
       to: { email: supportEmail },
@@ -439,7 +439,7 @@ export const ServerRoute = createServerFileRoute("/api/webhooks/square").methods
               amount,
             });
           } else if (PAYMENT_CANCELLED_STATUSES.has(status)) {
-            console.warn("[Square webhook] Payment moved to cancelled state", {
+            console.warn("[Square webhook] Payment moved to canceled state", {
               paymentId,
               orderId,
               status,

@@ -200,7 +200,7 @@ export default function LoginForm(props?: LoginFormProps) {
               auth.signInWithOAuth(
                 {
                   provider: "discord",
-                  callbackURL: redirectUrl,
+                  callbackURL: safeRedirectPath,
                 },
                 {
                   onRequest: () => {

@@ -35,7 +35,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
       const thunderCard = page.locator(".transition-shadow").filter({
         hasText: "Test Thunder",
       });
-      await expect(thunderCard.getByText("Toronto, ON")).toBeVisible();
+      await expect(thunderCard.getByText("Berlin, Germany")).toBeVisible();
       // Members count is shown as "Members" label with separate count
       await expect(thunderCard.getByText("Members")).toBeVisible();
       await expect(thunderCard.getByText("1")).toBeVisible(); // member count
@@ -58,14 +58,14 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
     test.skip("should search teams by city", async ({ page }) => {
       const searchInput = page.getByPlaceholder(/Search.*teams/i);
 
-      // Search for Toronto
-      await searchInput.fill("Toronto");
+      // Search for Berlin
+      await searchInput.fill("Berlin");
       await searchInput.press("Enter");
 
       // Wait for search results to update by checking for expected content
       await expect(page.getByText("Test Thunder")).toBeVisible({ timeout: 5000 });
 
-      // Should only show Toronto team
+      // Should only show Berlin team
       await expect(page.getByText("Test Lightning")).not.toBeVisible();
     });
 

@@ -36,9 +36,9 @@ async function updateEventEtransfer() {
       .update(schema.events)
       .set({
         allowEtransfer: true,
-        etransferRecipient: "payments@quadballcanada.com",
+        etransferRecipient: "payments@roundup.games",
         etransferInstructions:
-          "Please include the event name 'E2E Open Showcase' and your name in the e-transfer message. Security question: What sport? Answer: quadball",
+          "Please include the event name 'E2E Open Showcase' and your name in the e-transfer message.",
       })
       .where(eq(schema.events.id, event.id));
 

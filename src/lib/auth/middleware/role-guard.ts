@@ -66,7 +66,14 @@ export async function requireRole({
   }
 
   if (typeof window !== "undefined") {
-    if (!hasClientAccess({ user, requiredRoles, teamId, eventId })) {
+    const clientAccessArgs: Parameters<typeof hasClientAccess>[0] = {
+      user,
+      requiredRoles,
+      ...(teamId !== undefined ? { teamId } : {}),
+      ...(eventId !== undefined ? { eventId } : {}),
+    };
+
+    if (!hasClientAccess(clientAccessArgs)) {
       throw redirect({ to: redirectTo });
     }
     return;

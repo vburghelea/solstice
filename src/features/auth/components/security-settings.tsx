@@ -1,12 +1,12 @@
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { type ChangeEvent, type FormEvent, useState } from "react";
 import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { changePassword } from "~/features/auth/auth.queries";
 import { useAppForm } from "~/lib/form";
-import { Button } from "~/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/shared/ui/card";
-import { Input } from "~/shared/ui/input";
-import { Label } from "~/shared/ui/label";
 
 const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1, "Current password is required"),
@@ -45,10 +45,10 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
 
   const content = (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        form.handleSubmit();
+      onSubmit={(event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        void form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -66,7 +66,9 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
               type="password"
               value={field.state.value}
               onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                field.handleChange(event.target.value)
+              }
             />
             {field.state.meta.errors.length > 0 ? (
               <p className="text-destructive text-sm">
@@ -90,7 +92,9 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
               type="password"
               value={field.state.value}
               onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                field.handleChange(event.target.value)
+              }
             />
             {field.state.meta.errors.length > 0 ? (
               <p className="text-destructive text-sm">

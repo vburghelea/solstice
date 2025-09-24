@@ -331,9 +331,11 @@ function EventRegistrationPage() {
                   <Label>Registration Type</Label>
                   <RadioGroup
                     value={registrationType}
-                    onValueChange={(value) =>
-                      setRegistrationType(value as "team" | "individual")
-                    }
+                    onValueChange={(value: string) => {
+                      if (value === "team" || value === "individual") {
+                        setRegistrationType(value);
+                      }
+                    }}
                     disabled={event.registrationType !== "both"}
                   >
                     {(event.registrationType === "individual" ||
@@ -437,9 +439,11 @@ function EventRegistrationPage() {
                   <h3 className="font-semibold">Payment Method</h3>
                   <RadioGroup
                     value={effectivePaymentMethod}
-                    onValueChange={(value) =>
-                      setPaymentMethod(value as "square" | "etransfer")
-                    }
+                    onValueChange={(value: string) => {
+                      if (value === "square" || value === "etransfer") {
+                        setPaymentMethod(value);
+                      }
+                    }}
                     className="space-y-2"
                   >
                     <div className="flex items-start space-x-2">
@@ -620,7 +624,7 @@ function EventRegistrationPage() {
                     <MapPinIcon className="text-muted-foreground h-4 w-4" />
                     <span>
                       {event.city}
-                      {event.province && `, ${event.province}`}
+                      {event.country && `, ${event.country}`}
                     </span>
                   </div>
                 )}

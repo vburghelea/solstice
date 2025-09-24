@@ -14,8 +14,8 @@ type UserRow = typeof user.$inferSelect;
 
 const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
   {
-    id: "solstice-admin",
-    name: "Solstice Admin",
+    id: "platform-admin",
+    name: "Platform Admin",
     description: "Platform administrator with full system access",
     permissions: {
       "system:*": true,
@@ -27,11 +27,11 @@ const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
     },
   },
   {
-    id: "quadball-canada-admin",
-    name: "Quadball Canada Admin",
-    description: "Quadball Canada administrator with organization-wide access",
+    id: "roundup-games-admin",
+    name: "Roundup Games Admin",
+    description: "Roundup Games administrator with organization-wide access",
     permissions: {
-      "quadball_canada:*": true,
+      "roundup_games:*": true,
       "teams:manage": true,
       "events:manage": true,
       "members:manage": true,
@@ -97,20 +97,20 @@ function dedupe(values: string[]): string[] {
 }
 
 function getAssignmentsFromInput() {
-  const solsticeEmails = getArgValues("solstice");
-  const quadballEmails = getArgValues("quadball");
+  const platformEmails = getArgValues("platform");
+  const roundupEmails = getArgValues("roundup");
 
-  const envSolsticeEmails = parseCommaList(process.env["SOLSTICE_ADMIN_EMAILS"]);
-  const envQuadballEmails =
-    parseCommaList(process.env["QUADBALL_ADMIN_EMAILS"]) ||
+  const envPlatformEmails = parseCommaList(process.env["PLATFORM_ADMIN_EMAILS"]);
+  const envRoundupEmails =
+    parseCommaList(process.env["ROUNDUP_ADMIN_EMAILS"]) ||
     parseCommaList(process.env["GLOBAL_ADMIN_EMAILS"]);
 
-  const solstice = dedupe(solsticeEmails.length ? solsticeEmails : envSolsticeEmails);
-  const quadball = dedupe(quadballEmails.length ? quadballEmails : envQuadballEmails);
+  const platform = dedupe(platformEmails.length ? platformEmails : envPlatformEmails);
+  const roundup = dedupe(roundupEmails.length ? roundupEmails : envRoundupEmails);
 
   return {
-    solstice,
-    quadball,
+    platform,
+    roundup,
   };
 }
 
@@ -310,12 +310,12 @@ async function main() {
   const assignmentsInput = getAssignmentsFromInput();
   const assignments: Array<{ email: string; roleName: string }> = [];
 
-  assignmentsInput.solstice.forEach((email) => {
-    assignments.push({ email, roleName: "Solstice Admin" });
+  assignmentsInput.platform.forEach((email) => {
+    assignments.push({ email, roleName: "Platform Admin" });
   });
 
-  assignmentsInput.quadball.forEach((email) => {
-    assignments.push({ email, roleName: "Quadball Canada Admin" });
+  assignmentsInput.roundup.forEach((email) => {
+    assignments.push({ email, roleName: "Roundup Games Admin" });
   });
 
   const connectionString = getConnectionString();

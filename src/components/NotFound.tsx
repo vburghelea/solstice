@@ -46,8 +46,8 @@ export function NotFound() {
         </div>
         <p className="mt-8 text-xs tracking-[0.3em] text-gray-300 uppercase">
           Need support? Email{" "}
-          <a className="underline" href="mailto:info@quadball.ca">
-            info@quadball.ca
+          <a className="underline" href="mailto:info@roundup.games">
+            info@roundup.games
           </a>
         </p>
       </div>

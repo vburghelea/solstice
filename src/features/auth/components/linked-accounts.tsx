@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { getProviders } from "~/features/auth/auth.queries";
 import { auth } from "~/lib/auth-client";
-import { Button } from "~/shared/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/shared/ui/card";
 
 export function LinkedAccounts({ embedded = false }: { embedded?: boolean }) {
   const { data: providers } = useQuery({

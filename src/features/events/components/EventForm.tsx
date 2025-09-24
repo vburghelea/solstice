@@ -2,16 +2,17 @@ import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { createEventSchema } from "~/features/events/events.schemas";
-import { Label } from "~/shared/ui/label";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/shared/ui/select";
-import { Textarea } from "~/shared/ui/textarea";
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
+import { baseCreateEventSchema } from "~/db/schema/events.schema";
+import { createEventSchema } from "~/features/events/events.schemas";
 
 type CreateEventInput = z.infer<typeof createEventSchema>;
 
@@ -31,6 +32,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
     venueName: initialValues?.venueName ?? "",
     venueAddress: initialValues?.venueAddress ?? "",
     city: initialValues?.city ?? "",
+    province: initialValues?.province ?? "",
     country: initialValues?.country ?? "",
     postalCode: initialValues?.postalCode ?? "",
     startDate: initialValues?.startDate ?? new Date().toISOString().split("T")[0],
@@ -58,6 +60,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         // Ensure strings for dates (YYYY-MM-DD)
         startDate: value.startDate,
         endDate: value.endDate,
+        province: value.province ? value.province : undefined,
         // Fees in cents
         teamRegistrationFee:
           value.teamRegistrationFee !== undefined ? toInt(value.teamRegistrationFee) : 0,
@@ -104,7 +107,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         validators={{
           onChange: ({ value }) => {
             try {
-              createEventSchema.shape.name.parse(value);
+              baseCreateEventSchema.shape.name.parse(value);
               return undefined;
             } catch (e) {
               return (e as z.ZodError).errors?.[0]?.message;
@@ -142,7 +145,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
           validators={{
             onChange: ({ value }) => {
               try {
-                createEventSchema.shape.slug.parse(value);
+                baseCreateEventSchema.shape.slug.parse(value);
                 return undefined;
               } catch (e) {
                 return (e as z.ZodError).errors?.[0]?.message;
@@ -173,7 +176,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
               <Label htmlFor={field.name}>Type</Label>
               <Select
                 value={field.state.value as string}
-                onValueChange={(val) =>
+                onValueChange={(val: string) =>
                   field.handleChange(val as CreateEventInput["type"])
                 }
               >
@@ -233,7 +236,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
               <Label htmlFor={field.name}>Registration Type</Label>
               <Select
                 value={field.state.value as string}
-                onValueChange={(val) =>
+                onValueChange={(val: string) =>
                   field.handleChange(val as CreateEventInput["registrationType"])
                 }
               >
@@ -343,7 +346,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         </form.Field>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <form.Field name="city">
           {(field) => (
             <div>
@@ -358,6 +361,20 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
             </div>
           )}
         </form.Field>
+        <form.Field name="province">
+          {(field) => (
+            <div>
+              <Label htmlFor={field.name}>Province/State</Label>
+              <Input
+                id={field.name}
+                type="text"
+                value={field.state.value as string}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+              />
+            </div>
+          )}
+        </form.Field>
         <form.Field name="country">
           {(field) => (
             <div>
@@ -367,7 +384,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 type="text"
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(event) => field.handleChange(event.target.value)}
               />
             </div>
           )}

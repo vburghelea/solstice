@@ -41,7 +41,7 @@ describe("Event Base Schemas", () => {
         },
         allowEtransfer: true,
         etransferRecipient: "payments@example.com",
-        etransferInstructions: "Send with answer 'quadball'.",
+        etransferInstructions: "",
       };
 
       const result = createEventInputSchema.safeParse(validInput);

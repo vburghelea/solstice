@@ -43,7 +43,7 @@ test.describe("Teams Management (Authenticated)", () => {
       });
 
       await expect(teamCard).toBeVisible();
-      await expect(teamCard.getByText("Toronto, ON")).toBeVisible();
+      await expect(teamCard.getByText("Berlin, DEU")).toBeVisible();
       await expect(teamCard.getByText("Role")).toBeVisible();
       await expect(teamCard.getByText("captain")).toBeVisible();
       await expect(teamCard.getByText("Members")).toBeVisible();

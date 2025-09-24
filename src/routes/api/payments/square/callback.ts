@@ -200,7 +200,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
         const now = new Date();
         const nowIso = now.toISOString();
 
-        // Check if payment was cancelled
+        // Check if payment was canceled
         if (!transactionId) {
           await db
             .update(membershipPaymentSessions)

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { z } from "zod";
-import type { EventRegistration } from "~/db/schema";
+import type { Event, EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teams, user } from "~/db/schema";
 import { zod$ } from "~/lib/server/fn-utils";
 import type {
@@ -14,16 +14,6 @@ import type {
   EventRules,
   EventSchedule,
 } from "./events.db-types";
-
-// Lightweight DTO for registrations list
-export type EventRegistrationListItem = {
-  id: string;
-  registrationType: string;
-  status: string;
-  division: string | null;
-  team: { id: string; name: string; slug: string } | null;
-  user: { id: string; name: string; email: string };
-};
 import {
   checkEventRegistrationSchema,
   getEventSchema,
@@ -37,7 +27,8 @@ import type {
   EventPaymentStatus,
   EventWithDetails,
 } from "./events.types";
-import type { EventListResult, EventWithDetails } from "./events.types";
+import type { EventRegistrationWithRoster } from "./utils";
+
 // Lightweight DTO for registrations list
 export type EventRegistrationListItem = {
   id: string;
@@ -46,15 +37,6 @@ export type EventRegistrationListItem = {
   division: string | null;
   team: { id: string; name: string; slug: string } | null;
   user: { id: string; name: string; email: string };
-};
-
-// Type for EventRegistration with properly typed roster + metadata
-type EventRegistrationWithRoster = Omit<
-  EventRegistration,
-  "roster" | "paymentMetadata"
-> & {
-  roster: EventRegistrationRoster;
-  paymentMetadata: EventPaymentMetadata | null;
 };
 
 // Helper to cast registration jsonb fields
@@ -96,7 +78,7 @@ function castEventJsonbFields(
     availableSpots = Math.max(0, event.maxParticipants - registrationCount);
   }
 
-  return {
+  const baseEvent: EventWithDetails = {
     ...event,
     rules: (event.rules || {}) as EventRules,
     schedule: (event.schedule || {}) as EventSchedule,
@@ -104,11 +86,15 @@ function castEventJsonbFields(
     amenities: (event.amenities || {}) as EventAmenities,
     requirements: (event.requirements || {}) as EventRequirements,
     metadata: (event.metadata || {}) as EventMetadata,
-    organizer: organizer!,
     registrationCount,
     isRegistrationOpen,
     availableSpots,
+    province: event.province ?? null,
   };
+  if (organizer) {
+    return { ...baseEvent, organizer };
+  }
+  return baseEvent;
 }
 export type EventRegistrationSummary = {
   id: string;
@@ -156,12 +142,12 @@ export const listEvents = createServerFn({ method: "GET" })
 
     if (filters.status) {
       const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
-      conditions.push(inArray(events.status, statuses));
+      conditions.push(inArray(events.status, statuses as Event["status"][]));
     }
 
     if (filters.type) {
       const types = Array.isArray(filters.type) ? filters.type : [filters.type];
-      conditions.push(inArray(events.type, types));
+      conditions.push(inArray(events.type, types as Event["type"][]));
     }
 
     if (filters.organizerId) {
@@ -182,6 +168,10 @@ export const listEvents = createServerFn({ method: "GET" })
 
     if (filters.city) {
       conditions.push(eq(events.city, filters.city));
+    }
+
+    if (filters.province) {
+      conditions.push(eq(events.province, filters.province));
     }
 
     if (filters.country) {
@@ -236,21 +226,20 @@ export const listEvents = createServerFn({ method: "GET" })
         castEventJsonbFields(event, organizer, registrationCount),
     );
 
-      const totalPages = Math.ceil(count / pageSize);
+    const totalPages = Math.ceil(count / pageSize);
 
-      return {
-        events: eventsWithDetails,
-        totalCount: count,
-        pageInfo: {
-          currentPage: page,
-          pageSize,
-          totalPages,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1,
-        },
-      };
-    },
-  );
+    return {
+      events: eventsWithDetails,
+      totalCount: count,
+      pageInfo: {
+        currentPage: page,
+        pageSize,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  });
 
 /**
  * Get a single event by ID or slug
@@ -494,39 +483,40 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
         return { isRegistered: false };
       }
 
-    if (!data.userId && !data.teamId) {
-      return { isRegistered: false };
-    }
+      if (!data.userId && !data.teamId) {
+        return { isRegistered: false };
+      }
 
-    // Import server-only modules inside the handler
-    const { getDb } = await import("~/db/server-helpers");
-    const db = await getDb();
+      // Import server-only modules inside the handler
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
-    const conditions: ReturnType<typeof eq>[] = [
-      eq(eventRegistrations.eventId, data.eventId),
-      eq(eventRegistrations.status, "confirmed"),
-    ];
+      const conditions: ReturnType<typeof eq>[] = [
+        eq(eventRegistrations.eventId, data.eventId),
+        eq(eventRegistrations.status, "confirmed"),
+      ];
 
-    if (data.userId) {
-      conditions.push(eq(eventRegistrations.userId, data.userId));
-    }
+      if (data.userId) {
+        conditions.push(eq(eventRegistrations.userId, data.userId));
+      }
 
-    if (data.teamId) {
-      conditions.push(eq(eventRegistrations.teamId, data.teamId));
-    }
+      if (data.teamId) {
+        conditions.push(eq(eventRegistrations.teamId, data.teamId));
+      }
 
-    const [registration] = await db
-      .select()
-      .from(eventRegistrations)
-      .where(and(...conditions))
-      .limit(1);
+      const [registration] = await db
+        .select()
+        .from(eventRegistrations)
+        .where(and(...conditions))
+        .limit(1);
 
-    if (!registration) {
-      return { isRegistered: false };
-    }
+      if (!registration) {
+        return { isRegistered: false };
+      }
 
-    return {
-      isRegistered: true,
-      registration: castRegistrationJsonbFields(registration),
-    };
-  });
+      return {
+        isRegistered: true,
+        registration: castRegistrationJsonbFields(registration),
+      };
+    },
+  );

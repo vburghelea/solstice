@@ -42,11 +42,11 @@ export function PublicFooter() {
                 className="block text-gray-400 transition hover:text-white"
                 to="/about"
               >
-                About Quadball Canada
+                About Roundup Games
               </Link>
               <a
                 className="block text-gray-400 transition hover:text-white"
-                href="mailto:info@quadball.ca"
+                href="mailto:info@roundup.games"
               >
                 Contact Us
               </a>

@@ -23,6 +23,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { createEvent } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
+import { COUNTRIES } from "~/shared/hooks/useCountries";
 
 const EVENT_TYPE_OPTIONS = [
   { value: "tournament", label: "Tournament" },
@@ -37,20 +38,6 @@ const EVENT_STATUS_OPTIONS = [
   { value: "draft", label: "Draft (Not visible)" },
   { value: "published", label: "Published (Visible)" },
   { value: "registration_open", label: "Registration Open" },
-];
-
-const PROVINCE_OPTIONS = [
-  { value: "", label: "Select Province" },
-  { value: "AB", label: "Alberta" },
-  { value: "BC", label: "British Columbia" },
-  { value: "MB", label: "Manitoba" },
-  { value: "NB", label: "New Brunswick" },
-  { value: "NL", label: "Newfoundland and Labrador" },
-  { value: "NS", label: "Nova Scotia" },
-  { value: "ON", label: "Ontario" },
-  { value: "PE", label: "Prince Edward Island" },
-  { value: "QC", label: "Quebec" },
-  { value: "SK", label: "Saskatchewan" },
 ];
 
 const REGISTRATION_TYPE_OPTIONS = [
@@ -81,7 +68,7 @@ const eventFormSchema = z
     venueName: z.string().max(255).optional(),
     venueAddress: z.string().optional(),
     city: z.string().max(100).optional(),
-    province: z.string().max(50).optional(),
+    country: z.string().max(50).optional(),
     postalCode: z.string().max(10).optional(),
     locationNotes: z.string().optional(),
     startDate: z.string().min(1, "Start date is required"),
@@ -144,7 +131,7 @@ export function EventCreateForm() {
     venueName: "",
     venueAddress: "",
     city: "",
-    province: "",
+    country: "",
     postalCode: "",
     locationNotes: "",
     startDate: "",
@@ -196,7 +183,7 @@ export function EventCreateForm() {
         venueName: parsed.venueName || undefined,
         venueAddress: parsed.venueAddress || undefined,
         city: parsed.city || undefined,
-        province: parsed.province || undefined,
+        country: parsed.country || undefined,
         postalCode: parsed.postalCode || undefined,
         locationNotes: parsed.locationNotes || undefined,
         registrationOpensAt: parsed.registrationOpensAt || undefined,
@@ -293,7 +280,7 @@ export function EventCreateForm() {
       <CardHeader>
         <CardTitle>Create New Event</CardTitle>
         <CardDescription>
-          Fill in the details to create a new Quadball event. You can save as draft and
+          Fill in the details to create a new Roundup Games event. You can save as draft and
           publish later.
         </CardDescription>
       </CardHeader>
@@ -471,16 +458,16 @@ export function EventCreateForm() {
               <div className="grid gap-4 md:grid-cols-3">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Toronto" />
+                    <ValidatedInput field={field} label="City" placeholder="Berlin" />
                   )}
                 </form.Field>
 
-                <form.Field name="province">
+                <form.Field name="country">
                   {(field) => (
                     <ValidatedSelect
                       field={field}
-                      label="Province"
-                      options={PROVINCE_OPTIONS}
+                      label="Country"
+                      options={COUNTRIES}
                     />
                   )}
                 </form.Field>
@@ -787,7 +774,7 @@ export function EventCreateForm() {
                     <ValidatedCheckbox
                       field={field}
                       label="Require Active Membership"
-                      description="Only allow users with active Quadball Canada memberships to register"
+                      description="Only allow users with active Roundup Games memberships to register"
                     />
                   )}
                 </form.Field>

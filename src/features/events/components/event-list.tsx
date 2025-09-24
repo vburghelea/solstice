@@ -92,7 +92,7 @@ export function EventList({
 
   const typeFilterValue = typeof filters.type === "string" ? filters.type : "all";
   const statusFilterValue = typeof filters.status === "string" ? filters.status : "all";
-  const provinceFilterValue = filters.province ?? "all";
+  const countryFilterValue = filters.country ?? "all";
 
   const filterSection = showFilters ? (
     <Card>
@@ -165,31 +165,22 @@ export function EventList({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="province">Province</Label>
+            <Label htmlFor="country">Country</Label>
             <Select
-              value={provinceFilterValue}
+              value={countryFilterValue}
               onValueChange={(value) =>
                 handleFilterChange(
-                  "province",
-                  value === "all" ? undefined : (value as EventFilters["province"]),
+                  "country",
+                  value === "all" ? undefined : (value as EventFilters["country"]),
                 )
               }
             >
-              <SelectTrigger id="province">
-                <SelectValue placeholder="All provinces" />
+              <SelectTrigger id="country">
+                <SelectValue placeholder="All countries" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All provinces</SelectItem>
-                <SelectItem value="AB">Alberta</SelectItem>
-                <SelectItem value="BC">British Columbia</SelectItem>
-                <SelectItem value="MB">Manitoba</SelectItem>
-                <SelectItem value="NB">New Brunswick</SelectItem>
-                <SelectItem value="NL">Newfoundland and Labrador</SelectItem>
-                <SelectItem value="NS">Nova Scotia</SelectItem>
-                <SelectItem value="ON">Ontario</SelectItem>
-                <SelectItem value="PE">Prince Edward Island</SelectItem>
-                <SelectItem value="QC">Quebec</SelectItem>
-                <SelectItem value="SK">Saskatchewan</SelectItem>
+                <SelectItem value="all">All countries</SelectItem>
+                {/* TODO: map through all COUNTRIES */}
               </SelectContent>
             </Select>
           </div>
@@ -376,7 +367,7 @@ function EventCard({ event }: { event: EventWithDetails }) {
               <MapPinIcon className="text-muted-foreground h-4 w-4" />
               <span>
                 {event.city}
-                {event.province && `, ${event.province}`}
+                {event.country && `, ${event.country}`}
               </span>
             </div>
           ) : null}

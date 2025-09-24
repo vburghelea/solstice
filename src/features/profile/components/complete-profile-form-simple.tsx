@@ -248,7 +248,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     <ValidatedInput
                       field={field}
                       label="City (optional)"
-                      placeholder="e.g., Toronto"
+                      placeholder="e.g., Berlin"
                     />
                   )}
                 </form.Field>

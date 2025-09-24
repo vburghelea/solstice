@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS "events" (
   "venue_name" varchar(255),
   "venue_address" text,
   "city" varchar(100),
-  "province" varchar(50),
+  "country" varchar(50),
   "postal_code" varchar(10),
   "location_notes" text,
   "start_date" date NOT NULL,

@@ -38,7 +38,6 @@ import {
   currentTimestamp,
   getClockFromContext,
   isoTimestamp,
-  markEtransferPaidMetadata,
   markEtransferReminderMetadata,
 } from "./utils";
 
@@ -99,7 +98,7 @@ export const cancelEvent = createServerFn({ method: "POST" })
           ...(eventRecord.metadata ?? {}),
           canceledAt: nowIso,
           canceledBy: user.id,
-          cancelationReason: data.reason ?? null,
+          cancellationReason: data.reason ?? null,
         } as Record<string, unknown>;
 
         await db
@@ -932,200 +931,7 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
 export const markEventEtransferPaid = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(markEtransferPaidSchema))
-/**
- * Organizer: update registration status/payment
- */
-export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
-  .validator(updateEventRegistrationStatusSchema.parse)
-  .handler(async ({ data }) => {
-    try {
-      const [{ getDb }, { getAuth }, { PermissionService }] = await Promise.all([
-        import("~/db/server-helpers"),
-        import("~/lib/auth/server-helpers"),
-        import("~/features/roles/permission.server"),
-      ]);
-
-      const db = await getDb();
-      const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false as const,
-          errors: [{ code: "UNAUTHORIZED", message: "Not authenticated" }],
-        };
-      }
-
-      // Permission: global admin, event admin role, or organizerId
-      const canManage = await PermissionService.canManageEvent(
-        session.user.id,
-        data.eventId,
-      );
-      if (!canManage) {
-        const [ev] = await db
-          .select()
-          .from(events)
-          .where(eq(events.id, data.eventId))
-          .limit(1);
-        if (!ev || ev.organizerId !== session.user.id) {
-          return {
-            success: false as const,
-            errors: [{ code: "FORBIDDEN", message: "Insufficient permissions" }],
-          };
-        }
-      }
-
-      // Ensure registration belongs to event
-      const [reg] = await db
-        .select()
-        .from(eventRegistrations)
-        .where(eq(eventRegistrations.id, data.registrationId))
-        .limit(1);
-      if (!reg || reg.eventId !== data.eventId) {
-        return {
-          success: false as const,
-          errors: [{ code: "NOT_FOUND", message: "Registration not found" }],
-        };
-      }
-
-      const [updated] = await db
-        .update(eventRegistrations)
-        .set({
-          status: data.status,
-          paymentStatus: data.paymentStatus ?? reg.paymentStatus,
-          updatedAt: new Date(),
-          confirmedAt: data.status === "confirmed" ? new Date() : reg.confirmedAt,
-          canceledAt: data.status === "canceled" ? new Date() : reg.canceledAt,
-        })
-        .where(eq(eventRegistrations.id, data.registrationId))
-        .returning();
-
-      return { success: true as const, data: castRegistrationJsonbFields(updated) };
-    } catch (error) {
-      console.error("Error updating registration:", error);
-      return {
-        success: false as const,
-        errors: [{ code: "DATABASE_ERROR", message: "Failed to update registration" }],
-      };
-    }
-  });
-
-/**
- * Cancel event registration
- */
-export const cancelEventRegistration = createServerFn({ method: "POST" })
-  .validator(cancelEventRegistrationSchema.parse)
-  .handler(
-    async ({
-      data,
-      context,
-    }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
-      try {
-        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
-
-        const db = await getDb();
-        const user = requireUser(context);
-        const clock = getClockFromContext(context);
-
-        const registrationWithEvent = await db
-          .select({
-            registration: eventRegistrations,
-            event: events,
-          })
-          .from(eventRegistrations)
-          .innerJoin(events, eq(eventRegistrations.eventId, events.id))
-          .where(eq(eventRegistrations.id, data.registrationId))
-          .limit(1);
-
-        if (registrationWithEvent.length === 0) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "NOT_FOUND",
-                message: "Registration not found",
-              },
-            ],
-          };
-        }
-
-        const [{ registration, event }] = registrationWithEvent;
-
-        const isOrganizer = event.organizerId === user.id;
-        let isGlobalAdmin = false;
-        if (!isOrganizer) {
-          const { isAdmin } = await import("~/lib/auth/utils/admin-check");
-          isGlobalAdmin = await isAdmin(user.id);
-        }
-
-        if (!isOrganizer && !isGlobalAdmin) {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "FORBIDDEN",
-                message: "You do not have permission to update this registration",
-              },
-            ],
-          };
-        }
-
-        if (registration.paymentMethod !== "etransfer") {
-          return {
-            success: false,
-            errors: [
-              {
-                code: "VALIDATION_ERROR",
-                message: "Only e-transfer registrations can be marked as paid manually",
-              },
-            ],
-          };
-        }
-
-        const now = currentTimestamp(clock);
-        const existingMetadata = (registration.paymentMetadata ||
-          {}) as EventPaymentMetadata;
-        const updatedMetadata = markEtransferPaidMetadata(
-          existingMetadata,
-          user.id,
-          clock,
-        );
-
-        const [updatedRegistration] = await db
-          .update(eventRegistrations)
-          .set({
-            paymentStatus: "paid",
-            status:
-              registration.status === "canceled" ? registration.status : "confirmed",
-            paymentCompletedAt: now,
-            amountPaidCents: registration.amountDueCents,
-            paymentMetadata: updatedMetadata,
-            updatedAt: now,
-          })
-          .where(eq(eventRegistrations.id, data.registrationId))
-          .returning();
-
-        return {
-          success: true,
-          data: castRegistrationJsonbFields(updatedRegistration),
-        };
-      } catch (error) {
-        console.error("Error marking e-transfer as paid:", error);
-        return {
-          success: false,
-          errors: [
-            {
-              code: "DATABASE_ERROR",
-              message: "Failed to update registration",
-            },
-          ],
-        };
-      }
-    },
-  );
+  .validator(zod$(markEtransferPaidSchema));
 
 export const markEventEtransferReminder = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())

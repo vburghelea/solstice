@@ -272,7 +272,7 @@ export function RoleManagementDashboard() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Role Management</h1>
             <p className="text-muted-foreground mt-1">
-              Assign and revoke administrator access across Solstice and teams.
+              Assign and revoke administrator access across platform and teams.
             </p>
           </div>
           <Dialog open={assignDialogOpen} onOpenChange={handleDialogOpenChange}>

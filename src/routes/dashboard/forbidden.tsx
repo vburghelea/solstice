@@ -24,7 +24,7 @@ function ForbiddenPage() {
           <Link to="/dashboard">Return to dashboard</Link>
         </Button>
         <Button asChild variant="outline">
-          <a href="mailto:info@quadball.ca">Contact support</a>
+          <a href="mailto:info@roundup.games">Contact support</a>
         </Button>
       </div>
     </div>

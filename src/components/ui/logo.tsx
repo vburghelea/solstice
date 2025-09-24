@@ -5,7 +5,7 @@ interface LogoProps {
   alt?: string;
 }
 
-export function Logo({ className, alt = "Quadball Canada logo" }: LogoProps) {
+export function Logo({ className, alt = "Roundup Games logo" }: LogoProps) {
   const [src, setSrc] = useState<string>("/quadball-canada-logo.svg");
 
   return (

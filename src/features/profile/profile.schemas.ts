@@ -1,6 +1,16 @@
 import { z } from "zod";
 import { experienceLevelOptions } from "~/shared/types/common";
 
+export const profileNameSchema = z
+  .string()
+  .trim()
+  .min(3, "Profile name must be at least 3 characters")
+  .max(30, "Profile name must be 30 characters or less")
+  .regex(
+    /^[A-Za-z0-9._-]+$/,
+    "Profile name can only contain letters, numbers, periods, underscores, and hyphens",
+  );
+
 export const privacySettingsSchema = z.object({
   showEmail: z.boolean(),
   showPhone: z.boolean(),
@@ -24,6 +34,7 @@ export const availabilityDataSchema = z.object({
 });
 
 export const profileInputSchema = z.object({
+  name: profileNameSchema.optional(),
   gender: z.string().optional(),
   pronouns: z.string().optional(),
   phone: z.string().optional(),
@@ -55,26 +66,12 @@ export const profileInputSchema = z.object({
   gmStyle: z.string().optional(),
 });
 
-export const completeProfileInputSchema = z.object({
+export const completeProfileInputSchema = profileInputSchema.extend({
+  name: profileNameSchema,
   gender: z.string(),
   pronouns: z.string(),
   phone: z.string(),
-  city: z.string().optional(),
-  country: z.string().optional(),
-  languages: z.array(z.string()).optional(),
-  identityTags: z.array(z.string()).optional(),
-  preferredGameThemes: z.array(z.string()).optional(),
-  overallExperienceLevel: z.enum(experienceLevelOptions).optional(),
-  gameSystemPreferences: z
-    .object({
-      favorite: z.array(z.object({ id: z.number(), name: z.string() })),
-      avoid: z.array(z.object({ id: z.number(), name: z.string() })),
-    })
-    .optional(),
-  calendarAvailability: availabilityDataSchema.optional(),
   privacySettings: privacySettingsSchema,
-  isGM: z.boolean().optional(),
-  gmStyle: z.string().optional(),
 });
 
 export const partialProfileInputSchema = profileInputSchema.partial();
@@ -87,7 +84,7 @@ export type PartialProfileInputType = z.infer<typeof partialProfileInputSchema>;
 export const updateUserProfileInputSchema = partialProfileInputSchema;
 
 export const completeUserProfileInputSchema = z.object({
-  data: profileInputSchema,
+  data: completeProfileInputSchema,
 });
 
 export const updatePrivacySettingsInputSchema = z.object({

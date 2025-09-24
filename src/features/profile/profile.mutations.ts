@@ -5,9 +5,9 @@ import { userGameSystemPreferences } from "~/db/schema/game-systems.schema";
 import { getAuthMiddleware } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import {
+  completeProfileInputSchema,
   partialProfileInputSchema,
   privacySettingsSchema,
-  profileInputSchema,
 } from "./profile.schemas";
 import type {
   PrivacySettings,
@@ -15,7 +15,11 @@ import type {
   UserProfile,
 } from "./profile.types";
 import { defaultPrivacySettings } from "./profile.types";
-import { isProfileComplete } from "./profile.utils";
+import {
+  isProfileComplete,
+  normalizeProfileName,
+  sanitizeProfileName,
+} from "./profile.utils";
 
 function parseJsonField<T>(value: string | null | undefined): T | undefined {
   if (!value) return undefined;
@@ -103,13 +107,49 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       }
 
       // Import database dependencies inside handler
-      const { eq, sql } = await import("drizzle-orm");
+      const { and, eq, ne, sql } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
+
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
 
       const updateData: Record<string, unknown> = {
         profileUpdatedAt: new Date(),
         profileVersion: sql`${user.profileVersion} + 1`,
       };
+
+      if (inputData.name !== undefined) {
+        const sanitizedName = sanitizeProfileName(inputData.name);
+        const normalizedName = normalizeProfileName(sanitizedName);
+        const currentName = normalizeProfileName(currentUser.name ?? "");
+        if (normalizedName !== currentName) {
+          const [existingUser] = await db
+            .select({ id: user.id })
+            .from(user)
+            .where(
+              and(
+                sql`LOWER(${user.name}) = ${normalizedName}`,
+                ne(user.id, currentUser.id),
+              ),
+            )
+            .limit(1);
+
+          if (existingUser) {
+            return {
+              success: false,
+              errors: [
+                {
+                  code: "VALIDATION_ERROR",
+                  field: "name",
+                  message: "That profile name is already taken",
+                },
+              ],
+            };
+          }
+        }
+
+        updateData["name"] = sanitizedName;
+      }
 
       if (inputData.gender !== undefined) {
         updateData["gender"] = inputData.gender;
@@ -147,10 +187,6 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       if (inputData.calendarAvailability !== undefined) {
         updateData["calendarAvailability"] = inputData.calendarAvailability;
       }
-
-      // Import server-only modules inside the handler
-      const { getDb } = await import("~/db/server-helpers");
-      const db = await getDb();
 
       const [updatedUser] = await db
         .update(user)
@@ -203,8 +239,6 @@ export const updateUserProfile = createServerFn({ method: "POST" })
       const profileComplete = isProfileComplete(profile);
 
       if (profileComplete !== updatedUser.profileComplete) {
-        const { getDb } = await import("~/db/server-helpers");
-        const db = await getDb();
         const [finalUser] = await db
           .update(user)
           .set({ profileComplete })
@@ -237,7 +271,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
 export const completeUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(profileInputSchema))
+  .validator(zod$(completeProfileInputSchema))
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -256,10 +290,35 @@ export const completeUserProfile = createServerFn({ method: "POST" })
       // Input is already validated by .validator()
 
       // Import database dependencies inside handler
-      const { eq, sql } = await import("drizzle-orm");
+      const { and, eq, ne, sql } = await import("drizzle-orm");
       const { user } = await import("~/db/schema");
 
+      const sanitizedName = sanitizeProfileName(data.name);
+      const normalizedName = normalizeProfileName(sanitizedName);
+
+      const [existingUser] = await db
+        .select({ id: user.id })
+        .from(user)
+        .where(
+          and(sql`LOWER(${user.name}) = ${normalizedName}`, ne(user.id, currentUser.id)),
+        )
+        .limit(1);
+
+      if (existingUser) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "VALIDATION_ERROR",
+              field: "name",
+              message: "That profile name is already taken",
+            },
+          ],
+        };
+      }
+
       const updateData = {
+        name: sanitizedName,
         gender: data.gender || null,
         pronouns: data.pronouns || null,
         phone: data.phone || null,

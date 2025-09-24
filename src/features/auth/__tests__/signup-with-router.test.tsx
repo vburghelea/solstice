@@ -4,6 +4,26 @@ import { auth } from "~/lib/auth-client";
 import { renderWithRouter, screen, waitFor } from "~/tests/utils";
 import SignupForm from "../components/signup";
 
+const mockCheckProfileNameAvailability = vi.fn().mockResolvedValue({
+  success: true,
+  data: { available: true },
+});
+
+vi.mock("~/features/profile/profile.queries", async (importOriginal) => {
+  const actual =
+    (await importOriginal()) as typeof import("~/features/profile/profile.queries");
+  const mockedFn = Object.assign(
+    (...args: Parameters<typeof actual.checkProfileNameAvailability>) =>
+      mockCheckProfileNameAvailability(...args),
+    actual.checkProfileNameAvailability,
+  );
+
+  return {
+    ...actual,
+    checkProfileNameAvailability: mockedFn,
+  } satisfies typeof actual;
+});
+
 // Mock auth client
 vi.mock("~/lib/auth-client", () => ({
   auth: {
@@ -17,6 +37,7 @@ vi.mock("~/lib/auth-client", () => ({
 describe("SignupForm with Router", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCheckProfileNameAvailability.mockClear();
   });
 
   it("renders signup form with all fields", async () => {
@@ -76,7 +97,7 @@ describe("SignupForm with Router", () => {
         expect.objectContaining({
           email: "newuser@example.com",
           password: "securepassword123",
-          name: "New User",
+          name: "NewUser",
           callbackURL: "/dashboard",
         }),
       );

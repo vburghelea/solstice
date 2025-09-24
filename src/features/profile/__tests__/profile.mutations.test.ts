@@ -39,7 +39,7 @@ import {
 
 const mockUser: UserProfile = {
   id: "user-1",
-  name: "Test User",
+  name: "test-user",
   email: "test@example.com",
   profileComplete: false,
   profileVersion: 1,
@@ -249,6 +249,7 @@ describe("Profile Mutations", () => {
   describe("completeUserProfile", () => {
     it("should set all required fields and mark profile as complete", async () => {
       const profileData = {
+        name: "player-one",
         gender: "Male",
         pronouns: "he/him",
         phone: "9876543210",
@@ -290,6 +291,7 @@ describe("Profile Mutations", () => {
 
     it("should update with new fields", async () => {
       const profileData = {
+        name: "player-two",
         gender: "Female",
         pronouns: "she/her",
         phone: "9876543210",
@@ -321,6 +323,7 @@ describe("Profile Mutations", () => {
 
     it("should update with all new fields including city, country, GM fields, and calendar", async () => {
       const profileData = {
+        name: "player-three",
         gender: "Female",
         pronouns: "she/her",
         phone: "9876543210",

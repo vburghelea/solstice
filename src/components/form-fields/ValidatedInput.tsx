@@ -19,6 +19,8 @@ interface ValidatedInputProps extends FieldComponentProps {
   disabled?: boolean;
   description?: string;
   onValueChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void;
+  disableWhileSubmitting?: boolean;
+  onBlurCapture?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 // Correctly define the component receiving props
@@ -31,6 +33,9 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
     className,
     description,
     onValueChange,
+    disabled,
+    disableWhileSubmitting = true,
+    onBlurCapture,
     ...rest // Collect rest of props here
   } = props;
 
@@ -51,7 +56,10 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
         name={field.name}
         type={type}
         value={field.state.value ?? ""}
-        onBlur={field.handleBlur}
+        onBlur={(event) => {
+          field.handleBlur();
+          onBlurCapture?.(event);
+        }}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           if (onValueChange) {
             onValueChange(event.target.value, event);
@@ -60,7 +68,7 @@ export const ValidatedInput: React.FC<ValidatedInputProps> = (props) => {
           field.handleChange(event.target.value);
         }}
         placeholder={placeholder}
-        disabled={field.form.state.isSubmitting || props.disabled}
+        disabled={(disableWhileSubmitting && field.form.state.isSubmitting) || disabled}
         // Add aria-invalid for accessibility based on errors
         aria-invalid={!!meta.errors.length}
         aria-describedby={meta.errors.length ? `${inputId}-errors` : undefined}

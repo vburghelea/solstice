@@ -30,9 +30,11 @@ import { Link } from "@tanstack/react-router";
 import { Avatar } from "~/components/ui/avatar";
 import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { invalidateProfileCaches } from "../profile.cache";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
+import { sanitizeProfileName } from "../profile.utils";
 import { AvailabilityEditor } from "./availability-editor";
 import { AvatarUpload } from "./avatar-upload";
 import { GamePreferencesStep } from "./game-preferences-step";
@@ -64,6 +66,7 @@ export function ProfileView() {
 
   const form = useForm({
     defaultValues: {
+      name: "",
       gender: "",
       pronouns: "",
       phone: "",
@@ -99,6 +102,14 @@ export function ProfileView() {
 
         // Basic Information Fields
         if (editingSection === "basic") {
+          const trimmedName = value.name?.trim();
+          const currentName = profile?.name ?? "";
+
+          if (trimmedName && trimmedName !== currentName) {
+            dataToSubmit["name"] = trimmedName;
+            hasChanges = true;
+          }
+
           if (value.gender !== (profile?.["gender"] || "")) {
             dataToSubmit["gender"] = value.gender || null;
             hasChanges = true;
@@ -247,7 +258,7 @@ export function ProfileView() {
 
         if (result.success) {
           toast.success("Profile updated successfully");
-          await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+          await invalidateProfileCaches(queryClient, result.data?.id ?? profile?.id);
           // Only exit edit mode on success
           setEditingSection(null);
         } else {
@@ -273,6 +284,7 @@ export function ProfileView() {
   useEffect(() => {
     if (profile && !editingSection) {
       // Set form field values from profile data for display mode
+      form.setFieldValue("name", profile.name || "");
       form.setFieldValue(
         "calendarAvailability",
         profile.calendarAvailability || defaultAvailabilityData,
@@ -280,6 +292,7 @@ export function ProfileView() {
       form.setFieldValue("languages", profile.languages || []);
       form.setFieldValue("identityTags", profile.identityTags || []);
       form.setFieldValue("preferredGameThemes", profile.preferredGameThemes || []);
+      form.setFieldValue("name", profile.name || "");
       form.setFieldValue("gender", profile.gender || "");
       form.setFieldValue("pronouns", profile.pronouns || "");
       form.setFieldValue("phone", profile.phone || "");
@@ -388,6 +401,7 @@ export function ProfileView() {
 
     // Set field values from profile for the specific section
     if (sectionId === "basic") {
+      form.setFieldValue("name", profile.name || "");
       form.setFieldValue("gender", profile.gender || "");
       form.setFieldValue("pronouns", profile.pronouns || "");
       form.setFieldValue("phone", profile.phone || "");
@@ -571,6 +585,34 @@ export function ProfileView() {
               uploadedAvatarPath={profile?.uploadedAvatarPath ?? null}
             />
           ) : null}
+
+          {editingSection === "basic" ? (
+            <form.Field name="name">
+              {(field) => (
+                <ValidatedInput
+                  field={field}
+                  label="Profile Name"
+                  placeholder="choose a unique username"
+                  description="This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
+                  autoComplete="username"
+                  maxLength={30}
+                  disableWhileSubmitting={false}
+                  onValueChange={(value) => {
+                    const sanitizedValue = sanitizeProfileName(value);
+                    field.handleChange(sanitizedValue);
+                  }}
+                />
+              )}
+            </form.Field>
+          ) : (
+            <div>
+              <Label>Profile Name</Label>
+              <p className="mt-1 text-sm font-medium">{profile?.name ?? "Not set"}</p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                This name is public and visible to other players.
+              </p>
+            </div>
+          )}
 
           <div>
             <Label>Email Address</Label>

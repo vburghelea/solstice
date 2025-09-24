@@ -10,7 +10,7 @@ import {
 } from "~/db/schema/game-systems.schema";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { OperationResult } from "~/shared/types/common";
-import { listUserLocationsSchema } from "./profile.schemas";
+import { listUserLocationsSchema, profileNameSchema } from "./profile.schemas";
 import type {
   CountryLocationGroup,
   PrivacySettings,
@@ -402,6 +402,56 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
     }
   },
 );
+
+export const checkProfileNameAvailability = createServerFn({ method: "POST" })
+  .validator(
+    zod$(
+      z.object({
+        name: profileNameSchema,
+      }),
+    ),
+  )
+  .handler(async ({ data }): Promise<OperationResult<{ available: boolean }>> => {
+    try {
+      const trimmedName = data.name.trim();
+      const normalizedName = trimmedName.toLowerCase();
+
+      const [{ getDb }, { user }, { getCurrentUser }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/db/schema"),
+        import("~/features/auth/auth.queries"),
+      ]);
+
+      const db = await getDb();
+      const currentUser = await getCurrentUser();
+
+      const whereCondition = currentUser?.id
+        ? sql`LOWER(${user.name}) = ${normalizedName} AND ${user.id} <> ${currentUser.id}`
+        : sql`LOWER(${user.name}) = ${normalizedName}`;
+
+      const [existingUser] = await db
+        .select({ id: user.id })
+        .from(user)
+        .where(whereCondition)
+        .limit(1);
+
+      return {
+        success: true,
+        data: { available: !existingUser },
+      };
+    } catch (error) {
+      console.error("Error checking profile name availability:", error);
+      return {
+        success: false,
+        errors: [
+          {
+            code: "DATABASE_ERROR",
+            message: "Unable to verify profile name. Please try again.",
+          },
+        ],
+      };
+    }
+  });
 
 export const listUserLocations = createServerFn({ method: "GET" })
   .validator(zod$(listUserLocationsSchema))

@@ -24,11 +24,17 @@ import {
   languageOptions,
 } from "~/shared/types/common";
 import { TagInput } from "~/shared/ui/tag-input";
-import { completeUserProfile } from "../profile.mutations";
-import { getUserProfile } from "../profile.queries";
-import type { ProfileInputType } from "../profile.schemas";
-import type { ProfileInput, UserProfile } from "../profile.types";
+import { invalidateProfileCaches } from "../profile.cache";
+import { completeUserProfile, updateUserProfile } from "../profile.mutations";
+import { checkProfileNameAvailability, getUserProfile } from "../profile.queries";
+import { type CompleteProfileInputType, type ProfileInputType } from "../profile.schemas";
+import type { UserProfile } from "../profile.types";
 import { defaultPrivacySettings } from "../profile.types";
+import {
+  normalizeProfileName,
+  sanitizeProfileName,
+  validateProfileNameValue,
+} from "../profile.utils";
 import { AvailabilityEditor } from "./availability-editor";
 import { GamePreferencesStep } from "./game-preferences-step";
 
@@ -66,6 +72,14 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
+  const [nameAvailability, setNameAvailability] = useState<{
+    normalizedName: string;
+    available: boolean;
+  } | null>(null);
+  const initialNormalizedProfileName = normalizeProfileName(initialData.name ?? "");
+  const [reservedName, setReservedName] = useState<string | null>(
+    initialNormalizedProfileName ? initialNormalizedProfileName : null,
+  );
   // Merge initial data with default privacy settings to ensure all required fields are present
   const formDefaultValues = {
     ...initialData,
@@ -86,18 +100,28 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     onSubmit: async ({ value }) => {
       setError(null);
       try {
-        const result = await completeUserProfile({ data: value as ProfileInput });
+        const validation = await validateProfileName();
+        if (!validation.success) {
+          return;
+        }
+
+        const reserved = await reserveProfileName(
+          validation.sanitizedName,
+          validation.normalizedName,
+        );
+        if (!reserved) {
+          return;
+        }
+
+        const payload = {
+          ...value,
+          name: validation.sanitizedName,
+        } as CompleteProfileInputType;
+
+        const result = await completeUserProfile({ data: payload });
 
         if (result.success) {
-          // Invalidate all profile caches so subsequent profile views refetch fresh data
-          await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
-          if (result.data?.id) {
-            await queryClient.invalidateQueries({
-              queryKey: ["userProfile", result.data.id],
-            });
-          }
-          // Also invalidate generic user info if used elsewhere in UI
-          await queryClient.invalidateQueries({ queryKey: ["user"] });
+          await invalidateProfileCaches(queryClient, result.data?.id ?? initialData.id);
           router.navigate({ to: "/dashboard" });
         } else {
           const errorMessage = result.errors?.[0]?.message || "Failed to save profile";
@@ -112,8 +136,160 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
 
   const currentStepIndex = STEPS.findIndex((step) => step.id === currentStep);
 
-  const goToStep = (stepId: StepId) => setCurrentStep(stepId);
-  const goToNextStep = () => {
+  const updateNameFieldMeta = (errors: string[], extra?: { isValidating?: boolean }) => {
+    form.setFieldMeta("name", (prev) => ({
+      ...(prev ?? {}),
+      isTouched: true,
+      isBlurred: true,
+      errors,
+      ...(extra ?? {}),
+    }));
+  };
+
+  const validateProfileName = async (): Promise<
+    { success: true; sanitizedName: string; normalizedName: string } | { success: false }
+  > => {
+    const rawName = form.state.values.name ?? "";
+    const validation = validateProfileNameValue(rawName);
+
+    if (!validation.success) {
+      updateNameFieldMeta([validation.error], { isValidating: false });
+      setNameAvailability(null);
+      setError(validation.error);
+      return { success: false };
+    }
+
+    const sanitizedName = validation.value;
+    const normalizedName = normalizeProfileName(sanitizedName);
+    const initialNormalizedName = initialNormalizedProfileName;
+
+    if (sanitizedName !== form.state.values.name) {
+      form.setFieldValue("name", sanitizedName);
+    }
+
+    if (normalizedName === initialNormalizedName) {
+      updateNameFieldMeta([], { isValidating: false });
+      setNameAvailability({ normalizedName, available: true });
+      setError(null);
+      return { success: true, sanitizedName, normalizedName };
+    }
+
+    if (
+      nameAvailability &&
+      nameAvailability.available &&
+      nameAvailability.normalizedName === normalizedName
+    ) {
+      updateNameFieldMeta([], { isValidating: false });
+      setError(null);
+      return { success: true, sanitizedName, normalizedName };
+    }
+
+    try {
+      updateNameFieldMeta([], { isValidating: true });
+      const result = await checkProfileNameAvailability({
+        data: { name: sanitizedName },
+      });
+
+      if (!result.success) {
+        const message =
+          result.errors?.[0]?.message ||
+          "Unable to verify profile name. Please try again.";
+        updateNameFieldMeta([message], { isValidating: false });
+        setNameAvailability(null);
+        setError(message);
+        return { success: false };
+      }
+
+      if (!result.data.available) {
+        const message = "That profile name is already taken";
+        updateNameFieldMeta([message], { isValidating: false });
+        setNameAvailability({ normalizedName, available: false });
+        setError(message);
+        return { success: false };
+      }
+
+      updateNameFieldMeta([], { isValidating: false });
+      setNameAvailability({ normalizedName, available: true });
+      setError(null);
+      return { success: true, sanitizedName, normalizedName };
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Unable to verify profile name. Please try again.";
+      updateNameFieldMeta([message], { isValidating: false });
+      setNameAvailability(null);
+      setError(message);
+      return { success: false };
+    }
+  };
+
+  const reserveProfileName = async (
+    sanitizedName: string,
+    normalizedName: string,
+  ): Promise<boolean> => {
+    if (reservedName === normalizedName) {
+      return true;
+    }
+
+    try {
+      const result = await updateUserProfile({ data: { name: sanitizedName } });
+
+      if (!result.success) {
+        const message = result.errors?.[0]?.message || "Failed to reserve profile name";
+        updateNameFieldMeta([message], { isValidating: false });
+        setError(message);
+        setNameAvailability(null);
+        return false;
+      }
+
+      setReservedName(normalizedName);
+      setNameAvailability({ normalizedName, available: true });
+      setError(null);
+      return true;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to reserve profile name";
+      updateNameFieldMeta([message], { isValidating: false });
+      setError(message);
+      setNameAvailability(null);
+      return false;
+    }
+  };
+
+  const goToStep = async (stepId: StepId) => {
+    if (currentStep === "personal" && stepId !== "personal") {
+      const validation = await validateProfileName();
+      if (!validation.success) {
+        return;
+      }
+      const reserved = await reserveProfileName(
+        validation.sanitizedName,
+        validation.normalizedName,
+      );
+      if (!reserved) {
+        return;
+      }
+    }
+
+    setCurrentStep(stepId);
+  };
+
+  const goToNextStep = async () => {
+    if (currentStep === "personal") {
+      const validation = await validateProfileName();
+      if (!validation.success) {
+        return;
+      }
+      const reserved = await reserveProfileName(
+        validation.sanitizedName,
+        validation.normalizedName,
+      );
+      if (!reserved) {
+        return;
+      }
+    }
+
     const nextIndex = currentStepIndex + 1;
     if (nextIndex < STEPS.length) {
       setCurrentStep(STEPS[nextIndex].id);
@@ -122,6 +298,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
   const goToPreviousStep = () => {
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
+      setError(null);
       setCurrentStep(STEPS[prevIndex].id);
     }
   };
@@ -163,7 +340,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
         {STEPS.map((step, index) => (
           <button
             key={step.id}
-            onClick={() => goToStep(step.id)}
+            onClick={() => void goToStep(step.id)}
             className={cn(
               "flex items-center gap-2 text-sm font-medium transition-colors",
               index <= currentStepIndex ? "text-primary" : "text-muted-foreground",
@@ -193,13 +370,13 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
       )}
 
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           e.stopPropagation();
           if (isLastStep) {
             form.handleSubmit();
           } else {
-            goToNextStep();
+            await goToNextStep();
           }
         }}
       >
@@ -212,6 +389,35 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
             {/* Personal Information Step */}
             {currentStep === "personal" && (
               <>
+                <form.Field name="name">
+                  {(field) => (
+                    <ValidatedInput
+                      field={field}
+                      label="Profile Name"
+                      placeholder="choose a unique username"
+                      description="This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
+                      autoComplete="username"
+                      maxLength={30}
+                      required
+                      disableWhileSubmitting={false}
+                      onValueChange={(value) => {
+                        const sanitizedValue = sanitizeProfileName(value);
+                        setNameAvailability(null);
+                        setError(null);
+                        form.setFieldMeta("name", (prev) => ({
+                          ...(prev ?? {}),
+                          errors: [],
+                          isValidating: false,
+                        }));
+                        field.handleChange(sanitizedValue);
+                      }}
+                      onBlurCapture={() => {
+                        void validateProfileName();
+                      }}
+                    />
+                  )}
+                </form.Field>
+
                 <form.Field name="gender">
                   {(field) => (
                     <ValidatedSelect
@@ -257,7 +463,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     <ValidatedInput
                       field={field}
                       label="Country (optional)"
-                      placeholder="e.g., Canada"
+                      placeholder="e.g., Germany"
                     />
                   )}
                 </form.Field>

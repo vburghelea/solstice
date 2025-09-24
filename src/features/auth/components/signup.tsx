@@ -6,6 +6,11 @@ import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { checkProfileNameAvailability } from "~/features/profile/profile.queries";
+import {
+  sanitizeProfileName,
+  validateProfileNameValue,
+} from "~/features/profile/profile.utils";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 import { signupFormFields } from "../auth.schemas";
@@ -31,8 +36,65 @@ export default function SignupForm() {
       setErrorMessage("");
 
       try {
+        const sanitizedInput = sanitizeProfileName(value.name ?? "");
+        const nameValidation = validateProfileNameValue(value.name ?? "");
+
+        const setNameError = (message: string) => {
+          setErrorMessage(message);
+          form.setFieldMeta("name", (prev) => ({
+            ...(prev ?? {}),
+            errors: message ? [message] : [],
+            isTouched: true,
+            isBlurred: true,
+          }));
+        };
+
+        if (!sanitizedInput || !nameValidation.success) {
+          const message = nameValidation.success
+            ? "Profile name must contain allowed characters"
+            : nameValidation.error;
+          setNameError(message);
+          form.setFieldValue("name", sanitizedInput);
+          setIsLoading(false);
+          return;
+        }
+
+        const sanitizedName = nameValidation.value;
+        if (sanitizedName !== form.state.values.name) {
+          form.setFieldValue("name", sanitizedName);
+        }
+
+        const availabilityResult = await checkProfileNameAvailability({
+          data: { name: sanitizedName },
+        });
+
+        if (!availabilityResult.success) {
+          const message =
+            availabilityResult.errors?.[0]?.message ||
+            "Unable to verify profile name. Please try again.";
+          setNameError(message);
+          form.setFieldValue("name", sanitizedName);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!availabilityResult.data.available) {
+          setNameError("That profile name is already taken");
+          form.setFieldValue("name", sanitizedName);
+          setIsLoading(false);
+          return;
+        }
+
+        form.setFieldValue("name", sanitizedName);
+        form.setFieldMeta("name", (prev) => ({
+          ...(prev ?? {}),
+          errors: [],
+          isTouched: true,
+          isBlurred: true,
+        }));
+
         const result = await auth.signUp.email({
-          name: value.name,
+          name: sanitizedName,
           email: value.email,
           password: value.password,
           callbackURL: redirectUrl,
@@ -51,7 +113,7 @@ export default function SignupForm() {
         setErrorMessage((error as Error)?.message || "Signup failed");
         // Keep form values but reset submitting state by resetting with current values
         form.reset({
-          name: value.name,
+          name: form.state.values.name,
           email: value.email,
           password: value.password,
           confirmPassword: value.confirmPassword,

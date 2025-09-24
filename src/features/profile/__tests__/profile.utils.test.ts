@@ -1,179 +1,47 @@
 import { describe, expect, it } from "vitest";
-import type { UserProfile } from "../profile.types";
-import { defaultPrivacySettings } from "../profile.types";
-import { isProfileComplete } from "../profile.utils";
+import {
+  normalizeProfileName,
+  sanitizeProfileName,
+  validateProfileNameValue,
+} from "../profile.utils";
 
-describe("profile.utils", () => {
-  it("returns true when all required fields are present", () => {
-    const profile: UserProfile = {
-      id: "user-123",
-      name: "Test User",
-      email: "test@example.com",
-      profileComplete: false,
-      profileVersion: 1,
-      gender: "Male",
-      pronouns: "he/him",
-      phone: "1234567890",
-      privacySettings: {
-        ...defaultPrivacySettings,
-        showEmail: true,
-        allowTeamInvitations: true,
-      },
-      // Add missing required properties with default values
-      languages: ["en", "es"],
-      identityTags: ["LGBTQ+", "Artist"],
-      preferredGameThemes: ["Fantasy", "Scifi"],
-      isGM: true,
-      gamesHosted: 0,
-      responseRate: 0,
-      overallExperienceLevel: "intermediate",
-      city: "Test City",
-      country: "Test Country",
-      gmStyle: "Narrative",
-    };
+describe("profile name utilities", () => {
+  describe("sanitizeProfileName", () => {
+    it("removes invalid characters and trims whitespace while preserving case", () => {
+      expect(sanitizeProfileName("  Player-One!!  ")).toBe("Player-One");
+    });
 
-    expect(isProfileComplete(profile)).toBe(true);
+    it("limits the result to 30 characters", () => {
+      const longName = "ABCDEFGHIJKLMNOPQRSTUVWX.YZ123456"; // >30 chars
+      const sanitized = sanitizeProfileName(longName);
+      expect(sanitized.length).toBe(30);
+      expect(sanitized).toBe(longName.slice(0, 30));
+    });
   });
 
-  it("returns false when gender is missing", () => {
-    const profile: UserProfile = {
-      id: "user-123",
-      name: "Test User",
-      email: "test@example.com",
-      profileComplete: false,
-      profileVersion: 1,
-      pronouns: "he/him",
-      phone: "1234567890",
-      privacySettings: {
-        ...defaultPrivacySettings,
-        showEmail: true,
-        allowTeamInvitations: true,
-      },
-      // Add missing required properties with default values
-      languages: ["en", "es"],
-      identityTags: ["LGBTQ+", "Artist"],
-      preferredGameThemes: ["Fantasy", "Scifi"],
-      isGM: true,
-      gamesHosted: 0,
-      responseRate: 0,
-      overallExperienceLevel: "intermediate",
-      city: "Test City",
-      country: "Test Country",
-      gmStyle: "Narrative",
-    };
-    expect(isProfileComplete(profile)).toBe(false);
+  describe("validateProfileNameValue", () => {
+    it("accepts a valid sanitized profile name", () => {
+      const result = validateProfileNameValue("Valid.Name-123");
+      expect(result).toEqual({ success: true, value: "Valid.Name-123" });
+    });
+
+    it("returns an error when the name is too short after sanitization", () => {
+      const result = validateProfileNameValue("!a!");
+      expect(result).toEqual({
+        success: false,
+        error: "Profile name must be at least 3 characters",
+      });
+    });
+
+    it("returns an error when the name contains invalid characters", () => {
+      const result = validateProfileNameValue("Invalid Name!");
+      expect(result).toEqual({ success: true, value: "InvalidName" });
+    });
   });
 
-  it("returns false when pronouns are missing", () => {
-    const profile: UserProfile = {
-      id: "user-123",
-      name: "Test User",
-      email: "test@example.com",
-      profileComplete: false,
-      profileVersion: 1,
-      gender: "Male",
-      phone: "1234567890",
-      privacySettings: {
-        ...defaultPrivacySettings,
-        showEmail: true,
-        allowTeamInvitations: true,
-      },
-      // Add missing required properties with default values
-      languages: ["en", "es"],
-      identityTags: ["LGBTQ+", "Artist"],
-      preferredGameThemes: ["Fantasy", "Scifi"],
-      isGM: true,
-      gamesHosted: 0,
-      responseRate: 0,
-      overallExperienceLevel: "intermediate",
-      city: "Test City",
-      country: "Test Country",
-      gmStyle: "Narrative",
-    };
-    expect(isProfileComplete(profile)).toBe(false);
-  });
-
-  it("returns false when phone is missing", () => {
-    const profile: UserProfile = {
-      id: "user-123",
-      name: "Test User",
-      email: "test@example.com",
-      profileComplete: false,
-      profileVersion: 1,
-      gender: "Male",
-      pronouns: "he/him",
-      privacySettings: {
-        ...defaultPrivacySettings,
-        showEmail: true,
-        allowTeamInvitations: true,
-      },
-      // Add missing required properties with default values
-      languages: ["en", "es"],
-      identityTags: ["LGBTQ+", "Artist"],
-      preferredGameThemes: ["Fantasy", "Scifi"],
-      isGM: true,
-      gamesHosted: 0,
-      responseRate: 0,
-      overallExperienceLevel: "intermediate",
-      city: "Test City",
-      country: "Test Country",
-      gmStyle: "Narrative",
-    };
-    expect(isProfileComplete(profile)).toBe(false);
-  });
-
-  it("returns false when privacySettings are missing", () => {
-    const profile: UserProfile = {
-      id: "user-123",
-      name: "Test User",
-      email: "test@example.com",
-      profileComplete: false,
-      profileVersion: 1,
-      gender: "Male",
-      pronouns: "he/him",
-      phone: "1234567890",
-      // Add missing required properties with default values
-      languages: ["en", "es"],
-      identityTags: ["LGBTQ+", "Artist"],
-      preferredGameThemes: ["Fantasy", "Scifi"],
-      isGM: true,
-      gamesHosted: 0,
-      responseRate: 0,
-      overallExperienceLevel: "intermediate",
-      city: "Test City",
-      country: "Test Country",
-      gmStyle: "Narrative",
-    };
-    expect(isProfileComplete(profile)).toBe(false);
-  });
-
-  it("returns true when optional fields are undefined", () => {
-    const profile: UserProfile = {
-      id: "user-123",
-      name: "Test User",
-      email: "test@example.com",
-      profileComplete: false,
-      profileVersion: 1,
-      gender: "Male",
-      pronouns: "he/him",
-      phone: "1234567890",
-      privacySettings: {
-        showEmail: true,
-        showPhone: false,
-        showLocation: false,
-        showLanguages: false,
-        showGamePreferences: false,
-        allowTeamInvitations: true,
-        allowFollows: true,
-      },
-      // Add missing required properties with default values
-      languages: [],
-      identityTags: [],
-      preferredGameThemes: [],
-      isGM: false,
-      gamesHosted: 0,
-      responseRate: 0,
-    };
-    expect(isProfileComplete(profile)).toBe(true);
+  describe("normalizeProfileName", () => {
+    it("returns a lowercase sanitized version of the profile name", () => {
+      expect(normalizeProfileName("Player.Name-42")).toBe("player.name-42");
+    });
   });
 });

@@ -16,6 +16,7 @@ import { GameParticipantsList } from "~/features/games/components/GameParticipan
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 
 import { ProfileLink } from "~/components/ProfileLink";
+import { Badge } from "~/components/ui/badge";
 import { GMReviewForm } from "~/features/games/components/GMReviewForm";
 import { ManageInvitations } from "~/features/games/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
@@ -41,7 +42,6 @@ import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { strings } from "~/shared/lib/strings";
 import type { OperationResult } from "~/shared/types/common";
-import { Badge } from "~/components/ui/badge";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 

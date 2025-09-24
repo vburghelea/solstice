@@ -30,7 +30,7 @@ export async function handleFollow(body: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/social/follow").methods({
   POST: async ({ request }: { request: Request }) => {
     const body = await request.json();
     return handleFollow(body);

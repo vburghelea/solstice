@@ -22,11 +22,11 @@ import {
   confirmMembershipPurchase,
   createCheckoutSession,
 } from "~/features/membership/membership.mutations";
-import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import {
   getUserMembershipStatus,
   listMembershipTypes,
 } from "~/features/membership/membership.queries";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export const Route = createFileRoute("/dashboard/membership")({
   component: MembershipPage,

@@ -3,9 +3,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { useState } from "react";
-import { createCampaign } from "~/features/campaigns/campaigns.mutations";
-import { createCampaignInputSchema } from "~/features/campaigns/campaigns.schemas";
-import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import {
   Card,
   CardContent,
@@ -13,6 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { createCampaign } from "~/features/campaigns/campaigns.mutations";
+import { createCampaignInputSchema } from "~/features/campaigns/campaigns.schemas";
+import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 
 export const Route = createFileRoute("/dashboard/campaigns/create")({
   component: CreateCampaignPage,

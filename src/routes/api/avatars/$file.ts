@@ -28,7 +28,7 @@ export async function getAvatarResponse(
   }
 }
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/avatars/$file").methods({
   GET: async ({ params }: { params: { file?: string } }) =>
     getAvatarResponse(params.file),
 });

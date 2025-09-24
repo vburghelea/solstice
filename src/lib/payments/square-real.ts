@@ -185,8 +185,7 @@ export class SquarePaymentService {
           allowTipping: false,
           redirectUrl: `${baseUrl}/api/payments/square/callback`,
           askForShippingAddress: false,
-          merchantSupportEmail:
-            process.env["SUPPORT_EMAIL"] || "support@roundup.games",
+          merchantSupportEmail: process.env["SUPPORT_EMAIL"] || "support@roundup.games",
         },
         paymentNote: `Event registration ${params.registrationId} for event ${params.eventId}`,
       };

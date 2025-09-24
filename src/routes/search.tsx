@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { buttonVariants } from "~/components/ui/button";
 import { GameListItemView } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
-import { buttonVariants } from "~/components/ui/button";
 import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/search")({

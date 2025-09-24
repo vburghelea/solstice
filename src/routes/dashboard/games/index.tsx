@@ -3,6 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Calendar, ChevronRight, Gamepad2, PlusIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import {
   Select,
@@ -19,8 +21,6 @@ import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 
 function getStatusBadgeVariant(status: GameListItem["status"]) {
   switch (status) {

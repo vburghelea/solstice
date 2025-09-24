@@ -1,6 +1,6 @@
 import { createServerFileRoute } from "@tanstack/react-start/server";
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/test-square").methods({
   GET: async () => {
     const hasAccessToken = !!process.env["SQUARE_ACCESS_TOKEN"];
     const hasLocationId = !!process.env["SQUARE_LOCATION_ID"];

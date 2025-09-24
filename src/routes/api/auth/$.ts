@@ -3,7 +3,7 @@ import { getAuth } from "~/lib/auth/server-helpers";
 
 type RequestContext = { request: Request };
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/auth/$").methods({
   GET: async ({ request }: RequestContext) => {
     const auth = await getAuth();
     return await auth.handler(request);

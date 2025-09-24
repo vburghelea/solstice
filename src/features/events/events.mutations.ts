@@ -38,6 +38,7 @@ import {
   currentTimestamp,
   getClockFromContext,
   isoTimestamp,
+  markEtransferPaidMetadata,
   markEtransferReminderMetadata,
 } from "./utils";
 
@@ -931,7 +932,132 @@ export const registerForEvent = createServerFn({ method: "POST" })
 
 export const markEventEtransferPaid = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(markEtransferPaidSchema));
+  .validator(zod$(markEtransferPaidSchema))
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<EventOperationResult<EventRegistrationWithRoster>> => {
+      try {
+        const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
+
+        const db = await getDb();
+        const user = requireUser(context);
+        const clock = getClockFromContext(context);
+
+        const registrationWithEvent = await db
+          .select({
+            registration: eventRegistrations,
+            event: events,
+          })
+          .from(eventRegistrations)
+          .innerJoin(events, eq(eventRegistrations.eventId, events.id))
+          .where(eq(eventRegistrations.id, data.registrationId))
+          .limit(1);
+
+        if (registrationWithEvent.length === 0) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "NOT_FOUND",
+                message: "Registration not found",
+              },
+            ],
+          };
+        }
+
+        const [{ registration, event }] = registrationWithEvent;
+
+        const isOrganizer = event.organizerId === user.id;
+        let isGlobalAdmin = false;
+        if (!isOrganizer) {
+          const { isAdmin } = await import("~/lib/auth/utils/admin-check");
+          isGlobalAdmin = await isAdmin(user.id);
+        }
+
+        if (!isOrganizer && !isGlobalAdmin) {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "FORBIDDEN",
+                message: "You do not have permission to update this registration",
+              },
+            ],
+          };
+        }
+
+        if (registration.paymentMethod !== "etransfer") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "Only e-transfer registrations can be marked as paid",
+              },
+            ],
+          };
+        }
+
+        if (registration.paymentStatus === "paid") {
+          return {
+            success: false,
+            errors: [
+              {
+                code: "VALIDATION_ERROR",
+                message: "Registration is already marked as paid",
+              },
+            ],
+          };
+        }
+
+        const now = currentTimestamp(clock);
+        const existingMetadata = (registration.paymentMetadata ||
+          {}) as EventPaymentMetadata;
+        const updatedMetadata = markEtransferPaidMetadata(
+          existingMetadata,
+          user.id,
+          clock,
+        );
+
+        const nextStatus =
+          registration.status === "canceled" ? registration.status : "confirmed";
+        const resolvedAmountPaid =
+          registration.amountPaidCents ?? registration.amountDueCents;
+
+        const [updatedRegistration] = await db
+          .update(eventRegistrations)
+          .set({
+            paymentStatus: "paid",
+            status: nextStatus,
+            paymentCompletedAt: now,
+            confirmedAt: nextStatus === "confirmed" ? now : registration.confirmedAt,
+            amountPaidCents: resolvedAmountPaid,
+            paymentMetadata: updatedMetadata,
+            updatedAt: now,
+          })
+          .where(eq(eventRegistrations.id, data.registrationId))
+          .returning();
+
+        return {
+          success: true,
+          data: castRegistrationJsonbFields(updatedRegistration),
+        };
+      } catch (error) {
+        console.error("Error marking e-transfer paid:", error);
+        return {
+          success: false,
+          errors: [
+            {
+              code: "DATABASE_ERROR",
+              message: "Failed to update registration",
+            },
+          ],
+        };
+      }
+    },
+  );
 
 export const markEventEtransferReminder = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())

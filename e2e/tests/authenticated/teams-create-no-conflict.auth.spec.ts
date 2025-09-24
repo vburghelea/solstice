@@ -68,13 +68,13 @@ test.describe("Team Creation Without Conflict", () => {
       await slugField.click();
       await slugField.fill(uniqueTeam.slug);
 
-    const cityField = page.getByLabel("City");
-    await cityField.click();
-    await cityField.fill("Berlin");
+      const cityField = page.getByLabel("City");
+      await cityField.click();
+      await cityField.fill("Berlin");
 
-    // Select country from combobox
-    await page.getByLabel("Country").click();
-    await page.getByRole("option", { name: "Germany" }).click();
+      // Select country from combobox
+      await page.getByLabel("Country").click();
+      await page.getByRole("option", { name: "Germany" }).click();
 
       // Select country from combobox
       await page.getByLabel("Country").click();

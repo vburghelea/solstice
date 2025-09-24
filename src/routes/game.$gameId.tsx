@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Button } from "~/components/ui/button";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { useAuth } from "~/features/auth/hooks/useAuth";
 import { applyToGame } from "~/features/games/games.mutations";
@@ -9,7 +10,6 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
-import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/game/$gameId")({
   loader: async ({ params }) => {

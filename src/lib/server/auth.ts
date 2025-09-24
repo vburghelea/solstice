@@ -1,5 +1,8 @@
+import {
+  authMiddleware,
+  type AuthedRequestContext,
+} from "~/lib/auth/middleware/auth-guard";
 import type { AuthUser } from "~/lib/auth/types";
-import { authMiddleware, type AuthedRequestContext } from "~/lib/auth/middleware/auth-guard";
 import { unauthorized } from "~/lib/server/errors";
 
 // Middleware for authenticated server functions

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { TeamMemberRole, TeamMemberStatus } from "~/db/schema";
-import { requireUser, getAuthMiddleware } from "~/lib/server/auth";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { forbidden, notFound, validationError } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import {

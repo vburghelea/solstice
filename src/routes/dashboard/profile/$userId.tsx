@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -33,7 +34,6 @@ import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { strings } from "~/shared/lib/strings";
 import { gmStrengthIcons, gmStrengthLabels } from "~/shared/types/common";
-import { Badge } from "~/components/ui/badge";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/profile/$userId")({

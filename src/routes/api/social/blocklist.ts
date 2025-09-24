@@ -27,7 +27,7 @@ export async function handleBlocklist(input: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/social/blocklist").methods({
   GET: async ({ request }: { request: Request }) => {
     const url = new URL(request.url);
     const page = url.searchParams.get("page");

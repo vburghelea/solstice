@@ -2,15 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { SystemsDashboardTable } from "~/features/game-systems/admin/components/systems-dashboard-table";
-import { listAdminGameSystems } from "~/features/game-systems/admin/game-systems-admin.queries";
-import type { ListAdminGameSystemsInput } from "~/features/game-systems/admin/game-systems-admin.schemas";
-import type {
-  AdminGameSystemListResponse,
-  AdminSystemSortOption,
-  AdminSystemStatusFilter,
-} from "~/features/game-systems/admin/game-systems-admin.types";
-import { requireRole } from "~/lib/auth/middleware/role-guard";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -28,6 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { SystemsDashboardTable } from "~/features/game-systems/admin/components/systems-dashboard-table";
+import { listAdminGameSystems } from "~/features/game-systems/admin/game-systems-admin.queries";
+import type { ListAdminGameSystemsInput } from "~/features/game-systems/admin/game-systems-admin.schemas";
+import type {
+  AdminGameSystemListResponse,
+  AdminSystemSortOption,
+  AdminSystemStatusFilter,
+} from "~/features/game-systems/admin/game-systems-admin.types";
+import { requireRole } from "~/lib/auth/middleware/role-guard";
 
 const DEFAULT_STATUS: AdminSystemStatusFilter = "all";
 const DEFAULT_SORT: AdminSystemSortOption = "updated-desc";

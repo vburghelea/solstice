@@ -21,9 +21,9 @@ import {
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import { COUNTRIES } from "~/shared/hooks/useCountries";
 import { createEvent } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
-import { COUNTRIES } from "~/shared/hooks/useCountries";
 
 const EVENT_TYPE_OPTIONS = [
   { value: "tournament", label: "Tournament" },
@@ -280,8 +280,8 @@ export function EventCreateForm() {
       <CardHeader>
         <CardTitle>Create New Event</CardTitle>
         <CardDescription>
-          Fill in the details to create a new Roundup Games event. You can save as draft and
-          publish later.
+          Fill in the details to create a new Roundup Games event. You can save as draft
+          and publish later.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -464,11 +464,7 @@ export function EventCreateForm() {
 
                 <form.Field name="country">
                   {(field) => (
-                    <ValidatedSelect
-                      field={field}
-                      label="Country"
-                      options={COUNTRIES}
-                    />
+                    <ValidatedSelect field={field} label="Country" options={COUNTRIES} />
                   )}
                 </form.Field>
 

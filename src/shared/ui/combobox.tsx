@@ -1,7 +1,6 @@
 import { Check } from "lucide-react";
 import { useState } from "react";
 
-import { cn } from "~/shared/lib/utils";
 import {
   Command,
   CommandEmpty,
@@ -11,6 +10,7 @@ import {
   CommandList,
 } from "~/components/ui/command";
 import { Label } from "~/components/ui/label";
+import { cn } from "~/shared/lib/utils";
 
 export interface ComboboxProps {
   options: { value: string; label: string }[];

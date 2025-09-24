@@ -127,7 +127,8 @@ function EventsIndex() {
             {!isLoading && !isError && filteredEvents.length === 0 && (
               <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-600 sm:col-span-2 lg:col-span-3">
                 No events match this filter right now. Submit your club details to
-                events@roundup.games and we’ll add your tournament to the national calendar.
+                events@roundup.games and we’ll add your tournament to the national
+                calendar.
               </div>
             )}
             {!isLoading &&

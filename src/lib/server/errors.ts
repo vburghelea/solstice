@@ -18,15 +18,21 @@ export class TypedServerError extends Error {
   }
 }
 
-const createError = (code: ServerError["code"], message: string, details?: ServerError["details"]) =>
-  new TypedServerError({ code, message, ...(details ? { details } : {}) });
+const createError = (
+  code: ServerError["code"],
+  message: string,
+  details?: ServerError["details"],
+) => new TypedServerError({ code, message, ...(details ? { details } : {}) });
 
-export const unauthorized = (message = "Unauthorized") => createError("UNAUTHORIZED", message);
+export const unauthorized = (message = "Unauthorized") =>
+  createError("UNAUTHORIZED", message);
 export const forbidden = (message = "Forbidden") => createError("FORBIDDEN", message);
-export const notFound = (message = "Resource not found") => createError("NOT_FOUND", message);
+export const notFound = (message = "Resource not found") =>
+  createError("NOT_FOUND", message);
 export const validationError = (message: string, details?: ServerError["details"]) =>
   createError("VALIDATION", message, details);
-export const internalError = (message = "Internal server error") => createError("INTERNAL", message);
+export const internalError = (message = "Internal server error") =>
+  createError("INTERNAL", message);
 
 export const isTypedServerError = (error: unknown): error is TypedServerError =>
   error instanceof TypedServerError;

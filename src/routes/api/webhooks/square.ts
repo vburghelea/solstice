@@ -364,7 +364,7 @@ export const __squareWebhookTestUtils = {
   normalizeSquareStatus,
 };
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/webhooks/square").methods({
   POST: async ({ request }: { request: Request }) => {
     try {
       // Get the raw body for signature verification

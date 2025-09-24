@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { useMemo, useRef, useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import {
   getGameSystems,
   type GameSystemSummary,
@@ -8,8 +10,6 @@ import {
 import { useDebounce } from "~/shared/lib/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult, OptionalFetcher } from "~/shared/types/common";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 
 interface GameTagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   tags: { id: number; name: string }[];

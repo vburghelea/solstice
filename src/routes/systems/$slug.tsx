@@ -1,9 +1,5 @@
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 
-import { SystemHero } from "~/features/game-systems/components/system-hero";
-import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
-import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -15,6 +11,10 @@ import {
 } from "~/components/ui/card";
 import { ArrowLeftIcon, CalendarIcon, LinkIcon, UsersIcon } from "~/components/ui/icons";
 import { Separator } from "~/components/ui/separator";
+import { SystemHero } from "~/features/game-systems/components/system-hero";
+import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
+import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
+import { PublicLayout } from "~/features/layouts/public-layout";
 
 export const Route = createFileRoute("/systems/$slug")({
   loader: async ({ params }) => {

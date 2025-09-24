@@ -5,6 +5,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -29,15 +36,9 @@ import type {
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 
 import { ProfileLink } from "~/components/ProfileLink";
+import { Badge } from "~/components/ui/badge";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { ManageInvitations } from "~/features/campaigns/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation";
@@ -49,7 +50,6 @@ import { getRelationshipSnapshot } from "~/features/social";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
-import { Badge } from "~/components/ui/badge";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { UserAvatar } from "~/shared/ui/user-avatar";
 

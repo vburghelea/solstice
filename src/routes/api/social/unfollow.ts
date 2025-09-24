@@ -30,7 +30,7 @@ export async function handleUnfollow(body: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute().methods({
+export const ServerRoute = createServerFileRoute("/api/social/unfollow").methods({
   POST: async ({ request }: { request: Request }) => {
     const body = await request.json();
     return handleUnfollow(body);

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { FieldComponentProps, isFieldApi } from "~/lib/form";
 import {
   Select,
   SelectContent,
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { FieldComponentProps, isFieldApi } from "~/lib/form";
 
 interface DateTimePickerProps extends FieldComponentProps {
   minDate?: Date;

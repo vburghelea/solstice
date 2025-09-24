@@ -8,1335 +8,1665 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as TeamsRouteImport } from './routes/teams'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as ResourcesRouteImport } from './routes/resources'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as DesignSystemRouteImport } from './routes/design-system'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as OnboardingRouteRouteImport } from './routes/onboarding/route'
-import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
-import { Route as AuthRouteRouteImport } from './routes/auth/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SystemsIndexRouteImport } from './routes/systems/index'
-import { Route as OnboardingIndexRouteImport } from './routes/onboarding/index'
-import { Route as EventsIndexRouteImport } from './routes/events/index'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as SystemsSlugRouteImport } from './routes/systems/$slug'
-import { Route as GameGameIdRouteImport } from './routes/game.$gameId'
-import { Route as EventsSlugRouteImport } from './routes/events/$slug'
-import { Route as EventEventIdRouteImport } from './routes/event.$eventId'
-import { Route as DashboardTeamsRouteImport } from './routes/dashboard/teams'
-import { Route as DashboardSystemsRouteImport } from './routes/dashboard/systems'
-import { Route as DashboardSocialAuditsRouteImport } from './routes/dashboard/social-audits'
-import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
-import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
-import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
-import { Route as DashboardMembershipRouteImport } from './routes/dashboard/membership'
-import { Route as DashboardMembersRouteImport } from './routes/dashboard/members'
-import { Route as DashboardGamesRouteImport } from './routes/dashboard/games'
-import { Route as DashboardForbiddenRouteImport } from './routes/dashboard/forbidden'
-import { Route as DashboardEventsRouteImport } from './routes/dashboard/events'
-import { Route as DashboardCampaignsRouteImport } from './routes/dashboard/campaigns'
-import { Route as AuthSignupRouteImport } from './routes/auth/signup'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
-import { Route as AdminRolesRouteImport } from './routes/admin/roles'
-import { Route as AdminEventsReviewRouteImport } from './routes/admin/events-review'
-import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admin/route'
-import { Route as EventsSlugIndexRouteImport } from './routes/events/$slug.index'
-import { Route as DevEmailIndexRouteImport } from './routes/dev/email/index'
-import { Route as DashboardTeamsIndexRouteImport } from './routes/dashboard/teams/index'
-import { Route as DashboardSystemsIndexRouteImport } from './routes/dashboard/systems/index'
-import { Route as DashboardProfileIndexRouteImport } from './routes/dashboard/profile/index'
-import { Route as DashboardGamesIndexRouteImport } from './routes/dashboard/games/index'
-import { Route as DashboardEventsIndexRouteImport } from './routes/dashboard/events/index'
-import { Route as DashboardCampaignsIndexRouteImport } from './routes/dashboard/campaigns/index'
-import { Route as EventsSlugRegisterRouteImport } from './routes/events/$slug.register'
-import { Route as DevEmailTemplateRouteImport } from './routes/dev/email/$template'
-import { Route as DashboardTeamsCreateRouteImport } from './routes/dashboard/teams/create'
-import { Route as DashboardTeamsBrowseRouteImport } from './routes/dashboard/teams/browse'
-import { Route as DashboardTeamsTeamIdRouteImport } from './routes/dashboard/teams/$teamId'
-import { Route as DashboardSystemsSystemIdRouteImport } from './routes/dashboard/systems/$systemId'
-import { Route as DashboardReviewsPendingRouteImport } from './routes/dashboard/reviews/pending'
-import { Route as DashboardProfileBlocklistRouteImport } from './routes/dashboard/profile/blocklist'
-import { Route as DashboardProfileUserIdRouteImport } from './routes/dashboard/profile/$userId'
-import { Route as DashboardGamesCreateRouteImport } from './routes/dashboard/games/create'
-import { Route as DashboardGamesGameIdRouteImport } from './routes/dashboard/games/$gameId'
-import { Route as DashboardEventsCreateRouteImport } from './routes/dashboard/events/create'
-import { Route as DashboardEventsEventIdRouteImport } from './routes/dashboard/events/$eventId'
-import { Route as DashboardCampaignsCreateRouteImport } from './routes/dashboard/campaigns/create'
-import { Route as DashboardCampaignsCampaignIdRouteImport } from './routes/dashboard/campaigns/$campaignId'
-import { Route as DashboardAdminRolesRouteImport } from './routes/dashboard/admin/roles'
-import { Route as DashboardAdminEventsReviewRouteImport } from './routes/dashboard/admin/events-review'
-import { Route as DashboardTeamsTeamIdIndexRouteImport } from './routes/dashboard/teams/$teamId.index'
-import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from './routes/dashboard/campaigns/$campaignId/index'
-import { Route as DashboardTeamsTeamIdMembersRouteImport } from './routes/dashboard/teams/$teamId.members'
-import { Route as DashboardTeamsTeamIdManageRouteImport } from './routes/dashboard/teams/$teamId.manage'
-import { Route as DashboardEventsEventIdManageRouteImport } from './routes/dashboard/events/$eventId.manage'
-import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from './routes/dashboard/campaigns/$campaignId/zero'
+import { createServerRootRoute } from "@tanstack/react-start/server";
+
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as TeamsRouteImport } from "./routes/teams";
+import { Route as SearchRouteImport } from "./routes/search";
+import { Route as ResourcesRouteImport } from "./routes/resources";
+import { Route as EventsRouteImport } from "./routes/events";
+import { Route as DesignSystemRouteImport } from "./routes/design-system";
+import { Route as AboutRouteImport } from "./routes/about";
+import { Route as OnboardingRouteRouteImport } from "./routes/onboarding/route";
+import { Route as DashboardRouteRouteImport } from "./routes/dashboard/route";
+import { Route as AuthRouteRouteImport } from "./routes/auth/route";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as SystemsIndexRouteImport } from "./routes/systems/index";
+import { Route as OnboardingIndexRouteImport } from "./routes/onboarding/index";
+import { Route as EventsIndexRouteImport } from "./routes/events/index";
+import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
+import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
+import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
+import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
+import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
+import { Route as DashboardTeamsRouteImport } from "./routes/dashboard/teams";
+import { Route as DashboardSystemsRouteImport } from "./routes/dashboard/systems";
+import { Route as DashboardSocialAuditsRouteImport } from "./routes/dashboard/social-audits";
+import { Route as DashboardSettingsRouteImport } from "./routes/dashboard/settings";
+import { Route as DashboardReportsRouteImport } from "./routes/dashboard/reports";
+import { Route as DashboardProfileRouteImport } from "./routes/dashboard/profile";
+import { Route as DashboardMembershipRouteImport } from "./routes/dashboard/membership";
+import { Route as DashboardMembersRouteImport } from "./routes/dashboard/members";
+import { Route as DashboardGamesRouteImport } from "./routes/dashboard/games";
+import { Route as DashboardForbiddenRouteImport } from "./routes/dashboard/forbidden";
+import { Route as DashboardEventsRouteImport } from "./routes/dashboard/events";
+import { Route as DashboardCampaignsRouteImport } from "./routes/dashboard/campaigns";
+import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
+import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
+import { Route as AuthLoginRouteImport } from "./routes/auth/login";
+import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
+import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
+import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
+import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
+import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
+import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
+import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
+import { Route as DashboardSystemsIndexRouteImport } from "./routes/dashboard/systems/index";
+import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/profile/index";
+import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
+import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
+import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
+import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
+import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$template";
+import { Route as DashboardTeamsCreateRouteImport } from "./routes/dashboard/teams/create";
+import { Route as DashboardTeamsBrowseRouteImport } from "./routes/dashboard/teams/browse";
+import { Route as DashboardTeamsTeamIdRouteImport } from "./routes/dashboard/teams/$teamId";
+import { Route as DashboardSystemsSystemIdRouteImport } from "./routes/dashboard/systems/$systemId";
+import { Route as DashboardReviewsPendingRouteImport } from "./routes/dashboard/reviews/pending";
+import { Route as DashboardProfileBlocklistRouteImport } from "./routes/dashboard/profile/blocklist";
+import { Route as DashboardProfileUserIdRouteImport } from "./routes/dashboard/profile/$userId";
+import { Route as DashboardGamesCreateRouteImport } from "./routes/dashboard/games/create";
+import { Route as DashboardGamesGameIdRouteImport } from "./routes/dashboard/games/$gameId";
+import { Route as DashboardEventsCreateRouteImport } from "./routes/dashboard/events/create";
+import { Route as DashboardEventsEventIdRouteImport } from "./routes/dashboard/events/$eventId";
+import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard/campaigns/create";
+import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
+import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
+import { Route as DashboardAdminEventsReviewRouteImport } from "./routes/dashboard/admin/events-review";
+import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
+import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from "./routes/dashboard/campaigns/$campaignId/index";
+import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
+import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
+import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+import { Route as DashboardCampaignsCampaignIdZeroRouteImport } from "./routes/dashboard/campaigns/$campaignId/zero";
+import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
+import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
+import { ServerRoute as ApiDebugSquareServerRouteImport } from "./routes/api/debug-square";
+import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
+import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
+import { ServerRoute as ApiSocialUnfollowServerRouteImport } from "./routes/api/social/unfollow";
+import { ServerRoute as ApiSocialUnblockServerRouteImport } from "./routes/api/social/unblock";
+import { ServerRoute as ApiSocialRelationshipServerRouteImport } from "./routes/api/social/relationship";
+import { ServerRoute as ApiSocialFollowServerRouteImport } from "./routes/api/social/follow";
+import { ServerRoute as ApiSocialBlocklistServerRouteImport } from "./routes/api/social/blocklist";
+import { ServerRoute as ApiSocialBlockServerRouteImport } from "./routes/api/social/block";
+import { ServerRoute as ApiAvatarsFileServerRouteImport } from "./routes/api/avatars/$file";
+import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
+import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
+import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
+
+const rootServerRouteImport = createServerRootRoute();
 
 const TeamsRoute = TeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
+  id: "/teams",
+  path: "/teams",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
+  id: "/search",
+  path: "/search",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ResourcesRoute = ResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
+  id: "/resources",
+  path: "/resources",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+  id: "/events",
+  path: "/events",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DesignSystemRoute = DesignSystemRouteImport.update({
-  id: '/design-system',
-  path: '/design-system',
+  id: "/design-system",
+  path: "/design-system",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+  id: "/about",
+  path: "/about",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OnboardingRouteRoute = OnboardingRouteRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+  id: "/onboarding",
+  path: "/onboarding",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+  id: "/dashboard",
+  path: "/dashboard",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AuthRouteRoute = AuthRouteRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+  id: "/auth",
+  path: "/auth",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const SystemsIndexRoute = SystemsIndexRouteImport.update({
-  id: '/systems/',
-  path: '/systems/',
+  id: "/systems/",
+  path: "/systems/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => OnboardingRouteRoute,
-} as any)
+} as any);
 const EventsIndexRoute = EventsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => EventsRoute,
-} as any)
+} as any);
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const SystemsSlugRoute = SystemsSlugRouteImport.update({
-  id: '/systems/$slug',
-  path: '/systems/$slug',
+  id: "/systems/$slug",
+  path: "/systems/$slug",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const GameGameIdRoute = GameGameIdRouteImport.update({
-  id: '/game/$gameId',
-  path: '/game/$gameId',
+  id: "/game/$gameId",
+  path: "/game/$gameId",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const EventsSlugRoute = EventsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
+  id: "/$slug",
+  path: "/$slug",
   getParentRoute: () => EventsRoute,
-} as any)
+} as any);
 const EventEventIdRoute = EventEventIdRouteImport.update({
-  id: '/event/$eventId',
-  path: '/event/$eventId',
+  id: "/event/$eventId",
+  path: "/event/$eventId",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
+  id: "/teams",
+  path: "/teams",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardSystemsRoute = DashboardSystemsRouteImport.update({
-  id: '/systems',
-  path: '/systems',
+  id: "/systems",
+  path: "/systems",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardSocialAuditsRoute = DashboardSocialAuditsRouteImport.update({
-  id: '/social-audits',
-  path: '/social-audits',
+  id: "/social-audits",
+  path: "/social-audits",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+  id: "/settings",
+  path: "/settings",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardReportsRoute = DashboardReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+  id: "/reports",
+  path: "/reports",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
+  id: "/profile",
+  path: "/profile",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
-  id: '/membership',
-  path: '/membership',
+  id: "/membership",
+  path: "/membership",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardMembersRoute = DashboardMembersRouteImport.update({
-  id: '/members',
-  path: '/members',
+  id: "/members",
+  path: "/members",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardGamesRoute = DashboardGamesRouteImport.update({
-  id: '/games',
-  path: '/games',
+  id: "/games",
+  path: "/games",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardForbiddenRoute = DashboardForbiddenRouteImport.update({
-  id: '/forbidden',
-  path: '/forbidden',
+  id: "/forbidden",
+  path: "/forbidden",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardEventsRoute = DashboardEventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+  id: "/events",
+  path: "/events",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardCampaignsRoute = DashboardCampaignsRouteImport.update({
-  id: '/campaigns',
-  path: '/campaigns',
+  id: "/campaigns",
+  path: "/campaigns",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
+  id: "/signup",
+  path: "/signup",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+  id: "/reset-password",
+  path: "/reset-password",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
+  id: "/forgot-password",
+  path: "/forgot-password",
   getParentRoute: () => AuthRouteRoute,
-} as any)
+} as any);
 const AdminRolesRoute = AdminRolesRouteImport.update({
-  id: '/admin/roles',
-  path: '/admin/roles',
+  id: "/admin/roles",
+  path: "/admin/roles",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const AdminEventsReviewRoute = AdminEventsReviewRouteImport.update({
-  id: '/admin/events-review',
-  path: '/admin/events-review',
+  id: "/admin/events-review",
+  path: "/admin/events-review",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+  id: "/admin",
+  path: "/admin",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => EventsSlugRoute,
-} as any)
+} as any);
 const DevEmailIndexRoute = DevEmailIndexRouteImport.update({
-  id: '/dev/email/',
-  path: '/dev/email/',
+  id: "/dev/email/",
+  path: "/dev/email/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DashboardTeamsIndexRoute = DashboardTeamsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardTeamsRoute,
-} as any)
+} as any);
 const DashboardSystemsIndexRoute = DashboardSystemsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardSystemsRoute,
-} as any)
+} as any);
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardProfileRoute,
-} as any)
+} as any);
 const DashboardGamesIndexRoute = DashboardGamesIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardGamesRoute,
-} as any)
+} as any);
 const DashboardEventsIndexRoute = DashboardEventsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardEventsRoute,
-} as any)
+} as any);
 const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => DashboardCampaignsRoute,
-} as any)
+} as any);
 const EventsSlugRegisterRoute = EventsSlugRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+  id: "/register",
+  path: "/register",
   getParentRoute: () => EventsSlugRoute,
-} as any)
+} as any);
 const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
-  id: '/dev/email/$template',
-  path: '/dev/email/$template',
+  id: "/dev/email/$template",
+  path: "/dev/email/$template",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DashboardTeamsCreateRoute = DashboardTeamsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
+  id: "/create",
+  path: "/create",
   getParentRoute: () => DashboardTeamsRoute,
-} as any)
+} as any);
 const DashboardTeamsBrowseRoute = DashboardTeamsBrowseRouteImport.update({
-  id: '/browse',
-  path: '/browse',
+  id: "/browse",
+  path: "/browse",
   getParentRoute: () => DashboardTeamsRoute,
-} as any)
+} as any);
 const DashboardTeamsTeamIdRoute = DashboardTeamsTeamIdRouteImport.update({
-  id: '/$teamId',
-  path: '/$teamId',
+  id: "/$teamId",
+  path: "/$teamId",
   getParentRoute: () => DashboardTeamsRoute,
-} as any)
+} as any);
 const DashboardSystemsSystemIdRoute =
   DashboardSystemsSystemIdRouteImport.update({
-    id: '/$systemId',
-    path: '/$systemId',
+    id: "/$systemId",
+    path: "/$systemId",
     getParentRoute: () => DashboardSystemsRoute,
-  } as any)
+  } as any);
 const DashboardReviewsPendingRoute = DashboardReviewsPendingRouteImport.update({
-  id: '/reviews/pending',
-  path: '/reviews/pending',
+  id: "/reviews/pending",
+  path: "/reviews/pending",
   getParentRoute: () => DashboardRouteRoute,
-} as any)
+} as any);
 const DashboardProfileBlocklistRoute =
   DashboardProfileBlocklistRouteImport.update({
-    id: '/blocklist',
-    path: '/blocklist',
+    id: "/blocklist",
+    path: "/blocklist",
     getParentRoute: () => DashboardProfileRoute,
-  } as any)
+  } as any);
 const DashboardProfileUserIdRoute = DashboardProfileUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
+  id: "/$userId",
+  path: "/$userId",
   getParentRoute: () => DashboardProfileRoute,
-} as any)
+} as any);
 const DashboardGamesCreateRoute = DashboardGamesCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
+  id: "/create",
+  path: "/create",
   getParentRoute: () => DashboardGamesRoute,
-} as any)
+} as any);
 const DashboardGamesGameIdRoute = DashboardGamesGameIdRouteImport.update({
-  id: '/$gameId',
-  path: '/$gameId',
+  id: "/$gameId",
+  path: "/$gameId",
   getParentRoute: () => DashboardGamesRoute,
-} as any)
+} as any);
 const DashboardEventsCreateRoute = DashboardEventsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
+  id: "/create",
+  path: "/create",
   getParentRoute: () => DashboardEventsRoute,
-} as any)
+} as any);
 const DashboardEventsEventIdRoute = DashboardEventsEventIdRouteImport.update({
-  id: '/$eventId',
-  path: '/$eventId',
+  id: "/$eventId",
+  path: "/$eventId",
   getParentRoute: () => DashboardEventsRoute,
-} as any)
+} as any);
 const DashboardCampaignsCreateRoute =
   DashboardCampaignsCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
+    id: "/create",
+    path: "/create",
     getParentRoute: () => DashboardCampaignsRoute,
-  } as any)
+  } as any);
 const DashboardCampaignsCampaignIdRoute =
   DashboardCampaignsCampaignIdRouteImport.update({
-    id: '/$campaignId',
-    path: '/$campaignId',
+    id: "/$campaignId",
+    path: "/$campaignId",
     getParentRoute: () => DashboardCampaignsRoute,
-  } as any)
+  } as any);
 const DashboardAdminRolesRoute = DashboardAdminRolesRouteImport.update({
-  id: '/roles',
-  path: '/roles',
+  id: "/roles",
+  path: "/roles",
   getParentRoute: () => DashboardAdminRouteRoute,
-} as any)
+} as any);
 const DashboardAdminEventsReviewRoute =
   DashboardAdminEventsReviewRouteImport.update({
-    id: '/events-review',
-    path: '/events-review',
+    id: "/events-review",
+    path: "/events-review",
     getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
+  } as any);
 const DashboardTeamsTeamIdIndexRoute =
   DashboardTeamsTeamIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
+    id: "/",
+    path: "/",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
-  } as any)
+  } as any);
 const DashboardCampaignsCampaignIdIndexRoute =
   DashboardCampaignsCampaignIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
+    id: "/",
+    path: "/",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
-  } as any)
+  } as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
-    id: '/members',
-    path: '/members',
+    id: "/members",
+    path: "/members",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
-  } as any)
+  } as any);
 const DashboardTeamsTeamIdManageRoute =
   DashboardTeamsTeamIdManageRouteImport.update({
-    id: '/manage',
-    path: '/manage',
+    id: "/manage",
+    path: "/manage",
     getParentRoute: () => DashboardTeamsTeamIdRoute,
-  } as any)
+  } as any);
 const DashboardEventsEventIdManageRoute =
   DashboardEventsEventIdManageRouteImport.update({
-    id: '/manage',
-    path: '/manage',
+    id: "/manage",
+    path: "/manage",
     getParentRoute: () => DashboardEventsEventIdRoute,
-  } as any)
+  } as any);
 const DashboardCampaignsCampaignIdZeroRoute =
   DashboardCampaignsCampaignIdZeroRouteImport.update({
-    id: '/zero',
-    path: '/zero',
+    id: "/zero",
+    path: "/zero",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
-  } as any)
+  } as any);
+const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
+  id: "/api/test-square",
+  path: "/api/test-square",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
+  id: "/api/health",
+  path: "/api/health",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiDebugSquareServerRoute = ApiDebugSquareServerRouteImport.update({
+  id: "/api/debug-square",
+  path: "/api/debug-square",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiWebhooksSquareServerRoute = ApiWebhooksSquareServerRouteImport.update({
+  id: "/api/webhooks/square",
+  path: "/api/webhooks/square",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiTestCleanupServerRoute = ApiTestCleanupServerRouteImport.update({
+  id: "/api/test/cleanup",
+  path: "/api/test/cleanup",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialUnfollowServerRoute = ApiSocialUnfollowServerRouteImport.update({
+  id: "/api/social/unfollow",
+  path: "/api/social/unfollow",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialUnblockServerRoute = ApiSocialUnblockServerRouteImport.update({
+  id: "/api/social/unblock",
+  path: "/api/social/unblock",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialRelationshipServerRoute =
+  ApiSocialRelationshipServerRouteImport.update({
+    id: "/api/social/relationship",
+    path: "/api/social/relationship",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
+const ApiSocialFollowServerRoute = ApiSocialFollowServerRouteImport.update({
+  id: "/api/social/follow",
+  path: "/api/social/follow",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiSocialBlocklistServerRoute =
+  ApiSocialBlocklistServerRouteImport.update({
+    id: "/api/social/blocklist",
+    path: "/api/social/blocklist",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
+const ApiSocialBlockServerRoute = ApiSocialBlockServerRouteImport.update({
+  id: "/api/social/block",
+  path: "/api/social/block",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiAvatarsFileServerRoute = ApiAvatarsFileServerRouteImport.update({
+  id: "/api/avatars/$file",
+  path: "/api/avatars/$file",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
+  id: "/api/auth/$",
+  path: "/api/auth/$",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiPaymentsSquareCallbackServerRoute =
+  ApiPaymentsSquareCallbackServerRouteImport.update({
+    id: "/api/payments/square/callback",
+    path: "/api/payments/square/callback",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
+const ApiAuthActionProviderServerRoute =
+  ApiAuthActionProviderServerRouteImport.update({
+    id: "/api/auth/$action/$provider",
+    path: "/api/auth/$action/$provider",
+    getParentRoute: () => rootServerRouteImport,
+  } as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/auth': typeof AuthRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRouteWithChildren
-  '/onboarding': typeof OnboardingRouteRouteWithChildren
-  '/about': typeof AboutRoute
-  '/design-system': typeof DesignSystemRoute
-  '/events': typeof EventsRouteWithChildren
-  '/resources': typeof ResourcesRoute
-  '/search': typeof SearchRoute
-  '/teams': typeof TeamsRoute
-  '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
-  '/admin/events-review': typeof AdminEventsReviewRoute
-  '/admin/roles': typeof AdminRolesRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/dashboard/campaigns': typeof DashboardCampaignsRouteWithChildren
-  '/dashboard/events': typeof DashboardEventsRouteWithChildren
-  '/dashboard/forbidden': typeof DashboardForbiddenRoute
-  '/dashboard/games': typeof DashboardGamesRouteWithChildren
-  '/dashboard/members': typeof DashboardMembersRoute
-  '/dashboard/membership': typeof DashboardMembershipRoute
-  '/dashboard/profile': typeof DashboardProfileRouteWithChildren
-  '/dashboard/reports': typeof DashboardReportsRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/social-audits': typeof DashboardSocialAuditsRoute
-  '/dashboard/systems': typeof DashboardSystemsRouteWithChildren
-  '/dashboard/teams': typeof DashboardTeamsRouteWithChildren
-  '/event/$eventId': typeof EventEventIdRoute
-  '/events/$slug': typeof EventsSlugRouteWithChildren
-  '/game/$gameId': typeof GameGameIdRoute
-  '/systems/$slug': typeof SystemsSlugRoute
-  '/dashboard/': typeof DashboardIndexRoute
-  '/events/': typeof EventsIndexRoute
-  '/onboarding/': typeof OnboardingIndexRoute
-  '/systems': typeof SystemsIndexRoute
-  '/dashboard/admin/events-review': typeof DashboardAdminEventsReviewRoute
-  '/dashboard/admin/roles': typeof DashboardAdminRolesRoute
-  '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRouteWithChildren
-  '/dashboard/campaigns/create': typeof DashboardCampaignsCreateRoute
-  '/dashboard/events/$eventId': typeof DashboardEventsEventIdRouteWithChildren
-  '/dashboard/events/create': typeof DashboardEventsCreateRoute
-  '/dashboard/games/$gameId': typeof DashboardGamesGameIdRoute
-  '/dashboard/games/create': typeof DashboardGamesCreateRoute
-  '/dashboard/profile/$userId': typeof DashboardProfileUserIdRoute
-  '/dashboard/profile/blocklist': typeof DashboardProfileBlocklistRoute
-  '/dashboard/reviews/pending': typeof DashboardReviewsPendingRoute
-  '/dashboard/systems/$systemId': typeof DashboardSystemsSystemIdRoute
-  '/dashboard/teams/$teamId': typeof DashboardTeamsTeamIdRouteWithChildren
-  '/dashboard/teams/browse': typeof DashboardTeamsBrowseRoute
-  '/dashboard/teams/create': typeof DashboardTeamsCreateRoute
-  '/dev/email/$template': typeof DevEmailTemplateRoute
-  '/events/$slug/register': typeof EventsSlugRegisterRoute
-  '/dashboard/campaigns/': typeof DashboardCampaignsIndexRoute
-  '/dashboard/events/': typeof DashboardEventsIndexRoute
-  '/dashboard/games/': typeof DashboardGamesIndexRoute
-  '/dashboard/profile/': typeof DashboardProfileIndexRoute
-  '/dashboard/systems/': typeof DashboardSystemsIndexRoute
-  '/dashboard/teams/': typeof DashboardTeamsIndexRoute
-  '/dev/email': typeof DevEmailIndexRoute
-  '/events/$slug/': typeof EventsSlugIndexRoute
-  '/dashboard/campaigns/$campaignId/zero': typeof DashboardCampaignsCampaignIdZeroRoute
-  '/dashboard/events/$eventId/manage': typeof DashboardEventsEventIdManageRoute
-  '/dashboard/teams/$teamId/manage': typeof DashboardTeamsTeamIdManageRoute
-  '/dashboard/teams/$teamId/members': typeof DashboardTeamsTeamIdMembersRoute
-  '/dashboard/campaigns/$campaignId/': typeof DashboardCampaignsCampaignIdIndexRoute
-  '/dashboard/teams/$teamId/': typeof DashboardTeamsTeamIdIndexRoute
+  "/": typeof IndexRoute;
+  "/auth": typeof AuthRouteRouteWithChildren;
+  "/dashboard": typeof DashboardRouteRouteWithChildren;
+  "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/about": typeof AboutRoute;
+  "/design-system": typeof DesignSystemRoute;
+  "/events": typeof EventsRouteWithChildren;
+  "/resources": typeof ResourcesRoute;
+  "/search": typeof SearchRoute;
+  "/teams": typeof TeamsRoute;
+  "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
+  "/admin/events-review": typeof AdminEventsReviewRoute;
+  "/admin/roles": typeof AdminRolesRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+  "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
+  "/auth/signup": typeof AuthSignupRoute;
+  "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
+  "/dashboard/events": typeof DashboardEventsRouteWithChildren;
+  "/dashboard/forbidden": typeof DashboardForbiddenRoute;
+  "/dashboard/games": typeof DashboardGamesRouteWithChildren;
+  "/dashboard/members": typeof DashboardMembersRoute;
+  "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/profile": typeof DashboardProfileRouteWithChildren;
+  "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+  "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
+  "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+  "/event/$eventId": typeof EventEventIdRoute;
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
+  "/dashboard/": typeof DashboardIndexRoute;
+  "/events/": typeof EventsIndexRoute;
+  "/onboarding/": typeof OnboardingIndexRoute;
+  "/systems": typeof SystemsIndexRoute;
+  "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
+  "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
+  "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRouteWithChildren;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
+  "/dashboard/games/create": typeof DashboardGamesCreateRoute;
+  "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
+  "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
+  "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
+  "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
+  "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/games/": typeof DashboardGamesIndexRoute;
+  "/dashboard/profile/": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems/": typeof DashboardSystemsIndexRoute;
+  "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dev/email": typeof DevEmailIndexRoute;
+  "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+  "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
+  "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
+  "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/auth': typeof AuthRouteRouteWithChildren
-  '/about': typeof AboutRoute
-  '/design-system': typeof DesignSystemRoute
-  '/resources': typeof ResourcesRoute
-  '/search': typeof SearchRoute
-  '/teams': typeof TeamsRoute
-  '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
-  '/admin/events-review': typeof AdminEventsReviewRoute
-  '/admin/roles': typeof AdminRolesRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/dashboard/forbidden': typeof DashboardForbiddenRoute
-  '/dashboard/members': typeof DashboardMembersRoute
-  '/dashboard/membership': typeof DashboardMembershipRoute
-  '/dashboard/reports': typeof DashboardReportsRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/social-audits': typeof DashboardSocialAuditsRoute
-  '/event/$eventId': typeof EventEventIdRoute
-  '/game/$gameId': typeof GameGameIdRoute
-  '/systems/$slug': typeof SystemsSlugRoute
-  '/dashboard': typeof DashboardIndexRoute
-  '/events': typeof EventsIndexRoute
-  '/onboarding': typeof OnboardingIndexRoute
-  '/systems': typeof SystemsIndexRoute
-  '/dashboard/admin/events-review': typeof DashboardAdminEventsReviewRoute
-  '/dashboard/admin/roles': typeof DashboardAdminRolesRoute
-  '/dashboard/campaigns/create': typeof DashboardCampaignsCreateRoute
-  '/dashboard/events/$eventId': typeof DashboardEventsEventIdRouteWithChildren
-  '/dashboard/events/create': typeof DashboardEventsCreateRoute
-  '/dashboard/games/$gameId': typeof DashboardGamesGameIdRoute
-  '/dashboard/games/create': typeof DashboardGamesCreateRoute
-  '/dashboard/profile/$userId': typeof DashboardProfileUserIdRoute
-  '/dashboard/profile/blocklist': typeof DashboardProfileBlocklistRoute
-  '/dashboard/reviews/pending': typeof DashboardReviewsPendingRoute
-  '/dashboard/systems/$systemId': typeof DashboardSystemsSystemIdRoute
-  '/dashboard/teams/browse': typeof DashboardTeamsBrowseRoute
-  '/dashboard/teams/create': typeof DashboardTeamsCreateRoute
-  '/dev/email/$template': typeof DevEmailTemplateRoute
-  '/events/$slug/register': typeof EventsSlugRegisterRoute
-  '/dashboard/campaigns': typeof DashboardCampaignsIndexRoute
-  '/dashboard/events': typeof DashboardEventsIndexRoute
-  '/dashboard/games': typeof DashboardGamesIndexRoute
-  '/dashboard/profile': typeof DashboardProfileIndexRoute
-  '/dashboard/systems': typeof DashboardSystemsIndexRoute
-  '/dashboard/teams': typeof DashboardTeamsIndexRoute
-  '/dev/email': typeof DevEmailIndexRoute
-  '/events/$slug': typeof EventsSlugIndexRoute
-  '/dashboard/campaigns/$campaignId/zero': typeof DashboardCampaignsCampaignIdZeroRoute
-  '/dashboard/events/$eventId/manage': typeof DashboardEventsEventIdManageRoute
-  '/dashboard/teams/$teamId/manage': typeof DashboardTeamsTeamIdManageRoute
-  '/dashboard/teams/$teamId/members': typeof DashboardTeamsTeamIdMembersRoute
-  '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdIndexRoute
-  '/dashboard/teams/$teamId': typeof DashboardTeamsTeamIdIndexRoute
+  "/": typeof IndexRoute;
+  "/auth": typeof AuthRouteRouteWithChildren;
+  "/about": typeof AboutRoute;
+  "/design-system": typeof DesignSystemRoute;
+  "/resources": typeof ResourcesRoute;
+  "/search": typeof SearchRoute;
+  "/teams": typeof TeamsRoute;
+  "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
+  "/admin/events-review": typeof AdminEventsReviewRoute;
+  "/admin/roles": typeof AdminRolesRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+  "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
+  "/auth/signup": typeof AuthSignupRoute;
+  "/dashboard/forbidden": typeof DashboardForbiddenRoute;
+  "/dashboard/members": typeof DashboardMembersRoute;
+  "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+  "/event/$eventId": typeof EventEventIdRoute;
+  "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
+  "/dashboard": typeof DashboardIndexRoute;
+  "/events": typeof EventsIndexRoute;
+  "/onboarding": typeof OnboardingIndexRoute;
+  "/systems": typeof SystemsIndexRoute;
+  "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
+  "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRouteWithChildren;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
+  "/dashboard/games/create": typeof DashboardGamesCreateRoute;
+  "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
+  "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
+  "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
+  "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
+  "/dashboard/events": typeof DashboardEventsIndexRoute;
+  "/dashboard/games": typeof DashboardGamesIndexRoute;
+  "/dashboard/profile": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems": typeof DashboardSystemsIndexRoute;
+  "/dashboard/teams": typeof DashboardTeamsIndexRoute;
+  "/dev/email": typeof DevEmailIndexRoute;
+  "/events/$slug": typeof EventsSlugIndexRoute;
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+  "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
+  "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdIndexRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/auth': typeof AuthRouteRouteWithChildren
-  '/dashboard': typeof DashboardRouteRouteWithChildren
-  '/onboarding': typeof OnboardingRouteRouteWithChildren
-  '/about': typeof AboutRoute
-  '/design-system': typeof DesignSystemRoute
-  '/events': typeof EventsRouteWithChildren
-  '/resources': typeof ResourcesRoute
-  '/search': typeof SearchRoute
-  '/teams': typeof TeamsRoute
-  '/dashboard/admin': typeof DashboardAdminRouteRouteWithChildren
-  '/admin/events-review': typeof AdminEventsReviewRoute
-  '/admin/roles': typeof AdminRolesRoute
-  '/auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/auth/login': typeof AuthLoginRoute
-  '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/auth/signup': typeof AuthSignupRoute
-  '/dashboard/campaigns': typeof DashboardCampaignsRouteWithChildren
-  '/dashboard/events': typeof DashboardEventsRouteWithChildren
-  '/dashboard/forbidden': typeof DashboardForbiddenRoute
-  '/dashboard/games': typeof DashboardGamesRouteWithChildren
-  '/dashboard/members': typeof DashboardMembersRoute
-  '/dashboard/membership': typeof DashboardMembershipRoute
-  '/dashboard/profile': typeof DashboardProfileRouteWithChildren
-  '/dashboard/reports': typeof DashboardReportsRoute
-  '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/social-audits': typeof DashboardSocialAuditsRoute
-  '/dashboard/systems': typeof DashboardSystemsRouteWithChildren
-  '/dashboard/teams': typeof DashboardTeamsRouteWithChildren
-  '/event/$eventId': typeof EventEventIdRoute
-  '/events/$slug': typeof EventsSlugRouteWithChildren
-  '/game/$gameId': typeof GameGameIdRoute
-  '/systems/$slug': typeof SystemsSlugRoute
-  '/dashboard/': typeof DashboardIndexRoute
-  '/events/': typeof EventsIndexRoute
-  '/onboarding/': typeof OnboardingIndexRoute
-  '/systems/': typeof SystemsIndexRoute
-  '/dashboard/admin/events-review': typeof DashboardAdminEventsReviewRoute
-  '/dashboard/admin/roles': typeof DashboardAdminRolesRoute
-  '/dashboard/campaigns/$campaignId': typeof DashboardCampaignsCampaignIdRouteWithChildren
-  '/dashboard/campaigns/create': typeof DashboardCampaignsCreateRoute
-  '/dashboard/events/$eventId': typeof DashboardEventsEventIdRouteWithChildren
-  '/dashboard/events/create': typeof DashboardEventsCreateRoute
-  '/dashboard/games/$gameId': typeof DashboardGamesGameIdRoute
-  '/dashboard/games/create': typeof DashboardGamesCreateRoute
-  '/dashboard/profile/$userId': typeof DashboardProfileUserIdRoute
-  '/dashboard/profile/blocklist': typeof DashboardProfileBlocklistRoute
-  '/dashboard/reviews/pending': typeof DashboardReviewsPendingRoute
-  '/dashboard/systems/$systemId': typeof DashboardSystemsSystemIdRoute
-  '/dashboard/teams/$teamId': typeof DashboardTeamsTeamIdRouteWithChildren
-  '/dashboard/teams/browse': typeof DashboardTeamsBrowseRoute
-  '/dashboard/teams/create': typeof DashboardTeamsCreateRoute
-  '/dev/email/$template': typeof DevEmailTemplateRoute
-  '/events/$slug/register': typeof EventsSlugRegisterRoute
-  '/dashboard/campaigns/': typeof DashboardCampaignsIndexRoute
-  '/dashboard/events/': typeof DashboardEventsIndexRoute
-  '/dashboard/games/': typeof DashboardGamesIndexRoute
-  '/dashboard/profile/': typeof DashboardProfileIndexRoute
-  '/dashboard/systems/': typeof DashboardSystemsIndexRoute
-  '/dashboard/teams/': typeof DashboardTeamsIndexRoute
-  '/dev/email/': typeof DevEmailIndexRoute
-  '/events/$slug/': typeof EventsSlugIndexRoute
-  '/dashboard/campaigns/$campaignId/zero': typeof DashboardCampaignsCampaignIdZeroRoute
-  '/dashboard/events/$eventId/manage': typeof DashboardEventsEventIdManageRoute
-  '/dashboard/teams/$teamId/manage': typeof DashboardTeamsTeamIdManageRoute
-  '/dashboard/teams/$teamId/members': typeof DashboardTeamsTeamIdMembersRoute
-  '/dashboard/campaigns/$campaignId/': typeof DashboardCampaignsCampaignIdIndexRoute
-  '/dashboard/teams/$teamId/': typeof DashboardTeamsTeamIdIndexRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/auth": typeof AuthRouteRouteWithChildren;
+  "/dashboard": typeof DashboardRouteRouteWithChildren;
+  "/onboarding": typeof OnboardingRouteRouteWithChildren;
+  "/about": typeof AboutRoute;
+  "/design-system": typeof DesignSystemRoute;
+  "/events": typeof EventsRouteWithChildren;
+  "/resources": typeof ResourcesRoute;
+  "/search": typeof SearchRoute;
+  "/teams": typeof TeamsRoute;
+  "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
+  "/admin/events-review": typeof AdminEventsReviewRoute;
+  "/admin/roles": typeof AdminRolesRoute;
+  "/auth/forgot-password": typeof AuthForgotPasswordRoute;
+  "/auth/login": typeof AuthLoginRoute;
+  "/auth/reset-password": typeof AuthResetPasswordRoute;
+  "/auth/signup": typeof AuthSignupRoute;
+  "/dashboard/campaigns": typeof DashboardCampaignsRouteWithChildren;
+  "/dashboard/events": typeof DashboardEventsRouteWithChildren;
+  "/dashboard/forbidden": typeof DashboardForbiddenRoute;
+  "/dashboard/games": typeof DashboardGamesRouteWithChildren;
+  "/dashboard/members": typeof DashboardMembersRoute;
+  "/dashboard/membership": typeof DashboardMembershipRoute;
+  "/dashboard/profile": typeof DashboardProfileRouteWithChildren;
+  "/dashboard/reports": typeof DashboardReportsRoute;
+  "/dashboard/settings": typeof DashboardSettingsRoute;
+  "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
+  "/dashboard/systems": typeof DashboardSystemsRouteWithChildren;
+  "/dashboard/teams": typeof DashboardTeamsRouteWithChildren;
+  "/event/$eventId": typeof EventEventIdRoute;
+  "/events/$slug": typeof EventsSlugRouteWithChildren;
+  "/game/$gameId": typeof GameGameIdRoute;
+  "/systems/$slug": typeof SystemsSlugRoute;
+  "/dashboard/": typeof DashboardIndexRoute;
+  "/events/": typeof EventsIndexRoute;
+  "/onboarding/": typeof OnboardingIndexRoute;
+  "/systems/": typeof SystemsIndexRoute;
+  "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
+  "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
+  "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
+  "/dashboard/events/$eventId": typeof DashboardEventsEventIdRouteWithChildren;
+  "/dashboard/events/create": typeof DashboardEventsCreateRoute;
+  "/dashboard/games/$gameId": typeof DashboardGamesGameIdRoute;
+  "/dashboard/games/create": typeof DashboardGamesCreateRoute;
+  "/dashboard/profile/$userId": typeof DashboardProfileUserIdRoute;
+  "/dashboard/profile/blocklist": typeof DashboardProfileBlocklistRoute;
+  "/dashboard/reviews/pending": typeof DashboardReviewsPendingRoute;
+  "/dashboard/systems/$systemId": typeof DashboardSystemsSystemIdRoute;
+  "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdRouteWithChildren;
+  "/dashboard/teams/browse": typeof DashboardTeamsBrowseRoute;
+  "/dashboard/teams/create": typeof DashboardTeamsCreateRoute;
+  "/dev/email/$template": typeof DevEmailTemplateRoute;
+  "/events/$slug/register": typeof EventsSlugRegisterRoute;
+  "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
+  "/dashboard/events/": typeof DashboardEventsIndexRoute;
+  "/dashboard/games/": typeof DashboardGamesIndexRoute;
+  "/dashboard/profile/": typeof DashboardProfileIndexRoute;
+  "/dashboard/systems/": typeof DashboardSystemsIndexRoute;
+  "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
+  "/dev/email/": typeof DevEmailIndexRoute;
+  "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
+  "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
+  "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
+  "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
+  "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/auth'
-    | '/dashboard'
-    | '/onboarding'
-    | '/about'
-    | '/design-system'
-    | '/events'
-    | '/resources'
-    | '/search'
-    | '/teams'
-    | '/dashboard/admin'
-    | '/admin/events-review'
-    | '/admin/roles'
-    | '/auth/forgot-password'
-    | '/auth/login'
-    | '/auth/reset-password'
-    | '/auth/signup'
-    | '/dashboard/campaigns'
-    | '/dashboard/events'
-    | '/dashboard/forbidden'
-    | '/dashboard/games'
-    | '/dashboard/members'
-    | '/dashboard/membership'
-    | '/dashboard/profile'
-    | '/dashboard/reports'
-    | '/dashboard/settings'
-    | '/dashboard/social-audits'
-    | '/dashboard/systems'
-    | '/dashboard/teams'
-    | '/event/$eventId'
-    | '/events/$slug'
-    | '/game/$gameId'
-    | '/systems/$slug'
-    | '/dashboard/'
-    | '/events/'
-    | '/onboarding/'
-    | '/systems'
-    | '/dashboard/admin/events-review'
-    | '/dashboard/admin/roles'
-    | '/dashboard/campaigns/$campaignId'
-    | '/dashboard/campaigns/create'
-    | '/dashboard/events/$eventId'
-    | '/dashboard/events/create'
-    | '/dashboard/games/$gameId'
-    | '/dashboard/games/create'
-    | '/dashboard/profile/$userId'
-    | '/dashboard/profile/blocklist'
-    | '/dashboard/reviews/pending'
-    | '/dashboard/systems/$systemId'
-    | '/dashboard/teams/$teamId'
-    | '/dashboard/teams/browse'
-    | '/dashboard/teams/create'
-    | '/dev/email/$template'
-    | '/events/$slug/register'
-    | '/dashboard/campaigns/'
-    | '/dashboard/events/'
-    | '/dashboard/games/'
-    | '/dashboard/profile/'
-    | '/dashboard/systems/'
-    | '/dashboard/teams/'
-    | '/dev/email'
-    | '/events/$slug/'
-    | '/dashboard/campaigns/$campaignId/zero'
-    | '/dashboard/events/$eventId/manage'
-    | '/dashboard/teams/$teamId/manage'
-    | '/dashboard/teams/$teamId/members'
-    | '/dashboard/campaigns/$campaignId/'
-    | '/dashboard/teams/$teamId/'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/auth"
+    | "/dashboard"
+    | "/onboarding"
+    | "/about"
+    | "/design-system"
+    | "/events"
+    | "/resources"
+    | "/search"
+    | "/teams"
+    | "/dashboard/admin"
+    | "/admin/events-review"
+    | "/admin/roles"
+    | "/auth/forgot-password"
+    | "/auth/login"
+    | "/auth/reset-password"
+    | "/auth/signup"
+    | "/dashboard/campaigns"
+    | "/dashboard/events"
+    | "/dashboard/forbidden"
+    | "/dashboard/games"
+    | "/dashboard/members"
+    | "/dashboard/membership"
+    | "/dashboard/profile"
+    | "/dashboard/reports"
+    | "/dashboard/settings"
+    | "/dashboard/social-audits"
+    | "/dashboard/systems"
+    | "/dashboard/teams"
+    | "/event/$eventId"
+    | "/events/$slug"
+    | "/game/$gameId"
+    | "/systems/$slug"
+    | "/dashboard/"
+    | "/events/"
+    | "/onboarding/"
+    | "/systems"
+    | "/dashboard/admin/events-review"
+    | "/dashboard/admin/roles"
+    | "/dashboard/campaigns/$campaignId"
+    | "/dashboard/campaigns/create"
+    | "/dashboard/events/$eventId"
+    | "/dashboard/events/create"
+    | "/dashboard/games/$gameId"
+    | "/dashboard/games/create"
+    | "/dashboard/profile/$userId"
+    | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
+    | "/dashboard/teams/$teamId"
+    | "/dashboard/teams/browse"
+    | "/dashboard/teams/create"
+    | "/dev/email/$template"
+    | "/events/$slug/register"
+    | "/dashboard/campaigns/"
+    | "/dashboard/events/"
+    | "/dashboard/games/"
+    | "/dashboard/profile/"
+    | "/dashboard/systems/"
+    | "/dashboard/teams/"
+    | "/dev/email"
+    | "/events/$slug/"
+    | "/dashboard/campaigns/$campaignId/zero"
+    | "/dashboard/events/$eventId/manage"
+    | "/dashboard/teams/$teamId/manage"
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId/"
+    | "/dashboard/teams/$teamId/";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/auth'
-    | '/about'
-    | '/design-system'
-    | '/resources'
-    | '/search'
-    | '/teams'
-    | '/dashboard/admin'
-    | '/admin/events-review'
-    | '/admin/roles'
-    | '/auth/forgot-password'
-    | '/auth/login'
-    | '/auth/reset-password'
-    | '/auth/signup'
-    | '/dashboard/forbidden'
-    | '/dashboard/members'
-    | '/dashboard/membership'
-    | '/dashboard/reports'
-    | '/dashboard/settings'
-    | '/dashboard/social-audits'
-    | '/event/$eventId'
-    | '/game/$gameId'
-    | '/systems/$slug'
-    | '/dashboard'
-    | '/events'
-    | '/onboarding'
-    | '/systems'
-    | '/dashboard/admin/events-review'
-    | '/dashboard/admin/roles'
-    | '/dashboard/campaigns/create'
-    | '/dashboard/events/$eventId'
-    | '/dashboard/events/create'
-    | '/dashboard/games/$gameId'
-    | '/dashboard/games/create'
-    | '/dashboard/profile/$userId'
-    | '/dashboard/profile/blocklist'
-    | '/dashboard/reviews/pending'
-    | '/dashboard/systems/$systemId'
-    | '/dashboard/teams/browse'
-    | '/dashboard/teams/create'
-    | '/dev/email/$template'
-    | '/events/$slug/register'
-    | '/dashboard/campaigns'
-    | '/dashboard/events'
-    | '/dashboard/games'
-    | '/dashboard/profile'
-    | '/dashboard/systems'
-    | '/dashboard/teams'
-    | '/dev/email'
-    | '/events/$slug'
-    | '/dashboard/campaigns/$campaignId/zero'
-    | '/dashboard/events/$eventId/manage'
-    | '/dashboard/teams/$teamId/manage'
-    | '/dashboard/teams/$teamId/members'
-    | '/dashboard/campaigns/$campaignId'
-    | '/dashboard/teams/$teamId'
+    | "/"
+    | "/auth"
+    | "/about"
+    | "/design-system"
+    | "/resources"
+    | "/search"
+    | "/teams"
+    | "/dashboard/admin"
+    | "/admin/events-review"
+    | "/admin/roles"
+    | "/auth/forgot-password"
+    | "/auth/login"
+    | "/auth/reset-password"
+    | "/auth/signup"
+    | "/dashboard/forbidden"
+    | "/dashboard/members"
+    | "/dashboard/membership"
+    | "/dashboard/reports"
+    | "/dashboard/settings"
+    | "/dashboard/social-audits"
+    | "/event/$eventId"
+    | "/game/$gameId"
+    | "/systems/$slug"
+    | "/dashboard"
+    | "/events"
+    | "/onboarding"
+    | "/systems"
+    | "/dashboard/admin/events-review"
+    | "/dashboard/admin/roles"
+    | "/dashboard/campaigns/create"
+    | "/dashboard/events/$eventId"
+    | "/dashboard/events/create"
+    | "/dashboard/games/$gameId"
+    | "/dashboard/games/create"
+    | "/dashboard/profile/$userId"
+    | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
+    | "/dashboard/teams/browse"
+    | "/dashboard/teams/create"
+    | "/dev/email/$template"
+    | "/events/$slug/register"
+    | "/dashboard/campaigns"
+    | "/dashboard/events"
+    | "/dashboard/games"
+    | "/dashboard/profile"
+    | "/dashboard/systems"
+    | "/dashboard/teams"
+    | "/dev/email"
+    | "/events/$slug"
+    | "/dashboard/campaigns/$campaignId/zero"
+    | "/dashboard/events/$eventId/manage"
+    | "/dashboard/teams/$teamId/manage"
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId"
+    | "/dashboard/teams/$teamId";
   id:
-    | '__root__'
-    | '/'
-    | '/auth'
-    | '/dashboard'
-    | '/onboarding'
-    | '/about'
-    | '/design-system'
-    | '/events'
-    | '/resources'
-    | '/search'
-    | '/teams'
-    | '/dashboard/admin'
-    | '/admin/events-review'
-    | '/admin/roles'
-    | '/auth/forgot-password'
-    | '/auth/login'
-    | '/auth/reset-password'
-    | '/auth/signup'
-    | '/dashboard/campaigns'
-    | '/dashboard/events'
-    | '/dashboard/forbidden'
-    | '/dashboard/games'
-    | '/dashboard/members'
-    | '/dashboard/membership'
-    | '/dashboard/profile'
-    | '/dashboard/reports'
-    | '/dashboard/settings'
-    | '/dashboard/social-audits'
-    | '/dashboard/systems'
-    | '/dashboard/teams'
-    | '/event/$eventId'
-    | '/events/$slug'
-    | '/game/$gameId'
-    | '/systems/$slug'
-    | '/dashboard/'
-    | '/events/'
-    | '/onboarding/'
-    | '/systems/'
-    | '/dashboard/admin/events-review'
-    | '/dashboard/admin/roles'
-    | '/dashboard/campaigns/$campaignId'
-    | '/dashboard/campaigns/create'
-    | '/dashboard/events/$eventId'
-    | '/dashboard/events/create'
-    | '/dashboard/games/$gameId'
-    | '/dashboard/games/create'
-    | '/dashboard/profile/$userId'
-    | '/dashboard/profile/blocklist'
-    | '/dashboard/reviews/pending'
-    | '/dashboard/systems/$systemId'
-    | '/dashboard/teams/$teamId'
-    | '/dashboard/teams/browse'
-    | '/dashboard/teams/create'
-    | '/dev/email/$template'
-    | '/events/$slug/register'
-    | '/dashboard/campaigns/'
-    | '/dashboard/events/'
-    | '/dashboard/games/'
-    | '/dashboard/profile/'
-    | '/dashboard/systems/'
-    | '/dashboard/teams/'
-    | '/dev/email/'
-    | '/events/$slug/'
-    | '/dashboard/campaigns/$campaignId/zero'
-    | '/dashboard/events/$eventId/manage'
-    | '/dashboard/teams/$teamId/manage'
-    | '/dashboard/teams/$teamId/members'
-    | '/dashboard/campaigns/$campaignId/'
-    | '/dashboard/teams/$teamId/'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/auth"
+    | "/dashboard"
+    | "/onboarding"
+    | "/about"
+    | "/design-system"
+    | "/events"
+    | "/resources"
+    | "/search"
+    | "/teams"
+    | "/dashboard/admin"
+    | "/admin/events-review"
+    | "/admin/roles"
+    | "/auth/forgot-password"
+    | "/auth/login"
+    | "/auth/reset-password"
+    | "/auth/signup"
+    | "/dashboard/campaigns"
+    | "/dashboard/events"
+    | "/dashboard/forbidden"
+    | "/dashboard/games"
+    | "/dashboard/members"
+    | "/dashboard/membership"
+    | "/dashboard/profile"
+    | "/dashboard/reports"
+    | "/dashboard/settings"
+    | "/dashboard/social-audits"
+    | "/dashboard/systems"
+    | "/dashboard/teams"
+    | "/event/$eventId"
+    | "/events/$slug"
+    | "/game/$gameId"
+    | "/systems/$slug"
+    | "/dashboard/"
+    | "/events/"
+    | "/onboarding/"
+    | "/systems/"
+    | "/dashboard/admin/events-review"
+    | "/dashboard/admin/roles"
+    | "/dashboard/campaigns/$campaignId"
+    | "/dashboard/campaigns/create"
+    | "/dashboard/events/$eventId"
+    | "/dashboard/events/create"
+    | "/dashboard/games/$gameId"
+    | "/dashboard/games/create"
+    | "/dashboard/profile/$userId"
+    | "/dashboard/profile/blocklist"
+    | "/dashboard/reviews/pending"
+    | "/dashboard/systems/$systemId"
+    | "/dashboard/teams/$teamId"
+    | "/dashboard/teams/browse"
+    | "/dashboard/teams/create"
+    | "/dev/email/$template"
+    | "/events/$slug/register"
+    | "/dashboard/campaigns/"
+    | "/dashboard/events/"
+    | "/dashboard/games/"
+    | "/dashboard/profile/"
+    | "/dashboard/systems/"
+    | "/dashboard/teams/"
+    | "/dev/email/"
+    | "/events/$slug/"
+    | "/dashboard/campaigns/$campaignId/zero"
+    | "/dashboard/events/$eventId/manage"
+    | "/dashboard/teams/$teamId/manage"
+    | "/dashboard/teams/$teamId/members"
+    | "/dashboard/campaigns/$campaignId/"
+    | "/dashboard/teams/$teamId/";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AuthRouteRoute: typeof AuthRouteRouteWithChildren
-  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
-  OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren
-  AboutRoute: typeof AboutRoute
-  DesignSystemRoute: typeof DesignSystemRoute
-  EventsRoute: typeof EventsRouteWithChildren
-  ResourcesRoute: typeof ResourcesRoute
-  SearchRoute: typeof SearchRoute
-  TeamsRoute: typeof TeamsRoute
-  AdminEventsReviewRoute: typeof AdminEventsReviewRoute
-  AdminRolesRoute: typeof AdminRolesRoute
-  EventEventIdRoute: typeof EventEventIdRoute
-  GameGameIdRoute: typeof GameGameIdRoute
-  SystemsSlugRoute: typeof SystemsSlugRoute
-  SystemsIndexRoute: typeof SystemsIndexRoute
-  DevEmailTemplateRoute: typeof DevEmailTemplateRoute
-  DevEmailIndexRoute: typeof DevEmailIndexRoute
+  IndexRoute: typeof IndexRoute;
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren;
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren;
+  OnboardingRouteRoute: typeof OnboardingRouteRouteWithChildren;
+  AboutRoute: typeof AboutRoute;
+  DesignSystemRoute: typeof DesignSystemRoute;
+  EventsRoute: typeof EventsRouteWithChildren;
+  ResourcesRoute: typeof ResourcesRoute;
+  SearchRoute: typeof SearchRoute;
+  TeamsRoute: typeof TeamsRoute;
+  AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  AdminRolesRoute: typeof AdminRolesRoute;
+  EventEventIdRoute: typeof EventEventIdRoute;
+  GameGameIdRoute: typeof GameGameIdRoute;
+  SystemsSlugRoute: typeof SystemsSlugRoute;
+  SystemsIndexRoute: typeof SystemsIndexRoute;
+  DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
+  DevEmailIndexRoute: typeof DevEmailIndexRoute;
+}
+export interface FileServerRoutesByFullPath {
+  "/api/debug-square": typeof ApiDebugSquareServerRoute;
+  "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
+  "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+  "/api/social/block": typeof ApiSocialBlockServerRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
+  "/api/social/follow": typeof ApiSocialFollowServerRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
+}
+export interface FileServerRoutesByTo {
+  "/api/debug-square": typeof ApiDebugSquareServerRoute;
+  "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
+  "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+  "/api/social/block": typeof ApiSocialBlockServerRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
+  "/api/social/follow": typeof ApiSocialFollowServerRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport;
+  "/api/debug-square": typeof ApiDebugSquareServerRoute;
+  "/api/health": typeof ApiHealthServerRoute;
+  "/api/test-square": typeof ApiTestSquareServerRoute;
+  "/api/auth/$": typeof ApiAuthSplatServerRoute;
+  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+  "/api/social/block": typeof ApiSocialBlockServerRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
+  "/api/social/follow": typeof ApiSocialFollowServerRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath;
+  fullPaths:
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
+    | "/api/auth/$"
+    | "/api/avatars/$file"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback";
+  fileServerRoutesByTo: FileServerRoutesByTo;
+  to:
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
+    | "/api/auth/$"
+    | "/api/avatars/$file"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback";
+  id:
+    | "__root__"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
+    | "/api/auth/$"
+    | "/api/avatars/$file"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback";
+  fileServerRoutesById: FileServerRoutesById;
+}
+export interface RootServerRouteChildren {
+  ApiDebugSquareServerRoute: typeof ApiDebugSquareServerRoute;
+  ApiHealthServerRoute: typeof ApiHealthServerRoute;
+  ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
+  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
+  ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
+  ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
+  ApiSocialBlocklistServerRoute: typeof ApiSocialBlocklistServerRoute;
+  ApiSocialFollowServerRoute: typeof ApiSocialFollowServerRoute;
+  ApiSocialRelationshipServerRoute: typeof ApiSocialRelationshipServerRoute;
+  ApiSocialUnblockServerRoute: typeof ApiSocialUnblockServerRoute;
+  ApiSocialUnfollowServerRoute: typeof ApiSocialUnfollowServerRoute;
+  ApiTestCleanupServerRoute: typeof ApiTestCleanupServerRoute;
+  ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
+  ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
+  ApiPaymentsSquareCallbackServerRoute: typeof ApiPaymentsSquareCallbackServerRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/teams': {
-      id: '/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof TeamsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resources': {
-      id: '/resources'
-      path: '/resources'
-      fullPath: '/resources'
-      preLoaderRoute: typeof ResourcesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/design-system': {
-      id: '/design-system'
-      path: '/design-system'
-      fullPath: '/design-system'
-      preLoaderRoute: typeof DesignSystemRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/systems/': {
-      id: '/systems/'
-      path: '/systems'
-      fullPath: '/systems'
-      preLoaderRoute: typeof SystemsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding/': {
-      id: '/onboarding/'
-      path: '/'
-      fullPath: '/onboarding/'
-      preLoaderRoute: typeof OnboardingIndexRouteImport
-      parentRoute: typeof OnboardingRouteRoute
-    }
-    '/events/': {
-      id: '/events/'
-      path: '/'
-      fullPath: '/events/'
-      preLoaderRoute: typeof EventsIndexRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/systems/$slug': {
-      id: '/systems/$slug'
-      path: '/systems/$slug'
-      fullPath: '/systems/$slug'
-      preLoaderRoute: typeof SystemsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/game/$gameId': {
-      id: '/game/$gameId'
-      path: '/game/$gameId'
-      fullPath: '/game/$gameId'
-      preLoaderRoute: typeof GameGameIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events/$slug': {
-      id: '/events/$slug'
-      path: '/$slug'
-      fullPath: '/events/$slug'
-      preLoaderRoute: typeof EventsSlugRouteImport
-      parentRoute: typeof EventsRoute
-    }
-    '/event/$eventId': {
-      id: '/event/$eventId'
-      path: '/event/$eventId'
-      fullPath: '/event/$eventId'
-      preLoaderRoute: typeof EventEventIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/teams': {
-      id: '/dashboard/teams'
-      path: '/teams'
-      fullPath: '/dashboard/teams'
-      preLoaderRoute: typeof DashboardTeamsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/systems': {
-      id: '/dashboard/systems'
-      path: '/systems'
-      fullPath: '/dashboard/systems'
-      preLoaderRoute: typeof DashboardSystemsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/social-audits': {
-      id: '/dashboard/social-audits'
-      path: '/social-audits'
-      fullPath: '/dashboard/social-audits'
-      preLoaderRoute: typeof DashboardSocialAuditsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/settings': {
-      id: '/dashboard/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/reports': {
-      id: '/dashboard/reports'
-      path: '/reports'
-      fullPath: '/dashboard/reports'
-      preLoaderRoute: typeof DashboardReportsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/profile': {
-      id: '/dashboard/profile'
-      path: '/profile'
-      fullPath: '/dashboard/profile'
-      preLoaderRoute: typeof DashboardProfileRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/membership': {
-      id: '/dashboard/membership'
-      path: '/membership'
-      fullPath: '/dashboard/membership'
-      preLoaderRoute: typeof DashboardMembershipRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/members': {
-      id: '/dashboard/members'
-      path: '/members'
-      fullPath: '/dashboard/members'
-      preLoaderRoute: typeof DashboardMembersRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/games': {
-      id: '/dashboard/games'
-      path: '/games'
-      fullPath: '/dashboard/games'
-      preLoaderRoute: typeof DashboardGamesRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/forbidden': {
-      id: '/dashboard/forbidden'
-      path: '/forbidden'
-      fullPath: '/dashboard/forbidden'
-      preLoaderRoute: typeof DashboardForbiddenRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/events': {
-      id: '/dashboard/events'
-      path: '/events'
-      fullPath: '/dashboard/events'
-      preLoaderRoute: typeof DashboardEventsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/campaigns': {
-      id: '/dashboard/campaigns'
-      path: '/campaigns'
-      fullPath: '/dashboard/campaigns'
-      preLoaderRoute: typeof DashboardCampaignsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/auth/signup': {
-      id: '/auth/signup'
-      path: '/signup'
-      fullPath: '/auth/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/admin/roles': {
-      id: '/admin/roles'
-      path: '/admin/roles'
-      fullPath: '/admin/roles'
-      preLoaderRoute: typeof AdminRolesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/events-review': {
-      id: '/admin/events-review'
-      path: '/admin/events-review'
-      fullPath: '/admin/events-review'
-      preLoaderRoute: typeof AdminEventsReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/admin': {
-      id: '/dashboard/admin'
-      path: '/admin'
-      fullPath: '/dashboard/admin'
-      preLoaderRoute: typeof DashboardAdminRouteRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/events/$slug/': {
-      id: '/events/$slug/'
-      path: '/'
-      fullPath: '/events/$slug/'
-      preLoaderRoute: typeof EventsSlugIndexRouteImport
-      parentRoute: typeof EventsSlugRoute
-    }
-    '/dev/email/': {
-      id: '/dev/email/'
-      path: '/dev/email'
-      fullPath: '/dev/email'
-      preLoaderRoute: typeof DevEmailIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/teams/': {
-      id: '/dashboard/teams/'
-      path: '/'
-      fullPath: '/dashboard/teams/'
-      preLoaderRoute: typeof DashboardTeamsIndexRouteImport
-      parentRoute: typeof DashboardTeamsRoute
-    }
-    '/dashboard/systems/': {
-      id: '/dashboard/systems/'
-      path: '/'
-      fullPath: '/dashboard/systems/'
-      preLoaderRoute: typeof DashboardSystemsIndexRouteImport
-      parentRoute: typeof DashboardSystemsRoute
-    }
-    '/dashboard/profile/': {
-      id: '/dashboard/profile/'
-      path: '/'
-      fullPath: '/dashboard/profile/'
-      preLoaderRoute: typeof DashboardProfileIndexRouteImport
-      parentRoute: typeof DashboardProfileRoute
-    }
-    '/dashboard/games/': {
-      id: '/dashboard/games/'
-      path: '/'
-      fullPath: '/dashboard/games/'
-      preLoaderRoute: typeof DashboardGamesIndexRouteImport
-      parentRoute: typeof DashboardGamesRoute
-    }
-    '/dashboard/events/': {
-      id: '/dashboard/events/'
-      path: '/'
-      fullPath: '/dashboard/events/'
-      preLoaderRoute: typeof DashboardEventsIndexRouteImport
-      parentRoute: typeof DashboardEventsRoute
-    }
-    '/dashboard/campaigns/': {
-      id: '/dashboard/campaigns/'
-      path: '/'
-      fullPath: '/dashboard/campaigns/'
-      preLoaderRoute: typeof DashboardCampaignsIndexRouteImport
-      parentRoute: typeof DashboardCampaignsRoute
-    }
-    '/events/$slug/register': {
-      id: '/events/$slug/register'
-      path: '/register'
-      fullPath: '/events/$slug/register'
-      preLoaderRoute: typeof EventsSlugRegisterRouteImport
-      parentRoute: typeof EventsSlugRoute
-    }
-    '/dev/email/$template': {
-      id: '/dev/email/$template'
-      path: '/dev/email/$template'
-      fullPath: '/dev/email/$template'
-      preLoaderRoute: typeof DevEmailTemplateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/teams/create': {
-      id: '/dashboard/teams/create'
-      path: '/create'
-      fullPath: '/dashboard/teams/create'
-      preLoaderRoute: typeof DashboardTeamsCreateRouteImport
-      parentRoute: typeof DashboardTeamsRoute
-    }
-    '/dashboard/teams/browse': {
-      id: '/dashboard/teams/browse'
-      path: '/browse'
-      fullPath: '/dashboard/teams/browse'
-      preLoaderRoute: typeof DashboardTeamsBrowseRouteImport
-      parentRoute: typeof DashboardTeamsRoute
-    }
-    '/dashboard/teams/$teamId': {
-      id: '/dashboard/teams/$teamId'
-      path: '/$teamId'
-      fullPath: '/dashboard/teams/$teamId'
-      preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport
-      parentRoute: typeof DashboardTeamsRoute
-    }
-    '/dashboard/systems/$systemId': {
-      id: '/dashboard/systems/$systemId'
-      path: '/$systemId'
-      fullPath: '/dashboard/systems/$systemId'
-      preLoaderRoute: typeof DashboardSystemsSystemIdRouteImport
-      parentRoute: typeof DashboardSystemsRoute
-    }
-    '/dashboard/reviews/pending': {
-      id: '/dashboard/reviews/pending'
-      path: '/reviews/pending'
-      fullPath: '/dashboard/reviews/pending'
-      preLoaderRoute: typeof DashboardReviewsPendingRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/profile/blocklist': {
-      id: '/dashboard/profile/blocklist'
-      path: '/blocklist'
-      fullPath: '/dashboard/profile/blocklist'
-      preLoaderRoute: typeof DashboardProfileBlocklistRouteImport
-      parentRoute: typeof DashboardProfileRoute
-    }
-    '/dashboard/profile/$userId': {
-      id: '/dashboard/profile/$userId'
-      path: '/$userId'
-      fullPath: '/dashboard/profile/$userId'
-      preLoaderRoute: typeof DashboardProfileUserIdRouteImport
-      parentRoute: typeof DashboardProfileRoute
-    }
-    '/dashboard/games/create': {
-      id: '/dashboard/games/create'
-      path: '/create'
-      fullPath: '/dashboard/games/create'
-      preLoaderRoute: typeof DashboardGamesCreateRouteImport
-      parentRoute: typeof DashboardGamesRoute
-    }
-    '/dashboard/games/$gameId': {
-      id: '/dashboard/games/$gameId'
-      path: '/$gameId'
-      fullPath: '/dashboard/games/$gameId'
-      preLoaderRoute: typeof DashboardGamesGameIdRouteImport
-      parentRoute: typeof DashboardGamesRoute
-    }
-    '/dashboard/events/create': {
-      id: '/dashboard/events/create'
-      path: '/create'
-      fullPath: '/dashboard/events/create'
-      preLoaderRoute: typeof DashboardEventsCreateRouteImport
-      parentRoute: typeof DashboardEventsRoute
-    }
-    '/dashboard/events/$eventId': {
-      id: '/dashboard/events/$eventId'
-      path: '/$eventId'
-      fullPath: '/dashboard/events/$eventId'
-      preLoaderRoute: typeof DashboardEventsEventIdRouteImport
-      parentRoute: typeof DashboardEventsRoute
-    }
-    '/dashboard/campaigns/create': {
-      id: '/dashboard/campaigns/create'
-      path: '/create'
-      fullPath: '/dashboard/campaigns/create'
-      preLoaderRoute: typeof DashboardCampaignsCreateRouteImport
-      parentRoute: typeof DashboardCampaignsRoute
-    }
-    '/dashboard/campaigns/$campaignId': {
-      id: '/dashboard/campaigns/$campaignId'
-      path: '/$campaignId'
-      fullPath: '/dashboard/campaigns/$campaignId'
-      preLoaderRoute: typeof DashboardCampaignsCampaignIdRouteImport
-      parentRoute: typeof DashboardCampaignsRoute
-    }
-    '/dashboard/admin/roles': {
-      id: '/dashboard/admin/roles'
-      path: '/roles'
-      fullPath: '/dashboard/admin/roles'
-      preLoaderRoute: typeof DashboardAdminRolesRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/events-review': {
-      id: '/dashboard/admin/events-review'
-      path: '/events-review'
-      fullPath: '/dashboard/admin/events-review'
-      preLoaderRoute: typeof DashboardAdminEventsReviewRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/teams/$teamId/': {
-      id: '/dashboard/teams/$teamId/'
-      path: '/'
-      fullPath: '/dashboard/teams/$teamId/'
-      preLoaderRoute: typeof DashboardTeamsTeamIdIndexRouteImport
-      parentRoute: typeof DashboardTeamsTeamIdRoute
-    }
-    '/dashboard/campaigns/$campaignId/': {
-      id: '/dashboard/campaigns/$campaignId/'
-      path: '/'
-      fullPath: '/dashboard/campaigns/$campaignId/'
-      preLoaderRoute: typeof DashboardCampaignsCampaignIdIndexRouteImport
-      parentRoute: typeof DashboardCampaignsCampaignIdRoute
-    }
-    '/dashboard/teams/$teamId/members': {
-      id: '/dashboard/teams/$teamId/members'
-      path: '/members'
-      fullPath: '/dashboard/teams/$teamId/members'
-      preLoaderRoute: typeof DashboardTeamsTeamIdMembersRouteImport
-      parentRoute: typeof DashboardTeamsTeamIdRoute
-    }
-    '/dashboard/teams/$teamId/manage': {
-      id: '/dashboard/teams/$teamId/manage'
-      path: '/manage'
-      fullPath: '/dashboard/teams/$teamId/manage'
-      preLoaderRoute: typeof DashboardTeamsTeamIdManageRouteImport
-      parentRoute: typeof DashboardTeamsTeamIdRoute
-    }
-    '/dashboard/events/$eventId/manage': {
-      id: '/dashboard/events/$eventId/manage'
-      path: '/manage'
-      fullPath: '/dashboard/events/$eventId/manage'
-      preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport
-      parentRoute: typeof DashboardEventsEventIdRoute
-    }
-    '/dashboard/campaigns/$campaignId/zero': {
-      id: '/dashboard/campaigns/$campaignId/zero'
-      path: '/zero'
-      fullPath: '/dashboard/campaigns/$campaignId/zero'
-      preLoaderRoute: typeof DashboardCampaignsCampaignIdZeroRouteImport
-      parentRoute: typeof DashboardCampaignsCampaignIdRoute
-    }
+    "/teams": {
+      id: "/teams";
+      path: "/teams";
+      fullPath: "/teams";
+      preLoaderRoute: typeof TeamsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/search": {
+      id: "/search";
+      path: "/search";
+      fullPath: "/search";
+      preLoaderRoute: typeof SearchRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/resources": {
+      id: "/resources";
+      path: "/resources";
+      fullPath: "/resources";
+      preLoaderRoute: typeof ResourcesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/events": {
+      id: "/events";
+      path: "/events";
+      fullPath: "/events";
+      preLoaderRoute: typeof EventsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/design-system": {
+      id: "/design-system";
+      path: "/design-system";
+      fullPath: "/design-system";
+      preLoaderRoute: typeof DesignSystemRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/about": {
+      id: "/about";
+      path: "/about";
+      fullPath: "/about";
+      preLoaderRoute: typeof AboutRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/onboarding": {
+      id: "/onboarding";
+      path: "/onboarding";
+      fullPath: "/onboarding";
+      preLoaderRoute: typeof OnboardingRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/dashboard": {
+      id: "/dashboard";
+      path: "/dashboard";
+      fullPath: "/dashboard";
+      preLoaderRoute: typeof DashboardRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/auth": {
+      id: "/auth";
+      path: "/auth";
+      fullPath: "/auth";
+      preLoaderRoute: typeof AuthRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/systems/": {
+      id: "/systems/";
+      path: "/systems";
+      fullPath: "/systems";
+      preLoaderRoute: typeof SystemsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/onboarding/": {
+      id: "/onboarding/";
+      path: "/";
+      fullPath: "/onboarding/";
+      preLoaderRoute: typeof OnboardingIndexRouteImport;
+      parentRoute: typeof OnboardingRouteRoute;
+    };
+    "/events/": {
+      id: "/events/";
+      path: "/";
+      fullPath: "/events/";
+      preLoaderRoute: typeof EventsIndexRouteImport;
+      parentRoute: typeof EventsRoute;
+    };
+    "/dashboard/": {
+      id: "/dashboard/";
+      path: "/";
+      fullPath: "/dashboard/";
+      preLoaderRoute: typeof DashboardIndexRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/systems/$slug": {
+      id: "/systems/$slug";
+      path: "/systems/$slug";
+      fullPath: "/systems/$slug";
+      preLoaderRoute: typeof SystemsSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/game/$gameId": {
+      id: "/game/$gameId";
+      path: "/game/$gameId";
+      fullPath: "/game/$gameId";
+      preLoaderRoute: typeof GameGameIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/events/$slug": {
+      id: "/events/$slug";
+      path: "/$slug";
+      fullPath: "/events/$slug";
+      preLoaderRoute: typeof EventsSlugRouteImport;
+      parentRoute: typeof EventsRoute;
+    };
+    "/event/$eventId": {
+      id: "/event/$eventId";
+      path: "/event/$eventId";
+      fullPath: "/event/$eventId";
+      preLoaderRoute: typeof EventEventIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/dashboard/teams": {
+      id: "/dashboard/teams";
+      path: "/teams";
+      fullPath: "/dashboard/teams";
+      preLoaderRoute: typeof DashboardTeamsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/systems": {
+      id: "/dashboard/systems";
+      path: "/systems";
+      fullPath: "/dashboard/systems";
+      preLoaderRoute: typeof DashboardSystemsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/social-audits": {
+      id: "/dashboard/social-audits";
+      path: "/social-audits";
+      fullPath: "/dashboard/social-audits";
+      preLoaderRoute: typeof DashboardSocialAuditsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/settings": {
+      id: "/dashboard/settings";
+      path: "/settings";
+      fullPath: "/dashboard/settings";
+      preLoaderRoute: typeof DashboardSettingsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/reports": {
+      id: "/dashboard/reports";
+      path: "/reports";
+      fullPath: "/dashboard/reports";
+      preLoaderRoute: typeof DashboardReportsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/profile": {
+      id: "/dashboard/profile";
+      path: "/profile";
+      fullPath: "/dashboard/profile";
+      preLoaderRoute: typeof DashboardProfileRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/membership": {
+      id: "/dashboard/membership";
+      path: "/membership";
+      fullPath: "/dashboard/membership";
+      preLoaderRoute: typeof DashboardMembershipRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/members": {
+      id: "/dashboard/members";
+      path: "/members";
+      fullPath: "/dashboard/members";
+      preLoaderRoute: typeof DashboardMembersRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/games": {
+      id: "/dashboard/games";
+      path: "/games";
+      fullPath: "/dashboard/games";
+      preLoaderRoute: typeof DashboardGamesRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/forbidden": {
+      id: "/dashboard/forbidden";
+      path: "/forbidden";
+      fullPath: "/dashboard/forbidden";
+      preLoaderRoute: typeof DashboardForbiddenRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/events": {
+      id: "/dashboard/events";
+      path: "/events";
+      fullPath: "/dashboard/events";
+      preLoaderRoute: typeof DashboardEventsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/campaigns": {
+      id: "/dashboard/campaigns";
+      path: "/campaigns";
+      fullPath: "/dashboard/campaigns";
+      preLoaderRoute: typeof DashboardCampaignsRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/auth/signup": {
+      id: "/auth/signup";
+      path: "/signup";
+      fullPath: "/auth/signup";
+      preLoaderRoute: typeof AuthSignupRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/auth/reset-password": {
+      id: "/auth/reset-password";
+      path: "/reset-password";
+      fullPath: "/auth/reset-password";
+      preLoaderRoute: typeof AuthResetPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/auth/login": {
+      id: "/auth/login";
+      path: "/login";
+      fullPath: "/auth/login";
+      preLoaderRoute: typeof AuthLoginRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/auth/forgot-password": {
+      id: "/auth/forgot-password";
+      path: "/forgot-password";
+      fullPath: "/auth/forgot-password";
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport;
+      parentRoute: typeof AuthRouteRoute;
+    };
+    "/admin/roles": {
+      id: "/admin/roles";
+      path: "/admin/roles";
+      fullPath: "/admin/roles";
+      preLoaderRoute: typeof AdminRolesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/admin/events-review": {
+      id: "/admin/events-review";
+      path: "/admin/events-review";
+      fullPath: "/admin/events-review";
+      preLoaderRoute: typeof AdminEventsReviewRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/dashboard/admin": {
+      id: "/dashboard/admin";
+      path: "/admin";
+      fullPath: "/dashboard/admin";
+      preLoaderRoute: typeof DashboardAdminRouteRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/events/$slug/": {
+      id: "/events/$slug/";
+      path: "/";
+      fullPath: "/events/$slug/";
+      preLoaderRoute: typeof EventsSlugIndexRouteImport;
+      parentRoute: typeof EventsSlugRoute;
+    };
+    "/dev/email/": {
+      id: "/dev/email/";
+      path: "/dev/email";
+      fullPath: "/dev/email";
+      preLoaderRoute: typeof DevEmailIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/dashboard/teams/": {
+      id: "/dashboard/teams/";
+      path: "/";
+      fullPath: "/dashboard/teams/";
+      preLoaderRoute: typeof DashboardTeamsIndexRouteImport;
+      parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/systems/": {
+      id: "/dashboard/systems/";
+      path: "/";
+      fullPath: "/dashboard/systems/";
+      preLoaderRoute: typeof DashboardSystemsIndexRouteImport;
+      parentRoute: typeof DashboardSystemsRoute;
+    };
+    "/dashboard/profile/": {
+      id: "/dashboard/profile/";
+      path: "/";
+      fullPath: "/dashboard/profile/";
+      preLoaderRoute: typeof DashboardProfileIndexRouteImport;
+      parentRoute: typeof DashboardProfileRoute;
+    };
+    "/dashboard/games/": {
+      id: "/dashboard/games/";
+      path: "/";
+      fullPath: "/dashboard/games/";
+      preLoaderRoute: typeof DashboardGamesIndexRouteImport;
+      parentRoute: typeof DashboardGamesRoute;
+    };
+    "/dashboard/events/": {
+      id: "/dashboard/events/";
+      path: "/";
+      fullPath: "/dashboard/events/";
+      preLoaderRoute: typeof DashboardEventsIndexRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+    };
+    "/dashboard/campaigns/": {
+      id: "/dashboard/campaigns/";
+      path: "/";
+      fullPath: "/dashboard/campaigns/";
+      preLoaderRoute: typeof DashboardCampaignsIndexRouteImport;
+      parentRoute: typeof DashboardCampaignsRoute;
+    };
+    "/events/$slug/register": {
+      id: "/events/$slug/register";
+      path: "/register";
+      fullPath: "/events/$slug/register";
+      preLoaderRoute: typeof EventsSlugRegisterRouteImport;
+      parentRoute: typeof EventsSlugRoute;
+    };
+    "/dev/email/$template": {
+      id: "/dev/email/$template";
+      path: "/dev/email/$template";
+      fullPath: "/dev/email/$template";
+      preLoaderRoute: typeof DevEmailTemplateRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/dashboard/teams/create": {
+      id: "/dashboard/teams/create";
+      path: "/create";
+      fullPath: "/dashboard/teams/create";
+      preLoaderRoute: typeof DashboardTeamsCreateRouteImport;
+      parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/teams/browse": {
+      id: "/dashboard/teams/browse";
+      path: "/browse";
+      fullPath: "/dashboard/teams/browse";
+      preLoaderRoute: typeof DashboardTeamsBrowseRouteImport;
+      parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/teams/$teamId": {
+      id: "/dashboard/teams/$teamId";
+      path: "/$teamId";
+      fullPath: "/dashboard/teams/$teamId";
+      preLoaderRoute: typeof DashboardTeamsTeamIdRouteImport;
+      parentRoute: typeof DashboardTeamsRoute;
+    };
+    "/dashboard/systems/$systemId": {
+      id: "/dashboard/systems/$systemId";
+      path: "/$systemId";
+      fullPath: "/dashboard/systems/$systemId";
+      preLoaderRoute: typeof DashboardSystemsSystemIdRouteImport;
+      parentRoute: typeof DashboardSystemsRoute;
+    };
+    "/dashboard/reviews/pending": {
+      id: "/dashboard/reviews/pending";
+      path: "/reviews/pending";
+      fullPath: "/dashboard/reviews/pending";
+      preLoaderRoute: typeof DashboardReviewsPendingRouteImport;
+      parentRoute: typeof DashboardRouteRoute;
+    };
+    "/dashboard/profile/blocklist": {
+      id: "/dashboard/profile/blocklist";
+      path: "/blocklist";
+      fullPath: "/dashboard/profile/blocklist";
+      preLoaderRoute: typeof DashboardProfileBlocklistRouteImport;
+      parentRoute: typeof DashboardProfileRoute;
+    };
+    "/dashboard/profile/$userId": {
+      id: "/dashboard/profile/$userId";
+      path: "/$userId";
+      fullPath: "/dashboard/profile/$userId";
+      preLoaderRoute: typeof DashboardProfileUserIdRouteImport;
+      parentRoute: typeof DashboardProfileRoute;
+    };
+    "/dashboard/games/create": {
+      id: "/dashboard/games/create";
+      path: "/create";
+      fullPath: "/dashboard/games/create";
+      preLoaderRoute: typeof DashboardGamesCreateRouteImport;
+      parentRoute: typeof DashboardGamesRoute;
+    };
+    "/dashboard/games/$gameId": {
+      id: "/dashboard/games/$gameId";
+      path: "/$gameId";
+      fullPath: "/dashboard/games/$gameId";
+      preLoaderRoute: typeof DashboardGamesGameIdRouteImport;
+      parentRoute: typeof DashboardGamesRoute;
+    };
+    "/dashboard/events/create": {
+      id: "/dashboard/events/create";
+      path: "/create";
+      fullPath: "/dashboard/events/create";
+      preLoaderRoute: typeof DashboardEventsCreateRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+    };
+    "/dashboard/events/$eventId": {
+      id: "/dashboard/events/$eventId";
+      path: "/$eventId";
+      fullPath: "/dashboard/events/$eventId";
+      preLoaderRoute: typeof DashboardEventsEventIdRouteImport;
+      parentRoute: typeof DashboardEventsRoute;
+    };
+    "/dashboard/campaigns/create": {
+      id: "/dashboard/campaigns/create";
+      path: "/create";
+      fullPath: "/dashboard/campaigns/create";
+      preLoaderRoute: typeof DashboardCampaignsCreateRouteImport;
+      parentRoute: typeof DashboardCampaignsRoute;
+    };
+    "/dashboard/campaigns/$campaignId": {
+      id: "/dashboard/campaigns/$campaignId";
+      path: "/$campaignId";
+      fullPath: "/dashboard/campaigns/$campaignId";
+      preLoaderRoute: typeof DashboardCampaignsCampaignIdRouteImport;
+      parentRoute: typeof DashboardCampaignsRoute;
+    };
+    "/dashboard/admin/roles": {
+      id: "/dashboard/admin/roles";
+      path: "/roles";
+      fullPath: "/dashboard/admin/roles";
+      preLoaderRoute: typeof DashboardAdminRolesRouteImport;
+      parentRoute: typeof DashboardAdminRouteRoute;
+    };
+    "/dashboard/admin/events-review": {
+      id: "/dashboard/admin/events-review";
+      path: "/events-review";
+      fullPath: "/dashboard/admin/events-review";
+      preLoaderRoute: typeof DashboardAdminEventsReviewRouteImport;
+      parentRoute: typeof DashboardAdminRouteRoute;
+    };
+    "/dashboard/teams/$teamId/": {
+      id: "/dashboard/teams/$teamId/";
+      path: "/";
+      fullPath: "/dashboard/teams/$teamId/";
+      preLoaderRoute: typeof DashboardTeamsTeamIdIndexRouteImport;
+      parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
+    "/dashboard/campaigns/$campaignId/": {
+      id: "/dashboard/campaigns/$campaignId/";
+      path: "/";
+      fullPath: "/dashboard/campaigns/$campaignId/";
+      preLoaderRoute: typeof DashboardCampaignsCampaignIdIndexRouteImport;
+      parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+    };
+    "/dashboard/teams/$teamId/members": {
+      id: "/dashboard/teams/$teamId/members";
+      path: "/members";
+      fullPath: "/dashboard/teams/$teamId/members";
+      preLoaderRoute: typeof DashboardTeamsTeamIdMembersRouteImport;
+      parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
+    "/dashboard/teams/$teamId/manage": {
+      id: "/dashboard/teams/$teamId/manage";
+      path: "/manage";
+      fullPath: "/dashboard/teams/$teamId/manage";
+      preLoaderRoute: typeof DashboardTeamsTeamIdManageRouteImport;
+      parentRoute: typeof DashboardTeamsTeamIdRoute;
+    };
+    "/dashboard/events/$eventId/manage": {
+      id: "/dashboard/events/$eventId/manage";
+      path: "/manage";
+      fullPath: "/dashboard/events/$eventId/manage";
+      preLoaderRoute: typeof DashboardEventsEventIdManageRouteImport;
+      parentRoute: typeof DashboardEventsEventIdRoute;
+    };
+    "/dashboard/campaigns/$campaignId/zero": {
+      id: "/dashboard/campaigns/$campaignId/zero";
+      path: "/zero";
+      fullPath: "/dashboard/campaigns/$campaignId/zero";
+      preLoaderRoute: typeof DashboardCampaignsCampaignIdZeroRouteImport;
+      parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+    };
+  }
+}
+declare module "@tanstack/react-start/server" {
+  interface ServerFileRoutesByPath {
+    "/api/test-square": {
+      id: "/api/test-square";
+      path: "/api/test-square";
+      fullPath: "/api/test-square";
+      preLoaderRoute: typeof ApiTestSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/health": {
+      id: "/api/health";
+      path: "/api/health";
+      fullPath: "/api/health";
+      preLoaderRoute: typeof ApiHealthServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/debug-square": {
+      id: "/api/debug-square";
+      path: "/api/debug-square";
+      fullPath: "/api/debug-square";
+      preLoaderRoute: typeof ApiDebugSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/webhooks/square": {
+      id: "/api/webhooks/square";
+      path: "/api/webhooks/square";
+      fullPath: "/api/webhooks/square";
+      preLoaderRoute: typeof ApiWebhooksSquareServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/test/cleanup": {
+      id: "/api/test/cleanup";
+      path: "/api/test/cleanup";
+      fullPath: "/api/test/cleanup";
+      preLoaderRoute: typeof ApiTestCleanupServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/unfollow": {
+      id: "/api/social/unfollow";
+      path: "/api/social/unfollow";
+      fullPath: "/api/social/unfollow";
+      preLoaderRoute: typeof ApiSocialUnfollowServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/unblock": {
+      id: "/api/social/unblock";
+      path: "/api/social/unblock";
+      fullPath: "/api/social/unblock";
+      preLoaderRoute: typeof ApiSocialUnblockServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/relationship": {
+      id: "/api/social/relationship";
+      path: "/api/social/relationship";
+      fullPath: "/api/social/relationship";
+      preLoaderRoute: typeof ApiSocialRelationshipServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/follow": {
+      id: "/api/social/follow";
+      path: "/api/social/follow";
+      fullPath: "/api/social/follow";
+      preLoaderRoute: typeof ApiSocialFollowServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/blocklist": {
+      id: "/api/social/blocklist";
+      path: "/api/social/blocklist";
+      fullPath: "/api/social/blocklist";
+      preLoaderRoute: typeof ApiSocialBlocklistServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/social/block": {
+      id: "/api/social/block";
+      path: "/api/social/block";
+      fullPath: "/api/social/block";
+      preLoaderRoute: typeof ApiSocialBlockServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/avatars/$file": {
+      id: "/api/avatars/$file";
+      path: "/api/avatars/$file";
+      fullPath: "/api/avatars/$file";
+      preLoaderRoute: typeof ApiAvatarsFileServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/auth/$": {
+      id: "/api/auth/$";
+      path: "/api/auth/$";
+      fullPath: "/api/auth/$";
+      preLoaderRoute: typeof ApiAuthSplatServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/payments/square/callback": {
+      id: "/api/payments/square/callback";
+      path: "/api/payments/square/callback";
+      fullPath: "/api/payments/square/callback";
+      preLoaderRoute: typeof ApiPaymentsSquareCallbackServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
+    "/api/auth/$action/$provider": {
+      id: "/api/auth/$action/$provider";
+      path: "/api/auth/$action/$provider";
+      fullPath: "/api/auth/$action/$provider";
+      preLoaderRoute: typeof ApiAuthActionProviderServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
   }
 }
 
 interface AuthRouteRouteChildren {
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-  AuthSignupRoute: typeof AuthSignupRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute;
+  AuthLoginRoute: typeof AuthLoginRoute;
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute;
+  AuthSignupRoute: typeof AuthSignupRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
@@ -1344,28 +1674,28 @@ const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
-}
+};
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
-)
+);
 
 interface DashboardAdminRouteRouteChildren {
-  DashboardAdminEventsReviewRoute: typeof DashboardAdminEventsReviewRoute
-  DashboardAdminRolesRoute: typeof DashboardAdminRolesRoute
+  DashboardAdminEventsReviewRoute: typeof DashboardAdminEventsReviewRoute;
+  DashboardAdminRolesRoute: typeof DashboardAdminRolesRoute;
 }
 
 const DashboardAdminRouteRouteChildren: DashboardAdminRouteRouteChildren = {
   DashboardAdminEventsReviewRoute: DashboardAdminEventsReviewRoute,
   DashboardAdminRolesRoute: DashboardAdminRolesRoute,
-}
+};
 
 const DashboardAdminRouteRouteWithChildren =
-  DashboardAdminRouteRoute._addFileChildren(DashboardAdminRouteRouteChildren)
+  DashboardAdminRouteRoute._addFileChildren(DashboardAdminRouteRouteChildren);
 
 interface DashboardCampaignsCampaignIdRouteChildren {
-  DashboardCampaignsCampaignIdZeroRoute: typeof DashboardCampaignsCampaignIdZeroRoute
-  DashboardCampaignsCampaignIdIndexRoute: typeof DashboardCampaignsCampaignIdIndexRoute
+  DashboardCampaignsCampaignIdZeroRoute: typeof DashboardCampaignsCampaignIdZeroRoute;
+  DashboardCampaignsCampaignIdIndexRoute: typeof DashboardCampaignsCampaignIdIndexRoute;
 }
 
 const DashboardCampaignsCampaignIdRouteChildren: DashboardCampaignsCampaignIdRouteChildren =
@@ -1374,17 +1704,17 @@ const DashboardCampaignsCampaignIdRouteChildren: DashboardCampaignsCampaignIdRou
       DashboardCampaignsCampaignIdZeroRoute,
     DashboardCampaignsCampaignIdIndexRoute:
       DashboardCampaignsCampaignIdIndexRoute,
-  }
+  };
 
 const DashboardCampaignsCampaignIdRouteWithChildren =
   DashboardCampaignsCampaignIdRoute._addFileChildren(
     DashboardCampaignsCampaignIdRouteChildren,
-  )
+  );
 
 interface DashboardCampaignsRouteChildren {
-  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRouteWithChildren
-  DashboardCampaignsCreateRoute: typeof DashboardCampaignsCreateRoute
-  DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute
+  DashboardCampaignsCampaignIdRoute: typeof DashboardCampaignsCampaignIdRouteWithChildren;
+  DashboardCampaignsCreateRoute: typeof DashboardCampaignsCreateRoute;
+  DashboardCampaignsIndexRoute: typeof DashboardCampaignsIndexRoute;
 }
 
 const DashboardCampaignsRouteChildren: DashboardCampaignsRouteChildren = {
@@ -1392,105 +1722,105 @@ const DashboardCampaignsRouteChildren: DashboardCampaignsRouteChildren = {
     DashboardCampaignsCampaignIdRouteWithChildren,
   DashboardCampaignsCreateRoute: DashboardCampaignsCreateRoute,
   DashboardCampaignsIndexRoute: DashboardCampaignsIndexRoute,
-}
+};
 
 const DashboardCampaignsRouteWithChildren =
-  DashboardCampaignsRoute._addFileChildren(DashboardCampaignsRouteChildren)
+  DashboardCampaignsRoute._addFileChildren(DashboardCampaignsRouteChildren);
 
 interface DashboardEventsEventIdRouteChildren {
-  DashboardEventsEventIdManageRoute: typeof DashboardEventsEventIdManageRoute
+  DashboardEventsEventIdManageRoute: typeof DashboardEventsEventIdManageRoute;
 }
 
 const DashboardEventsEventIdRouteChildren: DashboardEventsEventIdRouteChildren =
   {
     DashboardEventsEventIdManageRoute: DashboardEventsEventIdManageRoute,
-  }
+  };
 
 const DashboardEventsEventIdRouteWithChildren =
   DashboardEventsEventIdRoute._addFileChildren(
     DashboardEventsEventIdRouteChildren,
-  )
+  );
 
 interface DashboardEventsRouteChildren {
-  DashboardEventsEventIdRoute: typeof DashboardEventsEventIdRouteWithChildren
-  DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute
-  DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute
+  DashboardEventsEventIdRoute: typeof DashboardEventsEventIdRouteWithChildren;
+  DashboardEventsCreateRoute: typeof DashboardEventsCreateRoute;
+  DashboardEventsIndexRoute: typeof DashboardEventsIndexRoute;
 }
 
 const DashboardEventsRouteChildren: DashboardEventsRouteChildren = {
   DashboardEventsEventIdRoute: DashboardEventsEventIdRouteWithChildren,
   DashboardEventsCreateRoute: DashboardEventsCreateRoute,
   DashboardEventsIndexRoute: DashboardEventsIndexRoute,
-}
+};
 
 const DashboardEventsRouteWithChildren = DashboardEventsRoute._addFileChildren(
   DashboardEventsRouteChildren,
-)
+);
 
 interface DashboardGamesRouteChildren {
-  DashboardGamesGameIdRoute: typeof DashboardGamesGameIdRoute
-  DashboardGamesCreateRoute: typeof DashboardGamesCreateRoute
-  DashboardGamesIndexRoute: typeof DashboardGamesIndexRoute
+  DashboardGamesGameIdRoute: typeof DashboardGamesGameIdRoute;
+  DashboardGamesCreateRoute: typeof DashboardGamesCreateRoute;
+  DashboardGamesIndexRoute: typeof DashboardGamesIndexRoute;
 }
 
 const DashboardGamesRouteChildren: DashboardGamesRouteChildren = {
   DashboardGamesGameIdRoute: DashboardGamesGameIdRoute,
   DashboardGamesCreateRoute: DashboardGamesCreateRoute,
   DashboardGamesIndexRoute: DashboardGamesIndexRoute,
-}
+};
 
 const DashboardGamesRouteWithChildren = DashboardGamesRoute._addFileChildren(
   DashboardGamesRouteChildren,
-)
+);
 
 interface DashboardProfileRouteChildren {
-  DashboardProfileUserIdRoute: typeof DashboardProfileUserIdRoute
-  DashboardProfileBlocklistRoute: typeof DashboardProfileBlocklistRoute
-  DashboardProfileIndexRoute: typeof DashboardProfileIndexRoute
+  DashboardProfileUserIdRoute: typeof DashboardProfileUserIdRoute;
+  DashboardProfileBlocklistRoute: typeof DashboardProfileBlocklistRoute;
+  DashboardProfileIndexRoute: typeof DashboardProfileIndexRoute;
 }
 
 const DashboardProfileRouteChildren: DashboardProfileRouteChildren = {
   DashboardProfileUserIdRoute: DashboardProfileUserIdRoute,
   DashboardProfileBlocklistRoute: DashboardProfileBlocklistRoute,
   DashboardProfileIndexRoute: DashboardProfileIndexRoute,
-}
+};
 
 const DashboardProfileRouteWithChildren =
-  DashboardProfileRoute._addFileChildren(DashboardProfileRouteChildren)
+  DashboardProfileRoute._addFileChildren(DashboardProfileRouteChildren);
 
 interface DashboardSystemsRouteChildren {
-  DashboardSystemsSystemIdRoute: typeof DashboardSystemsSystemIdRoute
-  DashboardSystemsIndexRoute: typeof DashboardSystemsIndexRoute
+  DashboardSystemsSystemIdRoute: typeof DashboardSystemsSystemIdRoute;
+  DashboardSystemsIndexRoute: typeof DashboardSystemsIndexRoute;
 }
 
 const DashboardSystemsRouteChildren: DashboardSystemsRouteChildren = {
   DashboardSystemsSystemIdRoute: DashboardSystemsSystemIdRoute,
   DashboardSystemsIndexRoute: DashboardSystemsIndexRoute,
-}
+};
 
 const DashboardSystemsRouteWithChildren =
-  DashboardSystemsRoute._addFileChildren(DashboardSystemsRouteChildren)
+  DashboardSystemsRoute._addFileChildren(DashboardSystemsRouteChildren);
 
 interface DashboardTeamsTeamIdRouteChildren {
-  DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute
-  DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute
-  DashboardTeamsTeamIdIndexRoute: typeof DashboardTeamsTeamIdIndexRoute
+  DashboardTeamsTeamIdManageRoute: typeof DashboardTeamsTeamIdManageRoute;
+  DashboardTeamsTeamIdMembersRoute: typeof DashboardTeamsTeamIdMembersRoute;
+  DashboardTeamsTeamIdIndexRoute: typeof DashboardTeamsTeamIdIndexRoute;
 }
 
 const DashboardTeamsTeamIdRouteChildren: DashboardTeamsTeamIdRouteChildren = {
   DashboardTeamsTeamIdManageRoute: DashboardTeamsTeamIdManageRoute,
   DashboardTeamsTeamIdMembersRoute: DashboardTeamsTeamIdMembersRoute,
   DashboardTeamsTeamIdIndexRoute: DashboardTeamsTeamIdIndexRoute,
-}
+};
 
 const DashboardTeamsTeamIdRouteWithChildren =
-  DashboardTeamsTeamIdRoute._addFileChildren(DashboardTeamsTeamIdRouteChildren)
+  DashboardTeamsTeamIdRoute._addFileChildren(DashboardTeamsTeamIdRouteChildren);
 
 interface DashboardTeamsRouteChildren {
-  DashboardTeamsTeamIdRoute: typeof DashboardTeamsTeamIdRouteWithChildren
-  DashboardTeamsBrowseRoute: typeof DashboardTeamsBrowseRoute
-  DashboardTeamsCreateRoute: typeof DashboardTeamsCreateRoute
-  DashboardTeamsIndexRoute: typeof DashboardTeamsIndexRoute
+  DashboardTeamsTeamIdRoute: typeof DashboardTeamsTeamIdRouteWithChildren;
+  DashboardTeamsBrowseRoute: typeof DashboardTeamsBrowseRoute;
+  DashboardTeamsCreateRoute: typeof DashboardTeamsCreateRoute;
+  DashboardTeamsIndexRoute: typeof DashboardTeamsIndexRoute;
 }
 
 const DashboardTeamsRouteChildren: DashboardTeamsRouteChildren = {
@@ -1498,28 +1828,28 @@ const DashboardTeamsRouteChildren: DashboardTeamsRouteChildren = {
   DashboardTeamsBrowseRoute: DashboardTeamsBrowseRoute,
   DashboardTeamsCreateRoute: DashboardTeamsCreateRoute,
   DashboardTeamsIndexRoute: DashboardTeamsIndexRoute,
-}
+};
 
 const DashboardTeamsRouteWithChildren = DashboardTeamsRoute._addFileChildren(
   DashboardTeamsRouteChildren,
-)
+);
 
 interface DashboardRouteRouteChildren {
-  DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren
-  DashboardCampaignsRoute: typeof DashboardCampaignsRouteWithChildren
-  DashboardEventsRoute: typeof DashboardEventsRouteWithChildren
-  DashboardForbiddenRoute: typeof DashboardForbiddenRoute
-  DashboardGamesRoute: typeof DashboardGamesRouteWithChildren
-  DashboardMembersRoute: typeof DashboardMembersRoute
-  DashboardMembershipRoute: typeof DashboardMembershipRoute
-  DashboardProfileRoute: typeof DashboardProfileRouteWithChildren
-  DashboardReportsRoute: typeof DashboardReportsRoute
-  DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute
-  DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren
-  DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren
-  DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute
+  DashboardAdminRouteRoute: typeof DashboardAdminRouteRouteWithChildren;
+  DashboardCampaignsRoute: typeof DashboardCampaignsRouteWithChildren;
+  DashboardEventsRoute: typeof DashboardEventsRouteWithChildren;
+  DashboardForbiddenRoute: typeof DashboardForbiddenRoute;
+  DashboardGamesRoute: typeof DashboardGamesRouteWithChildren;
+  DashboardMembersRoute: typeof DashboardMembersRoute;
+  DashboardMembershipRoute: typeof DashboardMembershipRoute;
+  DashboardProfileRoute: typeof DashboardProfileRouteWithChildren;
+  DashboardReportsRoute: typeof DashboardReportsRoute;
+  DashboardSettingsRoute: typeof DashboardSettingsRoute;
+  DashboardSocialAuditsRoute: typeof DashboardSocialAuditsRoute;
+  DashboardSystemsRoute: typeof DashboardSystemsRouteWithChildren;
+  DashboardTeamsRoute: typeof DashboardTeamsRouteWithChildren;
+  DashboardIndexRoute: typeof DashboardIndexRoute;
+  DashboardReviewsPendingRoute: typeof DashboardReviewsPendingRoute;
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
@@ -1538,50 +1868,50 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardTeamsRoute: DashboardTeamsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardReviewsPendingRoute: DashboardReviewsPendingRoute,
-}
+};
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
-)
+);
 
 interface OnboardingRouteRouteChildren {
-  OnboardingIndexRoute: typeof OnboardingIndexRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute;
 }
 
 const OnboardingRouteRouteChildren: OnboardingRouteRouteChildren = {
   OnboardingIndexRoute: OnboardingIndexRoute,
-}
+};
 
 const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
   OnboardingRouteRouteChildren,
-)
+);
 
 interface EventsSlugRouteChildren {
-  EventsSlugRegisterRoute: typeof EventsSlugRegisterRoute
-  EventsSlugIndexRoute: typeof EventsSlugIndexRoute
+  EventsSlugRegisterRoute: typeof EventsSlugRegisterRoute;
+  EventsSlugIndexRoute: typeof EventsSlugIndexRoute;
 }
 
 const EventsSlugRouteChildren: EventsSlugRouteChildren = {
   EventsSlugRegisterRoute: EventsSlugRegisterRoute,
   EventsSlugIndexRoute: EventsSlugIndexRoute,
-}
+};
 
 const EventsSlugRouteWithChildren = EventsSlugRoute._addFileChildren(
   EventsSlugRouteChildren,
-)
+);
 
 interface EventsRouteChildren {
-  EventsSlugRoute: typeof EventsSlugRouteWithChildren
-  EventsIndexRoute: typeof EventsIndexRoute
+  EventsSlugRoute: typeof EventsSlugRouteWithChildren;
+  EventsIndexRoute: typeof EventsIndexRoute;
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
   EventsSlugRoute: EventsSlugRouteWithChildren,
   EventsIndexRoute: EventsIndexRoute,
-}
+};
 
 const EventsRouteWithChildren =
-  EventsRoute._addFileChildren(EventsRouteChildren)
+  EventsRoute._addFileChildren(EventsRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1602,7 +1932,27 @@ const rootRouteChildren: RootRouteChildren = {
   SystemsIndexRoute: SystemsIndexRoute,
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiDebugSquareServerRoute: ApiDebugSquareServerRoute,
+  ApiHealthServerRoute: ApiHealthServerRoute,
+  ApiTestSquareServerRoute: ApiTestSquareServerRoute,
+  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
+  ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,
+  ApiSocialBlocklistServerRoute: ApiSocialBlocklistServerRoute,
+  ApiSocialFollowServerRoute: ApiSocialFollowServerRoute,
+  ApiSocialRelationshipServerRoute: ApiSocialRelationshipServerRoute,
+  ApiSocialUnblockServerRoute: ApiSocialUnblockServerRoute,
+  ApiSocialUnfollowServerRoute: ApiSocialUnfollowServerRoute,
+  ApiTestCleanupServerRoute: ApiTestCleanupServerRoute,
+  ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
+  ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,
+  ApiPaymentsSquareCallbackServerRoute: ApiPaymentsSquareCallbackServerRoute,
+};
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>();

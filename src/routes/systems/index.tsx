@@ -3,15 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 
-import { CategoryTagInput } from "~/features/game-systems/components/category-tag-input";
-import { SystemCard } from "~/features/game-systems/components/system-card";
-import { listSystems } from "~/features/game-systems/game-systems.queries";
-import type { ListSystemsInput } from "~/features/game-systems/game-systems.schemas";
-import type {
-  AvailableGameSystemFilters,
-  GameSystemListItem,
-} from "~/features/game-systems/game-systems.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -22,6 +13,15 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { CategoryTagInput } from "~/features/game-systems/components/category-tag-input";
+import { SystemCard } from "~/features/game-systems/components/system-card";
+import { listSystems } from "~/features/game-systems/game-systems.queries";
+import type { ListSystemsInput } from "~/features/game-systems/game-systems.schemas";
+import type {
+  AvailableGameSystemFilters,
+  GameSystemListItem,
+} from "~/features/game-systems/game-systems.types";
+import { PublicLayout } from "~/features/layouts/public-layout";
 
 const SYSTEMS_PER_PAGE = 20;
 

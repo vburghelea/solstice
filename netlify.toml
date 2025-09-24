@@ -1,0 +1,45 @@
+[build]
+  publish = "dist"
+  command = "pnpm build"
+
+[functions]
+  directory = "netlify/functions"
+
+# Scheduled functions to process crawl queue every 5 minutes
+[functions."process-crawl-queue"]
+  schedule = "*/5 * * * *"
+  timeout = 900
+
+# Environment variables for crawler configuration
+[context.production.environment]
+  CRAWLER_USER_AGENT = "SolsticeGameCrawler/1.0"
+
+[context.deploy-preview.environment]
+  CRAWLER_USER_AGENT = "SolsticeGameCrawler/1.0"
+
+[context.branch-deploy.environment]
+  CRAWLER_USER_AGENT = "SolsticeGameCrawler/1.0"
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://roundup.games"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+# Redirects for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

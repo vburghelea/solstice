@@ -1610,7 +1610,7 @@ export class SquarePaymentService {
           redirectUrl: `${baseUrl}/api/payments/square/callback`,
           askForShippingAddress: false,
           merchantSupportEmail:
-            process.env["SUPPORT_EMAIL"] || "support@quadballcanada.com",
+            process.env["SUPPORT_EMAIL"] || "support@roundup.games",
         },
         prePopulatedData: {
           buyerEmail: null, // Will be set from user data in the future

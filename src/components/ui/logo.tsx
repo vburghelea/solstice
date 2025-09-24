@@ -6,14 +6,14 @@ interface LogoProps {
 }
 
 export function Logo({ className, alt = "Roundup Games logo" }: LogoProps) {
-  const [src, setSrc] = useState<string>("/quadball-canada-logo.svg");
+  const [src, setSrc] = useState<string>("/roundup-games-logo.svg");
 
   return (
     <img
       src={src}
       alt={alt}
       className={"object-contain " + (className ?? "")}
-      onError={() => setSrc("/quadball-canada-logo.jpg")}
+      onError={() => setSrc("/icons/roundup-games-icon.svg")}
     />
   );
 }

@@ -44,6 +44,8 @@ export interface User extends BetterAuthUser {
   gender: string | null;
   pronouns: string | null;
   phone: string | null;
+  city: string | null;
+  country: string | null;
 
   // Privacy and preferences
   privacySettings: string | null; // JSON string

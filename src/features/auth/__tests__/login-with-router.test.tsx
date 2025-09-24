@@ -68,6 +68,8 @@ describe("LoginForm with TanStack Router", () => {
       phone: "+1234567890",
       gender: "male" as const,
       pronouns: "he/him",
+      city: null,
+      country: null,
       privacySettings: JSON.stringify({
         showEmail: false,
         showPhone: false,

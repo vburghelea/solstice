@@ -44,6 +44,8 @@ describe("AdminLayout with Router", () => {
       phone: "+1234567890",
       gender: "male" as const,
       pronouns: "he/him",
+      city: null,
+      country: null,
       privacySettings: JSON.stringify({
         showEmail: false,
         showPhone: false,
@@ -107,6 +109,8 @@ describe("AdminLayout with Router", () => {
       phone: "+1234567890",
       gender: "female" as const,
       pronouns: "she/her",
+      city: null,
+      country: null,
       privacySettings: JSON.stringify({
         showEmail: false,
         showPhone: false,

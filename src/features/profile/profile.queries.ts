@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { AvailabilityData } from "~/db/schema/auth.schema";
 import { user as userTable } from "~/db/schema/auth.schema";
@@ -8,8 +8,11 @@ import {
   userGameSystemPreferences,
   type GameSystem,
 } from "~/db/schema/game-systems.schema";
+import { zod$ } from "~/lib/server/fn-utils";
 import type { OperationResult } from "~/shared/types/common";
+import { listUserLocationsSchema } from "./profile.schemas";
 import type {
+  CountryLocationGroup,
   PrivacySettings,
   ProfileOperationResult,
   UserProfile,
@@ -399,6 +402,80 @@ export const getUserGameSystemPreferences = createServerFn({ method: "GET" }).ha
     }
   },
 );
+
+export const listUserLocations = createServerFn({ method: "GET" })
+  .validator(zod$(listUserLocationsSchema))
+  .handler(async ({ data }): Promise<CountryLocationGroup[]> => {
+    try {
+      const limitPerCountry = Math.max(1, Math.min(50, data?.limitPerCountry ?? 6));
+      const { getDb } = await import("~/db/server-helpers");
+      const db = await getDb();
+
+      const locationRows = await db
+        .select({
+          country: userTable.country,
+          city: userTable.city,
+          userCount: sql<number>`count(*)::int`,
+        })
+        .from(userTable)
+        .where(
+          and(
+            sql`NULLIF(TRIM(${userTable.city}), '') IS NOT NULL`,
+            sql`NULLIF(TRIM(${userTable.country}), '') IS NOT NULL`,
+          ),
+        )
+        .groupBy(userTable.country, userTable.city);
+
+      type LocationAccumulator = {
+        country: string;
+        total: number;
+        cities: Array<{ city: string; userCount: number }>;
+      };
+
+      const groupsMap = new Map<string, LocationAccumulator>();
+
+      for (const row of locationRows) {
+        const country = row.country?.trim();
+        const city = row.city?.trim();
+        if (!country || !city) {
+          continue;
+        }
+
+        const userCount = typeof row.userCount === "number" ? row.userCount : 0;
+        const existing: LocationAccumulator = groupsMap.get(country) ?? {
+          country,
+          total: 0,
+          cities: [],
+        };
+
+        existing.total += userCount;
+        existing.cities.push({ city, userCount });
+        groupsMap.set(country, existing);
+      }
+
+      const groupedLocations = Array.from(groupsMap.values())
+        .map<CountryLocationGroup>((group) => {
+          const sortedCities = [...group.cities]
+            .sort((a, b) => b.userCount - a.userCount || a.city.localeCompare(b.city))
+            .slice(0, limitPerCountry);
+
+          return {
+            country: group.country,
+            totalUsers: group.total,
+            cities: sortedCities,
+          };
+        })
+        .filter((group) => group.cities.length > 0)
+        .sort(
+          (a, b) => b.totalUsers - a.totalUsers || a.country.localeCompare(b.country),
+        );
+
+      return groupedLocations;
+    } catch (error) {
+      console.error("Error listing user locations:", error);
+      return [];
+    }
+  });
 
 // Re-export utility function
 export { isProfileComplete } from "./profile.utils";

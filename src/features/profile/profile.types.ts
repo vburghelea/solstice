@@ -57,6 +57,17 @@ export interface UserProfile {
 
 export type ProfileInput = ProfileInputType;
 
+export interface CityLocationOption {
+  city: string;
+  userCount: number;
+}
+
+export interface CountryLocationGroup {
+  country: string;
+  totalUsers: number;
+  cities: CityLocationOption[];
+}
+
 // Social Feature Types
 export interface UserFollow {
   id: string;

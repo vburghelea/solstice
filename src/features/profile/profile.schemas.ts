@@ -93,3 +93,11 @@ export const completeUserProfileInputSchema = z.object({
 export const updatePrivacySettingsInputSchema = z.object({
   data: privacySettingsSchema,
 });
+
+export const listUserLocationsSchema = z
+  .object({
+    limitPerCountry: z.number().int().min(1).max(50).optional(),
+  })
+  .optional();
+
+export type ListUserLocationsInput = z.infer<typeof listUserLocationsSchema>;

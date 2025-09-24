@@ -23,6 +23,8 @@ describe("Route Guards", () => {
     phone: "+1234567890",
     gender: "male",
     pronouns: "he/him",
+    city: null,
+    country: null,
     privacySettings: JSON.stringify({
       showEmail: false,
       showPhone: false,

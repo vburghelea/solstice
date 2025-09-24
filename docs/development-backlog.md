@@ -2,7 +2,7 @@
 
 **Last Updated**: January 2025
 
-This is the prioritized development roadmap for Solstice, Quadball Canada's league management platform. Each ticket includes priority (P0 = highest), status, dependencies, and key implementation details.
+This is the prioritized development roadmap for Solstice, Roundup Games' community platform for tabletop and board game organizers. Each ticket includes priority (P0 = highest), status, dependencies, and key implementation details.
 
 ---
 
@@ -137,14 +137,14 @@ These are production-critical issues that should be addressed before new feature
 
 ### FE-4: Mobile PWA Optimization
 
-|                |                                                                                                                                                                                                                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                    |
-| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                                          |
-| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                                          |
-| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                                              |
-| **Tasks**      | <ul><li>Add PWA manifest with Quadball Canada branding</li><li>Implement service worker for offline support</li><li>Add install prompt for mobile users</li><li>Optimize touch targets for mobile</li><li>Add pull-to-refresh on dashboard</li><li>Test on real devices</li></ul> |
-| **Thoughts**   | Vite has PWA plugin; focus on offline-first for event days with poor connectivity                                                                                                                                                                                                 |
+|                |                                                                                                                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | ❌ Not Started                                                                                                                                                                                                                                                                  |
+| **Why now**    | Mobile usage expected to be high for event check-ins; current mobile experience is basic                                                                                                                                                                                        |
+| **Depends on** | None, but best after core features (P1+)                                                                                                                                                                                                                                        |
+| **Code refs**  | `public/manifest.json` (create), `src/app.tsx`, service worker setup                                                                                                                                                                                                            |
+| **Tasks**      | <ul><li>Add PWA manifest with Roundup Games branding</li><li>Implement service worker for offline support</li><li>Add install prompt for mobile users</li><li>Optimize touch targets for mobile</li><li>Add pull-to-refresh on dashboard</li><li>Test on real devices</li></ul> |
+| **Thoughts**   | Vite has PWA plugin; focus on offline-first for event days with poor connectivity                                                                                                                                                                                               |
 
 ---
 

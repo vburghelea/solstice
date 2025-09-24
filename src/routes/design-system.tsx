@@ -42,7 +42,7 @@ function DesignSystemPage() {
         subtitle="Preview the design system building blocks used across Roundup Games user flows."
         backgroundImage="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
         ctaText="View source documentation"
-        ctaLink="https://github.com/quadball-canada"
+        ctaLink="https://github.com/roundup-games"
         secondaryCta={{
           text: "Return home",
           link: "/",

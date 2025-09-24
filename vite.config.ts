@@ -74,8 +74,8 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         includeAssets: [
           "favicon.ico",
-          "icons/quadball-icon.svg",
-          "icons/quadball-icon-maskable.svg",
+          "icons/roundup-games-icon.svg",
+          "icons/roundup-games-icon-maskable.svg",
         ],
         manifest: {
           id: "/",
@@ -89,13 +89,13 @@ export default defineConfig(({ mode }) => {
           display: "standalone",
           icons: [
             {
-              src: "/icons/quadball-icon.svg",
+              src: "/icons/roundup-games-icon.svg",
               sizes: "512x512",
               type: "image/svg+xml",
               purpose: "any",
             },
             {
-              src: "/icons/quadball-icon-maskable.svg",
+              src: "/icons/roundup-games-icon-maskable.svg",
               sizes: "512x512",
               type: "image/svg+xml",
               purpose: "maskable",
@@ -109,7 +109,7 @@ export default defineConfig(({ mode }) => {
                 request.destination === "document",
               handler: "NetworkFirst",
               options: {
-                cacheName: "qc-pages",
+                cacheName: "roundup-pages",
                 expiration: { maxEntries: 20, maxAgeSeconds: 60 * 30 },
               },
             },
@@ -117,7 +117,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }: { url: URL }) => url.pathname.startsWith("/events"),
               handler: "NetworkFirst",
               options: {
-                cacheName: "qc-events",
+                cacheName: "roundup-events",
                 expiration: { maxEntries: 60, maxAgeSeconds: 60 * 30 },
               },
             },
@@ -126,7 +126,7 @@ export default defineConfig(({ mode }) => {
                 request.destination === "image",
               handler: "CacheFirst",
               options: {
-                cacheName: "qc-images",
+                cacheName: "roundup-images",
                 expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
               },
             },

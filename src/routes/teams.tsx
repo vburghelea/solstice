@@ -14,7 +14,7 @@ const pathways = [
   {
     title: "Community & City Leagues",
     description:
-      "Adult leagues keep Quadball active year-round with mixed skill divisions, house teams, and travelling squads. We can help with scheduling, insurance, and grant applications.",
+      "Adult leagues keep tabletop nights thriving year-round with mixed skill divisions, house tables, and travelling meetup groups. We can help with scheduling, insurance, and grant applications.",
     icon: MapPinIcon,
   },
   {
@@ -53,7 +53,7 @@ function TeamsPage() {
       <HeroSection
         eyebrow="Teams & Clubs"
         title="Find your squad or build one from the ground up"
-        subtitle="From coast-to-coast, Quadball clubs are recruiting athletes, coaches, officials, and volunteers. Discover teams near you and access the resources to help your program thrive."
+        subtitle="From coast-to-coast, tabletop communities are recruiting hosts, storytellers, rules gurus, and volunteers. Discover groups near you and access the resources to help your program thrive."
         backgroundImage="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=2000&q=80"
         ctaText="Browse club resources"
         ctaLink="/resources"
@@ -105,7 +105,7 @@ function TeamsPage() {
               country.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="mailto:clubs@quadball.ca">
+              <a href="mailto:clubs@roundup.games">
                 <Button className="btn-brand-primary">Email regional support</Button>
               </a>
               <Link to="/events">

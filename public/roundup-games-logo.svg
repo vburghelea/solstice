@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="rg-gradient" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#d82929" />
+      <stop offset="100%" stop-color="#a91515" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#rg-gradient)" />
+  <circle cx="64" cy="44" r="20" fill="#ffffff" opacity="0.95" />
+  <path
+    fill="#ffffff"
+    d="M32 98c0-17.673 14.327-32 32-32s32 14.327 32 32v10H32z"
+    opacity="0.95"
+  />
+  <polygon points="64 62 92 108 36 108" fill="#f5d06f" opacity="0.9" />
+  <rect x="44" y="82" width="40" height="18" rx="6" fill="#d82929" opacity="0.75" />
+</svg>

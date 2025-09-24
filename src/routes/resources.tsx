@@ -7,63 +7,75 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 const resourceSections = [
   {
     id: "club-toolkit",
-    title: "Club starter toolkit",
+    title: "Community starter toolkit",
     description:
-      "Governing documents, budget planners, sponsorship decks, and communication templates that help new clubs launch with confidence.",
+      "Charters, budget planners, sponsorship decks, and onboarding emails tailored for tabletop clubs and board game cafés.",
     actions: [
-      { label: "Download toolkit", href: "https://cdn.quadball.ca/toolkit.pdf" },
       {
-        label: "View constitution template",
-        href: "https://cdn.quadball.ca/constitution.docx",
+        label: "Download toolkit",
+        href: "https://cdn.roundup.games/community-toolkit.pdf",
+      },
+      {
+        label: "View charter template",
+        href: "https://cdn.roundup.games/club-charter.docx",
       },
     ],
   },
   {
     id: "training",
-    title: "Training & performance library",
+    title: "Session design library",
     description:
-      "Position-specific drills, practice plans, and strength programs designed by national team and sport science staff.",
+      "Adventure prompts, campaign handbooks, and board game rotation plans curated by experienced Game Masters and event hosts.",
     actions: [
-      { label: "Access session plans", href: "https://cdn.quadball.ca/practice-plans" },
-      { label: "Watch skills clinics", href: "https://cdn.quadball.ca/clinic-replays" },
+      { label: "Browse session plans", href: "https://cdn.roundup.games/session-plans" },
+      {
+        label: "Watch facilitation clinics",
+        href: "https://cdn.roundup.games/facilitation-clinics",
+      },
     ],
   },
   {
     id: "safe-sport",
-    title: "Safe sport & governance",
+    title: "Safety & accessibility resources",
     description:
-      "Policies, reporting forms, and educational modules that align clubs with Quadball Canada’s safeguarding standards.",
+      "Policies, safety briefs, and inclusivity guidelines aligned with Roundup Games community standards.",
     actions: [
-      { label: "Download policies", href: "https://cdn.quadball.ca/safe-sport" },
-      { label: "Report a concern", href: "mailto:safesport@quadball.ca" },
+      {
+        label: "Download policies",
+        href: "https://cdn.roundup.games/community-guidelines",
+      },
+      { label: "Report a concern", href: "mailto:care@roundup.games" },
     ],
   },
 ];
 
 const certificationTracks = [
   {
-    title: "Coaching pathway",
+    title: "Game Master pathway",
     description:
-      "Three-tier certification with modules on program design, inclusive coaching, and athlete wellness. Required for national event bench staff.",
+      "Self-paced modules covering session zero best practices, safety tools, and campaign pacing—perfect for storytellers leading long-form games.",
     icon: UsersIcon,
-    cta: { label: "Start coaching modules", href: "https://learn.quadball.ca/coaching" },
+    cta: { label: "Start GM training", href: "https://learn.roundup.games/game-master" },
   },
   {
-    title: "Referee & snitch pathway",
+    title: "Community host pathway",
     description:
-      "Online rule exams plus in-person practicums scheduled across Canada. Stay certified for national championships and IQA events.",
+      "Workshops on event flow, table assignments, and welcoming new players—ideal for café managers and meetup organizers running open play nights.",
     icon: Trophy,
     cta: {
-      label: "Register for accreditation",
-      href: "https://learn.quadball.ca/officiating",
+      label: "Register for host labs",
+      href: "https://learn.roundup.games/community-host",
     },
   },
   {
     title: "Event operations pathway",
     description:
-      "Tournament-in-a-box guides covering scheduling, volunteer coordination, medical planning, and digital scoring systems.",
+      "Step-by-step playbooks for scheduling tournaments, coordinating volunteers, and implementing streamlined check-in systems.",
     icon: CalendarIcon,
-    cta: { label: "Download event kit", href: "https://cdn.quadball.ca/event-kit" },
+    cta: {
+      label: "Download operations kit",
+      href: "https://cdn.roundup.games/event-operations-kit",
+    },
   },
 ];
 
@@ -76,14 +88,14 @@ function ResourcesPage() {
     <PublicLayout>
       <HeroSection
         eyebrow="Resources"
-        title="Everything you need to run great Quadball"
-        subtitle="Toolkits, training plans, and certification pathways kept up to date by Quadball Canada’s development staff."
+        title="Run unforgettable tabletop programs"
+        subtitle="Toolkits, training plans, and certification pathways curated by the Roundup Games development team."
         backgroundImage="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80"
         ctaText="Browse by category"
         ctaLink="#club-toolkit"
         secondaryCta={{
           text: "Request custom support",
-          link: "mailto:development@quadball.ca",
+          link: "mailto:development@roundup.games",
         }}
       />
 
@@ -170,7 +182,7 @@ function ResourcesPage() {
               resources and connections for your region.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="https://cal.com/quadballcanada/development">
+              <a href="https://cal.com/roundupgames/community-success">
                 <Button className="btn-brand-primary" variant="default">
                   Schedule a meeting
                 </Button>

@@ -47,6 +47,8 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
       gender: dbUser[0].gender,
       pronouns: dbUser[0].pronouns,
       phone: dbUser[0].phone,
+      city: dbUser[0].city,
+      country: dbUser[0].country,
       privacySettings: dbUser[0].privacySettings,
       profileVersion: dbUser[0].profileVersion,
       profileUpdatedAt: dbUser[0].profileUpdatedAt,

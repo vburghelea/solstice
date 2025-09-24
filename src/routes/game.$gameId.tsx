@@ -85,44 +85,6 @@ function GameDetailPage() {
           </p>
         </div>
 
-        {/* Mobile anchor nav for sections */}
-        <nav aria-label="Sections" className="mb-4 overflow-x-auto">
-          <ul className="flex gap-3 text-sm">
-            <li>
-              <a
-                className="text-primary underline-offset-4 hover:underline"
-                href="#general"
-              >
-                General
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-primary underline-offset-4 hover:underline"
-                href="#location"
-              >
-                Location
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-primary underline-offset-4 hover:underline"
-                href="#requirements"
-              >
-                Requirements
-              </a>
-            </li>
-            <li>
-              <a
-                className="text-primary underline-offset-4 hover:underline"
-                href="#safety"
-              >
-                Safety
-              </a>
-            </li>
-          </ul>
-        </nav>
-
         {/* Description card */}
         {gameDetails.description ? (
           <div className="bg-card text-foreground mb-4 rounded-lg p-4 shadow-sm">

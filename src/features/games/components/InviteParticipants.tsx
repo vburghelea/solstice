@@ -11,6 +11,7 @@ import { useDebounce } from "~/shared/hooks/useDebounce";
 import type { OperationResult } from "~/shared/types/common";
 
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -21,7 +22,6 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface InviteParticipantsProps {
   gameId: string;
@@ -136,7 +136,7 @@ export function InviteParticipants({
                     className="hover:bg-accent flex items-center justify-between rounded-sm p-2"
                   >
                     <div className="flex items-center gap-2">
-                      <UserAvatar
+                      <Avatar
                         name={user.name}
                         email={user.email}
                         srcUploaded={
@@ -144,6 +144,7 @@ export function InviteParticipants({
                             .uploadedAvatarPath ?? null
                         }
                         srcProvider={(user as { image?: string | null }).image ?? null}
+                        userId={user.id}
                         className="h-8 w-8"
                       />
                       <ProfileLink userId={user.id} username={user.name || user.email} />

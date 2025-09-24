@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
+import { Avatar } from "~/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -11,7 +12,6 @@ import {
 } from "~/components/ui/card";
 import { DataTable } from "~/components/ui/data-table";
 import { exportToCSV, formatCurrency, formatDate } from "~/lib/utils/csv-export";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 import { getAllMemberships, type MembershipReportRow } from "../membership.admin-queries";
 
 const columns: ColumnDef<MembershipReportRow>[] = [
@@ -27,7 +27,7 @@ const columns: ColumnDef<MembershipReportRow>[] = [
           params={{ userId: original.userId }}
           className="inline-flex items-center gap-2"
         >
-          <UserAvatar
+          <Avatar
             name={original.userName}
             email={original.userEmail}
             srcUploaded={original.userUploadedAvatarPath}

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { removeUploadedAvatar, uploadAvatar } from "~/features/profile/profile.mutations";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface AvatarUploadProps {
   name?: string | null;
@@ -70,7 +70,7 @@ export function AvatarUpload({
   return (
     <Card className="overflow-hidden">
       <CardContent className="flex items-center gap-4 p-4">
-        <UserAvatar
+        <Avatar
           className="h-16 w-16"
           name={name ?? null}
           email={email ?? null}

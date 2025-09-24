@@ -38,6 +38,7 @@ import { CampaignParticipantsList } from "~/features/campaigns/components/Campai
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { ManageInvitations } from "~/features/campaigns/components/ManageInvitations";
@@ -51,7 +52,6 @@ import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import type { OperationResult } from "~/shared/types/common";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 import { z } from "zod";
 
@@ -412,11 +412,12 @@ function CampaignDetailsPage() {
             {campaign.owner ? (
               <div className="text-sm">
                 <div className="flex items-center gap-2">
-                  <UserAvatar
+                  <Avatar
                     name={campaign.owner.name}
                     email={campaign.owner.email}
                     srcUploaded={campaign.owner.uploadedAvatarPath ?? null}
                     srcProvider={campaign.owner.image ?? null}
+                    userId={campaign.owner.id}
                     className="h-6 w-6"
                   />
                   <ProfileLink

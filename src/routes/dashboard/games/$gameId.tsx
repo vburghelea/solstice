@@ -16,6 +16,7 @@ import { GameParticipantsList } from "~/features/games/components/GameParticipan
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
 
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { GMReviewForm } from "~/features/games/components/GMReviewForm";
 import { ManageInvitations } from "~/features/games/components/ManageInvitations";
@@ -43,7 +44,6 @@ import { formatDateAndTime } from "~/shared/lib/datetime";
 import { strings } from "~/shared/lib/strings";
 import type { OperationResult } from "~/shared/types/common";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -596,11 +596,12 @@ function GameDetailsPage() {
             {game.owner ? (
               <div className="text-sm">
                 <div className="flex items-center gap-2">
-                  <UserAvatar
+                  <Avatar
                     name={game.owner.name}
                     email={game.owner.email}
                     srcUploaded={game.owner.uploadedAvatarPath ?? null}
                     srcProvider={game.owner.image ?? null}
+                    userId={game.owner.id}
                     className="h-6 w-6"
                   />
                   <ProfileLink

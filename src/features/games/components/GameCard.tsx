@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -14,7 +15,6 @@ import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface GameCardProps {
   game: GameListItem;
@@ -49,11 +49,12 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
         <div className="space-y-2 text-sm">
           {game.owner && (
             <div className="flex items-center gap-2">
-              <UserAvatar
+              <Avatar
                 name={game.owner.name}
                 email={game.owner.email}
                 srcUploaded={game.owner.uploadedAvatarPath ?? null}
                 srcProvider={game.owner.image ?? null}
+                userId={game.owner.id}
                 className="h-6 w-6"
               />
               <ProfileLink

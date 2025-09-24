@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -23,7 +24,6 @@ import {
   type GetSocialAuditsInput,
   type SocialAuditRow,
 } from "~/features/social/social.admin-queries";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 const actionValues = ["follow", "unfollow", "block", "unblock"] as const;
 type ActionValue = (typeof actionValues)[number];
@@ -159,7 +159,7 @@ export function AdminSocialAuditsReport() {
                             params={{ userId: row.actor.id }}
                             className="inline-flex items-center gap-2"
                           >
-                            <UserAvatar
+                            <Avatar
                               name={row.actor.name}
                               email={row.actor.email}
                               srcUploaded={row.actor.uploadedAvatarPath}
@@ -189,7 +189,7 @@ export function AdminSocialAuditsReport() {
                             params={{ userId: row.target.id }}
                             className="inline-flex items-center gap-2"
                           >
-                            <UserAvatar
+                            <Avatar
                               name={row.target.name}
                               email={row.target.email}
                               srcUploaded={row.target.uploadedAvatarPath}

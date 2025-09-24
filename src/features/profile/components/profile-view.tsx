@@ -27,9 +27,9 @@ import {
 } from "~/shared/types/common";
 //
 import { Link } from "@tanstack/react-router";
+import { Avatar } from "~/components/ui/avatar";
 import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
@@ -498,7 +498,7 @@ export function ProfileView() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {editingSection !== "basic" ? (
-                <UserAvatar
+                <Avatar
                   className="h-10 w-10"
                   name={profile?.name ?? null}
                   email={profile?.email ?? null}

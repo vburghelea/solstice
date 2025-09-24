@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -13,7 +14,6 @@ import {
 import { getBlocklist, unblockUser } from "~/features/social";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { strings } from "~/shared/lib/strings";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/profile/blocklist")({
   component: BlocklistPage,
@@ -70,11 +70,12 @@ function BlocklistPage() {
               {items.map((item) => (
                 <li key={item.id} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3">
-                    <UserAvatar
+                    <Avatar
                       name={item.user.name ?? null}
                       email={item.user.email ?? null}
                       srcUploaded={item.user.uploadedAvatarPath ?? null}
                       srcProvider={item.user.image ?? null}
+                      userId={item.user.id}
                     />
                     <div>
                       <div className="font-medium">

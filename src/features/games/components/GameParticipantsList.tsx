@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -11,7 +12,6 @@ import {
 import { GameApplication, GameParticipant } from "~/features/games/games.types";
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface GameParticipantsListProps {
   gameId: string;
@@ -126,11 +126,12 @@ export function GameParticipantsList({
               {approvedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <div className="flex items-center gap-2">
-                    <UserAvatar
+                    <Avatar
                       name={p.user.name}
                       email={p.user.email}
                       srcUploaded={p.user.uploadedAvatarPath ?? null}
                       srcProvider={p.user.image ?? null}
+                      userId={p.userId}
                       className="h-8 w-8"
                     />
                     <span>
@@ -177,11 +178,12 @@ export function GameParticipantsList({
               {pendingApplications.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <div className="flex items-center gap-2">
-                    <UserAvatar
+                    <Avatar
                       name={p.user.name}
                       email={p.user.email}
                       srcUploaded={p.user.uploadedAvatarPath ?? null}
                       srcProvider={p.user.image ?? null}
+                      userId={p.userId}
                       className="h-8 w-8"
                     />
                     <span>
@@ -231,11 +233,12 @@ export function GameParticipantsList({
               {rejectedParticipants.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-1">
                   <div className="flex items-center gap-2">
-                    <UserAvatar
+                    <Avatar
                       name={p.user.name}
                       email={p.user.email}
                       srcUploaded={p.user.uploadedAvatarPath ?? null}
                       srcProvider={p.user.image ?? null}
+                      userId={p.userId}
                       className="h-8 w-8"
                     />
                     <span>

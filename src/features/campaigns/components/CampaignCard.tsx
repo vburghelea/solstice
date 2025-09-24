@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -12,7 +13,6 @@ import {
 } from "~/components/ui/card";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface CampaignCardProps {
   campaign: CampaignListItem;
@@ -37,11 +37,12 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         <div className="space-y-2 text-sm">
           {campaign.owner && (
             <div className="flex items-center gap-2">
-              <UserAvatar
+              <Avatar
                 name={campaign.owner.name}
                 email={campaign.owner.email}
                 srcUploaded={campaign.owner.uploadedAvatarPath ?? null}
                 srcProvider={campaign.owner.image ?? null}
+                userId={campaign.owner.id}
                 className="h-6 w-6"
               />
               <ProfileLink

@@ -8,12 +8,12 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
 import { useCountries } from "~/shared/hooks/useCountries";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/teams/$teamId")({
   loader: async ({ params }) => {
@@ -145,7 +145,7 @@ function TeamDetailsPage() {
                 {members.map(({ member, user }) => (
                   <div key={member.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <UserAvatar
+                      <Avatar
                         className="h-10 w-10"
                         name={user.name ?? null}
                         email={user.email ?? null}
@@ -154,6 +154,7 @@ function TeamDetailsPage() {
                             .uploadedAvatarPath ?? null
                         }
                         srcProvider={user.image ?? null}
+                        userId={user.id}
                       />
                       <div>
                         <ProfileLink

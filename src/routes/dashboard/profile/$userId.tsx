@@ -12,6 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -34,7 +35,6 @@ import { areTeammatesWithCurrentUser } from "~/features/teams/teams.queries";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { strings } from "~/shared/lib/strings";
 import { gmStrengthIcons, gmStrengthLabels } from "~/shared/types/common";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/profile/$userId")({
   loader: async ({ params }) => {
@@ -274,7 +274,7 @@ function UserProfileComponent() {
       </AlertDialog>
       <Card>
         <CardHeader className="flex flex-col items-center text-center">
-          <UserAvatar
+          <Avatar
             className="mb-4 h-24 w-24"
             name={profile.name ?? null}
             email={profile.email ?? null}

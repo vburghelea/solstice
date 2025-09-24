@@ -2,12 +2,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { GMReviewForm } from "~/features/games/components/GMReviewForm";
 import { listPendingGMReviews } from "~/features/reviews/reviews.queries";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 export const Route = createFileRoute("/dashboard/reviews/pending")({
   component: PendingReviewsPage,
@@ -70,11 +70,12 @@ function PendingReviewsPage() {
                         {formatDateAndTime(item.dateTime)}
                       </div>
                       <div className="mt-1 flex items-center gap-2 text-sm">
-                        <UserAvatar
+                        <Avatar
                           name={item.gm.name}
                           email={item.gm.email}
                           srcUploaded={item.gm.uploadedAvatarPath ?? null}
                           srcProvider={item.gm.image ?? null}
+                          userId={item.gm.id}
                           className="h-6 w-6"
                         />
                         <ProfileLink

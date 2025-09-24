@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -12,7 +13,6 @@ import {
 } from "~/components/ui/card";
 import { removeCampaignParticipant } from "~/features/campaigns/campaigns.mutations";
 import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
-import { UserAvatar } from "~/shared/ui/user-avatar";
 
 interface ManageInvitationsProps {
   campaignId: string;
@@ -64,11 +64,12 @@ export function ManageInvitations({ campaignId, invitations }: ManageInvitations
                 <div className="flex items-center gap-2">
                   {invitation.user ? (
                     <>
-                      <UserAvatar
+                      <Avatar
                         name={invitation.user.name}
                         email={invitation.user.email}
                         srcUploaded={invitation.user.uploadedAvatarPath ?? null}
                         srcProvider={invitation.user.image ?? null}
+                        userId={invitation.user.id}
                         className="h-8 w-8"
                       />
                       <span>

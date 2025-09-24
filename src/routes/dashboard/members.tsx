@@ -11,7 +11,9 @@ import {
   Users,
 } from "lucide-react";
 import { useCallback, useDeferredValue, useMemo, useState, type ReactNode } from "react";
+import { ProfileLink } from "~/components/ProfileLink";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
@@ -69,10 +71,24 @@ function MembersPage() {
         cell: ({ row }) => {
           const member = row.original;
           return (
-            <div className="space-y-1">
-              <div className="leading-none font-medium">{member.name}</div>
-              <div className="text-muted-foreground text-xs">
-                {member.pronouns || "Pronouns not provided"}
+            <div className="flex items-center gap-3">
+              <Avatar
+                name={member.name}
+                email={member.email}
+                srcUploaded={member.uploadedAvatarPath}
+                srcProvider={member.image}
+                userId={member.id}
+                className="h-10 w-10"
+              />
+              <div className="space-y-1">
+                <ProfileLink
+                  userId={member.id}
+                  username={member.name}
+                  className="leading-none"
+                />
+                <div className="text-muted-foreground text-xs">
+                  {member.pronouns || "Pronouns not provided"}
+                </div>
               </div>
             </div>
           );

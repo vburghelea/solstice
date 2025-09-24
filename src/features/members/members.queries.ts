@@ -27,6 +27,8 @@ type MemberAccumulator = {
   email: string | null;
   phone: string | null;
   pronouns: string | null;
+  uploadedAvatarPath: string | null;
+  image: string | null;
   privacySettings: string | null;
   profileUpdatedAt: Date | null;
   teams: Set<string>;
@@ -151,6 +153,8 @@ export const listMembers = createServerFn({ method: "POST" })
           email: user.email,
           phone: user.phone,
           pronouns: user.pronouns,
+          uploadedAvatarPath: user.uploadedAvatarPath,
+          image: user.image,
           privacySettings: user.privacySettings,
           profileUpdatedAt: user.profileUpdatedAt,
           teamId: teamMembers.teamId,
@@ -187,6 +191,8 @@ export const listMembers = createServerFn({ method: "POST" })
             email: row.email ?? null,
             phone: row.phone ?? null,
             pronouns: row.pronouns ?? null,
+            uploadedAvatarPath: row.uploadedAvatarPath ?? null,
+            image: row.image ?? null,
             privacySettings: row.privacySettings ?? null,
             profileUpdatedAt,
             teams: new Set<string>(),
@@ -294,6 +300,8 @@ export const listMembers = createServerFn({ method: "POST" })
           phone: showPhone ? accumulator.phone : null,
           phoneVisible: Boolean(showPhone && accumulator.phone),
           pronouns: accumulator.pronouns,
+          uploadedAvatarPath: accumulator.uploadedAvatarPath,
+          image: accumulator.image,
           teams: Array.from(accumulator.teams).sort((a, b) => a.localeCompare(b)),
           membershipStatus,
           membershipType,

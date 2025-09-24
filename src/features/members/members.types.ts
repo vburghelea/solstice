@@ -20,6 +20,8 @@ export interface MemberDirectoryMember {
   phone: string | null;
   phoneVisible: boolean;
   pronouns: string | null;
+  uploadedAvatarPath: string | null;
+  image: string | null;
   teams: string[];
   membershipStatus: "active" | "expired" | "canceled" | "none";
   membershipType: string | null;

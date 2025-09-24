@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import type {
   changePasswordInputSchema,
+  notificationPreferencesSchema,
   revokeSessionInputSchema,
   unlinkAccountInputSchema,
 } from "./settings.schemas";
@@ -43,3 +44,5 @@ export interface ApiResult<T> {
   data?: T;
   errors?: { code: string; message: string }[];
 }
+
+export type NotificationPreferences = z.infer<typeof notificationPreferencesSchema>;

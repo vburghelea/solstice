@@ -45,6 +45,26 @@ export const changePasswordInputSchema = z.object({
   revokeOtherSessions: z.boolean().optional(),
 });
 
+export const notificationPreferencesSchema = z.object({
+  gameReminders: z.boolean(),
+  gameUpdates: z.boolean(),
+  campaignDigests: z.boolean(),
+  campaignUpdates: z.boolean(),
+  reviewReminders: z.boolean(),
+  socialNotifications: z.boolean(),
+});
+
+export const defaultNotificationPreferences: z.infer<
+  typeof notificationPreferencesSchema
+> = {
+  gameReminders: true,
+  gameUpdates: true,
+  campaignDigests: true,
+  campaignUpdates: true,
+  reviewReminders: true,
+  socialNotifications: false,
+};
+
 export const revokeSessionInputSchema = z.object({
   token: z.string({ required_error: "Session token is required" }).min(1),
 });

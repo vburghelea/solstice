@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import { defaultNotificationPreferences } from "./settings.schemas";
 import type {
   ApiResult,
   LinkedAccountsOverview,
+  NotificationPreferences,
   SessionsOverview,
 } from "./settings.types";
 
@@ -129,6 +131,72 @@ export const getAccountOverview = createServerFn({ method: "GET" }).handler(
           },
         ],
       };
+    }
+  },
+);
+
+export const getNotificationPreferences = createServerFn({ method: "GET" }).handler(
+  async (): Promise<ApiResult<NotificationPreferences>> => {
+    try {
+      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+        import("~/lib/auth/server-helpers"),
+        import("@tanstack/react-start/server"),
+      ]);
+
+      const auth = await getAuth();
+      const { headers } = getWebRequest();
+
+      const session = await auth.api.getSession({ headers });
+
+      if (!session?.user?.id) {
+        return {
+          success: false,
+          errors: [{ code: "UNAUTHENTICATED", message: "User not authenticated" }],
+        };
+      }
+
+      const [{ getDb }, { user }] = await Promise.all([
+        import("~/db/server-helpers"),
+        import("~/db/schema"),
+      ]);
+
+      const db = await getDb();
+      const { eq } = await import("drizzle-orm");
+
+      const [record] = await db
+        .select({ notificationPreferences: user.notificationPreferences })
+        .from(user)
+        .where(eq(user.id, session.user.id))
+        .limit(1);
+
+      let preferences: NotificationPreferences = {
+        ...defaultNotificationPreferences,
+      };
+
+      const rawPreferences = record?.notificationPreferences;
+
+      if (rawPreferences && typeof rawPreferences === "object") {
+        preferences = {
+          ...preferences,
+          ...(rawPreferences as Partial<NotificationPreferences>),
+        };
+      }
+
+      return {
+        success: true,
+        data: preferences,
+      } satisfies ApiResult<NotificationPreferences>;
+    } catch (error) {
+      console.error("Failed to load notification preferences", error);
+      return {
+        success: false,
+        errors: [
+          {
+            code: "UNKNOWN_ERROR",
+            message: "Failed to load notification preferences",
+          },
+        ],
+      } satisfies ApiResult<NotificationPreferences>;
     }
   },
 );

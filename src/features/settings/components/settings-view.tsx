@@ -10,7 +10,7 @@ import {
   Shield,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
@@ -36,15 +36,19 @@ import {
 import type {
   ChangePasswordInput,
   LinkedAccountsOverview,
+  NotificationPreferences,
   SessionsOverview,
 } from "~/features/settings";
 import {
   changePassword,
+  defaultNotificationPreferences,
   getAccountOverview,
+  getNotificationPreferences,
   getSessionsOverview,
   revokeOtherSessions,
   revokeSession,
   unlinkAccount,
+  updateNotificationPreferences,
 } from "~/features/settings";
 import { auth } from "~/lib/auth-client";
 import {
@@ -80,6 +84,7 @@ function maskToken(token: string) {
 export function SettingsView() {
   const queryClient = useQueryClient();
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [notificationError, setNotificationError] = useState<string | null>(null);
 
   const {
     data: accountOverview,
@@ -113,6 +118,25 @@ export function SettingsView() {
       return result.data;
     },
     refetchInterval: 60_000,
+  });
+
+  const {
+    data: notificationPreferences,
+    isLoading: notificationLoading,
+    isFetching: notificationFetching,
+    error: notificationQueryError,
+  } = useQuery({
+    queryKey: ["notification-preferences"],
+    queryFn: async (): Promise<NotificationPreferences> => {
+      const result = await getNotificationPreferences();
+      if (!result.success || !result.data) {
+        throw new Error(
+          result.errors?.[0]?.message || "Failed to load email preferences",
+        );
+      }
+      return result.data;
+    },
+    staleTime: 60_000,
   });
 
   const changePasswordMutation = useMutation({
@@ -187,6 +211,26 @@ export function SettingsView() {
     },
   });
 
+  const updateNotificationPreferencesMutation = useMutation({
+    mutationFn: async (input: NotificationPreferences) =>
+      updateNotificationPreferences({ data: input }),
+    onSuccess: async (result) => {
+      if (!result.success || !result.data) {
+        const message =
+          result.errors?.[0]?.message || "Failed to update email preferences";
+        toast.error(message);
+        throw new Error(message);
+      }
+      toast.success("Email preferences updated");
+      await queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
+    },
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error ? error.message : "Failed to update email preferences";
+      toast.error(message);
+    },
+  });
+
   const changePasswordForm = useForm({
     defaultValues: {
       currentPassword: "",
@@ -227,6 +271,42 @@ export function SettingsView() {
     },
   });
 
+  const notificationForm = useForm({
+    defaultValues: {
+      ...defaultNotificationPreferences,
+    } as NotificationPreferences,
+    onSubmit: async ({ value, formApi }) => {
+      setNotificationError(null);
+      try {
+        const preferences = value as NotificationPreferences;
+        const result =
+          await updateNotificationPreferencesMutation.mutateAsync(preferences);
+        if (result.success) {
+          formApi.reset();
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Failed to update email preferences";
+        setNotificationError(message);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!notificationPreferences) {
+      return;
+    }
+
+    (
+      Object.entries(notificationPreferences) as [
+        keyof NotificationPreferences,
+        boolean,
+      ][]
+    ).forEach(([key, value]) => {
+      notificationForm.setFieldValue(key, value);
+    });
+  }, [notificationPreferences, notificationForm]);
+
   const pendingChangePassword = changePasswordMutation.isPending;
   const passwordStrength = (() => {
     const password = (changePasswordForm.state.values as ChangePasswordFormValues)
@@ -249,7 +329,8 @@ export function SettingsView() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your account security, sessions, and connected services
+          Manage your account security, email preferences, sessions, and connected
+          services
         </p>
       </div>
 
@@ -354,6 +435,137 @@ export function SettingsView() {
                       )}
                     </Button>
                   </div>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Email Preferences</CardTitle>
+              <CardDescription>
+                Choose which non-critical updates you receive in your inbox.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {notificationLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-6 w-11/12" />
+                  <Skeleton className="h-6 w-4/5" />
+                  <Skeleton className="h-10 w-32" />
+                </div>
+              ) : notificationQueryError ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Unable to load email preferences</AlertTitle>
+                  <AlertDescription>
+                    {(notificationQueryError as Error).message ||
+                      "Please refresh the page and try again."}
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <form
+                  className="space-y-4"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    notificationForm.handleSubmit();
+                  }}
+                >
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <notificationForm.Field name="gameReminders">
+                      {(field) => (
+                        <ValidatedCheckbox
+                          field={field}
+                          label="Game reminders"
+                          description="Reminders 24h and 2h before games you’re attending."
+                          disabled={updateNotificationPreferencesMutation.isPending}
+                        />
+                      )}
+                    </notificationForm.Field>
+                    <notificationForm.Field name="gameUpdates">
+                      {(field) => (
+                        <ValidatedCheckbox
+                          field={field}
+                          label="Game updates"
+                          description="Emails when a game you’re attending is scheduled, updated, or canceled."
+                          disabled={updateNotificationPreferencesMutation.isPending}
+                        />
+                      )}
+                    </notificationForm.Field>
+                    <notificationForm.Field name="campaignDigests">
+                      {(field) => (
+                        <ValidatedCheckbox
+                          field={field}
+                          label="Campaign weekly digest"
+                          description="Weekly summary of your upcoming campaign sessions."
+                          disabled={updateNotificationPreferencesMutation.isPending}
+                        />
+                      )}
+                    </notificationForm.Field>
+                    <notificationForm.Field name="campaignUpdates">
+                      {(field) => (
+                        <ValidatedCheckbox
+                          field={field}
+                          label="Campaign session updates"
+                          description="Emails when campaign sessions are scheduled, updated, or canceled."
+                          disabled={updateNotificationPreferencesMutation.isPending}
+                        />
+                      )}
+                    </notificationForm.Field>
+                    <notificationForm.Field name="reviewReminders">
+                      {(field) => (
+                        <ValidatedCheckbox
+                          field={field}
+                          label="Review reminders"
+                          description="Reminders to review your GM after games."
+                          disabled={updateNotificationPreferencesMutation.isPending}
+                        />
+                      )}
+                    </notificationForm.Field>
+                    <notificationForm.Field name="socialNotifications">
+                      {(field) => (
+                        <ValidatedCheckbox
+                          field={field}
+                          label="Social notifications"
+                          description="Emails for follows, requests, and other social activity."
+                          disabled={updateNotificationPreferencesMutation.isPending}
+                        />
+                      )}
+                    </notificationForm.Field>
+                  </div>
+
+                  {notificationError ? (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Unable to save preferences</AlertTitle>
+                      <AlertDescription>{notificationError}</AlertDescription>
+                    </Alert>
+                  ) : null}
+
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      type="submit"
+                      disabled={updateNotificationPreferencesMutation.isPending}
+                      className="min-w-[160px]"
+                    >
+                      {updateNotificationPreferencesMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save preferences"
+                      )}
+                    </Button>
+                  </div>
+
+                  {notificationFetching ? (
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Refreshing preferences...
+                    </div>
+                  ) : null}
                 </form>
               )}
             </CardContent>

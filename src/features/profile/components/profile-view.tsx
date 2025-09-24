@@ -17,8 +17,6 @@ import {
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
-import { LinkedAccounts } from "~/features/auth/components/linked-accounts";
-import { SecuritySettings } from "~/features/auth/components/security-settings";
 import {
   experienceLevelOptions,
   gameThemeOptions,
@@ -89,14 +87,6 @@ export function ProfileView() {
         allowTeamInvitations: false,
         allowFollows: true,
         allowInvitesOnlyFromConnections: false,
-      },
-      notificationPreferences: {
-        gameReminders: true,
-        gameUpdates: true,
-        campaignDigests: true,
-        campaignUpdates: true,
-        reviewReminders: true,
-        socialNotifications: false,
       },
     } as PartialProfileInputType,
     onSubmit: async ({ value }) => {
@@ -246,38 +236,6 @@ export function ProfileView() {
           }
         }
 
-        // Notification Preferences Fields
-        if (editingSection === "notifications") {
-          const currentPrefs = profile?.["notificationPreferences"] || {
-            gameReminders: true,
-            gameUpdates: true,
-            campaignDigests: true,
-            campaignUpdates: true,
-            reviewReminders: true,
-            socialNotifications: false,
-          };
-          const newPrefs = value.notificationPreferences || {
-            gameReminders: true,
-            gameUpdates: true,
-            campaignDigests: true,
-            campaignUpdates: true,
-            reviewReminders: true,
-            socialNotifications: false,
-          };
-
-          if (
-            newPrefs.gameReminders !== currentPrefs.gameReminders ||
-            newPrefs.campaignDigests !== currentPrefs.campaignDigests ||
-            newPrefs.gameUpdates !== currentPrefs.gameUpdates ||
-            newPrefs.campaignUpdates !== currentPrefs.campaignUpdates ||
-            newPrefs.reviewReminders !== currentPrefs.reviewReminders ||
-            newPrefs.socialNotifications !== currentPrefs.socialNotifications
-          ) {
-            dataToSubmit["notificationPreferences"] = newPrefs;
-            hasChanges = true;
-          }
-        }
-
         // If no changes, just close the form
         if (!hasChanges || Object.keys(dataToSubmit).length === 0) {
           setEditingSection(null);
@@ -362,36 +320,6 @@ export function ProfileView() {
       form.setFieldValue(
         "privacySettings.allowInvitesOnlyFromConnections",
         privacySettings.allowInvitesOnlyFromConnections ?? false,
-      );
-
-      const notifPrefs = profile.notificationPreferences || {
-        gameReminders: true,
-        gameUpdates: true,
-        campaignDigests: true,
-        campaignUpdates: true,
-        reviewReminders: true,
-        socialNotifications: false,
-      };
-      form.setFieldValue(
-        "notificationPreferences.gameReminders",
-        notifPrefs.gameReminders,
-      );
-      form.setFieldValue("notificationPreferences.gameUpdates", notifPrefs.gameUpdates);
-      form.setFieldValue(
-        "notificationPreferences.campaignDigests",
-        notifPrefs.campaignDigests,
-      );
-      form.setFieldValue(
-        "notificationPreferences.campaignUpdates",
-        notifPrefs.campaignUpdates,
-      );
-      form.setFieldValue(
-        "notificationPreferences.reviewReminders",
-        notifPrefs.reviewReminders,
-      );
-      form.setFieldValue(
-        "notificationPreferences.socialNotifications",
-        notifPrefs.socialNotifications,
       );
     }
   }, [profile, editingSection, form]);
@@ -812,125 +740,6 @@ export function ProfileView() {
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Email Preferences */}
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
-          <div>
-            <CardTitle>Email Preferences</CardTitle>
-            <CardDescription>Control non-critical email notifications</CardDescription>
-          </div>
-          {editingSection !== "notifications" && (
-            <Button
-              onClick={() => startEditingSection("notifications")}
-              variant="outline"
-              size="sm"
-            >
-              <Edit2 className="mr-2 h-4 w-4" />
-              Edit Email Preferences
-            </Button>
-          )}
-          {editingSection === "notifications" && (
-            <div className="flex gap-2">
-              <Button
-                onClick={cancelEditing}
-                variant="outline"
-                size="sm"
-                disabled={form.state.isSubmitting}
-              >
-                <X className="mr-2 h-4 w-4" />
-                Cancel
-              </Button>
-              <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-                {([canSubmit, isSubmitting]) => (
-                  <Button
-                    type="button"
-                    onClick={() => form.handleSubmit()}
-                    disabled={!canSubmit || isSubmitting}
-                    size="sm"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Changes
-                      </>
-                    )}
-                  </Button>
-                )}
-              </form.Subscribe>
-            </div>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <form.Field name="notificationPreferences.gameReminders">
-              {(field) => (
-                <ValidatedCheckbox
-                  field={field}
-                  label="Game Reminders"
-                  description="Receive reminders 24h/2h before games you’re attending."
-                  disabled={editingSection !== "notifications"}
-                />
-              )}
-            </form.Field>
-            <form.Field name="notificationPreferences.gameUpdates">
-              {(field) => (
-                <ValidatedCheckbox
-                  field={field}
-                  label="Game Updates"
-                  description="Emails when a game you’re attending is scheduled/updated/canceled."
-                  disabled={editingSection !== "notifications"}
-                />
-              )}
-            </form.Field>
-            <form.Field name="notificationPreferences.campaignDigests">
-              {(field) => (
-                <ValidatedCheckbox
-                  field={field}
-                  label="Campaign Weekly Digest"
-                  description="Receive a weekly summary of upcoming campaign sessions."
-                  disabled={editingSection !== "notifications"}
-                />
-              )}
-            </form.Field>
-            <form.Field name="notificationPreferences.campaignUpdates">
-              {(field) => (
-                <ValidatedCheckbox
-                  field={field}
-                  label="Campaign Session Updates"
-                  description="Emails when a campaign session is scheduled/updated/canceled."
-                  disabled={editingSection !== "notifications"}
-                />
-              )}
-            </form.Field>
-            <form.Field name="notificationPreferences.reviewReminders">
-              {(field) => (
-                <ValidatedCheckbox
-                  field={field}
-                  label="Review Reminders"
-                  description="Get a reminder to review your GM after games."
-                  disabled={editingSection !== "notifications"}
-                />
-              )}
-            </form.Field>
-            <form.Field name="notificationPreferences.socialNotifications">
-              {(field) => (
-                <ValidatedCheckbox
-                  field={field}
-                  label="Social Notifications"
-                  description="Emails for social events like follows and requests."
-                  disabled={editingSection !== "notifications"}
-                />
-              )}
-            </form.Field>
-          </div>
         </CardContent>
       </Card>
 
@@ -1556,21 +1365,6 @@ export function ProfileView() {
             Blocked users cannot follow you, invite you, or apply to your games/campaigns.
             You can unblock them at any time.
           </p>
-        </CardContent>
-      </Card>
-
-      {/* Security & Linked Accounts (Combined) */}
-      <Card>
-        <CardHeader>
-          <div>
-            <CardTitle>Security & Accounts</CardTitle>
-            <CardDescription>Manage your password and connected logins</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <SecuritySettings embedded />
-          <Separator />
-          <LinkedAccounts embedded />
         </CardContent>
       </Card>
     </div>

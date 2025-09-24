@@ -11,8 +11,8 @@ function MyProfilePage() {
       <div>
         <h1 className="text-foreground text-3xl font-bold tracking-tight">My Profile</h1>
         <p className="text-muted-foreground mt-2">
-          View and manage your personal information, preferences, security settings, and
-          linked accounts.
+          View and manage your account information and notification settings and
+          preferences.
         </p>
       </div>
 

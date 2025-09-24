@@ -3,6 +3,13 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { ArrowLeftIcon } from "~/components/ui/icons";
 import {
   Select,
@@ -25,13 +32,6 @@ import {
 } from "~/features/games/games.schemas";
 import type { GameWithDetails } from "~/features/games/games.types";
 import type { OperationResult } from "~/shared/types/common";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 
 const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),
@@ -161,20 +161,6 @@ export function CreateGamePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {campaignId && campaignData?.success && campaignData.data && (
-            <div className="mb-4">
-              <label htmlFor="campaign">Campaign</label>
-              <Select value={campaignId} disabled>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a campaign" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={campaignId}>{campaignData.data.name}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
           {serverError && (
             <div className="bg-destructive/10 text-destructive border-destructive/20 mb-4 flex items-start gap-3 rounded-lg border p-4">
               <div className="flex-1">

@@ -65,3 +65,7 @@ declare module "crawlee" {
     run(inputs: string[]): Promise<void>;
   }
 }
+
+declare module "@radix-ui/react-radio-group";
+declare module "@radix-ui/react-tabs";
+declare module "@tanstack/react-router-ssr-query";

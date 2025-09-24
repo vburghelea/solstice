@@ -148,6 +148,10 @@ export function GameForm({
     return selectedGameSystem;
   }, [isCampaignGame, campaignGameSystemData, selectedGameSystem]);
 
+  const initialExpectedDuration = initialValues?.expectedDuration ?? null;
+  const initialMinPlayers = initialValues?.minimumRequirements?.minPlayers ?? null;
+  const initialMaxPlayers = initialValues?.minimumRequirements?.maxPlayers ?? null;
+
   const gameSystemOptions =
     gameSystemSearchResults?.success && gameSystemSearchResults.data
       ? gameSystemSearchResults.data.map((gs) => ({
@@ -161,17 +165,32 @@ export function GameForm({
   // Update form fields when game system changes
   React.useEffect(() => {
     if (effectiveGameSystem) {
-      form.setFieldValue("expectedDuration", effectiveGameSystem.averagePlayTime ?? 1);
-      form.setFieldValue(
-        "minimumRequirements.minPlayers",
-        effectiveGameSystem.minPlayers ?? 1,
-      );
-      form.setFieldValue(
-        "minimumRequirements.maxPlayers",
-        effectiveGameSystem.maxPlayers ?? 1,
-      );
+      if (!isCampaignGame || initialExpectedDuration == null) {
+        form.setFieldValue("expectedDuration", effectiveGameSystem.averagePlayTime ?? 1);
+      }
+
+      if (initialMinPlayers == null) {
+        form.setFieldValue(
+          "minimumRequirements.minPlayers",
+          effectiveGameSystem.minPlayers ?? 1,
+        );
+      }
+
+      if (initialMaxPlayers == null) {
+        form.setFieldValue(
+          "minimumRequirements.maxPlayers",
+          effectiveGameSystem.maxPlayers ?? 1,
+        );
+      }
     }
-  }, [form, effectiveGameSystem]);
+  }, [
+    effectiveGameSystem,
+    form,
+    initialExpectedDuration,
+    initialMaxPlayers,
+    initialMinPlayers,
+    isCampaignGame,
+  ]);
 
   // Most spoken languages in the world
   const languageOptions = [

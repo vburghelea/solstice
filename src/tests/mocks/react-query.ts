@@ -30,13 +30,6 @@ export const mockReactQuery = () => {
     return {
       ...actual,
       useQuery: vi.fn((options) => {
-        const defaultReturnValue = {
-          data: undefined,
-          isLoading: false,
-          isFetching: false,
-          error: null,
-        };
-
         if (options.queryKey[0] === "campaign") {
           return mockUseQueryCampaign();
         }
@@ -68,15 +61,14 @@ export const mockReactQuery = () => {
           return mockUseQueryCampaignGameSessions();
         }
         // Fallback for other queries
-        return defaultReturnValue;
+        return actual.useQuery(options as never);
       }),
-      useMutation: vi.fn(() => ({
-        mutate: vi.fn(),
-        mutateAsync: vi.fn(),
-        isPending: false,
-        isSuccess: false,
-        error: null,
-      })),
+      useMutation: vi.fn(
+        (
+          options?: Parameters<typeof actual.useMutation>[0],
+          queryClient?: Parameters<typeof actual.useMutation>[1],
+        ) => actual.useMutation(options as never, queryClient as never),
+      ),
     };
   });
 };

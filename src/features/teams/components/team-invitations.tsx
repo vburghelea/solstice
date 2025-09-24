@@ -20,8 +20,7 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
   const queryClient = useQueryClient();
 
   const acceptInviteMutation = useMutation({
-    mutationFn: async (teamId: string) =>
-      acceptTeamInvite({ data: { teamId } }),
+    mutationFn: async (teamId: string) => acceptTeamInvite({ data: { teamId } }),
     onMutate: async (teamId: string) => {
       await queryClient.cancelQueries({ queryKey: ["pendingTeamInvites"] });
       const previousInvites = queryClient.getQueryData<PendingTeamInvite[]>([
@@ -52,8 +51,7 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
   });
 
   const declineInviteMutation = useMutation({
-    mutationFn: async (teamId: string) =>
-      declineTeamInvite({ data: { teamId } }),
+    mutationFn: async (teamId: string) => declineTeamInvite({ data: { teamId } }),
     onMutate: async (teamId: string) => {
       await queryClient.cancelQueries({ queryKey: ["pendingTeamInvites"] });
       const previousInvites = queryClient.getQueryData<PendingTeamInvite[]>([
@@ -159,14 +157,18 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
                 <div className="flex flex-col gap-2 md:flex-row">
                   <Button
                     variant="default"
-                    onClick={() => acceptInviteMutation.mutate(invite.membership.teamId)}
+                    onClick={() =>
+                      void acceptInviteMutation.mutateAsync(invite.membership.teamId)
+                    }
                     disabled={isProcessing}
                   >
                     {acceptInviteMutation.isPending ? "Accepting..." : "Accept"}
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => declineInviteMutation.mutate(invite.membership.teamId)}
+                    onClick={() =>
+                      void declineInviteMutation.mutateAsync(invite.membership.teamId)
+                    }
                     disabled={isProcessing}
                   >
                     {declineInviteMutation.isPending ? "Declining..." : "Decline"}

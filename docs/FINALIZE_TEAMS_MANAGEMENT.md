@@ -13,11 +13,14 @@
 
 ## Phase 2 — Server Actions & Validation
 
-- [ ] Add Zod schemas to `src/features/teams/teams.schemas.ts` for captain approvals and rejections (e.g., `respondToTeamRequestSchema`), reusing patterns already outlined for invites.
-- [ ] Implement `approveTeamMembership` and `rejectTeamMembership` server functions in `src/features/teams/teams.mutations.ts`, reusing `getAuthMiddleware` and enforcing the captain/coach permissions noted in the documentation.
-- [ ] Ensure approval flow transitions `pending` → `active`, clears invite/request metadata, and updates audit columns; rejection should mark the membership inactive/declined without deleting the row so historical invite tracking remains intact.
-- [ ] Reuse `isActiveMembershipConstraintError` handling so approvals surface a friendly validation error when a user already has an active team elsewhere.
-- [ ] Update `teams.queries.ts` (or add a dedicated helper) so pending request callers receive the new approval metadata while keeping existing “pending invitation” surfaces consistent with the docs.
+- [x] Add Zod schemas to `src/features/teams/teams.schemas.ts` for captain approvals and rejections (e.g., `respondToTeamRequestSchema`), reusing patterns already outlined for invites.
+- [x] Implement `approveTeamMembership` and `rejectTeamMembership` server functions in `src/features/teams/teams.mutations.ts`, reusing `getAuthMiddleware` and enforcing the captain/coach permissions noted in the documentation.
+  - Functions guard for captain/coach roles, ensure join requests (no inviter) are the only targets, and return the updated membership rows.
+- [x] Ensure approval flow transitions `pending` → `active`, clears invite/request metadata, and updates audit columns; rejection should mark the membership inactive/declined without deleting the row so historical invite tracking remains intact.
+  - Approvals reset reminder counters, clear request timestamps, capture `approvedBy`/`decisionAt`, and set `joinedAt`; rejections set `status = 'declined'` while preserving the record.
+- [x] Reuse `isActiveMembershipConstraintError` handling so approvals surface a friendly validation error when a user already has an active team elsewhere.
+- [x] Update `teams.queries.ts` (or add a dedicated helper) so pending request callers receive the new approval metadata while keeping existing “pending invitation” surfaces consistent with the docs.
+  - Existing roster and invite queries now expose `approvedBy`/`decisionAt`, so client consumers can reflect moderation outcomes.
 
 ## Phase 3 — Client Experience
 

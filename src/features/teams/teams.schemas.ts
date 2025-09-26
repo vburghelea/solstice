@@ -104,3 +104,9 @@ export const requestTeamMembershipSchema = z.object({
   teamId: z.string(),
 });
 export type RequestTeamMembershipInput = z.infer<typeof requestTeamMembershipSchema>;
+
+export const respondToTeamRequestSchema = z.object({
+  teamId: z.string(),
+  memberId: z.string(),
+});
+export type RespondToTeamRequestInput = z.infer<typeof respondToTeamRequestSchema>;

@@ -1,75 +1,8 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Campaign Weekly Digest</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body
-    style="
-      font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
-      line-height: 1.6;
-      color: #1f2937;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f9fafb;
-    "
-  >
-    <div
-      style="
-        background-color: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        margin: 20px 0;
-      "
-    >
-      <div
-        style="
-          background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-          padding: 32px 28px;
-          text-align: center;
-        "
-      >
-        <h2 style="color: #fff; margin: 0; font-size: 24px; font-weight: 700">
-          Campaign Digest
-        </h2>
-      </div>
-      <div style="padding: 28px">
-        <p style="margin-top: 0">Hi {{recipientName}},</p>
-        <p>Here are your upcoming campaign sessions and updates:</p>
-        <div style="margin: 18px 0">{{itemsHtml}}</div>
-        <div style="text-align: center; margin: 24px 0">
-          <a
-            href="{{manageUrl}}"
-            style="
-              background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-              color: #fff;
-              padding: 12px 20px;
-              text-decoration: none;
-              border-radius: 10px;
-              font-weight: 700;
-              display: inline-block;
-            "
-            >Manage Campaign</a
-          >
-        </div>
-        <p style="font-size: 12px; color: #6b7280">
-          You can adjust your email preferences in your profile.
-        </p>
-      </div>
-      <div
-        style="
-          background-color: #f9fafb;
-          padding: 20px;
-          border-top: 1px solid #e5e7eb;
-          text-align: center;
-        "
-      >
-        <p style="color: #6b7280; font-size: 12px; margin: 0">Roundup Games</p>
-      </div>
-    </div>
-  </body>
-</html>
+<section class="content-block">
+  <h1>Your campaign digest</h1>
+  <p>Hi {{recipientName}},</p>
+  <p>Here are the latest sessions and updates scheduled for your campaign:</p>
+  <div class="content-block">{{itemsHtml}}</div>
+  <a class="button" href="{{manageUrl}}">Manage campaign notifications</a>
+  <p class="muted">Update your email preferences any time from your profile.</p>
+</section>

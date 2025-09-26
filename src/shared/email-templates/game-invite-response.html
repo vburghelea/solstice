@@ -1,93 +1,10 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Game Invitation Response</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body
-    style="
-      font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
-      line-height: 1.6;
-      color: #1f2937;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f9fafb;
-    "
-  >
-    <div
-      style="
-        background-color: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        margin: 20px 0;
-      "
-    >
-      <div
-        style="
-          background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-          padding: 32px 28px;
-          text-align: center;
-        "
-      >
-        <h2 style="color: #fff; margin: 0; font-size: 24px; font-weight: 700">
-          Game Invitation Response
-        </h2>
-      </div>
-      <div style="padding: 28px">
-        <p style="margin-top: 0">Hi {{inviterName}},</p>
-        <p>
-          <strong>{{inviteeName}}</strong> has <strong>{{response}}</strong> your
-          invitation to join <strong>{{gameName}}</strong>.
-        </p>
-
-        <div
-          style="
-            background-color: #f3f4f6;
-            padding: 16px;
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-            margin: 18px 0;
-          "
-        >
-          <p style="margin: 0; font-size: 14px; color: #4b5563">
-            Time: <strong>{{time}}</strong>
-          </p>
-        </div>
-
-        <div style="text-align: center; margin: 24px 0">
-          <a
-            href="{{rosterUrl}}"
-            style="
-              background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-              color: #fff;
-              padding: 12px 20px;
-              text-decoration: none;
-              border-radius: 10px;
-              font-weight: 700;
-              display: inline-block;
-            "
-            >View Roster</a
-          >
-        </div>
-
-        <p style="font-size: 12px; color: #6b7280">
-          If you need to make changes, you can manage the game roster at any time.
-        </p>
-      </div>
-      <div
-        style="
-          background-color: #f9fafb;
-          padding: 20px;
-          border-top: 1px solid #e5e7eb;
-          text-align: center;
-        "
-      >
-        <p style="color: #6b7280; font-size: 12px; margin: 0">Roundup Games</p>
-      </div>
-    </div>
-  </body>
-</html>
+<section class="content-block">
+  <h1>Game invitation response</h1>
+  <p>Hi {{inviterName}},</p>
+  <p>
+    {{inviteeName}} has <strong>{{response}}</strong> your invitation for
+    <strong>{{gameName}}</strong>.
+  </p>
+  <p class="muted">Response logged {{time}}.</p>
+  <a class="button" href="{{rosterUrl}}">Open game roster</a>
+</section>

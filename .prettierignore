@@ -17,3 +17,6 @@ drizzle/
 .wrangler
 .netlify
 dist
+
+# email partials rely on surrounding layout wrappers
+src/shared/email-templates/partials/*.html

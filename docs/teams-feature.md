@@ -164,6 +164,8 @@ deactivateTeam({ teamId: string }): Promise<void>
   button; requests are tracked alongside traditional invitations.
 - Invitation metadata (invited/ requested timestamps, reminder counters, inviter) is recorded on
   the `team_members` table for auditing and reminder automation.
+- Request approvals trigger Resend notifications to the requester so they know when they have been
+  accepted or declined; failures are logged without interrupting the captain flow.
 - Resolution metadata (`approved_by`, `decision_at`, `status = 'declined'`) captures how pending
   requests were handled without deleting historical rows.
 

@@ -2,22 +2,23 @@
 
 This document covers all external service integrations for the Roundup Games platform.
 
-## SendGrid Email
+## Resend Email
 
-**Status**: ⏳ Planned
+**Status**: ✅ Active
 
 ### Configuration
 
 ```bash
-SENDGRID_API_KEY=         # API key from SendGrid
-SENDGRID_WEBHOOK_KEY=     # Webhook verification
-SENDGRID_FROM_EMAIL=staff@roundup.games
-SENDGRID_FROM_NAME=Roundup Games Staff
+RESEND_API_KEY=           # API key from Resend
+RESEND_FROM_EMAIL=staff@roundup.games
+RESEND_FROM_NAME=Roundup Games Staff
+WELCOME_EMAIL_ENABLED=true    # Optional feature flags
+INVITE_EMAIL_ENABLED=true     # Optional feature flags
 ```
 
-### Planned Implementation
+### Implementation Notes
 
-**Service Location**: `src/lib/email/sendgrid.ts` (not yet created)
+**Service Location**: `src/lib/email/resend.ts`
 
 **Email Types**:
 
@@ -26,13 +27,14 @@ SENDGRID_FROM_NAME=Roundup Games Staff
    - Payment confirmations
    - Event registrations
    - Password resets
+   - Team invitations
 
-2. **Marketing**:
+2. **Digest & Notifications** (planned enhancements):
    - Event announcements
-   - Newsletter
-   - Member updates
+   - Weekly updates
+   - Member reminders
 
-**Templates**: Will be managed in SendGrid dashboard for easy updates without code changes.
+**Templates**: Maintained in-code with JSX/React email templates; preview using the `/dev/emails` route while in development.
 
 ## Cloudinary Media Storage
 

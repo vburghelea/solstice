@@ -738,14 +738,14 @@ See /docs/development-backlog.md for prioritized feature implementation tickets
 - **Mobile Considerations:** Optimized for mobile (touch-friendly, progressive forms, simplified navigation, offline support).
 - **Analytics Events:** Track registration, membership, event, profile completion.
 
-**SendGrid Email Integration (docs/sendgrid-email-integration.md):**
+**Resend Email Integration (docs/resend-email-integration.md):**
 
-- **Status:** Complete (January 2025).
-- **Environment Variables:** `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL`, `SENDGRID_FROM_NAME`.
-- **Code Architecture:** Service pattern with environment-based switching (`sendgrid.ts`, `sendgrid-service.ts`, `mock-email-service.ts`).
+- **Status:** Active (March 2025).
+- **Environment Variables:** `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_FROM_NAME`, optional feature flags (`WELCOME_EMAIL_ENABLED`, `INVITE_EMAIL_ENABLED`).
+- **Code Architecture:** Service pattern with environment-based switching (`resend.ts`, `mock-email-service.ts`), loaded via `serverOnly()`.
 - **Email Templates:** Membership Purchase Receipt, Welcome Email, Password Reset, Team Invitation, Event Confirmation.
-- **Development Mode:** Mock service logs to console, no actual emails sent.
-- **Best Practices:** Always use templates, include text version, test in development, monitor delivery, handle failures gracefully.
+- **Development Mode:** Mock sender logs payloads instead of sending when credentials are absent.
+- **Best Practices:** Keep templates in code, include text variants, validate payloads with Zod, monitor Resend activity logs, handle failures gracefully.
 
 **State Management Recommendations (docs/state-management-recommendations.md):**
 

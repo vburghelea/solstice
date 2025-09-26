@@ -146,8 +146,8 @@ deactivateTeam({ teamId: string }): Promise<void>
 
 ## Invitations Workflow
 
-- Team managers invite members from the dashboard; invites trigger SendGrid emails using the
-  `TEAM_INVITATION` template and are logged in development.
+- Team managers invite members from the dashboard; invites trigger Resend emails via the
+  `teamInvitation` sender in `~/lib/email/resend`, with payloads logged in development.
 - Pending invitations surface on the Teams home page with accept/decline controls and status badges.
 - Non-members can request to join a team directly from the team detail page using the "Ask to Join"
   button; requests are tracked alongside traditional invitations.

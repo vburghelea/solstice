@@ -124,7 +124,7 @@ Redirect           UI updates            Database record
 ### Planned Additions
 
 - **Square SDK** - Payment processing (Q2 2025)
-- **SendGrid** - Email notifications (Q2 2025)
+- **Resend** - Email notifications (Q2 2025)
 - **Cloudinary** - Media storage (Q3 2025)
 - **WebSockets** - Real-time features (Q4 2025)
 

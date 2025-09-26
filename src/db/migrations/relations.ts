@@ -53,6 +53,11 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
     references: [user.id],
     relationName: "teamMembers_invitedBy_user_id",
   }),
+  user_approvedBy: one(user, {
+    fields: [teamMembers.approvedBy],
+    references: [user.id],
+    relationName: "teamMembers_approvedBy_user_id",
+  }),
 }));
 
 export const teamsRelations = relations(teams, ({ one, many }) => ({
@@ -70,6 +75,9 @@ export const userRelations = relations(user, ({ many }) => ({
   }),
   teamMembers_invitedBy: many(teamMembers, {
     relationName: "teamMembers_invitedBy_user_id",
+  }),
+  teamMembers_approvedBy: many(teamMembers, {
+    relationName: "teamMembers_approvedBy_user_id",
   }),
   campaigns: many(campaigns),
   campaignParticipants: many(campaignParticipants),

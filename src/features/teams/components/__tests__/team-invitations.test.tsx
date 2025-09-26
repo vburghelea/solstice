@@ -29,6 +29,8 @@ describe("TeamInvitationsSection", () => {
       invitedAt: new Date("2025-01-01T00:00:00Z"),
       requestedAt: null,
       invitedBy: "captain-1",
+      approvedBy: null,
+      decisionAt: null,
     },
     team: {
       id: "team-1",

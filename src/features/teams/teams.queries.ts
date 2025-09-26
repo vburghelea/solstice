@@ -199,6 +199,8 @@ export const getTeamMembers = createServerFn({ method: "POST" })
           requestedAt: teamMembers.requestedAt,
           invitationReminderCount: teamMembers.invitationReminderCount,
           lastInvitationReminderAt: teamMembers.lastInvitationReminderAt,
+          approvedBy: teamMembers.approvedBy,
+          decisionAt: teamMembers.decisionAt,
         },
         user: {
           id: user.id,
@@ -255,6 +257,8 @@ export const getPendingTeamInvites = createServerFn({ method: "POST" }).handler(
           invitedAt: teamMembers.invitedAt,
           requestedAt: teamMembers.requestedAt,
           invitedBy: teamMembers.invitedBy,
+          approvedBy: teamMembers.approvedBy,
+          decisionAt: teamMembers.decisionAt,
         },
         team: {
           id: teams.id,

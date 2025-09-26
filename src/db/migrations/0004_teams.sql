@@ -10,7 +10,8 @@ CREATE TYPE "public"."team_member_status" AS ENUM (
   'pending',
   'active',
   'inactive',
-  'removed'
+  'removed',
+  'declined'
 );
 
 CREATE TABLE "teams" (
@@ -50,6 +51,8 @@ CREATE TABLE "team_members" (
   "last_invitation_reminder_at" timestamp with time zone,
   "invitation_reminder_count" integer NOT NULL DEFAULT 0,
   "requested_at" timestamp with time zone,
+  "approved_by" text REFERENCES "public"."user"("id"),
+  "decision_at" timestamp with time zone,
   CONSTRAINT "team_members_team_id_fk" FOREIGN KEY ("team_id") REFERENCES "public"."teams"("id") ON DELETE CASCADE,
   CONSTRAINT "team_members_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE CASCADE,
   CONSTRAINT "team_members_invited_by_fk" FOREIGN KEY ("invited_by") REFERENCES "public"."user"("id")

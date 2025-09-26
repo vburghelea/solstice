@@ -26,6 +26,7 @@ export const teamMemberStatusEnum = pgEnum("team_member_status", [
   "active",
   "inactive",
   "removed",
+  "declined",
 ]);
 
 /**
@@ -89,6 +90,8 @@ export const teamMembers = pgTable(
     joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
     leftAt: timestamp("left_at", { withTimezone: true }),
     invitedBy: text("invited_by").references(() => user.id),
+    approvedBy: text("approved_by").references(() => user.id),
+    decisionAt: timestamp("decision_at", { withTimezone: true }),
     notes: text("notes"),
     invitedAt: timestamp("invited_at", { withTimezone: true }),
     lastInvitationReminderAt: timestamp("last_invitation_reminder_at", {
@@ -128,6 +131,10 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
   }),
   inviter: one(user, {
     fields: [teamMembers.invitedBy],
+    references: [user.id],
+  }),
+  approver: one(user, {
+    fields: [teamMembers.approvedBy],
     references: [user.id],
   }),
 }));

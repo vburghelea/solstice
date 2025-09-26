@@ -423,7 +423,12 @@ function TeamMembersPage() {
             approveMemberMutation.isPending || rejectMemberMutation.isPending;
 
           return (
-            <Card key={member.id}>
+            <Card
+              key={member.id}
+              data-testid="team-member-card"
+              data-member-id={user.id}
+              data-member-email={user.email ?? undefined}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex items-center gap-4">
@@ -522,7 +527,13 @@ function TeamMembersPage() {
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Remove ${
+                            user.name || user.email || "team member"
+                          }`}
+                        >
                           <XCircle className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>

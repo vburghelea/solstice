@@ -63,8 +63,11 @@
   - `src/features/teams/__tests__/teams.mutations.test.ts` exercises approval/decline mail dispatch, constraint resilience, and failure tolerance.
 - [x] Create component-level tests around the roster management UI to confirm buttons render only for eligible users and that state updates follow expectations.
   - `src/routes/dashboard/teams/__tests__/$teamId.quick-actions.test.tsx` covers dashboard quick actions and roster moderation controls.
-- [ ] Write a Playwright scenario where a player requests membership and a captain approves/declines, validating UI feedback and data changes.
-- [ ] Run `pnpm lint`, `pnpm check-types`, and the targeted `pnpm test` suites to ensure baseline quality gates pass.
+- [x] Write a Playwright scenario where a player requests membership and a captain approves/declines, validating UI feedback and data changes.
+  - Added `e2e/tests/authenticated/team-join-moderation.auth.spec.ts` to cover the
+    player request, captain approval/decline, and post-decision messaging states.
+- [x] Run `pnpm lint`, `pnpm check-types`, and the targeted `pnpm test` suites to ensure baseline quality gates pass.
+  - Verified with `pnpm lint`, `pnpm check-types`, and `pnpm test` prior to handoff.
 
 ## Phase 6 — Documentation & Rollout
 

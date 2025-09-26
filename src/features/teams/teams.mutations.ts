@@ -40,6 +40,42 @@ const isActiveMembershipConstraintError = (error: unknown): boolean => {
   return false;
 };
 
+const reportTeamRequestEmailFailure = async (
+  error: unknown,
+  {
+    actorId,
+    decision,
+    memberId,
+    teamId,
+  }: {
+    actorId: string;
+    decision: "approved" | "rejected";
+    memberId: string;
+    teamId: string;
+  },
+): Promise<void> => {
+  const hasPosthogKey =
+    typeof process !== "undefined" &&
+    Boolean(
+      process.env["POSTHOG_API_KEY"] ??
+        process.env["POSTHOG_PERSONAL_API_KEY"] ??
+        process.env["POSTHOG_KEY"] ??
+        process.env["VITE_POSTHOG_KEY"],
+    );
+  if (!hasPosthogKey) return;
+  try {
+    const { captureExceptionOnServer } = await import("~/lib/analytics/posthog-server");
+    await captureExceptionOnServer(error, actorId, {
+      context: "team-membership-request-email",
+      decision,
+      memberId,
+      teamId,
+    });
+  } catch {
+    /* ignore instrumentation failures */
+  }
+};
+
 export const createTeam = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
   .validator(zod$(createTeamSchema))
@@ -591,7 +627,12 @@ export const approveTeamMembershipHandler = async ({
             decidedByName: currentUser.name ?? undefined,
           });
         } catch (emailError) {
-          console.error("Failed to send team request approval email", emailError);
+          await reportTeamRequestEmailFailure(emailError, {
+            actorId: currentUser.id,
+            decision: "approved",
+            memberId: approvedMember.id,
+            teamId: data.teamId,
+          });
         }
       }
     }
@@ -693,7 +734,12 @@ export const rejectTeamMembershipHandler = async ({
         decidedByName: currentUser.name ?? undefined,
       });
     } catch (emailError) {
-      console.error("Failed to send team request rejection email", emailError);
+      await reportTeamRequestEmailFailure(emailError, {
+        actorId: currentUser.id,
+        decision: "rejected",
+        memberId: pendingRequest.id,
+        teamId: data.teamId,
+      });
     }
   }
   return rejectedMember;

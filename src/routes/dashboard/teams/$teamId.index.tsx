@@ -114,38 +114,6 @@ function TeamDetailsPage() {
     [resolvedDecisionAt],
   );
 
-  useEffect(() => {
-    // Temporary debug log requested to inspect membership gating.
-    console.debug("[TeamQuickActions] membership state", {
-      userId: user?.id ?? "anonymous",
-      teamId,
-      viewerMembership,
-      rosterDerived: viewerMemberEntry?.member ?? null,
-      resolvedStatus,
-      resolvedRole,
-      canManageTeam,
-      pendingInviteFromTeam,
-      pendingJoinRequest,
-      canRequestJoin,
-      wasDeclined,
-      declinedAt,
-    });
-  }, [
-    user?.id,
-    teamId,
-    viewerMembership,
-    viewerMemberEntry?.member,
-    resolvedStatus,
-    resolvedRole,
-    canManageTeam,
-    pendingInviteFromTeam,
-    pendingJoinRequest,
-    canRequestJoin,
-    wasDeclined,
-    resolvedDecisionAt,
-    declinedAt,
-  ]);
-
   const requestMembershipMutation = useMutation({
     mutationFn: () => unwrapServerFnResult(requestTeamMembership({ data: { teamId } })),
     onSuccess: () => {

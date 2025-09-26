@@ -47,7 +47,7 @@ export const Route = createFileRoute("/")({
         console.error("Failed to fetch popular systems:", error);
         return [] as PopularGameSystem[];
       }),
-      getUpcomingEvents({ data: { limit: 6 } }).catch((error) => {
+      getUpcomingEvents({ data: { limit: 24 } }).catch((error) => {
         console.error("Failed to fetch upcoming events:", error);
         return [] as EventWithDetails[];
       }),
@@ -231,8 +231,7 @@ function filterGamesBySelection(
     );
   });
 
-  const source = matches.length > 0 ? matches : games;
-  return source.slice(0, 3);
+  return matches.slice(0, 3);
 }
 
 function filterEventsBySelection(
@@ -263,8 +262,7 @@ function filterEventsBySelection(
     );
   });
 
-  const source = matches.length > 0 ? matches : events;
-  return source.slice(0, 3);
+  return matches.slice(0, 3);
 }
 
 function Index() {
@@ -387,30 +385,6 @@ function Index() {
         ctaText="Explore games"
         ctaLink="/search"
       />
-
-      {upcomingEvents.length > 0 ? (
-        <section className="border-border/60 bg-muted/20 dark:bg-muted/10 dark:border-border/40 border-y py-10 transition-colors sm:py-14 lg:py-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-2xl font-bold sm:text-3xl">Upcoming public events</h2>
-              <Link
-                to="/events"
-                className={cn(
-                  buttonVariants({ size: "sm", variant: "ghost" }),
-                  "rounded-full px-5",
-                )}
-              >
-                View all events
-              </Link>
-            </div>
-            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {upcomingEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
 
       <section className="border-border/60 bg-background dark:border-border/40 dark:bg-background border-b py-10 transition-colors sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">

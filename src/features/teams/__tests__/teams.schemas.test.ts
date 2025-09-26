@@ -8,7 +8,10 @@ import {
   isTeamMemberSchema,
   listTeamsSchema,
   removeTeamMemberSchema,
+  requestTeamMembershipSchema,
+  respondToTeamRequestSchema,
   searchTeamsSchema,
+  teamInviteActionSchema,
   updateTeamMemberSchema,
   updateTeamSchema,
 } from "../teams.schemas";
@@ -344,16 +347,55 @@ describe("Teams Schemas", () => {
         });
         expect(result.success).toBe(true);
       });
-
       it("fails without team ID", () => {
         const result = removeTeamMemberSchema.safeParse({
           memberId: "member-456",
         });
         expect(result.success).toBe(false);
       });
-
       it("fails without member ID", () => {
         const result = removeTeamMemberSchema.safeParse({
+          teamId: "team-123",
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+    describe("teamInviteActionSchema", () => {
+      it("validates with team ID", () => {
+        const result = teamInviteActionSchema.safeParse({ teamId: "team-123" });
+        expect(result.success).toBe(true);
+      });
+      it("fails without team ID", () => {
+        const result = teamInviteActionSchema.safeParse({});
+        expect(result.success).toBe(false);
+      });
+    });
+    describe("requestTeamMembershipSchema", () => {
+      it("validates with team ID", () => {
+        const result = requestTeamMembershipSchema.safeParse({ teamId: "team-123" });
+        expect(result.success).toBe(true);
+      });
+      it("fails without team ID", () => {
+        const result = requestTeamMembershipSchema.safeParse({});
+        expect(result.success).toBe(false);
+      });
+    });
+    describe("respondToTeamRequestSchema", () => {
+      it("validates with team and member IDs", () => {
+        const result = respondToTeamRequestSchema.safeParse({
+          teamId: "team-123",
+          memberId: "member-456",
+        });
+        expect(result.success).toBe(true);
+      });
+      it("fails without team ID", () => {
+        const result = respondToTeamRequestSchema.safeParse({
+          memberId: "member-456",
+        });
+        expect(result.success).toBe(false);
+      });
+      it("fails without member ID", () => {
+        const result = respondToTeamRequestSchema.safeParse({
           teamId: "team-123",
         });
         expect(result.success).toBe(false);

@@ -59,8 +59,10 @@
 
 ## Phase 5 — Testing & QA
 
-- [ ] Add Vitest coverage for the new schemas and server functions, mocking database access to assert authorization, validation, and constraint handling paths.
-- [ ] Create component-level tests around the roster management UI to confirm buttons render only for eligible users and that state updates follow expectations.
+- [x] Add Vitest coverage for the new schemas and server functions, mocking database access to assert authorization, validation, and constraint handling paths.
+  - `src/features/teams/__tests__/teams.mutations.test.ts` exercises approval/decline mail dispatch, constraint resilience, and failure tolerance.
+- [x] Create component-level tests around the roster management UI to confirm buttons render only for eligible users and that state updates follow expectations.
+  - `src/routes/dashboard/teams/__tests__/$teamId.quick-actions.test.tsx` covers dashboard quick actions and roster moderation controls.
 - [ ] Write a Playwright scenario where a player requests membership and a captain approves/declines, validating UI feedback and data changes.
 - [ ] Run `pnpm lint`, `pnpm check-types`, and the targeted `pnpm test` suites to ensure baseline quality gates pass.
 

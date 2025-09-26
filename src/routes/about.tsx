@@ -13,7 +13,7 @@ function AboutPage() {
         eyebrow="About Roundup Games"
         title="A platform for local-first gatherings around tabletop and board games."
         subtitle=""
-        backgroundImage="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2000&q=80"
+        backgroundImage="/images/hero-tabletop-board-game-about-optimized.png"
         ctaText="Explore our programs"
         ctaLink="/resources"
         secondaryCta={{

@@ -78,7 +78,7 @@ function EventsIndex() {
         eyebrow="Events"
         title="Tournaments, training camps, and community festivals"
         subtitle="Roundup Games sanctions competitions year-round so athletes at every level can compete, learn, and connect."
-        backgroundImage="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=2000&q=80"
+        backgroundImage="/images/hero-tabletop-board-game-tournament-optimized.png"
         ctaText="Register your team"
         ctaLink="/auth/signup"
         secondaryCta={{

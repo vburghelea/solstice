@@ -90,7 +90,7 @@ function ResourcesPage() {
         eyebrow="Resources"
         title="Run unforgettable tabletop programs"
         subtitle="Toolkits, training plans, and certification pathways curated by the Roundup Games development team."
-        backgroundImage="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80"
+        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
         ctaText="Browse by category"
         ctaLink="#club-toolkit"
         secondaryCta={{

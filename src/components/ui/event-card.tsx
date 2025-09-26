@@ -3,8 +3,7 @@ import { format, parseISO } from "date-fns";
 import { CalendarIcon, MapPinIcon } from "~/components/ui/icons";
 import type { EventWithDetails } from "~/features/events/events.types";
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80";
+const FALLBACK_IMAGE = "/images/hero-tabletop-board-game-tournament-cards-optimized.png";
 
 interface EventCardProps {
   event?: EventWithDetails;

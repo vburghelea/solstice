@@ -40,7 +40,7 @@ function DesignSystemPage() {
         eyebrow="Component demo"
         title="Reusable form elements & loading states"
         subtitle="Preview the design system building blocks used across Roundup Games user flows."
-        backgroundImage="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80"
+        backgroundImage="/images/hero-tabletop-board-game-about-optimized.png"
         ctaText="View source documentation"
         ctaLink="https://github.com/roundup-games"
         secondaryCta={{

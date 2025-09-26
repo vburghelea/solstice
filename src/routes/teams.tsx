@@ -54,7 +54,7 @@ function TeamsPage() {
         eyebrow="Teams & Clubs"
         title="Find your squad or build one from the ground up"
         subtitle="From coast-to-coast, tabletop communities are recruiting hosts, storytellers, rules gurus, and volunteers. Discover groups near you and access the resources to help your program thrive."
-        backgroundImage="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=2000&q=80"
+        backgroundImage="/images/hero-tabletop-board-game-teams-optimized.png"
         ctaText="Browse club resources"
         ctaLink="/resources"
         secondaryCta={{

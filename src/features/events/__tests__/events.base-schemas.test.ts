@@ -20,6 +20,8 @@ describe("Event Base Schemas", () => {
         endDate: "2025-07-17",
         registrationType: "team",
         maxTeams: 16,
+        minPlayersPerTeam: 9,
+        maxPlayersPerTeam: 18,
         teamRegistrationFee: 20000, // $200 in cents
         individualRegistrationFee: 5000,
         registrationOpensAt: "2025-06-01T00:00:00Z",
@@ -56,6 +58,8 @@ describe("Event Base Schemas", () => {
         expect(result.data.isFeatured).toBe(true);
         expect(result.data.logoUrl).toBe("https://cdn.example.com/logo.png");
         expect(result.data.bannerUrl).toBe("https://cdn.example.com/banner.jpg");
+        expect(result.data.minPlayersPerTeam).toBe(9);
+        expect(result.data.maxPlayersPerTeam).toBe(18);
       }
     });
 

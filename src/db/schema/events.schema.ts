@@ -344,6 +344,8 @@ export const baseCreateEventSchema = z.object({
   registrationType: z.enum(["team", "individual", "both"]),
   maxTeams: z.number().int().positive().optional(),
   maxParticipants: z.number().int().positive().optional(),
+  minPlayersPerTeam: z.number().int().positive().optional(),
+  maxPlayersPerTeam: z.number().int().positive().optional(),
   teamRegistrationFee: z.number().int().min(0).optional(),
   individualRegistrationFee: z.number().int().min(0).optional(),
   contactEmail: z.string().email().optional(),

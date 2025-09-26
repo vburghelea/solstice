@@ -9,6 +9,7 @@ import {
   createTeamSchema,
   removeTeamMemberSchema,
   requestTeamMembershipSchema,
+  respondToTeamRequestSchema,
   teamInviteActionSchema,
   updateTeamMemberSchema,
   updateTeamSchema,
@@ -502,6 +503,159 @@ export const removeTeamMember = createServerFn({ method: "POST" })
       .returning();
 
     return removedMember;
+  });
+
+/**
+ * Approve a pending join request as a team manager
+ */
+export const approveTeamMembership = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(respondToTeamRequestSchema))
+  .handler(async ({ data, context }) => {
+    const [{ getDb }, { and, eq, isNull }] = await Promise.all([
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+    ]);
+    const { teamMembers } = await import("~/db/schema");
+
+    const currentUser = requireUser(context);
+    const db = await getDb();
+
+    const [actor] = await db
+      .select({ role: teamMembers.role })
+      .from(teamMembers)
+      .where(
+        and(
+          eq(teamMembers.teamId, data.teamId),
+          eq(teamMembers.userId, currentUser.id),
+          eq(teamMembers.status, "active"),
+        ),
+      )
+      .limit(1);
+
+    if (!actor || !["captain", "coach"].includes(actor.role)) {
+      throw forbidden("Only captains and coaches can approve join requests");
+    }
+
+    const [pendingRequest] = await db
+      .select({ id: teamMembers.id })
+      .from(teamMembers)
+      .where(
+        and(
+          eq(teamMembers.id, data.memberId),
+          eq(teamMembers.teamId, data.teamId),
+          eq(teamMembers.status, "pending"),
+          isNull(teamMembers.invitedBy),
+        ),
+      )
+      .limit(1);
+
+    if (!pendingRequest) {
+      throw notFound("Pending join request not found");
+    }
+
+    const decisionTime = new Date();
+
+    try {
+      const [approvedMember] = await db
+        .update(teamMembers)
+        .set({
+          status: "active" as TeamMemberStatus,
+          joinedAt: decisionTime,
+          invitedAt: null,
+          requestedAt: null,
+          invitationReminderCount: 0,
+          lastInvitationReminderAt: null,
+          leftAt: null,
+          approvedBy: currentUser.id,
+          decisionAt: decisionTime,
+        })
+        .where(eq(teamMembers.id, data.memberId))
+        .returning();
+
+      return approvedMember;
+    } catch (error) {
+      if (isActiveMembershipConstraintError(error)) {
+        throw validationError(
+          "This member already has an active membership with another team.",
+        );
+      }
+
+      throw error;
+    }
+  });
+
+/**
+ * Reject a pending join request as a team manager
+ */
+export const rejectTeamMembership = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(respondToTeamRequestSchema))
+  .handler(async ({ data, context }) => {
+    const [{ getDb }, { and, eq, isNull }] = await Promise.all([
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+    ]);
+    const { teamMembers } = await import("~/db/schema");
+
+    const currentUser = requireUser(context);
+    const db = await getDb();
+
+    const [actor] = await db
+      .select({ role: teamMembers.role })
+      .from(teamMembers)
+      .where(
+        and(
+          eq(teamMembers.teamId, data.teamId),
+          eq(teamMembers.userId, currentUser.id),
+          eq(teamMembers.status, "active"),
+        ),
+      )
+      .limit(1);
+
+    if (!actor || !["captain", "coach"].includes(actor.role)) {
+      throw forbidden("Only captains and coaches can reject join requests");
+    }
+
+    const [pendingRequest] = await db
+      .select({ id: teamMembers.id })
+      .from(teamMembers)
+      .where(
+        and(
+          eq(teamMembers.id, data.memberId),
+          eq(teamMembers.teamId, data.teamId),
+          eq(teamMembers.status, "pending"),
+          isNull(teamMembers.invitedBy),
+        ),
+      )
+      .limit(1);
+
+    if (!pendingRequest) {
+      throw notFound("Pending join request not found");
+    }
+
+    const decisionTime = new Date();
+
+    const [rejectedMember] = await db
+      .update(teamMembers)
+      .set({
+        status: "declined" as TeamMemberStatus,
+        requestedAt: null,
+        invitedAt: null,
+        invitationReminderCount: 0,
+        lastInvitationReminderAt: null,
+        approvedBy: currentUser.id,
+        decisionAt: decisionTime,
+        leftAt: null,
+      })
+      .where(eq(teamMembers.id, data.memberId))
+      .returning();
+
+    if (!rejectedMember) {
+      throw notFound("Pending join request not found");
+    }
+
+    return rejectedMember;
   });
 
 /**

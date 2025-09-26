@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { MOCK_CAMPAIGN, mockCreateCampaign } from "~/tests/mocks/campaigns";
@@ -95,67 +95,55 @@ describe("CreateCampaignPage", () => {
     expect(screen.getByRole("button", { name: /Create Campaign/i })).toBeInTheDocument();
   });
 
-  it.skip("successfully creates a campaign and navigates to its details page", async () => {
-    await renderCreateCampaignPage();
-
-    await user.type(screen.getByLabelText(/Campaign Name/i), "Test Campaign");
-    await user.type(screen.getByLabelText(/Description/i), "This is a test description.");
+  const fillRequiredFields = async ({
+    name,
+    description,
+  }: {
+    name: string;
+    description: string;
+  }) => {
+    await user.type(screen.getByLabelText(/Campaign Name/i), name);
+    await user.type(screen.getByLabelText(/Description/i), description);
     await user.type(screen.getByLabelText(/Time of Day/i), "Evenings");
     await user.type(screen.getByLabelText(/Session Duration/i), "180");
     await user.type(screen.getByLabelText(/Address/i), "123 Test St");
 
-    // Ensure recurrence and visibility are set explicitly
-    const recurrenceLabel = screen.getByText(/^Recurrence$/i);
-    const recurrenceTrigger = recurrenceLabel.parentElement!.querySelector(
-      '[data-slot="select-trigger"]',
-    ) as HTMLElement;
-    await user.click(recurrenceTrigger);
-    const recurrenceListbox = await screen.findByRole("listbox");
-    await user.click(
-      within(recurrenceListbox).getByRole("option", { name: /^Weekly$/i }),
-    );
+    const selectFromRadix = async (labelRegex: RegExp, optionRegex: RegExp) => {
+      const label = screen.getByText(labelRegex);
+      const trigger = label.parentElement!.querySelector(
+        '[data-slot="select-trigger"]',
+      ) as HTMLElement;
+      await user.click(trigger);
+      const listbox = await screen.findByRole("listbox");
+      await user.click(within(listbox).getByRole("option", { name: optionRegex }));
+    };
 
-    const visibilityLabel = screen.getByText(/^Visibility$/i);
-    const visibilityTrigger = visibilityLabel.parentElement!.querySelector(
-      '[data-slot="select-trigger"]',
-    ) as HTMLElement;
-    await user.click(visibilityTrigger);
-    const visibilityListbox = await screen.findByRole("listbox");
-    await user.click(
-      within(visibilityListbox).getByRole("option", { name: /^Public$/i }),
-    );
+    await selectFromRadix(/^Recurrence$/i, /^Weekly$/i);
+    await selectFromRadix(/^Visibility$/i, /^Public$/i);
 
-    // Select a game system (debounced search)
     const gameSystemCombobox = screen.getByTestId("game-system-combobox");
     const gameSystemInput = gameSystemCombobox.querySelector("input") as HTMLInputElement;
     await user.type(gameSystemInput, "D&D");
-    // Wait for results to populate, then select via keyboard to ensure onSelect fires
-    const dndOption1 = await within(gameSystemCombobox).findByRole("option", {
-      name: MOCK_GAME_SYSTEM_DND5E.name,
+    const dndOption = await within(gameSystemCombobox).findByRole("option", {
+      name: new RegExp(MOCK_GAME_SYSTEM_DND5E.name, "i"),
     });
-    await user.click(dndOption1);
-    // Close the combobox dropdown to avoid overlaying the submit button
+    await user.click(dndOption);
     await user.keyboard("{Escape}");
-    (gameSystemInput as HTMLInputElement).blur();
-    // Shift focus elsewhere to ensure it closes
+    gameSystemInput.blur();
     await user.click(screen.getByLabelText(/Session Duration/i));
 
-    // Select a language via Radix Select
-    const languageLabel = screen.getByText(/^Language$/i);
-    const languageTrigger = languageLabel.parentElement!.querySelector(
-      '[data-slot="select-trigger"]',
-    ) as HTMLElement;
-    await user.click(languageTrigger);
-    const languageListbox = await screen.findByRole("listbox");
-    const englishOption = within(languageListbox).getByRole("option", {
-      name: /^English$/i,
-    });
-    await user.click(englishOption);
-    // Sanity: selected value should now be visible on the trigger
-    expect(languageTrigger).toHaveTextContent(/English/i);
+    await selectFromRadix(/^Language$/i, /^English$/i);
+  };
 
-    const form = document.querySelector("form") as HTMLFormElement;
-    fireEvent.submit(form);
+  it("successfully creates a campaign and navigates to its details page", async () => {
+    await renderCreateCampaignPage();
+
+    await fillRequiredFields({
+      name: "Test Campaign",
+      description: "This is a test description.",
+    });
+
+    await user.click(screen.getByRole("button", { name: /Create Campaign/i }));
 
     await waitFor(() => {
       expect(mockCreateCampaign).toHaveBeenCalledWith({
@@ -176,7 +164,7 @@ describe("CreateCampaignPage", () => {
     });
   });
 
-  it.skip("displays a server error message on failed campaign creation", async () => {
+  it("displays a server error message on failed campaign creation", async () => {
     const errorMessage = "Campaign creation failed due to server issues.";
     mockCreateCampaign.mockResolvedValue({
       success: false,
@@ -185,62 +173,18 @@ describe("CreateCampaignPage", () => {
 
     await renderCreateCampaignPage();
 
-    await user.type(screen.getByLabelText(/Campaign Name/i), "Failing Campaign");
-    await user.type(screen.getByLabelText(/Description/i), "This campaign will fail.");
-    await user.type(screen.getByLabelText(/Time of Day/i), "Evenings");
-    await user.type(screen.getByLabelText(/Session Duration/i), "180");
-    await user.type(screen.getByLabelText(/Address/i), "123 Test St");
-
-    const recurrenceLabel = screen.getByText(/^Recurrence$/i);
-    const recurrenceTrigger = recurrenceLabel.parentElement!.querySelector(
-      '[data-slot="select-trigger"]',
-    ) as HTMLElement;
-    await user.click(recurrenceTrigger);
-    const recurrenceListbox = await screen.findByRole("listbox");
-    await user.click(
-      within(recurrenceListbox).getByRole("option", { name: /^Weekly$/i }),
-    );
-
-    const visibilityLabel = screen.getByText(/^Visibility$/i);
-    const visibilityTrigger = visibilityLabel.parentElement!.querySelector(
-      '[data-slot="select-trigger"]',
-    ) as HTMLElement;
-    await user.click(visibilityTrigger);
-    const visibilityListbox = await screen.findByRole("listbox");
-    await user.click(
-      within(visibilityListbox).getByRole("option", { name: /^Public$/i }),
-    );
-
-    // Select a game system
-    const gameSystemCombobox = screen.getByTestId("game-system-combobox");
-    const gameSystemInput = gameSystemCombobox.querySelector("input") as HTMLInputElement;
-    await user.type(gameSystemInput, "D&D");
-    const dndOption2 = await within(gameSystemCombobox).findByRole("option", {
-      name: MOCK_GAME_SYSTEM_DND5E.name,
+    await fillRequiredFields({
+      name: "Failing Campaign",
+      description: "This campaign will fail.",
     });
-    await user.click(dndOption2);
-    await user.keyboard("{Escape}");
-    (gameSystemInput as HTMLInputElement).blur();
-    await user.click(screen.getByLabelText(/Session Duration/i));
 
-    // Language selection
-    const languageLabel = screen.getByText(/^Language$/i);
-    const languageTrigger = languageLabel.parentElement!.querySelector(
-      '[data-slot="select-trigger"]',
-    ) as HTMLElement;
-    await user.click(languageTrigger);
-    const languageListbox = await screen.findByRole("listbox");
-    const englishOption = within(languageListbox).getByRole("option", {
-      name: /^English$/i,
-    });
-    await user.click(englishOption);
-    expect(languageTrigger).toHaveTextContent(/English/i);
-
-    const form = document.querySelector("form") as HTMLFormElement;
-    fireEvent.submit(form);
+    await user.click(screen.getByRole("button", { name: /Create Campaign/i }));
 
     await waitFor(() => {
-      // Error banner shows a title and the specific message
+      expect(mockCreateCampaign).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
       expect(screen.getByText(/Error creating campaign/i)).toBeInTheDocument();
       expect(screen.getByText(errorMessage)).toBeInTheDocument();
     });

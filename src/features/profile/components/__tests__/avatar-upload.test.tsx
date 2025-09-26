@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 import { vi } from "vitest";
+import { spyUseMutationRun } from "~/tests/utils/react-query";
 
 // Mock the aliased mutations import used by the component
 vi.mock("~/features/profile/profile.mutations", () => ({
@@ -10,43 +11,32 @@ vi.mock("~/features/profile/profile.mutations", () => ({
 }));
 
 describe("AvatarUpload", () => {
-  it.skip("shows 'Use provider avatar' only when uploaded avatar exists and triggers removal", async () => {
+  let mutationSpy: ReturnType<typeof spyUseMutationRun>;
+
+  beforeEach(() => {
+    mutationSpy = spyUseMutationRun();
+  });
+
+  afterEach(() => {
+    mutationSpy.mockRestore();
+  });
+
+  it("shows 'Use provider avatar' only when uploaded avatar exists and triggers removal", async () => {
     const { AvatarUpload } = await import("../avatar-upload");
-    // Ensure our mocked useMutation actually invokes the mutationFn
-    const rq = await import("@tanstack/react-query");
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    (rq as any).useMutation.mockImplementation(
-      (
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        opts: any,
-      ) => ({
-        mutate: async (variables: unknown) => {
-          const res = await opts.mutationFn?.(variables);
-          await opts.onSuccess?.(res, variables, undefined);
-        },
-        mutateAsync: async (variables: unknown) => {
-          const res = await opts.mutationFn?.(variables);
-          await opts.onSuccess?.(res, variables, undefined);
-          return res;
-        },
-        isPending: false,
-        isSuccess: false,
-        error: null,
-      }),
-    );
+    const { removeUploadedAvatar } = await import("~/features/profile/profile.mutations");
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    // Alternatively, assert on success toast (mutation executed)
 
     const { rerender } = render(
       <QueryClientProvider client={qc}>
         <AvatarUpload
           name="Test User"
           email="test@example.com"
-          image={"https://example.com/p.png"}
+          image="https://example.com/p.png"
           uploadedAvatarPath={null}
         />
       </QueryClientProvider>,
     );
+
     expect(screen.queryByText(/Use provider avatar/i)).not.toBeInTheDocument();
 
     rerender(
@@ -54,19 +44,23 @@ describe("AvatarUpload", () => {
         <AvatarUpload
           name="Test User"
           email="test@example.com"
-          image={"https://example.com/p.png"}
-          uploadedAvatarPath={"/api/avatars/test.webp"}
+          image="https://example.com/p.png"
+          uploadedAvatarPath="/api/avatars/test.webp"
         />
       </QueryClientProvider>,
     );
-    const revertBtn = await screen.findByText(/Use provider avatar/i);
+
+    const revertBtn = await screen.findByRole("button", {
+      name: /Use provider avatar/i,
+    });
     fireEvent.click(revertBtn);
-    // Mutation runs synchronously in our override above
-    expect(
-      (toast.success as any).mock.calls.some((args: any[]) =>
-        String(args?.[0]).includes("Reverted to provider avatar"),
-      ),
-    ).toBe(true);
+
+    await waitFor(() => {
+      expect(removeUploadedAvatar).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith("Reverted to provider avatar");
+    });
   });
 
   it("clicking 'Upload avatar' triggers hidden file input click", async () => {

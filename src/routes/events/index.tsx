@@ -87,14 +87,14 @@ function EventsIndex() {
         }}
       />
 
-      <section className="bg-white py-10 sm:py-14 lg:py-16">
+      <section className="bg-background py-10 sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
                 Filter by location
               </p>
-              <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
+              <h2 className="text-foreground mt-2 text-2xl font-bold sm:text-3xl">
                 Upcoming events calendar
               </h2>
             </div>
@@ -125,7 +125,7 @@ function EventsIndex() {
               </div>
             )}
             {!isLoading && !isError && filteredEvents.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-600 sm:col-span-2 lg:col-span-3">
+              <div className="border-border bg-muted text-muted-foreground rounded-2xl border border-dashed p-8 text-center text-sm sm:col-span-2 lg:col-span-3">
                 No events match this filter right now. Submit your club details to
                 events@roundup.games and we’ll add your tournament to the national
                 calendar.

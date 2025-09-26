@@ -20,6 +20,7 @@ import {
   registerForEventSchema,
   updateEventRegistrationStatusSchema,
   updateEventSchema,
+  uploadEventImageSchema,
 } from "./events.schemas";
 import type {
   CancelEventResult,
@@ -1245,6 +1246,47 @@ export const updateEventRegistrationStatus = createServerFn({ method: "POST" })
       };
     }
   });
+
+export const uploadEventImage = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(uploadEventImageSchema))
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<EventOperationResult<{ url: string; publicId: string }>> => {
+      try {
+        requireUser(context);
+        const [{ uploadImage, computeChecksum }, { Buffer }] = await Promise.all([
+          import("~/features/game-systems/services/cloudinary"),
+          import("node:buffer"),
+        ]);
+
+        const [, base64Payload = data.file] = data.file.split(",");
+        const checksum = computeChecksum(Buffer.from(base64Payload, "base64"));
+        const uploaded = await uploadImage(data.file, {
+          checksum,
+          kind: `event_${data.kind}`,
+        });
+
+        return {
+          success: true,
+          data: { url: uploaded.secureUrl, publicId: uploaded.publicId },
+        };
+      } catch (error) {
+        console.error("Error uploading event image:", error);
+        return {
+          success: false,
+          errors: [
+            {
+              code: "DATABASE_ERROR",
+              message: "Failed to upload event image",
+            },
+          ],
+        };
+      }
+    },
+  );
 
 /**
  * Cancel event registration

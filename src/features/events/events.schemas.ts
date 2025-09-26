@@ -99,6 +99,12 @@ export const cancelEventRegistrationSchema = z.object({
 });
 export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistrationSchema>;
 
+export const uploadEventImageSchema = z.object({
+  file: z.string().min(1, "Image data is required"),
+  kind: z.enum(["logo", "banner"]),
+});
+export type UploadEventImageInput = z.infer<typeof uploadEventImageSchema>;
+
 export const cancelEntireEventSchema = z.object({
   eventId: z.string().uuid(),
   reason: z.string().optional(),

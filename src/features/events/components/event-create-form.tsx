@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedFileUpload } from "~/components/form-fields/ValidatedFileUpload";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -22,7 +23,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { COUNTRIES } from "~/shared/hooks/useCountries";
-import { createEvent } from "../events.mutations";
+import { createEvent, uploadEventImage } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
 
 const EVENT_TYPE_OPTIONS = [
@@ -65,6 +66,8 @@ const eventFormSchema = z
       .optional(),
     type: z.enum(["tournament", "league", "camp", "clinic", "social", "other"]),
     status: z.enum(["draft", "published", "registration_open"]),
+    logoUrl: z.string().url().optional().or(z.literal("")),
+    bannerUrl: z.string().url().optional().or(z.literal("")),
     venueName: z.string().max(255).optional(),
     venueAddress: z.string().optional(),
     city: z.string().max(100).optional(),
@@ -110,6 +113,22 @@ const eventFormSchema = z
         });
       }
     }
+
+    if (values.earlyBirdDiscount > 0 && !values.earlyBirdDeadline) {
+      ctx.addIssue({
+        path: ["earlyBirdDeadline"],
+        code: z.ZodIssueCode.custom,
+        message: "Early bird deadline is required when a discount is provided",
+      });
+    }
+
+    if (values.earlyBirdDiscount === 0 && values.earlyBirdDeadline) {
+      ctx.addIssue({
+        path: ["earlyBirdDiscount"],
+        code: z.ZodIssueCode.custom,
+        message: "Set a discount percentage or remove the deadline",
+      });
+    }
   });
 
 type EventFormData = z.infer<typeof eventFormSchema>;
@@ -150,6 +169,8 @@ export function EventCreateForm() {
     contactEmail: "",
     contactPhone: "",
     websiteUrl: "",
+    logoUrl: "",
+    bannerUrl: "",
     isPublic: true,
     isFeatured: false,
     allowWaitlist: false,
@@ -162,6 +183,11 @@ export function EventCreateForm() {
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
+      if (isLogoUploading || isBannerUploading) {
+        toast.info("Please wait for image uploads to complete before submitting.");
+        return;
+      }
+
       const validationResult = eventFormSchema.safeParse(value);
 
       if (!validationResult.success) {
@@ -172,14 +198,26 @@ export function EventCreateForm() {
 
       const parsed = validationResult.data;
 
+      const normalizedLogoUrl =
+        typeof parsed.logoUrl === "string" && parsed.logoUrl.trim().length > 0
+          ? parsed.logoUrl.trim()
+          : undefined;
+      const normalizedBannerUrl =
+        typeof parsed.bannerUrl === "string" && parsed.bannerUrl.trim().length > 0
+          ? parsed.bannerUrl.trim()
+          : undefined;
+
       const formData: EventFormData = {
         ...parsed,
         teamRegistrationFee: Math.round((parsed.teamRegistrationFee || 0) * 100),
         individualRegistrationFee: Math.round(
           (parsed.individualRegistrationFee || 0) * 100,
         ),
+        earlyBirdDiscount: Math.round(parsed.earlyBirdDiscount || 0),
         description: parsed.description || undefined,
         shortDescription: parsed.shortDescription || undefined,
+        logoUrl: normalizedLogoUrl,
+        bannerUrl: normalizedBannerUrl,
         venueName: parsed.venueName || undefined,
         venueAddress: parsed.venueAddress || undefined,
         city: parsed.city || undefined,
@@ -191,7 +229,7 @@ export function EventCreateForm() {
         earlyBirdDeadline: parsed.earlyBirdDeadline || undefined,
         contactEmail: parsed.contactEmail || undefined,
         contactPhone: parsed.contactPhone || undefined,
-        websiteUrl: parsed.websiteUrl,
+        websiteUrl: parsed.websiteUrl?.trim() || undefined,
         maxTeams: parsed.maxTeams,
         maxParticipants: parsed.maxParticipants,
         minPlayersPerTeam: parsed.minPlayersPerTeam,
@@ -212,7 +250,91 @@ export function EventCreateForm() {
     },
   });
 
+  const uploadEventAsset = async (file: File, kind: "logo" | "banner") => {
+    const base64 = await readFileAsDataUrl(file);
+    const result = (await uploadEventImage({
+      data: { file: base64, kind },
+    })) as EventOperationResult<{ url: string; publicId: string }>;
+
+    if (!result.success) {
+      throw new Error(result.errors[0]?.message ?? "Failed to upload image");
+    }
+
+    return result.data.url;
+  };
+
+  const logoPreviousUrlRef = useRef<string | null>(null);
+  const bannerPreviousUrlRef = useRef<string | null>(null);
+  const pendingLogoFileRef = useRef<File | null>(null);
+  const pendingBannerFileRef = useRef<File | null>(null);
+
+  const logoUploadMutation = useMutation<string, Error, File>({
+    mutationFn: (file) => uploadEventAsset(file, "logo"),
+    onSuccess: (url) => {
+      form.setFieldValue("logoUrl", url);
+      toast.success("Logo uploaded successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to upload logo");
+      form.setFieldValue("logoUrl", logoPreviousUrlRef.current ?? "");
+    },
+  });
+
+  const bannerUploadMutation = useMutation<string, Error, File>({
+    mutationFn: (file) => uploadEventAsset(file, "banner"),
+    onSuccess: (url) => {
+      form.setFieldValue("bannerUrl", url);
+      toast.success("Banner uploaded successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to upload banner");
+      form.setFieldValue("bannerUrl", bannerPreviousUrlRef.current ?? "");
+    },
+  });
+
+  const { mutate: mutateLogoUpload, isPending: isLogoUploading } = logoUploadMutation;
+  const { mutate: mutateBannerUpload, isPending: isBannerUploading } =
+    bannerUploadMutation;
+
   const formState = useStore(form.store, (state) => state);
+
+  useEffect(() => {
+    const rawValue = formState.values.logoUrl as unknown;
+    if (typeof rawValue === "string") {
+      logoPreviousUrlRef.current = rawValue.length > 0 ? rawValue : null;
+    }
+
+    if (rawValue instanceof File) {
+      if (pendingLogoFileRef.current === rawValue || isLogoUploading) {
+        return;
+      }
+      pendingLogoFileRef.current = rawValue;
+      mutateLogoUpload(rawValue, {
+        onSettled: () => {
+          pendingLogoFileRef.current = null;
+        },
+      });
+    }
+  }, [formState.values.logoUrl, isLogoUploading, mutateLogoUpload]);
+
+  useEffect(() => {
+    const rawValue = formState.values.bannerUrl as unknown;
+    if (typeof rawValue === "string") {
+      bannerPreviousUrlRef.current = rawValue.length > 0 ? rawValue : null;
+    }
+
+    if (rawValue instanceof File) {
+      if (pendingBannerFileRef.current === rawValue || isBannerUploading) {
+        return;
+      }
+      pendingBannerFileRef.current = rawValue;
+      mutateBannerUpload(rawValue, {
+        onSettled: () => {
+          pendingBannerFileRef.current = null;
+        },
+      });
+    }
+  }, [formState.values.bannerUrl, isBannerUploading, mutateBannerUpload]);
 
   useEffect(() => {
     const generatedSlug = generateSlug(formState.values.name ?? "");
@@ -256,6 +378,8 @@ export function EventCreateForm() {
       console.error(error);
     },
   });
+
+  const isUploadingAssets = isLogoUploading || isBannerUploading;
 
   const steps = [
     { title: "Basic Info", description: "Event name and description" },
@@ -404,6 +528,68 @@ export function EventCreateForm() {
                   </div>
                 )}
               </form.Field>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Branding</h3>
+                <p className="text-muted-foreground text-sm">
+                  Add visuals to personalize your event. Upload images or paste URLs for
+                  assets you already host.
+                </p>
+
+                <form.Field name="logoUrl">
+                  {(field) => (
+                    <div className="space-y-3">
+                      <ValidatedFileUpload
+                        field={field}
+                        label="Event Logo"
+                        accept="image/*"
+                        maxSizeMb={5}
+                        helperText={
+                          isLogoUploading
+                            ? "Uploading logo..."
+                            : "Ideal size is a square PNG or JPG up to 5MB."
+                        }
+                        description="Displayed on compact cards and featured sections."
+                      />
+                      <ValidatedInput
+                        field={field}
+                        type="url"
+                        label="Logo URL (optional)"
+                        placeholder="https://cdn.example.com/event-logo.png"
+                        description="Paste a hosted logo URL if you already have one."
+                      />
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="bannerUrl">
+                  {(field) => (
+                    <div className="space-y-3">
+                      <ValidatedFileUpload
+                        field={field}
+                        label="Hero Banner"
+                        accept="image/*"
+                        maxSizeMb={8}
+                        helperText={
+                          isBannerUploading
+                            ? "Uploading banner..."
+                            : "Use a wide image (16:9) up to 8MB for the event hero."
+                        }
+                        description="Shown on the public event page and featured listings."
+                      />
+                      <ValidatedInput
+                        field={field}
+                        type="url"
+                        label="Banner URL (optional)"
+                        placeholder="https://cdn.example.com/event-banner.jpg"
+                        description="Paste a hosted banner URL if you've already uploaded one."
+                      />
+                    </div>
+                  )}
+                </form.Field>
+              </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <form.Field name="type">
@@ -574,7 +760,8 @@ export function EventCreateForm() {
                       type="number"
                       min={1}
                       onValueChange={(value) => {
-                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        const nextValue =
+                          value === "" ? undefined : Number.parseInt(value, 10);
                         field.handleChange(nextValue as unknown as number);
                       }}
                     />
@@ -589,7 +776,8 @@ export function EventCreateForm() {
                       type="number"
                       min={1}
                       onValueChange={(value) => {
-                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        const nextValue =
+                          value === "" ? undefined : Number.parseInt(value, 10);
                         field.handleChange(nextValue as unknown as number);
                       }}
                     />
@@ -606,7 +794,8 @@ export function EventCreateForm() {
                       type="number"
                       min={1}
                       onValueChange={(value) => {
-                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        const nextValue =
+                          value === "" ? undefined : Number.parseInt(value, 10);
                         field.handleChange(nextValue as unknown as number);
                       }}
                     />
@@ -621,7 +810,8 @@ export function EventCreateForm() {
                       type="number"
                       min={1}
                       onValueChange={(value) => {
-                        const nextValue = value ? Number.parseInt(value, 10) : undefined;
+                        const nextValue =
+                          value === "" ? undefined : Number.parseInt(value, 10);
                         field.handleChange(nextValue as unknown as number);
                       }}
                     />
@@ -643,7 +833,9 @@ export function EventCreateForm() {
                         min={0}
                         step="0.01"
                         onValueChange={(value) => {
-                          field.handleChange(value === "" ? 0 : Number.parseFloat(value));
+                          const nextValue =
+                            value === "" ? undefined : Number.parseFloat(value);
+                          field.handleChange(nextValue as unknown as number);
                         }}
                       />
                     )}
@@ -658,7 +850,9 @@ export function EventCreateForm() {
                         min={0}
                         step="0.01"
                         onValueChange={(value) => {
-                          field.handleChange(value === "" ? 0 : Number.parseFloat(value));
+                          const nextValue =
+                            value === "" ? undefined : Number.parseFloat(value);
+                          field.handleChange(nextValue as unknown as number);
                         }}
                       />
                     )}
@@ -678,9 +872,9 @@ export function EventCreateForm() {
                         min={0}
                         max={100}
                         onValueChange={(value) => {
-                          field.handleChange(
-                            value === "" ? 0 : Number.parseInt(value, 10),
-                          );
+                          const nextValue =
+                            value === "" ? undefined : Number.parseInt(value, 10);
+                          field.handleChange(nextValue as unknown as number);
                         }}
                         description="Percentage discount for early registration"
                       />
@@ -892,7 +1086,7 @@ export function EventCreateForm() {
                 onClick={() =>
                   setCurrentStep((prev) => Math.min(steps.length - 1, prev + 1))
                 }
-                disabled={!canProceedToNext()}
+                disabled={!canProceedToNext() || isUploadingAssets}
               >
                 Next
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -901,7 +1095,7 @@ export function EventCreateForm() {
               <FormSubmitButton
                 isSubmitting={createMutation.isPending}
                 loadingText="Creating..."
-                disabled={!formState.canSubmit}
+                disabled={!formState.canSubmit || isUploadingAssets}
               >
                 Create Event
               </FormSubmitButton>
@@ -918,4 +1112,22 @@ function generateSlug(name: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+async function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        resolve(result);
+      } else {
+        reject(new Error("Failed to read file"));
+      }
+    };
+    reader.onerror = () => {
+      reject(reader.error ?? new Error("Failed to read file"));
+    };
+    reader.readAsDataURL(file);
+  });
 }

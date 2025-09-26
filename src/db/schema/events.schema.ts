@@ -320,6 +320,19 @@ export const baseCreateEventSchema = z.object({
   description: z.string().optional(),
   shortDescription: z.string().max(500).optional(),
   type: z.enum(["tournament", "league", "camp", "clinic", "social", "other"]),
+  status: z
+    .enum([
+      "draft",
+      "published",
+      "registration_open",
+      "registration_closed",
+      "in_progress",
+      "completed",
+      "canceled",
+    ])
+    .default("draft"),
+  logoUrl: z.string().url().optional(),
+  bannerUrl: z.string().url().optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
   city: z.string().optional(),
@@ -335,6 +348,8 @@ export const baseCreateEventSchema = z.object({
   individualRegistrationFee: z.number().int().min(0).optional(),
   contactEmail: z.string().email().optional(),
   contactPhone: z.string().optional(),
+  isPublic: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
   allowWaitlist: z.boolean().optional(),
   requireMembership: z.boolean().optional(),
   allowEtransfer: z.boolean().optional(),

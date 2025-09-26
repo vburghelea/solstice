@@ -10,6 +10,7 @@ describe("Event Base Schemas", () => {
         description: "Annual summer tournament",
         shortDescription: "Join us for the biggest event of the summer!",
         type: "tournament",
+        status: "published",
         venueName: "Sports Complex",
         venueAddress: "123 Sports Way",
         city: "Berlin",
@@ -23,7 +24,10 @@ describe("Event Base Schemas", () => {
         individualRegistrationFee: 5000,
         registrationOpensAt: "2025-06-01T00:00:00Z",
         registrationClosesAt: "2025-07-10T23:59:59Z",
-        status: "draft",
+        logoUrl: "https://cdn.example.com/logo.png",
+        bannerUrl: "https://cdn.example.com/banner.jpg",
+        isPublic: true,
+        isFeatured: true,
         visibility: "public",
         rules: {
           format: "Swiss rounds followed by knockout",
@@ -46,6 +50,13 @@ describe("Event Base Schemas", () => {
 
       const result = createEventInputSchema.safeParse(validInput);
       expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("published");
+        expect(result.data.isPublic).toBe(true);
+        expect(result.data.isFeatured).toBe(true);
+        expect(result.data.logoUrl).toBe("https://cdn.example.com/logo.png");
+        expect(result.data.bannerUrl).toBe("https://cdn.example.com/banner.jpg");
+      }
     });
 
     it("validates minimal required fields", () => {
@@ -60,6 +71,11 @@ describe("Event Base Schemas", () => {
 
       const result = createEventInputSchema.safeParse(minimalInput);
       expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.status).toBe("draft");
+        expect(result.data.isPublic).toBe(false);
+        expect(result.data.isFeatured).toBe(false);
+      }
     });
 
     it("validates all event types", () => {

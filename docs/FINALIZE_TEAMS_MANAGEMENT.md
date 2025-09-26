@@ -2,11 +2,14 @@
 
 ## Phase 1 — Schema & Data Integrity
 
-- [ ] Review current `teamMembers` table to confirm the metadata adequately distinguishes captain invites from player join requests, aligning with the “Ask to Join” support described in `docs/teams-feature.md`.
-- [ ] Cross-check planned data changes against the documented schema (roles, statuses, invite metadata) and capture any deviations that need doc updates instead of new migrations.
-- [ ] Decide whether to extend the schema with `approvedBy`, `decisionAt`, or a dedicated declined status; document the rationale and update `docs/teams-feature.md` if we broaden the enum beyond the values listed there.
-- [ ] If new columns or enum variants are required, draft migration scripts (`src/db/migrations/*.sql`), regenerate `src/db/schema/teams.schema.ts` via `pnpm db generate`, and reconcile the documentation so it reflects the live schema.
-- [ ] Validate resulting Drizzle types and ensure indexes (`team_members_team_status_idx`, `team_members_user_status_idx`, `team_members_active_user_idx`) still satisfy query requirements.
+- [x] Review current `teamMembers` table to confirm the metadata adequately distinguishes captain invites from player join requests, aligning with the “Ask to Join” support described in `docs/teams-feature.md`.
+- [x] Cross-check planned data changes against the documented schema (roles, statuses, invite metadata) and capture any deviations that need doc updates instead of new migrations.
+- [x] Decide whether to extend the schema with `approvedBy`, `decisionAt`, or a dedicated declined status; document the rationale and update `docs/teams-feature.md` if we broaden the enum beyond the values listed there.
+  - Added `approved_by`, `decision_at`, and `status = 'declined'` plus doc updates summarizing approval provenance.
+- [x] If new columns or enum variants are required, draft migration scripts (`src/db/migrations/*.sql`), regenerate `src/db/schema/teams.schema.ts` via `pnpm db generate`, and reconcile the documentation so it reflects the live schema.
+  - Migration: `0008_team_member_approvals.sql`; schema + relations updated. Run `pnpm db migrate` against local/preview DBs.
+- [x] Validate resulting Drizzle types and ensure indexes (`team_members_team_status_idx`, `team_members_user_status_idx`, `team_members_active_user_idx`) still satisfy query requirements.
+  - `pnpm lint` / `pnpm check-types` pass; existing indexes remain unchanged.
 
 ## Phase 2 — Server Actions & Validation
 

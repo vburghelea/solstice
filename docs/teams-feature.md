@@ -40,17 +40,26 @@ CREATE TABLE teams (
 CREATE TABLE team_members (
   id TEXT PRIMARY KEY,
   team_id TEXT NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-  user_id TEXT NOT NULL REFERENCES user(id),
-  role TEXT NOT NULL DEFAULT 'player',
-  jersey_number TEXT,
-  position TEXT,
-  status TEXT DEFAULT 'active',
-  joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  invited_at TIMESTAMP,
-  invited_by TEXT REFERENCES user(id),
+  user_id TEXT NOT NULL REFERENCES "user"(id),
+  role team_member_role NOT NULL DEFAULT 'player',
+  status team_member_status NOT NULL DEFAULT 'pending',
+  jersey_number VARCHAR(3),
+  position VARCHAR(50),
+  joined_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  left_at TIMESTAMPTZ,
+  invited_by TEXT REFERENCES "user"(id),
+  approved_by TEXT REFERENCES "user"(id),
+  notes TEXT,
+  invited_at TIMESTAMPTZ,
+  last_invitation_reminder_at TIMESTAMPTZ,
+  invitation_reminder_count INTEGER NOT NULL DEFAULT 0,
+  requested_at TIMESTAMPTZ,
+  decision_at TIMESTAMPTZ,
   UNIQUE(team_id, user_id)
 );
 ```
+
+`team_member_status` supports `pending`, `active`, `inactive`, `removed`, and `declined`. We use `invited_by`/`invited_at` to capture captain-led invitations, `requested_at` to capture member-initiated “Ask to Join” flows, and `approved_by` plus `decision_at` to record who resolved a request (regardless of approval or rejection).
 
 ### Member Roles
 
@@ -153,6 +162,8 @@ deactivateTeam({ teamId: string }): Promise<void>
   button; requests are tracked alongside traditional invitations.
 - Invitation metadata (invited/ requested timestamps, reminder counters, inviter) is recorded on
   the `team_members` table for auditing and reminder automation.
+- Resolution metadata (`approved_by`, `decision_at`, `status = 'declined'`) captures how pending
+  requests were handled without deleting historical rows.
 
 4. **Team Discovery**
    - Browse all active teams

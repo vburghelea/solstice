@@ -296,6 +296,8 @@ export const addTeamMember = createServerFn({ method: "POST" })
           invitationReminderCount: 0,
           lastInvitationReminderAt: null,
           requestedAt: null,
+          approvedBy: null,
+          decisionAt: null,
         })
         .where(
           and(eq(teamMembers.teamId, data.teamId), eq(teamMembers.userId, targetUser.id)),
@@ -320,6 +322,8 @@ export const addTeamMember = createServerFn({ method: "POST" })
         invitationReminderCount: 0,
         lastInvitationReminderAt: null,
         requestedAt: null,
+        approvedBy: null,
+        decisionAt: null,
       })
       .returning();
 
@@ -518,13 +522,17 @@ export const acceptTeamInvite = createServerFn({ method: "POST" })
 
     const db = await getDb();
 
+    const decisionTime = new Date();
+
     // Update membership status
     const [updatedMember] = await db
       .update(teamMembers)
       .set({
         status: "active" as TeamMemberStatus,
-        joinedAt: new Date(),
+        joinedAt: decisionTime,
         requestedAt: null,
+        approvedBy: currentUser.id,
+        decisionAt: decisionTime,
       })
       .where(
         and(
@@ -560,13 +568,17 @@ export const declineTeamInvite = createServerFn({ method: "POST" })
 
     const db = await getDb();
 
+    const decisionTime = new Date();
+
     // Update membership status
     const [declinedMember] = await db
       .update(teamMembers)
       .set({
-        status: "inactive" as TeamMemberStatus,
-        leftAt: new Date(),
+        status: "declined" as TeamMemberStatus,
+        leftAt: null,
         requestedAt: null,
+        approvedBy: currentUser.id,
+        decisionAt: decisionTime,
       })
       .where(
         and(
@@ -627,6 +639,8 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
             requestedAt: new Date(),
             invitationReminderCount: 0,
             lastInvitationReminderAt: null,
+            approvedBy: null,
+            decisionAt: null,
           })
           .where(eq(teamMembers.id, existingMember.id))
           .returning();
@@ -644,6 +658,8 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
           invitationReminderCount: 0,
           lastInvitationReminderAt: null,
           leftAt: null,
+          approvedBy: null,
+          decisionAt: null,
         })
         .where(eq(teamMembers.id, existingMember.id))
         .returning();
@@ -663,6 +679,8 @@ export const requestTeamMembership = createServerFn({ method: "POST" })
         requestedAt: new Date(),
         invitationReminderCount: 0,
         lastInvitationReminderAt: null,
+        approvedBy: null,
+        decisionAt: null,
       })
       .returning();
 

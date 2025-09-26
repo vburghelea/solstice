@@ -103,6 +103,7 @@ export const teamMemberStatus = pgEnum("team_member_status", [
   "active",
   "inactive",
   "removed",
+  "declined",
 ]);
 export const visibility = pgEnum("visibility", ["public", "protected", "private"]);
 
@@ -121,7 +122,9 @@ export const teamMembers = pgTable(
       .notNull(),
     leftAt: timestamp("left_at", { withTimezone: true, mode: "string" }),
     invitedBy: text("invited_by"),
+    approvedBy: text("approved_by"),
     notes: text(),
+    decisionAt: timestamp("decision_at", { withTimezone: true, mode: "string" }),
   },
   (table) => [
     uniqueIndex("team_members_active_user_idx")
@@ -156,6 +159,11 @@ export const teamMembers = pgTable(
       columns: [table.invitedBy],
       foreignColumns: [user.id],
       name: "team_members_invited_by_user_id_fk",
+    }),
+    foreignKey({
+      columns: [table.approvedBy],
+      foreignColumns: [user.id],
+      name: "team_members_approved_by_user_id_fk",
     }),
   ],
 );

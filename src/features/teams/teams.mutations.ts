@@ -4,6 +4,7 @@ import type { TeamMemberRole, TeamMemberStatus } from "~/db/schema";
 import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { forbidden, notFound, validationError } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
+import type { RespondToTeamRequestInput } from "./teams.schemas";
 import {
   addTeamMemberSchema,
   createTeamSchema,
@@ -505,216 +506,202 @@ export const removeTeamMember = createServerFn({ method: "POST" })
     return removedMember;
   });
 
-/**
- * Approve a pending join request as a team manager
- */
-export const approveTeamMembership = createServerFn({ method: "POST" })
-  .middleware(getAuthMiddleware())
-  .validator(zod$(respondToTeamRequestSchema))
-  .handler(async ({ data, context }) => {
-    const [{ getDb }, { and, eq, isNull }] = await Promise.all([
-      import("~/db/server-helpers"),
-      import("drizzle-orm"),
-    ]);
-    const { teamMembers, teams, user } = await import("~/db/schema");
-
-    const currentUser = requireUser(context);
-    const db = await getDb();
-
-    const [actor] = await db
-      .select({ role: teamMembers.role })
-      .from(teamMembers)
-      .where(
-        and(
-          eq(teamMembers.teamId, data.teamId),
-          eq(teamMembers.userId, currentUser.id),
-          eq(teamMembers.status, "active"),
-        ),
-      )
-      .limit(1);
-
-    if (!actor || !["captain", "coach"].includes(actor.role)) {
-      throw forbidden("Only captains and coaches can approve join requests");
-    }
-
-    const [pendingRequest] = await db
-      .select({ id: teamMembers.id })
-      .from(teamMembers)
-      .where(
-        and(
-          eq(teamMembers.id, data.memberId),
-          eq(teamMembers.teamId, data.teamId),
-          eq(teamMembers.status, "pending"),
-          isNull(teamMembers.invitedBy),
-        ),
-      )
-      .limit(1);
-
-    if (!pendingRequest) {
-      throw notFound("Pending join request not found");
-    }
-
-    const decisionTime = new Date();
-
-    try {
-      const [approvedMember] = await db
-        .update(teamMembers)
-        .set({
-          status: "active" as TeamMemberStatus,
-          joinedAt: decisionTime,
-          invitedAt: null,
-          requestedAt: null,
-          invitationReminderCount: 0,
-          lastInvitationReminderAt: null,
-          leftAt: null,
-          approvedBy: currentUser.id,
-          decisionAt: decisionTime,
-        })
-        .where(eq(teamMembers.id, data.memberId))
-        .returning();
-
-      if (approvedMember) {
-        const [recipient] = await db
-          .select({
-            email: user.email,
-            name: user.name,
-            teamName: teams.name,
-            teamSlug: teams.slug,
-          })
-          .from(teamMembers)
-          .innerJoin(user, eq(teamMembers.userId, user.id))
-          .innerJoin(teams, eq(teamMembers.teamId, teams.id))
-          .where(eq(teamMembers.id, approvedMember.id))
-          .limit(1);
-
-        if (recipient?.email) {
-          try {
-            const { sendTeamRequestDecisionEmail } = await import("~/lib/email/resend");
-            await sendTeamRequestDecisionEmail({
-              to: { email: recipient.email, name: recipient.name ?? undefined },
-              teamName: recipient.teamName,
-              teamSlug: recipient.teamSlug,
-              decision: "approved",
-              decidedByName: currentUser.name ?? undefined,
-            });
-          } catch (emailError) {
-            console.error("Failed to send team request approval email", emailError);
-          }
-        }
-      }
-
-      return approvedMember;
-    } catch (error) {
-      if (isActiveMembershipConstraintError(error)) {
-        throw validationError(
-          "This member already has an active membership with another team.",
-        );
-      }
-
-      throw error;
-    }
-  });
-
-/**
- * Reject a pending join request as a team manager
- */
-export const rejectTeamMembership = createServerFn({ method: "POST" })
-  .middleware(getAuthMiddleware())
-  .validator(zod$(respondToTeamRequestSchema))
-  .handler(async ({ data, context }) => {
-    const [{ getDb }, { and, eq, isNull }] = await Promise.all([
-      import("~/db/server-helpers"),
-      import("drizzle-orm"),
-    ]);
-    const { teamMembers, teams, user } = await import("~/db/schema");
-
-    const currentUser = requireUser(context);
-    const db = await getDb();
-
-    const [actor] = await db
-      .select({ role: teamMembers.role })
-      .from(teamMembers)
-      .where(
-        and(
-          eq(teamMembers.teamId, data.teamId),
-          eq(teamMembers.userId, currentUser.id),
-          eq(teamMembers.status, "active"),
-        ),
-      )
-      .limit(1);
-
-    if (!actor || !["captain", "coach"].includes(actor.role)) {
-      throw forbidden("Only captains and coaches can reject join requests");
-    }
-
-    const [pendingRequest] = await db
-      .select({ id: teamMembers.id })
-      .from(teamMembers)
-      .where(
-        and(
-          eq(teamMembers.id, data.memberId),
-          eq(teamMembers.teamId, data.teamId),
-          eq(teamMembers.status, "pending"),
-          isNull(teamMembers.invitedBy),
-        ),
-      )
-      .limit(1);
-
-    if (!pendingRequest) {
-      throw notFound("Pending join request not found");
-    }
-
-    const decisionTime = new Date();
-
-    const [rejectedMember] = await db
+type RespondToTeamRequestArgs = {
+  data: RespondToTeamRequestInput;
+  context: unknown;
+};
+export const approveTeamMembershipHandler = async ({
+  data,
+  context,
+}: RespondToTeamRequestArgs) => {
+  const [{ getDb }, { and, eq, isNull }] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("drizzle-orm"),
+  ]);
+  const { teamMembers, teams, user } = await import("~/db/schema");
+  const currentUser = requireUser(context);
+  const db = await getDb();
+  const [actor] = await db
+    .select({ role: teamMembers.role })
+    .from(teamMembers)
+    .where(
+      and(
+        eq(teamMembers.teamId, data.teamId),
+        eq(teamMembers.userId, currentUser.id),
+        eq(teamMembers.status, "active"),
+      ),
+    )
+    .limit(1);
+  if (!actor || !["captain", "coach"].includes(actor.role)) {
+    throw forbidden("Only captains and coaches can approve join requests");
+  }
+  const [pendingRequest] = await db
+    .select({ id: teamMembers.id })
+    .from(teamMembers)
+    .where(
+      and(
+        eq(teamMembers.id, data.memberId),
+        eq(teamMembers.teamId, data.teamId),
+        eq(teamMembers.status, "pending"),
+        isNull(teamMembers.invitedBy),
+      ),
+    )
+    .limit(1);
+  if (!pendingRequest) {
+    throw notFound("Pending join request not found");
+  }
+  const decisionTime = new Date();
+  try {
+    const [approvedMember] = await db
       .update(teamMembers)
       .set({
-        status: "declined" as TeamMemberStatus,
-        requestedAt: null,
+        status: "active" as TeamMemberStatus,
+        joinedAt: decisionTime,
         invitedAt: null,
+        requestedAt: null,
         invitationReminderCount: 0,
         lastInvitationReminderAt: null,
+        leftAt: null,
         approvedBy: currentUser.id,
         decisionAt: decisionTime,
-        leftAt: null,
       })
       .where(eq(teamMembers.id, data.memberId))
       .returning();
-
-    if (!rejectedMember) {
-      throw notFound("Pending join request not found");
-    }
-
-    const [recipient] = await db
-      .select({
-        email: user.email,
-        name: user.name,
-        teamName: teams.name,
-        teamSlug: teams.slug,
-      })
-      .from(teamMembers)
-      .innerJoin(user, eq(teamMembers.userId, user.id))
-      .innerJoin(teams, eq(teamMembers.teamId, teams.id))
-      .where(eq(teamMembers.id, rejectedMember.id))
-      .limit(1);
-
-    if (recipient?.email) {
-      try {
-        const { sendTeamRequestDecisionEmail } = await import("~/lib/email/resend");
-        await sendTeamRequestDecisionEmail({
-          to: { email: recipient.email, name: recipient.name ?? undefined },
-          teamName: recipient.teamName,
-          teamSlug: recipient.teamSlug,
-          decision: "declined",
-          decidedByName: currentUser.name ?? undefined,
-        });
-      } catch (emailError) {
-        console.error("Failed to send team request rejection email", emailError);
+    if (approvedMember) {
+      const [recipient] = await db
+        .select({
+          email: user.email,
+          name: user.name,
+          teamName: teams.name,
+          teamSlug: teams.slug,
+        })
+        .from(teamMembers)
+        .innerJoin(user, eq(teamMembers.userId, user.id))
+        .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+        .where(eq(teamMembers.id, approvedMember.id))
+        .limit(1);
+      if (recipient?.email) {
+        try {
+          const { sendTeamRequestDecisionEmail } = await import("~/lib/email/resend");
+          await sendTeamRequestDecisionEmail({
+            to: { email: recipient.email, name: recipient.name ?? undefined },
+            teamName: recipient.teamName,
+            teamSlug: recipient.teamSlug,
+            decision: "approved",
+            decidedByName: currentUser.name ?? undefined,
+          });
+        } catch (emailError) {
+          console.error("Failed to send team request approval email", emailError);
+        }
       }
     }
-
-    return rejectedMember;
-  });
+    return approvedMember;
+  } catch (error) {
+    if (isActiveMembershipConstraintError(error)) {
+      throw validationError(
+        "This member already has an active membership with another team.",
+      );
+    }
+    throw error;
+  }
+};
+export const approveTeamMembership = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(respondToTeamRequestSchema))
+  .handler(approveTeamMembershipHandler);
+/**
+ * Reject a pending join request as a team manager
+ */
+export const rejectTeamMembershipHandler = async ({
+  data,
+  context,
+}: RespondToTeamRequestArgs) => {
+  const [{ getDb }, { and, eq, isNull }] = await Promise.all([
+    import("~/db/server-helpers"),
+    import("drizzle-orm"),
+  ]);
+  const { teamMembers, teams, user } = await import("~/db/schema");
+  const currentUser = requireUser(context);
+  const db = await getDb();
+  const [actor] = await db
+    .select({ role: teamMembers.role })
+    .from(teamMembers)
+    .where(
+      and(
+        eq(teamMembers.teamId, data.teamId),
+        eq(teamMembers.userId, currentUser.id),
+        eq(teamMembers.status, "active"),
+      ),
+    )
+    .limit(1);
+  if (!actor || !["captain", "coach"].includes(actor.role)) {
+    throw forbidden("Only captains and coaches can reject join requests");
+  }
+  const [pendingRequest] = await db
+    .select({ id: teamMembers.id })
+    .from(teamMembers)
+    .where(
+      and(
+        eq(teamMembers.id, data.memberId),
+        eq(teamMembers.teamId, data.teamId),
+        eq(teamMembers.status, "pending"),
+        isNull(teamMembers.invitedBy),
+      ),
+    )
+    .limit(1);
+  if (!pendingRequest) {
+    throw notFound("Pending join request not found");
+  }
+  const decisionTime = new Date();
+  const [rejectedMember] = await db
+    .update(teamMembers)
+    .set({
+      status: "declined" as TeamMemberStatus,
+      requestedAt: null,
+      invitedAt: null,
+      invitationReminderCount: 0,
+      lastInvitationReminderAt: null,
+      approvedBy: currentUser.id,
+      decisionAt: decisionTime,
+      leftAt: null,
+    })
+    .where(eq(teamMembers.id, data.memberId))
+    .returning();
+  if (!rejectedMember) {
+    throw notFound("Pending join request not found");
+  }
+  const [recipient] = await db
+    .select({
+      email: user.email,
+      name: user.name,
+      teamName: teams.name,
+      teamSlug: teams.slug,
+    })
+    .from(teamMembers)
+    .innerJoin(user, eq(teamMembers.userId, user.id))
+    .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+    .where(eq(teamMembers.id, rejectedMember.id))
+    .limit(1);
+  if (recipient?.email) {
+    try {
+      const { sendTeamRequestDecisionEmail } = await import("~/lib/email/resend");
+      await sendTeamRequestDecisionEmail({
+        to: { email: recipient.email, name: recipient.name ?? undefined },
+        teamName: recipient.teamName,
+        teamSlug: recipient.teamSlug,
+        decision: "declined",
+        decidedByName: currentUser.name ?? undefined,
+      });
+    } catch (emailError) {
+      console.error("Failed to send team request rejection email", emailError);
+    }
+  }
+  return rejectedMember;
+};
+export const rejectTeamMembership = createServerFn({ method: "POST" })
+  .middleware(getAuthMiddleware())
+  .validator(zod$(respondToTeamRequestSchema))
+  .handler(rejectTeamMembershipHandler);
 
 /**
  * Accept a team invite

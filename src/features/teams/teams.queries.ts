@@ -232,6 +232,42 @@ export const getTeamMembers = createServerFn({ method: "POST" })
     return result;
   });
 
+export const getViewerTeamMembership = createServerFn({ method: "POST" })
+  .validator(zod$(getTeamSchema))
+  .handler(async ({ data }) => {
+    const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
+      import("~/features/auth/auth.queries"),
+      import("~/db/server-helpers"),
+      import("drizzle-orm"),
+    ]);
+    const { teamMembers } = await import("~/db/schema");
+
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return null;
+    }
+
+    const db = await getDb();
+
+    const [membership] = await db
+      .select({
+        id: teamMembers.id,
+        role: teamMembers.role,
+        status: teamMembers.status,
+        invitedBy: teamMembers.invitedBy,
+        requestedAt: teamMembers.requestedAt,
+        approvedBy: teamMembers.approvedBy,
+        decisionAt: teamMembers.decisionAt,
+      })
+      .from(teamMembers)
+      .where(
+        and(eq(teamMembers.teamId, data.teamId), eq(teamMembers.userId, currentUser.id)),
+      )
+      .limit(1);
+
+    return membership ?? null;
+  });
+
 export const getPendingTeamInvites = createServerFn({ method: "POST" }).handler(
   async () => {
     const [{ getCurrentUser }, { getDb }, { and, eq, sql }] = await Promise.all([
@@ -407,3 +443,4 @@ export type TeamListItem = Awaited<ReturnType<typeof listTeams>>[number];
 export type UserTeam = Awaited<ReturnType<typeof getUserTeams>>[number];
 export type TeamMemberDetails = Awaited<ReturnType<typeof getTeamMembers>>[number];
 export type PendingTeamInvite = Awaited<ReturnType<typeof getPendingTeamInvites>>[number];
+export type ViewerTeamMembership = Awaited<ReturnType<typeof getViewerTeamMembership>>;

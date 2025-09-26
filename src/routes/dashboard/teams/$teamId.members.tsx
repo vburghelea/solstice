@@ -3,6 +3,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ProfileLink } from "~/components/ProfileLink";
 import {
   AlertDialog,
@@ -36,15 +37,23 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { TeamMemberRole } from "~/db/schema";
+import { useAuth } from "~/features/auth";
 import {
   addTeamMember,
+  approveTeamMembership,
+  rejectTeamMembership,
   removeTeamMember,
   updateTeamMember,
 } from "~/features/teams/teams.mutations";
-import { getTeam, getTeamMembers } from "~/features/teams/teams.queries";
+import {
+  getTeam,
+  getTeamMembers,
+  type TeamMemberDetails,
+} from "~/features/teams/teams.queries";
 import type {
   AddTeamMemberInput,
   RemoveTeamMemberInput,
+  RespondToTeamRequestInput,
   UpdateTeamMemberInput,
 } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
@@ -68,6 +77,7 @@ function TeamMembersPage() {
   const queryClient = useQueryClient();
   const [showAddMember, setShowAddMember] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const { user: currentUser } = useAuth();
 
   const { data: members } = useSuspenseQuery({
     queryKey: ["teamMembers", teamId],
@@ -76,6 +86,9 @@ function TeamMembersPage() {
   });
 
   const pendingMembers = members.filter((entry) => entry.member.status === "pending");
+  const pendingJoinRequests = pendingMembers.filter(
+    (entry) => entry.member.requestedAt && !entry.invitedBy?.id,
+  );
 
   const addMemberMutation = useMutation({
     mutationFn: (payload: AddTeamMemberInput) =>
@@ -103,6 +116,125 @@ function TeamMembersPage() {
       unwrapServerFnResult(removeTeamMember({ data: payload })),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
+    },
+  });
+
+  const approveMemberMutation = useMutation<
+    unknown,
+    Error,
+    RespondToTeamRequestInput,
+    { previousMembers?: TeamMemberDetails[] }
+  >({
+    mutationFn: (payload) =>
+      unwrapServerFnResult(approveTeamMembership({ data: payload })),
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["teamMembers", teamId] });
+      const previousMembers = queryClient.getQueryData<TeamMemberDetails[]>([
+        "teamMembers",
+        teamId,
+      ]);
+
+      const decisionTime = new Date();
+      queryClient.setQueryData<TeamMemberDetails[] | undefined>(
+        ["teamMembers", teamId],
+        (current) =>
+          current?.map((entry) =>
+            entry.member.id === payload.memberId
+              ? {
+                  ...entry,
+                  member: {
+                    ...entry.member,
+                    status: "active",
+                    joinedAt: decisionTime,
+                    requestedAt: null,
+                    invitedAt: null,
+                    invitationReminderCount: 0,
+                    lastInvitationReminderAt: null,
+                    leftAt: null,
+                    approvedBy: currentUser?.id ?? entry.member.approvedBy ?? null,
+                    decisionAt: decisionTime,
+                  },
+                }
+              : entry,
+          ),
+      );
+
+      return previousMembers ? { previousMembers } : {};
+    },
+    onError: (error, _vars, context) => {
+      if (context?.previousMembers) {
+        queryClient.setQueryData(["teamMembers", teamId], context.previousMembers);
+      }
+      toast.error(
+        error instanceof Error ? error.message : "Failed to approve the join request.",
+      );
+    },
+    onSuccess: () => {
+      toast.success("Join request approved.");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
+      queryClient.invalidateQueries({ queryKey: ["userTeams"] });
+      queryClient.invalidateQueries({ queryKey: ["pendingTeamInvites"] });
+    },
+  });
+
+  const rejectMemberMutation = useMutation<
+    unknown,
+    Error,
+    RespondToTeamRequestInput,
+    { previousMembers?: TeamMemberDetails[] }
+  >({
+    mutationFn: (payload) =>
+      unwrapServerFnResult(rejectTeamMembership({ data: payload })),
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ["teamMembers", teamId] });
+      const previousMembers = queryClient.getQueryData<TeamMemberDetails[]>([
+        "teamMembers",
+        teamId,
+      ]);
+
+      const decisionTime = new Date();
+      queryClient.setQueryData<TeamMemberDetails[] | undefined>(
+        ["teamMembers", teamId],
+        (current) =>
+          current?.map((entry) =>
+            entry.member.id === payload.memberId
+              ? {
+                  ...entry,
+                  member: {
+                    ...entry.member,
+                    status: "declined",
+                    requestedAt: null,
+                    invitedAt: null,
+                    invitationReminderCount: 0,
+                    lastInvitationReminderAt: null,
+                    approvedBy: currentUser?.id ?? entry.member.approvedBy ?? null,
+                    decisionAt: decisionTime,
+                    leftAt: null,
+                  },
+                }
+              : entry,
+          ),
+      );
+
+      return previousMembers ? { previousMembers } : {};
+    },
+    onError: (error, _vars, context) => {
+      if (context?.previousMembers) {
+        queryClient.setQueryData(["teamMembers", teamId], context.previousMembers);
+      }
+      toast.error(
+        error instanceof Error ? error.message : "Failed to decline the join request.",
+      );
+    },
+    onSuccess: () => {
+      toast.success("Join request declined.");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["teamMembers", teamId] });
+      queryClient.invalidateQueries({ queryKey: ["userTeams"] });
+      queryClient.invalidateQueries({ queryKey: ["pendingTeamInvites"] });
     },
   });
 
@@ -143,8 +275,12 @@ function TeamMembersPage() {
           </p>
           {pendingMembers.length > 0 && (
             <Badge variant="secondary" className="mt-2 text-xs uppercase">
-              {pendingMembers.length} pending invite
-              {pendingMembers.length > 1 ? "s" : ""}
+              {pendingMembers.length} pending
+              {pendingJoinRequests.length > 0
+                ? ` (${pendingJoinRequests.length} request${
+                    pendingJoinRequests.length > 1 ? "s" : ""
+                  })`
+                : ""}
             </Badge>
           )}
         </div>
@@ -280,107 +416,145 @@ function TeamMembersPage() {
       )}
 
       <div className="space-y-4">
-        {members.map(({ member, user, invitedBy }) => (
-          <Card key={member.id}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Avatar
-                    name={user.name}
-                    email={user.email}
-                    srcUploaded={user.uploadedAvatarPath}
-                    srcProvider={user.image}
-                    userId={user.id}
-                    className="h-8 w-8"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <ProfileLink userId={user.id} username={user.name || user.email} />
-                      <Badge
-                        variant={member.status === "active" ? "default" : "secondary"}
-                      >
-                        {member.status}
-                      </Badge>
-                    </div>
-                    <div className="text-muted-foreground flex gap-4 text-sm">
-                      <span className="capitalize">{member.role}</span>
-                      {member.jerseyNumber && <span>#{member.jerseyNumber}</span>}
-                      {member.position && <span>{member.position}</span>}
-                    </div>
-                    {member.status === "pending" && (
-                      <p className="text-muted-foreground mt-2 text-sm">
-                        {member.requestedAt
-                          ? `Join request received ${formatDistanceToNow(
-                              new Date(member.requestedAt),
-                              { addSuffix: true },
-                            )}.`
-                          : member.invitedAt
-                            ? `Invitation sent ${formatDistanceToNow(
-                                new Date(member.invitedAt),
+        {members.map(({ member, user, invitedBy }) => {
+          const isJoinRequest =
+            member.status === "pending" && !invitedBy?.id && Boolean(member.requestedAt);
+          const isDecisionPending =
+            approveMemberMutation.isPending || rejectMemberMutation.isPending;
+
+          return (
+            <Card key={member.id}>
+              <CardContent className="p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar
+                      name={user.name}
+                      email={user.email}
+                      srcUploaded={user.uploadedAvatarPath}
+                      srcProvider={user.image}
+                      userId={user.id}
+                      className="h-8 w-8"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <ProfileLink
+                          userId={user.id}
+                          username={user.name || user.email}
+                        />
+                        <Badge
+                          variant={member.status === "active" ? "default" : "secondary"}
+                        >
+                          {member.status}
+                        </Badge>
+                      </div>
+                      <div className="text-muted-foreground flex gap-4 text-sm">
+                        <span className="capitalize">{member.role}</span>
+                        {member.jerseyNumber && <span>#{member.jerseyNumber}</span>}
+                        {member.position && <span>{member.position}</span>}
+                      </div>
+                      {member.status === "pending" && (
+                        <p className="text-muted-foreground mt-2 text-sm">
+                          {member.requestedAt
+                            ? `Join request received ${formatDistanceToNow(
+                                new Date(member.requestedAt),
                                 { addSuffix: true },
-                              )}${invitedBy?.name ? ` by ${invitedBy.name}` : ""}.`
-                            : "Pending response."}
-                      </p>
-                    )}
+                              )}.`
+                            : member.invitedAt
+                              ? `Invitation sent ${formatDistanceToNow(
+                                  new Date(member.invitedAt),
+                                  { addSuffix: true },
+                                )}${invitedBy?.name ? ` by ${invitedBy.name}` : ""}.`
+                              : "Pending response."}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <Select
-                    value={member.role}
-                    onValueChange={(value) =>
-                      updateMemberMutation.mutate({
-                        teamId,
-                        memberId: member.id,
-                        role: value as TeamMemberRole,
-                      })
-                    }
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="captain">Captain</SelectItem>
-                      <SelectItem value="coach">Coach</SelectItem>
-                      <SelectItem value="player">Player</SelectItem>
-                      <SelectItem value="substitute">Substitute</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <Select
+                      value={member.role}
+                      onValueChange={(value) =>
+                        updateMemberMutation.mutate({
+                          teamId,
+                          memberId: member.id,
+                          role: value as TeamMemberRole,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="captain">Captain</SelectItem>
+                        <SelectItem value="coach">Coach</SelectItem>
+                        <SelectItem value="player">Player</SelectItem>
+                        <SelectItem value="substitute">Substitute</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <XCircle className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Remove team member?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will remove {user.name || user.email} from the team. They
-                          can be re-invited later.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
+                    {isJoinRequest && (
+                      <>
+                        <Button
                           onClick={() =>
-                            removeMemberMutation.mutate({
+                            approveMemberMutation.mutate({
                               teamId,
                               memberId: member.id,
                             })
                           }
+                          disabled={isDecisionPending}
                         >
-                          Remove Member
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          {approveMemberMutation.isPending ? "Approving..." : "Approve"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            rejectMemberMutation.mutate({
+                              teamId,
+                              memberId: member.id,
+                            })
+                          }
+                          disabled={isDecisionPending}
+                        >
+                          {rejectMemberMutation.isPending ? "Declining..." : "Decline"}
+                        </Button>
+                      </>
+                    )}
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <XCircle className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Remove team member?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will remove {user.name || user.email} from the team. They
+                            can be re-invited later.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() =>
+                              removeMemberMutation.mutate({
+                                teamId,
+                                memberId: member.id,
+                              })
+                            }
+                          >
+                            Remove Member
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

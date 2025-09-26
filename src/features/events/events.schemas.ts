@@ -35,7 +35,7 @@ export type GetEventInput = z.infer<typeof getEventSchema>;
 
 export const getUpcomingEventsSchema = z
   .object({
-    limit: z.number().int().positive().max(10).optional(),
+    limit: z.number().int().positive().max(50).optional(),
   })
   .optional()
   .default({});

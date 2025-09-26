@@ -120,9 +120,9 @@ describe("Events Schemas", () => {
         expect(result.data).toEqual({});
       });
 
-      it("fails with limit over 10", () => {
+      it("fails with limit over 50", () => {
         const result = getUpcomingEventsSchema.safeParse({
-          limit: 11,
+          limit: 51,
         });
         expect(result.success).toBe(false);
       });

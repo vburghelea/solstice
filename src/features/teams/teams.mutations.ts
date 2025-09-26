@@ -516,7 +516,7 @@ export const approveTeamMembership = createServerFn({ method: "POST" })
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
-    const { teamMembers } = await import("~/db/schema");
+    const { teamMembers, teams, user } = await import("~/db/schema");
 
     const currentUser = requireUser(context);
     const db = await getDb();
@@ -573,6 +573,36 @@ export const approveTeamMembership = createServerFn({ method: "POST" })
         .where(eq(teamMembers.id, data.memberId))
         .returning();
 
+      if (approvedMember) {
+        const [recipient] = await db
+          .select({
+            email: user.email,
+            name: user.name,
+            teamName: teams.name,
+            teamSlug: teams.slug,
+          })
+          .from(teamMembers)
+          .innerJoin(user, eq(teamMembers.userId, user.id))
+          .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+          .where(eq(teamMembers.id, approvedMember.id))
+          .limit(1);
+
+        if (recipient?.email) {
+          try {
+            const { sendTeamRequestDecisionEmail } = await import("~/lib/email/resend");
+            await sendTeamRequestDecisionEmail({
+              to: { email: recipient.email, name: recipient.name ?? undefined },
+              teamName: recipient.teamName,
+              teamSlug: recipient.teamSlug,
+              decision: "approved",
+              decidedByName: currentUser.name ?? undefined,
+            });
+          } catch (emailError) {
+            console.error("Failed to send team request approval email", emailError);
+          }
+        }
+      }
+
       return approvedMember;
     } catch (error) {
       if (isActiveMembershipConstraintError(error)) {
@@ -596,7 +626,7 @@ export const rejectTeamMembership = createServerFn({ method: "POST" })
       import("~/db/server-helpers"),
       import("drizzle-orm"),
     ]);
-    const { teamMembers } = await import("~/db/schema");
+    const { teamMembers, teams, user } = await import("~/db/schema");
 
     const currentUser = requireUser(context);
     const db = await getDb();
@@ -653,6 +683,34 @@ export const rejectTeamMembership = createServerFn({ method: "POST" })
 
     if (!rejectedMember) {
       throw notFound("Pending join request not found");
+    }
+
+    const [recipient] = await db
+      .select({
+        email: user.email,
+        name: user.name,
+        teamName: teams.name,
+        teamSlug: teams.slug,
+      })
+      .from(teamMembers)
+      .innerJoin(user, eq(teamMembers.userId, user.id))
+      .innerJoin(teams, eq(teamMembers.teamId, teams.id))
+      .where(eq(teamMembers.id, rejectedMember.id))
+      .limit(1);
+
+    if (recipient?.email) {
+      try {
+        const { sendTeamRequestDecisionEmail } = await import("~/lib/email/resend");
+        await sendTeamRequestDecisionEmail({
+          to: { email: recipient.email, name: recipient.name ?? undefined },
+          teamName: recipient.teamName,
+          teamSlug: recipient.teamSlug,
+          decision: "declined",
+          decidedByName: currentUser.name ?? undefined,
+        });
+      } catch (emailError) {
+        console.error("Failed to send team request rejection email", emailError);
+      }
     }
 
     return rejectedMember;

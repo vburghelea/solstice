@@ -25,6 +25,22 @@ export interface GameInvitationData {
   recipientName: string;
 }
 
+export interface TeamInvitationData {
+  inviterName: string;
+  teamName: string;
+  role: string;
+  inviteUrl: string;
+  recipientName: string;
+}
+
+export interface TeamRequestDecisionData {
+  recipientName: string;
+  teamName: string;
+  decision: "approved" | "declined";
+  decidedByName: string;
+  detailsUrl: string;
+}
+
 export interface EmailVerificationData {
   recipientName: string;
   verificationUrl: string;
@@ -139,22 +155,15 @@ export interface ReviewReminderData {
 export async function renderCampaignInvitationEmail(
   data: CampaignInvitationData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/campaign-invitation.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{inviterName}}/g, data.inviterName);
-  template = template.replace(/{{campaignName}}/g, data.campaignName);
-  template = template.replace(/{{campaignDescription}}/g, data.campaignDescription);
-  template = template.replace(/{{gameSystem}}/g, data.gameSystem);
-  template = template.replace(/{{inviteUrl}}/g, data.inviteUrl);
-  template = template.replace(/{{expiresAt}}/g, data.expiresAt);
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-
-  return template;
+  return renderTemplate("campaign-invitation.html", {
+    inviterName: data.inviterName,
+    campaignName: data.campaignName,
+    campaignDescription: data.campaignDescription,
+    gameSystem: data.gameSystem,
+    inviteUrl: data.inviteUrl,
+    expiresAt: data.expiresAt,
+    recipientName: data.recipientName,
+  });
 }
 
 /**
@@ -163,22 +172,39 @@ export async function renderCampaignInvitationEmail(
 export async function renderGameInvitationEmail(
   data: GameInvitationData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/game-invitation.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
+  return renderTemplate("game-invitation.html", {
+    inviterName: data.inviterName,
+    gameName: data.gameName,
+    gameDescription: data.gameDescription,
+    gameSystem: data.gameSystem,
+    inviteUrl: data.inviteUrl,
+    expiresAt: data.expiresAt,
+    recipientName: data.recipientName,
+  });
+}
 
-  // Replace template variables
-  template = template.replace(/{{inviterName}}/g, data.inviterName);
-  template = template.replace(/{{gameName}}/g, data.gameName);
-  template = template.replace(/{{gameDescription}}/g, data.gameDescription);
-  template = template.replace(/{{gameSystem}}/g, data.gameSystem);
-  template = template.replace(/{{inviteUrl}}/g, data.inviteUrl);
-  template = template.replace(/{{expiresAt}}/g, data.expiresAt);
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
+export async function renderTeamInvitationEmail(
+  data: TeamInvitationData,
+): Promise<string> {
+  return renderTemplate("team-invitation.html", {
+    inviterName: data.inviterName,
+    teamName: data.teamName,
+    role: data.role,
+    inviteUrl: data.inviteUrl,
+    recipientName: data.recipientName,
+  });
+}
 
-  return template;
+export async function renderTeamRequestDecisionEmail(
+  data: TeamRequestDecisionData,
+): Promise<string> {
+  return renderTemplate("team-request-decision.html", {
+    recipientName: data.recipientName,
+    teamName: data.teamName,
+    decision: data.decision,
+    decidedByName: data.decidedByName,
+    detailsUrl: data.detailsUrl,
+  });
 }
 
 /**
@@ -187,36 +213,22 @@ export async function renderGameInvitationEmail(
 export async function renderEmailVerificationEmail(
   data: EmailVerificationData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/email-verification.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{verificationUrl}}/g, data.verificationUrl);
-  template = template.replace(/{{expiresAt}}/g, data.expiresAt);
-
-  return template;
+  return renderTemplate("email-verification.html", {
+    recipientName: data.recipientName,
+    verificationUrl: data.verificationUrl,
+    expiresAt: data.expiresAt,
+  });
 }
 
 /**
  * Load and render a password reset email template
  */
 export async function renderPasswordResetEmail(data: PasswordResetData): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/password-reset.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{resetUrl}}/g, data.resetUrl);
-  template = template.replace(/{{expiresAt}}/g, data.expiresAt);
-
-  return template;
+  return renderTemplate("password-reset.html", {
+    recipientName: data.recipientName,
+    resetUrl: data.resetUrl,
+    expiresAt: data.expiresAt,
+  });
 }
 
 /**
@@ -225,37 +237,23 @@ export async function renderPasswordResetEmail(data: PasswordResetData): Promise
 export async function renderMembershipReceiptEmail(
   data: MembershipReceiptData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/membership-receipt.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{membershipType}}/g, data.membershipType);
-  template = template.replace(/{{amount}}/g, data.amount);
-  template = template.replace(/{{paymentId}}/g, data.paymentId);
-  template = template.replace(/{{expiresAt}}/g, data.expiresAt);
-
-  return template;
+  return renderTemplate("membership-receipt.html", {
+    recipientName: data.recipientName,
+    membershipType: data.membershipType,
+    amount: data.amount,
+    paymentId: data.paymentId,
+    expiresAt: data.expiresAt,
+  });
 }
 
 /**
  * Load and render a welcome email template
  */
 export async function renderWelcomeEmail(data: WelcomeEmailData): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/welcome-email.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{profileUrl}}/g, data.profileUrl);
-
-  return template;
+  return renderTemplate("welcome-email.html", {
+    recipientName: data.recipientName,
+    profileUrl: data.profileUrl,
+  });
 }
 
 /**
@@ -264,17 +262,10 @@ export async function renderWelcomeEmail(data: WelcomeEmailData): Promise<string
 export async function renderEmailVerificationOTP(
   data: EmailVerificationOTPData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/email-verification-otp.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{otp}}/g, data.otp);
-
-  return template;
+  return renderTemplate("email-verification-otp.html", {
+    recipientName: data.recipientName,
+    otp: data.otp,
+  });
 }
 
 /**
@@ -283,34 +274,20 @@ export async function renderEmailVerificationOTP(
 export async function renderPasswordResetOTP(
   data: PasswordResetOTPData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/password-reset-otp.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{otp}}/g, data.otp);
-
-  return template;
+  return renderTemplate("password-reset-otp.html", {
+    recipientName: data.recipientName,
+    otp: data.otp,
+  });
 }
 
 /**
  * Load and render a sign-in OTP template
  */
 export async function renderSignInOTP(data: SignInOTPData): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/sign-in-otp.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  // Replace template variables
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{otp}}/g, data.otp);
-
-  return template;
+  return renderTemplate("sign-in-otp.html", {
+    recipientName: data.recipientName,
+    otp: data.otp,
+  });
 }
 
 /**
@@ -334,20 +311,14 @@ export function generateTextFromHtml(html: string): string {
 export async function renderGameInviteResponseEmail(
   data: GameInviteResponseData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/game-invite-response.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{inviterName}}/g, data.inviterName);
-  template = template.replace(/{{inviteeName}}/g, data.inviteeName);
-  template = template.replace(/{{gameName}}/g, data.gameName);
-  template = template.replace(/{{response}}/g, data.response);
-  template = template.replace(/{{time}}/g, data.time);
-  template = template.replace(/{{rosterUrl}}/g, data.rosterUrl);
-
-  return template;
+  return renderTemplate("game-invite-response.html", {
+    inviterName: data.inviterName,
+    inviteeName: data.inviteeName,
+    gameName: data.gameName,
+    response: data.response,
+    time: data.time,
+    rosterUrl: data.rosterUrl,
+  });
 }
 
 /**
@@ -356,38 +327,26 @@ export async function renderGameInviteResponseEmail(
 export async function renderGameStatusUpdateEmail(
   data: GameStatusUpdateData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/game-status-update.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{gameName}}/g, data.gameName);
-  template = template.replace(/{{dateTime}}/g, data.dateTime);
-  template = template.replace(/{{location}}/g, data.location);
-  template = template.replace(/{{changeSummary}}/g, data.changeSummary);
-  template = template.replace(/{{detailsUrl}}/g, data.detailsUrl);
-
-  return template;
+  return renderTemplate("game-status-update.html", {
+    recipientName: data.recipientName,
+    gameName: data.gameName,
+    dateTime: data.dateTime,
+    location: data.location,
+    changeSummary: data.changeSummary,
+    detailsUrl: data.detailsUrl,
+  });
 }
 
 /**
  * Load and render: Game reminder
  */
 export async function renderGameReminderEmail(data: GameReminderData): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/game-reminder.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{gameName}}/g, data.gameName);
-  template = template.replace(/{{dateTime}}/g, data.dateTime);
-  template = template.replace(/{{location}}/g, data.location);
-
-  return template;
+  return renderTemplate("game-reminder.html", {
+    recipientName: data.recipientName,
+    gameName: data.gameName,
+    dateTime: data.dateTime,
+    location: data.location,
+  });
 }
 
 /**
@@ -396,21 +355,15 @@ export async function renderGameReminderEmail(data: GameReminderData): Promise<s
 export async function renderCampaignInviteResponseEmail(
   data: CampaignInviteResponseData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/campaign-invite-response.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{ownerName}}/g, data.ownerName);
-  template = template.replace(/{{inviterName}}/g, data.inviterName);
-  template = template.replace(/{{inviteeName}}/g, data.inviteeName);
-  template = template.replace(/{{campaignName}}/g, data.campaignName);
-  template = template.replace(/{{response}}/g, data.response);
-  template = template.replace(/{{time}}/g, data.time);
-  template = template.replace(/{{detailsUrl}}/g, data.detailsUrl);
-
-  return template;
+  return renderTemplate("campaign-invite-response.html", {
+    ownerName: data.ownerName,
+    inviterName: data.inviterName,
+    inviteeName: data.inviteeName,
+    campaignName: data.campaignName,
+    response: data.response,
+    time: data.time,
+    detailsUrl: data.detailsUrl,
+  });
 }
 
 /**
@@ -419,20 +372,14 @@ export async function renderCampaignInviteResponseEmail(
 export async function renderCampaignSessionUpdateEmail(
   data: CampaignSessionUpdateData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/campaign-session-update.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{sessionTitle}}/g, data.sessionTitle);
-  template = template.replace(/{{dateTime}}/g, data.dateTime);
-  template = template.replace(/{{location}}/g, data.location);
-  template = template.replace(/{{changeSummary}}/g, data.changeSummary);
-  template = template.replace(/{{detailsUrl}}/g, data.detailsUrl);
-
-  return template;
+  return renderTemplate("campaign-session-update.html", {
+    recipientName: data.recipientName,
+    sessionTitle: data.sessionTitle,
+    dateTime: data.dateTime,
+    location: data.location,
+    changeSummary: data.changeSummary,
+    detailsUrl: data.detailsUrl,
+  });
 }
 
 /**
@@ -441,17 +388,11 @@ export async function renderCampaignSessionUpdateEmail(
 export async function renderCampaignDigestEmail(
   data: CampaignDigestData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/campaign-digest.html",
-  );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{itemsHtml}}/g, data.itemsHtml);
-  template = template.replace(/{{manageUrl}}/g, data.manageUrl);
-
-  return template;
+  return renderTemplate("campaign-digest.html", {
+    recipientName: data.recipientName,
+    itemsHtml: data.itemsHtml,
+    manageUrl: data.manageUrl,
+  });
 }
 
 /**
@@ -460,17 +401,50 @@ export async function renderCampaignDigestEmail(
 export async function renderReviewReminderEmail(
   data: ReviewReminderData,
 ): Promise<string> {
-  const templatePath = resolve(
-    process.cwd(),
-    "src/shared/email-templates/review-reminder.html",
+  return renderTemplate("review-reminder.html", {
+    recipientName: data.recipientName,
+    gmName: data.gmName,
+    gameName: data.gameName,
+    dateTime: data.dateTime,
+    reviewUrl: data.reviewUrl,
+  });
+}
+const TEMPLATE_ROOT = resolve(process.cwd(), "src/shared/email-templates");
+const HEADER_PATH = resolve(TEMPLATE_ROOT, "partials/header.html");
+const FOOTER_PATH = resolve(TEMPLATE_ROOT, "partials/footer.html");
+
+async function loadTemplate(path: string): Promise<string> {
+  return readFile(path, "utf-8");
+}
+
+function applyReplacements(
+  template: string,
+  replacements: Record<string, string>,
+): string {
+  return Object.entries(replacements).reduce((acc, [key, value]) => {
+    const safeValue = value ?? "";
+    return acc.replace(new RegExp(`{{${key}}}`, "g"), safeValue);
+  }, template);
+}
+
+async function renderTemplate(
+  bodyFileName: string,
+  replacements: Record<string, string>,
+): Promise<string> {
+  const map = {
+    currentYear: new Date().getFullYear().toString(),
+    ...replacements,
+  };
+
+  const [header, body, footer] = await Promise.all([
+    loadTemplate(HEADER_PATH),
+    loadTemplate(resolve(TEMPLATE_ROOT, bodyFileName)),
+    loadTemplate(FOOTER_PATH),
+  ]);
+
+  return (
+    applyReplacements(header, map) +
+    applyReplacements(body, map) +
+    applyReplacements(footer, map)
   );
-  let template = await readFile(templatePath, "utf-8");
-
-  template = template.replace(/{{recipientName}}/g, data.recipientName);
-  template = template.replace(/{{gmName}}/g, data.gmName);
-  template = template.replace(/{{gameName}}/g, data.gameName);
-  template = template.replace(/{{dateTime}}/g, data.dateTime);
-  template = template.replace(/{{reviewUrl}}/g, data.reviewUrl);
-
-  return template;
 }

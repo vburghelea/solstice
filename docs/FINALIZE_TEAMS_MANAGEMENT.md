@@ -48,10 +48,14 @@
 
 ## Phase 4 — Notifications & Messaging
 
-- [ ] Confirm the mail provider referenced in `teams-feature.md` aligns with the Resend implementation (`~/lib/email/resend`) and update any lingering references.
-- [ ] Update the chosen mailer to send transactional emails for approvals and rejections; reuse the invite template where possible to stay within brand guidelines.
-- [ ] Guard email dispatch in `try/catch` so messaging failures do not break mutations, and log meaningful errors for observability.
-- [ ] Add copy updates to any in-app messaging or docs so captains and players understand the new flow.
+- [x] Confirm the mail provider referenced in `teams-feature.md` aligns with the Resend implementation (`~/lib/email/resend`) and update any lingering references.
+  - Verified Resend remains the active provider; documentation now references the consolidated sender.
+- [x] Update the chosen mailer to send transactional emails for approvals and rejections; reuse the invite template where possible to stay within brand guidelines.
+  - Added `sendTeamRequestDecisionEmail` and hooked it into approval/rejection mutations so requestors receive status updates.
+- [x] Guard email dispatch in `try/catch` so messaging failures do not break mutations, and log meaningful errors for observability.
+  - Approval/rejection handlers wrap email delivery in `try/catch` with console error logging.
+- [x] Add copy updates to any in-app messaging or docs so captains and players understand the new flow.
+  - Updated `docs/teams-feature.md` invitation section to mention the new approval/rejection notifications.
 
 ## Phase 5 — Testing & QA
 

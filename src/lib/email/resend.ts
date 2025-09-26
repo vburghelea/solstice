@@ -24,6 +24,8 @@ import {
   renderPasswordResetOTP,
   renderReviewReminderEmail,
   renderSignInOTP,
+  renderTeamInvitationEmail,
+  renderTeamRequestDecisionEmail,
   renderWelcomeEmail,
 } from "~/shared/email-templates";
 
@@ -309,12 +311,13 @@ export const sendTeamInvitationEmail = serverOnly(
     const invitationUrl = `${appUrl}/dashboard/teams/${params.teamSlug}`;
 
     const inviterName = params.invitedByName ?? "A Roundup Games member";
-    const htmlContent = `
-      <p>Hello ${params.to.name ?? "there"},</p>
-      <p>${inviterName} has invited you to join <strong>${params.teamName}</strong> as a <strong>${params.role}</strong>.</p>
-      <p>You can review this invitation by visiting <a href="${invitationUrl}">${invitationUrl}</a>.</p>
-      <p>If you weren't expecting this email, you can safely ignore it.</p>
-    `;
+    const htmlContent = await renderTeamInvitationEmail({
+      inviterName,
+      teamName: params.teamName,
+      role: params.role,
+      inviteUrl: invitationUrl,
+      recipientName: params.to.name ?? "there",
+    });
 
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
     const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
@@ -332,6 +335,51 @@ export const sendTeamInvitationEmail = serverOnly(
       ...(replyTo ? { replyTo } : {}),
       metadata: {
         entity: "team_invitation",
+        entityId: params.teamSlug,
+      },
+    });
+  },
+);
+
+export const sendTeamRequestDecisionEmail = serverOnly(
+  async (params: {
+    to: EmailRecipient;
+    teamName: string;
+    teamSlug: string;
+    decision: "approved" | "declined";
+    decidedByName?: string;
+  }) => {
+    const service = await getEmailService();
+    const appUrl = (
+      process.env["APP_ORIGIN"] ||
+      process.env["APP_URL"] ||
+      "https://app.roundup.games"
+    ).replace(/\/$/, "");
+    const decisionUrl = `${appUrl}/dashboard/teams/${params.teamSlug}`;
+
+    const actorName = params.decidedByName ?? "A team manager";
+    const htmlContent = await renderTeamRequestDecisionEmail({
+      recipientName: params.to.name ?? "there",
+      teamName: params.teamName,
+      decision: params.decision,
+      decidedByName: actorName,
+      detailsUrl: decisionUrl,
+    });
+
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+
+    return service.send({
+      to: params.to,
+      from: { email: fromEmail, name: fromName },
+      subject:
+        params.decision === "approved"
+          ? `Your ${params.teamName} join request was approved`
+          : `Your ${params.teamName} join request was declined`,
+      html: htmlContent,
+      text: generateTextFromHtml(htmlContent),
+      metadata: {
+        entity: "team_request_decision",
         entityId: params.teamSlug,
       },
     });

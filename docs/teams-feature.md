@@ -152,6 +152,8 @@ deactivateTeam({ teamId: string }): Promise<void>
 - Role-based permissions
 - Track pending invitations with email notifications and dashboard actions
 - Support member-initiated "ask to join" requests for public teams
+  - Authenticated visitors see an "Ask to Join" button with inline success/error feedback, while
+    signed-out visitors are prompted to sign in before requesting membership.
 
 ## Invitations Workflow
 

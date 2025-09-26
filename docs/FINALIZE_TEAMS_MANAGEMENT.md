@@ -24,10 +24,27 @@
 
 ## Phase 3 — Client Experience
 
-- [ ] Extend the roster screen at `src/routes/dashboard/teams/$teamId.members.tsx` to show actionable controls for pending join requests (Approve/Decline buttons) alongside existing invite messaging, matching the management affordances promised in `teams-feature.md`.
-- [ ] Wire `useMutation` hooks to the new server functions with optimistic updates and consistent error messaging; invalidate `teamMembers`/`user-teams`/`pendingTeamInvites` cache keys on settlement.
-- [ ] Provide feedback UI (toasts or inline alerts) indicating approval/rejection success or failure, mirroring patterns already used in the invitations component.
-- [ ] Ensure the correct call-to-action appears for users who have submitted requests (disable duplicate requests, surface status badges) so the “Ask to Join” feature remains intuitive.
+- [x] Extend the roster screen at `src/routes/dashboard/teams/$teamId.members.tsx` to show actionable controls for pending join requests (Approve/Decline buttons) alongside existing invite messaging, matching the management affordances promised in `teams-feature.md`.
+  - Join requests now surface inline Approve/Decline actions with optimistic state updates,
+    while invitations retain their existing messaging.
+- [x] Wire `useMutation` hooks to the new server functions with optimistic updates and consistent error messaging; invalidate `teamMembers`/`user-teams`/`pendingTeamInvites` cache keys on settlement.
+  - Approvals/rejections optimistically update the roster, reuse `toast` notifications, and
+    refresh dependent caches on settle.
+- [x] Provide feedback UI (toasts or inline alerts) indicating approval/rejection success or failure, mirroring patterns already used in the invitations component.
+  - Success/error toasts mirror the invitation component patterns to keep captain messaging
+    consistent.
+- [x] Ensure the correct call-to-action appears for users who have submitted requests (disable duplicate requests, surface status badges) so the “Ask to Join” feature remains intuitive.
+  - Quick Actions now explain declined requests and relabel the CTA (“Request Again”) while
+    pending states continue to block duplicate submissions.
+- [x] Let unaffiliated players submit new join requests with inline confirmation messaging on the
+      team details page.
+  - Authenticated non-members see an “Ask to Join” button that posts via `requestTeamMembership`,
+    disables during submission, and confirms once sent; signed-out visitors receive a sign-in prompt
+    with a direct CTA; errors surface with a descriptive alert.
+- [x] Lock the “Manage Members” shortcut to captains and coaches, preventing regular players from
+      seeing management UI.
+  - Converted `/dashboard/teams/$teamId` into a layout that delegates to nested routes so the
+    existing roster management screen loads correctly; quick actions now respect resolved roles.
 
 ## Phase 4 — Notifications & Messaging
 

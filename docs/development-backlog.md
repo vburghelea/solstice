@@ -85,13 +85,13 @@ These are production-critical issues that should be addressed before new feature
 
 ### Team Invitations Flow
 
-|               |                                                                                                                                                                                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**    | ❌ Not Started                                                                                                                                                                                                                            |
-| **Priority**  | 🟢 Medium                                                                                                                                                                                                                                 |
-| **Why**       | Backend exists but no UI for pending invitations                                                                                                                                                                                          |
-| **Code refs** | `src/features/teams/components/team-invitations.tsx` (create)                                                                                                                                                                             |
-| **Tasks**     | <ul><li>Show pending status in team members list</li><li>Create invitations dashboard section</li><li>Add accept/decline buttons</li><li>Send invitation emails via SendGrid</li><li>Add notification badge for pending invites</li></ul> |
+|               |                                                                                                                                                                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**    | ❌ Not Started                                                                                                                                                                                                                          |
+| **Priority**  | 🟢 Medium                                                                                                                                                                                                                               |
+| **Why**       | Backend exists but no UI for pending invitations                                                                                                                                                                                        |
+| **Code refs** | `src/features/teams/components/team-invitations.tsx` (create)                                                                                                                                                                           |
+| **Tasks**     | <ul><li>Show pending status in team members list</li><li>Create invitations dashboard section</li><li>Add accept/decline buttons</li><li>Send invitation emails via Resend</li><li>Add notification badge for pending invites</li></ul> |
 
 ---
 

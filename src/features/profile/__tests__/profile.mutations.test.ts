@@ -60,19 +60,23 @@ describe("Profile Mutations", () => {
 
   describe("updateUserProfile", () => {
     it("should update basic profile fields", async () => {
-      const updatedProfile = { ...mockUser, gender: "Non-binary", phone: "1234567890" };
+      const updatedProfile = {
+        ...mockUser,
+        gender: "Non-binary",
+        phone: "+4915123456789",
+      };
       vi.mocked(updateUserProfile).mockResolvedValue({
         success: true,
         data: updatedProfile,
       });
 
       const result = await updateUserProfile({
-        data: { gender: "Non-binary", phone: "1234567890" },
+        data: { gender: "Non-binary", phone: "+4915123456789" },
       });
 
       expect(result.success).toBe(true);
       expect(result.data?.gender).toBe("Non-binary");
-      expect(result.data?.phone).toBe("1234567890");
+      expect(result.data?.phone).toBe("+4915123456789");
     });
 
     it("should update experience level", async () => {
@@ -134,19 +138,19 @@ describe("Profile Mutations", () => {
     });
 
     it("should update city and country", async () => {
-      const updatedProfile = { ...mockUser, city: "Test City", country: "Test Country" };
+      const updatedProfile = { ...mockUser, city: "Berlin", country: "Germany" };
       vi.mocked(updateUserProfile).mockResolvedValue({
         success: true,
         data: updatedProfile,
       });
 
       const result = await updateUserProfile({
-        data: { city: "Test City", country: "Test Country" },
+        data: { city: "Berlin", country: "Germany" },
       });
 
       expect(result.success).toBe(true);
-      expect(result.data?.city).toBe("Test City");
-      expect(result.data?.country).toBe("Test Country");
+      expect(result.data?.city).toBe("Berlin");
+      expect(result.data?.country).toBe("Germany");
     });
 
     it("should update GM-specific fields", async () => {
@@ -252,7 +256,7 @@ describe("Profile Mutations", () => {
         name: "player-one",
         gender: "Male",
         pronouns: "he/him",
-        phone: "9876543210",
+        phone: "+4915123456789",
         privacySettings: {
           ...defaultPrivacySettings,
           showEmail: true,
@@ -294,7 +298,7 @@ describe("Profile Mutations", () => {
         name: "player-two",
         gender: "Female",
         pronouns: "she/her",
-        phone: "9876543210",
+        phone: "+4915123456789",
         privacySettings: {
           ...defaultPrivacySettings,
           showEmail: true,
@@ -326,7 +330,7 @@ describe("Profile Mutations", () => {
         name: "player-three",
         gender: "Female",
         pronouns: "she/her",
-        phone: "9876543210",
+        phone: "+4915123456789",
         privacySettings: {
           ...defaultPrivacySettings,
           showEmail: true,
@@ -336,8 +340,8 @@ describe("Profile Mutations", () => {
         identityTags: ["LGBTQ+", "Artist"],
         preferredGameThemes: ["Fantasy", "Scifi"],
         languages: ["en", "es"],
-        city: "Test City",
-        country: "Test Country",
+        city: "Berlin",
+        country: "Germany",
         isGM: true,
         gmStyle: "Narrative",
         calendarAvailability: defaultAvailabilityData,
@@ -356,8 +360,8 @@ describe("Profile Mutations", () => {
       expect(result.data?.identityTags).toEqual(["LGBTQ+", "Artist"]);
       expect(result.data?.preferredGameThemes).toEqual(["Fantasy", "Scifi"]);
       expect(result.data?.languages).toEqual(["en", "es"]);
-      expect(result.data?.city).toBe("Test City");
-      expect(result.data?.country).toBe("Test Country");
+      expect(result.data?.city).toBe("Berlin");
+      expect(result.data?.country).toBe("Germany");
       expect(result.data?.isGM).toBe(true);
       expect(result.data?.gmStyle).toBe("Narrative");
       expect(result.data?.calendarAvailability).toEqual(defaultAvailabilityData);

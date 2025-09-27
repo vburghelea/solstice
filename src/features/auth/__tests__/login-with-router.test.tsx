@@ -65,7 +65,7 @@ describe("LoginForm with TanStack Router", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       profileComplete: true,
-      phone: "+1234567890",
+      phone: "+4915123456789",
       gender: "male" as const,
       pronouns: "he/him",
       city: null,

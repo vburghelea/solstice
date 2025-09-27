@@ -105,8 +105,6 @@ function CreateGamePage() {
             (gameSystem && gameSystem.maxPlayers !== null
               ? gameSystem.maxPlayers
               : undefined),
-          languageLevel: campaign.minimumRequirements?.languageLevel,
-          playerRadiusKm: campaign.minimumRequirements?.playerRadiusKm,
         },
         visibility: campaign.visibility,
         safetyRules: campaign.safetyRules,

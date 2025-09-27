@@ -10,7 +10,7 @@ const validCompleteProfileData = {
   name: "player-one",
   gender: "Female",
   pronouns: "she/her",
-  phone: "555-987-6543",
+  phone: "+4915123456789",
   privacySettings: {
     ...defaultPrivacySettings,
     showEmail: true,

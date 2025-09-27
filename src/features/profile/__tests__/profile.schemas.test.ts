@@ -36,7 +36,7 @@ describe("Profile Schemas", () => {
       const validInput = {
         gender: "Male",
         pronouns: "he/him",
-        phone: "987-654-3210",
+        phone: "+4915123456789",
         gameSystemPreferences: {
           favorite: [
             { id: 1, name: "System 1" },
@@ -164,8 +164,8 @@ describe("Profile Schemas", () => {
 
     it("validates valid city and country", () => {
       const validInput = {
-        city: "Test City",
-        country: "Test Country",
+        city: "Berlin",
+        country: "Germany",
       };
 
       const result = profileInputSchema.safeParse(validInput);
@@ -216,7 +216,7 @@ describe("Profile Schemas", () => {
           const validInput = {
             gender: "Male",
             pronouns: "he/him",
-            phone: "1234567890",
+            phone: "+4915123456789",
             privacySettings: {
               showEmail: true,
               showPhone: false,
@@ -230,8 +230,8 @@ describe("Profile Schemas", () => {
             identityTags: ["LGBTQ+", "Artist"],
             preferredGameThemes: ["Fantasy", "Scifi"],
             languages: ["en", "es"],
-            city: "Test City",
-            country: "Test Country",
+            city: "Berlin",
+            country: "Germany",
             isGM: true,
             gmStyle: "Narrative",
           };

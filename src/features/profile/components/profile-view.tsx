@@ -4,7 +4,9 @@ import { Edit2, LoaderCircle, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
+import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { Button } from "~/components/ui/button";
 import {
@@ -28,6 +30,7 @@ import {
 //
 import { Link } from "@tanstack/react-router";
 import { Avatar } from "~/components/ui/avatar";
+import { useCountries } from "~/shared/hooks/useCountries";
 import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { invalidateProfileCaches } from "../profile.cache";
@@ -42,6 +45,7 @@ import { GamePreferencesStep } from "./game-preferences-step";
 export function ProfileView() {
   const queryClient = useQueryClient();
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const { getCountryName } = useCountries();
 
   // Fetch profile data with better hydration handling
   const {
@@ -710,10 +714,10 @@ export function ProfileView() {
           {editingSection === "basic" ? (
             <form.Field name="phone">
               {(field) => (
-                <ValidatedInput
+                <ValidatedPhoneInput
                   field={field}
                   label="Phone Number"
-                  placeholder="Your phone number"
+                  placeholder="+49 1512 3456789"
                 />
               )}
             </form.Field>
@@ -721,7 +725,7 @@ export function ProfileView() {
             <div>
               <Label>Phone Number</Label>
               <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.phone || "Not specified"}
+                {formatPhoneNumber(profile?.phone) || "Not specified"}
               </p>
             </div>
           )}
@@ -729,7 +733,7 @@ export function ProfileView() {
           {editingSection === "basic" ? (
             <form.Field name="city">
               {(field) => (
-                <ValidatedInput field={field} label="City" placeholder="Your city" />
+                <ValidatedInput field={field} label="City" placeholder="Berlin" />
               )}
             </form.Field>
           ) : (
@@ -744,10 +748,11 @@ export function ProfileView() {
           {editingSection === "basic" ? (
             <form.Field name="country">
               {(field) => (
-                <ValidatedInput
+                <ValidatedCountryCombobox
                   field={field}
                   label="Country"
-                  placeholder="Your country"
+                  placeholder="Search for a country"
+                  valueFormat="label"
                 />
               )}
             </form.Field>
@@ -755,7 +760,9 @@ export function ProfileView() {
             <div>
               <Label>Country</Label>
               <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.country || "Not specified"}
+                {profile?.country
+                  ? getCountryName(profile.country) || profile.country
+                  : "Not specified"}
               </p>
             </div>
           )}
@@ -876,7 +883,7 @@ export function ProfileView() {
           <div>
             <Label className="text-base font-medium">Languages</Label>
             <p className="text-muted-foreground mb-4 text-sm">
-              Languages you speak fluently
+              Languages you feel comfortable using to play
             </p>
             {editingSection === "additional" ? (
               <form.Field name="languages">
@@ -1411,4 +1418,31 @@ export function ProfileView() {
       </Card>
     </div>
   );
+}
+
+function formatPhoneNumber(value?: string | null) {
+  if (!value) return "";
+  const digits = value.replace(/\D/g, "");
+  if (!digits.startsWith("49")) {
+    return value;
+  }
+
+  const localNumber = digits.slice(2);
+  const part1 = localNumber.slice(0, 4);
+  const part2 = localNumber.slice(4, 7);
+  const part3 = localNumber.slice(7, 11);
+
+  if (!part1) {
+    return "+49";
+  }
+
+  const segments = ["+49", part1];
+  if (part2) {
+    segments.push(part2);
+  }
+  if (part3) {
+    segments.push(part3);
+  }
+
+  return segments.join(" ").trim();
 }

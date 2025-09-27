@@ -6,8 +6,10 @@ import type { FieldComponentProps, FormSubmitButtonProps } from "./form-shared";
 
 import { FormSubmitButton as ImportedFormSubmitButton } from "../components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox as ImportedValidatedCheckbox } from "../components/form-fields/ValidatedCheckbox";
+import { ValidatedCountryCombobox as ImportedValidatedCountryCombobox } from "../components/form-fields/ValidatedCountryCombobox";
 import { ValidatedDatePicker as ImportedValidatedDatePicker } from "../components/form-fields/ValidatedDatePicker";
 import { ValidatedInput as ImportedValidatedInput } from "../components/form-fields/ValidatedInput";
+import { ValidatedPhoneInput as ImportedValidatedPhoneInput } from "../components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect as ImportedValidatedSelect } from "../components/form-fields/ValidatedSelect";
 
 // Forward declare component types to avoid circular dependencies
@@ -21,6 +23,8 @@ type ValidatedSelectComponent = React.FC<
     placeholderText?: string;
   }
 >;
+type ValidatedPhoneInputComponent = typeof ImportedValidatedPhoneInput;
+type ValidatedCountryComboboxComponent = typeof ImportedValidatedCountryCombobox;
 type ValidatedDatePickerComponent = React.FC<FieldComponentProps>;
 type ValidatedCheckboxComponent = React.FC<FieldComponentProps>;
 type FormSubmitButtonComponent = React.FC<FormSubmitButtonProps>;
@@ -51,12 +55,16 @@ export const { useAppForm } = createFormHook({
     ValidatedSelect: ImportedValidatedSelect,
     ValidatedDatePicker: ImportedValidatedDatePicker,
     ValidatedCheckbox: ImportedValidatedCheckbox,
+    ValidatedPhoneInput: ImportedValidatedPhoneInput,
+    ValidatedCountryCombobox: ImportedValidatedCountryCombobox,
   } as {
     // Explicitly type the components map with the actual component types
     ValidatedInput: ValidatedInputComponent;
     ValidatedSelect: ValidatedSelectComponent;
     ValidatedDatePicker: ValidatedDatePickerComponent;
     ValidatedCheckbox: ValidatedCheckboxComponent;
+    ValidatedPhoneInput: ValidatedPhoneInputComponent;
+    ValidatedCountryCombobox: ValidatedCountryComboboxComponent;
     // Add other components here
   },
   // Register reusable form-level components

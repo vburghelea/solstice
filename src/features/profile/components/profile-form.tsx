@@ -240,10 +240,10 @@ export function ProfileForm() {
             <form.AppField
               name="phone"
               children={(field) => (
-                <field.ValidatedInput
+                <field.ValidatedPhoneInput
                   field={field}
                   label="Phone Number (optional)"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+49 1512 3456789"
                 />
               )}
             />

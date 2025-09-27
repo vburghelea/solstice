@@ -8,10 +8,8 @@ export const locationSchema = z.object({
 });
 
 export const minimumRequirementsSchema = z.object({
-  languageLevel: z.enum(["beginner", "intermediate", "advanced", "fluent"]).optional(),
   minPlayers: z.number().int().positive().optional(),
   maxPlayers: z.number().int().positive().optional(),
-  playerRadiusKm: z.number().int().min(1).max(10).optional(),
 });
 
 // Standardized safety tools/rules used across campaigns and game sessions

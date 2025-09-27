@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
 vi.mock("~/features/profile/profile.queries", () => ({
@@ -32,11 +32,26 @@ vi.mock("~/features/social", () => ({
     success: true,
     data: { follows: false, followedBy: false, blocked: false, blockedBy: false },
   })),
+  followUser: vi.fn(async () => ({ success: true })),
+  unfollowUser: vi.fn(async () => ({ success: true })),
+  blockUser: vi.fn(async () => ({ success: true })),
+  unblockUser: vi.fn(async () => ({ success: true })),
 }));
 
-describe.skip("Other user's profile avatar", () => {
+vi.mock("~/lib/pacer", () => ({
+  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
+  useRateLimitedServerFn: (fn: unknown) => fn,
+  useRateLimitedSearch: vi.fn(),
+}));
+
+describe("Other user's profile avatar", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
   it("renders header avatar for other profile", async () => {
     const mod = await import("../$userId");
+    const profileQueries = await import("~/features/profile/profile.queries");
     (mod.Route as unknown as { useLoaderData: () => { userId: string } }).useLoaderData =
       () => ({
         userId: "u2",
@@ -57,5 +72,7 @@ describe.skip("Other user's profile avatar", () => {
 
     const img = await screen.findByRole("img", { name: /other user/i });
     expect(img).toHaveAttribute("src", "/api/avatars/u2.webp");
+    await waitFor(() => expect(profileQueries.getUserProfile).toHaveBeenCalled());
+    qc.clear();
   });
 });

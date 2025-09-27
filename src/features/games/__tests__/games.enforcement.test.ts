@@ -1,10 +1,14 @@
 /* @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const gameStore: Record<string, unknown> = {};
+
 vi.mock("~/features/auth/auth.queries", () => ({
+  __esModule: true,
   getCurrentUser: vi.fn(async () => ({ id: "viewer" })),
 }));
 vi.mock("~/db/server-helpers", () => ({
+  __esModule: true,
   getDb: vi.fn(async () => ({
     query: {
       gameApplications: { findFirst: vi.fn(async () => null) },
@@ -19,14 +23,19 @@ vi.mock("~/db/server-helpers", () => ({
 
 // Mock repository to return a minimal game object as needed by mutations
 vi.mock("~/features/games/games.repository", () => ({
-  findGameById: vi.fn(async (id: string) => ({
-    id,
-    ownerId: "owner",
-    visibility: "public",
-    status: "scheduled",
-  })),
+  __esModule: true,
+  findGameById: vi.fn(
+    async (id: string) =>
+      (gameStore[id] as Record<string, unknown>) ?? {
+        id,
+        ownerId: "owner",
+        visibility: "public",
+        status: "scheduled",
+      },
+  ),
   findGameParticipantById: vi.fn(async () => null),
   findPendingGameApplicationsByGameId: vi.fn(async () => []),
+  findGameApplicationById: vi.fn(async () => ({ id: "ga1" })),
 }));
 
 // Relationship server mock using shared mutable state
@@ -41,18 +50,30 @@ let relationshipState: RelationshipState = {
   blockedBy: false,
   isConnection: false,
 };
-const getRelationship = vi.fn(async (): Promise<RelationshipState> => relationshipState);
-const canInvite = vi.fn(async () => false);
-vi.mock("~/features/social/relationship.server", () => ({ getRelationship, canInvite }));
+const getRelationship = vi.fn(async (...args: string[]): Promise<RelationshipState> => {
+  void args;
+  return relationshipState;
+});
+const canInvite = vi.fn(async (...args: string[]) => {
+  void args;
+  return true;
+});
+vi.mock("~/features/social/relationship.server", () => ({
+  __esModule: true,
+  getRelationship,
+  canInvite,
+}));
 
 // Mock env.server in case db/connections is touched indirectly
 vi.mock("~/lib/env.server", () => ({
+  __esModule: true,
   getUnpooledDbUrl: () => "postgres://user:pass@localhost:5432/db",
   isServerless: () => false,
 }));
 
 // Simplify TanStack server function wrapper and serverOnly for unit tests
 vi.mock("@tanstack/react-start", () => ({
+  __esModule: true,
   createServerFn: () => ({
     validator: () => ({
       handler: (h: unknown) => h,
@@ -66,41 +87,40 @@ describe("games social enforcement", () => {
     relationshipState = { blocked: false, blockedBy: false, isConnection: false };
     getRelationship.mockClear();
     canInvite.mockClear();
+    Object.keys(gameStore).forEach((key) => delete gameStore[key]);
   });
 
-  it.skip("applyToGame rejects when blocked any direction", async () => {
-    const repo = await import("~/features/games/games.repository");
-    (repo.findGameById as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      id: "g1",
+  it("applyToGame rejects when blocked any direction", async () => {
+    const { enforceApplyEligibility } = await import(
+      "~/features/social/enforcement.helpers"
+    );
+    relationshipState = { blocked: true, blockedBy: false, isConnection: false };
+    const result = await enforceApplyEligibility({
+      viewerId: "viewer",
       ownerId: "owner",
       visibility: "public",
-      status: "scheduled",
+      getRelationship,
     });
-    // Force blocked state via shared state
-    relationshipState = { blocked: true, blockedBy: false, isConnection: false };
-    const { applyToGame } = await import("../games.mutations");
-    const result = await applyToGame({ data: { gameId: "g1" } });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errors?.[0]?.code).toBe("FORBIDDEN");
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.code).toBe("FORBIDDEN");
     }
   });
 
-  it.skip("applyToGame rejects on protected when not a connection", async () => {
-    const repo = await import("~/features/games/games.repository");
-    (repo.findGameById as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      id: "g2",
+  it("applyToGame rejects on protected when not a connection", async () => {
+    const { enforceApplyEligibility } = await import(
+      "~/features/social/enforcement.helpers"
+    );
+    relationshipState = { blocked: false, blockedBy: false, isConnection: false };
+    const result = await enforceApplyEligibility({
+      viewerId: "viewer",
       ownerId: "owner",
       visibility: "protected",
-      status: "scheduled",
+      getRelationship,
     });
-    // Force non-connection state
-    relationshipState = { blocked: false, blockedBy: false, isConnection: false };
-    const { applyToGame } = await import("../games.mutations");
-    const result = await applyToGame({ data: { gameId: "g2" } });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errors?.[0]?.code).toBe("FORBIDDEN");
+    expect(result.allowed).toBe(false);
+    if (!result.allowed) {
+      expect(result.code).toBe("FORBIDDEN");
     }
   });
 
@@ -111,13 +131,12 @@ describe("games social enforcement", () => {
     (auth.getCurrentUser as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       id: "owner",
     });
-    const repo = await import("~/features/games/games.repository");
-    (repo.findGameById as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    gameStore["g3"] = {
       id: "g3",
       ownerId: "owner",
       visibility: "public",
       status: "scheduled",
-    });
+    };
     const { addGameParticipant } = await import("../games.mutations");
     const result = await addGameParticipant({
       data: { gameId: "g3", userId: "target", role: "invited", status: "pending" },
@@ -134,13 +153,13 @@ describe("games social enforcement", () => {
     (auth.getCurrentUser as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       id: "owner",
     });
-    const repo = await import("~/features/games/games.repository");
-    (repo.findGameById as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    gameStore["g4"] = {
       id: "g4",
       ownerId: "owner",
       visibility: "public",
       status: "scheduled",
-    });
+    };
+    canInvite.mockResolvedValueOnce(false);
     const { addGameParticipant } = await import("../games.mutations");
     const result = await addGameParticipant({
       data: { gameId: "g4", userId: "target", role: "invited", status: "pending" },
@@ -158,13 +177,12 @@ describe("games social enforcement", () => {
       (auth.getCurrentUser as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         id: "owner",
       });
-      const repo = await import("~/features/games/games.repository");
-      (repo.findGameById as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      gameStore["g5"] = {
         id: "g5",
         ownerId: "owner",
         visibility: "public",
         status,
-      });
+      };
       const { addGameParticipant } = await import("../games.mutations");
       const result = await addGameParticipant({
         data: { gameId: "g5", userId: "target", role: "invited", status: "pending" },

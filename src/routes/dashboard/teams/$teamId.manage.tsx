@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
-import { ValidatedCombobox } from "~/components/form-fields/ValidatedCombobox";
+import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import {
   AlertDialog,
@@ -32,8 +32,6 @@ import { getTeam } from "~/features/teams/teams.queries";
 import type { UpdateTeamInput } from "~/features/teams/teams.schemas";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
-import { useCountries } from "~/shared/hooks/useCountries";
-
 export const Route = createFileRoute("/dashboard/teams/$teamId/manage")({
   loader: async ({ params }) => {
     const teamData = await getTeam({ data: { teamId: params.teamId } });
@@ -49,7 +47,6 @@ function ManageTeamPage() {
   const { teamId } = Route.useParams();
   const { teamData } = Route.useLoaderData();
   const { team } = teamData;
-  const { COUNTRIES } = useCountries();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const updateTeamMutation = useMutation({
@@ -176,19 +173,16 @@ function ManageTeamPage() {
               <div className="grid grid-cols-2 gap-4">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Victoria" />
+                    <ValidatedInput field={field} label="City" placeholder="Berlin" />
                   )}
                 </form.Field>
 
                 <form.Field name="country">
                   {(field) => (
-                    <ValidatedCombobox
+                    <ValidatedCountryCombobox
                       field={field}
                       label="Country"
-                      placeholder="Select a country"
-                      options={COUNTRIES}
-                      searchPlaceholder="Search countries..."
-                      emptyText="No country found."
+                      placeholder="Search for a country"
                     />
                   )}
                 </form.Field>

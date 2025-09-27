@@ -10,13 +10,13 @@ import {
 } from "~/shared/ui/tooltip";
 
 const DAYS = [
-  "sunday",
   "monday",
   "tuesday",
   "wednesday",
   "thursday",
   "friday",
   "saturday",
+  "sunday",
 ] as const;
 
 const TIME_INTERVALS = Array.from(

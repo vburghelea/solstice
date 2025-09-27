@@ -35,11 +35,7 @@ import {
   safetyRulesSchema,
   xCardSystemEnum,
 } from "~/shared/schemas/common";
-import {
-  LanguageLevel,
-  languageLevelOptions,
-  languageOptions,
-} from "~/shared/types/common";
+import { languageOptions } from "~/shared/types/common";
 import { FormSection } from "~/shared/ui/form-section";
 
 interface CampaignFormProps {
@@ -83,8 +79,6 @@ export function CampaignForm({
     minimumRequirements: initialValues?.minimumRequirements ?? {
       minPlayers: undefined,
       maxPlayers: undefined,
-      languageLevel: undefined,
-      playerRadiusKm: undefined,
     },
     safetyRules: {
       "no-alcohol": false,
@@ -335,7 +329,7 @@ export function CampaignForm({
           )}
         </form.Field>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <form.Field
             name="recurrence"
             validators={{
@@ -440,7 +434,7 @@ export function CampaignForm({
           </form.Field>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <form.Field
             name="sessionDuration"
             validators={{
@@ -550,7 +544,7 @@ export function CampaignForm({
           </form.Field>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <form.Field
             name="language"
             validators={{
@@ -671,7 +665,7 @@ export function CampaignForm({
       <FormSection
         title="Location"
         description="Let players know where your group will gather."
-        contentClassName="space-y-4"
+        contentClassName="space-y-6"
       >
         <form.Field
           name="location.address"
@@ -782,7 +776,7 @@ export function CampaignForm({
         description="Optional guidelines that help players gauge whether the campaign is a fit."
         contentClassName="space-y-6"
       >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <form.Field
             name="minimumRequirements.minPlayers"
             validators={{
@@ -879,116 +873,12 @@ export function CampaignForm({
             )}
           </form.Field>
         </div>
-        <form.Field
-          name="minimumRequirements.languageLevel"
-          validators={{
-            onChange: ({ value }) => {
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                minimumRequirementsSchema.shape.languageLevel.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Language Level</Label>
-              <Select
-                value={
-                  field.state.value === undefined || field.state.value === null
-                    ? ""
-                    : (field.state.value as LanguageLevel)
-                }
-                onValueChange={(value) => field.handleChange(value as LanguageLevel)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a language level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {languageLevelOptions.map((level) => (
-                    <SelectItem key={level.value} value={level.value}>
-                      {level.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "Players should speak the campaign language at least at this level to fit in.",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
-        <form.Field
-          name="minimumRequirements.playerRadiusKm"
-          validators={{
-            onChange: ({ value }) => {
-              if (value === undefined || value === null) {
-                return undefined;
-              }
-              try {
-                minimumRequirementsSchema.shape.playerRadiusKm.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
-            },
-          }}
-        >
-          {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Player Distance Radius (km)</Label>
-              <input
-                id={field.name}
-                name={field.name}
-                type="range"
-                min="1"
-                max="10"
-                value={field.state.value ?? 5}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  field.handleChange(
-                    event.target.value === "" ? 0 : Number(event.target.value),
-                  )
-                }
-                className="w-full"
-              />
-              <div className="text-muted-foreground flex justify-between text-sm">
-                <span>1 km</span>
-                <span className="text-center">Selected: {field.state.value || 5} km</span>
-                <span>10 km</span>
-              </div>
-              {field.state.meta.errors?.length > 0 && (
-                <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
-                    .map((error) =>
-                      typeof error === "string"
-                        ? error
-                        : "How far should players be from the location to be able to see this campaign?",
-                    )
-                    .join(", ")}
-                </p>
-              )}
-            </div>
-          )}
-        </form.Field>
       </FormSection>
 
       <FormSection
         title="Safety & table culture"
         description="Optional expectations to set the tone for how you'll play together."
-        contentClassName="space-y-4"
+        contentClassName="space-y-6"
       >
         <form.Field
           name="safetyRules.no-alcohol"
@@ -1007,7 +897,7 @@ export function CampaignForm({
           }}
         >
           {(field) => (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Checkbox
                 id={field.name}
                 checked={!!field.state.value}
@@ -1035,7 +925,7 @@ export function CampaignForm({
           }}
         >
           {(field) => (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Checkbox
                 id={field.name}
                 checked={!!field.state.value}
@@ -1061,7 +951,7 @@ export function CampaignForm({
           }}
         >
           {(field) => (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Checkbox
                 id={field.name}
                 checked={!!field.state.value}
@@ -1073,7 +963,7 @@ export function CampaignForm({
           )}
         </form.Field>
 
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <form.Field
             name="safetyRules.xCardSystem"
             validators={{

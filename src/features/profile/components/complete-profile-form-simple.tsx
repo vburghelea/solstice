@@ -4,7 +4,9 @@ import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
+import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import {
   Card,
@@ -441,11 +443,10 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
 
                 <form.Field name="phone">
                   {(field) => (
-                    <ValidatedInput
+                    <ValidatedPhoneInput
                       field={field}
                       label="Phone Number (optional)"
-                      type="tel"
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+49 1512 3456789"
                     />
                   )}
                 </form.Field>
@@ -454,16 +455,17 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     <ValidatedInput
                       field={field}
                       label="City (optional)"
-                      placeholder="e.g., Berlin"
+                      placeholder="Berlin"
                     />
                   )}
                 </form.Field>
                 <form.Field name="country">
                   {(field) => (
-                    <ValidatedInput
+                    <ValidatedCountryCombobox
                       field={field}
                       label="Country (optional)"
-                      placeholder="e.g., Germany"
+                      placeholder="Search for a country"
+                      valueFormat="label"
                     />
                   )}
                 </form.Field>

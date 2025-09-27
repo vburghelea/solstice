@@ -136,7 +136,6 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
             Players: {game.minimumRequirements?.minPlayers} -{" "}
             {game.minimumRequirements?.maxPlayers}
           </p>
-          <p>Language Level: {game.minimumRequirements?.languageLevel}</p>
         </div>
       </details>
 

@@ -26,7 +26,7 @@ export const MOCK_CAMPAIGN: CampaignWithDetails = {
   language: "English",
   location: { address: "Test Location", lat: 0, lng: 0 },
   status: "active",
-  minimumRequirements: { languageLevel: "beginner" },
+  minimumRequirements: {},
   visibility: "public",
   safetyRules: { "no-alcohol": true, "safe-word": false },
   // New fields for Session Zero

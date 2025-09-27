@@ -7,8 +7,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
+import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
 import { ValidatedFileUpload } from "~/components/form-fields/ValidatedFileUpload";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
+import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
@@ -22,7 +24,6 @@ import {
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
-import { COUNTRIES } from "~/shared/hooks/useCountries";
 import { createEvent, uploadEventImage } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
 
@@ -49,6 +50,22 @@ const REGISTRATION_TYPE_OPTIONS = [
 
 function Separator() {
   return <div className="border-t" />;
+}
+
+function getDateInputString(daysFromToday: number) {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() + daysFromToday);
+  return date.toISOString().split("T")[0];
+}
+
+function getNextDayString(dateString: string) {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (!year || !month || !day) return dateString;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().split("T")[0];
 }
 
 const eventFormSchema = z
@@ -139,6 +156,11 @@ export function EventCreateForm() {
   const isAdminUser = useMemo(() => isAdminClient(user), [user]);
   const [currentStep, setCurrentStep] = useState(0);
   const slugManuallyEditedRef = useRef(false);
+  const defaultStartDate = useMemo(() => getDateInputString(7), []);
+  const defaultEndDate = useMemo(
+    () => getNextDayString(defaultStartDate),
+    [defaultStartDate],
+  );
 
   const defaultValues: EventFormData = {
     name: "",
@@ -149,12 +171,12 @@ export function EventCreateForm() {
     status: "draft",
     venueName: "",
     venueAddress: "",
-    city: "",
-    country: "",
-    postalCode: "",
+    city: "Berlin",
+    country: "Germany",
+    postalCode: "10115",
     locationNotes: "",
-    startDate: "",
-    endDate: "",
+    startDate: defaultStartDate,
+    endDate: defaultEndDate,
     registrationOpensAt: "",
     registrationClosesAt: "",
     registrationType: "team",
@@ -167,7 +189,7 @@ export function EventCreateForm() {
     earlyBirdDiscount: 0,
     earlyBirdDeadline: "",
     contactEmail: "",
-    contactPhone: "",
+    contactPhone: "+4915123456789",
     websiteUrl: "",
     logoUrl: "",
     bannerUrl: "",
@@ -635,7 +657,7 @@ export function EventCreateForm() {
                     <ValidatedInput
                       field={field}
                       label="Venue Address"
-                      placeholder="123 Main Street"
+                      placeholder="Karl-Marx-Straße 1"
                     />
                   )}
                 </form.Field>
@@ -650,7 +672,12 @@ export function EventCreateForm() {
 
                 <form.Field name="country">
                   {(field) => (
-                    <ValidatedSelect field={field} label="Country" options={COUNTRIES} />
+                    <ValidatedCountryCombobox
+                      field={field}
+                      label="Country"
+                      placeholder="Search for a country"
+                      valueFormat="label"
+                    />
                   )}
                 </form.Field>
 
@@ -659,7 +686,7 @@ export function EventCreateForm() {
                     <ValidatedInput
                       field={field}
                       label="Postal Code"
-                      placeholder="M5V 3A8"
+                      placeholder="10115"
                     />
                   )}
                 </form.Field>
@@ -699,8 +726,13 @@ export function EventCreateForm() {
                       required
                       onValueChange={(value) => {
                         field.handleChange(value);
-                        if (!formState.values.endDate) {
-                          form.setFieldValue("endDate", value);
+                        if (!value) {
+                          return;
+                        }
+                        const nextDay = getNextDayString(value);
+                        const currentEnd = formState.values.endDate as string | undefined;
+                        if (!currentEnd || currentEnd < value) {
+                          form.setFieldValue("endDate", nextDay);
                         }
                       }}
                     />
@@ -709,7 +741,15 @@ export function EventCreateForm() {
 
                 <form.Field name="endDate">
                   {(field) => (
-                    <ValidatedInput field={field} label="End Date" type="date" required />
+                    <ValidatedInput
+                      field={field}
+                      label="End Date"
+                      type="date"
+                      required
+                      {...(formState.values.startDate
+                        ? { min: formState.values.startDate as string }
+                        : {})}
+                    />
                   )}
                 </form.Field>
               </div>
@@ -983,18 +1023,17 @@ export function EventCreateForm() {
                         field={field}
                         label="Contact Email"
                         type="email"
-                        placeholder="event@example.com"
+                        placeholder="event@beispiel.de"
                       />
                     )}
                   </form.Field>
 
                   <form.Field name="contactPhone">
                     {(field) => (
-                      <ValidatedInput
+                      <ValidatedPhoneInput
                         field={field}
                         label="Contact Phone"
-                        type="tel"
-                        placeholder="(555) 123-4567"
+                        placeholder="+49 1512 3456789"
                       />
                     )}
                   </form.Field>
@@ -1006,7 +1045,7 @@ export function EventCreateForm() {
                       field={field}
                       label="Event Website"
                       type="url"
-                      placeholder="https://example.com/event"
+                      placeholder="https://beispiel.de/event"
                     />
                   )}
                 </form.Field>

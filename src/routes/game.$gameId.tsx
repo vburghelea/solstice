@@ -149,17 +149,13 @@ function GameDetailPage() {
             <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
               Minimum Requirements
             </summary>
-            <div className="text-foreground grid gap-4 px-4 pt-2 pb-4 md:grid-cols-2">
+            <div className="text-foreground grid gap-4 px-4 pt-2 pb-4">
               <div>
                 <p className="font-semibold">Players</p>
                 <p>
                   {gameDetails.minimumRequirements?.minPlayers ?? "?"} -{" "}
                   {gameDetails.minimumRequirements?.maxPlayers ?? "?"}
                 </p>
-              </div>
-              <div>
-                <p className="font-semibold">Language Level</p>
-                <p>{gameDetails.minimumRequirements?.languageLevel || "N/A"}</p>
               </div>
             </div>
           </details>

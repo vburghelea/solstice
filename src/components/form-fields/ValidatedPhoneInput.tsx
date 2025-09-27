@@ -9,29 +9,32 @@ interface ValidatedPhoneInputProps extends FieldComponentProps {
   description?: string;
   disabled?: boolean;
   required?: boolean;
+  maxDigits?: number;
 }
 
-const DEFAULT_COUNTRY_CODE = "+1";
+const DEFAULT_COUNTRY_CODE = "+49";
+const DEFAULT_MAX_DIGITS = 11;
 
 export function ValidatedPhoneInput(props: ValidatedPhoneInputProps) {
   const {
     field,
     label,
-    placeholder = "(555) 123-4567",
+    placeholder = "+49 1512 3456789",
     className,
     countryCode = DEFAULT_COUNTRY_CODE,
     description,
     disabled,
     required,
+    maxDigits = DEFAULT_MAX_DIGITS,
   } = props;
 
   const inputId = `${field.name}-phone-input`;
   const meta = field.state.meta;
   const normalizedDigits = useMemo(
-    () => extractDigits(field.state.value as string | null, countryCode),
-    [field.state.value, countryCode],
+    () => extractDigits(field.state.value as string | null, countryCode, maxDigits),
+    [field.state.value, countryCode, maxDigits],
   );
-  const formattedValue = formatForDisplay(normalizedDigits);
+  const formattedValue = formatForDisplay(normalizedDigits, countryCode);
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -48,7 +51,7 @@ export function ValidatedPhoneInput(props: ValidatedPhoneInputProps) {
         onChange={(event) => {
           const digits = event.target.value.replace(/\D/g, "");
           const canonical =
-            digits.length === 0 ? "" : ensureCountryCode(digits, countryCode);
+            digits.length === 0 ? "" : ensureCountryCode(digits, countryCode, maxDigits);
           field.handleChange(canonical);
         }}
         disabled={field.form.state.isSubmitting || disabled}
@@ -66,38 +69,43 @@ export function ValidatedPhoneInput(props: ValidatedPhoneInputProps) {
   );
 }
 
-function extractDigits(value: string | null | undefined, countryCode: string) {
+function extractDigits(
+  value: string | null | undefined,
+  countryCode: string,
+  maxDigits: number,
+) {
   if (!value) return "";
   const digitsOnly = value.replace(/\D/g, "");
   const normalizedCountry = countryCode.replace(/\D/g, "");
   if (digitsOnly.startsWith(normalizedCountry)) {
-    return digitsOnly.slice(normalizedCountry.length).slice(0, 10);
+    return digitsOnly.slice(normalizedCountry.length).slice(0, maxDigits);
   }
-  return digitsOnly.slice(0, 10);
+  return digitsOnly.slice(0, maxDigits);
 }
 
-function ensureCountryCode(digits: string, countryCode: string) {
+function ensureCountryCode(digits: string, countryCode: string, maxDigits: number) {
   const normalizedCountry = countryCode.replace(/\D/g, "");
   const trimmed = digits.startsWith(normalizedCountry)
     ? digits.slice(normalizedCountry.length)
     : digits;
-  const limited = trimmed.slice(0, 10);
+  const limited = trimmed.slice(0, maxDigits);
   return `${countryCode}${limited}`;
 }
 
-function formatForDisplay(digits: string) {
+function formatForDisplay(digits: string, countryCode: string) {
   if (!digits) return "";
-  const part1 = digits.slice(0, 3);
-  const part2 = digits.slice(3, 6);
-  const part3 = digits.slice(6, 10);
 
-  if (digits.length <= 3) {
-    return `(${part1}`;
+  const part1 = digits.slice(0, 4);
+  const part2 = digits.slice(4, 7);
+  const part3 = digits.slice(7, 11);
+
+  if (digits.length <= 4) {
+    return `${countryCode} ${part1}`;
   }
 
-  if (digits.length <= 6) {
-    return `(${part1}) ${part2}`;
+  if (digits.length <= 7) {
+    return `${countryCode} ${part1} ${part2}`;
   }
 
-  return `(${part1}) ${part2}-${part3}`;
+  return `${countryCode} ${part1} ${part2} ${part3}`.trim();
 }

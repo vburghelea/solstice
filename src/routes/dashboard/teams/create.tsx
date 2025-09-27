@@ -4,7 +4,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
-import { ValidatedCombobox } from "~/components/form-fields/ValidatedCombobox";
+import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import {
@@ -47,8 +47,8 @@ function CreateTeamPage() {
       name: "",
       slug: "",
       description: "",
-      city: "",
-      country: "",
+      city: "Berlin",
+      country: "DEU",
       primaryColor: "#000000",
       secondaryColor: "#ffffff",
       foundedYear: new Date().getFullYear().toString(),
@@ -179,7 +179,7 @@ function CreateTeamPage() {
               <div className="grid grid-cols-2 gap-4">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Victoria" />
+                    <ValidatedInput field={field} label="City" placeholder="Berlin" />
                   )}
                 </form.Field>
 
@@ -195,13 +195,10 @@ function CreateTeamPage() {
                   }}
                 >
                   {(field) => (
-                    <ValidatedCombobox
+                    <ValidatedCountryCombobox
                       field={field}
                       label="Country"
-                      placeholder="Select a country..."
-                      options={COUNTRIES}
-                      searchPlaceholder="Search countries..."
-                      emptyText="No country found."
+                      placeholder="Search for a country"
                     />
                   )}
                 </form.Field>

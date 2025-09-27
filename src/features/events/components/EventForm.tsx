@@ -1,5 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
+import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -22,7 +24,25 @@ interface EventFormProps {
   isSubmitting: boolean;
 }
 
+function getDateInputString(daysFromToday: number) {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() + daysFromToday);
+  return date.toISOString().split("T")[0];
+}
+
+function getNextDayString(dateString: string) {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (!year || !month || !day) return dateString;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().split("T")[0];
+}
+
 export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormProps) {
+  const computedStartDate = initialValues?.startDate ?? getDateInputString(7);
+  const computedEndDate = initialValues?.endDate ?? getNextDayString(computedStartDate);
   const defaults = {
     name: initialValues?.name ?? "",
     slug: initialValues?.slug ?? "",
@@ -31,14 +51,12 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
     description: initialValues?.description ?? "",
     venueName: initialValues?.venueName ?? "",
     venueAddress: initialValues?.venueAddress ?? "",
-    city: initialValues?.city ?? "",
+    city: initialValues?.city ?? "Berlin",
     province: initialValues?.province ?? "",
-    country: initialValues?.country ?? "",
-    postalCode: initialValues?.postalCode ?? "",
-    startDate: initialValues?.startDate ?? new Date().toISOString().split("T")[0],
-    endDate:
-      initialValues?.endDate ??
-      new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    country: initialValues?.country ?? "Germany",
+    postalCode: initialValues?.postalCode ?? "10115",
+    startDate: computedStartDate,
+    endDate: computedEndDate,
     registrationType:
       (initialValues?.registrationType as CreateEventInput["registrationType"]) ?? "team",
     maxTeams: initialValues?.maxTeams,
@@ -46,7 +64,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
     teamRegistrationFee: initialValues?.teamRegistrationFee ?? 0,
     individualRegistrationFee: initialValues?.individualRegistrationFee ?? 0,
     contactEmail: initialValues?.contactEmail ?? "",
-    contactPhone: initialValues?.contactPhone ?? "",
+    contactPhone: initialValues?.contactPhone ?? "+4915123456789",
   } as const;
 
   const form = useForm({
@@ -207,7 +225,18 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 type="date"
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  field.handleChange(value);
+                  if (!value) {
+                    return;
+                  }
+                  const nextDay = getNextDayString(value);
+                  const currentEnd = form.state.values.endDate as string | undefined;
+                  if (!currentEnd || currentEnd < value) {
+                    form.setFieldValue("endDate", nextDay);
+                  }
+                }}
               />
             </div>
           )}
@@ -222,6 +251,9 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 type="date"
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
+                {...(form.state.values.startDate
+                  ? { min: form.state.values.startDate as string }
+                  : {})}
                 onChange={(e) => field.handleChange(e.target.value)}
               />
             </div>
@@ -357,6 +389,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Berlin"
               />
             </div>
           )}
@@ -377,16 +410,12 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         </form.Field>
         <form.Field name="country">
           {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Country</Label>
-              <Input
-                id={field.name}
-                type="text"
-                value={field.state.value as string}
-                onBlur={field.handleBlur}
-                onChange={(event) => field.handleChange(event.target.value)}
-              />
-            </div>
+            <ValidatedCountryCombobox
+              field={field}
+              label="Country"
+              placeholder="Search for a country"
+              valueFormat="label"
+            />
           )}
         </form.Field>
       </div>
@@ -434,22 +463,18 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="event@beispiel.de"
               />
             </div>
           )}
         </form.Field>
         <form.Field name="contactPhone">
           {(field) => (
-            <div>
-              <Label htmlFor={field.name}>Contact Phone</Label>
-              <Input
-                id={field.name}
-                type="tel"
-                value={field.state.value as string}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </div>
+            <ValidatedPhoneInput
+              field={field}
+              label="Contact Phone"
+              placeholder="+49 1512 3456789"
+            />
           )}
         </form.Field>
       </div>

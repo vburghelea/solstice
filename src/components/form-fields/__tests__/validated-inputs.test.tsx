@@ -25,7 +25,7 @@ function PhoneForm() {
             <ValidatedPhoneInput
               field={field}
               label="Phone"
-              placeholder="(555) 123-4567"
+              placeholder="+49 1512 3456789"
             />
             <div data-testid="raw-value">
               {String(field.form.state.values.phone ?? "")}
@@ -111,10 +111,10 @@ describe("form field components", () => {
     const input = screen.getByLabelText(/phone/i) as HTMLInputElement;
     const user = userEvent.setup();
 
-    await user.type(input, "6045551234");
+    await user.type(input, "15123456789");
 
-    expect(input.value).toBe("(604) 555-1234");
-    expect(screen.getByTestId("raw-value").textContent).toBe("+16045551234");
+    expect(input.value).toBe("+49 1512 345 6789");
+    expect(screen.getByTestId("raw-value").textContent).toBe("+4915123456789");
 
     await user.clear(input);
     expect(screen.getByTestId("raw-value").textContent).toBe("");

@@ -138,18 +138,18 @@ describe("Profile Mutations", () => {
     });
 
     it("should update city and country", async () => {
-      const updatedProfile = { ...mockUser, city: "Berlin", country: "Germany" };
+      const updatedProfile = { ...mockUser, city: "München", country: "Germany" };
       vi.mocked(updateUserProfile).mockResolvedValue({
         success: true,
         data: updatedProfile,
       });
 
       const result = await updateUserProfile({
-        data: { city: "Berlin", country: "Germany" },
+        data: { city: "München", country: "Germany" },
       });
 
       expect(result.success).toBe(true);
-      expect(result.data?.city).toBe("Berlin");
+      expect(result.data?.city).toBe("München");
       expect(result.data?.country).toBe("Germany");
     });
 
@@ -340,7 +340,7 @@ describe("Profile Mutations", () => {
         identityTags: ["LGBTQ+", "Artist"],
         preferredGameThemes: ["Fantasy", "Scifi"],
         languages: ["en", "es"],
-        city: "Berlin",
+        city: "München",
         country: "Germany",
         isGM: true,
         gmStyle: "Narrative",
@@ -360,7 +360,7 @@ describe("Profile Mutations", () => {
       expect(result.data?.identityTags).toEqual(["LGBTQ+", "Artist"]);
       expect(result.data?.preferredGameThemes).toEqual(["Fantasy", "Scifi"]);
       expect(result.data?.languages).toEqual(["en", "es"]);
-      expect(result.data?.city).toBe("Berlin");
+      expect(result.data?.city).toBe("München");
       expect(result.data?.country).toBe("Germany");
       expect(result.data?.isGM).toBe(true);
       expect(result.data?.gmStyle).toBe("Narrative");

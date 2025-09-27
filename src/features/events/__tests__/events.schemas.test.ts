@@ -20,8 +20,8 @@ describe("Events Schemas", () => {
             organizerId: "org-123",
             startDateFrom: new Date("2025-01-01"),
             startDateTo: new Date("2025-12-31"),
-            city: "Berlin",
-            country: "DEY",
+            city: "München",
+            country: "DEU",
             featured: true,
             publicOnly: true,
           },
@@ -43,7 +43,7 @@ describe("Events Schemas", () => {
         const result = listEventsSchema.safeParse({
           filters: {
             type: ["tournament", "league"],
-            city: "Berlin",
+            city: "München",
           },
           sortBy: "name",
         });

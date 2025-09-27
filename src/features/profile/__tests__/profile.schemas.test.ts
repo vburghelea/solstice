@@ -164,7 +164,7 @@ describe("Profile Schemas", () => {
 
     it("validates valid city and country", () => {
       const validInput = {
-        city: "Berlin",
+        city: "München",
         country: "Germany",
       };
 
@@ -230,7 +230,7 @@ describe("Profile Schemas", () => {
             identityTags: ["LGBTQ+", "Artist"],
             preferredGameThemes: ["Fantasy", "Scifi"],
             languages: ["en", "es"],
-            city: "Berlin",
+            city: "München",
             country: "Germany",
             isGM: true,
             gmStyle: "Narrative",

@@ -87,7 +87,7 @@ describe("Profile Queries", () => {
         identityTags: ["LGBTQ+", "Artist"],
         preferredGameThemes: ["Fantasy", "Scifi"],
         languages: ["en", "es"],
-        city: "Berlin",
+        city: "München",
         country: "Germany",
         isGM: true,
         gmStyle: "Narrative",

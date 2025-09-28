@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { ManualSystemCreateDialog } from "~/features/game-systems/admin/components/manual-system-create-dialog";
 import { SystemsDashboardTable } from "~/features/game-systems/admin/components/systems-dashboard-table";
 import { listAdminGameSystems } from "~/features/game-systems/admin/game-systems-admin.queries";
 import type { ListAdminGameSystemsInput } from "~/features/game-systems/admin/game-systems-admin.schemas";
@@ -176,11 +177,16 @@ function AdminSystemsPage() {
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <Card className="bg-card text-card-foreground shadow-sm">
         <CardHeader className="pb-4">
-          <CardTitle className="text-2xl font-semibold">Game systems</CardTitle>
-          <CardDescription className="text-sm">
-            Monitor crawler status, editorial readiness, and media moderation for each
-            ruleset.
-          </CardDescription>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-2">
+              <CardTitle className="text-2xl font-semibold">Game systems</CardTitle>
+              <CardDescription className="text-sm">
+                Monitor crawler status, editorial readiness, and media moderation for each
+                ruleset.
+              </CardDescription>
+            </div>
+            <ManualSystemCreateDialog />
+          </div>
         </CardHeader>
         <CardContent className="gap-4 space-y-4">
           <SummaryBadges summaryStats={summaryStats} total={filteredTotal} />

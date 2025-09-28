@@ -226,7 +226,8 @@ Deliverables
 
 - Dashboard list now wires `listAdminGameSystems` through status-aware pagination. Filters for publish state, CMS approval, crawl errors, hero/summary gaps, and taxonomy coverage now reflect the server-derived readiness flags used by content ops. The UI exposes keyword search, sort, and page-size controls while rendering manual pagination state (`page`, `perPage`, `pageCount`, `total`) returned by the server function.
 - `listAdminGameSystems` input now accepts `{ page, perPage }` alongside search, status, and sort parameters, and the response returns `{ page, perPage, pageCount, total }` so the admin dashboard can render accurate navigation + summary badges. Existing consumers remain unaffected because defaults (page=1, perPage=20) mirror earlier behavior.
-- Bulk actions remain blocked on a new server mutation that can accept an array of system IDs for approval/publish state changes plus moderation toggles. Need to spec `bulkUpdateGameSystems` with audit metadata to satisfy CMS requirements.
+- ~~Bulk actions remain blocked on a new server mutation that can accept an array of system IDs for approval/publish state changes plus moderation toggles. Need to spec `bulkUpdateGameSystems` with audit metadata to satisfy CMS requirements.~~
+- Bulk actions now flow through an expanded `bulkUpdateAdminSystems` contract that accepts typed `action` payloads for publish state, CMS approval, hero moderation, recrawl queueing, deactivation, and hard deletes. Audit metadata is applied automatically, and crawl events are recorded when queueing recrawls from the dashboard.
 - External tag re-mapping in bulk still requires a batching endpoint (current UI is per-system). Capture requirements in Phase 9.C and plan tests once server contract exists. Coordinate with Phase 12 to add vitest coverage for pagination schema once new bulk endpoints land.
 
 **Progress 2025-02-21**
@@ -234,7 +235,7 @@ Deliverables
 - Fixed the dashboard query wiring so pagination, search, and sort now trigger fresh table rows instead of holding onto stale data. Query keys flatten the params (`q`, `status`, `sort`, `page`, `perPage`) and disable structural sharing so the React Table instance remounts with the new dataset immediately after "Apply".
 - Added row selection, toolbar messaging, and bulk publish/approval controls to the systems list. A new `bulkUpdateAdminSystems` server mutation accepts `{ systemIds: number[]; updates: { isPublished?: boolean; cmsApproved?: boolean } }` and stamps `updatedAt`, `lastApprovedAt`, and `lastApprovedBy` when approvals flip. The React Query cache invalidates after mutations so the list refreshes without a manual reload.
 - Hardened access control by layering the `/dashboard/systems/` route behind `requireRole` for `Games Admin` and `Platform Admin` roles. Non-admin users will be redirected back to the dashboard shell before the list mounts.
-- Remaining gaps: bulk taxonomy/tag reconciliation still lacks a server contract, and the new bulk update endpoint does not yet cover media moderation or recrawl queueing. Capture these in a follow-up spec so content ops can clear larger backlogs without repeated single-item edits.
+- Remaining gaps: bulk taxonomy/tag reconciliation still lacks a server contract, though media moderation and recrawl queueing now run through `bulkUpdateAdminSystems`. Capture taxonomy batching requirements in Phase 9.C and plan tests once that endpoint lands.
 
 **Progress 2025-02-22**
 
@@ -246,6 +247,12 @@ Deliverables
 
 - The dashboard content tab now includes a full CMS editor: description overrides use a textarea with dirty-state messaging, copy-from-scraped controls, and save/reset actions that automatically clear approvals for review. CMS FAQs can be added, edited, removed, and populated from crawler data with duplicate protection and one-click bulk import.
 - Admin detail queries now return CMS override FAQs separately from scraped FAQs so the UI can distinguish curated copy from crawler suggestions.
+
+**Progress 2025-02-26**
+
+- Bulk selection toolbar now covers hero moderation, recrawl queueing, deactivation, and hard deletes in addition to publish/approval toggles. The backend mutation persists moderation flags, queues crawl events with source metadata, and cascades deletions across related tables while tracking audit timestamps.
+- Added an "Add manual system" dialog to the dashboard header so content ops can seed CMS-owned systems. The flow slugifies names, prevents duplicates, optionally captures external references (StartPlaying, BGG, Wikipedia, or custom), and can enqueue an initial recrawl event tied to the selected source.
+- Surface the `inactive` crawl status in the dashboard to reflect deactivated systems, keeping completeness signals aligned with the new bulk actions.
 
 Phase 10 - Reviews aggregation
 Deliverables

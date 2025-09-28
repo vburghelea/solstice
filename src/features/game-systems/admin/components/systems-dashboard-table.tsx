@@ -10,6 +10,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { DataTable } from "~/components/ui/data-table";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { bulkUpdateAdminSystems } from "../game-systems-admin.mutations";
+import type { BulkAdminAction } from "../game-systems-admin.schemas";
 import type { AdminGameSystemListItem } from "../game-systems-admin.types";
 import { SystemStatusPill } from "./system-status-pill";
 import {
@@ -178,6 +179,8 @@ function getCrawlVariant(
     case "queued":
     case "processing":
       return "outline";
+    case "inactive":
+      return "outline";
     case "error":
       return "destructive";
     default:
@@ -197,6 +200,8 @@ function formatCrawlStatus(status: string) {
       return "Queued";
     case "processing":
       return "Processing";
+    case "inactive":
+      return "Inactive";
     case "unknown":
       return "Unknown";
     default:
@@ -297,7 +302,7 @@ export function SystemsDashboardTable({
       await bulkUpdateAdminSystems({
         data: {
           systemIds: selectedIds,
-          updates: buildBulkUpdatePayload(action),
+          action: buildBulkUpdatePayload(action),
         },
       });
     },
@@ -316,6 +321,21 @@ export function SystemsDashboardTable({
 
   const handleBulkAction = (action: BulkAction) => {
     if (bulkMutation.isPending || selectedIds.length === 0) return;
+
+    if (action === "delete") {
+      const confirmed = window.confirm(
+        "This will permanently remove the selected systems and all related data. Continue?",
+      );
+      if (!confirmed) return;
+    }
+
+    if (action === "deactivate") {
+      const confirmed = window.confirm(
+        "Deactivate selected systems and mark them as inactive? They will be hidden from public listings.",
+      );
+      if (!confirmed) return;
+    }
+
     bulkMutation.mutate(action);
   };
 
@@ -366,7 +386,16 @@ export function SystemsDashboardTable({
   );
 }
 
-type BulkAction = "publish" | "unpublish" | "approve" | "revoke-approval";
+type BulkAction =
+  | "publish"
+  | "unpublish"
+  | "approve"
+  | "revoke-approval"
+  | "hero-approved"
+  | "hero-needs-review"
+  | "queue-recrawl"
+  | "deactivate"
+  | "delete";
 
 const bulkActionLabels: Record<
   BulkAction,
@@ -388,20 +417,52 @@ const bulkActionLabels: Record<
     successMessage: "Selected systems marked for review",
     errorPrefix: "Could not update approval status",
   },
+  "hero-approved": {
+    successMessage: "Hero images marked as reviewed",
+    errorPrefix: "Could not update hero moderation",
+  },
+  "hero-needs-review": {
+    successMessage: "Hero images flagged for review",
+    errorPrefix: "Could not update hero moderation",
+  },
+  "queue-recrawl": {
+    successMessage: "Selected systems queued for recrawl",
+    errorPrefix: "Could not queue recrawl",
+  },
+  deactivate: {
+    successMessage: "Selected systems deactivated",
+    errorPrefix: "Could not deactivate systems",
+  },
+  delete: {
+    successMessage: "Selected systems deleted",
+    errorPrefix: "Could not delete systems",
+  },
 };
 
-function buildBulkUpdatePayload(action: BulkAction) {
+function buildBulkUpdatePayload(action: BulkAction): BulkAdminAction {
   switch (action) {
     case "publish":
-      return { isPublished: true } as const;
+      return { type: "set-publish", isPublished: true };
     case "unpublish":
-      return { isPublished: false } as const;
+      return { type: "set-publish", isPublished: false };
     case "approve":
-      return { cmsApproved: true } as const;
+      return { type: "set-approval", cmsApproved: true };
     case "revoke-approval":
-      return { cmsApproved: false } as const;
-    default:
-      return {} as const;
+      return { type: "set-approval", cmsApproved: false };
+    case "hero-approved":
+      return { type: "set-hero-moderation", moderated: true };
+    case "hero-needs-review":
+      return { type: "set-hero-moderation", moderated: false };
+    case "queue-recrawl":
+      return { type: "queue-recrawl", source: "dashboard-bulk" };
+    case "deactivate":
+      return { type: "deactivate" };
+    case "delete":
+      return { type: "delete" };
+    default: {
+      const exhaustiveCheck: never = action;
+      throw new Error(`Unhandled bulk action: ${exhaustiveCheck}`);
+    }
   }
 }
 
@@ -415,7 +476,7 @@ function BulkActionsToolbar({
   onAction: (action: BulkAction) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-3">
       <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-semibold">
         {selectedCount} selected
       </Badge>
@@ -451,6 +512,50 @@ function BulkActionsToolbar({
           variant="ghost"
         >
           Mark for review
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          onClick={() => onAction("hero-approved")}
+          disabled={isBusy}
+          variant="default"
+        >
+          Hero reviewed
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onAction("hero-needs-review")}
+          disabled={isBusy}
+          variant="outline"
+        >
+          Hero needs review
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          onClick={() => onAction("queue-recrawl")}
+          disabled={isBusy}
+          variant="secondary"
+        >
+          Queue recrawl
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onAction("deactivate")}
+          disabled={isBusy}
+          variant="outline"
+        >
+          Deactivate
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => onAction("delete")}
+          disabled={isBusy}
+          variant="destructive"
+        >
+          Delete
         </Button>
       </div>
     </div>

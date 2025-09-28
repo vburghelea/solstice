@@ -1,76 +1,253 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, ChevronRight, MapPin, Sparkles, Users } from "lucide-react";
+import {
+  Calendar,
+  ChevronRight,
+  Clock,
+  Globe2,
+  MapPin,
+  Sparkles,
+  Users,
+} from "lucide-react";
+import type { ComponentType } from "react";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
+
+type MetaIcon = ComponentType<{ className?: string }>;
 
 interface GameListItemViewProps {
   game: GameListItem;
 }
 
 export function GameListItemView({ game }: GameListItemViewProps) {
-  const formattedDate = formatDateAndTime(game.dateTime);
-  const price = game.price ? `$${(game.price / 100).toFixed(2)}` : "Free";
-
   return (
-    <List.Item className="group px-4 py-4 sm:px-5 sm:py-5">
-      <article className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-2">
-          <div>
-            <h3 className="text-foreground truncate text-base font-semibold sm:text-lg">
-              {game.name}
-            </h3>
-            {game.description ? (
-              <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-                {game.description}
-              </p>
-            ) : null}
-          </div>
-          <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm">
-            <span className="inline-flex items-center gap-1.5">
-              <Calendar className="text-muted-foreground size-4" />
-              <span className="truncate">{formattedDate}</span>
-            </span>
-            {game.location?.address ? (
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin className="text-muted-foreground size-4" />
-                <span className="truncate">{game.location.address}</span>
-              </span>
-            ) : null}
-            {game.gameSystem?.name ? (
-              <span className="inline-flex items-center gap-1.5">
-                <Sparkles className="text-muted-foreground size-4" />
-                <span className="truncate">{game.gameSystem.name}</span>
-              </span>
-            ) : null}
-            <span className="text-foreground inline-flex items-center gap-1.5 font-medium">
-              {price}
-            </span>
-            {typeof game.participantCount === "number" ? (
-              <span className="inline-flex items-center gap-1.5">
-                <Users className="text-muted-foreground size-4" />
-                <span>{game.participantCount}</span>
-              </span>
-            ) : null}
-          </div>
-        </div>
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="w-full shrink-0 gap-1.5 sm:w-auto"
-        >
-          <Link
-            to="/game/$gameId"
-            params={{ gameId: game.id }}
-            className="flex items-center justify-center"
-          >
-            View
-            <ChevronRight className="size-4" />
-          </Link>
-        </Button>
-      </article>
+    <List.Item className="px-0 py-0 sm:px-0">
+      <GameShowcaseCard game={game} layout="list" />
     </List.Item>
   );
+}
+
+interface GameShowcaseCardProps {
+  game: GameListItem;
+  layout?: "grid" | "list";
+  className?: string;
+}
+
+export function GameShowcaseCard({
+  game,
+  layout = "grid",
+  className,
+}: GameShowcaseCardProps) {
+  const formattedDate = formatDateAndTime(game.dateTime);
+  const price = game.price ? `$${(game.price / 100).toFixed(2)}` : "Free";
+  const heroUrl = game.heroImageUrl;
+  const categories = (game.gameSystem?.categories ?? []).filter(Boolean).slice(0, 3);
+
+  const minPlayers =
+    game.minimumRequirements?.minPlayers ?? game.gameSystem?.minPlayers ?? null;
+  const maxPlayers =
+    game.minimumRequirements?.maxPlayers ?? game.gameSystem?.maxPlayers ?? null;
+
+  const playersLabelParts: string[] = [];
+  if (typeof game.participantCount === "number") {
+    playersLabelParts.push(`${game.participantCount} joined`);
+  }
+  const playersRange = buildPlayersRange(minPlayers, maxPlayers);
+  if (playersRange) {
+    playersLabelParts.push(playersRange);
+  }
+  const playersLabel = playersLabelParts.join(" • ");
+
+  const durationLabel =
+    formatExpectedDuration(game.expectedDuration) ??
+    formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
+
+  const metaItems = [
+    { icon: Calendar as MetaIcon, label: formattedDate },
+    { icon: MapPin as MetaIcon, label: game.location?.address ?? null },
+    { icon: Users as MetaIcon, label: playersLabel || null },
+    { icon: Clock as MetaIcon, label: durationLabel },
+    { icon: Globe2 as MetaIcon, label: game.language || null },
+  ].filter((item): item is { icon: MetaIcon; label: string } => {
+    return typeof item.label === "string" && item.label.trim().length > 0;
+  });
+
+  return (
+    <article
+      className={cn(
+        "border-border/60 bg-card hover:border-primary/60 relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm transition-colors hover:shadow-md",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "relative overflow-hidden",
+          layout === "list" ? "aspect-[16/9]" : "aspect-[4/3] sm:aspect-video",
+        )}
+      >
+        {heroUrl ? (
+          <img
+            src={heroUrl}
+            alt={`${game.gameSystem?.name ?? game.name} hero artwork`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="h-full w-full bg-[radial-gradient(circle_at_top,_rgba(146,102,204,0.55),_rgba(19,18,30,0.95))]" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4">
+          <Badge className="bg-white/20 text-xs font-semibold tracking-wide text-white uppercase">
+            {game.gameSystem?.name ?? "Original system"}
+          </Badge>
+          {categories.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Badge
+                  key={category}
+                  variant="secondary"
+                  className="bg-white/15 text-[0.65rem] font-medium text-white"
+                >
+                  {category}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-5 p-5">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-foreground text-lg font-semibold sm:text-xl">
+                <Link
+                  to="/game/$gameId"
+                  params={{ gameId: game.id }}
+                  className="flex items-center"
+                >
+                  {game.name}
+                </Link>
+              </h3>
+              {game.description ? (
+                <p className="text-muted-foreground mt-2 line-clamp-3 text-sm">
+                  {game.description}
+                </p>
+              ) : null}
+            </div>
+            <Badge variant="outline" className="shrink-0 text-xs font-medium">
+              {price}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 text-sm">
+          {metaItems.map((item) => {
+            const Icon = item.icon;
+            const iconName = Icon.name || "meta";
+            const metaKey = `${iconName}-${item.label}`;
+            return (
+              <div key={metaKey} className="flex items-start gap-2">
+                <Icon className="text-primary mt-0.5 size-4" />
+                <span className="text-muted-foreground flex-1 leading-snug">
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
+          {game.campaignId ? (
+            <div className="flex items-start gap-2">
+              <Sparkles className="text-primary mt-0.5 size-4" />
+              <span className="text-muted-foreground flex-1 leading-snug">
+                Linked to an ongoing campaign
+              </span>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+          <span className="text-muted-foreground text-sm">
+            Hosted by {game.owner?.name ?? game.owner?.email ?? "a community GM"}
+          </span>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="shrink-0 gap-1.5 rounded-full"
+          >
+            <Link
+              to="/game/$gameId"
+              params={{ gameId: game.id }}
+              className="flex items-center"
+            >
+              View details
+              <ChevronRight className="ml-1 size-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function buildPlayersRange(
+  minPlayers: number | null,
+  maxPlayers: number | null,
+): string | null {
+  if (minPlayers && maxPlayers) {
+    if (minPlayers === maxPlayers) {
+      return `${minPlayers} players`;
+    }
+    return `${minPlayers}-${maxPlayers} players`;
+  }
+
+  if (minPlayers) {
+    return `${minPlayers}+ players`;
+  }
+
+  if (maxPlayers) {
+    return `Up to ${maxPlayers} players`;
+  }
+
+  return null;
+}
+
+function formatExpectedDuration(value: number | null | undefined): string | null {
+  if (!value || Number.isNaN(value)) {
+    return null;
+  }
+
+  const totalMinutes = Math.max(15, Math.round(value));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours && minutes) {
+    return `${hours}h ${minutes}m session`;
+  }
+
+  if (hours) {
+    return `${hours}h session`;
+  }
+
+  return `${minutes}m session`;
+}
+
+function formatSystemDuration(minutes: number | null): string | null {
+  if (!minutes || Number.isNaN(minutes)) {
+    return null;
+  }
+
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+    if (remainder) {
+      return `~${hours}h ${remainder}m adventure`;
+    }
+    return `~${hours}h adventure`;
+  }
+
+  return `~${minutes}m adventure`;
 }

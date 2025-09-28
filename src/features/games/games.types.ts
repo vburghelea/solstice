@@ -46,7 +46,16 @@ export type GameListItem = Game & {
     uploadedAvatarPath?: string | null;
     gmRating?: number | null;
   } | null;
-  gameSystem: { id: number; name: string } | null;
+  gameSystem: {
+    id: number;
+    name: string;
+    slug: string | null;
+    averagePlayTime: number | null;
+    minPlayers: number | null;
+    maxPlayers: number | null;
+    categories: string[];
+  } | null;
+  heroImageUrl: string | null;
   participantCount: number;
   minimumRequirements: z.infer<typeof minimumRequirementsSchema> | null;
   safetyRules: z.infer<typeof safetyRulesSchema> | null;

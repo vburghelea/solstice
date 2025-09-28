@@ -107,7 +107,16 @@ export const MOCK_CAMPAIGN_GAME_1: GameListItem = {
   campaignId: MOCK_CAMPAIGN.id,
   status: "scheduled",
   participantCount: 0,
-  gameSystem: MOCK_GAME_SYSTEM, // Explicitly add gameSystem
+  heroImageUrl: null,
+  gameSystem: {
+    id: MOCK_GAME_SYSTEM.id,
+    name: MOCK_GAME_SYSTEM.name,
+    slug: MOCK_GAME_SYSTEM.slug ?? null,
+    averagePlayTime: MOCK_GAME_SYSTEM.averagePlayTime ?? null,
+    minPlayers: MOCK_GAME_SYSTEM.minPlayers ?? null,
+    maxPlayers: MOCK_GAME_SYSTEM.maxPlayers ?? null,
+    categories: [],
+  },
 };
 export const MOCK_CAMPAIGN_GAME_2: GameListItem = {
   ...MOCK_GAME,
@@ -115,7 +124,16 @@ export const MOCK_CAMPAIGN_GAME_2: GameListItem = {
   campaignId: MOCK_CAMPAIGN.id,
   status: "completed",
   participantCount: 0,
-  gameSystem: MOCK_GAME_SYSTEM_2, // Assign MOCK_GAME_SYSTEM_2
+  heroImageUrl: null,
+  gameSystem: {
+    id: MOCK_GAME_SYSTEM_2.id,
+    name: MOCK_GAME_SYSTEM_2.name,
+    slug: MOCK_GAME_SYSTEM_2.slug ?? null,
+    averagePlayTime: MOCK_GAME_SYSTEM_2.averagePlayTime ?? null,
+    minPlayers: MOCK_GAME_SYSTEM_2.minPlayers ?? null,
+    maxPlayers: MOCK_GAME_SYSTEM_2.maxPlayers ?? null,
+    categories: [],
+  },
 };
 export const MOCK_CAMPAIGN_GAME_3: GameListItem = {
   ...MOCK_GAME,
@@ -123,7 +141,16 @@ export const MOCK_CAMPAIGN_GAME_3: GameListItem = {
   campaignId: MOCK_CAMPAIGN.id,
   status: "canceled",
   participantCount: 0,
-  gameSystem: MOCK_GAME_SYSTEM_3, // Assign MOCK_GAME_SYSTEM_3
+  heroImageUrl: null,
+  gameSystem: {
+    id: MOCK_GAME_SYSTEM_3.id,
+    name: MOCK_GAME_SYSTEM_3.name,
+    slug: MOCK_GAME_SYSTEM_3.slug ?? null,
+    averagePlayTime: MOCK_GAME_SYSTEM_3.averagePlayTime ?? null,
+    minPlayers: MOCK_GAME_SYSTEM_3.minPlayers ?? null,
+    maxPlayers: MOCK_GAME_SYSTEM_3.maxPlayers ?? null,
+    categories: [],
+  },
 };
 
 import { vi } from "vitest";

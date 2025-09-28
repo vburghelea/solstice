@@ -2,12 +2,38 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { listGamesWithCountImpl } from "../games.queries";
 
-function makeDbReturning(rows: unknown[]) {
-  const rowsPromise = Promise.resolve(rows);
+type Row = Record<string, unknown>;
+
+function normalizeRow(row: Row): Row {
+  const system = (row["gameSystem"] ?? {}) as Record<string, unknown>;
+  const gameSystemId =
+    (row["gameSystemId"] as number | undefined) ??
+    (system["id"] as number | undefined) ??
+    0;
+  return {
+    ...row,
+    gameSystemId,
+    gameSystemName: row["gameSystemName"] ?? system["name"] ?? null,
+    gameSystemSlug: row["gameSystemSlug"] ?? system["slug"] ?? null,
+    gameSystemAveragePlayTime:
+      row["gameSystemAveragePlayTime"] ?? system["averagePlayTime"] ?? null,
+    gameSystemMinPlayers: row["gameSystemMinPlayers"] ?? system["minPlayers"] ?? null,
+    gameSystemMaxPlayers: row["gameSystemMaxPlayers"] ?? system["maxPlayers"] ?? null,
+    systemHeroUrl: row["systemHeroUrl"] ?? null,
+    systemCategories: row["systemCategories"] ?? [],
+  };
+}
+
+function makeDbReturning(rows: Row[]) {
+  const normalized = rows.map(normalizeRow);
+  const rowsPromise = Promise.resolve(normalized);
   const mainGroup = { orderBy: () => rowsPromise, limit: () => rowsPromise };
   const mainWhere = { groupBy: () => mainGroup };
-  const mainLeftJoin = { where: () => mainWhere };
-  const mainInner2 = { leftJoin: () => mainLeftJoin };
+  const leftJoinChain = {
+    leftJoin: () => leftJoinChain,
+    where: () => mainWhere,
+  };
+  const mainInner2 = { leftJoin: () => leftJoinChain };
   const mainInner1 = { innerJoin: () => mainInner2 };
 
   return {

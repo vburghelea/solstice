@@ -9,12 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ArrowLeftIcon, CalendarIcon, LinkIcon, UsersIcon } from "~/components/ui/icons";
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  Info,
+  LinkIcon,
+  UsersIcon,
+} from "~/components/ui/icons";
 import { Separator } from "~/components/ui/separator";
 import { SystemHero } from "~/features/game-systems/components/system-hero";
 import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 export const Route = createFileRoute("/systems/$slug")({
   loader: async ({ params }) => {
@@ -178,21 +185,64 @@ function SystemDetailPage() {
                 <CardTitle>Quick stats</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground space-y-3 text-sm">
-                <div>
-                  <div className="text-foreground font-medium">Players</div>
-                  <div>{playersLabel}</div>
-                </div>
+                <QuickFact label="Players" value={playersLabel} />
                 {system.optimalPlayers ? (
-                  <div>
-                    <div className="text-foreground font-medium">Optimal table</div>
-                    <div>{system.optimalPlayers} players</div>
-                  </div>
+                  <QuickFact
+                    label="Optimal table"
+                    value={`${system.optimalPlayers} players`}
+                  />
                 ) : null}
                 {system.averagePlayTime ? (
-                  <div>
-                    <div className="text-foreground font-medium">Average session</div>
-                    <div>{system.averagePlayTime} minutes</div>
-                  </div>
+                  <QuickFact
+                    label="Average session"
+                    value={`${system.averagePlayTime} minutes`}
+                  />
+                ) : null}
+                {system.yearReleased ? (
+                  <QuickFact label="First published" value={`${system.yearReleased}`} />
+                ) : null}
+                {system.ageRating ? (
+                  <QuickFact
+                    label="Age rating"
+                    value={
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="flex items-center gap-1">
+                            {system.ageRating}
+                            <Info className="h-3 w-3" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            Recommended minimum age for players based on content themes
+                            and mechanics.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    }
+                  />
+                ) : null}
+
+                {system.complexityRating ? (
+                  <QuickFact
+                    label="Complexity"
+                    value={
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="flex items-center gap-1">
+                            {system.complexityRating}/5
+                            <Info className="h-3 w-3" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            1-5 scale where 1 is simple/beginner-friendly and 5 is
+                            complex/expert-level.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    }
+                  />
                 ) : null}
                 <Separator />
                 <div>
@@ -267,6 +317,20 @@ function SystemDetailPage() {
         </section>
       </section>
     </PublicLayout>
+  );
+}
+
+interface QuickFactProps {
+  label: string;
+  value: React.ReactNode;
+}
+
+function QuickFact({ label, value }: QuickFactProps) {
+  return (
+    <div className="flex justify-between">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium">{value}</span>
+    </div>
   );
 }
 

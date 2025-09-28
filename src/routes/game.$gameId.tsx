@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ChevronsUpDownIcon, LinkIcon, MapPinIcon } from "~/components/ui/icons";
+import { ChevronsUpDownIcon, Info, LinkIcon, MapPinIcon } from "~/components/ui/icons";
 import { Separator } from "~/components/ui/separator";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { useAuth } from "~/features/auth/hooks/useAuth";
@@ -24,6 +24,7 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 type GameDetailLoaderData = {
   gameDetails: GameWithDetails | null;
@@ -134,6 +135,9 @@ function GameDetailPage() {
   const heroStyle = systemDetails?.heroUrl
     ? {
         backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.65), rgba(10,10,10,0.2)), url('${systemDetails.heroUrl}')`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }
     : undefined;
   const systemSummary = systemDetails?.description ?? systemDetails?.summary ?? null;
@@ -479,6 +483,51 @@ function GameDetailPage() {
                         value={`${systemDetails.yearReleased}`}
                       />
                     ) : null}
+
+                    {systemDetails.ageRating ? (
+                      <QuickFact
+                        label="Age rating"
+                        value={
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="flex items-center gap-1">
+                                {systemDetails.ageRating}
+                                <Info className="h-3 w-3" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Recommended minimum age for players based on content
+                                themes and mechanics.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        }
+                      />
+                    ) : null}
+
+                    {systemDetails.complexityRating ? (
+                      <QuickFact
+                        label="Complexity"
+                        value={
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="flex items-center gap-1">
+                                {systemDetails.complexityRating}/5
+                                <Info className="h-3 w-3" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                1-5 scale where 1 is simple/beginner-friendly and 5 is
+                                complex/expert-level.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        }
+                      />
+                    ) : null}
+
                     {systemDetails.externalRefs ? <Separator /> : null}
                     {systemLinks.length > 0 ? (
                       <div className="space-y-2">
@@ -564,12 +613,16 @@ function InfoItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function QuickFact({ label, value }: { label: string; value: string | null }) {
-  if (!value) return null;
+interface QuickFactProps {
+  label: string;
+  value: React.ReactNode;
+}
+
+function QuickFact({ label, value }: QuickFactProps) {
   return (
-    <div>
-      <p className="text-muted-foreground text-xs tracking-wide uppercase">{label}</p>
-      <p className="text-foreground font-medium">{value}</p>
+    <div className="flex justify-between">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium">{value}</span>
     </div>
   );
 }

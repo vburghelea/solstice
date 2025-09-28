@@ -420,7 +420,11 @@ export const getSystemBySlugHandler = async ({
 
   const [row] = await db
     .select({
-      system: gameSystems,
+      system: {
+        ...gameSystems,
+        ageRating: gameSystems.ageRating,
+        complexityRating: gameSystems.complexityRating,
+      },
       hero: heroImage,
       publisher: {
         id: publishers.id,
@@ -523,6 +527,8 @@ export const getSystemBySlugHandler = async ({
     publisher: mapPublisher(row.publisher as PublisherRow | null),
     yearReleased: row.system.yearReleased,
     releaseDate: toDateString(row.system.releaseDate),
+    ageRating: row.system.ageRating,
+    complexityRating: row.system.complexityRating,
     description: row.system.descriptionCms ?? row.system.descriptionScraped ?? null,
     descriptionCms: row.system.descriptionCms ?? null,
     descriptionScraped: row.system.descriptionScraped ?? null,

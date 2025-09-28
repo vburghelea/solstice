@@ -693,8 +693,20 @@ function GameDetailsPage() {
             <p className="text-destructive text-sm">Your application was rejected.</p>
           ) : null}
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <div className="space-y-6">
+          <div
+            className={cn(
+              "grid items-start gap-8",
+              isEditing
+                ? "lg:grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
+                : "lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]",
+            )}
+          >
+            <div
+              className={cn(
+                "space-y-6",
+                isEditing ? "lg:order-1 xl:order-none" : undefined,
+              )}
+            >
               {isEditing ? (
                 <Card>
                   <CardHeader>
@@ -703,27 +715,29 @@ function GameDetailsPage() {
                       Update the details your players see publicly.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <GameForm
-                      initialValues={{
-                        ...game,
-                        gameSystemId: game.gameSystem.id,
-                        campaignId: game.campaignId ?? undefined,
-                        price: game.price ?? undefined,
-                        minimumRequirements: game.minimumRequirements ?? undefined,
-                        safetyRules: game.safetyRules ?? undefined,
-                        dateTime: new Date(game.dateTime).toISOString().slice(0, 16),
-                      }}
-                      onSubmit={async (values) => {
-                        await updateGameMutation.mutateAsync({
-                          data: { ...values, id: gameId },
-                        });
-                      }}
-                      isSubmitting={updateGameMutation.isPending}
-                      isCampaignGame={isCampaignGame}
-                      gameSystemName={game.gameSystem.name}
-                      onCancelEdit={() => setIsEditing(false)}
-                    />
+                  <CardContent className="px-0 pb-0">
+                    <div className="px-4 pb-6 sm:px-6">
+                      <GameForm
+                        initialValues={{
+                          ...game,
+                          gameSystemId: game.gameSystem.id,
+                          campaignId: game.campaignId ?? undefined,
+                          price: game.price ?? undefined,
+                          minimumRequirements: game.minimumRequirements ?? undefined,
+                          safetyRules: game.safetyRules ?? undefined,
+                          dateTime: new Date(game.dateTime).toISOString().slice(0, 16),
+                        }}
+                        onSubmit={async (values) => {
+                          await updateGameMutation.mutateAsync({
+                            data: { ...values, id: gameId },
+                          });
+                        }}
+                        isSubmitting={updateGameMutation.isPending}
+                        isCampaignGame={isCampaignGame}
+                        gameSystemName={game.gameSystem.name}
+                        onCancelEdit={() => setIsEditing(false)}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               ) : (
@@ -793,7 +807,12 @@ function GameDetailsPage() {
               ) : null}
             </div>
 
-            <aside className="space-y-6">
+            <aside
+              className={cn(
+                "space-y-6",
+                isEditing ? "lg:order-2 xl:order-none" : undefined,
+              )}
+            >
               <Card>
                 <CardHeader>
                   <CardTitle>Session logistics</CardTitle>

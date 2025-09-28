@@ -571,8 +571,20 @@ function CampaignDetailsPage() {
             <p className="text-destructive text-sm">Your application was rejected.</p>
           ) : null}
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <div className="space-y-6">
+          <div
+            className={cn(
+              "grid items-start gap-8",
+              isEditing
+                ? "lg:grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
+                : "lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]",
+            )}
+          >
+            <div
+              className={cn(
+                "space-y-6",
+                isEditing ? "lg:order-1 xl:order-none" : undefined,
+              )}
+            >
               {isEditing ? (
                 <Card>
                   <CardHeader>
@@ -581,32 +593,35 @@ function CampaignDetailsPage() {
                       Update the overarching details for your ongoing story.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <CampaignForm
-                      initialValues={{
-                        ...(campaign as Partial<
-                          z.infer<typeof updateCampaignInputSchema>
-                        >),
-                        gameSystemId: campaign.gameSystem.id,
-                        pricePerSession: campaign.pricePerSession ?? undefined,
-                        minimumRequirements: campaign.minimumRequirements ?? undefined,
-                        safetyRules: campaign.safetyRules ?? undefined,
-                        sessionZeroData: campaign.sessionZeroData ?? undefined,
-                        campaignExpectations: campaign.campaignExpectations ?? undefined,
-                        tableExpectations: campaign.tableExpectations ?? undefined,
-                        characterCreationOutcome:
-                          campaign.characterCreationOutcome ?? undefined,
-                      }}
-                      onSubmit={async (values) => {
-                        await updateCampaignMutation.mutateAsync({
-                          data: { ...values, id: campaignId },
-                        });
-                      }}
-                      isSubmitting={updateCampaignMutation.isPending}
-                      onCancelEdit={() => setIsEditing(false)}
-                      isGameSystemReadOnly={true}
-                      gameSystemName={campaign.gameSystem.name}
-                    />
+                  <CardContent className="px-0 pb-0">
+                    <div className="px-4 pb-6 sm:px-6">
+                      <CampaignForm
+                        initialValues={{
+                          ...(campaign as Partial<
+                            z.infer<typeof updateCampaignInputSchema>
+                          >),
+                          gameSystemId: campaign.gameSystem.id,
+                          pricePerSession: campaign.pricePerSession ?? undefined,
+                          minimumRequirements: campaign.minimumRequirements ?? undefined,
+                          safetyRules: campaign.safetyRules ?? undefined,
+                          sessionZeroData: campaign.sessionZeroData ?? undefined,
+                          campaignExpectations:
+                            campaign.campaignExpectations ?? undefined,
+                          tableExpectations: campaign.tableExpectations ?? undefined,
+                          characterCreationOutcome:
+                            campaign.characterCreationOutcome ?? undefined,
+                        }}
+                        onSubmit={async (values) => {
+                          await updateCampaignMutation.mutateAsync({
+                            data: { ...values, id: campaignId },
+                          });
+                        }}
+                        isSubmitting={updateCampaignMutation.isPending}
+                        onCancelEdit={() => setIsEditing(false)}
+                        isGameSystemReadOnly={true}
+                        gameSystemName={campaign.gameSystem.name}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               ) : (
@@ -730,7 +745,12 @@ function CampaignDetailsPage() {
               ) : null}
             </div>
 
-            <aside className="space-y-6">
+            <aside
+              className={cn(
+                "space-y-6",
+                isEditing ? "lg:order-2 xl:order-none" : undefined,
+              )}
+            >
               <Card>
                 <CardHeader>
                   <CardTitle>Campaign logistics</CardTitle>

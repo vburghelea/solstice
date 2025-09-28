@@ -1,9 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Edit2, LoaderCircle } from "lucide-react";
+import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { LanguageTag } from "~/components/LanguageTag";
+import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,13 +16,22 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import {
+  CheckCircle2,
+  LoaderIcon,
+  MapPinIcon,
+  PenSquareIcon,
+  ScrollText,
+  Undo2,
+  XCircle,
+} from "~/components/ui/icons";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { gameStatusEnum } from "~/db/schema/games.schema";
+import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import {
   applyToCampaign,
   updateCampaign,
@@ -28,7 +41,7 @@ import {
   getCampaignApplicationForUser,
   getCampaignApplications,
 } from "~/features/campaigns/campaigns.queries";
-import type { updateCampaignInputSchema } from "~/features/campaigns/campaigns.schemas"; // Import updateCampaignInputSchema
+import type { updateCampaignInputSchema } from "~/features/campaigns/campaigns.schemas";
 import type {
   CampaignParticipant,
   CampaignWithDetails,
@@ -36,14 +49,10 @@ import type {
 import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
-
-import { LanguageTag } from "~/components/LanguageTag";
-import { ProfileLink } from "~/components/ProfileLink";
-import { Avatar } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
-import { StickyActionBar } from "~/components/ui/sticky-action-bar";
 import { ManageInvitations } from "~/features/campaigns/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/campaigns/components/RespondToInvitation";
+import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
+import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
 import { CampaignGameSessionCard } from "~/features/games/components/CampaignGameSessionCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
@@ -51,109 +60,65 @@ import type { GameListItem } from "~/features/games/games.types";
 import { getRelationshipSnapshot } from "~/features/social";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { strings } from "~/shared/lib/strings";
+import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 import { z } from "zod";
+import { gameStatusEnum } from "~/db/schema/games.schema";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const Route = createFileRoute("/dashboard/campaigns/$campaignId/")({
   component: CampaignDetailsPage,
   validateSearch: z.object({
     status: z.enum(gameStatusEnum.enumValues).optional(),
   }),
+  loader: async ({ params }) => {
+    if (!UUID_REGEX.test(params.campaignId)) {
+      return {
+        campaign: null,
+        error: "Invalid campaign ID format.",
+        systemDetails: null,
+      };
+    }
+
+    const result = await getCampaign({ data: { id: params.campaignId } });
+
+    if (!result.success || !result.data) {
+      return {
+        campaign: null,
+        error: "Failed to load campaign details.",
+        systemDetails: null,
+      };
+    }
+
+    let systemDetails: GameSystemDetail | null = null;
+    const slug = result.data.gameSystem?.slug;
+    if (slug) {
+      try {
+        systemDetails = await getSystemBySlug({ data: { slug } });
+      } catch (error) {
+        console.error("Failed to fetch system details for campaign", error);
+      }
+    }
+
+    return { campaign: result.data, error: null, systemDetails };
+  },
 });
 
-function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
-  return (
-    <div className="space-y-3">
-      <details
-        id="general"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-        open
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          General
-        </summary>
-        <div className="text-foreground grid gap-4 px-4 pt-2 pb-4 md:grid-cols-2">
-          <div>
-            <p className="font-semibold">Game System</p>
-            <p>{campaign.gameSystem?.name || "Not specified"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Recurrence</p>
-            <p>{campaign.recurrence}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Time of Day</p>
-            <p>{campaign.timeOfDay}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Session Duration</p>
-            <p>{campaign.sessionDuration}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Price Per Session</p>
-            <p>{campaign.pricePerSession ? `€${campaign.pricePerSession}` : "Free"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Language</p>
-            <LanguageTag language={campaign.language} />
-          </div>
-          <div>
-            <p className="font-semibold">Visibility</p>
-            {campaign.visibility === "protected" ? (
-              <Badge variant="secondary">Connections &amp; Teammates</Badge>
-            ) : (
-              <p className="capitalize">{campaign.visibility}</p>
-            )}
-          </div>
-        </div>
-      </details>
-
-      <details
-        id="location"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          Location
-        </summary>
-        <div className="text-foreground px-4 pt-2 pb-4">
-          <p>{campaign.location?.address || "Not specified"}</p>
-        </div>
-      </details>
-
-      <details
-        id="requirements"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          Minimum Requirements
-        </summary>
-        <div className="text-foreground grid gap-4 px-4 pt-2 pb-4">
-          <div>
-            <p className="font-semibold">Players</p>
-            <p>
-              {campaign.minimumRequirements?.minPlayers ?? "?"} -{" "}
-              {campaign.minimumRequirements?.maxPlayers ?? "?"}
-            </p>
-          </div>
-        </div>
-      </details>
-
-      <details
-        id="safety"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          Safety Rules
-        </summary>
-        <div className="text-foreground px-4 pt-2 pb-4">
-          <SafetyRulesView safetyRules={campaign.safetyRules} />
-        </div>
-      </details>
-    </div>
-  );
-}
+type OwnerAction = {
+  key: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onClick?: () => void;
+  disabled?: boolean;
+  to?: string;
+  params?: Record<string, string>;
+  destructive?: boolean;
+};
 
 function CampaignDetailsPage() {
   const queryClient = useQueryClient();
@@ -166,6 +131,17 @@ function CampaignDetailsPage() {
   const rlUpdateGameSessionStatus = useRateLimitedServerFn(updateGameSessionStatus, {
     type: "mutation",
   });
+
+  const loaderData = Route.useLoaderData() as
+    | {
+        campaign: CampaignWithDetails | null;
+        error: string | null;
+        systemDetails: GameSystemDetail | null;
+      }
+    | undefined;
+  const initialCampaign = loaderData?.campaign ?? null;
+  const loaderError = loaderData?.error ?? null;
+  const initialSystemDetails = loaderData?.systemDetails ?? null;
 
   const { data: campaign, isLoading } = useQuery({
     queryKey: ["campaign", campaignId], // Simplified queryKey
@@ -181,7 +157,14 @@ function CampaignDetailsPage() {
     },
     enabled: !!campaignId,
     refetchOnMount: "always",
+    initialData: initialCampaign ?? undefined,
   });
+
+  useEffect(() => {
+    if (loaderError) {
+      toast.error(loaderError);
+    }
+  }, [loaderError]);
 
   // Proactively invalidate potentially stale caches on initial mount to avoid empty flashes
   useEffect(() => {
@@ -271,6 +254,22 @@ function CampaignDetailsPage() {
     },
   });
 
+  const { data: systemDetailsQueryData } = useQuery({
+    queryKey: ["campaignSystemDetails", campaign?.gameSystem?.slug],
+    queryFn: async () => {
+      if (!campaign?.gameSystem?.slug) return null;
+      try {
+        return await getSystemBySlug({ data: { slug: campaign.gameSystem.slug } });
+      } catch (error) {
+        console.error("Failed to fetch system details", error);
+        return null;
+      }
+    },
+    enabled: Boolean(loaderData && campaign?.gameSystem?.slug),
+    initialData: initialSystemDetails ?? undefined,
+  });
+  const systemDetails = systemDetailsQueryData ?? initialSystemDetails ?? null;
+
   const { data: userApplication, isLoading: isLoadingUserApplication } = useQuery({
     queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
     queryFn: async () => {
@@ -343,7 +342,7 @@ function CampaignDetailsPage() {
     isLoadingGameSessions ||
     isLoadingUserApplication
   ) {
-    return <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />;
+    return <LoaderIcon className="mx-auto h-8 w-8 animate-spin" />;
   }
 
   if (!campaign) {
@@ -364,231 +363,555 @@ function CampaignDetailsPage() {
     !hasPendingApplication &&
     !hasRejectedApplication &&
     !hasRejectedParticipantStatus &&
-    campaign?.status === "active" && // Only allow applying to active campaigns
+    campaign?.status === "active" &&
     (campaign?.visibility === "public" ||
       (campaign?.visibility === "protected" && isConnection)) &&
     !blockedAny;
 
   const gameSessions = gameSessionsData?.success ? gameSessionsData.data : [];
+  const playersRange = buildPlayersRange(
+    campaign.minimumRequirements?.minPlayers,
+    campaign.minimumRequirements?.maxPlayers,
+  );
+  const priceLabel = formatPrice(campaign.pricePerSession);
+  const sessionDurationLabel = formatMinutes(campaign.sessionDuration);
+  const heroSubtitle = [
+    campaign.recurrence,
+    campaign.timeOfDay,
+    campaign.gameSystem?.name,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+  const statusLabel = campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1);
+  const visibilityLabel =
+    campaign.visibility === "protected"
+      ? "Connections & teammates"
+      : `${campaign.visibility} visibility`;
+  const heroStyle = systemDetails?.heroUrl
+    ? {
+        backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.65), rgba(10,10,10,0.2)), url('${systemDetails.heroUrl}')`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : undefined;
+
+  const ownerActions: OwnerAction[] = [];
+  if (isOwner && campaign.status === "active") {
+    ownerActions.push({
+      key: "complete",
+      label: "Mark campaign as completed",
+      icon: CheckCircle2,
+      onClick: () =>
+        updateCampaignMutation.mutate({
+          data: { id: campaignId, status: "completed" },
+        }),
+      disabled: updateCampaignMutation.isPending || isEditing,
+    });
+    ownerActions.push({
+      key: "cancel",
+      label: "Cancel this campaign",
+      icon: XCircle,
+      onClick: () => {
+        if (window.confirm("Are you sure you want to cancel this campaign?")) {
+          updateCampaignMutation.mutate({
+            data: { id: campaignId, status: "canceled" },
+          });
+        }
+      },
+      disabled: updateCampaignMutation.isPending || isEditing,
+      destructive: true,
+    });
+  }
+  if (isOwner) {
+    ownerActions.push({
+      key: "session-zero",
+      label: "Open session zero notes",
+      icon: ScrollText,
+      to: "/dashboard/campaigns/$campaignId/zero",
+      params: { campaignId },
+    });
+    ownerActions.push({
+      key: "edit",
+      label: isEditing ? "Exit edit mode" : "Edit campaign details",
+      icon: isEditing ? Undo2 : PenSquareIcon,
+      onClick: () => setIsEditing((prev) => !prev),
+      disabled: updateCampaignMutation.isPending,
+    });
+  }
 
   return (
-    <div key={campaignId} className="space-y-6">
-      {blockedAny && (
+    <div key={campaignId} className="pb-24">
+      {blockedAny ? (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          You cannot interact with this organizer due to block settings.
+          {strings.social.blockedOrganizerBanner}
         </div>
-      )}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col gap-3">
-            {isOwner && !isEditing ? (
-              <div className="flex items-center justify-end gap-2">
-                <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Edit Campaign
-                </Button>
-                <Link
-                  to="/dashboard/campaigns/$campaignId/zero"
-                  params={{ campaignId }}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
-                  Session Zero
-                </Link>
+      ) : null}
+
+      <section
+        className="bg-background relative mt-6 min-h-[260px] overflow-hidden"
+        style={heroStyle}
+      >
+        {!systemDetails?.heroUrl ? (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.55),_rgba(17,17,17,0.95))]" />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/55 to-black/15" />
+        <div className="relative z-10 flex h-full items-end pb-10">
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-6 text-white lg:flex-row lg:items-end lg:justify-between">
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <Badge className="border border-white/30 bg-white/10 text-xs font-medium tracking-wide text-white uppercase">
+                    {statusLabel}
+                  </Badge>
+                  <Badge className="border border-white/20 bg-white/10 text-xs font-medium tracking-wide text-white uppercase">
+                    {visibilityLabel}
+                  </Badge>
+                </div>
+                <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl">
+                  {campaign.name}
+                </h1>
+                <p className="text-sm text-white/85 sm:text-base">{heroSubtitle}</p>
+                {campaign.owner ? (
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-white/85">
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        name={campaign.owner.name}
+                        email={campaign.owner.email}
+                        srcUploaded={campaign.owner.uploadedAvatarPath ?? null}
+                        srcProvider={campaign.owner.image ?? null}
+                        userId={campaign.owner.id}
+                        className="h-8 w-8 border border-white/20"
+                      />
+                      <ProfileLink
+                        userId={campaign.owner.id}
+                        username={campaign.owner.name || campaign.owner.email}
+                        className="font-medium text-white hover:text-white/90"
+                      />
+                      <span className="text-white/60">•</span>
+                      <ThumbsScore
+                        value={campaign.owner.gmRating ?? null}
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                ) : null}
+                {canApply ? (
+                  <Button
+                    className="text-primary hidden bg-white hover:bg-white/90 sm:inline-flex"
+                    onClick={() =>
+                      applyToCampaignMutation.mutate({ data: { campaignId } })
+                    }
+                    disabled={applyToCampaignMutation.isPending}
+                  >
+                    {applyToCampaignMutation.isPending ? "Applying..." : "Apply to join"}
+                  </Button>
+                ) : null}
               </div>
-            ) : null}
-            <div>
-              <CardTitle className="text-foreground">{campaign.name}</CardTitle>
-              {campaign.description ? (
-                <CardDescription className="mt-1">{campaign.description}</CardDescription>
+              {ownerActions.length > 0 ? (
+                <div className="flex items-center gap-2 self-start lg:self-end">
+                  {ownerActions.map((action) => (
+                    <Tooltip key={action.key}>
+                      <TooltipTrigger asChild>
+                        {action.to ? (
+                          <Button
+                            asChild
+                            variant="secondary"
+                            size="icon"
+                            className={cn(
+                              "border border-white/20 bg-white/10 text-white hover:bg-white/20 focus-visible:ring-white",
+                              action.destructive &&
+                                "text-destructive-foreground hover:bg-destructive focus-visible:ring-destructive",
+                            )}
+                          >
+                            <Link
+                              to={action.to}
+                              params={action.params ?? {}}
+                              aria-label={action.label}
+                            >
+                              <action.icon className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            aria-label={action.label}
+                            onClick={action.onClick}
+                            disabled={action.disabled}
+                            className={cn(
+                              "border border-white/20 bg-white/10 text-white hover:bg-white/20 focus-visible:ring-white",
+                              action.destructive &&
+                                "text-destructive-foreground hover:bg-destructive focus-visible:ring-destructive",
+                            )}
+                          >
+                            <action.icon className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>{action.label}</TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
               ) : null}
             </div>
-            <div className="text-muted-foreground text-sm">
-              🗓️ {campaign.recurrence} • 🕒 {campaign.timeOfDay} • 🎲{" "}
-              {campaign.gameSystem.name}
-            </div>
-            {campaign.owner ? (
-              <div className="text-sm">
-                <div className="flex items-center gap-2">
-                  <Avatar
-                    name={campaign.owner.name}
-                    email={campaign.owner.email}
-                    srcUploaded={campaign.owner.uploadedAvatarPath ?? null}
-                    srcProvider={campaign.owner.image ?? null}
-                    userId={campaign.owner.id}
-                    className="h-6 w-6"
-                  />
-                  <ProfileLink
-                    userId={campaign.owner.id}
-                    username={campaign.owner.name || campaign.owner.email}
-                    className="font-medium"
-                  />
-                  <span className="text-muted-foreground">•</span>
-                  <ThumbsScore value={campaign.owner.gmRating ?? null} />
-                </div>
-              </div>
-            ) : null}
           </div>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <CampaignForm
-              initialValues={{
-                ...(campaign as Partial<z.infer<typeof updateCampaignInputSchema>>),
-                gameSystemId: campaign.gameSystem.id,
-                pricePerSession: campaign.pricePerSession ?? undefined,
-                minimumRequirements: campaign.minimumRequirements ?? undefined,
-                safetyRules: campaign.safetyRules ?? undefined,
-                // New session zero fields
-                sessionZeroData: campaign.sessionZeroData ?? undefined,
-                campaignExpectations: campaign.campaignExpectations ?? undefined,
-                tableExpectations: campaign.tableExpectations ?? undefined,
-                characterCreationOutcome: campaign.characterCreationOutcome ?? undefined,
-              }}
-              onSubmit={async (values) => {
-                await updateCampaignMutation.mutateAsync({
-                  data: { ...values, id: campaignId },
-                });
-              }}
-              isSubmitting={updateCampaignMutation.isPending}
-              onCancelEdit={() => setIsEditing(false)}
-              isGameSystemReadOnly={true}
-              gameSystemName={campaign.gameSystem.name}
-            />
-          ) : (
-            <CampaignDetailsView campaign={campaign} />
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {canApply && (
+      <section className="relative -mt-12 pb-12">
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 sm:px-6 lg:px-8">
+          {hasPendingApplication ? (
+            <p className="text-muted-foreground text-sm">
+              Your application is pending review.
+            </p>
+          ) : null}
+          {hasRejectedApplication ? (
+            <p className="text-destructive text-sm">Your application was rejected.</p>
+          ) : null}
+
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div className="space-y-6">
+              {isEditing ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Edit campaign</CardTitle>
+                    <CardDescription>
+                      Update the overarching details for your ongoing story.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CampaignForm
+                      initialValues={{
+                        ...(campaign as Partial<
+                          z.infer<typeof updateCampaignInputSchema>
+                        >),
+                        gameSystemId: campaign.gameSystem.id,
+                        pricePerSession: campaign.pricePerSession ?? undefined,
+                        minimumRequirements: campaign.minimumRequirements ?? undefined,
+                        safetyRules: campaign.safetyRules ?? undefined,
+                        sessionZeroData: campaign.sessionZeroData ?? undefined,
+                        campaignExpectations: campaign.campaignExpectations ?? undefined,
+                        tableExpectations: campaign.tableExpectations ?? undefined,
+                        characterCreationOutcome:
+                          campaign.characterCreationOutcome ?? undefined,
+                      }}
+                      onSubmit={async (values) => {
+                        await updateCampaignMutation.mutateAsync({
+                          data: { ...values, id: campaignId },
+                        });
+                      }}
+                      isSubmitting={updateCampaignMutation.isPending}
+                      onCancelEdit={() => setIsEditing(false)}
+                      isGameSystemReadOnly={true}
+                      gameSystemName={campaign.gameSystem.name}
+                    />
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>About this campaign</CardTitle>
+                    <CardDescription>
+                      Summarize the tone, arc, and player expectations.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {campaign.description ? (
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        {campaign.description}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        The organizer hasn't shared additional campaign context yet.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-foreground">Game sessions</CardTitle>
+                    <div className="flex items-center gap-4">
+                      <Select
+                        value={statusFilter}
+                        onValueChange={(value) => {
+                          navigate({
+                            search: {
+                              status: value as (typeof gameStatusEnum.enumValues)[number],
+                            },
+                          });
+                        }}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {gameStatusEnum.enumValues.map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {isOwner ? (
+                        <Button size="sm" asChild>
+                          <Link to="/dashboard/games/create" search={{ campaignId }}>
+                            Create session
+                          </Link>
+                        </Button>
+                      ) : null}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative">
+                  {isLoadingGameSessions ? (
+                    <div className="bg-background/80 absolute inset-0 z-10 flex items-center justify-center">
+                      <LoaderIcon className="text-primary h-8 w-8 animate-spin" />
+                    </div>
+                  ) : null}
+                  {gameSessions.length === 0 ? (
+                    <p className="text-muted-foreground">
+                      No game sessions found for this campaign with the selected status.
+                    </p>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {gameSessions.map((gameSession: GameListItem) => (
+                        <CampaignGameSessionCard
+                          key={gameSession.id}
+                          game={gameSession}
+                          isOwner={isOwner}
+                          onUpdateStatus={updateGameSessionStatusMutation.mutate}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {isInvited && invitedParticipant ? (
+                <RespondToInvitation participant={invitedParticipant} />
+              ) : null}
+
+              {isParticipant ? (
+                <CampaignParticipantsList
+                  campaignId={campaignId}
+                  isOwner={isOwner}
+                  currentUser={currentUser}
+                  campaignOwnerId={campaign.owner?.id || ""}
+                  applications={applicationsData?.success ? applicationsData.data : []}
+                  participants={
+                    campaign.participants?.map((p: CampaignParticipant) => ({
+                      ...p,
+                      role: p.role || "player",
+                    })) || []
+                  }
+                />
+              ) : null}
+
+              {isOwner ? (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <InviteParticipants
+                    campaignId={campaignId}
+                    currentParticipants={campaign.participants || []}
+                  />
+                  <ManageInvitations
+                    campaignId={campaignId}
+                    invitations={
+                      campaign?.participants?.filter(
+                        (p) => p.role === "invited" && p.status === "pending",
+                      ) || []
+                    }
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <aside className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Campaign logistics</CardTitle>
+                  <CardDescription>
+                    Keep everyone aligned on cadence and table shape.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <InfoItem label="Game system" value={campaign.gameSystem?.name} />
+                    <InfoItem label="Recurrence" value={campaign.recurrence} />
+                    <InfoItem label="Time of day" value={campaign.timeOfDay} />
+                    <InfoItem
+                      label="Language"
+                      value={<LanguageTag language={campaign.language} />}
+                    />
+                    <InfoItem label="Price per session" value={priceLabel} />
+                    <InfoItem label="Players" value={playersRange} />
+                    <InfoItem label="Session duration" value={sessionDurationLabel} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Organizer</CardTitle>
+                  <CardDescription>
+                    The campaign lead and primary contact.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center gap-3">
+                  <Avatar
+                    name={campaign.owner?.name ?? null}
+                    email={campaign.owner?.email ?? null}
+                    srcUploaded={campaign.owner?.uploadedAvatarPath ?? null}
+                    srcProvider={campaign.owner?.image ?? null}
+                    userId={campaign.owner?.id ?? null}
+                    className="h-12 w-12"
+                  />
+                  <div>
+                    {campaign.owner ? (
+                      <ProfileLink
+                        userId={campaign.owner.id}
+                        username={campaign.owner.name || campaign.owner.email}
+                        className="text-foreground font-semibold"
+                      />
+                    ) : (
+                      <p className="text-muted-foreground">Unassigned</p>
+                    )}
+                    {campaign.owner ? (
+                      <ThumbsScore
+                        value={campaign.owner.gmRating ?? null}
+                        className="text-muted-foreground"
+                      />
+                    ) : null}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Location</CardTitle>
+                  <CardDescription>Shared after your seat is approved.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-start gap-3 text-sm">
+                    <MapPinIcon className="text-muted-foreground mt-1 h-4 w-4" />
+                    <div>
+                      <p className="text-foreground font-medium">
+                        {campaign.location?.address || "Not specified"}
+                      </p>
+                      {campaign.location?.address ? (
+                        <SafeAddressLink address={campaign.location.address} />
+                      ) : null}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Safety & consent</CardTitle>
+                  <CardDescription>
+                    Consistency for every session in the campaign.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <SafetyRulesView safetyRules={campaign.safetyRules} />
+                </CardContent>
+              </Card>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {canApply ? (
         <StickyActionBar>
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <div className="text-sm">
-              {campaign.pricePerSession
-                ? `Price/Session: €${campaign.pricePerSession}`
-                : "Free"}
-              {campaign.minimumRequirements?.minPlayers &&
-              campaign.minimumRequirements?.maxPlayers
-                ? ` • Players ${campaign.minimumRequirements.minPlayers}-${campaign.minimumRequirements.maxPlayers}`
-                : ""}
+              Price/session: {priceLabel}
+              {playersRange ? ` • ${playersRange}` : ""}
             </div>
             <Button
               onClick={() => applyToCampaignMutation.mutate({ data: { campaignId } })}
               disabled={applyToCampaignMutation.isPending}
             >
-              {applyToCampaignMutation.isPending ? "Applying..." : "Apply to Campaign"}
+              {applyToCampaignMutation.isPending ? "Applying..." : "Apply to join"}
             </Button>
           </div>
         </StickyActionBar>
-      )}
-
-      {hasPendingApplication && (
-        <p className="text-muted-foreground">Your application is pending review.</p>
-      )}
-
-      {hasRejectedApplication && (
-        <p className="text-destructive">Your application was rejected.</p>
-      )}
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-foreground">Game Sessions</CardTitle>
-            <div className="flex items-center gap-4">
-              <Select
-                value={statusFilter}
-                onValueChange={(value) => {
-                  navigate({
-                    search: {
-                      status: value as (typeof gameStatusEnum.enumValues)[number],
-                    },
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gameStatusEnum.enumValues.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {isOwner && (
-                <Button size="sm" asChild>
-                  <Link to="/dashboard/games/create" search={{ campaignId }}>
-                    Create Game Session
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="relative">
-          {isLoadingGameSessions && (
-            <div className="bg-background/80 absolute inset-0 z-10 flex items-center justify-center">
-              <LoaderCircle className="text-primary h-8 w-8 animate-spin" />
-            </div>
-          )}
-          {gameSessions.length === 0 ? (
-            <p className="text-muted-foreground">
-              No game sessions found for this campaign with the selected status.
-            </p>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {gameSessions.map((gameSession: GameListItem) => (
-                <CampaignGameSessionCard
-                  key={gameSession.id}
-                  game={gameSession}
-                  isOwner={isOwner}
-                  onUpdateStatus={updateGameSessionStatusMutation.mutate}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {isInvited && invitedParticipant && (
-        <RespondToInvitation participant={invitedParticipant} />
-      )}
-
-      {isParticipant && (
-        <CampaignParticipantsList
-          campaignId={campaignId}
-          isOwner={isOwner}
-          currentUser={currentUser}
-          campaignOwnerId={campaign.owner?.id || ""}
-          applications={applicationsData?.success ? applicationsData.data : []}
-          participants={
-            campaign.participants?.map((p: CampaignParticipant) => ({
-              ...p,
-              role: p.role || "player",
-            })) || []
-          }
-        />
-      )}
-
-      {isOwner && (
-        <>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <InviteParticipants
-              campaignId={campaignId}
-              currentParticipants={campaign.participants || []}
-            />
-            <ManageInvitations
-              campaignId={campaignId}
-              invitations={
-                campaign?.participants?.filter(
-                  (p) => p.role === "invited" && p.status === "pending",
-                ) || []
-              }
-            />
-          </div>
-        </>
-      )}
+      ) : null}
     </div>
   );
+}
+
+function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
+  if (value == null || (typeof value === "string" && value.trim().length === 0)) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="text-muted-foreground text-xs tracking-wide uppercase">{label}</p>
+      <div className="text-foreground font-medium">{value}</div>
+    </div>
+  );
+}
+
+function SafeAddressLink({ address }: { address: string }) {
+  const href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="text-primary text-xs font-medium underline-offset-4 hover:underline"
+    >
+      Open in Google Maps
+    </a>
+  );
+}
+
+function formatPrice(price: number | null | undefined) {
+  if (price == null) {
+    return "Free";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "EUR",
+  }).format(price);
+}
+
+function buildPlayersRange(
+  minPlayers: number | null | undefined,
+  maxPlayers: number | null | undefined,
+) {
+  if (minPlayers && maxPlayers) {
+    return `${minPlayers}-${maxPlayers} players`;
+  }
+  if (minPlayers) {
+    return `${minPlayers}+ players`;
+  }
+  if (maxPlayers) {
+    return `Up to ${maxPlayers} players`;
+  }
+  return "Player count TBD";
+}
+
+function formatMinutes(duration: number | null | undefined) {
+  if (duration == null) {
+    return "Organizer will confirm";
+  }
+
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+  if (hours > 0 && minutes > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  return `${minutes}m`;
 }

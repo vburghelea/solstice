@@ -257,6 +257,11 @@ function GameDetailPage() {
                       }
                     />
                   </div>
+                  {gameDetails.campaignId ? (
+                    <div className="border-primary/30 bg-primary/10 text-muted-foreground mt-6 rounded-lg border px-3 py-2 text-sm">
+                      This session is part of an ongoing campaign.
+                    </div>
+                  ) : null}
                 </CardContent>
               </Card>
 

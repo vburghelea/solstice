@@ -116,7 +116,7 @@ describe("Campaign Details Page", () => {
     expect(viewLinks).toHaveLength(1);
   });
 
-  it("renders Create Game Session link with campaignId for owner", async () => {
+  it("renders Create session link with campaignId for owner", async () => {
     setupRouteSpies({});
 
     await renderWithRouter(<CampaignDetailsPage />, {
@@ -124,7 +124,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    const link = await screen.findByRole("link", { name: /Create Game Session/i });
+    const link = await screen.findByRole("link", { name: /Create session/i });
     expect(link).toHaveAttribute(
       "href",
       `/dashboard/games/create?campaignId=${MOCK_CAMPAIGN.id}`,
@@ -167,10 +167,10 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    const applyBtn = await screen.findByRole("button", { name: /Apply to Campaign/i });
-    expect(applyBtn).toBeInTheDocument();
+    const applyButtons = await screen.findAllByRole("button", { name: /apply to join/i });
+    expect(applyButtons.length).toBeGreaterThan(0);
 
-    await userEvent.click(applyBtn);
+    await userEvent.click(applyButtons[0]);
 
     expect(mockApplyToCampaign).toHaveBeenCalledWith({
       data: { campaignId: MOCK_CAMPAIGN.id },
@@ -188,7 +188,9 @@ describe("Campaign Details Page", () => {
     });
 
     // Enter edit mode if needed (form may already be visible)
-    const maybeEditBtn = screen.queryByRole("button", { name: /Edit Campaign/i });
+    const maybeEditBtn = screen.queryByRole("button", {
+      name: /Edit campaign details/i,
+    });
     if (maybeEditBtn) {
       await userEvent.click(maybeEditBtn);
     }
@@ -229,9 +231,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    expect(
-      screen.queryByRole("button", { name: /Apply to Campaign/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
   });
 
   it("hides Apply and shows block banner when user is blocked or blocking", async () => {
@@ -250,9 +250,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    expect(
-      screen.queryByRole("button", { name: /Apply to Campaign/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
     expect(
       screen.getByText(
         /You cannot interact with this organizer due to block settings\./i,
@@ -272,9 +270,7 @@ describe("Campaign Details Page", () => {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
-    expect(
-      screen.queryByRole("button", { name: /Apply to Campaign/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
   });
 
   it("hides Apply when user has a pending application", async () => {
@@ -289,9 +285,7 @@ describe("Campaign Details Page", () => {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
-    expect(
-      screen.queryByRole("button", { name: /Apply to Campaign/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
   });
 
   it("hides Apply when user has a rejected participant status", async () => {
@@ -312,9 +306,7 @@ describe("Campaign Details Page", () => {
       path: "/dashboard/campaigns/$campaignId",
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
-    expect(
-      screen.queryByRole("button", { name: /Apply to Campaign/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
   });
 
   // Error path for update flow
@@ -335,7 +327,9 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/dashboard/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    const maybeEdit = screen.queryByRole("button", { name: /Edit Campaign/i });
+    const maybeEdit = screen.queryByRole("button", {
+      name: /Edit campaign details/i,
+    });
     if (maybeEdit) await userEvent.click(maybeEdit);
 
     const updateBtn = await screen.findByRole("button", { name: /Update Campaign/i });

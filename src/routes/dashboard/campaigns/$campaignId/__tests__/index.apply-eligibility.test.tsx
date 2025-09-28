@@ -18,6 +18,17 @@ function setupRoute(mod: unknown, currentUserId: string, campaignId = "c1") {
   ).useRouteContext = () => ({
     user: { id: currentUserId },
   });
+  (
+    m.Route as unknown as {
+      useLoaderData: () =>
+        | {
+            campaign: Record<string, unknown> | null;
+            error: string | null;
+            systemDetails: unknown;
+          }
+        | undefined;
+    }
+  ).useLoaderData = () => undefined;
   // Stub Router-dependent hooks
   (m.Route as unknown as { useSearch: () => { status?: string } }).useSearch = () => ({
     status: "",
@@ -86,8 +97,8 @@ describe("CampaignDetailsPage apply eligibility (connections-only)", () => {
     );
 
     await screen.findByText(/protected campaign/i);
-    const btn = screen.queryByRole("button", { name: /apply to campaign/i });
-    expect(btn).toBeNull();
+    const buttons = screen.queryAllByRole("button", { name: /apply to join/i });
+    expect(buttons).toHaveLength(0);
   });
 
   it("shows Apply when protected and viewer is a connection", async () => {
@@ -145,7 +156,7 @@ describe("CampaignDetailsPage apply eligibility (connections-only)", () => {
     );
 
     await screen.findByText(/connected campaign/i);
-    const btn = await screen.findByRole("button", { name: /apply to campaign/i });
-    expect(btn).toBeInTheDocument();
+    const buttons = await screen.findAllByRole("button", { name: /apply to join/i });
+    expect(buttons.length).toBeGreaterThan(0);
   });
 });

@@ -107,10 +107,10 @@ describe("GameDetailsPage apply eligibility (connections-only)", () => {
     );
 
     // Wait for main section to render
-    await screen.findByText(/general/i);
+    await screen.findByText(/about this session/i);
     // Button should not be present
-    const btn = screen.queryByRole("button", { name: /apply to game/i });
-    expect(btn).toBeNull();
+    const buttons = screen.queryAllByRole("button", { name: /apply to join/i });
+    expect(buttons).toHaveLength(0);
   });
 
   it("shows Apply when protected and viewer is a connection", async () => {
@@ -192,8 +192,8 @@ describe("GameDetailsPage apply eligibility (connections-only)", () => {
     );
 
     // Wait for main section to render
-    await screen.findByText(/general/i);
-    const btn = await screen.findByRole("button", { name: /apply to game/i });
-    expect(btn).toBeInTheDocument();
+    await screen.findByText(/about this session/i);
+    const buttons = await screen.findAllByRole("button", { name: /apply to join/i });
+    expect(buttons.length).toBeGreaterThan(0);
   });
 });

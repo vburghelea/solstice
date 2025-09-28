@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle, Edit2, LoaderCircle, XCircle } from "lucide-react";
+import type React from "react";
 import { useEffect, useState } from "react";
 import { LanguageTag } from "~/components/LanguageTag";
+import { ProfileLink } from "~/components/ProfileLink";
+import { Avatar } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -11,15 +14,21 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  CheckCircle2,
+  LoaderIcon,
+  MapPinIcon,
+  PenSquareIcon,
+  Undo2,
+  XCircle,
+} from "~/components/ui/icons";
 import { StickyActionBar } from "~/components/ui/sticky-action-bar";
+import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
+import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
+import { GMReviewForm } from "~/features/games/components/GMReviewForm";
 import { GameForm } from "~/features/games/components/GameForm";
 import { GameParticipantsList } from "~/features/games/components/GameParticipantsList";
 import { InviteParticipants } from "~/features/games/components/InviteParticipants";
-
-import { ProfileLink } from "~/components/ProfileLink";
-import { Avatar } from "~/components/ui/avatar";
-import { Badge } from "~/components/ui/badge";
-import { GMReviewForm } from "~/features/games/components/GMReviewForm";
 import { ManageInvitations } from "~/features/games/components/ManageInvitations";
 import { RespondToInvitation } from "~/features/games/components/RespondToInvitation";
 import {
@@ -43,8 +52,10 @@ import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { strings } from "~/shared/lib/strings";
+import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -56,113 +67,51 @@ async function showToast(type: "success" | "error", message: string) {
 export const Route = createFileRoute("/dashboard/games/$gameId")({
   loader: async ({ params }) => {
     if (!UUID_REGEX.test(params.gameId)) {
-      return { game: null, error: "Invalid game ID format." };
+      return { game: null, error: "Invalid game ID format.", systemDetails: null };
     }
 
     const result = await getGame({ data: { id: params.gameId } });
     if (!result.success || !result.data) {
-      return { game: null, error: "Failed to load game details." };
+      return { game: null, error: "Failed to load game details.", systemDetails: null };
     }
-    return { game: result.data, error: null };
+    let systemDetails: GameSystemDetail | null = null;
+    const slug = result.data.gameSystem?.slug;
+    if (slug) {
+      try {
+        systemDetails = await getSystemBySlug({ data: { slug } });
+      } catch (error) {
+        console.error("Failed to fetch system details for game", error);
+      }
+    }
+
+    return { game: result.data, error: null, systemDetails };
   },
   component: GameDetailsPage,
 });
 
-function GameDetailsView({ game }: { game: GameWithDetails }) {
-  return (
-    <div className="space-y-4">
-      <details
-        id="general"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-        open
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          General
-        </summary>
-        <div className="text-foreground px-4 pt-2 pb-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <p className="font-semibold">Game System</p>
-              <p>{game.gameSystem.name}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Date & Time</p>
-              <p>{formatDateAndTime(game.dateTime)}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Expected Duration</p>
-              <p>{game.expectedDuration} minutes</p>
-            </div>
-            <div>
-              <p className="font-semibold">Price</p>
-              <p>{game.price ? `€${game.price}` : "Free"}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Language</p>
-              <LanguageTag language={game.language} />
-            </div>
-            <div>
-              <p className="font-semibold">Visibility</p>
-              {game.visibility === "protected" ? (
-                <Badge variant="secondary">Connections &amp; Teammates</Badge>
-              ) : (
-                <p className="capitalize">{game.visibility}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <details
-        id="location"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          Location
-        </summary>
-        <div className="text-foreground px-4 pt-2 pb-4">
-          <p>{game.location.address}</p>
-        </div>
-      </details>
-
-      <details
-        id="requirements"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          Minimum Requirements
-        </summary>
-        <div className="text-foreground px-4 pt-2 pb-4">
-          <p>
-            Players: {game.minimumRequirements?.minPlayers} -{" "}
-            {game.minimumRequirements?.maxPlayers}
-          </p>
-        </div>
-      </details>
-
-      <details
-        id="safety"
-        className="bg-card scroll-mt-24 rounded-lg border open:shadow-sm"
-      >
-        <summary className="text-foreground cursor-pointer px-4 py-3 font-medium select-none">
-          Safety Rules
-        </summary>
-        <div className="text-foreground px-4 pt-2 pb-4">
-          <SafetyRulesView safetyRules={game.safetyRules} />
-        </div>
-      </details>
-    </div>
-  );
-}
+type OwnerAction = {
+  key: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onClick: () => void;
+  disabled?: boolean;
+  destructive?: boolean;
+};
 
 function GameDetailsPage() {
   const queryClient = useQueryClient();
   const { gameId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
-  const { game: initialGame, error: loaderError } = Route.useLoaderData() as {
-    game: GameWithDetails | null;
-    error: string | null;
-  };
+  const loaderData = Route.useLoaderData() as
+    | {
+        game: GameWithDetails | null;
+        error: string | null;
+        systemDetails: GameSystemDetail | null;
+      }
+    | undefined;
+  const initialGame = loaderData?.game ?? null;
+  const loaderError = loaderData?.error ?? null;
+  const initialSystemDetails = loaderData?.systemDetails ?? null;
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -193,6 +142,22 @@ function GameDetailsPage() {
       void showToast("error", loaderError);
     }
   }, [loaderError]);
+
+  const { data: systemDetailsQueryData } = useQuery({
+    queryKey: ["gameSystemDetails", game?.gameSystem?.slug],
+    queryFn: async () => {
+      if (!game?.gameSystem?.slug) return null;
+      try {
+        return await getSystemBySlug({ data: { slug: game.gameSystem.slug } });
+      } catch (error) {
+        console.error("Failed to fetch system details", error);
+        return null;
+      }
+    },
+    enabled: Boolean(loaderData && game?.gameSystem?.slug),
+    initialData: initialSystemDetails ?? undefined,
+  });
+  const systemDetails = systemDetailsQueryData ?? initialSystemDetails ?? null;
 
   const isOwner = game?.owner?.id === currentUser?.id;
   const { data: rel } = useQuery({
@@ -516,7 +481,7 @@ function GameDetailsPage() {
   });
 
   if (isLoading || isLoadingApplications || isLoadingUserApplication) {
-    return <LoaderCircle className="mx-auto h-8 w-8 animate-spin" />;
+    return <LoaderIcon className="mx-auto h-8 w-8 animate-spin" />;
   }
 
   if (!game) {
@@ -538,184 +503,424 @@ function GameDetailsPage() {
     !hasRejectedApplication &&
     !hasRejectedParticipantStatus &&
     !blockedAny &&
-    game?.status === "scheduled" && // Only allow applying to scheduled games
-    (game?.visibility === "public" || (game?.visibility === "protected" && isConnection)); // Protected requires connection
+    game?.status === "scheduled" &&
+    (game?.visibility === "public" || (game?.visibility === "protected" && isConnection));
+
+  const approvedParticipants =
+    game.participants?.filter(
+      (participant) => participant.status === "approved" && participant.role !== "owner",
+    ) ?? [];
+  const maxPlayers = game.minimumRequirements?.maxPlayers ?? null;
+  const seatsAvailable =
+    typeof maxPlayers === "number"
+      ? Math.max(maxPlayers - approvedParticipants.length, 0)
+      : null;
+  const playersRange = buildPlayersRange(
+    game.minimumRequirements?.minPlayers,
+    game.minimumRequirements?.maxPlayers,
+  );
+  const expectedDuration = formatExpectedDuration(game.expectedDuration);
+  const priceLabel = formatPrice(game.price);
+  const heroSubtitle = [
+    formatDateAndTime(game.dateTime),
+    game.location.address,
+    game.gameSystem.name,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+  const isCampaignGame = Boolean(game.campaignId);
+  const heroStyle = systemDetails?.heroUrl
+    ? {
+        backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.65), rgba(10,10,10,0.2)), url('${systemDetails.heroUrl}')`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : undefined;
+
+  const ownerActions: OwnerAction[] = [];
+  if (isOwner && game.status === "scheduled") {
+    ownerActions.push({
+      key: "complete",
+      label: "Mark session as completed",
+      icon: CheckCircle2,
+      onClick: () =>
+        updateStatusMutation.mutate({
+          data: { gameId, status: "completed" },
+        }),
+      disabled: updateStatusMutation.isPending || isEditing,
+    });
+    ownerActions.push({
+      key: "cancel",
+      label: "Cancel this session",
+      icon: XCircle,
+      onClick: () => {
+        if (window.confirm("Are you sure you want to cancel this game?")) {
+          cancelGameMutation.mutate({ data: { id: gameId } });
+        }
+      },
+      disabled: cancelGameMutation.isPending || isEditing,
+      destructive: true,
+    });
+  }
+  if (isOwner) {
+    ownerActions.push({
+      key: "edit",
+      label: isEditing ? "Exit edit mode" : "Edit session details",
+      icon: isEditing ? Undo2 : PenSquareIcon,
+      onClick: () => setIsEditing((prev) => !prev),
+      disabled: updateGameMutation.isPending,
+    });
+  }
+
+  const visibilityLabel =
+    game.visibility === "protected"
+      ? "Connections & teammates"
+      : `${game.visibility} visibility`;
+
+  const statusLabel = game.status.charAt(0).toUpperCase() + game.status.slice(1);
 
   return (
-    <div className="space-y-6">
-      {blockedAny && (
+    <div className="pb-24">
+      {blockedAny ? (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           {strings.social.blockedOrganizerBanner}
         </div>
-      )}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col gap-3">
-            {isOwner && !isEditing && game.status === "scheduled" ? (
-              <div className="flex items-center justify-end gap-2">
-                <Button
-                  onClick={() =>
-                    updateStatusMutation.mutate({ data: { gameId, status: "completed" } })
-                  }
-                  variant="outline"
-                  size="sm"
-                  disabled={updateStatusMutation.isPending}
-                >
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Mark Completed
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (window.confirm("Are you sure you want to cancel this game?")) {
-                      cancelGameMutation.mutate({ data: { id: gameId } });
-                    }
-                  }}
-                  variant="destructive"
-                  size="sm"
-                  disabled={cancelGameMutation.isPending}
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancel Game
-                </Button>
-                <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Edit Game
-                </Button>
+      ) : null}
+
+      <section
+        className="bg-background relative mt-6 min-h-[260px] overflow-hidden"
+        style={heroStyle}
+      >
+        {!systemDetails?.heroUrl ? (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.55),_rgba(17,17,17,0.95))]" />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/55 to-black/15" />
+        <div className="relative z-10 flex h-full items-end pb-10">
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-6 text-white lg:flex-row lg:items-end lg:justify-between">
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <Badge className="border border-white/30 bg-white/10 text-xs font-medium tracking-wide text-white uppercase">
+                    {statusLabel}
+                  </Badge>
+                  <Badge className="border border-white/20 bg-white/10 text-xs font-medium tracking-wide text-white uppercase">
+                    {visibilityLabel}
+                  </Badge>
+                  {isCampaignGame ? (
+                    <Badge className="border border-amber-300/40 bg-amber-300/20 text-xs font-medium tracking-wide text-amber-100 uppercase">
+                      Campaign session
+                    </Badge>
+                  ) : null}
+                </div>
+                <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl">
+                  {game.name}
+                </h1>
+                <p className="text-sm text-white/85 sm:text-base">{heroSubtitle}</p>
+                {game.owner ? (
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-white/85">
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        name={game.owner.name}
+                        email={game.owner.email}
+                        srcUploaded={game.owner.uploadedAvatarPath ?? null}
+                        srcProvider={game.owner.image ?? null}
+                        userId={game.owner.id}
+                        className="h-8 w-8 border border-white/20"
+                      />
+                      <ProfileLink
+                        userId={game.owner.id}
+                        username={game.owner.name || game.owner.email}
+                        className="font-medium text-white hover:text-white/90"
+                      />
+                      <span className="text-white/60">•</span>
+                      <ThumbsScore
+                        value={game.owner.gmRating ?? null}
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                ) : null}
+                {canApply ? (
+                  <Button
+                    className="text-primary hidden bg-white hover:bg-white/90 sm:inline-flex"
+                    onClick={() => applyToGameMutation.mutate({ data: { gameId } })}
+                    disabled={applyToGameMutation.isPending}
+                  >
+                    {applyToGameMutation.isPending ? "Applying..." : "Apply to join"}
+                  </Button>
+                ) : null}
               </div>
-            ) : null}
-            <div>
-              <CardTitle className="text-foreground">{game.name}</CardTitle>
-              {game.description ? (
-                <CardDescription className="mt-1">{game.description}</CardDescription>
+              {ownerActions.length > 0 ? (
+                <div className="flex items-center gap-2 self-start lg:self-end">
+                  {ownerActions.map((action) => (
+                    <Tooltip key={action.key}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="icon"
+                          aria-label={action.label}
+                          onClick={action.onClick}
+                          disabled={action.disabled}
+                          className={cn(
+                            "border border-white/20 bg-white/10 text-white hover:bg-white/20 focus-visible:ring-white",
+                            action.destructive &&
+                              "hover:bg-destructive focus-visible:ring-destructive text-destructive-foreground",
+                          )}
+                        >
+                          <action.icon className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{action.label}</TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
               ) : null}
             </div>
-            <div className="text-muted-foreground text-sm">
-              🗓️ {formatDateAndTime(game.dateTime)} • 📍 {game.location.address} • 🎲{" "}
-              {game.gameSystem.name}
-            </div>
-            {game.owner ? (
-              <div className="text-sm">
-                <div className="flex items-center gap-2">
-                  <Avatar
-                    name={game.owner.name}
-                    email={game.owner.email}
-                    srcUploaded={game.owner.uploadedAvatarPath ?? null}
-                    srcProvider={game.owner.image ?? null}
-                    userId={game.owner.id}
-                    className="h-6 w-6"
-                  />
-                  <ProfileLink
-                    userId={game.owner.id}
-                    username={game.owner.name || game.owner.email}
-                    className="font-medium"
-                  />
-                  <span className="text-muted-foreground">•</span>
-                  <ThumbsScore value={game.owner.gmRating ?? null} />
-                </div>
-              </div>
-            ) : null}
           </div>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <GameForm
-              initialValues={{
-                ...game,
-                gameSystemId: game.gameSystem.id, // Pre-populate gameSystemId
-                campaignId: game.campaignId ?? undefined,
-                price: game.price ?? undefined,
-                minimumRequirements: game.minimumRequirements ?? undefined,
-                safetyRules: game.safetyRules ?? undefined,
-                dateTime: new Date(game.dateTime).toISOString().slice(0, 16),
-              }}
-              onSubmit={async (values) => {
-                await updateGameMutation.mutateAsync({ data: { ...values, id: gameId } });
-              }}
-              isSubmitting={updateGameMutation.isPending}
-              isCampaignGame={!!game.campaignId} // Pass campaign status
-              gameSystemName={game.gameSystem.name} // Pass game system name for display
-              onCancelEdit={() => setIsEditing(false)} // Pass cancel handler
-            />
-          ) : (
-            <GameDetailsView game={game} />
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      {/* GM Review prompt for approved participants after completion */}
-      {game?.status === "completed" &&
-        isApprovedParticipant &&
-        currentUser?.id &&
-        currentUser.id !== game.owner?.id && (
-          <GMReviewGate gameId={gameId} gmId={game.owner!.id} />
-        )}
+      <section className="relative -mt-12 pb-12">
+        <div className="mx-auto w-full max-w-6xl space-y-6 px-4 sm:px-6 lg:px-8">
+          {hasPendingApplication ? (
+            <p className="text-muted-foreground text-sm">
+              Your application is pending review.
+            </p>
+          ) : null}
+          {hasRejectedApplication ? (
+            <p className="text-destructive text-sm">Your application was rejected.</p>
+          ) : null}
 
-      {canApply && (
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div className="space-y-6">
+              {isEditing ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Edit session</CardTitle>
+                    <CardDescription>
+                      Update the details your players see publicly.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <GameForm
+                      initialValues={{
+                        ...game,
+                        gameSystemId: game.gameSystem.id,
+                        campaignId: game.campaignId ?? undefined,
+                        price: game.price ?? undefined,
+                        minimumRequirements: game.minimumRequirements ?? undefined,
+                        safetyRules: game.safetyRules ?? undefined,
+                        dateTime: new Date(game.dateTime).toISOString().slice(0, 16),
+                      }}
+                      onSubmit={async (values) => {
+                        await updateGameMutation.mutateAsync({
+                          data: { ...values, id: gameId },
+                        });
+                      }}
+                      isSubmitting={updateGameMutation.isPending}
+                      isCampaignGame={isCampaignGame}
+                      gameSystemName={game.gameSystem.name}
+                      onCancelEdit={() => setIsEditing(false)}
+                    />
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>About this session</CardTitle>
+                    <CardDescription>
+                      Set the tone and expectations before players request a seat.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {game.description ? (
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        {game.description}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        The game organizer hasn't shared additional details yet.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {game?.status === "completed" &&
+              isApprovedParticipant &&
+              currentUser?.id &&
+              currentUser.id !== game.owner?.id ? (
+                <GMReviewGate gameId={gameId} gmId={game.owner!.id} />
+              ) : null}
+
+              {isInvited && invitedParticipant ? (
+                <RespondToInvitation participant={invitedParticipant} />
+              ) : null}
+
+              {isParticipant ? (
+                <GameParticipantsList
+                  gameId={gameId}
+                  isOwner={isOwner}
+                  currentUser={currentUser}
+                  gameOwnerId={game.owner?.id || ""}
+                  applications={applicationsData?.success ? applicationsData.data : []}
+                  participants={
+                    game.participants?.map((p: GameParticipant) => ({
+                      ...p,
+                      role: p.role || "player",
+                    })) || []
+                  }
+                />
+              ) : null}
+
+              {isOwner ? (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <InviteParticipants
+                    gameId={gameId}
+                    currentParticipants={game.participants || []}
+                  />
+                  <ManageInvitations
+                    gameId={gameId}
+                    invitations={
+                      game?.participants?.filter(
+                        (p) => p.role === "invited" && p.status === "pending",
+                      ) || []
+                    }
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <aside className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Session logistics</CardTitle>
+                  <CardDescription>
+                    Everything you need to know before joining the table.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <InfoItem
+                      label="Date & time"
+                      value={formatDateAndTime(game.dateTime)}
+                    />
+                    <InfoItem
+                      label="Language"
+                      value={<LanguageTag language={game.language} />}
+                    />
+                    <InfoItem label="Price" value={priceLabel} />
+                    <InfoItem label="Players" value={playersRange} />
+                    <InfoItem
+                      label="Seats available"
+                      value={
+                        seatsAvailable != null ? `${seatsAvailable} open` : "Contact GM"
+                      }
+                    />
+                    <InfoItem
+                      label="Duration"
+                      value={
+                        expectedDuration ??
+                        (game.gameSystem?.averagePlayTime
+                          ? `${game.gameSystem.averagePlayTime} min`
+                          : "GM will confirm")
+                      }
+                    />
+                  </div>
+                  {isCampaignGame ? (
+                    <div className="border-primary/30 bg-primary/10 text-muted-foreground mt-6 rounded-lg border px-3 py-2 text-sm">
+                      This session is part of an ongoing campaign.
+                    </div>
+                  ) : null}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Organizer</CardTitle>
+                  <CardDescription>The primary contact for this table.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center gap-3">
+                  <Avatar
+                    name={game.owner?.name ?? null}
+                    email={game.owner?.email ?? null}
+                    srcUploaded={game.owner?.uploadedAvatarPath ?? null}
+                    srcProvider={game.owner?.image ?? null}
+                    userId={game.owner?.id ?? null}
+                    className="h-12 w-12"
+                  />
+                  <div>
+                    {game.owner ? (
+                      <ProfileLink
+                        userId={game.owner.id}
+                        username={game.owner.name || game.owner.email}
+                        className="text-foreground font-semibold"
+                      />
+                    ) : (
+                      <p className="text-muted-foreground">Unassigned</p>
+                    )}
+                    {game.owner ? (
+                      <ThumbsScore
+                        value={game.owner.gmRating ?? null}
+                        className="text-muted-foreground"
+                      />
+                    ) : null}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Location</CardTitle>
+                  <CardDescription>Confirmed once your seat is approved.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-start gap-3 text-sm">
+                    <MapPinIcon className="text-muted-foreground mt-1 h-4 w-4" />
+                    <div>
+                      <p className="text-foreground font-medium">
+                        {game.location.address}
+                      </p>
+                      <SafeAddressLink address={game.location.address} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Safety & consent</CardTitle>
+                  <CardDescription>
+                    Shared ground rules for every participant.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <SafetyRulesView safetyRules={game.safetyRules} />
+                </CardContent>
+              </Card>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {canApply ? (
         <StickyActionBar>
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <div className="text-sm">
-              {game.price ? `Price: €${game.price}` : "Free"}
-              {game.minimumRequirements?.minPlayers &&
-              game.minimumRequirements?.maxPlayers
-                ? ` • Players ${game.minimumRequirements.minPlayers}-${game.minimumRequirements.maxPlayers}`
-                : ""}
+              Price: {priceLabel}
+              {playersRange ? ` • ${playersRange}` : ""}
             </div>
             <Button
               onClick={() => applyToGameMutation.mutate({ data: { gameId } })}
               disabled={applyToGameMutation.isPending}
             >
-              {applyToGameMutation.isPending ? "Applying..." : "Apply to Game"}
+              {applyToGameMutation.isPending ? "Applying..." : "Apply to join"}
             </Button>
           </div>
         </StickyActionBar>
-      )}
-
-      {hasPendingApplication && (
-        <p className="text-muted-foreground">Your application is pending review.</p>
-      )}
-
-      {hasRejectedApplication && (
-        <p className="text-destructive">Your application was rejected.</p>
-      )}
-
-      {isInvited && invitedParticipant && (
-        <RespondToInvitation participant={invitedParticipant} />
-      )}
-
-      {isParticipant && (
-        <GameParticipantsList
-          gameId={gameId}
-          isOwner={isOwner}
-          currentUser={currentUser}
-          gameOwnerId={game.owner?.id || ""}
-          applications={applicationsData?.success ? applicationsData.data : []}
-          participants={
-            game.participants?.map((p: GameParticipant) => ({
-              ...p,
-              role: p.role || "player", // Default to "player" if role is missing
-            })) || []
-          }
-        />
-      )}
-
-      {isOwner && (
-        <>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <InviteParticipants
-              gameId={gameId}
-              currentParticipants={game.participants || []}
-            />
-            <ManageInvitations
-              gameId={gameId}
-              invitations={
-                game?.participants?.filter(
-                  (p) => p.role === "invited" && p.status === "pending",
-                ) || []
-              }
-            />
-          </div>
-        </>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -744,4 +949,72 @@ function GMReviewGate({ gameId, gmId }: { gameId: string; gmId: string }) {
       />
     </div>
   );
+}
+
+function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
+  if (value == null || (typeof value === "string" && value.trim().length === 0)) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="text-muted-foreground text-xs tracking-wide uppercase">{label}</p>
+      <div className="text-foreground font-medium">{value}</div>
+    </div>
+  );
+}
+
+function SafeAddressLink({ address }: { address: string }) {
+  const href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="text-primary text-xs font-medium underline-offset-4 hover:underline"
+    >
+      Open in Google Maps
+    </a>
+  );
+}
+
+function formatPrice(price: number | null | undefined) {
+  if (price == null) {
+    return "Free";
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "EUR",
+  }).format(price);
+}
+
+function buildPlayersRange(
+  minPlayers: number | null | undefined,
+  maxPlayers: number | null | undefined,
+) {
+  if (minPlayers && maxPlayers) {
+    return `${minPlayers}-${maxPlayers} players`;
+  }
+  if (minPlayers) {
+    return `${minPlayers}+ players`;
+  }
+  if (maxPlayers) {
+    return `Up to ${maxPlayers} players`;
+  }
+  return "Player count TBD";
+}
+
+function formatExpectedDuration(duration: number | null | undefined) {
+  if (duration == null) return null;
+  const totalMinutes = Math.round(duration * 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0 && minutes > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  return `${minutes}m`;
 }

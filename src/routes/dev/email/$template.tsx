@@ -175,6 +175,26 @@ export const Route = createFileRoute("/dev/email/$template")({
             otp: "123456",
           }),
         };
+      case "team-invitation":
+        return {
+          html: await r.renderTeamInvitationEmail({
+            inviterName: "Brock",
+            teamName: "Pewter City Gym",
+            role: "Player",
+            inviteUrl: "https://example.com/team/invite",
+            recipientName: "Ash",
+          }),
+        };
+      case "team-request-decision":
+        return {
+          html: await r.renderTeamRequestDecisionEmail({
+            recipientName: "Ash",
+            teamName: "Pewter City Gym",
+            decision: "approved",
+            decidedByName: "Brock",
+            detailsUrl: "https://example.com/team/1",
+          }),
+        };
       default:
         throw notFound();
     }

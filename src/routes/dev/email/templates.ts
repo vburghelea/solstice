@@ -15,6 +15,8 @@ export const templateNames = [
   "password-reset",
   "password-reset-otp",
   "sign-in-otp",
+  "team-invitation",
+  "team-request-decision",
 ] as const;
 
 export type TemplateName = (typeof templateNames)[number];

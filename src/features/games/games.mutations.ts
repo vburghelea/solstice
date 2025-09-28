@@ -233,6 +233,8 @@ export const updateGame = createServerFn({ method: "POST" })
         const changes = summarizeEventChanges(previousSnapshot, updatedSnapshot);
 
         if (changes.length > 0) {
+          const changeSummary = changes.join(" • ");
+          const notifiedEmails = new Set<string>();
           const { findGameParticipantsByGameId } = await import("./games.repository");
           const participants = await findGameParticipantsByGameId(updatedGame.id);
           const approved = participants.filter(
@@ -242,26 +244,37 @@ export const updateGame = createServerFn({ method: "POST" })
               p.user?.notificationPreferences?.gameUpdates !== false,
           );
           if (approved.length > 0) {
-            const recipients = approved.map((p) => ({
-              email: p.user!.email!,
-              name: p.user!.name ?? undefined,
-            }));
-            const { sendGameStatusUpdate } = await import("~/lib/email/resend");
-            const { getBaseUrl } = await import("~/lib/env.server");
-            const baseUrl = getBaseUrl();
-            const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
-            type GameLocation = { address?: string } | null;
-            const locationText =
-              (gameWithDetails.data?.location as unknown as GameLocation)?.address ||
-              "See details page";
-            await sendGameStatusUpdate({
-              to: recipients,
-              gameName: gameWithDetails.data!.name,
-              dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
-              location: locationText,
-              changeSummary: changes.join(" • "),
-              detailsUrl,
-            });
+            const recipients = approved
+              .map((p) => ({
+                email: p.user!.email!,
+                name: p.user!.name ?? undefined,
+              }))
+              .filter((recipient) => {
+                const key = recipient.email.toLowerCase();
+                if (notifiedEmails.has(key)) {
+                  return false;
+                }
+                notifiedEmails.add(key);
+                return true;
+              });
+            if (recipients.length > 0) {
+              const { sendGameStatusUpdate } = await import("~/lib/email/resend");
+              const { getBaseUrl } = await import("~/lib/env.server");
+              const baseUrl = getBaseUrl();
+              const detailsUrl = `${baseUrl}/dashboard/games/${updatedGame.id}`;
+              type GameLocation = { address?: string } | null;
+              const locationText =
+                (gameWithDetails.data?.location as unknown as GameLocation)?.address ||
+                "See details page";
+              await sendGameStatusUpdate({
+                to: recipients,
+                gameName: gameWithDetails.data!.name,
+                dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+                location: locationText,
+                changeSummary,
+                detailsUrl,
+              });
+            }
           }
 
           // Also notify campaign participants if this is part of a campaign
@@ -279,67 +292,42 @@ export const updateGame = createServerFn({ method: "POST" })
                 p.user?.notificationPreferences?.campaignUpdates !== false,
             );
             if (cApproved.length > 0) {
-              const cRecipients = cApproved.map((p) => ({
-                email: p.user!.email!,
-                name: p.user!.name ?? undefined,
-              }));
-              const { sendCampaignSessionUpdate } = await import("~/lib/email/resend");
-              const { getBaseUrl } = await import("~/lib/env.server");
-              const baseUrl2 = getBaseUrl();
-              const detailsUrl2 = `${baseUrl2}/games/${updatedGame.id}`;
-              type GameLocation2 = { address?: string } | null;
-              const locationText2 =
-                (gameWithDetails.data?.location as unknown as GameLocation2)?.address ||
-                "See details page";
-              await sendCampaignSessionUpdate({
-                to: cRecipients,
-                sessionTitle: gameWithDetails.data!.name,
-                dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
-                location: locationText2,
-                changeSummary: changes.join(" • "),
-                detailsUrl: detailsUrl2,
-              });
+              const cRecipients = cApproved
+                .map((p) => ({
+                  email: p.user!.email!,
+                  name: p.user!.name ?? undefined,
+                }))
+                .filter((recipient) => {
+                  const key = recipient.email.toLowerCase();
+                  if (notifiedEmails.has(key)) {
+                    return false;
+                  }
+                  notifiedEmails.add(key);
+                  return true;
+                });
+              if (cRecipients.length > 0) {
+                const { sendCampaignSessionUpdate } = await import("~/lib/email/resend");
+                const { getBaseUrl } = await import("~/lib/env.server");
+                const baseUrl2 = getBaseUrl();
+                const detailsUrl2 = `${baseUrl2}/games/${updatedGame.id}`;
+                type GameLocation2 = { address?: string } | null;
+                const locationText2 =
+                  (gameWithDetails.data?.location as unknown as GameLocation2)?.address ||
+                  "See details page";
+                await sendCampaignSessionUpdate({
+                  to: cRecipients,
+                  sessionTitle: gameWithDetails.data!.name,
+                  dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+                  location: locationText2,
+                  changeSummary,
+                  detailsUrl: detailsUrl2,
+                });
+              }
             }
           }
         }
       } catch (notifyError) {
         console.error("Failed to send game update notifications:", notifyError);
-      }
-
-      // Notify approved participants of cancellation
-      try {
-        const { findGameParticipantsByGameId } = await import("./games.repository");
-        const participants = await findGameParticipantsByGameId(updatedGame.id);
-        const approved = participants.filter(
-          (p) =>
-            p.status === "approved" &&
-            p.user?.email &&
-            p.user?.notificationPreferences?.gameUpdates !== false,
-        );
-        if (approved.length > 0) {
-          const recipients = approved.map((p) => ({
-            email: p.user!.email!,
-            name: p.user!.name ?? undefined,
-          }));
-          const { sendGameStatusUpdate } = await import("~/lib/email/resend");
-          const { getBaseUrl } = await import("~/lib/env.server");
-          const baseUrl = getBaseUrl();
-          const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
-          type GameLocation3 = { address?: string } | null;
-          const locationText =
-            (gameWithDetails.data?.location as unknown as GameLocation3)?.address ||
-            "See details page";
-          await sendGameStatusUpdate({
-            to: recipients,
-            gameName: gameWithDetails.data!.name,
-            dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
-            location: locationText,
-            changeSummary: "Canceled",
-            detailsUrl,
-          });
-        }
-      } catch (notifyError) {
-        console.error("Failed to send game cancellation notifications:", notifyError);
       }
 
       return {
@@ -1388,7 +1376,7 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
             const { sendCampaignSessionUpdate } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
-            const detailsUrl = `${baseUrl}/games/${newGame.id}`;
+            const detailsUrl = `${baseUrl}/dashboard/games/${newGame.id}`;
             type GameLocation4 = { address?: string } | null;
             const locationText =
               (gameWithDetails.data?.location as unknown as GameLocation4)?.address ||
@@ -1507,37 +1495,48 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
         };
       }
 
+      const statusChanges = summarizeEventChanges(
+        {
+          status: existingGame.status,
+          dateTime: existingGame.dateTime as Date | string | null,
+          location: existingGame.location,
+        },
+        { status: data.status },
+      );
+
       // Notify approved participants of status change
-      try {
-        const { findGameParticipantsByGameId } = await import("./games.repository");
-        const participants = await findGameParticipantsByGameId(updatedGame.id);
-        const approved = participants.filter(
-          (p) => p.status === "approved" && p.user?.email,
-        );
-        if (approved.length > 0) {
-          const recipients = approved.map((p) => ({
-            email: p.user!.email!,
-            name: p.user!.name ?? undefined,
-          }));
-          const { sendGameStatusUpdate } = await import("~/lib/email/resend");
-          const { getBaseUrl } = await import("~/lib/env.server");
-          const baseUrl = getBaseUrl();
-          const detailsUrl = `${baseUrl}/games/${updatedGame.id}`;
-          type GameLocation5 = { address?: string } | null;
-          const locationText =
-            (gameWithDetails.data?.location as unknown as GameLocation5)?.address ||
-            "See details page";
-          await sendGameStatusUpdate({
-            to: recipients,
-            gameName: gameWithDetails.data!.name,
-            dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
-            location: locationText,
-            changeSummary: `Status changed to ${data.status}`,
-            detailsUrl,
-          });
+      if (statusChanges.length > 0) {
+        try {
+          const { findGameParticipantsByGameId } = await import("./games.repository");
+          const participants = await findGameParticipantsByGameId(updatedGame.id);
+          const approved = participants.filter(
+            (p) => p.status === "approved" && p.user?.email,
+          );
+          if (approved.length > 0) {
+            const recipients = approved.map((p) => ({
+              email: p.user!.email!,
+              name: p.user!.name ?? undefined,
+            }));
+            const { sendGameStatusUpdate } = await import("~/lib/email/resend");
+            const { getBaseUrl } = await import("~/lib/env.server");
+            const baseUrl = getBaseUrl();
+            const detailsUrl = `${baseUrl}/dashboard/games/${updatedGame.id}`;
+            type GameLocation5 = { address?: string } | null;
+            const locationText =
+              (gameWithDetails.data?.location as unknown as GameLocation5)?.address ||
+              "See details page";
+            await sendGameStatusUpdate({
+              to: recipients,
+              gameName: gameWithDetails.data!.name,
+              dateTime: new Date(gameWithDetails.data!.dateTime as unknown as string),
+              location: locationText,
+              changeSummary: statusChanges.join(" • "),
+              detailsUrl,
+            });
+          }
+        } catch (notifyError) {
+          console.error("Failed to send game status notifications:", notifyError);
         }
-      } catch (notifyError) {
-        console.error("Failed to send game status notifications:", notifyError);
       }
 
       return { success: true, data: gameWithDetails.data };

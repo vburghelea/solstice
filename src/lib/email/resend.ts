@@ -507,44 +507,44 @@ export const sendGameStatusUpdate = serverOnly(
     if (recipients.length === 0) {
       return { success: true } as SendEmailResult;
     }
-    const htmlContent = await renderGameStatusUpdateEmail({
-      recipientName: params.recipientName || "there",
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+    const baseContext = {
       gameName: params.gameName,
       dateTime: params.dateTime.toLocaleString("en-US"),
       location: params.location,
       changeSummary: params.changeSummary,
       detailsUrl: params.detailsUrl,
-    });
+    };
+    const fallbackRecipientName = params.recipientName || "there";
 
-    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
-    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
-
-    if (recipients.length <= 1) {
-      return service.send({
-        to: recipients,
-        from: { email: fromEmail, name: fromName },
-        subject: `Game Update: ${params.gameName}`,
-        html: htmlContent,
-        text: generateTextFromHtml(htmlContent),
-      });
-    }
-
-    const chunks: EmailRecipient[][] = [];
-    for (let i = 0; i < recipients.length; i += 15) {
-      chunks.push(recipients.slice(i, i + 15));
-    }
-    const { paceBatch } = await import("~/lib/pacer/server");
     let anySuccess = false;
-    await paceBatch(chunks, { batchSize: 1, delayMs: 1000 }, async (chunk) => {
+
+    const sendToRecipient = async (recipient: EmailRecipient): Promise<void> => {
+      const greetingName = recipient.name || fallbackRecipientName;
+      const htmlContent = await renderGameStatusUpdateEmail({
+        ...baseContext,
+        recipientName: greetingName,
+      });
       const res = await service.send({
-        to: chunk,
+        to: recipient,
         from: { email: fromEmail, name: fromName },
         subject: `Game Update: ${params.gameName}`,
         html: htmlContent,
         text: generateTextFromHtml(htmlContent),
       });
       anySuccess ||= res.success;
-    });
+    };
+
+    if (recipients.length === 1) {
+      await sendToRecipient(recipients[0]);
+      return { success: anySuccess };
+    }
+
+    const { paceBatch } = await import("~/lib/pacer/server");
+    await paceBatch(recipients, { batchSize: 15, delayMs: 1000 }, async (recipient) =>
+      sendToRecipient(recipient),
+    );
     return { success: anySuccess };
   },
 );
@@ -695,44 +695,44 @@ export const sendCampaignSessionUpdate = serverOnly(
     if (recipients.length === 0) {
       return { success: true } as SendEmailResult;
     }
-    const htmlContent = await renderCampaignSessionUpdateEmail({
-      recipientName: params.recipientName || "there",
+    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
+    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
+    const baseContext = {
       sessionTitle: params.sessionTitle,
       dateTime: params.dateTime.toLocaleString("en-US"),
       location: params.location,
       changeSummary: params.changeSummary,
       detailsUrl: params.detailsUrl,
-    });
+    };
+    const fallbackRecipientName = params.recipientName || "there";
 
-    const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
-    const fromName = process.env["RESEND_FROM_NAME"] || "Roundup Games";
-
-    if (recipients.length <= 1) {
-      return service.send({
-        to: recipients,
-        from: { email: fromEmail, name: fromName },
-        subject: `Session Update: ${params.sessionTitle}`,
-        html: htmlContent,
-        text: generateTextFromHtml(htmlContent),
-      });
-    }
-
-    const chunks: EmailRecipient[][] = [];
-    for (let i = 0; i < recipients.length; i += 15) {
-      chunks.push(recipients.slice(i, i + 15));
-    }
-    const { paceBatch } = await import("~/lib/pacer/server");
     let anySuccess = false;
-    await paceBatch(chunks, { batchSize: 1, delayMs: 1000 }, async (chunk) => {
+
+    const sendToRecipient = async (recipient: EmailRecipient): Promise<void> => {
+      const greetingName = recipient.name || fallbackRecipientName;
+      const htmlContent = await renderCampaignSessionUpdateEmail({
+        ...baseContext,
+        recipientName: greetingName,
+      });
       const res = await service.send({
-        to: chunk,
+        to: recipient,
         from: { email: fromEmail, name: fromName },
         subject: `Session Update: ${params.sessionTitle}`,
         html: htmlContent,
         text: generateTextFromHtml(htmlContent),
       });
       anySuccess ||= res.success;
-    });
+    };
+
+    if (recipients.length === 1) {
+      await sendToRecipient(recipients[0]);
+      return { success: anySuccess };
+    }
+
+    const { paceBatch } = await import("~/lib/pacer/server");
+    await paceBatch(recipients, { batchSize: 15, delayMs: 1000 }, async (recipient) =>
+      sendToRecipient(recipient),
+    );
     return { success: anySuccess };
   },
 );

@@ -33,4 +33,20 @@ describe("summarizeEventChanges", () => {
     };
     expect(summarizeEventChanges(prev, next)).toEqual([]);
   });
+
+  it("describes cancellations with a concise message", () => {
+    const prev = { status: "scheduled" };
+    const next = { status: "canceled" };
+    expect(summarizeEventChanges(prev, next)).toEqual(["Canceled"]);
+  });
+
+  it("ignores optional location fields when the location is unchanged", () => {
+    const prev = {
+      location: { address: "Same", lat: 12.34, lng: 56.78, placeId: null },
+    };
+    const next = {
+      location: { address: "Same", lat: "12.34", lng: "56.78" },
+    };
+    expect(summarizeEventChanges(prev, next)).toEqual([]);
+  });
 });

@@ -78,7 +78,7 @@ export const Route = createFileRoute("/dev/email/$template")({
             dateTime: "May 1, 2025 10:00 AM",
             location: "Pallet Town",
             changeSummary: "time changed to 10:00 AM",
-            detailsUrl: "https://example.com/games/1",
+            detailsUrl: "https://example.com/game/1",
           }),
         };
       case "game-reminder":
@@ -99,7 +99,7 @@ export const Route = createFileRoute("/dev/email/$template")({
             campaignName: "Kanto Journeys",
             response: "accepted",
             time: "May 1, 2025 10:00 AM",
-            detailsUrl: "https://example.com/campaigns/1",
+            detailsUrl: "https://example.com/campaign/1",
           }),
         };
       case "campaign-session-update":
@@ -110,7 +110,7 @@ export const Route = createFileRoute("/dev/email/$template")({
             dateTime: "May 1, 2025 10:00 AM",
             location: "Pallet Town",
             changeSummary: "location changed to Pallet Town",
-            detailsUrl: "https://example.com/campaigns/1/sessions/1",
+            detailsUrl: "https://example.com/game/1",
           }),
         };
       case "campaign-digest":
@@ -122,10 +122,10 @@ export const Route = createFileRoute("/dev/email/$template")({
                 name: "Session 1",
                 dateTime: "May 1, 2025 10:00 AM",
                 location: "Pallet Town",
-                url: "https://example.com/campaigns/1/sessions/1",
+                url: "https://example.com/game/1",
               },
             ]),
-            manageUrl: "https://example.com/campaigns/1",
+            manageUrl: "https://example.com/campaign/1",
           }),
         };
       case "review-reminder":
@@ -135,7 +135,7 @@ export const Route = createFileRoute("/dev/email/$template")({
             gmName: "Brock",
             gameName: "Pokémon TTRPG",
             dateTime: "May 1, 2025 10:00 AM",
-            reviewUrl: "https://example.com/reviews/1",
+            reviewUrl: "https://example.com/review/1",
           }),
         };
       case "email-verification":

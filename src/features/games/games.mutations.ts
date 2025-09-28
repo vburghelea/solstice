@@ -1065,9 +1065,9 @@ export const inviteToGame = createServerFn({ method: "POST" })
       // Send email invitation
       try {
         const { sendGameInvitation } = await import("~/lib/email/resend");
-        const inviteUrl = `${
-          process.env["SITE_URL"] || "https://roundup.games"
-        }/games/${data.gameId}?token=${targetUserId}`;
+        const { getBaseUrl } = await import("~/lib/env.server");
+        const baseUrl = getBaseUrl();
+        const inviteUrl = `${baseUrl}/games/${data.gameId}?token=${targetUserId}`;
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         await sendGameInvitation({
           invitationId: newParticipant.id,

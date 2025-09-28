@@ -220,7 +220,7 @@ Deliverables
 - [x] Implement publish/draft toggles and CMS approval controls. _(Overview tab surfaces publish + approval actions backed by new server mutations with audit metadata refresh.)_
 - [x] Implement recrawl button with source selection and status feedback. _(Crawl tab exposes manual/source-specific recrawl controls with optimistic refresh.)_
       Definition of done
-- [ ] Content manager can publish a system end to end without developer intervention.
+- [x] Content manager can publish a system end to end without developer intervention.
 
 **Progress 2025-02-19**
 
@@ -241,6 +241,11 @@ Deliverables
 - Patched the admin systems dashboard so query params derived from the router search state now drive the React Query key directly. Filters, keyword search, sort changes, and pagination navigations all refetch the dataset instead of leaving stale rows in the table body.
 - Extracted the bulk selection reducer/initializers into a shared helper with fresh unit tests to guard signature resets and clearing logic. This keeps the selection state predictable as more bulk workflows (taxonomy/media) come online.
 - Documented the need for additional bulk mutations (taxonomy remap, media moderation) and a recrawl queue API before Phase 12 test expansion, ensuring backend gaps stay visible to the team.
+
+**Progress 2025-02-24**
+
+- The dashboard content tab now includes a full CMS editor: description overrides use a textarea with dirty-state messaging, copy-from-scraped controls, and save/reset actions that automatically clear approvals for review. CMS FAQs can be added, edited, removed, and populated from crawler data with duplicate protection and one-click bulk import.
+- Admin detail queries now return CMS override FAQs separately from scraped FAQs so the UI can distinguish curated copy from crawler suggestions.
 
 Phase 10 - Reviews aggregation
 Deliverables
@@ -311,7 +316,7 @@ listSystems request
 
 - systemId number
   `getAdminGameSystem` response
-- AdminGameSystemDetail (extends AdminGameSystemListItem with descriptionCms string nullable, descriptionScraped string nullable, externalRefs record, sourceOfTruth string nullable, lastApprovedAt string nullable ISO, lastApprovedBy string nullable, heroImage GameSystemMediaAsset nullable, gallery array of GameSystemMediaAsset, categories array of GameSystemTag, mechanics array of GameSystemTag, crawlEvents array of { id number, source string, status string, severity string, startedAt string ISO, finishedAt string ISO, httpStatus number nullable, errorMessage string nullable, details record<string, record<string, never>> nullable })
+- AdminGameSystemDetail (extends AdminGameSystemListItem with descriptionCms string nullable, descriptionScraped string nullable, externalRefs record, sourceOfTruth string nullable, lastApprovedAt string nullable ISO, lastApprovedBy string nullable, heroImage GameSystemMediaAsset nullable, gallery array of GameSystemMediaAsset, categories array of GameSystemTag, mechanics array of GameSystemTag, crawlEvents array of { id number, source string, status string, severity string, startedAt string ISO, finishedAt string ISO, httpStatus number nullable, errorMessage string nullable, details record<string, record<string, never>> nullable }, cmsFaqs array of GameSystemFaq, scrapedFaqs array of GameSystemFaq)
 - categoryMappings record<number, AdminExternalTagMapping[]>; mechanicMappings record<number, AdminExternalTagMapping[]>
 
 `mapExternalTag` request

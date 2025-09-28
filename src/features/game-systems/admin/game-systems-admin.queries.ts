@@ -403,6 +403,7 @@ const getAdminGameSystemHandler = async ({
       systemCrawlEvents,
       externalCategoryMap,
       externalMechanicMap,
+      faqs,
     },
   ] = await Promise.all([import("~/db/server-helpers"), import("~/db/schema")]);
   const { asc, desc, eq, inArray } = await import("drizzle-orm");
@@ -453,65 +454,71 @@ const getAdminGameSystemHandler = async ({
     return null;
   }
 
-  const [categoryRows, mechanicRows, galleryRows, crawlEventRows] = await Promise.all([
-    db
-      .select({
-        id: gameSystemCategories.id,
-        name: gameSystemCategories.name,
-        description: gameSystemCategories.description,
-      })
-      .from(gameSystemToCategory)
-      .innerJoin(
-        gameSystemCategories,
-        eq(gameSystemToCategory.categoryId, gameSystemCategories.id),
-      )
-      .where(eq(gameSystemToCategory.gameSystemId, data.systemId))
-      .orderBy(asc(gameSystemCategories.name)),
-    db
-      .select({
-        id: gameSystemMechanics.id,
-        name: gameSystemMechanics.name,
-        description: gameSystemMechanics.description,
-      })
-      .from(gameSystemToMechanics)
-      .innerJoin(
-        gameSystemMechanics,
-        eq(gameSystemToMechanics.mechanicsId, gameSystemMechanics.id),
-      )
-      .where(eq(gameSystemToMechanics.gameSystemId, data.systemId))
-      .orderBy(asc(gameSystemMechanics.name)),
-    db
-      .select({
-        id: mediaAssets.id,
-        secureUrl: mediaAssets.secureUrl,
-        kind: mediaAssets.kind,
-        orderIndex: mediaAssets.orderIndex,
-        license: mediaAssets.license,
-        licenseUrl: mediaAssets.licenseUrl,
-        width: mediaAssets.width,
-        height: mediaAssets.height,
-        moderated: mediaAssets.moderated,
-      })
-      .from(mediaAssets)
-      .where(eq(mediaAssets.gameSystemId, data.systemId))
-      .orderBy(asc(mediaAssets.orderIndex), asc(mediaAssets.id)),
-    db
-      .select({
-        id: systemCrawlEvents.id,
-        source: systemCrawlEvents.source,
-        status: systemCrawlEvents.status,
-        severity: systemCrawlEvents.severity,
-        startedAt: systemCrawlEvents.startedAt,
-        finishedAt: systemCrawlEvents.finishedAt,
-        httpStatus: systemCrawlEvents.httpStatus,
-        errorMessage: systemCrawlEvents.errorMessage,
-        details: systemCrawlEvents.details,
-      })
-      .from(systemCrawlEvents)
-      .where(eq(systemCrawlEvents.gameSystemId, data.systemId))
-      .orderBy(desc(systemCrawlEvents.startedAt))
-      .limit(CRAWL_EVENT_LIMIT),
-  ]);
+  const [categoryRows, mechanicRows, galleryRows, crawlEventRows, faqRows] =
+    await Promise.all([
+      db
+        .select({
+          id: gameSystemCategories.id,
+          name: gameSystemCategories.name,
+          description: gameSystemCategories.description,
+        })
+        .from(gameSystemToCategory)
+        .innerJoin(
+          gameSystemCategories,
+          eq(gameSystemToCategory.categoryId, gameSystemCategories.id),
+        )
+        .where(eq(gameSystemToCategory.gameSystemId, data.systemId))
+        .orderBy(asc(gameSystemCategories.name)),
+      db
+        .select({
+          id: gameSystemMechanics.id,
+          name: gameSystemMechanics.name,
+          description: gameSystemMechanics.description,
+        })
+        .from(gameSystemToMechanics)
+        .innerJoin(
+          gameSystemMechanics,
+          eq(gameSystemToMechanics.mechanicsId, gameSystemMechanics.id),
+        )
+        .where(eq(gameSystemToMechanics.gameSystemId, data.systemId))
+        .orderBy(asc(gameSystemMechanics.name)),
+      db
+        .select({
+          id: mediaAssets.id,
+          secureUrl: mediaAssets.secureUrl,
+          kind: mediaAssets.kind,
+          orderIndex: mediaAssets.orderIndex,
+          license: mediaAssets.license,
+          licenseUrl: mediaAssets.licenseUrl,
+          width: mediaAssets.width,
+          height: mediaAssets.height,
+          moderated: mediaAssets.moderated,
+        })
+        .from(mediaAssets)
+        .where(eq(mediaAssets.gameSystemId, data.systemId))
+        .orderBy(asc(mediaAssets.orderIndex), asc(mediaAssets.id)),
+      db
+        .select({
+          id: systemCrawlEvents.id,
+          source: systemCrawlEvents.source,
+          status: systemCrawlEvents.status,
+          severity: systemCrawlEvents.severity,
+          startedAt: systemCrawlEvents.startedAt,
+          finishedAt: systemCrawlEvents.finishedAt,
+          httpStatus: systemCrawlEvents.httpStatus,
+          errorMessage: systemCrawlEvents.errorMessage,
+          details: systemCrawlEvents.details,
+        })
+        .from(systemCrawlEvents)
+        .where(eq(systemCrawlEvents.gameSystemId, data.systemId))
+        .orderBy(desc(systemCrawlEvents.startedAt))
+        .limit(CRAWL_EVENT_LIMIT),
+      db
+        .select({ faq: faqs })
+        .from(faqs)
+        .where(eq(faqs.gameSystemId, data.systemId))
+        .orderBy(asc(faqs.id)),
+    ]);
 
   const categories = categoryRows
     .map(mapTagRow)
@@ -597,6 +604,8 @@ const getAdminGameSystemHandler = async ({
   const heroAsset = mapDetailedMediaAsset(systemRow.hero as DetailedMediaAssetRow | null);
 
   const crawlEvents = crawlEventRows.map(mapCrawlEventRow);
+  const cmsFaqs = faqRows.map((row) => row.faq).filter((faq) => faq.isCmsOverride);
+  const scrapedFaqs = faqRows.map((row) => row.faq).filter((faq) => !faq.isCmsOverride);
 
   const detail: AdminGameSystemDetail = {
     ...baseItem,
@@ -614,6 +623,8 @@ const getAdminGameSystemHandler = async ({
     crawlEvents,
     categoryMappings,
     mechanicMappings,
+    cmsFaqs,
+    scrapedFaqs,
   };
 
   return detail;

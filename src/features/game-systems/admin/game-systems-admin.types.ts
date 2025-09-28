@@ -1,5 +1,9 @@
 import type { ExternalRefs } from "~/db/schema/game-systems.schema";
-import type { GameSystemMediaAsset, GameSystemTag } from "../game-systems.types";
+import type {
+  GameSystemFaq,
+  GameSystemMediaAsset,
+  GameSystemTag,
+} from "../game-systems.types";
 
 export type AdminSystemStatusFilter =
   | "all"
@@ -91,4 +95,6 @@ export interface AdminGameSystemDetail extends AdminGameSystemListItem {
   crawlEvents: AdminGameSystemCrawlEvent[];
   categoryMappings: Record<number, AdminExternalTagMapping[]>;
   mechanicMappings: Record<number, AdminExternalTagMapping[]>;
+  cmsFaqs: GameSystemFaq[];
+  scrapedFaqs: GameSystemFaq[];
 }

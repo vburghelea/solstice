@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ChangeEvent, FormEvent } from "react";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -28,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { Textarea } from "~/components/ui/textarea";
 import {
   mapExternalTag,
   moderateImage,
@@ -35,6 +37,7 @@ import {
   triggerRecrawl,
   updateCmsApproval,
   updatePublishStatus,
+  upsertCmsContent,
 } from "~/features/game-systems/game-systems.mutations";
 import type { GameSystemTag } from "~/features/game-systems/game-systems.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
@@ -217,6 +220,29 @@ export function SystemEditor({
     },
   });
 
+  const cmsContentMutation = useMutation({
+    mutationFn: async (payload: {
+      description?: string;
+      faqs?: { question: string; answer: string }[];
+    }) => {
+      await upsertCmsContent({
+        data: {
+          systemId: system.id,
+          ...payload,
+        },
+      });
+      return refreshSystem();
+    },
+    onSuccess: () => {
+      toast.success("CMS content saved");
+    },
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error ? error.message : "Failed to save CMS content";
+      toast.error(message);
+    },
+  });
+
   return (
     <div className="space-y-6">
       <Card className="bg-card text-card-foreground border shadow-sm">
@@ -262,7 +288,13 @@ export function SystemEditor({
             isApprovalPending={cmsApprovalMutation.isPending}
           />
         ) : null}
-        {activeTab === "content" ? <ContentTab system={system} /> : null}
+        {activeTab === "content" ? (
+          <ContentTab
+            system={system}
+            onSave={(payload) => cmsContentMutation.mutate(payload)}
+            isSaving={cmsContentMutation.isPending}
+          />
+        ) : null}
         {activeTab === "media" ? (
           <MediaTab
             system={system}
@@ -432,51 +464,409 @@ function OverviewTab({
   );
 }
 
-function ContentTab({ system }: { system: AdminGameSystemDetail }) {
-  const hasCmsContent = Boolean(system.descriptionCms?.trim());
+type EditableFaq = {
+  key: string;
+  id: number | null;
+  question: string;
+  answer: string;
+};
+
+type SanitizedFaq = {
+  question: string;
+  answer: string;
+};
+
+const mapCmsFaqsToEditable = (faqs: AdminGameSystemDetail["cmsFaqs"]): EditableFaq[] =>
+  faqs.map((faq) => ({
+    key: `cms-${faq.id}`,
+    id: faq.id ?? null,
+    question: faq.question,
+    answer: faq.answer,
+  }));
+
+const sanitizeEditableFaqs = (faqs: EditableFaq[]): SanitizedFaq[] =>
+  faqs
+    .map((faq) => ({
+      question: faq.question.trim(),
+      answer: faq.answer.trim(),
+    }))
+    .filter((faq) => faq.question.length > 0 && faq.answer.length > 0);
+
+const sanitizeFaqList = (faqs: AdminGameSystemDetail["cmsFaqs"]): SanitizedFaq[] =>
+  faqs
+    .map((faq) => ({
+      question: faq.question.trim(),
+      answer: faq.answer.trim(),
+    }))
+    .filter((faq) => faq.question.length > 0 && faq.answer.length > 0);
+
+const areSanitizedFaqsEqual = (a: SanitizedFaq[], b: SanitizedFaq[]) => {
+  if (a.length !== b.length) return false;
+  return a.every(
+    (faq, index) =>
+      faq.question === b[index]?.question && faq.answer === b[index]?.answer,
+  );
+};
+
+function ContentTab({
+  system,
+  onSave,
+  isSaving,
+}: {
+  system: AdminGameSystemDetail;
+  onSave: (input: {
+    description?: string;
+    faqs?: { question: string; answer: string }[];
+  }) => void;
+  isSaving: boolean;
+}) {
+  const [description, setDescription] = useState(system.descriptionCms ?? "");
+  const [faqDrafts, setFaqDrafts] = useState<EditableFaq[]>(() =>
+    mapCmsFaqsToEditable(system.cmsFaqs),
+  );
+  const nextFaqKeyRef = useRef(0);
+
+  const resetState = useCallback(() => {
+    setDescription(system.descriptionCms ?? "");
+    setFaqDrafts(mapCmsFaqsToEditable(system.cmsFaqs));
+    nextFaqKeyRef.current = 0;
+  }, [system.cmsFaqs, system.descriptionCms]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setDescription(system.descriptionCms ?? "");
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setFaqDrafts(mapCmsFaqsToEditable(system.cmsFaqs));
+    nextFaqKeyRef.current = 0;
+  }, [system.cmsFaqs, system.descriptionCms, system.id]);
+
+  const allocateKey = useCallback(() => {
+    const key = `draft-${nextFaqKeyRef.current}`;
+    nextFaqKeyRef.current += 1;
+    return key;
+  }, []);
+
+  const normalizedDescription = description.trim();
+  const normalizedInitialDescription = (system.descriptionCms ?? "").trim();
+  const sanitizedDraftFaqs = useMemo(() => sanitizeEditableFaqs(faqDrafts), [faqDrafts]);
+  const sanitizedInitialFaqs = useMemo(
+    () => sanitizeFaqList(system.cmsFaqs),
+    [system.cmsFaqs],
+  );
+
+  const descriptionChanged = normalizedDescription !== normalizedInitialDescription;
+  const faqsChanged = !areSanitizedFaqsEqual(sanitizedDraftFaqs, sanitizedInitialFaqs);
+  const hasIncompleteFaq = faqDrafts.some((faq) => {
+    const hasQuestion = faq.question.trim().length > 0;
+    const hasAnswer = faq.answer.trim().length > 0;
+    return hasQuestion !== hasAnswer;
+  });
+  const isDirty = descriptionChanged || faqsChanged;
+  const canSave = isDirty && !hasIncompleteFaq && !isSaving;
   const hasScrapedContent = Boolean(system.descriptionScraped?.trim());
 
+  const handleSave = () => {
+    if (!descriptionChanged && !faqsChanged) return;
+    const payload: {
+      description?: string;
+      faqs?: { question: string; answer: string }[];
+    } = {};
+    if (descriptionChanged) {
+      payload.description = normalizedDescription;
+    }
+    if (faqsChanged) {
+      payload.faqs = sanitizedDraftFaqs;
+    }
+    if (Object.keys(payload).length === 0) return;
+    onSave(payload);
+  };
+
+  const handleReset = () => {
+    resetState();
+  };
+
+  const handleAddFaq = () => {
+    setFaqDrafts((previous) => [
+      ...previous,
+      { key: allocateKey(), id: null, question: "", answer: "" },
+    ]);
+  };
+
+  const handleRemoveFaq = (key: string) => {
+    setFaqDrafts((previous) => previous.filter((faq) => faq.key !== key));
+  };
+
+  const handleFaqChange = (key: string, field: "question" | "answer", value: string) => {
+    setFaqDrafts((previous) =>
+      previous.map((faq) =>
+        faq.key === key
+          ? {
+              ...faq,
+              [field]: value,
+            }
+          : faq,
+      ),
+    );
+  };
+
+  const handleCopyScrapedDescription = () => {
+    if (!system.descriptionScraped) return;
+    setDescription(system.descriptionScraped);
+    toast.success("Scraped description copied to CMS override");
+  };
+
+  const handleCopyScrapedFaq = (faq: AdminGameSystemDetail["scrapedFaqs"][number]) => {
+    setFaqDrafts((previous) => {
+      const sanitizedExisting = sanitizeEditableFaqs(previous);
+      const question = faq.question.trim();
+      const answer = faq.answer.trim();
+      const alreadyExists = sanitizedExisting.some(
+        (entry) => entry.question === question && entry.answer === answer,
+      );
+      if (alreadyExists) {
+        toast.info("FAQ already present in CMS overrides");
+        return previous;
+      }
+      return [
+        ...previous,
+        { key: allocateKey(), id: null, question: faq.question, answer: faq.answer },
+      ];
+    });
+  };
+
+  const handleCopyAllScrapedFaqs = () => {
+    if (system.scrapedFaqs.length === 0) return;
+    nextFaqKeyRef.current = 0;
+    setFaqDrafts(() =>
+      system.scrapedFaqs.map((faq) => ({
+        key: allocateKey(),
+        id: null,
+        question: faq.question,
+        answer: faq.answer,
+      })),
+    );
+    toast.success("Scraped FAQs copied into CMS overrides");
+  };
+
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>CMS copy</CardTitle>
-          <CardDescription>Manual synopsis authored by the content team.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
-            {hasCmsContent ? system.descriptionCms : "CMS description not yet provided."}
-          </p>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>CMS copy</CardTitle>
+            <CardDescription>
+              Manual synopsis authored by the content team.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="cms-description">CMS description</Label>
+              <Textarea
+                id="cms-description"
+                value={description}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  setDescription(event.target.value)
+                }
+                rows={10}
+                placeholder="Craft the narrative players should see."
+              />
+            </div>
+            <p className="text-muted-foreground text-xs">
+              Saving overrides crawler copy and resets CMS approval until a reviewer signs
+              off.
+            </p>
+          </CardContent>
+          <CardFooter className="bg-muted/40 flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-muted-foreground text-xs">
+              {hasIncompleteFaq
+                ? "Complete both question and answer for each FAQ before saving."
+                : isDirty
+                  ? "Unsaved changes will replace the current CMS overrides."
+                  : "No CMS changes to save."}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                disabled={!isDirty || isSaving}
+              >
+                Reset
+              </Button>
+              <Button type="button" size="sm" onClick={handleSave} disabled={!canSave}>
+                {isSaving ? "Saving…" : "Save CMS content"}
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Enriched description</CardTitle>
-          <CardDescription>Latest crawler output available for review.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
-            {hasScrapedContent
-              ? system.descriptionScraped
-              : "No crawler description captured."}
-          </p>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <CardTitle>CMS FAQs</CardTitle>
+              <CardDescription>
+                Curate the questions that appear on public detail pages.
+              </CardDescription>
+            </div>
+            <Button type="button" size="sm" variant="outline" onClick={handleAddFaq}>
+              Add FAQ
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {faqDrafts.length === 0 ? (
+              <PlaceholderMessage message="No CMS FAQs yet." />
+            ) : (
+              <div className="space-y-3">
+                {faqDrafts.map((faq, index) => (
+                  <div
+                    key={faq.key}
+                    className="bg-muted/40 space-y-3 rounded-md border p-4"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-semibold">FAQ {index + 1}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={() => handleRemoveFaq(faq.key)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`faq-question-${faq.key}`}>Question</Label>
+                      <Input
+                        id={`faq-question-${faq.key}`}
+                        value={faq.question}
+                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                          handleFaqChange(faq.key, "question", event.target.value)
+                        }
+                        placeholder="What should players ask?"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`faq-answer-${faq.key}`}>Answer</Label>
+                      <Textarea
+                        id={`faq-answer-${faq.key}`}
+                        value={faq.answer}
+                        onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                          handleFaqChange(faq.key, "answer", event.target.value)
+                        }
+                        rows={4}
+                        placeholder="Provide the curated response."
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Source of truth</CardTitle>
-          <CardDescription>Defines which upstream dataset wins merges.</CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm">
-          <p className="font-semibold">{system.sourceOfTruth ?? "Unset"}</p>
-          <p className="text-muted-foreground mt-2">
-            Adjust this setting when aligning manual content with the preferred crawler
-            payload.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <CardTitle>Enriched description</CardTitle>
+              <CardDescription>
+                Latest crawler output available for review.
+              </CardDescription>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleCopyScrapedDescription}
+              disabled={!hasScrapedContent}
+            >
+              Copy to CMS
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+              {hasScrapedContent
+                ? system.descriptionScraped
+                : "No crawler description captured."}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <CardTitle>Scraped FAQs</CardTitle>
+              <CardDescription>
+                Promote vetted crawler content into the CMS overrides.
+              </CardDescription>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={handleCopyAllScrapedFaqs}
+              disabled={system.scrapedFaqs.length === 0}
+            >
+              Copy all to CMS
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {system.scrapedFaqs.length === 0 ? (
+              <PlaceholderMessage message="No scraped FAQs available." />
+            ) : (
+              <div className="space-y-3">
+                {system.scrapedFaqs.map((faq) => (
+                  <div
+                    key={faq.id ?? faq.question}
+                    className="space-y-2 rounded-md border p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="leading-snug font-semibold">{faq.question}</p>
+                        {faq.source ? (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] tracking-wide uppercase"
+                          >
+                            {faq.source}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleCopyScrapedFaq(faq)}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">
+                      {faq.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Source of truth</CardTitle>
+            <CardDescription>Defines which upstream dataset wins merges.</CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm">
+            <p className="font-semibold">{system.sourceOfTruth ?? "Unset"}</p>
+            <p className="text-muted-foreground mt-2">
+              Adjust this setting when aligning manual content with the preferred crawler
+              payload.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

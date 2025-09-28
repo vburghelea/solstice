@@ -10,6 +10,7 @@ import {
 } from "./games.schemas";
 
 import type { SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import {
   locationSchema,
@@ -89,11 +90,45 @@ interface GameQueryResultRow {
     uploadedAvatarPath: typeof userTable.$inferSelect.uploadedAvatarPath;
     gmRating: typeof userTable.$inferSelect.gmRating;
   };
-  gameSystem: {
-    id: typeof gameSystemsTable.$inferSelect.id;
-    name: typeof gameSystemsTable.$inferSelect.name;
-  };
+  gameSystemName: typeof gameSystemsTable.$inferSelect.name;
+  gameSystemSlug: typeof gameSystemsTable.$inferSelect.slug;
+  gameSystemAveragePlayTime: typeof gameSystemsTable.$inferSelect.averagePlayTime;
+  gameSystemMinPlayers: typeof gameSystemsTable.$inferSelect.minPlayers;
+  gameSystemMaxPlayers: typeof gameSystemsTable.$inferSelect.maxPlayers;
+  systemHeroUrl: string | null;
+  systemCategories: string[] | null;
   participantCount: number;
+}
+
+function mapGameRowToListItem(row: GameQueryResultRow): GameListItem {
+  const {
+    gameSystemName,
+    gameSystemSlug,
+    gameSystemAveragePlayTime,
+    gameSystemMinPlayers,
+    gameSystemMaxPlayers,
+    systemHeroUrl,
+    systemCategories,
+    ...rest
+  } = row;
+
+  const categories = Array.isArray(systemCategories)
+    ? systemCategories.filter((name): name is string => typeof name === "string")
+    : [];
+
+  return {
+    ...rest,
+    heroImageUrl: systemHeroUrl ?? null,
+    gameSystem: {
+      id: row.gameSystemId,
+      name: gameSystemName,
+      slug: gameSystemSlug,
+      averagePlayTime: gameSystemAveragePlayTime,
+      minPlayers: gameSystemMinPlayers,
+      maxPlayers: gameSystemMaxPlayers,
+      categories,
+    },
+  };
 }
 
 export const getGameSystem = createServerFn({ method: "POST" })
@@ -217,8 +252,24 @@ export async function listGamesImpl(
   filters: z.infer<typeof listGamesSchema>["filters"] | undefined,
 ): Promise<OperationResult<GameListItem[]>> {
   try {
-    const { and, eq, gte, lte, or, sql, gameParticipants, games, gameSystems, user } =
-      await getServerDeps();
+    const {
+      and,
+      eq,
+      gte,
+      lte,
+      or,
+      sql,
+      gameParticipants,
+      games,
+      gameSystems,
+      user,
+      mediaAssets,
+      gameSystemToCategory,
+      gameSystemCategories,
+    } = await getServerDeps();
+    const heroImage = alias(mediaAssets, "heroImage");
+    const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
+    const category = alias(gameSystemCategories, "category");
     const statusFilterCondition: SqlExpr | null = filters?.status
       ? (eq(games.status, filters.status) as SqlExpr)
       : null;
@@ -323,18 +374,29 @@ export async function listGamesImpl(
           uploadedAvatarPath: user.uploadedAvatarPath,
           gmRating: user.gmRating,
         },
-        gameSystem: { id: gameSystems.id, name: gameSystems.name },
+        gameSystemName: gameSystems.name,
+        gameSystemSlug: gameSystems.slug,
+        gameSystemAveragePlayTime: gameSystems.averagePlayTime,
+        gameSystemMinPlayers: gameSystems.minPlayers,
+        gameSystemMaxPlayers: gameSystems.maxPlayers,
+        systemHeroUrl: heroImage.secureUrl,
+        systemCategories: sql<
+          string[]
+        >`array_remove(array_agg(distinct ${category.name}), NULL)`,
         participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
       })
       .from(games)
       .innerJoin(user, eq(games.ownerId, user.id))
       .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
       .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+      .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
+      .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
+      .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
       .where(finalWhereClause)
-      .groupBy(games.id, user.id, gameSystems.id)
+      .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
       .orderBy(games.dateTime);
 
-    return { success: true, data: result.map((r) => ({ ...r })) };
+    return { success: true, data: result.map(mapGameRowToListItem) };
   } catch (error) {
     console.error("Error listing games:", error);
     return {
@@ -386,8 +448,24 @@ export async function listGamesWithCountImpl(
   pageSize = 20,
 ): Promise<OperationResult<{ items: GameListItem[]; totalCount: number }>> {
   try {
-    const { and, eq, gte, lte, or, sql, gameParticipants, games, gameSystems, user } =
-      await getServerDeps();
+    const {
+      and,
+      eq,
+      gte,
+      lte,
+      or,
+      sql,
+      gameParticipants,
+      games,
+      gameSystems,
+      user,
+      mediaAssets,
+      gameSystemToCategory,
+      gameSystemCategories,
+    } = await getServerDeps();
+    const heroImage = alias(mediaAssets, "heroImage");
+    const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
+    const category = alias(gameSystemCategories, "category");
     const statusFilterCondition: SqlExpr | null = filters?.status
       ? (eq(games.status, filters.status) as SqlExpr)
       : null;
@@ -495,15 +573,26 @@ export async function listGamesWithCountImpl(
           uploadedAvatarPath: user.uploadedAvatarPath,
           gmRating: user.gmRating,
         },
-        gameSystem: { id: gameSystems.id, name: gameSystems.name },
+        gameSystemName: gameSystems.name,
+        gameSystemSlug: gameSystems.slug,
+        gameSystemAveragePlayTime: gameSystems.averagePlayTime,
+        gameSystemMinPlayers: gameSystems.minPlayers,
+        gameSystemMaxPlayers: gameSystems.maxPlayers,
+        systemHeroUrl: heroImage.secureUrl,
+        systemCategories: sql<
+          string[]
+        >`array_remove(array_agg(distinct ${category.name}), NULL)`,
         participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
       })
       .from(games)
       .innerJoin(user, eq(games.ownerId, user.id))
       .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
       .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+      .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
+      .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
+      .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
       .where(finalWhereClause)
-      .groupBy(games.id, user.id, gameSystems.id)
+      .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
       .orderBy(games.dateTime)
       .then((rows) => rows as unknown as GameQueryResultRow[]);
 
@@ -511,7 +600,7 @@ export async function listGamesWithCountImpl(
     const paged = allRows.slice(offset, offset + Math.max(1, pageSize));
     return {
       success: true,
-      data: { items: paged.map((r) => ({ ...r })), totalCount: count },
+      data: { items: paged.map(mapGameRowToListItem), totalCount: count },
     };
   } catch (error) {
     console.error("Error listing games with count:", error);
@@ -541,11 +630,18 @@ export const searchGames = createServerFn({ method: "POST" })
         eq,
         ilike,
         sql,
+        mediaAssets,
+        gameSystemToCategory,
+        gameSystemCategories,
       } = await getServerDeps();
       const db = await getDb();
       const currentUser = await getCurrentUser();
       const currentUserId = currentUser?.id;
       const searchTerm = `%${data.query}%`;
+
+      const heroImage = alias(mediaAssets, "heroImage");
+      const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
+      const category = alias(gameSystemCategories, "category");
 
       const result: GameQueryResultRow[] = await (db as DbLike)
         .select<GameQueryResultRow>({
@@ -576,13 +672,24 @@ export const searchGames = createServerFn({ method: "POST" })
             uploadedAvatarPath: user.uploadedAvatarPath,
             gmRating: user.gmRating,
           },
-          gameSystem: { id: gameSystems.id, name: gameSystems.name },
+          gameSystemName: gameSystems.name,
+          gameSystemSlug: gameSystems.slug,
+          gameSystemAveragePlayTime: gameSystems.averagePlayTime,
+          gameSystemMinPlayers: gameSystems.minPlayers,
+          gameSystemMaxPlayers: gameSystems.maxPlayers,
+          systemHeroUrl: heroImage.secureUrl,
+          systemCategories: sql<
+            string[]
+          >`array_remove(array_agg(distinct ${category.name}), NULL)`,
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
         })
         .from(games)
         .innerJoin(user, eq(games.ownerId, user.id))
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+        .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
+        .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
+        .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
         .where(() => {
           const base = and(
             eq(games.visibility, "public"),
@@ -596,15 +703,13 @@ export const searchGames = createServerFn({ method: "POST" })
           )`;
           return and(base, sql`NOT (${blockedSql})`);
         })
-        .groupBy(games.id, user.id, gameSystems.id)
+        .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
         .orderBy(games.dateTime)
         .limit(20);
 
       return {
         success: true,
-        data: result.map((r) => ({
-          ...r,
-        })),
+        data: result.map(mapGameRowToListItem),
       };
     } catch (error) {
       console.error("Error searching games:", error);
@@ -669,9 +774,23 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
   .validator(listGameSessionsByCampaignIdSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
     try {
-      const { getDb, eq, sql, and, gameParticipants, games, gameSystems, user } =
-        await getServerDeps();
+      const {
+        getDb,
+        eq,
+        sql,
+        and,
+        gameParticipants,
+        games,
+        gameSystems,
+        user,
+        mediaAssets,
+        gameSystemToCategory,
+        gameSystemCategories,
+      } = await getServerDeps();
       const db = await getDb();
+      const heroImage = alias(mediaAssets, "heroImage");
+      const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
+      const category = alias(gameSystemCategories, "category");
 
       const conditions = [eq(games.campaignId, data.campaignId)];
 
@@ -708,22 +827,31 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
             uploadedAvatarPath: user.uploadedAvatarPath,
             gmRating: user.gmRating,
           },
-          gameSystem: { id: gameSystems.id, name: gameSystems.name },
+          gameSystemName: gameSystems.name,
+          gameSystemSlug: gameSystems.slug,
+          gameSystemAveragePlayTime: gameSystems.averagePlayTime,
+          gameSystemMinPlayers: gameSystems.minPlayers,
+          gameSystemMaxPlayers: gameSystems.maxPlayers,
+          systemHeroUrl: heroImage.secureUrl,
+          systemCategories: sql<
+            string[]
+          >`array_remove(array_agg(distinct ${category.name}), NULL)`,
           participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
         })
         .from(games)
         .innerJoin(user, eq(games.ownerId, user.id))
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
         .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+        .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
+        .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
+        .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
         .where(and(...conditions))
-        .groupBy(games.id, user.id, gameSystems.id)
+        .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
         .orderBy(games.dateTime);
 
       return {
         success: true,
-        data: result.map((r) => ({
-          ...r,
-        })),
+        data: result.map(mapGameRowToListItem),
       };
     } catch (error) {
       console.error("Error listing game sessions by campaign ID:", error);

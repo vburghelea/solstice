@@ -4,19 +4,44 @@ import { listGamesImpl } from "../games.queries";
 
 // Lightweight chainable DB stub returning a fixed set of rows
 type Row = Record<string, unknown>;
+
+function normalizeRow(row: Row): Row {
+  const system = (row["gameSystem"] ?? {}) as Record<string, unknown>;
+  const gameSystemId =
+    (row["gameSystemId"] as number | undefined) ??
+    (system["id"] as number | undefined) ??
+    0;
+  return {
+    ...row,
+    gameSystemId,
+    gameSystemName: row["gameSystemName"] ?? system["name"] ?? null,
+    gameSystemSlug: row["gameSystemSlug"] ?? system["slug"] ?? null,
+    gameSystemAveragePlayTime:
+      row["gameSystemAveragePlayTime"] ?? system["averagePlayTime"] ?? null,
+    gameSystemMinPlayers: row["gameSystemMinPlayers"] ?? system["minPlayers"] ?? null,
+    gameSystemMaxPlayers: row["gameSystemMaxPlayers"] ?? system["maxPlayers"] ?? null,
+    systemHeroUrl: row["systemHeroUrl"] ?? null,
+    systemCategories: row["systemCategories"] ?? [],
+  };
+}
+
 function makeDbReturning(rows: Row[], filter: (row: Row) => boolean) {
-  const rowsPromise = Promise.resolve(rows.filter(filter));
-  const mainGroup = { orderBy: () => rowsPromise };
+  const filtered = rows.map(normalizeRow).filter(filter);
+  const rowsPromise = Promise.resolve(filtered);
+  const mainGroup = { orderBy: () => rowsPromise, limit: () => rowsPromise };
   const mainWhere = { groupBy: () => mainGroup };
-  const mainLeftJoin = { where: () => mainWhere };
-  const mainInner2 = { leftJoin: () => mainLeftJoin };
+  const leftJoinChain = {
+    leftJoin: () => leftJoinChain,
+    where: () => mainWhere,
+  };
+  const mainInner2 = { leftJoin: () => leftJoinChain };
   const mainInner1 = { innerJoin: () => mainInner2 };
 
   return {
     select: () => ({
       from: () => ({
         innerJoin: () => mainInner1,
-        where: () => ({}),
+        where: () => mainWhere,
       }),
     }),
   } as unknown;

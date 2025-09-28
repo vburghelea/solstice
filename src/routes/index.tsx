@@ -7,14 +7,16 @@ import { getUpcomingEvents } from "~/features/events/events.queries";
 import type { EventWithDetails } from "~/features/events/events.types";
 import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
 import type { PopularGameSystem } from "~/features/game-systems/game-systems.types";
-import { GameListItemView } from "~/features/games/components/GameListItemView";
+import {
+  GameListItemView,
+  GameShowcaseCard,
+} from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { listUserLocations } from "~/features/profile/profile.queries";
 import type { CountryLocationGroup } from "~/features/profile/profile.types";
 import type { AuthUser } from "~/lib/auth/types";
-import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
@@ -542,41 +544,7 @@ function Index() {
                   </div>
                   <div className="mt-6 hidden gap-8 md:grid md:grid-cols-2 xl:grid-cols-3">
                     {localGames.map((game) => (
-                      <article
-                        key={game.id}
-                        className="border-border/70 bg-card/80 hover:border-primary/50 flex h-full flex-col justify-between gap-4 rounded-3xl border p-6 text-left shadow-sm transition"
-                      >
-                        <div className="space-y-3">
-                          <h3 className="text-xl font-semibold">{game.name}</h3>
-                          {game.description ? (
-                            <p className="text-muted-foreground line-clamp-3 text-sm">
-                              {game.description}
-                            </p>
-                          ) : null}
-                        </div>
-                        <div className="text-muted-foreground space-y-2 text-sm">
-                          <p className="flex items-start gap-2">
-                            <span aria-hidden>📍</span>
-                            <span className="flex-1">{game.location.address}</span>
-                          </p>
-                          <p className="flex items-start gap-2">
-                            <span aria-hidden>🗓️</span>
-                            <span className="flex-1">
-                              {formatDateAndTime(game.dateTime)}
-                            </span>
-                          </p>
-                        </div>
-                        <Link
-                          to="/game/$gameId"
-                          params={{ gameId: game.id }}
-                          className={cn(
-                            buttonVariants({ size: "sm", variant: "outline" }),
-                            "mt-2 self-start rounded-full",
-                          )}
-                        >
-                          View details
-                        </Link>
-                      </article>
+                      <GameShowcaseCard key={game.id} game={game} />
                     ))}
                   </div>
                 </>

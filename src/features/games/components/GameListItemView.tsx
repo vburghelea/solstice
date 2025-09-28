@@ -43,7 +43,7 @@ export function GameShowcaseCard({
   className,
 }: GameShowcaseCardProps) {
   const formattedDate = formatDateAndTime(game.dateTime);
-  const price = game.price ? `$${(game.price / 100).toFixed(2)}` : "Free";
+  const price = game.price ? `€${game.price.toFixed(2)}` : "Free";
   const heroUrl = game.heroImageUrl;
   const categories = (game.gameSystem?.categories ?? []).filter(Boolean).slice(0, 3);
 
@@ -176,7 +176,7 @@ export function GameShowcaseCard({
             <div className="flex items-start gap-2">
               <Sparkles className="text-primary mt-0.5 size-4" />
               <span className="text-muted-foreground flex-1 leading-snug">
-                Linked to an ongoing campaign
+                Part of an ongoing campaign
               </span>
             </div>
           ) : null}

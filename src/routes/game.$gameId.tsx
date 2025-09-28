@@ -656,7 +656,7 @@ function SafeAddressLink({ address }: { address: string }) {
 }
 
 function formatPrice(price: number | null | undefined) {
-  if (price == null) {
+  if (price == null || price == 0) {
     return "Free";
   }
   return new Intl.NumberFormat("en-US", {
@@ -683,9 +683,8 @@ function buildPlayersRange(
 
 function formatExpectedDuration(duration: number | null | undefined) {
   if (duration == null) return null;
-  const totalMinutes = Math.round(duration * 60);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
   if (hours > 0 && minutes > 0) {
     return `${hours}h ${minutes}m`;
   }

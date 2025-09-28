@@ -76,6 +76,8 @@ export interface GameSystemDetail extends GameSystemListItem {
   externalRefs: ExternalRefs | null;
   gallery: GameSystemMediaAsset[];
   faqs: GameSystemFaq[];
+  ageRating: string | null;
+  complexityRating: string | null;
 }
 
 export interface PopularGameSystem {

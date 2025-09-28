@@ -59,6 +59,7 @@ export default defineConfig(({ mode }) => {
         tsr: {
           quoteStyle: "double",
           semicolons: true,
+          routeFileIgnorePrefix: "__tests__",
           // verboseFileRoutes: false,
         },
 

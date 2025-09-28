@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { templateNames } from "~/routes/dev/email/templates";
+import { templateNames } from "~/lib/email/templates";
 
 export const resendMembershipReceipt = createServerFn({ method: "POST" })
   .validator(z.object({ membershipId: z.string().min(1) }).parse)

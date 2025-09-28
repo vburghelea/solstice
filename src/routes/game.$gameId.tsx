@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type React from "react";
 import { useState } from "react";
+import { LanguageTag } from "~/components/LanguageTag";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -233,7 +235,10 @@ function GameDetailPage() {
                       label="Date & time"
                       value={formatDateAndTime(gameDetails.dateTime)}
                     />
-                    <InfoItem label="Language" value={gameDetails.language} />
+                    <InfoItem
+                      label="Language"
+                      value={<LanguageTag language={gameDetails.language} />}
+                    />
                     <InfoItem label="Price" value={priceLabel} />
                     <InfoItem label="Players" value={playersRange} />
                     <InfoItem
@@ -604,11 +609,15 @@ function GameDetailPage() {
   );
 }
 
-function InfoItem({ label, value }: { label: string; value: string }) {
+function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
+  if (value == null || (typeof value === "string" && value.trim().length === 0)) {
+    return null;
+  }
+
   return (
     <div className="space-y-1">
       <p className="text-muted-foreground text-xs tracking-wide uppercase">{label}</p>
-      <p className="text-foreground font-medium">{value}</p>
+      <div className="text-foreground font-medium">{value}</div>
     </div>
   );
 }

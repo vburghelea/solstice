@@ -37,6 +37,7 @@ import { CampaignForm } from "~/features/campaigns/components/CampaignForm";
 import { CampaignParticipantsList } from "~/features/campaigns/components/CampaignParticipantsList";
 import { InviteParticipants } from "~/features/campaigns/components/InviteParticipants";
 
+import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -96,12 +97,12 @@ function CampaignDetailsView({ campaign }: { campaign: CampaignWithDetails }) {
           </div>
           <div>
             <p className="font-semibold">Language</p>
-            <p>{campaign.language}</p>
+            <LanguageTag language={campaign.language} />
           </div>
           <div>
             <p className="font-semibold">Visibility</p>
             {campaign.visibility === "protected" ? (
-              <Badge variant="secondary">Connections-only</Badge>
+              <Badge variant="secondary">Connections &amp; Teammates</Badge>
             ) : (
               <p className="capitalize">{campaign.visibility}</p>
             )}

@@ -8,7 +8,8 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
+import { LanguageTag } from "~/components/LanguageTag";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import type { GameListItem } from "~/features/games/games.types";
@@ -65,15 +66,21 @@ export function GameShowcaseCard({
     formatExpectedDuration(game.expectedDuration) ??
     formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
 
-  const metaItems = [
-    { icon: Calendar as MetaIcon, label: formattedDate },
-    { icon: MapPin as MetaIcon, label: game.location?.address ?? null },
-    { icon: Users as MetaIcon, label: playersLabel || null },
-    { icon: Clock as MetaIcon, label: durationLabel },
-    { icon: Globe2 as MetaIcon, label: game.language || null },
-  ].filter((item): item is { icon: MetaIcon; label: string } => {
-    return typeof item.label === "string" && item.label.trim().length > 0;
-  });
+  const metaItems: Array<{ icon: MetaIcon; label: ReactNode }> = [];
+
+  const addMeta = (icon: MetaIcon, label: ReactNode) => {
+    if (label == null) return;
+    if (typeof label === "string" && label.trim().length === 0) return;
+    metaItems.push({ icon, label });
+  };
+
+  addMeta(Calendar as MetaIcon, formattedDate);
+  addMeta(MapPin as MetaIcon, game.location?.address ?? null);
+  addMeta(Users as MetaIcon, playersLabel || null);
+  addMeta(Clock as MetaIcon, durationLabel);
+
+  const languageTag = <LanguageTag language={game.language} className="text-[0.65rem]" />;
+  addMeta(Globe2 as MetaIcon, languageTag);
 
   return (
     <article
@@ -152,7 +159,14 @@ export function GameShowcaseCard({
             return (
               <div key={metaKey} className="flex items-start gap-2">
                 <Icon className="text-primary mt-0.5 size-4" />
-                <span className="text-muted-foreground flex-1 leading-snug">
+                <span
+                  className={cn(
+                    "flex-1 leading-snug",
+                    typeof item.label === "string"
+                      ? "text-muted-foreground"
+                      : "text-foreground",
+                  )}
+                >
                   {item.label}
                 </span>
               </div>

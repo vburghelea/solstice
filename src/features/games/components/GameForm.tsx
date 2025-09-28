@@ -605,7 +605,7 @@ export function GameForm({
                       (v: (typeof visibilityEnum.enumValues)[number]) => (
                         <SelectItem key={v} value={v}>
                           {v === "protected"
-                            ? "Connections-only"
+                            ? "Connections & Teammates"
                             : v.charAt(0).toUpperCase() + v.slice(1)}
                         </SelectItem>
                       ),
@@ -628,9 +628,9 @@ export function GameForm({
           </form.Field>
         </div>
         <p className="text-muted-foreground text-sm">
-          Visibility options: Public (visible to everyone), Connections-only (visible to
-          your followers and the people whom you follow), Private (visible only to invited
-          players)
+          Visibility options: Public (visible to everyone), Connections & Teammates
+          (visible to your followers, the people you follow, and active teammates),
+          Private (visible only to invited players)
         </p>
       </FormSection>
 

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar } from "lucide-react";
+import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -59,6 +60,10 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             <span className="font-medium">{campaign.gameSystem.name}</span>
           </div>
           <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Language</span>
+            <LanguageTag language={campaign.language} className="text-[0.7rem]" />
+          </div>
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Time of Day</span>
             <span className="font-medium">{campaign.timeOfDay}</span>
           </div>
@@ -69,7 +74,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Visibility</span>
             {campaign.visibility === "protected" ? (
-              <Badge variant="secondary">Connections-only</Badge>
+              <Badge variant="secondary">Connections &amp; Teammates</Badge>
             ) : (
               <span className="font-medium capitalize">{campaign.visibility}</span>
             )}

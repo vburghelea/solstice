@@ -295,7 +295,7 @@ export async function listGamesImpl(
     visibilityConditionsForOr.push(eq(games.visibility, "public"));
 
     if (currentUserId) {
-      const { userFollows, userBlocks } = await import("~/db/schema");
+      const { userFollows, userBlocks, teamMembers } = await import("~/db/schema");
       const userGames = (db as DbLike)
         .select({ gameId: gameParticipants.gameId })
         .from(gameParticipants)
@@ -311,13 +311,21 @@ export async function listGamesImpl(
       );
       visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
 
-      const isConnectedSql = sql<boolean>`(
+      const isConnectionOrTeammateSql = sql<boolean>`(
         EXISTS (
           SELECT 1 FROM ${userFollows} uf
           WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
         ) OR EXISTS (
           SELECT 1 FROM ${userFollows} uf2
           WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
+        ) OR EXISTS (
+          SELECT 1
+          FROM ${teamMembers} tm_self
+          INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
+          WHERE tm_self.user_id = ${currentUserId}
+            AND tm_self.status = 'active'
+            AND tm_target.user_id = ${games.ownerId}
+            AND tm_target.status = 'active'
         )
       )`;
       const isBlockedSql = sql<boolean>`EXISTS (
@@ -328,7 +336,7 @@ export async function listGamesImpl(
       visibilityConditionsForOr.push(
         and(
           eq(games.visibility, "protected"),
-          sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
+          sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})`,
         ) as SqlExpr,
       );
     }
@@ -491,7 +499,7 @@ export async function listGamesWithCountImpl(
     visibilityConditionsForOr.push(eq(games.visibility, "public"));
 
     if (currentUserId) {
-      const { userFollows, userBlocks } = await import("~/db/schema");
+      const { userFollows, userBlocks, teamMembers } = await import("~/db/schema");
       const userGames = (db as DbLike)
         .select({ gameId: gameParticipants.gameId })
         .from(gameParticipants)
@@ -507,13 +515,21 @@ export async function listGamesWithCountImpl(
       );
       visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
 
-      const isConnectedSql = sql<boolean>`(
+      const isConnectionOrTeammateSql = sql<boolean>`(
         EXISTS (
           SELECT 1 FROM ${userFollows} uf
           WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
         ) OR EXISTS (
           SELECT 1 FROM ${userFollows} uf2
           WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
+        ) OR EXISTS (
+          SELECT 1
+          FROM ${teamMembers} tm_self
+          INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
+          WHERE tm_self.user_id = ${currentUserId}
+            AND tm_self.status = 'active'
+            AND tm_target.user_id = ${games.ownerId}
+            AND tm_target.status = 'active'
         )
       )`;
       const isBlockedSql = sql<boolean>`EXISTS (
@@ -524,7 +540,7 @@ export async function listGamesWithCountImpl(
       visibilityConditionsForOr.push(
         and(
           eq(games.visibility, "protected"),
-          sql`${isConnectedSql} AND NOT (${isBlockedSql})`,
+          sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})`,
         ) as SqlExpr,
       );
     }
@@ -740,9 +756,50 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       >
     > => {
       try {
-        const { getDb, user, or, ilike } = await getServerDeps();
+        const {
+          getDb,
+          user,
+          or,
+          ilike,
+          and,
+          ne,
+          sql,
+          userFollows,
+          userBlocks,
+          teamMembers,
+          getCurrentUser,
+        } = await getServerDeps();
         const db = await getDb();
+        const currentUser = await getCurrentUser();
+        if (!currentUser?.id) {
+          return { success: true, data: [] };
+        }
+
         const searchTerm = `%${data.query}%`;
+
+        const isConnectionOrTeammateSql = sql<boolean>`(
+          EXISTS (
+            SELECT 1 FROM ${userFollows} uf
+            WHERE uf.follower_id = ${currentUser.id} AND uf.following_id = ${user.id}
+          ) OR EXISTS (
+            SELECT 1 FROM ${userFollows} uf2
+            WHERE uf2.follower_id = ${user.id} AND uf2.following_id = ${currentUser.id}
+          ) OR EXISTS (
+            SELECT 1
+            FROM ${teamMembers} tm_self
+            INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
+            WHERE tm_self.user_id = ${currentUser.id}
+              AND tm_self.status = 'active'
+              AND tm_target.user_id = ${user.id}
+              AND tm_target.status = 'active'
+          )
+        )`;
+
+        const isBlockedSql = sql<boolean>`EXISTS (
+          SELECT 1 FROM ${userBlocks} ub
+          WHERE (ub.blocker_id = ${currentUser.id} AND ub.blockee_id = ${user.id})
+             OR (ub.blocker_id = ${user.id} AND ub.blockee_id = ${currentUser.id})
+        )`;
 
         const users = await db
           .select({
@@ -753,7 +810,15 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
             uploadedAvatarPath: user.uploadedAvatarPath,
           })
           .from(user)
-          .where(or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)))
+          .where(
+            and(
+              ne(user.id, currentUser.id),
+              or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)),
+              sql`${isConnectionOrTeammateSql}`,
+              sql`NOT (${isBlockedSql})`,
+            ),
+          )
+          .orderBy(user.name)
           .limit(10);
 
         return { success: true, data: users };

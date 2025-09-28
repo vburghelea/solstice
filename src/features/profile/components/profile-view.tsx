@@ -8,6 +8,7 @@ import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCoun
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
+import { LanguageTag } from "~/components/LanguageTag";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -917,17 +918,9 @@ export function ProfileView() {
               </form.Field>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {profile?.languages?.map((langCode) => {
-                  const lang = languageOptions.find((l) => l.value === langCode);
-                  return lang ? (
-                    <span
-                      key={langCode}
-                      className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
-                    >
-                      {lang.label}
-                    </span>
-                  ) : null;
-                })}
+                {profile?.languages?.map((langCode) => (
+                  <LanguageTag key={langCode} language={langCode} />
+                ))}
                 {(!profile?.languages || profile.languages.length === 0) && (
                   <span className="text-muted-foreground text-sm">
                     No languages specified

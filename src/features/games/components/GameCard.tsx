@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
+import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -71,6 +72,10 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
             <span className="font-medium">{game.gameSystem?.name || "N/A"}</span>
           </div>
           <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Language</span>
+            <LanguageTag language={game.language} className="text-[0.7rem]" />
+          </div>
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Players</span>
             <span className="font-medium">
               {game.minimumRequirements?.minPlayers || "?"} -{" "}
@@ -80,7 +85,7 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Visibility</span>
             {game.visibility === "protected" ? (
-              <Badge variant="secondary">Connections-only</Badge>
+              <Badge variant="secondary">Connections &amp; Teammates</Badge>
             ) : (
               <span className="font-medium capitalize">{game.visibility}</span>
             )}

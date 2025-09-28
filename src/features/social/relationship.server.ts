@@ -5,7 +5,7 @@ type Relationship = {
   followedBy: boolean; // target → viewer
   blocked: boolean; // viewer blocks target
   blockedBy: boolean; // target blocks viewer
-  isConnection: boolean; // either follow direction
+  isConnection: boolean; // either follow direction or active teammates
 };
 
 // Simple TTL cache (module-scoped)
@@ -92,12 +92,34 @@ export const getRelationship = serverOnly(
         and(eq(f.followerId, targetId), eq(f.followingId, viewerId)),
     });
 
+    const [{ teamMembers }, { alias }] = await Promise.all([
+      import("~/db/schema"),
+      import("drizzle-orm/pg-core"),
+    ]);
+    const { and, eq } = await import("drizzle-orm");
+
+    const teammateAlias = alias(teamMembers, "teammate");
+
+    const sharedTeam = await db
+      .select({ teamId: teamMembers.teamId })
+      .from(teamMembers)
+      .innerJoin(
+        teammateAlias,
+        and(
+          eq(teamMembers.teamId, teammateAlias.teamId),
+          eq(teammateAlias.userId, targetId),
+          eq(teammateAlias.status, "active"),
+        ),
+      )
+      .where(and(eq(teamMembers.userId, viewerId), eq(teamMembers.status, "active")))
+      .limit(1);
+
     const rel: Relationship = {
       follows: !!followsRow,
       followedBy: !!followedByRow,
       blocked: !!blockedRow && blockedRow.blockerId === viewerId,
       blockedBy: !!blockedRow && blockedRow.blockerId === targetId,
-      isConnection: !!(followsRow || followedByRow),
+      isConnection: !!(followsRow || followedByRow || sharedTeam.length > 0),
     };
 
     setCache(viewerId, targetId, rel);

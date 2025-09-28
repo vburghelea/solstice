@@ -106,7 +106,7 @@ The CSP is configured to:
 The platform includes social safety mechanisms across the stack:
 
 - User Blocklist: Unidirectional blocks apply symmetric interaction restrictions. When a block exists in either direction, follow, invite, apply, and acceptance actions are prevented between the two users. Blocks do not auto-remove existing confirmed participations; they cancel pending invitations/applications and freeze new actions.
-- Connections-only Visibility: For games and campaigns marked `protected`, eligibility requires a connection (either follow direction) and no active blocks between viewer and owner. Admin/mod tooling can bypass only within moderation contexts and must avoid leaking state on user-facing surfaces.
+- Connections & Teammates Visibility: For games and campaigns marked `protected`, eligibility requires either a social connection (any follow direction) or an active shared team membership, and no active blocks between viewer and owner. Admin/mod tooling can bypass only within moderation contexts and must avoid leaking state on user-facing surfaces.
 - Auditing: All social actions (follow, unfollow, block, unblock) are recorded in `social_audit_logs` with minimal metadata (timestamp, actor, target, user agent, optional reason).
 
 ### Nonce Implementation

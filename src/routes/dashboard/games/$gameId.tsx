@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle, Edit2, LoaderCircle, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { LanguageTag } from "~/components/LanguageTag";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -98,12 +99,12 @@ function GameDetailsView({ game }: { game: GameWithDetails }) {
             </div>
             <div>
               <p className="font-semibold">Language</p>
-              <p>{game.language}</p>
+              <LanguageTag language={game.language} />
             </div>
             <div>
               <p className="font-semibold">Visibility</p>
               {game.visibility === "protected" ? (
-                <Badge variant="secondary">Connections-only</Badge>
+                <Badge variant="secondary">Connections &amp; Teammates</Badge>
               ) : (
                 <p className="capitalize">{game.visibility}</p>
               )}

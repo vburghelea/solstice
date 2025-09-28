@@ -539,7 +539,7 @@ export const applyToCampaign = createServerFn({ method: "POST" })
         };
       }
 
-      // Connections-only gate for protected campaigns
+      // Connections & teammates gate for protected campaigns
       if (campaign.visibility === "protected" && !rel.isConnection) {
         return {
           success: false,

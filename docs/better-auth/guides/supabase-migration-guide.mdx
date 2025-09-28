@@ -16,7 +16,7 @@ In this guide, we'll walk through the steps to migrate a project from Supabase A
 Before starting the migration process, set up Better Auth in your project. Follow the [installation guide](/docs/installation) to get started.
 
 <Steps>
-<Step>
+  <Step>
 ### Connect to your database
 
 You'll need to connect to your database to migrate the users and accounts. Copy your `DATABASE_URL` from your Supabase project and use it to connect to your database. And for this example, we'll need to install `pg` to connect to the database.
@@ -37,8 +37,8 @@ export const auth = betterAuth({
 });
 ```
 
-</Step>
-<Step>
+  </Step>
+  <Step>
 ### Enable Email and Password (Optional)
 
 Enable the email and password in your auth config.
@@ -63,8 +63,8 @@ export const auth = betterAuth({
 });
 ```
 
-</Step>
-<Step>
+  </Step>
+  <Step>
 ### Setup Social Providers (Optional)
 
 Add social providers you have enabled in your Supabase project in your auth config.
@@ -90,8 +90,8 @@ export const auth = betterAuth({
 });
 ```
 
-</Step>
-<Step>
+  </Step>
+  <Step>
 ### Add admin and anonymous plugins (Optional)
 
 Add the [admin](/docs/plugins/admin) and [anonymous](/docs/plugins/anonymous) plugins to your auth config.
@@ -116,8 +116,8 @@ export const auth = betterAuth({
 });
 ```
 
-</Step>
-<Step>
+  </Step>
+  <Step>
 ### Run the migration
 
 Run the migration to create the necessary tables in your database.
@@ -135,8 +135,8 @@ This will create the following tables in your database:
 
 This tables will be created on the `public` schema.
 
-</Step>
-<Step>
+  </Step>
+  <Step>
 ### Copy the migration script
 
 Now that we have the necessary tables in our database, we can run the migration script to migrate the users and accounts from Supabase to Better Auth.
@@ -262,9 +262,8 @@ const migrateFromSupabase = async () => {
 migrateFromSupabase();
 ```
 
-</Step>
-
-<Step>
+  </Step>
+  <Step>
 ### Customize the migration script (Optional)
 
 - `name`: the migration script will use the user's email as the name. You might want to customize it if you have the user display name in your database.
@@ -283,8 +282,8 @@ Run the migration script to migrate the users and accounts from Supabase to Bett
 bun migration.ts # or use node, ts-node, etc.
 ```
 
-</Step>
-<Step>
+  </Step>
+  <Step>
 ### Update your code
 
 Update your codebase from Supabase auth calls to Better Auth API.

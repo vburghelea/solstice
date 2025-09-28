@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle, ShieldBan, Star } from "lucide-react";
 import { useState } from "react";
+import { LanguageTag } from "~/components/LanguageTag";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -466,12 +467,7 @@ function UserProfileComponent() {
                   <h4 className="font-semibold">Languages:</h4>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {profile.languages.map((lang) => (
-                      <span
-                        key={lang}
-                        className="bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm"
-                      >
-                        {lang}
-                      </span>
+                      <LanguageTag key={lang} language={lang} />
                     ))}
                   </div>
                 </div>

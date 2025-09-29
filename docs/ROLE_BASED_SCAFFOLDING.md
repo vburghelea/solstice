@@ -42,15 +42,19 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Engineering Checklist**
 - [x] Build `/visit` layout with hero, featured events carousel (mobile swipe optimized), and story highlights.
   - The refreshed `/visit` experience now mirrors the unauthenticated homepage data flows while layering persona-aware narratives, responsive carousels, and CTAs tailored for Maya in `src/routes/visit/index.tsx`.
+  - Shared city preference heuristics now live in `src/features/profile/location-preferences.ts`, keeping the visitor namespace in lockstep with the public homepage while enabling reusable storage keys and memoized selectors.
+  - Maya-focused trust cues surface safety tools, facilitator bios, and venue vetting via a new "Confidence signals" section so the workspace reflects her decision criteria.
   - [ ] Integrate lightweight RSVP form gated by persona check (non-auth visitors) with rate limiting and analytics.
   - [ ] Implement contextual CTAs prompting registration when privileged actions are attempted.
   - [ ] Instrument SEO metadata and schema.org tags for public discoverability.
 - **Design & Content Checklist**
 - [x] Produce component-level designs for spotlight reels, testimonials, and CTA patterns respecting 12-column responsive grid.
   - Visitor spotlight, campaign showcase, and CTA stack patterns are codified through the new namespace composition so designers can reference live token usage for the responsive grid.
+  - Confidence signal tiles reinforce persona copy guidance for safety-forward messaging with accessible card patterns ready for brand refinement.
   - [ ] Curate content schedule (events, stories, GM spotlights) with cadence for updates.
   - [ ] Author accessibility guidelines for imagery alt text and copywriting inclusive language.
 - **QA & Validation Checklist**
+  - [x] Add unit coverage for visitor city preference heuristics to guarantee location persistence parity between `/visit` and the unauthenticated homepage (`src/features/profile/__tests__/location-preferences.test.ts`).
   - [ ] Run mobile device lab tests (Chrome DevTools + responsive viewer) to confirm tap target sizes and load performance.
   - [ ] Validate RSVP flow using form automation with both valid and blocked scenarios.
   - [ ] Monitor visitor conversion funnel metrics post-launch (page dwell time, CTA click-through, registration starts).

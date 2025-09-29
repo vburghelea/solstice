@@ -16,7 +16,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - Established persona-aware layout shells with hero copy, role switcher access, and suspense fallbacks while routing persona resolution through server functions.
   - [x] Introduce shared "Coming Soon" component supporting persona-specific messaging, telemetry hooks, and feature-flag-driven visibility.
     - Landing placeholders now compose a gated feedback card that records PostHog events for likes, dislikes, and persona-specific suggestions.
-  - [ ] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.
+  - [x] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.
+    - Introduced responsive spacing and typography scales with WCAG AA-compliant foreground/background pairings and applied them to persona namespace surfaces.
 - [x] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.
 - **Design & Content Checklist**
   - [ ] Create navigation information architecture diagrams for each persona with primary/secondary actions prioritized for mobile.

@@ -135,24 +135,26 @@ export function PersonaComingSoon({
   };
 
   return (
-    <Card className={cn("border-border/80 bg-card/70 border border-dashed", className)}>
-      <CardHeader className="space-y-3">
+    <Card
+      className={cn("bg-surface-elevated border-subtle border border-dashed", className)}
+    >
+      <CardHeader className="token-stack-sm">
         <Badge
-          className="border-primary/40 bg-primary/10 text-primary w-fit uppercase"
+          className="text-eyebrow w-fit border-[color:color-mix(in_oklab,var(--primary-soft)_60%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_35%,transparent)] text-[color:var(--primary-strong)]"
           variant="outline"
         >
           Coming soon
         </Badge>
-        <CardTitle className="text-xl leading-tight font-semibold">{title}</CardTitle>
-        <CardDescription className="space-y-2 text-base leading-relaxed">
+        <CardTitle className="text-heading-sm">{title}</CardTitle>
+        <CardDescription className="token-stack-xs text-body-md text-muted-strong">
           <p>{description}</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-body-sm text-subtle">
             {`We're actively interviewing ${resolvedPersonaLabel.toLowerCase()} voices to prioritize delivery.`}
           </p>
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex flex-wrap items-center gap-3">
+      <CardContent className="token-stack-lg">
+        <div className="token-gap-sm flex flex-wrap items-center">
           <Button
             type="button"
             onClick={() => void handleQuickFeedback("like")}
@@ -172,11 +174,16 @@ export function PersonaComingSoon({
           </Button>
         </div>
         <form
-          className="space-y-3"
+          className="token-stack-sm"
           onSubmit={(event) => void handleSuggestionSubmit(event)}
         >
-          <div className="space-y-2">
-            <Label htmlFor={textareaId}>{promptText}</Label>
+          <div className="token-stack-xs">
+            <Label
+              className="text-body-sm text-foreground font-semibold"
+              htmlFor={textareaId}
+            >
+              {promptText}
+            </Label>
             <Textarea
               id={textareaId}
               value={message}
@@ -184,9 +191,10 @@ export function PersonaComingSoon({
               placeholder={placeholderText}
               disabled={pendingType === "suggest" || suggestionSubmitted}
               rows={4}
+              className="text-body-sm"
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="token-gap-sm flex items-center">
             <Button
               type="submit"
               variant="secondary"
@@ -195,20 +203,22 @@ export function PersonaComingSoon({
               Share suggestion
             </Button>
             {pendingType === "suggest" ? (
-              <span className="text-muted-foreground text-sm">Sending…</span>
+              <span className="text-body-sm text-subtle">Sending…</span>
             ) : null}
           </div>
         </form>
-        <div className="space-y-2" aria-live="polite">
+        <div className="token-stack-xs" aria-live="polite">
           {acknowledgedType ? (
-            <p className="text-sm font-semibold text-emerald-600">{thankYouMessage}</p>
+            <p className="text-body-sm text-positive-strong font-semibold">
+              {thankYouMessage}
+            </p>
           ) : (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-body-sm text-subtle">
               {`We'll fold this into the next release of the ${resolvedPersonaLabel.toLowerCase()} workspace.`}
             </p>
           )}
           {errorMessage ? (
-            <p className="text-destructive text-sm" role="alert">
+            <p className="text-body-sm text-negative-strong" role="alert">
               {errorMessage}
             </p>
           ) : null}

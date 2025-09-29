@@ -48,32 +48,24 @@ export function PersonaNamespaceLayout({
   return (
     <div className="bg-background text-foreground flex min-h-dvh w-full flex-col">
       <header className="border-border from-background via-background to-muted/40 border-b bg-gradient-to-br">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
-                {hero.eyebrow}
-              </p>
-              <div className="space-y-2">
-                <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-                  {hero.title}
-                </h1>
-                <p className="text-muted-foreground text-base leading-relaxed sm:text-lg">
-                  {hero.description}
-                </p>
+        <div className="token-gap-lg token-section-padding-sm mx-auto flex w-full max-w-5xl flex-col">
+          <div className="token-gap-md flex flex-col md:flex-row md:items-start md:justify-between">
+            <div className="token-stack-sm">
+              <p className="text-eyebrow text-subtle">{hero.eyebrow}</p>
+              <div className="token-stack-xs">
+                <h1 className="text-heading-lg text-foreground">{hero.title}</h1>
+                <p className="text-body-lg text-muted-strong">{hero.description}</p>
               </div>
             </div>
             <RoleSwitcher />
           </div>
           {hero.supportingText ? (
-            <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
-              {hero.supportingText}
-            </p>
+            <p className="text-body-sm text-muted-strong">{hero.supportingText}</p>
           ) : null}
           {annotation}
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
+      <main className="token-gap-xl token-section-padding mx-auto flex w-full max-w-5xl flex-1 flex-col">
         {children}
         <Suspense fallback={fallback ?? <PersonaNamespaceFallback label={label} />}>
           <Outlet />
@@ -89,11 +81,9 @@ interface PersonaNamespaceFallbackProps {
 
 export function PersonaNamespaceFallback({ label }: PersonaNamespaceFallbackProps) {
   return (
-    <div className="border-border text-muted-foreground bg-muted/40 flex flex-col gap-2 rounded-xl border border-dashed p-6">
-      <span className="text-xs font-semibold tracking-wide uppercase">
-        Loading workspace
-      </span>
-      <p className="text-sm">Preparing the {label.toLowerCase()} experience...</p>
+    <div className="bg-surface-subtle border-subtle text-subtle token-gap-xs flex flex-col rounded-xl border border-dashed p-6">
+      <span className="text-eyebrow">Loading workspace</span>
+      <p className="text-body-sm">Preparing the {label.toLowerCase()} experience...</p>
     </div>
   );
 }
@@ -109,14 +99,14 @@ export function PersonaNamespacePillars({
   readonly items: PersonaPillarItem[];
 }) {
   return (
-    <div className="grid gap-3 md:grid-cols-2">
+    <div className="token-gap-sm grid md:grid-cols-2">
       {items.map((item) => (
         <div
           key={item.title}
-          className="border-border/70 bg-primary/5 text-primary/90 rounded-lg border border-dashed p-4"
+          className="rounded-lg border border-dashed border-[color:color-mix(in_oklab,var(--primary-soft)_60%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_30%,var(--surface-default)_70%)] p-4 text-[color:color-mix(in_oklab,var(--primary-strong)_85%,black_15%)]"
         >
-          <p className="text-sm font-semibold">{item.title}</p>
-          <p className="text-sm leading-relaxed">{item.description}</p>
+          <p className="text-body-sm text-foreground font-semibold">{item.title}</p>
+          <p className="text-body-sm text-muted-strong">{item.description}</p>
         </div>
       ))}
     </div>
@@ -142,26 +132,26 @@ export function PersonaWorkspacePlaceholder({
   milestones,
 }: PersonaWorkspacePlaceholderProps) {
   return (
-    <section className="space-y-6">
-      <Card className="border-border bg-card/80 border border-dashed">
+    <section className="token-stack-lg">
+      <Card className="bg-surface-elevated border-subtle border border-dashed">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold">{title}</CardTitle>
-          <CardDescription className="text-base leading-relaxed">
+          <CardTitle className="text-heading-sm">{title}</CardTitle>
+          <CardDescription className="text-body-md text-muted-strong">
             {description}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-4">
+          <ul className="token-stack-sm">
             {milestones.map((milestone) => (
-              <li key={milestone.title} className="flex gap-3">
-                <span aria-hidden className="text-primary">
+              <li key={milestone.title} className="token-gap-sm flex">
+                <span aria-hidden className="text-[color:var(--primary-base)]">
                   •
                 </span>
                 <div>
-                  <p className="text-foreground text-sm font-semibold">
+                  <p className="text-body-sm text-foreground font-semibold">
                     {milestone.title}
                   </p>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-body-sm text-muted-strong">
                     {milestone.description}
                   </p>
                 </div>
@@ -170,7 +160,7 @@ export function PersonaWorkspacePlaceholder({
           </ul>
         </CardContent>
       </Card>
-      <p className="text-muted-foreground text-sm leading-relaxed">
+      <p className="text-body-sm text-muted-strong">
         {`Need to explore another perspective while we finish the ${personaLabel.toLowerCase()} workspace? Use the persona switcher above to jump between experiences.`}
       </p>
     </section>

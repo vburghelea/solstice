@@ -91,7 +91,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Provide analytics-rich `/ops` namespace tailored to event managers with scoped permissions.
 - **Engineering Checklist**
-  - [ ] Construct `/ops/overview` dashboard with modular widgets (registration funnel, marketing attribution, staffing) and data freshness indicators.
+- [x] Construct `/ops/overview` dashboard with modular widgets (registration funnel, marketing attribution, staffing) and data freshness indicators.
+  - `/ops` now renders an operations mission control that mirrors the legacy events review workflow while layering Priya-focused metrics, approval actions, logistics watchlists, and marketing hotspot insights for upcoming events.
   - [ ] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
   - [ ] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
   - [ ] Integrate permission middleware ensuring Priya sees only authorized events; include degraded experience messaging when access denied.

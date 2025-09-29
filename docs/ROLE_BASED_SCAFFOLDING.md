@@ -95,8 +95,11 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - `/ops` now renders an operations mission control that mirrors the legacy events review workflow while layering Priya-focused metrics, approval actions, logistics watchlists, and marketing hotspot insights for upcoming events.
   - Introduced a reusable ops data hook (`useOpsEventsData`) that reuses event review queries, powers a mission focus banner, and keeps approval queues, pipeline health, and marketing hotspots synchronized for Priya's workspace.
   - Recent approvals history now lives alongside the approvals queue, bringing forward the `/dashboard/admin/events-review` context with instant links back to preview and manage published experiences from the ops surface.
-  - [ ] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
-  - [ ] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
+  - [x] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
+    - `/ops/events/$eventId` now renders `OpsEventDetail`, giving Priya persona-aware logistics snapshots, a drill-down timeline, and quick links back to the legacy dashboards while keeping navigation within the ops namespace.
+- [x] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
+  - The new ops task board derives persona-tuned checklists from event data, persists status updates to local storage for offline-friendly tracking, and surfaces blocked workstreams through attention signals.
+  - Priya can now reassign owners, capture inline notes, and filter the board by status so the `/ops/events/$eventId` workspace doubles as a lightweight runbook for day-of coordination.
   - [ ] Integrate permission middleware ensuring Priya sees only authorized events; include degraded experience messaging when access denied.
   - [ ] Provide CSV/ICS export utilities respecting localization and timezone.
 - **Design & Content Checklist**

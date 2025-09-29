@@ -1,62 +1,712 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { startTransition, useEffect, useMemo, useState } from "react";
 
-import {
-  PersonaComingSoon,
-  PersonaWorkspacePlaceholder,
-  type PersonaWorkspaceMilestone,
-} from "~/features/layouts/persona-namespace-layout";
+import { buttonVariants } from "~/components/ui/button";
+import { EventCard } from "~/components/ui/event-card";
+import { getUpcomingEvents } from "~/features/events/events.queries";
+import type { EventWithDetails } from "~/features/events/events.types";
+import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
+import type { PopularGameSystem } from "~/features/game-systems/game-systems.types";
+import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
+import { listGames } from "~/features/games/games.queries";
+import type { GameListItem } from "~/features/games/games.types";
+import { listUserLocations } from "~/features/profile/profile.queries";
+import type { CountryLocationGroup } from "~/features/profile/profile.types";
+import type { AuthUser } from "~/lib/auth/types";
+import { cn } from "~/shared/lib/utils";
+import { List } from "~/shared/ui/list";
 
-const VISITOR_MILESTONES: PersonaWorkspaceMilestone[] = [
+const CITY_STORAGE_KEY = "roundup:selected-city";
+
+type CitySelection = {
+  city: string;
+  country: string;
+};
+
+type VisitorLoaderData = {
+  featuredGames: GameListItem[];
+  popularSystems: PopularGameSystem[];
+  upcomingEvents: EventWithDetails[];
+  locationGroups: CountryLocationGroup[];
+};
+
+export const Route = createFileRoute("/visit/")({
+  loader: async (): Promise<VisitorLoaderData> => {
+    const [
+      gamesResult,
+      popularSystemsResult,
+      upcomingEventsResult,
+      locationGroupsResult,
+    ] = await Promise.all([
+      listGames({ data: { filters: { visibility: "public", status: "scheduled" } } }),
+      listPopularSystems().catch((error) => {
+        console.error("Failed to fetch popular systems:", error);
+        return [] as PopularGameSystem[];
+      }),
+      getUpcomingEvents({ data: { limit: 24 } }).catch((error) => {
+        console.error("Failed to fetch upcoming events:", error);
+        return [] as EventWithDetails[];
+      }),
+      listUserLocations({ data: { limitPerCountry: 8 } }).catch((error) => {
+        console.error("Failed to fetch location options:", error);
+        return [] as CountryLocationGroup[];
+      }),
+    ]);
+
+    if (!gamesResult.success) {
+      console.error("Failed to fetch featured games:", gamesResult.errors);
+    }
+
+    return {
+      featuredGames: gamesResult.success ? gamesResult.data.slice(0, 6) : [],
+      popularSystems: popularSystemsResult,
+      upcomingEvents: upcomingEventsResult,
+      locationGroups: locationGroupsResult,
+    };
+  },
+  component: VisitorExperience,
+});
+
+function normalizeText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/gi, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function encodeSelection(selection: CitySelection): string {
+  return `${encodeURIComponent(selection.country)}::${encodeURIComponent(selection.city)}`;
+}
+
+function decodeSelection(value: string): CitySelection | null {
+  if (!value) {
+    return null;
+  }
+
+  const [country, city] = value.split("::");
+  if (!country || !city) {
+    return null;
+  }
+
+  try {
+    return {
+      country: decodeURIComponent(country),
+      city: decodeURIComponent(city),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function deriveInitialCity(
+  user: AuthUser,
+  groups: CountryLocationGroup[],
+): CitySelection | null {
+  if (user?.city && user.country) {
+    const normalizedCity = normalizeText(user.city);
+    const normalizedCountry = normalizeText(user.country);
+
+    for (const group of groups) {
+      if (normalizeText(group.country) !== normalizedCountry) {
+        continue;
+      }
+
+      const match = group.cities.find(
+        (city) => normalizeText(city.city) === normalizedCity,
+      );
+
+      if (match) {
+        return { city: match.city, country: group.country };
+      }
+    }
+
+    return { city: user.city, country: user.country };
+  }
+
+  return null;
+}
+
+function buildFallbackSelection(groups: CountryLocationGroup[]): CitySelection | null {
+  for (const group of groups) {
+    const firstCity = group.cities[0];
+    if (firstCity) {
+      return { city: firstCity.city, country: group.country };
+    }
+  }
+
+  return null;
+}
+
+function guessCityFromTimezone(groups: CountryLocationGroup[]): CitySelection | null {
+  if (typeof Intl === "undefined" || groups.length === 0) {
+    return null;
+  }
+
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!timezone) {
+      return null;
+    }
+
+    const [, rawCity] = timezone.split("/");
+    if (!rawCity) {
+      return null;
+    }
+
+    const candidate = normalizeText(rawCity.replace(/_/g, " "));
+
+    for (const group of groups) {
+      const normalizedCountry = normalizeText(group.country);
+      if (
+        normalizedCountry.includes(candidate) ||
+        candidate.includes(normalizedCountry)
+      ) {
+        const fallbackCity = group.cities[0];
+        if (fallbackCity) {
+          return { city: fallbackCity.city, country: group.country };
+        }
+      }
+
+      for (const city of group.cities) {
+        const normalizedCity = normalizeText(city.city);
+        if (normalizedCity.includes(candidate) || candidate.includes(normalizedCity)) {
+          return { city: city.city, country: group.country };
+        }
+      }
+    }
+  } catch (error) {
+    console.warn("Unable to infer city from timezone:", error);
+  }
+
+  return null;
+}
+
+function cityOptionExists(
+  selection: CitySelection | null,
+  groups: CountryLocationGroup[],
+): boolean {
+  if (!selection) {
+    return false;
+  }
+
+  const normalizedCity = normalizeText(selection.city);
+  const normalizedCountry = normalizeText(selection.country);
+
+  return groups.some((group) => {
+    if (normalizeText(group.country) !== normalizedCountry) {
+      return false;
+    }
+
+    return group.cities.some((city) => normalizeText(city.city) === normalizedCity);
+  });
+}
+
+function filterGamesBySelection(
+  games: GameListItem[],
+  selection: CitySelection | null,
+): GameListItem[] {
+  if (games.length === 0) {
+    return [];
+  }
+
+  if (!selection) {
+    return games.slice(0, 3);
+  }
+
+  const normalizedCity = normalizeText(selection.city);
+  const normalizedCountry = normalizeText(selection.country);
+
+  const matches = games.filter((game) => {
+    const address = game.location?.address ?? "";
+    const normalizedAddress = normalizeText(address);
+    return (
+      normalizedAddress.includes(normalizedCity) ||
+      normalizedAddress.includes(normalizedCountry)
+    );
+  });
+
+  return matches.slice(0, 3);
+}
+
+function filterEventsBySelection(
+  events: EventWithDetails[],
+  selection: CitySelection | null,
+): EventWithDetails[] {
+  if (events.length === 0) {
+    return [];
+  }
+
+  if (!selection) {
+    return events.slice(0, 3);
+  }
+
+  const normalizedCity = normalizeText(selection.city);
+  const normalizedCountry = normalizeText(selection.country);
+
+  const matches = events.filter((event) => {
+    const eventCity = event.city ? normalizeText(event.city) : "";
+    const eventCountry = event.country ? normalizeText(event.country) : "";
+
+    return (
+      (eventCity &&
+        (eventCity.includes(normalizedCity) || normalizedCity.includes(eventCity))) ||
+      (eventCountry &&
+        (eventCountry.includes(normalizedCountry) ||
+          normalizedCountry.includes(eventCountry)))
+    );
+  });
+
+  return matches.slice(0, 3);
+}
+
+const DISCOVERY_THEMES = [
   {
-    title: "Story-driven landing journey",
-    description: [
-      "Curated hero panels, community spotlights, and narrative timelines",
-      "guide visitors through what makes Roundup special.",
-    ].join(" "),
+    title: "Guided spotlights",
+    description:
+      "Curated highlights surface the most welcoming stories for first-time guests.",
   },
   {
-    title: "Lightweight RSVP handoffs",
-    description: [
-      "Quick interest forms and event previews capture intent",
-      "without forcing immediate account creation.",
-    ].join(" "),
+    title: "Frictionless RSVPs",
+    description:
+      "Pick a city, preview gatherings, and raise your hand in just a few taps.",
   },
   {
-    title: "Conversion-ready CTAs",
-    description: [
-      "Contextual prompts nudge visitors toward registration",
-      "once they're ready to take the next step.",
-    ].join(" "),
+    title: "Signals of trust",
+    description: "Safety notes, facilitator intros, and photos help Maya feel grounded.",
   },
 ];
 
-export const Route = createFileRoute("/visit/")({
-  component: VisitorLanding,
-});
+const STORY_CHAPTERS = [
+  "Preview curated events tailored to curious first-timers.",
+  "Skim systems and campaigns that welcome new explorers.",
+  "Bookmark a city to receive updates as tables open up.",
+];
 
-function VisitorLanding() {
+function VisitorExperience() {
+  const { featuredGames, popularSystems, upcomingEvents, locationGroups } =
+    Route.useLoaderData() as VisitorLoaderData;
+  const { user } = Route.useRouteContext() as { user: AuthUser };
+
+  const fallbackSelection = useMemo(
+    () => buildFallbackSelection(locationGroups),
+    [locationGroups],
+  );
+
+  const [selectedCity, setSelectedCity] = useState<CitySelection | null>(() =>
+    deriveInitialCity(user, locationGroups),
+  );
+  const [hasLoadedPreference, setHasLoadedPreference] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || hasLoadedPreference) {
+      return;
+    }
+
+    if (selectedCity) {
+      startTransition(() => setHasLoadedPreference(true));
+      return;
+    }
+
+    let resolved: CitySelection | null = null;
+
+    try {
+      const stored = window.localStorage.getItem(CITY_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as CitySelection;
+        if (parsed?.city && parsed?.country) {
+          resolved = parsed;
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to restore stored city preference:", error);
+    }
+
+    if (!resolved) {
+      resolved = guessCityFromTimezone(locationGroups);
+    }
+
+    if (!resolved) {
+      resolved = fallbackSelection;
+    }
+
+    if (resolved) {
+      startTransition(() => setSelectedCity(resolved));
+    }
+
+    startTransition(() => setHasLoadedPreference(true));
+  }, [fallbackSelection, hasLoadedPreference, locationGroups, selectedCity]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !hasLoadedPreference) {
+      return;
+    }
+
+    try {
+      if (selectedCity) {
+        window.localStorage.setItem(CITY_STORAGE_KEY, JSON.stringify(selectedCity));
+      } else {
+        window.localStorage.removeItem(CITY_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.warn("Failed to persist city preference:", error);
+    }
+  }, [hasLoadedPreference, selectedCity]);
+
+  const activeSelection = selectedCity ?? fallbackSelection ?? null;
+  const activeSelectionLabel = activeSelection
+    ? `${activeSelection.city}, ${activeSelection.country}`
+    : "your area";
+
+  const localEvents = useMemo(
+    () => filterEventsBySelection(upcomingEvents, activeSelection),
+    [upcomingEvents, activeSelection],
+  );
+  const localGames = useMemo(
+    () => filterGamesBySelection(featuredGames, activeSelection),
+    [featuredGames, activeSelection],
+  );
+
+  const locationSelectValue = selectedCity ? encodeSelection(selectedCity) : "";
+  const selectionInOptions = cityOptionExists(selectedCity, locationGroups);
+  const hasLocationOptions = locationGroups.length > 0;
+
+  const flattenedSuggestions = useMemo(
+    () =>
+      locationGroups
+        .flatMap((group) =>
+          group.cities.map((city) => ({
+            city: city.city,
+            country: group.country,
+            userCount: city.userCount,
+            key: encodeSelection({ city: city.city, country: group.country }),
+          })),
+        )
+        .sort((a, b) => b.userCount - a.userCount),
+    [locationGroups],
+  );
+
+  const suggestionChips = useMemo(() => {
+    if (!flattenedSuggestions.length) {
+      return [] as typeof flattenedSuggestions;
+    }
+    const currentKey = selectedCity ? encodeSelection(selectedCity) : null;
+    return flattenedSuggestions.filter((option) => option.key !== currentKey).slice(0, 6);
+  }, [flattenedSuggestions, selectedCity]);
+
   return (
-    <div className="space-y-8">
-      <PersonaWorkspacePlaceholder
-        personaLabel="Visitor"
-        title="Public storytelling coming into focus"
-        description={[
-          "We're shaping a guided visitor experience that showcases events,",
-          "community highlights, and next steps with clarity.",
-        ].join(" ")}
-        milestones={VISITOR_MILESTONES}
-      />
-      <PersonaComingSoon
-        personaLabel="Visitor"
-        featureFlag="persona-coming-soon-visitor"
-        title="Tell us what earns your first RSVP"
-        description={[
-          "Help us prioritize the stories, signals, and invitations",
-          "that convert curiosity into participation.",
-        ].join(" ")}
-        feedbackPrompt="What should the visitor journey showcase first?"
-        suggestionPlaceholder="Describe the proof points, testimonials, or CTAs that would inspire you to sign up."
-      />
+    <div className="token-stack-2xl">
+      <section className="token-stack-xl">
+        <div className="bg-surface-elevated/60 border-subtle token-stack-lg rounded-2xl border p-6 md:p-8">
+          <div className="token-gap-xl flex flex-col lg:flex-row lg:items-start lg:justify-between">
+            <div className="token-stack-md max-w-2xl">
+              <p className="text-eyebrow text-primary-soft">Trail map for Maya</p>
+              <div className="token-stack-sm">
+                <h2 className="text-heading-md text-foreground">
+                  Chart where curiosity takes you next
+                </h2>
+                <p className="text-body-md text-muted-strong">
+                  Set a home base to preview gatherings, facilitators, and worlds opening
+                  their tables to new explorers.
+                </p>
+              </div>
+              <List className="token-stack-sm">
+                {DISCOVERY_THEMES.map((theme) => (
+                  <List.Item key={theme.title} className="token-gap-xs flex items-start">
+                    <span
+                      aria-hidden
+                      className="bg-primary-soft/40 text-primary-strong mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                    >
+                      •
+                    </span>
+                    <div className="token-stack-2xs">
+                      <p className="text-body-sm text-foreground font-semibold">
+                        {theme.title}
+                      </p>
+                      <p className="text-body-sm text-muted-strong">
+                        {theme.description}
+                      </p>
+                    </div>
+                  </List.Item>
+                ))}
+              </List>
+            </div>
+            <div className="token-stack-sm w-full max-w-sm">
+              <label className="text-body-sm text-muted-strong" htmlFor="visitor-city">
+                Focus on a city
+              </label>
+              <div className="relative">
+                <select
+                  id="visitor-city"
+                  className="border-subtle focus:border-primary focus:ring-primary/30 bg-surface-default text-body-sm w-full appearance-none rounded-full border px-5 py-3 pr-12 font-medium shadow-sm transition focus:ring-2 focus:outline-none"
+                  value={locationSelectValue}
+                  onChange={(event) => {
+                    setSelectedCity(decodeSelection(event.target.value));
+                  }}
+                  disabled={!hasLocationOptions}
+                >
+                  <option value="">
+                    {hasLocationOptions
+                      ? "Browse all locations"
+                      : "Location data coming soon"}
+                  </option>
+                  {selectedCity && !selectionInOptions ? (
+                    <option value={locationSelectValue}>
+                      {selectedCity.city}, {selectedCity.country} (from your profile)
+                    </option>
+                  ) : null}
+                  {locationGroups.map((group) => (
+                    <optgroup
+                      key={group.country}
+                      label={`${group.country} • ${group.totalUsers} players`}
+                    >
+                      {group.cities.map((city) => {
+                        const value = encodeSelection({
+                          city: city.city,
+                          country: group.country,
+                        });
+                        return (
+                          <option key={value} value={value}>
+                            {city.city} ({city.userCount} players)
+                          </option>
+                        );
+                      })}
+                    </optgroup>
+                  ))}
+                </select>
+                <div className="text-muted-strong pointer-events-none absolute inset-y-0 right-5 flex items-center">
+                  <svg
+                    aria-hidden
+                    className="h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.293 12.95 10 13.657 15.657 8 14.243 6.586 10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-body-xs text-muted-strong">
+                We suggest cities from your profile, saved preferences, or timezone when
+                we can.
+              </p>
+              {suggestionChips.length > 0 ? (
+                <div className="token-gap-xs flex flex-wrap items-center">
+                  <span className="text-body-xs text-muted-strong">Popular cities:</span>
+                  {suggestionChips.map((suggestion) => (
+                    <button
+                      key={suggestion.key}
+                      type="button"
+                      onClick={() =>
+                        setSelectedCity({
+                          city: suggestion.city,
+                          country: suggestion.country,
+                        })
+                      }
+                      className="bg-surface-default hover:bg-surface-subtle text-body-xs text-muted-strong hover:text-foreground border-subtle rounded-full border px-3 py-1 transition"
+                    >
+                      {suggestion.city}, {suggestion.country}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-surface-subtle/70 border-subtle token-gap-lg rounded-2xl border p-6 md:p-8">
+          <div className="token-stack-sm max-w-xl">
+            <h3 className="text-heading-sm text-foreground">How this tour flows</h3>
+            <p className="text-body-sm text-muted-strong">
+              Follow these beats to decide if Roundup should be part of your weekly
+              rotation.
+            </p>
+          </div>
+          <ol className="token-gap-md grid gap-4 md:grid-cols-3">
+            {STORY_CHAPTERS.map((chapter, index) => (
+              <li
+                key={chapter}
+                className="bg-surface-default/70 border-subtle token-stack-sm rounded-xl border p-4"
+              >
+                <span className="bg-primary-soft text-primary-strong text-body-sm inline-flex h-9 w-9 items-center justify-center rounded-full font-semibold">
+                  {index + 1}
+                </span>
+                <p className="text-body-sm text-muted-strong">{chapter}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="token-stack-lg">
+        <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="token-stack-xs">
+            <p className="text-eyebrow text-primary-soft">Upcoming gatherings</p>
+            <h2 className="text-heading-sm text-foreground">
+              Events near {activeSelectionLabel}
+            </h2>
+            <p className="text-body-sm text-muted-strong">
+              Curated by community hosts. Each RSVP takes you closer to your first
+              campaign memory.
+            </p>
+          </div>
+          <Link
+            to="/events"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "rounded-full",
+            )}
+          >
+            Browse full calendar
+          </Link>
+        </div>
+
+        {localEvents.length === 0 ? (
+          <div className="bg-surface-default/70 border-subtle token-stack-sm items-center rounded-2xl border p-8 text-center">
+            <p className="text-body-md text-muted-strong">
+              No events scheduled for this city yet.
+            </p>
+            <p className="text-body-sm text-muted-strong">
+              Switch to another city or check back as hosts publish new sessions.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {localEvents.map((event) => (
+              <EventCard key={`visitor-${event.id}`} event={event} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="token-stack-lg">
+        <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="token-stack-xs">
+            <p className="text-eyebrow text-primary-soft">Stories to sample</p>
+            <h2 className="text-heading-sm text-foreground">
+              Campaigns welcoming new explorers
+            </h2>
+            <p className="text-body-sm text-muted-strong">
+              These tables lean into onboarding, safety tools, and collaborative energy.
+            </p>
+          </div>
+          <Link
+            to="/search"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "rounded-full",
+            )}
+          >
+            Search all games
+          </Link>
+        </div>
+
+        {localGames.length === 0 ? (
+          <div className="bg-surface-default/70 border-subtle token-stack-sm items-center rounded-2xl border p-8 text-center">
+            <p className="text-body-md text-muted-strong">
+              No spotlight campaigns in this city yet.
+            </p>
+            <p className="text-body-sm text-muted-strong">
+              Try a nearby metro or follow our newsletter for launch announcements.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
+            {localGames.map((game) => (
+              <GameShowcaseCard
+                key={`visitor-game-${game.id}`}
+                game={game}
+                className="h-full"
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="token-stack-lg">
+        <div className="token-stack-xs">
+          <p className="text-eyebrow text-primary-soft">Trending systems</p>
+          <h2 className="text-heading-sm text-foreground">Rulesets with momentum</h2>
+          <p className="text-body-sm text-muted-strong">
+            Discover which systems are lighting up tables so you know what to learn next.
+          </p>
+        </div>
+        {popularSystems.length === 0 ? (
+          <p className="text-body-sm text-muted-strong">
+            We’ll highlight popular systems once more sessions are scheduled.
+          </p>
+        ) : (
+          <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
+            {popularSystems.map((system) => (
+              <Link
+                key={system.id}
+                to="/systems/$slug"
+                params={{ slug: system.slug }}
+                className="bg-surface-default/80 hover:bg-surface-elevated/80 focus-visible:ring-offset-background border-subtle hover:border-primary-soft focus-visible:ring-primary min-w-[16rem] rounded-2xl border p-4 transition focus-visible:ring-2 focus-visible:outline-none"
+              >
+                <div className="token-stack-sm">
+                  <div className="aspect-video overflow-hidden rounded-xl">
+                    {system.heroUrl ? (
+                      <img
+                        src={system.heroUrl}
+                        alt={`${system.name} cover art`}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="bg-muted text-muted-strong text-body-xs flex h-full w-full items-center justify-center">
+                        Hero art pending moderation
+                      </div>
+                    )}
+                  </div>
+                  <div className="token-stack-2xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-body-sm text-foreground font-semibold">
+                        {system.name}
+                      </p>
+                      <span className="text-body-2xs text-muted-strong tracking-wide uppercase">
+                        {system.gameCount} sessions
+                      </span>
+                    </div>
+                    <p className="text-body-xs text-muted-strong line-clamp-3">
+                      {system.summary ?? "Description coming soon."}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="from-primary-soft/20 via-surface-subtle to-primary-soft/10 token-stack-lg rounded-3xl border border-[color:color-mix(in_oklab,var(--primary-soft)_40%,transparent)] bg-gradient-to-br p-8 text-center">
+        <div className="token-stack-sm">
+          <h2 className="text-heading-sm text-foreground">
+            When you’re ready to go deeper
+          </h2>
+          <p className="text-body-md text-muted-strong">
+            Create a free account to follow cities, bookmark campaigns, and receive
+            invites from trusted GMs.
+          </p>
+        </div>
+        <div className="token-gap-sm flex flex-wrap items-center justify-center">
+          <Link
+            to="/auth/signup"
+            className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
+          >
+            Start your player profile
+          </Link>
+          <Link
+            to="/auth/login"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "lg" }),
+              "rounded-full px-8",
+            )}
+          >
+            I already have an account
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

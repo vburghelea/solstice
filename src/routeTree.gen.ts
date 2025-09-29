@@ -248,6 +248,16 @@ const EventEventIdRoute = EventEventIdRouteImport.update({
   path: "/event/$eventId",
   getParentRoute: () => rootRouteImport,
 } as any);
+const GmIndexRoute = GmIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => GmRouteRoute,
+} as any);
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AdminRouteRoute,
+} as any);
 const DashboardTeamsRoute = DashboardTeamsRouteImport.update({
   id: "/teams",
   path: "/teams",
@@ -605,11 +615,16 @@ export interface FileRoutesByFullPath {
   "/player": typeof PlayerRouteRouteWithChildren;
   "/visit": typeof VisitRouteRouteWithChildren;
   "/about": typeof AboutRoute;
+  "/visit": typeof VisitRouteRouteWithChildren;
+  "/player": typeof PlayerRouteRouteWithChildren;
+  "/ops": typeof OpsRouteRouteWithChildren;
+  "/gm": typeof GmRouteRouteWithChildren;
   "/design-system": typeof DesignSystemRoute;
   "/events": typeof EventsRouteWithChildren;
   "/resources": typeof ResourcesRoute;
   "/search": typeof SearchRoute;
   "/teams": typeof TeamsRoute;
+  "/admin": typeof AdminRouteRouteWithChildren;
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
@@ -644,6 +659,8 @@ export interface FileRoutesByFullPath {
   "/visit/": typeof VisitIndexRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
+  "/gm/": typeof GmIndexRoute;
+  "/admin/": typeof AdminIndexRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
   "/dashboard/events/$eventId": typeof DashboardEventsEventIdRouteWithChildren;
@@ -679,10 +696,15 @@ export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/auth": typeof AuthRouteRouteWithChildren;
   "/about": typeof AboutRoute;
+  "/visit": typeof VisitRouteRouteWithChildren;
+  "/player": typeof PlayerRouteRouteWithChildren;
+  "/ops": typeof OpsRouteRouteWithChildren;
   "/design-system": typeof DesignSystemRoute;
   "/resources": typeof ResourcesRoute;
   "/search": typeof SearchRoute;
   "/teams": typeof TeamsRoute;
+  "/gm": typeof GmRouteRouteWithChildren;
+  "/admin": typeof AdminRouteRouteWithChildren;
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
@@ -732,6 +754,8 @@ export interface FileRoutesByTo {
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/events/$slug": typeof EventsSlugIndexRoute;
+  "/gm": typeof GmIndexRoute;
+  "/admin": typeof AdminIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -751,11 +775,16 @@ export interface FileRoutesById {
   "/player": typeof PlayerRouteRouteWithChildren;
   "/visit": typeof VisitRouteRouteWithChildren;
   "/about": typeof AboutRoute;
+  "/visit": typeof VisitRouteRouteWithChildren;
+  "/player": typeof PlayerRouteRouteWithChildren;
+  "/ops": typeof OpsRouteRouteWithChildren;
   "/design-system": typeof DesignSystemRoute;
   "/events": typeof EventsRouteWithChildren;
   "/resources": typeof ResourcesRoute;
   "/search": typeof SearchRoute;
   "/teams": typeof TeamsRoute;
+  "/gm": typeof GmRouteRouteWithChildren;
+  "/admin": typeof AdminRouteRouteWithChildren;
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/roles": typeof AdminRolesRoute;
@@ -1061,11 +1090,18 @@ export interface RootRouteChildren {
   PlayerRouteRoute: typeof PlayerRouteRouteWithChildren;
   VisitRouteRoute: typeof VisitRouteRouteWithChildren;
   AboutRoute: typeof AboutRoute;
+  VisitRouteRoute: typeof VisitRouteRouteWithChildren;
+  PlayerRouteRoute: typeof PlayerRouteRouteWithChildren;
+  OpsRouteRoute: typeof OpsRouteRouteWithChildren;
   DesignSystemRoute: typeof DesignSystemRoute;
   EventsRoute: typeof EventsRouteWithChildren;
   ResourcesRoute: typeof ResourcesRoute;
   SearchRoute: typeof SearchRoute;
   TeamsRoute: typeof TeamsRoute;
+  GmRouteRoute: typeof GmRouteRouteWithChildren;
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren;
+  AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
+  AdminRolesRoute: typeof AdminRolesRoute;
   EventEventIdRoute: typeof EventEventIdRoute;
   GameGameIdRoute: typeof GameGameIdRoute;
   SystemsSlugRoute: typeof SystemsSlugRoute;
@@ -1248,6 +1284,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof VisitRouteRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/visit/": {
+      id: "/visit/";
+      path: "/";
+      fullPath: "/visit/";
+      preLoaderRoute: typeof VisitIndexRouteImport;
+      parentRoute: typeof VisitRouteRoute;
+    };
     "/player": {
       id: "/player";
       path: "/player";
@@ -1255,12 +1298,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlayerRouteRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/player/": {
+      id: "/player/";
+      path: "/";
+      fullPath: "/player/";
+      preLoaderRoute: typeof PlayerIndexRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
     "/ops": {
       id: "/ops";
       path: "/ops";
       fullPath: "/ops";
       preLoaderRoute: typeof OpsRouteRouteImport;
       parentRoute: typeof rootRouteImport;
+    };
+    "/ops/": {
+      id: "/ops/";
+      path: "/";
+      fullPath: "/ops/";
+      preLoaderRoute: typeof OpsIndexRouteImport;
+      parentRoute: typeof OpsRouteRoute;
     };
     "/onboarding": {
       id: "/onboarding";
@@ -1275,6 +1332,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/gm";
       preLoaderRoute: typeof GmRouteRouteImport;
       parentRoute: typeof rootRouteImport;
+    };
+    "/gm/": {
+      id: "/gm/";
+      path: "/";
+      fullPath: "/gm/";
+      preLoaderRoute: typeof GmIndexRouteImport;
+      parentRoute: typeof GmRouteRoute;
     };
     "/dashboard": {
       id: "/dashboard";
@@ -1296,6 +1360,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin";
       preLoaderRoute: typeof AdminRouteRouteImport;
       parentRoute: typeof rootRouteImport;
+    };
+    "/admin/": {
+      id: "/admin/";
+      path: "/";
+      fullPath: "/admin/";
+      preLoaderRoute: typeof AdminIndexRouteImport;
+      parentRoute: typeof AdminRouteRoute;
     };
     "/": {
       id: "/";
@@ -2191,11 +2262,18 @@ const rootRouteChildren: RootRouteChildren = {
   PlayerRouteRoute: PlayerRouteRouteWithChildren,
   VisitRouteRoute: VisitRouteRouteWithChildren,
   AboutRoute: AboutRoute,
+  VisitRouteRoute: VisitRouteRouteWithChildren,
+  PlayerRouteRoute: PlayerRouteRouteWithChildren,
+  OpsRouteRoute: OpsRouteRouteWithChildren,
   DesignSystemRoute: DesignSystemRoute,
   EventsRoute: EventsRouteWithChildren,
   ResourcesRoute: ResourcesRoute,
   SearchRoute: SearchRoute,
   TeamsRoute: TeamsRoute,
+  GmRouteRoute: GmRouteRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  AdminEventsReviewRoute: AdminEventsReviewRoute,
+  AdminRolesRoute: AdminRolesRoute,
   EventEventIdRoute: EventEventIdRoute,
   GameGameIdRoute: GameGameIdRoute,
   SystemsSlugRoute: SystemsSlugRoute,

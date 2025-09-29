@@ -9,13 +9,13 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - Establish deterministic persona resolution and role-switching infrastructure.
   - Prepare shared tooling that downstream phases rely upon (telemetry, design tokens, coming-soon patterns).
 - **Engineering Checklist**
-  - [ ] Extend permission service to emit persona descriptors for guests, players, event managers, game masters, and platform administrators with caching for session hydration.
-  - [ ] Implement role-switching context provider with persisted preference (local storage + server fallback) and ensure safe default to highest-privilege persona.
-  - [ ] Add optimistic role switch UI skeleton (button + sheet) with loading states and error recovery for permission drift.
+- [x] Extend permission service to emit persona descriptors for guests, players, event managers, game masters, and platform administrators with caching for session hydration.
+- [x] Implement role-switching context provider with persisted preference (local storage + server fallback) and ensure safe default to highest-privilege persona.
+- [x] Add optimistic role switch UI skeleton (button + sheet) with loading states and error recovery for permission drift.
   - [ ] Scaffold route namespaces (`/visit`, `/player`, `/ops`, `/gm`, `/admin`) with TanStack Router layout components and suspense boundaries.
   - [ ] Introduce shared "Coming Soon" component supporting persona-specific messaging, telemetry hooks, and feature-flag-driven visibility.
   - [ ] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.
-  - [ ] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.
+- [x] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.
 - **Design & Content Checklist**
   - [ ] Create navigation information architecture diagrams for each persona with primary/secondary actions prioritized for mobile.
   - [ ] Deliver responsive wireframe templates for layout shells, role switcher, and coming-soon modules.

@@ -1,10 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { addDays, differenceInCalendarDays, format, isWithinInterval } from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
 import {
   AlertCircleIcon,
   CalendarIcon,
   CheckCircle2Icon,
+  CheckCircleIcon,
   ClockIcon,
   MapPinIcon,
   ShieldAlertIcon,
@@ -12,7 +13,7 @@ import {
   Users2Icon,
   XCircleIcon,
 } from "lucide-react";
-import { type ReactNode, useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
@@ -46,19 +47,29 @@ import {
 } from "~/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { updateEvent } from "~/features/events/events.mutations";
-import { listEvents } from "~/features/events/events.queries";
 import type {
-  EventListResult,
   EventOperationResult,
-  EventStatus,
   EventWithDetails,
 } from "~/features/events/events.types";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
-const PIPELINE_STATUSES: EventStatus[] = ["registration_open", "published", "completed"];
+import {
+  opsCapacityThreshold,
+  useOpsEventsData,
+  type OpsAttentionItem,
+} from "./use-ops-events-data";
 
-const CAPACITY_THRESHOLD = 5;
+type FocusTone = "default" | "warning" | "critical";
+
+interface FocusTarget {
+  tone: FocusTone;
+  title: string;
+  description: string;
+  meta: string;
+  ctaHref: string;
+  ctaLabel: string;
+}
 
 export function OpsOverviewDashboard() {
   const queryClient = useQueryClient();
@@ -70,44 +81,16 @@ export function OpsOverviewDashboard() {
   }>({ isOpen: false, eventId: "", eventName: "", action: "approve" });
 
   const {
-    data: pendingEvents,
-    isLoading: pendingLoading,
-    isFetching: pendingFetching,
-  } = useQuery<EventListResult, Error>({
-    queryKey: ["ops", "events", "pending"],
-    queryFn: () =>
-      listEvents({
-        data: {
-          filters: {
-            status: "draft",
-            publicOnly: false,
-          },
-          pageSize: 50,
-          sortBy: "createdAt",
-          sortOrder: "asc",
-        },
-      }),
-  });
-
-  const {
-    data: pipelineEvents,
-    isLoading: pipelineLoading,
-    isFetching: pipelineFetching,
-  } = useQuery<EventListResult, Error>({
-    queryKey: ["ops", "events", "pipeline"],
-    queryFn: () =>
-      listEvents({
-        data: {
-          filters: {
-            status: PIPELINE_STATUSES,
-            publicOnly: false,
-          },
-          pageSize: 75,
-          sortBy: "startDate",
-          sortOrder: "asc",
-        },
-      }),
-  });
+    pendingList,
+    pipelineList,
+    recentlyReviewed,
+    snapshot,
+    attentionItems,
+    marketingBreakdown,
+    liveEvents,
+    isLoading,
+    isRefreshing,
+  } = useOpsEventsData();
 
   const approveMutation = useMutation<
     EventOperationResult<EventWithDetails>,
@@ -144,9 +127,9 @@ export function OpsOverviewDashboard() {
       } else {
         const message = result.errors?.[0]?.message || "Failed to update event";
         toast.error(message);
-        queryClient.setQueryData<EventListResult | undefined>(
+        queryClient.setQueryData(
           ["ops", "events", "pending"],
-          (previous) => previous,
+          (previous: unknown) => previous,
         );
       }
     },
@@ -163,112 +146,59 @@ export function OpsOverviewDashboard() {
     setApprovalDialog({ isOpen: true, eventId, eventName, action });
   };
 
-  const pendingList = useMemo(
-    () => pendingEvents?.events.filter((event) => !event.isPublic) ?? [],
-    [pendingEvents],
-  );
+  const handleApprovalAction = () => {
+    const { eventId, action } = approvalDialog;
+    approveMutation.mutate({ eventId, approve: action === "approve" });
+  };
 
-  const pipelineList = useMemo(() => pipelineEvents?.events ?? [], [pipelineEvents]);
+  const focusTarget = useMemo<FocusTarget | null>(() => {
+    if (pendingList.length > 0) {
+      const event = pendingList[0];
+      return {
+        tone: "critical",
+        title: "Approve the next submission",
+        description: `${event.name} is queued to go live once you give the green light. Double-check organizer details and publish when ready.`,
+        meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? "Location TBD"}`,
+        ctaHref: "/dashboard/admin/events-review",
+        ctaLabel: "Review submission",
+      };
+    }
 
-  const snapshot = useMemo(() => {
-    const now = new Date();
-    const registrationOpen = pipelineList.filter(
-      (event) => event.status === "registration_open",
-    ).length;
-    const confirmedEvents = pipelineList.filter(
-      (event) => event.status === "published",
-    ).length;
-    const upcomingWeek = pipelineList.filter((event) => {
-      const start = new Date(event.startDate);
-      const diff = differenceInCalendarDays(start, now);
-      return diff >= 0 && diff <= 7;
-    }).length;
-    const capacityAlerts = pipelineList.filter((event) => {
-      if (typeof event.availableSpots !== "number") {
-        return false;
-      }
-      return event.availableSpots <= CAPACITY_THRESHOLD;
-    }).length;
+    if (attentionItems.length > 0) {
+      const item = attentionItems[0];
+      return {
+        tone: item.severity === "critical" ? "critical" : "warning",
+        title:
+          item.severity === "critical"
+            ? "Urgent logistics check"
+            : "Monitor marketing pulse",
+        description: item.message,
+        meta: `${format(item.startDate, "MMM d")} · ${item.city ?? "Location TBD"}`,
+        ctaHref: "/dashboard/events",
+        ctaLabel: "Open event roster",
+      };
+    }
 
-    return {
-      approvals: pendingList.length,
-      registrationOpen,
-      confirmedEvents,
-      upcomingWeek,
-      capacityAlerts,
-    };
-  }, [pendingList, pipelineList]);
+    if (pipelineList.length > 0) {
+      const event = pipelineList[0];
+      return {
+        tone: "default",
+        title: "Stay ahead of the pipeline",
+        description: `${event.name} is the next confirmed experience. Review staffing notes and marketing pushes to keep momentum strong.`,
+        meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? "Location TBD"}`,
+        ctaHref: `/dashboard/events/${event.id}/manage`,
+        ctaLabel: "Manage playbook",
+      };
+    }
 
-  const attentionItems = useMemo(() => {
-    const now = new Date();
-    return pipelineList
-      .map((event) => {
-        const startDate = new Date(event.startDate);
-        const daysUntilStart = differenceInCalendarDays(startDate, now);
-        const availableSpots = event.availableSpots;
-        const lowCapacity =
-          typeof availableSpots === "number" && availableSpots <= CAPACITY_THRESHOLD;
-        const severity =
-          daysUntilStart <= 2 || lowCapacity
-            ? "critical"
-            : daysUntilStart <= 7
-              ? "warning"
-              : "info";
-        const message =
-          severity === "critical"
-            ? "Confirm staffing, safety briefings, and arrival logistics"
-            : severity === "warning"
-              ? "Schedule marketing boost and finalize vendor confirmations"
-              : "Review run-of-show document and volunteer assignments";
-
-        return {
-          id: event.id,
-          name: event.name,
-          severity,
-          message,
-          startDate,
-          availableSpots,
-          city: event.city,
-        };
-      })
-      .filter((item) => item.severity !== "info")
-      .slice(0, 4);
-  }, [pipelineList]);
-
-  const marketingBreakdown = useMemo(() => {
-    const now = new Date();
-    const grouped = new Map<string, { total: number; upcoming: number }>();
-    pipelineList.forEach((event) => {
-      const key = event.city
-        ? `${event.city}${event.country ? `, ${event.country}` : ""}`
-        : "Unlisted";
-      const entry = grouped.get(key) ?? { total: 0, upcoming: 0 };
-      entry.total += 1;
-      if (
-        isWithinInterval(new Date(event.startDate), {
-          start: now,
-          end: addDays(now, 30),
-        })
-      ) {
-        entry.upcoming += 1;
-      }
-      grouped.set(key, entry);
-    });
-
-    return Array.from(grouped.entries())
-      .sort(([, a], [, b]) => b.total - a.total)
-      .slice(0, 5);
-  }, [pipelineList]);
-
-  const liveEvents = useMemo(() => pipelineList.slice(0, 10), [pipelineList]);
-
-  const isLoading = pendingLoading || pipelineLoading;
+    return null;
+  }, [attentionItems, pendingList, pipelineList]);
 
   if (isLoading) {
     return <OpsOverviewSkeleton />;
   }
 
-  const isRefreshing = pendingFetching || pipelineFetching || approveMutation.isPending;
+  const isRefreshingData = isRefreshing || approveMutation.isPending;
 
   return (
     <div className="space-y-8">
@@ -294,6 +224,8 @@ export function OpsOverviewDashboard() {
           </Button>
         </div>
       </div>
+
+      {focusTarget ? <FocusBanner target={focusTarget} /> : null}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <SnapshotCard
@@ -323,7 +255,7 @@ export function OpsOverviewDashboard() {
         />
       </div>
 
-      {isRefreshing && (
+      {isRefreshingData ? (
         <Alert variant="default">
           <AlertCircleIcon className="h-4 w-4" />
           <AlertTitle>Refreshing data</AlertTitle>
@@ -331,17 +263,17 @@ export function OpsOverviewDashboard() {
             Pulling the latest submissions, staffing counts, and campaign stats.
           </AlertDescription>
         </Alert>
-      )}
+      ) : null}
 
       <Tabs defaultValue={pendingList.length > 0 ? "approvals" : "pipeline"}>
         <TabsList>
           <TabsTrigger value="approvals">
             Approvals queue
-            {pendingList.length > 0 && (
+            {pendingList.length > 0 ? (
               <Badge variant="destructive" className="ml-2">
                 {pendingList.length}
               </Badge>
-            )}
+            ) : null}
           </TabsTrigger>
           <TabsTrigger value="pipeline">Pipeline health</TabsTrigger>
         </TabsList>
@@ -442,16 +374,18 @@ export function OpsOverviewDashboard() {
                                 openApprovalDialog(event.id, event.name, "approve")
                               }
                             >
-                              <CheckCircle2Icon className="mr-1 h-4 w-4" /> Approve
+                              <CheckCircleIcon className="mr-1 h-4 w-4" />
+                              Approve
                             </Button>
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="destructive"
                               onClick={() =>
                                 openApprovalDialog(event.id, event.name, "reject")
                               }
                             >
-                              <XCircleIcon className="mr-1 h-4 w-4" /> Revise
+                              <XCircleIcon className="mr-1 h-4 w-4" />
+                              Reject
                             </Button>
                           </div>
                         </TableCell>
@@ -462,244 +396,294 @@ export function OpsOverviewDashboard() {
               </CardContent>
             </Card>
           )}
+
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle>Recent approvals</CardTitle>
+              <CardDescription>
+                Keep a pulse on which experiences moved forward and jump back into
+                operations if adjustments are needed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recentlyReviewed.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  Once events are approved they will appear here with quick links to
+                  manage rosters and logistics.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Event</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Visibility</TableHead>
+                      <TableHead>Updated</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentlyReviewed.slice(0, 8).map((event) => (
+                      <TableRow key={event.id}>
+                        <TableCell className="font-medium">{event.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {event.status.replace("_", " ")}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={event.isPublic ? "default" : "secondary"}>
+                            {event.isPublic ? "Public" : "Private"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground text-sm">
+                            {format(
+                              new Date(event.updatedAt ?? event.createdAt),
+                              "MMM d",
+                            )}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-2">
+                            <Button asChild size="sm" variant="outline">
+                              <Link to="/events/$slug" params={{ slug: event.slug }}>
+                                View
+                              </Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline">
+                              <Link
+                                to="/dashboard/events/$eventId/manage"
+                                params={{ eventId: event.id }}
+                              >
+                                Manage
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="pipeline" className="space-y-6">
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
-              <CardHeader className="space-y-1">
-                <CardTitle>Live pipeline</CardTitle>
-                <CardDescription>
-                  Track registration momentum and logistics status for the next wave of
-                  events.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {liveEvents.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-                    <p className="text-muted-foreground text-sm">
-                      No events in the operations pipeline right now. Approve a submission
-                      to populate this view.
-                    </p>
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Event</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Registrations</TableHead>
-                        <TableHead>Capacity</TableHead>
-                        <TableHead>Start</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {liveEvents.map((event) => {
-                        const availableSpots = event.availableSpots;
-                        const percentFull =
-                          typeof availableSpots === "number" &&
-                          event.registrationCount + availableSpots > 0
-                            ? Math.min(
-                                100,
-                                Math.round(
-                                  (event.registrationCount /
-                                    (event.registrationCount + availableSpots)) *
-                                    100,
-                                ),
-                              )
-                            : null;
-                        const statusLabel = event.status.replace("_", " ");
-                        return (
-                          <TableRow key={event.id}>
-                            <TableCell className="font-medium">
-                              <div className="space-y-1">
-                                <div>{event.name}</div>
-                                <p className="text-muted-foreground text-xs">
-                                  {event.city
-                                    ? `${event.city}${event.country ? `, ${event.country}` : ""}`
-                                    : "Location pending"}
-                                </p>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="capitalize">
-                                {statusLabel}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <div className="space-y-1">
-                                <div className="text-sm font-medium">
-                                  {event.registrationCount}
-                                </div>
-                                {percentFull !== null ? (
-                                  <div className="bg-muted h-1.5 rounded-full">
-                                    <div
-                                      className="bg-primary h-full rounded-full"
-                                      style={{ width: `${percentFull}%` }}
-                                    />
-                                  </div>
-                                ) : null}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {typeof availableSpots === "number" ? (
-                                <span
-                                  className={cn(
-                                    "text-sm font-medium",
-                                    availableSpots <= CAPACITY_THRESHOLD
-                                      ? "text-amber-600"
-                                      : "text-muted-foreground",
-                                  )}
-                                >
-                                  {availableSpots} spots left
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground text-sm">
-                                  Unlimited
-                                </span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-muted-foreground text-sm">
-                                {format(new Date(event.startDate), "MMM d")}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex justify-end gap-2">
-                                <Button asChild size="sm" variant="outline">
-                                  <Link
-                                    to="/dashboard/events/$eventId/manage"
-                                    params={{ eventId: event.id }}
-                                  >
-                                    Manage
-                                  </Link>
-                                </Button>
-                                <Button asChild size="sm" variant="ghost">
-                                  <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                    View
-                                  </Link>
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="space-y-1">
-                <CardTitle>Logistics watchlist</CardTitle>
-                <CardDescription>
-                  Upcoming events that need final staffing or marketing coordination.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {attentionItems.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">
-                    All systems are green — keep monitoring registration momentum.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {attentionItems.map((item) => (
-                      <div key={item.id} className="space-y-2 rounded-lg border p-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="leading-tight font-medium">{item.name}</p>
+        <TabsContent value="pipeline" className="space-y-4">
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle>Pipeline health</CardTitle>
+              <CardDescription>
+                Monitor registrations, capacity, and readiness for the upcoming slate of
+                events.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pipelineList.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  No events found in the pipeline. Keep approvals moving to populate this
+                  view.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Event</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Registered</TableHead>
+                      <TableHead>Capacity</TableHead>
+                      <TableHead>Start</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pipelineList.map((event) => {
+                      const statusLabel = event.status.replace("_", " ");
+                      const availableSpots = event.availableSpots ?? null;
+                      const percentFull =
+                        typeof event.registrationCount === "number" &&
+                        typeof availableSpots === "number" &&
+                        availableSpots >= 0
+                          ? Math.min(
+                              Math.round(
+                                (event.registrationCount /
+                                  (event.registrationCount + availableSpots)) *
+                                  100,
+                              ),
+                              100,
+                            )
+                          : null;
+
+                      return (
+                        <TableRow key={event.id}>
+                          <TableCell className="space-y-1 font-medium">
+                            <div>{event.name}</div>
                             <p className="text-muted-foreground text-xs">
-                              {format(item.startDate, "MMM d")} ·{" "}
-                              {item.city ?? "Location TBD"}
+                              {event.city
+                                ? `${event.city}${event.country ? `, ${event.country}` : ""}`
+                                : "Location pending"}
                             </p>
-                          </div>
-                          <Badge
-                            variant={
-                              item.severity === "critical" ? "destructive" : "secondary"
-                            }
-                            className="capitalize"
-                          >
-                            {item.severity === "critical" ? "Urgent" : "Monitor"}
-                          </Badge>
-                        </div>
-                        <p className="text-muted-foreground text-sm">{item.message}</p>
-                        {typeof item.availableSpots === "number" ? (
-                          <p className="text-xs font-medium">
-                            {item.availableSpots} spots remaining
-                          </p>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize">
+                              {statusLabel}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="text-sm font-medium">
+                                {event.registrationCount}
+                              </div>
+                              {percentFull !== null ? (
+                                <div className="bg-muted h-1.5 rounded-full">
+                                  <div
+                                    className="bg-primary h-full rounded-full"
+                                    style={{ width: `${percentFull}%` }}
+                                  />
+                                </div>
+                              ) : null}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {typeof availableSpots === "number" ? (
+                              <span
+                                className={cn(
+                                  "text-sm font-medium",
+                                  availableSpots <= opsCapacityThreshold
+                                    ? "text-amber-600"
+                                    : "text-muted-foreground",
+                                )}
+                              >
+                                {availableSpots} spots left
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">
+                                Unlimited
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-muted-foreground text-sm">
+                              {format(new Date(event.startDate), "MMM d")}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex justify-end gap-2">
+                              <Button asChild size="sm" variant="outline">
+                                <Link
+                                  to="/dashboard/events/$eventId/manage"
+                                  params={{ eventId: event.id }}
+                                >
+                                  Manage
+                                </Link>
+                              </Button>
+                              <Button asChild size="sm" variant="ghost">
+                                <Link to="/events/$slug" params={{ slug: event.slug }}>
+                                  View
+                                </Link>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle>Logistics watchlist</CardTitle>
+              <CardDescription>
+                Upcoming events that need final staffing or marketing coordination.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {attentionItems.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  All systems are green — keep monitoring registration momentum.
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {attentionItems.map((item) => (
+                    <WatchlistItem key={item.id} item={item} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader className="space-y-1">
                 <CardTitle>Marketing hotspots</CardTitle>
                 <CardDescription>
-                  Cities driving the highest volume of upcoming events in the next 30
-                  days.
+                  Cities generating the most volume and near-term activity.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {marketingBreakdown.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    Approve new submissions to start building regional insights.
+                    No marketing trends available yet. Approve more events to surface
+                    hotspots.
                   </p>
                 ) : (
                   <div className="space-y-3">
                     {marketingBreakdown.map(([location, stats]) => (
                       <div key={location} className="flex items-center justify-between">
                         <div>
-                          <p className="leading-tight font-medium">{location}</p>
+                          <p className="font-medium">{location}</p>
                           <p className="text-muted-foreground text-xs">
-                            {stats.upcoming} happening soon · {stats.total} total in
-                            pipeline
+                            {stats.upcoming} launching in the next 30 days
                           </p>
                         </div>
-                        <Badge variant="outline">{stats.total}</Badge>
+                        <Badge variant="outline">{stats.total} live</Badge>
                       </div>
                     ))}
                   </div>
                 )}
               </CardContent>
             </Card>
+
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle>Operational focus</CardTitle>
+                <CardTitle>Live event command list</CardTitle>
                 <CardDescription>
-                  Prep checklists to keep Priya aligned with on-site teams.
+                  Quick links to adjust staffing or check rosters for imminent
+                  experiences.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3 text-sm">
-                  <li className="bg-muted/50 rounded-md p-3">
-                    <p className="font-medium">Finalize runbooks</p>
-                    <p className="text-muted-foreground">
-                      Share safety protocols, vendor contacts, and escalation paths 48
-                      hours before event start.
-                    </p>
-                  </li>
-                  <li className="bg-muted/50 rounded-md p-3">
-                    <p className="font-medium">Align staffing rosters</p>
-                    <p className="text-muted-foreground">
-                      Confirm volunteer leads and send briefing survey to capture
-                      last-minute blockers.
-                    </p>
-                  </li>
-                  <li className="bg-muted/50 rounded-md p-3">
-                    <p className="font-medium">Close the feedback loop</p>
-                    <p className="text-muted-foreground">
-                      Schedule follow-up surveys for events marked complete to fuel
-                      continuous improvement.
-                    </p>
-                  </li>
-                </ul>
+                {liveEvents.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">
+                    No live events yet — approvals will populate this list automatically.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {liveEvents.map((event) => (
+                      <div key={event.id} className="flex items-center justify-between">
+                        <div>
+                          <p className="leading-tight font-medium">{event.name}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {format(new Date(event.startDate), "MMM d")} ·{" "}
+                            {event.city ?? "Location TBD"}
+                          </p>
+                        </div>
+                        <Button asChild size="sm" variant="outline">
+                          <Link
+                            to="/dashboard/events/$eventId/manage"
+                            params={{ eventId: event.id }}
+                          >
+                            Adjust
+                          </Link>
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -713,38 +697,72 @@ export function OpsOverviewDashboard() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {approvalDialog.action === "approve"
-                ? "Approve event"
-                : "Request revisions"}
+              {approvalDialog.action === "approve" ? "Approve Event" : "Reject Event"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {approvalDialog.action === "approve"
-                ? `Go-live will move "${approvalDialog.eventName}" into Priya's operations pipeline.`
-                : `We'll notify the organizer that "${approvalDialog.eventName}" needs updates before it can launch.`}
+                ? `Are you sure you want to approve "${approvalDialog.eventName}"? This will make the event publicly visible.`
+                : `Are you sure you want to reject "${approvalDialog.eventName}"? The organizer will need to make changes and resubmit.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() =>
-                approveMutation.mutate({
-                  eventId: approvalDialog.eventId,
-                  approve: approvalDialog.action === "approve",
-                })
-              }
-              className={cn(
-                "font-semibold",
+              onClick={handleApprovalAction}
+              className={
                 approvalDialog.action === "reject"
-                  ? "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  : undefined,
-              )}
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : ""
+              }
             >
-              {approvalDialog.action === "approve" ? "Approve" : "Send back"}
+              {approvalDialog.action === "approve" ? "Approve" : "Reject"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+function FocusBanner({ target }: { target: FocusTarget }) {
+  const toneStyles: Record<FocusTone, string> = {
+    default: "border-primary/30 bg-primary/5",
+    warning: "border-amber-200 bg-amber-50",
+    critical: "border-destructive/50 bg-destructive/10",
+  };
+
+  const toneIcon: Record<FocusTone, ReactNode> = {
+    default: <SparklesIcon className="text-primary h-5 w-5" />,
+    warning: <AlertCircleIcon className="h-5 w-5 text-amber-600" />,
+    critical: <ShieldAlertIcon className="text-destructive h-5 w-5" />,
+  };
+
+  const buttonVariant =
+    target.tone === "critical"
+      ? "destructive"
+      : target.tone === "warning"
+        ? "secondary"
+        : "default";
+
+  return (
+    <Card className={cn("border", toneStyles[target.tone])}>
+      <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5">{toneIcon[target.tone]}</div>
+          <div className="space-y-1">
+            <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
+              Mission focus
+            </p>
+            <h2 className="text-xl leading-tight font-semibold">{target.title}</h2>
+            <p className="text-muted-foreground text-sm">{target.description}</p>
+            <p className="text-muted-foreground text-xs font-medium">{target.meta}</p>
+          </div>
+        </div>
+        <Button asChild variant={buttonVariant} className="self-start">
+          <Link to={target.ctaHref}>{target.ctaLabel}</Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -759,63 +777,75 @@ function SnapshotCard({
   label: string;
   value: number;
   description: string;
-  tone?: "default" | "warning";
+  tone?: FocusTone;
 }) {
+  const toneClasses: Record<FocusTone, string> = {
+    default: "border-border",
+    warning: "border-amber-200",
+    critical: "border-destructive/60",
+  };
+
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-3 p-4">
-        <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-full",
-              tone === "warning"
-                ? "bg-amber-100 text-amber-700"
-                : "bg-primary/10 text-primary",
-            )}
-          >
-            {icon}
-          </span>
-          <div>
-            <p className="text-muted-foreground text-xs tracking-wide uppercase">
-              {label}
-            </p>
-            <p className="text-2xl font-semibold">{value}</p>
-          </div>
-        </div>
+    <Card className={cn("border", toneClasses[tone])}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <span className="text-muted-foreground text-sm font-medium">{label}</span>
+        <div className="text-muted-foreground">{icon}</div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold">{value}</div>
         <p className="text-muted-foreground text-sm">{description}</p>
       </CardContent>
     </Card>
   );
 }
 
-function OpsOverviewSkeleton() {
+function WatchlistItem({ item }: { item: OpsAttentionItem }) {
+  const tone = item.severity === "critical" ? "destructive" : "secondary";
+  const daysUntilStart = differenceInCalendarDays(item.startDate, new Date());
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <Skeleton className="h-6 w-32" />
-        <Skeleton className="h-10 w-3/4" />
-        <Skeleton className="h-4 w-2/3" />
+    <div className="space-y-2 rounded-lg border p-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="leading-tight font-medium">{item.name}</p>
+          <p className="text-muted-foreground text-xs">
+            {format(item.startDate, "MMM d")} · {item.city ?? "Location TBD"}
+          </p>
+        </div>
+        <Badge variant={tone} className="capitalize">
+          {item.severity === "critical" ? "Urgent" : "Monitor"}
+        </Badge>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {["approvals", "live", "confirmed", "alerts"].map((key) => (
-          <Card key={`metric-skeleton-${key}`}>
-            <CardContent className="space-y-3 p-4">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <Skeleton className="h-6 w-16" />
-              <Skeleton className="h-4 w-full" />
-            </CardContent>
-          </Card>
-        ))}
+      <p className="text-muted-foreground text-sm">{item.message}</p>
+      {typeof item.availableSpots === "number" ? (
+        <p className="text-xs font-medium">
+          {item.availableSpots} spots remaining · {Math.max(daysUntilStart, 0)} days out
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function OpsOverviewSkeleton() {
+  const skeletonRows = ["pending-0", "pending-1", "pending-2"];
+
+  return (
+    <div className="container mx-auto space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-32" />
       </div>
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-1/3" />
-          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-6 w-48" />
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {["row-one", "row-two", "row-three"].map((key) => (
-              <Skeleton key={`table-skeleton-${key}`} className="h-12 w-full" />
+            {skeletonRows.map((rowKey) => (
+              <Skeleton key={rowKey} className="h-16 w-full" />
             ))}
           </div>
         </CardContent>

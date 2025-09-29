@@ -93,6 +93,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Engineering Checklist**
 - [x] Construct `/ops/overview` dashboard with modular widgets (registration funnel, marketing attribution, staffing) and data freshness indicators.
   - `/ops` now renders an operations mission control that mirrors the legacy events review workflow while layering Priya-focused metrics, approval actions, logistics watchlists, and marketing hotspot insights for upcoming events.
+  - Introduced a reusable ops data hook (`useOpsEventsData`) that reuses event review queries, powers a mission focus banner, and keeps approval queues, pipeline health, and marketing hotspots synchronized for Priya's workspace.
+  - Recent approvals history now lives alongside the approvals queue, bringing forward the `/dashboard/admin/events-review` context with instant links back to preview and manage published experiences from the ops surface.
   - [ ] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
   - [ ] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
   - [ ] Integrate permission middleware ensuring Priya sees only authorized events; include degraded experience messaging when access denied.

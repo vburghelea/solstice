@@ -176,3 +176,6 @@ export function PersonaWorkspacePlaceholder({
     </section>
   );
 }
+
+export { PersonaComingSoon } from "./persona-coming-soon";
+export type { PersonaComingSoonProps } from "./persona-coming-soon";

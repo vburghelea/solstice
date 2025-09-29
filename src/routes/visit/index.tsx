@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
+  PersonaComingSoon,
   PersonaWorkspacePlaceholder,
   type PersonaWorkspaceMilestone,
 } from "~/features/layouts/persona-namespace-layout";
@@ -35,14 +36,27 @@ export const Route = createFileRoute("/visit/")({
 
 function VisitorLanding() {
   return (
-    <PersonaWorkspacePlaceholder
-      personaLabel="Visitor"
-      title="Public storytelling coming into focus"
-      description={[
-        "We're shaping a guided visitor experience that showcases events,",
-        "community highlights, and next steps with clarity.",
-      ].join(" ")}
-      milestones={VISITOR_MILESTONES}
-    />
+    <div className="space-y-8">
+      <PersonaWorkspacePlaceholder
+        personaLabel="Visitor"
+        title="Public storytelling coming into focus"
+        description={[
+          "We're shaping a guided visitor experience that showcases events,",
+          "community highlights, and next steps with clarity.",
+        ].join(" ")}
+        milestones={VISITOR_MILESTONES}
+      />
+      <PersonaComingSoon
+        personaLabel="Visitor"
+        featureFlag="persona-coming-soon-visitor"
+        title="Tell us what earns your first RSVP"
+        description={[
+          "Help us prioritize the stories, signals, and invitations",
+          "that convert curiosity into participation.",
+        ].join(" ")}
+        feedbackPrompt="What should the visitor journey showcase first?"
+        suggestionPlaceholder="Describe the proof points, testimonials, or CTAs that would inspire you to sign up."
+      />
+    </div>
   );
 }

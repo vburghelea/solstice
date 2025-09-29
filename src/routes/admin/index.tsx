@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
+  PersonaComingSoon,
   PersonaWorkspacePlaceholder,
   type PersonaWorkspaceMilestone,
 } from "~/features/layouts/persona-namespace-layout";
@@ -35,14 +36,27 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminLanding() {
   return (
-    <PersonaWorkspacePlaceholder
-      personaLabel="Platform admin"
-      title="A governance console is on the horizon"
-      description={[
-        "We're preparing administration surfaces that consolidate",
-        "compliance, permissions, and cross-persona telemetry.",
-      ].join(" ")}
-      milestones={ADMIN_MILESTONES}
-    />
+    <div className="space-y-8">
+      <PersonaWorkspacePlaceholder
+        personaLabel="Platform admin"
+        title="A governance console is on the horizon"
+        description={[
+          "We're preparing administration surfaces that consolidate",
+          "compliance, permissions, and cross-persona telemetry.",
+        ].join(" ")}
+        milestones={ADMIN_MILESTONES}
+      />
+      <PersonaComingSoon
+        personaLabel="Platform admin"
+        featureFlag="persona-coming-soon-admin"
+        title="Which governance tools do you need first?"
+        description={[
+          "Tell us which controls, automations, and audit views unlock",
+          "confidence for platform stewardship on day one.",
+        ].join(" ")}
+        feedbackPrompt="What should the administration console make effortless?"
+        suggestionPlaceholder="Share the reports, workflows, or safeguards that would streamline governance."
+      />
+    </div>
   );
 }

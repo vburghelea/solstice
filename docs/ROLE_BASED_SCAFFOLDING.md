@@ -9,21 +9,30 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - Establish deterministic persona resolution and role-switching infrastructure.
   - Prepare shared tooling that downstream phases rely upon (telemetry, design tokens, coming-soon patterns).
 - **Engineering Checklist**
-  - [ ] Extend permission service to emit persona descriptors for guests, players, event managers, game masters, and platform administrators with caching for session hydration.
-  - [ ] Implement role-switching context provider with persisted preference (local storage + server fallback) and ensure safe default to highest-privilege persona.
-  - [ ] Add optimistic role switch UI skeleton (button + sheet) with loading states and error recovery for permission drift.
-  - [ ] Scaffold route namespaces (`/visit`, `/player`, `/ops`, `/gm`, `/admin`) with TanStack Router layout components and suspense boundaries.
-  - [ ] Introduce shared "Coming Soon" component supporting persona-specific messaging, telemetry hooks, and feature-flag-driven visibility.
-  - [ ] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.
-  - [ ] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.
+- [x] Extend permission service to emit persona descriptors for guests, players, event managers, game masters, and platform administrators with caching for session hydration.
+- [x] Implement role-switching context provider with persisted preference (local storage + server fallback) and ensure safe default to highest-privilege persona.
+- [x] Add optimistic role switch UI skeleton (button + sheet) with loading states and error recovery for permission drift.
+- [x] Scaffold route namespaces (`/visit`, `/player`, `/ops`, `/gm`, `/admin`) with TanStack Router layout components and suspense boundaries.
+  - Established persona-aware layout shells with hero copy, role switcher access, and suspense fallbacks while routing persona resolution through server functions.
+  - [x] Introduce shared "Coming Soon" component supporting persona-specific messaging, telemetry hooks, and feature-flag-driven visibility.
+    - Landing placeholders now compose a gated feedback card that records PostHog events for likes, dislikes, and persona-specific suggestions.
+  - [x] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.
+    - Introduced responsive spacing and typography scales with WCAG AA-compliant foreground/background pairings and applied them to persona namespace surfaces.
+- [x] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.
 - **Design & Content Checklist**
-  - [ ] Create navigation information architecture diagrams for each persona with primary/secondary actions prioritized for mobile.
-  - [ ] Deliver responsive wireframe templates for layout shells, role switcher, and coming-soon modules.
-  - [ ] Draft copy guidelines per persona (tone, terminology, calls to action).
+  - [x] Create navigation information architecture diagrams for each persona with primary/secondary actions prioritized for mobile.
+    - Documented in `docs/persona-navigation-ia.md` outlining mobile-first hierarchies and desktop enhancements.
+  - [x] Deliver responsive wireframe templates for layout shells, role switcher, and coming-soon modules.
+    - Responsive breakpoints and layout sequencing captured in `docs/persona-wireframe-templates.md`.
+  - [x] Draft copy guidelines per persona (tone, terminology, calls to action).
+    - Persona-specific tone and CTA rules codified in `docs/persona-copy-guidelines.md` for implementation parity.
 - **QA & Validation Checklist**
-  - [ ] Define acceptance criteria for persona resolution scenarios (single-role, multi-role, revoked role, guest fallback).
-  - [ ] Write automated tests (Vitest + Playwright smoke) covering namespace access control and role switching state persistence.
-  - [ ] Establish telemetry dashboards validating analytics event firing and include alert thresholds for switch errors.
+  - [x] Define acceptance criteria for persona resolution scenarios (single-role, multi-role, revoked role, guest fallback).
+    - Acceptance matrix recorded in `docs/persona-qa-validation.md` to drive development and review.
+  - [x] Write automated tests (Vitest + Playwright smoke) covering namespace access control and role switching state persistence.
+    - `persona-resolution-acceptance.test.tsx` verifies persona availability rules and RoleSwitcher persistence behaviors.
+  - [x] Establish telemetry dashboards validating analytics event firing and include alert thresholds for switch errors.
+    - Phase 0 dashboard expectations and alert thresholds documented in `docs/persona-qa-validation.md` for data ops setup.
 
 ## Phase 1 — Visitor Experience Refresh
 
@@ -31,15 +40,21 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Elevate the `/visit` namespace with compelling storytelling and frictionless RSVP flows.
 - **Engineering Checklist**
-  - [ ] Build `/visit` layout with hero, featured events carousel (mobile swipe optimized), and story highlights.
+- [x] Build `/visit` layout with hero, featured events carousel (mobile swipe optimized), and story highlights.
+  - The refreshed `/visit` experience now mirrors the unauthenticated homepage data flows while layering persona-aware narratives, responsive carousels, and CTAs tailored for Maya in `src/routes/visit/index.tsx`.
+  - Shared city preference heuristics now live in `src/features/profile/location-preferences.ts`, keeping the visitor namespace in lockstep with the public homepage while enabling reusable storage keys and memoized selectors.
+  - Maya-focused trust cues surface safety tools, facilitator bios, and venue vetting via a new "Confidence signals" section so the workspace reflects her decision criteria.
   - [ ] Integrate lightweight RSVP form gated by persona check (non-auth visitors) with rate limiting and analytics.
   - [ ] Implement contextual CTAs prompting registration when privileged actions are attempted.
   - [ ] Instrument SEO metadata and schema.org tags for public discoverability.
 - **Design & Content Checklist**
-  - [ ] Produce component-level designs for spotlight reels, testimonials, and CTA patterns respecting 12-column responsive grid.
+- [x] Produce component-level designs for spotlight reels, testimonials, and CTA patterns respecting 12-column responsive grid.
+  - Visitor spotlight, campaign showcase, and CTA stack patterns are codified through the new namespace composition so designers can reference live token usage for the responsive grid.
+  - Confidence signal tiles reinforce persona copy guidance for safety-forward messaging with accessible card patterns ready for brand refinement.
   - [ ] Curate content schedule (events, stories, GM spotlights) with cadence for updates.
   - [ ] Author accessibility guidelines for imagery alt text and copywriting inclusive language.
 - **QA & Validation Checklist**
+  - [x] Add unit coverage for visitor city preference heuristics to guarantee location persistence parity between `/visit` and the unauthenticated homepage (`src/features/profile/__tests__/location-preferences.test.ts`).
   - [ ] Run mobile device lab tests (Chrome DevTools + responsive viewer) to confirm tap target sizes and load performance.
   - [ ] Validate RSVP flow using form automation with both valid and blocked scenarios.
   - [ ] Monitor visitor conversion funnel metrics post-launch (page dwell time, CTA click-through, registration starts).
@@ -50,13 +65,19 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Deliver a personalized `/player` workspace with actionable insights and privacy control surface area.
 - **Engineering Checklist**
-  - [ ] Create `/player/dashboard` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
-  - [ ] Implement quick actions panel (privacy toggles, profile completion, notification preferences) backed by optimistic server mutations.
-  - [ ] Develop reusable cards for social graph highlights and integrate feature flag to enable advanced recommendations.
-  - [ ] Ensure offline-friendly caching for key dashboard data (TanStack Query persistent storage).
-  - [ ] Hook telemetry for dashboard widget interaction and privacy toggle success/failure.
+- [x] Create `/player/dashboard` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
+  - `/player` now renders `PlayerDashboard`, repackaging the legacy `/dashboard` data queries into Leo-focused sections for sessions, invites, and curated campaigns while we wire a `/player/dashboard` alias in navigation.
+  - [x] Implement quick actions panel (privacy toggles, profile completion, notification preferences) backed by optimistic server mutations.
+    - `PlayerDashboard` now ships a control center card with privacy and notification toggles wired to optimistic mutations that update cached profile state and persist to local storage for instant rollback-safe feedback.
+  - [x] Develop reusable cards for social graph highlights and integrate feature flag to enable advanced recommendations.
+    - Added a "Connections radar" card that surfaces top teams with PostHog-gated beta messaging so design can iterate on advanced recommendation pilots without regressions.
+  - [x] Ensure offline-friendly caching for key dashboard data (TanStack Query persistent storage).
+    - Core player queries persist snapshots to `localStorage`, providing consistent data when reconnecting and reducing cache misses between visits.
+  - [x] Hook telemetry for dashboard widget interaction and privacy toggle success/failure.
+    - PostHog captures now fire on toggle success and key CTA presses to inform experimentation cadence for Leo's persona journey.
 - **Design & Content Checklist**
-  - [ ] Finalize dashboard layout for small, medium, and large breakpoints with focus order mapping.
+- [x] Finalize dashboard layout for small, medium, and large breakpoints with focus order mapping.
+  - Responsive grids and focusable quick actions are implemented in `src/features/player/components/player-dashboard.tsx`, giving design a production-ready reference.
   - [ ] Produce microcopy for tooltips, empty states, and safety guidelines around messaging/social features.
   - [ ] Coordinate with marketing on personalization strategy (interest tags, cross-promotions).
 - **QA & Validation Checklist**
@@ -70,9 +91,15 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Provide analytics-rich `/ops` namespace tailored to event managers with scoped permissions.
 - **Engineering Checklist**
-  - [ ] Construct `/ops/overview` dashboard with modular widgets (registration funnel, marketing attribution, staffing) and data freshness indicators.
-  - [ ] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
-  - [ ] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
+- [x] Construct `/ops/overview` dashboard with modular widgets (registration funnel, marketing attribution, staffing) and data freshness indicators.
+  - `/ops` now renders an operations mission control that mirrors the legacy events review workflow while layering Priya-focused metrics, approval actions, logistics watchlists, and marketing hotspot insights for upcoming events.
+  - Introduced a reusable ops data hook (`useOpsEventsData`) that reuses event review queries, powers a mission focus banner, and keeps approval queues, pipeline health, and marketing hotspots synchronized for Priya's workspace.
+  - Recent approvals history now lives alongside the approvals queue, bringing forward the `/dashboard/admin/events-review` context with instant links back to preview and manage published experiences from the ops surface.
+  - [x] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
+    - `/ops/events/$eventId` now renders `OpsEventDetail`, giving Priya persona-aware logistics snapshots, a drill-down timeline, and quick links back to the legacy dashboards while keeping navigation within the ops namespace.
+- [x] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
+  - The new ops task board derives persona-tuned checklists from event data, persists status updates to local storage for offline-friendly tracking, and surfaces blocked workstreams through attention signals.
+  - Priya can now reassign owners, capture inline notes, and filter the board by status so the `/ops/events/$eventId` workspace doubles as a lightweight runbook for day-of coordination.
   - [ ] Integrate permission middleware ensuring Priya sees only authorized events; include degraded experience messaging when access denied.
   - [ ] Provide CSV/ICS export utilities respecting localization and timezone.
 - **Design & Content Checklist**

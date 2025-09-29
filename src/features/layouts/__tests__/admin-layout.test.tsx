@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getGuestPersonaResolution } from "~/features/roles/persona-resolver";
+import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { renderWithRouter, screen } from "~/tests/utils";
 import { AdminLayout } from "../admin-layout";
 
@@ -9,13 +11,22 @@ vi.mock("~/lib/auth-client", () => ({
   },
 }));
 
+function renderWithPersona(options?: Parameters<typeof renderWithRouter>[1]) {
+  return renderWithRouter(
+    <RoleSwitcherProvider initialResolution={getGuestPersonaResolution()}>
+      <AdminLayout />
+    </RoleSwitcherProvider>,
+    options,
+  );
+}
+
 describe("AdminLayout with Router", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders admin layout with navigation", async () => {
-    await renderWithRouter(<AdminLayout />);
+    await renderWithPersona();
 
     // Check navigation elements - labels may appear in sidebar and mobile tab bar
     const dashboardTexts = screen.getAllByText("Dashboard");
@@ -54,7 +65,7 @@ describe("AdminLayout with Router", () => {
       profileUpdatedAt: new Date(),
     };
 
-    await renderWithRouter(<AdminLayout />, { user: customUser });
+    await renderWithPersona({ user: customUser });
 
     // Navigation should still render with custom user
     // Multiple "Dashboard" texts appear (sidebar subtitle and nav link)
@@ -66,7 +77,7 @@ describe("AdminLayout with Router", () => {
   });
 
   it("handles mobile menu toggle", async () => {
-    await renderWithRouter(<AdminLayout />);
+    await renderWithPersona();
 
     // Mobile menu is hidden by default on desktop
     // The test would need to mock window size to test mobile behavior
@@ -74,7 +85,7 @@ describe("AdminLayout with Router", () => {
   });
 
   it("displays all navigation links with correct hrefs", async () => {
-    await renderWithRouter(<AdminLayout />);
+    await renderWithPersona();
 
     const dashboardLinks = screen.getAllByRole("link", { name: /dashboard/i });
     const teamsLinks = screen.getAllByRole("link", { name: /teams/i });
@@ -138,7 +149,7 @@ describe("AdminLayout with Router", () => {
       ],
     };
 
-    await renderWithRouter(<AdminLayout />, { user: adminUser });
+    await renderWithPersona({ user: adminUser });
 
     expect(screen.getByText("Admin tools")).toBeInTheDocument();
 

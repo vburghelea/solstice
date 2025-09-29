@@ -40,12 +40,14 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Elevate the `/visit` namespace with compelling storytelling and frictionless RSVP flows.
 - **Engineering Checklist**
-  - [ ] Build `/visit` layout with hero, featured events carousel (mobile swipe optimized), and story highlights.
+- [x] Build `/visit` layout with hero, featured events carousel (mobile swipe optimized), and story highlights.
+  - The refreshed `/visit` experience now mirrors the unauthenticated homepage data flows while layering persona-aware narratives, responsive carousels, and CTAs tailored for Maya in `src/routes/visit/index.tsx`.
   - [ ] Integrate lightweight RSVP form gated by persona check (non-auth visitors) with rate limiting and analytics.
   - [ ] Implement contextual CTAs prompting registration when privileged actions are attempted.
   - [ ] Instrument SEO metadata and schema.org tags for public discoverability.
 - **Design & Content Checklist**
-  - [ ] Produce component-level designs for spotlight reels, testimonials, and CTA patterns respecting 12-column responsive grid.
+- [x] Produce component-level designs for spotlight reels, testimonials, and CTA patterns respecting 12-column responsive grid.
+  - Visitor spotlight, campaign showcase, and CTA stack patterns are codified through the new namespace composition so designers can reference live token usage for the responsive grid.
   - [ ] Curate content schedule (events, stories, GM spotlights) with cadence for updates.
   - [ ] Author accessibility guidelines for imagery alt text and copywriting inclusive language.
 - **QA & Validation Checklist**

@@ -53,12 +53,13 @@ export function resolvePersonaForContext(
 ): PersonaResolution {
   const context = createAccessContext(contextInput);
   const personas = PERSONA_DEFINITIONS.map((definition) => {
-    const accessResult = definition.access
-      ? definition.access(context)
+    const { access, ...definitionWithoutAccess } = definition;
+    const accessResult = access
+      ? access(context)
       : { availability: "available" as const };
 
     const personaState: PersonaState = {
-      ...definition,
+      ...definitionWithoutAccess,
       availability: accessResult.availability,
       ...(typeof accessResult.reason !== "undefined"
         ? { availabilityReason: accessResult.reason }

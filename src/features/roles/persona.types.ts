@@ -1,6 +1,8 @@
-import type { ReactNode } from "react";
+import { z } from "zod";
 
-export type PersonaId = "visitor" | "player" | "ops" | "gm" | "admin";
+export const personaIdSchema = z.enum(["visitor", "player", "ops", "gm", "admin"]);
+
+export type PersonaId = z.infer<typeof personaIdSchema>;
 
 export type PersonaAvailabilityStatus = "available" | "restricted" | "coming-soon";
 
@@ -18,12 +20,11 @@ export interface PersonaDefinition {
   namespacePath: string;
   defaultRedirect: string;
   priority: number;
-  icon?: ReactNode;
   analytics: PersonaAnalyticsConfig;
   access?: PersonaAccessEvaluator;
 }
 
-export interface PersonaState extends PersonaDefinition {
+export interface PersonaState extends Omit<PersonaDefinition, "access"> {
   availability: PersonaAvailabilityStatus;
   availabilityReason?: string;
 }

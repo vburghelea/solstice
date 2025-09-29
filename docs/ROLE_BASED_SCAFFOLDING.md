@@ -65,13 +65,15 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Deliver a personalized `/player` workspace with actionable insights and privacy control surface area.
 - **Engineering Checklist**
-  - [ ] Create `/player/dashboard` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
+- [x] Create `/player/dashboard` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
+  - `/player` now renders `PlayerDashboard`, repackaging the legacy `/dashboard` data queries into Leo-focused sections for sessions, invites, and curated campaigns while we wire a `/player/dashboard` alias in navigation.
   - [ ] Implement quick actions panel (privacy toggles, profile completion, notification preferences) backed by optimistic server mutations.
   - [ ] Develop reusable cards for social graph highlights and integrate feature flag to enable advanced recommendations.
   - [ ] Ensure offline-friendly caching for key dashboard data (TanStack Query persistent storage).
   - [ ] Hook telemetry for dashboard widget interaction and privacy toggle success/failure.
 - **Design & Content Checklist**
-  - [ ] Finalize dashboard layout for small, medium, and large breakpoints with focus order mapping.
+- [x] Finalize dashboard layout for small, medium, and large breakpoints with focus order mapping.
+  - Responsive grids and focusable quick actions are implemented in `src/features/player/components/player-dashboard.tsx`, giving design a production-ready reference.
   - [ ] Produce microcopy for tooltips, empty states, and safety guidelines around messaging/social features.
   - [ ] Coordinate with marketing on personalization strategy (interest tags, cross-promotions).
 - **QA & Validation Checklist**

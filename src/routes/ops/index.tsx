@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
+  PersonaComingSoon,
   PersonaWorkspacePlaceholder,
   type PersonaWorkspaceMilestone,
 } from "~/features/layouts/persona-namespace-layout";
@@ -35,14 +36,27 @@ export const Route = createFileRoute("/ops/")({
 
 function OpsLanding() {
   return (
-    <PersonaWorkspacePlaceholder
-      personaLabel="Operations"
-      title="An orchestration studio is in flight"
-      description={[
-        "We're crafting operations tooling that keeps event health, staffing,",
-        "and marketing context one tap away.",
-      ].join(" ")}
-      milestones={OPS_MILESTONES}
-    />
+    <div className="space-y-8">
+      <PersonaWorkspacePlaceholder
+        personaLabel="Operations"
+        title="An orchestration studio is in flight"
+        description={[
+          "We're crafting operations tooling that keeps event health, staffing,",
+          "and marketing context one tap away.",
+        ].join(" ")}
+        milestones={OPS_MILESTONES}
+      />
+      <PersonaComingSoon
+        personaLabel="Operations"
+        featureFlag="persona-coming-soon-ops"
+        title="Guide the event operations control center"
+        description={[
+          "Tell us which dashboards, alerts, and collaboration loops",
+          "will keep live events humming.",
+        ].join(" ")}
+        feedbackPrompt="What should the operations workspace make effortless?"
+        suggestionPlaceholder="Outline the metrics, automations, or handoffs that would streamline event execution."
+      />
+    </div>
   );
 }

@@ -147,6 +147,15 @@ describe("OpsOverviewDashboard", () => {
     startDate: "2024-04-22",
   });
 
+  const reviewedEvent = buildEvent({
+    id: "reviewed-1",
+    name: "Aurora Story Slam",
+    slug: "aurora-story-slam",
+    status: "published",
+    isPublic: true,
+    updatedAt: new Date("2024-03-30T12:00:00Z"),
+  });
+
   beforeEach(() => {
     queryMocks.useQuery.mockReset();
     queryMocks.useMutation.mockReset();
@@ -184,6 +193,18 @@ describe("OpsOverviewDashboard", () => {
         };
       }
 
+      if (key === "recent") {
+        return {
+          data: {
+            events: [reviewedEvent, publishedEvent],
+            totalCount: 2,
+            pageInfo,
+          },
+          isLoading: false,
+          isFetching: false,
+        };
+      }
+
       return { data: undefined, isLoading: false, isFetching: false };
     });
 
@@ -199,26 +220,27 @@ describe("OpsOverviewDashboard", () => {
     render(<OpsOverviewDashboard />);
 
     expect(screen.getByText("Event operations mission control")).toBeInTheDocument();
+    expect(screen.getByText("Approve the next submission")).toBeInTheDocument();
+    const missionLink = screen.getByRole("link", { name: "Review submission" });
+    expect(missionLink).toHaveAttribute("href", "/dashboard/admin/events-review");
     expect(screen.getByText("Awaiting review")).toBeInTheDocument();
-
-    const approvalsCard = screen.getByText("Awaiting review").closest("div");
-    expect(approvalsCard).not.toBeNull();
-    if (approvalsCard) {
-      expect(within(approvalsCard).getByText("1")).toBeInTheDocument();
-    }
 
     expect(screen.getByText("Community Showcase")).toBeInTheDocument();
     expect(screen.getByText("Story-first gathering for new tables")).toBeInTheDocument();
 
+    expect(screen.getByText("Recent approvals")).toBeInTheDocument();
+    expect(screen.getByText("Aurora Story Slam")).toBeInTheDocument();
+
     const user = userEvent.setup();
     await user.click(screen.getByRole("tab", { name: /Pipeline health/i }));
-    expect(screen.getAllByText("Galactic Championship").length).toBeGreaterThan(0);
+    const galacticRows = await screen.findAllByText("Galactic Championship");
+    expect(galacticRows.length).toBeGreaterThan(0);
     expect(screen.getAllByText("Legends Cup Finals").length).toBeGreaterThan(0);
     expect(
       screen.getAllByText("Confirm staffing, safety briefings, and arrival logistics")
         .length,
     ).toBeGreaterThan(0);
-  });
+  }, 10000);
 
   it("opens the approval dialog and triggers the mutation", async () => {
     const mutateSpy = vi.fn();

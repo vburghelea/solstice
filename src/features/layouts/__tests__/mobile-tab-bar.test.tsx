@@ -30,34 +30,22 @@ describe("MobileTabBar navigation", () => {
       path: "events",
       component: () => <div>Events</div>,
     });
-    const membersRoute = createRoute({
+    const gamesRoute = createRoute({
       getParentRoute: () => dashboardRoute,
-      path: "members",
-      component: () => <div>Members</div>,
+      path: "games",
+      component: () => <div>Games</div>,
     });
-    const profileRoute = createRoute({
+    const campaignsRoute = createRoute({
       getParentRoute: () => dashboardRoute,
-      path: "profile",
-      component: () => <div>Profile</div>,
-    });
-    const reportsRoute = createRoute({
-      getParentRoute: () => dashboardRoute,
-      path: "reports",
-      component: () => <div>Reports</div>,
-    });
-    const settingsRoute = createRoute({
-      getParentRoute: () => dashboardRoute,
-      path: "settings",
-      component: () => <div>Settings</div>,
+      path: "campaigns",
+      component: () => <div>Campaigns</div>,
     });
 
     const routeTree = rootRoute.addChildren([
       dashboardRoute,
       eventsRoute,
-      membersRoute,
-      profileRoute,
-      reportsRoute,
-      settingsRoute,
+      gamesRoute,
+      campaignsRoute,
     ]);
 
     const router = createRouter({
@@ -82,7 +70,10 @@ describe("MobileTabBar navigation", () => {
     const mobileNav = screen.getByRole("navigation", { name: /primary/i, hidden: true });
     expect(within(mobileNav).getByRole("link", { name: /home/i })).toBeInTheDocument();
     expect(within(mobileNav).getByRole("link", { name: /events/i })).toBeInTheDocument();
-    expect(within(mobileNav).getByRole("link", { name: /profile/i })).toBeInTheDocument();
+    expect(within(mobileNav).getByRole("link", { name: /games/i })).toBeInTheDocument();
+    expect(
+      within(mobileNav).getByRole("link", { name: /campaigns/i }),
+    ).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(within(mobileNav).getByRole("link", { name: /events/i }));
@@ -92,17 +83,17 @@ describe("MobileTabBar navigation", () => {
     );
 
     await act(async () => {
-      fireEvent.click(within(mobileNav).getByRole("link", { name: /members/i }));
+      fireEvent.click(within(mobileNav).getByRole("link", { name: /games/i }));
     });
     await waitFor(() =>
-      expect(router.history.location.pathname).toBe("/dashboard/members"),
+      expect(router.history.location.pathname).toBe("/dashboard/games"),
     );
 
     await act(async () => {
-      fireEvent.click(within(mobileNav).getByRole("link", { name: /settings/i }));
+      fireEvent.click(within(mobileNav).getByRole("link", { name: /campaigns/i }));
     });
     await waitFor(() =>
-      expect(router.history.location.pathname).toBe("/dashboard/settings"),
+      expect(router.history.location.pathname).toBe("/dashboard/campaigns"),
     );
   });
 });

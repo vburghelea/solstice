@@ -1,4 +1,4 @@
-import { Calendar, Home, Settings, User, Users } from "lucide-react";
+import { Calendar, Home, ScrollText, Swords } from "lucide-react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { cn } from "~/shared/lib/utils";
 
@@ -13,9 +13,13 @@ export function MobileTabBar() {
   const items: TabItem[] = [
     { key: "dashboard", label: "Home", icon: Home, to: "/dashboard" },
     { key: "events", label: "Events", icon: Calendar, to: "/dashboard/events" },
-    { key: "members", label: "Members", icon: Users, to: "/dashboard/members" },
-    { key: "profile", label: "Profile", icon: User, to: "/dashboard/profile" },
-    { key: "settings", label: "Settings", icon: Settings, to: "/dashboard/settings" },
+    { key: "games", label: "Games", icon: Swords, to: "/dashboard/games" },
+    {
+      key: "campaigns",
+      label: "Campaigns",
+      icon: ScrollText,
+      to: "/dashboard/campaigns",
+    },
   ];
 
   return (
@@ -34,7 +38,7 @@ export function MobileTabBar() {
             <Link
               to={to}
               className={cn(
-                "text-muted-foreground flex h-[var(--admin-mobile-nav-height,3.5rem)] flex-col items-center justify-center gap-1 text-xs font-medium",
+                "text-muted-foreground flex h-[var(--admin-mobile-nav-height,3.5rem)] items-center justify-center",
                 "data-[status=active]:text-primary",
               )}
               activeProps={{
@@ -42,9 +46,10 @@ export function MobileTabBar() {
                 "aria-current": "page",
                 "data-status": "active",
               }}
+              aria-label={label}
             >
               <Icon className="h-5 w-5" />
-              <span>{label}</span>
+              <span className="sr-only">{label}</span>
             </Link>
           </li>
         ))}

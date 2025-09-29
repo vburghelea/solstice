@@ -21,7 +21,6 @@ import {
   Swords,
   Trophy,
   User,
-  UserPlus,
   Users,
   XCircle,
 } from "~/components/ui/icons";
@@ -311,9 +310,6 @@ function DashboardIndex() {
               {membershipStatus?.hasMembership ? "Renew Membership" : "Buy Membership"}
             </Link>
           </Button>
-          <Button className="w-full" variant="outline" disabled>
-            Join a Team (Soon)
-          </Button>
         </div>
 
         {/* Desktop: Cards */}
@@ -370,24 +366,6 @@ function DashboardIndex() {
                 <Link to="/dashboard/membership">
                   {membershipStatus?.hasMembership ? "Renew Now" : "Get Membership"}
                 </Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Join Team */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center gap-2">
-                <UserPlus className="h-5 w-5" />
-                Join a Team
-              </CardTitle>
-              <CardDescription>
-                Find and join a team to compete in tournaments
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" variant="outline" disabled>
-                Coming Soon
               </Button>
             </CardContent>
           </Card>

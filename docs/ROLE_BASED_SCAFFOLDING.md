@@ -12,7 +12,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - [x] Extend permission service to emit persona descriptors for guests, players, event managers, game masters, and platform administrators with caching for session hydration.
 - [x] Implement role-switching context provider with persisted preference (local storage + server fallback) and ensure safe default to highest-privilege persona.
 - [x] Add optimistic role switch UI skeleton (button + sheet) with loading states and error recovery for permission drift.
-  - [ ] Scaffold route namespaces (`/visit`, `/player`, `/ops`, `/gm`, `/admin`) with TanStack Router layout components and suspense boundaries.
+- [x] Scaffold route namespaces (`/visit`, `/player`, `/ops`, `/gm`, `/admin`) with TanStack Router layout components and suspense boundaries.
+  - Established persona-aware layout shells with hero copy, role switcher access, and suspense fallbacks while routing persona resolution through server functions.
   - [ ] Introduce shared "Coming Soon" component supporting persona-specific messaging, telemetry hooks, and feature-flag-driven visibility.
   - [ ] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.
 - [x] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.

@@ -67,10 +67,14 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Engineering Checklist**
 - [x] Create `/player/dashboard` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
   - `/player` now renders `PlayerDashboard`, repackaging the legacy `/dashboard` data queries into Leo-focused sections for sessions, invites, and curated campaigns while we wire a `/player/dashboard` alias in navigation.
-  - [ ] Implement quick actions panel (privacy toggles, profile completion, notification preferences) backed by optimistic server mutations.
-  - [ ] Develop reusable cards for social graph highlights and integrate feature flag to enable advanced recommendations.
-  - [ ] Ensure offline-friendly caching for key dashboard data (TanStack Query persistent storage).
-  - [ ] Hook telemetry for dashboard widget interaction and privacy toggle success/failure.
+  - [x] Implement quick actions panel (privacy toggles, profile completion, notification preferences) backed by optimistic server mutations.
+    - `PlayerDashboard` now ships a control center card with privacy and notification toggles wired to optimistic mutations that update cached profile state and persist to local storage for instant rollback-safe feedback.
+  - [x] Develop reusable cards for social graph highlights and integrate feature flag to enable advanced recommendations.
+    - Added a "Connections radar" card that surfaces top teams with PostHog-gated beta messaging so design can iterate on advanced recommendation pilots without regressions.
+  - [x] Ensure offline-friendly caching for key dashboard data (TanStack Query persistent storage).
+    - Core player queries persist snapshots to `localStorage`, providing consistent data when reconnecting and reducing cache misses between visits.
+  - [x] Hook telemetry for dashboard widget interaction and privacy toggle success/failure.
+    - PostHog captures now fire on toggle success and key CTA presses to inform experimentation cadence for Leo's persona journey.
 - **Design & Content Checklist**
 - [x] Finalize dashboard layout for small, medium, and large breakpoints with focus order mapping.
   - Responsive grids and focusable quick actions are implemented in `src/features/player/components/player-dashboard.tsx`, giving design a production-ready reference.

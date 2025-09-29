@@ -186,8 +186,8 @@ export function OpsOverviewDashboard() {
         title: "Stay ahead of the pipeline",
         description: `${event.name} is the next confirmed experience. Review staffing notes and marketing pushes to keep momentum strong.`,
         meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? "Location TBD"}`,
-        ctaHref: `/dashboard/events/${event.id}/manage`,
-        ctaLabel: "Manage playbook",
+        ctaHref: `/ops/events/${event.id}`,
+        ctaLabel: "Open ops view",
       };
     }
 
@@ -446,6 +446,14 @@ export function OpsOverviewDashboard() {
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
+                            <Button asChild size="sm">
+                              <Link
+                                to="/ops/events/$eventId"
+                                params={{ eventId: event.id }}
+                              >
+                                Tasks & notes
+                              </Link>
+                            </Button>
                             <Button asChild size="sm" variant="outline">
                               <Link to="/events/$slug" params={{ slug: event.slug }}>
                                 View
@@ -570,6 +578,14 @@ export function OpsOverviewDashboard() {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end gap-2">
+                              <Button asChild size="sm">
+                                <Link
+                                  to="/ops/events/$eventId"
+                                  params={{ eventId: event.id }}
+                                >
+                                  Tasks & notes
+                                </Link>
+                              </Button>
                               <Button asChild size="sm" variant="outline">
                                 <Link
                                   to="/dashboard/events/$eventId/manage"

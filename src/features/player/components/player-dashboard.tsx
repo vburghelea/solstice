@@ -159,6 +159,7 @@ function initialsFromName(name?: string | null) {
 export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   const queryClient = useQueryClient();
   const [showSpotlight, setShowSpotlight] = useState(false);
+  const isAuthenticated = Boolean(user?.id);
 
   useEffect(() => {
     posthog.onFeatureFlags(() => {
@@ -186,13 +187,15 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       DEFAULT_PROFILE_SNAPSHOT,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+    enabled: isAuthenticated,
   });
 
   useEffect(() => {
-    if (personaProfile) {
-      persistData(STORAGE_KEYS.profile, personaProfile);
+    if (!isAuthenticated || !personaProfile) {
+      return;
     }
-  }, [personaProfile]);
+    persistData(STORAGE_KEYS.profile, personaProfile);
+  }, [isAuthenticated, personaProfile]);
 
   const { profileComplete, privacySettings, notificationPreferences } =
     personaProfile ?? DEFAULT_PROFILE_SNAPSHOT;
@@ -214,14 +217,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       readStoredData<DashboardStatsData>(STORAGE_KEYS.dashboardStats) ?? undefined,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+    enabled: isAuthenticated,
   });
   const dashboardStats = dashboardStatsQuery.data;
 
   useEffect(() => {
-    if (dashboardStats) {
-      persistData(STORAGE_KEYS.dashboardStats, dashboardStats);
+    if (!isAuthenticated || !dashboardStats) {
+      return;
     }
-  }, [dashboardStats]);
+    persistData(STORAGE_KEYS.dashboardStats, dashboardStats);
+  }, [dashboardStats, isAuthenticated]);
 
   const membershipStatusQuery = useQuery<MembershipStatusValue | null, Error>({
     queryKey: ["membership-status"],
@@ -240,14 +245,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       readStoredData<MembershipStatusValue | null>(STORAGE_KEYS.membership) ?? null,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+    enabled: isAuthenticated,
   });
   const membershipStatus = membershipStatusQuery.data;
 
   useEffect(() => {
-    if (membershipStatus !== undefined) {
-      persistData(STORAGE_KEYS.membership, membershipStatus);
+    if (!isAuthenticated || membershipStatus === undefined) {
+      return;
     }
-  }, [membershipStatus]);
+    persistData(STORAGE_KEYS.membership, membershipStatus);
+  }, [isAuthenticated, membershipStatus]);
 
   const userTeamsQuery = useQuery<UserTeamsData, Error>({
     queryKey: ["userTeams"],
@@ -258,12 +265,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     initialData: () => readStoredData<UserTeamsData>(STORAGE_KEYS.teams) ?? [],
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+    enabled: isAuthenticated,
   });
   const userTeams = useMemo(() => userTeamsQuery.data ?? [], [userTeamsQuery.data]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
     persistData(STORAGE_KEYS.teams, userTeams);
-  }, [userTeams]);
+  }, [isAuthenticated, userTeams]);
 
   const nextGameQuery = useQuery<NextGameOperationResult | undefined, Error>({
     queryKey: ["next-user-game"],
@@ -272,14 +283,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       readStoredData<NextGameOperationResult>(STORAGE_KEYS.nextGame) ?? undefined,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+    enabled: isAuthenticated,
   });
   const nextGameResult = nextGameQuery.data;
 
   useEffect(() => {
-    if (nextGameResult) {
-      persistData(STORAGE_KEYS.nextGame, nextGameResult);
+    if (!isAuthenticated || !nextGameResult) {
+      return;
     }
-  }, [nextGameResult]);
+    persistData(STORAGE_KEYS.nextGame, nextGameResult);
+  }, [isAuthenticated, nextGameResult]);
   const nextGame = nextGameResult?.success ? nextGameResult.data : null;
 
   const upcomingEventsQuery = useQuery<UpcomingEventsData, Error>({
@@ -288,6 +301,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     initialData: () => readStoredData<UpcomingEventsData>(STORAGE_KEYS.events) ?? [],
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
+    enabled: isAuthenticated,
   });
   const upcomingEventsRes = useMemo(
     () => upcomingEventsQuery.data ?? [],
@@ -295,10 +309,11 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   );
 
   useEffect(() => {
-    if (Array.isArray(upcomingEventsRes)) {
-      persistData(STORAGE_KEYS.events, upcomingEventsRes);
+    if (!isAuthenticated || !Array.isArray(upcomingEventsRes)) {
+      return;
     }
-  }, [upcomingEventsRes]);
+    persistData(STORAGE_KEYS.events, upcomingEventsRes);
+  }, [isAuthenticated, upcomingEventsRes]);
   const upcomingEvents = useMemo(
     () => (Array.isArray(upcomingEventsRes) ? upcomingEventsRes : []),
     [upcomingEventsRes],
@@ -312,14 +327,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     },
     refetchOnMount: "always",
     initialData: () => readStoredData<number>(STORAGE_KEYS.reviews) ?? 0,
+    enabled: isAuthenticated,
   });
   const pendingReviewsCount = pendingReviewsQuery.data ?? 0;
 
   useEffect(() => {
-    if (typeof pendingReviewsCount === "number") {
-      persistData(STORAGE_KEYS.reviews, pendingReviewsCount);
+    if (!isAuthenticated || typeof pendingReviewsCount !== "number") {
+      return;
     }
-  }, [pendingReviewsCount]);
+    persistData(STORAGE_KEYS.reviews, pendingReviewsCount);
+  }, [isAuthenticated, pendingReviewsCount]);
 
   const teamCount = userTeams.length;
   const membershipLabel = membershipStatus?.hasMembership ? "Active" : "Inactive";

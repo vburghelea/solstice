@@ -117,7 +117,9 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Launch the `/gm` workspace centered on campaign management, feedback loops, and bespoke pipeline visibility.
 - **Engineering Checklist**
-  - [ ] Develop `/gm/dashboard` summarizing campaign health, upcoming sessions, and player feedback trends.
+- [x] Develop `/gm/dashboard` summarizing campaign health, upcoming sessions, and player feedback trends.
+  - `/gm/dashboard` now surfaces a "session runway" fed by `listGamesWithCount`, a campaign pulse panel powered by `listCampaignsWithCount`,
+    and a feedback follow-up queue that maps scheduled sessions to narrative debrief tasks.
   - [ ] Implement campaign workspace `/gm/campaigns/$campaignId` with tabs for narrative assets, player dossiers, marketing briefs, and session history.
   - [ ] Create feedback triage board consolidating surveys, safety tools, and follow-up tasks.
   - [ ] Introduce B2B pipeline module with stages, assignments, and escalation hooks to Platform Admin namespace.

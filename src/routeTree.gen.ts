@@ -36,6 +36,7 @@ import { Route as EventsIndexRouteImport } from "./routes/events/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as AdminIndexRouteImport } from "./routes/admin/index";
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
+import { Route as GmDashboardRouteImport } from "./routes/gm/dashboard";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
@@ -232,6 +233,11 @@ const SystemsSlugRoute = SystemsSlugRouteImport.update({
   id: "/systems/$slug",
   path: "/systems/$slug",
   getParentRoute: () => rootRouteImport,
+} as any);
+const GmDashboardRoute = GmDashboardRouteImport.update({
+  id: "/dashboard",
+  path: "/dashboard",
+  getParentRoute: () => GmRouteRoute,
 } as any);
 const GameGameIdRoute = GameGameIdRouteImport.update({
   id: "/game/$gameId",
@@ -647,6 +653,7 @@ export interface FileRoutesByFullPath {
   "/event/$eventId": typeof EventEventIdRoute;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/gm/dashboard": typeof GmDashboardRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/admin/": typeof AdminIndexRoute;
   "/dashboard/": typeof DashboardIndexRoute;
@@ -720,6 +727,7 @@ export interface FileRoutesByTo {
   "/dashboard/social-audits": typeof DashboardSocialAuditsRoute;
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/gm/dashboard": typeof GmDashboardRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/admin": typeof AdminIndexRoute;
   "/dashboard": typeof DashboardIndexRoute;
@@ -807,6 +815,7 @@ export interface FileRoutesById {
   "/event/$eventId": typeof EventEventIdRoute;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/gm/dashboard": typeof GmDashboardRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/admin/": typeof AdminIndexRoute;
   "/dashboard/": typeof DashboardIndexRoute;
@@ -890,6 +899,7 @@ export interface FileRouteTypes {
     | "/event/$eventId"
     | "/events/$slug"
     | "/game/$gameId"
+    | "/gm/dashboard"
     | "/systems/$slug"
     | "/admin/"
     | "/dashboard/"
@@ -956,6 +966,7 @@ export interface FileRouteTypes {
     | "/dashboard/social-audits"
     | "/event/$eventId"
     | "/game/$gameId"
+    | "/gm/dashboard"
     | "/systems/$slug"
     | "/admin"
     | "/dashboard"
@@ -1035,6 +1046,7 @@ export interface FileRouteTypes {
     | "/event/$eventId"
     | "/events/$slug"
     | "/game/$gameId"
+    | "/gm/dashboard"
     | "/systems/$slug"
     | "/admin/"
     | "/dashboard/"
@@ -1444,6 +1456,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/systems/$slug";
       preLoaderRoute: typeof SystemsSlugRouteImport;
       parentRoute: typeof rootRouteImport;
+    };
+    "/gm/dashboard": {
+      id: "/gm/dashboard";
+      path: "/dashboard";
+      fullPath: "/gm/dashboard";
+      preLoaderRoute: typeof GmDashboardRouteImport;
+      parentRoute: typeof GmRouteRoute;
     };
     "/game/$gameId": {
       id: "/game/$gameId";
@@ -2164,10 +2183,12 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 );
 
 interface GmRouteRouteChildren {
+  GmDashboardRoute: typeof GmDashboardRoute;
   GmIndexRoute: typeof GmIndexRoute;
 }
 
 const GmRouteRouteChildren: GmRouteRouteChildren = {
+  GmDashboardRoute: GmDashboardRoute,
   GmIndexRoute: GmIndexRoute,
 };
 

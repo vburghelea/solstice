@@ -20,13 +20,19 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
     - Introduced responsive spacing and typography scales with WCAG AA-compliant foreground/background pairings and applied them to persona namespace surfaces.
 - [x] Set up centralized analytics events for persona switch, navigation impressions, and coming-soon feedback submissions.
 - **Design & Content Checklist**
-  - [ ] Create navigation information architecture diagrams for each persona with primary/secondary actions prioritized for mobile.
-  - [ ] Deliver responsive wireframe templates for layout shells, role switcher, and coming-soon modules.
-  - [ ] Draft copy guidelines per persona (tone, terminology, calls to action).
+  - [x] Create navigation information architecture diagrams for each persona with primary/secondary actions prioritized for mobile.
+    - Documented in `docs/persona-navigation-ia.md` outlining mobile-first hierarchies and desktop enhancements.
+  - [x] Deliver responsive wireframe templates for layout shells, role switcher, and coming-soon modules.
+    - Responsive breakpoints and layout sequencing captured in `docs/persona-wireframe-templates.md`.
+  - [x] Draft copy guidelines per persona (tone, terminology, calls to action).
+    - Persona-specific tone and CTA rules codified in `docs/persona-copy-guidelines.md` for implementation parity.
 - **QA & Validation Checklist**
-  - [ ] Define acceptance criteria for persona resolution scenarios (single-role, multi-role, revoked role, guest fallback).
-  - [ ] Write automated tests (Vitest + Playwright smoke) covering namespace access control and role switching state persistence.
-  - [ ] Establish telemetry dashboards validating analytics event firing and include alert thresholds for switch errors.
+  - [x] Define acceptance criteria for persona resolution scenarios (single-role, multi-role, revoked role, guest fallback).
+    - Acceptance matrix recorded in `docs/persona-qa-validation.md` to drive development and review.
+  - [x] Write automated tests (Vitest + Playwright smoke) covering namespace access control and role switching state persistence.
+    - `persona-resolution-acceptance.test.tsx` verifies persona availability rules and RoleSwitcher persistence behaviors.
+  - [x] Establish telemetry dashboards validating analytics event firing and include alert thresholds for switch errors.
+    - Phase 0 dashboard expectations and alert thresholds documented in `docs/persona-qa-validation.md` for data ops setup.
 
 ## Phase 1 — Visitor Experience Refresh
 

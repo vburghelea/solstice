@@ -120,8 +120,14 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - [x] Develop `/gm/dashboard` summarizing campaign health, upcoming sessions, and player feedback trends.
   - `/gm/dashboard` now surfaces a "session runway" fed by `listGamesWithCount`, a campaign pulse panel powered by `listCampaignsWithCount`,
     and a feedback follow-up queue that maps scheduled sessions to narrative debrief tasks.
-  - [ ] Implement campaign workspace `/gm/campaigns/$campaignId` with tabs for narrative assets, player dossiers, marketing briefs, and session history.
-  - [ ] Create feedback triage board consolidating surveys, safety tools, and follow-up tasks.
+  - [x] Implement campaign workspace `/gm/campaigns/$campaignId` with tabs for narrative assets, player dossiers, marketing briefs, and session history.
+    - Alex’s campaign studio now renders a narrative brief, safety checkpoints, player dossiers,
+      and upcoming/completed session pipeline cards fed by `getCampaign` and
+      `listGameSessionsByCampaignId` queries.
+  - [x] Create feedback triage board consolidating surveys, safety tools, and follow-up tasks.
+    - The `/gm/feedback` route aggregates completed sessions, active campaigns, and upcoming
+      games into a triage board that prioritizes debriefs, safety sweeps, and pre-session
+      nudges with severity cues.
   - [ ] Introduce B2B pipeline module with stages, assignments, and escalation hooks to Platform Admin namespace.
   - [ ] Ensure offline-friendly note editing with conflict resolution strategy and background sync indicators.
 - **Design & Content Checklist**

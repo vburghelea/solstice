@@ -24,13 +24,17 @@ interface GameMasterDashboardProps {
   campaignsTotal: number;
 }
 
+type FeedbackFollowUpAction =
+  | { to: "/gm/campaigns/$campaignId"; params: { campaignId: string } }
+  | { to: "/dashboard/games/$gameId"; params: { gameId: string } };
+
 interface FeedbackFollowUpItem {
   id: string;
   title: string;
   description: string;
   scheduledFor: string;
   actionLabel: string;
-  actionHref: string;
+  action: FeedbackFollowUpAction;
 }
 
 export function GameMasterDashboard({
@@ -57,7 +61,7 @@ export function GameMasterDashboard({
         ? (campaignLookup.get(game.campaignId) ?? "Standalone session")
         : "Standalone session";
       const sessionLabel = formatDateAndTime(game.dateTime);
-      const isCampaignSession = campaignName !== "Standalone session";
+      const isCampaignSession = Boolean(game.campaignId);
 
       return {
         id: game.id,
@@ -66,10 +70,16 @@ export function GameMasterDashboard({
           ? `Collect safety check-ins and narrative beats from ${game.participantCount} players.`
           : `Capture highlights and player energy while the story is fresh.`,
         scheduledFor: sessionLabel,
-        actionLabel: isCampaignSession ? "Open campaign" : "Session notes",
-        actionHref: isCampaignSession
-          ? "/dashboard/campaigns/" + game.campaignId
-          : "/dashboard/games/" + game.id,
+        actionLabel: isCampaignSession ? "Open campaign studio" : "Session notes",
+        action: game.campaignId
+          ? {
+              to: "/gm/campaigns/$campaignId",
+              params: { campaignId: game.campaignId },
+            }
+          : {
+              to: "/dashboard/games/$gameId",
+              params: { gameId: game.id },
+            },
       } satisfies FeedbackFollowUpItem;
     });
 
@@ -88,13 +98,22 @@ export function GameMasterDashboard({
                 into a single flow. Prioritize the stories that need attention next.
               </p>
             </div>
-            <Button
-              asChild
-              variant="secondary"
-              className="bg-white/10 text-white hover:bg-white/20"
-            >
-              <Link to="/dashboard/campaigns/create">Plan new campaign</Link>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                asChild
+                variant="secondary"
+                className="bg-white/10 text-white hover:bg-white/20"
+              >
+                <Link to="/dashboard/campaigns/create">Plan new campaign</Link>
+              </Button>
+              <Button
+                asChild
+                variant="secondary"
+                className="bg-white/10 text-white hover:bg-white/25"
+              >
+                <Link to="/gm/feedback">Feedback triage board</Link>
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -209,10 +228,10 @@ export function GameMasterDashboard({
                       </div>
                       <Button asChild variant="ghost" size="sm" className="shrink-0">
                         <Link
-                          to="/dashboard/campaigns/$campaignId"
+                          to="/gm/campaigns/$campaignId"
                           params={{ campaignId: campaign.id }}
                         >
-                          Review
+                          Open studio
                         </Link>
                       </Button>
                     </div>
@@ -232,9 +251,14 @@ export function GameMasterDashboard({
               Keep safety tools and post-session reflections flowing for every table.
             </p>
           </div>
-          <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
-            {feedbackFollowUps.length} upcoming touchpoints
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
+              {feedbackFollowUps.length} upcoming touchpoints
+            </Badge>
+            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+              <Link to="/gm/feedback">Open triage board</Link>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {feedbackFollowUps.length === 0 ? (
@@ -250,7 +274,10 @@ export function GameMasterDashboard({
               {feedbackFollowUps.map((followUp) => (
                 <List.Item
                   key={followUp.id}
-                  className="border-border/60 bg-muted/20 flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className={cn(
+                    "border-border/60 bg-muted/20 flex flex-col gap-3 rounded-2xl border p-4",
+                    "sm:flex-row sm:items-center sm:justify-between",
+                  )}
                 >
                   <div className="space-y-1">
                     <p className="font-medium">{followUp.title}</p>
@@ -267,7 +294,7 @@ export function GameMasterDashboard({
                     size="sm"
                     className="self-start sm:self-auto"
                   >
-                    <Link to={followUp.actionHref}>{followUp.actionLabel}</Link>
+                    <Link {...followUp.action}>{followUp.actionLabel}</Link>
                   </Button>
                 </List.Item>
               ))}

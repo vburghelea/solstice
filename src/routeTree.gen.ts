@@ -58,6 +58,7 @@ import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-passw
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as AdminUsersRouteImport } from "./routes/admin/users";
+import { Route as AdminSecurityRouteImport } from "./routes/admin/security";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminInsightsRouteImport } from "./routes/admin/insights";
 import { Route as AdminFeatureFlagsRouteImport } from "./routes/admin/feature-flags";
@@ -347,6 +348,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: "/users",
   path: "/users",
+  getParentRoute: () => AdminRouteRoute,
+} as any);
+const AdminSecurityRoute = AdminSecurityRouteImport.update({
+  id: "/security",
+  path: "/security",
   getParentRoute: () => AdminRouteRoute,
 } as any);
 const AdminRolesRoute = AdminRolesRouteImport.update({
@@ -651,6 +657,7 @@ export interface FileRoutesByFullPath {
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
+  "/admin/security": typeof AdminSecurityRoute;
   "/admin/users": typeof AdminUsersRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -730,6 +737,7 @@ export interface FileRoutesByTo {
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
+  "/admin/security": typeof AdminSecurityRoute;
   "/admin/users": typeof AdminUsersRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -809,6 +817,7 @@ export interface FileRoutesById {
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
+  "/admin/security": typeof AdminSecurityRoute;
   "/admin/users": typeof AdminUsersRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -898,6 +907,7 @@ export interface FileRouteTypes {
     | "/admin/feature-flags"
     | "/admin/insights"
     | "/admin/roles"
+    | "/admin/security"
     | "/admin/users"
     | "/auth/forgot-password"
     | "/auth/login"
@@ -977,6 +987,7 @@ export interface FileRouteTypes {
     | "/admin/feature-flags"
     | "/admin/insights"
     | "/admin/roles"
+    | "/admin/security"
     | "/admin/users"
     | "/auth/forgot-password"
     | "/auth/login"
@@ -1055,6 +1066,7 @@ export interface FileRouteTypes {
     | "/admin/feature-flags"
     | "/admin/insights"
     | "/admin/roles"
+    | "/admin/security"
     | "/admin/users"
     | "/auth/forgot-password"
     | "/auth/login"
@@ -1600,6 +1612,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminUsersRouteImport;
       parentRoute: typeof AdminRouteRoute;
     };
+    "/admin/security": {
+      id: "/admin/security";
+      path: "/security";
+      fullPath: "/admin/security";
+      preLoaderRoute: typeof AdminSecurityRouteImport;
+      parentRoute: typeof AdminRouteRoute;
+    };
     "/admin/roles": {
       id: "/admin/roles";
       path: "/roles";
@@ -1983,6 +2002,7 @@ interface AdminRouteRouteChildren {
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute;
   AdminInsightsRoute: typeof AdminInsightsRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
+  AdminSecurityRoute: typeof AdminSecurityRoute;
   AdminUsersRoute: typeof AdminUsersRoute;
   AdminIndexRoute: typeof AdminIndexRoute;
 }
@@ -1992,6 +2012,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminInsightsRoute: AdminInsightsRoute,
   AdminRolesRoute: AdminRolesRoute,
+  AdminSecurityRoute: AdminSecurityRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 };

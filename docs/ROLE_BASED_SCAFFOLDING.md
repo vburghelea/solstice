@@ -184,7 +184,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Introduce shared communication and reporting layers reinforcing multi-persona collaboration.
 - **Engineering Checklist**
-  - [ ] Deploy shared inbox module accessible from `/player/inbox`, `/ops/inbox`, `/gm/inbox`, and `/admin/inbox` with persona-aware filters.
+- [x] Deploy shared inbox module accessible from `/player/inbox`, `/ops/inbox`, `/gm/inbox`, and `/admin/inbox` with persona-aware filters.
+  - Implemented a shared inbox experience via `SharedInboxView`, exposing persona-specific filters, metrics, and action items across all namespaces with fixture-backed collaboration threads for validation.
   - [ ] Implement comment/annotation system with @mentions respecting permissions and notification preferences.
   - [ ] Create cross-namespace reporting dashboards linking visitor conversion, player retention, event performance, and GM pipeline metrics.
   - [ ] Add feedback capture loops (surveys, quick reactions) feeding into product backlog dashboards.

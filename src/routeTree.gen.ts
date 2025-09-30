@@ -36,6 +36,9 @@ import { Route as EventsIndexRouteImport } from "./routes/events/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as AdminIndexRouteImport } from "./routes/admin/index";
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
+import { Route as PlayerInboxRouteImport } from "./routes/player/inbox";
+import { Route as OpsInboxRouteImport } from "./routes/ops/inbox";
+import { Route as GmInboxRouteImport } from "./routes/gm/inbox";
 import { Route as GmFeedbackRouteImport } from "./routes/gm/feedback";
 import { Route as GmDashboardRouteImport } from "./routes/gm/dashboard";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
@@ -61,6 +64,7 @@ import { Route as AdminUsersRouteImport } from "./routes/admin/users";
 import { Route as AdminSecurityRouteImport } from "./routes/admin/security";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminInsightsRouteImport } from "./routes/admin/insights";
+import { Route as AdminInboxRouteImport } from "./routes/admin/inbox";
 import { Route as AdminFeatureFlagsRouteImport } from "./routes/admin/feature-flags";
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
@@ -240,6 +244,21 @@ const SystemsSlugRoute = SystemsSlugRouteImport.update({
   path: "/systems/$slug",
   getParentRoute: () => rootRouteImport,
 } as any);
+const PlayerInboxRoute = PlayerInboxRouteImport.update({
+  id: "/inbox",
+  path: "/inbox",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
+const OpsInboxRoute = OpsInboxRouteImport.update({
+  id: "/inbox",
+  path: "/inbox",
+  getParentRoute: () => OpsRouteRoute,
+} as any);
+const GmInboxRoute = GmInboxRouteImport.update({
+  id: "/inbox",
+  path: "/inbox",
+  getParentRoute: () => GmRouteRoute,
+} as any);
 const GmFeedbackRoute = GmFeedbackRouteImport.update({
   id: "/feedback",
   path: "/feedback",
@@ -363,6 +382,11 @@ const AdminRolesRoute = AdminRolesRouteImport.update({
 const AdminInsightsRoute = AdminInsightsRouteImport.update({
   id: "/insights",
   path: "/insights",
+  getParentRoute: () => AdminRouteRoute,
+} as any);
+const AdminInboxRoute = AdminInboxRouteImport.update({
+  id: "/inbox",
+  path: "/inbox",
   getParentRoute: () => AdminRouteRoute,
 } as any);
 const AdminFeatureFlagsRoute = AdminFeatureFlagsRouteImport.update({
@@ -655,6 +679,7 @@ export interface FileRoutesByFullPath {
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
+  "/admin/inbox": typeof AdminInboxRoute;
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
@@ -680,6 +705,9 @@ export interface FileRoutesByFullPath {
   "/game/$gameId": typeof GameGameIdRoute;
   "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
+  "/gm/inbox": typeof GmInboxRoute;
+  "/ops/inbox": typeof OpsInboxRoute;
+  "/player/inbox": typeof PlayerInboxRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/admin/": typeof AdminIndexRoute;
   "/dashboard/": typeof DashboardIndexRoute;
@@ -735,6 +763,7 @@ export interface FileRoutesByTo {
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
+  "/admin/inbox": typeof AdminInboxRoute;
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
@@ -753,6 +782,9 @@ export interface FileRoutesByTo {
   "/game/$gameId": typeof GameGameIdRoute;
   "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
+  "/gm/inbox": typeof GmInboxRoute;
+  "/ops/inbox": typeof OpsInboxRoute;
+  "/player/inbox": typeof PlayerInboxRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/admin": typeof AdminIndexRoute;
   "/dashboard": typeof DashboardIndexRoute;
@@ -815,6 +847,7 @@ export interface FileRoutesById {
   "/dashboard/admin": typeof DashboardAdminRouteRouteWithChildren;
   "/admin/events-review": typeof AdminEventsReviewRoute;
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
+  "/admin/inbox": typeof AdminInboxRoute;
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
@@ -840,6 +873,9 @@ export interface FileRoutesById {
   "/game/$gameId": typeof GameGameIdRoute;
   "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
+  "/gm/inbox": typeof GmInboxRoute;
+  "/ops/inbox": typeof OpsInboxRoute;
+  "/player/inbox": typeof PlayerInboxRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/admin/": typeof AdminIndexRoute;
   "/dashboard/": typeof DashboardIndexRoute;
@@ -905,6 +941,7 @@ export interface FileRouteTypes {
     | "/dashboard/admin"
     | "/admin/events-review"
     | "/admin/feature-flags"
+    | "/admin/inbox"
     | "/admin/insights"
     | "/admin/roles"
     | "/admin/security"
@@ -930,6 +967,9 @@ export interface FileRouteTypes {
     | "/game/$gameId"
     | "/gm/dashboard"
     | "/gm/feedback"
+    | "/gm/inbox"
+    | "/ops/inbox"
+    | "/player/inbox"
     | "/systems/$slug"
     | "/admin/"
     | "/dashboard/"
@@ -985,6 +1025,7 @@ export interface FileRouteTypes {
     | "/dashboard/admin"
     | "/admin/events-review"
     | "/admin/feature-flags"
+    | "/admin/inbox"
     | "/admin/insights"
     | "/admin/roles"
     | "/admin/security"
@@ -1003,6 +1044,9 @@ export interface FileRouteTypes {
     | "/game/$gameId"
     | "/gm/dashboard"
     | "/gm/feedback"
+    | "/gm/inbox"
+    | "/ops/inbox"
+    | "/player/inbox"
     | "/systems/$slug"
     | "/admin"
     | "/dashboard"
@@ -1064,6 +1108,7 @@ export interface FileRouteTypes {
     | "/dashboard/admin"
     | "/admin/events-review"
     | "/admin/feature-flags"
+    | "/admin/inbox"
     | "/admin/insights"
     | "/admin/roles"
     | "/admin/security"
@@ -1089,6 +1134,9 @@ export interface FileRouteTypes {
     | "/game/$gameId"
     | "/gm/dashboard"
     | "/gm/feedback"
+    | "/gm/inbox"
+    | "/ops/inbox"
+    | "/player/inbox"
     | "/systems/$slug"
     | "/admin/"
     | "/dashboard/"
@@ -1458,6 +1506,27 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SystemsSlugRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/player/inbox": {
+      id: "/player/inbox";
+      path: "/inbox";
+      fullPath: "/player/inbox";
+      preLoaderRoute: typeof PlayerInboxRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
+    "/ops/inbox": {
+      id: "/ops/inbox";
+      path: "/inbox";
+      fullPath: "/ops/inbox";
+      preLoaderRoute: typeof OpsInboxRouteImport;
+      parentRoute: typeof OpsRouteRoute;
+    };
+    "/gm/inbox": {
+      id: "/gm/inbox";
+      path: "/inbox";
+      fullPath: "/gm/inbox";
+      preLoaderRoute: typeof GmInboxRouteImport;
+      parentRoute: typeof GmRouteRoute;
+    };
     "/gm/feedback": {
       id: "/gm/feedback";
       path: "/feedback";
@@ -1631,6 +1700,13 @@ declare module "@tanstack/react-router" {
       path: "/insights";
       fullPath: "/admin/insights";
       preLoaderRoute: typeof AdminInsightsRouteImport;
+      parentRoute: typeof AdminRouteRoute;
+    };
+    "/admin/inbox": {
+      id: "/admin/inbox";
+      path: "/inbox";
+      fullPath: "/admin/inbox";
+      preLoaderRoute: typeof AdminInboxRouteImport;
       parentRoute: typeof AdminRouteRoute;
     };
     "/admin/feature-flags": {
@@ -2000,6 +2076,7 @@ declare module "@tanstack/react-start/server" {
 interface AdminRouteRouteChildren {
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute;
+  AdminInboxRoute: typeof AdminInboxRoute;
   AdminInsightsRoute: typeof AdminInsightsRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   AdminSecurityRoute: typeof AdminSecurityRoute;
@@ -2010,6 +2087,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminEventsReviewRoute: AdminEventsReviewRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
+  AdminInboxRoute: AdminInboxRoute,
   AdminInsightsRoute: AdminInsightsRoute,
   AdminRolesRoute: AdminRolesRoute,
   AdminSecurityRoute: AdminSecurityRoute,
@@ -2236,6 +2314,7 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 interface GmRouteRouteChildren {
   GmDashboardRoute: typeof GmDashboardRoute;
   GmFeedbackRoute: typeof GmFeedbackRoute;
+  GmInboxRoute: typeof GmInboxRoute;
   GmIndexRoute: typeof GmIndexRoute;
   GmCampaignsCampaignIdRoute: typeof GmCampaignsCampaignIdRoute;
 }
@@ -2243,6 +2322,7 @@ interface GmRouteRouteChildren {
 const GmRouteRouteChildren: GmRouteRouteChildren = {
   GmDashboardRoute: GmDashboardRoute,
   GmFeedbackRoute: GmFeedbackRoute,
+  GmInboxRoute: GmInboxRoute,
   GmIndexRoute: GmIndexRoute,
   GmCampaignsCampaignIdRoute: GmCampaignsCampaignIdRoute,
 };
@@ -2263,11 +2343,13 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
 );
 
 interface OpsRouteRouteChildren {
+  OpsInboxRoute: typeof OpsInboxRoute;
   OpsIndexRoute: typeof OpsIndexRoute;
   OpsEventsEventIdRoute: typeof OpsEventsEventIdRoute;
 }
 
 const OpsRouteRouteChildren: OpsRouteRouteChildren = {
+  OpsInboxRoute: OpsInboxRoute,
   OpsIndexRoute: OpsIndexRoute,
   OpsEventsEventIdRoute: OpsEventsEventIdRoute,
 };
@@ -2277,10 +2359,12 @@ const OpsRouteRouteWithChildren = OpsRouteRoute._addFileChildren(
 );
 
 interface PlayerRouteRouteChildren {
+  PlayerInboxRoute: typeof PlayerInboxRoute;
   PlayerIndexRoute: typeof PlayerIndexRoute;
 }
 
 const PlayerRouteRouteChildren: PlayerRouteRouteChildren = {
+  PlayerInboxRoute: PlayerInboxRoute,
   PlayerIndexRoute: PlayerIndexRoute,
 };
 

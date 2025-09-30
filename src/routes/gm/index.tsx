@@ -39,27 +39,33 @@ export const Route = createFileRoute("/gm/")({
 function GameMasterLanding() {
   return (
     <div className="space-y-8">
-      <div className="border-border/70 bg-muted/30 sm:justif y-between flex flex-col gap-4 rounded-3xl border p-6 sm:flex-row sm:items-center">
+      <div className="border-border/70 bg-muted/30 flex flex-col gap-4 rounded-3xl border p-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-4">
           <span className="bg-primary/10 text-primary inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
             <SparklesIcon className="size-5" />
           </span>
           <div className="space-y-1">
             <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-              Phase 4 preview
+              Phase 4 studio rollout
             </p>
             <h2 className="text-foreground text-xl font-semibold sm:text-2xl">
-              Explore the Game Master dashboard in progress
+              Explore the Game Master dashboard and triage board
             </h2>
             <p className="text-muted-foreground text-sm">
-              Peek at Alex’s unified studio—campaign pulse, upcoming sessions, and
-              follow-up rituals are ready for feedback.
+              Alex’s campaign workspace and feedback triage board now layer on top of the
+              dashboard so Story Guides can prep, run, and debrief without switching
+              personas.
             </p>
           </div>
         </div>
-        <Button asChild size="sm" className="self-start sm:self-center">
-          <Link to="/gm/dashboard">Open dashboard preview</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2 self-start sm:self-center">
+          <Button asChild size="sm">
+            <Link to="/gm/dashboard">Open dashboard</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/gm/feedback">Open feedback triage</Link>
+          </Button>
+        </div>
       </div>
       <PersonaWorkspacePlaceholder
         personaLabel="Game Master"

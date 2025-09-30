@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 
+import { AdminConsoleNavigation } from "~/features/admin/components/admin-console-navigation";
 import {
   PersonaNamespaceFallback,
   PersonaNamespaceLayout,
@@ -76,6 +77,7 @@ function AdminNamespaceShell() {
         }}
         annotation={<PersonaNamespacePillars items={ADMIN_PILLARS} />}
         fallback={<PersonaNamespaceFallback label="Platform admin" />}
+        children={<AdminConsoleNavigation />}
       />
     </RoleSwitcherProvider>
   );

@@ -149,13 +149,20 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Deliver the `/admin` namespace with robust governance tooling and cross-persona oversight.
 - **Engineering Checklist**
-  - [ ] Build `/admin/insights` featuring system KPIs, incident timeline, and alert configuration with role-based access enforcement.
-  - [ ] Implement `/admin/users` for role management, including bulk operations, audit trails, and MFA enforcement UI.
-  - [ ] Integrate feature flag management console with rollout analytics and persona impact notes.
-  - [ ] Provide export services for compliance reporting (PDF/CSV) with scheduled delivery.
+  - [x] Build `/admin/insights` featuring system KPIs, incident timeline, and alert configuration with role-based access enforcement.
+    - `/admin/insights` now streams the `AdminInsightsDashboard`, surfacing uptime, membership, incident timelines, and alert readiness with persona impact callouts.
+  - [x] Implement `/admin/users` for role management, including bulk operations, audit trails, and MFA enforcement UI.
+    - The user governance table highlights membership states, role coverage, MFA gaps, and recent audit activity while supporting CSV export and MFA filtering.
+  - [x] Integrate feature flag management console with rollout analytics and persona impact notes.
+    - The feature rollout console manages local overrides for persona previews and records environment defaults, giving Jordan safe experimentation controls.
+  - [x] Provide export services for compliance reporting (PDF/CSV) with scheduled delivery.
+    - Compliance exports generate CSV downloads with membership, MFA, and risk metadata ready for scheduled delivery wiring.
+  - [x] Resolve admin data model type regressions to restore build health ahead of QA automation.
+    - Admin insights and directory queries now normalize Postgres date comparisons and strict result typing so `pnpm check-types` passes cleanly.
   - [ ] Harden security (CSP updates, critical action confirmation modals, logging).
 - **Design & Content Checklist**
-  - [ ] Produce dense-data layouts optimized for desktop while maintaining responsive fallbacks.
+  - [x] Produce dense-data layouts optimized for desktop while maintaining responsive fallbacks.
+    - Insights, governance tables, and flag controls use responsive token spacing and accessible typographic hierarchy for large-screen stewardship.
   - [ ] Draft policy-aligned copy for warnings, confirmations, and audit logs.
   - [ ] Collaborate with legal/compliance stakeholders on reporting templates.
 - **QA & Validation Checklist**

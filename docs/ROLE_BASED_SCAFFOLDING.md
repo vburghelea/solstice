@@ -2,6 +2,14 @@
 
 _This execution plan operationalizes the value blueprint outlined in `docs/role-personas-plan.md`, providing phase-by-phase guidance for engineering, product design, and QA teams. Each phase includes checklists engineered for low-level delivery, centered on mobile-first, role-aware UX._
 
+## Current Validation Snapshot
+
+- Persona resolution and switching persistence are live through `RoleSwitcherProvider`, which hydrates preferred personas from storage, guards availability, and surfaces recovery paths when a switch fails (`src/features/roles/role-switcher-context.tsx`, backed by `persona-resolution-acceptance.test.tsx`).
+- Visitor namespace scaffolding ships the narrative-driven landing, responsive discovery widgets, and city preference heuristics described in Phase 1 via `src/routes/visit/index.tsx` and the namespace layout shell in `src/routes/visit/route.tsx`.
+- Player workspace renders the unified dashboard with optimistic privacy controls, persisted queries, and feature-flagged discovery tiles in `src/features/player/components/player-dashboard.tsx`, surfaced through the `/player` namespace entrypoint.
+- Operations task board combines event data, offline-friendly task persistence, and filter controls inside `src/features/ops/components/ops-event-detail.tsx`, aligning with the modular widget vision in Phase 3.
+- Shared inbox and collaboration workspace now expose persona-aware filters, reporting metrics, and feedback loops as defined in Phase 6 through `src/features/inbox/components/shared-inbox-view.tsx` and `src/features/collaboration/components/cross-persona-collaboration-workspace.tsx`, backed by live Drizzle queries in `shared-inbox.queries.ts` and `collaboration.queries.ts` instead of fixtures.
+
 ## Phase 0 — Foundation & Persona Resolution
 
 - _JTBD (Jordan, the Systems Steward): When I certify the platform for role-aware experiences, I want provable guardrails so I can trust future iterations to respect access boundaries._
@@ -185,10 +193,13 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - Introduce shared communication and reporting layers reinforcing multi-persona collaboration.
 - **Engineering Checklist**
 - [x] Deploy shared inbox module accessible from `/player/inbox`, `/ops/inbox`, `/gm/inbox`, and `/admin/inbox` with persona-aware filters.
-  - Implemented a shared inbox experience via `SharedInboxView`, exposing persona-specific filters, metrics, and action items across all namespaces with fixture-backed collaboration threads for validation.
+  - Implemented a shared inbox experience via `SharedInboxView`, exposing persona-specific filters, metrics, and action items across all namespaces with server-derived event, game, and membership data sourced from `shared-inbox.queries.ts`.
+  - Quick metrics now stream real registration counts, pending invites, and event alerts from Drizzle queries so each persona sees live KPIs instead of fixtures.
+  - Persona highlights and participant avatars pull from actual user, membership, and role records, ensuring fallback contacts only appear when no authoritative data exists.
   - [ ] Implement comment/annotation system with @mentions respecting permissions and notification preferences.
-  - [x] Create cross-namespace reporting dashboards linking visitor conversion, player retention, event performance, and GM pipeline metrics.
-    - Introduced the `CrossPersonaCollaborationWorkspace` across `/player`, `/ops`, `/gm`, and `/admin` namespaces to visualize shared KPIs and collaboration rhythms powered by fixture data.
+- [x] Create cross-namespace reporting dashboards linking visitor conversion, player retention, event performance, and GM pipeline metrics.
+  - Introduced the `CrossPersonaCollaborationWorkspace` across `/player`, `/ops`, `/gm`, and `/admin` namespaces to visualize shared KPIs and collaboration rhythms powered by live aggregates from `collaboration.queries.ts`.
+  - Snapshot summary strings, persona filters, and rhythm schedules now stitch together campaigns, memberships, reviews, and event pipelines with persona-specific callouts derived from the production schema.
   - [x] Add feedback capture loops (surveys, quick reactions) feeding into product backlog dashboards.
     - Embedded feedback panels with pulse survey insights and backlog-ready quick reactions that surface context-aware confirmations when teammates respond.
 - **Design & Content Checklist**
@@ -198,8 +209,27 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - [ ] Provide guidelines for responsive layout of collaborative tools, ensuring parity between mobile and desktop.
 - **QA & Validation Checklist**
   - [ ] Integration tests covering cross-role message visibility and permission boundaries.
-  - [ ] Accessibility audits for collaborative components (keyboard navigation, ARIA roles, live region announcements).
-  - [ ] Instrument feedback loops and confirm analytics dashboards reflect submission funnel accurately.
+
+## Integration Strategy for Production Rollout
+
+1. **Establish persona-aware entry routing.**
+   - Use the existing namespace shells (`src/routes/visit/route.tsx`, `src/routes/player/route.tsx`, and peers) to hydrate persona resolutions via `resolvePersonaResolution`, ensuring the RoleSwitcher loads identical state across tabs before gating access to child routes.
+   - Default multi-role accounts to the highest-privilege available persona using the stored preference fallback already handled by `RoleSwitcherProvider`, while logging telemetry through `trackPersonaNavigationImpression` for adoption tracking.
+2. **Bridge legacy routes into persona namespaces.**
+   - Mirror core dashboards by aliasing legacy paths (e.g., `/dashboard`) to the new `/player` experience, progressively swapping navigation links and deep links once parity validation completes (`src/routes/player/index.tsx` versus `src/routes/dashboard/index.tsx`).
+   - For operations, game master, and admin flows, introduce soft redirects from historical routes to the new namespace surfaces while keeping the namespace layout active so personas always enter through a role-specific shell.
+3. **Harmonize shared modules.**
+   - Replace legacy inbox/reporting embeds with the shared workspace components, wiring persona-specific filters through `SharedInboxView` and `CrossPersonaCollaborationWorkspace` so teams experience a consistent collaboration layer regardless of entry point.
+   - Promote the collaboration CTA blocks already rendered inside the inbox modules to guide users toward the cross-namespace reporting hub before fully removing redundant legacy dashboards.
+4. **Sequence QA and analytics checkpoints.**
+   - Expand the existing acceptance tests to cover redirected flows and persona switch regression scenarios, keeping Playwright smoke coverage aligned with the namespace shells.
+   - Monitor PostHog events for persona switches, namespace impressions, and collaboration feedback (validated in `role-analytics.test.ts`) to decide when to graduate each namespace from preview to default.
+5. **Launch orchestration.**
+   - Roll out via environment-scoped feature flags (mirroring the `dashboard-new-card` flag already wired into player experiences) so support can stage releases per persona.
+   - Communicate migration timelines through the persona-specific supporting copy slots in `PersonaNamespaceLayout`, keeping stakeholders aware of upcoming default switches while enabling opt-in previews for power users.
+
+- [ ] Accessibility audits for collaborative components (keyboard navigation, ARIA roles, live region announcements).
+- [ ] Instrument feedback loops and confirm analytics dashboards reflect submission funnel accurately.
 
 ## Sustaining Engineering & Rollout Governance
 

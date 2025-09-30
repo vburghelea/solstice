@@ -7,5 +7,14 @@ export const Route = createFileRoute("/admin/inbox")({
 });
 
 function AdminInbox() {
-  return <SharedInboxView persona="admin" />;
+  const { user } = Route.useRouteContext() as {
+    user: { id?: string | null; name?: string | null } | null;
+  };
+  return (
+    <SharedInboxView
+      persona="admin"
+      userName={user?.name ?? null}
+      userId={user?.id ?? null}
+    />
+  );
 }

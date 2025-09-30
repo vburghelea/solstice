@@ -128,10 +128,14 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
     - The `/gm/feedback` route aggregates completed sessions, active campaigns, and upcoming
       games into a triage board that prioritizes debriefs, safety sweeps, and pre-session
       nudges with severity cues.
-  - [ ] Introduce B2B pipeline module with stages, assignments, and escalation hooks to Platform Admin namespace.
-  - [ ] Ensure offline-friendly note editing with conflict resolution strategy and background sync indicators.
+  - [x] Introduce B2B pipeline module with stages, assignments, and escalation hooks to Platform Admin namespace.
+    - `/gm/dashboard` now renders a B2B collaboration pipeline board fed by `listGmB2bPipeline`, grouping opportunities by stage with Platform Admin escalation cues and assignment avatars so Alex can see who is covering each handoff.
+    - Added persona-tuned focus summary metrics, filter toggles, and urgency highlighting so Alex can zero-in on renewals at risk, live escalations, and time-bound follow-ups without losing the full pipeline context.
+  - [x] Ensure offline-friendly note editing with conflict resolution strategy and background sync indicators.
+    - Pipeline cards expose a studio note editor that caches drafts locally, auto-syncs when online, flags conflicts with Platform Admin edits, and provides retry/accept actions with clear sync status pills.
 - **Design & Content Checklist**
-  - [ ] Provide modular card/table systems adaptable to portrait tablet workflows.
+  - [x] Provide modular card/table systems adaptable to portrait tablet workflows.
+    - B2B pipeline columns now ship responsive summary pills, focus toggles, and card accents that collapse gracefully on small screens while preserving Alex-first readability.
   - [ ] Design iconography and color coding for campaign status, session readiness, and bespoke pipeline stages.
   - [ ] Develop voice-and-tone guide for player feedback messaging and safety reminders.
 - **QA & Validation Checklist**

@@ -10,6 +10,9 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - Operations task board combines event data, offline-friendly task persistence, and filter controls inside `src/features/ops/components/ops-event-detail.tsx`, aligning with the modular widget vision in Phase 3.
 - Shared inbox and collaboration workspace now expose persona-aware filters, reporting metrics, and feedback loops as defined in Phase 6 through `src/features/inbox/components/shared-inbox-view.tsx` and `src/features/collaboration/components/cross-persona-collaboration-workspace.tsx`, backed by live Drizzle queries in `shared-inbox.queries.ts` and `collaboration.queries.ts` instead of fixtures.
 - Persona namespace navigation now routes `/visit`, `/player`, `/ops`, and `/admin` directly to inbox and collaboration experiences, exposing the live cross-persona data previews to guests while keeping authenticated workflows intact (`PersonaNamespaceLayout`).
+- Player, Operations, and Platform Admin namespaces now share a production-ready `RoleWorkspaceLayout` that surfaces live membership, pipeline, and governance summaries with persona-safe sticky navigation, bottom mobile controls, a wide-format overview grid with a dedicated summary panel, and Suspense fallbacks tuned for GA rollout.
+- Player profile management and account settings now render in the shared workspace experience with live database-backed forms, optimistic editing, and mobile-safe layouts that respect keyboard overlap and small viewport constraints.
+- Workspace quick links now promote primary tools inside the summary panel while routing account surfaces (profile, settings) through an "Account" cluster so the new wide grid stays balanced without the legacy command center sidebar.
 
 ## Phase 0 — Foundation & Persona Resolution
 
@@ -83,6 +86,11 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
     - Added a "Connections radar" card that surfaces top teams with PostHog-gated beta messaging so design can iterate on advanced recommendation pilots without regressions.
   - [x] Ensure offline-friendly caching for key dashboard data (TanStack Query persistent storage).
     - Core player queries persist snapshots to `localStorage`, providing consistent data when reconnecting and reducing cache misses between visits.
+  - [x] Migrate profile view, edit, and account settings flows into the workspace shell with responsive grids, sticky action bars, and native form affordances for mobile.
+    - `ProfileView` and `SettingsView` now hydrate from live queries, gate edits by section, and collapse two-column clusters into vertical stacks below 640px for reliable thumb reach.
+    - Bottom navigation and safe-area padding keep primary actions accessible while modal sheets (avatar upload, availability) scale down gracefully on phones.
+  - [x] Promote the player namespace to the live workspace shell with profile and settings surfaces.
+    - `/player`, `/player/profile`, and `/player/settings` now run inside `RoleWorkspaceLayout`, presenting membership, next-session, and community summaries fed by production queries while keeping editing flows responsive on mobile.
   - [x] Hook telemetry for dashboard widget interaction and privacy toggle success/failure.
     - PostHog captures now fire on toggle success and key CTA presses to inform experimentation cadence for Leo's persona journey.
 - **Design & Content Checklist**
@@ -110,6 +118,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - [x] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
   - The new ops task board derives persona-tuned checklists from event data, persists status updates to local storage for offline-friendly tracking, and surfaces blocked workstreams through attention signals.
   - Priya can now reassign owners, capture inline notes, and filter the board by status so the `/ops/events/$eventId` workspace doubles as a lightweight runbook for day-of coordination.
+  - [x] Replace the preview shell with the shared workspace layout, highlighting approvals, pipeline, and alert telemetry.
+    - `/ops` now renders `RoleWorkspaceLayout` with live approvals queue counts, pipeline focus, and attention signals powered by `useOpsEventsData`, keeping CTA links and summaries mobile-friendly.
   - [ ] Integrate permission middleware ensuring Priya sees only authorized events; include degraded experience messaging when access denied.
   - [ ] Provide CSV/ICS export utilities respecting localization and timezone.
 - **Design & Content Checklist**
@@ -169,6 +179,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
     - Compliance exports generate CSV downloads with membership, MFA, and risk metadata ready for scheduled delivery wiring.
   - [x] Resolve admin data model type regressions to restore build health ahead of QA automation.
     - Admin insights and directory queries now normalize Postgres date comparisons and strict result typing so `pnpm check-types` passes cleanly.
+  - [x] Graduate the admin namespace into the shared workspace layout with live governance summaries.
+    - `/admin` now hosts `RoleWorkspaceLayout`, combining `AdminWorkspaceSummary` metrics (KPIs, alerts, persona impacts) with `AdminConsoleNavigation` links so Jordan can manage governance flows confidently on mobile and desktop.
   - [ ] Harden security (CSP updates, critical action confirmation modals, logging).
     - [x] Introduced `/admin/security` with a security posture dashboard, incident
           queue, and privileged action log tuned for Jordan’s stewardship review.

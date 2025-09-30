@@ -1,72 +1,89 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-
-import { AdminConsoleNavigation } from "~/features/admin/components/admin-console-navigation";
 import {
-  PersonaNamespaceFallback,
-  PersonaNamespaceLayout,
-  PersonaNamespacePillars,
-  type PersonaNamespaceNavItem,
-  type PersonaPillarItem,
-} from "~/features/layouts/persona-namespace-layout";
+  AlertCircle,
+  Flag,
+  Home,
+  Inbox,
+  LineChart,
+  Shield,
+  Users,
+  Workflow,
+} from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
+import { AdminConsoleNavigation } from "~/features/admin/components/admin-console-navigation";
+import { useAdminInsights } from "~/features/admin/insights/admin-insights.queries";
+import {
+  RoleWorkspaceLayout,
+  type RoleWorkspaceNavItem,
+} from "~/features/layouts/role-workspace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
+import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
 
-const ADMIN_PILLARS: PersonaPillarItem[] = [
-  {
-    title: "Governance insights",
-    description: [
-      "System KPIs, incident timelines, and alerts help Jordan",
-      "steward compliance and reliability.",
-    ].join(" "),
-  },
-  {
-    title: "Role and feature management",
-    description: [
-      "Bulk assignments, audit trails, and feature flag rollouts",
-      "keep permissions and launches coordinated.",
-    ].join(" "),
-  },
-  {
-    title: "Cross-persona alignment",
-    description: [
-      "Shared dashboards link visitor conversion, player retention,",
-      "and event performance into one story.",
-    ].join(" "),
-  },
-  {
-    title: "Exportable reporting",
-    description: [
-      "Compliance-ready exports and scheduling streamline",
-      "external reviews and partner updates.",
-    ].join(" "),
-  },
-];
-
-const ADMIN_NAVIGATION: PersonaNamespaceNavItem[] = [
+const ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
   {
     label: "Overview",
     to: "/admin",
+    icon: Home,
     exact: true,
+    description: "Review governance posture, alerts, and persona impacts at a glance.",
   },
   {
     label: "Insights",
     to: "/admin/insights",
+    icon: LineChart,
+    description: "Audit KPIs, uptime, and membership health across the platform.",
+  },
+  {
+    label: "Users",
+    to: "/admin/users",
+    icon: Users,
+    inMobileNav: false,
+    description: "Manage roles, MFA enrollment, and compliance exports.",
+  },
+  {
+    label: "Security",
+    to: "/admin/security",
+    icon: Shield,
+    inMobileNav: false,
+    description: "Monitor privileged actions, incidents, and security toggles.",
+  },
+  {
+    label: "Feature flags",
+    to: "/admin/feature-flags",
+    icon: Flag,
+    inMobileNav: false,
+    description: "Coordinate rollout plans and persona-targeted experiments.",
   },
   {
     label: "Shared inbox",
-    description: "Platform escalations",
     to: "/admin/inbox",
+    icon: Inbox,
+    description: "Coordinate escalations and platform-wide announcements.",
   },
   {
     label: "Collaboration",
-    description: "Governance alignment",
     to: "/admin/collaboration",
+    icon: Workflow,
+    description: "Work side-by-side with ops and GMs on active initiatives.",
+  },
+  {
+    label: "Event review",
+    to: "/admin/events-review",
+    icon: AlertCircle,
+    inMobileNav: false,
+    description: "Approve or escalate upcoming experiences before they go live.",
   },
 ];
 
 export const Route = createFileRoute("/admin")({
+  beforeLoad: async ({ context, location }) => {
+    requireAuthAndProfile({ user: context.user, location });
+  },
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });
     return { resolution };
@@ -85,24 +102,101 @@ function AdminNamespaceShell() {
         loadResolution({ data: { preferredPersonaId: personaId, forceRefresh: true } })
       }
     >
-      <PersonaNamespaceLayout
-        hero={{
-          eyebrow: "Platform administration workspace",
-          title: "Deliver Jordan a governance console",
-          description: [
-            "We're assembling oversight tooling that unifies compliance,",
-            "permissions, and cross-persona health metrics.",
-          ].join(" "),
-          supportingText: [
-            "Switch personas to contrast how visitor, player, operations,",
-            "and GM journeys intersect with platform stewardship.",
-          ].join(" "),
-        }}
-        annotation={<PersonaNamespacePillars items={ADMIN_PILLARS} />}
-        fallback={<PersonaNamespaceFallback label="Platform admin" />}
-        children={<AdminConsoleNavigation />}
-        navigation={ADMIN_NAVIGATION}
-      />
+      <RoleWorkspaceLayout
+        title="Administration workspace"
+        description="Coordinate governance, permissions, and platform-wide alerts across every persona."
+        navItems={ADMIN_NAVIGATION}
+        fallbackLabel="Platform admin"
+        headerSlot={<AdminWorkspaceSummary />}
+      >
+        <AdminConsoleNavigation />
+      </RoleWorkspaceLayout>
     </RoleSwitcherProvider>
+  );
+}
+
+function AdminWorkspaceSummary() {
+  const { data, isLoading, error } = useAdminInsights({
+    staleTime: 60_000,
+    retry: false,
+  });
+
+  const activeAlerts =
+    data?.alerts.filter((alert) => alert.enabled && alert.status !== "stable") ?? [];
+  const highlightedPersona = data?.personaImpacts[0] ?? null;
+  const headlineKpi = data?.kpis[0] ?? null;
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-medium">Platform health</CardTitle>
+          <LineChart className="text-muted-foreground h-4 w-4" />
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-2 text-sm">
+          {isLoading ? (
+            <Skeleton className="h-4 w-40" />
+          ) : headlineKpi ? (
+            <>
+              <span className="text-foreground text-xl font-semibold">
+                {headlineKpi.value}
+              </span>
+              <span>{headlineKpi.supportingCopy}</span>
+            </>
+          ) : (
+            <span>{error ? error.message : "No KPIs available"}</span>
+          )}
+          <Link to="/admin/insights" className="text-primary text-xs font-medium">
+            View insights
+          </Link>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-medium">Active alerts</CardTitle>
+          <AlertCircle className="text-muted-foreground h-4 w-4" />
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-2 text-sm">
+          {isLoading ? (
+            <Skeleton className="h-4 w-32" />
+          ) : activeAlerts.length > 0 ? (
+            <>
+              <span className="text-foreground font-medium">{activeAlerts[0].name}</span>
+              <span>{activeAlerts[0].threshold}</span>
+              <Link to="/admin/security" className="text-primary text-xs font-medium">
+                Investigate alert
+              </Link>
+            </>
+          ) : (
+            <span>All monitors are stable</span>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-medium">Persona impact</CardTitle>
+          <Users className="text-muted-foreground h-4 w-4" />
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-2 text-sm">
+          {isLoading ? (
+            <Skeleton className="h-4 w-32" />
+          ) : highlightedPersona ? (
+            <>
+              <span className="text-foreground font-medium">
+                {highlightedPersona.personaLabel}
+              </span>
+              <span>{highlightedPersona.headline}</span>
+              <span className="text-muted-foreground text-xs tracking-wide uppercase">
+                {highlightedPersona.direction === "up" ? "Trending up" : "Trending down"}
+              </span>
+            </>
+          ) : (
+            <span>No persona shifts detected</span>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

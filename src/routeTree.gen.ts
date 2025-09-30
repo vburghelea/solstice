@@ -74,6 +74,8 @@ import { Route as AdminFeatureFlagsRouteImport } from "./routes/admin/feature-fl
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as AdminCollaborationRouteImport } from "./routes/admin/collaboration";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
+import { Route as PlayerSettingsIndexRouteImport } from "./routes/player/settings/index";
+import { Route as PlayerProfileIndexRouteImport } from "./routes/player/profile/index";
 import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -440,6 +442,16 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
   path: "/admin",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const PlayerSettingsIndexRoute = PlayerSettingsIndexRouteImport.update({
+  id: "/settings/",
+  path: "/settings/",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
+const PlayerProfileIndexRoute = PlayerProfileIndexRouteImport.update({
+  id: "/profile/",
+  path: "/profile/",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
 const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -787,6 +799,8 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/player/profile": typeof PlayerProfileIndexRoute;
+  "/player/settings": typeof PlayerSettingsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -868,6 +882,8 @@ export interface FileRoutesByTo {
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/events/$slug": typeof EventsSlugIndexRoute;
+  "/player/profile": typeof PlayerProfileIndexRoute;
+  "/player/settings": typeof PlayerSettingsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -967,6 +983,8 @@ export interface FileRoutesById {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email/": typeof DevEmailIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/player/profile/": typeof PlayerProfileIndexRoute;
+  "/player/settings/": typeof PlayerSettingsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
@@ -1067,6 +1085,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams/"
     | "/dev/email"
     | "/events/$slug/"
+    | "/player/profile"
+    | "/player/settings"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
@@ -1148,6 +1168,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
     | "/dev/email"
     | "/events/$slug"
+    | "/player/profile"
+    | "/player/settings"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
@@ -1246,6 +1268,8 @@ export interface FileRouteTypes {
     | "/dashboard/teams/"
     | "/dev/email/"
     | "/events/$slug/"
+    | "/player/profile/"
+    | "/player/settings/"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
@@ -1843,6 +1867,20 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/admin";
       preLoaderRoute: typeof DashboardAdminRouteRouteImport;
       parentRoute: typeof DashboardRouteRoute;
+    };
+    "/player/settings/": {
+      id: "/player/settings/";
+      path: "/settings";
+      fullPath: "/player/settings";
+      preLoaderRoute: typeof PlayerSettingsIndexRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
+    "/player/profile/": {
+      id: "/player/profile/";
+      path: "/profile";
+      fullPath: "/player/profile";
+      preLoaderRoute: typeof PlayerProfileIndexRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
     };
     "/events/$slug/": {
       id: "/events/$slug/";
@@ -2482,12 +2520,16 @@ interface PlayerRouteRouteChildren {
   PlayerCollaborationRoute: typeof PlayerCollaborationRoute;
   PlayerInboxRoute: typeof PlayerInboxRoute;
   PlayerIndexRoute: typeof PlayerIndexRoute;
+  PlayerProfileIndexRoute: typeof PlayerProfileIndexRoute;
+  PlayerSettingsIndexRoute: typeof PlayerSettingsIndexRoute;
 }
 
 const PlayerRouteRouteChildren: PlayerRouteRouteChildren = {
   PlayerCollaborationRoute: PlayerCollaborationRoute,
   PlayerInboxRoute: PlayerInboxRoute,
   PlayerIndexRoute: PlayerIndexRoute,
+  PlayerProfileIndexRoute: PlayerProfileIndexRoute,
+  PlayerSettingsIndexRoute: PlayerSettingsIndexRoute,
 };
 
 const PlayerRouteRouteWithChildren = PlayerRouteRoute._addFileChildren(

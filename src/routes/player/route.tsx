@@ -1,67 +1,77 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { formatDistanceToNow } from "date-fns";
+import { CalendarDays, Home, Inbox, Settings, UserCircle, Users } from "lucide-react";
+import { useMemo } from "react";
 
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Skeleton } from "~/components/ui/skeleton";
 import {
-  PersonaNamespaceFallback,
-  PersonaNamespaceLayout,
-  PersonaNamespacePillars,
-  type PersonaNamespaceNavItem,
-  type PersonaPillarItem,
-} from "~/features/layouts/persona-namespace-layout";
+  getDashboardStats,
+  getNextUserGame,
+} from "~/features/dashboard/dashboard.queries";
+import {
+  RoleWorkspaceLayout,
+  type RoleWorkspaceNavItem,
+} from "~/features/layouts/role-workspace-layout";
+import { getUserMembershipStatus } from "~/features/membership/membership.queries";
+import type { MembershipStatus as PlayerMembershipStatus } from "~/features/membership/membership.types";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
+import { getUserTeams } from "~/features/teams/teams.queries";
+import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+import { formatDateAndTime } from "~/shared/lib/datetime";
 
-const PLAYER_PILLARS: PersonaPillarItem[] = [
-  {
-    title: "Unified dashboard",
-    description: [
-      "Sessions, invitations, and campaign teasers surface together",
-      "so Leo always knows what's next.",
-    ].join(" "),
-  },
-  {
-    title: "Privacy-first quick actions",
-    description: [
-      "Inline controls for status, notifications, and preferences",
-      "reinforce trust across devices.",
-    ].join(" "),
-  },
-  {
-    title: "Community insights",
-    description: [
-      "Trending campaigns, friend activity, and tailored recommendations",
-      "keep discovery effortless.",
-    ].join(" "),
-  },
-  {
-    title: "Mobile continuity",
-    description: [
-      "State persistence and responsive layouts ensure the experience",
-      "travels smoothly from phone to desktop.",
-    ].join(" "),
-  },
-];
-
-const PLAYER_NAVIGATION: PersonaNamespaceNavItem[] = [
+const PLAYER_NAVIGATION: RoleWorkspaceNavItem[] = [
   {
     label: "Overview",
     to: "/player",
+    icon: Home,
     exact: true,
+    description: "Track membership, invitations, and your next session at a glance.",
   },
   {
-    label: "Shared inbox",
-    description: "Session handoffs",
+    label: "Inbox",
     to: "/player/inbox",
+    icon: Inbox,
+    description: "Catch up on new announcements and shared threads.",
   },
   {
     label: "Collaboration",
-    description: "Cross-namespace insight",
     to: "/player/collaboration",
+    icon: Users,
+    inMobileNav: false,
+    description: "Coordinate with teammates and facilitators without leaving the hub.",
+  },
+  {
+    label: "Profile",
+    to: "/player/profile",
+    icon: UserCircle,
+    section: "account",
+    description: "Review and edit your personal details and preferences.",
+  },
+  {
+    label: "Settings",
+    to: "/player/settings",
+    icon: Settings,
+    section: "account",
+    description: "Manage privacy, notifications, and connected accounts.",
   },
 ];
 
+type DashboardStatsResult = Awaited<ReturnType<typeof getDashboardStats>>;
+type DashboardStatsData = Extract<DashboardStatsResult, { success: true }>["data"];
+type MembershipStatusData = PlayerMembershipStatus;
+type NextGameResult = Awaited<ReturnType<typeof getNextUserGame>>;
+type UserTeamsData = Awaited<ReturnType<typeof getUserTeams>>;
+
 export const Route = createFileRoute("/player")({
+  beforeLoad: async ({ context, location }) => {
+    requireAuthAndProfile({ user: context.user, location });
+  },
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });
     return { resolution };
@@ -80,23 +90,185 @@ function PlayerNamespaceShell() {
         loadResolution({ data: { preferredPersonaId: personaId, forceRefresh: true } })
       }
     >
-      <PersonaNamespaceLayout
-        hero={{
-          eyebrow: "Player workspace",
-          title: "Give Leo a connected command center",
-          description: [
-            "We're consolidating play scheduling, invitations, and social cues",
-            "into a single, mobile-first dashboard.",
-          ].join(" "),
-          supportingText: [
-            "Switch personas any time to compare how downstream tooling",
-            "will adapt for each audience.",
-          ].join(" "),
-        }}
-        annotation={<PersonaNamespacePillars items={PLAYER_PILLARS} />}
-        fallback={<PersonaNamespaceFallback label="Player" />}
-        navigation={PLAYER_NAVIGATION}
+      <RoleWorkspaceLayout
+        title="Player workspace"
+        description="Manage sessions, invitations, and community insights from one responsive hub."
+        navItems={PLAYER_NAVIGATION}
+        fallbackLabel="Player"
+        headerSlot={<PlayerWorkspaceSummary />}
       />
     </RoleSwitcherProvider>
+  );
+}
+
+function PlayerWorkspaceSummary() {
+  const { user } = Route.useRouteContext();
+  const isAuthenticated = Boolean(user?.id);
+
+  const dashboardStatsQuery = useQuery<DashboardStatsData>({
+    queryKey: ["dashboard-stats"],
+    queryFn: async () => {
+      const result = await getDashboardStats();
+      if (!result.success || !result.data) {
+        const message =
+          ("errors" in result && result.errors?.[0]?.message) ||
+          "Failed to load dashboard stats";
+        throw new Error(message);
+      }
+      return result.data;
+    },
+    staleTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+  });
+
+  const membershipStatusQuery = useQuery<MembershipStatusData | null>({
+    queryKey: ["membership-status"],
+    queryFn: async () => {
+      const result = await getUserMembershipStatus();
+      if (!result.success) {
+        const message =
+          ("errors" in result && result.errors?.[0]?.message) ||
+          "Failed to load membership status";
+        throw new Error(message);
+      }
+      return result.data ?? null;
+    },
+    staleTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+  });
+
+  const nextGameQuery = useQuery<NextGameResult | undefined>({
+    queryKey: ["next-user-game"],
+    queryFn: async () => getNextUserGame(),
+    staleTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+  });
+
+  const teamsQuery = useQuery<UserTeamsData>({
+    queryKey: ["userTeams"],
+    queryFn: async () => getUserTeams({ data: {} }),
+    staleTime: 5 * 60 * 1000,
+    enabled: isAuthenticated,
+  });
+
+  const membershipStatus = membershipStatusQuery.data;
+  const nextGame = nextGameQuery.data?.success ? nextGameQuery.data.data : null;
+  const teams = useMemo(() => teamsQuery.data ?? [], [teamsQuery.data]);
+  const firstTeam = teams[0];
+  const dashboardStats = dashboardStatsQuery.data;
+
+  const totalInvites =
+    (dashboardStats?.campaigns.pendingInvites ?? 0) +
+    (dashboardStats?.games.pendingInvites ?? 0);
+
+  const membershipBadgeVariant = membershipStatus?.hasMembership
+    ? "default"
+    : "secondary";
+  const membershipLabel = membershipStatus?.hasMembership ? "Active" : "Inactive";
+  const membershipDetail = membershipStatus?.hasMembership
+    ? membershipStatus.daysRemaining
+      ? `${membershipStatus.daysRemaining} days remaining`
+      : "Membership active"
+    : "No active membership";
+
+  const isLoading =
+    dashboardStatsQuery.isLoading ||
+    membershipStatusQuery.isLoading ||
+    nextGameQuery.isLoading ||
+    teamsQuery.isLoading;
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-medium">Membership</CardTitle>
+          <Badge
+            variant={membershipBadgeVariant}
+            className={
+              membershipStatus?.hasMembership
+                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                : undefined
+            }
+          >
+            {membershipLabel}
+          </Badge>
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-2 text-sm">
+          {membershipStatusQuery.isLoading ? (
+            <Skeleton className="h-4 w-36" />
+          ) : (
+            <span>{membershipDetail}</span>
+          )}
+          <Link to="/dashboard/membership" className="text-primary text-xs font-medium">
+            Manage membership
+          </Link>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-medium">Next session</CardTitle>
+          <CalendarDays className="text-muted-foreground h-4 w-4" />
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-2 text-sm">
+          {isLoading ? (
+            <Skeleton className="h-4 w-40" />
+          ) : nextGame ? (
+            <>
+              <span className="text-foreground font-medium">{nextGame.name}</span>
+              <span>{formatDateAndTime(nextGame.dateTime)}</span>
+              <span className="text-muted-foreground text-xs tracking-wide uppercase">
+                {formatDistanceToNow(new Date(nextGame.dateTime), { addSuffix: true })}
+              </span>
+              <Link
+                from="/player"
+                to="/dashboard/games/$gameId"
+                params={{ gameId: nextGame.id }}
+                className="text-primary text-xs font-medium"
+              >
+                View game details
+              </Link>
+            </>
+          ) : (
+            <span>No upcoming games scheduled</span>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-sm font-medium">Community</CardTitle>
+          <Users className="text-muted-foreground h-4 w-4" />
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-2 text-sm">
+          {isLoading ? (
+            <Skeleton className="h-4 w-32" />
+          ) : (
+            <>
+              <span className="text-foreground font-medium">
+                {firstTeam ? firstTeam.team.name : "You're not on a team yet"}
+              </span>
+              <span>
+                {teams.length > 0
+                  ? `${teams.length} team${teams.length === 1 ? "" : "s"} connected`
+                  : "Join a team to coordinate sessions"}
+              </span>
+              <span>
+                {totalInvites > 0
+                  ? `${totalInvites} pending invite${totalInvites === 1 ? "" : "s"}`
+                  : "No pending invitations"}
+              </span>
+              <Link to="/dashboard/teams" className="text-primary text-xs font-medium">
+                Browse teams
+              </Link>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -62,16 +62,26 @@ const EMPTY_ALIGNMENT: PersonaAlignmentSummary[] = [];
 type CrossPersonaCollaborationWorkspaceProps = {
   activePersona: PersonaId;
   userName?: string | null;
+  mode?: "interactive" | "preview";
+  previewMessage?: string;
+  inboxPathOverride?: string;
 };
 
 export function CrossPersonaCollaborationWorkspace(
   props: CrossPersonaCollaborationWorkspaceProps,
 ) {
-  const { activePersona, userName } = props;
+  const {
+    activePersona,
+    userName,
+    mode = "interactive",
+    previewMessage,
+    inboxPathOverride,
+  } = props;
   const [personaFilter, setPersonaFilter] = useState<PersonaId | "all">(
     activePersona ?? "all",
   );
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+  const isPreview = mode === "preview";
   const {
     data: snapshot,
     isLoading,
@@ -135,8 +145,18 @@ export function CrossPersonaCollaborationWorkspace(
     );
   }
 
+  const disableInboxLink = isPreview && !inboxPathOverride;
+
   return (
     <div className="container mx-auto space-y-8 px-4 py-6 sm:py-8">
+      {isPreview && previewMessage ? (
+        <div className="border-primary/40 bg-primary/5 text-primary-foreground/80 flex items-start gap-3 rounded-2xl border border-dashed p-4">
+          <span className="bg-primary text-primary-foreground mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+            ✨
+          </span>
+          <p className="text-foreground/80 text-sm">{previewMessage}</p>
+        </div>
+      ) : null}
       <header className="space-y-4">
         <Badge variant="outline" className="text-xs tracking-wide uppercase">
           Collaboration hub
@@ -194,8 +214,20 @@ export function CrossPersonaCollaborationWorkspace(
               Trace how experiments in one namespace influence outcomes across the others.
             </p>
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link to={`/${activePersona}/inbox`}>Review shared threads</Link>
+          <Button
+            variant="outline"
+            size="sm"
+            asChild={!disableInboxLink}
+            disabled={disableInboxLink}
+            aria-disabled={disableInboxLink}
+          >
+            {disableInboxLink ? (
+              <span>Review shared threads</span>
+            ) : (
+              <Link to={inboxPathOverride ?? `/${activePersona}/inbox`}>
+                Review shared threads
+              </Link>
+            )}
           </Button>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -488,12 +520,17 @@ export function CrossPersonaCollaborationWorkspace(
                           type="button"
                           variant={isSelected ? "default" : "outline"}
                           size="sm"
+                          disabled={isPreview}
+                          aria-disabled={isPreview}
                           onClick={() =>
-                            setSelectedReaction((current) =>
-                              current === `${entry.id}-${reaction.id}`
+                            setSelectedReaction((current) => {
+                              if (isPreview) {
+                                return current;
+                              }
+                              return current === `${entry.id}-${reaction.id}`
                                 ? null
-                                : `${entry.id}-${reaction.id}`,
-                            )
+                                : `${entry.id}-${reaction.id}`;
+                            })
                           }
                         >
                           <span className="mr-2" aria-hidden>
@@ -511,6 +548,11 @@ export function CrossPersonaCollaborationWorkspace(
                     <p className="text-muted-foreground text-xs">
                       Reaction saved to the backlog experiment log — Jordan and Priya will
                       see it in the next governance sync.
+                    </p>
+                  ) : null}
+                  {isPreview ? (
+                    <p className="text-muted-foreground text-xs">
+                      Create an account to record reactions that reach the platform team.
                     </p>
                   ) : null}
                 </div>

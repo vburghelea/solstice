@@ -5,6 +5,7 @@ import {
   PersonaNamespaceFallback,
   PersonaNamespaceLayout,
   PersonaNamespacePillars,
+  type PersonaNamespaceNavItem,
   type PersonaPillarItem,
 } from "~/features/layouts/persona-namespace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
@@ -42,6 +43,24 @@ const VISITOR_PILLARS: PersonaPillarItem[] = [
   },
 ];
 
+const VISITOR_NAVIGATION: PersonaNamespaceNavItem[] = [
+  {
+    label: "Overview",
+    to: "/visit",
+    exact: true,
+  },
+  {
+    label: "Shared inbox",
+    description: "Preview Maya's player handoffs",
+    to: "/visit/inbox",
+  },
+  {
+    label: "Collaboration",
+    description: "Cross-persona reporting",
+    to: "/visit/collaboration",
+  },
+];
+
 export const Route = createFileRoute("/visit")({
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });
@@ -76,6 +95,7 @@ function VisitorNamespaceShell() {
         }}
         annotation={<PersonaNamespacePillars items={VISITOR_PILLARS} />}
         fallback={<PersonaNamespaceFallback label="Visitor" />}
+        navigation={VISITOR_NAVIGATION}
       />
     </RoleSwitcherProvider>
   );

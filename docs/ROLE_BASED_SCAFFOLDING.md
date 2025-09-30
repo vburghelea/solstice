@@ -9,6 +9,7 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - Player workspace renders the unified dashboard with optimistic privacy controls, persisted queries, and feature-flagged discovery tiles in `src/features/player/components/player-dashboard.tsx`, surfaced through the `/player` namespace entrypoint.
 - Operations task board combines event data, offline-friendly task persistence, and filter controls inside `src/features/ops/components/ops-event-detail.tsx`, aligning with the modular widget vision in Phase 3.
 - Shared inbox and collaboration workspace now expose persona-aware filters, reporting metrics, and feedback loops as defined in Phase 6 through `src/features/inbox/components/shared-inbox-view.tsx` and `src/features/collaboration/components/cross-persona-collaboration-workspace.tsx`, backed by live Drizzle queries in `shared-inbox.queries.ts` and `collaboration.queries.ts` instead of fixtures.
+- Persona namespace navigation now routes `/visit`, `/player`, `/ops`, and `/admin` directly to inbox and collaboration experiences, exposing the live cross-persona data previews to guests while keeping authenticated workflows intact (`PersonaNamespaceLayout`).
 
 ## Phase 0 — Foundation & Persona Resolution
 
@@ -22,6 +23,7 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - [x] Add optimistic role switch UI skeleton (button + sheet) with loading states and error recovery for permission drift.
 - [x] Scaffold route namespaces (`/visit`, `/player`, `/ops`, `/gm`, `/admin`) with TanStack Router layout components and suspense boundaries.
   - Established persona-aware layout shells with hero copy, role switcher access, and suspense fallbacks while routing persona resolution through server functions.
+  - [x] Rolled navigation controls into each namespace shell so visitors and authenticated users can pivot between overview, inbox, and collaboration surfaces without bypassing persona guardrails.
   - [x] Introduce shared "Coming Soon" component supporting persona-specific messaging, telemetry hooks, and feature-flag-driven visibility.
     - Landing placeholders now compose a gated feedback card that records PostHog events for likes, dislikes, and persona-specific suggestions.
   - [x] Define design token updates (spacing, typography scale, color variables) to meet WCAG AA on mobile and desktop.

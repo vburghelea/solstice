@@ -5,6 +5,7 @@ import {
   PersonaNamespaceFallback,
   PersonaNamespaceLayout,
   PersonaNamespacePillars,
+  type PersonaNamespaceNavItem,
   type PersonaPillarItem,
 } from "~/features/layouts/persona-namespace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
@@ -42,6 +43,24 @@ const OPS_PILLARS: PersonaPillarItem[] = [
   },
 ];
 
+const OPS_NAVIGATION: PersonaNamespaceNavItem[] = [
+  {
+    label: "Overview",
+    to: "/ops",
+    exact: true,
+  },
+  {
+    label: "Shared inbox",
+    description: "Approvals & escalations",
+    to: "/ops/inbox",
+  },
+  {
+    label: "Collaboration",
+    description: "Mission control sync",
+    to: "/ops/collaboration",
+  },
+];
+
 export const Route = createFileRoute("/ops")({
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });
@@ -76,6 +95,7 @@ function OpsNamespaceShell() {
         }}
         annotation={<PersonaNamespacePillars items={OPS_PILLARS} />}
         fallback={<PersonaNamespaceFallback label="Operations" />}
+        navigation={OPS_NAVIGATION}
       />
     </RoleSwitcherProvider>
   );

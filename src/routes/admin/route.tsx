@@ -6,6 +6,7 @@ import {
   PersonaNamespaceFallback,
   PersonaNamespaceLayout,
   PersonaNamespacePillars,
+  type PersonaNamespaceNavItem,
   type PersonaPillarItem,
 } from "~/features/layouts/persona-namespace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
@@ -40,6 +41,28 @@ const ADMIN_PILLARS: PersonaPillarItem[] = [
       "Compliance-ready exports and scheduling streamline",
       "external reviews and partner updates.",
     ].join(" "),
+  },
+];
+
+const ADMIN_NAVIGATION: PersonaNamespaceNavItem[] = [
+  {
+    label: "Overview",
+    to: "/admin",
+    exact: true,
+  },
+  {
+    label: "Insights",
+    to: "/admin/insights",
+  },
+  {
+    label: "Shared inbox",
+    description: "Platform escalations",
+    to: "/admin/inbox",
+  },
+  {
+    label: "Collaboration",
+    description: "Governance alignment",
+    to: "/admin/collaboration",
   },
 ];
 
@@ -78,6 +101,7 @@ function AdminNamespaceShell() {
         annotation={<PersonaNamespacePillars items={ADMIN_PILLARS} />}
         fallback={<PersonaNamespaceFallback label="Platform admin" />}
         children={<AdminConsoleNavigation />}
+        navigation={ADMIN_NAVIGATION}
       />
     </RoleSwitcherProvider>
   );

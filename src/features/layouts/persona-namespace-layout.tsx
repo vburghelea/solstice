@@ -1,4 +1,4 @@
-import { Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Suspense, useEffect, type ReactNode } from "react";
 
 import {
@@ -11,6 +11,7 @@ import {
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { trackPersonaNavigationImpression } from "~/features/roles/role-analytics";
 import { useActivePersona } from "~/features/roles/role-switcher-context";
+import { cn } from "~/shared/lib/utils";
 
 export interface PersonaNamespaceHero {
   eyebrow: string;
@@ -24,6 +25,8 @@ export interface PersonaNamespaceLayoutProps {
   annotation?: ReactNode;
   fallback?: ReactNode;
   children?: ReactNode;
+  navigation?: PersonaNamespaceNavItem[];
+  navigationLabel?: string;
 }
 
 export function PersonaNamespaceLayout({
@@ -31,6 +34,8 @@ export function PersonaNamespaceLayout({
   annotation,
   fallback,
   children,
+  navigation,
+  navigationLabel,
 }: PersonaNamespaceLayoutProps) {
   const activePersona = useActivePersona();
   const location = useRouterState({ select: (state) => state.location });
@@ -44,6 +49,8 @@ export function PersonaNamespaceLayout({
       source: "layout",
     });
   }, [analytics, id, namespacePath, location.pathname]);
+
+  const hasNavigation = Boolean(navigation?.length);
 
   return (
     <div className="bg-background text-foreground flex min-h-dvh w-full flex-col">
@@ -66,6 +73,13 @@ export function PersonaNamespaceLayout({
         </div>
       </header>
       <main className="token-gap-xl token-section-padding mx-auto flex w-full max-w-5xl flex-1 flex-col">
+        {hasNavigation ? (
+          <PersonaNamespaceNavigation
+            items={navigation ?? []}
+            activePath={location.pathname}
+            ariaLabel={navigationLabel ?? `${label} workspace navigation`}
+          />
+        ) : null}
         {children}
         <Suspense fallback={fallback ?? <PersonaNamespaceFallback label={label} />}>
           <Outlet />
@@ -116,6 +130,62 @@ export function PersonaNamespacePillars({
 export interface PersonaWorkspaceMilestone {
   title: string;
   description: string;
+}
+
+export interface PersonaNamespaceNavItem {
+  label: string;
+  to: string;
+  description?: string;
+  exact?: boolean;
+}
+
+interface PersonaNamespaceNavigationProps {
+  items: PersonaNamespaceNavItem[];
+  activePath: string;
+  ariaLabel: string;
+}
+
+function PersonaNamespaceNavigation({
+  items,
+  activePath,
+  ariaLabel,
+}: PersonaNamespaceNavigationProps) {
+  return (
+    <nav
+      aria-label={ariaLabel}
+      className="border-border/60 bg-surface-default/80 token-gap-sm rounded-2xl border p-3 shadow-sm"
+    >
+      <ul className="token-gap-xs flex flex-wrap items-stretch gap-2">
+        {items.map((item) => {
+          const isActive = item.exact
+            ? activePath === item.to
+            : activePath === item.to || activePath.startsWith(`${item.to}/`);
+          return (
+            <li key={item.to} className="flex">
+              <Link
+                to={item.to}
+                className={cn(
+                  "rounded-xl border px-4 py-2 text-sm font-medium transition",
+                  "hover:border-primary/60 hover:bg-primary/5",
+                  isActive
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "text-muted-foreground border-transparent bg-transparent",
+                )}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <span className="block">{item.label}</span>
+                {item.description ? (
+                  <span className="text-muted-foreground block text-xs font-normal">
+                    {item.description}
+                  </span>
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
 }
 
 interface PersonaWorkspacePlaceholderProps {

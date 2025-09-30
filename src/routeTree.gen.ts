@@ -35,6 +35,8 @@ import { Route as GmIndexRouteImport } from "./routes/gm/index";
 import { Route as EventsIndexRouteImport } from "./routes/events/index";
 import { Route as DashboardIndexRouteImport } from "./routes/dashboard/index";
 import { Route as AdminIndexRouteImport } from "./routes/admin/index";
+import { Route as VisitInboxRouteImport } from "./routes/visit/inbox";
+import { Route as VisitCollaborationRouteImport } from "./routes/visit/collaboration";
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
 import { Route as PlayerInboxRouteImport } from "./routes/player/inbox";
 import { Route as PlayerCollaborationRouteImport } from "./routes/player/collaboration";
@@ -242,6 +244,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AdminRouteRoute,
+} as any);
+const VisitInboxRoute = VisitInboxRouteImport.update({
+  id: "/inbox",
+  path: "/inbox",
+  getParentRoute: () => VisitRouteRoute,
+} as any);
+const VisitCollaborationRoute = VisitCollaborationRouteImport.update({
+  id: "/collaboration",
+  path: "/collaboration",
+  getParentRoute: () => VisitRouteRoute,
 } as any);
 const SystemsSlugRoute = SystemsSlugRouteImport.update({
   id: "/systems/$slug",
@@ -737,6 +749,8 @@ export interface FileRoutesByFullPath {
   "/player/collaboration": typeof PlayerCollaborationRoute;
   "/player/inbox": typeof PlayerInboxRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
+  "/visit/collaboration": typeof VisitCollaborationRoute;
+  "/visit/inbox": typeof VisitInboxRoute;
   "/admin/": typeof AdminIndexRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
@@ -818,6 +832,8 @@ export interface FileRoutesByTo {
   "/player/collaboration": typeof PlayerCollaborationRoute;
   "/player/inbox": typeof PlayerInboxRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
+  "/visit/collaboration": typeof VisitCollaborationRoute;
+  "/visit/inbox": typeof VisitInboxRoute;
   "/admin": typeof AdminIndexRoute;
   "/dashboard": typeof DashboardIndexRoute;
   "/events": typeof EventsIndexRoute;
@@ -913,6 +929,8 @@ export interface FileRoutesById {
   "/player/collaboration": typeof PlayerCollaborationRoute;
   "/player/inbox": typeof PlayerInboxRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
+  "/visit/collaboration": typeof VisitCollaborationRoute;
+  "/visit/inbox": typeof VisitInboxRoute;
   "/admin/": typeof AdminIndexRoute;
   "/dashboard/": typeof DashboardIndexRoute;
   "/events/": typeof EventsIndexRoute;
@@ -1011,6 +1029,8 @@ export interface FileRouteTypes {
     | "/player/collaboration"
     | "/player/inbox"
     | "/systems/$slug"
+    | "/visit/collaboration"
+    | "/visit/inbox"
     | "/admin/"
     | "/dashboard/"
     | "/events/"
@@ -1092,6 +1112,8 @@ export interface FileRouteTypes {
     | "/player/collaboration"
     | "/player/inbox"
     | "/systems/$slug"
+    | "/visit/collaboration"
+    | "/visit/inbox"
     | "/admin"
     | "/dashboard"
     | "/events"
@@ -1186,6 +1208,8 @@ export interface FileRouteTypes {
     | "/player/collaboration"
     | "/player/inbox"
     | "/systems/$slug"
+    | "/visit/collaboration"
+    | "/visit/inbox"
     | "/admin/"
     | "/dashboard/"
     | "/events/"
@@ -1546,6 +1570,20 @@ declare module "@tanstack/react-router" {
       fullPath: "/admin/";
       preLoaderRoute: typeof AdminIndexRouteImport;
       parentRoute: typeof AdminRouteRoute;
+    };
+    "/visit/inbox": {
+      id: "/visit/inbox";
+      path: "/inbox";
+      fullPath: "/visit/inbox";
+      preLoaderRoute: typeof VisitInboxRouteImport;
+      parentRoute: typeof VisitRouteRoute;
+    };
+    "/visit/collaboration": {
+      id: "/visit/collaboration";
+      path: "/collaboration";
+      fullPath: "/visit/collaboration";
+      preLoaderRoute: typeof VisitCollaborationRouteImport;
+      parentRoute: typeof VisitRouteRoute;
     };
     "/systems/$slug": {
       id: "/systems/$slug";
@@ -2457,10 +2495,14 @@ const PlayerRouteRouteWithChildren = PlayerRouteRoute._addFileChildren(
 );
 
 interface VisitRouteRouteChildren {
+  VisitCollaborationRoute: typeof VisitCollaborationRoute;
+  VisitInboxRoute: typeof VisitInboxRoute;
   VisitIndexRoute: typeof VisitIndexRoute;
 }
 
 const VisitRouteRouteChildren: VisitRouteRouteChildren = {
+  VisitCollaborationRoute: VisitCollaborationRoute,
+  VisitInboxRoute: VisitInboxRoute,
   VisitIndexRoute: VisitIndexRoute,
 };
 

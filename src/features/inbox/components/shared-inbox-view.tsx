@@ -37,10 +37,12 @@ type SharedInboxViewProps = {
   persona: PersonaId;
   userName?: string | null;
   userId?: string | null;
+  mode?: "interactive" | "preview";
+  previewMessage?: string;
 };
 
 export function SharedInboxView(props: SharedInboxViewProps) {
-  const { persona, userName, userId } = props;
+  const { persona, userName, userId, mode = "interactive", previewMessage } = props;
   const {
     data: snapshot,
     isLoading,
@@ -63,6 +65,7 @@ export function SharedInboxView(props: SharedInboxViewProps) {
 
   const personaConfig = snapshot?.config;
   const personaThreads = snapshot?.threads ?? EMPTY_THREADS;
+  const isPreview = mode === "preview";
 
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
@@ -153,6 +156,14 @@ export function SharedInboxView(props: SharedInboxViewProps) {
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-6 sm:py-8">
+      {isPreview && previewMessage ? (
+        <div className="border-primary/40 bg-primary/5 text-primary-foreground/80 flex items-start gap-3 rounded-2xl border border-dashed p-4">
+          <span className="bg-primary text-primary-foreground mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+            ✨
+          </span>
+          <p className="text-foreground/80 text-sm">{previewMessage}</p>
+        </div>
+      ) : null}
       <header className="space-y-3">
         <Badge variant="outline" className="text-xs tracking-wide uppercase">
           Collaboration beta
@@ -265,7 +276,12 @@ export function SharedInboxView(props: SharedInboxViewProps) {
         <section className="space-y-4 lg:col-span-4">
           <div className="flex items-center justify-between">
             <h2 className="text-foreground text-lg font-semibold">Threads</h2>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isPreview}
+              aria-disabled={isPreview}
+            >
               Log internal note
             </Button>
           </div>
@@ -293,7 +309,11 @@ export function SharedInboxView(props: SharedInboxViewProps) {
 
         <section className="space-y-4 lg:col-span-5">
           {selectedThread ? (
-            <ThreadDetail persona={persona} thread={selectedThread} />
+            <ThreadDetail
+              persona={persona}
+              thread={selectedThread}
+              isPreview={isPreview}
+            />
           ) : (
             <Card className="items-center justify-center gap-2 px-6 py-10 text-center">
               <CardTitle className="text-base">Select a thread</CardTitle>
@@ -369,10 +389,11 @@ function ThreadListItem(props: ThreadListItemProps) {
 type ThreadDetailProps = {
   persona: PersonaId;
   thread: SharedInboxThread;
+  isPreview: boolean;
 };
 
 function ThreadDetail(props: ThreadDetailProps) {
-  const { persona, thread } = props;
+  const { persona, thread, isPreview } = props;
   const participantsById = useMemo(() => {
     return thread.participants.reduce<
       Record<string, (typeof thread.participants)[number]>
@@ -514,8 +535,15 @@ function ThreadDetail(props: ThreadDetailProps) {
           })}
         </p>
         <div className="flex flex-wrap gap-2">
-          <Button size="sm">Reply to thread</Button>
-          <Button variant="outline" size="sm">
+          <Button size="sm" disabled={isPreview} aria-disabled={isPreview}>
+            Reply to thread
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={isPreview}
+            aria-disabled={isPreview}
+          >
             Add follow-up task
           </Button>
         </div>

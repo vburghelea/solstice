@@ -5,6 +5,7 @@ import {
   PersonaNamespaceFallback,
   PersonaNamespaceLayout,
   PersonaNamespacePillars,
+  type PersonaNamespaceNavItem,
   type PersonaPillarItem,
 } from "~/features/layouts/persona-namespace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
@@ -42,6 +43,24 @@ const PLAYER_PILLARS: PersonaPillarItem[] = [
   },
 ];
 
+const PLAYER_NAVIGATION: PersonaNamespaceNavItem[] = [
+  {
+    label: "Overview",
+    to: "/player",
+    exact: true,
+  },
+  {
+    label: "Shared inbox",
+    description: "Session handoffs",
+    to: "/player/inbox",
+  },
+  {
+    label: "Collaboration",
+    description: "Cross-namespace insight",
+    to: "/player/collaboration",
+  },
+];
+
 export const Route = createFileRoute("/player")({
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });
@@ -76,6 +95,7 @@ function PlayerNamespaceShell() {
         }}
         annotation={<PersonaNamespacePillars items={PLAYER_PILLARS} />}
         fallback={<PersonaNamespaceFallback label="Player" />}
+        navigation={PLAYER_NAVIGATION}
       />
     </RoleSwitcherProvider>
   );

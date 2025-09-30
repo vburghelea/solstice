@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 
@@ -118,6 +119,11 @@ export function SharedInboxView(props: SharedInboxViewProps) {
         <p className="text-muted-foreground max-w-2xl text-sm">
           {personaConfig.supportingCopy}
         </p>
+        <div>
+          <Button asChild size="sm" variant="outline">
+            <Link to={`/${persona}/collaboration`}>Open cross-namespace reporting</Link>
+          </Button>
+        </div>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-12">

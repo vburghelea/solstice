@@ -187,10 +187,13 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - [x] Deploy shared inbox module accessible from `/player/inbox`, `/ops/inbox`, `/gm/inbox`, and `/admin/inbox` with persona-aware filters.
   - Implemented a shared inbox experience via `SharedInboxView`, exposing persona-specific filters, metrics, and action items across all namespaces with fixture-backed collaboration threads for validation.
   - [ ] Implement comment/annotation system with @mentions respecting permissions and notification preferences.
-  - [ ] Create cross-namespace reporting dashboards linking visitor conversion, player retention, event performance, and GM pipeline metrics.
-  - [ ] Add feedback capture loops (surveys, quick reactions) feeding into product backlog dashboards.
+  - [x] Create cross-namespace reporting dashboards linking visitor conversion, player retention, event performance, and GM pipeline metrics.
+    - Introduced the `CrossPersonaCollaborationWorkspace` across `/player`, `/ops`, `/gm`, and `/admin` namespaces to visualize shared KPIs and collaboration rhythms powered by fixture data.
+  - [x] Add feedback capture loops (surveys, quick reactions) feeding into product backlog dashboards.
+    - Embedded feedback panels with pulse survey insights and backlog-ready quick reactions that surface context-aware confirmations when teammates respond.
 - **Design & Content Checklist**
-  - [ ] Align visual language for shared modules (inbox, reporting) to minimize cognitive load when switching personas.
+  - [x] Align visual language for shared modules (inbox, reporting) to minimize cognitive load when switching personas.
+    - Shared inboxes now link into the collaboration workspace, which reuses token-driven badges, cards, and CTA hierarchy for consistent navigation cues.
   - [ ] Define notification hierarchy and tone for cross-role interactions.
   - [ ] Provide guidelines for responsive layout of collaborative tools, ensuring parity between mobile and desktop.
 - **QA & Validation Checklist**

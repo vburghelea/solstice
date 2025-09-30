@@ -13,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";
+import { GameMasterB2bPipeline } from "~/features/gm/components/game-master-b2b-pipeline";
+import type { GmPipelineOpportunity, GmPipelineStage } from "~/features/gm/gm.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
@@ -22,6 +24,8 @@ interface GameMasterDashboardProps {
   scheduledGamesTotal: number;
   campaigns: CampaignListItem[];
   campaignsTotal: number;
+  pipelineStages: GmPipelineStage[];
+  pipelineOpportunities: GmPipelineOpportunity[];
 }
 
 type FeedbackFollowUpAction =
@@ -42,6 +46,8 @@ export function GameMasterDashboard({
   scheduledGamesTotal,
   campaigns,
   campaignsTotal,
+  pipelineStages,
+  pipelineOpportunities,
 }: GameMasterDashboardProps) {
   const engagedPlayers = scheduledGames.reduce(
     (total, game) => total + (game.participantCount ?? 0),
@@ -302,6 +308,11 @@ export function GameMasterDashboard({
           )}
         </CardContent>
       </Card>
+
+      <GameMasterB2bPipeline
+        stages={pipelineStages}
+        opportunities={pipelineOpportunities}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { FlagIcon, LineChartIcon, UsersIcon } from "lucide-react";
+import { FlagIcon, LineChartIcon, ShieldAlertIcon, UsersIcon } from "lucide-react";
 
 import { cn } from "~/shared/lib/utils";
 
@@ -24,6 +24,12 @@ const NAV_ITEMS: AdminNavItem[] = [
     icon: UsersIcon,
   },
   {
+    to: "/admin/security",
+    label: "Security",
+    description: "Safeguards, incidents, and audit logs",
+    icon: ShieldAlertIcon,
+  },
+  {
     to: "/admin/feature-flags",
     label: "Feature flags",
     description: "Persona rollouts and experiments",
@@ -34,7 +40,10 @@ const NAV_ITEMS: AdminNavItem[] = [
 export function AdminConsoleNavigation() {
   const location = useRouterState({ select: (state) => state.location.pathname });
   return (
-    <nav className="token-gap-sm grid gap-3 md:grid-cols-3" aria-label="Admin navigation">
+    <nav
+      className="token-gap-sm grid gap-3 md:grid-cols-2 lg:grid-cols-4"
+      aria-label="Admin navigation"
+    >
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive = location.startsWith(item.to);

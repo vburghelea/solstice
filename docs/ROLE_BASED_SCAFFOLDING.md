@@ -160,9 +160,17 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
   - [x] Resolve admin data model type regressions to restore build health ahead of QA automation.
     - Admin insights and directory queries now normalize Postgres date comparisons and strict result typing so `pnpm check-types` passes cleanly.
   - [ ] Harden security (CSP updates, critical action confirmation modals, logging).
+    - [x] Introduced `/admin/security` with a security posture dashboard, incident
+          queue, and privileged action log tuned for Jordan’s stewardship review.
+    - [x] Wrapped high-impact controls with justification modals that append to the
+          audit log via `updateAdminSecurityControl`.
+    - [ ] Ship CSP nonce enforcement preview and SIEM forwarding toggles once infra
+          changes land.
 - **Design & Content Checklist**
   - [x] Produce dense-data layouts optimized for desktop while maintaining responsive fallbacks.
     - Insights, governance tables, and flag controls use responsive token spacing and accessible typographic hierarchy for large-screen stewardship.
+  - [x] Craft Platform Security Center visual language with emphasis on
+        stewardship copy, risk color semantics, and audit-friendly action affordances.
   - [ ] Draft policy-aligned copy for warnings, confirmations, and audit logs.
   - [ ] Collaborate with legal/compliance stakeholders on reporting templates.
 - **QA & Validation Checklist**

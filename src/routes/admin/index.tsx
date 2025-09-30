@@ -1,5 +1,10 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRightIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ShieldAlertIcon,
+  ShieldCheckIcon,
+  UsersIcon,
+} from "lucide-react";
 
 import {
   Card,
@@ -130,6 +135,28 @@ function AdminOverview() {
               className="text-body-sm text-primary inline-flex items-center gap-2"
             >
               Manage feature flags
+              <ArrowRightIcon className="size-4" aria-hidden />
+            </Link>
+          </CardContent>
+        </Card>
+        <Card className="bg-surface-elevated border-subtle">
+          <CardHeader className="token-stack-xs">
+            <CardTitle className="text-heading-xs">Security posture</CardTitle>
+            <CardDescription className="text-body-sm text-muted-strong">
+              Review incidents, guardrails, and audit logs tailored for Jordan’s
+              stewardship remit.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="token-stack-xs">
+            <div className="text-body-sm text-muted-foreground flex items-center gap-2">
+              <ShieldAlertIcon className="size-4" aria-hidden />
+              <span>Confirm safeguards before adjusting privileged access.</span>
+            </div>
+            <Link
+              to="/admin/security"
+              className="text-body-sm text-primary inline-flex items-center gap-2"
+            >
+              Open security center
               <ArrowRightIcon className="size-4" aria-hidden />
             </Link>
           </CardContent>

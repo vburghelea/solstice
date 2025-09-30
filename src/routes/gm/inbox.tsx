@@ -7,5 +7,14 @@ export const Route = createFileRoute("/gm/inbox")({
 });
 
 function GmInbox() {
-  return <SharedInboxView persona="gm" />;
+  const { user } = Route.useRouteContext() as {
+    user: { id?: string | null; name?: string | null } | null;
+  };
+  return (
+    <SharedInboxView
+      persona="gm"
+      userName={user?.name ?? null}
+      userId={user?.id ?? null}
+    />
+  );
 }

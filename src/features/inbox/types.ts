@@ -68,3 +68,8 @@ export type PersonaInboxConfig = {
   }>;
   collaborationTips: string[];
 };
+
+export type SharedInboxSnapshot = {
+  config: PersonaInboxConfig;
+  threads: SharedInboxThread[];
+};

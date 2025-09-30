@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { useMemo, useState } from "react";
 
@@ -15,10 +16,7 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 
-import {
-  PERSONA_INBOX_CONFIG,
-  SHARED_INBOX_THREADS,
-} from "~/features/inbox/data/shared-inbox.fixtures";
+import { getSharedInboxSnapshot } from "~/features/inbox/shared-inbox.queries";
 import { type PersonaId, type SharedInboxThread } from "~/features/inbox/types";
 
 const THREAD_STATUS_LABEL: Record<SharedInboxThread["status"], string> = {
@@ -33,24 +31,51 @@ const THREAD_PRIORITY_STYLE: Record<SharedInboxThread["priority"], string> = {
   low: "bg-muted text-muted-foreground border-muted",
 };
 
+const EMPTY_THREADS: SharedInboxThread[] = [];
+
 type SharedInboxViewProps = {
   persona: PersonaId;
   userName?: string | null;
+  userId?: string | null;
 };
 
 export function SharedInboxView(props: SharedInboxViewProps) {
-  const { persona, userName } = props;
-  const personaConfig = PERSONA_INBOX_CONFIG[persona];
-  const personaThreads = useMemo(
-    () => SHARED_INBOX_THREADS.filter((thread) => thread.personas.includes(persona)),
-    [persona],
-  );
+  const { persona, userName, userId } = props;
+  const {
+    data: snapshot,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["shared-inbox", persona, userId ?? null],
+    queryFn: async () => {
+      const result = await getSharedInboxSnapshot({
+        data: { persona, userId: userId ?? undefined },
+      });
+      if (!result.success || !result.data) {
+        const message = result.success
+          ? "Failed to load inbox snapshot"
+          : (result.errors[0]?.message ?? "Failed to load inbox snapshot");
+        throw new Error(message);
+      }
+      return result.data;
+    },
+  });
 
-  const [selectedFilter, setSelectedFilter] = useState(
-    personaConfig.filters[0]?.id ?? "all",
-  );
+  const personaConfig = snapshot?.config;
+  const personaThreads = snapshot?.threads ?? EMPTY_THREADS;
+
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+
+  const availableFilters = personaConfig?.filters ?? [];
+  const effectiveFilter = availableFilters.some((filter) => filter.id === selectedFilter)
+    ? selectedFilter
+    : (availableFilters[0]?.id ?? "all");
 
   const filterCounts = useMemo(() => {
+    if (!personaConfig) {
+      return {} as Record<string, number>;
+    }
     return personaConfig.filters.reduce<Record<string, number>>((acc, filter) => {
       if (filter.id === "all") {
         acc[filter.id] = personaThreads.length;
@@ -61,29 +86,28 @@ export function SharedInboxView(props: SharedInboxViewProps) {
       ).length;
       return acc;
     }, {});
-  }, [personaConfig.filters, personaThreads]);
+  }, [personaConfig, personaThreads]);
 
   const filteredThreads = useMemo(() => {
-    if (selectedFilter === "all") {
+    if (effectiveFilter === "all") {
       return personaThreads;
     }
-    return personaThreads.filter((thread) => thread.categories.includes(selectedFilter));
-  }, [personaThreads, selectedFilter]);
+    return personaThreads.filter((thread) => thread.categories.includes(effectiveFilter));
+  }, [personaThreads, effectiveFilter]);
 
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(
-    () => personaThreads[0]?.id ?? null,
-  );
+  const effectiveThreadId =
+    selectedThreadId && personaThreads.some((thread) => thread.id === selectedThreadId)
+      ? selectedThreadId
+      : (personaThreads[0]?.id ?? null);
 
   const activeThreadId = useMemo(() => {
-    if (!selectedThreadId) {
+    if (!effectiveThreadId) {
       return filteredThreads[0]?.id ?? null;
     }
-    const isAvailable = filteredThreads.some((thread) => thread.id === selectedThreadId);
-    if (isAvailable) {
-      return selectedThreadId;
-    }
-    return filteredThreads[0]?.id ?? null;
-  }, [filteredThreads, selectedThreadId]);
+    return filteredThreads.some((thread) => thread.id === effectiveThreadId)
+      ? effectiveThreadId
+      : (filteredThreads[0]?.id ?? null);
+  }, [effectiveThreadId, filteredThreads]);
 
   const selectedThread = useMemo(() => {
     if (!activeThreadId) {
@@ -100,6 +124,32 @@ export function SharedInboxView(props: SharedInboxViewProps) {
     () => personaThreads.filter((thread) => thread.unreadFor.includes(persona)).length,
     [personaThreads, persona],
   );
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
+        <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
+          <CardTitle className="text-lg">Loading shared inbox</CardTitle>
+          <CardDescription className="max-w-md">
+            Pulling live threads and persona metrics for the {persona} workspace.
+          </CardDescription>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isError || !snapshot || !personaConfig) {
+    return (
+      <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
+        <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
+          <CardTitle className="text-lg">Unable to load shared inbox</CardTitle>
+          <CardDescription className="max-w-md">
+            Please refresh to retry. Contact the platform team if the issue continues.
+          </CardDescription>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-6 sm:py-8">

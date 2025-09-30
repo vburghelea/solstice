@@ -7,5 +7,14 @@ export const Route = createFileRoute("/ops/inbox")({
 });
 
 function OpsInbox() {
-  return <SharedInboxView persona="ops" />;
+  const { user } = Route.useRouteContext() as {
+    user: { id?: string | null; name?: string | null } | null;
+  };
+  return (
+    <SharedInboxView
+      persona="ops"
+      userName={user?.name ?? null}
+      userId={user?.id ?? null}
+    />
+  );
 }

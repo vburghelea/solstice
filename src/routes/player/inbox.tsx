@@ -8,7 +8,13 @@ export const Route = createFileRoute("/player/inbox")({
 
 function PlayerInbox() {
   const { user } = Route.useRouteContext() as {
-    user?: { name?: string | null } | null;
+    user: { id?: string | null; name?: string | null } | null;
   };
-  return <SharedInboxView persona="player" userName={user?.name ?? null} />;
+  return (
+    <SharedInboxView
+      persona="player"
+      userName={user?.name ?? null}
+      userId={user?.id ?? null}
+    />
+  );
 }

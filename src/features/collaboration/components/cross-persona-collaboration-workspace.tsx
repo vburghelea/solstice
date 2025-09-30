@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { useMemo, useState } from "react";
 
@@ -14,7 +15,7 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 
-import { CROSS_PERSONA_REPORTING_SNAPSHOT } from "~/features/collaboration/data/cross-namespace-reporting.fixtures";
+import { getCrossPersonaCollaborationSnapshot } from "~/features/collaboration/collaboration.queries";
 import type {
   FeedbackLoopEntry,
   PersonaAlignmentSummary,
@@ -55,6 +56,9 @@ const ALIGNMENT_TONE: Record<PersonaAlignmentSummary["confidence"], string> = {
   watch: "text-amber-600",
 };
 
+const EMPTY_FEEDBACK_LOOPS: FeedbackLoopEntry[] = [];
+const EMPTY_ALIGNMENT: PersonaAlignmentSummary[] = [];
+
 type CrossPersonaCollaborationWorkspaceProps = {
   activePersona: PersonaId;
   userName?: string | null;
@@ -68,24 +72,68 @@ export function CrossPersonaCollaborationWorkspace(
     activePersona ?? "all",
   );
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
+  const {
+    data: snapshot,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["collaboration-snapshot", activePersona],
+    queryFn: async () => {
+      const result = await getCrossPersonaCollaborationSnapshot({
+        data: { activePersona },
+      });
+      if (!result.success || !result.data) {
+        const message = result.success
+          ? "Failed to load snapshot"
+          : (result.errors[0]?.message ?? "Failed to load snapshot");
+        throw new Error(message);
+      }
+      return result.data;
+    },
+  });
 
-  const snapshot = CROSS_PERSONA_REPORTING_SNAPSHOT;
+  const feedbackLoops = snapshot?.feedbackLoops ?? EMPTY_FEEDBACK_LOOPS;
+  const personaAlignment = snapshot?.personaAlignment ?? EMPTY_ALIGNMENT;
 
   const filteredFeedbackLoops = useMemo(() => {
     if (personaFilter === "all") {
-      return snapshot.feedbackLoops;
+      return feedbackLoops;
     }
-    return snapshot.feedbackLoops.filter((entry) => entry.persona === personaFilter);
-  }, [personaFilter, snapshot.feedbackLoops]);
+    return feedbackLoops.filter((entry) => entry.persona === personaFilter);
+  }, [feedbackLoops, personaFilter]);
 
   const filteredPersonaAlignment = useMemo(() => {
     if (personaFilter === "all") {
-      return snapshot.personaAlignment;
+      return personaAlignment;
     }
-    return snapshot.personaAlignment.filter(
-      (alignment) => alignment.persona === personaFilter,
+    return personaAlignment.filter((alignment) => alignment.persona === personaFilter);
+  }, [personaAlignment, personaFilter]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
+        <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
+          <CardTitle className="text-lg">Loading collaboration insights</CardTitle>
+          <CardDescription className="max-w-md">
+            Gathering live metrics across player, ops, GM, and admin workspaces.
+          </CardDescription>
+        </Card>
+      </div>
     );
-  }, [personaFilter, snapshot.personaAlignment]);
+  }
+
+  if (isError || !snapshot) {
+    return (
+      <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
+        <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
+          <CardTitle className="text-lg">Unable to load collaboration data</CardTitle>
+          <CardDescription className="max-w-md">
+            Please refresh to retry. If the issue persists, contact the platform team.
+          </CardDescription>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-6 sm:py-8">

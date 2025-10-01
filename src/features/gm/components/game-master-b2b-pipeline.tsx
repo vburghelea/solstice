@@ -43,7 +43,7 @@ interface GameMasterB2bPipelineProps {
   opportunities: GmPipelineOpportunity[];
 }
 
-type FocusMode = "alex" | "all";
+type FocusMode = "mine" | "all";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -70,7 +70,7 @@ export function GameMasterB2bPipeline({
   stages,
   opportunities,
 }: GameMasterB2bPipelineProps) {
-  const [focusMode, setFocusMode] = useState<FocusMode>("alex");
+  const [focusMode, setFocusMode] = useState<FocusMode>("mine");
   const stageBuckets = useMemo(() => {
     const grouped = new Map<
       string,
@@ -87,7 +87,7 @@ export function GameMasterB2bPipeline({
       }
 
       entry.total += 1;
-      const matches = focusMode === "all" || isOpportunityInAlexFocus(opportunity);
+      const matches = focusMode === "all" || isOpportunityInFocus(opportunity);
 
       if (matches) {
         entry.filtered.push(opportunity);
@@ -110,7 +110,7 @@ export function GameMasterB2bPipeline({
         <div>
           <CardTitle className="text-2xl">B2B collaboration pipeline</CardTitle>
           <p className="text-muted-foreground text-sm">
-            Follow every corporate opportunity with clear handoffs, Alex-first cues, and
+            Follow every corporate opportunity with clear handoffs, story-guide cues, and
             escalation hooks tied to platform oversight.
           </p>
         </div>
@@ -123,7 +123,7 @@ export function GameMasterB2bPipeline({
           <div className="border-border/60 bg-muted/30 flex flex-col gap-4 rounded-3xl border p-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold">Focus cues tuned for Alex</p>
+                <p className="text-sm font-semibold">Focus cues tuned for you</p>
                 <p className="text-muted-foreground text-xs">
                   Highlight urgent narrative threads, live escalations, and renewals at
                   risk without losing sight of the broader pipeline.
@@ -196,8 +196,8 @@ interface FocusSummaryProps {
 function FocusToggle({ focusMode, onChange }: FocusToggleProps) {
   const options: Array<{ value: FocusMode; label: string; description: string }> = [
     {
-      value: "alex",
-      label: "Alex’s focus",
+      value: "mine",
+      label: "My focus",
       description: "Urgent, escalated, or at-risk threads assigned to you.",
     },
     {
@@ -260,7 +260,7 @@ function FocusSummary({
       />
       <SummaryPill
         icon={<TargetIcon className="size-4" />}
-        label="Alex’s focus"
+        label="My focus"
         value={focusThreads}
         assistive="Urgent & assigned to you"
       />
@@ -406,7 +406,7 @@ function buildPipelineSummary(opportunities: GmPipelineOpportunity[]): FocusSumm
   );
 }
 
-function isOpportunityInAlexFocus(opportunity: GmPipelineOpportunity) {
+function isOpportunityInFocus(opportunity: GmPipelineOpportunity) {
   return getOpportunityFocusMeta(opportunity).isFocusCandidate;
 }
 

@@ -29,7 +29,7 @@ export function GameMasterFeedbackTriageBoard({
           <div className="space-y-3">
             <Badge className="bg-white/10 text-white">Feedback triage</Badge>
             <h1 className="text-3xl font-semibold sm:text-4xl">
-              Keep Alex’s tables feeling heard and safe
+              Keep every table feeling heard and safe
             </h1>
             <p className="max-w-2xl text-sm text-white/75 sm:text-base">
               Consolidate post-session surveys, safety escalations, and celebration cues
@@ -210,7 +210,7 @@ function buildColumns(
       key: "upcoming",
       title: "Upcoming touchpoints",
       description:
-        "Pre-session nudges and rituals that prime Alex for cinematic delivery.",
+        "Pre-session nudges and rituals that prime your storytelling for cinematic delivery.",
       tasks: upcomingPrep,
       empty: {
         title: "No upcoming sessions queued",

@@ -46,7 +46,7 @@ export function GameMasterCampaignWorkspace({
               <Badge className="bg-white/15 text-white">Campaign studio</Badge>
               <h1 className="text-3xl font-semibold sm:text-4xl">{campaign.name}</h1>
               <p className="max-w-3xl text-base text-white/80 sm:text-lg">
-                Orchestrate Alex’s narrative arc, prep rituals, and player energy from a
+                Orchestrate this narrative arc, prep rituals, and player energy from a
                 single workspace tailored for the Story Guide.
               </p>
               <div className="flex flex-wrap gap-3 text-sm text-white/80">

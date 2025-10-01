@@ -117,7 +117,7 @@ function GameMasterDashboardRoute() {
     <div className="space-y-6">
       {hasError ? (
         <Alert variant="destructive">
-          <AlertTitle>We hit a snag loading Alex’s studio</AlertTitle>
+          <AlertTitle>We hit a snag loading the studio</AlertTitle>
           <AlertDescription>
             Some campaign or session data could not be fetched. Refresh to retry or open
             the classic dashboard views.

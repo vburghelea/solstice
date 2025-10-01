@@ -78,8 +78,8 @@ function GameMasterCampaignWorkspaceRoute() {
       <Alert variant="destructive">
         <AlertTitle>Campaign workspace unavailable</AlertTitle>
         <AlertDescription>
-          We could not load this campaign for Alex’s studio. Return to the dashboard or
-          try again later.
+          We couldn’t load this campaign workspace. Return to the dashboard or try again
+          later.
         </AlertDescription>
       </Alert>
     );

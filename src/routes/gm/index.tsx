@@ -13,7 +13,7 @@ const GM_MILESTONES: PersonaWorkspaceMilestone[] = [
     title: "Unified campaign dashboards",
     description: [
       "Session prep, asset management, and scheduling co-exist",
-      "so Alex can focus on storytelling, not tab juggling.",
+      "so Story Guides can focus on storytelling, not tab juggling.",
     ].join(" "),
   },
   {
@@ -52,7 +52,7 @@ function GameMasterLanding() {
               Explore the Game Master dashboard and triage board
             </h2>
             <p className="text-muted-foreground text-sm">
-              Alex’s campaign workspace and feedback triage board now layer on top of the
+              The campaign workspace and feedback triage board now layer on top of the
               dashboard so Story Guides can prep, run, and debrief without switching
               personas.
             </p>

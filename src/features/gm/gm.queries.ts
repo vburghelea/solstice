@@ -12,8 +12,8 @@ import type {
 import { GmPipelineNote } from "./gm.types";
 
 const STORY_GUIDE_USER = {
-  id: "gm-alex",
-  name: "Alex Morgan",
+  id: "gm-riley",
+  name: "Riley Harper",
   role: "story_guide" as const,
 };
 

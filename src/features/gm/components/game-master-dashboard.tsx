@@ -100,7 +100,7 @@ export function GameMasterDashboard({
                 Orchestrate campaigns with cinematic clarity
               </h1>
               <p className="max-w-2xl text-base text-white/80 sm:text-lg">
-                Alex’s studio brings campaign prep, session pacing, and follow-up rituals
+                The studio brings campaign prep, session pacing, and follow-up rituals
                 into a single flow. Prioritize the stories that need attention next.
               </p>
             </div>
@@ -202,7 +202,7 @@ export function GameMasterDashboard({
               <EmptyState
                 icon={<SparklesIcon className="size-10" />}
                 title="No active campaigns yet"
-                description="Draft your next narrative arc or revive a past favorite to give Alex a fresh stage."
+                description="Draft your next narrative arc or revive a past favorite to keep your tables engaged."
                 actionLabel="Start a campaign"
                 actionHref="/dashboard/campaigns/create"
               />

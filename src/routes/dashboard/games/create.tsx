@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { ArrowLeftIcon } from "~/components/ui/icons";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import {
   Select,
   SelectContent,
@@ -130,7 +131,7 @@ function CreateGamePage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        navigate({ to: `/dashboard/games/${data.data?.id}` });
+        void navigate({ to: `/dashboard/games/${data.data?.id}` } as never);
       } else {
         setServerError(data.errors?.[0]?.message || "Failed to create game");
       }

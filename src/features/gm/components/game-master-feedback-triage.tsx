@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import { differenceInHours, formatDistanceToNow } from "date-fns";
 import { CalendarClockIcon, ClipboardListIcon, HeartPulseIcon } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";

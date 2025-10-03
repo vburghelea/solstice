@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import {
   BarChart3,
   Calendar,
@@ -20,6 +20,8 @@ import { useState } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { userHasRole } from "~/features/roles/permission.service";
 import { auth } from "~/lib/auth-client";
+import type { AuthUser } from "~/lib/auth/types";
+import { Route as RootRoute } from "~/routes/__root";
 
 type SidebarItem = {
   icon: typeof Home;
@@ -89,8 +91,7 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps = {}) {
   const queryClient = useQueryClient();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
-  const context = useRouteContext({ strict: false });
-  const user = context?.user || null;
+  const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
 
   const filterItemsForUser = (items: SidebarItem[]) =>
     items.filter((item) => {
@@ -147,7 +148,6 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps = {}) {
                 activeProps={{
                   className: "nav-item-active",
                   "aria-current": "page",
-                  "data-status": "active",
                 }}
                 onClick={onNavigate}
               >
@@ -173,7 +173,6 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps = {}) {
                   activeProps={{
                     className: "nav-item-active",
                     "aria-current": "page",
-                    "data-status": "active",
                   }}
                   onClick={onNavigate}
                 >
@@ -196,7 +195,6 @@ export function AdminSidebar({ onNavigate }: AdminSidebarProps = {}) {
               activeProps={{
                 className: "nav-item-active",
                 "aria-current": "page",
-                "data-status": "active",
               }}
               onClick={onNavigate}
             >

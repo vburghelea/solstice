@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import {
   Calendar,
   ChevronRight,
@@ -12,6 +11,7 @@ import type { ComponentType, ReactNode } from "react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";

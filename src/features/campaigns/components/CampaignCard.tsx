@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Calendar } from "lucide-react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
@@ -12,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 

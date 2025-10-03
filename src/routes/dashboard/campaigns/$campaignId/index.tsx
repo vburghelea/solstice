@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import {
   Undo2,
   XCircle,
 } from "~/components/ui/icons";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import {
   Select,
   SelectContent,

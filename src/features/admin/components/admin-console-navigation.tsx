@@ -1,6 +1,7 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { FlagIcon, LineChartIcon, ShieldAlertIcon, UsersIcon } from "lucide-react";
 
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { cn } from "~/shared/lib/utils";
 
 interface AdminNavItem {

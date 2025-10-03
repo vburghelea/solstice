@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Calendar, CheckCircle, XCircle } from "lucide-react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
@@ -12,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";

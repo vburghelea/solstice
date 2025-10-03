@@ -14,6 +14,10 @@ export const mockReactRouter = () => {
       useParams: vi.fn(() => ({ gameId: MOCK_GAME.id, campaignId: MOCK_CAMPAIGN.id })),
       useRouteContext: vi.fn(() => ({ user: MOCK_OWNER_USER })),
       useNavigate: vi.fn(() => vi.fn()),
+      useRouter: vi.fn(() => ({
+        navigate: vi.fn(),
+        invalidate: vi.fn(),
+      })),
       useSearch: vi.fn(() => ({ status: "scheduled" })),
     };
   });

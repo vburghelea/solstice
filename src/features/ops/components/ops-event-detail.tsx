@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import {
   addDays,
   format,
@@ -22,6 +21,7 @@ import {
   Users2Icon,
 } from "lucide-react";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";

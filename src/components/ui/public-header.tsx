@@ -1,13 +1,15 @@
-import { Link, useRouteContext, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
+import type { AuthUser } from "~/lib/auth/types";
+import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
 import { Button } from "./button";
 
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const context = useRouteContext({ strict: false });
-  const user = context?.user || null;
+  const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
   const { location } = useRouterState();
 
   const navLinks = [

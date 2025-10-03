@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import {
   CalendarCheck2Icon,
@@ -10,6 +9,7 @@ import type { ReactNode } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";

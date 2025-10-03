@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import {
   CalendarCheck2Icon,
   ListChecksIcon,
@@ -10,6 +9,7 @@ import { useMemo, type ReactNode } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";

@@ -622,7 +622,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             <div className="grid gap-2 sm:grid-cols-2">
               <Button asChild variant="outline" className="justify-start gap-2">
                 <Link
-                  to="/dashboard/profile"
+                  to="/player/profile"
                   onClick={() => {
                     posthog.capture("player_dashboard_action_selected", {
                       action: "profile",
@@ -634,7 +634,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               </Button>
               <Button asChild className="justify-start gap-2">
                 <Link
-                  to="/dashboard/membership"
+                  to="/player/membership"
                   onClick={() => {
                     posthog.capture("player_dashboard_action_selected", {
                       action: "membership",
@@ -692,9 +692,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   {formatDateAndTime(nextGame.dateTime)} · {nextGame.location.address}
                 </p>
                 <Button asChild>
-                  <Link to={`/dashboard/games/${nextGame.id}`}>
-                    Open session briefing
-                  </Link>
+                  <Link to={`/player/games/${nextGame.id}`}>Open session briefing</Link>
                 </Button>
               </div>
             ) : (
@@ -891,7 +889,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   {topTeams.map((team) => (
                     <Link
                       key={team.id}
-                      to={`/dashboard/teams/${team.id}`}
+                      to={`/player/teams/${team.id}`}
                       className="border-muted-foreground/30 hover:border-primary/60 flex items-center justify-between rounded-lg border px-3 py-3 transition-colors"
                     >
                       <div>
@@ -915,7 +913,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 className="text-primary hover:text-primary justify-start"
               >
                 <Link
-                  to="/dashboard/teams"
+                  to="/player/teams"
                   onClick={() => {
                     posthog.capture("player_dashboard_action_selected", {
                       action: "teams",

@@ -241,7 +241,7 @@ describe("OpsOverviewDashboard", () => {
     expect(screen.getByText("Event operations mission control")).toBeInTheDocument();
     expect(screen.getByText("Approve the next submission")).toBeInTheDocument();
     const missionLink = screen.getByRole("link", { name: "Review submission" });
-    expect(missionLink).toHaveAttribute("href", "/dashboard/admin/events-review");
+    expect(missionLink).toHaveAttribute("href", "/admin/events-review");
     expect(screen.getByText("Awaiting review")).toBeInTheDocument();
 
     expect(screen.getByText("Community Showcase")).toBeInTheDocument();

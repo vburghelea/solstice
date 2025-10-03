@@ -17,20 +17,44 @@ import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 
+type LinkPrimitive = string | number | boolean;
+
+export type GameCardLinkConfig = {
+  readonly to: string;
+  readonly params?: Record<string, LinkPrimitive>;
+  readonly search?: Record<string, LinkPrimitive | undefined>;
+  readonly from?: string;
+  readonly label?: string;
+};
+
 interface GameCardProps {
-  game: GameListItem;
-  isOwner?: boolean;
-  onUpdateStatus?: (variables: {
+  readonly game: GameListItem;
+  readonly isOwner?: boolean;
+  readonly onUpdateStatus?: (variables: {
     data: { gameId: string; status: (typeof gameStatusEnum.enumValues)[number] };
   }) => void;
+  readonly viewLink?: GameCardLinkConfig;
 }
 
-export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProps) {
+export function GameCard({
+  game,
+  isOwner = false,
+  onUpdateStatus,
+  viewLink,
+}: GameCardProps) {
   const formattedDateTime = formatDateAndTime(game.dateTime);
 
   const canCancel = game.status !== "completed" && game.status !== "canceled";
   const isActionable =
     isOwner && game.status !== "completed" && game.status !== "canceled";
+
+  const resolvedLink: GameCardLinkConfig = {
+    to: viewLink?.to ?? "/dashboard/games/$gameId",
+    params: viewLink?.params ?? { gameId: game.id },
+    from: viewLink?.from ?? "/dashboard/games",
+    label: viewLink?.label ?? "View Game",
+    ...(viewLink?.search ? { search: viewLink.search } : {}),
+  };
 
   return (
     <Card className="transition-shadow hover:shadow-lg">
@@ -98,11 +122,12 @@ export function GameCard({ game, isOwner = false, onUpdateStatus }: GameCardProp
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link
-              from="/dashboard/games"
-              to="/dashboard/games/$gameId"
-              params={{ gameId: game.id }}
+              to={resolvedLink.to}
+              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             >
-              View Game
+              {resolvedLink.label ?? "View Game"}
             </Link>
           </Button>
         </div>

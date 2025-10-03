@@ -10,7 +10,7 @@ import {
 import type { EventRegistrationListItem } from "~/features/events/events.queries";
 import { getEvent, listEventRegistrations } from "~/features/events/events.queries";
 
-export const Route = createFileRoute("/ops/events/$eventId")({
+export const Route = createFileRoute("/player/events/$eventId")({
   component: DashboardEventDetailPage,
 });
 

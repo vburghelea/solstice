@@ -30,7 +30,7 @@ interface GameMasterDashboardProps {
 
 type FeedbackFollowUpAction =
   | { to: "/gm/campaigns/$campaignId"; params: { campaignId: string } }
-  | { to: "/dashboard/games/$gameId"; params: { gameId: string } };
+  | { to: "/gm/games/$gameId"; params: { gameId: string } };
 
 interface FeedbackFollowUpItem {
   id: string;
@@ -83,7 +83,7 @@ export function GameMasterDashboard({
               params: { campaignId: game.campaignId },
             }
           : {
-              to: "/dashboard/games/$gameId",
+              to: "/gm/games/$gameId",
               params: { gameId: game.id },
             },
       } satisfies FeedbackFollowUpItem;
@@ -110,7 +110,7 @@ export function GameMasterDashboard({
                 variant="secondary"
                 className="bg-white/10 text-white hover:bg-white/20"
               >
-                <Link to="/dashboard/campaigns/create">Plan new campaign</Link>
+                <Link to="/gm/campaigns/create">Plan new campaign</Link>
               </Button>
               <Button
                 asChild
@@ -163,7 +163,7 @@ export function GameMasterDashboard({
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
-              <Link to="/dashboard/games">Open session manager</Link>
+              <Link to="/gm/games">Open session manager</Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -173,7 +173,7 @@ export function GameMasterDashboard({
                 title="No sessions on deck"
                 description="Schedule a new gathering or convert a campaign beat into a live session to keep momentum."
                 actionLabel="Schedule session"
-                actionHref="/dashboard/games/create"
+                actionHref="/gm/games/create"
               />
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
@@ -204,7 +204,7 @@ export function GameMasterDashboard({
                 title="No active campaigns yet"
                 description="Draft your next narrative arc or revive a past favorite to keep your tables engaged."
                 actionLabel="Start a campaign"
-                actionHref="/dashboard/campaigns/create"
+                actionHref="/gm/campaigns/create"
               />
             ) : (
               <List className="space-y-3">
@@ -273,7 +273,7 @@ export function GameMasterDashboard({
               title="No follow-ups queued"
               description="Once you host a session, we’ll surface the debrief, survey, and escalation tasks here."
               actionLabel="Browse session archive"
-              actionHref="/dashboard/games"
+              actionHref="/gm/games"
             />
           ) : (
             <List className="space-y-3">

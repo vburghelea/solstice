@@ -23,10 +23,22 @@ import type { EventFilters, EventListResult, EventWithDetails } from "../events.
 type SortBy = "startDate" | "name" | "createdAt";
 type SortOrder = "asc" | "desc";
 
+type LinkPrimitive = string | number | boolean;
+
+type LinkConfig = {
+  readonly to: string;
+  readonly params?: Record<string, LinkPrimitive>;
+  readonly search?: Record<string, LinkPrimitive | undefined>;
+  readonly from?: string;
+  readonly label?: string;
+};
+
 interface EventListProps {
-  showFilters?: boolean;
-  initialFilters?: EventFilters;
-  pageSize?: number;
+  readonly showFilters?: boolean;
+  readonly initialFilters?: EventFilters;
+  readonly pageSize?: number;
+  readonly buildEventLink?: (event: EventWithDetails) => LinkConfig | undefined;
+  readonly actionLabel?: string;
 }
 
 const DEFAULT_FILTERS: EventFilters = {};
@@ -54,6 +66,8 @@ export function EventList({
   showFilters = true,
   initialFilters = DEFAULT_FILTERS,
   pageSize = 12,
+  buildEventLink,
+  actionLabel,
 }: EventListProps) {
   const [filters, setFilters] = useState<EventFilters>(() => ({ ...initialFilters }));
   const [page, setPage] = useState(1);
@@ -262,7 +276,12 @@ export function EventList({
         <>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard
+                key={event.id}
+                event={event}
+                buildEventLink={buildEventLink}
+                fallbackActionLabel={actionLabel}
+              />
             ))}
           </div>
 
@@ -319,9 +338,26 @@ export function EventList({
   );
 }
 
-function EventCard({ event }: { event: EventWithDetails }) {
+function EventCard({
+  event,
+  buildEventLink,
+  fallbackActionLabel,
+}: {
+  readonly event: EventWithDetails;
+  readonly buildEventLink?: EventListProps["buildEventLink"];
+  readonly fallbackActionLabel?: EventListProps["actionLabel"];
+}) {
   const typeIcon = getTypeIcon(event.type);
   const badgeAppearance = getStatusBadgeAppearance(event.status);
+  const builderLink = buildEventLink?.(event);
+  const linkLabel = builderLink?.label ?? fallbackActionLabel ?? "View Details";
+  const resolvedLink: LinkConfig = {
+    to: builderLink?.to ?? "/events/$slug",
+    params: builderLink?.params ?? { slug: event.slug },
+    label: linkLabel,
+    ...(builderLink?.search ? { search: builderLink.search } : {}),
+    ...(builderLink?.from ? { from: builderLink.from } : {}),
+  };
 
   return (
     <Card className="group transition-all hover:shadow-lg">
@@ -329,8 +365,10 @@ function EventCard({ event }: { event: EventWithDetails }) {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link
-              to="/events/$slug"
-              params={{ slug: event.slug }}
+              to={resolvedLink.to}
+              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
               className="group-hover:underline"
             >
               <CardTitle className="line-clamp-2">
@@ -397,8 +435,13 @@ function EventCard({ event }: { event: EventWithDetails }) {
 
         <div className="pt-2">
           <Button asChild className="w-full" size="sm">
-            <Link to="/events/$slug" params={{ slug: event.slug }}>
-              View Details
+            <Link
+              to={resolvedLink.to}
+              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
+            >
+              {linkLabel}
             </Link>
           </Button>
         </div>

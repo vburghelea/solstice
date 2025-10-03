@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Home, Inbox, KanbanSquare } from "lucide-react";
+import { AlertTriangle, CalendarDays, Home, Inbox, KanbanSquare } from "lucide-react";
 import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -24,6 +24,12 @@ const OPS_NAVIGATION: RoleWorkspaceNavItem[] = [
     exact: true,
     description:
       "Watch approvals, staffing, and logistics rollups in one mission control.",
+  },
+  {
+    label: "Events",
+    to: "/ops/events",
+    icon: CalendarDays,
+    description: "Review approvals, logistics, and marketing health for each event.",
   },
   {
     label: "Shared inbox",

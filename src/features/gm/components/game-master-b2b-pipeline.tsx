@@ -147,7 +147,7 @@ export function GameMasterB2bPipeline({
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
-              <a href="/dashboard/campaigns/create">Plan corporate pilot</a>
+              <a href="/gm/campaigns/create">Plan corporate pilot</a>
             </Button>
           </div>
         ) : (

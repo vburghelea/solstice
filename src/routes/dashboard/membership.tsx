@@ -32,7 +32,7 @@ export const Route = createFileRoute("/dashboard/membership")({
   component: MembershipPage,
 });
 
-function MembershipPage() {
+export function MembershipPage() {
   const [processingPayment, setProcessingPayment] = useState(false);
   const paymentReturn = usePaymentReturn();
   const [hasProcessedReturn, setHasProcessedReturn] = useState(false);

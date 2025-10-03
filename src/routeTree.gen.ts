@@ -38,14 +38,22 @@ import { Route as AdminIndexRouteImport } from "./routes/admin/index";
 import { Route as VisitInboxRouteImport } from "./routes/visit/inbox";
 import { Route as VisitCollaborationRouteImport } from "./routes/visit/collaboration";
 import { Route as SystemsSlugRouteImport } from "./routes/systems/$slug";
+import { Route as PlayerTeamsRouteImport } from "./routes/player/teams";
+import { Route as PlayerMembershipRouteImport } from "./routes/player/membership";
 import { Route as PlayerInboxRouteImport } from "./routes/player/inbox";
+import { Route as PlayerGamesRouteImport } from "./routes/player/games";
+import { Route as PlayerEventsRouteImport } from "./routes/player/events";
 import { Route as PlayerCollaborationRouteImport } from "./routes/player/collaboration";
+import { Route as PlayerCampaignsRouteImport } from "./routes/player/campaigns";
 import { Route as OpsInboxRouteImport } from "./routes/ops/inbox";
+import { Route as OpsEventsRouteImport } from "./routes/ops/events";
 import { Route as OpsCollaborationRouteImport } from "./routes/ops/collaboration";
 import { Route as GmInboxRouteImport } from "./routes/gm/inbox";
+import { Route as GmGamesRouteImport } from "./routes/gm/games";
 import { Route as GmFeedbackRouteImport } from "./routes/gm/feedback";
 import { Route as GmDashboardRouteImport } from "./routes/gm/dashboard";
 import { Route as GmCollaborationRouteImport } from "./routes/gm/collaboration";
+import { Route as GmCampaignsRouteImport } from "./routes/gm/campaigns";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
 import { Route as EventsSlugRouteImport } from "./routes/events/$slug";
 import { Route as EventEventIdRouteImport } from "./routes/event.$eventId";
@@ -74,8 +82,15 @@ import { Route as AdminFeatureFlagsRouteImport } from "./routes/admin/feature-fl
 import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-review";
 import { Route as AdminCollaborationRouteImport } from "./routes/admin/collaboration";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
+import { Route as PlayerTeamsIndexRouteImport } from "./routes/player/teams/index";
 import { Route as PlayerSettingsIndexRouteImport } from "./routes/player/settings/index";
 import { Route as PlayerProfileIndexRouteImport } from "./routes/player/profile/index";
+import { Route as PlayerGamesIndexRouteImport } from "./routes/player/games/index";
+import { Route as PlayerEventsIndexRouteImport } from "./routes/player/events/index";
+import { Route as PlayerCampaignsIndexRouteImport } from "./routes/player/campaigns/index";
+import { Route as OpsEventsIndexRouteImport } from "./routes/ops/events/index";
+import { Route as GmGamesIndexRouteImport } from "./routes/gm/games/index";
+import { Route as GmCampaignsIndexRouteImport } from "./routes/gm/campaigns/index";
 import { Route as EventsSlugIndexRouteImport } from "./routes/events/$slug.index";
 import { Route as DevEmailIndexRouteImport } from "./routes/dev/email/index";
 import { Route as DashboardTeamsIndexRouteImport } from "./routes/dashboard/teams/index";
@@ -84,7 +99,20 @@ import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/pr
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
+import { Route as PlayerTeamsCreateRouteImport } from "./routes/player/teams/create";
+import { Route as PlayerTeamsBrowseRouteImport } from "./routes/player/teams/browse";
+import { Route as PlayerTeamsTeamIdRouteImport } from "./routes/player/teams/$teamId";
+import { Route as PlayerGamesCreateRouteImport } from "./routes/player/games/create";
+import { Route as PlayerGamesGameIdRouteImport } from "./routes/player/games/$gameId";
+import { Route as PlayerEventsCreateRouteImport } from "./routes/player/events/create";
+import { Route as PlayerEventsEventIdRouteImport } from "./routes/player/events/$eventId";
+import { Route as PlayerCampaignsCreateRouteImport } from "./routes/player/campaigns/create";
+import { Route as PlayerCampaignsCampaignIdRouteImport } from "./routes/player/campaigns/$campaignId";
+import { Route as OpsEventsCreateRouteImport } from "./routes/ops/events/create";
 import { Route as OpsEventsEventIdRouteImport } from "./routes/ops/events/$eventId";
+import { Route as GmGamesCreateRouteImport } from "./routes/gm/games/create";
+import { Route as GmGamesGameIdRouteImport } from "./routes/gm/games/$gameId";
+import { Route as GmCampaignsCreateRouteImport } from "./routes/gm/campaigns/create";
 import { Route as GmCampaignsCampaignIdRouteImport } from "./routes/gm/campaigns.$campaignId";
 import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
 import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$template";
@@ -103,8 +131,15 @@ import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
 import { Route as DashboardAdminEventsReviewRouteImport } from "./routes/dashboard/admin/events-review";
+import { Route as PlayerTeamsTeamIdIndexRouteImport } from "./routes/player/teams/$teamId.index";
+import { Route as PlayerCampaignsCampaignIdIndexRouteImport } from "./routes/player/campaigns/$campaignId/index";
 import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboard/teams/$teamId.index";
 import { Route as DashboardCampaignsCampaignIdIndexRouteImport } from "./routes/dashboard/campaigns/$campaignId/index";
+import { Route as PlayerTeamsTeamIdMembersRouteImport } from "./routes/player/teams/$teamId.members";
+import { Route as PlayerTeamsTeamIdManageRouteImport } from "./routes/player/teams/$teamId.manage";
+import { Route as PlayerEventsEventIdManageRouteImport } from "./routes/player/events/$eventId.manage";
+import { Route as PlayerCampaignsCampaignIdZeroRouteImport } from "./routes/player/campaigns/$campaignId/zero";
+import { Route as OpsEventsEventIdManageRouteImport } from "./routes/ops/events/$eventId.manage";
 import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
 import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
 import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
@@ -262,9 +297,29 @@ const SystemsSlugRoute = SystemsSlugRouteImport.update({
   path: "/systems/$slug",
   getParentRoute: () => rootRouteImport,
 } as any);
+const PlayerTeamsRoute = PlayerTeamsRouteImport.update({
+  id: "/teams",
+  path: "/teams",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
+const PlayerMembershipRoute = PlayerMembershipRouteImport.update({
+  id: "/membership",
+  path: "/membership",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
 const PlayerInboxRoute = PlayerInboxRouteImport.update({
   id: "/inbox",
   path: "/inbox",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
+const PlayerGamesRoute = PlayerGamesRouteImport.update({
+  id: "/games",
+  path: "/games",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
+const PlayerEventsRoute = PlayerEventsRouteImport.update({
+  id: "/events",
+  path: "/events",
   getParentRoute: () => PlayerRouteRoute,
 } as any);
 const PlayerCollaborationRoute = PlayerCollaborationRouteImport.update({
@@ -272,9 +327,19 @@ const PlayerCollaborationRoute = PlayerCollaborationRouteImport.update({
   path: "/collaboration",
   getParentRoute: () => PlayerRouteRoute,
 } as any);
+const PlayerCampaignsRoute = PlayerCampaignsRouteImport.update({
+  id: "/campaigns",
+  path: "/campaigns",
+  getParentRoute: () => PlayerRouteRoute,
+} as any);
 const OpsInboxRoute = OpsInboxRouteImport.update({
   id: "/inbox",
   path: "/inbox",
+  getParentRoute: () => OpsRouteRoute,
+} as any);
+const OpsEventsRoute = OpsEventsRouteImport.update({
+  id: "/events",
+  path: "/events",
   getParentRoute: () => OpsRouteRoute,
 } as any);
 const OpsCollaborationRoute = OpsCollaborationRouteImport.update({
@@ -285,6 +350,11 @@ const OpsCollaborationRoute = OpsCollaborationRouteImport.update({
 const GmInboxRoute = GmInboxRouteImport.update({
   id: "/inbox",
   path: "/inbox",
+  getParentRoute: () => GmRouteRoute,
+} as any);
+const GmGamesRoute = GmGamesRouteImport.update({
+  id: "/games",
+  path: "/games",
   getParentRoute: () => GmRouteRoute,
 } as any);
 const GmFeedbackRoute = GmFeedbackRouteImport.update({
@@ -300,6 +370,11 @@ const GmDashboardRoute = GmDashboardRouteImport.update({
 const GmCollaborationRoute = GmCollaborationRouteImport.update({
   id: "/collaboration",
   path: "/collaboration",
+  getParentRoute: () => GmRouteRoute,
+} as any);
+const GmCampaignsRoute = GmCampaignsRouteImport.update({
+  id: "/campaigns",
+  path: "/campaigns",
   getParentRoute: () => GmRouteRoute,
 } as any);
 const GameGameIdRoute = GameGameIdRouteImport.update({
@@ -442,6 +517,11 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
   path: "/admin",
   getParentRoute: () => DashboardRouteRoute,
 } as any);
+const PlayerTeamsIndexRoute = PlayerTeamsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PlayerTeamsRoute,
+} as any);
 const PlayerSettingsIndexRoute = PlayerSettingsIndexRouteImport.update({
   id: "/settings/",
   path: "/settings/",
@@ -451,6 +531,36 @@ const PlayerProfileIndexRoute = PlayerProfileIndexRouteImport.update({
   id: "/profile/",
   path: "/profile/",
   getParentRoute: () => PlayerRouteRoute,
+} as any);
+const PlayerGamesIndexRoute = PlayerGamesIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PlayerGamesRoute,
+} as any);
+const PlayerEventsIndexRoute = PlayerEventsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PlayerEventsRoute,
+} as any);
+const PlayerCampaignsIndexRoute = PlayerCampaignsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PlayerCampaignsRoute,
+} as any);
+const OpsEventsIndexRoute = OpsEventsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => OpsEventsRoute,
+} as any);
+const GmGamesIndexRoute = GmGamesIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => GmGamesRoute,
+} as any);
+const GmCampaignsIndexRoute = GmCampaignsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => GmCampaignsRoute,
 } as any);
 const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
   id: "/",
@@ -492,15 +602,81 @@ const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DashboardCampaignsRoute,
 } as any);
+const PlayerTeamsCreateRoute = PlayerTeamsCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => PlayerTeamsRoute,
+} as any);
+const PlayerTeamsBrowseRoute = PlayerTeamsBrowseRouteImport.update({
+  id: "/browse",
+  path: "/browse",
+  getParentRoute: () => PlayerTeamsRoute,
+} as any);
+const PlayerTeamsTeamIdRoute = PlayerTeamsTeamIdRouteImport.update({
+  id: "/$teamId",
+  path: "/$teamId",
+  getParentRoute: () => PlayerTeamsRoute,
+} as any);
+const PlayerGamesCreateRoute = PlayerGamesCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => PlayerGamesRoute,
+} as any);
+const PlayerGamesGameIdRoute = PlayerGamesGameIdRouteImport.update({
+  id: "/$gameId",
+  path: "/$gameId",
+  getParentRoute: () => PlayerGamesRoute,
+} as any);
+const PlayerEventsCreateRoute = PlayerEventsCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => PlayerEventsRoute,
+} as any);
+const PlayerEventsEventIdRoute = PlayerEventsEventIdRouteImport.update({
+  id: "/$eventId",
+  path: "/$eventId",
+  getParentRoute: () => PlayerEventsRoute,
+} as any);
+const PlayerCampaignsCreateRoute = PlayerCampaignsCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => PlayerCampaignsRoute,
+} as any);
+const PlayerCampaignsCampaignIdRoute =
+  PlayerCampaignsCampaignIdRouteImport.update({
+    id: "/$campaignId",
+    path: "/$campaignId",
+    getParentRoute: () => PlayerCampaignsRoute,
+  } as any);
+const OpsEventsCreateRoute = OpsEventsCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => OpsEventsRoute,
+} as any);
 const OpsEventsEventIdRoute = OpsEventsEventIdRouteImport.update({
-  id: "/events/$eventId",
-  path: "/events/$eventId",
-  getParentRoute: () => OpsRouteRoute,
+  id: "/$eventId",
+  path: "/$eventId",
+  getParentRoute: () => OpsEventsRoute,
+} as any);
+const GmGamesCreateRoute = GmGamesCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => GmGamesRoute,
+} as any);
+const GmGamesGameIdRoute = GmGamesGameIdRouteImport.update({
+  id: "/$gameId",
+  path: "/$gameId",
+  getParentRoute: () => GmGamesRoute,
+} as any);
+const GmCampaignsCreateRoute = GmCampaignsCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => GmCampaignsRoute,
 } as any);
 const GmCampaignsCampaignIdRoute = GmCampaignsCampaignIdRouteImport.update({
-  id: "/campaigns/$campaignId",
-  path: "/campaigns/$campaignId",
-  getParentRoute: () => GmRouteRoute,
+  id: "/$campaignId",
+  path: "/$campaignId",
+  getParentRoute: () => GmCampaignsRoute,
 } as any);
 const EventsSlugRegisterRoute = EventsSlugRegisterRouteImport.update({
   id: "/register",
@@ -592,6 +768,17 @@ const DashboardAdminEventsReviewRoute =
     path: "/events-review",
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any);
+const PlayerTeamsTeamIdIndexRoute = PlayerTeamsTeamIdIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => PlayerTeamsTeamIdRoute,
+} as any);
+const PlayerCampaignsCampaignIdIndexRoute =
+  PlayerCampaignsCampaignIdIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => PlayerCampaignsCampaignIdRoute,
+  } as any);
 const DashboardTeamsTeamIdIndexRoute =
   DashboardTeamsTeamIdIndexRouteImport.update({
     id: "/",
@@ -604,6 +791,34 @@ const DashboardCampaignsCampaignIdIndexRoute =
     path: "/",
     getParentRoute: () => DashboardCampaignsCampaignIdRoute,
   } as any);
+const PlayerTeamsTeamIdMembersRoute =
+  PlayerTeamsTeamIdMembersRouteImport.update({
+    id: "/members",
+    path: "/members",
+    getParentRoute: () => PlayerTeamsTeamIdRoute,
+  } as any);
+const PlayerTeamsTeamIdManageRoute = PlayerTeamsTeamIdManageRouteImport.update({
+  id: "/manage",
+  path: "/manage",
+  getParentRoute: () => PlayerTeamsTeamIdRoute,
+} as any);
+const PlayerEventsEventIdManageRoute =
+  PlayerEventsEventIdManageRouteImport.update({
+    id: "/manage",
+    path: "/manage",
+    getParentRoute: () => PlayerEventsEventIdRoute,
+  } as any);
+const PlayerCampaignsCampaignIdZeroRoute =
+  PlayerCampaignsCampaignIdZeroRouteImport.update({
+    id: "/zero",
+    path: "/zero",
+    getParentRoute: () => PlayerCampaignsCampaignIdRoute,
+  } as any);
+const OpsEventsEventIdManageRoute = OpsEventsEventIdManageRouteImport.update({
+  id: "/manage",
+  path: "/manage",
+  getParentRoute: () => OpsEventsEventIdRoute,
+} as any);
 const DashboardTeamsTeamIdMembersRoute =
   DashboardTeamsTeamIdMembersRouteImport.update({
     id: "/members",
@@ -752,14 +967,22 @@ export interface FileRoutesByFullPath {
   "/event/$eventId": typeof EventEventIdRoute;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/gm/campaigns": typeof GmCampaignsRouteWithChildren;
   "/gm/collaboration": typeof GmCollaborationRoute;
   "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
+  "/gm/games": typeof GmGamesRouteWithChildren;
   "/gm/inbox": typeof GmInboxRoute;
   "/ops/collaboration": typeof OpsCollaborationRoute;
+  "/ops/events": typeof OpsEventsRouteWithChildren;
   "/ops/inbox": typeof OpsInboxRoute;
+  "/player/campaigns": typeof PlayerCampaignsRouteWithChildren;
   "/player/collaboration": typeof PlayerCollaborationRoute;
+  "/player/events": typeof PlayerEventsRouteWithChildren;
+  "/player/games": typeof PlayerGamesRouteWithChildren;
   "/player/inbox": typeof PlayerInboxRoute;
+  "/player/membership": typeof PlayerMembershipRoute;
+  "/player/teams": typeof PlayerTeamsRouteWithChildren;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/visit/collaboration": typeof VisitCollaborationRoute;
   "/visit/inbox": typeof VisitInboxRoute;
@@ -790,7 +1013,20 @@ export interface FileRoutesByFullPath {
   "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/gm/campaigns/$campaignId": typeof GmCampaignsCampaignIdRoute;
-  "/ops/events/$eventId": typeof OpsEventsEventIdRoute;
+  "/gm/campaigns/create": typeof GmCampaignsCreateRoute;
+  "/gm/games/$gameId": typeof GmGamesGameIdRoute;
+  "/gm/games/create": typeof GmGamesCreateRoute;
+  "/ops/events/$eventId": typeof OpsEventsEventIdRouteWithChildren;
+  "/ops/events/create": typeof OpsEventsCreateRoute;
+  "/player/campaigns/$campaignId": typeof PlayerCampaignsCampaignIdRouteWithChildren;
+  "/player/campaigns/create": typeof PlayerCampaignsCreateRoute;
+  "/player/events/$eventId": typeof PlayerEventsEventIdRouteWithChildren;
+  "/player/events/create": typeof PlayerEventsCreateRoute;
+  "/player/games/$gameId": typeof PlayerGamesGameIdRoute;
+  "/player/games/create": typeof PlayerGamesCreateRoute;
+  "/player/teams/$teamId": typeof PlayerTeamsTeamIdRouteWithChildren;
+  "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
+  "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
@@ -799,14 +1035,28 @@ export interface FileRoutesByFullPath {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/gm/campaigns/": typeof GmCampaignsIndexRoute;
+  "/gm/games/": typeof GmGamesIndexRoute;
+  "/ops/events/": typeof OpsEventsIndexRoute;
+  "/player/campaigns/": typeof PlayerCampaignsIndexRoute;
+  "/player/events/": typeof PlayerEventsIndexRoute;
+  "/player/games/": typeof PlayerGamesIndexRoute;
   "/player/profile": typeof PlayerProfileIndexRoute;
   "/player/settings": typeof PlayerSettingsIndexRoute;
+  "/player/teams/": typeof PlayerTeamsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
+  "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
+  "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
+  "/player/teams/$teamId/manage": typeof PlayerTeamsTeamIdManageRoute;
+  "/player/teams/$teamId/members": typeof PlayerTeamsTeamIdMembersRoute;
   "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
+  "/player/campaigns/$campaignId/": typeof PlayerCampaignsCampaignIdIndexRoute;
+  "/player/teams/$teamId/": typeof PlayerTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
@@ -845,6 +1095,7 @@ export interface FileRoutesByTo {
   "/ops/inbox": typeof OpsInboxRoute;
   "/player/collaboration": typeof PlayerCollaborationRoute;
   "/player/inbox": typeof PlayerInboxRoute;
+  "/player/membership": typeof PlayerMembershipRoute;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/visit/collaboration": typeof VisitCollaborationRoute;
   "/visit/inbox": typeof VisitInboxRoute;
@@ -873,7 +1124,18 @@ export interface FileRoutesByTo {
   "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/gm/campaigns/$campaignId": typeof GmCampaignsCampaignIdRoute;
-  "/ops/events/$eventId": typeof OpsEventsEventIdRoute;
+  "/gm/campaigns/create": typeof GmCampaignsCreateRoute;
+  "/gm/games/$gameId": typeof GmGamesGameIdRoute;
+  "/gm/games/create": typeof GmGamesCreateRoute;
+  "/ops/events/$eventId": typeof OpsEventsEventIdRouteWithChildren;
+  "/ops/events/create": typeof OpsEventsCreateRoute;
+  "/player/campaigns/create": typeof PlayerCampaignsCreateRoute;
+  "/player/events/$eventId": typeof PlayerEventsEventIdRouteWithChildren;
+  "/player/events/create": typeof PlayerEventsCreateRoute;
+  "/player/games/$gameId": typeof PlayerGamesGameIdRoute;
+  "/player/games/create": typeof PlayerGamesCreateRoute;
+  "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
+  "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
@@ -882,14 +1144,28 @@ export interface FileRoutesByTo {
   "/dashboard/teams": typeof DashboardTeamsIndexRoute;
   "/dev/email": typeof DevEmailIndexRoute;
   "/events/$slug": typeof EventsSlugIndexRoute;
+  "/gm/campaigns": typeof GmCampaignsIndexRoute;
+  "/gm/games": typeof GmGamesIndexRoute;
+  "/ops/events": typeof OpsEventsIndexRoute;
+  "/player/campaigns": typeof PlayerCampaignsIndexRoute;
+  "/player/events": typeof PlayerEventsIndexRoute;
+  "/player/games": typeof PlayerGamesIndexRoute;
   "/player/profile": typeof PlayerProfileIndexRoute;
   "/player/settings": typeof PlayerSettingsIndexRoute;
+  "/player/teams": typeof PlayerTeamsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
+  "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
+  "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
+  "/player/teams/$teamId/manage": typeof PlayerTeamsTeamIdManageRoute;
+  "/player/teams/$teamId/members": typeof PlayerTeamsTeamIdMembersRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdIndexRoute;
   "/dashboard/teams/$teamId": typeof DashboardTeamsTeamIdIndexRoute;
+  "/player/campaigns/$campaignId": typeof PlayerCampaignsCampaignIdIndexRoute;
+  "/player/teams/$teamId": typeof PlayerTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -936,14 +1212,22 @@ export interface FileRoutesById {
   "/event/$eventId": typeof EventEventIdRoute;
   "/events/$slug": typeof EventsSlugRouteWithChildren;
   "/game/$gameId": typeof GameGameIdRoute;
+  "/gm/campaigns": typeof GmCampaignsRouteWithChildren;
   "/gm/collaboration": typeof GmCollaborationRoute;
   "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
+  "/gm/games": typeof GmGamesRouteWithChildren;
   "/gm/inbox": typeof GmInboxRoute;
   "/ops/collaboration": typeof OpsCollaborationRoute;
+  "/ops/events": typeof OpsEventsRouteWithChildren;
   "/ops/inbox": typeof OpsInboxRoute;
+  "/player/campaigns": typeof PlayerCampaignsRouteWithChildren;
   "/player/collaboration": typeof PlayerCollaborationRoute;
+  "/player/events": typeof PlayerEventsRouteWithChildren;
+  "/player/games": typeof PlayerGamesRouteWithChildren;
   "/player/inbox": typeof PlayerInboxRoute;
+  "/player/membership": typeof PlayerMembershipRoute;
+  "/player/teams": typeof PlayerTeamsRouteWithChildren;
   "/systems/$slug": typeof SystemsSlugRoute;
   "/visit/collaboration": typeof VisitCollaborationRoute;
   "/visit/inbox": typeof VisitInboxRoute;
@@ -974,7 +1258,20 @@ export interface FileRoutesById {
   "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/gm/campaigns/$campaignId": typeof GmCampaignsCampaignIdRoute;
-  "/ops/events/$eventId": typeof OpsEventsEventIdRoute;
+  "/gm/campaigns/create": typeof GmCampaignsCreateRoute;
+  "/gm/games/$gameId": typeof GmGamesGameIdRoute;
+  "/gm/games/create": typeof GmGamesCreateRoute;
+  "/ops/events/$eventId": typeof OpsEventsEventIdRouteWithChildren;
+  "/ops/events/create": typeof OpsEventsCreateRoute;
+  "/player/campaigns/$campaignId": typeof PlayerCampaignsCampaignIdRouteWithChildren;
+  "/player/campaigns/create": typeof PlayerCampaignsCreateRoute;
+  "/player/events/$eventId": typeof PlayerEventsEventIdRouteWithChildren;
+  "/player/events/create": typeof PlayerEventsCreateRoute;
+  "/player/games/$gameId": typeof PlayerGamesGameIdRoute;
+  "/player/games/create": typeof PlayerGamesCreateRoute;
+  "/player/teams/$teamId": typeof PlayerTeamsTeamIdRouteWithChildren;
+  "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
+  "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
@@ -983,14 +1280,28 @@ export interface FileRoutesById {
   "/dashboard/teams/": typeof DashboardTeamsIndexRoute;
   "/dev/email/": typeof DevEmailIndexRoute;
   "/events/$slug/": typeof EventsSlugIndexRoute;
+  "/gm/campaigns/": typeof GmCampaignsIndexRoute;
+  "/gm/games/": typeof GmGamesIndexRoute;
+  "/ops/events/": typeof OpsEventsIndexRoute;
+  "/player/campaigns/": typeof PlayerCampaignsIndexRoute;
+  "/player/events/": typeof PlayerEventsIndexRoute;
+  "/player/games/": typeof PlayerGamesIndexRoute;
   "/player/profile/": typeof PlayerProfileIndexRoute;
   "/player/settings/": typeof PlayerSettingsIndexRoute;
+  "/player/teams/": typeof PlayerTeamsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
   "/dashboard/teams/$teamId/manage": typeof DashboardTeamsTeamIdManageRoute;
   "/dashboard/teams/$teamId/members": typeof DashboardTeamsTeamIdMembersRoute;
+  "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
+  "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
+  "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
+  "/player/teams/$teamId/manage": typeof PlayerTeamsTeamIdManageRoute;
+  "/player/teams/$teamId/members": typeof PlayerTeamsTeamIdMembersRoute;
   "/dashboard/campaigns/$campaignId/": typeof DashboardCampaignsCampaignIdIndexRoute;
   "/dashboard/teams/$teamId/": typeof DashboardTeamsTeamIdIndexRoute;
+  "/player/campaigns/$campaignId/": typeof PlayerCampaignsCampaignIdIndexRoute;
+  "/player/teams/$teamId/": typeof PlayerTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -1038,14 +1349,22 @@ export interface FileRouteTypes {
     | "/event/$eventId"
     | "/events/$slug"
     | "/game/$gameId"
+    | "/gm/campaigns"
     | "/gm/collaboration"
     | "/gm/dashboard"
     | "/gm/feedback"
+    | "/gm/games"
     | "/gm/inbox"
     | "/ops/collaboration"
+    | "/ops/events"
     | "/ops/inbox"
+    | "/player/campaigns"
     | "/player/collaboration"
+    | "/player/events"
+    | "/player/games"
     | "/player/inbox"
+    | "/player/membership"
+    | "/player/teams"
     | "/systems/$slug"
     | "/visit/collaboration"
     | "/visit/inbox"
@@ -1076,7 +1395,20 @@ export interface FileRouteTypes {
     | "/dev/email/$template"
     | "/events/$slug/register"
     | "/gm/campaigns/$campaignId"
+    | "/gm/campaigns/create"
+    | "/gm/games/$gameId"
+    | "/gm/games/create"
     | "/ops/events/$eventId"
+    | "/ops/events/create"
+    | "/player/campaigns/$campaignId"
+    | "/player/campaigns/create"
+    | "/player/events/$eventId"
+    | "/player/events/create"
+    | "/player/games/$gameId"
+    | "/player/games/create"
+    | "/player/teams/$teamId"
+    | "/player/teams/browse"
+    | "/player/teams/create"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
@@ -1085,14 +1417,28 @@ export interface FileRouteTypes {
     | "/dashboard/teams/"
     | "/dev/email"
     | "/events/$slug/"
+    | "/gm/campaigns/"
+    | "/gm/games/"
+    | "/ops/events/"
+    | "/player/campaigns/"
+    | "/player/events/"
+    | "/player/games/"
     | "/player/profile"
     | "/player/settings"
+    | "/player/teams/"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/ops/events/$eventId/manage"
+    | "/player/campaigns/$campaignId/zero"
+    | "/player/events/$eventId/manage"
+    | "/player/teams/$teamId/manage"
+    | "/player/teams/$teamId/members"
     | "/dashboard/campaigns/$campaignId/"
-    | "/dashboard/teams/$teamId/";
+    | "/dashboard/teams/$teamId/"
+    | "/player/campaigns/$campaignId/"
+    | "/player/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
@@ -1131,6 +1477,7 @@ export interface FileRouteTypes {
     | "/ops/inbox"
     | "/player/collaboration"
     | "/player/inbox"
+    | "/player/membership"
     | "/systems/$slug"
     | "/visit/collaboration"
     | "/visit/inbox"
@@ -1159,7 +1506,18 @@ export interface FileRouteTypes {
     | "/dev/email/$template"
     | "/events/$slug/register"
     | "/gm/campaigns/$campaignId"
+    | "/gm/campaigns/create"
+    | "/gm/games/$gameId"
+    | "/gm/games/create"
     | "/ops/events/$eventId"
+    | "/ops/events/create"
+    | "/player/campaigns/create"
+    | "/player/events/$eventId"
+    | "/player/events/create"
+    | "/player/games/$gameId"
+    | "/player/games/create"
+    | "/player/teams/browse"
+    | "/player/teams/create"
     | "/dashboard/campaigns"
     | "/dashboard/events"
     | "/dashboard/games"
@@ -1168,14 +1526,28 @@ export interface FileRouteTypes {
     | "/dashboard/teams"
     | "/dev/email"
     | "/events/$slug"
+    | "/gm/campaigns"
+    | "/gm/games"
+    | "/ops/events"
+    | "/player/campaigns"
+    | "/player/events"
+    | "/player/games"
     | "/player/profile"
     | "/player/settings"
+    | "/player/teams"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/ops/events/$eventId/manage"
+    | "/player/campaigns/$campaignId/zero"
+    | "/player/events/$eventId/manage"
+    | "/player/teams/$teamId/manage"
+    | "/player/teams/$teamId/members"
     | "/dashboard/campaigns/$campaignId"
-    | "/dashboard/teams/$teamId";
+    | "/dashboard/teams/$teamId"
+    | "/player/campaigns/$campaignId"
+    | "/player/teams/$teamId";
   id:
     | "__root__"
     | "/"
@@ -1221,14 +1593,22 @@ export interface FileRouteTypes {
     | "/event/$eventId"
     | "/events/$slug"
     | "/game/$gameId"
+    | "/gm/campaigns"
     | "/gm/collaboration"
     | "/gm/dashboard"
     | "/gm/feedback"
+    | "/gm/games"
     | "/gm/inbox"
     | "/ops/collaboration"
+    | "/ops/events"
     | "/ops/inbox"
+    | "/player/campaigns"
     | "/player/collaboration"
+    | "/player/events"
+    | "/player/games"
     | "/player/inbox"
+    | "/player/membership"
+    | "/player/teams"
     | "/systems/$slug"
     | "/visit/collaboration"
     | "/visit/inbox"
@@ -1259,7 +1639,20 @@ export interface FileRouteTypes {
     | "/dev/email/$template"
     | "/events/$slug/register"
     | "/gm/campaigns/$campaignId"
+    | "/gm/campaigns/create"
+    | "/gm/games/$gameId"
+    | "/gm/games/create"
     | "/ops/events/$eventId"
+    | "/ops/events/create"
+    | "/player/campaigns/$campaignId"
+    | "/player/campaigns/create"
+    | "/player/events/$eventId"
+    | "/player/events/create"
+    | "/player/games/$gameId"
+    | "/player/games/create"
+    | "/player/teams/$teamId"
+    | "/player/teams/browse"
+    | "/player/teams/create"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
@@ -1268,14 +1661,28 @@ export interface FileRouteTypes {
     | "/dashboard/teams/"
     | "/dev/email/"
     | "/events/$slug/"
+    | "/gm/campaigns/"
+    | "/gm/games/"
+    | "/ops/events/"
+    | "/player/campaigns/"
+    | "/player/events/"
+    | "/player/games/"
     | "/player/profile/"
     | "/player/settings/"
+    | "/player/teams/"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
     | "/dashboard/teams/$teamId/manage"
     | "/dashboard/teams/$teamId/members"
+    | "/ops/events/$eventId/manage"
+    | "/player/campaigns/$campaignId/zero"
+    | "/player/events/$eventId/manage"
+    | "/player/teams/$teamId/manage"
+    | "/player/teams/$teamId/members"
     | "/dashboard/campaigns/$campaignId/"
-    | "/dashboard/teams/$teamId/";
+    | "/dashboard/teams/$teamId/"
+    | "/player/campaigns/$campaignId/"
+    | "/player/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -1616,11 +2023,39 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SystemsSlugRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/player/teams": {
+      id: "/player/teams";
+      path: "/teams";
+      fullPath: "/player/teams";
+      preLoaderRoute: typeof PlayerTeamsRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
+    "/player/membership": {
+      id: "/player/membership";
+      path: "/membership";
+      fullPath: "/player/membership";
+      preLoaderRoute: typeof PlayerMembershipRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
     "/player/inbox": {
       id: "/player/inbox";
       path: "/inbox";
       fullPath: "/player/inbox";
       preLoaderRoute: typeof PlayerInboxRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
+    "/player/games": {
+      id: "/player/games";
+      path: "/games";
+      fullPath: "/player/games";
+      preLoaderRoute: typeof PlayerGamesRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
+    "/player/events": {
+      id: "/player/events";
+      path: "/events";
+      fullPath: "/player/events";
+      preLoaderRoute: typeof PlayerEventsRouteImport;
       parentRoute: typeof PlayerRouteRoute;
     };
     "/player/collaboration": {
@@ -1630,11 +2065,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlayerCollaborationRouteImport;
       parentRoute: typeof PlayerRouteRoute;
     };
+    "/player/campaigns": {
+      id: "/player/campaigns";
+      path: "/campaigns";
+      fullPath: "/player/campaigns";
+      preLoaderRoute: typeof PlayerCampaignsRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
     "/ops/inbox": {
       id: "/ops/inbox";
       path: "/inbox";
       fullPath: "/ops/inbox";
       preLoaderRoute: typeof OpsInboxRouteImport;
+      parentRoute: typeof OpsRouteRoute;
+    };
+    "/ops/events": {
+      id: "/ops/events";
+      path: "/events";
+      fullPath: "/ops/events";
+      preLoaderRoute: typeof OpsEventsRouteImport;
       parentRoute: typeof OpsRouteRoute;
     };
     "/ops/collaboration": {
@@ -1649,6 +2098,13 @@ declare module "@tanstack/react-router" {
       path: "/inbox";
       fullPath: "/gm/inbox";
       preLoaderRoute: typeof GmInboxRouteImport;
+      parentRoute: typeof GmRouteRoute;
+    };
+    "/gm/games": {
+      id: "/gm/games";
+      path: "/games";
+      fullPath: "/gm/games";
+      preLoaderRoute: typeof GmGamesRouteImport;
       parentRoute: typeof GmRouteRoute;
     };
     "/gm/feedback": {
@@ -1670,6 +2126,13 @@ declare module "@tanstack/react-router" {
       path: "/collaboration";
       fullPath: "/gm/collaboration";
       preLoaderRoute: typeof GmCollaborationRouteImport;
+      parentRoute: typeof GmRouteRoute;
+    };
+    "/gm/campaigns": {
+      id: "/gm/campaigns";
+      path: "/campaigns";
+      fullPath: "/gm/campaigns";
+      preLoaderRoute: typeof GmCampaignsRouteImport;
       parentRoute: typeof GmRouteRoute;
     };
     "/game/$gameId": {
@@ -1868,6 +2331,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardAdminRouteRouteImport;
       parentRoute: typeof DashboardRouteRoute;
     };
+    "/player/teams/": {
+      id: "/player/teams/";
+      path: "/";
+      fullPath: "/player/teams/";
+      preLoaderRoute: typeof PlayerTeamsIndexRouteImport;
+      parentRoute: typeof PlayerTeamsRoute;
+    };
     "/player/settings/": {
       id: "/player/settings/";
       path: "/settings";
@@ -1881,6 +2351,48 @@ declare module "@tanstack/react-router" {
       fullPath: "/player/profile";
       preLoaderRoute: typeof PlayerProfileIndexRouteImport;
       parentRoute: typeof PlayerRouteRoute;
+    };
+    "/player/games/": {
+      id: "/player/games/";
+      path: "/";
+      fullPath: "/player/games/";
+      preLoaderRoute: typeof PlayerGamesIndexRouteImport;
+      parentRoute: typeof PlayerGamesRoute;
+    };
+    "/player/events/": {
+      id: "/player/events/";
+      path: "/";
+      fullPath: "/player/events/";
+      preLoaderRoute: typeof PlayerEventsIndexRouteImport;
+      parentRoute: typeof PlayerEventsRoute;
+    };
+    "/player/campaigns/": {
+      id: "/player/campaigns/";
+      path: "/";
+      fullPath: "/player/campaigns/";
+      preLoaderRoute: typeof PlayerCampaignsIndexRouteImport;
+      parentRoute: typeof PlayerCampaignsRoute;
+    };
+    "/ops/events/": {
+      id: "/ops/events/";
+      path: "/";
+      fullPath: "/ops/events/";
+      preLoaderRoute: typeof OpsEventsIndexRouteImport;
+      parentRoute: typeof OpsEventsRoute;
+    };
+    "/gm/games/": {
+      id: "/gm/games/";
+      path: "/";
+      fullPath: "/gm/games/";
+      preLoaderRoute: typeof GmGamesIndexRouteImport;
+      parentRoute: typeof GmGamesRoute;
+    };
+    "/gm/campaigns/": {
+      id: "/gm/campaigns/";
+      path: "/";
+      fullPath: "/gm/campaigns/";
+      preLoaderRoute: typeof GmCampaignsIndexRouteImport;
+      parentRoute: typeof GmCampaignsRoute;
     };
     "/events/$slug/": {
       id: "/events/$slug/";
@@ -1938,19 +2450,110 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardCampaignsIndexRouteImport;
       parentRoute: typeof DashboardCampaignsRoute;
     };
+    "/player/teams/create": {
+      id: "/player/teams/create";
+      path: "/create";
+      fullPath: "/player/teams/create";
+      preLoaderRoute: typeof PlayerTeamsCreateRouteImport;
+      parentRoute: typeof PlayerTeamsRoute;
+    };
+    "/player/teams/browse": {
+      id: "/player/teams/browse";
+      path: "/browse";
+      fullPath: "/player/teams/browse";
+      preLoaderRoute: typeof PlayerTeamsBrowseRouteImport;
+      parentRoute: typeof PlayerTeamsRoute;
+    };
+    "/player/teams/$teamId": {
+      id: "/player/teams/$teamId";
+      path: "/$teamId";
+      fullPath: "/player/teams/$teamId";
+      preLoaderRoute: typeof PlayerTeamsTeamIdRouteImport;
+      parentRoute: typeof PlayerTeamsRoute;
+    };
+    "/player/games/create": {
+      id: "/player/games/create";
+      path: "/create";
+      fullPath: "/player/games/create";
+      preLoaderRoute: typeof PlayerGamesCreateRouteImport;
+      parentRoute: typeof PlayerGamesRoute;
+    };
+    "/player/games/$gameId": {
+      id: "/player/games/$gameId";
+      path: "/$gameId";
+      fullPath: "/player/games/$gameId";
+      preLoaderRoute: typeof PlayerGamesGameIdRouteImport;
+      parentRoute: typeof PlayerGamesRoute;
+    };
+    "/player/events/create": {
+      id: "/player/events/create";
+      path: "/create";
+      fullPath: "/player/events/create";
+      preLoaderRoute: typeof PlayerEventsCreateRouteImport;
+      parentRoute: typeof PlayerEventsRoute;
+    };
+    "/player/events/$eventId": {
+      id: "/player/events/$eventId";
+      path: "/$eventId";
+      fullPath: "/player/events/$eventId";
+      preLoaderRoute: typeof PlayerEventsEventIdRouteImport;
+      parentRoute: typeof PlayerEventsRoute;
+    };
+    "/player/campaigns/create": {
+      id: "/player/campaigns/create";
+      path: "/create";
+      fullPath: "/player/campaigns/create";
+      preLoaderRoute: typeof PlayerCampaignsCreateRouteImport;
+      parentRoute: typeof PlayerCampaignsRoute;
+    };
+    "/player/campaigns/$campaignId": {
+      id: "/player/campaigns/$campaignId";
+      path: "/$campaignId";
+      fullPath: "/player/campaigns/$campaignId";
+      preLoaderRoute: typeof PlayerCampaignsCampaignIdRouteImport;
+      parentRoute: typeof PlayerCampaignsRoute;
+    };
+    "/ops/events/create": {
+      id: "/ops/events/create";
+      path: "/create";
+      fullPath: "/ops/events/create";
+      preLoaderRoute: typeof OpsEventsCreateRouteImport;
+      parentRoute: typeof OpsEventsRoute;
+    };
     "/ops/events/$eventId": {
       id: "/ops/events/$eventId";
-      path: "/events/$eventId";
+      path: "/$eventId";
       fullPath: "/ops/events/$eventId";
       preLoaderRoute: typeof OpsEventsEventIdRouteImport;
-      parentRoute: typeof OpsRouteRoute;
+      parentRoute: typeof OpsEventsRoute;
+    };
+    "/gm/games/create": {
+      id: "/gm/games/create";
+      path: "/create";
+      fullPath: "/gm/games/create";
+      preLoaderRoute: typeof GmGamesCreateRouteImport;
+      parentRoute: typeof GmGamesRoute;
+    };
+    "/gm/games/$gameId": {
+      id: "/gm/games/$gameId";
+      path: "/$gameId";
+      fullPath: "/gm/games/$gameId";
+      preLoaderRoute: typeof GmGamesGameIdRouteImport;
+      parentRoute: typeof GmGamesRoute;
+    };
+    "/gm/campaigns/create": {
+      id: "/gm/campaigns/create";
+      path: "/create";
+      fullPath: "/gm/campaigns/create";
+      preLoaderRoute: typeof GmCampaignsCreateRouteImport;
+      parentRoute: typeof GmCampaignsRoute;
     };
     "/gm/campaigns/$campaignId": {
       id: "/gm/campaigns/$campaignId";
-      path: "/campaigns/$campaignId";
+      path: "/$campaignId";
       fullPath: "/gm/campaigns/$campaignId";
       preLoaderRoute: typeof GmCampaignsCampaignIdRouteImport;
-      parentRoute: typeof GmRouteRoute;
+      parentRoute: typeof GmCampaignsRoute;
     };
     "/events/$slug/register": {
       id: "/events/$slug/register";
@@ -2071,6 +2674,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardAdminEventsReviewRouteImport;
       parentRoute: typeof DashboardAdminRouteRoute;
     };
+    "/player/teams/$teamId/": {
+      id: "/player/teams/$teamId/";
+      path: "/";
+      fullPath: "/player/teams/$teamId/";
+      preLoaderRoute: typeof PlayerTeamsTeamIdIndexRouteImport;
+      parentRoute: typeof PlayerTeamsTeamIdRoute;
+    };
+    "/player/campaigns/$campaignId/": {
+      id: "/player/campaigns/$campaignId/";
+      path: "/";
+      fullPath: "/player/campaigns/$campaignId/";
+      preLoaderRoute: typeof PlayerCampaignsCampaignIdIndexRouteImport;
+      parentRoute: typeof PlayerCampaignsCampaignIdRoute;
+    };
     "/dashboard/teams/$teamId/": {
       id: "/dashboard/teams/$teamId/";
       path: "/";
@@ -2084,6 +2701,41 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/campaigns/$campaignId/";
       preLoaderRoute: typeof DashboardCampaignsCampaignIdIndexRouteImport;
       parentRoute: typeof DashboardCampaignsCampaignIdRoute;
+    };
+    "/player/teams/$teamId/members": {
+      id: "/player/teams/$teamId/members";
+      path: "/members";
+      fullPath: "/player/teams/$teamId/members";
+      preLoaderRoute: typeof PlayerTeamsTeamIdMembersRouteImport;
+      parentRoute: typeof PlayerTeamsTeamIdRoute;
+    };
+    "/player/teams/$teamId/manage": {
+      id: "/player/teams/$teamId/manage";
+      path: "/manage";
+      fullPath: "/player/teams/$teamId/manage";
+      preLoaderRoute: typeof PlayerTeamsTeamIdManageRouteImport;
+      parentRoute: typeof PlayerTeamsTeamIdRoute;
+    };
+    "/player/events/$eventId/manage": {
+      id: "/player/events/$eventId/manage";
+      path: "/manage";
+      fullPath: "/player/events/$eventId/manage";
+      preLoaderRoute: typeof PlayerEventsEventIdManageRouteImport;
+      parentRoute: typeof PlayerEventsEventIdRoute;
+    };
+    "/player/campaigns/$campaignId/zero": {
+      id: "/player/campaigns/$campaignId/zero";
+      path: "/zero";
+      fullPath: "/player/campaigns/$campaignId/zero";
+      preLoaderRoute: typeof PlayerCampaignsCampaignIdZeroRouteImport;
+      parentRoute: typeof PlayerCampaignsCampaignIdRoute;
+    };
+    "/ops/events/$eventId/manage": {
+      id: "/ops/events/$eventId/manage";
+      path: "/manage";
+      fullPath: "/ops/events/$eventId/manage";
+      preLoaderRoute: typeof OpsEventsEventIdManageRouteImport;
+      parentRoute: typeof OpsEventsEventIdRoute;
     };
     "/dashboard/teams/$teamId/members": {
       id: "/dashboard/teams/$teamId/members";
@@ -2465,22 +3117,55 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 );
 
+interface GmCampaignsRouteChildren {
+  GmCampaignsCampaignIdRoute: typeof GmCampaignsCampaignIdRoute;
+  GmCampaignsCreateRoute: typeof GmCampaignsCreateRoute;
+  GmCampaignsIndexRoute: typeof GmCampaignsIndexRoute;
+}
+
+const GmCampaignsRouteChildren: GmCampaignsRouteChildren = {
+  GmCampaignsCampaignIdRoute: GmCampaignsCampaignIdRoute,
+  GmCampaignsCreateRoute: GmCampaignsCreateRoute,
+  GmCampaignsIndexRoute: GmCampaignsIndexRoute,
+};
+
+const GmCampaignsRouteWithChildren = GmCampaignsRoute._addFileChildren(
+  GmCampaignsRouteChildren,
+);
+
+interface GmGamesRouteChildren {
+  GmGamesGameIdRoute: typeof GmGamesGameIdRoute;
+  GmGamesCreateRoute: typeof GmGamesCreateRoute;
+  GmGamesIndexRoute: typeof GmGamesIndexRoute;
+}
+
+const GmGamesRouteChildren: GmGamesRouteChildren = {
+  GmGamesGameIdRoute: GmGamesGameIdRoute,
+  GmGamesCreateRoute: GmGamesCreateRoute,
+  GmGamesIndexRoute: GmGamesIndexRoute,
+};
+
+const GmGamesRouteWithChildren =
+  GmGamesRoute._addFileChildren(GmGamesRouteChildren);
+
 interface GmRouteRouteChildren {
+  GmCampaignsRoute: typeof GmCampaignsRouteWithChildren;
   GmCollaborationRoute: typeof GmCollaborationRoute;
   GmDashboardRoute: typeof GmDashboardRoute;
   GmFeedbackRoute: typeof GmFeedbackRoute;
+  GmGamesRoute: typeof GmGamesRouteWithChildren;
   GmInboxRoute: typeof GmInboxRoute;
   GmIndexRoute: typeof GmIndexRoute;
-  GmCampaignsCampaignIdRoute: typeof GmCampaignsCampaignIdRoute;
 }
 
 const GmRouteRouteChildren: GmRouteRouteChildren = {
+  GmCampaignsRoute: GmCampaignsRouteWithChildren,
   GmCollaborationRoute: GmCollaborationRoute,
   GmDashboardRoute: GmDashboardRoute,
   GmFeedbackRoute: GmFeedbackRoute,
+  GmGamesRoute: GmGamesRouteWithChildren,
   GmInboxRoute: GmInboxRoute,
   GmIndexRoute: GmIndexRoute,
-  GmCampaignsCampaignIdRoute: GmCampaignsCampaignIdRoute,
 };
 
 const GmRouteRouteWithChildren =
@@ -2498,35 +3183,180 @@ const OnboardingRouteRouteWithChildren = OnboardingRouteRoute._addFileChildren(
   OnboardingRouteRouteChildren,
 );
 
+interface OpsEventsEventIdRouteChildren {
+  OpsEventsEventIdManageRoute: typeof OpsEventsEventIdManageRoute;
+}
+
+const OpsEventsEventIdRouteChildren: OpsEventsEventIdRouteChildren = {
+  OpsEventsEventIdManageRoute: OpsEventsEventIdManageRoute,
+};
+
+const OpsEventsEventIdRouteWithChildren =
+  OpsEventsEventIdRoute._addFileChildren(OpsEventsEventIdRouteChildren);
+
+interface OpsEventsRouteChildren {
+  OpsEventsEventIdRoute: typeof OpsEventsEventIdRouteWithChildren;
+  OpsEventsCreateRoute: typeof OpsEventsCreateRoute;
+  OpsEventsIndexRoute: typeof OpsEventsIndexRoute;
+}
+
+const OpsEventsRouteChildren: OpsEventsRouteChildren = {
+  OpsEventsEventIdRoute: OpsEventsEventIdRouteWithChildren,
+  OpsEventsCreateRoute: OpsEventsCreateRoute,
+  OpsEventsIndexRoute: OpsEventsIndexRoute,
+};
+
+const OpsEventsRouteWithChildren = OpsEventsRoute._addFileChildren(
+  OpsEventsRouteChildren,
+);
+
 interface OpsRouteRouteChildren {
   OpsCollaborationRoute: typeof OpsCollaborationRoute;
+  OpsEventsRoute: typeof OpsEventsRouteWithChildren;
   OpsInboxRoute: typeof OpsInboxRoute;
   OpsIndexRoute: typeof OpsIndexRoute;
-  OpsEventsEventIdRoute: typeof OpsEventsEventIdRoute;
 }
 
 const OpsRouteRouteChildren: OpsRouteRouteChildren = {
   OpsCollaborationRoute: OpsCollaborationRoute,
+  OpsEventsRoute: OpsEventsRouteWithChildren,
   OpsInboxRoute: OpsInboxRoute,
   OpsIndexRoute: OpsIndexRoute,
-  OpsEventsEventIdRoute: OpsEventsEventIdRoute,
 };
 
 const OpsRouteRouteWithChildren = OpsRouteRoute._addFileChildren(
   OpsRouteRouteChildren,
 );
 
+interface PlayerCampaignsCampaignIdRouteChildren {
+  PlayerCampaignsCampaignIdZeroRoute: typeof PlayerCampaignsCampaignIdZeroRoute;
+  PlayerCampaignsCampaignIdIndexRoute: typeof PlayerCampaignsCampaignIdIndexRoute;
+}
+
+const PlayerCampaignsCampaignIdRouteChildren: PlayerCampaignsCampaignIdRouteChildren =
+  {
+    PlayerCampaignsCampaignIdZeroRoute: PlayerCampaignsCampaignIdZeroRoute,
+    PlayerCampaignsCampaignIdIndexRoute: PlayerCampaignsCampaignIdIndexRoute,
+  };
+
+const PlayerCampaignsCampaignIdRouteWithChildren =
+  PlayerCampaignsCampaignIdRoute._addFileChildren(
+    PlayerCampaignsCampaignIdRouteChildren,
+  );
+
+interface PlayerCampaignsRouteChildren {
+  PlayerCampaignsCampaignIdRoute: typeof PlayerCampaignsCampaignIdRouteWithChildren;
+  PlayerCampaignsCreateRoute: typeof PlayerCampaignsCreateRoute;
+  PlayerCampaignsIndexRoute: typeof PlayerCampaignsIndexRoute;
+}
+
+const PlayerCampaignsRouteChildren: PlayerCampaignsRouteChildren = {
+  PlayerCampaignsCampaignIdRoute: PlayerCampaignsCampaignIdRouteWithChildren,
+  PlayerCampaignsCreateRoute: PlayerCampaignsCreateRoute,
+  PlayerCampaignsIndexRoute: PlayerCampaignsIndexRoute,
+};
+
+const PlayerCampaignsRouteWithChildren = PlayerCampaignsRoute._addFileChildren(
+  PlayerCampaignsRouteChildren,
+);
+
+interface PlayerEventsEventIdRouteChildren {
+  PlayerEventsEventIdManageRoute: typeof PlayerEventsEventIdManageRoute;
+}
+
+const PlayerEventsEventIdRouteChildren: PlayerEventsEventIdRouteChildren = {
+  PlayerEventsEventIdManageRoute: PlayerEventsEventIdManageRoute,
+};
+
+const PlayerEventsEventIdRouteWithChildren =
+  PlayerEventsEventIdRoute._addFileChildren(PlayerEventsEventIdRouteChildren);
+
+interface PlayerEventsRouteChildren {
+  PlayerEventsEventIdRoute: typeof PlayerEventsEventIdRouteWithChildren;
+  PlayerEventsCreateRoute: typeof PlayerEventsCreateRoute;
+  PlayerEventsIndexRoute: typeof PlayerEventsIndexRoute;
+}
+
+const PlayerEventsRouteChildren: PlayerEventsRouteChildren = {
+  PlayerEventsEventIdRoute: PlayerEventsEventIdRouteWithChildren,
+  PlayerEventsCreateRoute: PlayerEventsCreateRoute,
+  PlayerEventsIndexRoute: PlayerEventsIndexRoute,
+};
+
+const PlayerEventsRouteWithChildren = PlayerEventsRoute._addFileChildren(
+  PlayerEventsRouteChildren,
+);
+
+interface PlayerGamesRouteChildren {
+  PlayerGamesGameIdRoute: typeof PlayerGamesGameIdRoute;
+  PlayerGamesCreateRoute: typeof PlayerGamesCreateRoute;
+  PlayerGamesIndexRoute: typeof PlayerGamesIndexRoute;
+}
+
+const PlayerGamesRouteChildren: PlayerGamesRouteChildren = {
+  PlayerGamesGameIdRoute: PlayerGamesGameIdRoute,
+  PlayerGamesCreateRoute: PlayerGamesCreateRoute,
+  PlayerGamesIndexRoute: PlayerGamesIndexRoute,
+};
+
+const PlayerGamesRouteWithChildren = PlayerGamesRoute._addFileChildren(
+  PlayerGamesRouteChildren,
+);
+
+interface PlayerTeamsTeamIdRouteChildren {
+  PlayerTeamsTeamIdManageRoute: typeof PlayerTeamsTeamIdManageRoute;
+  PlayerTeamsTeamIdMembersRoute: typeof PlayerTeamsTeamIdMembersRoute;
+  PlayerTeamsTeamIdIndexRoute: typeof PlayerTeamsTeamIdIndexRoute;
+}
+
+const PlayerTeamsTeamIdRouteChildren: PlayerTeamsTeamIdRouteChildren = {
+  PlayerTeamsTeamIdManageRoute: PlayerTeamsTeamIdManageRoute,
+  PlayerTeamsTeamIdMembersRoute: PlayerTeamsTeamIdMembersRoute,
+  PlayerTeamsTeamIdIndexRoute: PlayerTeamsTeamIdIndexRoute,
+};
+
+const PlayerTeamsTeamIdRouteWithChildren =
+  PlayerTeamsTeamIdRoute._addFileChildren(PlayerTeamsTeamIdRouteChildren);
+
+interface PlayerTeamsRouteChildren {
+  PlayerTeamsTeamIdRoute: typeof PlayerTeamsTeamIdRouteWithChildren;
+  PlayerTeamsBrowseRoute: typeof PlayerTeamsBrowseRoute;
+  PlayerTeamsCreateRoute: typeof PlayerTeamsCreateRoute;
+  PlayerTeamsIndexRoute: typeof PlayerTeamsIndexRoute;
+}
+
+const PlayerTeamsRouteChildren: PlayerTeamsRouteChildren = {
+  PlayerTeamsTeamIdRoute: PlayerTeamsTeamIdRouteWithChildren,
+  PlayerTeamsBrowseRoute: PlayerTeamsBrowseRoute,
+  PlayerTeamsCreateRoute: PlayerTeamsCreateRoute,
+  PlayerTeamsIndexRoute: PlayerTeamsIndexRoute,
+};
+
+const PlayerTeamsRouteWithChildren = PlayerTeamsRoute._addFileChildren(
+  PlayerTeamsRouteChildren,
+);
+
 interface PlayerRouteRouteChildren {
+  PlayerCampaignsRoute: typeof PlayerCampaignsRouteWithChildren;
   PlayerCollaborationRoute: typeof PlayerCollaborationRoute;
+  PlayerEventsRoute: typeof PlayerEventsRouteWithChildren;
+  PlayerGamesRoute: typeof PlayerGamesRouteWithChildren;
   PlayerInboxRoute: typeof PlayerInboxRoute;
+  PlayerMembershipRoute: typeof PlayerMembershipRoute;
+  PlayerTeamsRoute: typeof PlayerTeamsRouteWithChildren;
   PlayerIndexRoute: typeof PlayerIndexRoute;
   PlayerProfileIndexRoute: typeof PlayerProfileIndexRoute;
   PlayerSettingsIndexRoute: typeof PlayerSettingsIndexRoute;
 }
 
 const PlayerRouteRouteChildren: PlayerRouteRouteChildren = {
+  PlayerCampaignsRoute: PlayerCampaignsRouteWithChildren,
   PlayerCollaborationRoute: PlayerCollaborationRoute,
+  PlayerEventsRoute: PlayerEventsRouteWithChildren,
+  PlayerGamesRoute: PlayerGamesRouteWithChildren,
   PlayerInboxRoute: PlayerInboxRoute,
+  PlayerMembershipRoute: PlayerMembershipRoute,
+  PlayerTeamsRoute: PlayerTeamsRouteWithChildren,
   PlayerIndexRoute: PlayerIndexRoute,
   PlayerProfileIndexRoute: PlayerProfileIndexRoute,
   PlayerSettingsIndexRoute: PlayerSettingsIndexRoute,

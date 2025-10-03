@@ -73,7 +73,7 @@ export function GameMasterCampaignWorkspace({
                   size="sm"
                 >
                   <Link
-                    to="/dashboard/campaigns/$campaignId"
+                    to="/gm/campaigns/$campaignId"
                     params={{ campaignId: campaign.id }}
                   >
                     Open legacy view
@@ -85,7 +85,7 @@ export function GameMasterCampaignWorkspace({
                   size="sm"
                   className="text-primary bg-white"
                 >
-                  <Link to="/dashboard/games/create" search={{ campaignId: campaign.id }}>
+                  <Link to="/gm/games/create" search={{ campaignId: campaign.id }}>
                     Schedule session
                   </Link>
                 </Button>
@@ -140,10 +140,7 @@ export function GameMasterCampaignWorkspace({
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
-              <Link
-                to="/dashboard/campaigns/$campaignId"
-                params={{ campaignId: campaign.id }}
-              >
+              <Link to="/gm/campaigns/$campaignId" params={{ campaignId: campaign.id }}>
                 Edit details
               </Link>
             </Button>
@@ -235,7 +232,7 @@ export function GameMasterCampaignWorkspace({
                 <EmptyState
                   title="No sessions scheduled"
                   description="Queue the next chapter to keep your players immersed."
-                  actionHref="/dashboard/games/create"
+                  actionHref="/gm/games/create"
                   actionLabel="Plan session"
                 />
               ) : (
@@ -258,7 +255,7 @@ export function GameMasterCampaignWorkspace({
                 <EmptyState
                   title="No completed sessions"
                   description="Once you finish a gathering, we’ll spotlight the debrief tasks here."
-                  actionHref="/dashboard/games"
+                  actionHref="/gm/games"
                   actionLabel="View archive"
                 />
               ) : (
@@ -393,7 +390,7 @@ function SessionSummaryChip({ session }: SessionSummaryChipProps) {
         Last updated {formatDistanceToNow(new Date(completedAt), { addSuffix: true })}
       </p>
       <Button asChild variant="ghost" size="sm" className="self-start px-0 text-xs">
-        <Link to="/dashboard/games/$gameId" params={{ gameId: session.id }}>
+        <Link to="/gm/games/$gameId" params={{ gameId: session.id }}>
           Review recap
         </Link>
       </Button>

@@ -2,7 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { differenceInHours } from "date-fns";
-import { ClipboardList, Home, Inbox, LayoutDashboard, Users2 } from "lucide-react";
+import {
+  ClipboardList,
+  Gamepad2,
+  Home,
+  Inbox,
+  LayoutDashboard,
+  ScrollText,
+  Users2,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -28,6 +36,18 @@ const GM_NAVIGATION: RoleWorkspaceNavItem[] = [
     exact: true,
     description:
       "Review prep cues, live feedback, and the B2B pipeline from one command center.",
+  },
+  {
+    label: "Campaigns",
+    to: "/gm/campaigns",
+    icon: ScrollText,
+    description: "Manage story arcs, dossiers, and campaign health in one place.",
+  },
+  {
+    label: "Games",
+    to: "/gm/games",
+    icon: Gamepad2,
+    description: "Schedule, update, and debrief the sessions on your runway.",
   },
   {
     label: "Dashboard",
@@ -207,8 +227,8 @@ function GameMasterWorkspaceSummary() {
             : "No sessions scheduled"
         }
         cta={
-          <Link to="/gm/dashboard" className="text-primary text-xs font-medium">
-            Open dashboard
+          <Link to="/gm/games" className="text-primary text-xs font-medium">
+            Manage sessions
           </Link>
         }
       />

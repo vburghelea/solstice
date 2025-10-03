@@ -159,7 +159,7 @@ export function OpsOverviewDashboard() {
         title: "Approve the next submission",
         description: `${event.name} is queued to go live once you give the green light. Double-check organizer details and publish when ready.`,
         meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? "Location TBD"}`,
-        ctaHref: "/dashboard/admin/events-review",
+        ctaHref: "/admin/events-review",
         ctaLabel: "Review submission",
       };
     }
@@ -174,7 +174,7 @@ export function OpsOverviewDashboard() {
             : "Monitor marketing pulse",
         description: item.message,
         meta: `${format(item.startDate, "MMM d")} · ${item.city ?? "Location TBD"}`,
-        ctaHref: "/dashboard/events",
+        ctaHref: "/ops/events",
         ctaLabel: "Open event roster",
       };
     }
@@ -217,10 +217,10 @@ export function OpsOverviewDashboard() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="secondary">
-            <Link to="/dashboard/events">View legacy dashboard</Link>
+            <Link to="/ops/events">View legacy dashboard</Link>
           </Button>
           <Button asChild>
-            <Link to="/dashboard/events/create">Launch new event</Link>
+            <Link to="/ops/events/create">Launch new event</Link>
           </Button>
         </div>
       </div>
@@ -461,7 +461,7 @@ export function OpsOverviewDashboard() {
                             </Button>
                             <Button asChild size="sm" variant="outline">
                               <Link
-                                to="/dashboard/events/$eventId/manage"
+                                to="/ops/events/$eventId/manage"
                                 params={{ eventId: event.id }}
                               >
                                 Manage
@@ -588,7 +588,7 @@ export function OpsOverviewDashboard() {
                               </Button>
                               <Button asChild size="sm" variant="outline">
                                 <Link
-                                  to="/dashboard/events/$eventId/manage"
+                                  to="/ops/events/$eventId/manage"
                                   params={{ eventId: event.id }}
                                 >
                                   Manage
@@ -690,7 +690,7 @@ export function OpsOverviewDashboard() {
                         </div>
                         <Button asChild size="sm" variant="outline">
                           <Link
-                            to="/dashboard/events/$eventId/manage"
+                            to="/ops/events/$eventId/manage"
                             params={{ eventId: event.id }}
                           >
                             Adjust

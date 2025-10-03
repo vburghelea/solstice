@@ -315,12 +315,12 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
-            <Link to="/dashboard/events/$eventId/manage" params={{ eventId: event.id }}>
+            <Link to="/ops/events/$eventId/manage" params={{ eventId: event.id }}>
               Open legacy playbook
             </Link>
           </Button>
           <Button asChild>
-            <Link to="/dashboard/admin/events-review" search={{ focus: event.id }}>
+            <Link to="/admin/events-review" search={{ focus: event.id }}>
               Review submission history
             </Link>
           </Button>

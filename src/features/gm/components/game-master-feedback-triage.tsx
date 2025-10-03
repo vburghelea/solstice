@@ -83,7 +83,7 @@ export function GameMasterFeedbackTriageBoard({
 }
 
 type TriageTaskAction =
-  | { to: "/dashboard/games/$gameId"; params: { gameId: string } }
+  | { to: "/gm/games/$gameId"; params: { gameId: string } }
   | { to: "/gm/campaigns/$campaignId"; params: { campaignId: string } };
 
 interface TriageTask {
@@ -124,7 +124,7 @@ function buildColumns(
       severity,
       actionLabel: "Open recap",
       action: {
-        to: "/dashboard/games/$gameId",
+        to: "/gm/games/$gameId",
         params: { gameId: session.id },
       },
     } satisfies TriageTask;
@@ -176,7 +176,7 @@ function buildColumns(
       severity,
       actionLabel: "Session details",
       action: {
-        to: "/dashboard/games/$gameId",
+        to: "/gm/games/$gameId",
         params: { gameId: session.id },
       },
     } satisfies TriageTask;

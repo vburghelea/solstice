@@ -2,7 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { formatDistanceToNow } from "date-fns";
-import { CalendarDays, Home, Inbox, Settings, UserCircle, Users } from "lucide-react";
+import {
+  CalendarDays,
+  Gamepad2,
+  Home,
+  Inbox,
+  ScrollText,
+  Settings,
+  UserCircle,
+  Users,
+  Users2,
+} from "lucide-react";
 import { useMemo } from "react";
 
 import { Badge } from "~/components/ui/badge";
@@ -32,6 +42,30 @@ const PLAYER_NAVIGATION: RoleWorkspaceNavItem[] = [
     icon: Home,
     exact: true,
     description: "Track membership, invitations, and your next session at a glance.",
+  },
+  {
+    label: "Campaigns",
+    to: "/player/campaigns",
+    icon: ScrollText,
+    description: "Review your active story arcs and plan upcoming beats.",
+  },
+  {
+    label: "Games",
+    to: "/player/games",
+    icon: Gamepad2,
+    description: "Manage scheduled sessions and update participation.",
+  },
+  {
+    label: "Events",
+    to: "/player/events",
+    icon: CalendarDays,
+    description: "Browse upcoming gatherings and confirm attendance.",
+  },
+  {
+    label: "Teams",
+    to: "/player/teams",
+    icon: Users2,
+    description: "Coordinate with your crews and handle invitations.",
   },
   {
     label: "Inbox",
@@ -203,7 +237,7 @@ function PlayerWorkspaceSummary() {
           ) : (
             <span>{membershipDetail}</span>
           )}
-          <Link to="/dashboard/membership" className="text-primary text-xs font-medium">
+          <Link to="/player/membership" className="text-primary text-xs font-medium">
             Manage membership
           </Link>
         </CardContent>
@@ -226,7 +260,7 @@ function PlayerWorkspaceSummary() {
               </span>
               <Link
                 from="/player"
-                to="/dashboard/games/$gameId"
+                to="/player/games/$gameId"
                 params={{ gameId: nextGame.id }}
                 className="text-primary text-xs font-medium"
               >
@@ -262,7 +296,7 @@ function PlayerWorkspaceSummary() {
                   ? `${totalInvites} pending invite${totalInvites === 1 ? "" : "s"}`
                   : "No pending invitations"}
               </span>
-              <Link to="/dashboard/teams" className="text-primary text-xs font-medium">
+              <Link to="/player/teams" className="text-primary text-xs font-medium">
                 Browse teams
               </Link>
             </>

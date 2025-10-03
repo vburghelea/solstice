@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { CalendarIcon, MapPinIcon } from "~/components/ui/icons";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { EventWithDetails } from "~/features/events/events.types";
 
 const FALLBACK_IMAGE = "/images/hero-tabletop-board-game-tournament-cards-optimized.png";

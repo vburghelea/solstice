@@ -29,7 +29,7 @@ export function requireAuth({
       search: {
         redirect: location.pathname,
       },
-    });
+    } as never);
   }
 }
 
@@ -54,7 +54,7 @@ export function redirectIfAuthenticated({
   if (user) {
     throw redirect({
       to: redirectTo,
-    });
+    } as never);
   }
 }
 

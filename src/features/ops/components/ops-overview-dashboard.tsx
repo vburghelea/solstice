@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { differenceInCalendarDays, format } from "date-fns";
 import {
   AlertCircleIcon,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {

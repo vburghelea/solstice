@@ -29,8 +29,8 @@ import {
   languageOptions,
 } from "~/shared/types/common";
 //
-import { Link } from "@tanstack/react-router";
 import { Avatar } from "~/components/ui/avatar";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { useCountries } from "~/shared/hooks/useCountries";
 import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";

@@ -1,5 +1,6 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SparklesIcon } from "lucide-react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 import { Button } from "~/components/ui/button";
 import {

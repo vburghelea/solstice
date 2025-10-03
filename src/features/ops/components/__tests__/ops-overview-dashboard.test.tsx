@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EventListResult, EventWithDetails } from "~/features/events/events.types";
@@ -36,6 +36,25 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, ...rest }: ComponentProps<"a"> & { to?: string }) => (
     <a {...rest} href={to ?? "#"}>
       {children}
+    </a>
+  ),
+}));
+
+vi.mock("~/components/ui/SafeLink", () => ({
+  SafeLink: ({
+    to,
+    children,
+    ...rest
+  }: {
+    to: string;
+    children:
+      | ReactNode
+      | ((args: { isActive: boolean; isTransitioning: boolean }) => ReactNode);
+  } & Omit<ComponentProps<"a">, "href">) => (
+    <a href={to} {...rest}>
+      {typeof children === "function"
+        ? children({ isActive: false, isTransitioning: false })
+        : children}
     </a>
   ),
 }));

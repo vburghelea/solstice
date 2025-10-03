@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Outlet, useRouterState } from "@tanstack/react-router";
 import { Suspense, useEffect, type ReactNode } from "react";
 
 import {
@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { trackPersonaNavigationImpression } from "~/features/roles/role-analytics";
 import { useActivePersona } from "~/features/roles/role-switcher-context";

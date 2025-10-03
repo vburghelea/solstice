@@ -1,10 +1,11 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRightIcon,
   ShieldAlertIcon,
   ShieldCheckIcon,
   UsersIcon,
 } from "lucide-react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 import {
   Card,

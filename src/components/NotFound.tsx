@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { ArrowLeftIcon, SearchIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";

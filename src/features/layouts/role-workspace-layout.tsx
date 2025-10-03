@@ -1,14 +1,16 @@
-import { Link, Outlet, useRouteContext, useRouterState } from "@tanstack/react-router";
+import { Outlet, useRouterState } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import { Menu, X } from "lucide-react";
 import { Suspense, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 
 import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { PersonaNamespaceFallback } from "~/features/layouts/persona-namespace-layout";
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { useActivePersona } from "~/features/roles/role-switcher-context";
 import type { AuthUser } from "~/lib/auth/types";
+import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
 
 export interface RoleWorkspaceNavItem {
@@ -54,10 +56,7 @@ export function RoleWorkspaceLayout({
   const [navOpen, setNavOpen] = useState(false);
   const persona = useActivePersona();
   const location = useRouterState({ select: (state) => state.location.pathname });
-  const routeContext = useRouteContext({ strict: false }) as
-    | { user?: AuthUser | null }
-    | undefined;
-  const user = routeContext?.user ?? null;
+  const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
 
   const workspaceNavItems = useMemo(
     () => navItems.filter((item) => (item.section ?? "workspace") === "workspace"),

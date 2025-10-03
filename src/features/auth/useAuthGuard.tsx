@@ -75,21 +75,18 @@ export function useAuthGuard({
   useEffect(() => {
     // Handle redirect for authenticated users (e.g., on login/signup pages)
     if (redirectAuthenticated && user) {
-      navigate({ to: authenticatedRedirectTo, replace: true });
+      void navigate({ to: authenticatedRedirectTo, replace: true } as never);
       return;
     }
 
     // Handle authentication requirement
     if (requireAuth && !user) {
       onAuthFail?.();
-      navigate({
+      void navigate({
         to: redirectTo,
         replace: true,
-        search: (prev: Record<string, unknown>) => ({
-          ...prev,
-          redirect: window.location.pathname,
-        }),
-      });
+        search: { redirect: window.location.pathname },
+      } as never);
       return;
     }
 

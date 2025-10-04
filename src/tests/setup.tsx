@@ -1,8 +1,11 @@
 // Ensure we are in React dev/test mode for tests
 process.env["NODE_ENV"] = "test";
 
-// @ts-expect-error - This is a global variable set for React's act environment
-global.IS_REACT_ACT_ENVIRONMENT = true;
+declare global {
+  var IS_REACT_ACT_ENVIRONMENT: boolean;
+}
+
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 import "@testing-library/jest-dom";
 import { beforeEach, vi } from "vitest";

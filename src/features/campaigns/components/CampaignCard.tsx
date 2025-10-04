@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Calendar } from "lucide-react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
@@ -12,14 +11,34 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 
+type LinkPrimitive = string | number | boolean;
+
+export type CampaignCardLinkConfig = {
+  readonly to: string;
+  readonly params?: Record<string, LinkPrimitive>;
+  readonly search?: Record<string, LinkPrimitive | undefined>;
+  readonly from?: string;
+  readonly label?: string;
+};
+
 interface CampaignCardProps {
-  campaign: CampaignListItem;
+  readonly campaign: CampaignListItem;
+  readonly viewLink?: CampaignCardLinkConfig;
 }
 
-export function CampaignCard({ campaign }: CampaignCardProps) {
+export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
+  const resolvedLink: CampaignCardLinkConfig = {
+    to: viewLink?.to ?? "/dashboard/campaigns/$campaignId",
+    params: viewLink?.params ?? { campaignId: campaign.id },
+    from: viewLink?.from ?? "/dashboard/campaigns",
+    label: viewLink?.label ?? "View Campaign",
+    ...(viewLink?.search ? { search: viewLink.search } : {}),
+  };
+
   return (
     <Card className="transition-shadow hover:shadow-lg">
       <CardHeader>
@@ -87,11 +106,12 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link
-              from="/dashboard/campaigns"
-              to="/dashboard/campaigns/$campaignId"
-              params={{ campaignId: campaign.id }}
+              to={resolvedLink.to}
+              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             >
-              View Campaign
+              {resolvedLink.label ?? "View Campaign"}
             </Link>
           </Button>
         </div>

@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import type { ColumnDef, OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useReducer } from "react";
@@ -8,6 +7,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { DataTable } from "~/components/ui/data-table";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { bulkUpdateAdminSystems } from "../game-systems-admin.mutations";
 import type { BulkAdminAction } from "../game-systems-admin.schemas";

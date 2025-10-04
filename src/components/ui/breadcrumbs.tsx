@@ -1,4 +1,5 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 const LABEL_OVERRIDES: Record<string, string> = {
   dashboard: "Dashboard",

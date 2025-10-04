@@ -1,4 +1,5 @@
-import { Link, createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";

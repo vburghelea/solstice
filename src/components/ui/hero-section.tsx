@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "./button";
 
 interface HeroSectionProps {

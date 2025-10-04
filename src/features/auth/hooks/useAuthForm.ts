@@ -24,8 +24,11 @@ export function useAuthForm(options: UseAuthFormOptions = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const router = useRouter();
+  const navigate = useNavigate();
+  const navigateTo = async (path: string): Promise<void> => {
+    await navigate({ to: path } as never);
+  };
 
   const handleAuth = async (
     authFunction: () => Promise<void>,
@@ -49,7 +52,7 @@ export function useAuthForm(options: UseAuthFormOptions = {}) {
   const handleAuthSuccess = async () => {
     queryClient.invalidateQueries({ queryKey: ["user"] });
     await router.invalidate();
-    navigate({ to: redirectUrl });
+    await navigateTo(redirectUrl);
   };
 
   const resetError = () => setErrorMessage("");

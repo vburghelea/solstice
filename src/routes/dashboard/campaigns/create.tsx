@@ -26,7 +26,7 @@ function CreateCampaignPage() {
     mutationFn: createCampaign,
     onSuccess: (data) => {
       if (data.success) {
-        navigate({ to: `/dashboard/campaigns/${data.data?.id}` });
+        void navigate({ to: `/dashboard/campaigns/${data.data?.id}` } as never);
       } else {
         setServerError(data.errors?.[0]?.message || "Failed to create campaign");
       }
@@ -63,7 +63,7 @@ function CreateCampaignPage() {
               });
             }}
             isSubmitting={createCampaignMutation.isPending}
-            onCancelEdit={() => navigate({ to: "/dashboard/campaigns" })} // Pass cancel handler
+            onCancelEdit={() => navigate({ to: "/dashboard/campaigns" } as never)}
           />
         </CardContent>
       </Card>

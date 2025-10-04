@@ -24,7 +24,14 @@ import { getGame } from "~/features/games/games.queries";
 import type { GameApplication, GameWithDetails } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { InfoItem } from "~/shared/components/info-item";
+import { SafeAddressLink } from "~/shared/components/safe-address-link";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import {
+  buildPlayersRange,
+  formatExpectedDuration,
+  formatPrice,
+} from "~/shared/lib/game-formatting";
 import type { OperationResult } from "~/shared/types/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
@@ -614,19 +621,6 @@ function GameDetailPage() {
   );
 }
 
-function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
-  if (value == null || (typeof value === "string" && value.trim().length === 0)) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-1">
-      <p className="text-muted-foreground text-xs tracking-wide uppercase">{label}</p>
-      <div className="text-foreground font-medium">{value}</div>
-    </div>
-  );
-}
-
 interface QuickFactProps {
   label: string;
   value: React.ReactNode;
@@ -639,59 +633,6 @@ function QuickFact({ label, value }: QuickFactProps) {
       <span className="font-medium">{value}</span>
     </div>
   );
-}
-
-function SafeAddressLink({ address }: { address: string }) {
-  const href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="text-primary text-xs font-medium underline-offset-4 hover:underline"
-    >
-      Open in Google Maps
-    </a>
-  );
-}
-
-function formatPrice(price: number | null | undefined) {
-  if (price == null || price == 0) {
-    return "Free";
-  }
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "EUR",
-  }).format(price);
-}
-
-function buildPlayersRange(
-  minPlayers: number | null | undefined,
-  maxPlayers: number | null | undefined,
-) {
-  if (minPlayers && maxPlayers) {
-    return `${minPlayers}-${maxPlayers} players`;
-  }
-  if (minPlayers) {
-    return `${minPlayers}+ players`;
-  }
-  if (maxPlayers) {
-    return `Up to ${maxPlayers} players`;
-  }
-  return "Player count TBD";
-}
-
-function formatExpectedDuration(duration: number | null | undefined) {
-  if (duration == null) return null;
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
-  if (hours > 0 && minutes > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  if (hours > 0) {
-    return `${hours}h`;
-  }
-  return `${minutes}m`;
 }
 
 function buildSystemExternalLinks(system: GameSystemDetail) {

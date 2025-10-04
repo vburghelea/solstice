@@ -58,7 +58,7 @@ export async function requireRole({
   redirectTo = "/dashboard",
 }: RoleGuardOptions) {
   if (!user) {
-    throw redirect({ to: "/auth/login" });
+    throw redirect({ to: "/auth/login" } as never);
   }
 
   if (!requiredRoles || requiredRoles.length === 0) {
@@ -74,7 +74,7 @@ export async function requireRole({
     };
 
     if (!hasClientAccess(clientAccessArgs)) {
-      throw redirect({ to: redirectTo });
+      throw redirect({ to: redirectTo } as never);
     }
     return;
   }
@@ -100,18 +100,18 @@ export async function requireRole({
   }
 
   if (!hasAccess) {
-    throw redirect({ to: redirectTo });
+    throw redirect({ to: redirectTo } as never);
   }
 }
 
 export async function requireGlobalAdmin(user: User | null, redirectTo = "/dashboard") {
   if (!user) {
-    throw redirect({ to: "/auth/login" });
+    throw redirect({ to: "/auth/login" } as never);
   }
 
   if (typeof window !== "undefined") {
     if (!isAdminClient(user)) {
-      throw redirect({ to: redirectTo });
+      throw redirect({ to: redirectTo } as never);
     }
     return;
   }
@@ -119,6 +119,6 @@ export async function requireGlobalAdmin(user: User | null, redirectTo = "/dashb
   const { PermissionService } = await import("~/features/roles/permission.service");
   const isAdmin = await PermissionService.isGlobalAdmin(user.id);
   if (!isAdmin) {
-    throw redirect({ to: redirectTo });
+    throw redirect({ to: redirectTo } as never);
   }
 }

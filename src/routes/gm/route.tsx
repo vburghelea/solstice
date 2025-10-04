@@ -2,15 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { differenceInHours } from "date-fns";
-import {
-  ClipboardList,
-  Gamepad2,
-  Home,
-  Inbox,
-  LayoutDashboard,
-  ScrollText,
-  Users2,
-} from "lucide-react";
+import { ClipboardList, Gamepad2, Home, Inbox, ScrollText, Users2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -48,12 +40,6 @@ const GM_NAVIGATION: RoleWorkspaceNavItem[] = [
     to: "/gm/games",
     icon: Gamepad2,
     description: "Schedule, update, and debrief the sessions on your runway.",
-  },
-  {
-    label: "Dashboard",
-    to: "/gm/dashboard",
-    icon: LayoutDashboard,
-    description: "Track upcoming sessions, campaign momentum, and follow-up workstreams.",
   },
   {
     label: "Feedback triage",
@@ -272,7 +258,7 @@ function GameMasterWorkspaceSummary() {
         }
         cta={
           pipelineSnapshot ? (
-            <Link to="/gm/dashboard" className="text-primary text-xs font-medium">
+            <Link to="/gm" className="text-primary text-xs font-medium">
               Review pipeline
             </Link>
           ) : undefined

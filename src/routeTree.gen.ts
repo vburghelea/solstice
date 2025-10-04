@@ -51,7 +51,6 @@ import { Route as OpsCollaborationRouteImport } from "./routes/ops/collaboration
 import { Route as GmInboxRouteImport } from "./routes/gm/inbox";
 import { Route as GmGamesRouteImport } from "./routes/gm/games";
 import { Route as GmFeedbackRouteImport } from "./routes/gm/feedback";
-import { Route as GmDashboardRouteImport } from "./routes/gm/dashboard";
 import { Route as GmCollaborationRouteImport } from "./routes/gm/collaboration";
 import { Route as GmCampaignsRouteImport } from "./routes/gm/campaigns";
 import { Route as GameGameIdRouteImport } from "./routes/game.$gameId";
@@ -360,11 +359,6 @@ const GmGamesRoute = GmGamesRouteImport.update({
 const GmFeedbackRoute = GmFeedbackRouteImport.update({
   id: "/feedback",
   path: "/feedback",
-  getParentRoute: () => GmRouteRoute,
-} as any);
-const GmDashboardRoute = GmDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
   getParentRoute: () => GmRouteRoute,
 } as any);
 const GmCollaborationRoute = GmCollaborationRouteImport.update({
@@ -969,7 +963,6 @@ export interface FileRoutesByFullPath {
   "/game/$gameId": typeof GameGameIdRoute;
   "/gm/campaigns": typeof GmCampaignsRouteWithChildren;
   "/gm/collaboration": typeof GmCollaborationRoute;
-  "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
   "/gm/games": typeof GmGamesRouteWithChildren;
   "/gm/inbox": typeof GmInboxRoute;
@@ -1088,7 +1081,6 @@ export interface FileRoutesByTo {
   "/event/$eventId": typeof EventEventIdRoute;
   "/game/$gameId": typeof GameGameIdRoute;
   "/gm/collaboration": typeof GmCollaborationRoute;
-  "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
   "/gm/inbox": typeof GmInboxRoute;
   "/ops/collaboration": typeof OpsCollaborationRoute;
@@ -1214,7 +1206,6 @@ export interface FileRoutesById {
   "/game/$gameId": typeof GameGameIdRoute;
   "/gm/campaigns": typeof GmCampaignsRouteWithChildren;
   "/gm/collaboration": typeof GmCollaborationRoute;
-  "/gm/dashboard": typeof GmDashboardRoute;
   "/gm/feedback": typeof GmFeedbackRoute;
   "/gm/games": typeof GmGamesRouteWithChildren;
   "/gm/inbox": typeof GmInboxRoute;
@@ -1351,7 +1342,6 @@ export interface FileRouteTypes {
     | "/game/$gameId"
     | "/gm/campaigns"
     | "/gm/collaboration"
-    | "/gm/dashboard"
     | "/gm/feedback"
     | "/gm/games"
     | "/gm/inbox"
@@ -1470,7 +1460,6 @@ export interface FileRouteTypes {
     | "/event/$eventId"
     | "/game/$gameId"
     | "/gm/collaboration"
-    | "/gm/dashboard"
     | "/gm/feedback"
     | "/gm/inbox"
     | "/ops/collaboration"
@@ -1595,7 +1584,6 @@ export interface FileRouteTypes {
     | "/game/$gameId"
     | "/gm/campaigns"
     | "/gm/collaboration"
-    | "/gm/dashboard"
     | "/gm/feedback"
     | "/gm/games"
     | "/gm/inbox"
@@ -2112,13 +2100,6 @@ declare module "@tanstack/react-router" {
       path: "/feedback";
       fullPath: "/gm/feedback";
       preLoaderRoute: typeof GmFeedbackRouteImport;
-      parentRoute: typeof GmRouteRoute;
-    };
-    "/gm/dashboard": {
-      id: "/gm/dashboard";
-      path: "/dashboard";
-      fullPath: "/gm/dashboard";
-      preLoaderRoute: typeof GmDashboardRouteImport;
       parentRoute: typeof GmRouteRoute;
     };
     "/gm/collaboration": {
@@ -3151,7 +3132,6 @@ const GmGamesRouteWithChildren =
 interface GmRouteRouteChildren {
   GmCampaignsRoute: typeof GmCampaignsRouteWithChildren;
   GmCollaborationRoute: typeof GmCollaborationRoute;
-  GmDashboardRoute: typeof GmDashboardRoute;
   GmFeedbackRoute: typeof GmFeedbackRoute;
   GmGamesRoute: typeof GmGamesRouteWithChildren;
   GmInboxRoute: typeof GmInboxRoute;
@@ -3161,7 +3141,6 @@ interface GmRouteRouteChildren {
 const GmRouteRouteChildren: GmRouteRouteChildren = {
   GmCampaignsRoute: GmCampaignsRouteWithChildren,
   GmCollaborationRoute: GmCollaborationRoute,
-  GmDashboardRoute: GmDashboardRoute,
   GmFeedbackRoute: GmFeedbackRoute,
   GmGamesRoute: GmGamesRouteWithChildren,
   GmInboxRoute: GmInboxRoute,

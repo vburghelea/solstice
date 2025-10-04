@@ -9,6 +9,7 @@ import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { LanguageTag } from "~/components/LanguageTag";
+import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -18,8 +19,11 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Separator } from "~/components/ui/separator";
+import type { AvailabilityData } from "~/db/schema/auth.schema";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
+import { useCountries } from "~/shared/hooks/useCountries";
 import {
   experienceLevelOptions,
   gameThemeOptions,
@@ -28,10 +32,6 @@ import {
   identityTagOptions,
   languageOptions,
 } from "~/shared/types/common";
-//
-import { Avatar } from "~/components/ui/avatar";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
-import { useCountries } from "~/shared/hooks/useCountries";
 import { TagInput } from "~/shared/ui/tag-input";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { invalidateProfileCaches } from "../profile.cache";
@@ -39,9 +39,11 @@ import { updateUserProfile } from "../profile.mutations";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 import { sanitizeProfileName } from "../profile.utils";
-import { AvailabilityEditor } from "./availability-editor";
+import { AvailabilityEditor, MobileAvailabilityEditor } from "./availability-editor";
 import { AvatarUpload } from "./avatar-upload";
 import { GamePreferencesStep } from "./game-preferences-step";
+
+const noopAvailabilityChange = () => {};
 
 export function ProfileView() {
   const queryClient = useQueryClient();
@@ -510,12 +512,12 @@ export function ProfileView() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 pb-12 sm:px-6 lg:gap-8">
       {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+      <Card className="w-full">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+            <div className="flex flex-1 flex-col gap-3 sm:min-w-[220px] sm:flex-row sm:items-center">
               {editingSection !== "basic" ? (
                 <Avatar
                   className="h-10 w-10"
@@ -532,53 +534,59 @@ export function ProfileView() {
                 </CardDescription>
               </div>
             </div>
-            {editingSection !== "basic" && (
-              <Button
-                onClick={() => startEditingSection("basic")}
-                variant="outline"
-                size="sm"
-              >
-                <Edit2 className="mr-2 h-4 w-4" />
-                Edit Basic Information
-              </Button>
-            )}
-            {editingSection === "basic" && (
-              <div className="flex gap-2">
+
+            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+              {editingSection !== "basic" && (
                 <Button
-                  onClick={cancelEditing}
+                  className="w-full sm:w-auto"
+                  onClick={() => startEditingSection("basic")}
                   variant="outline"
                   size="sm"
-                  disabled={form.state.isSubmitting}
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Basic Information
                 </Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button
-                      type="button"
-                      onClick={() => form.handleSubmit()}
-                      disabled={!canSubmit || isSubmitting}
-                      size="sm"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </div>
-            )}
+              )}
+              {editingSection === "basic" && (
+                <>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={cancelEditing}
+                    variant="outline"
+                    size="sm"
+                    disabled={form.state.isSubmitting}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </Button>
+                  <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  >
+                    {([canSubmit, isSubmitting]) => (
+                      <Button
+                        className="w-full sm:w-auto"
+                        type="button"
+                        onClick={() => form.handleSubmit()}
+                        disabled={!canSubmit || isSubmitting}
+                        size="sm"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                </>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -794,60 +802,66 @@ export function ProfileView() {
       </Card>
 
       {/* Additional Information */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+      <Card className="w-full">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
               <CardTitle>Additional Information</CardTitle>
               <CardDescription>Your gaming preferences and availability</CardDescription>
             </div>
-            {editingSection !== "additional" && (
-              <Button
-                onClick={() => startEditingSection("additional")}
-                variant="outline"
-                size="sm"
-              >
-                <Edit2 className="mr-2 h-4 w-4" />
-                Edit Additional Information
-              </Button>
-            )}
-            {editingSection === "additional" && (
-              <div className="flex gap-2">
+
+            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+              {editingSection !== "additional" && (
                 <Button
-                  onClick={cancelEditing}
+                  className="w-full sm:w-auto"
+                  onClick={() => startEditingSection("additional")}
                   variant="outline"
                   size="sm"
-                  disabled={form.state.isSubmitting}
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Additional Information
                 </Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button
-                      type="button"
-                      onClick={() => form.handleSubmit()}
-                      disabled={!canSubmit || isSubmitting}
-                      size="sm"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </div>
-            )}
+              )}
+              {editingSection === "additional" && (
+                <>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={cancelEditing}
+                    variant="outline"
+                    size="sm"
+                    disabled={form.state.isSubmitting}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </Button>
+                  <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  >
+                    {([canSubmit, isSubmitting]) => (
+                      <Button
+                        className="w-full sm:w-auto"
+                        type="button"
+                        onClick={() => form.handleSubmit()}
+                        disabled={!canSubmit || isSubmitting}
+                        size="sm"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                </>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -860,7 +874,7 @@ export function ProfileView() {
             {editingSection === "additional" ? (
               <form.Field name="calendarAvailability">
                 {(field) => (
-                  <AvailabilityEditor
+                  <ResponsiveAvailabilityEditor
                     value={field.state.value || defaultAvailabilityData}
                     onChange={(newValue) => {
                       field.handleChange(newValue);
@@ -870,10 +884,10 @@ export function ProfileView() {
                 )}
               </form.Field>
             ) : (
-              <AvailabilityEditor
+              <ResponsiveAvailabilityEditor
                 value={profile?.calendarAvailability || defaultAvailabilityData}
-                onChange={() => {}}
-                readOnly={true}
+                onChange={noopAvailabilityChange}
+                readOnly
               />
             )}
           </div>
@@ -1046,62 +1060,68 @@ export function ProfileView() {
       </Card>
 
       {/* Privacy Settings */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+      <Card className="w-full">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
               <CardTitle>Privacy Settings</CardTitle>
               <CardDescription>
                 Control what information is visible to others
               </CardDescription>
             </div>
-            {editingSection !== "privacy" && (
-              <Button
-                onClick={() => startEditingSection("privacy")}
-                variant="outline"
-                size="sm"
-              >
-                <Edit2 className="mr-2 h-4 w-4" />
-                Edit Privacy Settings
-              </Button>
-            )}
-            {editingSection === "privacy" && (
-              <div className="flex gap-2">
+
+            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+              {editingSection !== "privacy" && (
                 <Button
-                  onClick={cancelEditing}
+                  className="w-full sm:w-auto"
+                  onClick={() => startEditingSection("privacy")}
                   variant="outline"
                   size="sm"
-                  disabled={form.state.isSubmitting}
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Privacy Settings
                 </Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button
-                      type="button"
-                      onClick={() => form.handleSubmit()}
-                      disabled={!canSubmit || isSubmitting}
-                      size="sm"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </div>
-            )}
+              )}
+              {editingSection === "privacy" && (
+                <>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={cancelEditing}
+                    variant="outline"
+                    size="sm"
+                    disabled={form.state.isSubmitting}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </Button>
+                  <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  >
+                    {([canSubmit, isSubmitting]) => (
+                      <Button
+                        className="w-full sm:w-auto"
+                        type="button"
+                        onClick={() => form.handleSubmit()}
+                        disabled={!canSubmit || isSubmitting}
+                        size="sm"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                </>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -1211,49 +1231,49 @@ export function ProfileView() {
             </>
           ) : (
             <>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Email visible to teammates</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showEmail ? "Yes" : "No"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Phone number visible to teammates</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showPhone ? "Yes" : "No"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Location visible to everyone</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showLocation ? "Yes" : "No"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Languages visible to everyone</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showLanguages ? "Yes" : "No"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Game preferences visible to everyone</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.showGamePreferences ? "Yes" : "No"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Allow team invitations</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.allowTeamInvitations ? "Yes" : "No"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Only allow invites from connections</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.allowInvitesOnlyFromConnections
@@ -1262,7 +1282,7 @@ export function ProfileView() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-sm">Allow follows</span>
                 <span className="text-muted-foreground text-sm">
                   {profile?.privacySettings?.allowFollows ? "Yes" : "No"}
@@ -1274,60 +1294,66 @@ export function ProfileView() {
       </Card>
 
       {/* Game Preferences */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+      <Card className="w-full">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
               <CardTitle>Game Preferences</CardTitle>
               <CardDescription>Your favorite and avoided game systems</CardDescription>
             </div>
-            {editingSection !== "game-preferences" && (
-              <Button
-                onClick={() => startEditingSection("game-preferences")}
-                variant="outline"
-                size="sm"
-              >
-                <Edit2 className="mr-2 h-4 w-4" />
-                Edit Game Preferences
-              </Button>
-            )}
-            {editingSection === "game-preferences" && (
-              <div className="flex gap-2">
+
+            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+              {editingSection !== "game-preferences" && (
                 <Button
-                  onClick={cancelEditing}
+                  className="w-full sm:w-auto"
+                  onClick={() => startEditingSection("game-preferences")}
                   variant="outline"
                   size="sm"
-                  disabled={form.state.isSubmitting}
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Game Preferences
                 </Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button
-                      type="button"
-                      onClick={() => form.handleSubmit()}
-                      disabled={!canSubmit || isSubmitting}
-                      size="sm"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </div>
-            )}
+              )}
+              {editingSection === "game-preferences" && (
+                <>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={cancelEditing}
+                    variant="outline"
+                    size="sm"
+                    disabled={form.state.isSubmitting}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </Button>
+                  <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  >
+                    {([canSubmit, isSubmitting]) => (
+                      <Button
+                        className="w-full sm:w-auto"
+                        type="button"
+                        onClick={() => form.handleSubmit()}
+                        disabled={!canSubmit || isSubmitting}
+                        size="sm"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                </>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -1390,16 +1416,18 @@ export function ProfileView() {
       </Card>
 
       {/* Blocklist Management */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+      <Card className="w-full">
+        <CardHeader className="gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
               <CardTitle>Blocklist</CardTitle>
               <CardDescription>Manage users you’ve blocked</CardDescription>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/dashboard/profile/blocklist">Open Blocklist</Link>
-            </Button>
+            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:justify-end">
+              <Button asChild className="w-full sm:w-auto" variant="outline" size="sm">
+                <Link to="/dashboard/profile/blocklist">Open Blocklist</Link>
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -1409,6 +1437,37 @@ export function ProfileView() {
           </p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+interface ResponsiveAvailabilityEditorProps {
+  value: AvailabilityData;
+  onChange: (value: AvailabilityData) => void;
+  readOnly?: boolean;
+}
+
+function ResponsiveAvailabilityEditor({
+  value,
+  onChange,
+  readOnly = false,
+}: ResponsiveAvailabilityEditorProps) {
+  return (
+    <div className="max-w-full space-y-3">
+      <div className="lg:hidden">
+        <div className="border-border/60 bg-muted/30 rounded-xl border p-2 shadow-sm">
+          <MobileAvailabilityEditor
+            value={value}
+            onChange={onChange}
+            readOnly={readOnly}
+          />
+        </div>
+      </div>
+      <div className="hidden lg:block">
+        <div className="border-border/60 bg-muted/20 rounded-xl border p-2 shadow-sm lg:border-none lg:bg-transparent lg:p-0 lg:shadow-none">
+          <AvailabilityEditor value={value} onChange={onChange} readOnly={readOnly} />
+        </div>
+      </div>
     </div>
   );
 }

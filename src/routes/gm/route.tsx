@@ -96,6 +96,10 @@ export const Route = createFileRoute("/gm")({
 function GameMasterNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
+  const { user } = Route.useRouteContext();
+
+  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
+  const workspaceLabel = user?.name ? `${user.name}` : "Game Master";
 
   return (
     <RoleSwitcherProvider
@@ -106,9 +110,11 @@ function GameMasterNamespaceShell() {
     >
       <RoleWorkspaceLayout
         title="Game Master workspace"
-        description="Coordinate campaigns, sessions, and bespoke threads without leaving the studio."
+        description="Coordinate campaigns, sessions, and bespoke threads tailored to your tables."
         navItems={GM_NAVIGATION}
         fallbackLabel="Game Master"
+        subtitle={workspaceSubtitle}
+        workspaceLabel={workspaceLabel}
         headerSlot={<GameMasterWorkspaceSummary />}
       />
     </RoleSwitcherProvider>
@@ -215,7 +221,7 @@ function GameMasterWorkspaceSummary() {
   }, 0);
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <SummaryCard
         title="Upcoming sessions"
         isLoading={upcomingSessionsQuery.isLoading}
@@ -294,11 +300,11 @@ function SummaryCard({
   cta,
 }: SummaryCardProps) {
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="text-muted-foreground space-y-2 text-sm">
+      <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
         {isLoading ? (
           <Skeleton className="h-4 w-32" />
         ) : error ? (

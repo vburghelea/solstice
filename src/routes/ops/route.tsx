@@ -59,6 +59,10 @@ export const Route = createFileRoute("/ops")({
 function OpsNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
+  const { user } = Route.useRouteContext();
+
+  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
+  const workspaceLabel = user?.name ? `${user.name}` : "Operations";
 
   return (
     <RoleSwitcherProvider
@@ -72,6 +76,8 @@ function OpsNamespaceShell() {
         description="Monitor approvals, logistics, and staffing signals in real time so every event stays on track."
         navItems={OPS_NAVIGATION}
         fallbackLabel="Operations"
+        subtitle={workspaceSubtitle}
+        workspaceLabel={workspaceLabel}
         headerSlot={<OpsWorkspaceSummary />}
       />
     </RoleSwitcherProvider>
@@ -92,15 +98,15 @@ function OpsWorkspaceSummary() {
   );
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      <Card>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Approvals queue</CardTitle>
           <span className="text-muted-foreground text-xs font-semibold">
             {pendingList.length}
           </span>
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-32" />
           ) : pendingList.length > 0 ? (
@@ -120,14 +126,14 @@ function OpsWorkspaceSummary() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Pipeline focus</CardTitle>
           <span className="text-muted-foreground text-xs font-semibold">
             {pipelineList.length}
           </span>
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-36" />
           ) : nextPipelineEvent ? (
@@ -152,12 +158,12 @@ function OpsWorkspaceSummary() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Attention signals</CardTitle>
           <AlertTriangle className="text-muted-foreground h-4 w-4" />
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-40" />
           ) : criticalAttention ? (

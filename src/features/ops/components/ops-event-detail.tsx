@@ -333,8 +333,7 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
             <div>
               <CardTitle className="text-2xl">Operational outlook</CardTitle>
               <CardDescription>
-                Daily readiness, capacity signals, and dependent workflows for Priya’s
-                team.
+                Daily readiness, capacity signals, and dependent workflows for your team.
               </CardDescription>
             </div>
             <Badge variant="outline" className="text-sm">

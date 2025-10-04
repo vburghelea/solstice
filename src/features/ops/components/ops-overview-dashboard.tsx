@@ -204,15 +204,12 @@ export function OpsOverviewDashboard() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
-          <Badge variant="outline" className="bg-primary/10 text-primary w-fit">
-            Priya · Operations Strategist
-          </Badge>
           <h1 className="text-3xl font-bold tracking-tight">
             Event operations mission control
           </h1>
           <p className="text-muted-foreground max-w-2xl">
             Keep approvals, staffing, and marketing signals aligned in one workspace so
-            Priya can steer live experiences without leaving the dashboard.
+            you can steer live experiences without leaving the dashboard.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

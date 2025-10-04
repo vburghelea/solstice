@@ -151,7 +151,6 @@ export function RoleWorkspaceLayout({
                   title={title}
                   {...(description ? { description } : {})}
                 />
-                {headerSlot ? <div className="lg:hidden">{headerSlot}</div> : null}
                 {children ? <div className="flex flex-col gap-6">{children}</div> : null}
                 <div>
                   <Suspense
@@ -164,6 +163,7 @@ export function RoleWorkspaceLayout({
                     <Outlet />
                   </Suspense>
                 </div>
+                {headerSlot ? <div className="lg:hidden">{headerSlot}</div> : null}
               </div>
               <WorkspaceSummaryPanel
                 workspaceLabel={resolvedWorkspaceLabel}
@@ -198,7 +198,7 @@ function WorkspaceSummaryPanel({
   return (
     <aside
       className={cn(
-        "border-border/60 bg-muted/40 flex flex-col gap-6 rounded-2xl border p-4",
+        "border-border/60 bg-muted/40 hidden flex-col gap-6 rounded-2xl border p-4 lg:flex",
         "sm:p-6",
       )}
     >

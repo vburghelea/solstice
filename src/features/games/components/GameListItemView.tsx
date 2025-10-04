@@ -14,6 +14,7 @@ import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { buildPlayersRange, formatExpectedDuration } from "~/shared/lib/game-formatting";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
@@ -56,15 +57,16 @@ export function GameShowcaseCard({
   if (typeof game.participantCount === "number") {
     playersLabelParts.push(`${game.participantCount} joined`);
   }
-  const playersRange = buildPlayersRange(minPlayers, maxPlayers);
+  const playersRange = buildPlayersRange(minPlayers, maxPlayers, { fallback: null });
   if (playersRange) {
     playersLabelParts.push(playersRange);
   }
   const playersLabel = playersLabelParts.join(" • ");
 
-  const durationLabel =
-    formatExpectedDuration(game.expectedDuration) ??
-    formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
+  const expectedDuration = formatExpectedDuration(game.expectedDuration);
+  const durationLabel = expectedDuration
+    ? `${expectedDuration} session`
+    : formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
 
   const metaItems: Array<{ icon: MetaIcon; label: ReactNode }> = [];
 
@@ -205,48 +207,6 @@ export function GameShowcaseCard({
       </div>
     </article>
   );
-}
-
-function buildPlayersRange(
-  minPlayers: number | null,
-  maxPlayers: number | null,
-): string | null {
-  if (minPlayers && maxPlayers) {
-    if (minPlayers === maxPlayers) {
-      return `${minPlayers} players`;
-    }
-    return `${minPlayers}-${maxPlayers} players`;
-  }
-
-  if (minPlayers) {
-    return `${minPlayers}+ players`;
-  }
-
-  if (maxPlayers) {
-    return `Up to ${maxPlayers} players`;
-  }
-
-  return null;
-}
-
-function formatExpectedDuration(value: number | null | undefined): string | null {
-  if (!value || Number.isNaN(value)) {
-    return null;
-  }
-
-  const totalMinutes = Math.max(15, Math.round(value));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours && minutes) {
-    return `${hours}h ${minutes}m session`;
-  }
-
-  if (hours) {
-    return `${hours}h session`;
-  }
-
-  return `${minutes}m session`;
 }
 
 function formatSystemDuration(minutes: number | null): string | null {

@@ -13,7 +13,6 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
-import { AdminConsoleNavigation } from "~/features/admin/components/admin-console-navigation";
 import { useAdminInsights } from "~/features/admin/insights/admin-insights.queries";
 import {
   RoleWorkspaceLayout,
@@ -30,7 +29,8 @@ const ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
     to: "/admin",
     icon: Home,
     exact: true,
-    description: "Review governance posture, alerts, and persona impacts at a glance.",
+    description:
+      "Review governance posture, alerts, and organization-wide impacts at a glance.",
   },
   {
     label: "Insights",
@@ -57,7 +57,7 @@ const ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
     to: "/admin/feature-flags",
     icon: Flag,
     inMobileNav: false,
-    description: "Coordinate rollout plans and persona-targeted experiments.",
+    description: "Coordinate rollout plans and targeted experiments for your teams.",
   },
   {
     label: "Shared inbox",
@@ -94,6 +94,10 @@ export const Route = createFileRoute("/admin")({
 function AdminNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
+  const { user } = Route.useRouteContext();
+
+  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
+  const workspaceLabel = user?.name ? `${user.name}` : "Admin";
 
   return (
     <RoleSwitcherProvider
@@ -104,13 +108,13 @@ function AdminNamespaceShell() {
     >
       <RoleWorkspaceLayout
         title="Administration workspace"
-        description="Coordinate governance, permissions, and platform-wide alerts across every persona."
+        description="Coordinate governance, permissions, and platform-wide alerts for your organization."
         navItems={ADMIN_NAVIGATION}
         fallbackLabel="Platform admin"
+        subtitle={workspaceSubtitle}
+        workspaceLabel={workspaceLabel}
         headerSlot={<AdminWorkspaceSummary />}
-      >
-        <AdminConsoleNavigation />
-      </RoleWorkspaceLayout>
+      ></RoleWorkspaceLayout>
     </RoleSwitcherProvider>
   );
 }
@@ -123,17 +127,17 @@ function AdminWorkspaceSummary() {
 
   const activeAlerts =
     data?.alerts.filter((alert) => alert.enabled && alert.status !== "stable") ?? [];
-  const highlightedPersona = data?.personaImpacts[0] ?? null;
+  const prioritizedImpact = data?.personaImpacts[0] ?? null;
   const headlineKpi = data?.kpis[0] ?? null;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      <Card>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Platform health</CardTitle>
           <LineChart className="text-muted-foreground h-4 w-4" />
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-40" />
           ) : headlineKpi ? (
@@ -152,12 +156,12 @@ function AdminWorkspaceSummary() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Active alerts</CardTitle>
           <AlertCircle className="text-muted-foreground h-4 w-4" />
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-32" />
           ) : activeAlerts.length > 0 ? (
@@ -174,26 +178,26 @@ function AdminWorkspaceSummary() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Persona impact</CardTitle>
+          <CardTitle className="text-sm font-medium">Impact focus</CardTitle>
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-32" />
-          ) : highlightedPersona ? (
+          ) : prioritizedImpact ? (
             <>
               <span className="text-foreground font-medium">
-                {highlightedPersona.personaLabel}
+                {prioritizedImpact.personaLabel}
               </span>
-              <span>{highlightedPersona.headline}</span>
+              <span>{prioritizedImpact.headline}</span>
               <span className="text-muted-foreground text-xs tracking-wide uppercase">
-                {highlightedPersona.direction === "up" ? "Trending up" : "Trending down"}
+                {prioritizedImpact.direction === "up" ? "Trending up" : "Trending down"}
               </span>
             </>
           ) : (
-            <span>No persona shifts detected</span>
+            <span>No major shifts detected</span>
           )}
         </CardContent>
       </Card>

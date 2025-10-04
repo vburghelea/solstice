@@ -38,7 +38,12 @@ describe("AvailabilityEditor", () => {
     render(
       <AvailabilityEditor value={defaultAvailabilityData} onChange={handleChange} />,
     );
-    fireEvent.mouseDown(getSlot("wednesday", 10));
+    fireEvent.pointerDown(getSlot("wednesday", 10), {
+      pointerId: 1,
+      button: 0,
+      buttons: 1,
+    });
+    fireEvent.pointerUp(window, { pointerId: 1, button: 0 });
     expect(handleChange).toHaveBeenCalledOnce();
     const lastCallValue = handleChange.mock.calls[0][0];
     expect(lastCallValue.wednesday[56]).toBe(true);
@@ -53,7 +58,12 @@ describe("AvailabilityEditor", () => {
     initialData.wednesday[56] = true;
     initialData.wednesday[57] = true;
     render(<AvailabilityEditor value={initialData} onChange={handleChange} />);
-    fireEvent.mouseDown(getSlot("wednesday", 10));
+    fireEvent.pointerDown(getSlot("wednesday", 10), {
+      pointerId: 1,
+      button: 0,
+      buttons: 1,
+    });
+    fireEvent.pointerUp(window, { pointerId: 1, button: 0 });
     expect(handleChange).toHaveBeenCalledOnce();
     const lastCallValue = handleChange.mock.calls[0][0];
     expect(lastCallValue.wednesday[56]).toBe(false);
@@ -70,13 +80,25 @@ describe("AvailabilityEditor", () => {
     const rerenderWithNewData = () =>
       rerender(<AvailabilityEditor value={currentData} onChange={handleChange} />);
 
-    fireEvent.mouseDown(getSlot("friday", 5));
+    fireEvent.pointerDown(getSlot("friday", 5), {
+      pointerId: 1,
+      button: 0,
+      buttons: 1,
+    });
     rerenderWithNewData();
-    fireEvent.mouseEnter(getSlot("friday", 6));
+    fireEvent.pointerEnter(getSlot("friday", 6), {
+      pointerId: 1,
+      button: 0,
+      buttons: 1,
+    });
     rerenderWithNewData();
-    fireEvent.mouseEnter(getSlot("friday", 7));
+    fireEvent.pointerEnter(getSlot("friday", 7), {
+      pointerId: 1,
+      button: 0,
+      buttons: 1,
+    });
     rerenderWithNewData();
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window, { pointerId: 1, button: 0 });
 
     expect(handleChange).toHaveBeenCalledTimes(3);
     [46, 47, 48, 49, 50, 51].forEach((i) => {
@@ -96,11 +118,19 @@ describe("AvailabilityEditor", () => {
     const rerenderWithNewData = () =>
       rerender(<AvailabilityEditor value={currentData} onChange={handleChange} />);
 
-    fireEvent.mouseDown(getSlot("monday", 4)); // 11:00
+    fireEvent.pointerDown(getSlot("monday", 4), {
+      pointerId: 2,
+      button: 0,
+      buttons: 1,
+    }); // 11:00
     rerenderWithNewData();
-    fireEvent.mouseEnter(getSlot("monday", 5)); // 11:30
+    fireEvent.pointerEnter(getSlot("monday", 5), {
+      pointerId: 2,
+      button: 0,
+      buttons: 1,
+    }); // 11:30
     rerenderWithNewData();
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window, { pointerId: 2, button: 0 });
 
     expect(currentData.monday[40]).toBe(true); // 10:00 still true
     expect(currentData.monday[44]).toBe(false); // 11:00 now false
@@ -122,11 +152,15 @@ describe("AvailabilityEditor", () => {
     const emptySlot = getSlot("tuesday", 1);
     const adjacentSlot = getSlot("tuesday", 2);
 
-    fireEvent.mouseDown(emptySlot);
+    fireEvent.pointerDown(emptySlot, { pointerId: 3, button: 0, buttons: 1 });
     rerenderWithNewData();
-    fireEvent.mouseEnter(adjacentSlot);
+    fireEvent.pointerEnter(adjacentSlot, {
+      pointerId: 3,
+      button: 0,
+      buttons: 1,
+    });
     rerenderWithNewData();
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window, { pointerId: 3, button: 0 });
 
     for (let i = 38; i < 48; i++) {
       expect(currentData.tuesday[i]).toBe(true);
@@ -142,7 +176,12 @@ describe("AvailabilityEditor", () => {
         readOnly
       />,
     );
-    fireEvent.mouseDown(getSlot("tuesday", 10));
+    fireEvent.pointerDown(getSlot("tuesday", 10), {
+      pointerId: 4,
+      button: 0,
+      buttons: 1,
+    });
+    fireEvent.pointerUp(window, { pointerId: 4, button: 0 });
     expect(handleChange).not.toHaveBeenCalled();
   });
 

@@ -116,6 +116,10 @@ export const Route = createFileRoute("/player")({
 function PlayerNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
+  const { user } = Route.useRouteContext();
+
+  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
+  const workspaceLabel = user?.name ? `${user.name}` : "Player";
 
   return (
     <RoleSwitcherProvider
@@ -129,6 +133,8 @@ function PlayerNamespaceShell() {
         description="Manage sessions, invitations, and community insights from one responsive hub."
         navItems={PLAYER_NAVIGATION}
         fallbackLabel="Player"
+        subtitle={workspaceSubtitle}
+        workspaceLabel={workspaceLabel}
         headerSlot={<PlayerWorkspaceSummary />}
       />
     </RoleSwitcherProvider>
@@ -216,8 +222,8 @@ function PlayerWorkspaceSummary() {
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      <Card>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Membership</CardTitle>
           <Badge
@@ -231,7 +237,7 @@ function PlayerWorkspaceSummary() {
             {membershipLabel}
           </Badge>
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {membershipStatusQuery.isLoading ? (
             <Skeleton className="h-4 w-36" />
           ) : (
@@ -243,12 +249,12 @@ function PlayerWorkspaceSummary() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Next session</CardTitle>
           <CalendarDays className="text-muted-foreground h-4 w-4" />
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-40" />
           ) : nextGame ? (
@@ -273,12 +279,12 @@ function PlayerWorkspaceSummary() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Community</CardTitle>
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-2 text-sm">
+        <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
           {isLoading ? (
             <Skeleton className="h-4 w-32" />
           ) : (

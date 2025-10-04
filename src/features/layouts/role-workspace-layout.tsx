@@ -32,6 +32,7 @@ export interface RoleWorkspaceLayoutProps {
   headerSlot?: ReactNode;
   children?: ReactNode;
   fallbackLabel?: string;
+  workspaceLabel?: string;
 }
 
 const layoutStyleVars = {
@@ -52,11 +53,18 @@ export function RoleWorkspaceLayout({
   headerSlot,
   children,
   fallbackLabel,
+  workspaceLabel,
 }: RoleWorkspaceLayoutProps) {
   const [navOpen, setNavOpen] = useState(false);
   const persona = useActivePersona();
   const location = useRouterState({ select: (state) => state.location.pathname });
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
+
+  const resolvedWorkspaceLabel =
+    workspaceLabel ?? persona?.label ?? fallbackLabel ?? "Workspace";
+  const headerSubtitle =
+    subtitle ??
+    (user?.name ? `${user.name}'s workspace` : `${resolvedWorkspaceLabel} workspace`);
 
   const workspaceNavItems = useMemo(
     () => navItems.filter((item) => (item.section ?? "workspace") === "workspace"),
@@ -91,7 +99,7 @@ export function RoleWorkspaceLayout({
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-muted-foreground text-xs font-medium uppercase">
-                  {persona.label}
+                  {resolvedWorkspaceLabel}
                 </span>
                 <span className="text-base font-semibold">Workspace</span>
               </div>
@@ -109,7 +117,7 @@ export function RoleWorkspaceLayout({
               <RoleSwitcher />
             </div>
             <WorkspaceNavSection
-              personaLabel={persona.label}
+              workspaceLabel={resolvedWorkspaceLabel}
               heading="Workspace tools"
               items={workspaceNavItems}
               activePath={location}
@@ -117,7 +125,7 @@ export function RoleWorkspaceLayout({
             />
             {accountNavItems.length ? (
               <WorkspaceNavSection
-                personaLabel={persona.label}
+                workspaceLabel={resolvedWorkspaceLabel}
                 heading="Account"
                 items={accountNavItems}
                 activePath={location}
@@ -130,18 +138,17 @@ export function RoleWorkspaceLayout({
 
       <div className="flex min-h-dvh min-w-0 flex-1 flex-col">
         <WorkspaceMobileHeader
-          personaLabel={persona.label}
+          workspaceLabel={resolvedWorkspaceLabel}
           title={title}
           onMenuClick={() => setNavOpen(true)}
         />
         <main className="flex-1 px-4 pt-4 pb-[var(--workspace-mobile-main-padding)] sm:px-6 sm:pt-6 lg:px-10 lg:pb-12">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:max-w-[90%]">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
               <div className="flex flex-col gap-6">
                 <WorkspaceHeader
-                  subtitle={subtitle ?? `${persona.label} workspace`}
+                  subtitle={headerSubtitle}
                   title={title}
-                  user={user}
                   {...(description ? { description } : {})}
                 />
                 {headerSlot ? <div className="lg:hidden">{headerSlot}</div> : null}
@@ -149,7 +156,9 @@ export function RoleWorkspaceLayout({
                 <div>
                   <Suspense
                     fallback={
-                      <PersonaNamespaceFallback label={fallbackLabel ?? persona.label} />
+                      <PersonaNamespaceFallback
+                        label={fallbackLabel ?? resolvedWorkspaceLabel}
+                      />
                     }
                   >
                     <Outlet />
@@ -157,7 +166,7 @@ export function RoleWorkspaceLayout({
                 </div>
               </div>
               <WorkspaceSummaryPanel
-                personaLabel={persona.label}
+                workspaceLabel={resolvedWorkspaceLabel}
                 user={user}
                 workspaceNavItems={workspaceNavItems}
                 accountNavItems={accountNavItems}
@@ -174,13 +183,13 @@ export function RoleWorkspaceLayout({
 }
 
 function WorkspaceSummaryPanel({
-  personaLabel,
+  workspaceLabel,
   user,
   workspaceNavItems,
   accountNavItems,
   activePath,
 }: {
-  personaLabel: string;
+  workspaceLabel: string;
   user: AuthUser | null;
   workspaceNavItems: RoleWorkspaceNavItem[];
   accountNavItems: RoleWorkspaceNavItem[];
@@ -200,14 +209,14 @@ function WorkspaceSummaryPanel({
         </div>
       </div>
       <WorkspaceNavSection
-        personaLabel={personaLabel}
+        workspaceLabel={workspaceLabel}
         heading="Workspace tools"
         items={workspaceNavItems}
         activePath={activePath}
       />
       {accountNavItems.length ? (
         <WorkspaceNavSection
-          personaLabel={personaLabel}
+          workspaceLabel={workspaceLabel}
           heading="Account"
           items={accountNavItems}
           activePath={activePath}
@@ -218,13 +227,13 @@ function WorkspaceSummaryPanel({
 }
 
 function WorkspaceNavSection({
-  personaLabel,
+  workspaceLabel,
   heading,
   items,
   activePath,
   onNavigate,
 }: {
-  personaLabel: string;
+  workspaceLabel: string;
   heading: string;
   items: RoleWorkspaceNavItem[];
   activePath: string;
@@ -241,7 +250,7 @@ function WorkspaceNavSection({
       </span>
       <nav
         className="flex flex-col gap-2"
-        aria-label={`${personaLabel} ${heading.toLowerCase()}`}
+        aria-label={`${workspaceLabel} ${heading.toLowerCase()}`}
       >
         {items.map((item) => {
           const Icon = item.icon;
@@ -283,11 +292,11 @@ function WorkspaceNavSection({
 }
 
 function WorkspaceMobileHeader({
-  personaLabel,
+  workspaceLabel,
   title,
   onMenuClick,
 }: {
-  personaLabel: string;
+  workspaceLabel: string;
   title: string;
   onMenuClick: () => void;
 }) {
@@ -299,13 +308,13 @@ function WorkspaceMobileHeader({
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
-            aria-label={`Open ${personaLabel} workspace navigation`}
+            aria-label="Open workspace navigation"
           >
             <Menu className="h-6 w-6" />
           </Button>
           <div className="flex flex-col">
             <span className="text-muted-foreground text-xs font-medium uppercase">
-              {personaLabel}
+              {workspaceLabel}
             </span>
             <span className="text-sm font-semibold">{title}</span>
           </div>
@@ -363,12 +372,10 @@ function WorkspaceHeader({
   subtitle,
   title,
   description,
-  user,
 }: {
   subtitle: string;
   title: string;
   description?: string;
-  user: AuthUser;
 }) {
   return (
     <section className="flex flex-col gap-4">
@@ -381,12 +388,6 @@ function WorkspaceHeader({
           <p className="text-muted-foreground max-w-2xl text-sm">{description}</p>
         ) : null}
       </div>
-      {user ? (
-        <div className="text-muted-foreground flex items-center gap-3 text-sm">
-          <span>Signed in as</span>
-          <UserSummary user={user} condensed />
-        </div>
-      ) : null}
     </section>
   );
 }

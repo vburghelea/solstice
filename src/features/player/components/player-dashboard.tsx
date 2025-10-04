@@ -556,7 +556,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader className="space-y-3">
             <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-              <Trophy className="h-4 w-4" /> Leo's control center
+              <Trophy className="h-4 w-4" /> Your control center
             </CardTitle>
             <CardDescription>
               Tune visibility, stay notified, and jump into actions without leaving HQ.

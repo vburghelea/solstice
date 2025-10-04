@@ -3,8 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { LanguageTag } from "~/components/LanguageTag";
-import { ProfileLink } from "~/components/ProfileLink";
-import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -50,11 +48,17 @@ import type {
 import { getRelationshipSnapshot } from "~/features/social";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { InfoItem } from "~/shared/components/info-item";
+import { SafeAddressLink } from "~/shared/components/safe-address-link";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import {
+  buildPlayersRange,
+  formatExpectedDuration,
+  formatPrice,
+} from "~/shared/lib/game-formatting";
 import { strings } from "~/shared/lib/strings";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
-import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -521,13 +525,6 @@ function GameDetailsPage() {
   );
   const expectedDuration = formatExpectedDuration(game.expectedDuration);
   const priceLabel = formatPrice(game.price);
-  const heroSubtitle = [
-    formatDateAndTime(game.dateTime),
-    game.location.address,
-    game.gameSystem.name,
-  ]
-    .filter(Boolean)
-    .join(" • ");
   const isCampaignGame = Boolean(game.campaignId);
   const heroStyle = systemDetails?.heroUrl
     ? {
@@ -616,31 +613,6 @@ function GameDetailsPage() {
                 <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl">
                   {game.name}
                 </h1>
-                <p className="text-sm text-white/85 sm:text-base">{heroSubtitle}</p>
-                {game.owner ? (
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-white/85">
-                    <div className="flex items-center gap-2">
-                      <Avatar
-                        name={game.owner.name}
-                        email={game.owner.email}
-                        srcUploaded={game.owner.uploadedAvatarPath ?? null}
-                        srcProvider={game.owner.image ?? null}
-                        userId={game.owner.id}
-                        className="h-8 w-8 border border-white/20"
-                      />
-                      <ProfileLink
-                        userId={game.owner.id}
-                        username={game.owner.name || game.owner.email}
-                        className="font-medium text-white hover:text-white/90"
-                      />
-                      <span className="text-white/60">•</span>
-                      <ThumbsScore
-                        value={game.owner.gmRating ?? null}
-                        className="text-white"
-                      />
-                    </div>
-                  </div>
-                ) : null}
                 {canApply ? (
                   <Button
                     className="text-primary hidden bg-white hover:bg-white/90 sm:inline-flex"
@@ -858,40 +830,6 @@ function GameDetailsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Organizer</CardTitle>
-                  <CardDescription>The primary contact for this table.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center gap-3">
-                  <Avatar
-                    name={game.owner?.name ?? null}
-                    email={game.owner?.email ?? null}
-                    srcUploaded={game.owner?.uploadedAvatarPath ?? null}
-                    srcProvider={game.owner?.image ?? null}
-                    userId={game.owner?.id ?? null}
-                    className="h-12 w-12"
-                  />
-                  <div>
-                    {game.owner ? (
-                      <ProfileLink
-                        userId={game.owner.id}
-                        username={game.owner.name || game.owner.email}
-                        className="text-foreground font-semibold"
-                      />
-                    ) : (
-                      <p className="text-muted-foreground">Unassigned</p>
-                    )}
-                    {game.owner ? (
-                      <ThumbsScore
-                        value={game.owner.gmRating ?? null}
-                        className="text-muted-foreground"
-                      />
-                    ) : null}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
                   <CardTitle>Location</CardTitle>
                   <CardDescription>Confirmed once your seat is approved.</CardDescription>
                 </CardHeader>
@@ -968,72 +906,4 @@ function GMReviewGate({ gameId, gmId }: { gameId: string; gmId: string }) {
       />
     </div>
   );
-}
-
-function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
-  if (value == null || (typeof value === "string" && value.trim().length === 0)) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-1">
-      <p className="text-muted-foreground text-xs tracking-wide uppercase">{label}</p>
-      <div className="text-foreground font-medium">{value}</div>
-    </div>
-  );
-}
-
-function SafeAddressLink({ address }: { address: string }) {
-  const href = `https://maps.google.com/?q=${encodeURIComponent(address)}`;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="text-primary text-xs font-medium underline-offset-4 hover:underline"
-    >
-      Open in Google Maps
-    </a>
-  );
-}
-
-function formatPrice(price: number | null | undefined) {
-  if (price == null) {
-    return "Free";
-  }
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "EUR",
-  }).format(price);
-}
-
-function buildPlayersRange(
-  minPlayers: number | null | undefined,
-  maxPlayers: number | null | undefined,
-) {
-  if (minPlayers && maxPlayers) {
-    return `${minPlayers}-${maxPlayers} players`;
-  }
-  if (minPlayers) {
-    return `${minPlayers}+ players`;
-  }
-  if (maxPlayers) {
-    return `Up to ${maxPlayers} players`;
-  }
-  return "Player count TBD";
-}
-
-function formatExpectedDuration(duration: number | null | undefined) {
-  if (duration == null) return null;
-  const totalMinutes = Math.round(duration * 60);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  if (hours > 0 && minutes > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-  if (hours > 0) {
-    return `${hours}h`;
-  }
-  return `${minutes}m`;
 }

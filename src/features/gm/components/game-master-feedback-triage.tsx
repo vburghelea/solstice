@@ -52,7 +52,7 @@ export function GameMasterFeedbackTriageBoard({
             variant="secondary"
             className="text-primary bg-white hover:bg-white/90"
           >
-            <Link to="/gm/dashboard">Back to studio overview</Link>
+            <Link to="/gm">Back to studio overview</Link>
           </Button>
         </div>
         <div className="absolute inset-0 rounded-3xl border border-white/15" />

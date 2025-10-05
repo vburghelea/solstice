@@ -95,8 +95,8 @@ import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/game
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
 import { Route as VisitSystemsSlugRouteImport } from "./routes/visit/systems/$slug";
+import { Route as VisitGameGameIdRouteImport } from "./routes/visit/game.$gameId";
 import { Route as VisitEventsSlugRouteImport } from "./routes/visit/events/$slug";
-import { Route as VisitEventEventIdRouteImport } from "./routes/visit/event.$eventId";
 import { Route as PlayerTeamsCreateRouteImport } from "./routes/player/teams/create";
 import { Route as PlayerTeamsBrowseRouteImport } from "./routes/player/teams/browse";
 import { Route as PlayerTeamsTeamIdRouteImport } from "./routes/player/teams/$teamId";
@@ -581,15 +581,15 @@ const VisitSystemsSlugRoute = VisitSystemsSlugRouteImport.update({
   path: "/systems/$slug",
   getParentRoute: () => VisitRouteRoute,
 } as any);
+const VisitGameGameIdRoute = VisitGameGameIdRouteImport.update({
+  id: "/game/$gameId",
+  path: "/game/$gameId",
+  getParentRoute: () => VisitRouteRoute,
+} as any);
 const VisitEventsSlugRoute = VisitEventsSlugRouteImport.update({
   id: "/$slug",
   path: "/$slug",
   getParentRoute: () => VisitEventsRoute,
-} as any);
-const VisitEventEventIdRoute = VisitEventEventIdRouteImport.update({
-  id: "/event/$eventId",
-  path: "/event/$eventId",
-  getParentRoute: () => VisitRouteRoute,
 } as any);
 const PlayerTeamsCreateRoute = PlayerTeamsCreateRouteImport.update({
   id: "/create",
@@ -1014,8 +1014,8 @@ export interface FileRoutesByFullPath {
   "/player/teams/$teamId": typeof PlayerTeamsTeamIdRouteWithChildren;
   "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
-  "/visit/event/$eventId": typeof VisitEventEventIdRoute;
   "/visit/events/$slug": typeof VisitEventsSlugRouteWithChildren;
+  "/visit/game/$gameId": typeof VisitGameGameIdRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
@@ -1123,7 +1123,7 @@ export interface FileRoutesByTo {
   "/player/games/create": typeof PlayerGamesCreateRoute;
   "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
-  "/visit/event/$eventId": typeof VisitEventEventIdRoute;
+  "/visit/game/$gameId": typeof VisitGameGameIdRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
@@ -1257,8 +1257,8 @@ export interface FileRoutesById {
   "/player/teams/$teamId": typeof PlayerTeamsTeamIdRouteWithChildren;
   "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
-  "/visit/event/$eventId": typeof VisitEventEventIdRoute;
   "/visit/events/$slug": typeof VisitEventsSlugRouteWithChildren;
+  "/visit/game/$gameId": typeof VisitGameGameIdRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
@@ -1393,8 +1393,8 @@ export interface FileRouteTypes {
     | "/player/teams/$teamId"
     | "/player/teams/browse"
     | "/player/teams/create"
-    | "/visit/event/$eventId"
     | "/visit/events/$slug"
+    | "/visit/game/$gameId"
     | "/visit/systems/$slug"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
@@ -1502,7 +1502,7 @@ export interface FileRouteTypes {
     | "/player/games/create"
     | "/player/teams/browse"
     | "/player/teams/create"
-    | "/visit/event/$eventId"
+    | "/visit/game/$gameId"
     | "/visit/systems/$slug"
     | "/dashboard/campaigns"
     | "/dashboard/events"
@@ -1635,8 +1635,8 @@ export interface FileRouteTypes {
     | "/player/teams/$teamId"
     | "/player/teams/browse"
     | "/player/teams/create"
-    | "/visit/event/$eventId"
     | "/visit/events/$slug"
+    | "/visit/game/$gameId"
     | "/visit/systems/$slug"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
@@ -2401,19 +2401,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof VisitSystemsSlugRouteImport;
       parentRoute: typeof VisitRouteRoute;
     };
+    "/visit/game/$gameId": {
+      id: "/visit/game/$gameId";
+      path: "/game/$gameId";
+      fullPath: "/visit/game/$gameId";
+      preLoaderRoute: typeof VisitGameGameIdRouteImport;
+      parentRoute: typeof VisitRouteRoute;
+    };
     "/visit/events/$slug": {
       id: "/visit/events/$slug";
       path: "/$slug";
       fullPath: "/visit/events/$slug";
       preLoaderRoute: typeof VisitEventsSlugRouteImport;
       parentRoute: typeof VisitEventsRoute;
-    };
-    "/visit/event/$eventId": {
-      id: "/visit/event/$eventId";
-      path: "/event/$eventId";
-      fullPath: "/visit/event/$eventId";
-      preLoaderRoute: typeof VisitEventEventIdRouteImport;
-      parentRoute: typeof VisitRouteRoute;
     };
     "/player/teams/create": {
       id: "/player/teams/create";
@@ -3374,7 +3374,7 @@ interface VisitRouteRouteChildren {
   VisitSearchRoute: typeof VisitSearchRoute;
   VisitTeamsRoute: typeof VisitTeamsRoute;
   VisitIndexRoute: typeof VisitIndexRoute;
-  VisitEventEventIdRoute: typeof VisitEventEventIdRoute;
+  VisitGameGameIdRoute: typeof VisitGameGameIdRoute;
   VisitSystemsSlugRoute: typeof VisitSystemsSlugRoute;
   VisitSystemsIndexRoute: typeof VisitSystemsIndexRoute;
 }
@@ -3389,7 +3389,7 @@ const VisitRouteRouteChildren: VisitRouteRouteChildren = {
   VisitSearchRoute: VisitSearchRoute,
   VisitTeamsRoute: VisitTeamsRoute,
   VisitIndexRoute: VisitIndexRoute,
-  VisitEventEventIdRoute: VisitEventEventIdRoute,
+  VisitGameGameIdRoute: VisitGameGameIdRoute,
   VisitSystemsSlugRoute: VisitSystemsSlugRoute,
   VisitSystemsIndexRoute: VisitSystemsIndexRoute,
 };

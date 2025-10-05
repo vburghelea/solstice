@@ -8,7 +8,10 @@ import { getUpcomingEvents } from "~/features/events/events.queries";
 import type { EventWithDetails } from "~/features/events/events.types";
 import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
 import type { PopularGameSystem } from "~/features/game-systems/game-systems.types";
-import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
+import {
+  GameShowcaseCard,
+  type GameLinkConfig,
+} from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import {
@@ -93,7 +96,7 @@ const DISCOVERY_THEMES = [
 
 const STORY_CHAPTERS = [
   "Preview gatherings and festivals curated for curious first-timers.",
-  "Explore systems and campaigns that prioritize onboarding and safety tools.",
+  "Explore systems and sessions that prioritize onboarding and safety tools.",
   "Save a home base city to receive updates when seats open up.",
 ];
 
@@ -238,7 +241,7 @@ function VisitorExperience() {
   }, [flattenedSuggestions, selectedCity]);
 
   return (
-    <div className="token-stack-3xl">
+    <div className="token-stack-3xl space-y-4">
       <HeroSection
         eyebrow="Start planning"
         title="Discover tabletop adventures tailored to explorers"
@@ -249,7 +252,7 @@ function VisitorExperience() {
         secondaryCta={{ text: "Log in to continue", link: "/auth/login" }}
       />
 
-      <section className={cn("token-stack-2xl p-6 md:p-10", SECTION_SURFACE)}>
+      <section className={cn("token-stack-2xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-stack-lg rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_38%,transparent)] bg-[radial-gradient(circle_at_top,_rgba(255,227,208,0.75),_rgba(255,255,255,0.95))] p-6 shadow-sm md:p-8">
           <div className="token-gap-xl flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="token-stack-md max-w-2xl">
@@ -366,7 +369,7 @@ function VisitorExperience() {
           </div>
         </div>
 
-        <div className="token-gap-lg rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-6 shadow-sm md:p-8">
+        <div className="token-gap-lg space-y-4 rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-6 shadow-sm md:p-8">
           <div className="token-stack-sm max-w-xl">
             <h3 className="text-heading-sm text-foreground">How this tour flows</h3>
             <p className="text-body-sm text-muted-strong">
@@ -390,7 +393,7 @@ function VisitorExperience() {
         </div>
       </section>
 
-      <section className={cn("token-stack-xl p-6 md:p-10", SECTION_SURFACE)}>
+      <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-stack-xs">
           <p className="text-eyebrow text-primary-soft">Confidence signals</p>
           <h2 className="text-heading-sm text-foreground">
@@ -414,7 +417,7 @@ function VisitorExperience() {
         </div>
       </section>
 
-      <section className={cn("token-stack-xl p-6 md:p-10", SECTION_SURFACE)}>
+      <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="token-stack-xs">
             <p className="text-eyebrow text-primary-soft">Upcoming gatherings</p>
@@ -422,8 +425,8 @@ function VisitorExperience() {
               Events near {activeSelectionLabel}
             </h2>
             <p className="text-body-sm text-muted-strong">
-              Curated by community hosts. Each RSVP takes you closer to your first
-              campaign memory.
+              Curated by community hosts. Each RSVP takes you closer to your first game
+              session memory.
             </p>
           </div>
           <Link
@@ -443,7 +446,7 @@ function VisitorExperience() {
               No events scheduled for this city yet.
             </p>
             <p className="text-body-sm text-muted-strong">
-              Switch to another city or check back as hosts publish new sessions.
+              Check back later as hosts publish new sessions.
             </p>
           </div>
         ) : (
@@ -455,12 +458,12 @@ function VisitorExperience() {
         )}
       </section>
 
-      <section className={cn("token-stack-xl p-6 md:p-10", SECTION_SURFACE)}>
+      <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="token-stack-xs">
             <p className="text-eyebrow text-primary-soft">Stories to sample</p>
             <h2 className="text-heading-sm text-foreground">
-              Campaigns welcoming new explorers
+              Sessions welcoming new explorers
             </h2>
             <p className="text-body-sm text-muted-strong">
               These tables lean into onboarding, safety tools, and collaborative energy.
@@ -480,26 +483,34 @@ function VisitorExperience() {
         {localGames.length === 0 ? (
           <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
             <p className="text-body-md text-muted-strong">
-              No spotlight campaigns in this city yet.
+              No spotlight sessions in this city yet.
             </p>
             <p className="text-body-sm text-muted-strong">
-              Try a nearby metro or follow our newsletter for launch announcements.
+              Subscribe to our newsletter or try again later for new content.
             </p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
-            {localGames.map((game) => (
-              <GameShowcaseCard
-                key={`visitor-game-${game.id}`}
-                game={game}
-                className="h-full"
-              />
-            ))}
+            {localGames.map((game) => {
+              const visitLink: GameLinkConfig = {
+                to: "/visit/game/$gameId",
+                params: { gameId: game.id },
+              };
+
+              return (
+                <GameShowcaseCard
+                  key={`visitor-game-${game.id}`}
+                  game={game}
+                  className="h-full"
+                  link={visitLink}
+                />
+              );
+            })}
           </div>
         )}
       </section>
 
-      <section className={cn("token-stack-lg p-6 md:p-10", SECTION_SURFACE)}>
+      <section className={cn("token-stack-lg space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-stack-xs">
           <p className="text-eyebrow text-primary-soft">Trending systems</p>
           <h2 className="text-heading-sm text-foreground">Rulesets with momentum</h2>
@@ -557,7 +568,7 @@ function VisitorExperience() {
 
       <section
         className={cn(
-          "token-stack-xl from-primary-soft/28 bg-gradient-to-br via-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)] to-amber-50/80 p-8 text-center",
+          "token-stack-xl from-primary-soft/28 space-y-4 bg-gradient-to-br via-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)] to-amber-50/80 p-8 text-center",
           SECTION_SURFACE,
         )}
       >
@@ -566,8 +577,8 @@ function VisitorExperience() {
             When you’re ready to go deeper
           </h2>
           <p className="text-body-md text-muted-strong">
-            Create a free account to follow cities, bookmark campaigns, and receive
-            invites from trusted GMs.
+            Create a free account to follow cities, join sessions, and receive invites
+            from trusted GMs.
           </p>
         </div>
         <div className="token-gap-sm flex flex-wrap items-center justify-center">

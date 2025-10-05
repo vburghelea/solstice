@@ -62,7 +62,7 @@ export function EventCard({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
           {event?.isFeatured ? (
-            <span className="bg-primary-strong/90 absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase shadow-md">
+            <span className="bg-primary-foreground text-accent-foreground absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-semibold tracking-wide uppercase shadow-md">
               Featured
             </span>
           ) : null}

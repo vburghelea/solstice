@@ -145,7 +145,7 @@ function EventDetailPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             {/* Header */}
-            <Card>
+            <Card className="bg-secondary">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
@@ -242,7 +242,7 @@ function EventDetailPage() {
 
             {/* Schedule */}
             {event.schedule && Object.keys(event.schedule).length > 0 && (
-              <Card>
+              <Card className="bg-secondary">
                 <CardHeader>
                   <CardTitle>Event Schedule</CardTitle>
                 </CardHeader>
@@ -266,7 +266,7 @@ function EventDetailPage() {
 
             {/* Rules */}
             {event.rules && Object.keys(event.rules).length > 0 && (
-              <Card>
+              <Card className="bg-secondary">
                 <CardHeader>
                   <CardTitle>Rules & Format</CardTitle>
                 </CardHeader>
@@ -287,7 +287,7 @@ function EventDetailPage() {
 
             {/* Requirements */}
             {event.requirements && Object.keys(event.requirements).length > 0 && (
-              <Card>
+              <Card className="bg-secondary">
                 <CardHeader>
                   <CardTitle>Requirements</CardTitle>
                 </CardHeader>
@@ -310,7 +310,7 @@ function EventDetailPage() {
 
             {/* Amenities */}
             {event.amenities && Object.keys(event.amenities).length > 0 && (
-              <Card>
+              <Card className="bg-secondary">
                 <CardHeader>
                   <CardTitle>Amenities</CardTitle>
                 </CardHeader>
@@ -337,7 +337,7 @@ function EventDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Registration Card */}
-            <Card>
+            <Card className="bg-secondary">
               <CardHeader>
                 <CardTitle>Registration</CardTitle>
               </CardHeader>
@@ -473,7 +473,7 @@ function EventDetailPage() {
             </Card>
 
             {/* Organizer Card */}
-            <Card>
+            <Card className="bg-secondary">
               <CardHeader>
                 <CardTitle>Event Organizer</CardTitle>
               </CardHeader>
@@ -501,7 +501,7 @@ function EventDetailPage() {
             </Card>
 
             {/* Share Card */}
-            <Card>
+            <Card className="bg-secondary">
               <CardHeader>
                 <CardTitle>Share Event</CardTitle>
               </CardHeader>

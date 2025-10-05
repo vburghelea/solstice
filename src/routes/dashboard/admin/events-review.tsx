@@ -276,7 +276,10 @@ function EventsReviewPage() {
                         <TableCell>
                           <div className="flex gap-2">
                             <Button asChild size="sm" variant="outline">
-                              <Link to="/events/$slug" params={{ slug: event.slug }}>
+                              <Link
+                                to="/visit/events/$slug"
+                                params={{ slug: event.slug }}
+                              >
                                 <EyeIcon className="h-4 w-4" />
                               </Link>
                             </Button>
@@ -362,7 +365,10 @@ function EventsReviewPage() {
                         <TableCell>
                           <div className="flex gap-2">
                             <Button asChild size="sm" variant="outline">
-                              <Link to="/events/$slug" params={{ slug: event.slug }}>
+                              <Link
+                                to="/visit/events/$slug"
+                                params={{ slug: event.slug }}
+                              >
                                 View
                               </Link>
                             </Button>

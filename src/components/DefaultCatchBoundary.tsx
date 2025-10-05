@@ -46,7 +46,7 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
           variant="outline"
           onClick={() => {
             if (isRoot) {
-              router.navigate({ to: "/" });
+              router.navigate({ to: "/visit" });
             } else {
               window.history.back();
             }
@@ -56,7 +56,7 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
           {isRoot ? "Go to homepage" : "Go back"}
         </Button>
         <Button asChild variant="ghost" className="text-sm">
-          <a href="/resources#safe-sport">Visit resources</a>
+          <a href="/visit/resources#safe-sport">Visit resources</a>
         </Button>
       </div>
       <div className="mt-10 w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 text-left text-sm text-gray-600 shadow-sm">

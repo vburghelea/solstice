@@ -79,7 +79,7 @@ const certificationTracks = [
   },
 ];
 
-export const Route = createFileRoute("/resources")({
+export const Route = createFileRoute("/visit/resources")({
   component: ResourcesPage,
 });
 
@@ -99,7 +99,7 @@ function ResourcesPage() {
         }}
       />
 
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-10">
           {resourceSections.map((section) => (
             <div
@@ -134,7 +134,7 @@ function ResourcesPage() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
             Certification & education pathways
@@ -167,7 +167,7 @@ function ResourcesPage() {
         </div>
       </section>
 
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto grid grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16 lg:px-10">
           <div className="space-y-4">
             <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
@@ -187,7 +187,7 @@ function ResourcesPage() {
                   Schedule a meeting
                 </Button>
               </a>
-              <Link to="/teams">
+              <Link to="/visit/teams">
                 <Button
                   variant="outline"
                   className="text-brand-red border-brand-red hover:bg-brand-red/10"

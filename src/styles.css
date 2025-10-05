@@ -127,7 +127,7 @@
   --popover-foreground: var(--text-strong);
   --primary: var(--primary-base);
   --primary-foreground: oklch(0.99 0.001 260);
-  --secondary: var(--surface-muted);
+  --secondary: oklch(0.99 0 0);
   --secondary-foreground: var(--text-strong);
   --muted: var(--surface-subtle);
   --muted-foreground: var(--text-subtle);
@@ -188,7 +188,7 @@
   --popover-foreground: var(--text-strong);
   --primary: var(--primary-base);
   --primary-foreground: var(--surface-inverse-strong);
-  --secondary: var(--surface-muted);
+  --secondary: oklch(0.96 0 0);
   --secondary-foreground: var(--text-strong);
   --muted: var(--surface-subtle);
   --muted-foreground: var(--text-subtle);

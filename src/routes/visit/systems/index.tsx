@@ -38,7 +38,7 @@ interface FiltersFormState {
   categoryIds: string[];
 }
 
-export const Route = createFileRoute("/systems/")({
+export const Route = createFileRoute("/visit/systems/")({
   validateSearch: rawSearchSchema.parse,
   component: SystemsBrowsePage,
 });
@@ -103,7 +103,7 @@ function SystemsBrowsePage() {
         </div>
       </section>
 
-      <section className="container mx-auto space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+      <section className="bg-secondary container mx-auto space-y-8 px-4 py-10 sm:px-6 lg:px-8">
         <FilterPanel
           filters={filters}
           formState={formState}

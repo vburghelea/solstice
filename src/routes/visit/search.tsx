@@ -33,7 +33,7 @@ interface QuickFilterDefinition {
   predicate: (game: GameListItem) => boolean;
 }
 
-export const Route = createFileRoute("/search")({
+export const Route = createFileRoute("/visit/search")({
   loader: async () => {
     const [gamesOutcome, profileOutcome] = await Promise.allSettled([
       listGames({
@@ -197,8 +197,8 @@ function SearchPage() {
 
   return (
     <PublicLayout>
-      <div className="bg-background text-foreground">
-        <section className="border-border/60 bg-muted/30 border-b">
+      <div className="bg-secondary text-foreground">
+        <section className="border-border/60 bg-secondary border-b">
           <div className="container mx-auto px-4 py-12 sm:py-16">
             <div className="mx-auto max-w-2xl space-y-3 text-center">
               <h1 className="font-heading text-4xl sm:text-5xl">All game sessions</h1>
@@ -210,7 +210,7 @@ function SearchPage() {
         </section>
 
         {showQuickFilters ? (
-          <section className="border-border/60 bg-card/40 border-b py-4">
+          <section className="border-border/60 bg-secondary border-b py-4">
             <div className="container mx-auto px-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground text-sm font-medium">
@@ -249,7 +249,7 @@ function SearchPage() {
           </section>
         ) : null}
 
-        <section className="py-12 sm:py-16">
+        <section className="bg-secondary py-12 sm:py-16">
           <div className="container mx-auto px-4">
             {!hasGames ? (
               <div className="border-border/70 bg-card/50 mx-auto flex max-w-xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center">

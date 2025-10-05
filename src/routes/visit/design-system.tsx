@@ -10,7 +10,7 @@ import { HeroSection } from "~/components/ui/hero-section";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 
-export const Route = createFileRoute("/design-system")({
+export const Route = createFileRoute("/visit/design-system")({
   component: DesignSystemPage,
 });
 
@@ -49,7 +49,7 @@ function DesignSystemPage() {
         }}
       />
 
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto grid grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10">
           <Card className="shadow-md">
             <CardHeader>

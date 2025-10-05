@@ -32,13 +32,13 @@ import type {
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { cn } from "~/shared/lib/utils";
 
-export const Route = createFileRoute("/events/$slug/")({
+export const Route = createFileRoute("/visit/events/$slug/")({
   component: EventDetailPage,
 });
 
 function EventDetailPage() {
   const { slug } = Route.useParams();
-  const { user } = useRouteContext({ from: "/events/$slug" });
+  const { user } = useRouteContext({ from: "/visit/events/$slug" });
 
   const {
     data: eventResult,
@@ -91,7 +91,7 @@ function EventDetailPage() {
             </AlertDescription>
           </Alert>
           <Button asChild className="mt-6">
-            <Link to="/events">
+            <Link to="/visit/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Events
             </Link>
@@ -135,7 +135,7 @@ function EventDetailPage() {
       <div className="container mx-auto space-y-6 px-4 py-16">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/events">
+            <Link to="/visit/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Events
             </Link>
@@ -451,7 +451,10 @@ function EventDetailPage() {
                       </Alert>
                     ) : isRegistrationOpen && hasSpots ? (
                       <Button asChild className="w-full">
-                        <Link to="/events/$slug/register" params={{ slug: event.slug }}>
+                        <Link
+                          to="/visit/events/$slug/register"
+                          params={{ slug: event.slug }}
+                        >
                           Register Now
                         </Link>
                       </Button>

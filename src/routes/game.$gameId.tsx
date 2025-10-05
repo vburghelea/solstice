@@ -569,7 +569,7 @@ function GameDetailPage() {
                     ) : null}
                     <Separator />
                     <Link
-                      to="/systems/$slug"
+                      to="/visit/systems/$slug"
                       params={{ slug: systemDetails.slug }}
                       className="text-primary text-sm font-semibold underline-offset-4 hover:underline"
                     >

@@ -360,7 +360,10 @@ export function OpsOverviewDashboard() {
                         <TableCell>
                           <div className="flex justify-end gap-2">
                             <Button asChild size="sm" variant="outline">
-                              <Link to="/events/$slug" params={{ slug: event.slug }}>
+                              <Link
+                                to="/visit/events/$slug"
+                                params={{ slug: event.slug }}
+                              >
                                 Preview
                               </Link>
                             </Button>
@@ -452,7 +455,10 @@ export function OpsOverviewDashboard() {
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
-                              <Link to="/events/$slug" params={{ slug: event.slug }}>
+                              <Link
+                                to="/visit/events/$slug"
+                                params={{ slug: event.slug }}
+                              >
                                 View
                               </Link>
                             </Button>
@@ -592,7 +598,10 @@ export function OpsOverviewDashboard() {
                                 </Link>
                               </Button>
                               <Button asChild size="sm" variant="ghost">
-                                <Link to="/events/$slug" params={{ slug: event.slug }}>
+                                <Link
+                                  to="/visit/events/$slug"
+                                  params={{ slug: event.slug }}
+                                >
                                   View
                                 </Link>
                               </Button>

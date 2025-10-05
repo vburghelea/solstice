@@ -17,7 +17,7 @@ import { getEvent } from "~/features/events/events.queries";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { getUserTeams } from "~/features/teams/teams.queries";
 
-export const Route = createFileRoute("/event/$eventId")({
+export const Route = createFileRoute("/visit/event/$eventId")({
   component: PublicEventDetailPage,
 });
 
@@ -91,7 +91,10 @@ function PublicEventDetailPage() {
             <p className="text-muted-foreground">
               This event does not exist or has been removed.
             </p>
-            <Link to="/events" className="text-primary mt-4 inline-block hover:underline">
+            <Link
+              to="/visit/events"
+              className="text-primary mt-4 inline-block hover:underline"
+            >
               Back to events
             </Link>
           </div>
@@ -156,7 +159,7 @@ function PublicEventDetailPage() {
                       onClick={() =>
                         navigate({
                           to: "/auth/login",
-                          search: { redirect: `/event/${eventId}` },
+                          search: { redirect: `/visit/event/${eventId}` },
                         })
                       }
                     >

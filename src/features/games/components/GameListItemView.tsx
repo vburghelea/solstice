@@ -20,14 +20,24 @@ import { List } from "~/shared/ui/list";
 
 type MetaIcon = ComponentType<{ className?: string }>;
 
+type LinkPrimitive = string | number | boolean;
+
+export type GameLinkConfig = {
+  to: string;
+  params?: Record<string, LinkPrimitive>;
+  search?: Record<string, LinkPrimitive | undefined>;
+  from?: string;
+};
+
 interface GameListItemViewProps {
   game: GameListItem;
+  link?: GameLinkConfig | undefined;
 }
 
-export function GameListItemView({ game }: GameListItemViewProps) {
+export function GameListItemView({ game, link }: GameListItemViewProps) {
   return (
     <List.Item className="px-0 py-0 sm:px-0">
-      <GameShowcaseCard game={game} layout="list" />
+      <GameShowcaseCard game={game} layout="list" link={link} />
     </List.Item>
   );
 }
@@ -36,12 +46,14 @@ interface GameShowcaseCardProps {
   game: GameListItem;
   layout?: "grid" | "list";
   className?: string;
+  link?: GameLinkConfig | undefined;
 }
 
 export function GameShowcaseCard({
   game,
   layout = "grid",
   className,
+  link,
 }: GameShowcaseCardProps) {
   const formattedDate = formatDateAndTime(game.dateTime);
   const price = game.price ? `€${game.price.toFixed(2)}` : "Free";
@@ -83,6 +95,11 @@ export function GameShowcaseCard({
 
   const languageTag = <LanguageTag language={game.language} className="text-[0.65rem]" />;
   addMeta(Globe2 as MetaIcon, languageTag);
+
+  const resolvedLink: GameLinkConfig = link ?? {
+    to: "/game/$gameId",
+    params: { gameId: game.id },
+  };
 
   return (
     <article
@@ -134,8 +151,10 @@ export function GameShowcaseCard({
             <div className="min-w-0">
               <h3 className="text-foreground text-lg font-semibold sm:text-xl">
                 <Link
-                  to="/game/$gameId"
-                  params={{ gameId: game.id }}
+                  to={resolvedLink.to}
+                  {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+                  {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+                  {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
                   className="flex items-center"
                 >
                   {game.name}
@@ -195,8 +214,10 @@ export function GameShowcaseCard({
             className="shrink-0 gap-1.5 rounded-full"
           >
             <Link
-              to="/game/$gameId"
-              params={{ gameId: game.id }}
+              to={resolvedLink.to}
+              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
               className="flex items-center"
             >
               View details

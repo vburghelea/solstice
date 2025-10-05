@@ -4,6 +4,7 @@ import { buttonVariants } from "~/components/ui/button";
 import {
   GameListItemView,
   GameShowcaseCard,
+  type GameLinkConfig,
 } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
@@ -305,16 +306,34 @@ function SearchPage() {
                   <>
                     <div className="md:hidden">
                       <List>
-                        {filteredGames.map((game) => (
-                          <GameListItemView key={game.id} game={game} />
-                        ))}
+                        {filteredGames.map((game) => {
+                          const visitLink: GameLinkConfig = {
+                            to: "/visit/game/$gameId",
+                            params: { gameId: game.id },
+                          };
+
+                          return (
+                            <GameListItemView
+                              key={game.id}
+                              game={game}
+                              link={visitLink}
+                            />
+                          );
+                        })}
                       </List>
                     </div>
 
                     <div className="hidden grid-cols-1 gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-                      {filteredGames.map((game) => (
-                        <GameShowcaseCard key={game.id} game={game} />
-                      ))}
+                      {filteredGames.map((game) => {
+                        const visitLink: GameLinkConfig = {
+                          to: "/visit/game/$gameId",
+                          params: { gameId: game.id },
+                        };
+
+                        return (
+                          <GameShowcaseCard key={game.id} game={game} link={visitLink} />
+                        );
+                      })}
                     </div>
                   </>
                 )}

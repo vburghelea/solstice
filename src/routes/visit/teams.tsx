@@ -29,21 +29,21 @@ const resources = [
   {
     title: "Club starter toolkit",
     copy: "Download constitution templates, budget planners, and volunteer role descriptions to launch a sustainable program.",
-    link: "/resources#club-toolkit",
+    link: "/visit/resources#club-toolkit",
   },
   {
     title: "Practice & fitness library",
     copy: "Access progressive training plans, skills videos, and goalkeeper clinics designed by national team staff.",
-    link: "/resources#training",
+    link: "/visit/resources#training",
   },
   {
     title: "Safe sport & safeguarding",
     copy: "Stay compliant with national policies covering background checks, injury reporting, and inclusive program design.",
-    link: "/resources#safe-sport",
+    link: "/visit/resources#safe-sport",
   },
 ];
 
-export const Route = createFileRoute("/teams")({
+export const Route = createFileRoute("/visit/teams")({
   component: TeamsPage,
 });
 
@@ -56,14 +56,14 @@ function TeamsPage() {
         subtitle="From coast-to-coast, tabletop communities are recruiting hosts, storytellers, rules gurus, and volunteers. Discover groups near you and access the resources to help your program thrive."
         backgroundImage="/images/hero-tabletop-board-game-teams-optimized.png"
         ctaText="Browse club resources"
-        ctaLink="/resources"
+        ctaLink="/visit/resources"
         secondaryCta={{
           text: "Start a new club",
-          link: "/resources#club-toolkit",
+          link: "/visit/resources#club-toolkit",
         }}
       />
 
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {pathways.map((pathway) => (
@@ -84,7 +84,7 @@ function TeamsPage() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto grid grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10">
           <div className="space-y-4">
             <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
@@ -108,7 +108,7 @@ function TeamsPage() {
               <a href="mailto:clubs@roundup.games">
                 <Button className="btn-brand-primary">Email regional support</Button>
               </a>
-              <Link to="/events">
+              <Link to="/visit/events">
                 <Button
                   variant="outline"
                   className="text-brand-red border-brand-red hover:bg-brand-red/10"
@@ -133,7 +133,7 @@ function TeamsPage() {
         </div>
       </section>
 
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section className="bg-secondary py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">
             Tools for every stage

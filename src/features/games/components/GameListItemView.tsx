@@ -87,7 +87,7 @@ export function GameShowcaseCard({
   return (
     <article
       className={cn(
-        "border-border/60 bg-card hover:border-primary/60 relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm transition-colors hover:shadow-md",
+        "bg-secondary text-secondary-foreground relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] shadow-sm transition-all hover:border-[color:color-mix(in_oklab,var(--primary-soft)_52%,transparent)] hover:shadow-lg",
         className,
       )}
     >

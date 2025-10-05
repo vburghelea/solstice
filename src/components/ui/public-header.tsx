@@ -13,10 +13,10 @@ export function PublicHeader() {
   const { location } = useRouterState();
 
   const navLinks = [
-    { label: "Events", to: "/events" },
-    { label: "Teams", to: "/teams" },
-    { label: "Resources", to: "/resources" },
-    { label: "About", to: "/about" },
+    { label: "Events", to: "/visit/events" },
+    { label: "Find games", to: "/visit/search" },
+    { label: "Game systems", to: "/visit/systems" },
+    { label: "Teams", to: "/visit/teams" },
   ];
 
   const isActivePath = (path: string) => {
@@ -27,7 +27,7 @@ export function PublicHeader() {
     <header className="bg-brand-light/95 text-brand-dark sticky top-0 z-50 shadow-sm backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between sm:h-20">
-          <Link to="/" className="flex items-center gap-2 sm:gap-3">
+          <Link to="/visit" className="flex items-center gap-2 sm:gap-3">
             {" "}
             {/* Added Link wrapper */}
             <div
@@ -40,14 +40,14 @@ export function PublicHeader() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-6 text-sm font-medium lg:flex lg:gap-8">
+          <nav className="hidden items-center gap-4 text-sm font-semibold lg:flex lg:gap-6">
             {navLinks.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "hover:text-brand-red text-gray-700 transition",
-                  isActivePath(item.to) && "text-brand-red font-semibold",
+                  "hover:bg-brand-red/10 hover:text-brand-red rounded-full px-3 py-2 text-gray-700 transition",
+                  isActivePath(item.to) && "bg-brand-red text-white shadow-sm",
                 )}
               >
                 {item.label}
@@ -67,12 +67,12 @@ export function PublicHeader() {
               <>
                 <Link
                   to="/auth/login"
-                  className="text-brand-dark rounded-lg px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
+                  className="text-brand-dark rounded-full px-4 py-2 text-sm font-bold transition hover:bg-gray-100"
                 >
                   Login
                 </Link>
                 <Link to="/auth/signup">
-                  <Button className="btn-brand-primary rounded-lg px-4 py-2 text-sm font-bold">
+                  <Button className="btn-brand-primary rounded-full px-4 py-2 text-sm font-bold">
                     Register
                   </Button>
                 </Link>
@@ -102,8 +102,8 @@ export function PublicHeader() {
                   key={item.to}
                   to={item.to}
                   className={cn(
-                    "hover:text-brand-red text-base font-medium text-gray-900 transition",
-                    isActivePath(item.to) && "text-brand-red font-semibold",
+                    "hover:bg-brand-red/10 hover:text-brand-red rounded-full px-4 py-2 text-base font-medium text-gray-900 transition",
+                    isActivePath(item.to) && "bg-brand-red text-white shadow-sm",
                   )}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -122,13 +122,13 @@ export function PublicHeader() {
                 <>
                   <Link
                     to="/auth/login"
-                    className="rounded-lg px-4 py-2 text-center text-sm font-bold transition hover:bg-gray-100"
+                    className="rounded-full px-4 py-2 text-center text-sm font-bold transition hover:bg-gray-100"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link to="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="btn-brand-primary w-full rounded-lg px-4 py-2 text-sm font-bold">
+                    <Button className="btn-brand-primary w-full rounded-full px-4 py-2 text-sm font-bold">
                       Register
                     </Button>
                   </Link>

@@ -33,8 +33,8 @@ export function SystemCard({ system }: SystemCardProps) {
   })();
 
   return (
-    <Card className="overflow-hidden">
-      <Link to="/systems/$slug" params={{ slug: system.slug }} className="block">
+    <Card className="bg-secondary text-secondary-foreground overflow-hidden shadow-sm">
+      <Link to="/visit/systems/$slug" params={{ slug: system.slug }} className="block">
         <div className="relative aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-700">
           {system.heroUrl ? (
             <img
@@ -95,7 +95,7 @@ export function SystemCard({ system }: SystemCardProps) {
       </CardContent>
       <CardFooter className="justify-end">
         <Link
-          to="/systems/$slug"
+          to="/visit/systems/$slug"
           params={{ slug: system.slug }}
           className={cn(buttonVariants({ size: "sm" }), "ml-auto")}
         >

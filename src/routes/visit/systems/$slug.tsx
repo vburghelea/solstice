@@ -24,7 +24,7 @@ import type { GameSystemDetail } from "~/features/game-systems/game-systems.type
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
-export const Route = createFileRoute("/systems/$slug")({
+export const Route = createFileRoute("/visit/systems/$slug")({
   loader: async ({ params }) => {
     const system = await getSystemBySlug({ data: { slug: params.slug } });
     if (!system) {
@@ -50,10 +50,10 @@ function SystemDetailPage() {
         heroUrl={system.heroUrl}
       />
 
-      <section className="container mx-auto space-y-10 px-4 py-10 sm:px-6 lg:px-8">
+      <section className="bg-secondary container mx-auto space-y-10 px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Button asChild variant="outline" size="sm">
-            <Link to="/systems">
+            <Link to="/visit/systems">
               <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to browse
             </Link>
           </Button>
@@ -75,14 +75,14 @@ function SystemDetailPage() {
 
         <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
           <article className="space-y-8">
-            <section className="space-y-3">
+            <section className="bg-secondary space-y-3">
               <h2 className="text-2xl font-semibold">Overview</h2>
               <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-wrap">
                 {description}
               </p>
             </section>
 
-            <section className="space-y-4">
+            <section className="bg-secondary space-y-4">
               <h3 className="text-xl font-semibold">Taxonomy</h3>
               {taxonomyMissing ? (
                 <Card className="border-dashed">
@@ -129,7 +129,7 @@ function SystemDetailPage() {
               )}
             </section>
 
-            <section className="space-y-4">
+            <section className="bg-secondary space-y-4">
               <h3 className="text-xl font-semibold">Gallery</h3>
               {system.gallery.length > 0 ? (
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -289,7 +289,7 @@ function SystemDetailPage() {
           </aside>
         </div>
 
-        <section className="space-y-4">
+        <section className="bg-secondary space-y-4">
           <h3 className="text-xl font-semibold">FAQ</h3>
           {system.faqs.length > 0 ? (
             <div className="space-y-4">

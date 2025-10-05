@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HeroSection } from "~/components/ui/hero-section";
 import { PublicLayout } from "~/features/layouts/public-layout";
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/visit/about")({
   component: AboutPage,
 });
 
@@ -15,10 +15,10 @@ function AboutPage() {
         subtitle=""
         backgroundImage="/images/hero-tabletop-board-game-about-optimized.png"
         ctaText="Explore our programs"
-        ctaLink="/resources"
+        ctaLink="/visit/resources"
         secondaryCta={{
           text: "Meet our teams",
-          link: "/teams",
+          link: "/visit/teams",
         }}
       />
     </PublicLayout>

@@ -17,7 +17,7 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 
 const UPCOMING_EVENTS_LIMIT = 10;
 
-export const Route = createFileRoute("/events/")({
+export const Route = createFileRoute("/visit/events/")({
   loader: async () => {
     const events = (await getUpcomingEvents({
       data: { limit: UPCOMING_EVENTS_LIMIT },
@@ -87,7 +87,7 @@ function EventsIndex() {
         }}
       />
 
-      <section className="bg-background py-10 sm:py-14 lg:py-16">
+      <section className="bg-secondary py-10 sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>

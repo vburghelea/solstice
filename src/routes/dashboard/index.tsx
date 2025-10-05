@@ -167,7 +167,7 @@ function DashboardIndex() {
               </div>
             </div>
             <Button asChild variant="secondary">
-              <Link to="/search">Find games</Link>
+              <Link to="/visit/search">Find games</Link>
             </Button>
           </div>
         )}

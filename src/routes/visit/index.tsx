@@ -3,6 +3,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 
 import { buttonVariants } from "~/components/ui/button";
 import { EventCard } from "~/components/ui/event-card";
+import { HeroSection } from "~/components/ui/hero-section";
 import { getUpcomingEvents } from "~/features/events/events.queries";
 import type { EventWithDetails } from "~/features/events/events.types";
 import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
@@ -74,44 +75,48 @@ export const Route = createFileRoute("/visit/")({
 });
 const DISCOVERY_THEMES = [
   {
-    title: "Guided spotlights",
+    title: "Curated spotlights",
     description:
-      "Curated highlights surface the most welcoming stories for first-time guests.",
+      "Hand-picked sessions and stories make it easy to feel the Roundup vibe before you ever sit down at the table.",
   },
   {
-    title: "Frictionless RSVPs",
+    title: "Effortless planning",
     description:
-      "Pick a city, preview gatherings, and raise your hand in just a few taps.",
+      "Choose a city, explore open seats, and mark events you love without committing before you're ready.",
   },
   {
-    title: "Signals of trust",
-    description: "Safety notes, facilitator intros, and photos help Maya feel grounded.",
+    title: "Trust-first design",
+    description:
+      "Safety practices, accessibility callouts, and facilitator intros appear upfront so explorers can make confident choices.",
   },
 ];
 
 const STORY_CHAPTERS = [
-  "Preview curated events tailored to curious first-timers.",
-  "Skim systems and campaigns that welcome new explorers.",
-  "Bookmark a city to receive updates as tables open up.",
+  "Preview gatherings and festivals curated for curious first-timers.",
+  "Explore systems and campaigns that prioritize onboarding and safety tools.",
+  "Save a home base city to receive updates when seats open up.",
 ];
 
-const TRUST_SIGNALS = [
+const TRUST_PROMISES = [
   {
     title: "Safety tools on display",
     description:
-      "Hosts commit to Lines & Veils, the X-Card, or Script Change so Maya knows boundaries are honored before she RSVPs.",
+      "Hosts showcase Lines & Veils, X-Cards, and debrief rituals so everyone knows how care shows up at the table.",
   },
   {
     title: "Meet the facilitator",
     description:
-      "GM bios highlight pronouns, vibe tags, and first-session rituals that help explorers ease into the table culture.",
+      "GM bios highlight pronouns, session pacing, and welcome rituals to help you read the room before you arrive.",
   },
   {
-    title: "Vetted venues",
+    title: "Spaces that feel welcoming",
     description:
-      "We spotlight community spaces with accessibility notes, transit tips, and photos so new visitors feel oriented on arrival.",
+      "Each venue callout includes mobility notes, transit tips, and community vibes, helping visitors picture the experience.",
   },
 ];
+
+const SECTION_SURFACE =
+  "rounded-3xl bg-secondary shadow-sm ring-1 ring-inset ring-[color:color-mix(in_oklab,var(--primary-soft)_18%,transparent)]";
 
 function VisitorExperience() {
   const { featuredGames, popularSystems, upcomingEvents, locationGroups } =
@@ -233,19 +238,29 @@ function VisitorExperience() {
   }, [flattenedSuggestions, selectedCity]);
 
   return (
-    <div className="token-stack-2xl">
-      <section className="token-stack-xl">
-        <div className="bg-surface-elevated/60 border-subtle token-stack-lg rounded-2xl border p-6 md:p-8">
+    <div className="token-stack-3xl">
+      <HeroSection
+        eyebrow="Start planning"
+        title="Discover tabletop adventures tailored to explorers"
+        subtitle="Tour community gatherings, curate your favourite systems, and follow the storytellers who match your style."
+        backgroundImage="/images/hero-tabletop-board-game-tournament-cards-optimized.png"
+        ctaText="Create your profile"
+        ctaLink="/auth/signup"
+        secondaryCta={{ text: "Log in to continue", link: "/auth/login" }}
+      />
+
+      <section className={cn("token-stack-2xl p-6 md:p-10", SECTION_SURFACE)}>
+        <div className="token-stack-lg rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_38%,transparent)] bg-[radial-gradient(circle_at_top,_rgba(255,227,208,0.75),_rgba(255,255,255,0.95))] p-6 shadow-sm md:p-8">
           <div className="token-gap-xl flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="token-stack-md max-w-2xl">
-              <p className="text-eyebrow text-primary-soft">Trail map for Maya</p>
+              <p className="text-eyebrow text-primary-soft">Explorer guide</p>
               <div className="token-stack-sm">
                 <h2 className="text-heading-md text-foreground">
-                  Chart where curiosity takes you next
+                  Chart the next stop on your journey
                 </h2>
                 <p className="text-body-md text-muted-strong">
-                  Set a home base to preview gatherings, facilitators, and worlds opening
-                  their tables to new explorers.
+                  Set a home base city to preview gatherings, facilitators, and story
+                  worlds that welcome new players.
                 </p>
               </div>
               <List className="token-stack-sm">
@@ -340,7 +355,7 @@ function VisitorExperience() {
                           country: suggestion.country,
                         })
                       }
-                      className="bg-surface-default hover:bg-surface-subtle text-body-xs text-muted-strong hover:text-foreground border-subtle rounded-full border px-3 py-1 transition"
+                      className="text-body-xs text-muted-strong hover:text-foreground rounded-full border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 px-3 py-1 transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_48%,transparent)]"
                     >
                       {suggestion.city}, {suggestion.country}
                     </button>
@@ -351,19 +366,19 @@ function VisitorExperience() {
           </div>
         </div>
 
-        <div className="bg-surface-subtle/70 border-subtle token-gap-lg rounded-2xl border p-6 md:p-8">
+        <div className="token-gap-lg rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-6 shadow-sm md:p-8">
           <div className="token-stack-sm max-w-xl">
             <h3 className="text-heading-sm text-foreground">How this tour flows</h3>
             <p className="text-body-sm text-muted-strong">
-              Follow these beats to decide if Roundup should be part of your weekly
-              rotation.
+              Follow these beats to decide when to join the community or watch for new
+              invitations.
             </p>
           </div>
-          <ol className="token-gap-md grid gap-4 md:grid-cols-3">
+          <ol className="token-gap-md grid gap-5 md:grid-cols-3">
             {STORY_CHAPTERS.map((chapter, index) => (
               <li
                 key={chapter}
-                className="bg-surface-default/70 border-subtle token-stack-sm rounded-xl border p-4"
+                className="token-stack-sm rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)]/90 p-4 shadow-sm"
               >
                 <span className="bg-primary-soft text-primary-strong text-body-sm inline-flex h-9 w-9 items-center justify-center rounded-full font-semibold">
                   {index + 1}
@@ -375,22 +390,22 @@ function VisitorExperience() {
         </div>
       </section>
 
-      <section className="token-stack-lg">
+      <section className={cn("token-stack-xl p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-stack-xs">
           <p className="text-eyebrow text-primary-soft">Confidence signals</p>
           <h2 className="text-heading-sm text-foreground">
             What makes Roundup feel safe
           </h2>
           <p className="text-body-sm text-muted-strong">
-            Maya explores solo, so we foreground the trust cues she needs before stepping
+            We foreground the cues that help solo explorers feel confident before stepping
             into a new space.
           </p>
         </div>
-        <div className="token-gap-md grid gap-4 md:grid-cols-3">
-          {TRUST_SIGNALS.map((signal) => (
+        <div className="token-gap-md grid gap-5 md:grid-cols-3">
+          {TRUST_PROMISES.map((signal) => (
             <div
               key={signal.title}
-              className="bg-surface-default/75 border-subtle token-stack-sm rounded-2xl border p-5"
+              className="token-stack-sm rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 p-5 shadow-sm"
             >
               <p className="text-body-sm text-foreground font-semibold">{signal.title}</p>
               <p className="text-body-sm text-muted-strong">{signal.description}</p>
@@ -399,7 +414,7 @@ function VisitorExperience() {
         </div>
       </section>
 
-      <section className="token-stack-lg">
+      <section className={cn("token-stack-xl p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="token-stack-xs">
             <p className="text-eyebrow text-primary-soft">Upcoming gatherings</p>
@@ -412,7 +427,7 @@ function VisitorExperience() {
             </p>
           </div>
           <Link
-            to="/events"
+            to="/visit/events"
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
               "rounded-full",
@@ -423,7 +438,7 @@ function VisitorExperience() {
         </div>
 
         {localEvents.length === 0 ? (
-          <div className="bg-surface-default/70 border-subtle token-stack-sm items-center rounded-2xl border p-8 text-center">
+          <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
             <p className="text-body-md text-muted-strong">
               No events scheduled for this city yet.
             </p>
@@ -440,7 +455,7 @@ function VisitorExperience() {
         )}
       </section>
 
-      <section className="token-stack-lg">
+      <section className={cn("token-stack-xl p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="token-stack-xs">
             <p className="text-eyebrow text-primary-soft">Stories to sample</p>
@@ -452,7 +467,7 @@ function VisitorExperience() {
             </p>
           </div>
           <Link
-            to="/search"
+            to="/visit/search"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
               "rounded-full",
@@ -463,7 +478,7 @@ function VisitorExperience() {
         </div>
 
         {localGames.length === 0 ? (
-          <div className="bg-surface-default/70 border-subtle token-stack-sm items-center rounded-2xl border p-8 text-center">
+          <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
             <p className="text-body-md text-muted-strong">
               No spotlight campaigns in this city yet.
             </p>
@@ -484,7 +499,7 @@ function VisitorExperience() {
         )}
       </section>
 
-      <section className="token-stack-lg">
+      <section className={cn("token-stack-lg p-6 md:p-10", SECTION_SURFACE)}>
         <div className="token-stack-xs">
           <p className="text-eyebrow text-primary-soft">Trending systems</p>
           <h2 className="text-heading-sm text-foreground">Rulesets with momentum</h2>
@@ -501,12 +516,12 @@ function VisitorExperience() {
             {systemHighlights.map((system) => (
               <Link
                 key={system.id}
-                to="/systems/$slug"
+                to="/visit/systems/$slug"
                 params={{ slug: system.slug }}
-                className="bg-surface-default/80 hover:bg-surface-elevated/80 focus-visible:ring-offset-background border-subtle hover:border-primary-soft focus-visible:ring-primary min-w-[16rem] rounded-2xl border p-4 transition focus-visible:ring-2 focus-visible:outline-none"
+                className="focus-visible:ring-primary focus-visible:ring-offset-background min-w-[16rem] rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 p-4 transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_50%,transparent)] hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
               >
                 <div className="token-stack-sm">
-                  <div className="aspect-video overflow-hidden rounded-xl">
+                  <div className="aspect-video overflow-hidden rounded-lg">
                     {system.heroUrl ? (
                       <img
                         src={system.heroUrl}
@@ -540,7 +555,12 @@ function VisitorExperience() {
         )}
       </section>
 
-      <section className="from-primary-soft/20 via-surface-subtle to-primary-soft/10 token-stack-lg rounded-3xl border border-[color:color-mix(in_oklab,var(--primary-soft)_40%,transparent)] bg-gradient-to-br p-8 text-center">
+      <section
+        className={cn(
+          "token-stack-xl from-primary-soft/28 bg-gradient-to-br via-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)] to-amber-50/80 p-8 text-center",
+          SECTION_SURFACE,
+        )}
+      >
         <div className="token-stack-sm">
           <h2 className="text-heading-sm text-foreground">
             When you’re ready to go deeper

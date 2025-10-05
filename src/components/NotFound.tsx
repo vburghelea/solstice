@@ -36,7 +36,7 @@ export function NotFound() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/events">Browse events</Link>
+              <Link to="/visit/events">Browse events</Link>
             </Button>
           </div>
           <p className="text-muted-foreground mt-8 text-xs tracking-[0.3em] uppercase">

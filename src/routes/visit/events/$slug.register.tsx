@@ -65,7 +65,7 @@ type UserTeamEntry = {
   memberCount: number;
 };
 
-export const Route = createFileRoute("/events/$slug/register")({
+export const Route = createFileRoute("/visit/events/$slug/register")({
   beforeLoad: async ({ context, location }) => {
     if (!context.user) {
       throw redirect({
@@ -79,7 +79,7 @@ export const Route = createFileRoute("/events/$slug/register")({
 
 function EventRegistrationPage() {
   const { slug } = Route.useParams();
-  const { user } = useRouteContext({ from: "/events/$slug/register" });
+  const { user } = useRouteContext({ from: "/visit/events/$slug/register" });
   const navigate = useNavigate();
   const [registrationType, setRegistrationType] = useState<"team" | "individual">(
     "individual",
@@ -238,7 +238,7 @@ function EventRegistrationPage() {
             </AlertDescription>
           </Alert>
           <Button asChild className="mt-6">
-            <Link to="/events">
+            <Link to="/visit/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Events
             </Link>
@@ -306,12 +306,12 @@ function EventRegistrationPage() {
           </Alert>
           <div className="mt-6 flex gap-2">
             <Button asChild>
-              <Link to="/events/$slug" params={{ slug }}>
+              <Link to="/visit/events/$slug" params={{ slug }}>
                 View Event Details
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/events">Back to Events</Link>
+              <Link to="/visit/events">Back to Events</Link>
             </Button>
           </div>
         </div>
@@ -324,7 +324,7 @@ function EventRegistrationPage() {
       <div className="container mx-auto space-y-6 px-4 py-16">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/events/$slug" params={{ slug }}>
+            <Link to="/visit/events/$slug" params={{ slug }}>
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Event Details
             </Link>

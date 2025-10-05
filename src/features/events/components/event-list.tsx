@@ -352,7 +352,7 @@ function EventCard({
   const builderLink = buildEventLink?.(event);
   const linkLabel = builderLink?.label ?? fallbackActionLabel ?? "View Details";
   const resolvedLink: LinkConfig = {
-    to: builderLink?.to ?? "/events/$slug",
+    to: builderLink?.to ?? "/visit/events/$slug",
     params: builderLink?.params ?? { slug: event.slug },
     label: linkLabel,
     ...(builderLink?.search ? { search: builderLink.search } : {}),

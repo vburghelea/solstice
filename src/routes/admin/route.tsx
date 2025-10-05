@@ -5,6 +5,7 @@ import {
   Flag,
   Home,
   Inbox,
+  Layers,
   LineChart,
   Shield,
   Users,
@@ -37,6 +38,12 @@ const ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
     to: "/admin/insights",
     icon: LineChart,
     description: "Audit KPIs, uptime, and membership health across the platform.",
+  },
+  {
+    label: "Systems",
+    to: "/admin/systems",
+    icon: Layers,
+    description: "Curate rulesets, manage crawls, and moderate media.",
   },
   {
     label: "Users",

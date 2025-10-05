@@ -13,11 +13,19 @@ import {
   systemEditorSearchSchema,
   type SystemEditorSearchParams,
 } from "~/features/game-systems/admin/views/system-editor-route-schemas";
+import { requireRole } from "~/lib/auth/middleware/role-guard";
 
 type LoaderData = { system: AdminGameSystemDetail };
 
-export const Route = createFileRoute("/dashboard/systems/$systemId")({
+export const Route = createFileRoute("/admin/systems/$systemId")({
   validateSearch: systemEditorSearchSchema.parse,
+  beforeLoad: async ({ context }) => {
+    await requireRole({
+      user: context.user,
+      requiredRoles: ["Platform Admin", "Games Admin"],
+      redirectTo: "/admin",
+    });
+  },
   loader: async ({ params }) => {
     const parsedParams = systemEditorParamsSchema.parse(params);
     const systemId = Number.parseInt(parsedParams.systemId, 10);

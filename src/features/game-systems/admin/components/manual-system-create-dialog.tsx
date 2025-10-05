@@ -23,6 +23,10 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { createManualGameSystem } from "../game-systems-admin.mutations";
+import {
+  DEFAULT_SYSTEM_DETAIL_ROUTE,
+  type SystemDetailRoute,
+} from "../lib/system-routes";
 
 const EXTERNAL_SOURCE_OPTIONS = [
   { value: "none", label: "None" },
@@ -52,9 +56,13 @@ const INITIAL_FORM_STATE: ManualSystemFormState = {
 
 interface ManualSystemCreateDialogProps {
   onCreated?: () => void;
+  detailRoute?: SystemDetailRoute;
 }
 
-export function ManualSystemCreateDialog({ onCreated }: ManualSystemCreateDialogProps) {
+export function ManualSystemCreateDialog({
+  onCreated,
+  detailRoute = DEFAULT_SYSTEM_DETAIL_ROUTE,
+}: ManualSystemCreateDialogProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -63,6 +71,26 @@ export function ManualSystemCreateDialog({ onCreated }: ManualSystemCreateDialog
   const trimmedName = formState.name.trim();
   const trimmedSourceValue = formState.sourceValue.trim();
   const trimmedCustomKey = formState.customKey.trim();
+
+  const navigateToSystemDetail = (systemId: string) => {
+    if (detailRoute === "/admin/systems/$systemId") {
+      const navigateOptions = {
+        to: "/admin/systems/$systemId",
+        params: { systemId },
+        // TanStack Router's navigate typings expect strongly typed route objects; casting via unknown avoids
+        // incompatibilities when sharing this component across namespaces.
+      } as unknown as Parameters<typeof router.navigate>[0];
+      void router.navigate(navigateOptions);
+      return;
+    }
+
+    const navigateOptions = {
+      to: "/dashboard/systems/$systemId",
+      params: { systemId },
+      // See note above regarding TanStack Router navigation typings.
+    } as unknown as Parameters<typeof router.navigate>[0];
+    void router.navigate(navigateOptions);
+  };
 
   const externalSourcePayload = useMemo(() => {
     if (formState.sourceKind === "none") return undefined;
@@ -106,12 +134,7 @@ export function ManualSystemCreateDialog({ onCreated }: ManualSystemCreateDialog
           typeof targetId === "number"
             ? {
                 label: "Edit",
-                onClick: () => {
-                  void router.navigate({
-                    to: "/dashboard/systems/$systemId",
-                    params: { systemId: String(targetId) },
-                  });
-                },
+                onClick: () => navigateToSystemDetail(String(targetId)),
               }
             : undefined,
       });

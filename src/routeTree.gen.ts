@@ -68,6 +68,7 @@ import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-passw
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
 import { Route as AdminUsersRouteImport } from "./routes/admin/users";
+import { Route as AdminSystemsRouteImport } from "./routes/admin/systems";
 import { Route as AdminSecurityRouteImport } from "./routes/admin/security";
 import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminInsightsRouteImport } from "./routes/admin/insights";
@@ -94,6 +95,7 @@ import { Route as DashboardProfileIndexRouteImport } from "./routes/dashboard/pr
 import { Route as DashboardGamesIndexRouteImport } from "./routes/dashboard/games/index";
 import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/events/index";
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
+import { Route as AdminSystemsIndexRouteImport } from "./routes/admin/systems/index";
 import { Route as VisitSystemsSlugRouteImport } from "./routes/visit/systems/$slug";
 import { Route as VisitGameGameIdRouteImport } from "./routes/visit/game.$gameId";
 import { Route as VisitEventsSlugRouteImport } from "./routes/visit/events/$slug";
@@ -128,6 +130,7 @@ import { Route as DashboardCampaignsCreateRouteImport } from "./routes/dashboard
 import { Route as DashboardCampaignsCampaignIdRouteImport } from "./routes/dashboard/campaigns/$campaignId";
 import { Route as DashboardAdminRolesRouteImport } from "./routes/dashboard/admin/roles";
 import { Route as DashboardAdminEventsReviewRouteImport } from "./routes/dashboard/admin/events-review";
+import { Route as AdminSystemsSystemIdRouteImport } from "./routes/admin/systems/$systemId";
 import { Route as VisitEventsSlugIndexRouteImport } from "./routes/visit/events/$slug.index";
 import { Route as PlayerTeamsTeamIdIndexRouteImport } from "./routes/player/teams/$teamId.index";
 import { Route as PlayerCampaignsCampaignIdIndexRouteImport } from "./routes/player/campaigns/$campaignId/index";
@@ -446,6 +449,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: "/users",
   getParentRoute: () => AdminRouteRoute,
 } as any);
+const AdminSystemsRoute = AdminSystemsRouteImport.update({
+  id: "/systems",
+  path: "/systems",
+  getParentRoute: () => AdminRouteRoute,
+} as any);
 const AdminSecurityRoute = AdminSecurityRouteImport.update({
   id: "/security",
   path: "/security",
@@ -575,6 +583,11 @@ const DashboardCampaignsIndexRoute = DashboardCampaignsIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DashboardCampaignsRoute,
+} as any);
+const AdminSystemsIndexRoute = AdminSystemsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AdminSystemsRoute,
 } as any);
 const VisitSystemsSlugRoute = VisitSystemsSlugRouteImport.update({
   id: "/systems/$slug",
@@ -752,6 +765,11 @@ const DashboardAdminEventsReviewRoute =
     path: "/events-review",
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any);
+const AdminSystemsSystemIdRoute = AdminSystemsSystemIdRouteImport.update({
+  id: "/$systemId",
+  path: "/$systemId",
+  getParentRoute: () => AdminSystemsRoute,
+} as any);
 const VisitEventsSlugIndexRoute = VisitEventsSlugIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -935,6 +953,7 @@ export interface FileRoutesByFullPath {
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
+  "/admin/systems": typeof AdminSystemsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -983,6 +1002,7 @@ export interface FileRoutesByFullPath {
   "/ops/": typeof OpsIndexRoute;
   "/player/": typeof PlayerIndexRoute;
   "/visit/": typeof VisitIndexRoute;
+  "/admin/systems/$systemId": typeof AdminSystemsSystemIdRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
@@ -1017,6 +1037,7 @@ export interface FileRoutesByFullPath {
   "/visit/events/$slug": typeof VisitEventsSlugRouteWithChildren;
   "/visit/game/$gameId": typeof VisitGameGameIdRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
+  "/admin/systems/": typeof AdminSystemsIndexRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
@@ -1096,6 +1117,7 @@ export interface FileRoutesByTo {
   "/ops": typeof OpsIndexRoute;
   "/player": typeof PlayerIndexRoute;
   "/visit": typeof VisitIndexRoute;
+  "/admin/systems/$systemId": typeof AdminSystemsSystemIdRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/create": typeof DashboardCampaignsCreateRoute;
@@ -1125,6 +1147,7 @@ export interface FileRoutesByTo {
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/visit/game/$gameId": typeof VisitGameGameIdRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
+  "/admin/systems": typeof AdminSystemsIndexRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events": typeof DashboardEventsIndexRoute;
   "/dashboard/games": typeof DashboardGamesIndexRoute;
@@ -1178,6 +1201,7 @@ export interface FileRoutesById {
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
+  "/admin/systems": typeof AdminSystemsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
@@ -1226,6 +1250,7 @@ export interface FileRoutesById {
   "/ops/": typeof OpsIndexRoute;
   "/player/": typeof PlayerIndexRoute;
   "/visit/": typeof VisitIndexRoute;
+  "/admin/systems/$systemId": typeof AdminSystemsSystemIdRoute;
   "/dashboard/admin/events-review": typeof DashboardAdminEventsReviewRoute;
   "/dashboard/admin/roles": typeof DashboardAdminRolesRoute;
   "/dashboard/campaigns/$campaignId": typeof DashboardCampaignsCampaignIdRouteWithChildren;
@@ -1260,6 +1285,7 @@ export interface FileRoutesById {
   "/visit/events/$slug": typeof VisitEventsSlugRouteWithChildren;
   "/visit/game/$gameId": typeof VisitGameGameIdRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
+  "/admin/systems/": typeof AdminSystemsIndexRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
   "/dashboard/events/": typeof DashboardEventsIndexRoute;
   "/dashboard/games/": typeof DashboardGamesIndexRoute;
@@ -1314,6 +1340,7 @@ export interface FileRouteTypes {
     | "/admin/insights"
     | "/admin/roles"
     | "/admin/security"
+    | "/admin/systems"
     | "/admin/users"
     | "/auth/forgot-password"
     | "/auth/login"
@@ -1362,6 +1389,7 @@ export interface FileRouteTypes {
     | "/ops/"
     | "/player/"
     | "/visit/"
+    | "/admin/systems/$systemId"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/$campaignId"
@@ -1396,6 +1424,7 @@ export interface FileRouteTypes {
     | "/visit/events/$slug"
     | "/visit/game/$gameId"
     | "/visit/systems/$slug"
+    | "/admin/systems/"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
@@ -1475,6 +1504,7 @@ export interface FileRouteTypes {
     | "/ops"
     | "/player"
     | "/visit"
+    | "/admin/systems/$systemId"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/create"
@@ -1504,6 +1534,7 @@ export interface FileRouteTypes {
     | "/player/teams/create"
     | "/visit/game/$gameId"
     | "/visit/systems/$slug"
+    | "/admin/systems"
     | "/dashboard/campaigns"
     | "/dashboard/events"
     | "/dashboard/games"
@@ -1556,6 +1587,7 @@ export interface FileRouteTypes {
     | "/admin/insights"
     | "/admin/roles"
     | "/admin/security"
+    | "/admin/systems"
     | "/admin/users"
     | "/auth/forgot-password"
     | "/auth/login"
@@ -1604,6 +1636,7 @@ export interface FileRouteTypes {
     | "/ops/"
     | "/player/"
     | "/visit/"
+    | "/admin/systems/$systemId"
     | "/dashboard/admin/events-review"
     | "/dashboard/admin/roles"
     | "/dashboard/campaigns/$campaignId"
@@ -1638,6 +1671,7 @@ export interface FileRouteTypes {
     | "/visit/events/$slug"
     | "/visit/game/$gameId"
     | "/visit/systems/$slug"
+    | "/admin/systems/"
     | "/dashboard/campaigns/"
     | "/dashboard/events/"
     | "/dashboard/games/"
@@ -2212,6 +2246,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminUsersRouteImport;
       parentRoute: typeof AdminRouteRoute;
     };
+    "/admin/systems": {
+      id: "/admin/systems";
+      path: "/systems";
+      fullPath: "/admin/systems";
+      preLoaderRoute: typeof AdminSystemsRouteImport;
+      parentRoute: typeof AdminRouteRoute;
+    };
     "/admin/security": {
       id: "/admin/security";
       path: "/security";
@@ -2393,6 +2434,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/dashboard/campaigns/";
       preLoaderRoute: typeof DashboardCampaignsIndexRouteImport;
       parentRoute: typeof DashboardCampaignsRoute;
+    };
+    "/admin/systems/": {
+      id: "/admin/systems/";
+      path: "/";
+      fullPath: "/admin/systems/";
+      preLoaderRoute: typeof AdminSystemsIndexRouteImport;
+      parentRoute: typeof AdminSystemsRoute;
     };
     "/visit/systems/$slug": {
       id: "/visit/systems/$slug";
@@ -2632,6 +2680,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardAdminEventsReviewRouteImport;
       parentRoute: typeof DashboardAdminRouteRoute;
     };
+    "/admin/systems/$systemId": {
+      id: "/admin/systems/$systemId";
+      path: "/$systemId";
+      fullPath: "/admin/systems/$systemId";
+      preLoaderRoute: typeof AdminSystemsSystemIdRouteImport;
+      parentRoute: typeof AdminSystemsRoute;
+    };
     "/visit/events/$slug/": {
       id: "/visit/events/$slug/";
       path: "/";
@@ -2849,6 +2904,20 @@ declare module "@tanstack/react-start/server" {
   }
 }
 
+interface AdminSystemsRouteChildren {
+  AdminSystemsSystemIdRoute: typeof AdminSystemsSystemIdRoute;
+  AdminSystemsIndexRoute: typeof AdminSystemsIndexRoute;
+}
+
+const AdminSystemsRouteChildren: AdminSystemsRouteChildren = {
+  AdminSystemsSystemIdRoute: AdminSystemsSystemIdRoute,
+  AdminSystemsIndexRoute: AdminSystemsIndexRoute,
+};
+
+const AdminSystemsRouteWithChildren = AdminSystemsRoute._addFileChildren(
+  AdminSystemsRouteChildren,
+);
+
 interface AdminRouteRouteChildren {
   AdminCollaborationRoute: typeof AdminCollaborationRoute;
   AdminEventsReviewRoute: typeof AdminEventsReviewRoute;
@@ -2857,6 +2926,7 @@ interface AdminRouteRouteChildren {
   AdminInsightsRoute: typeof AdminInsightsRoute;
   AdminRolesRoute: typeof AdminRolesRoute;
   AdminSecurityRoute: typeof AdminSecurityRoute;
+  AdminSystemsRoute: typeof AdminSystemsRouteWithChildren;
   AdminUsersRoute: typeof AdminUsersRoute;
   AdminIndexRoute: typeof AdminIndexRoute;
 }
@@ -2869,6 +2939,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminInsightsRoute: AdminInsightsRoute,
   AdminRolesRoute: AdminRolesRoute,
   AdminSecurityRoute: AdminSecurityRoute,
+  AdminSystemsRoute: AdminSystemsRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 };

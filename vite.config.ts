@@ -1,3 +1,4 @@
+import netlify from "@netlify/vite-plugin-tanstack-start";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -46,6 +47,9 @@ export default defineConfig(({ mode }) => {
           // verboseFileRoutes: false,
         },
       }),
+
+      // Netlify adapter for TanStack Start (SSR, server routes/functions)
+      netlify(),
 
       viteReact({
         // https://react.dev/learn/react-compiler

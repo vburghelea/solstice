@@ -26,7 +26,7 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
         </span>
       </div>
       <h1 className="mt-4 text-2xl font-bold text-gray-900 sm:text-3xl">
-        We hit a bludger while loading this view
+        A bludger hit us while loading this view
       </h1>
       <p className="mt-3 max-w-xl text-sm text-gray-600 sm:text-base">
         {error.message ||

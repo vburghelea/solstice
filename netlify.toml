@@ -1,6 +1,6 @@
 [build]
   command = "pnpm build"
-  publish = "dist"
+  publish = "dist/client"
   edge_functions = "netlify/edge-functions"
 
 [build.environment]
@@ -29,7 +29,7 @@
 
 [dev]
   targetPort = 5173
-  publish = "dist"
+  publish = "dist/client"
   command = "pnpm dev"
 
 # Proxy API requests to the Vite dev server (best practice for dev)
@@ -37,23 +37,7 @@
   path = "/api"
   url = "http://localhost:5173"
 
-# Server functions redirect (must come before catch-all)
-[[redirects]]
-  from = "/_serverFn/*"
-  to = "/_serverFn/:splat"
-  status = 200
-
-# API routes redirect (must come before catch-all)
-[[redirects]]
-  from = "/api/*"
-  to = "/api/:splat"
-  status = 200
-
-# SPA fallback for production (handles client-side routing)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Redirects are handled by the Netlify TanStack Start plugin
 
 # Security Headers (backup for edge function)
 [[headers]]

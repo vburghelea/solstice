@@ -103,6 +103,7 @@
     "@eslint/js": "^9.36.0",
     "@mermaid-js/mermaid-cli": "^11.10.1",
     "@netlify/edge-functions": "^2.18.1",
+    "@netlify/vite-plugin-tanstack-start": "^1.1.0",
     "@playwright/test": "^1.55.1",
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/eslint-plugin-query": "^5.90.1",

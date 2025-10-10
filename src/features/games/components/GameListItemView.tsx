@@ -104,7 +104,7 @@ export function GameShowcaseCard({
   return (
     <article
       className={cn(
-        "bg-secondary text-secondary-foreground relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] shadow-sm transition-all hover:border-[color:color-mix(in_oklab,var(--primary-soft)_52%,transparent)] hover:shadow-lg",
+        "bg-secondary text-secondary-foreground relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] shadow-sm transition-all hover:border-[color:color-mix(in_oklab,var(--primary-soft)_52%,transparent)] hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70",
         className,
       )}
     >
@@ -149,7 +149,7 @@ export function GameShowcaseCard({
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h3 className="text-foreground text-lg font-semibold sm:text-xl">
+              <h3 className="text-foreground text-lg font-semibold sm:text-xl dark:text-gray-50">
                 <Link
                   to={resolvedLink.to}
                   {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
@@ -161,12 +161,15 @@ export function GameShowcaseCard({
                 </Link>
               </h3>
               {game.description ? (
-                <p className="text-muted-foreground mt-2 line-clamp-3 text-sm">
+                <p className="text-muted-foreground mt-2 line-clamp-3 text-sm dark:text-gray-300">
                   {game.description}
                 </p>
               ) : null}
             </div>
-            <Badge variant="outline" className="shrink-0 text-xs font-medium">
+            <Badge
+              variant="outline"
+              className="dark:border-primary/40 dark:bg-primary/15 dark:text-primary-100 shrink-0 text-xs font-medium"
+            >
               {price}
             </Badge>
           </div>
@@ -184,8 +187,8 @@ export function GameShowcaseCard({
                   className={cn(
                     "flex-1 leading-snug",
                     typeof item.label === "string"
-                      ? "text-muted-foreground"
-                      : "text-foreground",
+                      ? "text-muted-foreground dark:text-gray-300"
+                      : "text-foreground dark:text-gray-50",
                   )}
                 >
                   {item.label}
@@ -196,7 +199,7 @@ export function GameShowcaseCard({
           {game.campaignId ? (
             <div className="flex items-start gap-2">
               <Sparkles className="text-primary mt-0.5 size-4" />
-              <span className="text-muted-foreground flex-1 leading-snug">
+              <span className="text-muted-foreground flex-1 leading-snug dark:text-gray-300">
                 Part of an ongoing campaign
               </span>
             </div>
@@ -204,14 +207,14 @@ export function GameShowcaseCard({
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-2">
-          <span className="text-muted-foreground text-sm">
+          <span className="text-muted-foreground text-sm dark:text-gray-300">
             Hosted by {game.owner?.name ?? game.owner?.email ?? "a community GM"}
           </span>
           <Button
             asChild
             variant="outline"
             size="sm"
-            className="shrink-0 gap-1.5 rounded-full"
+            className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 shrink-0 gap-1.5 rounded-full"
           >
             <Link
               to={resolvedLink.to}

@@ -38,7 +38,7 @@ function VisitLayout() {
 
   return (
     <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
-      <header className="border-border/40 bg-surface-default/90 sticky top-0 z-40 border-b backdrop-blur">
+      <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
           <Link
             to="/visit"
@@ -92,7 +92,7 @@ function VisitLayout() {
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
-        <div className="border-border/30 from-primary-soft/30 to-primary-soft/20 border-t bg-gradient-to-r via-transparent">
+        <div className="border-border/40 from-primary-soft/30 to-primary-soft/10 border-t bg-gradient-to-r via-transparent">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
             <p className="text-foreground font-medium">
               Complete your player profile to match with storytellers, venues, and
@@ -112,7 +112,7 @@ function VisitLayout() {
           </div>
         </div>
         {isMenuOpen ? (
-          <div className="border-border/20 bg-surface-default/95 border-t px-4 pt-4 pb-6 md:hidden">
+          <div className="border-border/40 border-t bg-[color:color-mix(in_oklab,var(--surface-default)_94%,transparent)] px-4 pt-4 pb-6 supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur md:hidden">
             <nav className="flex flex-col gap-2">
               {VISIT_NAVIGATION.map((item) => (
                 <Link

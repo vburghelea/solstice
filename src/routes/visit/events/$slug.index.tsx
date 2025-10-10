@@ -145,7 +145,7 @@ function EventDetailPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             {/* Header */}
-            <Card className="bg-secondary">
+            <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
@@ -230,7 +230,7 @@ function EventDetailPage() {
                     )}
 
                     {event.locationNotes && (
-                      <div className="bg-muted rounded-lg p-3 text-sm">
+                      <div className="bg-muted rounded-lg p-3 text-sm transition-colors dark:bg-gray-900/60 dark:text-gray-300">
                         <p className="mb-1 font-medium">Location Notes:</p>
                         <p>{event.locationNotes}</p>
                       </div>
@@ -242,7 +242,7 @@ function EventDetailPage() {
 
             {/* Schedule */}
             {event.schedule && Object.keys(event.schedule).length > 0 && (
-              <Card className="bg-secondary">
+              <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
                   <CardTitle>Event Schedule</CardTitle>
                 </CardHeader>
@@ -266,7 +266,7 @@ function EventDetailPage() {
 
             {/* Rules */}
             {event.rules && Object.keys(event.rules).length > 0 && (
-              <Card className="bg-secondary">
+              <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
                   <CardTitle>Rules & Format</CardTitle>
                 </CardHeader>
@@ -287,7 +287,7 @@ function EventDetailPage() {
 
             {/* Requirements */}
             {event.requirements && Object.keys(event.requirements).length > 0 && (
-              <Card className="bg-secondary">
+              <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
                   <CardTitle>Requirements</CardTitle>
                 </CardHeader>
@@ -310,7 +310,7 @@ function EventDetailPage() {
 
             {/* Amenities */}
             {event.amenities && Object.keys(event.amenities).length > 0 && (
-              <Card className="bg-secondary">
+              <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
                   <CardTitle>Amenities</CardTitle>
                 </CardHeader>
@@ -337,7 +337,7 @@ function EventDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Registration Card */}
-            <Card className="bg-secondary">
+            <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
                 <CardTitle>Registration</CardTitle>
               </CardHeader>
@@ -473,13 +473,13 @@ function EventDetailPage() {
             </Card>
 
             {/* Organizer Card */}
-            <Card className="bg-secondary">
+            <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
                 <CardTitle>Event Organizer</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
+                  <div className="bg-primary/10 dark:bg-primary/25 flex h-10 w-10 items-center justify-center rounded-full">
                     <UserIcon className="text-primary h-5 w-5" />
                   </div>
                   <div>
@@ -501,7 +501,7 @@ function EventDetailPage() {
             </Card>
 
             {/* Share Card */}
-            <Card className="bg-secondary">
+            <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
                 <CardTitle>Share Event</CardTitle>
               </CardHeader>
@@ -572,17 +572,20 @@ function getEventStatusBadge(status: EventWithDetails["status"]): {
     case "registration_open":
       return {
         variant: "outline",
-        className: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        className:
+          "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-100",
       };
     case "registration_closed":
       return {
         variant: "outline",
-        className: "border-amber-200 bg-amber-50 text-amber-700",
+        className:
+          "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/40 dark:bg-amber-400/15 dark:text-amber-100",
       };
     case "in_progress":
       return {
         variant: "outline",
-        className: "border-sky-200 bg-sky-50 text-sky-700",
+        className:
+          "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-400/40 dark:bg-sky-400/15 dark:text-sky-100",
       };
     case "canceled":
       return { variant: "destructive" };
@@ -603,13 +606,15 @@ function getRegistrationAvailabilityBadge(
   if (!hasSpots) {
     return {
       variant: "outline",
-      className: "border-amber-200 bg-amber-50 text-amber-700",
+      className:
+        "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/40 dark:bg-amber-400/15 dark:text-amber-100",
     };
   }
 
   return {
     variant: "outline",
-    className: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    className:
+      "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-400/15 dark:text-emerald-100",
   };
 }
 

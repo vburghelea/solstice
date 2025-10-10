@@ -12,6 +12,7 @@ import { lazy, Suspense } from "react";
 import { PostHogProvider } from "~/app/posthog-provider";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import type { AuthUser } from "~/lib/auth/types";
+import { ThemeProvider } from "~/shared/hooks/useTheme";
 import appCss from "~/styles.css?url";
 
 // Lazy load devtools to avoid hydration issues
@@ -80,7 +81,9 @@ function RootComponent() {
   return (
     <RootDocument>
       <PostHogProvider user={user}>
-        <Outlet />
+        <ThemeProvider>
+          <Outlet />
+        </ThemeProvider>
       </PostHogProvider>
     </RootDocument>
   );

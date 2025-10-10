@@ -48,7 +48,7 @@ plugins: [
 **Action:** Added missing `BETTER_AUTH_SECRET` environment variable
 
 ```bash
-netlify env:set BETTER_AUTH_SECRET "d881ae910b5c42c5c55f9c5f9092373b6da6b2bd861039dbe2e942cc1ad04516"
+netlify env:set BETTER_AUTH_SECRET "[REDACTED]"
 ```
 
 **Result:** ✅ Environment variable set successfully

@@ -119,7 +119,10 @@ const TRUST_PROMISES = [
 ];
 
 const SECTION_SURFACE =
-  "rounded-3xl bg-secondary shadow-sm ring-1 ring-inset ring-[color:color-mix(in_oklab,var(--primary-soft)_18%,transparent)]";
+  "rounded-3xl bg-secondary shadow-sm ring-1 ring-inset ring-[color:color-mix(in_oklab,var(--primary-soft)_18%,transparent)] dark:bg-card/70 dark:ring-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)]";
+
+const explorerPanelSurface =
+  "rounded-2xl border border-border bg-card p-6 shadow-sm transition-colors dark:bg-card/80 md:p-8";
 
 function VisitorExperience() {
   const { featuredGames, popularSystems, upcomingEvents, locationGroups } =
@@ -253,8 +256,11 @@ function VisitorExperience() {
       />
 
       <section className={cn("token-stack-2xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
-        <div className="token-stack-lg rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_38%,transparent)] bg-[radial-gradient(circle_at_top,_rgba(255,227,208,0.75),_rgba(255,255,255,0.95))] p-6 shadow-sm md:p-8">
-          <div className="token-gap-xl flex flex-col lg:flex-row lg:items-start lg:justify-between">
+        <div
+          className={cn("token-stack-lg relative overflow-hidden", explorerPanelSurface)}
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,227,208,0.75),_rgba(255,255,255,0.95))] opacity-95 dark:hidden" />
+          <div className="token-gap-xl relative flex flex-col lg:flex-row lg:items-start lg:justify-between">
             <div className="token-stack-md max-w-2xl">
               <p className="text-eyebrow text-primary-soft">Explorer guide</p>
               <div className="token-stack-sm">
@@ -271,7 +277,7 @@ function VisitorExperience() {
                   <List.Item key={theme.title} className="token-gap-xs flex items-start">
                     <span
                       aria-hidden
-                      className="bg-primary-soft/40 text-primary-strong mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                      className="bg-primary-soft/40 text-primary-strong dark:bg-primary/35 dark:text-primary-foreground mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
                     >
                       •
                     </span>
@@ -294,7 +300,7 @@ function VisitorExperience() {
               <div className="relative">
                 <select
                   id="visitor-city"
-                  className="border-subtle focus:border-primary focus:ring-primary/30 bg-surface-default text-body-sm w-full appearance-none rounded-full border px-5 py-3 pr-12 font-medium shadow-sm transition focus:ring-2 focus:outline-none"
+                  className="border-border focus:border-primary focus:ring-primary/30 bg-card text-body-sm text-foreground dark:bg-card/80 w-full appearance-none rounded-full border px-5 py-3 pr-12 font-medium shadow-sm transition focus:ring-2 focus:outline-none"
                   value={locationSelectValue}
                   onChange={(event) => {
                     setSelectedCity(decodeSelection(event.target.value));
@@ -330,7 +336,7 @@ function VisitorExperience() {
                     </optgroup>
                   ))}
                 </select>
-                <div className="text-muted-strong pointer-events-none absolute inset-y-0 right-5 flex items-center">
+                <div className="text-muted-strong dark:text-muted-foreground pointer-events-none absolute inset-y-0 right-5 flex items-center">
                   <svg
                     aria-hidden
                     className="h-4 w-4"
@@ -358,7 +364,7 @@ function VisitorExperience() {
                           country: suggestion.country,
                         })
                       }
-                      className="text-body-xs text-muted-strong hover:text-foreground rounded-full border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 px-3 py-1 transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_48%,transparent)]"
+                      className="text-body-xs text-muted-strong hover:text-foreground border-border bg-card hover:border-primary/80 dark:bg-card/80 dark:text-muted-foreground rounded-full border px-3 py-1 transition"
                     >
                       {suggestion.city}, {suggestion.country}
                     </button>
@@ -369,7 +375,7 @@ function VisitorExperience() {
           </div>
         </div>
 
-        <div className="token-gap-lg space-y-4 rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-6 shadow-sm md:p-8">
+        <div className={cn("token-gap-lg space-y-4", explorerPanelSurface)}>
           <div className="token-stack-sm max-w-xl">
             <h3 className="text-heading-sm text-foreground">How this tour flows</h3>
             <p className="text-body-sm text-muted-strong">
@@ -381,12 +387,14 @@ function VisitorExperience() {
             {STORY_CHAPTERS.map((chapter, index) => (
               <li
                 key={chapter}
-                className="token-stack-sm rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)]/90 p-4 shadow-sm"
+                className="token-stack-sm border-border bg-card dark:bg-card/70 rounded-xl border p-4 shadow-sm transition-colors"
               >
                 <span className="bg-primary-soft text-primary-strong text-body-sm inline-flex h-9 w-9 items-center justify-center rounded-full font-semibold">
                   {index + 1}
                 </span>
-                <p className="text-body-sm text-muted-strong">{chapter}</p>
+                <p className="text-body-sm text-muted-strong dark:text-muted-foreground">
+                  {chapter}
+                </p>
               </li>
             ))}
           </ol>
@@ -408,7 +416,7 @@ function VisitorExperience() {
           {TRUST_PROMISES.map((signal) => (
             <div
               key={signal.title}
-              className="token-stack-sm rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 p-5 shadow-sm"
+              className={cn("token-stack-sm p-5", explorerPanelSurface)}
             >
               <p className="text-body-sm text-foreground font-semibold">{signal.title}</p>
               <p className="text-body-sm text-muted-strong">{signal.description}</p>
@@ -529,7 +537,10 @@ function VisitorExperience() {
                 key={system.id}
                 to="/visit/systems/$slug"
                 params={{ slug: system.slug }}
-                className="focus-visible:ring-primary focus-visible:ring-offset-background min-w-[16rem] rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 p-4 transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_50%,transparent)] hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
+                className={cn(
+                  "focus-visible:ring-primary focus-visible:ring-offset-background min-w-[16rem] transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_50%,transparent)] hover:shadow-md focus-visible:ring-2 focus-visible:outline-none",
+                  explorerPanelSurface,
+                )}
               >
                 <div className="token-stack-sm">
                   <div className="aspect-video overflow-hidden rounded-lg">
@@ -568,7 +579,7 @@ function VisitorExperience() {
 
       <section
         className={cn(
-          "token-stack-xl from-primary-soft/28 space-y-4 bg-gradient-to-br via-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)] to-amber-50/80 p-8 text-center",
+          "token-stack-xl from-primary-soft/28 space-y-4 bg-gradient-to-br via-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)] to-amber-50/80 p-8 text-center dark:bg-gray-900/70 dark:text-gray-200",
           SECTION_SURFACE,
         )}
       >

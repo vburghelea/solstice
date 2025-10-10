@@ -93,53 +93,55 @@ function SystemsBrowsePage() {
 
   return (
     <PublicLayout>
-      <section className="bg-secondary text-secondary-foreground py-16">
+      <section className="bg-secondary text-secondary-foreground py-16 dark:bg-gray-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold sm:text-4xl">Explore Game Systems</h1>
-          <p className="text-secondary-foreground/80 mt-4 max-w-2xl text-sm sm:text-base">
+          <p className="text-secondary-foreground/80 dark:text-secondary-foreground/70 mt-4 max-w-2xl text-sm sm:text-base">
             Browse tabletop rulesets with curated hero art, taxonomy, and key details. Use
             the search box or pick a category to narrow the catalog.
           </p>
         </div>
       </section>
 
-      <section className="bg-secondary container mx-auto space-y-8 px-4 py-10 sm:px-6 lg:px-8">
-        <FilterPanel
-          filters={filters}
-          formState={formState}
-          setFormState={setFormState}
-          isSubmitting={systemsQuery.isFetching}
-          onSubmit={handleFormSubmit}
-          onReset={handleReset}
-        />
-
-        <ResultsSummary
-          systemsCount={systems.length}
-          total={data?.total ?? 0}
-          isFetching={systemsQuery.isFetching}
-        />
-
-        <SystemsGrid systems={systems} isLoading={systemsQuery.isLoading} />
-
-        {systems.length === 0 && !systemsQuery.isLoading ? (
-          <Card className="bg-muted/40 border-dashed text-center">
-            <CardHeader>
-              <CardTitle>No systems found</CardTitle>
-              <CardDescription>
-                Clear your filters or try a different name to browse the full catalog.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ) : null}
-
-        {data && data.total > data.perPage ? (
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            isLoading={systemsQuery.isFetching}
-            onChange={goToPage}
+      <section className="bg-secondary dark:bg-gray-950">
+        <div className="container mx-auto space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+          <FilterPanel
+            filters={filters}
+            formState={formState}
+            setFormState={setFormState}
+            isSubmitting={systemsQuery.isFetching}
+            onSubmit={handleFormSubmit}
+            onReset={handleReset}
           />
-        ) : null}
+
+          <ResultsSummary
+            systemsCount={systems.length}
+            total={data?.total ?? 0}
+            isFetching={systemsQuery.isFetching}
+          />
+
+          <SystemsGrid systems={systems} isLoading={systemsQuery.isLoading} />
+
+          {systems.length === 0 && !systemsQuery.isLoading ? (
+            <Card className="border-dashed text-center dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
+              <CardHeader>
+                <CardTitle>No systems found</CardTitle>
+                <CardDescription>
+                  Clear your filters or try a different name to browse the full catalog.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : null}
+
+          {data && data.total > data.perPage ? (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              isLoading={systemsQuery.isFetching}
+              onChange={goToPage}
+            />
+          ) : null}
+        </div>
       </section>
     </PublicLayout>
   );

@@ -78,6 +78,7 @@ import { Route as AdminEventsReviewRouteImport } from "./routes/admin/events-rev
 import { Route as AdminCollaborationRouteImport } from "./routes/admin/collaboration";
 import { Route as DashboardAdminRouteRouteImport } from "./routes/dashboard/admin/route";
 import { Route as VisitSystemsIndexRouteImport } from "./routes/visit/systems/index";
+import { Route as VisitResourcesIndexRouteImport } from "./routes/visit/resources/index";
 import { Route as VisitEventsIndexRouteImport } from "./routes/visit/events/index";
 import { Route as PlayerTeamsIndexRouteImport } from "./routes/player/teams/index";
 import { Route as PlayerSettingsIndexRouteImport } from "./routes/player/settings/index";
@@ -97,6 +98,15 @@ import { Route as DashboardEventsIndexRouteImport } from "./routes/dashboard/eve
 import { Route as DashboardCampaignsIndexRouteImport } from "./routes/dashboard/campaigns/index";
 import { Route as AdminSystemsIndexRouteImport } from "./routes/admin/systems/index";
 import { Route as VisitSystemsSlugRouteImport } from "./routes/visit/systems/$slug";
+import { Route as VisitResourcesToolkitRouteImport } from "./routes/visit/resources/toolkit";
+import { Route as VisitResourcesSessionPlansRouteImport } from "./routes/visit/resources/session-plans";
+import { Route as VisitResourcesSafetyPoliciesRouteImport } from "./routes/visit/resources/safety-policies";
+import { Route as VisitResourcesReportConcernRouteImport } from "./routes/visit/resources/report-concern";
+import { Route as VisitResourcesGameMasterPathwayRouteImport } from "./routes/visit/resources/game-master-pathway";
+import { Route as VisitResourcesFacilitationClinicsRouteImport } from "./routes/visit/resources/facilitation-clinics";
+import { Route as VisitResourcesEventOperationsKitRouteImport } from "./routes/visit/resources/event-operations-kit";
+import { Route as VisitResourcesCommunityHostPathwayRouteImport } from "./routes/visit/resources/community-host-pathway";
+import { Route as VisitResourcesCharterTemplateRouteImport } from "./routes/visit/resources/charter-template";
 import { Route as VisitGameGameIdRouteImport } from "./routes/visit/game.$gameId";
 import { Route as VisitEventsSlugRouteImport } from "./routes/visit/events/$slug";
 import { Route as PlayerTeamsCreateRouteImport } from "./routes/player/teams/create";
@@ -499,6 +509,11 @@ const VisitSystemsIndexRoute = VisitSystemsIndexRouteImport.update({
   path: "/systems/",
   getParentRoute: () => VisitRouteRoute,
 } as any);
+const VisitResourcesIndexRoute = VisitResourcesIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => VisitResourcesRoute,
+} as any);
 const VisitEventsIndexRoute = VisitEventsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -594,6 +609,59 @@ const VisitSystemsSlugRoute = VisitSystemsSlugRouteImport.update({
   path: "/systems/$slug",
   getParentRoute: () => VisitRouteRoute,
 } as any);
+const VisitResourcesToolkitRoute = VisitResourcesToolkitRouteImport.update({
+  id: "/toolkit",
+  path: "/toolkit",
+  getParentRoute: () => VisitResourcesRoute,
+} as any);
+const VisitResourcesSessionPlansRoute =
+  VisitResourcesSessionPlansRouteImport.update({
+    id: "/session-plans",
+    path: "/session-plans",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesSafetyPoliciesRoute =
+  VisitResourcesSafetyPoliciesRouteImport.update({
+    id: "/safety-policies",
+    path: "/safety-policies",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesReportConcernRoute =
+  VisitResourcesReportConcernRouteImport.update({
+    id: "/report-concern",
+    path: "/report-concern",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesGameMasterPathwayRoute =
+  VisitResourcesGameMasterPathwayRouteImport.update({
+    id: "/game-master-pathway",
+    path: "/game-master-pathway",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesFacilitationClinicsRoute =
+  VisitResourcesFacilitationClinicsRouteImport.update({
+    id: "/facilitation-clinics",
+    path: "/facilitation-clinics",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesEventOperationsKitRoute =
+  VisitResourcesEventOperationsKitRouteImport.update({
+    id: "/event-operations-kit",
+    path: "/event-operations-kit",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesCommunityHostPathwayRoute =
+  VisitResourcesCommunityHostPathwayRouteImport.update({
+    id: "/community-host-pathway",
+    path: "/community-host-pathway",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
+const VisitResourcesCharterTemplateRoute =
+  VisitResourcesCharterTemplateRouteImport.update({
+    id: "/charter-template",
+    path: "/charter-template",
+    getParentRoute: () => VisitResourcesRoute,
+  } as any);
 const VisitGameGameIdRoute = VisitGameGameIdRouteImport.update({
   id: "/game/$gameId",
   path: "/game/$gameId",
@@ -992,7 +1060,7 @@ export interface FileRoutesByFullPath {
   "/visit/design-system": typeof VisitDesignSystemRoute;
   "/visit/events": typeof VisitEventsRouteWithChildren;
   "/visit/inbox": typeof VisitInboxRoute;
-  "/visit/resources": typeof VisitResourcesRoute;
+  "/visit/resources": typeof VisitResourcesRouteWithChildren;
   "/visit/search": typeof VisitSearchRoute;
   "/visit/teams": typeof VisitTeamsRoute;
   "/admin/": typeof AdminIndexRoute;
@@ -1036,6 +1104,15 @@ export interface FileRoutesByFullPath {
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/visit/events/$slug": typeof VisitEventsSlugRouteWithChildren;
   "/visit/game/$gameId": typeof VisitGameGameIdRoute;
+  "/visit/resources/charter-template": typeof VisitResourcesCharterTemplateRoute;
+  "/visit/resources/community-host-pathway": typeof VisitResourcesCommunityHostPathwayRoute;
+  "/visit/resources/event-operations-kit": typeof VisitResourcesEventOperationsKitRoute;
+  "/visit/resources/facilitation-clinics": typeof VisitResourcesFacilitationClinicsRoute;
+  "/visit/resources/game-master-pathway": typeof VisitResourcesGameMasterPathwayRoute;
+  "/visit/resources/report-concern": typeof VisitResourcesReportConcernRoute;
+  "/visit/resources/safety-policies": typeof VisitResourcesSafetyPoliciesRoute;
+  "/visit/resources/session-plans": typeof VisitResourcesSessionPlansRoute;
+  "/visit/resources/toolkit": typeof VisitResourcesToolkitRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
   "/admin/systems/": typeof AdminSystemsIndexRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
@@ -1055,6 +1132,7 @@ export interface FileRoutesByFullPath {
   "/player/settings": typeof PlayerSettingsIndexRoute;
   "/player/teams/": typeof PlayerTeamsIndexRoute;
   "/visit/events/": typeof VisitEventsIndexRoute;
+  "/visit/resources/": typeof VisitResourcesIndexRoute;
   "/visit/systems": typeof VisitSystemsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
@@ -1107,7 +1185,6 @@ export interface FileRoutesByTo {
   "/visit/collaboration": typeof VisitCollaborationRoute;
   "/visit/design-system": typeof VisitDesignSystemRoute;
   "/visit/inbox": typeof VisitInboxRoute;
-  "/visit/resources": typeof VisitResourcesRoute;
   "/visit/search": typeof VisitSearchRoute;
   "/visit/teams": typeof VisitTeamsRoute;
   "/admin": typeof AdminIndexRoute;
@@ -1146,6 +1223,15 @@ export interface FileRoutesByTo {
   "/player/teams/browse": typeof PlayerTeamsBrowseRoute;
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/visit/game/$gameId": typeof VisitGameGameIdRoute;
+  "/visit/resources/charter-template": typeof VisitResourcesCharterTemplateRoute;
+  "/visit/resources/community-host-pathway": typeof VisitResourcesCommunityHostPathwayRoute;
+  "/visit/resources/event-operations-kit": typeof VisitResourcesEventOperationsKitRoute;
+  "/visit/resources/facilitation-clinics": typeof VisitResourcesFacilitationClinicsRoute;
+  "/visit/resources/game-master-pathway": typeof VisitResourcesGameMasterPathwayRoute;
+  "/visit/resources/report-concern": typeof VisitResourcesReportConcernRoute;
+  "/visit/resources/safety-policies": typeof VisitResourcesSafetyPoliciesRoute;
+  "/visit/resources/session-plans": typeof VisitResourcesSessionPlansRoute;
+  "/visit/resources/toolkit": typeof VisitResourcesToolkitRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
   "/admin/systems": typeof AdminSystemsIndexRoute;
   "/dashboard/campaigns": typeof DashboardCampaignsIndexRoute;
@@ -1165,6 +1251,7 @@ export interface FileRoutesByTo {
   "/player/settings": typeof PlayerSettingsIndexRoute;
   "/player/teams": typeof PlayerTeamsIndexRoute;
   "/visit/events": typeof VisitEventsIndexRoute;
+  "/visit/resources": typeof VisitResourcesIndexRoute;
   "/visit/systems": typeof VisitSystemsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
@@ -1240,7 +1327,7 @@ export interface FileRoutesById {
   "/visit/design-system": typeof VisitDesignSystemRoute;
   "/visit/events": typeof VisitEventsRouteWithChildren;
   "/visit/inbox": typeof VisitInboxRoute;
-  "/visit/resources": typeof VisitResourcesRoute;
+  "/visit/resources": typeof VisitResourcesRouteWithChildren;
   "/visit/search": typeof VisitSearchRoute;
   "/visit/teams": typeof VisitTeamsRoute;
   "/admin/": typeof AdminIndexRoute;
@@ -1284,6 +1371,15 @@ export interface FileRoutesById {
   "/player/teams/create": typeof PlayerTeamsCreateRoute;
   "/visit/events/$slug": typeof VisitEventsSlugRouteWithChildren;
   "/visit/game/$gameId": typeof VisitGameGameIdRoute;
+  "/visit/resources/charter-template": typeof VisitResourcesCharterTemplateRoute;
+  "/visit/resources/community-host-pathway": typeof VisitResourcesCommunityHostPathwayRoute;
+  "/visit/resources/event-operations-kit": typeof VisitResourcesEventOperationsKitRoute;
+  "/visit/resources/facilitation-clinics": typeof VisitResourcesFacilitationClinicsRoute;
+  "/visit/resources/game-master-pathway": typeof VisitResourcesGameMasterPathwayRoute;
+  "/visit/resources/report-concern": typeof VisitResourcesReportConcernRoute;
+  "/visit/resources/safety-policies": typeof VisitResourcesSafetyPoliciesRoute;
+  "/visit/resources/session-plans": typeof VisitResourcesSessionPlansRoute;
+  "/visit/resources/toolkit": typeof VisitResourcesToolkitRoute;
   "/visit/systems/$slug": typeof VisitSystemsSlugRoute;
   "/admin/systems/": typeof AdminSystemsIndexRoute;
   "/dashboard/campaigns/": typeof DashboardCampaignsIndexRoute;
@@ -1303,6 +1399,7 @@ export interface FileRoutesById {
   "/player/settings/": typeof PlayerSettingsIndexRoute;
   "/player/teams/": typeof PlayerTeamsIndexRoute;
   "/visit/events/": typeof VisitEventsIndexRoute;
+  "/visit/resources/": typeof VisitResourcesIndexRoute;
   "/visit/systems/": typeof VisitSystemsIndexRoute;
   "/dashboard/campaigns/$campaignId/zero": typeof DashboardCampaignsCampaignIdZeroRoute;
   "/dashboard/events/$eventId/manage": typeof DashboardEventsEventIdManageRoute;
@@ -1423,6 +1520,15 @@ export interface FileRouteTypes {
     | "/player/teams/create"
     | "/visit/events/$slug"
     | "/visit/game/$gameId"
+    | "/visit/resources/charter-template"
+    | "/visit/resources/community-host-pathway"
+    | "/visit/resources/event-operations-kit"
+    | "/visit/resources/facilitation-clinics"
+    | "/visit/resources/game-master-pathway"
+    | "/visit/resources/report-concern"
+    | "/visit/resources/safety-policies"
+    | "/visit/resources/session-plans"
+    | "/visit/resources/toolkit"
     | "/visit/systems/$slug"
     | "/admin/systems/"
     | "/dashboard/campaigns/"
@@ -1442,6 +1548,7 @@ export interface FileRouteTypes {
     | "/player/settings"
     | "/player/teams/"
     | "/visit/events/"
+    | "/visit/resources/"
     | "/visit/systems"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
@@ -1494,7 +1601,6 @@ export interface FileRouteTypes {
     | "/visit/collaboration"
     | "/visit/design-system"
     | "/visit/inbox"
-    | "/visit/resources"
     | "/visit/search"
     | "/visit/teams"
     | "/admin"
@@ -1533,6 +1639,15 @@ export interface FileRouteTypes {
     | "/player/teams/browse"
     | "/player/teams/create"
     | "/visit/game/$gameId"
+    | "/visit/resources/charter-template"
+    | "/visit/resources/community-host-pathway"
+    | "/visit/resources/event-operations-kit"
+    | "/visit/resources/facilitation-clinics"
+    | "/visit/resources/game-master-pathway"
+    | "/visit/resources/report-concern"
+    | "/visit/resources/safety-policies"
+    | "/visit/resources/session-plans"
+    | "/visit/resources/toolkit"
     | "/visit/systems/$slug"
     | "/admin/systems"
     | "/dashboard/campaigns"
@@ -1552,6 +1667,7 @@ export interface FileRouteTypes {
     | "/player/settings"
     | "/player/teams"
     | "/visit/events"
+    | "/visit/resources"
     | "/visit/systems"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
@@ -1670,6 +1786,15 @@ export interface FileRouteTypes {
     | "/player/teams/create"
     | "/visit/events/$slug"
     | "/visit/game/$gameId"
+    | "/visit/resources/charter-template"
+    | "/visit/resources/community-host-pathway"
+    | "/visit/resources/event-operations-kit"
+    | "/visit/resources/facilitation-clinics"
+    | "/visit/resources/game-master-pathway"
+    | "/visit/resources/report-concern"
+    | "/visit/resources/safety-policies"
+    | "/visit/resources/session-plans"
+    | "/visit/resources/toolkit"
     | "/visit/systems/$slug"
     | "/admin/systems/"
     | "/dashboard/campaigns/"
@@ -1689,6 +1814,7 @@ export interface FileRouteTypes {
     | "/player/settings/"
     | "/player/teams/"
     | "/visit/events/"
+    | "/visit/resources/"
     | "/visit/systems/"
     | "/dashboard/campaigns/$campaignId/zero"
     | "/dashboard/events/$eventId/manage"
@@ -2316,6 +2442,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof VisitSystemsIndexRouteImport;
       parentRoute: typeof VisitRouteRoute;
     };
+    "/visit/resources/": {
+      id: "/visit/resources/";
+      path: "/";
+      fullPath: "/visit/resources/";
+      preLoaderRoute: typeof VisitResourcesIndexRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
     "/visit/events/": {
       id: "/visit/events/";
       path: "/";
@@ -2448,6 +2581,69 @@ declare module "@tanstack/react-router" {
       fullPath: "/visit/systems/$slug";
       preLoaderRoute: typeof VisitSystemsSlugRouteImport;
       parentRoute: typeof VisitRouteRoute;
+    };
+    "/visit/resources/toolkit": {
+      id: "/visit/resources/toolkit";
+      path: "/toolkit";
+      fullPath: "/visit/resources/toolkit";
+      preLoaderRoute: typeof VisitResourcesToolkitRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/session-plans": {
+      id: "/visit/resources/session-plans";
+      path: "/session-plans";
+      fullPath: "/visit/resources/session-plans";
+      preLoaderRoute: typeof VisitResourcesSessionPlansRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/safety-policies": {
+      id: "/visit/resources/safety-policies";
+      path: "/safety-policies";
+      fullPath: "/visit/resources/safety-policies";
+      preLoaderRoute: typeof VisitResourcesSafetyPoliciesRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/report-concern": {
+      id: "/visit/resources/report-concern";
+      path: "/report-concern";
+      fullPath: "/visit/resources/report-concern";
+      preLoaderRoute: typeof VisitResourcesReportConcernRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/game-master-pathway": {
+      id: "/visit/resources/game-master-pathway";
+      path: "/game-master-pathway";
+      fullPath: "/visit/resources/game-master-pathway";
+      preLoaderRoute: typeof VisitResourcesGameMasterPathwayRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/facilitation-clinics": {
+      id: "/visit/resources/facilitation-clinics";
+      path: "/facilitation-clinics";
+      fullPath: "/visit/resources/facilitation-clinics";
+      preLoaderRoute: typeof VisitResourcesFacilitationClinicsRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/event-operations-kit": {
+      id: "/visit/resources/event-operations-kit";
+      path: "/event-operations-kit";
+      fullPath: "/visit/resources/event-operations-kit";
+      preLoaderRoute: typeof VisitResourcesEventOperationsKitRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/community-host-pathway": {
+      id: "/visit/resources/community-host-pathway";
+      path: "/community-host-pathway";
+      fullPath: "/visit/resources/community-host-pathway";
+      preLoaderRoute: typeof VisitResourcesCommunityHostPathwayRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
+    };
+    "/visit/resources/charter-template": {
+      id: "/visit/resources/charter-template";
+      path: "/charter-template";
+      fullPath: "/visit/resources/charter-template";
+      preLoaderRoute: typeof VisitResourcesCharterTemplateRouteImport;
+      parentRoute: typeof VisitResourcesRoute;
     };
     "/visit/game/$gameId": {
       id: "/visit/game/$gameId";
@@ -3435,13 +3631,45 @@ const VisitEventsRouteWithChildren = VisitEventsRoute._addFileChildren(
   VisitEventsRouteChildren,
 );
 
+interface VisitResourcesRouteChildren {
+  VisitResourcesCharterTemplateRoute: typeof VisitResourcesCharterTemplateRoute;
+  VisitResourcesCommunityHostPathwayRoute: typeof VisitResourcesCommunityHostPathwayRoute;
+  VisitResourcesEventOperationsKitRoute: typeof VisitResourcesEventOperationsKitRoute;
+  VisitResourcesFacilitationClinicsRoute: typeof VisitResourcesFacilitationClinicsRoute;
+  VisitResourcesGameMasterPathwayRoute: typeof VisitResourcesGameMasterPathwayRoute;
+  VisitResourcesReportConcernRoute: typeof VisitResourcesReportConcernRoute;
+  VisitResourcesSafetyPoliciesRoute: typeof VisitResourcesSafetyPoliciesRoute;
+  VisitResourcesSessionPlansRoute: typeof VisitResourcesSessionPlansRoute;
+  VisitResourcesToolkitRoute: typeof VisitResourcesToolkitRoute;
+  VisitResourcesIndexRoute: typeof VisitResourcesIndexRoute;
+}
+
+const VisitResourcesRouteChildren: VisitResourcesRouteChildren = {
+  VisitResourcesCharterTemplateRoute: VisitResourcesCharterTemplateRoute,
+  VisitResourcesCommunityHostPathwayRoute:
+    VisitResourcesCommunityHostPathwayRoute,
+  VisitResourcesEventOperationsKitRoute: VisitResourcesEventOperationsKitRoute,
+  VisitResourcesFacilitationClinicsRoute:
+    VisitResourcesFacilitationClinicsRoute,
+  VisitResourcesGameMasterPathwayRoute: VisitResourcesGameMasterPathwayRoute,
+  VisitResourcesReportConcernRoute: VisitResourcesReportConcernRoute,
+  VisitResourcesSafetyPoliciesRoute: VisitResourcesSafetyPoliciesRoute,
+  VisitResourcesSessionPlansRoute: VisitResourcesSessionPlansRoute,
+  VisitResourcesToolkitRoute: VisitResourcesToolkitRoute,
+  VisitResourcesIndexRoute: VisitResourcesIndexRoute,
+};
+
+const VisitResourcesRouteWithChildren = VisitResourcesRoute._addFileChildren(
+  VisitResourcesRouteChildren,
+);
+
 interface VisitRouteRouteChildren {
   VisitAboutRoute: typeof VisitAboutRoute;
   VisitCollaborationRoute: typeof VisitCollaborationRoute;
   VisitDesignSystemRoute: typeof VisitDesignSystemRoute;
   VisitEventsRoute: typeof VisitEventsRouteWithChildren;
   VisitInboxRoute: typeof VisitInboxRoute;
-  VisitResourcesRoute: typeof VisitResourcesRoute;
+  VisitResourcesRoute: typeof VisitResourcesRouteWithChildren;
   VisitSearchRoute: typeof VisitSearchRoute;
   VisitTeamsRoute: typeof VisitTeamsRoute;
   VisitIndexRoute: typeof VisitIndexRoute;
@@ -3456,7 +3684,7 @@ const VisitRouteRouteChildren: VisitRouteRouteChildren = {
   VisitDesignSystemRoute: VisitDesignSystemRoute,
   VisitEventsRoute: VisitEventsRouteWithChildren,
   VisitInboxRoute: VisitInboxRoute,
-  VisitResourcesRoute: VisitResourcesRoute,
+  VisitResourcesRoute: VisitResourcesRouteWithChildren,
   VisitSearchRoute: VisitSearchRoute,
   VisitTeamsRoute: VisitTeamsRoute,
   VisitIndexRoute: VisitIndexRoute,

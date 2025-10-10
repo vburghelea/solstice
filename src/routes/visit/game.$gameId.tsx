@@ -27,7 +27,7 @@ import type { OperationResult } from "~/shared/types/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 const SURFACE_CLASSNAME =
-  "rounded-3xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/95 shadow-sm";
+  "rounded-3xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/95 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
 
 interface LoaderData {
   gameDetails: GameWithDetails | null;
@@ -277,7 +277,10 @@ function VisitGameDetailPage() {
       <div className="grid gap-8 lg:grid-cols-[1.7fr_minmax(0,1fr)]">
         <div className="token-stack-xl gap-6 space-y-4">
           <section
-            className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-4")}
+            className={cn(
+              SURFACE_CLASSNAME,
+              "token-stack-md bg-secondary p-6 sm:p-4 dark:bg-gray-900/70",
+            )}
           >
             <header className="token-stack-2xs">
               <p className="text-eyebrow text-primary-soft">Table briefing</p>
@@ -314,7 +317,10 @@ function VisitGameDetailPage() {
           </section>
 
           <section
-            className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-8")}
+            className={cn(
+              SURFACE_CLASSNAME,
+              "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+            )}
           >
             <header className="token-stack-2xs">
               <p className="text-eyebrow text-primary-soft">Session logistics</p>
@@ -348,13 +354,16 @@ function VisitGameDetailPage() {
                 }
               />
             </div>
-            <div className="token-stack-2xs border-primary/20 bg-primary/5 text-body-sm text-muted-strong rounded-2xl border p-4">
+            <div className="token-stack-2xs border-primary/20 bg-primary/5 text-body-sm text-muted-strong rounded-2xl border p-4 transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
               Precise meeting details are shared once your seat is confirmed.
             </div>
           </section>
 
           <section
-            className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-8")}
+            className={cn(
+              SURFACE_CLASSNAME,
+              "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+            )}
           >
             <header className="token-stack-2xs">
               <p className="text-eyebrow text-primary-soft">Where we’re meeting</p>
@@ -376,7 +385,10 @@ function VisitGameDetailPage() {
 
           {gallery.length > 0 ? (
             <section
-              className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-8")}
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+              )}
             >
               <header className="token-stack-2xs">
                 <p className="text-eyebrow text-primary-soft">Art & inspiration</p>
@@ -389,7 +401,7 @@ function VisitGameDetailPage() {
                 {gallery.slice(0, 4).map((asset) => (
                   <figure
                     key={asset.id}
-                    className="border-border/40 bg-muted/30 overflow-hidden rounded-2xl border"
+                    className="border-border/40 bg-muted/30 overflow-hidden rounded-2xl border transition-colors dark:border-gray-700 dark:bg-gray-900/60"
                   >
                     <img
                       src={asset.secureUrl}
@@ -423,7 +435,10 @@ function VisitGameDetailPage() {
           ) : null}
 
           <section
-            className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-8")}
+            className={cn(
+              SURFACE_CLASSNAME,
+              "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+            )}
           >
             <header className="token-stack-2xs">
               <p className="text-eyebrow text-primary-soft">Safety tools</p>
@@ -437,7 +452,10 @@ function VisitGameDetailPage() {
 
           {systemDetails ? (
             <section
-              className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-8")}
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+              )}
             >
               <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="token-stack-2xs">
@@ -537,7 +555,10 @@ function VisitGameDetailPage() {
 
         <aside className="token-stack-lg gap-6">
           <section
-            className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-7")}
+            className={cn(
+              SURFACE_CLASSNAME,
+              "token-stack-md bg-secondary p-6 sm:p-7 dark:bg-gray-900/70",
+            )}
           >
             <header className="token-stack-3xs">
               <p className="text-eyebrow text-primary-soft">Host snapshot</p>
@@ -575,7 +596,10 @@ function VisitGameDetailPage() {
 
           {systemDetails ? (
             <section
-              className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-7")}
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-7 dark:bg-gray-900/70",
+              )}
             >
               <header className="token-stack-3xs">
                 <p className="text-eyebrow text-primary-soft">System quick facts</p>
@@ -634,7 +658,10 @@ function VisitGameDetailPage() {
           ) : null}
 
           <section
-            className={cn(SURFACE_CLASSNAME, "token-stack-md bg-secondary p-6 sm:p-7")}
+            className={cn(
+              SURFACE_CLASSNAME,
+              "token-stack-md bg-secondary p-6 sm:p-7 dark:bg-gray-900/70",
+            )}
           >
             <header className="token-stack-3xs">
               <p className="text-eyebrow text-primary-soft">Ready to join?</p>

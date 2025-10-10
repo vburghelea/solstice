@@ -271,7 +271,7 @@ function EventsIndex() {
         }}
       />
 
-      <section className="bg-secondary py-10 sm:py-14 lg:py-16">
+      <section className="bg-secondary py-10 sm:py-14 lg:py-16 dark:bg-gray-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -279,7 +279,7 @@ function EventsIndex() {
                 <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
                   Filter upcoming events
                 </p>
-                <h2 className="text-foreground mt-2 text-2xl font-bold sm:text-3xl">
+                <h2 className="text-foreground mt-2 text-2xl font-bold sm:text-3xl dark:text-gray-50">
                   Upcoming events calendar
                 </h2>
               </div>
@@ -336,7 +336,7 @@ function EventsIndex() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
               <div className="space-y-1">
-                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase">
+                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
                   Country
                 </p>
                 <Select
@@ -360,7 +360,7 @@ function EventsIndex() {
               </div>
 
               <div className="space-y-1">
-                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase">
+                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
                   City
                 </p>
                 <Select
@@ -384,7 +384,7 @@ function EventsIndex() {
               </div>
 
               <div className="space-y-1">
-                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase">
+                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
                   Type
                 </p>
                 <Select
@@ -411,7 +411,7 @@ function EventsIndex() {
               </div>
 
               <div className="space-y-1">
-                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase">
+                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
                   Status
                 </p>
                 <Select
@@ -438,7 +438,7 @@ function EventsIndex() {
               </div>
 
               <div className="space-y-1">
-                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase">
+                <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
                   Registration type
                 </p>
                 <Select

@@ -6,11 +6,11 @@ The admin "Systems" area provides content managers with visibility into crawler 
 
 ## Route Structure
 
-- `/dashboard/systems` (layout wrapper for admin systems tooling)
-- `/dashboard/systems/` (dashboard list implemented in this phase)
-- `/dashboard/systems/$systemId` (editor shell with tabs: Overview, Content, Media, Taxonomy, Crawl – planned for later sub-phases)
+- `/admin/systems` (layout wrapper for admin systems tooling)
+- `/admin/systems/` (dashboard list implemented in this phase)
+- `/admin/systems/$systemId` (editor shell with tabs: Overview, Content, Media, Taxonomy, Crawl – planned for later sub-phases)
 
-Each route lives under `src/routes/dashboard/systems/` to keep the dashboard tree thin. Feature-specific UI and data hooks live in `src/features/game-systems/admin/`.
+Each route lives under `src/routes/admin/systems/` to keep the dashboard tree thin. Feature-specific UI and data hooks live in `src/features/game-systems/admin/`.
 
 ## Feature Modules
 
@@ -43,7 +43,7 @@ src/features/game-systems/admin/
    - `hasErrors`: true when `crawlStatus === "error"` or `errorMessage` populated
 4. Response returns filtered `items`, overall `total`, and aggregate counts `{ total, needsCuration, errors, published }` for summary chips.
 5. Client renders data table with inline badges, filter controls, and quick actions (Edit stub).
-6. Editor route `/dashboard/systems/$systemId` calls `getAdminGameSystem` to hydrate tabbed layout with hero, gallery, taxonomy, and crawl history placeholders.
+6. Editor route `/player/systems/$systemId` calls `getAdminGameSystem` to hydrate tabbed layout with hero, gallery, taxonomy, and crawl history placeholders.
 
 ## Status Definitions
 
@@ -77,12 +77,12 @@ src/features/game-systems/admin/
 ## Implementation Phases
 
 1. **Phase 9.A (complete)** – Dashboard list delivered in this session.
-2. **Phase 9.B (ongoing)** – Editor scaffold (`/dashboard/systems/$systemId`) now supports tab navigation plus media moderation toggles and hero assignment.
+2. **Phase 9.B (ongoing)** – Editor scaffold (`/admin/systems/$systemId`) now supports tab navigation plus media moderation toggles and hero assignment.
 3. **Phase 9.C (up next)** – Ship recrawl controls and richer audit timeline integrations (ties into Phase 11).
 
 ## Editor Shell Overview
 
-- **Route**: `/dashboard/systems/$systemId`
+- **Route**: `/admin/systems/$systemId`
 - **Server data**: `getAdminGameSystem` returns base status flags plus hero, gallery, taxonomy, external refs, and recent crawl events (limit 10).
 - **Tabs**:
   - _Overview_: Publication flags, publish/draft + CMS approval actions, crawl summary, external reference grid.

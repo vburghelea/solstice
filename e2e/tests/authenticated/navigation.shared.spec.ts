@@ -7,7 +7,7 @@ test.use({ storageState: undefined });
 test.describe("Navigation (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
-    await gotoWithAuth(page, "/dashboard", {
+    await gotoWithAuth(page, "/player", {
       email: process.env["E2E_TEST_EMAIL"]!,
       password: process.env["E2E_TEST_PASSWORD"]!,
     });
@@ -20,17 +20,17 @@ test.describe("Navigation (Authenticated)", () => {
 
     // Main navigation items
     const navItems = [
-      { name: "Dashboard", url: "/dashboard" },
-      { name: "Teams", url: "/dashboard/teams" },
-      { name: "Events", url: "/dashboard/events" },
-      { name: "Members", url: "/dashboard/members" },
+      { name: "Dashboard", url: "/player" },
+      { name: "Teams", url: "/player/teams" },
+      { name: "Events", url: "/player/events" },
+      { name: "Members", url: "/player/members" },
       // Reports link is only visible for admin users with specific roles
     ];
 
     // User navigation items
     const userItems = [
-      { name: "Profile", url: "/dashboard/profile" },
-      { name: "Settings", url: "/dashboard/settings" },
+      { name: "Profile", url: "/player/profile" },
+      { name: "Settings", url: "/player/settings" },
     ];
 
     // Check all navigation items are visible
@@ -72,7 +72,7 @@ test.describe("Navigation (Authenticated)", () => {
 
   test("should maintain sidebar state across page refreshes", async ({ page }) => {
     // Navigate to teams page
-    await page.goto("/dashboard/teams");
+    await page.goto("/player/teams");
 
     // Wait for teams page to load
     await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible();
@@ -81,7 +81,7 @@ test.describe("Navigation (Authenticated)", () => {
     await page.reload();
 
     // Should still be on teams page
-    await expect(page).toHaveURL("/dashboard/teams");
+    await expect(page).toHaveURL("/player/teams");
 
     // Sidebar should still be visible
     const sidebar = page.getByRole("complementary");
@@ -95,33 +95,33 @@ test.describe("Navigation (Authenticated)", () => {
   test("should handle direct navigation to authenticated pages", async ({ page }) => {
     // Direct navigation should work for authenticated users
     const authenticatedPages = [
-      "/dashboard",
-      "/dashboard/profile",
-      "/dashboard/teams",
-      "/dashboard/events",
-      "/dashboard/members",
-      "/dashboard/reports",
-      "/dashboard/settings",
+      "/player",
+      "/player/profile",
+      "/player/teams",
+      "/player/events",
+      "/player/members",
+      "/player/reports",
+      "/player/settings",
     ];
 
     for (const url of authenticatedPages) {
-      // Skip /dashboard/reports as it requires admin role
-      if (url === "/dashboard/reports") continue;
+      // Skip /player/reports as it requires admin role
+      if (url === "/player/reports") continue;
 
       await page.goto(url);
 
       // Wait for page to load - each page has its own heading
-      if (url === "/dashboard") {
+      if (url === "/player") {
         await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
-      } else if (url === "/dashboard/profile") {
+      } else if (url === "/player/profile") {
         await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible();
-      } else if (url === "/dashboard/teams") {
+      } else if (url === "/player/teams") {
         await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible();
-      } else if (url === "/dashboard/events") {
+      } else if (url === "/player/events") {
         await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
-      } else if (url === "/dashboard/members") {
+      } else if (url === "/player/members") {
         await expect(page.getByRole("heading", { name: "Members" })).toBeVisible();
-      } else if (url === "/dashboard/settings") {
+      } else if (url === "/player/settings") {
         await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
       }
 

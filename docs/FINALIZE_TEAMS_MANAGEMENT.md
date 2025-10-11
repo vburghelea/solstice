@@ -24,7 +24,7 @@
 
 ## Phase 3 — Client Experience
 
-- [x] Extend the roster screen at `src/routes/dashboard/teams/$teamId.members.tsx` to show actionable controls for pending join requests (Approve/Decline buttons) alongside existing invite messaging, matching the management affordances promised in `teams-feature.md`.
+- [x] Extend the roster screen at `src/routes/player/teams/$teamId.members.tsx` to show actionable controls for pending join requests (Approve/Decline buttons) alongside existing invite messaging, matching the management affordances promised in `teams-feature.md`.
   - Join requests now surface inline Approve/Decline actions with optimistic state updates,
     while invitations retain their existing messaging.
 - [x] Wire `useMutation` hooks to the new server functions with optimistic updates and consistent error messaging; invalidate `teamMembers`/`user-teams`/`pendingTeamInvites` cache keys on settlement.
@@ -43,7 +43,7 @@
     with a direct CTA; errors surface with a descriptive alert.
 - [x] Lock the “Manage Members” shortcut to captains and coaches, preventing regular players from
       seeing management UI.
-  - Converted `/dashboard/teams/$teamId` into a layout that delegates to nested routes so the
+  - Converted `/player/teams/$teamId` into a layout that delegates to nested routes so the
     existing roster management screen loads correctly; quick actions now respect resolved roles.
 
 ## Phase 4 — Notifications & Messaging
@@ -62,7 +62,7 @@
 - [x] Add Vitest coverage for the new schemas and server functions, mocking database access to assert authorization, validation, and constraint handling paths.
   - `src/features/teams/__tests__/teams.mutations.test.ts` exercises approval/decline mail dispatch, constraint resilience, and failure tolerance.
 - [x] Create component-level tests around the roster management UI to confirm buttons render only for eligible users and that state updates follow expectations.
-  - `src/routes/dashboard/teams/__tests__/$teamId.quick-actions.test.tsx` covers dashboard quick actions and roster moderation controls.
+  - `src/routes/player/teams/__tests__/$teamId.quick-actions.test.tsx` covers dashboard quick actions and roster moderation controls.
 - [x] Write a Playwright scenario where a player requests membership and a captain approves/declines, validating UI feedback and data changes.
   - Added `e2e/tests/authenticated/team-join-moderation.auth.spec.ts` to cover the
     player request, captain approval/decline, and post-decision messaging states.

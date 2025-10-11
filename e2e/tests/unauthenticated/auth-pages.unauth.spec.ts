@@ -75,7 +75,7 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
 
   test("should redirect to login when accessing protected routes", async ({ page }) => {
     // Try to access dashboard without auth
-    await page.goto("/dashboard");
+    await page.goto("/player");
 
     // Should redirect to login
     await expect(page).toHaveURL(/\/auth\/login/);
@@ -85,12 +85,12 @@ test.describe("Authentication Pages (Unauthenticated)", () => {
   });
 
   test("should redirect to login when accessing profile", async ({ page }) => {
-    await page.goto("/dashboard/profile");
+    await page.goto("/player/profile");
     await expect(page).toHaveURL(/\/auth\/login/);
   });
 
   test("should redirect to login when accessing teams", async ({ page }) => {
-    await page.goto("/dashboard/teams");
+    await page.goto("/player/teams");
     await expect(page).toHaveURL(/\/auth\/login/);
   });
 });

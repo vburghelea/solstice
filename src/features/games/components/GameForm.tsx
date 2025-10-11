@@ -1052,7 +1052,7 @@ export function GameForm({
           </Button>
         ) : (
           <Button variant="outline" asChild>
-            <Link to="/dashboard/games">Cancel</Link>
+            <Link to="/player/games">Cancel</Link>
           </Button>
         )}
         <FormSubmitButton isSubmitting={isSubmitting}>

@@ -140,7 +140,7 @@ export const updateProfile = serverOnly(async (data: unknown) => {
 Use TanStack Query to call server functions:
 
 ```tsx
-// src/routes/dashboard/profile.tsx
+// src/routes/player/profile.tsx
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCurrentUser, updateProfile } from "~/features/auth/auth.queries";
 

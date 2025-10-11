@@ -19,8 +19,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -37,8 +37,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -55,8 +55,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -77,8 +77,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -99,8 +99,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -122,8 +122,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -146,8 +146,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 
@@ -173,8 +173,8 @@ describe("CampaignGameSessionCard", () => {
         onUpdateStatus={onUpdateStatus}
       />,
       {
-        path: "/dashboard/campaigns/$campaignId",
-        initialEntries: ["/dashboard/campaigns/123"],
+        path: "/player/campaigns/$campaignId",
+        initialEntries: ["/player/campaigns/123"],
       },
     );
 

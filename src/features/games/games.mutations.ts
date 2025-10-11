@@ -261,7 +261,7 @@ export const updateGame = createServerFn({ method: "POST" })
               const { sendGameStatusUpdate } = await import("~/lib/email/resend");
               const { getBaseUrl } = await import("~/lib/env.server");
               const baseUrl = getBaseUrl();
-              const detailsUrl = `${baseUrl}/dashboard/games/${updatedGame.id}`;
+              const detailsUrl = `${baseUrl}/player/games/${updatedGame.id}`;
               type GameLocation = { address?: string } | null;
               const locationText =
                 (gameWithDetails.data?.location as unknown as GameLocation)?.address ||
@@ -1376,7 +1376,7 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
             const { sendCampaignSessionUpdate } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
-            const detailsUrl = `${baseUrl}/dashboard/games/${newGame.id}`;
+            const detailsUrl = `${baseUrl}/player/games/${newGame.id}`;
             type GameLocation4 = { address?: string } | null;
             const locationText =
               (gameWithDetails.data?.location as unknown as GameLocation4)?.address ||
@@ -1520,7 +1520,7 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
             const { sendGameStatusUpdate } = await import("~/lib/email/resend");
             const { getBaseUrl } = await import("~/lib/env.server");
             const baseUrl = getBaseUrl();
-            const detailsUrl = `${baseUrl}/dashboard/games/${updatedGame.id}`;
+            const detailsUrl = `${baseUrl}/player/games/${updatedGame.id}`;
             type GameLocation5 = { address?: string } | null;
             const locationText =
               (gameWithDetails.data?.location as unknown as GameLocation5)?.address ||

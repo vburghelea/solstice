@@ -1,7 +1,7 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+
+import { EventsReviewDashboard } from "~/features/admin/components/events-review-dashboard";
 
 export const Route = createFileRoute("/admin/events-review")({
-  beforeLoad: () => {
-    throw redirect({ to: "/dashboard/admin/events-review" });
-  },
+  component: EventsReviewDashboard,
 });

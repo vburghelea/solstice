@@ -152,7 +152,7 @@ type EventFormData = z.infer<typeof eventFormSchema>;
 
 export function EventCreateForm() {
   const navigate = useNavigate();
-  const { user } = useRouteContext({ from: "/dashboard/events/create" });
+  const { user } = useRouteContext({ from: "/player/events/create" });
   const isAdminUser = useMemo(() => isAdminClient(user), [user]);
   const [currentStep, setCurrentStep] = useState(0);
   const slugManuallyEditedRef = useRef(false);

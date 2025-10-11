@@ -63,8 +63,8 @@ export interface MakeOptionalPathParams<
 
 ### Using SafeLink Component
 
-- `src/routes/dashboard/teams/$teamId.tsx` (line 214)
-- `src/routes/dashboard/teams/index.tsx` (lines 130, 138)
+- `src/routes/player/teams/$teamId.tsx` (line 214)
+- `src/routes/player/teams/index.tsx` (lines 130, 138)
 
 ### SafeLink Component Implementation
 
@@ -94,9 +94,9 @@ Test results:
 
 ## Real Root Cause
 
-The TypeScript compiler is unable to properly infer that the route "/dashboard/teams/$teamId" has a param named "teamId". The error message shows it's trying to match against:
+The TypeScript compiler is unable to properly infer that the route "/player/teams/$teamId" has a param named "teamId". The error message shows it's trying to match against:
 
-- `ParamsReducerFn<AnyRouter, "PATH", string, "/dashboard/teams/$teamId">`
+- `ParamsReducerFn<AnyRouter, "PATH", string, "/player/teams/$teamId">`
 
 Note that it's using `AnyRouter` instead of the properly registered router type. This suggests the type inference chain is broken somewhere.
 
@@ -113,7 +113,7 @@ Continue using type assertions but document why:
 ```typescript
 // Type assertion needed due to TanStack Router type inference issue
 // The router cannot infer param types from dynamic routes
-<Link to="/dashboard/teams/$teamId" params={{ teamId } as any}>
+<Link to="/player/teams/$teamId" params={{ teamId } as any}>
 ```
 
 ### Option 3: Create a Typed Link Helper
@@ -129,7 +129,7 @@ function createTypedLink<TPath extends keyof FileRoutesByFullPath>(
 }
 
 // Usage
-<Link {...createTypedLink("/dashboard/teams/$teamId", { teamId })} />
+<Link {...createTypedLink("/player/teams/$teamId", { teamId })} />
 ```
 
 ## Verification Completed
@@ -175,7 +175,7 @@ export function TypedLink<
 
 ```typescript
 // Simple param passing - types are inferred correctly
-<Link to="/dashboard/teams/$teamId" params={{ teamId: team.id }}>
+<Link to="/player/teams/$teamId" params={{ teamId: team.id }}>
   View Team
 </Link>
 

@@ -1215,7 +1215,7 @@ export const respondToCampaignInvitation = createServerFn({ method: "POST" })
           ]);
           const { getBaseUrl } = await import("~/lib/env.server");
           const baseUrl = getBaseUrl();
-          const detailsUrl = `${baseUrl}/dashboard/campaigns/${existingParticipant.campaignId}`;
+          const detailsUrl = `${baseUrl}/player/campaigns/${existingParticipant.campaignId}`;
           await sendCampaignInviteResponse({
             to: {
               email: owner.email,

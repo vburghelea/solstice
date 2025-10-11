@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Campaign Management", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/dashboard/campaigns");
+    await page.goto("/player/campaigns");
   });
 
   test("should navigate to campaigns list page", async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe("Campaign Management", () => {
     await page.getByRole("button", { name: /Create Campaign/i }).click();
 
     // Verify redirection to campaign details page
-    await expect(page.url()).toMatch(/\/dashboard\/campaigns\/[a-f0-9-]{36}$/);
+    await expect(page.url()).toMatch(/\/player\/campaigns\/[a-f0-9-]{36}$/);
     await expect(
       page.getByRole("heading", { name: "Playwright Test Campaign" }),
     ).toBeVisible();
@@ -37,10 +37,10 @@ test.describe("Campaign Management", () => {
     await page.getByLabel(/Campaign Name/i).fill("Campaign for Viewing");
     await page.getByLabel(/Description/i).fill("Details to be viewed.");
     await page.getByRole("button", { name: /Create Campaign/i }).click();
-    await expect(page.url()).toMatch(/\/dashboard\/campaigns\/[a-f0-9-]{36}$/);
+    await expect(page.url()).toMatch(/\/player\/campaigns\/[a-f0-9-]{36}$/);
 
     // Navigate back to campaigns list and click on the created campaign
-    await page.goto("/dashboard/campaigns");
+    await page.goto("/player/campaigns");
     await page.getByRole("link", { name: "Campaign for Viewing" }).click();
 
     // Verify details are displayed
@@ -56,7 +56,7 @@ test.describe("Campaign Management", () => {
     await page.getByRole("link", { name: /Create New Campaign/i }).click();
     await page.getByLabel(/Campaign Name/i).fill("Campaign to Update");
     await page.getByRole("button", { name: /Create Campaign/i }).click();
-    await expect(page.url()).toMatch(/\/dashboard\/campaigns\/[a-f0-9-]{36}$/);
+    await expect(page.url()).toMatch(/\/player\/campaigns\/[a-f0-9-]{36}$/);
 
     // Click edit button
     await page.getByRole("button", { name: /Edit Campaign/i }).click();
@@ -79,10 +79,10 @@ test.describe("Campaign Management", () => {
   //   await page.getByRole("link", { name: /Create New Campaign/i }).click();
   //   await page.getByLabel(/Campaign Name/i).fill("Campaign to Delete");
   //   await page.getByRole("button", { name: /Create Campaign/i }).click();
-  //   await expect(page.url()).toMatch(/\/dashboard\/campaigns\/[a-f0-9-]{36}$/);
+  //   await expect(page.url()).toMatch(/\/player\/campaigns\/[a-f0-9-]{36}$/);
 
   //   // Navigate back to campaigns list
-  //   await page.goto("/dashboard/campaigns");
+  //   await page.goto("/player/campaigns");
   //   await expect(page.getByText("Campaign to Delete")).toBeVisible();
 
   //   // Implement deletion steps (e.g., click delete button, confirm dialog)

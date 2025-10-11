@@ -308,7 +308,7 @@ export const sendTeamInvitationEmail = serverOnly(
       process.env["APP_URL"] ||
       "https://app.roundup.games"
     ).replace(/\/$/, "");
-    const invitationUrl = `${appUrl}/dashboard/teams/${params.teamSlug}`;
+    const invitationUrl = `${appUrl}/player/teams/${params.teamSlug}`;
 
     const inviterName = params.invitedByName ?? "A Roundup Games member";
     const htmlContent = await renderTeamInvitationEmail({
@@ -355,7 +355,7 @@ export const sendTeamRequestDecisionEmail = serverOnly(
       process.env["APP_URL"] ||
       "https://app.roundup.games"
     ).replace(/\/$/, "");
-    const decisionUrl = `${appUrl}/dashboard/teams/${params.teamSlug}`;
+    const decisionUrl = `${appUrl}/player/teams/${params.teamSlug}`;
 
     const actorName = params.decidedByName ?? "A team manager";
     const htmlContent = await renderTeamRequestDecisionEmail({

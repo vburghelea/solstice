@@ -24,13 +24,13 @@ async function testRouting() {
   await page.getByRole("button", { name: "Login", exact: true }).click();
 
   // Wait for dashboard
-  console.log("4. Waiting for dashboard...");
-  await page.waitForURL("/dashboard", { timeout: 10000 });
-  console.log("✓ Successfully navigated to dashboard");
+  console.log("4. Waiting for player hub...");
+  await page.waitForURL("/player", { timeout: 10000 });
+  console.log("✓ Successfully navigated to player hub");
 
   // Navigate to teams
   console.log("5. Navigating to teams page...");
-  await page.goto("http://localhost:5173/dashboard/teams");
+  await page.goto("http://localhost:5173/player/teams");
   await page.waitForLoadState("networkidle");
 
   // Try clicking the Create Team button

@@ -5,6 +5,7 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { AuthUser } from "~/lib/auth/types";
 import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
+import { Avatar } from "./avatar";
 import { Button } from "./button";
 
 export function PublicHeader() {
@@ -60,10 +61,19 @@ export function PublicHeader() {
           {/* Desktop Actions */}
           <div className="hidden items-center gap-3 lg:flex">
             {user ? (
-              <Link to="/dashboard">
-                <Button className="btn-brand-primary rounded-lg px-4 py-2 text-sm font-bold">
-                  Dashboard
-                </Button>
+              <Link
+                to="/player"
+                className="border-border/60 hover:border-brand-red/60 hover:bg-brand-red/10 text-foreground flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition"
+              >
+                <Avatar
+                  name={user.name}
+                  email={user.email}
+                  src={user.uploadedAvatarPath ?? user.image}
+                  profileHref={null}
+                  userId={user.id}
+                  className="size-8"
+                />
+                <span>Account</span>
               </Link>
             ) : (
               <>
@@ -117,10 +127,20 @@ export function PublicHeader() {
             </nav>
             <div className="border-border/40 flex flex-col space-y-3 border-t pt-4">
               {user ? (
-                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="btn-brand-primary w-full rounded-lg px-4 py-2 text-sm font-bold">
-                    Dashboard
-                  </Button>
+                <Link
+                  to="/player"
+                  className="border-border/60 hover:border-brand-red/60 hover:bg-brand-red/10 flex items-center gap-3 rounded-full border px-4 py-2 text-sm font-semibold transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Avatar
+                    name={user.name}
+                    email={user.email}
+                    src={user.uploadedAvatarPath ?? user.image}
+                    profileHref={null}
+                    userId={user.id}
+                    className="size-9"
+                  />
+                  <span>Account</span>
                 </Link>
               ) : (
                 <>

@@ -15,7 +15,7 @@ test.use({ storageState: undefined });
 test.describe("Logout Flow (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
     await clearAuthState(page);
-    await gotoWithAuth(page, "/dashboard", LOGOUT_USER);
+    await gotoWithAuth(page, "/player", LOGOUT_USER);
   });
 
   test("should logout successfully", async ({ page }) => {
@@ -50,7 +50,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
     // Try to access protected route - don't use authenticatedGoto here
     // because we're testing that we should NOT be authenticated
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await page.goto("/player", { waitUntil: "domcontentloaded" });
 
     // Should redirect to login
     await expect(page).toHaveURL(/\/auth\/login/);
@@ -58,7 +58,7 @@ test.describe("Logout Flow (Authenticated)", () => {
 
   test("should handle logout from profile page", async ({ page }) => {
     // Navigate to profile page - already authenticated from beforeEach
-    await page.goto("/dashboard/profile", { waitUntil: "networkidle" });
+    await page.goto("/player/profile", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({
       timeout: 15000,
     });
@@ -83,13 +83,13 @@ test.describe("Logout Flow (Authenticated)", () => {
     await expect(page).toHaveURL(/\/auth\/login/);
 
     // Try to access a protected route to verify logout worked
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await page.goto("/player", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(/\/auth\/(login|signin)/, { timeout: 15000 });
   });
 
   test("should handle logout from teams page", async ({ page }) => {
     // Navigate to teams page - already authenticated from beforeEach
-    await page.goto("/dashboard/teams", { waitUntil: "networkidle" });
+    await page.goto("/player/teams", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible({
       timeout: 15000,
     });
@@ -114,7 +114,7 @@ test.describe("Logout Flow (Authenticated)", () => {
     await expect(page).toHaveURL(/\/auth\/login/);
 
     // Try to access a protected route to verify logout worked
-    await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+    await page.goto("/player", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveURL(/\/auth\/(login|signin)/, { timeout: 15000 });
   });
 });

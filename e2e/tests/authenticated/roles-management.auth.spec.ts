@@ -21,6 +21,6 @@ test.describe("Roles management", () => {
     });
 
     await expect(page).not.toHaveURL(/\/admin\/roles/);
-    await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page).toHaveURL(/\/player/);
   });
 });

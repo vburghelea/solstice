@@ -5,7 +5,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Browse Teams Page", () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to browse teams page with authentication
-      await gotoWithAuth(page, "/dashboard/teams/browse", {
+      await gotoWithAuth(page, "/player/teams/browse", {
         email: process.env["E2E_TEST_EMAIL"]!,
         password: process.env["E2E_TEST_PASSWORD"]!,
       });
@@ -102,7 +102,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Join Team Flow", () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to browse teams page with authentication
-      await gotoWithAuth(page, "/dashboard/teams/browse", {
+      await gotoWithAuth(page, "/player/teams/browse", {
         email: process.env["E2E_TEST_EMAIL"]!,
         password: process.env["E2E_TEST_PASSWORD"]!,
       });
@@ -154,7 +154,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Team Filtering", () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to browse teams page with authentication
-      await gotoWithAuth(page, "/dashboard/teams/browse", {
+      await gotoWithAuth(page, "/player/teams/browse", {
         email: process.env["E2E_TEST_EMAIL"]!,
         password: process.env["E2E_TEST_PASSWORD"]!,
       });
@@ -209,7 +209,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Team Quick Actions", () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to browse teams page with authentication
-      await gotoWithAuth(page, "/dashboard/teams/browse", {
+      await gotoWithAuth(page, "/player/teams/browse", {
         email: process.env["E2E_TEST_EMAIL"]!,
         password: process.env["E2E_TEST_PASSWORD"]!,
       });
@@ -227,7 +227,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
       await viewTeamLink.click();
 
       // Should navigate to team detail page
-      await expect(page).toHaveURL(/\/dashboard\/teams\/(test-team-1|[a-zA-Z0-9]+)/);
+      await expect(page).toHaveURL(/\/player\/teams\/(test-team-1|[a-zA-Z0-9]+)/);
     });
 
     test("should show team member count", async ({ page }) => {
@@ -270,7 +270,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
   test.describe("Empty States", () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to browse teams page with authentication
-      await gotoWithAuth(page, "/dashboard/teams/browse", {
+      await gotoWithAuth(page, "/player/teams/browse", {
         email: process.env["E2E_TEST_EMAIL"]!,
         password: process.env["E2E_TEST_PASSWORD"]!,
       });
@@ -292,7 +292,7 @@ test.describe("Team Browsing and Search (Authenticated)", () => {
       const createTeamButton = page.getByRole("link", { name: /Create.*Team/i });
       if (await createTeamButton.isVisible()) {
         await createTeamButton.click();
-        await expect(page).toHaveURL("/dashboard/teams/create");
+        await expect(page).toHaveURL("/player/teams/create");
       }
     });
   });

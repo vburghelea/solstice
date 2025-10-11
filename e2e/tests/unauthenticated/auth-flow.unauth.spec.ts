@@ -82,7 +82,7 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     // Wait for either dashboard or onboarding URL
     await page.waitForURL(
       (url) => {
-        return url.pathname === "/dashboard" || url.pathname === "/onboarding";
+        return url.pathname === "/player" || url.pathname === "/player/onboarding";
       },
       { timeout: 30_000 },
     );
@@ -117,7 +117,7 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
     // which is that protected pages redirect to login
 
     // Navigate to a protected page
-    await page.goto("/dashboard/profile");
+    await page.goto("/player/profile");
 
     // Should redirect to login
     await page.waitForURL(/\/auth\/login/, { timeout: 10_000 });
@@ -127,12 +127,12 @@ test.describe("Authentication Flow (Unauthenticated)", () => {
       page,
       process.env["E2E_TEST_EMAIL"]!,
       process.env["E2E_TEST_PASSWORD"]!,
-      "/dashboard/profile",
+      "/player/profile",
     );
 
     // The redirect parameter may be stripped, so ensure we land on profile
-    if (!page.url().includes("/dashboard/profile")) {
-      await page.goto("/dashboard/profile");
+    if (!page.url().includes("/player/profile")) {
+      await page.goto("/player/profile");
     }
 
     // Verify we can access the profile page after login

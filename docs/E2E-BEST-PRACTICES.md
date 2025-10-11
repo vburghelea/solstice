@@ -72,7 +72,7 @@ await page.locator(".submit-btn").click();
 
 ```typescript
 // Good
-await page.waitForURL("/dashboard");
+await page.waitForURL("/player");
 await expect(page.getByRole("heading")).toBeVisible();
 
 // Avoid

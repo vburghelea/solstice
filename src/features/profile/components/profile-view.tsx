@@ -1425,7 +1425,7 @@ export function ProfileView() {
             </div>
             <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:justify-end">
               <Button asChild className="w-full sm:w-auto" variant="outline" size="sm">
-                <Link to="/dashboard/profile/blocklist">Open Blocklist</Link>
+                <Link to="/player/profile/blocklist">Open Blocklist</Link>
               </Button>
             </div>
           </div>

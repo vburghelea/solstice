@@ -170,7 +170,7 @@ function EventRegistrationPage() {
       }
 
       toast.success("Registration completed!");
-      navigate({ to: "/dashboard/events" });
+      navigate({ to: "/player/events" });
     },
     onError: (error) => {
       toast.error("An error occurred during registration");
@@ -429,7 +429,7 @@ function EventRegistrationPage() {
                       <Alert>
                         <AlertDescription>
                           You need to be part of a team to register as a team. {""}
-                          <Link to="/dashboard/teams" className="underline">
+                          <Link to="/player/teams" className="underline">
                             Join or create a team
                           </Link>
                         </AlertDescription>
@@ -621,7 +621,7 @@ function EventRegistrationPage() {
                     </AlertDescription>
                   </Alert>
                   <Button asChild variant="outline">
-                    <Link to="/dashboard/events">Return to Dashboard</Link>
+                    <Link to="/player/events">Return to Dashboard</Link>
                   </Button>
                 </CardContent>
               </Card>

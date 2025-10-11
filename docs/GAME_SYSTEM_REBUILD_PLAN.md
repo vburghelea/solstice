@@ -213,8 +213,8 @@ Deliverables
 
 - Systems dashboard pages for curation.
   Checklist
-- [x] Create dashboard list with completeness and crawl status, filters for needs curation and errors. _(Route `/dashboard/systems/` with server-backed filters and summary badges delivered in Phase 9.A.)_
-- [x] Create system editor with tabs for Overview, Content, Media, Taxonomy, Crawl. _(Route `/dashboard/systems/$systemId` renders tab scaffold with read-only data; actions follow in Phase 9.C.)_
+- [x] Create dashboard list with completeness and crawl status, filters for needs curation and errors. _(Route `/admin/systems/` with server-backed filters and summary badges delivered in Phase 9.A.)_
+- [x] Create system editor with tabs for Overview, Content, Media, Taxonomy, Crawl. _(Route `/admin/systems/$systemId` renders tab scaffold with read-only data; actions follow in Phase 9.C.)_
 - [x] Implement image moderation toggles and hero selection. _(Media tab supports moderation toggles and hero assignment backed by new server functions.)_
 - [x] Implement external tag mapping UI with search and assignment to canonical items. _(Taxonomy tab now supports per-category/mechanic mapping with source + confidence inputs.)_
 - [x] Implement publish/draft toggles and CMS approval controls. _(Overview tab surfaces publish + approval actions backed by new server mutations with audit metadata refresh.)_
@@ -234,7 +234,7 @@ Deliverables
 
 - Fixed the dashboard query wiring so pagination, search, and sort now trigger fresh table rows instead of holding onto stale data. Query keys flatten the params (`q`, `status`, `sort`, `page`, `perPage`) and disable structural sharing so the React Table instance remounts with the new dataset immediately after "Apply".
 - Added row selection, toolbar messaging, and bulk publish/approval controls to the systems list. A new `bulkUpdateAdminSystems` server mutation accepts `{ systemIds: number[]; updates: { isPublished?: boolean; cmsApproved?: boolean } }` and stamps `updatedAt`, `lastApprovedAt`, and `lastApprovedBy` when approvals flip. The React Query cache invalidates after mutations so the list refreshes without a manual reload.
-- Hardened access control by layering the `/dashboard/systems/` route behind `requireRole` for `Games Admin` and `Platform Admin` roles. Non-admin users will be redirected back to the dashboard shell before the list mounts.
+- Hardened access control by layering the `/admin/systems/` route behind `requireRole` for `Games Admin` and `Platform Admin` roles. Non-admin users will be redirected back to the dashboard shell before the list mounts.
 - Remaining gaps: bulk taxonomy/tag reconciliation still lacks a server contract, though media moderation and recrawl queueing now run through `bulkUpdateAdminSystems`. Capture taxonomy batching requirements in Phase 9.C and plan tests once that endpoint lands.
 
 **Progress 2025-02-22**

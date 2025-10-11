@@ -19,7 +19,7 @@ export default function SignupForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
-  const redirectUrl = "/dashboard"; // Default redirect after signup
+  const redirectUrl = "/player"; // Default redirect after signup
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

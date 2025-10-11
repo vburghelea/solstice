@@ -20,7 +20,7 @@ This document outlines the primary user flows through the Roundup Games platform
 ```
 Landing Page → Sign Up → Email Verification → Complete Profile → Purchase Membership
      /              ↓                              ↓                    ↓
-    /         /login or /signup            /dashboard/profile    Square Checkout
+    /         /login or /signup            /player/profile    Square Checkout
    /                                                              (planned)
 ```
 
@@ -37,7 +37,7 @@ Landing Page → Sign Up → Email Verification → Complete Profile → Purchas
 - `/` - Landing page with CTA ✅
 - `/signup` - Registration form ✅
 - `/login` - Alternative entry ✅
-- `/dashboard/profile` - Profile completion ✅
+- `/player/profile` - Profile completion ✅
 - External payment checkout ⏳
 
 ### 2. Team Registration for Event ⏳ (Planned)
@@ -47,7 +47,7 @@ Landing Page → Sign Up → Email Verification → Complete Profile → Purchas
 ```
 Team Dashboard → Browse Events → Event Details → Team Registration → Payment
       ↓               ↓               ↓                ↓               ↓
-/dashboard/team  /events         /events/[slug]   Registration    Square/E-transfer
+/player/team  /events         /events/[slug]   Registration    Square/E-transfer
    (planned)     (planned)         (planned)         Form            (planned)
 ```
 
@@ -61,7 +61,7 @@ Team Dashboard → Browse Events → Event Details → Team Registration → Pay
 
 **Routes Involved**:
 
-- `/dashboard` - Team overview ✅
+- `/player` - Team overview ✅
 - `/events` - Event listing ⏳
 - `/events/[slug]` - Event details ⏳
 - `/events/[slug]/register` - Registration flow ⏳
@@ -99,7 +99,7 @@ Admin Panel → Create Event → Configure Details → Open Registration → Man
 ```
 Email Reminder → Login → Dashboard → Renewal Prompt → Payment → Confirmation
        ↓           ↓         ↓            ↓              ↓           ↓
-   Notification  /login  /dashboard   Membership     Square      Email + UI
+   Notification  /login  /player   Membership     Square      Email + UI
    (planned)      ✅         ✅        Page (planned) (planned)   (planned)
 ```
 
@@ -115,7 +115,7 @@ Email Reminder → Login → Dashboard → Renewal Prompt → Payment → Confir
 **Routes Involved**:
 
 - `/login` - Authentication ✅
-- `/dashboard` - Member dashboard ✅
+- `/player` - Member dashboard ✅
 - `/membership` - Membership management ⏳
 - External payment flow ⏳
 
@@ -135,7 +135,7 @@ Login Page → Forgot Password → Email Sent → Reset Link → New Password �
 ```
 Team Dashboard → Roster → Add Players → Send Invites → Players Join
        ↓           ↓          ↓             ↓              ↓
-/dashboard/team  /team/roster  Modal    Email sent    Accept invite
+/player/team  /team/roster  Modal    Email sent    Accept invite
    (planned)      (planned)  (planned)   (planned)      (planned)
 ```
 
@@ -144,7 +144,7 @@ Team Dashboard → Roster → Add Players → Send Invites → Players Join
 ```
 Dashboard → Profile → Edit → Save → Confirmation
     ↓         ↓       ↓      ↓         ↓
-/dashboard  /profile  Form  Server   Success
+/player  /profile  Form  Server   Success
     ✅         ✅       ✅      ✅        ✅
 ```
 

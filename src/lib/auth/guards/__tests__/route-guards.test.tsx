@@ -62,11 +62,11 @@ describe("Route Guards", () => {
   });
 
   describe("redirectIfAuthenticated", () => {
-    it("redirects to dashboard when user is authenticated", () => {
+    it("redirects to player hub when user is authenticated", () => {
       expect(() => redirectIfAuthenticated({ user: mockUser })).toThrow(
-        "Redirect to /dashboard",
+        "Redirect to /player",
       );
-      expect(redirect).toHaveBeenCalledWith({ to: "/dashboard" });
+      expect(redirect).toHaveBeenCalledWith({ to: "/player" });
     });
 
     it("allows unauthenticated users through", () => {

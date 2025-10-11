@@ -85,7 +85,7 @@ export function ManualSystemCreateDialog({
     }
 
     const navigateOptions = {
-      to: "/dashboard/systems/$systemId",
+      to: "/admin/systems/$systemId",
       params: { systemId },
       // See note above regarding TanStack Router navigation typings.
     } as unknown as Parameters<typeof router.navigate>[0];

@@ -35,7 +35,7 @@ export const test = base.extend<AuthFixtures>({
     await page.getByRole("button", { name: "Login", exact: true }).click();
 
     // Wait for authentication to complete
-    await page.waitForURL("/dashboard");
+    await page.waitForURL("/player");
 
     // Use the authenticated page in the test
     await use(page);

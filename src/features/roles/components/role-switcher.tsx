@@ -1,5 +1,5 @@
 import { Loader2Icon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -21,14 +21,42 @@ import {
 export function RoleSwitcher() {
   const { resolution, status, error, switchPersona, clearError } = useRoleSwitcher();
   const activePersona = useActivePersona();
-  const [open, setOpen] = useState(false);
+  const [open, dispatchOpen] = useReducer(
+    (state: boolean, action: "open" | "close" | "toggle") => {
+      switch (action) {
+        case "open":
+          return true;
+        case "close":
+          return false;
+        case "toggle":
+          return !state;
+        default:
+          return state;
+      }
+    },
+    false,
+  );
+  const previousPersonaIdRef = useRef(resolution.activePersonaId);
+
+  const closeDialog = useCallback(() => {
+    dispatchOpen("close");
+  }, []);
 
   const handleOpenChange = (nextOpen: boolean) => {
-    setOpen(nextOpen);
+    dispatchOpen(nextOpen ? "open" : "close");
     if (!nextOpen) {
       clearError();
     }
   };
+
+  useEffect(() => {
+    if (previousPersonaIdRef.current === resolution.activePersonaId) {
+      return;
+    }
+
+    previousPersonaIdRef.current = resolution.activePersonaId;
+    closeDialog();
+  }, [closeDialog, resolution.activePersonaId]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

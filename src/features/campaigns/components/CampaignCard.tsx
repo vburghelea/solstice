@@ -32,9 +32,9 @@ interface CampaignCardProps {
 
 export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
   const resolvedLink: CampaignCardLinkConfig = {
-    to: viewLink?.to ?? "/dashboard/campaigns/$campaignId",
+    to: viewLink?.to ?? "/player/campaigns/$campaignId",
     params: viewLink?.params ?? { campaignId: campaign.id },
-    from: viewLink?.from ?? "/dashboard/campaigns",
+    from: viewLink?.from ?? "/player/campaigns",
     label: viewLink?.label ?? "View Campaign",
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };

@@ -9,7 +9,7 @@ const PROFILE_USER = {
 test.describe("Profile Edit", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to profile page with authentication
-    await gotoWithAuth(page, "/dashboard/profile", PROFILE_USER);
+    await gotoWithAuth(page, "/player/profile", PROFILE_USER);
 
     // Wait for the page to be ready
     await expect(page.getByRole("heading", { name: "My Profile" })).toBeVisible({

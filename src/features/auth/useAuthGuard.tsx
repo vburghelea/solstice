@@ -28,7 +28,7 @@ interface UseAuthGuardOptions {
 
   /**
    * URL to redirect authenticated users to when redirectAuthenticated is true
-   * @default "/dashboard"
+   * @default "/player"
    */
   authenticatedRedirectTo?: string;
 
@@ -66,7 +66,7 @@ export function useAuthGuard({
   requireAuth = true,
   redirectAuthenticated = false,
   redirectTo = "/login",
-  authenticatedRedirectTo = "/dashboard",
+  authenticatedRedirectTo = "/player",
   onAuthSuccess,
   onAuthFail,
 }: UseAuthGuardOptions) {

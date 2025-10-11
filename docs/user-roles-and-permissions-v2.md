@@ -7,9 +7,9 @@ src/lib/auth/index.ts,
 src/features/auth/auth.queries.ts,
 src/features/auth/auth.mutations.ts,
 src/components/ui/admin-sidebar.tsx,
-src/routes/dashboard/reports.tsx,
-src/routes/dashboard/teams/$teamId.manage.tsx,
-src/routes/dashboard/events/$eventId.manage.tsx,
+src/routes/player/reports.tsx,
+src/routes/player/teams/$teamId.manage.tsx,
+src/routes/player/events/$eventId.manage.tsx,
 src/routes/\_\_root.tsx,
 src/lib/auth/middleware/auth-guard.ts,
 src/features/profile/profile.guards.ts,
@@ -20,7 +20,7 @@ src/app/providers.tsx,
 docs/user-roles-and-permissions-v2.md,
 src/db/connections.ts,
 src/features/auth/useAuthGuard.tsx,
-src/routes/dashboard/route.tsx
+src/routes/player/route.tsx
 
 # User Roles, Tags, and Permissions System Design V2
 
@@ -635,7 +635,7 @@ This design provides the flexibility you need while keeping the concepts clearly
    - Client-side helper for UI-only checks
 
 6. **Add role guards to protected routes** (~30 min)
-   - Apply guards to /dashboard/reports, team/event management
+   - Apply guards to /player/reports, team/event management
    - Use beforeLoad hooks in TanStack Router
 
 7. **Create seed script for default roles** (~20 min)

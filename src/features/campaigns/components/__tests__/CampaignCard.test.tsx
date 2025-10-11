@@ -13,8 +13,8 @@ describe("CampaignCard", () => {
         campaign={MOCK_CAMPAIGN as CampaignWithDetails as CampaignListItem}
       />,
       {
-        path: "/dashboard/campaigns",
-        initialEntries: ["/dashboard/campaigns"],
+        path: "/player/campaigns",
+        initialEntries: ["/player/campaigns"],
       },
     );
 
@@ -39,13 +39,13 @@ describe("CampaignCard", () => {
     await renderWithRouter(
       <CampaignCard campaign={MOCK_CAMPAIGN as unknown as CampaignListItem} />,
       {
-        path: "/dashboard/campaigns",
-        initialEntries: ["/dashboard/campaigns"],
+        path: "/player/campaigns",
+        initialEntries: ["/player/campaigns"],
       },
     );
 
     const link = screen.getByRole("link", { name: /View Campaign/i });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", `/dashboard/campaigns/${MOCK_CAMPAIGN.id}`);
+    expect(link).toHaveAttribute("href", `/player/campaigns/${MOCK_CAMPAIGN.id}`);
   });
 });

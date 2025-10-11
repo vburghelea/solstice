@@ -36,7 +36,7 @@ vi.mock("@tanstack/react-router", () => ({
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useNavigate: () => mockNavigate,
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useRouteContext: () => ({ redirectUrl: "/dashboard" }),
+  useRouteContext: () => ({ redirectUrl: "/player" }),
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouterState: () => ({ location: { pathname: "/auth/login" } }),
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
@@ -139,7 +139,7 @@ describe("LoginForm", () => {
       expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ["user"] });
 
       // Verify navigation
-      expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard" });
+      expect(mockNavigate).toHaveBeenCalledWith({ to: "/player" });
     });
   });
 
@@ -215,7 +215,7 @@ describe("LoginForm", () => {
     expect(auth.signInWithOAuth).toHaveBeenCalledWith(
       {
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: "/player",
       },
       expect.objectContaining({
         onRequest: expect.any(Function),

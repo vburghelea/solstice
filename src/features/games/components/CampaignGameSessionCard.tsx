@@ -44,9 +44,9 @@ export function CampaignGameSessionCard({
   const formattedDateTime = formatDateAndTime(game.dateTime);
 
   const resolvedLink: GameCardLinkConfig = {
-    to: viewLink?.to ?? "/dashboard/games/$gameId",
+    to: viewLink?.to ?? "/player/games/$gameId",
     params: viewLink?.params ?? { gameId: game.id },
-    from: viewLink?.from ?? "/dashboard/campaigns/$campaignId",
+    from: viewLink?.from ?? "/player/campaigns/$campaignId",
     label: viewLink?.label ?? "View Game",
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };

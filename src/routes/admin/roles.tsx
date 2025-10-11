@@ -1,7 +1,7 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+
+import { RoleManagementDashboard } from "~/features/roles/components/role-management-dashboard";
 
 export const Route = createFileRoute("/admin/roles")({
-  beforeLoad: () => {
-    throw redirect({ to: "/dashboard/admin/roles" });
-  },
+  component: RoleManagementDashboard,
 });

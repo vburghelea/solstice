@@ -221,7 +221,7 @@ const createAuth = async () => {
                   email: newUser.email,
                   name: newUser.name || undefined,
                 },
-                profileUrl: `${baseUrl}/dashboard/profile`,
+                profileUrl: `${baseUrl}/player/profile`,
               });
             } catch (error) {
               console.error("Error sending welcome email:", error);

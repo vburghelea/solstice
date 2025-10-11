@@ -22,7 +22,7 @@ export const Route = createFileRoute("/dev/email/$template")({
         return {
           html: await r.renderWelcomeEmail({
             recipientName: "Ash",
-            profileUrl: "https://example.com/dashboard/profile",
+            profileUrl: "https://example.com/player/profile",
           }),
         };
       case "membership-receipt":

@@ -78,8 +78,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Deliver a personalized `/player` workspace with actionable insights and privacy control surface area.
 - **Engineering Checklist**
-- [x] Create `/player/dashboard` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
-  - `/player` now renders `PlayerDashboard`, repackaging the legacy `/dashboard` data queries into Leo-focused sections for sessions, invites, and curated campaigns while we wire a `/player/dashboard` alias in navigation.
+- [x] Create `/player` route fetching sessions, invitations, and recommended campaigns with skeleton loaders.
+  - `/player` now renders `PlayerDashboard`, repackaging the legacy `/player` data queries into Leo-focused sections for sessions, invites, and curated campaigns while we wire a `/player` alias in navigation.
   - [x] Implement quick actions panel (privacy toggles, profile completion, notification preferences) backed by optimistic server mutations.
     - `PlayerDashboard` now ships a control center card with privacy and notification toggles wired to optimistic mutations that update cached profile state and persist to local storage for instant rollback-safe feedback.
   - [x] Develop reusable cards for social graph highlights and integrate feature flag to enable advanced recommendations.
@@ -112,7 +112,7 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - [x] Construct `/ops/overview` dashboard with modular widgets (registration funnel, marketing attribution, staffing) and data freshness indicators.
   - `/ops` now renders an operations mission control that mirrors the legacy events review workflow while layering Priya-focused metrics, approval actions, logistics watchlists, and marketing hotspot insights for upcoming events.
   - Introduced a reusable ops data hook (`useOpsEventsData`) that reuses event review queries, powers a mission focus banner, and keeps approval queues, pipeline health, and marketing hotspots synchronized for Priya's workspace.
-  - Recent approvals history now lives alongside the approvals queue, bringing forward the `/dashboard/admin/events-review` context with instant links back to preview and manage published experiences from the ops surface.
+  - Recent approvals history now lives alongside the approvals queue, bringing forward the `/admin/events-review` context with instant links back to preview and manage published experiences from the ops surface.
   - [x] Implement event detail route `/ops/events/$eventId` with tabbed navigation for logistics, marketing, staffing, and finances.
     - `/ops/events/$eventId` now renders `OpsEventDetail`, giving Priya persona-aware logistics snapshots, a drill-down timeline, and quick links back to the legacy dashboards while keeping navigation within the ops namespace.
 - [x] Add task management subsystem (assignment, due dates, statuses) with optimistic updates and audit logging.
@@ -137,8 +137,8 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
 - **Objectives**
   - Launch the `/gm` workspace centered on campaign management, feedback loops, and bespoke pipeline visibility.
 - **Engineering Checklist**
-- [x] Develop `/gm/dashboard` summarizing campaign health, upcoming sessions, and player feedback trends.
-  - `/gm/dashboard` now surfaces a "session runway" fed by `listGamesWithCount`, a campaign pulse panel powered by `listCampaignsWithCount`,
+- [x] Develop `/gm` summarizing campaign health, upcoming sessions, and player feedback trends.
+  - `/gm` now surfaces a "session runway" fed by `listGamesWithCount`, a campaign pulse panel powered by `listCampaignsWithCount`,
     and a feedback follow-up queue that maps scheduled sessions to narrative debrief tasks.
   - [x] Implement campaign workspace `/gm/campaigns/$campaignId` with tabs for narrative assets, player dossiers, marketing briefs, and session history.
     - Alex’s campaign studio now renders a narrative brief, safety checkpoints, player dossiers,
@@ -149,7 +149,7 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
       games into a triage board that prioritizes debriefs, safety sweeps, and pre-session
       nudges with severity cues.
   - [x] Introduce B2B pipeline module with stages, assignments, and escalation hooks to Platform Admin namespace.
-    - `/gm/dashboard` now renders a B2B collaboration pipeline board fed by `listGmB2bPipeline`, grouping opportunities by stage with Platform Admin escalation cues and assignment avatars so Alex can see who is covering each handoff.
+    - `/gm` now renders a B2B collaboration pipeline board fed by `listGmB2bPipeline`, grouping opportunities by stage with Platform Admin escalation cues and assignment avatars so Alex can see who is covering each handoff.
     - Added persona-tuned focus summary metrics, filter toggles, and urgency highlighting so Alex can zero-in on renewals at risk, live escalations, and time-bound follow-ups without losing the full pipeline context.
   - [x] Ensure offline-friendly note editing with conflict resolution strategy and background sync indicators.
     - Pipeline cards expose a studio note editor that caches drafts locally, auto-syncs when online, flags conflicts with Platform Admin edits, and provides retry/accept actions with clear sync status pills.
@@ -230,7 +230,7 @@ _This execution plan operationalizes the value blueprint outlined in `docs/role-
    - Use the existing namespace shells (`src/routes/visit/route.tsx`, `src/routes/player/route.tsx`, and peers) to hydrate persona resolutions via `resolvePersonaResolution`, ensuring the RoleSwitcher loads identical state across tabs before gating access to child routes.
    - Default multi-role accounts to the highest-privilege available persona using the stored preference fallback already handled by `RoleSwitcherProvider`, while logging telemetry through `trackPersonaNavigationImpression` for adoption tracking.
 2. **Bridge legacy routes into persona namespaces.**
-   - Mirror core dashboards by aliasing legacy paths (e.g., `/dashboard`) to the new `/player` experience, progressively swapping navigation links and deep links once parity validation completes (`src/routes/player/index.tsx` versus `src/routes/dashboard/index.tsx`).
+   - Mirror core dashboards by aliasing legacy paths to the new `/player` experience, progressively swapping navigation links and deep links once parity validation completes.
    - For operations, game master, and admin flows, introduce soft redirects from historical routes to the new namespace surfaces while keeping the namespace layout active so personas always enter through a role-specific shell.
 3. **Harmonize shared modules.**
    - Replace legacy inbox/reporting embeds with the shared workspace components, wiring persona-specific filters through `SharedInboxView` and `CrossPersonaCollaborationWorkspace` so teams experience a consistent collaboration layer regardless of entry point.

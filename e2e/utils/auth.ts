@@ -19,7 +19,7 @@ export async function uiLogin(
   page: Page,
   email: string,
   password: string,
-  redirect = "/dashboard",
+  redirect = "/player",
 ) {
   await page.goto(`/auth/login?redirect=${redirect}`);
 
@@ -85,7 +85,7 @@ export async function login(page: Page, email: string, password: string) {
   await loginBtn.click();
 
   // Wait for navigation to complete
-  await page.waitForURL("/dashboard");
+  await page.waitForURL("/player");
 }
 
 export async function signup(page: Page, name: string, email: string, password: string) {
@@ -99,7 +99,7 @@ export async function signup(page: Page, name: string, email: string, password: 
   await signupBtn.click();
 
   // Wait for navigation to complete
-  await page.waitForURL("/onboarding");
+  await page.waitForURL("/player/player/onboarding");
 }
 
 export async function logout(page: Page) {
@@ -137,7 +137,7 @@ export async function gotoWithAuth(
     // After login, check if we're on dashboard (redirect might be stripped)
     await page.waitForLoadState("networkidle");
     const currentUrl = page.url();
-    if (currentUrl.includes("/dashboard") && !currentUrl.includes(path)) {
+    if (currentUrl.includes("/player") && !currentUrl.includes(path)) {
       // Navigate to the intended path since redirect was stripped
       console.log(`Redirect was stripped. Navigating from ${currentUrl} to ${path}`);
       await page.goto(path, { waitUntil: "domcontentloaded" });

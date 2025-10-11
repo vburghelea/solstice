@@ -6,7 +6,7 @@ import type { User } from "~/lib/auth/types";
  * Redirects to onboarding if profile is incomplete.
  *
  * @param user - The authenticated user object
- * @throws Redirect to /onboarding if profile is incomplete
+ * @throws Redirect to /player/onboarding if profile is incomplete
  */
 export function requireCompleteProfile(user: User | null | undefined) {
   if (!user) {
@@ -14,7 +14,7 @@ export function requireCompleteProfile(user: User | null | undefined) {
   }
 
   if (!user.profileComplete) {
-    throw redirect({ to: "/onboarding" });
+    throw redirect({ to: "/player/onboarding" });
   }
 }
 

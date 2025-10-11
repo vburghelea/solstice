@@ -1,14 +1,27 @@
-import { Outlet, useRouterState } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Outlet, useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
-import { Menu, X } from "lucide-react";
-import { Suspense, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { LogOut, Menu, X } from "lucide-react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
+import { toast } from "sonner";
 import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { PersonaNamespaceFallback } from "~/features/layouts/persona-namespace-layout";
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { useActivePersona } from "~/features/roles/role-switcher-context";
+import { auth } from "~/lib/auth-client";
 import type { AuthUser } from "~/lib/auth/types";
 import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
@@ -55,10 +68,52 @@ export function RoleWorkspaceLayout({
   fallbackLabel,
   workspaceLabel,
 }: RoleWorkspaceLayoutProps) {
-  const [navOpen, setNavOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const routerInstance = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [navOpen, dispatchNavOpen] = useReducer(
+    (state: boolean, action: "open" | "close" | "toggle") => {
+      switch (action) {
+        case "open":
+          return true;
+        case "close":
+          return false;
+        case "toggle":
+          return !state;
+        default:
+          return state;
+      }
+    },
+    false,
+  );
   const persona = useActivePersona();
+  const previousPersonaIdRef = useRef(persona.id);
   const location = useRouterState({ select: (state) => state.location.pathname });
+  const navigate = useNavigate();
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
+
+  const handleSignOut = useCallback(async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    try {
+      const result = await auth.signOut();
+      if (result?.error) {
+        throw result.error;
+      }
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+      toast.error("We couldn't sign you out. Please try again.");
+      setIsSigningOut(false);
+      return;
+    }
+
+    try {
+      queryClient.clear();
+      await routerInstance.invalidate();
+    } finally {
+      window.location.href = "/auth/login";
+    }
+  }, [isSigningOut, queryClient, routerInstance]);
 
   const resolvedWorkspaceLabel =
     workspaceLabel ?? persona?.label ?? fallbackLabel ?? "Workspace";
@@ -84,6 +139,26 @@ export function RoleWorkspaceLayout({
     return items.slice(0, 4);
   }, [workspaceNavItems]);
 
+  useEffect(() => {
+    const previousPersonaId = previousPersonaIdRef.current;
+    if (previousPersonaId === persona.id) {
+      return;
+    }
+
+    previousPersonaIdRef.current = persona.id;
+    dispatchNavOpen("close");
+
+    const targetPath = persona.defaultRedirect ?? persona.namespacePath ?? "/";
+    const isWithinNamespace =
+      persona.namespacePath === "/"
+        ? location === "/"
+        : location.startsWith(persona.namespacePath);
+
+    if (!isWithinNamespace || location !== targetPath) {
+      void navigate({ to: targetPath } as never);
+    }
+  }, [location, navigate, persona]);
+
   return (
     <div
       className="bg-background text-foreground min-h-dvh w-full"
@@ -93,7 +168,7 @@ export function RoleWorkspaceLayout({
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
             className="absolute inset-0 bg-black/50"
-            onClick={() => setNavOpen(false)}
+            onClick={() => dispatchNavOpen("close")}
           />
           <div className="border-border bg-background absolute inset-y-0 right-0 flex w-[min(90vw,22rem)] flex-col gap-6 border-l px-5 py-6 shadow-2xl">
             <div className="flex items-center justify-between">
@@ -106,7 +181,7 @@ export function RoleWorkspaceLayout({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setNavOpen(false)}
+                onClick={() => dispatchNavOpen("close")}
                 aria-label="Close workspace navigation"
               >
                 <X className="h-5 w-5" />
@@ -121,7 +196,7 @@ export function RoleWorkspaceLayout({
               heading="Workspace tools"
               items={workspaceNavItems}
               activePath={location}
-              onNavigate={() => setNavOpen(false)}
+              onNavigate={() => dispatchNavOpen("close")}
             />
             {accountNavItems.length ? (
               <WorkspaceNavSection
@@ -129,8 +204,17 @@ export function RoleWorkspaceLayout({
                 heading="Account"
                 items={accountNavItems}
                 activePath={location}
-                onNavigate={() => setNavOpen(false)}
+                onNavigate={() => dispatchNavOpen("close")}
               />
+            ) : null}
+            {user ? (
+              <div className="border-border/60 border-t pt-4">
+                <SignOutButton
+                  onSignOut={handleSignOut}
+                  isSigningOut={isSigningOut}
+                  className="w-full justify-center"
+                />
+              </div>
             ) : null}
           </div>
         </div>
@@ -140,7 +224,7 @@ export function RoleWorkspaceLayout({
         <WorkspaceMobileHeader
           workspaceLabel={resolvedWorkspaceLabel}
           title={title}
-          onMenuClick={() => setNavOpen(true)}
+          onMenuClick={() => dispatchNavOpen("open")}
         />
         <main className="flex-1 px-4 pt-4 pb-[var(--workspace-mobile-main-padding)] sm:px-6 sm:pt-6 lg:px-10 lg:pb-12">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:max-w-[90%]">
@@ -171,6 +255,8 @@ export function RoleWorkspaceLayout({
                 workspaceNavItems={workspaceNavItems}
                 accountNavItems={accountNavItems}
                 activePath={location}
+                onSignOut={handleSignOut}
+                isSigningOut={isSigningOut}
               />
             </div>
             {headerSlot ? <div className="hidden lg:block">{headerSlot}</div> : null}
@@ -188,12 +274,16 @@ function WorkspaceSummaryPanel({
   workspaceNavItems,
   accountNavItems,
   activePath,
+  onSignOut,
+  isSigningOut,
 }: {
   workspaceLabel: string;
   user: AuthUser | null;
   workspaceNavItems: RoleWorkspaceNavItem[];
   accountNavItems: RoleWorkspaceNavItem[];
   activePath: string;
+  onSignOut: () => Promise<void> | void;
+  isSigningOut: boolean;
 }) {
   return (
     <aside
@@ -221,6 +311,15 @@ function WorkspaceSummaryPanel({
           items={accountNavItems}
           activePath={activePath}
         />
+      ) : null}
+      {user ? (
+        <div className="border-border/60 border-t pt-4">
+          <SignOutButton
+            onSignOut={onSignOut}
+            isSigningOut={isSigningOut}
+            className="w-full"
+          />
+        </div>
       ) : null}
     </aside>
   );
@@ -288,6 +387,35 @@ function WorkspaceNavSection({
         })}
       </nav>
     </div>
+  );
+}
+
+function SignOutButton({
+  onSignOut,
+  isSigningOut,
+  className,
+}: {
+  onSignOut: () => Promise<void> | void;
+  isSigningOut: boolean;
+  className?: string;
+}) {
+  const handleClick = () => {
+    void onSignOut();
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={cn(
+        "border-destructive/50 text-destructive hover:bg-destructive/10 flex items-center gap-2 rounded-xl border px-3 py-3 text-sm font-medium transition disabled:opacity-60",
+        className,
+      )}
+      disabled={isSigningOut}
+    >
+      <LogOut className="h-4 w-4" aria-hidden />
+      <span>{isSigningOut ? "Signing out..." : "Sign out"}</span>
+    </button>
   );
 }
 

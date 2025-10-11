@@ -7,7 +7,7 @@ interface ProfileLinkProps {
 }
 
 export function ProfileLink({ userId, username, className }: ProfileLinkProps) {
-  const href = `/dashboard/profile/${encodeURIComponent(userId)}`;
+  const href = `/profile/${encodeURIComponent(userId)}`;
   return (
     <a href={href} className={cn("text-primary font-medium hover:underline", className)}>
       {username}

@@ -1,0 +1,189 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { mockUseQueryGame, mockUseQueryRelationship } from "~/tests/mocks/react-query";
+
+function setupRoute(mod: unknown, currentUserId: string, gameId = "g1", loaderData = {}) {
+  const m = mod as { Route: unknown };
+  (m.Route as unknown as { useParams: () => { gameId: string } }).useParams = () => ({
+    gameId,
+  });
+  (
+    m.Route as unknown as { useRouteContext: () => { user: { id: string } | null } }
+  ).useRouteContext = () => ({
+    user: { id: currentUserId },
+  });
+  (m.Route as unknown as { useLoaderData: () => unknown }).useLoaderData = () =>
+    loaderData;
+}
+
+function qc() {
+  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
+}
+
+describe("PlayerGameDetails apply eligibility (connections-only)", () => {
+  it("hides Apply when protected and not a connection", async () => {
+    mockUseQueryGame.mockReturnValueOnce({
+      data: {
+        id: "g1",
+        owner: { id: "owner", name: "Owner", email: "o@x" },
+        gameSystem: { id: 1, name: "Test System" },
+        dateTime: new Date().toISOString(),
+        description: "A test game session",
+        expectedDuration: 120,
+        price: 0,
+        language: "English",
+        location: { address: "Test Location" },
+        status: "scheduled",
+        minimumRequirements: null,
+        safetyRules: {
+          basicRules: {
+            noAlcohol: false,
+            safeWordRequired: false,
+            encourageOpenCommunication: false,
+          },
+          safetyTools: [{ id: "tool1", label: "Safety Tool", enabled: false }],
+        },
+        visibility: "protected",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        participants: [],
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    mockUseQueryRelationship.mockReturnValueOnce({
+      data: {
+        success: true,
+        data: { blocked: false, blockedBy: false, isConnection: false },
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    const mod = await import("../$gameId");
+    setupRoute(mod, "viewer", "g1", {
+      game: {
+        id: "g1",
+        owner: { id: "owner", name: "Owner", email: "o@x" },
+        gameSystem: { id: 1, name: "Test System" },
+        dateTime: new Date().toISOString(),
+        description: "A test game session",
+        expectedDuration: 120,
+        price: 0,
+        language: "English",
+        location: { address: "Test Location" },
+        status: "scheduled",
+        minimumRequirements: null,
+        safetyRules: {
+          basicRules: {
+            noAlcohol: false,
+            safeWordRequired: false,
+            encourageOpenCommunication: false,
+          },
+          safetyTools: [{ id: "tool1", label: "Safety Tool", enabled: false }],
+        },
+        visibility: "protected",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        participants: [],
+      },
+      error: null,
+    });
+
+    const Component = mod.Route.options.component!;
+    render(
+      <QueryClientProvider client={qc()}>
+        <Component />
+      </QueryClientProvider>,
+    );
+
+    await screen.findByText(/about this session/i);
+    const buttons = screen.queryAllByRole("button", { name: /apply to join/i });
+    expect(buttons).toHaveLength(0);
+  });
+
+  it("shows Apply when protected and viewer is a connection", async () => {
+    mockUseQueryGame.mockReturnValueOnce({
+      data: {
+        id: "g2",
+        owner: { id: "owner", name: "Owner", email: "o@x" },
+        gameSystem: { id: 1, name: "Test System" },
+        dateTime: new Date().toISOString(),
+        description: "A test game session",
+        expectedDuration: 120,
+        price: 0,
+        language: "English",
+        location: { address: "Test Location" },
+        status: "scheduled",
+        minimumRequirements: null,
+        safetyRules: {
+          basicRules: {
+            noAlcohol: false,
+            safeWordRequired: false,
+            encourageOpenCommunication: false,
+          },
+          safetyTools: [{ id: "tool1", label: "Safety Tool", enabled: false }],
+        },
+        visibility: "protected",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        participants: [],
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    mockUseQueryRelationship.mockReturnValueOnce({
+      data: {
+        success: true,
+        data: { blocked: false, blockedBy: false, isConnection: true },
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    const mod = await import("../$gameId");
+    setupRoute(mod, "viewer", "g2", {
+      game: {
+        id: "g2",
+        owner: { id: "owner", name: "Owner", email: "o@x" },
+        gameSystem: { id: 1, name: "Test System" },
+        dateTime: new Date().toISOString(),
+        description: "A test game session",
+        expectedDuration: 120,
+        price: 0,
+        language: "English",
+        location: { address: "Test Location" },
+        status: "scheduled",
+        minimumRequirements: null,
+        safetyRules: {
+          basicRules: {
+            noAlcohol: false,
+            safeWordRequired: false,
+            encourageOpenCommunication: false,
+          },
+          safetyTools: [{ id: "tool1", label: "Safety Tool", enabled: false }],
+        },
+        visibility: "protected",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        participants: [],
+      },
+      error: null,
+    });
+
+    const Component = mod.Route.options.component!;
+    render(
+      <QueryClientProvider client={qc()}>
+        <Component />
+      </QueryClientProvider>,
+    );
+
+    await screen.findByText(/about this session/i);
+    const buttons = await screen.findAllByRole("button", { name: /apply to join/i });
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+});

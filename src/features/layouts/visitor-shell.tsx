@@ -43,7 +43,7 @@ export function VisitorShell({ children }: VisitorShellProps) {
               <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
                 Roundup Games
               </span>
-              <span className="text-base md:text-lg">Visit experience</span>
+              <span className="text-base md:text-lg">At a table near you!</span>
             </span>
           </Link>
           <nav className="hidden items-center gap-2 text-sm font-medium md:flex">

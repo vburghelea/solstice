@@ -37,7 +37,7 @@ test.describe("Events flow", () => {
 
     await test.step("Admin creates a public event", async () => {
       await clearAuthState(page);
-      await gotoWithAuth(page, "/dashboard/events/create", {
+      await gotoWithAuth(page, "/player/events/create", {
         email: adminEmail,
         password: adminPassword,
       });
@@ -101,7 +101,7 @@ test.describe("Events flow", () => {
 
       await page.getByRole("button", { name: "Complete Registration" }).click();
 
-      await page.waitForURL(/\/dashboard\/events$/, { timeout: 10000 });
+      await page.waitForURL(/\/player\/events$/, { timeout: 10000 });
       await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
     });
 
@@ -120,7 +120,7 @@ test.describe("Events flow", () => {
       await expect(reviewedRow).toBeVisible({ timeout: 10000 });
       await reviewedRow.getByRole("link", { name: "Manage" }).click();
 
-      await page.waitForURL(/\/dashboard\/events\/.+\/manage$/, { timeout: 10000 });
+      await page.waitForURL(/\/player\/events\/.+\/manage$/, { timeout: 10000 });
       await expect(page.getByRole("heading", { name: "Manage Event" })).toBeVisible();
       await expect(page.getByText(eventName)).toBeVisible();
 

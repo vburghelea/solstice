@@ -19,20 +19,20 @@ import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
-  getDashboardStats,
-  getNextUserGame,
-} from "~/features/dashboard/dashboard.queries";
-import {
   RoleWorkspaceLayout,
   type RoleWorkspaceNavItem,
 } from "~/features/layouts/role-workspace-layout";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import type { MembershipStatus as PlayerMembershipStatus } from "~/features/membership/membership.types";
+import {
+  getNextPlayerGame,
+  getPlayerWorkspaceStats,
+} from "~/features/player/player.queries";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { getUserTeams } from "~/features/teams/teams.queries";
-import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+import { requireAuth, requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 
 const PLAYER_NAVIGATION: RoleWorkspaceNavItem[] = [
@@ -96,14 +96,19 @@ const PLAYER_NAVIGATION: RoleWorkspaceNavItem[] = [
   },
 ];
 
-type DashboardStatsResult = Awaited<ReturnType<typeof getDashboardStats>>;
-type DashboardStatsData = Extract<DashboardStatsResult, { success: true }>["data"];
+type WorkspaceStatsResult = Awaited<ReturnType<typeof getPlayerWorkspaceStats>>;
+type WorkspaceStatsData = Extract<WorkspaceStatsResult, { success: true }>["data"];
 type MembershipStatusData = PlayerMembershipStatus;
-type NextGameResult = Awaited<ReturnType<typeof getNextUserGame>>;
+type NextGameResult = Awaited<ReturnType<typeof getNextPlayerGame>>;
 type UserTeamsData = Awaited<ReturnType<typeof getUserTeams>>;
 
 export const Route = createFileRoute("/player")({
   beforeLoad: async ({ context, location }) => {
+    if (location.pathname.startsWith("/player/onboarding")) {
+      requireAuth({ user: context.user, location });
+      return;
+    }
+
     requireAuthAndProfile({ user: context.user, location });
   },
   loader: async () => {
@@ -145,14 +150,14 @@ function PlayerWorkspaceSummary() {
   const { user } = Route.useRouteContext();
   const isAuthenticated = Boolean(user?.id);
 
-  const dashboardStatsQuery = useQuery<DashboardStatsData>({
-    queryKey: ["dashboard-stats"],
+  const workspaceStatsQuery = useQuery<WorkspaceStatsData>({
+    queryKey: ["player-workspace-stats"],
     queryFn: async () => {
-      const result = await getDashboardStats();
+      const result = await getPlayerWorkspaceStats();
       if (!result.success || !result.data) {
         const message =
           ("errors" in result && result.errors?.[0]?.message) ||
-          "Failed to load dashboard stats";
+          "Failed to load workspace stats";
         throw new Error(message);
       }
       return result.data;
@@ -179,7 +184,7 @@ function PlayerWorkspaceSummary() {
 
   const nextGameQuery = useQuery<NextGameResult | undefined>({
     queryKey: ["next-user-game"],
-    queryFn: async () => getNextUserGame(),
+    queryFn: async () => getNextPlayerGame(),
     staleTime: 5 * 60 * 1000,
     enabled: isAuthenticated,
   });
@@ -195,11 +200,11 @@ function PlayerWorkspaceSummary() {
   const nextGame = nextGameQuery.data?.success ? nextGameQuery.data.data : null;
   const teams = useMemo(() => teamsQuery.data ?? [], [teamsQuery.data]);
   const firstTeam = teams[0];
-  const dashboardStats = dashboardStatsQuery.data;
+  const workspaceStats = workspaceStatsQuery.data;
 
   const totalInvites =
-    (dashboardStats?.campaigns.pendingInvites ?? 0) +
-    (dashboardStats?.games.pendingInvites ?? 0);
+    (workspaceStats?.campaigns.pendingInvites ?? 0) +
+    (workspaceStats?.games.pendingInvites ?? 0);
 
   const membershipBadgeVariant = membershipStatus?.hasMembership
     ? "default"
@@ -212,7 +217,7 @@ function PlayerWorkspaceSummary() {
     : "No active membership";
 
   const isLoading =
-    dashboardStatsQuery.isLoading ||
+    workspaceStatsQuery.isLoading ||
     membershipStatusQuery.isLoading ||
     nextGameQuery.isLoading ||
     teamsQuery.isLoading;

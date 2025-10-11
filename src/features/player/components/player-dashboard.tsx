@@ -25,15 +25,15 @@ import {
 } from "~/components/ui/icons";
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
-import {
-  getDashboardStats,
-  getNextUserGame,
-} from "~/features/dashboard/dashboard.queries";
 import { getUpcomingEvents } from "~/features/events/events.queries";
 import type { EventWithDetails } from "~/features/events/events.types";
 import type { GameListItem } from "~/features/games/games.types";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
 import type { MembershipStatus } from "~/features/membership/membership.types";
+import {
+  getNextPlayerGame,
+  getPlayerWorkspaceStats,
+} from "~/features/player/player.queries";
 import { updatePrivacySettings } from "~/features/profile/profile.mutations";
 import { getUserProfile } from "~/features/profile/profile.queries";
 import type {
@@ -59,7 +59,7 @@ type PlayerPersonaProfile = {
 
 type ProfileMutationContext = { previous: PlayerPersonaProfile | undefined };
 
-type DashboardStatsData = {
+type PlayerWorkspaceStatsData = {
   campaigns: { owned: number; member: number; pendingInvites: number };
   games: { owned: number; member: number; pendingInvites: number };
 };
@@ -72,13 +72,13 @@ type UserTeamsData = Awaited<ReturnType<typeof getUserTeams>>;
 type UpcomingEventsData = EventWithDetails[];
 
 const STORAGE_KEYS = {
-  dashboardStats: "player-dashboard:stats",
-  membership: "player-dashboard:membership",
-  teams: "player-dashboard:teams",
-  nextGame: "player-dashboard:next-game",
-  events: "player-dashboard:events",
-  reviews: "player-dashboard:reviews",
-  profile: "player-dashboard:profile",
+  workspaceStats: "player-workspace:stats",
+  membership: "player-workspace:membership",
+  teams: "player-workspace:teams",
+  nextGame: "player-workspace:next-game",
+  events: "player-workspace:events",
+  reviews: "player-workspace:reviews",
+  profile: "player-workspace:profile",
 } as const;
 
 function readStoredData<T>(key: string): T | undefined {
@@ -200,33 +200,33 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   const { profileComplete, privacySettings, notificationPreferences } =
     personaProfile ?? DEFAULT_PROFILE_SNAPSHOT;
 
-  const dashboardStatsQuery = useQuery<DashboardStatsData | undefined, Error>({
-    queryKey: ["dashboard-stats"],
+  const workspaceStatsQuery = useQuery<PlayerWorkspaceStatsData | undefined, Error>({
+    queryKey: ["player-workspace-stats"],
     queryFn: async () => {
-      const result = await getDashboardStats();
+      const result = await getPlayerWorkspaceStats();
       if (!result.success) {
         const message =
           "errors" in result && result.errors?.[0]?.message
             ? result.errors[0]?.message
-            : "Failed to fetch dashboard stats";
+            : "Failed to fetch player workspace stats";
         throw new Error(message);
       }
       return result.data;
     },
     initialData: () =>
-      readStoredData<DashboardStatsData>(STORAGE_KEYS.dashboardStats) ?? undefined,
+      readStoredData<PlayerWorkspaceStatsData>(STORAGE_KEYS.workspaceStats) ?? undefined,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
     enabled: isAuthenticated,
   });
-  const dashboardStats = dashboardStatsQuery.data;
+  const workspaceStats = workspaceStatsQuery.data;
 
   useEffect(() => {
-    if (!isAuthenticated || !dashboardStats) {
+    if (!isAuthenticated || !workspaceStats) {
       return;
     }
-    persistData(STORAGE_KEYS.dashboardStats, dashboardStats);
-  }, [dashboardStats, isAuthenticated]);
+    persistData(STORAGE_KEYS.workspaceStats, workspaceStats);
+  }, [isAuthenticated, workspaceStats]);
 
   const membershipStatusQuery = useQuery<MembershipStatusValue | null, Error>({
     queryKey: ["membership-status"],
@@ -277,8 +277,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   }, [isAuthenticated, userTeams]);
 
   const nextGameQuery = useQuery<NextGameOperationResult | undefined, Error>({
-    queryKey: ["next-user-game"],
-    queryFn: async () => getNextUserGame(),
+    queryKey: ["next-player-game"],
+    queryFn: async () => getNextPlayerGame(),
     initialData: () =>
       readStoredData<NextGameOperationResult>(STORAGE_KEYS.nextGame) ?? undefined,
     staleTime: 1000 * 60 * 5,
@@ -346,12 +346,12 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       : "Membership active"
     : "No active membership";
 
-  const campaignsSummary = dashboardStats?.campaigns ?? {
+  const campaignsSummary = workspaceStats?.campaigns ?? {
     owned: 0,
     member: 0,
     pendingInvites: 0,
   };
-  const gamesSummary = dashboardStats?.games ?? {
+  const gamesSummary = workspaceStats?.games ?? {
     owned: 0,
     member: 0,
     pendingInvites: 0,

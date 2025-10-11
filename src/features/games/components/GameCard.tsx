@@ -49,9 +49,9 @@ export function GameCard({
     isOwner && game.status !== "completed" && game.status !== "canceled";
 
   const resolvedLink: GameCardLinkConfig = {
-    to: viewLink?.to ?? "/dashboard/games/$gameId",
+    to: viewLink?.to ?? "/player/games/$gameId",
     params: viewLink?.params ?? { gameId: game.id },
-    from: viewLink?.from ?? "/dashboard/games",
+    from: viewLink?.from ?? "/player/games",
     label: viewLink?.label ?? "View Game",
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };

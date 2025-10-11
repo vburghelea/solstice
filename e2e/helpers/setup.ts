@@ -19,7 +19,7 @@ export async function waitForAuthStateToLoad(page: Page) {
     // Only wait if we're on a dashboard page
     const currentUrl = page.url();
     if (
-      currentUrl.includes("/dashboard") ||
+      currentUrl.includes("/player") ||
       currentUrl.includes("/profile") ||
       currentUrl.includes("/teams")
     ) {
@@ -76,7 +76,7 @@ export async function authenticatedGoto(page: Page, url: string) {
     // For pages without sidebar, check for other auth indicators
     const currentUrl = page.url();
     if (
-      currentUrl.includes("/dashboard") ||
+      currentUrl.includes("/player") ||
       currentUrl.includes("/profile") ||
       currentUrl.includes("/teams")
     ) {

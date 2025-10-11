@@ -4,7 +4,7 @@ import { gotoWithAuth } from "../../utils/auth";
 test.describe("Teams Management (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to teams page with authentication
-    await gotoWithAuth(page, "/dashboard/teams", {
+    await gotoWithAuth(page, "/player/teams", {
       email: process.env["E2E_TEST_EMAIL"]!,
       password: process.env["E2E_TEST_PASSWORD"]!,
     });
@@ -29,11 +29,11 @@ test.describe("Teams Management (Authenticated)", () => {
     });
 
     test("should navigate to teams from sidebar", async ({ page }) => {
-      await page.goto("/dashboard");
+      await page.goto("/player");
 
       const sidebar = page.getByRole("complementary");
       await sidebar.getByRole("link", { name: "Teams" }).click();
-      await expect(page).toHaveURL("/dashboard/teams");
+      await expect(page).toHaveURL("/player/teams");
     });
 
     test("should display user teams with correct information", async ({ page }) => {
@@ -100,7 +100,7 @@ test.describe("Teams Management (Authenticated)", () => {
       });
       await teamCard.getByRole("link", { name: "View Team" }).click();
 
-      await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1/);
+      await expect(page).toHaveURL(/\/player\/teams\/test-team-1/);
     });
 
     test("should navigate to team management page for captains/coaches", async ({
@@ -114,12 +114,12 @@ test.describe("Teams Management (Authenticated)", () => {
       });
       await teamCard.getByRole("link", { name: "Manage" }).click();
 
-      await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1\/manage/);
+      await expect(page).toHaveURL(/\/player\/teams\/test-team-1\/manage/);
     });
 
     test("should navigate to create team page", async ({ page }) => {
       await page.getByRole("link", { name: "Create Team" }).click();
-      await expect(page).toHaveURL("/dashboard/teams/create");
+      await expect(page).toHaveURL("/player/teams/create");
 
       // Check create team form is displayed
       await expect(page.getByText("Create a New Team")).toBeVisible();
@@ -135,7 +135,7 @@ test.describe("Teams Management (Authenticated)", () => {
   test.describe("Team Creation", () => {
     test.beforeEach(async ({ page }) => {
       // Simply navigate to the create team page - we already have auth from storageState
-      await page.goto("/dashboard/teams/create");
+      await page.goto("/player/teams/create");
 
       // Wait for the page to load - look for the text in the form
       await expect(page.getByText("Create a New Team")).toBeVisible({
@@ -168,7 +168,7 @@ test.describe("Teams Management (Authenticated)", () => {
 
     test("should validate required fields", async ({ page }) => {
       // Navigate to create team page
-      await page.goto("/dashboard/teams/create");
+      await page.goto("/player/teams/create");
       await page.waitForLoadState("networkidle");
 
       // Focus on the team name field and leave it empty to trigger validation
@@ -271,14 +271,14 @@ test.describe("Teams Management (Authenticated)", () => {
 
       // The cancel link should navigate back, but fall back to the header link if it doesn't
       await page.waitForTimeout(500);
-      if (page.url().includes("/dashboard/teams/create")) {
+      if (page.url().includes("/player/teams/create")) {
         const backToTeamsLink = page.getByRole("link", { name: "Back to Teams" });
         if (await backToTeamsLink.isVisible().catch(() => false)) {
           await backToTeamsLink.click();
         }
       }
 
-      await expect(page).toHaveURL("/dashboard/teams", { timeout: 15000 });
+      await expect(page).toHaveURL("/player/teams", { timeout: 15000 });
     });
   });
 });

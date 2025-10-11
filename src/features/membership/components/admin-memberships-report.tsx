@@ -23,7 +23,7 @@ const columns: ColumnDef<MembershipReportRow>[] = [
       const display = original.userName || original.userEmail || original.userId;
       return (
         <Link
-          to="/dashboard/profile/$userId"
+          to="/profile/$userId"
           params={{ userId: original.userId }}
           className="inline-flex items-center gap-2"
         >

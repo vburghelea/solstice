@@ -302,7 +302,7 @@ import { LoaderIcon } from "~/components/ui/icons";
 
 ```typescript
 // In your route component
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/player")({
   component: Dashboard,
   loader: ({ context }) => ({ user: context.user }),
 });

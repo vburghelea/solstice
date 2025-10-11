@@ -63,7 +63,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Membership Flow", () => {
   test("should display membership types", async ({ page }) => {
-    await page.goto("/dashboard/membership");
+    await page.goto("/player/membership");
 
     // Should see membership types
     await expect(page.getByText("Annual Player Membership")).toBeVisible();
@@ -71,7 +71,7 @@ test.describe("Membership Flow", () => {
   });
 
   test("should handle checkout flow", async ({ page }) => {
-    await page.goto("/dashboard/membership");
+    await page.goto("/player/membership");
 
     // Click purchase button
     await page.getByRole("button", { name: "Purchase Membership" }).click();

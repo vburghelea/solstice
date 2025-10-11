@@ -18,7 +18,7 @@ The Netlify deployment dated 2025‑09‑19 now completes the full Square sandbo
 ## Validation Steps
 
 1. Triggered sandbox payment via Square testing panel (`Test Payment` button)
-2. Callback redirected to `/dashboard/membership?success=true&payment_id=...&session=...`
+2. Callback redirected to `/player/membership?success=true&payment_id=...&session=...`
 3. Verified membership session stored with `status=completed`, linked membership id, payment id
 4. Confirmed UI reflects active membership state after redirect
 

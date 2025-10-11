@@ -163,7 +163,7 @@ import { test, expect } from "@playwright/test";
 
 test("view dashboard", async ({ page }) => {
   // Already authenticated via setup
-  await page.goto("/dashboard");
+  await page.goto("/player");
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 });
 ```
@@ -174,7 +174,7 @@ test("view dashboard", async ({ page }) => {
 import { test, expect } from "../fixtures/auth";
 
 test("update profile", async ({ authenticatedPage }) => {
-  await authenticatedPage.goto("/dashboard/profile");
+  await authenticatedPage.goto("/player/profile");
   await authenticatedPage.getByLabel("Phone").fill("+1234567890");
   await authenticatedPage.getByRole("button", { name: "Save" }).click();
 

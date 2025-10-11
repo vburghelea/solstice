@@ -129,7 +129,7 @@ SQUARE_LOCATION_ID=LVDXQH3JBZ5EK
 
 ## Current Problem
 
-When clicking "Purchase" on the membership page at https://snazzy-twilight-39e1e9.netlify.app/dashboard/membership:
+When clicking "Purchase" on the membership page at https://snazzy-twilight-39e1e9.netlify.app/player/membership:
 - The checkout session creation fails with "Failed to create checkout session"
 - The `/api/health` endpoint shows Square is configured
 - The test endpoint confirms correct environment variables
@@ -1169,7 +1169,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
 
         if (!checkoutId) {
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "cancelled",
             },
@@ -1204,7 +1204,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           }
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "cancelled",
             },
@@ -1252,7 +1252,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           }
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "verification_failed",
             },
@@ -1288,13 +1288,13 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
         }
 
         return redirect({
-          to: "/dashboard/membership",
+          to: "/player/membership",
           search: searchParams,
         });
       } catch (error) {
         console.error("Square callback error:", error);
         return redirect({
-          to: "/dashboard/membership",
+          to: "/player/membership",
           search: {
             error: "processing_error",
           },
@@ -2183,7 +2183,7 @@ export class MockSquarePaymentService {
     const checkoutSession: CheckoutSession = {
       id: sessionId,
       // Mock checkout URL - in production this would be a Square URL
-      checkoutUrl: `${baseUrl}/dashboard/membership?mock_checkout=true&session=${sessionId}&type=${membershipTypeId}&amount=${amount}`,
+      checkoutUrl: `${baseUrl}/player/membership?mock_checkout=true&session=${sessionId}&type=${membershipTypeId}&amount=${amount}`,
       membershipTypeId,
       userId,
       amount,
@@ -3148,9 +3148,9 @@ index 1ce86ee..1b6d0fc 100644
 --- a/src/routeTree.gen.ts
 +++ b/src/routeTree.gen.ts
 @@ -39,6 +39,7 @@ import { Route as DashboardTeamsTeamIdIndexRouteImport } from "./routes/dashboar
- import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/dashboard/teams/$teamId.members";
- import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/dashboard/teams/$teamId.manage";
- import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/dashboard/events/$eventId.manage";
+ import { Route as DashboardTeamsTeamIdMembersRouteImport } from "./routes/player/teams/$teamId.members";
+ import { Route as DashboardTeamsTeamIdManageRouteImport } from "./routes/player/teams/$teamId.manage";
+ import { Route as DashboardEventsEventIdManageRouteImport } from "./routes/player/events/$eventId.manage";
 +import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
  import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
  import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";

@@ -89,7 +89,7 @@ describe("PlayerDashboard", () => {
               },
             },
           };
-        case "dashboard-stats":
+        case "player-workspace-stats":
           return {
             data: {
               campaigns: { owned: 1, member: 2, pendingInvites: 1 },
@@ -108,7 +108,7 @@ describe("PlayerDashboard", () => {
               },
             ],
           };
-        case "next-user-game":
+        case "next-player-game":
           return {
             data: {
               success: true,

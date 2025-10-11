@@ -3,7 +3,7 @@ import { clearAuthState, gotoWithAuth, logout } from "../../utils/auth";
 
 const TEAM_ID = "test-team-1";
 const TEAM_JOIN_USER_ID = "clxpfz4jn000508l8f7k8e6o7";
-const TEAM_DETAIL_PATH = `/dashboard/teams/${TEAM_ID}`;
+const TEAM_DETAIL_PATH = `/player/teams/${TEAM_ID}`;
 const TEAM_MEMBERS_PATH = `${TEAM_DETAIL_PATH}/members`;
 
 const CAPTAIN_CREDENTIALS = {

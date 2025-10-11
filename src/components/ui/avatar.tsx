@@ -105,8 +105,7 @@ export function Avatar(props: AvatarComponentProps) {
     </AvatarPrimitive.Root>
   );
 
-  const href =
-    profileHref ?? (userId ? `/dashboard/profile/${encodeURIComponent(userId)}` : null);
+  const href = profileHref ?? (userId ? `/profile/${encodeURIComponent(userId)}` : null);
 
   if (!href) {
     return root;

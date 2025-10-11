@@ -63,7 +63,7 @@ export class MockSquarePaymentService {
     const checkoutSession: CheckoutSession = {
       id: sessionId,
       // Mock checkout URL - in production this would be a Square URL
-      checkoutUrl: `${baseUrl}/dashboard/membership?mock_checkout=true&session=${sessionId}&type=${membershipTypeId}&amount=${amount}`,
+      checkoutUrl: `${baseUrl}/player/membership?mock_checkout=true&session=${sessionId}&type=${membershipTypeId}&amount=${amount}`,
       membershipTypeId,
       userId,
       amount,
@@ -91,7 +91,7 @@ export class MockSquarePaymentService {
 
     return {
       id: sessionId,
-      checkoutUrl: `${baseUrl}/dashboard/events?mock_event_checkout=true&session=${sessionId}&event=${params.eventId}&amount=${params.amount}`,
+      checkoutUrl: `${baseUrl}/player/events?mock_event_checkout=true&session=${sessionId}&event=${params.eventId}&amount=${params.amount}`,
       userId: params.userId,
       amount: params.amount,
       currency: "CAD",

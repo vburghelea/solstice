@@ -124,7 +124,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
 
         if (result.success) {
           await invalidateProfileCaches(queryClient, result.data?.id ?? initialData.id);
-          router.navigate({ to: "/dashboard" });
+          router.navigate({ to: "/player" });
         } else {
           const errorMessage = result.errors?.[0]?.message || "Failed to save profile";
           setError(errorMessage);

@@ -55,6 +55,6 @@ describe("Avatar", () => {
     );
 
     const link = screen.getByRole("link", { name: /link/i });
-    expect(link).toHaveAttribute("href", "/dashboard/profile/user-123");
+    expect(link).toHaveAttribute("href", "/profile/user-123");
   });
 });

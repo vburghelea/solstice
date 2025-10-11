@@ -46,7 +46,7 @@ export function requireAuth({
  */
 export function redirectIfAuthenticated({
   user,
-  redirectTo = "/dashboard",
+  redirectTo = "/player",
 }: {
   user: User | null;
   redirectTo?: string;

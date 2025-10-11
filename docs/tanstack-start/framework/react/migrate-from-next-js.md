@@ -300,8 +300,8 @@ Learn more about the [Dynamic and Catch-All Routes](/router/latest/docs/framewor
 + import { Link } from "@tanstack/react-router" // [!code ++]
 
 function Component() {
--   return <Link href="/dashboard">Dashboard</Link> // [!code --]
-+   return <Link to="/dashboard">Dashboard</Link> // [!code ++]
+-   return <Link href="/player">Dashboard</Link> // [!code --]
++   return <Link to="/player">Dashboard</Link> // [!code ++]
 }
 ```
 

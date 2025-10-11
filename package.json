@@ -27,7 +27,7 @@
     "test:e2e:setup": "tsx scripts/seed-e2e-data.ts",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:chrome": "playwright test --project=chromium",
-    "test:e2e:smoke": "pnpm test:e2e:setup && pnpm exec playwright test e2e/tests/unauthenticated/auth-flow.unauth.spec.ts e2e/tests/authenticated/dashboard.shared.spec.ts e2e/tests/authenticated/logout.shared.spec.ts e2e/tests/authenticated/profile-edit.auth.spec.ts e2e/tests/authenticated/teams-create-no-conflict.auth.spec.ts --reporter=line --project=chromium-unauthenticated --project=chromium-authenticated --workers=1",
+    "test:e2e:smoke": "pnpm test:e2e:setup && pnpm exec playwright test e2e/tests/unauthenticated/auth-flow.unauth.spec.ts e2e/tests/authenticated/player-workspace.shared.spec.ts e2e/tests/authenticated/logout.shared.spec.ts e2e/tests/authenticated/profile-edit.auth.spec.ts e2e/tests/authenticated/teams-create-no-conflict.auth.spec.ts --reporter=line --project=chromium-unauthenticated --project=chromium-authenticated --workers=1",
     "prepare": "husky",
     "preinstall": "node scripts/generate-auth-secret.js",
     "docs:reference": "typedoc",

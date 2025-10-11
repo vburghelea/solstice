@@ -111,7 +111,7 @@ Components can now access all custom fields through the route context:
 // In route beforeLoad
 const { user } = context;
 if (!user.profileComplete) {
-  throw redirect({ to: "/onboarding" });
+  throw redirect({ to: "/player/onboarding" });
 }
 
 // In components

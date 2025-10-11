@@ -15,14 +15,14 @@ test.describe("Membership Purchase Flow - No Active Membership", () => {
     });
 
     // Use membership-purchase account which has no active membership
-    await gotoWithAuth(page, "/dashboard", {
+    await gotoWithAuth(page, "/player", {
       email: "membership-purchase@example.com",
       password: "testpassword123",
     });
   });
 
   test("should show purchase flow for users without membership", async ({ page }) => {
-    await page.goto("/dashboard/membership");
+    await page.goto("/player/membership");
 
     // Wait for the page to fully load
     await page.waitForLoadState("networkidle");

@@ -10,7 +10,7 @@ test.describe("Team Creation Without Conflict", () => {
     // Clear any existing auth and ensure the team creator user has a clean slate
     await clearAuthState(page);
 
-    await gotoWithAuth(page, "/dashboard/teams", {
+    await gotoWithAuth(page, "/player/teams", {
       email: "teamcreator@example.com",
       password: "testpassword123",
     });
@@ -35,10 +35,10 @@ test.describe("Team Creation Without Conflict", () => {
           .getByRole("button", { name: "Deactivate Team" })
           .last();
         await confirmButton.click();
-        await expect(page).toHaveURL("/dashboard/teams", { timeout: 15000 });
+        await expect(page).toHaveURL("/player/teams", { timeout: 15000 });
       } else {
         // If we cannot deactivate, navigate back and exit to avoid a potential loop
-        await page.goto("/dashboard/teams");
+        await page.goto("/player/teams");
         break;
       }
     }
@@ -101,7 +101,7 @@ test.describe("Team Creation Without Conflict", () => {
 
       // Wait for either success redirect or error message
       await Promise.race([
-        page.waitForURL(/\/dashboard\/teams\/[a-z0-9-]+/, { timeout: 10000 }),
+        page.waitForURL(/\/player\/teams\/[a-z0-9-]+/, { timeout: 10000 }),
         page.waitForSelector("text=Error creating team", { timeout: 10000 }),
       ]);
 
@@ -118,9 +118,9 @@ test.describe("Team Creation Without Conflict", () => {
 
       // Verify we're on the team detail page
       const detailUrl = page.url();
-      expect(detailUrl).toMatch(/\/dashboard\/teams\/[a-z0-9-]+/);
+      expect(detailUrl).toMatch(/\/player\/teams\/[a-z0-9-]+/);
 
-      const match = detailUrl.match(/\/dashboard\/teams\/([^/]+)/);
+      const match = detailUrl.match(/\/player\/teams\/([^/]+)/);
       createdTeamId = match ? match[1] : null;
 
       // Verify the team was created with the name we provided
@@ -130,7 +130,7 @@ test.describe("Team Creation Without Conflict", () => {
     } finally {
       if (createdTeamId) {
         try {
-          await gotoWithAuth(page, `/dashboard/teams/${createdTeamId}/manage`, {
+          await gotoWithAuth(page, `/player/teams/${createdTeamId}/manage`, {
             email: "teamcreator@example.com",
             password: "testpassword123",
           });
@@ -142,7 +142,7 @@ test.describe("Team Creation Without Conflict", () => {
               .getByRole("button", { name: "Deactivate Team" })
               .last();
             await confirmButton.click();
-            await expect(page).toHaveURL("/dashboard/teams", { timeout: 15000 });
+            await expect(page).toHaveURL("/player/teams", { timeout: 15000 });
           }
         } catch (cleanupError) {
           console.warn(

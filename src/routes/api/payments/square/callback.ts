@@ -26,7 +26,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
           console.log("Payment canceled or missing data");
           // Redirect back to membership page with error
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "canceled",
             },
@@ -86,7 +86,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
               .where(eq(eventRegistrations.id, registration.id));
 
             return redirect({
-              to: "/dashboard/events",
+              to: "/player/events",
               search: {
                 payment: "canceled",
                 eventId: event.id,
@@ -114,7 +114,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
               .where(eq(eventPaymentSessions.id, session.id));
 
             return redirect({
-              to: "/dashboard/events",
+              to: "/player/events",
               search: {
                 payment: "verification_failed",
                 eventId: event.id,
@@ -164,7 +164,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .where(eq(eventRegistrations.id, registration.id));
 
           return redirect({
-            to: "/dashboard/events",
+            to: "/player/events",
             search: {
               payment: "success",
               eventId: event.id,
@@ -189,7 +189,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             transactionId,
           });
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "processing_error",
             },
@@ -215,7 +215,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .where(eq(membershipPaymentSessions.id, sessionRecord.id));
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "canceled",
             },
@@ -269,7 +269,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .where(eq(membershipPaymentSessions.id, sessionRecord.id));
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "verification_failed",
             },
@@ -323,7 +323,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .where(eq(membershipPaymentSessions.id, sessionRecord.id));
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "processing_error",
             },
@@ -355,7 +355,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .where(eq(membershipPaymentSessions.id, sessionRecord.id));
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "processing_error",
             },
@@ -384,7 +384,7 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
             .where(eq(membershipPaymentSessions.id, sessionRecord.id));
 
           return redirect({
-            to: "/dashboard/membership",
+            to: "/player/membership",
             search: {
               error: "processing_error",
             },
@@ -455,13 +455,13 @@ export const ServerRoute = createServerFileRoute("/api/payments/square/callback"
         }
 
         return redirect({
-          to: "/dashboard/membership",
+          to: "/player/membership",
           search: searchParams,
         });
       } catch (error) {
         console.error("Square callback error:", error);
         return redirect({
-          to: "/dashboard/membership",
+          to: "/player/membership",
           search: {
             error: "processing_error",
           },

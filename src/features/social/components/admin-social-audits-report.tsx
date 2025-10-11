@@ -155,7 +155,7 @@ export function AdminSocialAuditsReport() {
                       <td className="px-3 py-2">
                         {row.actor ? (
                           <Link
-                            to="/dashboard/profile/$userId"
+                            to="/profile/$userId"
                             params={{ userId: row.actor.id }}
                             className="inline-flex items-center gap-2"
                           >
@@ -172,7 +172,7 @@ export function AdminSocialAuditsReport() {
                           </Link>
                         ) : row.actorUserId ? (
                           <Link
-                            to="/dashboard/profile/$userId"
+                            to="/profile/$userId"
                             params={{ userId: row.actorUserId }}
                             className="underline"
                           >
@@ -185,7 +185,7 @@ export function AdminSocialAuditsReport() {
                       <td className="px-3 py-2">
                         {row.target ? (
                           <Link
-                            to="/dashboard/profile/$userId"
+                            to="/profile/$userId"
                             params={{ userId: row.target.id }}
                             className="inline-flex items-center gap-2"
                           >
@@ -202,7 +202,7 @@ export function AdminSocialAuditsReport() {
                           </Link>
                         ) : row.targetUserId ? (
                           <Link
-                            to="/dashboard/profile/$userId"
+                            to="/profile/$userId"
                             params={{ userId: row.targetUserId }}
                             className="underline"
                           >

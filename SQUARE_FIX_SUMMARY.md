@@ -9,7 +9,7 @@ no membership created. The callback endpoint now:
 2. Loads membership + user context and guards for amount / currency drift
 3. Finalizes the purchase atomically (create membership, link session, stamp metadata)
 4. Sends a receipt email when a new membership is issued
-5. Redirects back to `/dashboard/membership` with stable query params including `payment_id`
+5. Redirects back to `/player/membership` with stable query params including `payment_id`
 
 ## Key Changes
 

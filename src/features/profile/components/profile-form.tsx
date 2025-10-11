@@ -1,7 +1,7 @@
 import { useAppForm } from "~/lib/form";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouteContext, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -18,6 +18,7 @@ import { getUserGameSystemPreferences } from "../profile.queries";
 import { profileInputSchema, ProfileInputType } from "../profile.schemas";
 import type { ProfileOperationResult } from "../profile.types";
 
+import { Route as RootRoute } from "~/routes/__root";
 import { GamePreferencesStep } from "./game-preferences-step";
 
 const defaultProfile: ProfileInputType = {
@@ -43,7 +44,7 @@ const defaultProfile: ProfileInputType = {
 export function ProfileForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user } = useRouteContext({ from: "/dashboard/profile" });
+  const { user } = RootRoute.useRouteContext();
 
   const { data: gamePreferences } = useQuery({
     queryKey: ["user-game-preferences"],

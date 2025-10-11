@@ -35,9 +35,9 @@ This document provides a comprehensive guide to form implementation in the Solst
 | **Signup Form**      | [`src/features/auth/components/signup.tsx`](../src/features/auth/components/signup.tsx)                                                   | ✅ TanStack Form | ✅ Zod schemas       |
 | **Profile Complete** | [`src/features/profile/components/complete-profile-form-simple.tsx`](../src/features/profile/components/complete-profile-form-simple.tsx) | ✅ TanStack Form | ✅ Zod schemas       |
 | **Profile Edit**     | [`src/features/profile/components/profile-view.tsx`](../src/features/profile/components/profile-view.tsx)                                 | ✅ TanStack Form | ✅ Zod schemas       |
-| **Team Creation**    | [`src/routes/dashboard/teams/create.tsx`](../src/routes/dashboard/teams/create.tsx)                                                       | ✅ TanStack Form | ⚠️ Inline validation |
-| **Team Management**  | [`src/routes/dashboard/teams/$teamId.manage.tsx`](../src/routes/dashboard/teams/$teamId.manage.tsx)                                       | ✅ TanStack Form | ⚠️ Inline validation |
-| **Team Members**     | [`src/routes/dashboard/teams/$teamId.members.tsx`](../src/routes/dashboard/teams/$teamId.members.tsx)                                     | ✅ TanStack Form | ⚠️ Inline validation |
+| **Team Creation**    | [`src/routes/player/teams/create.tsx`](../src/routes/player/teams/create.tsx)                                                             | ✅ TanStack Form | ⚠️ Inline validation |
+| **Team Management**  | [`src/routes/player/teams/$teamId.manage.tsx`](../src/routes/player/teams/$teamId.manage.tsx)                                             | ✅ TanStack Form | ⚠️ Inline validation |
+| **Team Members**     | [`src/routes/player/teams/$teamId.members.tsx`](../src/routes/player/teams/$teamId.members.tsx)                                           | ✅ TanStack Form | ⚠️ Inline validation |
 
 ### Schema Definitions
 

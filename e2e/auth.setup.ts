@@ -15,7 +15,7 @@ setup("authenticate", async ({ page }) => {
   await uiLogin(page, process.env["E2E_TEST_EMAIL"]!, process.env["E2E_TEST_PASSWORD"]!);
 
   // 3. Verify login was successful and we are on the dashboard
-  await page.waitForURL("/dashboard", { timeout: 15_000 });
+  await page.waitForURL("/player", { timeout: 15_000 });
   await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible({
     timeout: 10_000,
   });

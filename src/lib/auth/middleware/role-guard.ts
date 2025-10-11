@@ -55,7 +55,7 @@ export async function requireRole({
   requiredRoles,
   teamId,
   eventId,
-  redirectTo = "/dashboard",
+  redirectTo = "/player",
 }: RoleGuardOptions) {
   if (!user) {
     throw redirect({ to: "/auth/login" } as never);
@@ -104,7 +104,7 @@ export async function requireRole({
   }
 }
 
-export async function requireGlobalAdmin(user: User | null, redirectTo = "/dashboard") {
+export async function requireGlobalAdmin(user: User | null, redirectTo = "/player") {
   if (!user) {
     throw redirect({ to: "/auth/login" } as never);
   }

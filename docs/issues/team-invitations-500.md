@@ -1,4 +1,4 @@
-# Issue: `/dashboard/teams` 500 after HP-3 migrations
+# Issue: `/player/teams` 500 after HP-3 migrations
 
 **Feature:** HP-3 – Team Invitations Experience  
 **Environment:** Local TanStack Start dev server (`localhost:5173`) running with Playwright MCP browser tooling  
@@ -6,7 +6,7 @@
 
 ## Symptoms
 
-- Navigating to `/dashboard/teams` immediately trips the default catch boundary (`Something went wrong!`).
+- Navigating to `/player/teams` immediately trips the default catch boundary (`Something went wrong!`).
 - Network panel shows repeated `500 Internal Server Error` responses from the server functions:
   - `getPendingTeamInvites`
   - `getUserTeams`
@@ -29,13 +29,13 @@ The running dev server is still connected to a database instance that lacks the 
 
 ## Expected vs Actual
 
-- **Expected:** `/dashboard/teams` renders the `TeamInvitationsSection` with accept/decline controls, pending invite badge, and success/error toasts.
+- **Expected:** `/player/teams` renders the `TeamInvitationsSection` with accept/decline controls, pending invite badge, and success/error toasts.
 - **Actual:** Catch boundary shows a generic error; backend logs emit the missing-column exception above.
 
 ## Next actions
 
 1. Apply the new migration to the database the dev server is currently using (or restart the server after ensuring the schema is current).
-2. Once `/dashboard/teams` loads successfully, re-run the manual acceptance checklist:
+2. Once `/player/teams` loads successfully, re-run the manual acceptance checklist:
    - View pending invites for `team-join@example.com` and exercise **Accept**/**Decline**.
    - Visit a public team as a non-member and send an **Ask to Join** request.
    - Confirm roster views show pending status badges and timestamps.

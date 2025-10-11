@@ -20,7 +20,7 @@ interface UseAuthFormOptions {
  * };
  */
 export function useAuthForm(options: UseAuthFormOptions = {}) {
-  const { redirectUrl = "/dashboard" } = options;
+  const { redirectUrl = "/player" } = options;
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const queryClient = useQueryClient();

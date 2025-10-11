@@ -26,7 +26,7 @@ export default function LoginForm(props?: LoginFormProps) {
 
   const safeRedirectPath = props?.redirectPath?.startsWith("/")
     ? props.redirectPath
-    : "/dashboard";
+    : "/player";
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

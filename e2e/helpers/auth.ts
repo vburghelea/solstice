@@ -17,7 +17,7 @@ export async function ensureAuthenticated(page: Page) {
 
     // Extract the redirect URL if present
     const currentUrl = new URL(page.url());
-    const redirectPath = currentUrl.searchParams.get("redirect") || "/dashboard";
+    const redirectPath = currentUrl.searchParams.get("redirect") || "/player";
 
     // Wait for the login form to be ready
     await page.waitForLoadState("networkidle");
@@ -36,7 +36,7 @@ export async function ensureAuthenticated(page: Page) {
     await page.waitForURL(redirectPath, { timeout: 10000 });
 
     // For dashboard routes, verify we're logged in
-    if (redirectPath.includes("/dashboard")) {
+    if (redirectPath.includes("/player")) {
       await expect(
         page
           .getByRole("heading", { name: /Welcome back/ })

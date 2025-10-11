@@ -507,7 +507,7 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    import { test, expect } from "@playwright/test";
 
    test("should display user dashboard", async ({ page }) => {
-     await page.goto("/dashboard");
+     await page.goto("/player");
      await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
    });
    ```

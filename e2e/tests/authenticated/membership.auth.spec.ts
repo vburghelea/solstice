@@ -5,7 +5,7 @@ import { gotoWithAuth } from "../../utils/auth";
 test.describe("Membership Purchase Flow (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to membership page with authentication
-    await gotoWithAuth(page, "/dashboard/membership", {
+    await gotoWithAuth(page, "/player/membership", {
       email: process.env["E2E_TEST_EMAIL"]!,
       password: process.env["E2E_TEST_PASSWORD"]!,
     });
@@ -79,7 +79,7 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
     });
 
     // Navigate to membership page with network delay
-    await page.goto("/dashboard/membership");
+    await page.goto("/player/membership");
 
     // Should show loading spinner initially
     await expect(page.locator(".animate-spin")).toBeVisible();
@@ -225,7 +225,7 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
 
   test("should navigate from dashboard quick action", async ({ page }) => {
     // Navigate to dashboard first
-    await page.goto("/dashboard");
+    await page.goto("/player");
 
     // Wait for dashboard to load
     await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible({
@@ -238,7 +238,7 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
     await membershipLink.click();
 
     // Should navigate to membership page
-    await expect(page).toHaveURL("/dashboard/membership");
+    await expect(page).toHaveURL("/player/membership");
     await expect(
       page.getByRole("heading", { name: "Membership", exact: true }),
     ).toBeVisible();
@@ -254,14 +254,14 @@ test.describe("Membership Purchase Flow (Authenticated)", () => {
 
     // Navigate away - use exact match to avoid ambiguity
     await page.getByRole("link", { name: "Dashboard", exact: true }).click();
-    await expect(page).toHaveURL("/dashboard");
+    await expect(page).toHaveURL("/player");
 
     // Navigate back using either link text
     const membershipLink = page.getByRole("link", { name: /Get Membership|Renew Now/ });
     await membershipLink.click();
 
     // Wait for navigation to complete
-    await expect(page).toHaveURL("/dashboard/membership");
+    await expect(page).toHaveURL("/player/membership");
 
     // Membership options should still be visible
     await expect(

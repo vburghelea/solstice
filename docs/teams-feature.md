@@ -124,12 +124,12 @@ deactivateTeam({ teamId: string }): Promise<void>
 
 ### Routes
 
-- `/dashboard/teams` - List user's teams
-- `/dashboard/teams/create` - Create new team form
-- `/dashboard/teams/browse` - Browse all public teams
-- `/dashboard/teams/$teamId` - Team detail page
-- `/dashboard/teams/$teamId/manage` - Team settings
-- `/dashboard/teams/$teamId/members` - Member management
+- `/player/teams` - List user's teams
+- `/player/teams/create` - Create new team form
+- `/player/teams/browse` - Browse all public teams
+- `/player/teams/$teamId` - Team detail page
+- `/player/teams/$teamId/manage` - Team settings
+- `/player/teams/$teamId/members` - Member management
 
 ### Key Features
 
@@ -270,10 +270,10 @@ VALUES
 
 ### UI Testing
 
-1. Create team at `/dashboard/teams/create`
-2. View team list at `/dashboard/teams`
-3. Browse teams at `/dashboard/teams/browse`
-4. Manage members at `/dashboard/teams/{id}/members`
+1. Create team at `/player/teams/create`
+2. View team list at `/player/teams`
+3. Browse teams at `/player/teams/browse`
+4. Manage members at `/player/teams/{id}/members`
 
 ## Known Issues
 

@@ -1079,7 +1079,7 @@ export function CampaignForm({
           </Button>
         ) : (
           <Button variant="outline" asChild>
-            <Link to="/dashboard/campaigns">Cancel</Link>
+            <Link to="/player/campaigns">Cancel</Link>
           </Button>
         )}
         <FormSubmitButton isSubmitting={isSubmitting}>

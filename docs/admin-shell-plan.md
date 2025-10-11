@@ -10,21 +10,21 @@
 ## Information Architecture
 
 - Consolidate all authenticated screens under a single layout tree:
-  - `/dashboard/*` – general authenticated experience (teams, events, profile, etc.).
-  - `/dashboard/admin/*` – admin-only tools (event review, roles, other future tools) nested beneath the same layout for UX alignment.
+  - `/player/*` – general authenticated experience (teams, events, profile, etc.).
+  - `/admin/*` – admin-only tools (event review, roles, other future tools) nested beneath the same layout for UX alignment.
 - Keep public/marketing pages separate with a lighter shell.
 
 ## Navigation & Layout
 
-- Promote `AdminLayout` to serve both `/dashboard/*` and `/dashboard/admin/*` routes.
+- Promote `AdminLayout` to serve both `/player/*` and `/admin/*` routes.
 - Extract a typed navigation config describing items (label, icon, path, role visibility) so both desktop and mobile sidebars render from a single source.
 - Add role filtering to hide admin-only links for non-admins while keeping the list order stable.
 - Introduce breadcrumbs derived from the matched route segments to improve context and deep link UX.
 
 ## Access Control
 
-- `/dashboard` layout `beforeLoad`: enforce `requireAuthAndProfile`.
-- `/dashboard/admin` layout `beforeLoad`: enforce admin privileges (`isAdminClient`).
+- `/player` layout `beforeLoad`: enforce `requireAuthAndProfile`.
+- `/player/admin` layout `beforeLoad`: enforce admin privileges (`isAdminClient`).
 - Return a dedicated 403 Forbidden page when a non-admin attempts to access admin routes (instead of redirect looping).
 
 ## UX Enhancements
@@ -44,17 +44,17 @@
 ## Migration Plan
 
 1. **Restructure routes**
-   - Move `src/routes/admin/*` to `src/routes/dashboard/admin/*` (e.g. `events-review.tsx`, `roles.tsx`).
-   - Add redirects from old `/admin/...` paths to the new `/dashboard/admin/...` equivalents to preserve bookmarks.
+   - Move `src/routes/admin/*` to `src/routes/admin/*` (e.g. `events-review.tsx`, `roles.tsx`).
+   - Add redirects from old `/admin/...` paths to the new `/admin/...` equivalents to preserve bookmarks.
 2. **Layout hierarchy**
-   - Create `src/routes/dashboard/admin/route.tsx` that renders `<AdminLayout />` and applies the admin-only guard.
+   - Create `src/routes/admin/route.tsx` that renders `<AdminLayout />` and applies the admin-only guard.
    - Remove redundant guard logic from the page components once the layout guard is in place.
 3. **Navigation config**
    - Introduce `src/features/layouts/admin-nav.ts` exporting a typed array of nav items.
    - Refactor `AdminSidebar` and mobile header to consume the config, filtering items by role.
 4. **Breadcrumbs & 403**
    - Build a `Breadcrumbs` component reading matches from the router and mount it in `AdminLayout`.
-   - Add `src/routes/dashboard/admin/forbidden.tsx` (or a shared route) to render a friendly 403 page.
+   - Add `src/routes/admin/forbidden.tsx` (or a shared route) to render a friendly 403 page.
 5. **Validation**
    - Update Playwright flows to reflect new URLs and confirm sidebar remains in place across admin screens.
    - Verify redirects for old `/admin` links and non-admin access behavior.
@@ -66,12 +66,12 @@
 # Next Steps
 
 1. **Restructure routes**
-   - [ ] Move `src/routes/admin/events-review.tsx` → `src/routes/dashboard/admin/events-review.tsx`.
-   - [ ] Move `src/routes/admin/roles.tsx` → `src/routes/dashboard/admin/roles.tsx`.
-   - [ ] Add redirect routes from `/admin/events-review` and `/admin/roles` to their new `/dashboard/admin/...` counterparts.
+   - [ ] Move `src/routes/admin/events-review.tsx` → `src/routes/admin/events-review.tsx`.
+   - [ ] Move `src/routes/admin/roles.tsx` → `src/routes/admin/roles.tsx`.
+   - [ ] Add redirect routes from `/admin/events-review` and `/admin/roles` to their new `/admin/...` counterparts.
 
 2. **Add admin layout guard**
-   - [ ] Create `src/routes/dashboard/admin/route.tsx` that renders `AdminLayout` and enforces `isAdminClient` in `beforeLoad`.
+   - [ ] Create `src/routes/admin/route.tsx` that renders `AdminLayout` and enforces `isAdminClient` in `beforeLoad`.
    - [ ] Remove the now-redundant guard code from the moved page components, relying on the layout guard.
 
 3. **Navigation config & role filtering**
@@ -80,11 +80,11 @@
 
 4. **Breadcrumbs & forbidden page**
    - [ ] Implement a breadcrumb component using TanStack Router matches and mount it in `AdminLayout`.
-   - [ ] Add a shared `Forbidden` page route and use it for unauthorized access to `/dashboard/admin/*`.
+   - [ ] Add a shared `Forbidden` page route and use it for unauthorized access to `/admin/*`.
 
 5. **Testing updates**
    - [ ] Adjust Playwright/E2E scripts to use new paths and verify sidebar persistence on admin pages.
-   - [ ] Add a regression test ensuring non-admin users see the forbidden page when visiting `/dashboard/admin/...`.
+   - [ ] Add a regression test ensuring non-admin users see the forbidden page when visiting `/admin/...`.
 
 6. **Docs & cleanup**
    - [ ] Update internal docs (e.g., `docs/development-backlog.md` or relevant architectural notes) to record the new IA and guard structure.

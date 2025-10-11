@@ -3,7 +3,7 @@ import { gotoWithAuth } from "../../utils/auth";
 
 test.describe("Members Directory (Authenticated)", () => {
   test.beforeEach(async ({ page }) => {
-    await gotoWithAuth(page, "/dashboard/members", {
+    await gotoWithAuth(page, "/player/members", {
       email: process.env["E2E_TEST_EMAIL"]!,
       password: process.env["E2E_TEST_PASSWORD"]!,
     });

@@ -6,7 +6,7 @@ test.describe("Team Member Management (Authenticated)", () => {
     test.beforeEach(async ({ page }) => {
       await clearAuthState(page);
       // Navigate to Test Thunder team detail page
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
+      await gotoWithAuth(page, "/player/teams/test-team-1", {
         email: "test@example.com",
         password: "testpassword123",
       });
@@ -61,14 +61,14 @@ test.describe("Team Member Management (Authenticated)", () => {
       const manageButton = page.getByRole("link", { name: "Manage Members" });
       await expect(manageButton).toBeVisible();
       await manageButton.click();
-      await expect(page).toHaveURL(/\/dashboard\/teams\/test-team-1\/members/);
+      await expect(page).toHaveURL(/\/player\/teams\/test-team-1\/members/);
     });
   });
 
   test.describe("Team Members Management Page", () => {
     test("should display management tabs", async ({ page }) => {
       await clearAuthState(page);
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1/members", {
+      await gotoWithAuth(page, "/player/teams/test-team-1/members", {
         email: "test@example.com",
         password: "testpassword123",
       });
@@ -87,7 +87,7 @@ test.describe("Team Member Management (Authenticated)", () => {
     test("should allow editing team information", async ({ page }) => {
       // Fresh login for this test
       await clearAuthState(page);
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+      await gotoWithAuth(page, "/player/teams/test-team-1/manage", {
         email: "test@example.com",
         password: "testpassword123",
       });
@@ -119,7 +119,7 @@ test.describe("Team Member Management (Authenticated)", () => {
         await page.getByRole("button", { name: "Save Changes" }).click();
 
         // Wait for navigation back to team details page after successful save
-        await page.waitForURL("/dashboard/teams/test-team-1", { timeout: 10000 });
+        await page.waitForURL("/player/teams/test-team-1", { timeout: 10000 });
 
         // Verify the updated team name is displayed
         const mainContent = page.locator("main");
@@ -136,7 +136,7 @@ test.describe("Team Member Management (Authenticated)", () => {
         });
       } finally {
         // Reset the team information so subsequent tests continue to work with seeded data
-        await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+        await gotoWithAuth(page, "/player/teams/test-team-1/manage", {
           email: "test@example.com",
           password: "testpassword123",
         });
@@ -151,7 +151,7 @@ test.describe("Team Member Management (Authenticated)", () => {
         await descriptionField.fill(originalDescription);
 
         await page.getByRole("button", { name: "Save Changes" }).click();
-        await page.waitForURL("/dashboard/teams/test-team-1", { timeout: 10000 });
+        await page.waitForURL("/player/teams/test-team-1", { timeout: 10000 });
 
         const mainContent = page.locator("main");
         await expect(mainContent.getByRole("heading", { level: 1 })).toHaveText(
@@ -168,7 +168,7 @@ test.describe("Team Member Management (Authenticated)", () => {
     test.beforeEach(async ({ page }) => {
       await clearAuthState(page);
       // Navigate to team management members section
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1/manage", {
+      await gotoWithAuth(page, "/player/teams/test-team-1/manage", {
         email: "test@example.com",
         password: "testpassword123",
       });
@@ -255,7 +255,7 @@ test.describe("Team Member Management (Authenticated)", () => {
     test("players should not see manage button", async ({ page }) => {
       await clearAuthState(page);
       // Login as admin user who is a player in Test Thunder
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
+      await gotoWithAuth(page, "/player/teams/test-team-1", {
         email: "admin@example.com",
         password: "testpassword123",
       });
@@ -274,7 +274,7 @@ test.describe("Team Member Management (Authenticated)", () => {
   test.describe("Team Invitations", () => {
     test("should display pending invitations", async ({ page }) => {
       await clearAuthState(page);
-      await gotoWithAuth(page, "/dashboard/teams", {
+      await gotoWithAuth(page, "/player/teams", {
         email: "team-join@example.com",
         password: "testpassword123",
       });
@@ -287,7 +287,7 @@ test.describe("Team Member Management (Authenticated)", () => {
 
     test("should accept team invitation", async ({ page }) => {
       await clearAuthState(page);
-      await gotoWithAuth(page, "/dashboard/teams", {
+      await gotoWithAuth(page, "/player/teams", {
         email: "team-join@example.com",
         password: "testpassword123",
       });
@@ -302,7 +302,7 @@ test.describe("Team Member Management (Authenticated)", () => {
 
     test("should decline team invitation", async ({ page }) => {
       await clearAuthState(page);
-      await gotoWithAuth(page, "/dashboard/teams", {
+      await gotoWithAuth(page, "/player/teams", {
         email: "team-invite-decline@example.com",
         password: "testpassword123",
       });
@@ -319,7 +319,7 @@ test.describe("Team Member Management (Authenticated)", () => {
     test("should allow members to leave team", async ({ page }) => {
       await clearAuthState(page);
       // Navigate to team page as a regular member
-      await gotoWithAuth(page, "/dashboard/teams/test-team-1", {
+      await gotoWithAuth(page, "/player/teams/test-team-1", {
         email: "admin@example.com",
         password: "testpassword123",
       });
@@ -333,7 +333,7 @@ test.describe("Team Member Management (Authenticated)", () => {
         await page.getByRole("button", { name: "Confirm" }).click();
 
         // Should redirect to teams list
-        await expect(page).toHaveURL("/dashboard/teams", { timeout: 10000 });
+        await expect(page).toHaveURL("/player/teams", { timeout: 10000 });
 
         // Team should no longer appear in list
         await expect(page.getByText("Test Thunder")).not.toBeVisible();

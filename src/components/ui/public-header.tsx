@@ -13,10 +13,10 @@ export function PublicHeader() {
   const { location } = useRouterState();
 
   const navLinks = [
-    { label: "Events", to: "/visit/events" },
-    { label: "Find games", to: "/visit/search" },
-    { label: "Game systems", to: "/visit/systems" },
-    { label: "Teams", to: "/visit/teams" },
+    { label: "Events", to: "/events" },
+    { label: "Find games", to: "/search" },
+    { label: "Game systems", to: "/systems" },
+    { label: "Teams", to: "/teams" },
   ];
 
   const isActivePath = (path: string) => {
@@ -27,7 +27,7 @@ export function PublicHeader() {
     <header className="border-border/60 bg-background/95 text-foreground supports-[backdrop-filter]:bg-background/80 sticky top-0 z-50 border-b shadow-sm transition-colors supports-[backdrop-filter]:backdrop-blur">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex h-16 items-center justify-between sm:h-20">
-          <Link to="/visit" className="flex items-center gap-2 sm:gap-3">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3">
             {" "}
             {/* Added Link wrapper */}
             <div

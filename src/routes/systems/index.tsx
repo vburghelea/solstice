@@ -38,7 +38,7 @@ interface FiltersFormState {
   categoryIds: string[];
 }
 
-export const Route = createFileRoute("/visit/systems/")({
+export const Route = createFileRoute("/systems/")({
   validateSearch: rawSearchSchema.parse,
   component: SystemsBrowsePage,
 });

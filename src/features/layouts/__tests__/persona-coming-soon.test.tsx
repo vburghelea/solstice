@@ -65,7 +65,7 @@ describe("PersonaComingSoon", () => {
       expect.objectContaining({ impressionEvent: expect.any(String) }),
       expect.objectContaining({
         personaId: "visitor",
-        namespacePath: "/visit",
+        namespacePath: "/",
         feedbackType: "like",
       }),
     );
@@ -91,7 +91,7 @@ describe("PersonaComingSoon", () => {
       expect.objectContaining({ impressionEvent: expect.any(String) }),
       expect.objectContaining({
         personaId: "visitor",
-        namespacePath: "/visit",
+        namespacePath: "/",
         feedbackType: "suggest",
         message: "Add more community highlights",
       }),

@@ -32,7 +32,7 @@ const policyPillars = [
   },
 ];
 
-export const Route = createFileRoute("/visit/resources/safety-policies")({
+export const Route = createFileRoute("/resources/safety-policies")({
   component: SafetyPoliciesPage,
 });
 
@@ -48,7 +48,7 @@ function SafetyPoliciesPage() {
         ctaLink="#policy-downloads"
         secondaryCta={{
           text: "Report an urgent concern",
-          link: "/visit/resources/report-concern",
+          link: "/resources/report-concern",
         }}
       />
 

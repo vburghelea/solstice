@@ -5,13 +5,13 @@ import { join } from 'node:path';
 const VIEWPORT = { width: 1440, height: 900 };
 
 const PAGES = [
-  { url: 'http://localhost:5173/visit/', prefix: 'visit' },
-  { url: 'http://localhost:5173/visit/resources', prefix: 'resources' },
-  { url: 'http://localhost:5173/visit/teams', prefix: 'teams' },
-  { url: 'http://localhost:5173/visit/about', prefix: 'about' },
-  { url: 'http://localhost:5173/visit/systems', prefix: 'systems', detailSelector: 'a[href^="/visit/systems/"]' },
-  { url: 'http://localhost:5173/visit/events', prefix: 'events', detailSelector: 'a[href^="/visit/events/"]' },
-  { url: 'http://localhost:5173/visit/search', prefix: 'search', detailSelector: 'a[href^="/visit/game/"]' },
+  { url: 'http://localhost:5173/', prefix: 'visit' },
+  { url: 'http://localhost:5173/resources', prefix: 'resources' },
+  { url: 'http://localhost:5173/teams', prefix: 'teams' },
+  { url: 'http://localhost:5173/about', prefix: 'about' },
+  { url: 'http://localhost:5173/systems', prefix: 'systems', detailSelector: 'a[href^="/systems/"]' },
+  { url: 'http://localhost:5173/events', prefix: 'events', detailSelector: 'a[href^="/events/"]' },
+  { url: 'http://localhost:5173/search', prefix: 'search', detailSelector: 'a[href^="/game/"]' },
 ];
 
 async function ensureDir(path) {

@@ -29,21 +29,21 @@ const resources = [
   {
     title: "Club starter toolkit",
     copy: "Download constitution templates, budget planners, and volunteer role descriptions to launch a sustainable program.",
-    link: "/visit/resources#club-toolkit",
+    link: "/resources#club-toolkit",
   },
   {
     title: "Practice & fitness library",
     copy: "Access progressive training plans, skills videos, and goalkeeper clinics designed by national team staff.",
-    link: "/visit/resources#training",
+    link: "/resources#training",
   },
   {
     title: "Safe sport & safeguarding",
     copy: "Stay compliant with national policies covering background checks, injury reporting, and inclusive program design.",
-    link: "/visit/resources#safe-sport",
+    link: "/resources#safe-sport",
   },
 ];
 
-export const Route = createFileRoute("/visit/teams")({
+export const Route = createFileRoute("/teams")({
   component: TeamsPage,
 });
 
@@ -56,10 +56,10 @@ function TeamsPage() {
         subtitle="From coast-to-coast, tabletop communities are recruiting hosts, storytellers, rules gurus, and volunteers. Discover groups near you and access the resources to help your program thrive."
         backgroundImage="/images/hero-tabletop-board-game-teams-optimized.png"
         ctaText="Browse club resources"
-        ctaLink="/visit/resources"
+        ctaLink="/resources"
         secondaryCta={{
           text: "Start a new club",
-          link: "/visit/resources#club-toolkit",
+          link: "/resources#club-toolkit",
         }}
       />
 
@@ -110,7 +110,7 @@ function TeamsPage() {
               <a href="mailto:clubs@roundup.games">
                 <Button className="btn-brand-primary">Email regional support</Button>
               </a>
-              <Link to="/visit/events">
+              <Link to="/events">
                 <Button
                   variant="outline"
                   className="text-primary border-primary hover:bg-primary/10"

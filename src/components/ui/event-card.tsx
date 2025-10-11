@@ -35,7 +35,7 @@ export function EventCard({
     (event?.description
       ? truncate(event.description, 140)
       : "Stay tuned for more event details.");
-  const to = link ?? (event ? `/visit/events/${event.slug}` : "/visit/events");
+  const to = link ?? (event ? `/events/${event.slug}` : "/events");
   const startDate = event?.startDate
     ? format(parseISO(event.startDate), "MMM d, yyyy")
     : null;

@@ -325,7 +325,7 @@ function EventManagementPage() {
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline">
-            <Link to="/visit/events/$slug" params={{ slug: event.slug }}>
+            <Link to="/events/$slug" params={{ slug: event.slug }}>
               View Public Page
             </Link>
           </Button>

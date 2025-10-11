@@ -26,7 +26,7 @@ describe("role analytics helpers", () => {
     await trackPersonaNavigationImpression(visitorPersona.analytics, {
       personaId: visitorPersona.id,
       namespacePath: visitorPersona.namespacePath,
-      pathname: "/visit", // hypothetical path inside visitor namespace
+      pathname: "/", // hypothetical path inside visitor namespace
       source: "layout",
     });
 
@@ -34,7 +34,7 @@ describe("role analytics helpers", () => {
     expect(captureEvent).toHaveBeenCalledWith(visitorPersona.analytics.impressionEvent, {
       persona: visitorPersona.id,
       namespace: visitorPersona.namespacePath,
-      pathname: "/visit",
+      pathname: "/",
       source: "layout",
     });
   });

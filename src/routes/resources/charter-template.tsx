@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
-import { CalendarIcon } from "~/components/ui/icons";
+import { CheckCircle2, ScrollText, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
 
 const cardSurfaceClass =
@@ -11,59 +11,59 @@ const cardSurfaceClass =
 const mutedCardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/60";
 
-const clinicModules = [
+const charterSections = [
   {
-    title: "Setting the table",
-    duration: "28 minutes",
-    focus:
-      "Hospitality rituals, onboarding scripts, and accessibility walkthroughs that calm first-session nerves.",
-    resources: [
-      "Facilitator opening script",
-      "Room layout checklist",
-      "Sensory considerations worksheet",
+    title: "Mission & values",
+    description:
+      "Anchor your storytelling focus and community promises so everyone knows why this space exists.",
+    icon: ScrollText,
+    highlights: [
+      "Statement of purpose tailored to tabletop and board gaming",
+      "Commitment to safety, accessibility, and anti-harassment",
+      "Inclusion charter with language for gender-affirming and neurodivergent players",
     ],
   },
   {
-    title: "Safety tools in motion",
-    duration: "34 minutes",
-    focus:
-      "Demonstrations of consent-based safety tools with live debrief and coaching tips for tricky moments.",
-    resources: [
-      "X-card and Open Door playset",
-      "Lines & Veils sample prompts",
-      "Escalation decision tree",
+    title: "Membership & governance",
+    description:
+      "Clarify who can join, how decisions are made, and the pathways to leadership roles.",
+    icon: UsersIcon,
+    highlights: [
+      "Membership tiers with benefits and expectations",
+      "Voting structure and annual general meeting checklist",
+      "Conflict resolution ladder and escalation timelines",
     ],
   },
   {
-    title: "Pacing & spotlight management",
-    duration: "31 minutes",
-    focus:
-      "Balancing action and reflection, supporting quieter players, and reading the table's energy in real time.",
-    resources: [
-      "Beat structure worksheet",
-      "Audience engagement tracker",
-      "Post-session reflection form",
+    title: "Programming & safety",
+    description:
+      "Outline how events are proposed, approved, and evaluated with player wellbeing in mind.",
+    icon: CheckCircle2,
+    highlights: [
+      "Session pitch form and selection rubric",
+      "Table facilitator roles, responsibilities, and training modules",
+      "Incident reporting workflow with response benchmarks",
     ],
   },
 ];
 
-export const Route = createFileRoute("/visit/resources/facilitation-clinics")({
-  component: FacilitationClinicsPage,
+export const Route = createFileRoute("/resources/charter-template")({
+  component: CharterTemplatePage,
 });
 
-function FacilitationClinicsPage() {
+function CharterTemplatePage() {
   return (
     <PublicLayout>
       <HeroSection
-        eyebrow="Facilitation clinics"
-        title="On-demand coaching for storytellers and hosts"
-        subtitle="Watch master facilitators lead live sessions, then apply the same techniques at your tables with guided practice materials."
+        eyebrow="Club charter template"
+        title="Adaptable governance for tabletop communities"
+        subtitle="Use our living charter to formalize expectations, celebrate your shared identity, and welcome newcomers with clarity."
         backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
-        ctaText="Stream the clinics"
-        ctaLink="#clinic-library"
+        ctaText="Copy the template"
+        ctaLink="#charter-downloads"
         secondaryCta={{
-          text: "Book live coaching",
-          link: "mailto:training@roundup.games?subject=Facilitation%20coaching",
+          text: "Request facilitation support",
+          link: "mailto:development@roundup.games?subject=Charter%20facilitation",
         }}
       />
 
@@ -71,37 +71,34 @@ function FacilitationClinicsPage() {
         <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-10">
           <div className="max-w-3xl space-y-3">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Clinic format
+              Why this charter works
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Learn by watching real tables in action
+              Transparent, inclusive guidelines for clubs of any size
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Each clinic pairs a live-recorded session with commentary from Roundup Games
-              facilitators. Pause at reflection markers to practice with your own staff,
-              or use the included discussion prompts to turn the video into a team
-              workshop.
+              Built alongside administrators, librarians, and café owners, this charter
+              keeps structure approachable. Each clause comes with facilitator notes to
+              help you introduce it to members, plus optional amendments for schools and
+              youth-serving organizations.
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {clinicModules.map((module) => (
-              <Card key={module.title} className={cardSurfaceClass}>
+            {charterSections.map((section) => (
+              <Card key={section.title} className={cardSurfaceClass}>
                 <CardHeader className="space-y-3">
                   <div className="bg-brand-red/10 text-brand-red dark:bg-brand-red/20 flex size-12 items-center justify-center rounded-full">
-                    <CalendarIcon className="size-6" />
+                    <section.icon className="size-6" />
                   </div>
                   <CardTitle className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                    {module.title}
+                    {section.title}
                   </CardTitle>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Runtime: {module.duration}
-                  </p>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  <p>{module.focus}</p>
+                  <p>{section.description}</p>
                   <ul className="space-y-2">
-                    {module.resources.map((resource) => (
-                      <li key={resource}>• {resource}</li>
+                    {section.highlights.map((highlight) => (
+                      <li key={highlight}>• {highlight}</li>
                     ))}
                   </ul>
                 </CardContent>
@@ -111,59 +108,52 @@ function FacilitationClinicsPage() {
         </div>
       </section>
 
-      <section
-        id="clinic-library"
-        className="bg-white py-12 sm:py-16 lg:py-20 dark:bg-gray-950"
-      >
-        <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-10">
+      <section className="bg-white py-12 sm:py-16 lg:py-20 dark:bg-gray-950">
+        <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Streaming access
+              Facilitation notes
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Watch clinics anytime, anywhere
+              Host a charter review workshop
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Videos are hosted on our private learning portal. Request an access code and
-              you’ll receive streaming links, slide decks, and note-taking packets for
-              each clinic. Chapters are timestamped so you can jump straight to the
-              moments you want to review.
+              Bring staff, volunteers, and community members into the drafting process.
+              Our facilitation guide walks you through a 90-minute workshop covering
+              values, membership flow, and accountability. Use the included slide deck and
+              breakout prompts to co-create language that reflects your campus or region.
             </p>
             <div className={mutedCardSurfaceClass + " space-y-3"}>
               <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                Request access
+                Workshop outline
               </h3>
-              <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                Email training@roundup.games with your organization name, preferred
-                clinic, and facilitator roster. We approve requests within two business
-                days.
-              </p>
-              <Button asChild className="sm:w-fit">
-                <a href="mailto:training@roundup.games?subject=Facilitation%20clinic%20access">
-                  Email the training team
-                </a>
-              </Button>
+              <ul className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
+                <li>• Icebreaker: "Memorable moments at the table" circle</li>
+                <li>• Charter walkthrough with annotation activity</li>
+                <li>• Small group edits using scenario cards</li>
+                <li>• Consent-based ratification and next steps</li>
+              </ul>
             </div>
           </div>
           <div className="space-y-4">
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Discussion guide
+                  Facilitation toolkit
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
                 <p>
-                  Turn the clinics into a team learning session with reflection prompts
-                  and skill drills for new and experienced facilitators alike.
+                  Includes annotated script, editable slides, and evaluation form to
+                  capture feedback from participants.
                 </p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
-                    href="https://cdn.roundup.games/facilitation-clinic-discussion-guide.pdf"
+                    href="https://cdn.roundup.games/charter-workshop-kit.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download PDF guide
+                    Download workshop kit
                   </a>
                 </Button>
               </CardContent>
@@ -171,89 +161,91 @@ function FacilitationClinicsPage() {
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Certification credits
+                  Scenario cards
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
                 <p>
-                  Complete all three clinics and submit reflection assignments to earn
-                  continuing education hours recognized by Roundup Games and partner
-                  leagues.
+                  Thirty real-world tabletop dilemmas to stress-test your charter language
+                  and escalation procedures.
                 </p>
-                <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/60">
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    • 2 CE hours per clinic
-                    <br />• Digital badge issued within 7 days
-                    <br />• Counts toward Game Master and Host pathway renewals
-                  </p>
-                </div>
+                <Button asChild variant="outline" className="justify-center">
+                  <a
+                    href="https://cdn.roundup.games/charter-scenario-cards.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Download PDF deck
+                  </a>
+                </Button>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      <section className="bg-secondary py-12 sm:py-16 lg:py-20 dark:bg-gray-950">
+      <section
+        id="charter-downloads"
+        className="bg-secondary py-12 sm:py-16 lg:py-20 dark:bg-gray-950"
+      >
         <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-10">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Download clinic resources
+            Choose your format
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card className={cardSurfaceClass}>
-              <CardHeader>
+              <CardHeader className="space-y-2">
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Opening rituals packet
+                  Editable document (DOCX)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>Scripts, table signs, and welcome cards featured in the clinics.</p>
+                <p>Best for committees drafting in Word or Google Docs.</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
-                    href="https://cdn.roundup.games/facilitation-opening-rituals.zip"
+                    href="https://cdn.roundup.games/club-charter.docx"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download ZIP
+                    Download DOCX
                   </a>
                 </Button>
               </CardContent>
             </Card>
             <Card className={cardSurfaceClass}>
-              <CardHeader>
+              <CardHeader className="space-y-2">
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Safety tool kit
+                  Printable version (PDF)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Printable cards, facilitator cheat sheets, and incident log templates.
-                </p>
+                <p>Ready-to-share document with fillable fields for sign-off.</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
-                    href="https://cdn.roundup.games/facilitation-safety-tools.zip"
+                    href="https://cdn.roundup.games/club-charter.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download ZIP
+                    Download PDF
                   </a>
                 </Button>
               </CardContent>
             </Card>
             <Card className={cardSurfaceClass}>
-              <CardHeader>
+              <CardHeader className="space-y-2">
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Spotlight scheduler
+                  Lightweight constitution (Markdown)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>Editable pacing tracker compatible with Google Sheets and Excel.</p>
+                <p>Use with static sites, Git-based communities, or Notion workspaces.</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
-                    href="https://cdn.roundup.games/facilitation-spotlight-scheduler.xlsx"
+                    href="https://cdn.roundup.games/club-charter.md"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download XLSX
+                    Copy Markdown
                   </a>
                 </Button>
               </CardContent>
@@ -263,16 +255,16 @@ function FacilitationClinicsPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                  Need interpretation services?
+                  Need a custom clause?
                 </h3>
                 <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  We can arrange live captioning, ASL interpretation, or translation for
-                  your team training. Let us know at least two weeks ahead of time.
+                  Our policy specialists can help tailor language for youth programs,
+                  public institutions, or multilingual chapters.
                 </p>
               </div>
               <Button asChild className="sm:w-auto">
-                <a href="mailto:accessibility@roundup.games?subject=Clinic%20accessibility">
-                  Coordinate accessibility support
+                <a href="mailto:policy@roundup.games?subject=Custom%20charter%20support">
+                  Connect with policy team
                 </a>
               </Button>
             </div>

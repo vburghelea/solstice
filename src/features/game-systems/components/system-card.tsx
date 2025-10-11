@@ -34,7 +34,7 @@ export function SystemCard({ system }: SystemCardProps) {
 
   return (
     <Card className="text-foreground overflow-hidden border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-neutral-100 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/75 dark:text-gray-50">
-      <Link to="/visit/systems/$slug" params={{ slug: system.slug }} className="block">
+      <Link to="/systems/$slug" params={{ slug: system.slug }} className="block">
         <div className="relative aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-700">
           {system.heroUrl ? (
             <img
@@ -105,7 +105,7 @@ export function SystemCard({ system }: SystemCardProps) {
       </CardContent>
       <CardFooter className="justify-end">
         <Link
-          to="/visit/systems/$slug"
+          to="/systems/$slug"
           params={{ slug: system.slug }}
           className={cn(buttonVariants({ size: "sm" }), "ml-auto")}
         >

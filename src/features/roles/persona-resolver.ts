@@ -150,8 +150,8 @@ function createPersonaDefinitions(): PersonaDefinition[] {
       shortLabel: "Visit",
       description:
         "Preview public stories, events, and highlights curated for newcomers.",
-      namespacePath: "/visit",
-      defaultRedirect: "/visit",
+      namespacePath: "/",
+      defaultRedirect: "/",
       priority: 0,
       analytics: buildAnalyticsConfig("visitor"),
     },

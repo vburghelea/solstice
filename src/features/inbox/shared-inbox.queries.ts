@@ -928,7 +928,7 @@ async function buildPlayerSnapshot(
           : "Bookmark campaigns you love; we'll surface new sessions the moment they publish.",
         registrations.length
           ? "Registrations automatically sync across ops and admin personas for smoother approvals."
-          : "RSVP to public events from /visit to unlock collaboration analytics here.",
+          : "RSVP to public events from /events to unlock collaboration analytics here.",
       ],
     },
     threads: sortedThreads,

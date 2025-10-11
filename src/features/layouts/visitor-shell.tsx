@@ -1,49 +1,43 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 import { cn } from "~/shared/lib/utils";
 
-type VisitNavPath =
-  | "/visit"
-  | "/visit/events"
-  | "/visit/search"
-  | "/visit/systems"
-  | "/visit/teams";
+type VisitorNavPath = "/" | "/events" | "/search" | "/systems" | "/teams";
 
-type VisitNavItem = {
+type VisitorNavItem = {
   label: string;
-  to: VisitNavPath;
+  to: VisitorNavPath;
   search?: unknown;
 };
 
-const VISIT_NAVIGATION: readonly VisitNavItem[] = [
-  { label: "Home", to: "/visit" },
-  { label: "Events", to: "/visit/events" },
-  { label: "Find games", to: "/visit/search" },
-  { label: "Game systems", to: "/visit/systems", search: {} },
-  { label: "Teams", to: "/visit/teams" },
+const VISITOR_NAVIGATION: readonly VisitorNavItem[] = [
+  { label: "Home", to: "/" },
+  { label: "Events", to: "/events" },
+  { label: "Find games", to: "/search" },
+  { label: "Game systems", to: "/systems", search: {} },
+  { label: "Teams", to: "/teams" },
 ];
 
-export const Route = createFileRoute("/visit")({
-  component: VisitLayout,
-});
+interface VisitorShellProps {
+  children: ReactNode;
+}
 
-function VisitLayout() {
+export function VisitorShell({ children }: VisitorShellProps) {
   const { location } = useRouterState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isActive = (path: string) =>
-    location.pathname === path || location.pathname.startsWith(`${path}/`);
+    path === "/"
+      ? location.pathname === "/"
+      : location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   return (
     <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
       <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
-          <Link
-            to="/visit"
-            className="text-foreground flex items-center gap-3 font-semibold"
-          >
+          <Link to="/" className="text-foreground flex items-center gap-3 font-semibold">
             <span className="roundup-star-logo h-9 w-9" aria-hidden="true" />
             <span className="flex flex-col leading-tight">
               <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
@@ -53,7 +47,7 @@ function VisitLayout() {
             </span>
           </Link>
           <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
-            {VISIT_NAVIGATION.map((item) => (
+            {VISITOR_NAVIGATION.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -114,7 +108,7 @@ function VisitLayout() {
         {isMenuOpen ? (
           <div className="border-border/40 border-t bg-[color:color-mix(in_oklab,var(--surface-default)_94%,transparent)] px-4 pt-4 pb-6 supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur md:hidden">
             <nav className="flex flex-col gap-2">
-              {VISIT_NAVIGATION.map((item) => (
+              {VISITOR_NAVIGATION.map((item) => (
                 <Link
                   key={`mobile-${item.to}`}
                   to={item.to}
@@ -153,7 +147,7 @@ function VisitLayout() {
 
       <main className="flex-1">
         <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8">
-          <Outlet />
+          {children}
         </div>
       </main>
 
@@ -172,13 +166,13 @@ function VisitLayout() {
           <div className="space-y-2">
             <p className="text-foreground text-sm font-semibold">Plan your visit</p>
             <div className="text-muted-strong flex flex-col gap-1 text-sm">
-              <Link to="/visit/events" className="hover:text-foreground transition">
+              <Link to="/events" className="hover:text-foreground transition">
                 Event calendar
               </Link>
-              <Link to="/visit/search" className="hover:text-foreground transition">
+              <Link to="/search" className="hover:text-foreground transition">
                 Find a game night
               </Link>
-              <Link to="/visit/systems" className="hover:text-foreground transition">
+              <Link to="/systems" className="hover:text-foreground transition">
                 Browse systems
               </Link>
             </div>
@@ -186,10 +180,10 @@ function VisitLayout() {
           <div className="space-y-2">
             <p className="text-foreground text-sm font-semibold">Stay in touch</p>
             <div className="text-muted-strong flex flex-col gap-1 text-sm">
-              <Link to="/visit/resources" className="hover:text-foreground transition">
+              <Link to="/resources" className="hover:text-foreground transition">
                 Resources
               </Link>
-              <Link to="/visit/about" className="hover:text-foreground transition">
+              <Link to="/about" className="hover:text-foreground transition">
                 About Roundup
               </Link>
               <a

@@ -1,21 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import type React from "react";
+import { Calendar, Clock, Globe2, MapPin, Sparkles, Users } from "lucide-react";
 import { useState } from "react";
+
 import { LanguageTag } from "~/components/LanguageTag";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
-import { ChevronsUpDownIcon, Info, LinkIcon, MapPinIcon } from "~/components/ui/icons";
-import { Separator } from "~/components/ui/separator";
-import { StickyActionBar } from "~/components/ui/sticky-action-bar";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { useAuth } from "~/features/auth/hooks/useAuth";
 import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
@@ -32,13 +23,17 @@ import {
   formatExpectedDuration,
   formatPrice,
 } from "~/shared/lib/game-formatting";
+import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
-type GameDetailLoaderData = {
+const SURFACE_CLASSNAME =
+  "rounded-3xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/95 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
+
+interface LoaderData {
   gameDetails: GameWithDetails | null;
   systemDetails: GameSystemDetail | null;
-};
+}
 
 export const Route = createFileRoute("/game/$gameId")({
   loader: async ({ params }) => {
@@ -47,36 +42,40 @@ export const Route = createFileRoute("/game/$gameId")({
     });
 
     if (result.success && result.data) {
-      if (result.data.visibility === "public" && result.data.status === "scheduled") {
+      const game = result.data;
+
+      if (game.visibility === "public" && game.status === "scheduled") {
         let systemDetails: GameSystemDetail | null = null;
-        const slug = result.data.gameSystem?.slug;
+        const slug = game.gameSystem?.slug;
+
         if (slug) {
           try {
             systemDetails = await getSystemBySlug({ data: { slug } });
           } catch (error) {
-            console.error("Failed to enrich game with system details", error);
+            console.error("Failed to fetch system details", error);
           }
         }
 
-        return { gameDetails: result.data, systemDetails } satisfies GameDetailLoaderData;
+        return { gameDetails: game, systemDetails } satisfies LoaderData;
       }
 
-      return { gameDetails: null, systemDetails: null } satisfies GameDetailLoaderData;
+      return { gameDetails: null, systemDetails: null } satisfies LoaderData;
     }
 
     console.error(
       "Failed to fetch game details:",
       result.success ? "Unknown error" : result.errors,
     );
-    return { gameDetails: null, systemDetails: null } satisfies GameDetailLoaderData;
+
+    return { gameDetails: null, systemDetails: null } satisfies LoaderData;
   },
-  component: GameDetailPage,
+  component: VisitGameDetailPage,
 });
 
-function GameDetailPage() {
+function VisitGameDetailPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { gameDetails, systemDetails } = Route.useLoaderData() as GameDetailLoaderData;
+  const { gameDetails, systemDetails } = Route.useLoaderData() as LoaderData;
   const [isSystemAboutOpen, setIsSystemAboutOpen] = useState(false);
 
   const applyMutation = useMutation<
@@ -85,21 +84,39 @@ function GameDetailPage() {
     { data: { gameId: string; message?: string } }
   >({
     mutationFn: (variables) => applyToGame(variables),
-    onSuccess: (res) => {
-      if (res.success) {
-        console.info("Application submitted");
-      }
-    },
   });
 
   if (!gameDetails) {
     return (
       <PublicLayout>
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="font-heading mb-8 text-4xl">Game Not Found</h1>
-          <p className="text-muted-foreground">
-            The game you are looking for does not exist or has been removed.
+        <div
+          className={cn(
+            SURFACE_CLASSNAME,
+            "token-stack-lg mx-auto max-w-3xl items-center text-center",
+          )}
+        >
+          <h1 className="text-heading-sm text-foreground">Session unavailable</h1>
+          <p className="text-body-sm text-muted-strong">
+            The game you were looking for is no longer accepting players or may have been
+            removed.
           </p>
+          <div className="token-gap-sm flex flex-wrap items-center justify-center">
+            <Link
+              to="/search"
+              className={cn(buttonVariants({ size: "sm" }), "rounded-full")}
+            >
+              Browse all games
+            </Link>
+            <Link
+              to="/"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "rounded-full",
+              )}
+            >
+              Visit homepage
+            </Link>
+          </div>
         </div>
       </PublicLayout>
     );
@@ -141,481 +158,570 @@ function GameDetailPage() {
   ]
     .filter(Boolean)
     .join(" • ");
-  const heroStyle = systemDetails?.heroUrl
-    ? {
-        backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.65), rgba(10,10,10,0.2)), url('${systemDetails.heroUrl}')`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
-    : undefined;
+
+  const heroBackground =
+    systemDetails?.heroUrl ??
+    "radial-gradient(circle at top, rgba(146,102,204,0.55), rgba(19,18,30,0.95))";
+
   const systemSummary = systemDetails?.description ?? systemDetails?.summary ?? null;
   const systemLinks = systemDetails ? buildSystemExternalLinks(systemDetails) : [];
   const gallery = systemDetails?.gallery ?? [];
 
+  const metaItems = [
+    { icon: Calendar, label: formatDateAndTime(gameDetails.dateTime) },
+    { icon: MapPin, label: gameDetails.location.address },
+    { icon: Users, label: playersRange },
+    {
+      icon: Clock,
+      label:
+        expectedDuration ??
+        (systemDetails?.averagePlayTime
+          ? `${systemDetails.averagePlayTime} minutes`
+          : "GM will confirm"),
+    },
+    {
+      icon: Globe2,
+      label: <LanguageTag language={gameDetails.language} className="text-[0.65rem]" />,
+    },
+  ] as const;
+
+  const heroStyle = heroBackground.startsWith("radial")
+    ? {
+        backgroundImage: heroBackground,
+      }
+    : {
+        backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.7), rgba(10,10,10,0.2)), url('${heroBackground}')`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      };
+
   return (
     <PublicLayout>
-      <div className="pb-28 lg:pb-16">
+      <div className="token-stack-2xl space-y-4">
         <section
-          className="bg-background relative h-[340px] overflow-hidden sm:h-[420px]"
+          className={cn(
+            "relative overflow-hidden rounded-[32px] border border-[color:color-mix(in_oklab,var(--primary-soft)_36%,transparent)]",
+            "bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.6),_rgba(17,17,17,0.95))]",
+          )}
           style={heroStyle}
         >
-          {!systemDetails?.heroUrl ? (
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.6),_rgba(17,17,17,0.95))]" />
-          ) : null}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/10" />
-          <div className="relative z-10 flex h-full items-end pb-12">
-            <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-              <div className="max-w-3xl space-y-4 text-white">
-                <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-white/15 text-xs font-medium tracking-wide text-white uppercase">
-                    Public session
-                  </Badge>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/20" />
+          <div className="relative z-10 flex min-h-[260px] flex-col justify-end gap-6 p-8 text-white sm:p-12">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge className="bg-white/15 text-xs font-semibold tracking-wide text-white uppercase">
+                Public session
+              </Badge>
+              {gameDetails.campaignId ? (
+                <Badge className="bg-white/15 text-xs font-semibold tracking-wide text-white uppercase">
+                  Ongoing campaign
+                </Badge>
+              ) : null}
+            </div>
+            <div className="token-stack-2xs max-w-3xl">
+              <h1 className="text-heading-md text-balance text-white sm:text-[2.75rem]">
+                {gameDetails.name}
+              </h1>
+              <p className="text-body-sm text-white/85 sm:text-base">{heroSubtitle}</p>
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar
+                  name={gameDetails.owner?.name ?? null}
+                  email={gameDetails.owner?.email ?? null}
+                  src={gameDetails.owner?.image ?? null}
+                  srcUploaded={gameDetails.owner?.uploadedAvatarPath ?? null}
+                  className="size-14 border-2 border-white/40"
+                />
+                <div className="token-stack-3xs text-left">
+                  <p className="text-body-sm tracking-[0.25em] text-white/75 uppercase">
+                    Hosted by
+                  </p>
+                  <p className="text-body-lg font-semibold text-white">
+                    {gameDetails.owner?.name ??
+                      gameDetails.owner?.email ??
+                      "Community GM"}
+                  </p>
+                  <p className="text-body-xs text-white/75">
+                    {gameDetails.owner?.gmRating
+                      ? `Community rating: ${gameDetails.owner.gmRating.toFixed(1)}/5`
+                      : "New to the Roundup Games community"}
+                  </p>
                 </div>
-                <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl">
-                  {gameDetails.name}
-                </h1>
-                <p className="text-sm text-white/85 sm:text-base">{heroSubtitle}</p>
-                {canApply ? (
-                  isAuthenticated ? (
-                    <Button
-                      className="hidden sm:inline-flex"
-                      onClick={() =>
-                        applyMutation.mutate({ data: { gameId: gameDetails.id } })
-                      }
-                      disabled={applyMutation.isPending}
-                    >
-                      {applyMutation.isPending ? "Applying..." : "Apply to join"}
-                    </Button>
-                  ) : (
-                    <Button
-                      className="hidden sm:inline-flex"
-                      onClick={() =>
-                        navigate({
-                          to: "/auth/login",
-                          search: { redirect: `/game/${gameDetails.id}` },
-                        })
-                      }
-                    >
-                      Sign in to apply
-                    </Button>
-                  )
-                ) : null}
               </div>
+              {canApply ? (
+                isAuthenticated ? (
+                  <Button
+                    size="lg"
+                    className="rounded-full px-8"
+                    disabled={applyMutation.isPending}
+                    onClick={() =>
+                      applyMutation.mutate({ data: { gameId: gameDetails.id } })
+                    }
+                  >
+                    {applyMutation.isPending ? "Applying..." : "Request a seat"}
+                  </Button>
+                ) : (
+                  <Button
+                    size="lg"
+                    className="rounded-full px-8"
+                    onClick={() =>
+                      navigate({
+                        to: "/auth/login",
+                        search: { redirect: `/game/${gameDetails.id}` },
+                      })
+                    }
+                  >
+                    Sign in to apply
+                  </Button>
+                )
+              ) : null}
             </div>
           </div>
         </section>
 
-        <section className="relative -mt-8 pb-10">
-          <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[2fr_1fr] lg:px-8">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>About this session</CardTitle>
-                  <CardDescription>
-                    Get a feel for the table vibe before you request a seat.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {gameDetails.description ? (
-                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                      {gameDetails.description}
-                    </p>
-                  ) : (
-                    <p className="text-muted-foreground">
-                      The game organizer hasn't shared additional details yet.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+        <div className="grid gap-8 lg:grid-cols-[1.7fr_minmax(0,1fr)]">
+          <div className="token-stack-xl gap-6 space-y-4">
+            <section
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-4 dark:bg-gray-900/70",
+              )}
+            >
+              <header className="token-stack-2xs">
+                <p className="text-eyebrow text-primary-soft">Table briefing</p>
+                <h2 className="text-heading-xs text-foreground">About this session</h2>
+                <p className="text-body-sm text-muted-strong">
+                  Get a feel for the table vibe before you request a seat.
+                </p>
+              </header>
+              <div className="text-body-sm text-muted-strong whitespace-pre-wrap">
+                {gameDetails.description ??
+                  "The game organizer hasn't shared additional details yet."}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {metaItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={Icon.name} className="flex items-start gap-3">
+                      <Icon className="text-primary mt-1 size-5" />
+                      <span className="text-body-sm text-muted-strong leading-snug">
+                        {item.label}
+                      </span>
+                    </div>
+                  );
+                })}
+                <div className="flex items-start gap-3">
+                  <Sparkles className="text-primary mt-1 size-5" />
+                  <span className="text-body-sm text-muted-strong leading-snug">
+                    {gameDetails.campaignId
+                      ? "Part of an ongoing campaign"
+                      : "One-shot friendly for curious players"}
+                  </span>
+                </div>
+              </div>
+            </section>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Session logistics</CardTitle>
-                  <CardDescription>
-                    Everything you need to know before joining.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <InfoItem
-                      label="Date & time"
-                      value={formatDateAndTime(gameDetails.dateTime)}
-                    />
-                    <InfoItem
-                      label="Language"
-                      value={<LanguageTag language={gameDetails.language} />}
-                    />
-                    <InfoItem label="Price" value={priceLabel} />
-                    <InfoItem label="Players" value={playersRange} />
-                    <InfoItem
-                      label="Seats available"
-                      value={
-                        seatsAvailable != null ? `${seatsAvailable} open` : "Contact GM"
-                      }
-                    />
-                    <InfoItem
-                      label="Duration"
-                      value={
-                        expectedDuration ??
-                        (systemDetails?.averagePlayTime
-                          ? `${systemDetails.averagePlayTime} min`
-                          : "GM will confirm")
-                      }
-                    />
+            <section
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+              )}
+            >
+              <header className="token-stack-2xs">
+                <p className="text-eyebrow text-primary-soft">Session logistics</p>
+                <h2 className="text-heading-xs text-foreground">Arrival checklist</h2>
+                <p className="text-body-sm text-muted-strong">
+                  Everything you need to know before joining the table.
+                </p>
+              </header>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <InfoItem
+                  label="Date & time"
+                  value={formatDateAndTime(gameDetails.dateTime)}
+                />
+                <InfoItem
+                  label="Language"
+                  value={<LanguageTag language={gameDetails.language} />}
+                />
+                <InfoItem label="Price" value={priceLabel} />
+                <InfoItem label="Players" value={playersRange} />
+                <InfoItem
+                  label="Seats available"
+                  value={seatsAvailable != null ? `${seatsAvailable} open` : "Contact GM"}
+                />
+                <InfoItem
+                  label="Duration"
+                  value={
+                    expectedDuration ??
+                    (systemDetails?.averagePlayTime
+                      ? `${systemDetails.averagePlayTime} min`
+                      : "GM will confirm")
+                  }
+                />
+              </div>
+              <div className="token-stack-2xs border-primary/20 bg-primary/5 text-body-sm text-muted-strong rounded-2xl border p-4 transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
+                Precise meeting details are shared once your seat is confirmed.
+              </div>
+            </section>
+
+            <section
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+              )}
+            >
+              <header className="token-stack-2xs">
+                <p className="text-eyebrow text-primary-soft">Where we’re meeting</p>
+                <h2 className="text-heading-xs text-foreground">Venue details</h2>
+                <p className="text-body-sm text-muted-strong">
+                  We share exact instructions with approved players.
+                </p>
+              </header>
+              <div className="text-body-sm text-muted-strong flex items-start gap-3">
+                <MapPin className="text-primary mt-1 size-5" />
+                <div className="token-stack-3xs">
+                  <p className="text-body-sm text-foreground font-semibold">
+                    {gameDetails.location.address}
+                  </p>
+                  <SafeAddressLink address={gameDetails.location.address} />
+                </div>
+              </div>
+            </section>
+
+            {gallery.length > 0 ? (
+              <section
+                className={cn(
+                  SURFACE_CLASSNAME,
+                  "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+                )}
+              >
+                <header className="token-stack-2xs">
+                  <p className="text-eyebrow text-primary-soft">Art & inspiration</p>
+                  <h2 className="text-heading-xs text-foreground">Visual mood board</h2>
+                  <p className="text-body-sm text-muted-strong">
+                    Approved imagery curated for {systemDetails?.name ?? "this system"}.
+                  </p>
+                </header>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {gallery.slice(0, 4).map((asset) => (
+                    <figure
+                      key={asset.id}
+                      className="border-border/40 bg-muted/30 overflow-hidden rounded-2xl border transition-colors dark:border-gray-700 dark:bg-gray-900/60"
+                    >
+                      <img
+                        src={asset.secureUrl}
+                        alt={`${systemDetails?.name ?? "Game system"} artwork`}
+                        loading="lazy"
+                        className="h-48 w-full object-cover"
+                      />
+                      {asset.license ? (
+                        <figcaption className="text-body-2xs text-muted-strong px-4 py-2">
+                          Licensed: {asset.license}
+                          {asset.licenseUrl ? (
+                            <>
+                              {" "}
+                              ·{" "}
+                              <a
+                                href={asset.licenseUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline"
+                              >
+                                View details
+                              </a>
+                            </>
+                          ) : null}
+                        </figcaption>
+                      ) : null}
+                    </figure>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+              )}
+            >
+              <header className="token-stack-2xs">
+                <p className="text-eyebrow text-primary-soft">Safety tools</p>
+                <h2 className="text-heading-xs text-foreground">Table expectations</h2>
+                <p className="text-body-sm text-muted-strong">
+                  Tools and boundaries shared by the game organizer.
+                </p>
+              </header>
+              <SafetyRulesView safetyRules={gameDetails.safetyRules} />
+            </section>
+
+            {systemDetails ? (
+              <section
+                className={cn(
+                  SURFACE_CLASSNAME,
+                  "token-stack-md bg-secondary p-6 sm:p-8 dark:bg-gray-900/70",
+                )}
+              >
+                <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="token-stack-2xs">
+                    <p className="text-eyebrow text-primary-soft">System spotlight</p>
+                    <h2 className="text-heading-xs text-foreground">
+                      About {systemDetails.name}
+                    </h2>
+                    <p className="text-body-sm text-muted-strong">
+                      Pulled from the Roundup Games system library.
+                    </p>
                   </div>
-                  {gameDetails.campaignId ? (
-                    <div className="border-primary/30 bg-primary/10 text-muted-foreground mt-6 rounded-lg border px-3 py-2 text-sm">
-                      This session is part of an ongoing campaign.
-                    </div>
-                  ) : null}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Location</CardTitle>
-                  <CardDescription>
-                    Precise meeting details are shared once your seat is confirmed.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-start gap-3 text-sm">
-                    <MapPinIcon className="text-muted-foreground mt-1 h-4 w-4" />
-                    <div>
-                      <p className="text-foreground font-medium">
-                        {gameDetails.location.address}
-                      </p>
-                      <SafeAddressLink address={gameDetails.location.address} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {gallery.length > 0 ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Art & inspiration</CardTitle>
-                    <CardDescription>
-                      Approved imagery curated for {systemDetails?.name ?? "this system"}.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {gallery.slice(0, 4).map((asset) => (
-                        <figure
-                          key={asset.id}
-                          className="bg-muted/40 overflow-hidden rounded-xl border"
-                        >
-                          <img
-                            src={asset.secureUrl}
-                            alt={`${systemDetails?.name ?? "Game system"} artwork`}
-                            loading="lazy"
-                            className="h-48 w-full object-cover"
-                          />
-                          {asset.license ? (
-                            <figcaption className="text-muted-foreground px-3 py-2 text-xs">
-                              Licensed: {asset.license}
-                              {asset.licenseUrl ? (
-                                <>
-                                  {" "}
-                                  ·{" "}
-                                  <a
-                                    href={asset.licenseUrl}
-                                    className="underline"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    View details
-                                  </a>
-                                </>
-                              ) : null}
-                            </figcaption>
-                          ) : null}
-                        </figure>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : null}
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Safety & table rules</CardTitle>
-                  <CardDescription>
-                    Tools and expectations shared by the game organizer.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <SafetyRulesView safetyRules={gameDetails.safetyRules} />
-                </CardContent>
-              </Card>
-
-              {systemDetails ? (
-                <Card>
-                  <CardHeader className="space-y-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <CardTitle>About {systemDetails.name}</CardTitle>
-                        <CardDescription>
-                          Pulled from the Roundup Games system library.
-                        </CardDescription>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsSystemAboutOpen((prev) => !prev)}
-                        aria-expanded={isSystemAboutOpen}
-                        aria-controls="system-about-content"
-                        className="mt-1 h-auto gap-2 px-3 py-1 text-xs font-semibold tracking-wide uppercase"
-                      >
-                        {isSystemAboutOpen ? "Hide" : "Show"} details
-                        <ChevronsUpDownIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  {isSystemAboutOpen ? (
-                    <CardContent id="system-about-content" className="space-y-4">
-                      {systemSummary ? (
-                        <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                          {systemSummary}
-                        </p>
-                      ) : (
-                        <p className="text-muted-foreground">
-                          We're still gathering lore for this system—check back soon.
-                        </p>
-                      )}
-                      {(systemDetails.categories.length > 0 ||
-                        systemDetails.mechanics.length > 0) && (
-                        <div className="space-y-4">
-                          {systemDetails.categories.length > 0 ? (
-                            <div className="space-y-2">
-                              <h4 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
-                                Categories
-                              </h4>
-                              <div className="flex flex-wrap gap-2">
-                                {systemDetails.categories.map((category) => (
-                                  <Badge
-                                    key={`category-${category.id}`}
-                                    variant="secondary"
-                                  >
-                                    {category.name}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          ) : null}
-                          {systemDetails.mechanics.length > 0 ? (
-                            <div className="space-y-2">
-                              <h4 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
-                                Mechanics
-                              </h4>
-                              <div className="flex flex-wrap gap-2">
-                                {systemDetails.mechanics.map((mechanic) => (
-                                  <Badge
-                                    key={`mechanic-${mechanic.id}`}
-                                    variant="outline"
-                                  >
-                                    {mechanic.name}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
-                      )}
-                    </CardContent>
-                  ) : null}
-                </Card>
-              ) : null}
-            </div>
-
-            <aside className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Game Organizer</CardTitle>
-                  <CardDescription>Meet your host for the adventure.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {gameDetails.owner ? (
-                    <div className="flex items-center gap-4">
-                      <Avatar
-                        name={gameDetails.owner.name}
-                        email={gameDetails.owner.email}
-                        src={gameDetails.owner.image ?? null}
-                        srcUploaded={gameDetails.owner.uploadedAvatarPath ?? null}
-                        className="size-12"
-                      />
-                      <div className="space-y-1">
-                        <p className="text-foreground text-base font-semibold">
-                          {gameDetails.owner.name ?? gameDetails.owner.email}
-                        </p>
-                        <p className="text-muted-foreground text-sm">
-                          {gameDetails.owner.gmRating
-                            ? `Community rating: ${gameDetails.owner.gmRating.toFixed(1)}/5`
-                            : "New to the Roundup Games community"}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-sm">
-                      We'll share the game organizer's details once the schedule is
-                      confirmed.
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsSystemAboutOpen((prev) => !prev)}
+                    aria-expanded={isSystemAboutOpen}
+                    aria-controls="system-about-content"
+                    className="rounded-full px-4"
+                  >
+                    {isSystemAboutOpen ? "Hide details" : "Show details"}
+                  </Button>
+                </header>
+                {isSystemAboutOpen ? (
+                  <div id="system-about-content" className="token-stack-sm">
+                    <p className="text-body-sm text-muted-strong whitespace-pre-wrap">
+                      {systemSummary ??
+                        "We're still gathering lore for this system—check back soon."}
                     </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {systemDetails ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>System quick facts</CardTitle>
-                    <CardDescription>
-                      Snapshot of {systemDetails.name} for new players.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4 text-sm">
-                    <QuickFact
-                      label="Players"
-                      value={buildPlayersRange(
-                        systemDetails.minPlayers,
-                        systemDetails.maxPlayers,
-                      )}
-                    />
-                    {systemDetails.optimalPlayers ? (
-                      <QuickFact
-                        label="Optimal table"
-                        value={`${systemDetails.optimalPlayers} players`}
-                      />
-                    ) : null}
-                    {systemDetails.averagePlayTime ? (
-                      <QuickFact
-                        label="Average session"
-                        value={`${systemDetails.averagePlayTime} minutes`}
-                      />
-                    ) : null}
-                    {systemDetails.yearReleased ? (
-                      <QuickFact
-                        label="First published"
-                        value={`${systemDetails.yearReleased}`}
-                      />
-                    ) : null}
-
-                    {systemDetails.ageRating ? (
-                      <QuickFact
-                        label="Age rating"
-                        value={
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="flex items-center gap-1">
-                                {systemDetails.ageRating}
-                                <Info className="h-3 w-3" />
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                Recommended minimum age for players based on content
-                                themes and mechanics.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        }
-                      />
-                    ) : null}
-
-                    {systemDetails.complexityRating ? (
-                      <QuickFact
-                        label="Complexity"
-                        value={
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="flex items-center gap-1">
-                                {systemDetails.complexityRating}/5
-                                <Info className="h-3 w-3" />
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                1-5 scale where 1 is simple/beginner-friendly and 5 is
-                                complex/expert-level.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        }
-                      />
-                    ) : null}
-
-                    {systemDetails.externalRefs ? <Separator /> : null}
+                    {(systemDetails.categories.length > 0 ||
+                      systemDetails.mechanics.length > 0) && (
+                      <div className="grid gap-6 sm:grid-cols-2">
+                        {systemDetails.categories.length > 0 ? (
+                          <div className="token-stack-3xs">
+                            <h3 className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
+                              Categories
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {systemDetails.categories.map((category) => (
+                                <Badge
+                                  key={`category-${category.id}`}
+                                  variant="secondary"
+                                >
+                                  {category.name}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                        {systemDetails.mechanics.length > 0 ? (
+                          <div className="token-stack-3xs">
+                            <h3 className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
+                              Mechanics
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {systemDetails.mechanics.map((mechanic) => (
+                                <Badge key={`mechanic-${mechanic.id}`} variant="outline">
+                                  {mechanic.name}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
                     {systemLinks.length > 0 ? (
-                      <div className="space-y-2">
-                        <h4 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                      <div className="token-stack-3xs">
+                        <h3 className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
                           External references
-                        </h4>
-                        <ul className="space-y-2">
+                        </h3>
+                        <ul className="token-stack-3xs">
                           {systemLinks.map((link) => (
                             <li key={link.label}>
                               <a
                                 href={link.href}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-primary flex items-center gap-2 text-sm font-medium underline-offset-4 hover:underline"
+                                className="text-primary text-body-sm font-semibold underline-offset-4 hover:underline"
                               >
-                                <LinkIcon className="h-4 w-4" /> {link.label}
+                                {link.label}
                               </a>
                             </li>
                           ))}
                         </ul>
                       </div>
                     ) : null}
-                    <Separator />
-                    <Link
-                      to="/visit/systems/$slug"
-                      params={{ slug: systemDetails.slug }}
-                      className="text-primary text-sm font-semibold underline-offset-4 hover:underline"
-                    >
-                      More details &raquo;
-                    </Link>
-                  </CardContent>
-                </Card>
-              ) : null}
-            </aside>
+                    <div>
+                      <Link
+                        to="/systems/$slug"
+                        params={{ slug: systemDetails.slug }}
+                        className="text-primary text-body-sm font-semibold underline-offset-4 hover:underline"
+                      >
+                        Explore the full system profile &raquo;
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
           </div>
-        </section>
 
-        {canApply ? (
-          <StickyActionBar>
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-foreground text-sm font-semibold">{priceLabel}</p>
-                <p className="text-muted-foreground text-xs">
+          <aside className="token-stack-lg gap-6">
+            <section
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-7 dark:bg-gray-900/70",
+              )}
+            >
+              <header className="token-stack-3xs">
+                <p className="text-eyebrow text-primary-soft">Host snapshot</p>
+                <h2 className="text-heading-xs text-foreground">Game organizer</h2>
+                <p className="text-body-sm text-muted-strong">
+                  Meet your storyteller before you arrive.
+                </p>
+              </header>
+              {gameDetails.owner ? (
+                <div className="flex items-center gap-4">
+                  <Avatar
+                    name={gameDetails.owner.name ?? null}
+                    email={gameDetails.owner.email ?? null}
+                    src={gameDetails.owner.image ?? null}
+                    srcUploaded={gameDetails.owner.uploadedAvatarPath ?? null}
+                    className="size-14"
+                  />
+                  <div className="token-stack-3xs">
+                    <p className="text-body-md text-foreground font-semibold">
+                      {gameDetails.owner.name ?? gameDetails.owner.email}
+                    </p>
+                    <p className="text-body-sm text-muted-strong">
+                      {gameDetails.owner.gmRating
+                        ? `Community rating: ${gameDetails.owner.gmRating.toFixed(1)}/5`
+                        : "New to the Roundup Games community"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-body-sm text-muted-strong">
+                  We'll share the organizer's details once the schedule is confirmed.
+                </p>
+              )}
+            </section>
+
+            {systemDetails ? (
+              <section
+                className={cn(
+                  SURFACE_CLASSNAME,
+                  "token-stack-md bg-secondary p-6 sm:p-7 dark:bg-gray-900/70",
+                )}
+              >
+                <header className="token-stack-3xs">
+                  <p className="text-eyebrow text-primary-soft">System quick facts</p>
+                  <h2 className="text-heading-xs text-foreground">Ruleset overview</h2>
+                </header>
+                <div className="token-stack-3xs text-body-sm text-muted-strong">
+                  <QuickFact
+                    label="Players"
+                    value={buildPlayersRange(
+                      systemDetails.minPlayers,
+                      systemDetails.maxPlayers,
+                    )}
+                  />
+                  {systemDetails.optimalPlayers ? (
+                    <QuickFact
+                      label="Optimal table"
+                      value={`${systemDetails.optimalPlayers} players`}
+                    />
+                  ) : null}
+                  {systemDetails.averagePlayTime ? (
+                    <QuickFact
+                      label="Average session"
+                      value={`${systemDetails.averagePlayTime} minutes`}
+                    />
+                  ) : null}
+                  {systemDetails.yearReleased ? (
+                    <QuickFact
+                      label="First published"
+                      value={`${systemDetails.yearReleased}`}
+                    />
+                  ) : null}
+                  {systemDetails.ageRating ? (
+                    <QuickFact
+                      label="Age rating"
+                      value={
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="flex items-center gap-1">
+                              {systemDetails.ageRating}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-[220px] text-sm">
+                              Recommended minimum age based on content themes and
+                              mechanics.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      }
+                    />
+                  ) : null}
+                  {systemDetails.complexityRating ? (
+                    <QuickFact
+                      label="Complexity"
+                      value={systemDetails.complexityRating}
+                    />
+                  ) : null}
+                </div>
+              </section>
+            ) : null}
+
+            <section
+              className={cn(
+                SURFACE_CLASSNAME,
+                "token-stack-md bg-secondary p-6 sm:p-7 dark:bg-gray-900/70",
+              )}
+            >
+              <header className="token-stack-3xs">
+                <p className="text-eyebrow text-primary-soft">Ready to join?</p>
+                <h2 className="text-heading-xs text-foreground">Reserve your seat</h2>
+              </header>
+              <div className="token-stack-2xs text-body-sm text-muted-strong">
+                <p>
+                  Cost per player:{" "}
+                  <span className="text-foreground font-semibold">{priceLabel}</span>
+                </p>
+                <p>
                   {playersRange}
                   {seatsAvailable != null ? ` • ${seatsAvailable} seats left` : ""}
                 </p>
               </div>
-              {isAuthenticated ? (
-                <Button
-                  onClick={() =>
-                    applyMutation.mutate({ data: { gameId: gameDetails.id } })
-                  }
-                  disabled={applyMutation.isPending}
-                >
-                  {applyMutation.isPending ? "Applying..." : "Apply to join"}
-                </Button>
+              {canApply ? (
+                isAuthenticated ? (
+                  <Button
+                    className="rounded-full"
+                    disabled={applyMutation.isPending}
+                    onClick={() =>
+                      applyMutation.mutate({ data: { gameId: gameDetails.id } })
+                    }
+                  >
+                    {applyMutation.isPending ? "Applying..." : "Apply to join"}
+                  </Button>
+                ) : (
+                  <Button
+                    className="rounded-full"
+                    onClick={() =>
+                      navigate({
+                        to: "/auth/login",
+                        search: { redirect: `/game/${gameDetails.id}` },
+                      })
+                    }
+                  >
+                    Sign in to apply
+                  </Button>
+                )
               ) : (
-                <Button
-                  onClick={() =>
-                    navigate({
-                      to: "/auth/login",
-                      search: { redirect: `/game/${gameDetails.id}` },
-                    })
-                  }
-                >
-                  Sign in to apply
-                </Button>
+                <p className="text-body-sm text-muted-strong">
+                  Applications for this session are currently closed.
+                </p>
               )}
-            </div>
-          </StickyActionBar>
-        ) : null}
+            </section>
+          </aside>
+        </div>
       </div>
     </PublicLayout>
   );
@@ -628,15 +734,17 @@ interface QuickFactProps {
 
 function QuickFact({ label, value }: QuickFactProps) {
   return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
+        {label}
+      </span>
+      <span className="text-body-sm text-foreground font-semibold">{value}</span>
     </div>
   );
 }
 
 function buildSystemExternalLinks(system: GameSystemDetail) {
-  const refs = [] as Array<{ href: string; label: string }>;
+  const refs: Array<{ href: string; label: string }> = [];
   const externalRefs = system.externalRefs;
   if (!externalRefs) return refs;
 

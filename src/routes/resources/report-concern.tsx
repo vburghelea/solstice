@@ -80,7 +80,7 @@ const channelCards = [
   },
 ];
 
-export const Route = createFileRoute("/visit/resources/report-concern")({
+export const Route = createFileRoute("/resources/report-concern")({
   component: ReportConcernPage,
 });
 
@@ -96,7 +96,7 @@ function ReportConcernPage() {
         ctaLink="#reporting-steps"
         secondaryCta={{
           text: "Visit safety policies",
-          link: "/visit/resources/safety-policies",
+          link: "/resources/safety-policies",
         }}
       />
 

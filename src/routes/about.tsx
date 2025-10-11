@@ -74,7 +74,7 @@ const feedbackTopics = [
   },
 ];
 
-export const Route = createFileRoute("/visit/about")({
+export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
 
@@ -87,10 +87,10 @@ function AboutPage() {
         subtitle="We exist to make it easier for every visitor to step into a lively room, roll some dice, and leave knowing more people who care about their stories."
         backgroundImage="/images/hero-tabletop-board-game-about-optimized.png"
         ctaText="Explore our programs"
-        ctaLink="/visit/resources"
+        ctaLink="/resources"
         secondaryCta={{
           text: "Meet our teams",
-          link: "/visit/teams",
+          link: "/teams",
         }}
       />
 

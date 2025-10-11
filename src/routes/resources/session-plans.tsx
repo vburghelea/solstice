@@ -47,7 +47,7 @@ const programCollections = [
   },
 ];
 
-export const Route = createFileRoute("/visit/resources/session-plans")({
+export const Route = createFileRoute("/resources/session-plans")({
   component: SessionPlansPage,
 });
 

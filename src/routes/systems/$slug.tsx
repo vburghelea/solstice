@@ -27,7 +27,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 const detailSurfaceClass =
   "rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8";
 
-export const Route = createFileRoute("/visit/systems/$slug")({
+export const Route = createFileRoute("/systems/$slug")({
   loader: async ({ params }) => {
     const system = await getSystemBySlug({ data: { slug: params.slug } });
     if (!system) {
@@ -56,7 +56,7 @@ function SystemDetailPage() {
       <section className="container mx-auto space-y-10 px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Button asChild variant="outline" size="sm">
-            <Link to="/visit/systems">
+            <Link to="/systems">
               <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to browse
             </Link>
           </Button>

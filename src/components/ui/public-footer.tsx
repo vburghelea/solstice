@@ -25,25 +25,25 @@ export function PublicFooter() {
             <nav className="mt-3 space-y-2 text-sm sm:mt-4">
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/visit/events"
+                to="/events"
               >
                 Events
               </Link>
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/visit/teams"
+                to="/teams"
               >
                 Teams
               </Link>
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/visit/resources"
+                to="/resources"
               >
                 Resources
               </Link>
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/visit/about"
+                to="/about"
               >
                 About Roundup Games
               </Link>

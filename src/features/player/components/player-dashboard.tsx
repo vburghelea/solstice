@@ -653,7 +653,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 className="justify-start gap-2 sm:col-span-2"
               >
                 <Link
-                  to="/visit/search"
+                  to="/search"
                   onClick={() => {
                     posthog.capture("player_dashboard_action_selected", {
                       action: "discover-games",
@@ -701,7 +701,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   Keep your calendar flexible and claim a spot in the next adventure.
                 </p>
                 <Button asChild variant="secondary">
-                  <Link to="/visit/search">Discover a new session</Link>
+                  <Link to="/search">Discover a new session</Link>
                 </Button>
               </div>
             )}
@@ -835,7 +835,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             </div>
             <Button asChild variant="ghost" className="text-primary hover:text-primary">
               <Link
-                to="/visit/search"
+                to="/search"
                 onClick={() => {
                   posthog.capture("player_dashboard_action_selected", {
                     action: "see-all-events",

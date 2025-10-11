@@ -14,11 +14,11 @@ const resourceSections = [
     actions: [
       {
         label: "Download toolkit",
-        href: "/visit/resources/toolkit",
+        href: "/resources/toolkit",
       },
       {
         label: "View charter template",
-        href: "/visit/resources/charter-template",
+        href: "/resources/charter-template",
       },
     ],
   },
@@ -28,10 +28,10 @@ const resourceSections = [
     description:
       "Adventure prompts, campaign handbooks, and board game rotation plans curated by experienced Game Masters and event hosts.",
     actions: [
-      { label: "Browse session plans", href: "/visit/resources/session-plans" },
+      { label: "Browse session plans", href: "/resources/session-plans" },
       {
         label: "Watch facilitation clinics",
-        href: "/visit/resources/facilitation-clinics",
+        href: "/resources/facilitation-clinics",
       },
     ],
   },
@@ -43,9 +43,9 @@ const resourceSections = [
     actions: [
       {
         label: "Download policies",
-        href: "/visit/resources/safety-policies",
+        href: "/resources/safety-policies",
       },
-      { label: "Report a concern", href: "/visit/resources/report-concern" },
+      { label: "Report a concern", href: "/resources/report-concern" },
     ],
   },
 ];
@@ -56,7 +56,7 @@ const certificationTracks = [
     description:
       "Self-paced modules covering session zero best practices, safety tools, and campaign pacing—perfect for storytellers leading long-form games.",
     icon: UsersIcon,
-    cta: { label: "Start GM training", href: "/visit/resources/game-master-pathway" },
+    cta: { label: "Start GM training", href: "/resources/game-master-pathway" },
   },
   {
     title: "Community host pathway",
@@ -65,7 +65,7 @@ const certificationTracks = [
     icon: Trophy,
     cta: {
       label: "Register for host labs",
-      href: "/visit/resources/community-host-pathway",
+      href: "/resources/community-host-pathway",
     },
   },
   {
@@ -75,12 +75,12 @@ const certificationTracks = [
     icon: CalendarIcon,
     cta: {
       label: "Download operations kit",
-      href: "/visit/resources/event-operations-kit",
+      href: "/resources/event-operations-kit",
     },
   },
 ];
 
-export const Route = createFileRoute("/visit/resources/")({
+export const Route = createFileRoute("/resources/")({
   component: ResourcesIndexPage,
 });
 
@@ -213,7 +213,7 @@ function ResourcesIndexPage() {
                   Schedule a meeting
                 </Button>
               </a>
-              <Link to="/visit/teams">
+              <Link to="/teams">
                 <Button
                   variant="outline"
                   className="text-brand-red border-brand-red hover:bg-brand-red/10"

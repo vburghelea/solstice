@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/visit/events/$slug")({
+export const Route = createFileRoute("/events/$slug")({
   component: EventLayout,
 });
 

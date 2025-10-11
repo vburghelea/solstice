@@ -87,7 +87,7 @@ const DEFAULT_FILTERS: FiltersState = {
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
-export const Route = createFileRoute("/visit/events/")({
+export const Route = createFileRoute("/events/")({
   loader: async () => {
     const [eventsOutcome, profileOutcome] = await Promise.allSettled([
       getUpcomingEvents({

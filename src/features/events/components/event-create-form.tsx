@@ -393,7 +393,7 @@ export function EventCreateForm() {
         toast.success("Event created successfully!");
       }
 
-      navigate({ to: "/visit/events/$slug", params: { slug: result.data.slug } });
+      navigate({ to: "/events/$slug", params: { slug: result.data.slug } });
     },
     onError: (error) => {
       toast.error("An error occurred while creating the event");

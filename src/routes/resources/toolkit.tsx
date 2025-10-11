@@ -32,7 +32,7 @@ const readinessBlocks = [
   },
 ];
 
-export const Route = createFileRoute("/visit/resources/toolkit")({
+export const Route = createFileRoute("/resources/toolkit")({
   component: CommunityStarterToolkitPage,
 });
 

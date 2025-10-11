@@ -34,7 +34,7 @@ interface QuickFilterDefinition {
   predicate: (game: GameListItem) => boolean;
 }
 
-export const Route = createFileRoute("/visit/search")({
+export const Route = createFileRoute("/search")({
   loader: async () => {
     const [gamesOutcome, profileOutcome] = await Promise.allSettled([
       listGames({
@@ -308,7 +308,7 @@ function SearchPage() {
                       <List>
                         {filteredGames.map((game) => {
                           const visitLink: GameLinkConfig = {
-                            to: "/visit/game/$gameId",
+                            to: "/game/$gameId",
                             params: { gameId: game.id },
                           };
 
@@ -326,7 +326,7 @@ function SearchPage() {
                     <div className="hidden grid-cols-1 gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
                       {filteredGames.map((game) => {
                         const visitLink: GameLinkConfig = {
-                          to: "/visit/game/$gameId",
+                          to: "/game/$gameId",
                           params: { gameId: game.id },
                         };
 

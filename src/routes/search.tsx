@@ -4,6 +4,7 @@ import { buttonVariants } from "~/components/ui/button";
 import {
   GameListItemView,
   GameShowcaseCard,
+  type GameLinkConfig,
 } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
@@ -197,8 +198,8 @@ function SearchPage() {
 
   return (
     <PublicLayout>
-      <div className="bg-background text-foreground">
-        <section className="border-border/60 bg-muted/30 border-b">
+      <div className="bg-secondary text-foreground dark:bg-gray-950">
+        <section className="border-border/60 bg-secondary border-b dark:border-gray-800 dark:bg-gray-950">
           <div className="container mx-auto px-4 py-12 sm:py-16">
             <div className="mx-auto max-w-2xl space-y-3 text-center">
               <h1 className="font-heading text-4xl sm:text-5xl">All game sessions</h1>
@@ -210,7 +211,7 @@ function SearchPage() {
         </section>
 
         {showQuickFilters ? (
-          <section className="border-border/60 bg-card/40 border-b py-4">
+          <section className="border-border/60 bg-secondary border-b py-4 dark:border-gray-800 dark:bg-gray-950">
             <div className="container mx-auto px-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-muted-foreground text-sm font-medium">
@@ -227,8 +228,8 @@ function SearchPage() {
                         "border px-3 py-1 text-sm font-medium transition",
                         "rounded-full",
                         isActive
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "bg-muted/60 text-foreground hover:border-primary/50 border-transparent",
+                          ? "border-primary bg-primary/10 text-primary dark:border-primary/40 dark:bg-primary/20 dark:text-primary-100"
+                          : "bg-muted/60 text-foreground hover:border-primary/50 border-transparent dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200",
                       )}
                     >
                       {filter.label}
@@ -239,7 +240,7 @@ function SearchPage() {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="text-primary text-sm font-medium hover:underline"
+                    className="text-primary dark:text-primary-200 text-sm font-medium hover:underline"
                   >
                     Clear filters
                   </button>
@@ -249,10 +250,10 @@ function SearchPage() {
           </section>
         ) : null}
 
-        <section className="py-12 sm:py-16">
+        <section className="bg-secondary py-12 sm:py-16 dark:bg-gray-950">
           <div className="container mx-auto px-4">
             {!hasGames ? (
-              <div className="border-border/70 bg-card/50 mx-auto flex max-w-xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center">
+              <div className="border-border/70 bg-card/50 mx-auto flex max-w-xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
                 <p className="text-muted-foreground text-base font-medium">
                   No public games found right now.
                 </p>
@@ -285,7 +286,7 @@ function SearchPage() {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="text-primary text-sm font-medium hover:underline"
+                      className="text-primary dark:text-primary-200 text-sm font-medium hover:underline"
                     >
                       Clear all
                     </button>
@@ -293,7 +294,7 @@ function SearchPage() {
                 </div>
 
                 {!hasFilteredGames ? (
-                  <div className="border-border/70 bg-card/60 mx-auto flex max-w-2xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center">
+                  <div className="border-border/70 bg-card/60 mx-auto flex max-w-2xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
                     <p className="text-muted-foreground text-base font-medium">
                       No sessions match your quick filters yet.
                     </p>
@@ -305,16 +306,34 @@ function SearchPage() {
                   <>
                     <div className="md:hidden">
                       <List>
-                        {filteredGames.map((game) => (
-                          <GameListItemView key={game.id} game={game} />
-                        ))}
+                        {filteredGames.map((game) => {
+                          const visitLink: GameLinkConfig = {
+                            to: "/game/$gameId",
+                            params: { gameId: game.id },
+                          };
+
+                          return (
+                            <GameListItemView
+                              key={game.id}
+                              game={game}
+                              link={visitLink}
+                            />
+                          );
+                        })}
                       </List>
                     </div>
 
                     <div className="hidden grid-cols-1 gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-                      {filteredGames.map((game) => (
-                        <GameShowcaseCard key={game.id} game={game} />
-                      ))}
+                      {filteredGames.map((game) => {
+                        const visitLink: GameLinkConfig = {
+                          to: "/game/$gameId",
+                          params: { gameId: game.id },
+                        };
+
+                        return (
+                          <GameShowcaseCard key={game.id} game={game} link={visitLink} />
+                        );
+                      })}
                     </div>
                   </>
                 )}

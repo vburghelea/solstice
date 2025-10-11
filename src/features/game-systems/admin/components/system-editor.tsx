@@ -48,6 +48,10 @@ import type {
   AdminGameSystemCrawlEvent,
   AdminGameSystemDetail,
 } from "../game-systems-admin.types";
+import {
+  formatSystemCrawlStatus,
+  formatSystemRelativeTime,
+} from "../lib/system-formatters";
 import { SystemStatusPill } from "./system-status-pill";
 
 type ExternalSourceOption = "startplaying" | "bgg" | "wikipedia";
@@ -88,7 +92,7 @@ export function SystemEditor({
   onSystemChange,
 }: SystemEditorProps) {
   const queryClient = useQueryClient();
-  const updatedRelative = formatRelativeTime(system.updatedAt);
+  const updatedRelative = formatSystemRelativeTime(system.updatedAt);
   const statusPills =
     system.statusFlags.length === 0 ? (
       <Badge variant="secondary">Publish ready</Badge>
@@ -379,7 +383,7 @@ function OverviewTab({
             label="Last approval"
             value={
               system.lastApprovedAt
-                ? `${formatDateAndTime(system.lastApprovedAt)} (${formatRelativeTime(system.lastApprovedAt)})`
+                ? `${formatDateAndTime(system.lastApprovedAt)} (${formatSystemRelativeTime(system.lastApprovedAt)})`
                 : "Never"
             }
           />
@@ -425,7 +429,7 @@ function OverviewTab({
         <CardContent className="space-y-3 text-sm">
           <StatusRow
             label="Status"
-            value={formatCrawlStatus(system.crawlStatus)}
+            value={formatSystemCrawlStatus(system.crawlStatus)}
             highlight={system.crawlStatus === "success"}
           />
           <StatusRow
@@ -1355,7 +1359,7 @@ function CrawlTab({
                   <div className="flex flex-col text-sm">
                     <span>{formatDateAndTime(event.startedAt)}</span>
                     <span className="text-muted-foreground text-xs">
-                      {formatRelativeTime(event.startedAt)}
+                      {formatSystemRelativeTime(event.startedAt)}
                     </span>
                   </div>
                 </TableCell>
@@ -1363,7 +1367,7 @@ function CrawlTab({
                   <div className="flex flex-col text-sm">
                     <span>{formatDateAndTime(event.finishedAt)}</span>
                     <span className="text-muted-foreground text-xs">
-                      {formatRelativeTime(event.finishedAt)}
+                      {formatSystemRelativeTime(event.finishedAt)}
                     </span>
                   </div>
                 </TableCell>
@@ -1425,40 +1429,6 @@ function renderExternalRefs(system: AdminGameSystemDetail) {
       <span className="font-mono text-sm">{value}</span>
     </Fragment>
   ));
-}
-
-function formatCrawlStatus(status: string | null) {
-  if (!status) return "Unknown";
-  return status.charAt(0).toUpperCase() + status.slice(1);
-}
-
-function formatRelativeTime(isoString: string | null | undefined) {
-  if (!isoString) return "unknown";
-  const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return "invalid date";
-  const deltaMs = Date.now() - date.getTime();
-  const deltaSeconds = Math.round(deltaMs / 1000);
-  if (Math.abs(deltaSeconds) < 60) return "just now";
-  const divisions = [
-    { amount: 60, unit: "minute" },
-    { amount: 60, unit: "hour" },
-    { amount: 24, unit: "day" },
-    { amount: 7, unit: "week" },
-    { amount: 4.348, unit: "month" },
-    { amount: 12, unit: "year" },
-  ] as const;
-
-  const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-  let duration = deltaSeconds;
-  let unit: Intl.RelativeTimeFormatUnit = "second";
-
-  for (const division of divisions) {
-    if (Math.abs(duration) < division.amount) break;
-    duration /= division.amount;
-    unit = division.unit as Intl.RelativeTimeFormatUnit;
-  }
-
-  return formatter.format(Math.round(duration * -1), unit);
 }
 
 export const ADMIN_SYSTEM_EDITOR_TABS = TABS;

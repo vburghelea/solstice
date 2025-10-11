@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { z } from "zod";
+
 import {
   DEFAULT_SYSTEM_EDITOR_TAB,
   SystemEditor,
@@ -8,24 +8,18 @@ import {
 } from "~/features/game-systems/admin/components/system-editor";
 import { getAdminGameSystem } from "~/features/game-systems/admin/game-systems-admin.queries";
 import type { AdminGameSystemDetail } from "~/features/game-systems/admin/game-systems-admin.types";
-
-const tabEnumValues = ["overview", "content", "media", "taxonomy", "crawl"] as const;
-const searchSchema = z.object({
-  tab: z.enum(tabEnumValues).optional(),
-});
-
-const paramsSchema = z.object({
-  systemId: z.string(),
-});
-
-type AdminSystemEditorSearch = z.infer<typeof searchSchema>;
+import {
+  systemEditorParamsSchema,
+  systemEditorSearchSchema,
+  type SystemEditorSearchParams,
+} from "~/features/game-systems/admin/views/system-editor-route-schemas";
 
 type LoaderData = { system: AdminGameSystemDetail };
 
 export const Route = createFileRoute("/dashboard/systems/$systemId")({
-  validateSearch: searchSchema.parse,
+  validateSearch: systemEditorSearchSchema.parse,
   loader: async ({ params }) => {
-    const parsedParams = paramsSchema.parse(params);
+    const parsedParams = systemEditorParamsSchema.parse(params);
     const systemId = Number.parseInt(parsedParams.systemId, 10);
     if (!Number.isFinite(systemId)) {
       throw notFound();
@@ -43,7 +37,7 @@ export const Route = createFileRoute("/dashboard/systems/$systemId")({
 
 function AdminSystemEditorRoute() {
   const { system } = Route.useLoaderData() as LoaderData;
-  const search = Route.useSearch() as AdminSystemEditorSearch;
+  const search = Route.useSearch() as SystemEditorSearchParams;
   const navigate = Route.useNavigate();
   const [systemState, setSystemState] = useState(system);
 
@@ -57,7 +51,7 @@ function AdminSystemEditorRoute() {
   const handleTabChange = (nextTab: AdminSystemEditorTab) => {
     navigate({
       search: (prev) => {
-        const next: AdminSystemEditorSearch = { ...prev, tab: nextTab };
+        const next: SystemEditorSearchParams = { ...prev, tab: nextTab };
         if (nextTab === DEFAULT_SYSTEM_EDITOR_TAB) {
           next.tab = undefined;
         }

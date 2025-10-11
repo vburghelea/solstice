@@ -1,5 +1,5 @@
-import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Twitter } from "lucide-react";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 
 export function PublicFooter() {
   return (

@@ -146,7 +146,7 @@ export function InviteParticipants({
 
         <div className="space-y-2">
           <Label htmlFor="email-invite">Invite by Email</Label>
-          <div className="flex space-x-2">
+          <div className="space-y-2">
             <Input
               id="invitee-name"
               placeholder="Enter name"

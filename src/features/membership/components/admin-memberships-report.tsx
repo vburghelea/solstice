@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 import { Avatar } from "~/components/ui/avatar";
@@ -11,6 +10,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { DataTable } from "~/components/ui/data-table";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { exportToCSV, formatCurrency, formatDate } from "~/lib/utils/csv-export";
 import { getAllMemberships, type MembershipReportRow } from "../membership.admin-queries";
 

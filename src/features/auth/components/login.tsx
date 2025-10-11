@@ -17,8 +17,12 @@ type LoginFormProps = {
 
 export default function LoginForm(props?: LoginFormProps) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const router = useRouter();
+  const navigate = useNavigate();
+
+  const navigateTo = async (path: string): Promise<void> => {
+    await navigate({ to: path } as never);
+  };
 
   const safeRedirectPath = props?.redirectPath?.startsWith("/")
     ? props.redirectPath
@@ -53,7 +57,7 @@ export default function LoginForm(props?: LoginFormProps) {
         // Success path
         await queryClient.invalidateQueries({ queryKey: ["user"] });
         await router.invalidate();
-        await navigate({ to: safeRedirectPath });
+        await navigateTo(safeRedirectPath);
       } catch (error) {
         // Error handling
         setErrorMessage((error as Error)?.message || "Invalid email or password");

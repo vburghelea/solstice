@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { startTransition, useEffect, useMemo, useState } from "react";
+
 import { buttonVariants } from "~/components/ui/button";
 import { EventCard } from "~/components/ui/event-card";
 import { HeroSection } from "~/components/ui/hero-section";
@@ -8,28 +9,32 @@ import type { EventWithDetails } from "~/features/events/events.types";
 import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
 import type { PopularGameSystem } from "~/features/game-systems/game-systems.types";
 import {
-  GameListItemView,
   GameShowcaseCard,
+  type GameLinkConfig,
 } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import {
+  buildFallbackSelection,
+  CITY_PREFERENCE_STORAGE_KEY,
+  cityOptionExists,
+  CitySelection,
+  decodeSelection,
+  deriveInitialCity,
+  deriveSystemHighlights,
+  encodeSelection,
+  filterEventsBySelection,
+  filterGamesBySelection,
+  guessCityFromTimezone,
+} from "~/features/profile/location-preferences";
 import { listUserLocations } from "~/features/profile/profile.queries";
 import type { CountryLocationGroup } from "~/features/profile/profile.types";
 import type { AuthUser } from "~/lib/auth/types";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
-const HERO_IMAGE_URL = "/images/hero-tabletop-board-game-small-group-optimized.png";
-
-const CITY_STORAGE_KEY = "roundup:selected-city";
-
-type CitySelection = {
-  city: string;
-  country: string;
-};
-
-type HomeLoaderData = {
+type VisitorLoaderData = {
   featuredGames: GameListItem[];
   popularSystems: PopularGameSystem[];
   upcomingEvents: EventWithDetails[];
@@ -37,7 +42,7 @@ type HomeLoaderData = {
 };
 
 export const Route = createFileRoute("/")({
-  loader: async (): Promise<HomeLoaderData> => {
+  loader: async (): Promise<VisitorLoaderData> => {
     const [
       gamesResult,
       popularSystemsResult,
@@ -70,206 +75,59 @@ export const Route = createFileRoute("/")({
       locationGroups: locationGroupsResult,
     };
   },
-  component: Index,
+  component: VisitorExperience,
 });
+const DISCOVERY_THEMES = [
+  {
+    title: "Curated spotlights",
+    description:
+      "Hand-picked sessions and stories make it easy to feel the Roundup vibe before you ever sit down at the table.",
+  },
+  {
+    title: "Effortless planning",
+    description:
+      "Choose a city, explore open seats, and mark events you love without committing before you're ready.",
+  },
+  {
+    title: "Trust-first design",
+    description:
+      "Safety practices, accessibility callouts, and facilitator intros appear upfront so explorers can make confident choices.",
+  },
+];
 
-function normalizeText(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/gi, " ")
-    .trim()
-    .toLowerCase();
-}
+const STORY_CHAPTERS = [
+  "Preview gatherings and festivals curated for curious first-timers.",
+  "Explore systems and sessions that prioritize onboarding and safety tools.",
+  "Save a home base city to receive updates when seats open up.",
+];
 
-function encodeSelection(selection: CitySelection): string {
-  return `${encodeURIComponent(selection.country)}::${encodeURIComponent(selection.city)}`;
-}
+const TRUST_PROMISES = [
+  {
+    title: "Safety tools on display",
+    description:
+      "Hosts showcase Lines & Veils, X-Cards, and debrief rituals so everyone knows how care shows up at the table.",
+  },
+  {
+    title: "Meet the facilitator",
+    description:
+      "GM bios highlight pronouns, session pacing, and welcome rituals to help you read the room before you arrive.",
+  },
+  {
+    title: "Spaces that feel welcoming",
+    description:
+      "Each venue callout includes mobility notes, transit tips, and community vibes, helping visitors picture the experience.",
+  },
+];
 
-function decodeSelection(value: string): CitySelection | null {
-  if (!value) {
-    return null;
-  }
+const SECTION_SURFACE =
+  "rounded-3xl bg-secondary shadow-sm ring-1 ring-inset ring-[color:color-mix(in_oklab,var(--primary-soft)_18%,transparent)] dark:bg-card/70 dark:ring-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)]";
 
-  const [country, city] = value.split("::");
-  if (!country || !city) {
-    return null;
-  }
+const explorerPanelSurface =
+  "rounded-2xl border border-border bg-card p-6 shadow-sm transition-colors dark:bg-card/80 md:p-8";
 
-  try {
-    return {
-      country: decodeURIComponent(country),
-      city: decodeURIComponent(city),
-    };
-  } catch {
-    return null;
-  }
-}
-
-function deriveInitialCity(
-  user: AuthUser,
-  groups: CountryLocationGroup[],
-): CitySelection | null {
-  if (user?.city && user.country) {
-    const normalizedCity = normalizeText(user.city);
-    const normalizedCountry = normalizeText(user.country);
-
-    for (const group of groups) {
-      if (normalizeText(group.country) !== normalizedCountry) {
-        continue;
-      }
-
-      const match = group.cities.find(
-        (city) => normalizeText(city.city) === normalizedCity,
-      );
-
-      if (match) {
-        return { city: match.city, country: group.country };
-      }
-    }
-
-    return { city: user.city, country: user.country };
-  }
-
-  return null;
-}
-
-function buildFallbackSelection(groups: CountryLocationGroup[]): CitySelection | null {
-  for (const group of groups) {
-    const firstCity = group.cities[0];
-    if (firstCity) {
-      return { city: firstCity.city, country: group.country };
-    }
-  }
-
-  return null;
-}
-
-function guessCityFromTimezone(groups: CountryLocationGroup[]): CitySelection | null {
-  if (typeof Intl === "undefined" || groups.length === 0) {
-    return null;
-  }
-
-  try {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (!timezone) {
-      return null;
-    }
-
-    const [, rawCity] = timezone.split("/");
-    if (!rawCity) {
-      return null;
-    }
-
-    const candidate = normalizeText(rawCity.replace(/_/g, " "));
-
-    for (const group of groups) {
-      const normalizedCountry = normalizeText(group.country);
-      if (
-        normalizedCountry.includes(candidate) ||
-        candidate.includes(normalizedCountry)
-      ) {
-        const fallbackCity = group.cities[0];
-        if (fallbackCity) {
-          return { city: fallbackCity.city, country: group.country };
-        }
-      }
-
-      for (const city of group.cities) {
-        const normalizedCity = normalizeText(city.city);
-        if (normalizedCity.includes(candidate) || candidate.includes(normalizedCity)) {
-          return { city: city.city, country: group.country };
-        }
-      }
-    }
-  } catch (error) {
-    console.warn("Unable to infer city from timezone:", error);
-  }
-
-  return null;
-}
-
-function cityOptionExists(
-  selection: CitySelection | null,
-  groups: CountryLocationGroup[],
-): boolean {
-  if (!selection) {
-    return false;
-  }
-
-  const normalizedCity = normalizeText(selection.city);
-  const normalizedCountry = normalizeText(selection.country);
-
-  return groups.some((group) => {
-    if (normalizeText(group.country) !== normalizedCountry) {
-      return false;
-    }
-
-    return group.cities.some((city) => normalizeText(city.city) === normalizedCity);
-  });
-}
-
-function filterGamesBySelection(
-  games: GameListItem[],
-  selection: CitySelection | null,
-): GameListItem[] {
-  if (games.length === 0) {
-    return [];
-  }
-
-  if (!selection) {
-    return games.slice(0, 3);
-  }
-
-  const normalizedCity = normalizeText(selection.city);
-  const normalizedCountry = normalizeText(selection.country);
-
-  const matches = games.filter((game) => {
-    const address = game.location?.address ?? "";
-    const normalizedAddress = normalizeText(address);
-    return (
-      normalizedAddress.includes(normalizedCity) ||
-      normalizedAddress.includes(normalizedCountry)
-    );
-  });
-
-  return matches.slice(0, 3);
-}
-
-function filterEventsBySelection(
-  events: EventWithDetails[],
-  selection: CitySelection | null,
-): EventWithDetails[] {
-  if (events.length === 0) {
-    return [];
-  }
-
-  if (!selection) {
-    return events.slice(0, 3);
-  }
-
-  const normalizedCity = normalizeText(selection.city);
-  const normalizedCountry = normalizeText(selection.country);
-
-  const matches = events.filter((event) => {
-    const eventCity = event.city ? normalizeText(event.city) : "";
-    const eventCountry = event.country ? normalizeText(event.country) : "";
-
-    return (
-      (eventCity &&
-        (eventCity.includes(normalizedCity) || normalizedCity.includes(eventCity))) ||
-      (eventCountry &&
-        (eventCountry.includes(normalizedCountry) ||
-          normalizedCountry.includes(eventCountry)))
-    );
-  });
-
-  return matches.slice(0, 3);
-}
-
-function Index() {
+function VisitorExperience() {
   const { featuredGames, popularSystems, upcomingEvents, locationGroups } =
-    Route.useLoaderData() as HomeLoaderData;
+    Route.useLoaderData() as VisitorLoaderData;
   const { user } = Route.useRouteContext() as { user: AuthUser };
 
   const fallbackSelection = useMemo(
@@ -295,7 +153,7 @@ function Index() {
     let resolved: CitySelection | null = null;
 
     try {
-      const stored = window.localStorage.getItem(CITY_STORAGE_KEY);
+      const stored = window.localStorage.getItem(CITY_PREFERENCE_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as CitySelection;
         if (parsed?.city && parsed?.country) {
@@ -328,9 +186,12 @@ function Index() {
 
     try {
       if (selectedCity) {
-        window.localStorage.setItem(CITY_STORAGE_KEY, JSON.stringify(selectedCity));
+        window.localStorage.setItem(
+          CITY_PREFERENCE_STORAGE_KEY,
+          JSON.stringify(selectedCity),
+        );
       } else {
-        window.localStorage.removeItem(CITY_STORAGE_KEY);
+        window.localStorage.removeItem(CITY_PREFERENCE_STORAGE_KEY);
       }
     } catch (error) {
       console.warn("Failed to persist city preference:", error);
@@ -349,6 +210,11 @@ function Index() {
   const localGames = useMemo(
     () => filterGamesBySelection(featuredGames, activeSelection),
     [featuredGames, activeSelection],
+  );
+
+  const systemHighlights = useMemo(
+    () => deriveSystemHighlights(popularSystems),
+    [popularSystems],
   );
 
   const locationSelectValue = selectedCity ? encodeSelection(selectedCity) : "";
@@ -380,323 +246,384 @@ function Index() {
 
   return (
     <PublicLayout>
-      <HeroSection
-        title="Welcome to Roundup Games"
-        subtitle="Connect with tabletop and board game enthusiasts, organize sessions, and keep long-running campaigns on track."
-        backgroundImage={HERO_IMAGE_URL}
-        ctaText="Explore games"
-        ctaLink="/search"
-      />
+      <div className="token-stack-3xl space-y-4">
+        <HeroSection
+          eyebrow="Start planning"
+          title="Discover tabletop adventures tailored to explorers"
+          subtitle="Tour community gatherings, curate your favourite systems, and follow the storytellers who match your style."
+          backgroundImage="/images/hero-tabletop-board-game-tournament-cards-optimized.png"
+          ctaText="Create your profile"
+          ctaLink="/auth/signup"
+          secondaryCta={{ text: "Log in to continue", link: "/auth/login" }}
+        />
 
-      <section className="border-border/60 bg-background dark:border-border/40 dark:bg-background border-b py-10 transition-colors sm:py-14 lg:py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
-                Find a local table
-              </p>
-              <h2 className="text-3xl font-bold sm:text-4xl">
-                Discover board game nights near {activeSelectionLabel}
-              </h2>
-              <p className="text-foreground/80 dark:text-muted-foreground text-sm sm:text-base">
-                We surface cities directly from player profiles so you can quickly join
-                communities that are already meeting up.
-              </p>
-            </div>
-            <div className="w-full max-w-md">
-              <label className="sr-only" htmlFor="home-city">
-                Select your city
-              </label>
-              <div className="relative">
-                <select
-                  id="home-city"
-                  className="border-border bg-card/80 focus:border-primary focus:ring-primary/30 w-full appearance-none rounded-full border px-5 py-3 pr-10 text-sm font-medium shadow-sm transition focus:ring-2 focus:outline-none"
-                  value={locationSelectValue}
-                  onChange={(event) => {
-                    setSelectedCity(decodeSelection(event.target.value));
-                  }}
-                  disabled={!hasLocationOptions}
-                >
-                  <option value="">
-                    {hasLocationOptions
-                      ? "Browse all locations"
-                      : "Location data coming soon"}
-                  </option>
-                  {selectedCity && !selectionInOptions ? (
-                    <option value={locationSelectValue}>
-                      {selectedCity.city}, {selectedCity.country} (from your profile)
-                    </option>
-                  ) : null}
-                  {locationGroups.map((group) => (
-                    <optgroup
-                      key={group.country}
-                      label={`${group.country} • ${group.totalUsers} players`}
+        <section className={cn("token-stack-2xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
+          <div
+            className={cn(
+              "token-stack-lg relative overflow-hidden",
+              explorerPanelSurface,
+            )}
+          >
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,227,208,0.75),_rgba(255,255,255,0.95))] opacity-95 dark:hidden" />
+            <div className="token-gap-xl relative flex flex-col lg:flex-row lg:items-start lg:justify-between">
+              <div className="token-stack-md max-w-2xl">
+                <p className="text-eyebrow text-primary-soft">Explorer guide</p>
+                <div className="token-stack-sm">
+                  <h2 className="text-heading-md text-foreground">
+                    Chart the next stop on your journey
+                  </h2>
+                  <p className="text-body-md text-muted-strong">
+                    Set a home base city to preview gatherings, facilitators, and story
+                    worlds that welcome new players.
+                  </p>
+                </div>
+                <List className="token-stack-sm">
+                  {DISCOVERY_THEMES.map((theme) => (
+                    <List.Item
+                      key={theme.title}
+                      className="token-gap-xs flex items-start"
                     >
-                      {group.cities.map((city) => {
-                        const value = encodeSelection({
-                          city: city.city,
-                          country: group.country,
-                        });
-                        return (
-                          <option key={value} value={value}>
-                            {city.city} ({city.userCount} players)
-                          </option>
-                        );
-                      })}
-                    </optgroup>
+                      <span
+                        aria-hidden
+                        className="bg-primary-soft/40 text-primary-strong dark:bg-primary/35 dark:text-primary-foreground mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                      >
+                        •
+                      </span>
+                      <div className="token-stack-2xs">
+                        <p className="text-body-sm text-foreground font-semibold">
+                          {theme.title}
+                        </p>
+                        <p className="text-body-sm text-muted-strong">
+                          {theme.description}
+                        </p>
+                      </div>
+                    </List.Item>
                   ))}
-                </select>
-                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 right-4 flex items-center">
-                  <svg
-                    aria-hidden
-                    className="h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
+                </List>
+              </div>
+              <div className="token-stack-sm w-full max-w-sm">
+                <label className="text-body-sm text-muted-strong" htmlFor="visitor-city">
+                  Focus on a city
+                </label>
+                <div className="relative">
+                  <select
+                    id="visitor-city"
+                    className="border-border focus:border-primary focus:ring-primary/30 bg-card text-body-sm text-foreground dark:bg-card/80 w-full appearance-none rounded-full border px-5 py-3 pr-12 font-medium shadow-sm transition focus:ring-2 focus:outline-none"
+                    value={locationSelectValue}
+                    onChange={(event) => {
+                      setSelectedCity(decodeSelection(event.target.value));
+                    }}
+                    disabled={!hasLocationOptions}
                   >
-                    <path d="M9.293 12.95 10 13.657 15.657 8 14.243 6.586 10 10.828 5.757 6.586 4.343 8z" />
-                  </svg>
-                </div>
-              </div>
-              <p className="text-muted-foreground/80 mt-2 text-xs">
-                We guess your city from your profile, saved preferences, or timezone when
-                available.
-              </p>
-            </div>
-          </div>
-
-          {suggestionChips.length > 0 ? (
-            <div className="mt-6 flex flex-wrap items-center gap-2 text-xs font-medium">
-              <span className="text-muted-foreground/80">Popular cities:</span>
-              {suggestionChips.map((suggestion) => (
-                <button
-                  key={suggestion.key}
-                  type="button"
-                  onClick={() =>
-                    setSelectedCity({
-                      city: suggestion.city,
-                      country: suggestion.country,
-                    })
-                  }
-                  className="bg-card hover:bg-muted text-muted-foreground/90 hover:text-foreground rounded-full border px-3 py-1 transition"
-                >
-                  {suggestion.city}, {suggestion.country}
-                </button>
-              ))}
-            </div>
-          ) : null}
-
-          <div className="mt-12 grid gap-12 lg:grid-cols-[1fr,1fr] xl:grid-cols-[5fr,7fr]">
-            <div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-semibold">
-                  Events near {activeSelectionLabel}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  Approved public events sourced directly from community organizers.
-                </p>
-              </div>
-              {localEvents.length === 0 ? (
-                <div className="border-border/60 bg-card/50 mt-6 rounded-3xl border border-dashed px-6 py-10 text-center">
-                  <p className="text-muted-foreground text-base font-medium">
-                    No events scheduled for this city yet.
-                  </p>
-                  <p className="text-muted-foreground/80 mt-2 text-sm">
-                    Switch to another city or check back soon as organizers publish their
-                    calendars.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  {localEvents.map((event) => (
-                    <EventCard key={`local-${event.id}`} event={event} />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-semibold">
-                  Games hosted near {activeSelectionLabel}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  Player-run sessions and campaign nights that still have seats open.
-                </p>
-              </div>
-              {localGames.length === 0 ? (
-                <div className="border-border/60 bg-card/50 mt-6 rounded-3xl border border-dashed px-6 py-10 text-center">
-                  <p className="text-muted-foreground text-base font-medium">
-                    No featured games in this area yet.
-                  </p>
-                  <p className="text-muted-foreground/80 mt-2 text-sm">
-                    Try another location or browse the full catalogue to find an online
-                    group.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="mt-6 md:hidden">
-                    <List>
-                      {localGames.map((game) => (
-                        <GameListItemView key={game.id} game={game} />
-                      ))}
-                    </List>
+                    <option value="">
+                      {hasLocationOptions
+                        ? "Browse all locations"
+                        : "Location data coming soon"}
+                    </option>
+                    {selectedCity && !selectionInOptions ? (
+                      <option value={locationSelectValue}>
+                        {selectedCity.city}, {selectedCity.country} (from your profile)
+                      </option>
+                    ) : null}
+                    {locationGroups.map((group) => (
+                      <optgroup
+                        key={group.country}
+                        label={`${group.country} • ${group.totalUsers} players`}
+                      >
+                        {group.cities.map((city) => {
+                          const value = encodeSelection({
+                            city: city.city,
+                            country: group.country,
+                          });
+                          return (
+                            <option key={value} value={value}>
+                              {city.city} ({city.userCount} players)
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <div className="text-muted-strong dark:text-muted-foreground pointer-events-none absolute inset-y-0 right-5 flex items-center">
+                    <svg
+                      aria-hidden
+                      className="h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.293 12.95 10 13.657 15.657 8 14.243 6.586 10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
                   </div>
-                  <div className="mt-6 hidden gap-8 md:grid md:grid-cols-2 xl:grid-cols-3">
-                    {localGames.map((game) => (
-                      <GameShowcaseCard key={game.id} game={game} />
+                </div>
+                <p className="text-body-xs text-muted-strong">
+                  We suggest cities from your profile, saved preferences, or timezone when
+                  we can.
+                </p>
+                {suggestionChips.length > 0 ? (
+                  <div className="token-gap-xs flex flex-wrap items-center">
+                    <span className="text-body-xs text-muted-strong">
+                      Popular cities:
+                    </span>
+                    {suggestionChips.map((suggestion) => (
+                      <button
+                        key={suggestion.key}
+                        type="button"
+                        onClick={() =>
+                          setSelectedCity({
+                            city: suggestion.city,
+                            country: suggestion.country,
+                          })
+                        }
+                        className="text-body-xs text-muted-strong hover:text-foreground border-border bg-card hover:border-primary/80 dark:bg-card/80 dark:text-muted-foreground rounded-full border px-3 py-1 transition"
+                      >
+                        {suggestion.city}, {suggestion.country}
+                      </button>
                     ))}
                   </div>
-                </>
-              )}
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to="/search"
-                  className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
-                >
-                  Browse all games
-                </Link>
-                <Link
-                  to="/events"
-                  className={cn(
-                    buttonVariants({ size: "lg", variant: "ghost" }),
-                    "rounded-full px-8",
-                  )}
-                >
-                  Browse all events
-                </Link>
+                ) : null}
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="py-16 transition-colors sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-2">
-              <h2 className="font-heading text-3xl sm:text-4xl">Popular game systems</h2>
-              <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
-                Sessions most frequently booked by the community over the past few weeks.
+          <div className={cn("token-gap-lg space-y-4", explorerPanelSurface)}>
+            <div className="token-stack-sm max-w-xl">
+              <h3 className="text-heading-sm text-foreground">How this tour flows</h3>
+              <p className="text-body-sm text-muted-strong">
+                Follow these beats to decide when to join the community or watch for new
+                invitations.
+              </p>
+            </div>
+            <ol className="token-gap-md grid gap-5 md:grid-cols-3">
+              {STORY_CHAPTERS.map((chapter, index) => (
+                <li
+                  key={chapter}
+                  className="token-stack-sm border-border bg-card dark:bg-card/70 rounded-xl border p-4 shadow-sm transition-colors"
+                >
+                  <span className="bg-primary-soft text-primary-strong text-body-sm inline-flex h-9 w-9 items-center justify-center rounded-full font-semibold">
+                    {index + 1}
+                  </span>
+                  <p className="text-body-sm text-muted-strong dark:text-muted-foreground">
+                    {chapter}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
+          <div className="token-stack-xs">
+            <p className="text-eyebrow text-primary-soft">Confidence signals</p>
+            <h2 className="text-heading-sm text-foreground">
+              What makes Roundup feel safe
+            </h2>
+            <p className="text-body-sm text-muted-strong">
+              We foreground the cues that help solo explorers feel confident before
+              stepping into a new space.
+            </p>
+          </div>
+          <div className="token-gap-md grid gap-5 md:grid-cols-3">
+            {TRUST_PROMISES.map((signal) => (
+              <div
+                key={signal.title}
+                className={cn("token-stack-sm p-5", explorerPanelSurface)}
+              >
+                <p className="text-body-sm text-foreground font-semibold">
+                  {signal.title}
+                </p>
+                <p className="text-body-sm text-muted-strong">{signal.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
+          <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="token-stack-xs">
+              <p className="text-eyebrow text-primary-soft">Upcoming gatherings</p>
+              <h2 className="text-heading-sm text-foreground">
+                Events near {activeSelectionLabel}
+              </h2>
+              <p className="text-body-sm text-muted-strong">
+                Curated by community hosts. Each RSVP takes you closer to your first game
+                session memory.
               </p>
             </div>
             <Link
-              to="/systems"
+              to="/events"
               className={cn(
-                buttonVariants({ size: "sm", variant: "ghost" }),
-                "self-start rounded-full px-5",
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "rounded-full",
               )}
             >
-              Browse all systems
+              Browse full calendar
             </Link>
           </div>
 
-          {popularSystems.length === 0 ? (
-            <p className="text-muted-foreground/80 mt-10 text-center text-sm">
+          {localEvents.length === 0 ? (
+            <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
+              <p className="text-body-md text-muted-strong">
+                No events scheduled for this city yet.
+              </p>
+              <p className="text-body-sm text-muted-strong">
+                Check back later as hosts publish new sessions.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {localEvents.map((event) => (
+                <EventCard key={`visitor-${event.id}`} event={event} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
+          <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="token-stack-xs">
+              <p className="text-eyebrow text-primary-soft">Stories to sample</p>
+              <h2 className="text-heading-sm text-foreground">
+                Sessions welcoming new explorers
+              </h2>
+              <p className="text-body-sm text-muted-strong">
+                These tables lean into onboarding, safety tools, and collaborative energy.
+              </p>
+            </div>
+            <Link
+              to="/search"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "rounded-full",
+              )}
+            >
+              Search all games
+            </Link>
+          </div>
+
+          {localGames.length === 0 ? (
+            <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
+              <p className="text-body-md text-muted-strong">
+                No spotlight sessions in this city yet.
+              </p>
+              <p className="text-body-sm text-muted-strong">
+                Subscribe to our newsletter or try again later for new content.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2">
+              {localGames.map((game) => {
+                const visitLink: GameLinkConfig = {
+                  to: "/game/$gameId",
+                  params: { gameId: game.id },
+                };
+
+                return (
+                  <GameShowcaseCard
+                    key={`visitor-game-${game.id}`}
+                    game={game}
+                    className="h-full"
+                    link={visitLink}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        <section className={cn("token-stack-lg space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
+          <div className="token-stack-xs">
+            <p className="text-eyebrow text-primary-soft">Trending systems</p>
+            <h2 className="text-heading-sm text-foreground">Rulesets with momentum</h2>
+            <p className="text-body-sm text-muted-strong">
+              Discover which systems are lighting up tables so you know what to learn
+              next.
+            </p>
+          </div>
+          {systemHighlights.length === 0 ? (
+            <p className="text-body-sm text-muted-strong">
               We’ll highlight popular systems once more sessions are scheduled.
             </p>
           ) : (
-            <div className="mt-10 overflow-x-auto pb-4">
-              <div className="flex gap-6 pb-2">
-                {popularSystems.map((system) => (
-                  <Link
-                    key={system.id}
-                    to="/systems/$slug"
-                    params={{ slug: system.slug }}
-                    className="focus-visible:ring-offset-background group border-border/70 bg-card/80 hover:border-primary/50 hover:bg-card/90 w-64 flex-shrink-0 rounded-3xl border px-3 pt-3 pb-4 shadow-sm transition sm:w-72 sm:px-4 sm:pt-4 sm:pb-5"
-                  >
-                    <div className="bg-muted h-40 w-full overflow-hidden rounded-2xl">
+            <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
+              {systemHighlights.map((system) => (
+                <Link
+                  key={system.id}
+                  to="/systems/$slug"
+                  params={{ slug: system.slug }}
+                  className={cn(
+                    "focus-visible:ring-primary focus-visible:ring-offset-background min-w-[16rem] transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_50%,transparent)] hover:shadow-md focus-visible:ring-2 focus-visible:outline-none",
+                    explorerPanelSurface,
+                  )}
+                >
+                  <div className="token-stack-sm">
+                    <div className="aspect-video overflow-hidden rounded-lg">
                       {system.heroUrl ? (
                         <img
                           src={system.heroUrl}
                           alt={`${system.name} cover art`}
+                          className="h-full w-full object-cover"
                           loading="lazy"
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="text-muted-foreground flex h-full w-full items-center justify-center px-4 text-center text-sm">
+                        <div className="bg-muted text-muted-strong text-body-xs flex h-full w-full items-center justify-center">
                           Hero art pending moderation
                         </div>
                       )}
                     </div>
-                    <div className="mt-4 space-y-2">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h3 className="text-lg font-semibold">{system.name}</h3>
-                        <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                    <div className="token-stack-2xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-body-sm text-foreground font-semibold">
+                          {system.name}
+                        </p>
+                        <span className="text-body-2xs text-muted-strong tracking-wide uppercase">
                           {system.gameCount} sessions
                         </span>
                       </div>
-                      {system.summary ? (
-                        <p className="text-muted-foreground/90 line-clamp-3 text-sm">
-                          {system.summary}
-                        </p>
-                      ) : (
-                        <p className="text-muted-foreground/70 text-sm">
-                          Description coming soon.
-                        </p>
-                      )}
+                      <p className="text-body-xs text-muted-strong line-clamp-3">
+                        {system.summary ?? "Description coming soon."}
+                      </p>
                     </div>
-                  </Link>
-                ))}
-              </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           )}
-        </div>
-      </section>
+        </section>
 
-      <section className="border-border/60 bg-muted/30 dark:border-border/40 dark:bg-muted/20 border-t py-16 transition-colors sm:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-heading mb-12 text-3xl md:text-4xl">How it works</h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {["Find a local game", "Join a session", "Play in person"].map(
-              (title, index) => {
-                const descriptions = [
-                  "Search for tabletop RPGs, board game meetups, and events happening near you.",
-                  "Connect with Game Masters and fellow players. RSVP or book your spot directly.",
-                  "Enjoy immersive gaming experiences and build a local gaming community.",
-                ];
-
-                return (
-                  <div
-                    key={title}
-                    className="border-border/60 bg-card/60 flex flex-col items-center rounded-3xl border p-6 text-center shadow-sm"
-                  >
-                    <div className="bg-primary/15 text-primary mb-4 flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold">
-                      {index + 1}
-                    </div>
-                    <h3 className="mb-2 text-xl font-semibold">{title}</h3>
-                    <p className="text-muted-foreground text-sm">{descriptions[index]}</p>
-                  </div>
-                );
-              },
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative isolate overflow-hidden py-16 text-center sm:py-20">
-        <div className="from-primary/80 via-primary to-primary/80 absolute inset-0 -z-10 bg-gradient-to-r" />
-        <div className="container mx-auto px-4">
-          <div className="text-primary-foreground mx-auto max-w-2xl space-y-6">
-            <h2 className="font-heading text-3xl md:text-4xl">
-              Ready to host your own game?
+        <section
+          className={cn(
+            "token-stack-xl from-primary-soft/28 space-y-4 bg-gradient-to-br via-[color:color-mix(in_oklab,var(--primary-soft)_14%,white)] to-amber-50/80 p-8 text-center dark:bg-gray-900/70 dark:text-gray-200",
+            SECTION_SURFACE,
+          )}
+        >
+          <div className="token-stack-sm">
+            <h2 className="text-heading-sm text-foreground">
+              When you’re ready to go deeper
             </h2>
-            <p className="text-lg sm:text-xl">
-              Share your passion! Become a Game Master or host a board game meetup in your
-              area.
+            <p className="text-body-md text-muted-strong">
+              Create a free account to follow cities, join sessions, and receive invites
+              from trusted GMs.
             </p>
+          </div>
+          <div className="token-gap-sm flex flex-wrap items-center justify-center">
             <Link
               to="/auth/signup"
+              className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
+            >
+              Start your player profile
+            </Link>
+            <Link
+              to="/auth/login"
               className={cn(
-                buttonVariants({ size: "lg", variant: "secondary" }),
+                buttonVariants({ variant: "ghost", size: "lg" }),
                 "rounded-full px-8",
               )}
             >
-              Become a host
+              I already have an account
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </PublicLayout>
   );
 }

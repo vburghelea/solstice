@@ -3,13 +3,13 @@ import type { ChangeEvent } from "react";
 import React, { useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { DateTimePicker } from "~/components/form-fields/DateTimePicker";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import {
   Select,
   SelectContent,

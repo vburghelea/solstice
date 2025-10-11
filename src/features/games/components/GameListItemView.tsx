@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import {
   Calendar,
   ChevronRight,
@@ -12,21 +11,33 @@ import type { ComponentType, ReactNode } from "react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { GameListItem } from "~/features/games/games.types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
+import { buildPlayersRange, formatExpectedDuration } from "~/shared/lib/game-formatting";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
 type MetaIcon = ComponentType<{ className?: string }>;
 
+type LinkPrimitive = string | number | boolean;
+
+export type GameLinkConfig = {
+  to: string;
+  params?: Record<string, LinkPrimitive>;
+  search?: Record<string, LinkPrimitive | undefined>;
+  from?: string;
+};
+
 interface GameListItemViewProps {
   game: GameListItem;
+  link?: GameLinkConfig | undefined;
 }
 
-export function GameListItemView({ game }: GameListItemViewProps) {
+export function GameListItemView({ game, link }: GameListItemViewProps) {
   return (
     <List.Item className="px-0 py-0 sm:px-0">
-      <GameShowcaseCard game={game} layout="list" />
+      <GameShowcaseCard game={game} layout="list" link={link} />
     </List.Item>
   );
 }
@@ -35,12 +46,14 @@ interface GameShowcaseCardProps {
   game: GameListItem;
   layout?: "grid" | "list";
   className?: string;
+  link?: GameLinkConfig | undefined;
 }
 
 export function GameShowcaseCard({
   game,
   layout = "grid",
   className,
+  link,
 }: GameShowcaseCardProps) {
   const formattedDate = formatDateAndTime(game.dateTime);
   const price = game.price ? `€${game.price.toFixed(2)}` : "Free";
@@ -56,15 +69,16 @@ export function GameShowcaseCard({
   if (typeof game.participantCount === "number") {
     playersLabelParts.push(`${game.participantCount} joined`);
   }
-  const playersRange = buildPlayersRange(minPlayers, maxPlayers);
+  const playersRange = buildPlayersRange(minPlayers, maxPlayers, { fallback: null });
   if (playersRange) {
     playersLabelParts.push(playersRange);
   }
   const playersLabel = playersLabelParts.join(" • ");
 
-  const durationLabel =
-    formatExpectedDuration(game.expectedDuration) ??
-    formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
+  const expectedDuration = formatExpectedDuration(game.expectedDuration);
+  const durationLabel = expectedDuration
+    ? `${expectedDuration} session`
+    : formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
 
   const metaItems: Array<{ icon: MetaIcon; label: ReactNode }> = [];
 
@@ -82,10 +96,15 @@ export function GameShowcaseCard({
   const languageTag = <LanguageTag language={game.language} className="text-[0.65rem]" />;
   addMeta(Globe2 as MetaIcon, languageTag);
 
+  const resolvedLink: GameLinkConfig = link ?? {
+    to: "/game/$gameId",
+    params: { gameId: game.id },
+  };
+
   return (
     <article
       className={cn(
-        "border-border/60 bg-card hover:border-primary/60 relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm transition-colors hover:shadow-md",
+        "bg-secondary text-secondary-foreground relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] shadow-sm transition-all hover:border-[color:color-mix(in_oklab,var(--primary-soft)_52%,transparent)] hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70",
         className,
       )}
     >
@@ -130,22 +149,27 @@ export function GameShowcaseCard({
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h3 className="text-foreground text-lg font-semibold sm:text-xl">
+              <h3 className="text-foreground text-lg font-semibold sm:text-xl dark:text-gray-50">
                 <Link
-                  to="/game/$gameId"
-                  params={{ gameId: game.id }}
+                  to={resolvedLink.to}
+                  {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+                  {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+                  {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
                   className="flex items-center"
                 >
                   {game.name}
                 </Link>
               </h3>
               {game.description ? (
-                <p className="text-muted-foreground mt-2 line-clamp-3 text-sm">
+                <p className="text-muted-foreground mt-2 line-clamp-3 text-sm dark:text-gray-300">
                   {game.description}
                 </p>
               ) : null}
             </div>
-            <Badge variant="outline" className="shrink-0 text-xs font-medium">
+            <Badge
+              variant="outline"
+              className="dark:border-primary/40 dark:bg-primary/15 dark:text-primary-100 shrink-0 text-xs font-medium"
+            >
               {price}
             </Badge>
           </div>
@@ -163,8 +187,8 @@ export function GameShowcaseCard({
                   className={cn(
                     "flex-1 leading-snug",
                     typeof item.label === "string"
-                      ? "text-muted-foreground"
-                      : "text-foreground",
+                      ? "text-muted-foreground dark:text-gray-300"
+                      : "text-foreground dark:text-gray-50",
                   )}
                 >
                   {item.label}
@@ -175,7 +199,7 @@ export function GameShowcaseCard({
           {game.campaignId ? (
             <div className="flex items-start gap-2">
               <Sparkles className="text-primary mt-0.5 size-4" />
-              <span className="text-muted-foreground flex-1 leading-snug">
+              <span className="text-muted-foreground flex-1 leading-snug dark:text-gray-300">
                 Part of an ongoing campaign
               </span>
             </div>
@@ -183,18 +207,20 @@ export function GameShowcaseCard({
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-2">
-          <span className="text-muted-foreground text-sm">
+          <span className="text-muted-foreground text-sm dark:text-gray-300">
             Hosted by {game.owner?.name ?? game.owner?.email ?? "a community GM"}
           </span>
           <Button
             asChild
             variant="outline"
             size="sm"
-            className="shrink-0 gap-1.5 rounded-full"
+            className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 shrink-0 gap-1.5 rounded-full"
           >
             <Link
-              to="/game/$gameId"
-              params={{ gameId: game.id }}
+              to={resolvedLink.to}
+              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
               className="flex items-center"
             >
               View details
@@ -205,48 +231,6 @@ export function GameShowcaseCard({
       </div>
     </article>
   );
-}
-
-function buildPlayersRange(
-  minPlayers: number | null,
-  maxPlayers: number | null,
-): string | null {
-  if (minPlayers && maxPlayers) {
-    if (minPlayers === maxPlayers) {
-      return `${minPlayers} players`;
-    }
-    return `${minPlayers}-${maxPlayers} players`;
-  }
-
-  if (minPlayers) {
-    return `${minPlayers}+ players`;
-  }
-
-  if (maxPlayers) {
-    return `Up to ${maxPlayers} players`;
-  }
-
-  return null;
-}
-
-function formatExpectedDuration(value: number | null | undefined): string | null {
-  if (!value || Number.isNaN(value)) {
-    return null;
-  }
-
-  const totalMinutes = Math.max(15, Math.round(value));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (hours && minutes) {
-    return `${hours}h ${minutes}m session`;
-  }
-
-  if (hours) {
-    return `${hours}h session`;
-  }
-
-  return `${minutes}m session`;
 }
 
 function formatSystemDuration(minutes: number | null): string | null {

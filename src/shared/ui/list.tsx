@@ -5,7 +5,7 @@ export function List({ className, ...props }: React.ComponentProps<"ul">) {
   return (
     <ul
       className={cn(
-        "divide-border border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm",
+        "divide-border border-border text-card-foreground overflow-hidden rounded-lg border shadow-sm",
         className,
       )}
       {...props}
@@ -17,7 +17,7 @@ export function ListItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       className={cn(
-        "text-card-foreground hover:bg-muted/50 px-4 py-3 text-sm transition-colors [&:first-child]:rounded-t-lg [&:last-child]:rounded-b-lg",
+        "text-card-foreground px-4 py-3 text-sm transition-colors [&:first-child]:rounded-t-lg [&:last-child]:rounded-b-lg",
         className,
       )}
       {...props}

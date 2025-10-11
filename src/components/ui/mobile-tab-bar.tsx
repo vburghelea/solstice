@@ -44,7 +44,6 @@ export function MobileTabBar() {
               activeProps={{
                 className: "text-primary",
                 "aria-current": "page",
-                "data-status": "active",
               }}
               aria-label={label}
             >

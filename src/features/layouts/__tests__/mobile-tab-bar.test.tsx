@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { getGuestPersonaResolution } from "~/features/roles/persona-resolver";
+import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { AdminLayout } from "../admin-layout";
 
 describe("MobileTabBar navigation", () => {
@@ -17,7 +19,11 @@ describe("MobileTabBar navigation", () => {
     const dashboardRoute = createRoute({
       getParentRoute: () => rootRoute,
       path: "/dashboard",
-      component: () => <AdminLayout />,
+      component: () => (
+        <RoleSwitcherProvider initialResolution={getGuestPersonaResolution()}>
+          <AdminLayout />
+        </RoleSwitcherProvider>
+      ),
       beforeLoad: () => ({
         user: {
           id: "u1",

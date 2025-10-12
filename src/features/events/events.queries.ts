@@ -483,10 +483,6 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
         return { isRegistered: false };
       }
 
-      if (!data.userId && !data.teamId) {
-        return { isRegistered: false };
-      }
-
       // Import server-only modules inside the handler
       const { getDb } = await import("~/db/server-helpers");
       const db = await getDb();

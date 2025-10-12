@@ -11,7 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { getUpcomingEvents } from "~/features/events/events.queries";
+import {
+  DEFAULT_UPCOMING_EVENTS_LIMIT,
+  createUpcomingEventsQueryFn,
+  prefetchUpcomingEvents,
+  upcomingEventsQueryKey,
+} from "~/features/events/events.query-options";
 import type {
   EventStatus,
   EventType,
@@ -22,8 +27,6 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 import { getUserProfile } from "~/features/profile/profile.queries";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { useCountries } from "~/shared/hooks/useCountries";
-
-const UPCOMING_EVENTS_LIMIT = 10;
 
 const EVENT_TYPE_OPTIONS: Array<{ value: EventType; label: string }> = [
   { value: "tournament", label: "Tournament" },
@@ -55,7 +58,6 @@ type PlayerLocationFilters = {
 };
 
 type EventsLoaderData = {
-  events: EventWithDetails[];
   playerFilters: PlayerLocationFilters | null;
 };
 
@@ -90,20 +92,17 @@ const normalize = (value: string) => value.trim().toLowerCase();
 const SKELETON_KEYS = ["north", "south", "east", "west", "central", "prairie"] as const;
 
 export const Route = createFileRoute("/events/")({
-  loader: async () => {
-    const [eventsOutcome, profileOutcome] = await Promise.allSettled([
-      getUpcomingEvents({
-        data: { limit: UPCOMING_EVENTS_LIMIT },
-      }),
-      getUserProfile(),
-    ]);
+  loader: async ({ context }) => {
+    const prefetchPromise = prefetchUpcomingEvents(
+      context.queryClient,
+      DEFAULT_UPCOMING_EVENTS_LIMIT,
+    );
+    const profilePromise = getUserProfile();
 
-    let events: EventWithDetails[] = [];
-    if (eventsOutcome.status === "fulfilled") {
-      events = eventsOutcome.value as EventWithDetails[];
-    } else {
-      console.error("Failed to fetch events:", eventsOutcome.reason);
-    }
+    const [, profileOutcome] = await Promise.allSettled([
+      prefetchPromise,
+      profilePromise,
+    ]);
 
     let playerFilters: PlayerLocationFilters | null = null;
     if (
@@ -120,14 +119,13 @@ export const Route = createFileRoute("/events/")({
       console.error("Failed to fetch profile:", profileOutcome.reason);
     }
 
-    return { events, playerFilters } satisfies EventsLoaderData;
+    return { playerFilters } satisfies EventsLoaderData;
   },
   component: EventsIndex,
 });
 
 function EventsIndex() {
-  const { events: initialEvents, playerFilters } =
-    Route.useLoaderData() as EventsLoaderData;
+  const { playerFilters } = Route.useLoaderData() as EventsLoaderData;
   const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const { getCountryName } = useCountries();
 
@@ -138,13 +136,14 @@ function EventsIndex() {
     isError,
     error,
     refetch,
-  } = useQuery({
-    queryKey: ["upcoming-events", { limit: UPCOMING_EVENTS_LIMIT }],
-    queryFn: async () =>
-      (await getUpcomingEvents({
-        data: { limit: UPCOMING_EVENTS_LIMIT },
-      })) as EventWithDetails[],
-    initialData: initialEvents,
+  } = useQuery<
+    EventWithDetails[],
+    Error,
+    EventWithDetails[],
+    ReturnType<typeof upcomingEventsQueryKey>
+  >({
+    queryKey: upcomingEventsQueryKey(DEFAULT_UPCOMING_EVENTS_LIMIT),
+    queryFn: createUpcomingEventsQueryFn(DEFAULT_UPCOMING_EVENTS_LIMIT),
     staleTime: 1000 * 60,
   });
 

@@ -10,6 +10,7 @@ import { ValidatedPhoneInput } from "~/components/form-fields/ValidatedPhoneInpu
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
 import { LanguageTag } from "~/components/LanguageTag";
 import { Avatar } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -512,931 +513,975 @@ export function ProfileView() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 pb-12 sm:px-6 lg:gap-8">
-      {/* Basic Information */}
-      <Card className="w-full">
-        <CardHeader className="gap-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
-            <div className="flex flex-1 flex-col gap-3 sm:min-w-[220px] sm:flex-row sm:items-center">
-              {editingSection !== "basic" ? (
-                <Avatar
-                  className="h-10 w-10"
-                  name={profile?.name ?? null}
-                  email={profile?.email ?? null}
-                  srcUploaded={profile?.uploadedAvatarPath ?? null}
-                  srcProvider={profile?.image ?? null}
-                />
-              ) : null}
-              <div>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>
-                  Your personal details and contact information
-                </CardDescription>
-              </div>
-            </div>
-
-            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
-              {editingSection !== "basic" && (
-                <Button
-                  className="w-full sm:w-auto"
-                  onClick={() => startEditingSection("basic")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Edit Basic Information
-                </Button>
-              )}
-              {editingSection === "basic" && (
-                <>
-                  <Button
-                    className="w-full sm:w-auto"
-                    onClick={cancelEditing}
-                    variant="outline"
-                    size="sm"
-                    disabled={form.state.isSubmitting}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => (
-                      <Button
-                        className="w-full sm:w-auto"
-                        type="button"
-                        onClick={() => form.handleSubmit()}
-                        disabled={!canSubmit || isSubmitting}
-                        size="sm"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Changes
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </form.Subscribe>
-                </>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {editingSection === "basic" ? (
-            <AvatarUpload
-              name={profile?.name ?? null}
-              email={profile?.email ?? null}
-              image={profile?.image ?? null}
-              uploadedAvatarPath={profile?.uploadedAvatarPath ?? null}
-            />
-          ) : null}
-
-          {editingSection === "basic" ? (
-            <form.Field name="name">
-              {(field) => (
-                <ValidatedInput
-                  field={field}
-                  label="Profile Name"
-                  placeholder="choose a unique username"
-                  description="This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
-                  autoComplete="username"
-                  maxLength={30}
-                  disableWhileSubmitting={false}
-                  onValueChange={(value) => {
-                    const sanitizedValue = sanitizeProfileName(value);
-                    field.handleChange(sanitizedValue);
-                  }}
-                />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Profile Name</Label>
-              <p className="mt-1 text-sm font-medium">{profile?.name ?? "Not set"}</p>
-              <p className="text-muted-foreground mt-1 text-xs">
-                This name is public and visible to other players.
-              </p>
-            </div>
-          )}
-
-          <div>
-            <Label>Email Address</Label>
-            <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
-          </div>
-
-          {profile?.isGM ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Label>Games Hosted</Label>
-                <p className="mt-1 text-sm font-medium">{profile.gamesHosted}</p>
-              </div>
-              <div>
-                <Label>GM Rating</Label>
-                <p className="mt-1 text-sm font-medium">
-                  <ThumbsScore value={profile.gmRating ?? null} />
-                </p>
-              </div>
-              <div>
-                <Label>Response Rate</Label>
-                <p className="mt-1 text-sm font-medium">
-                  {typeof profile.responseRate === "number"
-                    ? `${profile.responseRate}%`
-                    : "N/A"}
-                </p>
-              </div>
-              <div>
-                <Label>Avg Response Time</Label>
-                <p className="mt-1 text-sm font-medium">
-                  {typeof profile.averageResponseTime === "number"
-                    ? `${profile.averageResponseTime} min`
-                    : "N/A"}
-                </p>
-              </div>
-              {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 ? (
-                <div className="sm:col-span-2">
-                  <Label>Top Strengths</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {profile.gmTopStrengths.map((s) => (
-                      <span
-                        key={s}
-                        className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
-                      >
-                        <span className="mr-1" aria-hidden>
-                          {gmStrengthIcons[s] ?? "✨"}
-                        </span>
-                        {gmStrengthLabels[s] ?? s}
-                      </span>
-                    ))}
+    <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
+        <div className="space-y-6">
+          {/* Basic Information */}
+          <Card className="w-full">
+            <CardHeader className="gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+                <div className="flex flex-1 flex-col gap-3 sm:min-w-[220px] sm:flex-row sm:items-center">
+                  {editingSection !== "basic" ? (
+                    <Avatar
+                      className="h-10 w-10"
+                      name={profile?.name ?? null}
+                      email={profile?.email ?? null}
+                      srcUploaded={profile?.uploadedAvatarPath ?? null}
+                      srcProvider={profile?.image ?? null}
+                    />
+                  ) : null}
+                  <div>
+                    <CardTitle>Basic Information</CardTitle>
+                    <CardDescription>
+                      Your personal details and contact information
+                    </CardDescription>
                   </div>
                 </div>
+
+                <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+                  {editingSection !== "basic" && (
+                    <Button
+                      className="w-full sm:w-auto"
+                      onClick={() => startEditingSection("basic")}
+                      variant="outline"
+                      size="sm"
+                      aria-label="Edit Basic Information"
+                    >
+                      <Edit2 className="mr-2 h-4 w-4" />
+                      Edit
+                    </Button>
+                  )}
+                  {editingSection === "basic" && (
+                    <>
+                      <Button
+                        className="w-full sm:w-auto"
+                        onClick={cancelEditing}
+                        variant="outline"
+                        size="sm"
+                        disabled={form.state.isSubmitting}
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                      <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                      >
+                        {([canSubmit, isSubmitting]) => (
+                          <Button
+                            className="w-full sm:w-auto"
+                            type="button"
+                            onClick={() => form.handleSubmit()}
+                            disabled={!canSubmit || isSubmitting}
+                            size="sm"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="mr-2 h-4 w-4" />
+                                Save Changes
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </form.Subscribe>
+                    </>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {editingSection === "basic" ? (
+                <AvatarUpload
+                  name={profile?.name ?? null}
+                  email={profile?.email ?? null}
+                  image={profile?.image ?? null}
+                  uploadedAvatarPath={profile?.uploadedAvatarPath ?? null}
+                />
               ) : null}
-            </div>
-          ) : null}
 
-          {editingSection === "basic" ? (
-            <form.Field name="gender">
-              {(field) => (
-                <ValidatedSelect
-                  field={field}
-                  label="Gender"
-                  placeholder="Select gender"
-                  options={genderOptions}
-                />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Gender</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.gender || "Not specified"}
-              </p>
-            </div>
-          )}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="name">
+                      {(field) => (
+                        <ValidatedInput
+                          field={field}
+                          label="Profile Name"
+                          placeholder="choose a unique username"
+                          description="This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
+                          autoComplete="username"
+                          maxLength={30}
+                          disableWhileSubmitting={false}
+                          onValueChange={(value) => {
+                            const sanitizedValue = sanitizeProfileName(value);
+                            field.handleChange(sanitizedValue);
+                          }}
+                        />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>Profile Name</Label>
+                      <p className="mt-1 text-sm font-medium">
+                        {profile?.name ?? "Not set"}
+                      </p>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        This name is public and visible to other players.
+                      </p>
+                    </>
+                  )}
+                </div>
 
-          {editingSection === "basic" ? (
-            <form.Field name="pronouns">
-              {(field) => (
-                <ValidatedInput
-                  field={field}
-                  label="Pronouns"
-                  placeholder="e.g. he/him, she/her, they/them"
-                />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Pronouns</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.pronouns || "Not specified"}
-              </p>
-            </div>
-          )}
+                <div>
+                  <Label>Email Address</Label>
+                  <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
+                </div>
 
-          {editingSection === "basic" ? (
-            <form.Field name="phone">
-              {(field) => (
-                <ValidatedPhoneInput
-                  field={field}
-                  label="Phone Number"
-                  placeholder="+49 1512 3456789"
-                />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Phone Number</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {formatPhoneNumber(profile?.phone) || "Not specified"}
-              </p>
-            </div>
-          )}
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="gender">
+                      {(field) => (
+                        <ValidatedSelect
+                          field={field}
+                          label="Gender"
+                          placeholder="Select gender"
+                          options={genderOptions}
+                        />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>Gender</Label>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {profile?.gender || "Not specified"}
+                      </p>
+                    </>
+                  )}
+                </div>
 
-          {editingSection === "basic" ? (
-            <form.Field name="city">
-              {(field) => (
-                <ValidatedInput field={field} label="City" placeholder="Berlin" />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>City</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.city || "Not specified"}
-              </p>
-            </div>
-          )}
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="pronouns">
+                      {(field) => (
+                        <ValidatedInput
+                          field={field}
+                          label="Pronouns"
+                          placeholder="e.g. he/him, she/her, they/them"
+                        />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>Pronouns</Label>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {profile?.pronouns || "Not specified"}
+                      </p>
+                    </>
+                  )}
+                </div>
 
-          {editingSection === "basic" ? (
-            <form.Field name="country">
-              {(field) => (
-                <ValidatedCountryCombobox
-                  field={field}
-                  label="Country"
-                  placeholder="Search for a country"
-                  valueFormat="label"
-                />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Country</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.country
-                  ? getCountryName(profile.country) || profile.country
-                  : "Not specified"}
-              </p>
-            </div>
-          )}
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="phone">
+                      {(field) => (
+                        <ValidatedPhoneInput
+                          field={field}
+                          label="Phone Number"
+                          placeholder="+49 1512 3456789"
+                        />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>Phone Number</Label>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {formatPhoneNumber(profile?.phone) || "Not specified"}
+                      </p>
+                    </>
+                  )}
+                </div>
 
-          {editingSection === "basic" ? (
-            <form.Field name="overallExperienceLevel">
-              {(field) => (
-                <ValidatedSelect
-                  field={field}
-                  label="Overall Experience Level"
-                  placeholder="Select experience level"
-                  options={mappedExperienceLevelOptions}
-                />
-              )}
-            </form.Field>
-          ) : (
-            <div>
-              <Label>Overall Experience Level</Label>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {profile?.overallExperienceLevel
-                  ? profile.overallExperienceLevel.charAt(0).toUpperCase() +
-                    profile.overallExperienceLevel.slice(1)
-                  : "Not specified"}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="city">
+                      {(field) => (
+                        <ValidatedInput field={field} label="City" placeholder="Berlin" />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>City</Label>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {profile?.city || "Not specified"}
+                      </p>
+                    </>
+                  )}
+                </div>
 
-      {/* Additional Information */}
-      <Card className="w-full">
-        <CardHeader className="gap-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
-            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-              <CardTitle>Additional Information</CardTitle>
-              <CardDescription>Your gaming preferences and availability</CardDescription>
-            </div>
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="country">
+                      {(field) => (
+                        <ValidatedCountryCombobox
+                          field={field}
+                          label="Country"
+                          placeholder="Search for a country"
+                          valueFormat="label"
+                        />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>Country</Label>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {profile?.country
+                          ? getCountryName(profile.country) || profile.country
+                          : "Not specified"}
+                      </p>
+                    </>
+                  )}
+                </div>
 
-            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
-              {editingSection !== "additional" && (
-                <Button
-                  className="w-full sm:w-auto"
-                  onClick={() => startEditingSection("additional")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Edit Additional Information
-                </Button>
-              )}
-              {editingSection === "additional" && (
-                <>
-                  <Button
-                    className="w-full sm:w-auto"
-                    onClick={cancelEditing}
-                    variant="outline"
-                    size="sm"
-                    disabled={form.state.isSubmitting}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => (
+                <div>
+                  {editingSection === "basic" ? (
+                    <form.Field name="overallExperienceLevel">
+                      {(field) => (
+                        <ValidatedSelect
+                          field={field}
+                          label="Overall Experience Level"
+                          placeholder="Select experience level"
+                          options={mappedExperienceLevelOptions}
+                        />
+                      )}
+                    </form.Field>
+                  ) : (
+                    <>
+                      <Label>Overall Experience Level</Label>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {profile?.overallExperienceLevel
+                          ? profile.overallExperienceLevel.charAt(0).toUpperCase() +
+                            profile.overallExperienceLevel.slice(1)
+                          : "Not specified"}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {profile?.isGM ? (
+                  <div className="md:col-span-2 xl:col-span-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <Label>Games Hosted</Label>
+                        <p className="mt-1 text-sm font-medium">{profile.gamesHosted}</p>
+                      </div>
+                      <div>
+                        <Label>GM Rating</Label>
+                        <p className="mt-1 text-sm font-medium">
+                          <ThumbsScore value={profile.gmRating ?? null} />
+                        </p>
+                      </div>
+                      <div>
+                        <Label>Response Rate</Label>
+                        <p className="mt-1 text-sm font-medium">
+                          {typeof profile.responseRate === "number"
+                            ? `${profile.responseRate}%`
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <Label>Avg Response Time</Label>
+                        <p className="mt-1 text-sm font-medium">
+                          {typeof profile.averageResponseTime === "number"
+                            ? `${profile.averageResponseTime} min`
+                            : "N/A"}
+                        </p>
+                      </div>
+                      {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 ? (
+                        <div className="sm:col-span-2">
+                          <Label>Top Strengths</Label>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {profile.gmTopStrengths.map((s) => (
+                              <span
+                                key={s}
+                                className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
+                              >
+                                <span className="mr-1" aria-hidden>
+                                  {gmStrengthIcons[s] ?? "✨"}
+                                </span>
+                                {gmStrengthLabels[s] ?? s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Additional Information */}
+          <Card className="w-full">
+            <CardHeader className="gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+                <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
+                  <CardTitle>Additional Information</CardTitle>
+                  <CardDescription>
+                    Your gaming preferences and availability
+                  </CardDescription>
+                </div>
+
+                <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+                  {editingSection !== "additional" && (
+                    <Button
+                      className="w-full sm:w-auto"
+                      onClick={() => startEditingSection("additional")}
+                      variant="outline"
+                      size="sm"
+                      aria-label="Edit Additional Information"
+                    >
+                      <Edit2 className="mr-2 h-4 w-4" />
+                      Edit
+                    </Button>
+                  )}
+                  {editingSection === "additional" && (
+                    <>
                       <Button
                         className="w-full sm:w-auto"
-                        type="button"
-                        onClick={() => form.handleSubmit()}
-                        disabled={!canSubmit || isSubmitting}
+                        onClick={cancelEditing}
+                        variant="outline"
                         size="sm"
+                        disabled={form.state.isSubmitting}
                       >
-                        {isSubmitting ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Changes
-                          </>
-                        )}
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
                       </Button>
+                      <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                      >
+                        {([canSubmit, isSubmitting]) => (
+                          <Button
+                            className="w-full sm:w-auto"
+                            type="button"
+                            onClick={() => form.handleSubmit()}
+                            disabled={!canSubmit || isSubmitting}
+                            size="sm"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="mr-2 h-4 w-4" />
+                                Save Changes
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </form.Subscribe>
+                    </>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Calendar Availability */}
+              <div>
+                <Label className="text-base font-medium">Availability Calendar</Label>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Set your weekly availability for gaming sessions
+                </p>
+                {editingSection === "additional" ? (
+                  <form.Field name="calendarAvailability">
+                    {(field) => (
+                      <ResponsiveAvailabilityEditor
+                        value={field.state.value || defaultAvailabilityData}
+                        onChange={(newValue) => {
+                          field.handleChange(newValue);
+                        }}
+                        readOnly={false}
+                      />
                     )}
-                  </form.Subscribe>
-                </>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Calendar Availability */}
-          <div>
-            <Label className="text-base font-medium">Availability Calendar</Label>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Set your weekly availability for gaming sessions
-            </p>
-            {editingSection === "additional" ? (
-              <form.Field name="calendarAvailability">
-                {(field) => (
+                  </form.Field>
+                ) : (
                   <ResponsiveAvailabilityEditor
-                    value={field.state.value || defaultAvailabilityData}
-                    onChange={(newValue) => {
-                      field.handleChange(newValue);
-                    }}
-                    readOnly={false}
+                    value={profile?.calendarAvailability || defaultAvailabilityData}
+                    onChange={noopAvailabilityChange}
+                    readOnly
                   />
                 )}
-              </form.Field>
-            ) : (
-              <ResponsiveAvailabilityEditor
-                value={profile?.calendarAvailability || defaultAvailabilityData}
-                onChange={noopAvailabilityChange}
-                readOnly
-              />
-            )}
-          </div>
+              </div>
 
-          <Separator />
+              <Separator />
 
-          {/* Languages */}
-          <div>
-            <Label className="text-base font-medium">Languages</Label>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Languages you feel comfortable using to play
-            </p>
-            {editingSection === "additional" ? (
-              <form.Field name="languages">
-                {(field) => {
-                  const currentLanguages = field.state.value || [];
-                  const tags = currentLanguages.map((langCode) => {
-                    const lang = languageOptions.find((l) => l.value === langCode);
-                    return lang
-                      ? { id: langCode, name: lang.label }
-                      : { id: langCode, name: langCode };
-                  });
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div>
+                  <Label className="text-base font-medium">Languages</Label>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Languages you feel comfortable using to play
+                  </p>
+                  {editingSection === "additional" ? (
+                    <form.Field name="languages">
+                      {(field) => {
+                        const currentLanguages = field.state.value || [];
+                        const tags = currentLanguages.map((langCode) => {
+                          const lang = languageOptions.find((l) => l.value === langCode);
+                          return lang
+                            ? { id: langCode, name: lang.label }
+                            : { id: langCode, name: langCode };
+                        });
 
-                  return (
-                    <TagInput
-                      tags={tags}
-                      onAddTag={(tag) => {
-                        const currentValue = field.state.value || [];
-                        if (!currentValue.includes(tag.id)) {
-                          field.handleChange([...currentValue, tag.id]);
-                        }
+                        return (
+                          <TagInput
+                            tags={tags}
+                            onAddTag={(tag) => {
+                              const currentValue = field.state.value || [];
+                              if (!currentValue.includes(tag.id)) {
+                                field.handleChange([...currentValue, tag.id]);
+                              }
+                            }}
+                            onRemoveTag={(id) => {
+                              const currentValue = field.state.value || [];
+                              field.handleChange(
+                                currentValue.filter((lang) => lang !== id),
+                              );
+                            }}
+                            availableSuggestions={mappedLanguageOptions}
+                            placeholder="Select languages you speak"
+                          />
+                        );
                       }}
-                      onRemoveTag={(id) => {
-                        const currentValue = field.state.value || [];
-                        field.handleChange(currentValue.filter((lang) => lang !== id));
+                    </form.Field>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.languages?.map((langCode) => (
+                        <LanguageTag key={langCode} language={langCode} />
+                      ))}
+                      {(!profile?.languages || profile.languages.length === 0) && (
+                        <span className="text-muted-foreground text-sm">
+                          No languages specified
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label className="text-base font-medium">Identity Tags</Label>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Help others find compatible gaming partners
+                  </p>
+                  {editingSection === "additional" ? (
+                    <form.Field name="identityTags">
+                      {(field) => {
+                        const currentTags = field.state.value || [];
+                        const tags = currentTags.map((tagId) => {
+                          const tag = identityTagOptions.find((t) => t === tagId);
+                          return tag
+                            ? { id: tagId, name: tag }
+                            : { id: tagId, name: tagId };
+                        });
+
+                        return (
+                          <TagInput
+                            tags={tags}
+                            onAddTag={(tag) => {
+                              const currentValue = field.state.value || [];
+                              if (!currentValue.includes(tag.id)) {
+                                field.handleChange([...currentValue, tag.id]);
+                              }
+                            }}
+                            onRemoveTag={(id) => {
+                              const currentValue = field.state.value || [];
+                              field.handleChange(
+                                currentValue.filter((tag) => tag !== id),
+                              );
+                            }}
+                            availableSuggestions={mappedIdentityTagOptions}
+                            placeholder="Select identity tags"
+                          />
+                        );
                       }}
-                      availableSuggestions={mappedLanguageOptions}
-                      placeholder="Select languages you speak"
-                    />
-                  );
-                }}
-              </form.Field>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {profile?.languages?.map((langCode) => (
-                  <LanguageTag key={langCode} language={langCode} />
-                ))}
-                {(!profile?.languages || profile.languages.length === 0) && (
-                  <span className="text-muted-foreground text-sm">
-                    No languages specified
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+                    </form.Field>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.identityTags?.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="rounded-full border-dashed px-3 py-1 text-xs"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {(!profile?.identityTags || profile.identityTags.length === 0) && (
+                        <span className="text-muted-foreground text-sm">
+                          No identity tags specified
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-          <Separator />
+                <div>
+                  <Label className="text-base font-medium">Preferred Game Themes</Label>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    Game themes you enjoy most
+                  </p>
+                  {editingSection === "additional" ? (
+                    <form.Field name="preferredGameThemes">
+                      {(field) => {
+                        const currentThemes = field.state.value || [];
+                        const tags = currentThemes.map((themeId) => {
+                          const theme = gameThemeOptions.find((t) => t === themeId);
+                          return theme
+                            ? { id: themeId, name: theme }
+                            : { id: themeId, name: themeId };
+                        });
 
-          {/* Identity Tags */}
-          <div>
-            <Label className="text-base font-medium">Identity Tags</Label>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Help others find compatible gaming partners
-            </p>
-            {editingSection === "additional" ? (
-              <form.Field name="identityTags">
-                {(field) => {
-                  const currentTags = field.state.value || [];
-                  const tags = currentTags.map((tagId) => {
-                    const tag = identityTagOptions.find((t) => t === tagId);
-                    return tag ? { id: tagId, name: tag } : { id: tagId, name: tagId };
-                  });
-
-                  return (
-                    <TagInput
-                      tags={tags}
-                      onAddTag={(tag) => {
-                        const currentValue = field.state.value || [];
-                        if (!currentValue.includes(tag.id)) {
-                          field.handleChange([...currentValue, tag.id]);
-                        }
+                        return (
+                          <TagInput
+                            tags={tags}
+                            onAddTag={(tag) => {
+                              const currentValue = field.state.value || [];
+                              if (!currentValue.includes(tag.id)) {
+                                field.handleChange([...currentValue, tag.id]);
+                              }
+                            }}
+                            onRemoveTag={(id) => {
+                              const currentValue = field.state.value || [];
+                              field.handleChange(
+                                currentValue.filter((theme) => theme !== id),
+                              );
+                            }}
+                            availableSuggestions={mappedGameThemeOptions}
+                            placeholder="Select preferred game themes"
+                          />
+                        );
                       }}
-                      onRemoveTag={(id) => {
-                        const currentValue = field.state.value || [];
-                        field.handleChange(currentValue.filter((tag) => tag !== id));
-                      }}
-                      availableSuggestions={mappedIdentityTagOptions}
-                      placeholder="Select identity tags"
-                    />
-                  );
-                }}
-              </form.Field>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {profile?.identityTags?.map((tag) => (
-                  <span
-                    key={tag}
-                    className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
-                  >
-                    {tag}
-                  </span>
-                ))}
-                {(!profile?.identityTags || profile.identityTags.length === 0) && (
-                  <span className="text-muted-foreground text-sm">
-                    No identity tags specified
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          <Separator />
-
-          {/* Preferred Game Themes */}
-          <div>
-            <Label className="text-base font-medium">Preferred Game Themes</Label>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Game themes you enjoy most
-            </p>
-            {editingSection === "additional" ? (
-              <form.Field name="preferredGameThemes">
-                {(field) => {
-                  const currentThemes = field.state.value || [];
-                  const tags = currentThemes.map((themeId) => {
-                    const theme = gameThemeOptions.find((t) => t === themeId);
-                    return theme
-                      ? { id: themeId, name: theme }
-                      : { id: themeId, name: themeId };
-                  });
-
-                  return (
-                    <TagInput
-                      tags={tags}
-                      onAddTag={(tag) => {
-                        const currentValue = field.state.value || [];
-                        if (!currentValue.includes(tag.id)) {
-                          field.handleChange([...currentValue, tag.id]);
-                        }
-                      }}
-                      onRemoveTag={(id) => {
-                        const currentValue = field.state.value || [];
-                        field.handleChange(currentValue.filter((theme) => theme !== id));
-                      }}
-                      availableSuggestions={mappedGameThemeOptions}
-                      placeholder="Select preferred game themes"
-                    />
-                  );
-                }}
-              </form.Field>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {profile?.preferredGameThemes?.map((theme) => (
-                  <span
-                    key={theme}
-                    className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-2 py-1 text-xs"
-                  >
-                    {theme}
-                  </span>
-                ))}
-                {(!profile?.preferredGameThemes ||
-                  profile.preferredGameThemes.length === 0) && (
-                  <span className="text-muted-foreground text-sm">
-                    No game themes specified
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Privacy Settings */}
-      <Card className="w-full">
-        <CardHeader className="gap-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
-            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-              <CardTitle>Privacy Settings</CardTitle>
-              <CardDescription>
-                Control what information is visible to others
-              </CardDescription>
-            </div>
-
-            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
-              {editingSection !== "privacy" && (
-                <Button
-                  className="w-full sm:w-auto"
-                  onClick={() => startEditingSection("privacy")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Edit Privacy Settings
-                </Button>
-              )}
-              {editingSection === "privacy" && (
-                <>
-                  <Button
-                    className="w-full sm:w-auto"
-                    onClick={cancelEditing}
-                    variant="outline"
-                    size="sm"
-                    disabled={form.state.isSubmitting}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => (
-                      <Button
-                        className="w-full sm:w-auto"
-                        type="button"
-                        onClick={() => form.handleSubmit()}
-                        disabled={!canSubmit || isSubmitting}
-                        size="sm"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Changes
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </form.Subscribe>
-                </>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {editingSection === "privacy" ? (
-            <>
-              <form.Field name="privacySettings.showEmail">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my email address to teammates"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showPhone">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my phone number to teammates"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showLocation">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my location (city and country) to everyone"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showLanguages">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my languages to everyone"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showGamePreferences">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my game preferences to everyone"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showLocation">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my location (city/country) to others"
-                    disabled={false}
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showLanguages">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my languages to others"
-                    disabled={false}
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.showGamePreferences">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Show my game preferences to others"
-                    disabled={false}
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.allowTeamInvitations">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Allow team invitations from other users"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.allowInvitesOnlyFromConnections">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Only allow invites from connections"
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="privacySettings.allowFollows">
-                {(field) => (
-                  <ValidatedCheckbox
-                    field={field}
-                    label="Allow other users to follow you"
-                  />
-                )}
-              </form.Field>
-            </>
-          ) : (
-            <>
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Email visible to teammates</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.showEmail ? "Yes" : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Phone number visible to teammates</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.showPhone ? "Yes" : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Location visible to everyone</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.showLocation ? "Yes" : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Languages visible to everyone</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.showLanguages ? "Yes" : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Game preferences visible to everyone</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.showGamePreferences ? "Yes" : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Allow team invitations</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.allowTeamInvitations ? "Yes" : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Only allow invites from connections</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.allowInvitesOnlyFromConnections
-                    ? "Yes"
-                    : "No"}
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm">Allow follows</span>
-                <span className="text-muted-foreground text-sm">
-                  {profile?.privacySettings?.allowFollows ? "Yes" : "No"}
-                </span>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Game Preferences */}
-      <Card className="w-full">
-        <CardHeader className="gap-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
-            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-              <CardTitle>Game Preferences</CardTitle>
-              <CardDescription>Your favorite and avoided game systems</CardDescription>
-            </div>
-
-            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
-              {editingSection !== "game-preferences" && (
-                <Button
-                  className="w-full sm:w-auto"
-                  onClick={() => startEditingSection("game-preferences")}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Edit2 className="mr-2 h-4 w-4" />
-                  Edit Game Preferences
-                </Button>
-              )}
-              {editingSection === "game-preferences" && (
-                <>
-                  <Button
-                    className="w-full sm:w-auto"
-                    onClick={cancelEditing}
-                    variant="outline"
-                    size="sm"
-                    disabled={form.state.isSubmitting}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => (
-                      <Button
-                        className="w-full sm:w-auto"
-                        type="button"
-                        onClick={() => form.handleSubmit()}
-                        disabled={!canSubmit || isSubmitting}
-                        size="sm"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Changes
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </form.Subscribe>
-                </>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {editingSection === "game-preferences" ? (
-            <form.Field name="gameSystemPreferences">
-              {(field) => (
-                <GamePreferencesStep
-                  initialFavorites={field.state.value?.favorite || []}
-                  initialToAvoid={field.state.value?.avoid || []}
-                  onPreferencesChange={(favorites, toAvoid) => {
-                    field.handleChange({ favorite: favorites, avoid: toAvoid });
-                  }}
-                />
-              )}
-            </form.Field>
-          ) : (
-            <>
-              <div>
-                <Label className="text-base font-medium">Favorite Systems</Label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {profile?.gameSystemPreferences?.favorite?.map((system) => (
-                    <span
-                      key={system.id}
-                      className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
-                    >
-                      {system.name}
-                    </span>
-                  ))}
-                  {(!profile?.gameSystemPreferences?.favorite ||
-                    profile.gameSystemPreferences.favorite.length === 0) && (
-                    <span className="text-muted-foreground text-sm">
-                      No favorites specified
-                    </span>
+                    </form.Field>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {profile?.preferredGameThemes?.map((theme) => (
+                        <Badge
+                          key={theme}
+                          variant="outline"
+                          className="rounded-full border-dashed px-3 py-1 text-xs"
+                        >
+                          {theme}
+                        </Badge>
+                      ))}
+                      {(!profile?.preferredGameThemes ||
+                        profile.preferredGameThemes.length === 0) && (
+                        <span className="text-muted-foreground text-sm">
+                          No game themes specified
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
-              <div>
-                <Label className="text-base font-medium">Avoided Systems</Label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {profile?.gameSystemPreferences?.avoid?.map((system) => (
-                    <span
-                      key={system.id}
-                      className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs text-red-800"
+          {/* Blocklist Management */}
+          <Card className="w-full">
+            <CardHeader className="gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+                <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
+                  <CardTitle>Blocklist</CardTitle>
+                  <CardDescription>Manage users you’ve blocked</CardDescription>
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:justify-end">
+                  <Button
+                    asChild
+                    className="w-full sm:w-auto"
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Link to="/player/profile/blocklist">Open Blocklist</Link>
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm">
+                Blocked users cannot follow you, invite you, or apply to your
+                games/campaigns. You can unblock them at any time.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-6">
+          {/* Privacy Settings */}
+          <Card className="w-full">
+            <CardHeader className="gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+                <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
+                  <CardTitle>Privacy Settings</CardTitle>
+                  <CardDescription>
+                    Control what information is visible to others
+                  </CardDescription>
+                </div>
+
+                <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+                  {editingSection !== "privacy" && (
+                    <Button
+                      className="w-full sm:w-auto"
+                      onClick={() => startEditingSection("privacy")}
+                      variant="outline"
+                      size="sm"
+                      aria-label="Edit Privacy Settings"
                     >
-                      {system.name}
-                    </span>
-                  ))}
-                  {(!profile?.gameSystemPreferences?.avoid ||
-                    profile.gameSystemPreferences.avoid.length === 0) && (
-                    <span className="text-muted-foreground text-sm">
-                      No avoided systems specified
-                    </span>
+                      <Edit2 className="mr-2 h-4 w-4" />
+                      Edit
+                    </Button>
+                  )}
+                  {editingSection === "privacy" && (
+                    <>
+                      <Button
+                        className="w-full sm:w-auto"
+                        onClick={cancelEditing}
+                        variant="outline"
+                        size="sm"
+                        disabled={form.state.isSubmitting}
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                      <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                      >
+                        {([canSubmit, isSubmitting]) => (
+                          <Button
+                            className="w-full sm:w-auto"
+                            type="button"
+                            onClick={() => form.handleSubmit()}
+                            disabled={!canSubmit || isSubmitting}
+                            size="sm"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="mr-2 h-4 w-4" />
+                                Save Changes
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </form.Subscribe>
+                    </>
                   )}
                 </div>
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {editingSection === "privacy" ? (
+                <>
+                  <form.Field name="privacySettings.showEmail">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my email address to teammates"
+                      />
+                    )}
+                  </form.Field>
 
-      {/* Blocklist Management */}
-      <Card className="w-full">
-        <CardHeader className="gap-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
-            <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-              <CardTitle>Blocklist</CardTitle>
-              <CardDescription>Manage users you’ve blocked</CardDescription>
-            </div>
-            <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:justify-end">
-              <Button asChild className="w-full sm:w-auto" variant="outline" size="sm">
-                <Link to="/player/profile/blocklist">Open Blocklist</Link>
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">
-            Blocked users cannot follow you, invite you, or apply to your games/campaigns.
-            You can unblock them at any time.
-          </p>
-        </CardContent>
-      </Card>
+                  <form.Field name="privacySettings.showPhone">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my phone number to teammates"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showLocation">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my location (city and country) to everyone"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showLanguages">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my languages to everyone"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showGamePreferences">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my game preferences to everyone"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showLocation">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my location (city/country) to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showLanguages">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my languages to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.showGamePreferences">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Show my game preferences to others"
+                        disabled={false}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.allowTeamInvitations">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Allow team invitations from other users"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.allowInvitesOnlyFromConnections">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Only allow invites from connections"
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="privacySettings.allowFollows">
+                    {(field) => (
+                      <ValidatedCheckbox
+                        field={field}
+                        label="Allow other users to follow you"
+                      />
+                    )}
+                  </form.Field>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Email visible to teammates</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.showEmail ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Phone number visible to teammates</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.showPhone ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Location visible to everyone</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.showLocation ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Languages visible to everyone</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.showLanguages ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Game preferences visible to everyone</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.showGamePreferences ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Allow team invitations</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.allowTeamInvitations ? "Yes" : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Only allow invites from connections</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.allowInvitesOnlyFromConnections
+                        ? "Yes"
+                        : "No"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-sm">Allow follows</span>
+                    <span className="text-muted-foreground text-sm">
+                      {profile?.privacySettings?.allowFollows ? "Yes" : "No"}
+                    </span>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Game Preferences */}
+          <Card className="w-full">
+            <CardHeader className="gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
+                <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
+                  <CardTitle>Game Preferences</CardTitle>
+                  <CardDescription>
+                    Your favorite and avoided game systems
+                  </CardDescription>
+                </div>
+
+                <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+                  {editingSection !== "game-preferences" && (
+                    <Button
+                      className="w-full sm:w-auto"
+                      onClick={() => startEditingSection("game-preferences")}
+                      variant="outline"
+                      size="sm"
+                      aria-label="Edit Game Preferences"
+                    >
+                      <Edit2 className="mr-2 h-4 w-4" />
+                      Edit
+                    </Button>
+                  )}
+                  {editingSection === "game-preferences" && (
+                    <>
+                      <Button
+                        className="w-full sm:w-auto"
+                        onClick={cancelEditing}
+                        variant="outline"
+                        size="sm"
+                        disabled={form.state.isSubmitting}
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                      <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                      >
+                        {([canSubmit, isSubmitting]) => (
+                          <Button
+                            className="w-full sm:w-auto"
+                            type="button"
+                            onClick={() => form.handleSubmit()}
+                            disabled={!canSubmit || isSubmitting}
+                            size="sm"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="mr-2 h-4 w-4" />
+                                Save Changes
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </form.Subscribe>
+                    </>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {editingSection === "game-preferences" ? (
+                <form.Field name="gameSystemPreferences">
+                  {(field) => (
+                    <GamePreferencesStep
+                      initialFavorites={field.state.value?.favorite || []}
+                      initialToAvoid={field.state.value?.avoid || []}
+                      onPreferencesChange={(favorites, toAvoid) => {
+                        field.handleChange({ favorite: favorites, avoid: toAvoid });
+                      }}
+                    />
+                  )}
+                </form.Field>
+              ) : (
+                <>
+                  <div>
+                    <Label className="text-base font-medium">Favorite Systems</Label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {profile?.gameSystemPreferences?.favorite?.map((system) => (
+                        <span
+                          key={system.id}
+                          className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
+                        >
+                          {system.name}
+                        </span>
+                      ))}
+                      {(!profile?.gameSystemPreferences?.favorite ||
+                        profile.gameSystemPreferences.favorite.length === 0) && (
+                        <span className="text-muted-foreground text-sm">
+                          No favorites specified
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-base font-medium">Avoided Systems</Label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {profile?.gameSystemPreferences?.avoid?.map((system) => (
+                        <span
+                          key={system.id}
+                          className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs text-red-800"
+                        >
+                          {system.name}
+                        </span>
+                      ))}
+                      {(!profile?.gameSystemPreferences?.avoid ||
+                        profile.gameSystemPreferences.avoid.length === 0) && (
+                        <span className="text-muted-foreground text-sm">
+                          No avoided systems specified
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

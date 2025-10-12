@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 export const COUNTRIES = [
   { value: "AFG", label: "Afghanistan" },
   { value: "ALB", label: "Albania" },
@@ -195,22 +193,25 @@ export const COUNTRIES = [
   { value: "ZWE", label: "Zimbabwe" },
 ];
 
+import { useMemo } from "react";
+
+const COUNTRY_MAP = new Map<string, string>(
+  COUNTRIES.map((country) => [country.value, country.label] as const),
+);
+
+const getCountryName = (isoCode: string | null | undefined): string => {
+  if (!isoCode) {
+    return "";
+  }
+  return COUNTRY_MAP.get(isoCode) ?? isoCode;
+};
+
 export function useCountries() {
-  const countryMap = useMemo(() => {
-    const map = new Map<string, string>();
-    COUNTRIES.forEach((country) => {
-      map.set(country.value, country.label);
-    });
-    return map;
-  }, []);
-
-  const getCountryName = (isoCode: string | null | undefined): string => {
-    if (!isoCode) return "";
-    return countryMap.get(isoCode) || isoCode;
-  };
-
-  return {
-    COUNTRIES,
-    getCountryName,
-  };
+  return useMemo(
+    () => ({
+      COUNTRIES,
+      getCountryName,
+    }),
+    [],
+  );
 }

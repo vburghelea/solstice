@@ -222,15 +222,15 @@ export function RoleWorkspaceLayout({
 
       <div className="flex min-h-dvh min-w-0 flex-1 flex-col">
         <WorkspaceMobileHeader
-          workspaceLabel={resolvedWorkspaceLabel}
           title={title}
+          subtitle={headerSubtitle}
           onMenuClick={() => dispatchNavOpen("open")}
         />
         <main className="flex-1 px-4 pt-4 pb-[var(--workspace-mobile-main-padding)] sm:px-6 sm:pt-6 lg:px-10 lg:pb-12">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:max-w-[90%]">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
               <div className="flex flex-col gap-6">
-                <WorkspaceHeader
+                <WorkspaceBrandHeader
                   subtitle={headerSubtitle}
                   title={title}
                   {...(description ? { description } : {})}
@@ -420,12 +420,12 @@ function SignOutButton({
 }
 
 function WorkspaceMobileHeader({
-  workspaceLabel,
   title,
+  subtitle,
   onMenuClick,
 }: {
-  workspaceLabel: string;
   title: string;
+  subtitle: string;
   onMenuClick: () => void;
 }) {
   return (
@@ -440,12 +440,21 @@ function WorkspaceMobileHeader({
           >
             <Menu className="h-6 w-6" />
           </Button>
-          <div className="flex flex-col">
-            <span className="text-muted-foreground text-xs font-medium uppercase">
-              {workspaceLabel}
+          <Link to="/" className="text-foreground flex items-center gap-3">
+            <span className="roundup-star-logo h-8 w-8" aria-hidden="true" />
+            <span className="flex flex-col leading-tight">
+              <span className="text-primary text-[0.65rem] font-semibold tracking-[0.3em] uppercase">
+                Roundup Games
+              </span>
+              <span className="text-sm font-semibold">At a table near you!</span>
             </span>
-            <span className="text-sm font-semibold">{title}</span>
-          </div>
+          </Link>
+        </div>
+        <div className="flex flex-col items-end gap-1 text-right">
+          <span className="text-muted-foreground text-[0.65rem] font-semibold uppercase">
+            {subtitle}
+          </span>
+          <span className="text-sm font-semibold">{title}</span>
         </div>
       </div>
     </header>
@@ -496,7 +505,7 @@ function WorkspaceMobileNav({
   );
 }
 
-function WorkspaceHeader({
+function WorkspaceBrandHeader({
   subtitle,
   title,
   description,
@@ -506,15 +515,28 @@ function WorkspaceHeader({
   description?: string;
 }) {
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
-        <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-          {subtitle}
-        </span>
-        <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-        {description ? (
-          <p className="text-muted-foreground max-w-2xl text-sm">{description}</p>
-        ) : null}
+    <section className="border-border/60 bg-muted/30 dark:bg-card/70 flex flex-col gap-6 rounded-2xl border px-5 py-6 shadow-sm sm:px-6">
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Link to="/" className="text-foreground flex items-center gap-3">
+          <span className="roundup-star-logo h-12 w-12" aria-hidden="true" />
+          <span className="flex flex-col leading-tight">
+            <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
+              Roundup Games
+            </span>
+            <span className="text-lg font-semibold md:text-xl">At a table near you!</span>
+          </span>
+        </Link>
+        <div className="flex max-w-xl flex-col gap-2 text-left sm:items-end sm:text-right">
+          <span className="text-muted-foreground text-xs font-semibold uppercase">
+            {subtitle}
+          </span>
+          <h1 className="text-foreground text-3xl font-semibold tracking-tight">
+            {title}
+          </h1>
+          {description ? (
+            <p className="text-muted-foreground text-sm">{description}</p>
+          ) : null}
+        </div>
       </div>
     </section>
   );

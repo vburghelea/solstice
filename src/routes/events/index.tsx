@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DataErrorState } from "~/components/ui/data-state";
 import { EventCard, EventCardSkeleton } from "~/components/ui/event-card";
 import { HeroSection } from "~/components/ui/hero-section";
@@ -20,8 +20,8 @@ import type {
 } from "~/features/events/events.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { getUserProfile } from "~/features/profile/profile.queries";
+import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { useCountries } from "~/shared/hooks/useCountries";
-import { cn } from "~/shared/lib/utils";
 
 const UPCOMING_EVENTS_LIMIT = 10;
 
@@ -86,6 +86,8 @@ const DEFAULT_FILTERS: FiltersState = {
 };
 
 const normalize = (value: string) => value.trim().toLowerCase();
+
+const SKELETON_KEYS = ["north", "south", "east", "west", "central", "prairie"] as const;
 
 export const Route = createFileRoute("/events/")({
   loader: async () => {
@@ -242,19 +244,30 @@ function EventsIndex() {
   }, [events, filters]);
 
   const isLoading = (isPending || isFetching) && events.length === 0;
-  const skeletonKeys = ["north", "south", "east", "west", "central", "prairie"];
-  const hasQuickFilters = quickFilters.length > 0;
-  const hasActiveFilters = useMemo(() => {
-    return (
-      filters.country !== "all" ||
-      filters.city !== "all" ||
-      filters.type !== "all" ||
-      filters.status !== "all" ||
-      filters.registrationType !== "all"
-    );
-  }, [filters]);
+  const quickFilterButtons = useMemo(() => {
+    return quickFilters.map((filter) => ({
+      id: filter.key,
+      label: filter.label,
+      active: filter.isActive(filters),
+      onToggle: () =>
+        setFilters((prev) =>
+          filter.isActive(prev) ? filter.clear(prev) : filter.apply(prev),
+        ),
+    }));
+  }, [filters, quickFilters]);
 
-  const resetFilters = () => setFilters({ ...DEFAULT_FILTERS });
+  const hasQuickFilters = quickFilterButtons.length > 0;
+  const hasActiveFilters =
+    filters.country !== "all" ||
+    filters.city !== "all" ||
+    filters.type !== "all" ||
+    filters.status !== "all" ||
+    filters.registrationType !== "all";
+
+  const resetFilters = useCallback(
+    () => setFilters({ ...DEFAULT_FILTERS }),
+    [setFilters],
+  );
 
   return (
     <PublicLayout>
@@ -295,43 +308,10 @@ function EventsIndex() {
             </div>
 
             {hasQuickFilters ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground text-sm font-medium">
-                  Quick filters:
-                </span>
-                {quickFilters.map((filter) => {
-                  const active = filter.isActive(filters);
-                  return (
-                    <button
-                      key={filter.key}
-                      type="button"
-                      onClick={() =>
-                        setFilters((prev) =>
-                          filter.isActive(prev) ? filter.clear(prev) : filter.apply(prev),
-                        )
-                      }
-                      className={cn(
-                        "border px-3 py-1 text-sm font-medium transition",
-                        "rounded-full",
-                        active
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "bg-muted/60 text-foreground hover:border-primary/50 border-transparent",
-                      )}
-                    >
-                      {filter.label}
-                    </button>
-                  );
-                })}
-                {hasActiveFilters ? (
-                  <button
-                    type="button"
-                    onClick={resetFilters}
-                    className="text-primary text-sm font-medium hover:underline"
-                  >
-                    Clear filters
-                  </button>
-                ) : null}
-              </div>
+              <QuickFiltersBar
+                filters={quickFilterButtons}
+                {...(hasActiveFilters ? { onClear: resetFilters } : {})}
+              />
             ) : null}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -467,7 +447,7 @@ function EventsIndex() {
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {isLoading && skeletonKeys.map((key) => <EventCardSkeleton key={key} />)}
+            {isLoading && SKELETON_KEYS.map((key) => <EventCardSkeleton key={key} />)}
             {!isLoading && isError && filteredEvents.length === 0 && (
               <div className="sm:col-span-2 lg:col-span-3">
                 <DataErrorState

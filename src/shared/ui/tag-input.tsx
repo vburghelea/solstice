@@ -2,7 +2,7 @@ import * as React from "react";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useDebounce } from "~/shared/lib/hooks/useDebounce";
+import { useDebounce } from "~/shared/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
 
 interface Tag {

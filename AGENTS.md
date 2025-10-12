@@ -830,7 +830,7 @@ See /docs/development-backlog.md for prioritized feature implementation tickets
 **State Management Recommendations (docs/state-management-recommendations.md):**
 
 - **Current Strengths:** Minimal state, React Query for server state, calculated values, state proximity.
-- **Improvements:** Custom hooks (`useAuthForm`, `useLocalStorage`, `useFocusOnMount`, `useAsyncState`, `useProfileFormReducer`), Context for cross-cutting concerns (`ThemeContext`).
+- **Improvements:** Custom hooks (`useAuthForm`, `useLocalStorage`, `useDebounce`, `useProfileFormReducer`), Context for cross-cutting concerns (`ThemeContext`).
 - **Recommendations:** Group related state, avoid contradictions/redundancy.
 - **Tool Usage:** `useState` (simple), `useReducer` (complex related state), `Context` (cross-cutting), `React Query` (server state).
 - **Anti-Patterns:** Don't sync props to state, don't duplicate server data, don't create deeply nested state, don't store derived state.

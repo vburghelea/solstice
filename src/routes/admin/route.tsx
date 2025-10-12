@@ -11,6 +11,7 @@ import {
   Users,
   Workflow,
 } from "lucide-react";
+import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -23,8 +24,10 @@ import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
+import { useFeatureFlag } from "~/lib/feature-flags";
 
-const ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
+const BASE_ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
   {
     label: "Overview",
     to: "/admin",
@@ -102,6 +105,22 @@ function AdminNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
   const { user } = Route.useRouteContext();
+  const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
+  const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
+
+  const navigationItems = useMemo(() => {
+    return BASE_ADMIN_NAVIGATION.filter((item) => {
+      if (item.to === "/admin/inbox") {
+        return showSharedInbox;
+      }
+
+      if (item.to === "/admin/collaboration") {
+        return showCollaboration;
+      }
+
+      return true;
+    });
+  }, [showCollaboration, showSharedInbox]);
 
   const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
   const workspaceLabel = user?.name ? `${user.name}` : "Admin";
@@ -116,7 +135,7 @@ function AdminNamespaceShell() {
       <RoleWorkspaceLayout
         title="Administration workspace"
         description="Coordinate governance, permissions, and platform-wide alerts for your organization."
-        navItems={ADMIN_NAVIGATION}
+        navItems={navigationItems}
         fallbackLabel="Platform admin"
         subtitle={workspaceSubtitle}
         workspaceLabel={workspaceLabel}

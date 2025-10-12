@@ -33,9 +33,11 @@ import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { requireAuth, requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
+import { useFeatureFlag } from "~/lib/feature-flags";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 
-const PLAYER_NAVIGATION: RoleWorkspaceNavItem[] = [
+const BASE_PLAYER_NAVIGATION: RoleWorkspaceNavItem[] = [
   {
     label: "Overview",
     to: "/player",
@@ -122,6 +124,22 @@ function PlayerNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
   const { user } = Route.useRouteContext();
+  const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
+  const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
+
+  const navigationItems = useMemo(() => {
+    return BASE_PLAYER_NAVIGATION.filter((item) => {
+      if (item.to === "/player/inbox") {
+        return showSharedInbox;
+      }
+
+      if (item.to === "/player/collaboration") {
+        return showCollaboration;
+      }
+
+      return true;
+    });
+  }, [showCollaboration, showSharedInbox]);
 
   const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
   const workspaceLabel = user?.name ? `${user.name}` : "Player";
@@ -136,7 +154,7 @@ function PlayerNamespaceShell() {
       <RoleWorkspaceLayout
         title="Player workspace"
         description="Manage sessions, invitations, and community insights from one responsive hub."
-        navItems={PLAYER_NAVIGATION}
+        navItems={navigationItems}
         fallbackLabel="Player"
         subtitle={workspaceSubtitle}
         workspaceLabel={workspaceLabel}

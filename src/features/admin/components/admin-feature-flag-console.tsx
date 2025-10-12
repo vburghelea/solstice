@@ -21,6 +21,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
+import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
 import {
   FEATURE_FLAG_CHANGE_EVENT,
   FEATURE_FLAG_STORAGE_PREFIX,
@@ -67,6 +68,18 @@ const curatedFlags: Array<{
     label: "Admin coming-soon card",
     description:
       "Legacy placeholder for Jordan's workspace. Disable once the governance console ships.",
+  },
+  {
+    key: WORKSPACE_FEATURE_FLAGS.sharedInbox,
+    label: "Workspace shared inbox",
+    description:
+      "Toggles the shared inbox experience across player, ops, GM, and admin workspaces.",
+  },
+  {
+    key: WORKSPACE_FEATURE_FLAGS.collaboration,
+    label: "Cross-persona collaboration workspace",
+    description:
+      "Controls access to the collaboration workspace for role-based dashboards.",
   },
 ];
 

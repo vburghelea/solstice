@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import type { GameSystemListItem } from "~/features/game-systems/game-systems.types";
+import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
 import { cn } from "~/shared/lib/utils";
 
 interface SystemCardProps {
@@ -19,18 +20,7 @@ interface SystemCardProps {
 
 export function SystemCard({ system }: SystemCardProps) {
   const heroAlt = `${system.name} hero artwork`;
-  const playersLabel = (() => {
-    if (system.minPlayers && system.maxPlayers) {
-      return `${system.minPlayers}-${system.maxPlayers} players`;
-    }
-    if (system.minPlayers) {
-      return `${system.minPlayers}+ players`;
-    }
-    if (system.maxPlayers) {
-      return `Up to ${system.maxPlayers} players`;
-    }
-    return "Players: TBD";
-  })();
+  const playersLabel = formatPlayerCountLabel(system);
 
   return (
     <Card className="text-foreground overflow-hidden border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-neutral-100 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/75 dark:text-gray-50">

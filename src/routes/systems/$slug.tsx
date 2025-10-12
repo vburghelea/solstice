@@ -21,6 +21,7 @@ import { Separator } from "~/components/ui/separator";
 import { SystemHero } from "~/features/game-systems/components/system-hero";
 import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
+import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/systems/$slug")({
 
 function SystemDetailPage() {
   const { system } = Route.useLoaderData() as { system: GameSystemDetail };
-  const playersLabel = buildPlayersLabel(system);
+  const playersLabel = formatPlayerCountLabel(system);
   const description = system.description ?? "We're compiling details for this system.";
   const taxonomyMissing = system.categories.length === 0 && system.mechanics.length === 0;
   const externalLinks = buildExternalLinks(system);
@@ -336,19 +337,6 @@ function QuickFact({ label, value }: QuickFactProps) {
       <span className="font-medium">{value}</span>
     </div>
   );
-}
-
-function buildPlayersLabel(system: GameSystemDetail) {
-  if (system.minPlayers && system.maxPlayers) {
-    return `${system.minPlayers}-${system.maxPlayers} players`;
-  }
-  if (system.minPlayers) {
-    return `${system.minPlayers}+ players`;
-  }
-  if (system.maxPlayers) {
-    return `Up to ${system.maxPlayers} players`;
-  }
-  return "Player count TBD";
 }
 
 function buildExternalLinks(system: GameSystemDetail) {

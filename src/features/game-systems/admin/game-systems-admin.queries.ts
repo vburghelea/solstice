@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { SQL } from "drizzle-orm";
 import { z } from "zod";
 import type { GameSystemMediaAsset, GameSystemTag } from "../game-systems.types";
+import { sanitizeSlug } from "../lib/sanitize-slug";
 import {
   getAdminGameSystemSchema,
   listAdminGameSystemsSchema,
@@ -75,9 +76,6 @@ const toIsoString = (value: Date | string | null | undefined) => {
   const date = value instanceof Date ? value : new Date(value);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 };
-
-const sanitizeSlug = (slug: string | null, fallbackId: number) =>
-  slug && slug.length > 0 ? slug : String(fallbackId);
 
 const applyStatusFilter = (
   items: AdminGameSystemListItem[],

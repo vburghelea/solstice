@@ -12,6 +12,7 @@ import type {
   GameSystemTag,
   PopularGameSystem,
 } from "./game-systems.types";
+import { sanitizeSlug } from "./lib/sanitize-slug";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PER_PAGE = 20;
@@ -138,9 +139,6 @@ interface PublisherRow {
   websiteUrl: string | null;
   verified: boolean | null;
 }
-
-const sanitizeSlug = (slug: string | null, fallbackId: number) =>
-  slug && slug.length > 0 ? slug : String(fallbackId);
 
 const toDateString = (value: Date | string | null | undefined) => {
   if (!value) return null;

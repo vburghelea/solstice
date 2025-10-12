@@ -59,7 +59,10 @@ export function useGameSystemSearch({
     gcTime: 1000 * 60 * 10,
   });
 
-  const systems = (queryResult.data ?? []) as GameSystemSearchResult[];
+  const systems = useMemo(
+    () => (queryResult.data ?? []) as GameSystemSearchResult[],
+    [queryResult.data],
+  );
   const { isPending, isFetching, isError, error, refetch } = queryResult;
 
   const options = useMemo(

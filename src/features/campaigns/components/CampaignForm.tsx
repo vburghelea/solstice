@@ -1,8 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import type { ChangeEvent } from "react";
 import React, { useEffect, useState } from "react";
-
-import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
@@ -27,8 +25,7 @@ import {
   updateCampaignInputSchema,
 } from "~/features/campaigns/campaigns.schemas";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
-import { searchGameSystems } from "~/features/games/games.queries";
-import { useDebounce } from "~/shared/hooks/useDebounce";
+import { useGameSystemSearch } from "~/features/games/hooks/useGameSystemSearch";
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -102,14 +99,12 @@ export function CampaignForm({
     },
   });
 
-  const [gameSystemSearchTerm, setGameSystemSearchTerm] = useState("");
-  const debouncedGameSystemSearchTerm = useDebounce(gameSystemSearchTerm, 500);
-
-  const { data: gameSystemSearchResults, isLoading: isLoadingGameSystems } = useQuery({
-    queryKey: ["searchGameSystems", debouncedGameSystemSearchTerm],
-    queryFn: () => searchGameSystems({ data: { query: debouncedGameSystemSearchTerm } }),
-    enabled: debouncedGameSystemSearchTerm.length >= 3,
-  });
+  const {
+    setSearchTerm: setGameSystemSearchTerm,
+    results: gameSystemResults,
+    options: gameSystemOptions,
+    isLoading: isLoadingGameSystems,
+  } = useGameSystemSearch();
 
   // State to store the selected game system details
   const [selectedGameSystem, setSelectedGameSystem] = useState<{
@@ -119,14 +114,6 @@ export function CampaignForm({
     minPlayers: number | null;
     maxPlayers: number | null;
   } | null>(null);
-
-  const gameSystemOptions =
-    gameSystemSearchResults?.success && gameSystemSearchResults.data
-      ? gameSystemSearchResults.data.map((gs) => ({
-          value: gs.id.toString(),
-          label: gs.name,
-        }))
-      : [];
 
   // Update form fields when game system changes
   useEffect(() => {
@@ -287,15 +274,17 @@ export function CampaignForm({
                   placeholder="Search and select the game system you want to use"
                   value={field.state.value?.toString() ?? ""}
                   onValueChange={(value) => {
-                    const parsedValue = parseInt(value);
-                    field.handleChange(isNaN(parsedValue) ? undefined : parsedValue);
+                    const parsedValue = Number.parseInt(value, 10);
+                    field.handleChange(
+                      Number.isNaN(parsedValue) ? undefined : parsedValue,
+                    );
                     // Find and store the selected game system details
-                    const selectedId = isNaN(parsedValue) ? undefined : parsedValue;
+                    const selectedId = Number.isNaN(parsedValue)
+                      ? undefined
+                      : parsedValue;
                     const selected =
-                      gameSystemSearchResults?.success &&
-                      gameSystemSearchResults.data &&
                       selectedId !== undefined
-                        ? gameSystemSearchResults.data.find((gs) => gs.id === selectedId)
+                        ? (gameSystemResults.find((gs) => gs.id === selectedId) ?? null)
                         : null;
                     setSelectedGameSystem(selected || null);
                   }}

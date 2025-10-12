@@ -21,12 +21,11 @@ import { Textarea } from "~/components/ui/textarea";
 import { visibilityEnum } from "~/db/schema/shared.schema";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import type { getGameSystem } from "~/features/games/games.queries";
-import { searchGameSystems } from "~/features/games/games.queries";
 import {
   createGameInputSchema,
   updateGameInputSchema,
 } from "~/features/games/games.schemas";
-import { useDebounce } from "~/shared/hooks/useDebounce";
+import { useGameSystemSearch } from "~/features/games/hooks/useGameSystemSearch";
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -95,14 +94,12 @@ export function GameForm({
     },
   });
 
-  const [gameSystemSearchTerm, setGameSystemSearchTerm] = useState("");
-  const debouncedGameSystemSearchTerm = useDebounce(gameSystemSearchTerm, 500);
-
-  const { data: gameSystemSearchResults, isLoading: isLoadingGameSystems } = useQuery({
-    queryKey: ["searchGameSystems", debouncedGameSystemSearchTerm],
-    queryFn: () => searchGameSystems({ data: { query: debouncedGameSystemSearchTerm } }),
-    enabled: debouncedGameSystemSearchTerm.length >= 3 && !isCampaignGame,
-  });
+  const {
+    setSearchTerm: setGameSystemSearchTerm,
+    results: gameSystemResults,
+    options: baseGameSystemOptions,
+    isLoading: isLoadingGameSystems,
+  } = useGameSystemSearch({ enabled: !isCampaignGame });
 
   // State to store the selected game system details
   const [selectedGameSystem, setSelectedGameSystem] = useState<{
@@ -150,14 +147,9 @@ export function GameForm({
   const initialMaxPlayers = initialValues?.minimumRequirements?.maxPlayers ?? null;
 
   const gameSystemOptions =
-    gameSystemSearchResults?.success && gameSystemSearchResults.data
-      ? gameSystemSearchResults.data.map((gs) => ({
-          value: gs.id.toString(),
-          label: gs.name,
-        }))
-      : isCampaignGame && initialValues?.gameSystemId && gameSystemName
-        ? [{ value: initialValues.gameSystemId.toString(), label: gameSystemName }]
-        : [];
+    isCampaignGame && initialValues?.gameSystemId && gameSystemName
+      ? [{ value: initialValues.gameSystemId.toString(), label: gameSystemName }]
+      : baseGameSystemOptions;
 
   // Update form fields when game system changes
   React.useEffect(() => {
@@ -349,15 +341,16 @@ export function GameForm({
                   placeholder="Search and select the game system you want to use"
                   value={field.state.value?.toString() ?? ""}
                   onValueChange={(value) => {
-                    field.handleChange(parseInt(value));
+                    const parsedValue = Number.parseInt(value, 10);
+                    field.handleChange(
+                      Number.isNaN(parsedValue) ? undefined : parsedValue,
+                    );
                     // Find and store the selected game system details
-                    const selected =
-                      gameSystemSearchResults?.success && gameSystemSearchResults.data
-                        ? gameSystemSearchResults.data.find(
-                            (gs) => gs.id === parseInt(value),
-                          )
-                        : null;
-                    setSelectedGameSystem(selected || null);
+                    const selected = Number.isNaN(parsedValue)
+                      ? null
+                      : (gameSystemResults.find((system) => system.id === parsedValue) ??
+                        null);
+                    setSelectedGameSystem(selected);
                   }}
                   onSearchChange={setGameSystemSearchTerm}
                   isLoading={isLoadingGameSystems}

@@ -1,10 +1,6 @@
 import { vi } from "vitest";
 import { MOCK_APPLICATIONS, MOCK_CAMPAIGN } from "./campaigns";
-import {
-  MOCK_GAME_SYSTEM,
-  MOCK_GAME_SYSTEM_DND5E,
-  MOCK_GAME_SYSTEM_PATHFINDER2E,
-} from "./game-systems";
+import { MOCK_GAME_SYSTEM } from "./game-systems";
 import {
   MOCK_CAMPAIGN_GAME_1,
   MOCK_CAMPAIGN_GAME_2,
@@ -40,7 +36,7 @@ export const mockReactQuery = () => {
           return mockUseQueryGameSystem();
         }
         if (options.queryKey[0] === "searchGameSystems") {
-          return mockUseQuerySearchGameSystems();
+          return actual.useQuery(options as never);
         }
         if (options.queryKey[0] === "campaignApplications") {
           return mockUseQueryCampaignApplications();
@@ -84,14 +80,7 @@ export const setupReactQueryMocks = () => {
   mockUseQueryGameSystem
     .mockReset()
     .mockReturnValue({ data: MOCK_GAME_SYSTEM, isLoading: false, error: null });
-  mockUseQuerySearchGameSystems.mockReset().mockReturnValue({
-    data: {
-      success: true,
-      data: [MOCK_GAME_SYSTEM_DND5E, MOCK_GAME_SYSTEM_PATHFINDER2E],
-    },
-    isLoading: false,
-    error: null,
-  });
+  mockUseQuerySearchGameSystems.mockReset();
   mockUseQueryCampaignApplications.mockReset().mockReturnValue({
     data: { success: true, data: MOCK_APPLICATIONS },
     isLoading: false,

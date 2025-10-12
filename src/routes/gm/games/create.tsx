@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -34,7 +35,7 @@ import {
 import type { GameWithDetails } from "~/features/games/games.types";
 import type { OperationResult } from "~/shared/types/common";
 
-const createGameSearchSchema = z.object({
+export const createGameSearchSchema = z.object({
   campaignId: z.string().optional(),
 });
 
@@ -43,9 +44,20 @@ export const Route = createFileRoute("/gm/games/create")({
   validateSearch: (search) => createGameSearchSchema.parse(search),
 });
 
-function CreateGamePage() {
+type GameCreateViewProps = {
+  readonly basePath: string;
+  readonly backLinkTo?: string;
+  readonly tips?: ReactNode;
+  readonly campaignId?: string | undefined;
+};
+
+export function GameCreateView({
+  basePath,
+  backLinkTo,
+  tips,
+  campaignId,
+}: GameCreateViewProps) {
   const navigate = useNavigate();
-  const { campaignId } = useSearch({ from: Route.id });
   const [serverError, setServerError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -60,14 +72,12 @@ function CreateGamePage() {
     refetchOnMount: "always",
   });
 
-  // Proactively refresh possible stale/empty cache when arriving via navigation
   useEffect(() => {
     if (campaignId) {
       queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
     }
   }, [campaignId, queryClient]);
 
-  // Create a key that changes when all data is loaded
   const formKey = useMemo(() => {
     if (!campaignId) return "no-campaign";
     if (isCampaignDataSuccess && campaignData?.success && campaignData.data) {
@@ -112,7 +122,6 @@ function CreateGamePage() {
       };
     }
 
-    // Return empty object while data is loading
     return {};
   }, [isCampaignDataSuccess, campaignData, campaignId]);
 
@@ -131,7 +140,7 @@ function CreateGamePage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        void navigate({ to: `/gm/games/${data.data?.id}` } as never);
+        void navigate({ to: `${basePath}/${data.data?.id}` } as never);
       } else {
         setServerError(data.errors?.[0]?.message || "Failed to create game");
       }
@@ -142,97 +151,160 @@ function CreateGamePage() {
   });
 
   return (
-    <div className="container mx-auto max-w-2xl p-6">
-      <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/gm/games">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Games
-          </Link>
-        </Button>
-      </div>
+    <div className="space-y-6">
+      {backLinkTo ? (
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to={backLinkTo}>
+              <ArrowLeftIcon className="mr-2 h-4 w-4" />
+              Back to Games
+            </Link>
+          </Button>
+        </div>
+      ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-foreground">Create a New Game</CardTitle>
-          <CardDescription>
-            Set up your game session and start inviting players
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {serverError && (
-            <div className="bg-destructive/10 text-destructive border-destructive/20 mb-4 flex items-start gap-3 rounded-lg border p-4">
-              <div className="flex-1">
-                <p className="font-medium">Error creating game</p>
-                <p className="mt-1 text-sm">{serverError}</p>
-              </div>
-            </div>
-          )}
-
-          {campaignId && isCampaignDataPending ? (
-            <div className="text-muted-foreground mb-4 text-center">
-              Loading campaign data...
-            </div>
-          ) : (
-            <>
-              {campaignId && isCampaignDataSuccess && campaignData?.success && (
-                <div className="mb-4">
-                  <label htmlFor="campaign">Campaign</label>
-                  <Select value={campaignId} disabled>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a campaign" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {campaignData.data && (
-                        <SelectItem value={campaignId}>
-                          {campaignData.data.name}
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] xl:grid-cols-[minmax(0,2fr)_minmax(0,20rem)]">
+        <Card className="md:col-span-1">
+          <CardHeader>
+            <CardTitle className="text-foreground">Create a New Game</CardTitle>
+            <CardDescription>
+              Set up your game session and start inviting players
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {serverError && (
+              <div className="bg-destructive/10 text-destructive border-destructive/20 flex items-start gap-3 rounded-lg border p-4">
+                <div className="flex-1">
+                  <p className="font-medium">Error creating game</p>
+                  <p className="mt-1 text-sm">{serverError}</p>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Only render the form when campaign context is ready or when not creating from a campaign */}
-              {(!campaignId ||
-                (isCampaignDataSuccess &&
-                  campaignData?.success &&
-                  campaignData.data)) && (
-                <GameForm
-                  key={formKey}
-                  onSubmit={async (values) => {
-                    setServerError(null);
+            {campaignId && isCampaignDataPending ? (
+              <div className="text-muted-foreground text-center">
+                Loading campaign data...
+              </div>
+            ) : (
+              <>
+                {campaignId && isCampaignDataSuccess && campaignData?.success && (
+                  <div className="border-border/60 bg-muted/30 grid gap-2 rounded-xl border p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-foreground text-sm font-medium">
+                        Campaign
+                      </span>
+                      <span className="text-muted-foreground text-xs tracking-wide uppercase">
+                        Context synced
+                      </span>
+                    </div>
+                    <Select value={campaignId} disabled>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a campaign" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {campaignData.data && (
+                          <SelectItem value={campaignId}>
+                            {campaignData.data.name}
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
-                    try {
-                      await createGameMutation.mutateAsync({
-                        data: {
-                          ...values,
-                          campaignId,
-                        } as z.infer<typeof createGameInputSchema>,
-                      });
-                    } catch (error) {
-                      console.error("Form submission error:", error);
-                      setServerError(
-                        error instanceof Error ? error.message : "Failed to create game",
-                      );
+                {(!campaignId ||
+                  (isCampaignDataSuccess &&
+                    campaignData?.success &&
+                    campaignData.data)) && (
+                  <GameForm
+                    key={formKey}
+                    onSubmit={async (values) => {
+                      setServerError(null);
+
+                      try {
+                        await createGameMutation.mutateAsync({
+                          data: {
+                            ...values,
+                            campaignId,
+                          } as z.infer<typeof createGameInputSchema>,
+                        });
+                      } catch (error) {
+                        console.error("Form submission error:", error);
+                        setServerError(
+                          error instanceof Error
+                            ? error.message
+                            : "Failed to create game",
+                        );
+                      }
+                    }}
+                    isSubmitting={createGameMutation.isPending}
+                    initialValues={
+                      initialValues as Partial<z.infer<typeof updateGameInputSchema>>
                     }
-                  }}
-                  isSubmitting={createGameMutation.isPending}
-                  initialValues={
-                    initialValues as Partial<z.infer<typeof updateGameInputSchema>>
-                  }
-                  isCampaignGame={!!campaignId}
-                  gameSystemName={
-                    isCampaignDataSuccess && campaignData?.success && campaignData.data
-                      ? campaignData.data.gameSystem?.name || ""
-                      : ""
-                  }
-                />
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+                    isCampaignGame={!!campaignId}
+                    gameSystemName={
+                      isCampaignDataSuccess && campaignData?.success && campaignData.data
+                        ? campaignData.data.gameSystem?.name || ""
+                        : ""
+                    }
+                    onCancelEdit={() => navigate({ to: basePath } as never)}
+                  />
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {tips ?? null}
+      </div>
     </div>
+  );
+}
+
+export function GameSessionTipsCard() {
+  return (
+    <Card className="md:col-span-1">
+      <CardHeader>
+        <CardTitle>Session checklist</CardTitle>
+        <CardDescription>
+          Keep these cues in mind while finalizing the session briefing.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="text-muted-foreground space-y-4 text-sm">
+        <div>
+          <p className="text-foreground font-medium">Logistics first</p>
+          <p className="mt-1">
+            Confirm the time, duration, and player count so the platform can surface the
+            session to the right players.
+          </p>
+        </div>
+        <div>
+          <p className="text-foreground font-medium">Safety tooling</p>
+          <p className="mt-1">
+            Use the safety section to document the consent workflow you use at the table
+            and any boundaries already discussed with the group.
+          </p>
+        </div>
+        <div>
+          <p className="text-foreground font-medium">Campaign context</p>
+          <p className="mt-1">
+            When spinning a session out of an existing campaign, we reuse the system
+            defaults to keep onboarding fast. Adjust anything that’s special for this run.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CreateGamePage() {
+  const { campaignId } = useSearch({ from: Route.id });
+  return (
+    <GameCreateView
+      basePath="/gm/games"
+      backLinkTo="/gm/games"
+      tips={<GameSessionTipsCard />}
+      campaignId={campaignId}
+    />
   );
 }

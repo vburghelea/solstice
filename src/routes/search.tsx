@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { buttonVariants } from "~/components/ui/button";
 import {
   GameListItemView,
@@ -10,6 +10,7 @@ import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { getUserProfile } from "~/features/profile/profile.queries";
+import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
@@ -184,17 +185,31 @@ function SearchPage() {
     return games.filter((game) => predicates.every((predicate) => predicate(game)));
   }, [games, activeFilters, filterMap]);
 
-  const showQuickFilters = availableFilters.length > 0;
+  const toggleFilter = useCallback(
+    (key: QuickFilterKey) => {
+      setActiveFilters((prev) =>
+        prev.includes(key) ? prev.filter((filter) => filter !== key) : [...prev, key],
+      );
+    },
+    [setActiveFilters],
+  );
+
+  const clearFilters = useCallback(() => setActiveFilters([]), [setActiveFilters]);
+
+  const quickFilterButtons = useMemo(
+    () =>
+      availableFilters.map((filter) => ({
+        id: filter.key,
+        label: filter.label,
+        active: activeFilters.includes(filter.key),
+        onToggle: () => toggleFilter(filter.key),
+      })),
+    [activeFilters, availableFilters, toggleFilter],
+  );
+
+  const showQuickFilters = quickFilterButtons.length > 0;
   const hasGames = games.length > 0;
   const hasFilteredGames = filteredGames.length > 0;
-
-  const toggleFilter = (key: QuickFilterKey) => {
-    setActiveFilters((prev) =>
-      prev.includes(key) ? prev.filter((filter) => filter !== key) : [...prev, key],
-    );
-  };
-
-  const clearFilters = () => setActiveFilters([]);
 
   return (
     <PublicLayout>
@@ -213,39 +228,10 @@ function SearchPage() {
         {showQuickFilters ? (
           <section className="border-border/60 bg-secondary border-b py-4 dark:border-gray-800 dark:bg-gray-950">
             <div className="container mx-auto px-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-muted-foreground text-sm font-medium">
-                  Quick filters:
-                </span>
-                {availableFilters.map((filter) => {
-                  const isActive = activeFilters.includes(filter.key);
-                  return (
-                    <button
-                      key={filter.key}
-                      type="button"
-                      onClick={() => toggleFilter(filter.key)}
-                      className={cn(
-                        "border px-3 py-1 text-sm font-medium transition",
-                        "rounded-full",
-                        isActive
-                          ? "border-primary bg-primary/10 text-primary dark:border-primary/40 dark:bg-primary/20 dark:text-primary-100"
-                          : "bg-muted/60 text-foreground hover:border-primary/50 border-transparent dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200",
-                      )}
-                    >
-                      {filter.label}
-                    </button>
-                  );
-                })}
-                {activeFilters.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="text-primary dark:text-primary-200 text-sm font-medium hover:underline"
-                  >
-                    Clear filters
-                  </button>
-                ) : null}
-              </div>
+              <QuickFiltersBar
+                filters={quickFilterButtons}
+                {...(activeFilters.length > 0 ? { onClear: clearFilters } : {})}
+              />
             </div>
           </section>
         ) : null}

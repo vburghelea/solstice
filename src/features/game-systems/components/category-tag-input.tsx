@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { searchCategories } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemCategoryTag } from "~/features/game-systems/game-systems.types";
-import { useDebounce } from "~/shared/lib/hooks/useDebounce";
+import { useDebounce } from "~/shared/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
 
 interface CategoryTagInputProps extends React.InputHTMLAttributes<HTMLInputElement> {

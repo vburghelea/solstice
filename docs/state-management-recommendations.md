@@ -16,8 +16,7 @@ Based on analysis of React's state management best practices and the current cod
 1. **Custom Hooks for Common Patterns**
    - `useAuthForm` - Eliminates duplicate auth form state
    - `useLocalStorage` - Proper external system synchronization
-   - `useFocusOnMount` - DOM manipulation with refs
-   - `useAsyncState` - Prevents contradictory loading/error states
+   - `useDebounce` - Shared rate-limiting for fast inputs
    - `useProfileFormReducer` - Groups related form state
 
 2. **Context for Cross-Cutting Concerns**
@@ -35,8 +34,8 @@ const [isLoading, setIsLoading] = useState(false);
 const [error, setError] = useState(null);
 const [data, setData] = useState(null);
 
-// ✅ Good: Use a single state or custom hook
-const { state, execute } = useAsyncState();
+// ✅ Good: Use a single state or reducer-driven workflow
+const [auth, dispatch] = useReducer(authReducer, initialAuthState);
 ```
 
 **Avoid Contradictions**
@@ -94,7 +93,7 @@ const fullName = `${firstName} ${lastName}`;
 1. **Profile Form**: Adopt `useProfileFormReducer` to simplify state management
 2. **Theme**: Consider using `ThemeContext` if theme is needed in many components
 3. **Auth Forms**: Already improved with `useAuthForm`
-4. **Async Operations**: Use `useAsyncState` for non-React Query async operations
+4. **Async Operations**: Prefer React Query or feature-specific reducers for non-React Query async workflows
 
 ### 4. State Anti-Patterns to Avoid
 

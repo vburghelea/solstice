@@ -7,7 +7,7 @@ import {
   getGameSystems,
   type GameSystemSummary,
 } from "~/features/profile/profile.queries";
-import { useDebounce } from "~/shared/lib/hooks/useDebounce";
+import { useDebounce } from "~/shared/hooks/useDebounce";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult, OptionalFetcher } from "~/shared/types/common";
 

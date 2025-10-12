@@ -9,9 +9,9 @@ import {
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
-import { getUserProfile } from "~/features/profile/profile.queries";
+import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
-import { cn } from "~/shared/lib/utils";
+import { cn, normalizeText } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
 type PlayerFilterContext = {
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/search")({
       listGames({
         data: { filters: { visibility: "public", status: "scheduled" } },
       }),
-      getUserProfile(),
+      getCurrentUserProfileSafe(),
     ]);
 
     let games: GameListItem[] = [];
@@ -56,12 +56,8 @@ export const Route = createFileRoute("/search")({
     }
 
     let playerFilters: PlayerFilterContext | null = null;
-    if (
-      profileOutcome.status === "fulfilled" &&
-      profileOutcome.value.success &&
-      profileOutcome.value.data
-    ) {
-      const profile = profileOutcome.value.data;
+    if (profileOutcome.status === "fulfilled" && profileOutcome.value) {
+      const profile = profileOutcome.value;
       playerFilters = {
         city: profile.city ?? null,
         country: profile.country ?? null,
@@ -85,13 +81,12 @@ function SearchPage() {
       return [];
     }
 
-    const normalize = (value: string) => value.trim().toLowerCase();
     const filters: QuickFilterDefinition[] = [];
 
     if (playerFilters.city) {
-      const cityNormalized = normalize(playerFilters.city);
+      const cityNormalized = normalizeText(playerFilters.city);
       const countryNormalized = playerFilters.country
-        ? normalize(playerFilters.country)
+        ? normalizeText(playerFilters.country)
         : null;
 
       filters.push({
@@ -99,7 +94,7 @@ function SearchPage() {
         label: `In ${playerFilters.city}`,
         predicate: (game) => {
           const address = game.location?.address ?? "";
-          const normalizedAddress = normalize(address);
+          const normalizedAddress = normalizeText(address);
           if (cityNormalized && normalizedAddress.includes(cityNormalized)) {
             return true;
           }
@@ -126,7 +121,7 @@ function SearchPage() {
     }
 
     if (playerFilters.languages.length > 0) {
-      const languages = playerFilters.languages.map(normalize);
+      const languages = playerFilters.languages.map(normalizeText);
       filters.push({
         key: "language",
         label: "In my language",
@@ -134,7 +129,7 @@ function SearchPage() {
           if (!game.language) {
             return false;
           }
-          const language = normalize(game.language);
+          const language = normalizeText(game.language);
           return languages.some(
             (preferred) => language.includes(preferred) || preferred.includes(language),
           );
@@ -143,12 +138,12 @@ function SearchPage() {
     }
 
     if (playerFilters.themes.length > 0) {
-      const themes = playerFilters.themes.map(normalize);
+      const themes = playerFilters.themes.map(normalizeText);
       filters.push({
         key: "themes",
         label: "My themes",
         predicate: (game) => {
-          const categories = (game.gameSystem?.categories ?? []).map(normalize);
+          const categories = (game.gameSystem?.categories ?? []).map(normalizeText);
           if (categories.length === 0) {
             return false;
           }

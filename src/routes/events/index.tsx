@@ -12,6 +12,16 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import {
+  DEFAULT_EVENT_FILTERS,
+  buildEventFilterContext,
+  filterEventsWithContext,
+  hasActiveEventFilters,
+  isCityFilterActive,
+  isCountryFilterActive,
+  type EventFilterContext,
+  type EventFiltersState,
+} from "~/features/events/events-filtering";
+import {
   DEFAULT_UPCOMING_EVENTS_LIMIT,
   createUpcomingEventsQueryFn,
   prefetchUpcomingEvents,
@@ -24,7 +34,7 @@ import type {
   RegistrationType,
 } from "~/features/events/events.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
-import { getUserProfile } from "~/features/profile/profile.queries";
+import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { useCountries } from "~/shared/hooks/useCountries";
 
@@ -61,63 +71,31 @@ type EventsLoaderData = {
   playerFilters: PlayerLocationFilters | null;
 };
 
-type FiltersState = {
-  country: string;
-  city: string;
-  type: EventType | "all";
-  status: EventStatus | "all";
-  registrationType: RegistrationType | "all";
-};
-
 type QuickFilterKey = "city" | "country";
 
 interface QuickFilterDefinition {
   key: QuickFilterKey;
   label: string;
-  apply: (filters: FiltersState) => FiltersState;
-  clear: (filters: FiltersState) => FiltersState;
-  isActive: (filters: FiltersState) => boolean;
+  apply: (filters: EventFiltersState) => EventFiltersState;
+  clear: (filters: EventFiltersState) => EventFiltersState;
+  isActive: (context: EventFilterContext) => boolean;
 }
-
-const DEFAULT_FILTERS: FiltersState = {
-  country: "all",
-  city: "all",
-  type: "all",
-  status: "all",
-  registrationType: "all",
-};
-
-const normalize = (value: string) => value.trim().toLowerCase();
 
 const SKELETON_KEYS = ["north", "south", "east", "west", "central", "prairie"] as const;
 
 export const Route = createFileRoute("/events/")({
   loader: async ({ context }) => {
-    const prefetchPromise = prefetchUpcomingEvents(
-      context.queryClient,
-      DEFAULT_UPCOMING_EVENTS_LIMIT,
-    );
-    const profilePromise = getUserProfile();
-
-    const [, profileOutcome] = await Promise.allSettled([
-      prefetchPromise,
-      profilePromise,
+    const [, profile] = await Promise.all([
+      prefetchUpcomingEvents(context.queryClient, DEFAULT_UPCOMING_EVENTS_LIMIT),
+      getCurrentUserProfileSafe(),
     ]);
 
-    let playerFilters: PlayerLocationFilters | null = null;
-    if (
-      profileOutcome.status === "fulfilled" &&
-      profileOutcome.value.success &&
-      profileOutcome.value.data
-    ) {
-      const profile = profileOutcome.value.data;
-      playerFilters = {
-        city: profile.city ?? null,
-        country: profile.country ?? null,
-      };
-    } else if (profileOutcome.status === "rejected") {
-      console.error("Failed to fetch profile:", profileOutcome.reason);
-    }
+    const playerFilters: PlayerLocationFilters | null = profile
+      ? {
+          city: profile.city ?? null,
+          country: profile.country ?? null,
+        }
+      : null;
 
     return { playerFilters } satisfies EventsLoaderData;
   },
@@ -126,7 +104,7 @@ export const Route = createFileRoute("/events/")({
 
 function EventsIndex() {
   const { playerFilters } = Route.useLoaderData() as EventsLoaderData;
-  const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<EventFiltersState>(DEFAULT_EVENT_FILTERS);
   const { getCountryName } = useCountries();
 
   const {
@@ -189,7 +167,7 @@ function EventsIndex() {
         label: `In ${cityValue}`,
         apply: (current) => ({ ...current, city: cityValue }),
         clear: (current) => ({ ...current, city: "all" }),
-        isActive: (current) => normalize(current.city) === normalize(cityValue),
+        isActive: (context) => isCityFilterActive(context, cityValue),
       });
     }
 
@@ -201,70 +179,41 @@ function EventsIndex() {
         label: `In ${countryLabel}`,
         apply: (current) => ({ ...current, country: countryValue }),
         clear: (current) => ({ ...current, country: "all" }),
-        isActive: (current) => current.country === countryValue,
+        isActive: (context) => isCountryFilterActive(context, countryValue),
       });
     }
 
     return definitions;
   }, [playerFilters, getCountryName]);
 
-  const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
-      if (filters.country !== "all" && event.country !== filters.country) {
-        return false;
-      }
+  const filterContext = useMemo(() => buildEventFilterContext(filters), [filters]);
 
-      if (filters.city !== "all") {
-        if (!event.city) {
-          return false;
-        }
-        if (normalize(event.city) !== normalize(filters.city)) {
-          return false;
-        }
-      }
-
-      if (filters.type !== "all" && event.type !== filters.type) {
-        return false;
-      }
-
-      if (filters.status !== "all" && event.status !== filters.status) {
-        return false;
-      }
-
-      if (
-        filters.registrationType !== "all" &&
-        event.registrationType !== filters.registrationType
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [events, filters]);
+  const filteredEvents = useMemo(
+    () => filterEventsWithContext(events, filterContext),
+    [events, filterContext],
+  );
 
   const isLoading = (isPending || isFetching) && events.length === 0;
   const quickFilterButtons = useMemo(() => {
     return quickFilters.map((filter) => ({
       id: filter.key,
       label: filter.label,
-      active: filter.isActive(filters),
+      active: filter.isActive(filterContext),
       onToggle: () =>
-        setFilters((prev) =>
-          filter.isActive(prev) ? filter.clear(prev) : filter.apply(prev),
-        ),
+        setFilters((prev) => {
+          const previousContext = buildEventFilterContext(prev);
+          return filter.isActive(previousContext)
+            ? filter.clear(prev)
+            : filter.apply(prev);
+        }),
     }));
-  }, [filters, quickFilters]);
+  }, [filterContext, quickFilters]);
 
   const hasQuickFilters = quickFilterButtons.length > 0;
-  const hasActiveFilters =
-    filters.country !== "all" ||
-    filters.city !== "all" ||
-    filters.type !== "all" ||
-    filters.status !== "all" ||
-    filters.registrationType !== "all";
+  const hasActiveFilters = hasActiveEventFilters(filterContext);
 
   const resetFilters = useCallback(
-    () => setFilters({ ...DEFAULT_FILTERS }),
+    () => setFilters({ ...DEFAULT_EVENT_FILTERS }),
     [setFilters],
   );
 
@@ -371,7 +320,7 @@ function EventsIndex() {
                   onValueChange={(value) =>
                     setFilters((prev) => ({
                       ...prev,
-                      type: value as FiltersState["type"],
+                      type: value as EventFiltersState["type"],
                     }))
                   }
                 >
@@ -398,7 +347,7 @@ function EventsIndex() {
                   onValueChange={(value) =>
                     setFilters((prev) => ({
                       ...prev,
-                      status: value as FiltersState["status"],
+                      status: value as EventFiltersState["status"],
                     }))
                   }
                 >
@@ -425,7 +374,7 @@ function EventsIndex() {
                   onValueChange={(value) =>
                     setFilters((prev) => ({
                       ...prev,
-                      registrationType: value as FiltersState["registrationType"],
+                      registrationType: value as EventFiltersState["registrationType"],
                     }))
                   }
                 >

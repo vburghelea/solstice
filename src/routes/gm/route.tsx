@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { differenceInHours } from "date-fns";
 import { ClipboardList, Gamepad2, Home, Inbox, ScrollText, Users2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -18,9 +18,11 @@ import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
+import { useFeatureFlag } from "~/lib/feature-flags";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 
-const GM_NAVIGATION: RoleWorkspaceNavItem[] = [
+const BASE_GM_NAVIGATION: RoleWorkspaceNavItem[] = [
   {
     label: "Overview",
     to: "/gm",
@@ -83,6 +85,22 @@ function GameMasterNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
   const { user } = Route.useRouteContext();
+  const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
+  const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
+
+  const navigationItems = useMemo(() => {
+    return BASE_GM_NAVIGATION.filter((item) => {
+      if (item.to === "/gm/inbox") {
+        return showSharedInbox;
+      }
+
+      if (item.to === "/gm/collaboration") {
+        return showCollaboration;
+      }
+
+      return true;
+    });
+  }, [showCollaboration, showSharedInbox]);
 
   const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
   const workspaceLabel = user?.name ? `${user.name}` : "Game Master";
@@ -97,7 +115,7 @@ function GameMasterNamespaceShell() {
       <RoleWorkspaceLayout
         title="Game Master workspace"
         description="Coordinate campaigns, sessions, and bespoke threads tailored to your tables."
-        navItems={GM_NAVIGATION}
+        navItems={navigationItems}
         fallbackLabel="Game Master"
         subtitle={workspaceSubtitle}
         workspaceLabel={workspaceLabel}

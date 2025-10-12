@@ -14,9 +14,11 @@ import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
+import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
+import { useFeatureFlag } from "~/lib/feature-flags";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 
-const OPS_NAVIGATION: RoleWorkspaceNavItem[] = [
+const BASE_OPS_NAVIGATION: RoleWorkspaceNavItem[] = [
   {
     label: "Overview",
     to: "/ops",
@@ -60,6 +62,22 @@ function OpsNamespaceShell() {
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
   const { user } = Route.useRouteContext();
+  const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
+  const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
+
+  const navigationItems = useMemo(() => {
+    return BASE_OPS_NAVIGATION.filter((item) => {
+      if (item.to === "/ops/inbox") {
+        return showSharedInbox;
+      }
+
+      if (item.to === "/ops/collaboration") {
+        return showCollaboration;
+      }
+
+      return true;
+    });
+  }, [showCollaboration, showSharedInbox]);
 
   const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
   const workspaceLabel = user?.name ? `${user.name}` : "Operations";
@@ -74,7 +92,7 @@ function OpsNamespaceShell() {
       <RoleWorkspaceLayout
         title="Operations workspace"
         description="Monitor approvals, logistics, and staffing signals in real time so every event stays on track."
-        navItems={OPS_NAVIGATION}
+        navItems={navigationItems}
         fallbackLabel="Operations"
         subtitle={workspaceSubtitle}
         workspaceLabel={workspaceLabel}

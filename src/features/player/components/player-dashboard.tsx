@@ -532,13 +532,14 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   Player HQ
                 </p>
                 <h1 className="text-foreground text-2xl font-semibold sm:text-3xl">
-                  Welcome back, {user?.name || "Leo"}
+                  Welcome back
+                  {user?.name?.trim() ? `, ${user.name.trim()}` : ""}
                 </h1>
               </div>
             </div>
             <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
               Stay on top of sessions, invitations, and community highlights. Everything
-              Leo needs to feel connected is organized here.
+              you need to feel connected is organized here.
             </p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <Badge variant="outline" className="border-primary/40 text-primary">
@@ -610,7 +611,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               />
               <QuickToggle
                 label="Review reminders"
-                description="Stay accountable to your GMs."
+                description="Stay accountable to your game organizers."
                 checked={notificationPreferences.reviewReminders}
                 disabled={notificationMutation.isPending}
                 onCheckedChange={(value) => {
@@ -619,8 +620,12 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               />
             </div>
             <Separator />
-            <div className="grid gap-2 sm:grid-cols-2">
-              <Button asChild variant="outline" className="justify-start gap-2">
+            <div className="grid gap-2">
+              <Button
+                asChild
+                variant="outline"
+                className="w-full justify-center gap-2 text-center"
+              >
                 <Link
                   to="/player/profile"
                   onClick={() => {
@@ -629,10 +634,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     });
                   }}
                 >
-                  <Users className="h-4 w-4" /> Update profile details
+                  <Users className="h-4 w-4" /> Edit profile
                 </Link>
               </Button>
-              <Button asChild className="justify-start gap-2">
+              <Button asChild className="w-full justify-center gap-2 text-center">
                 <Link
                   to="/player/membership"
                   onClick={() => {
@@ -642,15 +647,13 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   }}
                 >
                   <CreditCard className="h-4 w-4" />
-                  {membershipStatus?.hasMembership
-                    ? "Manage membership"
-                    : "Activate membership"}
+                  {membershipStatus?.hasMembership ? "Manage plan" : "Start membership"}
                 </Link>
               </Button>
               <Button
                 asChild
-                variant="secondary"
-                className="justify-start gap-2 sm:col-span-2"
+                variant="outline"
+                className="border-muted/40 bg-muted/20 text-foreground hover:bg-muted/30 w-full justify-center gap-2 text-center"
               >
                 <Link
                   to="/search"
@@ -660,7 +663,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     });
                   }}
                 >
-                  <Calendar className="h-4 w-4" /> Find a new game night
+                  <Calendar className="h-4 w-4" /> Find games
                 </Link>
               </Button>
             </div>
@@ -700,8 +703,12 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 <p className="text-muted-foreground text-sm">
                   Keep your calendar flexible and claim a spot in the next adventure.
                 </p>
-                <Button asChild variant="secondary">
-                  <Link to="/search">Discover a new session</Link>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-muted/40 bg-muted/20 text-foreground hover:bg-muted/30"
+                >
+                  <Link to="/search">Discover sessions</Link>
                 </Button>
               </div>
             )}
@@ -777,7 +784,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             <StatPill
-              label="Owner"
+              label="Organizer"
               value={campaignsSummary.owned}
               icon={<ScrollText className="h-4 w-4" />}
             />
@@ -804,7 +811,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             <StatPill
-              label="GM"
+              label="Organizer"
               value={gamesSummary.owned}
               icon={<Swords className="h-4 w-4" />}
             />

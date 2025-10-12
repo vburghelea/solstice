@@ -1,17 +1,29 @@
-import { chromium } from '@playwright/test';
-import { mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { chromium } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
+import { join } from "node:path";
 
 const VIEWPORT = { width: 1440, height: 900 };
 
 const PAGES = [
-  { url: 'http://localhost:5173/', prefix: 'visit' },
-  { url: 'http://localhost:5173/resources', prefix: 'resources' },
-  { url: 'http://localhost:5173/teams', prefix: 'teams' },
-  { url: 'http://localhost:5173/about', prefix: 'about' },
-  { url: 'http://localhost:5173/systems', prefix: 'systems', detailSelector: 'a[href^="/systems/"]' },
-  { url: 'http://localhost:5173/events', prefix: 'events', detailSelector: 'a[href^="/events/"]' },
-  { url: 'http://localhost:5173/search', prefix: 'search', detailSelector: 'a[href^="/game/"]' },
+  { url: "http://localhost:5173/", prefix: "visit" },
+  { url: "http://localhost:5173/resources", prefix: "resources" },
+  { url: "http://localhost:5173/teams", prefix: "teams" },
+  { url: "http://localhost:5173/about", prefix: "about" },
+  {
+    url: "http://localhost:5173/systems",
+    prefix: "systems",
+    detailSelector: 'a[href^="/systems/"]',
+  },
+  {
+    url: "http://localhost:5173/events",
+    prefix: "events",
+    detailSelector: 'a[href^="/events/"]',
+  },
+  {
+    url: "http://localhost:5173/search",
+    prefix: "search",
+    detailSelector: 'a[href^="/game/"]',
+  },
 ];
 
 async function ensureDir(path) {
@@ -24,12 +36,16 @@ async function scrollAndCapture(page, destDir, prefix) {
   await page.screenshot({ path: join(destDir, `${prefix}-top.png`) });
 
   console.log(`  • capturing ${prefix} mid`);
-  await page.evaluate(() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' }));
+  await page.evaluate(() =>
+    window.scrollTo({ top: window.innerHeight, behavior: "smooth" }),
+  );
   await page.waitForTimeout(700);
   await page.screenshot({ path: join(destDir, `${prefix}-mid.png`) });
 
   console.log(`  • capturing ${prefix} bottom`);
-  await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+  await page.evaluate(() =>
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }),
+  );
   await page.waitForTimeout(900);
   await page.screenshot({ path: join(destDir, `${prefix}-bottom.png`) });
 
@@ -38,7 +54,7 @@ async function scrollAndCapture(page, destDir, prefix) {
 
 async function capture(page, destDir, { url, prefix, detailSelector }) {
   console.log(`Navigating to ${url}`);
-  await page.goto(url, { waitUntil: 'networkidle' });
+  await page.goto(url, { waitUntil: "networkidle" });
   await scrollAndCapture(page, destDir, prefix);
 
   if (!detailSelector) {
@@ -57,10 +73,12 @@ async function capture(page, destDir, { url, prefix, detailSelector }) {
     if (!href) continue;
     console.log(`  ↳ visiting detail ${index + 1}: ${href}`);
     try {
-      await page.goto(href, { waitUntil: 'networkidle', timeout: 15000 });
+      await page.goto(href, { waitUntil: "networkidle", timeout: 15000 });
       await page.waitForTimeout(600);
       await page.screenshot({ path: join(destDir, `${prefix}-detail-${index}.png`) });
-      await page.evaluate(() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' }));
+      await page.evaluate(() =>
+        window.scrollTo({ top: window.innerHeight, behavior: "smooth" }),
+      );
       await page.waitForTimeout(600);
       await page.screenshot({ path: join(destDir, `${prefix}-detail-${index}-mid.png`) });
       await page.evaluate(() => window.scrollTo({ top: 0 }));
@@ -68,13 +86,13 @@ async function capture(page, destDir, { url, prefix, detailSelector }) {
       console.warn(`    ⚠️ failed to capture detail: ${href}`, error);
     }
     console.log(`  ↳ returning to ${url}`);
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 15000 });
+    await page.goto(url, { waitUntil: "networkidle", timeout: 15000 });
   }
 }
 
 async function main() {
-  const theme = process.argv[2] === 'dark' ? 'dark' : 'light';
-  const outDir = join('playwright-output', theme);
+  const theme = process.argv[2] === "dark" ? "dark" : "light";
+  const outDir = join("playwright-output", theme);
   await ensureDir(outDir);
 
   console.log(`Starting visual sweep in ${theme} mode → ${outDir}`);
@@ -87,7 +105,7 @@ async function main() {
   }
 
   await browser.close();
-  console.log('Sweep complete');
+  console.log("Sweep complete");
 }
 
 main().catch((error) => {

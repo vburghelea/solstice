@@ -144,14 +144,17 @@ describe("PlayerDashboard", () => {
   it("surfaces Leo's primary dashboard cues", () => {
     render(<PlayerDashboard user={null} />);
 
-    expect(screen.getByText(/Welcome back, Leo/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /update profile details/i }),
+      screen.getByRole("heading", { level: 1, name: /welcome back/i }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /edit profile/i })).toBeInTheDocument();
     expect(screen.getByText(/Membership/)).toBeInTheDocument();
     expect(screen.getByText(/Catalyst Cup/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Join the pilot/i })).toBeInTheDocument();
     expect(screen.getByText(/Connections radar/i)).toBeInTheDocument();
     expect(screen.getByText(/Only allow invites from connections/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Stay accountable to your game organizers/i),
+    ).toBeInTheDocument();
   });
 });

@@ -77,47 +77,42 @@ export function RoleSwitcher() {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          {resolution.personas.map((persona) => {
-            const isActive = persona.id === resolution.activePersonaId;
-            const isDisabled =
-              persona.availability !== "available" || status === "switching";
+          {resolution.personas
+            .filter(
+              (persona) =>
+                persona.availability === "available" ||
+                persona.id === resolution.activePersonaId,
+            )
+            .map((persona) => {
+              const isActive = persona.id === resolution.activePersonaId;
+              const isDisabled = status === "switching";
 
-            return (
-              <button
-                key={persona.id}
-                type="button"
-                onClick={() => switchPersona(persona.id)}
-                disabled={isDisabled}
-                className={cn(
-                  "border-border focus-visible:ring-ring hover:bg-muted/60 inline-flex w-full flex-col gap-2",
-                  "rounded-md border p-4 text-left transition focus-visible:ring-2 focus-visible:outline-hidden",
-                  isActive && "border-primary bg-primary/10",
-                  persona.availability !== "available" && "opacity-60",
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex flex-col">
-                    <span className="text-base font-semibold">{persona.label}</span>
-                    <span className="text-muted-foreground text-sm">
-                      {persona.description}
-                    </span>
+              return (
+                <button
+                  key={persona.id}
+                  type="button"
+                  onClick={() => switchPersona(persona.id)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "border-border focus-visible:ring-ring hover:bg-muted/60 inline-flex w-full flex-col gap-2",
+                    "rounded-md border p-4 text-left transition focus-visible:ring-2 focus-visible:outline-hidden",
+                    isActive && "border-primary bg-primary/10",
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex flex-col">
+                      <span className="text-base font-semibold">{persona.label}</span>
+                      <span className="text-muted-foreground text-sm">
+                        {persona.description}
+                      </span>
+                    </div>
+                    <Badge variant={isActive ? "default" : "outline"}>
+                      {isActive ? "Active" : "Available"}
+                    </Badge>
                   </div>
-                  <Badge variant={isActive ? "default" : "outline"}>
-                    {persona.availability === "available"
-                      ? isActive
-                        ? "Active"
-                        : "Available"
-                      : "Locked"}
-                  </Badge>
-                </div>
-                {persona.availability !== "available" && persona.availabilityReason ? (
-                  <p className="text-muted-foreground text-xs">
-                    {persona.availabilityReason}
-                  </p>
-                ) : null}
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
         </div>
         {error ? (
           <p className="text-destructive text-sm" role="alert">

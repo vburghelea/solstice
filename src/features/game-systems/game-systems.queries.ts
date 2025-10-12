@@ -13,6 +13,7 @@ import type {
   PopularGameSystem,
 } from "./game-systems.types";
 import { sanitizeSlug } from "./lib/sanitize-slug";
+import { mapTagRows, mapTagRowsBySystem } from "./lib/tags";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PER_PAGE = 20;
@@ -205,13 +206,7 @@ export const listSystemsHandler = async ({
       .orderBy(asc(gameSystemCategories.name));
 
     return {
-      categories: categoryRows
-        .filter((row) => row.id != null && row.name)
-        .map((row) => ({
-          id: row.id,
-          name: row.name,
-          description: row.description ?? null,
-        })),
+      categories: mapTagRows(categoryRows),
     };
   };
 
@@ -294,7 +289,7 @@ export const listSystemsHandler = async ({
 
   const systemIds = systemsRows.map((row) => row.system.id);
 
-  const categoryMap = new Map<number, GameSystemTag[]>();
+  let categoryMap = new Map<number, GameSystemTag[]>();
   const galleryMap = new Map<number, GameSystemMediaAsset[]>();
 
   if (systemIds.length > 0) {
@@ -330,16 +325,7 @@ export const listSystemsHandler = async ({
         .execute(),
     ]);
 
-    for (const row of categoryRowsForSystems) {
-      if (!row.id || !row.name) continue;
-      const group = categoryMap.get(row.systemId) ?? [];
-      group.push({
-        id: row.id,
-        name: row.name,
-        description: row.description ?? null,
-      });
-      categoryMap.set(row.systemId, group);
-    }
+    categoryMap = mapTagRowsBySystem(categoryRowsForSystems);
 
     for (const row of galleryRows) {
       const asset = mapMediaAsset(row.asset as MediaAssetRow);
@@ -483,21 +469,9 @@ export const getSystemBySlugHandler = async ({
       .orderBy(asc(faqs.id)),
   ]);
 
-  const categories: GameSystemTag[] = categoryRows
-    .filter((row) => row.id != null && row.name)
-    .map((row) => ({
-      id: row.id,
-      name: row.name,
-      description: row.description ?? null,
-    }));
+  const categories: GameSystemTag[] = mapTagRows(categoryRows);
 
-  const mechanics: GameSystemTag[] = mechanicRows
-    .filter((row) => row.id != null && row.name)
-    .map((row) => ({
-      id: row.id,
-      name: row.name,
-      description: row.description ?? null,
-    }));
+  const mechanics: GameSystemTag[] = mapTagRows(mechanicRows);
 
   const galleryAssets = galleryRows
     .map(({ asset }) => mapMediaAsset(asset as MediaAssetRow))

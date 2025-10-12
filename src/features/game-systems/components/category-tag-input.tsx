@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -29,8 +29,6 @@ export function CategoryTagInput({
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDebounce(inputValue, 300);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const searchTerm = debouncedValue.trim();
 
   const { data: suggestionsResult } = useQuery({
@@ -45,11 +43,12 @@ export function CategoryTagInput({
     staleTime: 60_000,
   });
 
+  const selectedIds = useMemo(() => new Set(tags.map((tag) => tag.id)), [tags]);
+
   const suggestions = useMemo(() => {
     const allSuggestions = suggestionsResult ?? EMPTY_SUGGESTIONS;
-    const selectedIds = new Set(tags.map((tag) => tag.id));
     return allSuggestions.filter((suggestion) => !selectedIds.has(suggestion.id));
-  }, [suggestionsResult, tags]);
+  }, [selectedIds, suggestionsResult]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -60,10 +59,6 @@ export function CategoryTagInput({
     onAddTag(tag);
     setInputValue("");
     setShowSuggestions(false);
-  };
-
-  const handleRemoveTag = (id: number) => {
-    onRemoveTag(id);
   };
 
   return (
@@ -79,7 +74,7 @@ export function CategoryTagInput({
               variant="ghost"
               size="sm"
               className="text-primary hover:bg-primary/10 ml-1 h-auto p-0"
-              onClick={() => handleRemoveTag(tag.id)}
+              onClick={() => onRemoveTag(tag.id)}
             >
               &times;
             </Button>
@@ -88,7 +83,6 @@ export function CategoryTagInput({
       </div>
       <div className="relative">
         <Input
-          ref={inputRef}
           value={inputValue}
           onChange={handleInputChange}
           placeholder={placeholder}

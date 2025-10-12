@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Skeleton } from "~/components/ui/skeleton";
+import { applyEventFilterChange } from "~/features/events/utils";
+import { COUNTRIES } from "~/shared/hooks/useCountries";
 import { cn } from "~/shared/lib/utils";
 import { listEvents } from "../events.queries";
 import type { EventFilters, EventListResult, EventWithDetails } from "../events.types";
@@ -92,16 +94,18 @@ export function EventList({
     key: K,
     value: EventFilters[K] | undefined,
   ) => {
+    let didChange = false;
     setFilters((prev) => {
-      const next: EventFilters = { ...prev };
-      if (value === undefined || (typeof value === "string" && value.length === 0)) {
-        delete next[key];
-      } else {
-        next[key] = value as EventFilters[K];
+      const { nextFilters, changed } = applyEventFilterChange(prev, key, value);
+      if (changed) {
+        didChange = true;
+        return nextFilters;
       }
-      return next;
+      return prev;
     });
-    setPage(1);
+    if (didChange) {
+      setPage(1);
+    }
   };
 
   const typeFilterValue = typeof filters.type === "string" ? filters.type : "all";
@@ -194,7 +198,11 @@ export function EventList({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All countries</SelectItem>
-                {/* TODO: map through all COUNTRIES */}
+                {COUNTRIES.map((country) => (
+                  <SelectItem key={country.value} value={country.value}>
+                    {country.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

@@ -45,6 +45,7 @@ import {
   defaultPrivacySettings,
 } from "~/features/profile/profile.types";
 import { listPendingGMReviews } from "~/features/reviews/reviews.queries";
+import type { PendingGMReviewItem } from "~/features/reviews/reviews.types";
 import { updateNotificationPreferences } from "~/features/settings/settings.mutations";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import type { AuthUser } from "~/lib/auth/types";
@@ -154,6 +155,72 @@ function initialsFromName(name?: string | null) {
     return first.slice(0, 2).toUpperCase();
   }
   return "P";
+}
+
+function normalizePendingReview(entry: unknown): PendingGMReviewItem | null {
+  if (!entry || typeof entry !== "object") {
+    return null;
+  }
+
+  const candidate = entry as {
+    gameId?: unknown;
+    gameName?: unknown;
+    dateTime?: unknown;
+    gm?: {
+      id?: unknown;
+      name?: unknown;
+      gmRating?: unknown;
+    };
+  };
+
+  if (typeof candidate.gameId !== "string" || typeof candidate.gameName !== "string") {
+    return null;
+  }
+
+  const rawDate = candidate.dateTime;
+  if (
+    !(
+      rawDate instanceof Date ||
+      typeof rawDate === "string" ||
+      typeof rawDate === "number"
+    )
+  ) {
+    return null;
+  }
+  const parsedDate = rawDate instanceof Date ? rawDate : new Date(rawDate);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  const gm = candidate.gm;
+  if (!gm || typeof gm !== "object") {
+    return null;
+  }
+
+  const gmId = (gm as { id?: unknown }).id;
+  if (typeof gmId !== "string") {
+    return null;
+  }
+
+  const gmName = (gm as { name?: unknown }).name;
+  const gmRating = (gm as { gmRating?: unknown }).gmRating;
+
+  const normalizedGm: PendingGMReviewItem["gm"] = {
+    id: gmId,
+    name: typeof gmName === "string" ? gmName : null,
+  };
+  if (typeof gmRating === "number") {
+    normalizedGm.gmRating = gmRating;
+  } else if (gmRating === null) {
+    normalizedGm.gmRating = null;
+  }
+
+  return {
+    gameId: candidate.gameId,
+    gameName: candidate.gameName,
+    dateTime: parsedDate,
+    gm: normalizedGm,
+  };
 }
 
 export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
@@ -320,24 +387,41 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     [upcomingEventsRes],
   );
 
-  const pendingReviewsQuery = useQuery({
-    queryKey: ["pending-gm-reviews-count"],
-    queryFn: async (): Promise<number> => {
+  const pendingReviewsQuery = useQuery<PendingGMReviewItem[]>({
+    queryKey: ["pending-gm-reviews"],
+    queryFn: async () => {
       const res = await listPendingGMReviews({ data: { days: 365 } });
-      return res.success ? res.data.length : 0;
+      if (!res.success || !Array.isArray(res.data)) {
+        return [];
+      }
+      return res.data
+        .map((item) => normalizePendingReview(item))
+        .filter((item): item is PendingGMReviewItem => Boolean(item));
     },
     refetchOnMount: "always",
-    initialData: () => readStoredData<number>(STORAGE_KEYS.reviews) ?? 0,
+    initialData: () => {
+      const cached = readStoredData<unknown>(STORAGE_KEYS.reviews);
+      if (!Array.isArray(cached)) {
+        return [];
+      }
+      return cached
+        .map((item) => normalizePendingReview(item))
+        .filter((item): item is PendingGMReviewItem => Boolean(item));
+    },
     enabled: isAuthenticated,
   });
-  const pendingReviewsCount = pendingReviewsQuery.data ?? 0;
+  const pendingReviews = useMemo(
+    () => pendingReviewsQuery.data ?? [],
+    [pendingReviewsQuery.data],
+  );
+  const pendingReviewsCount = pendingReviews.length;
 
   useEffect(() => {
-    if (!isAuthenticated || typeof pendingReviewsCount !== "number") {
+    if (!isAuthenticated) {
       return;
     }
-    persistData(STORAGE_KEYS.reviews, pendingReviewsCount);
-  }, [isAuthenticated, pendingReviewsCount]);
+    persistData(STORAGE_KEYS.reviews, pendingReviews);
+  }, [isAuthenticated, pendingReviews]);
 
   const teamCount = userTeams.length;
   const membershipLabel = membershipStatus?.hasMembership ? "Active" : "Inactive";
@@ -554,6 +638,35 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               </Badge>
             </div>
           </CardHeader>
+          {pendingReviewsCount > 0 ? (
+            <CardContent className="bg-background/70 relative z-10 border-t border-white/10 p-4 sm:p-6">
+              <div className="text-primary flex items-center gap-2 text-xs font-semibold tracking-widest uppercase sm:text-sm">
+                <ScrollText className="h-4 w-4" />
+                Review reminders
+              </div>
+              <div className="mt-3 space-y-2">
+                {pendingReviews.map((review) => (
+                  <Link
+                    key={`${review.gameId}-${review.dateTime.toISOString()}`}
+                    to={`/player/games/${review.gameId}#gm-review`}
+                    className="group border-primary/30 bg-primary/10 hover:border-primary/50 hover:bg-primary/15 flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition"
+                  >
+                    <div className="flex min-w-0 flex-col">
+                      <span className="text-foreground truncate font-medium">
+                        {review.gameName}
+                      </span>
+                      <span className="text-muted-foreground mt-1 text-xs">
+                        {`Review ${review.gm.name ?? "your GM"} • ${formatDateAndTime(review.dateTime)}`}
+                      </span>
+                    </div>
+                    <span className="text-primary group-hover:text-primary/80 text-xs font-semibold tracking-widest uppercase transition">
+                      Start
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          ) : null}
         </Card>
         <Card className="border-muted-foreground/20">
           <CardHeader className="space-y-3">

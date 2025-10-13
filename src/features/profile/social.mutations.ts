@@ -189,8 +189,8 @@ export const submitGMReview = createServerFn({ method: "POST" })
         where: eq(user.id, data.gmId),
       });
 
-      if (!gmUser || !gmUser.isGM) {
-        return { success: false, message: "User is not a GM" };
+      if (!gmUser) {
+        return { success: false, message: "User could not be found!" };
       }
 
       // Map thumbs rating (-2..2) to stored 1..5 scale

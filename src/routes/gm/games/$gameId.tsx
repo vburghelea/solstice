@@ -896,7 +896,7 @@ function GMReviewGate({ gameId, gmId }: { gameId: string; gmId: string }) {
   if (data && data.success && data.data) return null;
 
   return (
-    <div className="my-4">
+    <div id="gm-review" className="my-4 scroll-mt-24">
       <GMReviewForm
         gameId={gameId}
         gmId={gmId}

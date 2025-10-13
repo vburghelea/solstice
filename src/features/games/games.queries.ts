@@ -42,12 +42,15 @@ const getServerDeps = serverOnly(async () => {
   return { ...drizzle, ...schema, ...serverHelpers, ...authQueries, ...gameRepo };
 });
 
-type DbLimitChain<R> = { limit: (n: number) => Promise<R[]> };
-type DbOrderChain<R> = Promise<R[]> & DbLimitChain<R>;
-type DbOrderable<R> = { orderBy: (...args: unknown[]) => DbOrderChain<R> };
+type DbQueryResult<R> = Promise<R[]> & {
+  limit: (n: number) => DbQueryResult<R>;
+  offset: (n: number) => DbQueryResult<R>;
+};
+type DbOrderable<R> = { orderBy: (...args: unknown[]) => DbQueryResult<R> };
 type DbGroupChain<R> = { groupBy: (...cols: unknown[]) => DbOrderable<R> };
+type DbWhereResult<R> = DbGroupChain<R> & Promise<R[]>;
 type DbWhereChain<R> = {
-  where: (cond: unknown) => DbGroupChain<R>;
+  where: (cond: unknown) => DbWhereResult<R>;
 };
 type DbJoinChain<R> = DbWhereChain<R> & {
   innerJoin: (a: unknown, b: unknown) => DbJoinChain<R>;
@@ -129,6 +132,198 @@ function mapGameRowToListItem(row: GameQueryResultRow): GameListItem {
       categories,
     },
   };
+}
+
+async function createGameListQueryContext(
+  db: unknown,
+  currentUserId: string | null | undefined,
+  filters: z.infer<typeof listGamesSchema>["filters"] | undefined,
+) {
+  const {
+    and,
+    eq,
+    gte,
+    lte,
+    or,
+    sql,
+    gameParticipants,
+    games,
+    gameSystems,
+    user,
+    mediaAssets,
+    gameSystemToCategory,
+    gameSystemCategories,
+  } = await getServerDeps();
+
+  const heroImage = alias(mediaAssets, "heroImage");
+  const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
+  const category = alias(gameSystemCategories, "category");
+
+  const statusFilterCondition: SqlExpr | null = filters?.status
+    ? (eq(games.status, filters.status) as SqlExpr)
+    : null;
+
+  const otherBaseConditions: SqlExpr[] = [];
+  if (filters?.gameSystemId)
+    otherBaseConditions.push(eq(games.gameSystemId, filters.gameSystemId));
+  if (filters?.dateFrom)
+    otherBaseConditions.push(gte(games.dateTime, new Date(filters.dateFrom)));
+  if (filters?.dateTo)
+    otherBaseConditions.push(lte(games.dateTime, new Date(filters.dateTo)));
+  if (filters?.searchTerm) {
+    const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
+    otherBaseConditions.push(
+      or(
+        sql`lower(${games.description}) LIKE ${searchTerm}`,
+        sql`lower(${games.language}) LIKE ${searchTerm}`,
+      ) as SqlExpr,
+    );
+  }
+
+  const visibilityConditions: SqlExpr[] = [eq(games.visibility, "public") as SqlExpr];
+
+  if (currentUserId) {
+    const { userFollows, userBlocks, teamMembers } = await import("~/db/schema");
+    const userGames = (db as DbLike)
+      .select({ gameId: gameParticipants.gameId })
+      .from(gameParticipants)
+      .where(
+        and(
+          eq(gameParticipants.userId, currentUserId),
+          or(eq(gameParticipants.role, "player"), eq(gameParticipants.role, "invited")),
+        ),
+      );
+
+    visibilityConditions.push(
+      and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`) as SqlExpr,
+    );
+    visibilityConditions.push(eq(games.ownerId, currentUserId) as SqlExpr);
+
+    const isConnectionOrTeammateSql = sql<boolean>`(
+      EXISTS (
+        SELECT 1 FROM ${userFollows} uf
+        WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
+      ) OR EXISTS (
+        SELECT 1 FROM ${userFollows} uf2
+        WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
+      ) OR EXISTS (
+        SELECT 1
+        FROM ${teamMembers} tm_self
+        INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
+        WHERE tm_self.user_id = ${currentUserId}
+          AND tm_self.status = 'active'
+          AND tm_target.user_id = ${games.ownerId}
+          AND tm_target.status = 'active'
+      )
+    )`;
+    const isBlockedSql = sql<boolean>`EXISTS (
+      SELECT 1 FROM ${userBlocks} ub
+      WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${games.ownerId})
+         OR (ub.blocker_id = ${games.ownerId} AND ub.blockee_id = ${currentUserId})
+    )`;
+    visibilityConditions.push(
+      and(
+        eq(games.visibility, "protected"),
+        sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})`,
+      ) as SqlExpr,
+    );
+  }
+
+  const visibilityConditionsWithStatus = visibilityConditions.map((condition) =>
+    statusFilterCondition
+      ? (and(statusFilterCondition, condition) as SqlExpr)
+      : condition,
+  );
+
+  const finalWhereClause = and(
+    ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
+    or(...visibilityConditionsWithStatus),
+  );
+
+  return {
+    db: db as DbLike,
+    games,
+    user,
+    gameSystems,
+    gameParticipants,
+    heroImage,
+    systemCategoryLink,
+    category,
+    finalWhereClause,
+    eq,
+    sql,
+  };
+}
+
+type GameListQueryContext = Awaited<ReturnType<typeof createGameListQueryContext>>;
+
+function buildGameListQuery(
+  context: GameListQueryContext,
+): DbQueryResult<GameQueryResultRow> {
+  const {
+    db,
+    games,
+    user,
+    gameSystems,
+    gameParticipants,
+    heroImage,
+    systemCategoryLink,
+    category,
+    finalWhereClause,
+    eq,
+    sql,
+  } = context;
+
+  return db
+    .select<GameQueryResultRow>({
+      id: games.id,
+      ownerId: games.ownerId,
+      campaignId: games.campaignId,
+      gameSystemId: games.gameSystemId,
+      name: games.name,
+      dateTime: games.dateTime,
+      description: games.description,
+      expectedDuration: games.expectedDuration,
+      price: games.price,
+      language: games.language,
+      location: sql<z.infer<typeof locationSchema>>`${games.location}`,
+      status: games.status,
+      minimumRequirements: sql<z.infer<typeof minimumRequirementsSchema>>`
+        ${games.minimumRequirements}
+      `,
+      visibility: games.visibility,
+      safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
+      createdAt: games.createdAt,
+      updatedAt: games.updatedAt,
+      owner: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        uploadedAvatarPath: user.uploadedAvatarPath,
+        gmRating: user.gmRating,
+      },
+      gameSystemName: gameSystems.name,
+      gameSystemSlug: gameSystems.slug,
+      gameSystemAveragePlayTime: gameSystems.averagePlayTime,
+      gameSystemMinPlayers: gameSystems.minPlayers,
+      gameSystemMaxPlayers: gameSystems.maxPlayers,
+      systemHeroUrl: heroImage.secureUrl,
+      systemCategories: sql<string[]>`
+        array_remove(array_agg(distinct ${category.name}), NULL)
+      `,
+      participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
+    })
+    .from(games)
+    .innerJoin(user, eq(games.ownerId, user.id))
+    .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
+    .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+    .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
+    .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
+    .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
+    .where(finalWhereClause)
+    .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
+    .orderBy(games.dateTime);
 }
 
 export const getGameSystem = createServerFn({ method: "POST" })
@@ -252,158 +447,8 @@ export async function listGamesImpl(
   filters: z.infer<typeof listGamesSchema>["filters"] | undefined,
 ): Promise<OperationResult<GameListItem[]>> {
   try {
-    const {
-      and,
-      eq,
-      gte,
-      lte,
-      or,
-      sql,
-      gameParticipants,
-      games,
-      gameSystems,
-      user,
-      mediaAssets,
-      gameSystemToCategory,
-      gameSystemCategories,
-    } = await getServerDeps();
-    const heroImage = alias(mediaAssets, "heroImage");
-    const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
-    const category = alias(gameSystemCategories, "category");
-    const statusFilterCondition: SqlExpr | null = filters?.status
-      ? (eq(games.status, filters.status) as SqlExpr)
-      : null;
-
-    const otherBaseConditions: SqlExpr[] = [];
-    if (filters?.gameSystemId)
-      otherBaseConditions.push(eq(games.gameSystemId, filters.gameSystemId));
-    if (filters?.dateFrom)
-      otherBaseConditions.push(gte(games.dateTime, new Date(filters.dateFrom)));
-    if (filters?.dateTo)
-      otherBaseConditions.push(lte(games.dateTime, new Date(filters.dateTo)));
-    if (filters?.searchTerm) {
-      const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
-      otherBaseConditions.push(
-        or(
-          sql`lower(${games.description}) LIKE ${searchTerm}`,
-          sql`lower(${games.language}) LIKE ${searchTerm}`,
-        ) as SqlExpr,
-      );
-    }
-
-    const visibilityConditionsForOr: SqlExpr[] = [];
-    visibilityConditionsForOr.push(eq(games.visibility, "public"));
-
-    if (currentUserId) {
-      const { userFollows, userBlocks, teamMembers } = await import("~/db/schema");
-      const userGames = (db as DbLike)
-        .select({ gameId: gameParticipants.gameId })
-        .from(gameParticipants)
-        .where(
-          and(
-            eq(gameParticipants.userId, currentUserId),
-            or(eq(gameParticipants.role, "player"), eq(gameParticipants.role, "invited")),
-          ),
-        );
-
-      visibilityConditionsForOr.push(
-        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`) as SqlExpr,
-      );
-      visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
-
-      const isConnectionOrTeammateSql = sql<boolean>`(
-        EXISTS (
-          SELECT 1 FROM ${userFollows} uf
-          WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
-        ) OR EXISTS (
-          SELECT 1 FROM ${userFollows} uf2
-          WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
-        ) OR EXISTS (
-          SELECT 1
-          FROM ${teamMembers} tm_self
-          INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
-          WHERE tm_self.user_id = ${currentUserId}
-            AND tm_self.status = 'active'
-            AND tm_target.user_id = ${games.ownerId}
-            AND tm_target.status = 'active'
-        )
-      )`;
-      const isBlockedSql = sql<boolean>`EXISTS (
-        SELECT 1 FROM ${userBlocks} ub
-        WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${games.ownerId})
-           OR (ub.blocker_id = ${games.ownerId} AND ub.blockee_id = ${currentUserId})
-      )`;
-      visibilityConditionsForOr.push(
-        and(
-          eq(games.visibility, "protected"),
-          sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})`,
-        ) as SqlExpr,
-      );
-    }
-
-    const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
-      (condition) =>
-        statusFilterCondition
-          ? (and(statusFilterCondition, condition) as SqlExpr)
-          : condition,
-    );
-
-    const finalWhereClause = and(
-      ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
-      or(...visibilityConditionsForOrWithStatus),
-    );
-
-    const result: GameQueryResultRow[] = await (db as DbLike)
-      .select<GameQueryResultRow>({
-        id: games.id,
-        ownerId: games.ownerId,
-        campaignId: games.campaignId,
-        gameSystemId: games.gameSystemId,
-        name: games.name,
-        dateTime: games.dateTime,
-        description: games.description,
-        expectedDuration: games.expectedDuration,
-        price: games.price,
-        language: games.language,
-        location: sql<z.infer<typeof locationSchema>>`${games.location}`,
-        status: games.status,
-        minimumRequirements: sql<
-          z.infer<typeof minimumRequirementsSchema>
-        >`${games.minimumRequirements}`,
-        visibility: games.visibility,
-        safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
-        createdAt: games.createdAt,
-        updatedAt: games.updatedAt,
-        owner: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-          uploadedAvatarPath: user.uploadedAvatarPath,
-          gmRating: user.gmRating,
-        },
-        gameSystemName: gameSystems.name,
-        gameSystemSlug: gameSystems.slug,
-        gameSystemAveragePlayTime: gameSystems.averagePlayTime,
-        gameSystemMinPlayers: gameSystems.minPlayers,
-        gameSystemMaxPlayers: gameSystems.maxPlayers,
-        systemHeroUrl: heroImage.secureUrl,
-        systemCategories: sql<
-          string[]
-        >`array_remove(array_agg(distinct ${category.name}), NULL)`,
-        participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
-      })
-      .from(games)
-      .innerJoin(user, eq(games.ownerId, user.id))
-      .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
-      .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
-      .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
-      .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
-      .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
-      .where(finalWhereClause)
-      .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
-      .orderBy(games.dateTime);
-
+    const context = await createGameListQueryContext(db, currentUserId, filters);
+    const result = await buildGameListQuery(context);
     return { success: true, data: result.map(mapGameRowToListItem) };
   } catch (error) {
     console.error("Error listing games:", error);
@@ -456,167 +501,23 @@ export async function listGamesWithCountImpl(
   pageSize = 20,
 ): Promise<OperationResult<{ items: GameListItem[]; totalCount: number }>> {
   try {
-    const {
-      and,
-      eq,
-      gte,
-      lte,
-      or,
-      sql,
-      gameParticipants,
-      games,
-      gameSystems,
-      user,
-      mediaAssets,
-      gameSystemToCategory,
-      gameSystemCategories,
-    } = await getServerDeps();
-    const heroImage = alias(mediaAssets, "heroImage");
-    const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
-    const category = alias(gameSystemCategories, "category");
-    const statusFilterCondition: SqlExpr | null = filters?.status
-      ? (eq(games.status, filters.status) as SqlExpr)
-      : null;
+    const safePage = Math.max(1, page);
+    const safePageSize = Math.max(1, Math.min(100, pageSize));
+    const offset = (safePage - 1) * safePageSize;
 
-    const otherBaseConditions: SqlExpr[] = [];
-    if (filters?.gameSystemId)
-      otherBaseConditions.push(eq(games.gameSystemId, filters.gameSystemId));
-    if (filters?.dateFrom)
-      otherBaseConditions.push(gte(games.dateTime, new Date(filters.dateFrom)));
-    if (filters?.dateTo)
-      otherBaseConditions.push(lte(games.dateTime, new Date(filters.dateTo)));
-    if (filters?.searchTerm) {
-      const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
-      otherBaseConditions.push(
-        or(
-          sql`lower(${games.description}) LIKE ${searchTerm}`,
-          sql`lower(${games.language}) LIKE ${searchTerm}`,
-        ) as SqlExpr,
-      );
-    }
+    const context = await createGameListQueryContext(db, currentUserId, filters);
+    const rows = await buildGameListQuery(context).limit(safePageSize).offset(offset);
 
-    const visibilityConditionsForOr: SqlExpr[] = [];
-    visibilityConditionsForOr.push(eq(games.visibility, "public"));
+    const countResult = (await context.db
+      .select({ value: context.sql<number>`count(distinct ${context.games.id})::int` })
+      .from(context.games)
+      .where(context.finalWhereClause)) as Array<{ value: number }>;
 
-    if (currentUserId) {
-      const { userFollows, userBlocks, teamMembers } = await import("~/db/schema");
-      const userGames = (db as DbLike)
-        .select({ gameId: gameParticipants.gameId })
-        .from(gameParticipants)
-        .where(
-          and(
-            eq(gameParticipants.userId, currentUserId),
-            or(eq(gameParticipants.role, "player"), eq(gameParticipants.role, "invited")),
-          ),
-        );
+    const totalCount = countResult[0]?.value ?? 0;
 
-      visibilityConditionsForOr.push(
-        and(eq(games.visibility, "private"), sql`${games.id} IN ${userGames}`) as SqlExpr,
-      );
-      visibilityConditionsForOr.push(eq(games.ownerId, currentUserId));
-
-      const isConnectionOrTeammateSql = sql<boolean>`(
-        EXISTS (
-          SELECT 1 FROM ${userFollows} uf
-          WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${games.ownerId}
-        ) OR EXISTS (
-          SELECT 1 FROM ${userFollows} uf2
-          WHERE uf2.follower_id = ${games.ownerId} AND uf2.following_id = ${currentUserId}
-        ) OR EXISTS (
-          SELECT 1
-          FROM ${teamMembers} tm_self
-          INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
-          WHERE tm_self.user_id = ${currentUserId}
-            AND tm_self.status = 'active'
-            AND tm_target.user_id = ${games.ownerId}
-            AND tm_target.status = 'active'
-        )
-      )`;
-      const isBlockedSql = sql<boolean>`EXISTS (
-        SELECT 1 FROM ${userBlocks} ub
-        WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${games.ownerId})
-           OR (ub.blocker_id = ${games.ownerId} AND ub.blockee_id = ${currentUserId})
-      )`;
-      visibilityConditionsForOr.push(
-        and(
-          eq(games.visibility, "protected"),
-          sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})`,
-        ) as SqlExpr,
-      );
-    }
-
-    const visibilityConditionsForOrWithStatus = visibilityConditionsForOr.map(
-      (condition) =>
-        statusFilterCondition
-          ? (and(statusFilterCondition, condition) as SqlExpr)
-          : condition,
-    );
-
-    const finalWhereClause = and(
-      ...(otherBaseConditions.length > 0 ? otherBaseConditions : [sql`true`]),
-      or(...visibilityConditionsForOrWithStatus),
-    );
-
-    const offset = Math.max(0, (Math.max(1, page) - 1) * Math.max(1, pageSize));
-
-    // Fetch all matching rows, then compute count and slice to page
-    const allRows: GameQueryResultRow[] = await (db as DbLike)
-      .select<GameQueryResultRow>({
-        id: games.id,
-        ownerId: games.ownerId,
-        campaignId: games.campaignId,
-        gameSystemId: games.gameSystemId,
-        name: games.name,
-        dateTime: games.dateTime,
-        description: games.description,
-        expectedDuration: games.expectedDuration,
-        price: games.price,
-        language: games.language,
-        location: sql<z.infer<typeof locationSchema>>`${games.location}`,
-        status: games.status,
-        minimumRequirements: sql<
-          z.infer<typeof minimumRequirementsSchema>
-        >`${games.minimumRequirements}`,
-        visibility: games.visibility,
-        safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
-        createdAt: games.createdAt,
-        updatedAt: games.updatedAt,
-        owner: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-          uploadedAvatarPath: user.uploadedAvatarPath,
-          gmRating: user.gmRating,
-        },
-        gameSystemName: gameSystems.name,
-        gameSystemSlug: gameSystems.slug,
-        gameSystemAveragePlayTime: gameSystems.averagePlayTime,
-        gameSystemMinPlayers: gameSystems.minPlayers,
-        gameSystemMaxPlayers: gameSystems.maxPlayers,
-        systemHeroUrl: heroImage.secureUrl,
-        systemCategories: sql<
-          string[]
-        >`array_remove(array_agg(distinct ${category.name}), NULL)`,
-        participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
-      })
-      .from(games)
-      .innerJoin(user, eq(games.ownerId, user.id))
-      .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
-      .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
-      .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
-      .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
-      .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
-      .where(finalWhereClause)
-      .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
-      .orderBy(games.dateTime)
-      .then((rows) => rows as unknown as GameQueryResultRow[]);
-
-    const count = allRows.length;
-    const paged = allRows.slice(offset, offset + Math.max(1, pageSize));
     return {
       success: true,
-      data: { items: paged.map(mapGameRowToListItem), totalCount: count },
+      data: { items: rows.map(mapGameRowToListItem), totalCount },
     };
   } catch (error) {
     console.error("Error listing games with count:", error);
@@ -659,7 +560,7 @@ export const searchGames = createServerFn({ method: "POST" })
       const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
       const category = alias(gameSystemCategories, "category");
 
-      const result: GameQueryResultRow[] = await (db as DbLike)
+      const result: GameQueryResultRow[] = await (db as unknown as DbLike)
         .select<GameQueryResultRow>({
           id: games.id,
           ownerId: games.ownerId,
@@ -863,7 +764,7 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
         conditions.push(eq(games.status, data.status));
       }
 
-      const result: GameQueryResultRow[] = await (db as DbLike)
+      const result: GameQueryResultRow[] = await (db as unknown as DbLike)
         .select<GameQueryResultRow>({
           id: games.id,
           ownerId: games.ownerId,

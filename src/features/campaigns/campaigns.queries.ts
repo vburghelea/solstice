@@ -57,7 +57,45 @@ interface DbLike {
 type CampaignFilters = z.infer<typeof listCampaignsSchema>["filters"] | undefined;
 type SqlExpr = ReturnType<typeof and>;
 
-type CampaignQueryDependencies = Awaited<ReturnType<typeof getServerDeps>>;
+export type CampaignQueryDependencies = Awaited<ReturnType<typeof getServerDeps>>;
+
+async function loadCampaignDeps(): Promise<CampaignQueryDependencies> {
+  return getServerDeps();
+}
+
+function createRelationshipVisibilitySql(
+  deps: Pick<
+    CampaignQueryDependencies,
+    "sql" | "userFollows" | "userBlocks" | "teamMembers"
+  >,
+  currentUserId: string,
+  targetUserIdColumn: unknown,
+) {
+  const { sql, userFollows, userBlocks, teamMembers } = deps;
+  const isConnectionOrTeammateSql = sql<boolean>`(
+    EXISTS (
+      SELECT 1 FROM ${userFollows} uf
+      WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${targetUserIdColumn}
+    ) OR EXISTS (
+      SELECT 1 FROM ${userFollows} uf2
+      WHERE uf2.follower_id = ${targetUserIdColumn} AND uf2.following_id = ${currentUserId}
+    ) OR EXISTS (
+      SELECT 1
+      FROM ${teamMembers} tm_self
+      INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
+      WHERE tm_self.user_id = ${currentUserId}
+        AND tm_self.status = 'active'
+        AND tm_target.user_id = ${targetUserIdColumn}
+        AND tm_target.status = 'active'
+    )
+  )`;
+  const isBlockedSql = sql<boolean>`EXISTS (
+    SELECT 1 FROM ${userBlocks} ub
+    WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${targetUserIdColumn})
+       OR (ub.blocker_id = ${targetUserIdColumn} AND ub.blockee_id = ${currentUserId})
+  )`;
+  return { isConnectionOrTeammateSql, isBlockedSql };
+}
 
 function applyPagination<R>(
   chain: DbWhereChain<R>,
@@ -108,18 +146,7 @@ function buildCampaignWhereClause(
   currentUserId: string | null | undefined,
   filters: CampaignFilters,
 ): SqlExpr {
-  const {
-    and,
-    eq,
-    ilike,
-    or,
-    sql,
-    campaigns,
-    campaignParticipants,
-    userFollows,
-    userBlocks,
-    teamMembers,
-  } = deps;
+  const { and, eq, ilike, or, sql, campaigns, campaignParticipants } = deps;
 
   const baseConditions: SqlExpr[] = [];
   if (filters?.status) {
@@ -145,28 +172,11 @@ function buildCampaignWhereClause(
       and(eq(campaigns.visibility, "private"), sql`${campaigns.id} IN ${userCampaigns}`),
     );
 
-    const isConnectionOrTeammateSql = sql<boolean>`(
-      EXISTS (
-        SELECT 1 FROM ${userFollows} uf
-        WHERE uf.follower_id = ${currentUserId} AND uf.following_id = ${campaigns.ownerId}
-      ) OR EXISTS (
-        SELECT 1 FROM ${userFollows} uf2
-        WHERE uf2.follower_id = ${campaigns.ownerId} AND uf2.following_id = ${currentUserId}
-      ) OR EXISTS (
-        SELECT 1
-        FROM ${teamMembers} tm_self
-        INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
-        WHERE tm_self.user_id = ${currentUserId}
-          AND tm_self.status = 'active'
-          AND tm_target.user_id = ${campaigns.ownerId}
-          AND tm_target.status = 'active'
-      )
-    )`;
-    const isBlockedSql = sql<boolean>`EXISTS (
-      SELECT 1 FROM ${userBlocks} ub
-      WHERE (ub.blocker_id = ${currentUserId} AND ub.blockee_id = ${campaigns.ownerId})
-         OR (ub.blocker_id = ${campaigns.ownerId} AND ub.blockee_id = ${currentUserId})
-    )`;
+    const { isConnectionOrTeammateSql, isBlockedSql } = createRelationshipVisibilitySql(
+      deps,
+      currentUserId,
+      campaigns.ownerId,
+    );
     visibilityConditions.push(
       and(
         eq(campaigns.visibility, "protected"),
@@ -179,6 +189,16 @@ function buildCampaignWhereClause(
   const combinedConditions = baseConditions.length > 0 ? baseConditions : [sql`true`];
   combinedConditions.push(visibilityClause);
   return and(...combinedConditions);
+}
+
+async function resolveCampaignQueryContext(
+  db: unknown,
+  currentUserId: string | null | undefined,
+  filters: CampaignFilters,
+) {
+  const deps = await loadCampaignDeps();
+  const finalWhereClause = buildCampaignWhereClause(deps, db, currentUserId, filters);
+  return { deps, finalWhereClause };
 }
 
 function mapCampaignRowToListItem(row: CampaignQueryResultRow): CampaignListItem {
@@ -252,7 +272,7 @@ export const getCampaign = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignWithDetails | null>> => {
     try {
-      const { findCampaignById } = await getServerDeps();
+      const { findCampaignById } = await loadCampaignDeps();
       const campaign = await findCampaignById(data.id);
 
       if (!campaign) {
@@ -295,8 +315,11 @@ export async function listCampaignsImpl(
   filters: CampaignFilters,
 ): Promise<OperationResult<CampaignListItem[]>> {
   try {
-    const deps = await getServerDeps();
-    const finalWhereClause = buildCampaignWhereClause(deps, db, currentUserId, filters);
+    const { deps, finalWhereClause } = await resolveCampaignQueryContext(
+      db,
+      currentUserId,
+      filters,
+    );
 
     const rows = await fetchCampaignRows(db, deps, finalWhereClause);
 
@@ -313,20 +336,13 @@ export async function listCampaignsImpl(
   }
 }
 
-export const listCampaigns = createServerFn({ method: "POST" })
-  .validator(listCampaignsSchema.parse)
-  .handler(async ({ data = {} }): Promise<OperationResult<CampaignListItem[]>> => {
-    return listCampaignsInternal(data);
-  });
-
 export async function listCampaignsInternal(
   data:
     | { filters?: z.infer<typeof listCampaignsSchema>["filters"] | undefined }
     | undefined,
 ): Promise<OperationResult<CampaignListItem[]>> {
-  const { getDb, getCurrentUser } = await getServerDeps();
-  const db = await getDb();
-  const currentUser = await getCurrentUser();
+  const { getDb, getCurrentUser } = await loadCampaignDeps();
+  const [db, currentUser] = await Promise.all([getDb(), getCurrentUser()]);
   return listCampaignsImpl(db, currentUser?.id, data?.filters);
 }
 
@@ -338,8 +354,11 @@ export async function listCampaignsWithCountImpl(
   pageSize = 20,
 ): Promise<OperationResult<{ items: CampaignListItem[]; totalCount: number }>> {
   try {
-    const deps = await getServerDeps();
-    const finalWhereClause = buildCampaignWhereClause(deps, db, currentUserId, filters);
+    const { deps, finalWhereClause } = await resolveCampaignQueryContext(
+      db,
+      currentUserId,
+      filters,
+    );
 
     const safePage = Math.max(1, page);
     const safePageSize = Math.max(1, Math.min(100, pageSize));
@@ -378,9 +397,8 @@ export const listCampaignsWithCount = createServerFn({ method: "POST" })
     async ({
       data = {},
     }): Promise<OperationResult<{ items: CampaignListItem[]; totalCount: number }>> => {
-      const { getDb, getCurrentUser } = await getServerDeps();
-      const db = await getDb();
-      const currentUser = await getCurrentUser();
+      const { getDb, getCurrentUser } = await loadCampaignDeps();
+      const [db, currentUser] = await Promise.all([getDb(), getCurrentUser()]);
       const page = Math.max(1, data.page ?? 1);
       const pageSize = Math.min(100, Math.max(1, data.pageSize ?? 20));
       return listCampaignsWithCountImpl(
@@ -401,7 +419,7 @@ export const getCampaignApplications = createServerFn({ method: "POST" })
         getCurrentUser,
         findCampaignById,
         findPendingCampaignApplicationsByCampaignId,
-      } = await getServerDeps();
+      } = await loadCampaignDeps();
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         return {
@@ -440,7 +458,7 @@ export const getCampaignParticipants = createServerFn({ method: "POST" })
   .validator(getCampaignSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignParticipant[]>> => {
     try {
-      const { findCampaignParticipantsByCampaignId } = await getServerDeps();
+      const { findCampaignParticipantsByCampaignId } = await loadCampaignDeps();
       const participants = await findCampaignParticipantsByCampaignId(data.id);
       return { success: true, data: participants as CampaignParticipant[] };
     } catch (error) {
@@ -459,7 +477,7 @@ export const getCampaignApplicationForUser = createServerFn({ method: "POST" })
   .validator(getCampaignApplicationForUserInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<CampaignApplication | null>> => {
     try {
-      const { getDb, and, eq, campaignApplications } = await getServerDeps();
+      const { getDb, and, eq, campaignApplications } = await loadCampaignDeps();
       const db = await getDb();
       const application = await db.query.campaignApplications.findFirst({
         where: and(
@@ -491,70 +509,8 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       data,
     }): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> => {
       try {
-        const {
-          getDb,
-          user,
-          or,
-          ilike,
-          and,
-          ne,
-          sql,
-          userFollows,
-          userBlocks,
-          teamMembers,
-          getCurrentUser,
-        } = await getServerDeps();
-        const db = await getDb();
-        const currentUser = await getCurrentUser();
-        if (!currentUser?.id) {
-          return { success: true, data: [] };
-        }
-
-        const searchTerm = `%${data.query}%`;
-
-        const isConnectionOrTeammateSql = sql<boolean>`(
-          EXISTS (
-            SELECT 1 FROM ${userFollows} uf
-            WHERE uf.follower_id = ${currentUser.id} AND uf.following_id = ${user.id}
-          ) OR EXISTS (
-            SELECT 1 FROM ${userFollows} uf2
-            WHERE uf2.follower_id = ${user.id} AND uf2.following_id = ${currentUser.id}
-          ) OR EXISTS (
-            SELECT 1
-            FROM ${teamMembers} tm_self
-            INNER JOIN ${teamMembers} tm_target ON tm_self.team_id = tm_target.team_id
-            WHERE tm_self.user_id = ${currentUser.id}
-              AND tm_self.status = 'active'
-              AND tm_target.user_id = ${user.id}
-              AND tm_target.status = 'active'
-          )
-        )`;
-
-        const isBlockedSql = sql<boolean>`EXISTS (
-          SELECT 1 FROM ${userBlocks} ub
-          WHERE (ub.blocker_id = ${currentUser.id} AND ub.blockee_id = ${user.id})
-             OR (ub.blocker_id = ${user.id} AND ub.blockee_id = ${currentUser.id})
-        )`;
-
-        const users = await db
-          .select({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-          })
-          .from(user)
-          .where(
-            and(
-              ne(user.id, currentUser.id),
-              or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)),
-              sql`${isConnectionOrTeammateSql}`,
-              sql`NOT (${isBlockedSql})`,
-            ),
-          )
-          .orderBy(user.name)
-          .limit(10);
-
-        return { success: true, data: users };
+        const deps = await loadCampaignDeps();
+        return searchUsersForInvitationImpl(deps, data.query);
       } catch (error) {
         console.error("Error searching users for invitation:", error);
         return {
@@ -564,3 +520,74 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
       }
     },
   );
+
+type SearchInvitationDependencies = Pick<
+  CampaignQueryDependencies,
+  | "getDb"
+  | "getCurrentUser"
+  | "user"
+  | "or"
+  | "ilike"
+  | "and"
+  | "ne"
+  | "sql"
+  | "userFollows"
+  | "userBlocks"
+  | "teamMembers"
+>;
+
+export async function searchUsersForInvitationImpl(
+  deps: SearchInvitationDependencies,
+  query: string,
+): Promise<OperationResult<Array<{ id: string; name: string; email: string }>>> {
+  const {
+    getDb,
+    getCurrentUser,
+    user,
+    or,
+    ilike,
+    and,
+    ne,
+    sql,
+    userFollows,
+    userBlocks,
+    teamMembers,
+  } = deps;
+  const [db, currentUser] = await Promise.all([getDb(), getCurrentUser()]);
+  if (!currentUser?.id) {
+    return { success: true, data: [] };
+  }
+
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) {
+    return { success: true, data: [] };
+  }
+
+  const searchTerm = `%${trimmedQuery}%`;
+
+  const { isConnectionOrTeammateSql, isBlockedSql } = createRelationshipVisibilitySql(
+    { sql, userFollows, userBlocks, teamMembers },
+    currentUser.id,
+    user.id,
+  );
+
+  const users = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    })
+    .from(user)
+    .where(
+      and(
+        ne(user.id, currentUser.id),
+        or(ilike(user.name, searchTerm), ilike(user.email, searchTerm)),
+        sql`${isConnectionOrTeammateSql}`,
+        sql`NOT (${isBlockedSql})`,
+      ),
+    )
+    .orderBy(user.name)
+    .limit(10);
+
+  return { success: true, data: users };
+}

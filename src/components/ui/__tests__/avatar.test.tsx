@@ -57,4 +57,19 @@ describe("Avatar", () => {
     const link = screen.getByRole("link", { name: /link/i });
     expect(link).toHaveAttribute("href", "/profile/user-123");
   });
+
+  it("does not render a profile link when explicitly set to null", () => {
+    render(
+      <Avatar
+        name="Nolink"
+        email="nolink@example.com"
+        userId="user-123"
+        profileHref={null}
+        srcUploaded={null}
+        srcProvider={null}
+      />,
+    );
+
+    expect(screen.queryByRole("link", { name: /nolink/i })).not.toBeInTheDocument();
+  });
 });

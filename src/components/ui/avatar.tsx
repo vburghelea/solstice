@@ -105,7 +105,12 @@ export function Avatar(props: AvatarComponentProps) {
     </AvatarPrimitive.Root>
   );
 
-  const href = profileHref ?? (userId ? `/profile/${encodeURIComponent(userId)}` : null);
+  const href =
+    profileHref !== undefined
+      ? profileHref
+      : userId
+        ? `/profile/${encodeURIComponent(userId)}`
+        : null;
 
   if (!href) {
     return root;

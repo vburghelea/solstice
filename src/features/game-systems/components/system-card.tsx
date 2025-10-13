@@ -12,6 +12,7 @@ import {
 } from "~/components/ui/card";
 import type { GameSystemListItem } from "~/features/game-systems/game-systems.types";
 import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
+import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { cn } from "~/shared/lib/utils";
 
 interface SystemCardProps {
@@ -27,10 +28,10 @@ export function SystemCard({ system }: SystemCardProps) {
       <Link to="/systems/$slug" params={{ slug: system.slug }} className="block">
         <div className="relative aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-700">
           {system.heroUrl ? (
-            <img
-              src={system.heroUrl}
+            <CloudinaryImage
+              imageUrl={system.heroUrl}
+              transform={{ width: 960, height: 540 }}
               alt={heroAlt}
-              loading="lazy"
               className="h-full w-full object-cover"
             />
           ) : (

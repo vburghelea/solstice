@@ -296,7 +296,7 @@ export const uploadImageHandler = async ({
   const [{ getDb }, { mediaAssets }, cloudinary] = await Promise.all([
     import("~/db/server-helpers"),
     import("~/db/schema"),
-    import("./services/cloudinary"),
+    import("~/lib/storage/cloudinary"),
   ]);
   type MediaAsset = typeof mediaAssets.$inferSelect;
   const db = await getDb();

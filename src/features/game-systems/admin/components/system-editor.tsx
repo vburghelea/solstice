@@ -40,6 +40,7 @@ import {
   upsertCmsContent,
 } from "~/features/game-systems/game-systems.mutations";
 import type { GameSystemTag } from "~/features/game-systems/game-systems.types";
+import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import { getAdminGameSystem } from "../game-systems-admin.queries";
@@ -903,11 +904,11 @@ function MediaTab({
         <CardContent className="space-y-4">
           {hero ? (
             <div className="bg-muted/30 overflow-hidden rounded-lg border">
-              <img
-                src={hero.secureUrl}
+              <CloudinaryImage
+                imageUrl={hero.secureUrl}
+                transform={{ width: 1200, height: 600 }}
                 alt={`${system.name} hero artwork`}
                 className="h-64 w-full object-cover"
-                loading="lazy"
               />
             </div>
           ) : (

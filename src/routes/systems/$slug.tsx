@@ -23,6 +23,8 @@ import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
 import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { CloudinaryImage } from "~/shared/components/cloudinary-image";
+import { useCloudinaryImage } from "~/shared/hooks/useCloudinaryImage";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
 
 const detailSurfaceClass =
@@ -45,16 +47,20 @@ function SystemDetailPage() {
   const description = system.description ?? "We're compiling details for this system.";
   const taxonomyMissing = system.categories.length === 0 && system.mechanics.length === 0;
   const externalLinks = buildExternalLinks(system);
+  const heroBackground = useCloudinaryImage(system.heroUrl, {
+    width: 1920,
+    height: 1080,
+  });
 
   return (
     <PublicLayout className="max-w-none px-0">
       <div className="relative isolate overflow-hidden">
-        {system.heroUrl ? (
+        {heroBackground.src ? (
           <>
             <div
               className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-no-repeat"
               style={{
-                backgroundImage: `url('${system.heroUrl}')`,
+                backgroundImage: `url('${heroBackground.src}')`,
                 backgroundPosition: "center top",
                 backgroundSize: "cover",
               }}
@@ -163,10 +169,10 @@ function SystemDetailPage() {
                         key={asset.id}
                         className="bg-muted/40 overflow-hidden rounded-xl border"
                       >
-                        <img
-                          src={asset.secureUrl}
+                        <CloudinaryImage
+                          imageUrl={asset.secureUrl}
+                          transform={{ width: 900, height: 600 }}
                           alt={`${system.name} gallery asset ${asset.id}`}
-                          loading="lazy"
                           className="h-56 w-full object-cover"
                         />
                         {asset.license ? (

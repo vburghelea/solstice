@@ -551,9 +551,7 @@ async function ensureHeroImage(
     }
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const { computeChecksum, uploadImage } = await import(
-      "~/features/game-systems/services/cloudinary"
-    );
+    const { computeChecksum, uploadImage } = await import("~/lib/storage/cloudinary");
     const checksum = computeChecksum(buffer);
 
     const existingAsset = await database.query.mediaAssets.findFirst({

@@ -639,7 +639,7 @@ const getDb = serverOnly(async () => {
 });
 
 const getCloudinary = serverOnly(async () => {
-  const { uploadImage, computeChecksum } = await import("../services/cloudinary");
+  const { uploadImage, computeChecksum } = await import("~/lib/storage/cloudinary");
   return { uploadImage, computeChecksum };
 });
 

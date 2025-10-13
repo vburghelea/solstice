@@ -1258,7 +1258,7 @@ export const uploadEventImage = createServerFn({ method: "POST" })
       try {
         requireUser(context);
         const [{ uploadImage, computeChecksum }, { Buffer }] = await Promise.all([
-          import("~/features/game-systems/services/cloudinary"),
+          import("~/lib/storage/cloudinary"),
           import("node:buffer"),
         ]);
 

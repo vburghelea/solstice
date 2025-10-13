@@ -109,7 +109,7 @@ vi.mock("drizzle-orm", () => ({
   and: (...args: unknown[]) => ({ and: args }),
   sql: (strings: TemplateStringsArray, ...vals: unknown[]) => ({ sql: [strings, vals] }),
 }));
-vi.mock("../services/cloudinary", () => ({
+vi.mock("~/lib/storage/cloudinary", () => ({
   uploadImage: vi.fn(async () => ({
     publicId: "pid",
     secureUrl: "https://img",

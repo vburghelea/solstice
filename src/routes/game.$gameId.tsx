@@ -15,6 +15,7 @@ import { getGame } from "~/features/games/games.queries";
 import type { GameApplication, GameWithDetails } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { InfoItem } from "~/shared/components/info-item";
 import { SafeAddressLink } from "~/shared/components/safe-address-link";
 import { formatDateAndTime } from "~/shared/lib/datetime";
@@ -409,10 +410,10 @@ function VisitGameDetailPage() {
                       key={asset.id}
                       className="border-border/40 bg-muted/30 overflow-hidden rounded-2xl border transition-colors dark:border-gray-700 dark:bg-gray-900/60"
                     >
-                      <img
-                        src={asset.secureUrl}
+                      <CloudinaryImage
+                        imageUrl={asset.secureUrl}
+                        transform={{ width: 800, height: 400 }}
                         alt={`${systemDetails?.name ?? "Game system"} artwork`}
-                        loading="lazy"
                         className="h-48 w-full object-cover"
                       />
                       {asset.license ? (

@@ -43,6 +43,7 @@ type DbJoinChain<R> = {
 };
 type DbWhereChain<R> = {
   groupBy: (...cols: unknown[]) => Promise<R[]>;
+  execute?: () => Promise<R[]>;
 } & Partial<{
   limit: (value: number) => DbWhereChain<R>;
   offset: (value: number) => DbWhereChain<R>;
@@ -259,11 +260,29 @@ async function fetchCampaignCount(
   finalWhereClause: SqlExpr,
 ) {
   const { campaigns, sql } = deps;
-  const [{ totalCount } = { totalCount: 0 }] = await createCampaignSelection<{
-    totalCount: number;
-  }>(db, deps, finalWhereClause, {
-    totalCount: sql<number>`count(distinct ${campaigns.id})::int`,
-  }).groupBy(sql`1`);
+  const countSelection = (db as DbLike)
+    .select<{ totalCount: number }>({
+      totalCount: sql<number>`count(distinct ${campaigns.id})::int`,
+    })
+    .from(campaigns)
+    .where(finalWhereClause);
+
+  const countQuery = countSelection as
+    | { execute: () => Promise<{ totalCount: number }[]> }
+    | { groupBy: (...args: unknown[]) => Promise<{ totalCount: number }[]> }
+    | Promise<{ totalCount: number }[]>;
+
+  let countResult: { totalCount: number }[] | undefined;
+
+  if ("execute" in countQuery && typeof countQuery.execute === "function") {
+    countResult = await countQuery.execute();
+  } else if ("groupBy" in countQuery && typeof countQuery.groupBy === "function") {
+    countResult = await countQuery.groupBy();
+  } else {
+    countResult = await (countQuery as Promise<{ totalCount: number }[]>);
+  }
+
+  const [{ totalCount } = { totalCount: 0 }] = countResult ?? [{ totalCount: 0 }];
 
   return totalCount ?? 0;
 }

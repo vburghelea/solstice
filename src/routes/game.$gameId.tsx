@@ -16,8 +16,10 @@ import type { GameApplication, GameWithDetails } from "~/features/games/games.ty
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
+import { HeroBackgroundImage } from "~/shared/components/hero-background-image";
 import { InfoItem } from "~/shared/components/info-item";
 import { SafeAddressLink } from "~/shared/components/safe-address-link";
+import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import {
   buildPlayersRange,
@@ -160,10 +162,6 @@ function VisitGameDetailPage() {
     .filter(Boolean)
     .join(" • ");
 
-  const heroBackground =
-    systemDetails?.heroUrl ??
-    "radial-gradient(circle at top, rgba(146,102,204,0.55), rgba(19,18,30,0.95))";
-
   const systemSummary = systemDetails?.description ?? systemDetails?.summary ?? null;
   const systemLinks = systemDetails ? buildSystemExternalLinks(systemDetails) : [];
   const gallery = systemDetails?.gallery ?? [];
@@ -186,16 +184,26 @@ function VisitGameDetailPage() {
     },
   ] as const;
 
-  const heroStyle = heroBackground.startsWith("radial")
-    ? {
-        backgroundImage: heroBackground,
-      }
-    : {
-        backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.7), rgba(10,10,10,0.2)), url('${heroBackground}')`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      };
+  const heroBackgroundImage = systemDetails?.heroUrl
+    ? createResponsiveCloudinaryImage(systemDetails.heroUrl, {
+        transformation: {
+          width: 1600,
+          height: 900,
+          crop: "fill",
+          gravity: "auto",
+        },
+        widths: [640, 960, 1280, 1600],
+        sizes: "100vw",
+      })
+    : null;
+
+  const heroBackgroundOverlayClass = heroBackgroundImage
+    ? "bg-gradient-to-t from-black/85 via-black/50 to-black/20"
+    : "bg-[radial-gradient(circle_at_top,_rgba(146,102,204,0.55),_rgba(19,18,30,0.95))]";
+
+  const heroBackgroundAlt = systemDetails?.name
+    ? `${systemDetails.name} hero artwork`
+    : "";
 
   return (
     <PublicLayout>
@@ -203,11 +211,22 @@ function VisitGameDetailPage() {
         <section
           className={cn(
             "relative overflow-hidden rounded-[32px] border border-[color:color-mix(in_oklab,var(--primary-soft)_36%,transparent)]",
-            "bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.6),_rgba(17,17,17,0.95))]",
+            heroBackgroundImage
+              ? undefined
+              : "bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.6),_rgba(17,17,17,0.95))]",
           )}
-          style={heroStyle}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/20" />
+          {heroBackgroundImage ? (
+            <HeroBackgroundImage
+              image={heroBackgroundImage}
+              alt={heroBackgroundAlt}
+              loading="eager"
+            />
+          ) : null}
+          <div
+            aria-hidden
+            className={cn("absolute inset-0 -z-10", heroBackgroundOverlayClass)}
+          />
           <div className="relative z-10 flex min-h-[260px] flex-col justify-end gap-6 p-8 text-white sm:p-12">
             <div className="flex flex-wrap items-center gap-3">
               <Badge className="bg-white/15 text-xs font-semibold tracking-wide text-white uppercase">

@@ -59,7 +59,7 @@ function EventOperationsKitPage() {
         eyebrow="Event operations kit"
         title="Run seamless tabletop events, tournaments, and festivals"
         subtitle="Operational blueprints tested by the Roundup Games events team to help you deliver safe, memorable, and profitable gatherings."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Download the kit"
         ctaLink="#downloads"
         secondaryCta={{

@@ -56,7 +56,7 @@ function CommunityHostPathwayPage() {
         eyebrow="Community host pathway"
         title="Grow gatherings that feel like home"
         subtitle="Training for event leads, café teams, and volunteers who turn spaces into memorable tabletop destinations."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Apply for the next cohort"
         ctaLink="#apply"
         secondaryCta={{

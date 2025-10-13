@@ -44,7 +44,7 @@ function CommunityStarterToolkitPage() {
         eyebrow="Community starter toolkit"
         title="Launch your tabletop club with confidence"
         subtitle="Our toolkit distills the best practices from thriving Roundup Games chapters so you can build momentum in weeks, not months."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Access the toolkit"
         ctaLink="#download"
         secondaryCta={{

@@ -53,7 +53,7 @@ function GameMasterPathwayPage() {
         eyebrow="Game Master pathway"
         title="Level up your storytelling practice"
         subtitle="A structured curriculum blending narrative craft, safety leadership, and production skills so you can deliver unforgettable campaigns."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Enroll now"
         ctaLink="#enroll"
         secondaryCta={{

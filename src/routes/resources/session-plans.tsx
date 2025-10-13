@@ -59,7 +59,7 @@ function SessionPlansPage() {
         eyebrow="Session design library"
         title="Facilitator-tested sessions for every table"
         subtitle="Download ready-to-run adventures, rotation schedules, and debrief guides built by Roundup Games storytellers."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Browse collections"
         ctaLink="#collections"
         secondaryCta={{

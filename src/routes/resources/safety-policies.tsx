@@ -44,7 +44,7 @@ function SafetyPoliciesPage() {
         eyebrow="Safety & accessibility policies"
         title="Feel protected at every Roundup gathering"
         subtitle="We design policies with community members, safeguarding experts, and legal advisors so your stories flourish in safe spaces."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Download policies"
         ctaLink="#policy-downloads"
         secondaryCta={{

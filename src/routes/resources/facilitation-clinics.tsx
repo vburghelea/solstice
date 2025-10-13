@@ -59,7 +59,7 @@ function FacilitationClinicsPage() {
         eyebrow="Facilitation clinics"
         title="On-demand coaching for storytellers and hosts"
         subtitle="Watch master facilitators lead live sessions, then apply the same techniques at your tables with guided practice materials."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Stream the clinics"
         ctaLink="#clinic-library"
         secondaryCta={{

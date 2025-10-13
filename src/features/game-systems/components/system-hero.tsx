@@ -1,5 +1,5 @@
 import { HeroSection } from "~/components/ui/hero-section";
-import { useCloudinaryImage } from "~/shared/hooks/useCloudinaryImage";
+import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
 interface SystemHeroProps {
   name: string;
@@ -14,18 +14,26 @@ export function SystemHero({
   heroUrl,
   renderBackground = true,
 }: SystemHeroProps) {
-  const optimizedHero = useCloudinaryImage(heroUrl, {
-    width: 1600,
-    height: 900,
-  });
+  const heroBackground = heroUrl
+    ? createResponsiveCloudinaryImage(heroUrl, {
+        transformation: {
+          width: 1600,
+          height: 900,
+          crop: "fill",
+          gravity: "auto",
+        },
+        widths: [640, 960, 1280, 1600],
+        sizes: "100vw",
+      })
+    : null;
 
   return (
     <div className={renderBackground ? undefined : "pb-6"}>
       <HeroSection
         title={name}
         subtitle={subtitle}
-        {...(renderBackground && optimizedHero.src
-          ? { backgroundImage: optimizedHero.src }
+        {...(renderBackground && heroBackground
+          ? { backgroundImageSet: heroBackground }
           : {})}
         className={
           renderBackground
@@ -48,7 +56,7 @@ export function SystemHero({
             : "mt-3 max-w-xl px-0 text-sm text-white/80 sm:text-base"
         }
       />
-      {!optimizedHero.src && (
+      {!heroBackground && (
         <p className="text-muted-foreground mt-2 text-center text-sm">
           Image pending moderation
         </p>

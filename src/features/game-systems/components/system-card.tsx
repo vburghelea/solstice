@@ -30,9 +30,16 @@ export function SystemCard({ system }: SystemCardProps) {
           {system.heroUrl ? (
             <CloudinaryImage
               imageUrl={system.heroUrl}
-              transform={{ width: 960, height: 540 }}
+              transform={{
+                width: 960,
+                height: 540,
+                crop: "fill",
+                gravity: "auto",
+                widthVariants: [360, 480, 640, 768, 960],
+              }}
               alt={heroAlt}
               className="h-full w-full object-cover"
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm text-slate-200 dark:text-slate-100">

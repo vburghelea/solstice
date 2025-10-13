@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { MapPinIcon, Trophy, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
-import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
+import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
 const pathways = [
   {
@@ -44,11 +44,15 @@ const resources = [
   },
 ];
 
-const TEAMS_HERO_IMAGE = getCloudinaryAssetUrl("heroTeams", {
-  width: 1920,
-  height: 1080,
-  crop: "fill",
-  gravity: "auto",
+const TEAMS_HERO_IMAGE = createResponsiveCloudinaryImage("heroTeams", {
+  transformation: {
+    width: 1920,
+    height: 1080,
+    crop: "fill",
+    gravity: "auto",
+  },
+  widths: [480, 768, 1024, 1440, 1920],
+  sizes: "100vw",
 });
 
 export const Route = createFileRoute("/teams")({
@@ -62,7 +66,7 @@ function TeamsPage() {
         eyebrow="Teams & Clubs"
         title="Find your squad or build one from the ground up"
         subtitle="From coast-to-coast, tabletop communities are recruiting hosts, storytellers, rules gurus, and volunteers. Discover groups near you and access the resources to help your program thrive."
-        backgroundImage={TEAMS_HERO_IMAGE}
+        backgroundImageSet={TEAMS_HERO_IMAGE}
         ctaText="Browse club resources"
         ctaLink="/resources"
         secondaryCta={{

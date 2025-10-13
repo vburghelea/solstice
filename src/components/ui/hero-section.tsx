@@ -1,4 +1,6 @@
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { HeroBackgroundImage } from "~/shared/components/hero-background-image";
+import type { CloudinaryResponsiveImageSet } from "~/shared/lib/cloudinary-assets";
 import { cn } from "~/shared/lib/utils";
 import { Button } from "./button";
 
@@ -7,6 +9,9 @@ interface HeroSectionProps {
   title: string;
   subtitle: string;
   backgroundImage?: string;
+  backgroundImageSet?: CloudinaryResponsiveImageSet | null;
+  backgroundImageAlt?: string;
+  backgroundImageLoading?: "eager" | "lazy";
   ctaText?: string;
   ctaLink?: string;
   secondaryCta?: {
@@ -25,6 +30,9 @@ export function HeroSection({
   title,
   subtitle,
   backgroundImage,
+  backgroundImageSet,
+  backgroundImageAlt,
+  backgroundImageLoading,
   ctaText,
   ctaLink = "/",
   secondaryCta,
@@ -34,23 +42,40 @@ export function HeroSection({
   titleClassName,
   subtitleClassName,
 }: HeroSectionProps) {
-  const backgroundStyle = backgroundImage
-    ? {
-        backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), url('${backgroundImage}')`,
-      }
-    : undefined;
+  const hasResponsiveBackground = Boolean(backgroundImageSet);
+  const showOverlayTint = hasResponsiveBackground || Boolean(backgroundImage);
+  const backgroundStyle =
+    !hasResponsiveBackground && backgroundImage
+      ? {
+          backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2)), url('${backgroundImage}')`,
+        }
+      : undefined;
 
   return (
     <section
       className={cn(
-        "relative h-[50vh] min-h-[360px] bg-cover bg-center sm:h-[60vh]",
+        "relative h-[50vh] min-h-[360px] overflow-hidden bg-cover bg-center sm:h-[60vh]",
         className,
       )}
       style={backgroundStyle}
     >
+      {hasResponsiveBackground && backgroundImageSet ? (
+        <>
+          <HeroBackgroundImage
+            image={backgroundImageSet}
+            alt={backgroundImageAlt ?? null}
+            loading={backgroundImageLoading ?? "eager"}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-black/45 to-black/20"
+          />
+        </>
+      ) : null}
       <div
         className={cn(
-          "absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center text-white",
+          "absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white",
+          showOverlayTint ? "bg-black/40" : undefined,
           overlayClassName,
         )}
       >

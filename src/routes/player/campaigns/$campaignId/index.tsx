@@ -58,9 +58,11 @@ import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { getRelationshipSnapshot } from "~/features/social";
 import { useRateLimitedServerFn } from "~/lib/pacer";
+import { HeroBackgroundImage } from "~/shared/components/hero-background-image";
 import { InfoItem } from "~/shared/components/info-item";
 import { SafeAddressLink } from "~/shared/components/safe-address-link";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
+import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 import {
   buildPlayersRange,
   formatExpectedDuration,
@@ -386,14 +388,22 @@ function CampaignDetailsPage() {
     campaign.visibility === "protected"
       ? "Connections & teammates"
       : `${campaign.visibility} visibility`;
-  const heroStyle = systemDetails?.heroUrl
-    ? {
-        backgroundImage: `linear-gradient(to top, rgba(10,10,10,0.65), rgba(10,10,10,0.2)), url('${systemDetails.heroUrl}')`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }
-    : undefined;
+  const heroBackgroundImage = systemDetails?.heroUrl
+    ? createResponsiveCloudinaryImage(systemDetails.heroUrl, {
+        transformation: {
+          width: 1600,
+          height: 900,
+          crop: "fill",
+          gravity: "auto",
+        },
+        widths: [640, 960, 1280, 1600],
+        sizes: "100vw",
+      })
+    : null;
+
+  const heroBackgroundAlt = systemDetails?.name
+    ? `${systemDetails.name} hero artwork`
+    : "";
 
   const ownerActions: OwnerAction[] = [];
   if (isOwner && campaign.status === "active") {
@@ -447,14 +457,23 @@ function CampaignDetailsPage() {
         </div>
       ) : null}
 
-      <section
-        className="bg-background relative mt-6 min-h-[260px] overflow-hidden"
-        style={heroStyle}
-      >
-        {!systemDetails?.heroUrl ? (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.55),_rgba(17,17,17,0.95))]" />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/55 to-black/15" />
+      <section className="bg-background relative mt-6 min-h-[260px] overflow-hidden">
+        {heroBackgroundImage ? (
+          <HeroBackgroundImage
+            image={heroBackgroundImage}
+            alt={heroBackgroundAlt}
+            loading="eager"
+          />
+        ) : (
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top,_rgba(90,46,141,0.55),_rgba(17,17,17,0.95))]"
+          />
+        )}
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/55 to-black/15"
+        />
         <div className="relative z-10 flex h-full items-end pb-10">
           <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-6 text-white lg:flex-row lg:items-end lg:justify-between">

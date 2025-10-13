@@ -5,10 +5,15 @@ import { SystemHero } from "../system-hero";
 describe("SystemHero", () => {
   it("shows hero image when url provided", () => {
     const { container } = render(
-      <SystemHero name="Example" heroUrl="https://img" subtitle="Test" />,
+      <SystemHero
+        name="Example"
+        heroUrl="https://img"
+        renderBackground={true}
+        subtitle="Test"
+      />,
     );
-    const section = container.querySelector("section");
-    expect(section?.style.backgroundImage).toContain("https://img");
+    const img = container.querySelector("img");
+    expect(img?.src).toContain("https://img");
     expect(screen.queryByText("Image pending moderation")).not.toBeInTheDocument();
   });
 

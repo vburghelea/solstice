@@ -37,7 +37,7 @@ import { PublicLayout } from "~/features/layouts/public-layout";
 import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { useCountries } from "~/shared/hooks/useCountries";
-import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
+import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
 const EVENT_TYPE_OPTIONS: Array<{ value: EventType; label: string }> = [
   { value: "tournament", label: "Tournament" },
@@ -54,11 +54,15 @@ const EVENT_STATUS_OPTIONS: Array<{ value: EventStatus; label: string }> = [
   { value: "in_progress", label: "In Progress" },
 ];
 
-const EVENTS_HERO_IMAGE = getCloudinaryAssetUrl("heroTournament", {
-  width: 1920,
-  height: 1080,
-  crop: "fill",
-  gravity: "auto",
+const EVENTS_HERO_IMAGE = createResponsiveCloudinaryImage("heroTournament", {
+  transformation: {
+    width: 1920,
+    height: 1080,
+    crop: "fill",
+    gravity: "auto",
+  },
+  widths: [480, 768, 1024, 1440, 1920],
+  sizes: "100vw",
 });
 
 const REGISTRATION_TYPE_OPTIONS: Array<{
@@ -231,7 +235,7 @@ function EventsIndex() {
         eyebrow="Events"
         title="Tournaments, training camps, and community festivals"
         subtitle="Roundup Games sanctions competitions year-round so athletes at every level can compete, learn, and connect."
-        backgroundImage={EVENTS_HERO_IMAGE}
+        backgroundImageSet={EVENTS_HERO_IMAGE}
         ctaText="Register your team"
         ctaLink="/auth/signup"
         secondaryCta={{

@@ -59,7 +59,7 @@ function CharterTemplatePage() {
         eyebrow="Club charter template"
         title="Adaptable governance for tabletop communities"
         subtitle="Use our living charter to formalize expectations, celebrate your shared identity, and welcome newcomers with clarity."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="Copy the template"
         ctaLink="#charter-downloads"
         secondaryCta={{

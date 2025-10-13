@@ -92,7 +92,7 @@ function ReportConcernPage() {
         eyebrow="Report a concern"
         title="We're here to help—day or night"
         subtitle="Roundup Games takes every report seriously. Reach out so we can keep our community safe, supported, and informed."
-        backgroundImage={RESOURCES_HERO_IMAGE}
+        backgroundImageSet={RESOURCES_HERO_IMAGE}
         ctaText="View reporting steps"
         ctaLink="#reporting-steps"
         secondaryCta={{

@@ -31,7 +31,7 @@ import {
 import { listUserLocations } from "~/features/profile/profile.queries";
 import type { CountryLocationGroup } from "~/features/profile/profile.types";
 import type { AuthUser } from "~/lib/auth/types";
-import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
+import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
@@ -120,11 +120,15 @@ const TRUST_PROMISES = [
   },
 ];
 
-const VISITOR_HERO_IMAGE = getCloudinaryAssetUrl("heroTournamentCards", {
-  width: 1920,
-  height: 1080,
-  crop: "fill",
-  gravity: "auto",
+const VISITOR_HERO_IMAGE = createResponsiveCloudinaryImage("heroTournamentCards", {
+  transformation: {
+    width: 1920,
+    height: 1080,
+    crop: "fill",
+    gravity: "auto",
+  },
+  widths: [480, 768, 1024, 1440, 1920],
+  sizes: "100vw",
 });
 
 const SECTION_SURFACE =
@@ -259,7 +263,7 @@ function VisitorExperience() {
           eyebrow="Start planning"
           title="Discover tabletop adventures tailored to explorers"
           subtitle="Tour community gatherings, curate your favourite systems, and follow the storytellers who match your style."
-          backgroundImage={VISITOR_HERO_IMAGE}
+          backgroundImageSet={VISITOR_HERO_IMAGE}
           ctaText="Create your profile"
           ctaLink="/auth/signup"
           secondaryCta={{ text: "Log in to continue", link: "/auth/login" }}

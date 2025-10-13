@@ -281,6 +281,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     queryFn: async () => getNextPlayerGame(),
     initialData: () =>
       readStoredData<NextGameOperationResult>(STORAGE_KEYS.nextGame) ?? undefined,
+    initialDataUpdatedAt: () => 0,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
     enabled: isAuthenticated,

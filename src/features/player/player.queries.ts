@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, count, eq, gte, sql } from "drizzle-orm";
+import { and, count, eq, gte, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -138,6 +138,15 @@ export const getNextPlayerGame = createServerFn({ method: "GET" }).handler(
 
       const now = new Date();
 
+      const participantExists = sql<boolean>`exists (
+        select 1
+        from ${gameParticipants} gp_user
+        where gp_user.game_id = ${games.id}
+          and gp_user.user_id = ${currentUser.id}
+          and gp_user.status in ('approved', 'pending')
+          and gp_user.role in ('player', 'owner', 'invited')
+      )`;
+
       const rows = await db
         .select({
           id: games.id,
@@ -161,19 +170,24 @@ export const getNextPlayerGame = createServerFn({ method: "GET" }).handler(
           updatedAt: games.updatedAt,
           owner: { id: user.id, name: user.name, email: user.email },
           gameSystem: { id: gameSystems.id, name: gameSystems.name },
-          participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
+          participantCount: sql<number>`
+            count(
+              distinct case
+                when ${gameParticipants.status} = ${"approved"}
+                then ${gameParticipants.userId}
+              end
+            )::int
+          `,
         })
         .from(games)
         .innerJoin(user, eq(games.ownerId, user.id))
         .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
-        .innerJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+        .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
         .where(
           and(
             gte(games.dateTime, now),
             eq(games.status, "scheduled"),
-            eq(gameParticipants.userId, currentUser.id),
-            eq(gameParticipants.role, "player"),
-            eq(gameParticipants.status, "approved"),
+            or(eq(games.ownerId, currentUser.id), participantExists),
           ),
         )
         .groupBy(games.id, user.id, gameSystems.id)

@@ -20,4 +20,18 @@ describe("SystemHero", () => {
     expect(section?.style.backgroundImage).toBe("");
     expect(screen.getByText("Image pending moderation")).toBeInTheDocument();
   });
+
+  it("omits background image when renderBackground is false", () => {
+    const { container } = render(
+      <SystemHero
+        name="Example"
+        heroUrl="https://img"
+        subtitle="Test"
+        renderBackground={false}
+      />,
+    );
+    const section = container.querySelector("section");
+    expect(section?.style.backgroundImage).toBe("");
+    expect(screen.queryByText("Image pending moderation")).not.toBeInTheDocument();
+  });
 });

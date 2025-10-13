@@ -1,4 +1,5 @@
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { cn } from "~/shared/lib/utils";
 import { Button } from "./button";
 
 interface HeroSectionProps {
@@ -12,6 +13,11 @@ interface HeroSectionProps {
     text: string;
     link: string;
   };
+  className?: string | undefined;
+  overlayClassName?: string | undefined;
+  contentClassName?: string | undefined;
+  titleClassName?: string | undefined;
+  subtitleClassName?: string | undefined;
 }
 
 export function HeroSection({
@@ -22,6 +28,11 @@ export function HeroSection({
   ctaText,
   ctaLink = "/",
   secondaryCta,
+  className,
+  overlayClassName,
+  contentClassName,
+  titleClassName,
+  subtitleClassName,
 }: HeroSectionProps) {
   const backgroundStyle = backgroundImage
     ? {
@@ -31,20 +42,38 @@ export function HeroSection({
 
   return (
     <section
-      className="relative h-[50vh] min-h-[360px] bg-cover bg-center sm:h-[60vh]"
+      className={cn(
+        "relative h-[50vh] min-h-[360px] bg-cover bg-center sm:h-[60vh]",
+        className,
+      )}
       style={backgroundStyle}
     >
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+      <div
+        className={cn(
+          "absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center text-white",
+          overlayClassName,
+        )}
+      >
+        <div className={cn("container mx-auto px-4 sm:px-6 lg:px-10", contentClassName)}>
           {eyebrow && (
             <p className="text-brand-red/90 mx-auto mb-4 max-w-2xl text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
               {eyebrow}
             </p>
           )}
-          <h1 className="mx-auto max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-6xl">
+          <h1
+            className={cn(
+              "mx-auto max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-6xl",
+              titleClassName,
+            )}
+          >
             {title}
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl px-4 text-base text-gray-200 sm:px-0 sm:text-lg">
+          <p
+            className={cn(
+              "mx-auto mt-4 max-w-2xl px-4 text-base text-gray-200 sm:px-0 sm:text-lg",
+              subtitleClassName,
+            )}
+          >
             {subtitle}
           </p>
           {(ctaText || secondaryCta) && (

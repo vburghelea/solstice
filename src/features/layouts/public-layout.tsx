@@ -34,13 +34,11 @@ export function PublicLayout({ children, className }: PublicLayoutProps) {
   });
 
   if (isMarketingPath) {
-    const content = className ? (
-      <div className={cn(className)}>{children}</div>
-    ) : (
-      children
+    return (
+      <VisitorShell contentClassName={className ? cn(className) : undefined}>
+        {children}
+      </VisitorShell>
     );
-
-    return <VisitorShell>{content}</VisitorShell>;
   }
 
   return (

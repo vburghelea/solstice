@@ -25,9 +25,10 @@ const VISITOR_NAVIGATION: readonly VisitorNavItem[] = [
 
 interface VisitorShellProps {
   children: ReactNode;
+  contentClassName?: string | undefined;
 }
 
-export function VisitorShell({ children }: VisitorShellProps) {
+export function VisitorShell({ children, contentClassName }: VisitorShellProps) {
   const { location } = useRouterState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
@@ -189,7 +190,12 @@ export function VisitorShell({ children }: VisitorShellProps) {
       </header>
 
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8">
+        <div
+          className={cn(
+            "mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8 lg:max-w-7xl",
+            contentClassName,
+          )}
+        >
           {children}
         </div>
       </main>

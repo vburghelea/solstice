@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, ScrollText, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -58,7 +59,7 @@ function CharterTemplatePage() {
         eyebrow="Club charter template"
         title="Adaptable governance for tabletop communities"
         subtitle="Use our living charter to formalize expectations, celebrate your shared identity, and welcome newcomers with clarity."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Copy the template"
         ctaLink="#charter-downloads"
         secondaryCta={{

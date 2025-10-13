@@ -9,6 +9,7 @@ import {
   UsersIcon,
 } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -91,7 +92,7 @@ function ReportConcernPage() {
         eyebrow="Report a concern"
         title="We're here to help—day or night"
         subtitle="Roundup Games takes every report seriously. Reach out so we can keep our community safe, supported, and informed."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="View reporting steps"
         ctaLink="#reporting-steps"
         secondaryCta={{

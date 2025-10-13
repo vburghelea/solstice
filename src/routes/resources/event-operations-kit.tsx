@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, CreditCard, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -58,7 +59,7 @@ function EventOperationsKitPage() {
         eyebrow="Event operations kit"
         title="Run seamless tabletop events, tournaments, and festivals"
         subtitle="Operational blueprints tested by the Roundup Games events team to help you deliver safe, memorable, and profitable gatherings."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Download the kit"
         ctaLink="#downloads"
         secondaryCta={{

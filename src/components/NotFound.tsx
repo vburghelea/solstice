@@ -2,12 +2,23 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { ArrowLeftIcon, SearchIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
+
+const NOT_FOUND_BACKGROUND = getCloudinaryAssetUrl("heroNotFound", {
+  width: 1920,
+  height: 1080,
+  crop: "fill",
+  gravity: "auto",
+});
 
 export function NotFound() {
   return (
     <PublicLayout>
       <section className="bg-background relative overflow-hidden py-24 sm:py-28 lg:py-32">
-        <div className="pointer-events-none absolute inset-0 bg-[url('/images/hero-tabletop-board-game-404-optimized.png')] bg-cover bg-center opacity-10" />
+        <div
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10"
+          style={{ backgroundImage: `url('${NOT_FOUND_BACKGROUND}')` }}
+        />
         <div className="relative z-10 container mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-6 text-center sm:px-8 lg:px-12">
           <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
             404 — page not found

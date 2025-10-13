@@ -24,6 +24,34 @@ export function isCloudinaryUrl(url: string | null | undefined): url is string {
   }
 }
 
+const CLOUDINARY_TRANSFORM_PREFIXES = new Set([
+  "a",
+  "ac",
+  "af",
+  "ar",
+  "b",
+  "bo",
+  "c",
+  "dpr",
+  "e",
+  "eo",
+  "f",
+  "fl",
+  "g",
+  "h",
+  "l",
+  "o",
+  "p",
+  "q",
+  "r",
+  "t",
+  "u",
+  "w",
+  "x",
+  "y",
+  "z",
+]);
+
 function buildTransformationSegment(options: CloudinaryTransformOptions): string | null {
   const transforms: string[] = [];
   if (options.format) {
@@ -58,6 +86,17 @@ function buildTransformationSegment(options: CloudinaryTransformOptions): string
   return transforms.length ? transforms.join(",") : null;
 }
 
+function isTransformationSegment(segment: string | undefined): boolean {
+  if (!segment) {
+    return false;
+  }
+
+  return segment.split(",").every((part) => {
+    const [prefix] = part.split("_", 1);
+    return prefix !== undefined && CLOUDINARY_TRANSFORM_PREFIXES.has(prefix);
+  });
+}
+
 export function buildCloudinaryUrl(
   url: string,
   options: CloudinaryTransformOptions = {},
@@ -85,7 +124,7 @@ export function buildCloudinaryUrl(
   }
 
   const existingSegment = segments[uploadIndex + 1];
-  if (existingSegment && existingSegment.length > 0 && existingSegment[0] !== "v") {
+  if (isTransformationSegment(existingSegment)) {
     segments[uploadIndex + 1] = `${transformation},${existingSegment}`;
   } else {
     segments.splice(uploadIndex + 1, 0, transformation);

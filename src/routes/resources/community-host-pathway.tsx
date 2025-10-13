@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -55,7 +56,7 @@ function CommunityHostPathwayPage() {
         eyebrow="Community host pathway"
         title="Grow gatherings that feel like home"
         subtitle="Training for event leads, café teams, and volunteers who turn spaces into memorable tabletop destinations."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Apply for the next cohort"
         ctaLink="#apply"
         secondaryCta={{

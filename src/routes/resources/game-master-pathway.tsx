@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, Trophy } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -52,7 +53,7 @@ function GameMasterPathwayPage() {
         eyebrow="Game Master pathway"
         title="Level up your storytelling practice"
         subtitle="A structured curriculum blending narrative craft, safety leadership, and production skills so you can deliver unforgettable campaigns."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Enroll now"
         ctaLink="#enroll"
         secondaryCta={{

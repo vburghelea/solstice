@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, CreditCard, ScrollText, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const readinessBlocks = [
   {
@@ -43,7 +44,7 @@ function CommunityStarterToolkitPage() {
         eyebrow="Community starter toolkit"
         title="Launch your tabletop club with confidence"
         subtitle="Our toolkit distills the best practices from thriving Roundup Games chapters so you can build momentum in weeks, not months."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Access the toolkit"
         ctaLink="#download"
         secondaryCta={{

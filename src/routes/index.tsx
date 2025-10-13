@@ -31,6 +31,7 @@ import {
 import { listUserLocations } from "~/features/profile/profile.queries";
 import type { CountryLocationGroup } from "~/features/profile/profile.types";
 import type { AuthUser } from "~/lib/auth/types";
+import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
@@ -118,6 +119,13 @@ const TRUST_PROMISES = [
       "Each venue callout includes mobility notes, transit tips, and community vibes, helping visitors picture the experience.",
   },
 ];
+
+const VISITOR_HERO_IMAGE = getCloudinaryAssetUrl("heroTournamentCards", {
+  width: 1920,
+  height: 1080,
+  crop: "fill",
+  gravity: "auto",
+});
 
 const SECTION_SURFACE =
   "rounded-3xl bg-secondary shadow-sm ring-1 ring-inset ring-[color:color-mix(in_oklab,var(--primary-soft)_18%,transparent)] dark:bg-card/70 dark:ring-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)]";
@@ -251,7 +259,7 @@ function VisitorExperience() {
           eyebrow="Start planning"
           title="Discover tabletop adventures tailored to explorers"
           subtitle="Tour community gatherings, curate your favourite systems, and follow the storytellers who match your style."
-          backgroundImage="/images/hero-tabletop-board-game-tournament-cards-optimized.png"
+          backgroundImage={VISITOR_HERO_IMAGE}
           ctaText="Create your profile"
           ctaLink="/auth/signup"
           secondaryCta={{ text: "Log in to continue", link: "/auth/login" }}

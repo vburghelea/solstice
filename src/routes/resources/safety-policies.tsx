@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, Info, PenSquareIcon, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -43,7 +44,7 @@ function SafetyPoliciesPage() {
         eyebrow="Safety & accessibility policies"
         title="Feel protected at every Roundup gathering"
         subtitle="We design policies with community members, safeguarding experts, and legal advisors so your stories flourish in safe spaces."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Download policies"
         ctaLink="#policy-downloads"
         secondaryCta={{

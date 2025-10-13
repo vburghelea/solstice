@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, ScrollText, Swords } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -58,7 +59,7 @@ function SessionPlansPage() {
         eyebrow="Session design library"
         title="Facilitator-tested sessions for every table"
         subtitle="Download ready-to-run adventures, rotation schedules, and debrief guides built by Roundup Games storytellers."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Browse collections"
         ctaLink="#collections"
         secondaryCta={{

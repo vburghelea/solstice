@@ -3,8 +3,10 @@ import { Badge } from "~/components/ui/badge";
 import { CalendarIcon, MapPinIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { EventWithDetails } from "~/features/events/events.types";
+import { CloudinaryImage } from "~/shared/components/cloudinary-image";
+import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
 
-const FALLBACK_IMAGE = "/images/hero-tabletop-board-game-tournament-cards-optimized.png";
+const FALLBACK_IMAGE_ID = "heroTournamentCards";
 
 interface EventCardProps {
   event?: EventWithDetails;
@@ -27,7 +29,18 @@ export function EventCard({
     return <EventCardSkeleton />;
   }
 
-  const coverImage = event?.bannerUrl || image || FALLBACK_IMAGE;
+  const isFallbackImage = !event?.bannerUrl && !image;
+  const coverImage = isFallbackImage
+    ? getCloudinaryAssetUrl(FALLBACK_IMAGE_ID, {
+        width: 960,
+        height: 720,
+        crop: "fill",
+        gravity: "auto",
+      })
+    : event?.bannerUrl || image || null;
+  const imageTransform = isFallbackImage
+    ? undefined
+    : { width: 960, height: 720, crop: "fill" as const, gravity: "auto" as const };
   const eventTitle = event?.name || title || "Upcoming Roundup Games Event";
   const eventDescription =
     event?.shortDescription ||
@@ -55,11 +68,12 @@ export function EventCard({
     <Link to={to} className="group block h-full">
       <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 shadow-sm transition-all duration-300 hover:border-[color:color-mix(in_oklab,var(--primary-soft)_52%,transparent)] hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
-          <img
+          <CloudinaryImage
             alt={eventTitle}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            src={coverImage}
+            imageUrl={coverImage}
             loading="lazy"
+            {...(imageTransform ? { transform: imageTransform } : {})}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
           {event?.isFeatured ? (

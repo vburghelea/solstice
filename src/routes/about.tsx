@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, ScrollText, Swords, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -74,6 +75,13 @@ const feedbackTopics = [
   },
 ];
 
+const ABOUT_HERO_IMAGE = getCloudinaryAssetUrl("heroAbout", {
+  width: 1920,
+  height: 1080,
+  crop: "fill",
+  gravity: "auto",
+});
+
 export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
@@ -85,7 +93,7 @@ function AboutPage() {
         eyebrow="About Roundup Games"
         title="A platform for local-first gatherings around tabletop and board games."
         subtitle="We exist to make it easier for every visitor to step into a lively room, roll some dice, and leave knowing more people who care about their stories."
-        backgroundImage="/images/hero-tabletop-board-game-about-optimized.png"
+        backgroundImage={ABOUT_HERO_IMAGE}
         ctaText="Explore our programs"
         ctaLink="/resources"
         secondaryCta={{

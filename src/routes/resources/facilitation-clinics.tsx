@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";
@@ -58,7 +59,7 @@ function FacilitationClinicsPage() {
         eyebrow="Facilitation clinics"
         title="On-demand coaching for storytellers and hosts"
         subtitle="Watch master facilitators lead live sessions, then apply the same techniques at your tables with guided practice materials."
-        backgroundImage="/images/hero-tabletop-board-game-resources-optimized.png"
+        backgroundImage={RESOURCES_HERO_IMAGE}
         ctaText="Stream the clinics"
         ctaLink="#clinic-library"
         secondaryCta={{

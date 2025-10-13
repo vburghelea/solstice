@@ -120,6 +120,7 @@ import { ServerRoute as ApiSocialRelationshipServerRouteImport } from "./routes/
 import { ServerRoute as ApiSocialFollowServerRouteImport } from "./routes/api/social/follow";
 import { ServerRoute as ApiSocialBlocklistServerRouteImport } from "./routes/api/social/blocklist";
 import { ServerRoute as ApiSocialBlockServerRouteImport } from "./routes/api/social/block";
+import { ServerRoute as ApiC15tSplatServerRouteImport } from "./routes/api/c15t/$";
 import { ServerRoute as ApiAvatarsFileServerRouteImport } from "./routes/api/avatars/$file";
 import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
 import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
@@ -682,6 +683,11 @@ const ApiSocialBlocklistServerRoute =
 const ApiSocialBlockServerRoute = ApiSocialBlockServerRouteImport.update({
   id: "/api/social/block",
   path: "/api/social/block",
+  getParentRoute: () => rootServerRouteImport,
+} as any);
+const ApiC15tSplatServerRoute = ApiC15tSplatServerRouteImport.update({
+  id: "/api/c15t/$",
+  path: "/api/c15t/$",
   getParentRoute: () => rootServerRouteImport,
 } as any);
 const ApiAvatarsFileServerRoute = ApiAvatarsFileServerRouteImport.update({
@@ -1300,6 +1306,7 @@ export interface FileServerRoutesByFullPath {
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+  "/api/c15t/$": typeof ApiC15tSplatServerRoute;
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1317,6 +1324,7 @@ export interface FileServerRoutesByTo {
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+  "/api/c15t/$": typeof ApiC15tSplatServerRoute;
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1335,6 +1343,7 @@ export interface FileServerRoutesById {
   "/api/test-square": typeof ApiTestSquareServerRoute;
   "/api/auth/$": typeof ApiAuthSplatServerRoute;
   "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
+  "/api/c15t/$": typeof ApiC15tSplatServerRoute;
   "/api/social/block": typeof ApiSocialBlockServerRoute;
   "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
   "/api/social/follow": typeof ApiSocialFollowServerRoute;
@@ -1354,6 +1363,7 @@ export interface FileServerRouteTypes {
     | "/api/test-square"
     | "/api/auth/$"
     | "/api/avatars/$file"
+    | "/api/c15t/$"
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1371,6 +1381,7 @@ export interface FileServerRouteTypes {
     | "/api/test-square"
     | "/api/auth/$"
     | "/api/avatars/$file"
+    | "/api/c15t/$"
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1388,6 +1399,7 @@ export interface FileServerRouteTypes {
     | "/api/test-square"
     | "/api/auth/$"
     | "/api/avatars/$file"
+    | "/api/c15t/$"
     | "/api/social/block"
     | "/api/social/blocklist"
     | "/api/social/follow"
@@ -1406,6 +1418,7 @@ export interface RootServerRouteChildren {
   ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
   ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
+  ApiC15tSplatServerRoute: typeof ApiC15tSplatServerRoute;
   ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
   ApiSocialBlocklistServerRoute: typeof ApiSocialBlocklistServerRoute;
   ApiSocialFollowServerRoute: typeof ApiSocialFollowServerRoute;
@@ -2187,6 +2200,13 @@ declare module "@tanstack/react-start/server" {
       preLoaderRoute: typeof ApiSocialBlockServerRouteImport;
       parentRoute: typeof rootServerRouteImport;
     };
+    "/api/c15t/$": {
+      id: "/api/c15t/$";
+      path: "/api/c15t/$";
+      fullPath: "/api/c15t/$";
+      preLoaderRoute: typeof ApiC15tSplatServerRouteImport;
+      parentRoute: typeof rootServerRouteImport;
+    };
     "/api/avatars/$file": {
       id: "/api/avatars/$file";
       path: "/api/avatars/$file";
@@ -2615,6 +2635,7 @@ const rootServerRouteChildren: RootServerRouteChildren = {
   ApiTestSquareServerRoute: ApiTestSquareServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
   ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
+  ApiC15tSplatServerRoute: ApiC15tSplatServerRoute,
   ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,
   ApiSocialBlocklistServerRoute: ApiSocialBlocklistServerRoute,
   ApiSocialFollowServerRoute: ApiSocialFollowServerRoute,

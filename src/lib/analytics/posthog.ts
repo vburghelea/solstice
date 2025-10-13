@@ -1,4 +1,5 @@
 import type { PostHog } from "posthog-js";
+import { hasMeasurementConsent } from "~/features/consent/state";
 import { env } from "~/lib/env.client";
 import { getCspNonce } from "~/shared/lib/csp";
 
@@ -61,11 +62,17 @@ export function initializePostHogClient(): void {
             autocapture: true,
             // Persist to both localStorage and cookies for robustness
             persistence: "localStorage+cookie",
+            cookieless_mode: "on_reject",
             // Avoid invalid cookie domain warnings by scoping to the current host
             ...(cookieDomain ? { cookie_domain: cookieDomain } : {}),
             // Add additional configuration to prevent SSR issues
             loaded: () => {
               postHogInitialized = true;
+              try {
+                posthog.default.has_opted_out_capturing();
+              } catch (error) {
+                console.error("PostHog: failed to check opt-out status", error);
+              }
 
               // Register global error handlers to capture uncaught exceptions
               try {
@@ -222,7 +229,7 @@ export async function captureEvent(
 
   try {
     const posthog = await getPostHogInstance();
-    if (posthog) {
+    if (posthog && hasMeasurementConsent()) {
       posthog.capture(event, properties);
     }
   } catch (error) {

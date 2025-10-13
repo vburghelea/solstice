@@ -1,3 +1,4 @@
+import { useConsentManager } from "@c15t/react";
 import { useRouter } from "@tanstack/react-router";
 import { ReactNode, useEffect } from "react";
 import {
@@ -16,6 +17,8 @@ export const PostHogProvider = ({
   user: AuthUser | null; // Allow null user
 }) => {
   const router = useRouter();
+  const { consents } = useConsentManager();
+  const measurementAllowed = Boolean(consents.measurement);
 
   // Initialize PostHog client when provider mounts
   useEffect(() => {
@@ -30,7 +33,7 @@ export const PostHogProvider = ({
 
   // Handle user identification
   useEffect(() => {
-    if (typeof window === "undefined" || !isAnalyticsEnabled()) {
+    if (typeof window === "undefined" || !isAnalyticsEnabled() || !measurementAllowed) {
       return;
     }
 
@@ -69,11 +72,42 @@ export const PostHogProvider = ({
       .catch((error) => {
         console.error("Failed to load PostHog client for user identification:", error);
       });
-  }, [user]);
+  }, [user, measurementAllowed]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !isAnalyticsEnabled()) {
+      return;
+    }
+
+    getPostHogInstance()
+      .then((posthog) => {
+        if (!posthog) {
+          return;
+        }
+
+        if (measurementAllowed) {
+          try {
+            posthog.opt_in_capturing();
+          } catch (error) {
+            console.error("Failed to opt into PostHog capturing:", error);
+          }
+        } else {
+          try {
+            posthog.opt_out_capturing();
+            posthog.reset();
+          } catch (error) {
+            console.error("Failed to opt out of PostHog capturing:", error);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to update PostHog consent state:", error);
+      });
+  }, [measurementAllowed]);
 
   // Handle pageview tracking
   useEffect(() => {
-    if (typeof window === "undefined" || !isAnalyticsEnabled()) {
+    if (typeof window === "undefined" || !isAnalyticsEnabled() || !measurementAllowed) {
       return;
     }
 
@@ -90,6 +124,6 @@ export const PostHogProvider = ({
     });
 
     return unsubscribe;
-  }, [router]);
+  }, [router, measurementAllowed]);
   return <>{children}</>;
 };

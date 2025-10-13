@@ -1,5 +1,6 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { CookiePreferencesTrigger } from "~/features/consent";
 
 export function PublicFooter() {
   return (
@@ -74,6 +75,9 @@ export function PublicFooter() {
         </div>
         <div className="mt-8 border-t border-gray-700 pt-6 text-center text-xs text-gray-400 sm:mt-12 sm:pt-8 sm:text-sm">
           <p>© 2025 Roundup Games. All Rights Reserved.</p>
+          <div className="mt-3">
+            <CookiePreferencesTrigger className="text-xs sm:text-sm" />
+          </div>
         </div>
       </div>
     </footer>

@@ -9,10 +9,9 @@ import {
 } from "@tanstack/react-router";
 
 import { lazy, Suspense } from "react";
-import { PostHogProvider } from "~/app/posthog-provider";
 import { getCurrentUser } from "~/features/auth/auth.queries";
+import { ConsentProvider } from "~/features/consent";
 import type { AuthUser } from "~/lib/auth/types";
-import { ThemeProvider } from "~/shared/hooks/useTheme";
 import appCss from "~/styles.css?url";
 
 // Lazy load devtools to avoid hydration issues
@@ -80,11 +79,9 @@ function RootComponent() {
   const { user } = Route.useRouteContext();
   return (
     <RootDocument>
-      <PostHogProvider user={user}>
-        <ThemeProvider>
-          <Outlet />
-        </ThemeProvider>
-      </PostHogProvider>
+      <ConsentProvider user={user}>
+        <Outlet />
+      </ConsentProvider>
     </RootDocument>
   );
 }

@@ -31,6 +31,8 @@ export const env = createEnv({
     DATABASE_UNPOOLED_URL: z.string().url().optional(),
     NETLIFY_DATABASE_URL: z.string().url().optional(),
     NETLIFY_DATABASE_URL_UNPOOLED: z.string().url().optional(),
+    C15T_DATABASE_URL: z.string().url().optional(),
+    C15T_TRUSTED_ORIGINS: z.string().optional(),
 
     // Auth
     BETTER_AUTH_SECRET: z
@@ -113,6 +115,16 @@ export const getUnpooledDbUrl = () =>
   env.NETLIFY_DATABASE_URL_UNPOOLED ||
   env.DATABASE_URL;
 
+export const getConsentDbUrl = () => {
+  if (!env.C15T_DATABASE_URL) {
+    throw new Error(
+      "C15T_DATABASE_URL must be configured to use the consent management backend.",
+    );
+  }
+
+  return env.C15T_DATABASE_URL;
+};
+
 export const getBaseUrl = () => {
   const explicit = env.VITE_BASE_URL;
   const netlifyUrl = env.URL || env.SITE_URL || env.DEPLOY_PRIME_URL || env.DEPLOY_URL;
@@ -132,6 +144,26 @@ export const getBaseUrl = () => {
   }
 
   return candidate;
+};
+
+export const getConsentTrustedOrigins = () => {
+  const raw = env.C15T_TRUSTED_ORIGINS;
+  if (raw) {
+    return raw
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter((origin) => origin.length > 0);
+  }
+
+  const base = getBaseUrl();
+  const defaults = new Set([
+    base,
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:8888",
+  ]);
+
+  return Array.from(defaults);
 };
 export const getAuthSecret = () => env.BETTER_AUTH_SECRET;
 

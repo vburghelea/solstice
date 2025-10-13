@@ -20,7 +20,6 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 import { visibilityEnum } from "~/db/schema/shared.schema";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
-import type { getGameSystem } from "~/features/games/games.queries";
 import {
   createGameInputSchema,
   updateGameInputSchema,
@@ -33,6 +32,14 @@ import {
   xCardSystemEnum,
 } from "~/shared/schemas/common";
 import { FormSection } from "~/shared/ui/form-section";
+
+type GameSystemSummary = {
+  id: number;
+  name: string;
+  averagePlayTime: number | null;
+  minPlayers: number | null;
+  maxPlayers: number | null;
+};
 
 interface GameFormProps {
   initialValues?: Partial<z.infer<typeof updateGameInputSchema>>;
@@ -102,7 +109,7 @@ export function GameForm({
   } = useGameSystemSearch({ enabled: !isCampaignGame });
 
   // State to store the selected game system details
-  const [selectedGameSystem, setSelectedGameSystem] = useState<{
+  const [userSelectedGameSystem, setUserSelectedGameSystem] = useState<{
     id: number;
     name: string;
     averagePlayTime: number | null;
@@ -110,41 +117,88 @@ export function GameForm({
     maxPlayers: number | null;
   } | null>(null);
 
-  // When creating within a campaign, fetch the game system details by ID to ensure
-  // the name and defaults are available immediately without requiring reload
-  const { data: campaignGameSystemData } = useQuery<
-    Awaited<ReturnType<typeof getGameSystem>>
-  >({
-    queryKey: ["gameSystemById", defaults.gameSystemId],
+  const initialExpectedDuration = initialValues?.expectedDuration ?? null;
+  const initialMinPlayers = initialValues?.minimumRequirements?.minPlayers ?? null;
+  const initialMaxPlayers = initialValues?.minimumRequirements?.maxPlayers ?? null;
+  const trimmedCampaignSystemName = gameSystemName?.trim() ?? "";
+  const shouldPrefetchCampaignSystem = Boolean(
+    isCampaignGame &&
+      defaults.gameSystemId &&
+      trimmedCampaignSystemName.length >= 3 &&
+      (initialExpectedDuration == null ||
+        initialMinPlayers == null ||
+        initialMaxPlayers == null),
+  );
+
+  const fallbackCampaignGameSystem = React.useMemo(() => {
+    if (
+      !isCampaignGame ||
+      !defaults.gameSystemId ||
+      !gameSystemName ||
+      trimmedCampaignSystemName.length < 1
+    ) {
+      return null;
+    }
+
+    return {
+      id: defaults.gameSystemId,
+      name: gameSystemName,
+      averagePlayTime: initialExpectedDuration,
+      minPlayers: initialMinPlayers,
+      maxPlayers: initialMaxPlayers,
+    } satisfies GameSystemSummary;
+  }, [
+    defaults.gameSystemId,
+    gameSystemName,
+    initialExpectedDuration,
+    initialMaxPlayers,
+    initialMinPlayers,
+    isCampaignGame,
+    trimmedCampaignSystemName,
+  ]);
+
+  const { data: campaignGameSystemData } = useQuery<GameSystemSummary | null>({
+    queryKey: ["gameSystemById", defaults.gameSystemId, trimmedCampaignSystemName],
     queryFn: async () => {
-      const { getGameSystem } = await import("~/features/games/games.queries");
-      return getGameSystem({ data: { id: defaults.gameSystemId! } });
+      if (!defaults.gameSystemId) {
+        return null;
+      }
+
+      const { searchGameSystems } = await import("~/features/games/games.queries");
+      const response = await searchGameSystems({
+        data: { query: trimmedCampaignSystemName },
+      });
+
+      if (!response.success) {
+        throw new Error(response.errors?.[0]?.message ?? "Failed to fetch game system");
+      }
+
+      return response.data.find((system) => system.id === defaults.gameSystemId) ?? null;
     },
-    enabled: !!isCampaignGame && !!defaults.gameSystemId,
+    enabled: shouldPrefetchCampaignSystem,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   // Derive effective game system (campaign-provided or user selection)
   const effectiveGameSystem = React.useMemo(() => {
-    if (
-      isCampaignGame &&
-      campaignGameSystemData?.success &&
-      campaignGameSystemData.data
-    ) {
-      const gs = campaignGameSystemData.data;
-      return {
-        id: gs["id"],
-        name: gs["name"],
-        averagePlayTime: gs["averagePlayTime"],
-        minPlayers: gs["minPlayers"],
-        maxPlayers: gs["maxPlayers"],
-      } as typeof selectedGameSystem;
-    }
-    return selectedGameSystem;
-  }, [isCampaignGame, campaignGameSystemData, selectedGameSystem]);
+    if (isCampaignGame) {
+      if (campaignGameSystemData) {
+        return campaignGameSystemData;
+      }
 
-  const initialExpectedDuration = initialValues?.expectedDuration ?? null;
-  const initialMinPlayers = initialValues?.minimumRequirements?.minPlayers ?? null;
-  const initialMaxPlayers = initialValues?.minimumRequirements?.maxPlayers ?? null;
+      if (fallbackCampaignGameSystem) {
+        return fallbackCampaignGameSystem;
+      }
+    }
+
+    return userSelectedGameSystem;
+  }, [
+    campaignGameSystemData,
+    fallbackCampaignGameSystem,
+    isCampaignGame,
+    userSelectedGameSystem,
+  ]);
 
   const gameSystemOptions =
     isCampaignGame && initialValues?.gameSystemId && gameSystemName
@@ -350,7 +404,7 @@ export function GameForm({
                       ? null
                       : (gameSystemResults.find((system) => system.id === parsedValue) ??
                         null);
-                    setSelectedGameSystem(selected);
+                    setUserSelectedGameSystem(selected);
                   }}
                   onSearchChange={setGameSystemSearchTerm}
                   isLoading={isLoadingGameSystems}
@@ -658,7 +712,7 @@ export function GameForm({
                   id={field.name}
                   name={field.name}
                   type="number"
-                  value={field.state.value ?? selectedGameSystem?.minPlayers ?? 1}
+                  value={field.state.value ?? effectiveGameSystem?.minPlayers ?? 1}
                   onBlur={field.handleBlur}
                   onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     field.handleChange(
@@ -706,7 +760,7 @@ export function GameForm({
                   id={field.name}
                   name={field.name}
                   type="number"
-                  value={field.state.value ?? selectedGameSystem?.maxPlayers ?? 1}
+                  value={field.state.value ?? effectiveGameSystem?.maxPlayers ?? 1}
                   onBlur={field.handleBlur}
                   onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     field.handleChange(

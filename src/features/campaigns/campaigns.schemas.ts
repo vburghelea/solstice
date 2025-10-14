@@ -105,6 +105,7 @@ export const listCampaignsSchema = z
         visibility: z.enum(visibilityEnum.enumValues).optional(), // Changed to visibilityEnum
         ownerId: z.string().optional(),
         participantId: z.string().optional(),
+        userRole: z.enum(participantRoleEnum.enumValues).optional(),
         searchTerm: z.string().optional(),
       })
       .optional(),

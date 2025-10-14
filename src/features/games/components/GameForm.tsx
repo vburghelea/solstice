@@ -41,6 +41,18 @@ type GameSystemSummary = {
   maxPlayers: number | null;
 };
 
+interface ValidationError {
+  code: string;
+  expected?: string;
+  received?: string;
+  path: string[];
+  message: string;
+  minimum?: number;
+  type?: string;
+  inclusive?: boolean;
+  exact?: boolean;
+}
+
 interface GameFormProps {
   initialValues?: Partial<z.infer<typeof updateGameInputSchema>>;
   onSubmit: (
@@ -50,6 +62,7 @@ interface GameFormProps {
   isCampaignGame?: boolean;
   gameSystemName?: string;
   onCancelEdit?: () => void;
+  serverErrors?: ValidationError[] | string | null;
 }
 
 export function GameForm({
@@ -59,6 +72,7 @@ export function GameForm({
   isCampaignGame,
   gameSystemName,
   onCancelEdit,
+  serverErrors,
 }: GameFormProps) {
   const defaults = {
     gameSystemId: initialValues?.gameSystemId,
@@ -247,6 +261,34 @@ export function GameForm({
     { value: "ru", label: "Russian" },
   ];
 
+  // Parse server errors and map them to field paths
+  const getServerErrorsForField = (fieldPath: string): string[] => {
+    if (!serverErrors) return [];
+
+    let errors: ValidationError[];
+
+    if (typeof serverErrors === "string") {
+      try {
+        const parsed = JSON.parse(serverErrors);
+        errors = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    } else if (Array.isArray(serverErrors)) {
+      errors = serverErrors;
+    } else {
+      return [];
+    }
+
+    return errors
+      .filter((error) => {
+        // Match field paths (e.g., "name", "location.address", "minimumRequirements.minPlayers")
+        const errorPath = error.path.join(".");
+        return errorPath === fieldPath || errorPath.startsWith(fieldPath + ".");
+      })
+      .map((error) => error.message);
+  };
+
   return (
     <form
       onSubmit={(e) => {
@@ -298,9 +340,13 @@ export function GameForm({
                 placeholder="Enter a compelling name for your planned game session"
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
-              {field.state.meta.errors?.length > 0 && (
+              {(field.state.meta.errors?.length > 0 ||
+                getServerErrorsForField("name").length > 0) && (
                 <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
+                  {[
+                    ...(field.state.meta.errors || []),
+                    ...getServerErrorsForField("name"),
+                  ]
                     .map((error) =>
                       typeof error === "string"
                         ? error
@@ -345,9 +391,13 @@ export function GameForm({
                 }
                 className="mt-1"
               />
-              {field.state.meta.errors?.length > 0 && (
+              {(field.state.meta.errors?.length > 0 ||
+                getServerErrorsForField("description").length > 0) && (
                 <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
+                  {[
+                    ...(field.state.meta.errors || []),
+                    ...getServerErrorsForField("description"),
+                  ]
                     .map((error) =>
                       typeof error === "string"
                         ? error
@@ -421,9 +471,13 @@ export function GameForm({
                   }
                 />
               )}
-              {field.state.meta.errors?.length > 0 && (
+              {(field.state.meta.errors?.length > 0 ||
+                getServerErrorsForField("gameSystemId").length > 0) && (
                 <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
+                  {[
+                    ...(field.state.meta.errors || []),
+                    ...getServerErrorsForField("gameSystemId"),
+                  ]
                     .map((error) =>
                       typeof error === "string"
                         ? error
@@ -494,9 +548,13 @@ export function GameForm({
                   }
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                {field.state.meta.errors?.length > 0 && (
+                {(field.state.meta.errors?.length > 0 ||
+                  getServerErrorsForField("expectedDuration").length > 0) && (
                   <p className="text-destructive mt-1 text-sm">
-                    {field.state.meta.errors
+                    {[
+                      ...(field.state.meta.errors || []),
+                      ...getServerErrorsForField("expectedDuration"),
+                    ]
                       .map((error) =>
                         typeof error === "string"
                           ? error
@@ -824,9 +882,13 @@ export function GameForm({
                 }
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
-              {field.state.meta.errors?.length > 0 && (
+              {(field.state.meta.errors?.length > 0 ||
+                getServerErrorsForField("location.address").length > 0) && (
                 <p className="text-destructive mt-1 text-sm">
-                  {field.state.meta.errors
+                  {[
+                    ...(field.state.meta.errors || []),
+                    ...getServerErrorsForField("location.address"),
+                  ]
                     .map((error) =>
                       typeof error === "string"
                         ? error

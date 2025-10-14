@@ -9,7 +9,7 @@ import {
   searchUsersForInvitationSchema,
 } from "./games.schemas";
 
-import type { SQL } from "drizzle-orm";
+import { and, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import {
@@ -28,6 +28,7 @@ import {
 import type {
   games as gamesTable,
   gameSystems as gameSystemsTable,
+  gameParticipants as participantsTable,
   user as userTable,
 } from "~/db/schema";
 
@@ -99,9 +100,15 @@ interface GameQueryResultRow {
   systemHeroUrl: string | null;
   systemCategories: string[] | null;
   participantCount: number;
+  // User's role in this game
+  userRole: typeof participantsTable.$inferSelect.role | null;
+  userStatus: typeof participantsTable.$inferSelect.status | null;
 }
 
-function mapGameRowToListItem(row: GameQueryResultRow): GameListItem {
+function mapGameRowToListItem(
+  row: GameQueryResultRow,
+  currentUserId?: string | null,
+): GameListItem {
   const {
     gameSystemName,
     gameSystemSlug,
@@ -110,6 +117,8 @@ function mapGameRowToListItem(row: GameQueryResultRow): GameListItem {
     gameSystemMaxPlayers,
     systemHeroUrl,
     systemCategories,
+    userRole,
+    userStatus,
     ...rest
   } = row;
 
@@ -129,6 +138,12 @@ function mapGameRowToListItem(row: GameQueryResultRow): GameListItem {
       maxPlayers: gameSystemMaxPlayers,
       categories,
     },
+    userRole:
+      currentUserId && row.ownerId === currentUserId
+        ? { role: "owner", status: "approved" as const }
+        : userRole && userStatus
+          ? { role: userRole, status: userStatus }
+          : null,
   };
 }
 
@@ -164,6 +179,8 @@ async function createGameListQueryContext(
   const heroImage = alias(mediaAssets, "heroImage");
   const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
   const category = alias(gameSystemCategories, "category");
+  const currentUserParticipant = alias(gameParticipants, "currentUserParticipant");
+  const allParticipants = alias(gameParticipants, "allParticipants");
 
   const visibilityScope = options.visibilityScope ?? "allAccessible";
   const statusFilterCondition: SqlExpr | null = filters?.status
@@ -185,6 +202,21 @@ async function createGameListQueryContext(
         sql`lower(${games.language}) LIKE ${searchTerm}`,
       ) as SqlExpr,
     );
+  }
+
+  if (filters?.userRole && currentUserId) {
+    if (filters.userRole === "owner") {
+      otherBaseConditions.push(eq(games.ownerId, currentUserId) as SqlExpr);
+    } else {
+      otherBaseConditions.push(
+        sql`EXISTS (
+          SELECT 1 FROM ${gameParticipants} gp
+          WHERE gp.game_id = ${games.id}
+          AND gp.user_id = ${currentUserId}
+          AND gp.role = ${filters.userRole}
+        )` as SqlExpr,
+      );
+    }
   }
 
   const visibilityConditions: SqlExpr[] = [eq(games.visibility, "public") as SqlExpr];
@@ -260,10 +292,13 @@ async function createGameListQueryContext(
     user,
     gameSystems,
     gameParticipants,
+    currentUserParticipant,
+    allParticipants,
     heroImage,
     systemCategoryLink,
     category,
     finalWhereClause,
+    currentUserId,
     eq,
     sql,
   };
@@ -279,7 +314,8 @@ function buildGameListQuery(
     games,
     user,
     gameSystems,
-    gameParticipants,
+    allParticipants,
+    currentUserParticipant,
     heroImage,
     systemCategoryLink,
     category,
@@ -326,17 +362,46 @@ function buildGameListQuery(
       systemCategories: sql<string[]>`
         array_remove(array_agg(distinct ${category.name}), NULL)
       `,
-      participantCount: sql<number>`count(distinct ${gameParticipants.userId})::int`,
+      participantCount: sql<number>`count(distinct ${allParticipants.userId})::int`,
+      userRole: sql`
+        CASE
+          WHEN ${games.ownerId} = ${context.currentUserId} THEN 'owner'
+          ELSE ${currentUserParticipant.role}
+        END
+      `,
+      userStatus: sql`
+        CASE
+          WHEN ${games.ownerId} = ${context.currentUserId} THEN 'approved'
+          ELSE ${currentUserParticipant.status}
+        END
+      `,
     })
     .from(games)
     .innerJoin(user, eq(games.ownerId, user.id))
     .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))
-    .leftJoin(gameParticipants, eq(gameParticipants.gameId, games.id))
+    .leftJoin(
+      currentUserParticipant,
+      and(
+        eq(currentUserParticipant.gameId, games.id),
+        context.currentUserId
+          ? eq(currentUserParticipant.userId, sql`${context.currentUserId}`)
+          : sql`false`,
+      ),
+    )
+    .leftJoin(allParticipants, eq(allParticipants.gameId, games.id))
     .leftJoin(heroImage, eq(heroImage.id, gameSystems.heroImageId))
     .leftJoin(systemCategoryLink, eq(systemCategoryLink.gameSystemId, gameSystems.id))
     .leftJoin(category, eq(category.id, systemCategoryLink.categoryId))
     .where(finalWhereClause)
-    .groupBy(games.id, user.id, gameSystems.id, heroImage.id, heroImage.secureUrl)
+    .groupBy(
+      games.id,
+      user.id,
+      gameSystems.id,
+      heroImage.id,
+      heroImage.secureUrl,
+      currentUserParticipant.role,
+      currentUserParticipant.status,
+    )
     .orderBy(games.dateTime);
 }
 
@@ -453,7 +518,10 @@ export async function listGamesImpl(
       query = query.limit(Math.floor(options.limit));
     }
     const rows = await query;
-    return { success: true, data: rows.map(mapGameRowToListItem) };
+    return {
+      success: true,
+      data: rows.map((row) => mapGameRowToListItem(row, currentUserId)),
+    };
   } catch (error) {
     console.error("Error listing games:", error);
     return {
@@ -521,7 +589,10 @@ export async function listGamesWithCountImpl(
 
     return {
       success: true,
-      data: { items: rows.map(mapGameRowToListItem), totalCount },
+      data: {
+        items: rows.map((row) => mapGameRowToListItem(row, currentUserId)),
+        totalCount,
+      },
     };
   } catch (error) {
     console.error("Error listing games with count:", error);
@@ -684,6 +755,7 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
     try {
       const {
         getDb,
+        getCurrentUser,
         eq,
         sql,
         and,
@@ -695,7 +767,8 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
         gameSystemToCategory,
         gameSystemCategories,
       } = await getServerDeps();
-      const db = await getDb();
+      const [db, currentUser] = await Promise.all([getDb(), getCurrentUser()]);
+      const currentUserId = currentUser?.id;
       const heroImage = alias(mediaAssets, "heroImage");
       const systemCategoryLink = alias(gameSystemToCategory, "systemCategoryLink");
       const category = alias(gameSystemCategories, "category");
@@ -759,7 +832,7 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
 
       return {
         success: true,
-        data: result.map(mapGameRowToListItem),
+        data: result.map((row) => mapGameRowToListItem(row, currentUserId)),
       };
     } catch (error) {
       console.error("Error listing game sessions by campaign ID:", error);

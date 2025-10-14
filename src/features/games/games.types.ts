@@ -60,6 +60,11 @@ export type GameListItem = Game & {
   minimumRequirements: z.infer<typeof minimumRequirementsSchema> | null;
   safetyRules: z.infer<typeof safetyRulesSchema> | null;
   campaignId: string | null;
+  // User's role in this game (if logged in)
+  userRole?: {
+    role: ParticipantRole;
+    status?: ParticipantStatus;
+  } | null;
 };
 
 export type GameSearchFilters = {
@@ -68,6 +73,7 @@ export type GameSearchFilters = {
   visibility?: GameVisibility;
   ownerId?: string;
   participantId?: string;
+  userRole?: ParticipantRole;
   dateFrom?: Date;
   dateTo?: Date;
   searchTerm?: string;

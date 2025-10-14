@@ -1,5 +1,5 @@
 import { createServerFn, serverOnly } from "@tanstack/react-start";
-import type { and } from "drizzle-orm";
+import { type SQL } from "drizzle-orm";
 import type {
   campaigns as campaignsTable,
   gameSystems as gameSystemsTable,
@@ -56,7 +56,7 @@ interface DbLike {
 }
 
 type CampaignFilters = z.infer<typeof listCampaignsSchema>["filters"] | undefined;
-type SqlExpr = ReturnType<typeof and>;
+type SqlExpr = SQL<unknown>;
 
 export type CampaignQueryDependencies = Awaited<ReturnType<typeof getServerDeps>>;
 
@@ -156,8 +156,26 @@ function buildCampaignWhereClause(
   if (filters?.searchTerm) {
     const searchTerm = `%${filters.searchTerm.toLowerCase()}%`;
     baseConditions.push(
-      or(ilike(campaigns.name, searchTerm), ilike(campaigns.description, searchTerm)),
+      or(
+        ilike(campaigns.name, searchTerm),
+        ilike(campaigns.description, searchTerm),
+      ) as SqlExpr,
     );
+  }
+
+  if (filters?.userRole && currentUserId) {
+    if (filters.userRole === "owner") {
+      baseConditions.push(eq(campaigns.ownerId, currentUserId) as SqlExpr);
+    } else {
+      baseConditions.push(
+        sql`EXISTS (
+          SELECT 1 FROM ${campaignParticipants} cp
+          WHERE cp.campaign_id = ${campaigns.id}
+          AND cp.user_id = ${currentUserId}
+          AND cp.role = ${filters.userRole}
+        )` as SqlExpr,
+      );
+    }
   }
 
   const visibilityConditions: SqlExpr[] = [eq(campaigns.visibility, "public")];
@@ -170,7 +188,10 @@ function buildCampaignWhereClause(
 
     visibilityConditions.push(eq(campaigns.ownerId, currentUserId));
     visibilityConditions.push(
-      and(eq(campaigns.visibility, "private"), sql`${campaigns.id} IN ${userCampaigns}`),
+      and(
+        eq(campaigns.visibility, "private"),
+        sql`${campaigns.id} IN ${userCampaigns}` as SqlExpr,
+      ) as SqlExpr,
     );
 
     const { isConnectionOrTeammateSql, isBlockedSql } = createRelationshipVisibilitySql(
@@ -181,15 +202,16 @@ function buildCampaignWhereClause(
     visibilityConditions.push(
       and(
         eq(campaigns.visibility, "protected"),
-        sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})`,
-      ),
+        sql`${isConnectionOrTeammateSql} AND NOT (${isBlockedSql})` as SqlExpr,
+      ) as SqlExpr,
     );
   }
 
-  const visibilityClause = or(...visibilityConditions);
-  const combinedConditions = baseConditions.length > 0 ? baseConditions : [sql`true`];
+  const visibilityClause = or(...visibilityConditions) as SqlExpr;
+  const combinedConditions =
+    baseConditions.length > 0 ? baseConditions : [sql`true` as SqlExpr];
   combinedConditions.push(visibilityClause);
-  return and(...combinedConditions);
+  return and(...combinedConditions) as SqlExpr;
 }
 
 async function resolveCampaignQueryContext(
@@ -202,7 +224,10 @@ async function resolveCampaignQueryContext(
   return { deps, finalWhereClause };
 }
 
-function mapCampaignRowToListItem(row: CampaignQueryResultRow): CampaignListItem {
+function mapCampaignRowToListItem(
+  row: CampaignQueryResultRow,
+  currentUserId?: string | null,
+): CampaignListItem {
   return {
     ...row.campaign,
     owner: row.owner,
@@ -217,6 +242,10 @@ function mapCampaignRowToListItem(row: CampaignQueryResultRow): CampaignListItem
     campaignExpectations: row.campaign.campaignExpectations ?? null,
     tableExpectations: row.campaign.tableExpectations ?? null,
     characterCreationOutcome: row.campaign.characterCreationOutcome ?? null,
+    userRole:
+      currentUserId && row.campaign.ownerId === currentUserId
+        ? { role: "owner", status: "approved" as const }
+        : null,
   };
 }
 
@@ -344,7 +373,7 @@ export async function listCampaignsImpl(
 
     return {
       success: true,
-      data: rows.map(mapCampaignRowToListItem),
+      data: rows.map((row) => mapCampaignRowToListItem(row, currentUserId)),
     };
   } catch (error) {
     console.error("Error listing campaigns:", error);
@@ -391,7 +420,7 @@ export async function listCampaignsWithCountImpl(
       fetchCampaignCount(db, deps, finalWhereClause),
     ]);
 
-    const items = rows.map(mapCampaignRowToListItem);
+    const items = rows.map((row) => mapCampaignRowToListItem(row, currentUserId));
 
     return { success: true, data: { items, totalCount } };
   } catch (error) {

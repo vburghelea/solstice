@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { RoleBadge } from "~/components/ui/RoleBadge";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
@@ -42,7 +43,16 @@ export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
   return (
     <Card className="transition-shadow hover:shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl">{campaign.name}</CardTitle>
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="flex-1 text-xl">{campaign.name}</CardTitle>
+          {campaign.userRole && (
+            <RoleBadge
+              role={campaign.userRole.role}
+              {...(campaign.userRole.status ? { status: campaign.userRole.status } : {})}
+              className="shrink-0"
+            />
+          )}
+        </div>
         <div className="text-muted-foreground mt-1 flex items-center text-sm">
           <Calendar className="mr-2 h-4 w-4" />
           <span>{campaign.recurrence}</span>

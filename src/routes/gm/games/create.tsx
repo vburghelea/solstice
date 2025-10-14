@@ -142,7 +142,12 @@ export function GameCreateView({
       if (data.success) {
         void navigate({ to: `${basePath}/${data.data?.id}` } as never);
       } else {
-        setServerError(data.errors?.[0]?.message || "Failed to create game");
+        // Convert errors to JSON string for GameForm to parse
+        if (data.errors && data.errors.length > 0) {
+          setServerError(JSON.stringify(data.errors));
+        } else {
+          setServerError("Failed to create game");
+        }
       }
     },
     onError: (error) => {
@@ -172,15 +177,6 @@ export function GameCreateView({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {serverError && (
-              <div className="bg-destructive/10 text-destructive border-destructive/20 flex items-start gap-3 rounded-lg border p-4">
-                <div className="flex-1">
-                  <p className="font-medium">Error creating game</p>
-                  <p className="mt-1 text-sm">{serverError}</p>
-                </div>
-              </div>
-            )}
-
             {campaignId && isCampaignDataPending ? (
               <div className="text-muted-foreground text-center">
                 Loading campaign data...
@@ -247,6 +243,7 @@ export function GameCreateView({
                         ? campaignData.data.gameSystem?.name || ""
                         : ""
                     }
+                    serverErrors={serverError}
                     onCancelEdit={() => navigate({ to: basePath } as never)}
                   />
                 )}

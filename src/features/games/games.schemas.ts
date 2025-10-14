@@ -47,6 +47,7 @@ export const listGamesSchema = z
         visibility: z.enum(visibilityEnum.enumValues).optional(), // Changed to visibilityEnum
         ownerId: z.string().optional(),
         participantId: z.string().optional(),
+        userRole: z.enum(participantRoleEnum.enumValues).optional(),
         dateFrom: z.string().datetime().optional(),
         dateTo: z.string().datetime().optional(),
         searchTerm: z.string().optional(),

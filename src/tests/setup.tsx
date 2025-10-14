@@ -139,6 +139,19 @@ vi.mock("sonner", async (importOriginal) => {
   };
 });
 
+// Mock PostHog to avoid gzip compression issues in tests
+vi.mock("posthog-node", () => ({
+  PostHog: vi.fn().mockImplementation(() => ({
+    capture: vi.fn(),
+    identify: vi.fn(),
+    alias: vi.fn(),
+    reset: vi.fn(),
+    shutdown: vi.fn(),
+    flush: vi.fn(),
+    _flush: vi.fn(),
+  })),
+}));
+
 // Mock Radix Avatar to render <img> synchronously for tests
 vi.mock("@radix-ui/react-avatar", () => {
   // Use a basic shim so AvatarImage is always present in DOM

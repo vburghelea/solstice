@@ -73,7 +73,7 @@ export function PublicHeader() {
                   userId={user.id}
                   className="size-8"
                 />
-                <span>Account</span>
+                <span>{user.name}</span>
               </Link>
             ) : (
               <>
@@ -140,7 +140,7 @@ export function PublicHeader() {
                     userId={user.id}
                     className="size-9"
                   />
-                  <span>Account</span>
+                  <span>{user.name}</span>
                 </Link>
               ) : (
                 <>

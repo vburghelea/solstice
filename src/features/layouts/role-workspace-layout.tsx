@@ -240,11 +240,7 @@ export function RoleWorkspaceLayout({
                     fallback={
                       <div className="bg-surface-subtle border-subtle text-subtle token-gap-xs flex flex-col rounded-xl border border-dashed p-6">
                         <span className="text-eyebrow">Loading workspace</span>
-                        <p className="text-body-sm">
-                          Preparing{" "}
-                          {(fallbackLabel ?? resolvedWorkspaceLabel).toLowerCase()}{" "}
-                          experience...
-                        </p>
+                        <p className="text-body-sm">Preparing workspace experience...</p>
                       </div>
                     }
                   >

@@ -13,7 +13,7 @@ import {
   Users,
   Users2,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -219,6 +219,11 @@ function PlayerWorkspaceSummary() {
   const teams = useMemo(() => teamsQuery.data ?? [], [teamsQuery.data]);
   const firstTeam = teams[0];
   const workspaceStats = workspaceStatsQuery.data;
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const totalInvites =
     (workspaceStats?.campaigns.pendingInvites ?? 0) +
@@ -261,11 +266,13 @@ function PlayerWorkspaceSummary() {
           </Badge>
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-          {membershipStatusQuery.isLoading ? (
-            <Skeleton className="h-4 w-36" />
-          ) : (
-            <span>{membershipDetail}</span>
-          )}
+          <span>
+            {!isHydrated || membershipStatusQuery.isLoading ? (
+              <span className="bg-muted inline-block h-4 w-36 animate-pulse rounded" />
+            ) : (
+              membershipDetail
+            )}
+          </span>
           <Link to="/player/membership" className="text-primary text-xs font-medium">
             Manage membership
           </Link>
@@ -278,7 +285,7 @@ function PlayerWorkspaceSummary() {
           <CalendarDays className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-          {isLoading ? (
+          {!isHydrated || isLoading ? (
             <Skeleton className="h-4 w-40" />
           ) : nextGame ? (
             <>
@@ -308,7 +315,7 @@ function PlayerWorkspaceSummary() {
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-          {isLoading ? (
+          {!isHydrated || isLoading ? (
             <Skeleton className="h-4 w-32" />
           ) : (
             <>

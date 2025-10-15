@@ -226,7 +226,12 @@ function normalizePendingReview(entry: unknown): PendingGMReviewItem | null {
 export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   const queryClient = useQueryClient();
   const [showSpotlight, setShowSpotlight] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const isAuthenticated = Boolean(user?.id);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     posthog.onFeatureFlags(() => {
@@ -286,7 +291,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     gcTime: 1000 * 60 * 30,
     enabled: isAuthenticated,
   });
-  const workspaceStats = workspaceStatsQuery.data;
+  const workspaceStats =
+    !isHydrated || workspaceStatsQuery.isLoading ? undefined : workspaceStatsQuery.data;
 
   useEffect(() => {
     if (!isAuthenticated || !workspaceStats) {
@@ -314,7 +320,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     gcTime: 1000 * 60 * 30,
     enabled: isAuthenticated,
   });
-  const membershipStatus = membershipStatusQuery.data;
+  const membershipStatus =
+    !isHydrated || membershipStatusQuery.isLoading
+      ? undefined
+      : membershipStatusQuery.data;
 
   useEffect(() => {
     if (!isAuthenticated || membershipStatus === undefined) {
@@ -334,7 +343,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     gcTime: 1000 * 60 * 30,
     enabled: isAuthenticated,
   });
-  const userTeams = useMemo(() => userTeamsQuery.data ?? [], [userTeamsQuery.data]);
+  const userTeams = useMemo(
+    () => (!isHydrated || userTeamsQuery.isLoading ? [] : (userTeamsQuery.data ?? [])),
+    [isHydrated, userTeamsQuery.isLoading, userTeamsQuery.data],
+  );
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -361,7 +373,12 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     }
     persistData(STORAGE_KEYS.nextGame, nextGameResult);
   }, [isAuthenticated, nextGameResult]);
-  const nextGame = nextGameResult?.success ? nextGameResult.data : null;
+  const nextGame =
+    !isHydrated || nextGameQuery.isLoading
+      ? null
+      : nextGameResult?.success
+        ? nextGameResult.data
+        : null;
 
   const upcomingEventsQuery = useQuery<UpcomingEventsData, Error>({
     queryKey: ["upcoming-events-dashboard"],
@@ -411,8 +428,11 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     enabled: isAuthenticated,
   });
   const pendingReviews = useMemo(
-    () => pendingReviewsQuery.data ?? [],
-    [pendingReviewsQuery.data],
+    () =>
+      !isHydrated || pendingReviewsQuery.isLoading
+        ? []
+        : (pendingReviewsQuery.data ?? []),
+    [isHydrated, pendingReviewsQuery.isLoading, pendingReviewsQuery.data],
   );
   const pendingReviewsCount = pendingReviews.length;
 

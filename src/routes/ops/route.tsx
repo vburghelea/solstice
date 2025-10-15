@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CalendarDays, Home, Inbox, KanbanSquare } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -105,6 +105,11 @@ function OpsNamespaceShell() {
 function OpsWorkspaceSummary() {
   const { pendingList, pipelineList, attentionItems, liveEvents, isLoading } =
     useOpsEventsData();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const nextPipelineEvent = useMemo(() => pipelineList[0] ?? null, [pipelineList]);
   const criticalAttention = useMemo(
@@ -125,7 +130,7 @@ function OpsWorkspaceSummary() {
           </span>
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-          {isLoading ? (
+          {!isHydrated || isLoading ? (
             <Skeleton className="h-4 w-32" />
           ) : pendingList.length > 0 ? (
             <>
@@ -152,27 +157,31 @@ function OpsWorkspaceSummary() {
           </span>
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-          {isLoading ? (
-            <Skeleton className="h-4 w-36" />
-          ) : nextPipelineEvent ? (
-            <>
-              <span className="text-foreground font-medium">
-                {nextPipelineEvent.name}
+          <span>
+            {!isHydrated || isLoading ? (
+              <Skeleton className="h-4 w-36" />
+            ) : nextPipelineEvent ? (
+              <span className="inline-block">
+                <span className="text-foreground block font-medium">
+                  {nextPipelineEvent.name}
+                </span>
+                <span className="block">
+                  {formatDateAndTime(nextPipelineEvent.startDate)}
+                </span>
+                <span className="block">{nextPipelineEvent.city ?? "Location TBD"}</span>
+                <Link
+                  from="/ops"
+                  to="/ops/events/$eventId"
+                  params={{ eventId: nextPipelineEvent.id }}
+                  className="text-primary text-xs font-medium"
+                >
+                  Open ops detail
+                </Link>
               </span>
-              <span>{formatDateAndTime(nextPipelineEvent.startDate)}</span>
-              <span>{nextPipelineEvent.city ?? "Location TBD"}</span>
-              <Link
-                from="/ops"
-                to="/ops/events/$eventId"
-                params={{ eventId: nextPipelineEvent.id }}
-                className="text-primary text-xs font-medium"
-              >
-                Open ops detail
-              </Link>
-            </>
-          ) : (
-            <span>No confirmed events in the pipeline</span>
-          )}
+            ) : (
+              <span>No confirmed events in the pipeline</span>
+            )}
+          </span>
         </CardContent>
       </Card>
 
@@ -182,7 +191,7 @@ function OpsWorkspaceSummary() {
           <AlertTriangle className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
-          {isLoading ? (
+          {!isHydrated || isLoading ? (
             <Skeleton className="h-4 w-40" />
           ) : criticalAttention ? (
             <>

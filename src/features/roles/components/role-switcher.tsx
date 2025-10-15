@@ -1,5 +1,5 @@
 import { Loader2Icon } from "lucide-react";
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -21,6 +21,11 @@ import {
 export function RoleSwitcher() {
   const { resolution, status, error, switchPersona, clearError } = useRoleSwitcher();
   const activePersona = useActivePersona();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
   const [open, dispatchOpen] = useReducer(
     (state: boolean, action: "open" | "close" | "toggle") => {
       switch (action) {
@@ -65,7 +70,9 @@ export function RoleSwitcher() {
           {status === "switching" ? (
             <Loader2Icon className="mr-2 size-4 animate-spin" aria-hidden="true" />
           ) : null}
-          <span className="mr-2 font-medium">{activePersona.shortLabel}</span>
+          <span className="mr-2 font-medium">
+            {isHydrated ? activePersona.shortLabel : "Loading..."}
+          </span>
           <Badge variant="secondary">Persona</Badge>
         </Button>
       </DialogTrigger>

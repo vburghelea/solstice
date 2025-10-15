@@ -8,6 +8,7 @@ const cleanupSchema = z.object({
     "delete-team",
     "clear-user-teams",
     "clear-user-memberships",
+    "clear-user-blocks",
   ]),
   userId: z.string().optional(),
   teamId: z.string().optional(),
@@ -36,7 +37,9 @@ export const ServerRoute = createServerFileRoute("/api/test/cleanup").methods({
 
       // Import server-only modules inside the handler
       const { getDb } = await import("~/db/server-helpers");
-      const { teams, teamMembers, user, memberships } = await import("~/db/schema");
+      const { teams, teamMembers, user, memberships, userBlocks } = await import(
+        "~/db/schema"
+      );
 
       const db = await getDb();
 
@@ -126,6 +129,30 @@ export const ServerRoute = createServerFileRoute("/api/test/cleanup").methods({
 
             if (targetUserId) {
               await db.delete(memberships).where(eq(memberships.userId, targetUserId));
+            }
+          }
+          return new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        case "clear-user-blocks": {
+          // Remove all blocks for a user (both blocks they made and blocks made against them)
+          if (userId || userEmail) {
+            const targetUserId =
+              userId ||
+              (await db
+                .select({ id: user.id })
+                .from(user)
+                .where(eq(user.email, userEmail!))
+                .then((rows) => rows[0]?.id));
+
+            if (targetUserId) {
+              // Remove blocks where user is the blocker
+              await db.delete(userBlocks).where(eq(userBlocks.blockerId, targetUserId));
+              // Remove blocks where user is the blockee
+              await db.delete(userBlocks).where(eq(userBlocks.blockeeId, targetUserId));
             }
           }
           return new Response(JSON.stringify({ success: true }), {

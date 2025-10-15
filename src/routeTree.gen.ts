@@ -102,6 +102,7 @@ import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.re
 import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$template";
 import { Route as AdminSystemsSystemIdRouteImport } from "./routes/admin/systems/$systemId";
 import { Route as PlayerTeamsTeamIdIndexRouteImport } from "./routes/player/teams/$teamId.index";
+import { Route as PlayerProfileBlocklistIndexRouteImport } from "./routes/player/profile/blocklist/index";
 import { Route as PlayerCampaignsCampaignIdIndexRouteImport } from "./routes/player/campaigns/$campaignId/index";
 import { Route as PlayerTeamsTeamIdMembersRouteImport } from "./routes/player/teams/$teamId.members";
 import { Route as PlayerTeamsTeamIdManageRouteImport } from "./routes/player/teams/$teamId.manage";
@@ -589,6 +590,12 @@ const PlayerTeamsTeamIdIndexRoute = PlayerTeamsTeamIdIndexRouteImport.update({
   path: "/",
   getParentRoute: () => PlayerTeamsTeamIdRoute,
 } as any);
+const PlayerProfileBlocklistIndexRoute =
+  PlayerProfileBlocklistIndexRouteImport.update({
+    id: "/profile/blocklist/",
+    path: "/profile/blocklist/",
+    getParentRoute: () => PlayerRouteRoute,
+  } as any);
 const PlayerCampaignsCampaignIdIndexRoute =
   PlayerCampaignsCampaignIdIndexRouteImport.update({
     id: "/",
@@ -811,6 +818,7 @@ export interface FileRoutesByFullPath {
   "/player/teams/$teamId/manage": typeof PlayerTeamsTeamIdManageRoute;
   "/player/teams/$teamId/members": typeof PlayerTeamsTeamIdMembersRoute;
   "/player/campaigns/$campaignId/": typeof PlayerCampaignsCampaignIdIndexRoute;
+  "/player/profile/blocklist": typeof PlayerProfileBlocklistIndexRoute;
   "/player/teams/$teamId/": typeof PlayerTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesByTo {
@@ -893,6 +901,7 @@ export interface FileRoutesByTo {
   "/player/teams/$teamId/manage": typeof PlayerTeamsTeamIdManageRoute;
   "/player/teams/$teamId/members": typeof PlayerTeamsTeamIdMembersRoute;
   "/player/campaigns/$campaignId": typeof PlayerCampaignsCampaignIdIndexRoute;
+  "/player/profile/blocklist": typeof PlayerProfileBlocklistIndexRoute;
   "/player/teams/$teamId": typeof PlayerTeamsTeamIdIndexRoute;
 }
 export interface FileRoutesById {
@@ -994,6 +1003,7 @@ export interface FileRoutesById {
   "/player/teams/$teamId/manage": typeof PlayerTeamsTeamIdManageRoute;
   "/player/teams/$teamId/members": typeof PlayerTeamsTeamIdMembersRoute;
   "/player/campaigns/$campaignId/": typeof PlayerCampaignsCampaignIdIndexRoute;
+  "/player/profile/blocklist/": typeof PlayerProfileBlocklistIndexRoute;
   "/player/teams/$teamId/": typeof PlayerTeamsTeamIdIndexRoute;
 }
 export interface FileRouteTypes {
@@ -1096,6 +1106,7 @@ export interface FileRouteTypes {
     | "/player/teams/$teamId/manage"
     | "/player/teams/$teamId/members"
     | "/player/campaigns/$campaignId/"
+    | "/player/profile/blocklist"
     | "/player/teams/$teamId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -1178,6 +1189,7 @@ export interface FileRouteTypes {
     | "/player/teams/$teamId/manage"
     | "/player/teams/$teamId/members"
     | "/player/campaigns/$campaignId"
+    | "/player/profile/blocklist"
     | "/player/teams/$teamId";
   id:
     | "__root__"
@@ -1278,6 +1290,7 @@ export interface FileRouteTypes {
     | "/player/teams/$teamId/manage"
     | "/player/teams/$teamId/members"
     | "/player/campaigns/$campaignId/"
+    | "/player/profile/blocklist/"
     | "/player/teams/$teamId/";
   fileRoutesById: FileRoutesById;
 }
@@ -2071,6 +2084,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PlayerTeamsTeamIdIndexRouteImport;
       parentRoute: typeof PlayerTeamsTeamIdRoute;
     };
+    "/player/profile/blocklist/": {
+      id: "/player/profile/blocklist/";
+      path: "/profile/blocklist";
+      fullPath: "/player/profile/blocklist";
+      preLoaderRoute: typeof PlayerProfileBlocklistIndexRouteImport;
+      parentRoute: typeof PlayerRouteRoute;
+    };
     "/player/campaigns/$campaignId/": {
       id: "/player/campaigns/$campaignId/";
       path: "/";
@@ -2529,6 +2549,7 @@ interface PlayerRouteRouteChildren {
   PlayerIndexRoute: typeof PlayerIndexRoute;
   PlayerProfileIndexRoute: typeof PlayerProfileIndexRoute;
   PlayerSettingsIndexRoute: typeof PlayerSettingsIndexRoute;
+  PlayerProfileBlocklistIndexRoute: typeof PlayerProfileBlocklistIndexRoute;
 }
 
 const PlayerRouteRouteChildren: PlayerRouteRouteChildren = {
@@ -2543,6 +2564,7 @@ const PlayerRouteRouteChildren: PlayerRouteRouteChildren = {
   PlayerIndexRoute: PlayerIndexRoute,
   PlayerProfileIndexRoute: PlayerProfileIndexRoute,
   PlayerSettingsIndexRoute: PlayerSettingsIndexRoute,
+  PlayerProfileBlocklistIndexRoute: PlayerProfileBlocklistIndexRoute,
 };
 
 const PlayerRouteRouteWithChildren = PlayerRouteRoute._addFileChildren(

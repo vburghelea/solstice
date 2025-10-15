@@ -229,11 +229,13 @@ export function RoleWorkspaceLayout({
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:max-w-[90%]">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
               <div className="flex flex-col gap-6">
-                <WorkspaceBrandHeader
-                  subtitle={headerSubtitle}
-                  title={title}
-                  {...(description ? { description } : {})}
-                />
+                <div className="hidden lg:block">
+                  <WorkspaceBrandHeader
+                    subtitle={headerSubtitle}
+                    title={title}
+                    {...(description ? { description } : {})}
+                  />
+                </div>
                 {children ? <div className="flex flex-col gap-6">{children}</div> : null}
                 <div>
                   <Suspense

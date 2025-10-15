@@ -37,6 +37,25 @@ export async function deleteTeam(page: Page, teamId: string) {
 }
 
 /**
+ * Clear all blocks for a user
+ */
+export async function clearUserBlocks(page: Page, userEmail: string) {
+  const response = await page.request.post("/api/test/cleanup", {
+    data: {
+      action: "clear-user-blocks",
+      userEmail,
+    },
+  });
+
+  if (!response.ok()) {
+    const body = await response.text();
+    throw new Error(
+      `Failed to clear blocks for ${userEmail}: ${response.status()} - ${body}`,
+    );
+  }
+}
+
+/**
  * Reset test user to clean state
  */
 export async function resetTestUser(page: Page, userEmail: string) {

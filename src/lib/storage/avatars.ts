@@ -20,10 +20,10 @@ function isNetlifyRuntime() {
 export async function saveAvatar(filename: string, data: Buffer): Promise<StoredAvatar> {
   if (isNetlifyRuntime()) {
     try {
-      const moduleName: string = "@netlify/blobs";
-      // Dynamic import using variable to avoid type resolution at build
+      const moduleName = "@netlify/blobs";
+      // Dynamic import with vite-ignore to suppress warning
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const blobsMod: any = await import(moduleName);
+      const blobsMod: any = await import(/* @vite-ignore */ moduleName);
       const store = blobsMod.getStore
         ? blobsMod.getStore(AVATAR_STORE_NAME)
         : // Backwards compatibility if API differs
@@ -53,9 +53,10 @@ export async function readAvatar(
 ): Promise<{ data: Uint8Array; contentType: string } | null> {
   if (isNetlifyRuntime()) {
     try {
-      const moduleName: string = "@netlify/blobs";
+      const moduleName = "@netlify/blobs";
+      // Dynamic import with vite-ignore to suppress warning
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const blobsMod: any = await import(moduleName);
+      const blobsMod: any = await import(/* @vite-ignore */ moduleName);
       const store = blobsMod.getStore
         ? blobsMod.getStore(AVATAR_STORE_NAME)
         : blobsMod.store?.(AVATAR_STORE_NAME);

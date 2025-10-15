@@ -13,91 +13,40 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Import centralized configuration
+import config, { loadParserConfig } from "./lib/i18n-config.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const projectRoot = path.resolve(__dirname, "..");
 
 /**
- * Load configuration from i18next-parser.config.js
- */
-function loadParserConfig() {
-  const configPath = path.join(projectRoot, "i18next-parser.config.js");
-
-  if (!existsSync(configPath)) {
-    throw new Error(`i18next-parser.config.js not found at ${configPath}`);
-  }
-
-  try {
-    // Convert ES module export to CommonJS require by reading the file
-    const configContent = readFileSync(configPath, "utf8");
-
-    // Simple extraction of the export default object
-    const match = configContent.match(/export default\s+({[\s\S]*})\s*;?\s*$/m);
-    if (!match) {
-      throw new Error("Could not parse i18next-parser.config.js");
-    }
-
-    // Use eval to parse the exported object (safe since we control the file)
-    const config = eval(`(${match[1]})`);
-
-    return config;
-  } catch (error) {
-    throw new Error(`Failed to load i18next-parser config: ${error.message}`);
-  }
-}
-
-/**
- * Initialize configuration from parser config
+ * Initialize configuration from centralized config
  */
 function initializeConfig() {
   const parserConfig = loadParserConfig();
   const options = parserConfig.options || {};
 
   return {
-    // Paths
-    tempLocalesDir: path.join(projectRoot, "temp-locales"),
-    localesDir: path.resolve(
-      projectRoot,
-      options.resource?.loadPath
-        ?.replace("{{lng}}", "")
-        .replace("{{ns}}", "")
-        .replace(/\/[^\/]*$/, "") || "src/lib/i18n/locales",
-    ),
+    // Paths - use centralized config
+    tempLocalesDir: config.tempLocalesDir,
+    localesDir: config.localesDir,
+    projectRoot: config.projectRoot,
 
-    // Language and namespace settings
-    languages: options.lngs || ["en", "de", "pl"],
-    namespaces: options.ns || [
-      "common",
-      "auth",
-      "navigation",
-      "games",
-      "events",
-      "teams",
-      "forms",
-      "errors",
-      "admin",
-      "campaigns",
-      "membership",
-      "player",
-      "profile",
-      "settings",
-    ],
+    // Language and namespace settings - use centralized config
+    languages: config.languages,
+    namespaces: config.namespaces,
+    defaultLanguage: config.defaultLanguage,
+    defaultNamespace: config.defaultNamespace,
 
     // Parser options
-    inputPatterns: parserConfig.input || ["src/**/*.{ts,tsx}"],
-    tempSavePath:
-      options.resource?.savePath
-        ?.replace("{{lng}}", "en")
-        .replace("{{ns}}", "common")
-        .replace("en/common.json", "")
-        .replace(/\/$/, "") || "temp-locales",
+    inputPatterns: config.inputPatterns,
+    tempSavePath: config.tempLocalesDir,
 
-    // Formatting options
-    jsonIndent: options.jsonIndent || 2,
-    lineEnding: options.lineEnding || "\n",
+    // Formatting options - use centralized config
+    jsonIndent: config.jsonIndent,
+    lineEnding: config.lineEnding,
 
-    // Project paths
-    projectRoot,
+    // Original parser config for reference
     parserConfig,
   };
 }
@@ -317,10 +266,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 export {
   deepMerge,
+  flattenObject,
   initializeConfig,
   loadExistingTranslations,
   loadNewTranslations,
-  loadParserConfig,
   main,
   saveMergedTranslations,
 };

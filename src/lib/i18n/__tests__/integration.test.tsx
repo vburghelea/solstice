@@ -38,8 +38,8 @@ function TestComponent() {
   return (
     <div>
       <span data-testid="current-language">{currentLanguage}</span>
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <span data-testid="translation">{t("buttons.save" as any)}</span>{" "}
-      {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
       <button type="button" onClick={() => changeLanguage("de")}>
         Switch to German
       </button>

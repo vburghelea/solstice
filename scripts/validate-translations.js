@@ -7,12 +7,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Import i18next-parser config to get namespaces dynamically
-const i18nConfig = await import("../i18next-parser.config.js");
+// Import centralized configuration
+import config from "./lib/i18n-config.js";
 
-const LOCALES_DIR = path.join(__dirname, "../src/lib/i18n/locales");
-const SUPPORTED_LANGUAGES = i18nConfig.default.options.lngs;
-const NAMESPACES = i18nConfig.default.options.ns;
+const LOCALES_DIR = config.localesDir;
+const SUPPORTED_LANGUAGES = config.languages;
+const NAMESPACES = config.namespaces;
+const DEFAULT_LANGUAGE = config.defaultLanguage;
 
 function loadJsonFile(filePath) {
   try {
@@ -28,25 +29,27 @@ async function validateTranslations() {
   console.log("🔍 Validating translation files...\n");
 
   let hasErrors = false;
-  const enTranslations = {};
+  const referenceTranslations = {};
 
-  // Load English translations as reference
+  // Load default language translations as reference
   for (const ns of NAMESPACES) {
-    const enPath = path.join(LOCALES_DIR, "en", `${ns}.json`);
-    const translations = loadJsonFile(enPath);
+    const defaultLangPath = path.join(LOCALES_DIR, DEFAULT_LANGUAGE, `${ns}.json`);
+    const translations = loadJsonFile(defaultLangPath);
 
     if (!translations) {
-      console.error(`❌ Failed to load English translations for namespace: ${ns}`);
+      console.error(
+        `❌ Failed to load ${DEFAULT_LANGUAGE} translations for namespace: ${ns}`,
+      );
       hasErrors = true;
       continue;
     }
 
-    enTranslations[ns] = translations;
+    referenceTranslations[ns] = translations;
   }
 
   // Validate other languages
   for (const lang of SUPPORTED_LANGUAGES) {
-    if (lang === "en") continue; // Skip English as it's the reference
+    if (lang === DEFAULT_LANGUAGE) continue; // Skip default language as it's the reference
 
     console.log(`📝 Validating ${lang} translations...`);
 
@@ -60,21 +63,23 @@ async function validateTranslations() {
         continue;
       }
 
-      const enKeys = getNestedKeys(enTranslations[ns]);
+      const referenceKeys = getNestedKeys(referenceTranslations[ns]);
       const langKeys = getNestedKeys(translations);
 
       // Check for missing keys
-      const missingKeys = enKeys.filter((key) => !langKeys.includes(key));
+      const missingKeys = referenceKeys.filter((key) => !langKeys.includes(key));
       if (missingKeys.length > 0) {
         console.error(`❌ Missing keys in ${lang}/${ns}.json:`);
         missingKeys.forEach((key) => console.error(`   - ${key}`));
         hasErrors = true;
       }
 
-      // Check for extra keys (not in English)
-      const extraKeys = langKeys.filter((key) => !enKeys.includes(key));
+      // Check for extra keys (not in reference language)
+      const extraKeys = langKeys.filter((key) => !referenceKeys.includes(key));
       if (extraKeys.length > 0) {
-        console.warn(`⚠️  Extra keys in ${lang}/${ns}.json (not in English):`);
+        console.warn(
+          `⚠️  Extra keys in ${lang}/${ns}.json (not in ${DEFAULT_LANGUAGE}):`,
+        );
         extraKeys.forEach((key) => console.warn(`   - ${key}`));
       }
 

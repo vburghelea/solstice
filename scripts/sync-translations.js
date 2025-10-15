@@ -7,12 +7,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Import i18next-parser config to get namespaces dynamically
-const i18nConfig = await import("../i18next-parser.config.js");
+// Import centralized configuration
+import config from "./lib/i18n-config.js";
 
-const LOCALES_DIR = path.join(__dirname, "../src/lib/i18n/locales");
-const SUPPORTED_LANGUAGES = i18nConfig.default.options.lngs;
-const NAMESPACES = i18nConfig.default.options.ns;
+const LOCALES_DIR = config.localesDir;
+const SUPPORTED_LANGUAGES = config.languages;
+const NAMESPACES = config.namespaces;
+const DEFAULT_LANGUAGE = config.defaultLanguage;
 
 function loadJsonFile(filePath) {
   try {
@@ -67,31 +68,35 @@ function setNestedValue(obj, key, value) {
 async function syncTranslations() {
   console.log("🔄 Syncing translation files...\n");
 
-  // Load English translations as reference
-  const enTranslations = {};
+  // Load default language translations as reference
+  const referenceTranslations = {};
   let hasErrors = false;
 
   for (const ns of NAMESPACES) {
-    const enPath = path.join(LOCALES_DIR, "en", `${ns}.json`);
-    const translations = loadJsonFile(enPath);
+    const defaultLangPath = path.join(LOCALES_DIR, DEFAULT_LANGUAGE, `${ns}.json`);
+    const translations = loadJsonFile(defaultLangPath);
 
     if (!translations) {
-      console.error(`❌ Failed to load English translations for namespace: ${ns}`);
+      console.error(
+        `❌ Failed to load ${DEFAULT_LANGUAGE} translations for namespace: ${ns}`,
+      );
       hasErrors = true;
       continue;
     }
 
-    enTranslations[ns] = translations;
+    referenceTranslations[ns] = translations;
   }
 
   if (hasErrors) {
-    console.error("\n❌ Cannot sync translations due to missing English files!");
+    console.error(
+      `\n❌ Cannot sync translations due to missing ${DEFAULT_LANGUAGE} files!`,
+    );
     process.exit(1);
   }
 
   // Sync other languages
   for (const lang of SUPPORTED_LANGUAGES) {
-    if (lang === "en") continue; // Skip English as it's the reference
+    if (lang === DEFAULT_LANGUAGE) continue; // Skip default language as it's the reference
 
     console.log(`📝 Syncing ${lang} translations...`);
 
@@ -99,12 +104,12 @@ async function syncTranslations() {
       const langPath = path.join(LOCALES_DIR, lang, `${ns}.json`);
       let translations = loadJsonFile(langPath) || {};
 
-      const enKeys = getNestedKeys(enTranslations[ns]);
+      const referenceKeys = getNestedKeys(referenceTranslations[ns]);
       const langKeys = getNestedKeys(translations);
 
       // Add missing keys with placeholder value
       let addedCount = 0;
-      for (const key of enKeys) {
+      for (const key of referenceKeys) {
         if (!langKeys.includes(key)) {
           setNestedValue(translations, key, `TODO: Translate "${key}"`);
           addedCount++;

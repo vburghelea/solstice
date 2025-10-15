@@ -21,6 +21,22 @@ import {
 } from "./lib/i18n-config.js";
 
 /**
+ * Check if file is already broken by previous migration
+ */
+function isFileAlreadyBroken(content) {
+  // Check for broken function signatures
+  const brokenPatterns = [
+    /export function \w+\s*\n\s*const \{ t \} = \w+\(\);\(/,
+    /const \w+\s*\n\s*const \{ t \} = \w+\(\);\(/,
+    /\)\s*\(\s*\{.*?\}/, // Function params in wrong place
+    /function\s+\w+[\s\S]*?\)\s*\n\s*const \{ t \} = \w+\(\);\(/,
+    /const\s+\w+\s*=\s*\([^)]*\)\s*\n\s*const \{ t \} = \w+\(\);\(/,
+  ];
+
+  return brokenPatterns.some((pattern) => pattern.test(content));
+}
+
+/**
  * Load existing translations from the JSON files using config
  */
 function loadExistingTranslations() {
@@ -73,11 +89,42 @@ function analyzeFile(filePath, existingTranslations) {
 
   const content = readFileSync(fullPath, "utf8");
 
-  // Skip if already using i18n
-  if (content.includes("useTypedTranslation") || content.includes("useTranslation")) {
+  // Skip if already using i18n properly
+  if (content.includes("useTypedTranslation()") || content.includes("{ t }")) {
     return { file: filePath, strings: [], hasI18n: true };
   }
 
+  // Skip if already broken by previous migration
+  if (isFileAlreadyBroken(content)) {
+    return {
+      file: filePath,
+      strings: [],
+      hasI18n: true,
+      reason: "Already broken by previous migration",
+    };
+  }
+
+  const strings = [];
+
+  // IMPROVED: First check what strings we can actually translate
+  const translatableStrings = findTranslatableStrings(content, existingTranslations);
+
+  return {
+    file: filePath,
+    strings: translatableStrings,
+    hasI18n: false,
+    // Add metadata for better reporting
+    hasTranslatableContent: translatableStrings.length > 0,
+    totalStringsFound: translatableStrings.length,
+    existingMatches: translatableStrings.filter((s) => s.key && s.key.includes("."))
+      .length,
+  };
+}
+
+/**
+ * IMPROVED: Find strings that can actually be translated with existing translations
+ */
+function findTranslatableStrings(content, existingTranslations) {
   const strings = [];
 
   // Simple regex patterns for common hardcoded strings
@@ -103,21 +150,21 @@ function analyzeFile(filePath, existingTranslations) {
       const text = match[1];
 
       if (shouldTranslateString(text)) {
-        const key =
-          findExistingTranslation(text, existingTranslations) ||
-          generateKey(text, filePath);
+        // Check if we have an existing translation for this text
+        const existingKey = findExistingTranslation(text, existingTranslations);
 
         strings.push({
           text,
-          key,
+          key: existingKey || generateKey(text, filePath), // Use existing key if available
           pattern: patternIndex,
           line: content.substring(0, match.index).split("\n").length,
+          hasExistingTranslation: !!existingKey, // IMPROVED: Track if translation exists
         });
       }
     }
   });
 
-  return { file: filePath, strings, hasI18n: false };
+  return strings;
 }
 
 /**
@@ -269,7 +316,7 @@ async function analyzeMigration(dryRun = true) {
     });
 
     // Print results
-    console.log("📈 Migration Analysis Results:");
+    console.log("📈 IMPROVED Migration Analysis Results:");
     console.log("=".repeat(50));
     console.log(`Total files analyzed: ${results.totalFiles}`);
     console.log(`Files already using i18n: ${results.filesWithI18n}`);
@@ -277,6 +324,21 @@ async function analyzeMigration(dryRun = true) {
     console.log(`Total hardcoded strings found: ${results.totalStrings}`);
     console.log(`Existing translation matches: ${results.existingMatches}`);
     console.log(`New translation keys needed: ${results.newKeys}`);
+
+    // IMPROVED: Add additional useful metrics
+    const filesWithTranslatableContent = results.fileDetails.filter(
+      (d) => d.hasTranslatableContent,
+    ).length;
+    const filesWithOnlyNewKeys = results.fileDetails.filter(
+      (d) => d.hasTranslatableContent && d.existingMatches === 0,
+    ).length;
+
+    console.log(`\n📊 Additional Metrics:`);
+    console.log(`Files with translatable content: ${filesWithTranslatableContent}`);
+    console.log(`Files needing only new translation keys: ${filesWithOnlyNewKeys}`);
+    console.log(
+      `Files that can be migrated immediately: ${filesWithTranslatableContent - filesWithOnlyNewKeys}`,
+    );
 
     if (results.fileDetails.length > 0) {
       console.log("\n📋 Files requiring migration (top 10):");

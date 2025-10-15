@@ -39,13 +39,13 @@ function transformFile(filePath, existingTranslations) {
   let content = readFileSync(fullPath, "utf8");
   const originalContent = content;
 
-  // Skip if already using i18n
-  if (content.includes("useTypedTranslation") || content.includes("useTranslation")) {
+  // Skip if already using i18n properly
+  if (content.includes("useTypedTranslation()") || content.includes("{ t }")) {
     return {
       file: filePath,
       transformed: false,
       changes: [],
-      reason: "Already uses i18n",
+      reason: "Already properly uses i18n",
     };
   }
 
@@ -53,29 +53,36 @@ function transformFile(filePath, existingTranslations) {
   const namespace = inferNamespace(filePath);
   const hookName = getHookName(namespace);
 
-  // Add import if needed
-  if (!content.includes("useTypedTranslation") && needsTranslationImport(content)) {
-    content = addTranslationImport(content, hookName);
-    changes.push({ type: "import_added", hook: hookName });
-  }
-
-  // Add hook usage if needed
-  if (
-    !content.includes(`const { t } = ${hookName}()`) &&
-    needsTranslationUsage(content, changes)
-  ) {
-    content = addTranslationUsage(content, hookName);
-    changes.push({ type: "hook_usage_added", hook: hookName });
-  }
-
-  // Replace strings with translation keys
+  // First, check what strings we can actually replace
   const stringReplacements = replaceStringsWithTranslations(
     content,
     filePath,
     existingTranslations,
   );
-  content = stringReplacements.content;
-  changes.push(...stringReplacements.changes);
+
+  // Only add imports and hooks if we actually have strings to replace
+  if (stringReplacements.changes.length > 0) {
+    // Add import if needed
+    if (!content.includes("useTypedTranslation")) {
+      content = addTranslationImport(content, hookName);
+      changes.push({ type: "import_added", hook: hookName });
+    }
+
+    // Add hook usage if needed
+    if (!content.includes(`const { t } = ${hookName}()`)) {
+      content = addTranslationUsage(content, hookName);
+      changes.push({ type: "hook_usage_added", hook: hookName });
+    }
+
+    // Now apply the string replacements to the content that already has imports/hooks
+    const finalReplacements = replaceStringsWithTranslations(
+      content,
+      filePath,
+      existingTranslations,
+    );
+    content = finalReplacements.content;
+    changes.push(...finalReplacements.changes);
+  }
 
   // Write back if changed
   const transformed = content !== originalContent;
@@ -155,15 +162,30 @@ function addTranslationImport(content, hookName) {
  * Add translation hook usage
  */
 function addTranslationUsage(content, hookName) {
-  // Find component function or hook
-  const componentMatch = content.match(
-    /(export\s+(const|function)\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>)/,
-  );
+  // Find component function with proper regex that captures the full signature INCLUDING the opening brace
+  const functionPatterns = [
+    // Function declarations: export function Name(params) {
+    /(export\s+function\s+\w+\s*\([^)]*\)\s*\{)/,
+    // Regular function declarations: function Name(params) {
+    /(function\s+\w+\s*\([^)]*\)\s*\{)/,
+    // Arrow function components: export const Name = (params) => {
+    /(export\s+const\s+\w+\s*=\s*\([^)]*\)\s*=>\s*\{)/,
+    // Regular arrow functions: const Name = (params) => {
+    /(const\s+\w+\s*=\s*\([^)]*\)\s*=>\s*\{)/,
+    // Function without parameters: export function Name() {
+    /(export\s+function\s+\w+\s*\(\s*\)\s*\{)/,
+    // Arrow without parameters: export const Name = () => {
+    /(export\s+const\s+\w+\s*=\s*\(\s*\)\s*=>\s*\{)/,
+  ];
 
-  if (componentMatch) {
-    const insertPosition = content.indexOf(componentMatch[0]) + componentMatch[0].length;
-    const hookUsage = `\n  const { t } = ${hookName}();`;
-    return content.slice(0, insertPosition) + hookUsage + content.slice(insertPosition);
+  for (const pattern of functionPatterns) {
+    const match = content.match(pattern);
+    if (match) {
+      // The match now includes the opening brace, so we can insert right after it
+      const insertPosition = content.indexOf(match[0]) + match[0].length;
+      const hookUsage = `\n  const { t } = ${hookName}();`;
+      return content.slice(0, insertPosition) + hookUsage + content.slice(insertPosition);
+    }
   }
 
   return content;

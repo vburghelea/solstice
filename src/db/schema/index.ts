@@ -6,6 +6,7 @@ export * from "./external-mechanic-map.schema";
 export * from "./faqs.schema";
 export * from "./game-systems.schema";
 export * from "./games.schema";
+export * from "./locales.schema";
 export * from "./media-assets.schema";
 export * from "./membership.schema";
 export * from "./notifications.schema";

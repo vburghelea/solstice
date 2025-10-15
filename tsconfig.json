@@ -26,6 +26,8 @@
     "scripts",
     "app.config.ts",
     "*.config.ts",
+    "vitest.config.*.ts",
+    "vitest.setup.ts",
     "netlify/**/*.ts",
     "e2e",
     "src/tests"

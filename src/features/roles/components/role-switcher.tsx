@@ -24,8 +24,11 @@ export function RoleSwitcher() {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+    if (!isHydrated) {
+      // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+      setIsHydrated(true);
+    }
+  }, [isHydrated]); // isHydrated only changes once, safe for hydration detection
   const [open, dispatchOpen] = useReducer(
     (state: boolean, action: "open" | "close" | "toggle") => {
       switch (action) {

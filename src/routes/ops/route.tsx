@@ -108,8 +108,11 @@ function OpsWorkspaceSummary() {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+    if (!isHydrated) {
+      // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+      setIsHydrated(true);
+    }
+  }, [isHydrated]); // isHydrated only changes once, safe for hydration detection
 
   const nextPipelineEvent = useMemo(() => pipelineList[0] ?? null, [pipelineList]);
   const criticalAttention = useMemo(

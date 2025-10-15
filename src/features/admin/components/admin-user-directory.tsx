@@ -448,8 +448,11 @@ export function AdminUserDirectory() {
 
   // Prevent hydration mismatch by only running role management queries on client
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    if (!isClient) {
+      // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+      setIsClient(true);
+    }
+  }, [isClient]); // isClient only changes once, safe for hydration detection
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [userSearchOpen, setUserSearchOpen] = useState(false);

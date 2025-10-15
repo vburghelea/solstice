@@ -230,8 +230,11 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   const isAuthenticated = Boolean(user?.id);
 
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+    if (!isHydrated) {
+      // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+      setIsHydrated(true);
+    }
+  }, [isHydrated]); // isHydrated only changes once, safe for hydration detection
 
   useEffect(() => {
     posthog.onFeatureFlags(() => {

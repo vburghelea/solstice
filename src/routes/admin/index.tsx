@@ -67,8 +67,8 @@ function AdminOverview() {
           Platform governance cockpit
         </h2>
         <p className="text-body-sm text-muted-strong">
-          Jordan’s workspace now surfaces live insights, role coverage, and rollout
-          controls tailored to the stewardship remit.
+          The Admin workspace surfaces live insights, role coverage, and rollout controls
+          tailored to the stewardship remit.
         </p>
       </div>
       <div className="token-gap-md grid gap-4 md:grid-cols-2">
@@ -144,7 +144,7 @@ function AdminOverview() {
           <CardHeader className="token-stack-xs">
             <CardTitle className="text-heading-xs">Security posture</CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Review incidents, guardrails, and audit logs tailored for Jordan’s
+              Review incidents, guardrails, and audit logs tailored for the admins'
               stewardship remit.
             </CardDescription>
           </CardHeader>
@@ -168,7 +168,7 @@ function AdminOverview() {
           <CardHeader className="token-stack-xs">
             <CardTitle className="text-heading-xs">Live insights preview</CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Streamlined metrics keep Jordan oriented before diving into the full
+              Streamlined metrics keep admins oriented before diving into the full
               console.
             </CardDescription>
           </CardHeader>

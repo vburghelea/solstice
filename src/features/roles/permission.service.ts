@@ -15,7 +15,28 @@ export class PermissionService {
       .where(
         and(
           eq(userRoles.userId, userId),
-          inArray(roles.name, ["Platform Admin", "Games Admin"]),
+          inArray(roles.name, ["Platform Admin", "Roundup Games Admin", "Super Admin"]),
+        ),
+      )
+      .limit(1);
+
+    return !!row;
+  }
+
+  /**
+   * Check if a user can delete other users (Super Admin or Platform Admin only)
+   */
+  static async canDeleteUsers(userId: string): Promise<boolean> {
+    const { db } = await import("~/db");
+    const database = await db();
+    const [row] = await database
+      .select()
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(
+        and(
+          eq(userRoles.userId, userId),
+          inArray(roles.name, ["Super Admin", "Platform Admin"]),
         ),
       )
       .limit(1);
@@ -153,8 +174,25 @@ export function isAnyAdmin(user: { roles?: Array<{ role: { name: string } }> }):
   if (!user.roles) return false;
 
   return user.roles.some((userRole) =>
-    ["Platform Admin", "Games Admin", "Team Admin", "Event Admin"].includes(
-      userRole.role.name,
-    ),
+    [
+      "Platform Admin",
+      "Roundup Games Admin",
+      "Super Admin",
+      "Team Admin",
+      "Event Admin",
+    ].includes(userRole.role.name),
+  );
+}
+
+/**
+ * Client-side helper to check if user can delete other users (Super Admin or Platform Admin only)
+ */
+export function canDeleteUsers(user: {
+  roles?: Array<{ role: { name: string } }>;
+}): boolean {
+  if (!user.roles) return false;
+
+  return user.roles.some((userRole) =>
+    ["Super Admin", "Platform Admin"].includes(userRole.role.name),
   );
 }

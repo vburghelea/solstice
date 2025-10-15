@@ -43,7 +43,7 @@ const curatedFlags: Array<{
     key: "persona-coming-soon-visitor",
     label: "Visitor coming-soon card",
     description:
-      "Controls whether the visitor namespace shows the feedback module Jordan uses for narrative intake.",
+      "Controls whether the visitor namespace shows the feedback module they use for narrative intake.",
   },
   {
     key: "persona-coming-soon-player",
@@ -55,19 +55,19 @@ const curatedFlags: Array<{
     key: "persona-coming-soon-ops",
     label: "Operations coming-soon card",
     description:
-      "Determines if Priya sees the ops workspace preview or the production console.",
+      "Determines if the ops workspace preview or the production console are visible.",
   },
   {
     key: "persona-coming-soon-gm",
     label: "GM coming-soon card",
     description:
-      "Keeps Alex's studio experience behind a flag for iterative testing with Jordan's oversight.",
+      "Keeps the GM studio experience behind a flag for iterative testing with admins' oversight.",
   },
   {
     key: "persona-coming-soon-admin",
     label: "Admin coming-soon card",
     description:
-      "Legacy placeholder for Jordan's workspace. Disable once the governance console ships.",
+      "Legacy placeholder for the admin workspace. Disable once the governance console ships.",
   },
   {
     key: WORKSPACE_FEATURE_FLAGS.sharedInbox,

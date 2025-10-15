@@ -40,6 +40,20 @@ const DEFAULT_ROLES: Array<InferInsertModel<typeof roles>> = [
     },
   },
   {
+    id: "super-admin",
+    name: "Super Admin",
+    description: "Super administrator with elevated system access",
+    permissions: {
+      "system:*": true,
+      "roles:manage": true,
+      "memberships:manage": true,
+      "events:manage": true,
+      "teams:manage": true,
+      "reports:view": true,
+      "super:*": true,
+    },
+  },
+  {
     id: "team-admin",
     name: "Team Admin",
     description: "Administrator for a specific team",

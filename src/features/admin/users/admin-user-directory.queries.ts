@@ -32,6 +32,8 @@ type AdminUserRecordWire = {
   membershipStatus: AdminMembershipStatus;
   membershipExpiresAt: string | null;
   membershipTypeName: string | null;
+  image: string | null;
+  uploadedAvatarPath: string | null;
   roles: {
     id: string;
     roleId: string;
@@ -215,6 +217,8 @@ async function fetchAdminDirectory({ filters, page, pageSize }: QueryContext) {
       emailVerified: user.emailVerified,
       profileComplete: user.profileComplete,
       createdAt: user.createdAt,
+      image: user.image,
+      uploadedAvatarPath: user.uploadedAvatarPath,
     })
     .from(user);
 
@@ -336,7 +340,8 @@ async function fetchAdminDirectory({ filters, page, pageSize }: QueryContext) {
 
   const personaRoleMap: Record<string, { personaId: string; label: string }> = {
     "Platform Admin": { personaId: "admin", label: "Platform Admin" },
-    "Games Admin": { personaId: "admin", label: "Games Admin" },
+    "Roundup Games Admin": { personaId: "admin", label: "Roundup Games Admin" },
+    "Super Admin": { personaId: "admin", label: "Super Admin" },
     "Event Admin": { personaId: "ops", label: "Event Admin" },
     "Team Admin": { personaId: "ops", label: "Team Admin" },
     "Game Master": { personaId: "gm", label: "Game Master" },
@@ -424,6 +429,8 @@ async function fetchAdminDirectory({ filters, page, pageSize }: QueryContext) {
       membershipStatus,
       membershipExpiresAt,
       membershipTypeName: membership?.membershipTypeName ?? null,
+      image: row.image,
+      uploadedAvatarPath: row.uploadedAvatarPath,
       roles: assignments.map((assignment) => ({
         id: assignment.id,
         roleId: assignment.roleId,

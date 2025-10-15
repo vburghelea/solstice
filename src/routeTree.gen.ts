@@ -64,7 +64,6 @@ import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-pas
 import { Route as AdminUsersRouteImport } from "./routes/admin/users";
 import { Route as AdminSystemsRouteImport } from "./routes/admin/systems";
 import { Route as AdminSecurityRouteImport } from "./routes/admin/security";
-import { Route as AdminRolesRouteImport } from "./routes/admin/roles";
 import { Route as AdminInsightsRouteImport } from "./routes/admin/insights";
 import { Route as AdminInboxRouteImport } from "./routes/admin/inbox";
 import { Route as AdminFeatureFlagsRouteImport } from "./routes/admin/feature-flags";
@@ -109,6 +108,7 @@ import { Route as PlayerTeamsTeamIdManageRouteImport } from "./routes/player/tea
 import { Route as PlayerEventsEventIdManageRouteImport } from "./routes/player/events/$eventId.manage";
 import { Route as PlayerCampaignsCampaignIdZeroRouteImport } from "./routes/player/campaigns/$campaignId/zero";
 import { Route as OpsEventsEventIdManageRouteImport } from "./routes/ops/events/$eventId.manage";
+import { Route as ApiAdminUsersDeleteRouteImport } from "./routes/api/admin/users/delete";
 import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
 import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
 import { ServerRoute as ApiDebugSquareServerRouteImport } from "./routes/api/debug-square";
@@ -398,11 +398,6 @@ const AdminSecurityRoute = AdminSecurityRouteImport.update({
   path: "/security",
   getParentRoute: () => AdminRouteRoute,
 } as any);
-const AdminRolesRoute = AdminRolesRouteImport.update({
-  id: "/roles",
-  path: "/roles",
-  getParentRoute: () => AdminRouteRoute,
-} as any);
 const AdminInsightsRoute = AdminInsightsRouteImport.update({
   id: "/insights",
   path: "/insights",
@@ -628,6 +623,11 @@ const OpsEventsEventIdManageRoute = OpsEventsEventIdManageRouteImport.update({
   path: "/manage",
   getParentRoute: () => OpsEventsEventIdRoute,
 } as any);
+const ApiAdminUsersDeleteRoute = ApiAdminUsersDeleteRouteImport.update({
+  id: "/api/admin/users/delete",
+  path: "/api/admin/users/delete",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
   id: "/api/test-square",
   path: "/api/test-square",
@@ -731,7 +731,6 @@ export interface FileRoutesByFullPath {
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
   "/admin/inbox": typeof AdminInboxRoute;
   "/admin/insights": typeof AdminInsightsRoute;
-  "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
   "/admin/systems": typeof AdminSystemsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
@@ -805,6 +804,7 @@ export interface FileRoutesByFullPath {
   "/player/profile": typeof PlayerProfileIndexRoute;
   "/player/settings": typeof PlayerSettingsIndexRoute;
   "/player/teams/": typeof PlayerTeamsIndexRoute;
+  "/api/admin/users/delete": typeof ApiAdminUsersDeleteRoute;
   "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
   "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
   "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
@@ -824,7 +824,6 @@ export interface FileRoutesByTo {
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
   "/admin/inbox": typeof AdminInboxRoute;
   "/admin/insights": typeof AdminInsightsRoute;
-  "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
   "/admin/users": typeof AdminUsersRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
@@ -887,6 +886,7 @@ export interface FileRoutesByTo {
   "/player/profile": typeof PlayerProfileIndexRoute;
   "/player/settings": typeof PlayerSettingsIndexRoute;
   "/player/teams": typeof PlayerTeamsIndexRoute;
+  "/api/admin/users/delete": typeof ApiAdminUsersDeleteRoute;
   "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
   "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
   "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
@@ -914,7 +914,6 @@ export interface FileRoutesById {
   "/admin/feature-flags": typeof AdminFeatureFlagsRoute;
   "/admin/inbox": typeof AdminInboxRoute;
   "/admin/insights": typeof AdminInsightsRoute;
-  "/admin/roles": typeof AdminRolesRoute;
   "/admin/security": typeof AdminSecurityRoute;
   "/admin/systems": typeof AdminSystemsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
@@ -988,6 +987,7 @@ export interface FileRoutesById {
   "/player/profile/": typeof PlayerProfileIndexRoute;
   "/player/settings/": typeof PlayerSettingsIndexRoute;
   "/player/teams/": typeof PlayerTeamsIndexRoute;
+  "/api/admin/users/delete": typeof ApiAdminUsersDeleteRoute;
   "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
   "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
   "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
@@ -1016,7 +1016,6 @@ export interface FileRouteTypes {
     | "/admin/feature-flags"
     | "/admin/inbox"
     | "/admin/insights"
-    | "/admin/roles"
     | "/admin/security"
     | "/admin/systems"
     | "/admin/users"
@@ -1090,6 +1089,7 @@ export interface FileRouteTypes {
     | "/player/profile"
     | "/player/settings"
     | "/player/teams/"
+    | "/api/admin/users/delete"
     | "/ops/events/$eventId/manage"
     | "/player/campaigns/$campaignId/zero"
     | "/player/events/$eventId/manage"
@@ -1109,7 +1109,6 @@ export interface FileRouteTypes {
     | "/admin/feature-flags"
     | "/admin/inbox"
     | "/admin/insights"
-    | "/admin/roles"
     | "/admin/security"
     | "/admin/users"
     | "/auth/forgot-password"
@@ -1172,6 +1171,7 @@ export interface FileRouteTypes {
     | "/player/profile"
     | "/player/settings"
     | "/player/teams"
+    | "/api/admin/users/delete"
     | "/ops/events/$eventId/manage"
     | "/player/campaigns/$campaignId/zero"
     | "/player/events/$eventId/manage"
@@ -1198,7 +1198,6 @@ export interface FileRouteTypes {
     | "/admin/feature-flags"
     | "/admin/inbox"
     | "/admin/insights"
-    | "/admin/roles"
     | "/admin/security"
     | "/admin/systems"
     | "/admin/users"
@@ -1272,6 +1271,7 @@ export interface FileRouteTypes {
     | "/player/profile/"
     | "/player/settings/"
     | "/player/teams/"
+    | "/api/admin/users/delete"
     | "/ops/events/$eventId/manage"
     | "/player/campaigns/$campaignId/zero"
     | "/player/events/$eventId/manage"
@@ -1299,6 +1299,7 @@ export interface RootRouteChildren {
   SystemsIndexRoute: typeof SystemsIndexRoute;
   DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
+  ApiAdminUsersDeleteRoute: typeof ApiAdminUsersDeleteRoute;
 }
 export interface FileServerRoutesByFullPath {
   "/api/debug-square": typeof ApiDebugSquareServerRoute;
@@ -1804,13 +1805,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AdminSecurityRouteImport;
       parentRoute: typeof AdminRouteRoute;
     };
-    "/admin/roles": {
-      id: "/admin/roles";
-      path: "/roles";
-      fullPath: "/admin/roles";
-      preLoaderRoute: typeof AdminRolesRouteImport;
-      parentRoute: typeof AdminRouteRoute;
-    };
     "/admin/insights": {
       id: "/admin/insights";
       path: "/insights";
@@ -2119,6 +2113,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof OpsEventsEventIdManageRouteImport;
       parentRoute: typeof OpsEventsEventIdRoute;
     };
+    "/api/admin/users/delete": {
+      id: "/api/admin/users/delete";
+      path: "/api/admin/users/delete";
+      fullPath: "/api/admin/users/delete";
+      preLoaderRoute: typeof ApiAdminUsersDeleteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 declare module "@tanstack/react-start/server" {
@@ -2258,7 +2259,6 @@ interface AdminRouteRouteChildren {
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute;
   AdminInboxRoute: typeof AdminInboxRoute;
   AdminInsightsRoute: typeof AdminInsightsRoute;
-  AdminRolesRoute: typeof AdminRolesRoute;
   AdminSecurityRoute: typeof AdminSecurityRoute;
   AdminSystemsRoute: typeof AdminSystemsRouteWithChildren;
   AdminUsersRoute: typeof AdminUsersRoute;
@@ -2271,7 +2271,6 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminInboxRoute: AdminInboxRoute,
   AdminInsightsRoute: AdminInsightsRoute,
-  AdminRolesRoute: AdminRolesRoute,
   AdminSecurityRoute: AdminSecurityRoute,
   AdminSystemsRoute: AdminSystemsRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
@@ -2625,6 +2624,7 @@ const rootRouteChildren: RootRouteChildren = {
   SystemsIndexRoute: SystemsIndexRoute,
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
+  ApiAdminUsersDeleteRoute: ApiAdminUsersDeleteRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

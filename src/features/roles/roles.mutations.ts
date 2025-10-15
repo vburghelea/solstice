@@ -58,10 +58,20 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
         };
       }
 
-      const { requireAdmin, GLOBAL_ADMIN_ROLE_NAMES } = await import(
-        "~/lib/auth/utils/admin-check"
-      );
-      await requireAdmin(session.user.id);
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const { GLOBAL_ADMIN_ROLE_NAMES } = await import("~/lib/auth/utils/admin-check");
+      const isAdmin = await PermissionService.isGlobalAdmin(session.user.id);
+      if (!isAdmin) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "UNAUTHORIZED",
+              message: "Admin access required",
+            },
+          ],
+        };
+      }
 
       const db = await getDb();
       const { roles, user, userRoles } = await import("~/db/schema");
@@ -301,8 +311,19 @@ export const removeRoleAssignment = createServerFn({ method: "POST" })
         };
       }
 
-      const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-      await requireAdmin(session.user.id);
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(session.user.id);
+      if (!isAdmin) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "UNAUTHORIZED",
+              message: "Admin access required",
+            },
+          ],
+        };
+      }
 
       const db = await getDb();
       const { roles, userRoles, user } = await import("~/db/schema");

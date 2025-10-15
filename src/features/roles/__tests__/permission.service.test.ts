@@ -38,8 +38,8 @@ describe("PermissionService", () => {
       expect(result).toBe(true);
     });
 
-    it("should return true for Games Admin", async () => {
-      const mockResult = [{ id: "role-2", name: "Games Admin" }];
+    it("should return true for Super Admin", async () => {
+      const mockResult = [{ id: "role-2", name: "Super Admin" }];
       mockDbInstance.limit.mockResolvedValueOnce(mockResult);
 
       const result = await PermissionService.isGlobalAdmin("user-123");

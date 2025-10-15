@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
-import { PersonaNamespaceFallback } from "~/features/layouts/persona-namespace-layout";
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { useActivePersona } from "~/features/roles/role-switcher-context";
 import { auth } from "~/lib/auth-client";
@@ -239,9 +238,14 @@ export function RoleWorkspaceLayout({
                 <div>
                   <Suspense
                     fallback={
-                      <PersonaNamespaceFallback
-                        label={fallbackLabel ?? resolvedWorkspaceLabel}
-                      />
+                      <div className="bg-surface-subtle border-subtle text-subtle token-gap-xs flex flex-col rounded-xl border border-dashed p-6">
+                        <span className="text-eyebrow">Loading workspace</span>
+                        <p className="text-body-sm">
+                          Preparing{" "}
+                          {(fallbackLabel ?? resolvedWorkspaceLabel).toLowerCase()}{" "}
+                          experience...
+                        </p>
+                      </div>
                     }
                   >
                     <Outlet />

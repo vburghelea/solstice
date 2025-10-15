@@ -40,36 +40,6 @@ const curatedFlags: Array<{
   description: string;
 }> = [
   {
-    key: "persona-coming-soon-visitor",
-    label: "Visitor coming-soon card",
-    description:
-      "Controls whether the visitor namespace shows the feedback module they use for narrative intake.",
-  },
-  {
-    key: "persona-coming-soon-player",
-    label: "Player coming-soon card",
-    description:
-      "Toggles the player dashboard placeholder for safe rollout sequencing across personas.",
-  },
-  {
-    key: "persona-coming-soon-ops",
-    label: "Operations coming-soon card",
-    description:
-      "Determines if the ops workspace preview or the production console are visible.",
-  },
-  {
-    key: "persona-coming-soon-gm",
-    label: "GM coming-soon card",
-    description:
-      "Keeps the GM studio experience behind a flag for iterative testing with admins' oversight.",
-  },
-  {
-    key: "persona-coming-soon-admin",
-    label: "Admin coming-soon card",
-    description:
-      "Legacy placeholder for the admin workspace. Disable once the governance console ships.",
-  },
-  {
     key: WORKSPACE_FEATURE_FLAGS.sharedInbox,
     label: "Workspace shared inbox",
     description:
@@ -121,9 +91,9 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
         : "Disabled";
 
   return (
-    <div className="border-border token-gap-sm rounded-lg border p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="token-stack-xs">
+    <div className="border-border bg-surface-default rounded-lg border p-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="token-stack-sm min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {effective ? (
               <ToggleRightIcon aria-hidden className="size-5 text-emerald-600" />
@@ -134,7 +104,7 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
               {flag.label ?? flag.key}
             </p>
           </div>
-          <p className="text-body-xs text-muted-foreground">
+          <p className="text-body-xs text-muted-foreground mt-1">
             {flag.description ?? "Custom flag override"}
           </p>
         </div>
@@ -145,23 +115,27 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
           >
             Env: {environmentLabel}
           </Badge>
-          <Badge variant="outline" className="border-transparent">
+          <Badge
+            variant={override === null ? "outline" : override ? "default" : "secondary"}
+            className="border-transparent"
+          >
             Override: {override === null ? "None" : override ? "Enabled" : "Disabled"}
           </Badge>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="token-gap-sm mt-4 flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"
           onClick={() => setFeatureFlagOverride(flag.key, true)}
+          className={effective ? "bg-emerald-600 hover:bg-emerald-700" : ""}
         >
           Enable
         </Button>
         <Button
           type="button"
           size="sm"
-          variant="secondary"
+          variant={!effective ? "destructive" : "secondary"}
           onClick={() => setFeatureFlagOverride(flag.key, false)}
         >
           Disable
@@ -169,13 +143,21 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
         <Button
           type="button"
           size="sm"
-          variant="ghost"
+          variant="outline"
           onClick={() => setFeatureFlagOverride(flag.key, null)}
+          className="text-muted-foreground hover:text-foreground"
         >
           Clear override
         </Button>
-        <span className="text-body-xs text-muted-foreground">
-          Effective state: {effective ? "Enabled" : "Disabled"}
+        <span className="text-body-xs text-muted-foreground ml-auto">
+          Effective state:{" "}
+          <span
+            className={
+              effective ? "font-medium text-emerald-600" : "text-muted-foreground"
+            }
+          >
+            {effective ? "Enabled" : "Disabled"}
+          </span>
         </span>
       </div>
     </div>
@@ -318,14 +300,14 @@ export function AdminFeatureFlagConsole() {
             </p>
           </div>
         ) : (
-          <div className="token-stack-sm">
+          <div className="token-gap-sm">
             {allFlags.map((flag) => (
               <FeatureFlagRow key={flag.key} flag={flag} />
             ))}
           </div>
         )}
         {data?.flags.length ? (
-          <p className="text-body-xs text-muted-foreground">
+          <p className="text-body-xs text-muted-foreground border-border/60 border-t pt-2">
             Environment snapshot refreshed{" "}
             {formatDistanceToNow(new Date(), { addSuffix: true })}
           </p>

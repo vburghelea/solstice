@@ -33,7 +33,7 @@
     "docs:reference": "typedoc",
     "docs:erd": "node scripts/generate-erd.js",
     "docs:all": "pnpm docs:reference && pnpm docs:erd",
-    "i18n:extract": "node scripts/extract-translations.js",
+    "i18n:extract": "node scripts/extract-hardcoded-strings.js",
     "i18n:validate": "node scripts/validate-translations.js",
     "i18n:sync": "node scripts/sync-translations.js",
     "i18n:generate-types": "node scripts/generate-translation-types.js",

@@ -3,6 +3,7 @@
 /**
  * Generate TypeScript types from translation files
  * This script reads JSON translation files and generates TypeScript type definitions
+ * Uses i18next-parser configuration for consistency.
  */
 
 import { existsSync, readFileSync, writeFileSync } from "fs";
@@ -13,38 +14,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
 
-// Configuration
-const LOCALES_DIR = path.join(projectRoot, "src/lib/i18n/locales");
-const EN_LOCALE_DIR = path.join(LOCALES_DIR, "en");
-const TYPES_OUTPUT_FILE = path.join(projectRoot, "src/lib/i18n/generated-types.ts");
+// Load i18next-parser configuration
+const i18nextConfig = await import(path.join(projectRoot, "i18next-parser.config.js"));
 
-// Namespaces to process
-const NAMESPACES = [
-  "common",
-  "auth",
-  "navigation",
-  "games",
-  "events",
-  "teams",
-  "forms",
-  "errors",
-  "admin",
-  "campaigns",
-  "membership",
-  "player",
-  "profile",
-  "settings",
-  "collaboration",
-  "consent",
-  "game-systems",
-  "gm",
-  "inbox",
-  "members",
-  "ops",
-  "reviews",
-  "roles",
-  "social",
-];
+// Extract configuration from i18next-parser config
+const CONFIG = {
+  languages: i18nextConfig.default.options.lngs,
+  defaultLanguage: i18nextConfig.default.options.defaultLng,
+  defaultNs: i18nextConfig.default.options.defaultNs,
+  localesDir: path.join(
+    projectRoot,
+    i18nextConfig.default.options.resource.loadPath
+      .replace("{{lng}}/", "")
+      .replace("/{{ns}}.json", ""),
+  ),
+  namespaces: i18nextConfig.default.options.ns,
+};
+
+const EN_LOCALE_DIR = path.join(CONFIG.localesDir, CONFIG.defaultLanguage);
+const TYPES_OUTPUT_FILE = path.join(projectRoot, "src/lib/i18n/generated-types.ts");
 
 /**
  * Convert a nested object to TypeScript interface with dot notation keys
@@ -114,12 +102,16 @@ function capitalize(str) {
  */
 function generateTranslationTypes() {
   console.log("🔧 Generating TypeScript types from translation files...");
+  console.log(`   Using i18next-parser configuration`);
+  console.log(`   Languages: ${CONFIG.languages.join(", ")}`);
+  console.log(`   Namespaces: ${CONFIG.namespaces.join(", ")}`);
+  console.log(`   Default language: ${CONFIG.defaultLanguage}`);
 
   const types = [];
   const allKeys = new Set();
 
-  // Process each namespace
-  for (const namespace of NAMESPACES) {
+  // Process each namespace from configuration
+  for (const namespace of CONFIG.namespaces) {
     const filePath = path.join(EN_LOCALE_DIR, `${namespace}.json`);
 
     if (existsSync(filePath)) {

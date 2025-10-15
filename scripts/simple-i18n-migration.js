@@ -107,7 +107,11 @@ function analyzeFile(filePath, existingTranslations) {
   const strings = [];
 
   // IMPROVED: First check what strings we can actually translate
-  const translatableStrings = findTranslatableStrings(content, existingTranslations);
+  const translatableStrings = findTranslatableStrings(
+    content,
+    existingTranslations,
+    filePath,
+  );
 
   return {
     file: filePath,
@@ -124,7 +128,7 @@ function analyzeFile(filePath, existingTranslations) {
 /**
  * IMPROVED: Find strings that can actually be translated with existing translations
  */
-function findTranslatableStrings(content, existingTranslations) {
+function findTranslatableStrings(content, existingTranslations, filePath) {
   const strings = [];
 
   // Simple regex patterns for common hardcoded strings

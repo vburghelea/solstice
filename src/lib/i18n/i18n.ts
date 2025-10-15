@@ -9,12 +9,9 @@ import adminEn from "./locales/en/admin.json";
 import authEn from "./locales/en/auth.json";
 import campaignsEn from "./locales/en/campaigns.json";
 import commonEn from "./locales/en/common.json";
-import errorsEn from "./locales/en/errors.json";
 import eventsEn from "./locales/en/events.json";
-import formsEn from "./locales/en/forms.json";
 import gamesEn from "./locales/en/games.json";
 import membershipEn from "./locales/en/membership.json";
-import navigationEn from "./locales/en/navigation.json";
 import playerEn from "./locales/en/player.json";
 import profileEn from "./locales/en/profile.json";
 import settingsEn from "./locales/en/settings.json";
@@ -25,13 +22,10 @@ const resources = {
   en: {
     common: commonEn,
     auth: authEn,
-    navigation: navigationEn,
     games: gamesEn,
     events: eventsEn,
     teams: teamsEn,
     player: playerEn,
-    forms: formsEn,
-    errors: errorsEn,
     admin: adminEn,
     campaigns: campaignsEn,
     membership: membershipEn,

@@ -41,8 +41,19 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
         };
       }
 
-      const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-      await requireAdmin(session.user.id);
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(session.user.id);
+      if (!isAdmin) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "UNAUTHORIZED",
+              message: "Admin access required",
+            },
+          ],
+        };
+      }
 
       const db = await getDb();
       const { roles, userRoles, user } = await import("~/db/schema");
@@ -145,8 +156,19 @@ export const searchRoleEligibleUsers = createServerFn({ method: "POST" })
         };
       }
 
-      const { requireAdmin } = await import("~/lib/auth/utils/admin-check");
-      await requireAdmin(session.user.id);
+      const { PermissionService } = await import("~/features/roles/permission.service");
+      const isAdmin = await PermissionService.isGlobalAdmin(session.user.id);
+      if (!isAdmin) {
+        return {
+          success: false,
+          errors: [
+            {
+              code: "UNAUTHORIZED",
+              message: "Admin access required",
+            },
+          ],
+        };
+      }
 
       const db = await getDb();
       const { user, userRoles, roles } = await import("~/db/schema");

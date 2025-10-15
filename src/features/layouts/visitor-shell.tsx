@@ -82,7 +82,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                   userId={user.id}
                   className="size-8"
                 />
-                <span>Account</span>
+                <span>{user.name}</span>
               </Link>
             ) : (
               <>
@@ -163,7 +163,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                       userId={user.id}
                       className="size-8"
                     />
-                    <span>Account</span>
+                    <span>{user.name}</span>
                   </Link>
                 ) : (
                   <>

@@ -6,6 +6,7 @@ import { Calendar, ChevronRight, Gamepad2, PlusIcon, Users } from "lucide-react"
 import { toast } from "sonner";
 import { z } from "zod";
 import { Card, CardContent } from "~/components/ui/card";
+import { RoleBadge } from "~/components/ui/RoleBadge";
 import {
   Select,
   SelectContent,
@@ -14,6 +15,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { campaignStatusEnum } from "~/db/schema";
+import { participantRoleEnum } from "~/db/schema/shared.schema";
 import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
@@ -23,12 +25,13 @@ export const Route = createFileRoute("/player/campaigns/")({
   component: CampaignsPage,
   validateSearch: z.object({
     status: z.enum(campaignStatusEnum.enumValues).optional(),
+    userRole: z.enum(participantRoleEnum.enumValues).optional(),
     page: z.coerce.number().int().min(1).optional(),
     pageSize: z.coerce.number().int().min(1).max(100).optional(),
   }),
   loader: async () => {
     const result = await listCampaignsWithCount({
-      data: { filters: { status: "active" }, page: 1, pageSize: 20 },
+      data: { filters: { status: "active", userRole: "player" }, page: 1, pageSize: 20 },
     });
     if (!result.success) {
       toast.error("Failed to load campaigns.");
@@ -41,6 +44,7 @@ export const Route = createFileRoute("/player/campaigns/")({
 function CampaignsPage() {
   const {
     status = "active",
+    userRole = "player",
     page: searchPage,
     pageSize: searchPageSize,
   } = Route.useSearch();
@@ -49,10 +53,10 @@ function CampaignsPage() {
 
   const pageSize = Math.min(100, Math.max(1, Number(searchPageSize ?? 20)));
   const { data: campaignsData } = useSuspenseQuery({
-    queryKey: ["allVisibleCampaigns", status, page, pageSize],
+    queryKey: ["allVisibleCampaigns", status, userRole, page, pageSize],
     queryFn: async () => {
       const result = await listCampaignsWithCount({
-        data: { filters: { status }, page, pageSize },
+        data: { filters: { status, userRole }, page, pageSize },
       });
       if (!result.success) {
         toast.error("Failed to load campaigns.");
@@ -84,6 +88,7 @@ function CampaignsPage() {
               navigate({
                 search: {
                   status: value as (typeof campaignStatusEnum.enumValues)[number],
+                  userRole,
                 },
               });
             }}
@@ -95,6 +100,34 @@ function CampaignsPage() {
               {campaignStatusEnum.enumValues.map((status) => (
                 <SelectItem key={status} value={status}>
                   {status.charAt(0).toUpperCase() + status.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={userRole}
+            onValueChange={(value) => {
+              navigate({
+                search: {
+                  status,
+                  userRole: value as (typeof participantRoleEnum.enumValues)[number],
+                },
+              });
+            }}
+          >
+            <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              {participantRoleEnum.enumValues.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {role === "owner"
+                    ? "Organizer"
+                    : role === "player"
+                      ? "Participant"
+                      : role === "invited"
+                        ? "Invitee"
+                        : "Requested"}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -133,8 +166,17 @@ function CampaignsPage() {
                 <List.Item key={c.id} className="group">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="text-foreground truncate text-base font-semibold">
-                        {c.name}
+                      <div className="flex items-center gap-2">
+                        <div className="text-foreground truncate text-base font-semibold">
+                          {c.name}
+                        </div>
+                        {c.userRole && (
+                          <RoleBadge
+                            role={c.userRole.role}
+                            {...(c.userRole.status ? { status: c.userRole.status } : {})}
+                            compact
+                          />
+                        )}
                       </div>
                       <div className="text-muted-foreground mt-1 flex items-center gap-3 text-xs">
                         <span className="inline-flex items-center gap-1">
@@ -187,7 +229,9 @@ function CampaignsPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              navigate({ search: { status, page: Math.max(1, page - 1), pageSize } })
+              navigate({
+                search: { status, userRole, page: Math.max(1, page - 1), pageSize },
+              })
             }
             disabled={page <= 1}
           >
@@ -198,7 +242,12 @@ function CampaignsPage() {
             size="sm"
             onClick={() =>
               navigate({
-                search: { status, page: Math.min(totalPages, page + 1), pageSize },
+                search: {
+                  status,
+                  userRole,
+                  page: Math.min(totalPages, page + 1),
+                  pageSize,
+                },
               })
             }
             disabled={page >= totalPages}

@@ -354,7 +354,7 @@ export function AdminInsightsDashboard() {
           <CardHeader className="token-stack-sm">
             <CardTitle className="text-heading-sm">Live alerting</CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Channel routing and thresholds designed for Jordan's governance guardrails.
+              Channel routing and thresholds designed for the admin governance guardrails.
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">

@@ -85,4 +85,9 @@ export type CampaignListItem = Campaign & {
   campaignExpectations?: CampaignExpectationsType | null;
   tableExpectations?: TableExpectationsType | null;
   characterCreationOutcome?: string | null;
+  // User's role in this campaign (if logged in)
+  userRole?: {
+    role: ParticipantRole;
+    status?: ParticipantStatus;
+  } | null;
 };

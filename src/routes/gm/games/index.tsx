@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { RoleBadge } from "~/components/ui/RoleBadge";
 import {
   Select,
   SelectContent,
@@ -14,6 +15,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { gameStatusEnum } from "~/db/schema";
+import { participantRoleEnum } from "~/db/schema/shared.schema";
 import { GameCard } from "~/features/games/components/GameCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGamesWithCount } from "~/features/games/games.queries";
@@ -38,6 +40,7 @@ export const Route = createFileRoute("/gm/games/")({
   component: GamesPage,
   validateSearch: z.object({
     status: z.enum(gameStatusEnum.enumValues).optional(),
+    userRole: z.enum(participantRoleEnum.enumValues).optional(),
     page: z.coerce.number().int().min(1).optional(),
     pageSize: z.coerce.number().int().min(1).max(100).optional(),
   }),
@@ -46,7 +49,11 @@ export const Route = createFileRoute("/gm/games/")({
       items: GameListItem[];
       totalCount: number;
     }> = await listGamesWithCount({
-      data: { filters: { status: "scheduled" }, page: 1, pageSize: 20 },
+      data: {
+        filters: { status: "scheduled", userRole: "owner" },
+        page: 1,
+        pageSize: 20,
+      },
     });
     if (!result.success) {
       toast.error("Failed to load games.");
@@ -59,6 +66,7 @@ export const Route = createFileRoute("/gm/games/")({
 function GamesPage() {
   const {
     status = "scheduled",
+    userRole = "owner",
     page: searchPage,
     pageSize: searchPageSize,
   } = Route.useSearch();
@@ -71,13 +79,13 @@ function GamesPage() {
   const { data: gamesData } = useSuspenseQuery<
     OperationResult<{ items: GameListItem[]; totalCount: number }>
   >({
-    queryKey: ["allVisibleGames", status, page, pageSize],
+    queryKey: ["allVisibleGames", status, userRole, page, pageSize],
     queryFn: async () => {
       const result: OperationResult<{
         items: GameListItem[];
         totalCount: number;
       }> = await listGamesWithCount({
-        data: { filters: { status }, page, pageSize },
+        data: { filters: { status, userRole }, page, pageSize },
       });
       if (!result.success) {
         toast.error("Failed to load games.");
@@ -191,7 +199,10 @@ function GamesPage() {
             value={status}
             onValueChange={(value) => {
               navigate({
-                search: { status: value as (typeof gameStatusEnum.enumValues)[number] },
+                search: {
+                  status: value as (typeof gameStatusEnum.enumValues)[number],
+                  userRole,
+                },
               });
             }}
           >
@@ -202,6 +213,34 @@ function GamesPage() {
               {gameStatusEnum.enumValues.map((status) => (
                 <SelectItem key={status} value={status}>
                   {status.charAt(0).toUpperCase() + status.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={userRole}
+            onValueChange={(value) => {
+              navigate({
+                search: {
+                  status,
+                  userRole: value as (typeof participantRoleEnum.enumValues)[number],
+                },
+              });
+            }}
+          >
+            <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              {participantRoleEnum.enumValues.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {role === "owner"
+                    ? "Organizer"
+                    : role === "player"
+                      ? "Participant"
+                      : role === "invited"
+                        ? "Invitee"
+                        : "Requested"}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -255,6 +294,15 @@ function GamesPage() {
                             >
                               {g.status}
                             </Badge>
+                            {g.userRole && (
+                              <RoleBadge
+                                role={g.userRole.role}
+                                {...(g.userRole.status
+                                  ? { status: g.userRole.status }
+                                  : {})}
+                                compact
+                              />
+                            )}
                             <h3 className="truncate text-base leading-6 font-semibold">
                               {g.name}
                             </h3>
@@ -323,7 +371,9 @@ function GamesPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              navigate({ search: { status, page: Math.max(1, page - 1), pageSize } })
+              navigate({
+                search: { status, userRole, page: Math.max(1, page - 1), pageSize },
+              })
             }
             disabled={page <= 1}
           >
@@ -334,7 +384,12 @@ function GamesPage() {
             size="sm"
             onClick={() =>
               navigate({
-                search: { status, page: Math.min(totalPages, page + 1), pageSize },
+                search: {
+                  status,
+                  userRole,
+                  page: Math.min(totalPages, page + 1),
+                  pageSize,
+                },
               })
             }
             disabled={page >= totalPages}

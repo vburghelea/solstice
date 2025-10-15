@@ -20,7 +20,7 @@ export const listEventsSchema = z
       .optional(),
     page: z.number().int().positive().optional(),
     pageSize: z.number().int().positive().optional(),
-    sortBy: z.enum(["startDate", "createdAt", "name"]).optional(),
+    sortBy: z.enum(["startDate", "createdAt", "updatedAt", "name"]).optional(),
     sortOrder: z.enum(["asc", "desc"]).optional(),
   })
   .optional()

@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { RoleBadge } from "~/components/ui/RoleBadge";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
@@ -59,7 +60,16 @@ export function GameCard({
   return (
     <Card className="transition-shadow hover:shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl">{game.name}</CardTitle>
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="flex-1 text-xl">{game.name}</CardTitle>
+          {game.userRole && (
+            <RoleBadge
+              role={game.userRole.role}
+              {...(game.userRole.status ? { status: game.userRole.status } : {})}
+              className="shrink-0"
+            />
+          )}
+        </div>
         <div className="text-muted-foreground mt-1 flex items-center text-sm">
           <Calendar className="mr-2 h-4 w-4" />
           <span>{formattedDateTime}</span>

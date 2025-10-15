@@ -217,11 +217,11 @@ export function AdminSecurityCenter() {
             Security posture
           </p>
           <h1 className="text-heading-sm text-foreground font-semibold">
-            Steward safeguards for Jordan’s governance console
+            Steward safeguards for the governance console
           </h1>
           <p className="text-body-sm text-muted-strong max-w-2xl">
             Track platform defenses, guide incident review, and confirm that privileged
-            controls respect Jordan’s need for auditable guardrails.
+            controls respect admins' need for auditable guardrails.
           </p>
         </div>
         <Button
@@ -364,7 +364,7 @@ export function AdminSecurityCenter() {
             </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
               Prioritize mitigations that shield visitor, player, and operations trust
-              while Jordan monitors the console.
+              while admins monitor the console.
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">
@@ -438,7 +438,7 @@ export function AdminSecurityCenter() {
             </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
               Sequence the next best actions so audits stay fast and defensible for
-              Jordan.
+              admins.
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">
@@ -551,8 +551,7 @@ export function AdminSecurityCenter() {
           </AlertDialogHeader>
           <div className="token-stack-sm">
             <p className="text-body-sm text-muted-strong">
-              Provide context for Jordan’s audit log so we can trace stewardship
-              decisions.
+              Provide context for the audit log so we can trace stewardship decisions.
             </p>
             <Textarea
               value={reason}

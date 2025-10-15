@@ -17,13 +17,6 @@ interface PersonaSwitchPayload {
   reason?: string;
 }
 
-interface ComingSoonFeedbackPayload {
-  personaId: PersonaId;
-  namespacePath: string;
-  feedbackType: "like" | "dislike" | "suggest" | string;
-  message?: string;
-}
-
 export async function trackPersonaNavigationImpression(
   analytics: PersonaAnalyticsConfig,
   payload: PersonaNavigationPayload,
@@ -46,17 +39,5 @@ export async function trackPersonaSwitch(
     previousPersona: payload.previousPersonaId,
     intent: payload.intent,
     reason: payload.reason,
-  });
-}
-
-export async function trackComingSoonFeedback(
-  analytics: PersonaAnalyticsConfig,
-  payload: ComingSoonFeedbackPayload,
-): Promise<void> {
-  await captureEvent(analytics.feedbackEvent, {
-    persona: payload.personaId,
-    namespace: payload.namespacePath,
-    feedbackType: payload.feedbackType,
-    message: payload.message,
   });
 }

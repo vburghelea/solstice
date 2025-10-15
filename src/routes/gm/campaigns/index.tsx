@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { campaignStatusEnum } from "~/db/schema";
+import { participantRoleEnum } from "~/db/schema/shared.schema";
 import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/gm/campaigns/")({
   component: CampaignsPage,
   validateSearch: z.object({
     status: z.enum(campaignStatusEnum.enumValues).optional(),
+    userRole: z.enum(participantRoleEnum.enumValues).optional(),
     page: z.coerce.number().int().min(1).optional(),
     pageSize: z.coerce.number().int().min(1).max(100).optional(),
   }),
@@ -41,6 +43,7 @@ export const Route = createFileRoute("/gm/campaigns/")({
 function CampaignsPage() {
   const {
     status = "active",
+    userRole,
     page: searchPage,
     pageSize: searchPageSize,
   } = Route.useSearch();
@@ -49,10 +52,10 @@ function CampaignsPage() {
 
   const pageSize = Math.min(100, Math.max(1, Number(searchPageSize ?? 20)));
   const { data: campaignsData } = useSuspenseQuery({
-    queryKey: ["allVisibleCampaigns", status, page, pageSize],
+    queryKey: ["allVisibleCampaigns", status, userRole, page, pageSize],
     queryFn: async () => {
       const result = await listCampaignsWithCount({
-        data: { filters: { status }, page, pageSize },
+        data: { filters: { status, userRole }, page, pageSize },
       });
       if (!result.success) {
         toast.error("Failed to load campaigns.");
@@ -84,6 +87,7 @@ function CampaignsPage() {
               navigate({
                 search: {
                   status: value as (typeof campaignStatusEnum.enumValues)[number],
+                  userRole,
                 },
               });
             }}
@@ -95,6 +99,34 @@ function CampaignsPage() {
               {campaignStatusEnum.enumValues.map((status) => (
                 <SelectItem key={status} value={status}>
                   {status.charAt(0).toUpperCase() + status.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            {...(userRole ? { value: userRole } : {})}
+            onValueChange={(value) => {
+              navigate({
+                search: {
+                  status,
+                  userRole: value as (typeof participantRoleEnum.enumValues)[number],
+                },
+              });
+            }}
+          >
+            <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              {participantRoleEnum.enumValues.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {role === "owner"
+                    ? "Organizer"
+                    : role === "player"
+                      ? "Participant"
+                      : role === "invited"
+                        ? "Invitee"
+                        : "Requested"}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -187,7 +219,9 @@ function CampaignsPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              navigate({ search: { status, page: Math.max(1, page - 1), pageSize } })
+              navigate({
+                search: { status, userRole, page: Math.max(1, page - 1), pageSize },
+              })
             }
             disabled={page <= 1}
           >
@@ -198,7 +232,12 @@ function CampaignsPage() {
             size="sm"
             onClick={() =>
               navigate({
-                search: { status, page: Math.min(totalPages, page + 1), pageSize },
+                search: {
+                  status,
+                  userRole,
+                  page: Math.min(totalPages, page + 1),
+                  pageSize,
+                },
               })
             }
             disabled={page >= totalPages}

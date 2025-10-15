@@ -22,7 +22,11 @@ function hasClientAccess({
   eventId?: string;
 }): boolean {
   return requiredRoles.some((roleName) => {
-    if (roleName === "Platform Admin" || roleName === "Games Admin") {
+    if (
+      roleName === "Platform Admin" ||
+      roleName === "Roundup Games Admin" ||
+      roleName === "Super Admin"
+    ) {
       return isAdminClient(user);
     }
 
@@ -84,7 +88,11 @@ export async function requireRole({
   let hasAccess = false;
 
   for (const roleName of requiredRoles) {
-    if (roleName === "Platform Admin" || roleName === "Games Admin") {
+    if (
+      roleName === "Platform Admin" ||
+      roleName === "Roundup Games Admin" ||
+      roleName === "Super Admin"
+    ) {
       hasAccess = await PermissionService.isGlobalAdmin(user.id);
     } else if (roleName === "Team Admin" && teamId) {
       hasAccess = await PermissionService.canManageTeam(user.id, teamId);

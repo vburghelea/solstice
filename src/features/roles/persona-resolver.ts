@@ -12,7 +12,6 @@ const PERSONA_DEFINITIONS: PersonaDefinition[] = createPersonaDefinitions();
 
 const OPS_ROLE_NAMES = new Set([
   "Event Admin",
-  "Games Admin",
   "Platform Admin",
   "Roundup Games Admin",
   "Super Admin",
@@ -21,7 +20,6 @@ const OPS_ROLE_NAMES = new Set([
 const GM_ROLE_NAMES = new Set([
   "Game Master",
   "Story Guide",
-  "Games Admin",
   "Platform Admin",
   "Roundup Games Admin",
   "Super Admin",
@@ -187,8 +185,7 @@ function createPersonaDefinitions(): PersonaDefinition[] {
           ? { availability: "available" }
           : {
               availability: "restricted",
-              reason:
-                "Operations tools unlock when you're assigned an Event or Games Admin role.",
+              reason: "Operations tools unlock when you're assigned an Event Admin role.",
             },
     },
     {

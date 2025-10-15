@@ -11,7 +11,7 @@ export const Route = createFileRoute("/admin/systems/")({
   beforeLoad: async ({ context }) => {
     await requireRole({
       user: context.user,
-      requiredRoles: ["Platform Admin", "Games Admin"],
+      requiredRoles: ["Platform Admin", "Roundup Games Admin", "Super Admin"],
       redirectTo: "/admin",
     });
   },

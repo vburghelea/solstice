@@ -62,7 +62,7 @@ export default {
     ],
     resource: {
       loadPath: "src/lib/i18n/locales/{{lng}}/{{ns}}.json",
-      savePath: "temp-locales/{{lng}}/{{ns}}.json",
+      savePath: "src/lib/i18n/locales/{{lng}}/{{ns}}.json",
       jsonIndent: 2,
       lineEnding: "\n",
     },

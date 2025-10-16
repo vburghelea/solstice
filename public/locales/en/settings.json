@@ -1,0 +1,108 @@
+{
+  "title": "Settings",
+  "subtitle": "Manage your account settings and preferences",
+  "sections": {
+    "account": {
+      "title": "Account Settings",
+      "subtitle": "Manage your profile and account information",
+      "buttons": {
+        "save_changes": "Save changes",
+        "cancel": "Cancel"
+      },
+      "messages": {
+        "saved": "Account settings saved successfully",
+        "error": "Failed to save account settings"
+      }
+    },
+    "security": {
+      "title": "Security Settings",
+      "subtitle": "Manage your password and security preferences",
+      "password": {
+        "current_password": "Current password",
+        "new_password": "New password",
+        "confirm_new_password": "Confirm new password",
+        "button": "Change password",
+        "success": "Password changed successfully",
+        "error": "Failed to change password"
+      },
+      "two_factor": {
+        "title": "Two-Factor Authentication",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "enable": "Enable 2FA",
+        "disable": "Disable 2FA"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Manage your notification preferences",
+      "email_notifications": "Email Notifications",
+      "push_notifications": "Push Notifications",
+      "preferences": {
+        "marketing": "Marketing emails",
+        "updates": "Product updates",
+        "security": "Security alerts",
+        "messages": "Message notifications"
+      },
+      "buttons": {
+        "save": "Save preferences",
+        "reset": "Reset to default"
+      }
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "subtitle": "Manage your active sessions and devices",
+      "current_session": "Current session",
+      "device_info": "Device information",
+      "last_active": "Last active",
+      "actions": {
+        "revoke": "Revoke",
+        "revoke_all": "Revoke all other sessions"
+      },
+      "device_types": {
+        "mobile_device": "Mobile device",
+        "desktop": "Desktop",
+        "tablet": "Tablet"
+      },
+      "platforms": {
+        "macos": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "confirmation": {
+        "revoke_title": "Revoke Session",
+        "revoke_message": "Are you sure you want to revoke this session?",
+        "revoke_all_title": "Revoke All Sessions",
+        "revoke_all_message": "Are you sure you want to revoke all other sessions?"
+      }
+    },
+    "privacy": {
+      "title": "Privacy Settings",
+      "subtitle": "Control your privacy and data sharing preferences",
+      "profile_visibility": "Profile Visibility",
+      "data_sharing": "Data Sharing",
+      "preferences": {
+        "public_profile": "Public profile",
+        "show_email": "Show email address",
+        "show_activity": "Show activity status",
+        "analytics": "Share usage analytics",
+        "personalization": "Personalized recommendations"
+      }
+    }
+  },
+  "errors": {
+    "load_failed": "Failed to load account overview",
+    "save_failed": "Failed to save settings",
+    "invalid_password": "Current password is incorrect",
+    "password_mismatch": "New passwords do not match",
+    "session_revoke_failed": "Failed to revoke session"
+  },
+  "success": {
+    "settings_saved": "Settings saved successfully",
+    "password_changed": "Password changed successfully",
+    "session_revoked": "Session revoked successfully",
+    "all_sessions_revoked": "All other sessions revoked successfully"
+  }
+}

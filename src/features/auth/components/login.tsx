@@ -7,6 +7,7 @@ import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { useAuthTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 import { loginFormSchema } from "../auth.schemas";
@@ -16,6 +17,7 @@ type LoginFormProps = {
 };
 
 export default function LoginForm(props?: LoginFormProps) {
+  const { t } = useAuthTranslation();
   const queryClient = useQueryClient();
   const router = useRouter();
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ export default function LoginForm(props?: LoginFormProps) {
         const result = await auth.signIn.email(value);
 
         if (result?.error) {
-          throw new Error(result.error.message || "Invalid email or password");
+          throw new Error(result.error.message || t("login.errors.invalid_credentials"));
         }
 
         // Success path
@@ -60,7 +62,9 @@ export default function LoginForm(props?: LoginFormProps) {
         await navigateTo(safeRedirectPath);
       } catch (error) {
         // Error handling
-        setErrorMessage((error as Error)?.message || "Invalid email or password");
+        setErrorMessage(
+          (error as Error)?.message || t("login.errors.invalid_credentials"),
+        );
         // Keep form values but reset submitting state by resetting with current values
         form.reset(value);
       } finally {
@@ -89,7 +93,7 @@ export default function LoginForm(props?: LoginFormProps) {
               </div>
               <span className="sr-only">Roundup Games</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome back to Roundup Games</h1>
+            <h1 className="text-xl font-bold">{t("login.welcome_back")}</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field
@@ -101,9 +105,9 @@ export default function LoginForm(props?: LoginFormProps) {
                     return undefined;
                   } catch (error) {
                     if (error instanceof z.ZodError) {
-                      return error.errors?.[0]?.message || "Invalid email";
+                      return error.errors?.[0]?.message || t("validation.invalid_email");
                     }
-                    return "Invalid email";
+                    return t("validation.invalid_email");
                   }
                 },
               }}
@@ -111,9 +115,9 @@ export default function LoginForm(props?: LoginFormProps) {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Email"
+                  label={t("labels.email")}
                   type="email"
-                  placeholder="hello@example.com"
+                  placeholder={t("placeholders.email")}
                   autoComplete="email"
                   autoFocus
                 />
@@ -128,9 +132,11 @@ export default function LoginForm(props?: LoginFormProps) {
                     return undefined;
                   } catch (error) {
                     if (error instanceof z.ZodError) {
-                      return error.errors?.[0]?.message || "Password is required";
+                      return (
+                        error.errors?.[0]?.message || t("validation.password_required")
+                      );
                     }
-                    return "Password is required";
+                    return t("validation.password_required");
                   }
                 },
               }}
@@ -138,25 +144,25 @@ export default function LoginForm(props?: LoginFormProps) {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Password"
+                  label={t("labels.password")}
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("placeholders.password")}
                   autoComplete="current-password"
                 />
               )}
             </form.Field>
             <div className="text-right text-sm">
               <Link to="/auth/forgot-password" className="underline underline-offset-4">
-                Forgot Password?
+                {t("buttons.forgot_password")}
               </Link>
             </div>
             <FormSubmitButton
               isSubmitting={form.state.isSubmitting || isLoading}
               className="mt-2 w-full"
               size="lg"
-              loadingText="Logging in..."
+              loadingText={t("buttons.logging_in")}
             >
-              Login
+              {t("buttons.login")}
             </FormSubmitButton>
           </div>
           {errorMessage && (
@@ -164,7 +170,7 @@ export default function LoginForm(props?: LoginFormProps) {
           )}
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
-              Or
+              {t("login.oauth.or_continue_with")}
             </span>
           </div>
           <Button
@@ -186,14 +192,14 @@ export default function LoginForm(props?: LoginFormProps) {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onError: (ctx: any) => {
                     setIsLoading(false);
-                    setErrorMessage(ctx.error?.message || "OAuth login failed");
+                    setErrorMessage(ctx.error?.message || t("login.errors.oauth_failed"));
                   },
                 },
               )
             }
           >
             <GoogleIcon />
-            Login with Google
+            {t("login.oauth.login_with_google")}
           </Button>
           <Button
             variant="outline"
@@ -214,7 +220,7 @@ export default function LoginForm(props?: LoginFormProps) {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onError: (ctx: any) => {
                     setIsLoading(false);
-                    setErrorMessage(ctx.error?.message || "OAuth login failed");
+                    setErrorMessage(ctx.error?.message || t("login.errors.oauth_failed"));
                   },
                 },
               )
@@ -239,15 +245,15 @@ export default function LoginForm(props?: LoginFormProps) {
               <path d="M4.5 10c.98-.98.98-2.52 0-3.5-.98-.98-2.52-.98-3.5 0-.98.98-.98 2.52 0 3.5.98.98 2.52.98 3.5 0Z" />
               <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" />
             </svg>
-            Login with Discord
+            {t("login.oauth.login_with_discord")}
           </Button>
         </div>
       </form>
 
       <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
+        {t("login.buttons.no_account")}{" "}
         <Link to="/auth/signup" className="underline underline-offset-4">
-          Sign up
+          {t("login.buttons.sign_up")}
         </Link>
       </div>
     </div>

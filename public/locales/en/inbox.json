@@ -1,0 +1,89 @@
+{
+  "title": "Inbox",
+  "subtitle": "Manage your messages and notifications",
+  "status_labels": {
+    "open": "Open",
+    "waiting_on_response": "Waiting on response",
+    "resolved": "Resolved",
+    "closed": "Closed",
+    "in_progress": "In Progress",
+    "urgent": "Urgent",
+    "low_priority": "Low Priority"
+  },
+  "filters": {
+    "title": "Filter Messages",
+    "all": "All",
+    "unread": "Unread",
+    "important": "Important",
+    "recent": "Recent",
+    "resolved": "Resolved",
+    "pending": "Pending"
+  },
+  "messages": {
+    "loading_messages": "Loading messages...",
+    "no_messages": "No messages found",
+    "failed_to_load": "Failed to load inbox snapshot",
+    "empty_state": {
+      "title": "No messages yet",
+      "subtitle": "When you receive messages, they'll appear here"
+    },
+    "compose": {
+      "title": "Compose Message",
+      "placeholder": "Type your message here...",
+      "send": "Send",
+      "sending": "Sending...",
+      "attach_file": "Attach file"
+    },
+    "reply": {
+      "title": "Reply to message",
+      "placeholder": "Type your reply here...",
+      "send": "Send reply",
+      "sending": "Sending reply..."
+    }
+  },
+  "actions": {
+    "mark_as_read": "Mark as read",
+    "mark_as_unread": "Mark as unread",
+    "archive": "Archive",
+    "delete": "Delete",
+    "reply": "Reply",
+    "forward": "Forward",
+    "star": "Star",
+    "unstar": "Unstar",
+    "flag": "Flag",
+    "unflag": "Unflag"
+  },
+  "thread": {
+    "title": "Thread",
+    "participants": "Participants",
+    "messages": "Messages",
+    "last_message": "Last message",
+    "started_by": "Started by",
+    "reply_to_thread": "Reply to thread"
+  },
+  "notifications": {
+    "new_message": "New message",
+    "message_reply": "Message reply",
+    "thread_updated": "Thread updated"
+  },
+  "search": {
+    "placeholder": "Search messages...",
+    "no_results": "No messages found matching your search",
+    "filters": {
+      "date_range": "Date range",
+      "sender": "Sender",
+      "subject": "Subject"
+    }
+  },
+  "errors": {
+    "send_failed": "Failed to send message",
+    "load_failed": "Failed to load messages",
+    "delete_failed": "Failed to delete message",
+    "archive_failed": "Failed to archive message"
+  },
+  "success": {
+    "message_sent": "Message sent successfully",
+    "message_archived": "Message archived successfully",
+    "message_deleted": "Message deleted successfully"
+  }
+}

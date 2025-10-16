@@ -280,9 +280,8 @@ async function ensureFolderExists(folderPath: string): Promise<void> {
     // We'll just log the folder structure for tracking purposes
     console.log(`Preparing folder structure: ${folderPath}`);
 
-    // In a full implementation, you could use the Admin API to create folders explicitly,
-    // but it requires higher-tier Cloudinary plans. The automatic creation during upload
-    // works well for our use case.
+    // The automatic folder creation during upload works well for our use case
+    // and doesn't require Admin API access which might not be available
   } catch (error) {
     console.error("Error ensuring folder exists:", error);
     // Don't throw here - we want to continue with the upload even if folder creation fails

@@ -67,29 +67,31 @@ export async function uploadGameSystemMedia(
   const checksum =
     typeof file === "string" ? computeChecksum(file) : computeChecksum(file);
 
-  // Build Cloudinary context with metadata
-  const context: Record<string, string> = {
-    moderated: String(options.moderated ?? false),
-    checksum,
-    type: options.type,
-    source: options.source,
-    game_system_id: String(options.gameSystemId),
-    game_system_name: gameSystem.name,
-    game_system_slug: gameSystem.slug || "",
-    source_of_truth: gameSystem.sourceOfTruth || "",
-  };
+  // Build Cloudinary context with metadata (format: key=value pairs)
+  const contextPairs: string[] = [
+    `moderated=${options.moderated ?? false}`,
+    `checksum=${checksum}`,
+    `type=${options.type}`,
+    `source=${options.source}`,
+    `game_system_id=${options.gameSystemId}`,
+    `game_system_name=${gameSystem.name}`,
+    `game_system_slug=${gameSystem.slug || ""}`,
+    `source_of_truth=${gameSystem.sourceOfTruth || ""}`,
+  ];
 
   if (options.originalUrl) {
-    context["original_url"] = options.originalUrl;
+    contextPairs.push(`original_url=${options.originalUrl}`);
   }
 
   if (options.license) {
-    context["license"] = options.license;
+    contextPairs.push(`license=${options.license}`);
   }
 
   if (options.licenseUrl) {
-    context["license_url"] = options.licenseUrl;
+    contextPairs.push(`license_url=${options.licenseUrl}`);
   }
+
+  const context = contextPairs.join("|");
 
   // Build folder structure: game_systems/[source]/[game-system-slug]
   const folderParts = ["game_systems"];
@@ -106,9 +108,14 @@ export async function uploadGameSystemMedia(
   const safeName = gameSystem.slug || gameSystem.name.replace(/[^a-zA-Z0-9]/g, "_");
   const publicId = `${options.type}_${safeName}_${timestamp}`;
 
+  // Ensure folder structure exists
+  await ensureFolderExists(folder);
+
+  const cloudinary = await getCloudinary();
+
   const uploadOptions: UploadApiOptions = {
     resource_type: "image",
-    context,
+    context: context as unknown as Record<string, string>,
     folder,
     public_id: publicId,
     use_filename: false,
@@ -116,9 +123,15 @@ export async function uploadGameSystemMedia(
     overwrite: true,
   };
 
-  const cloudinary = await getCloudinary();
-  // Convert Buffer to string if needed for Cloudinary upload
-  const uploadData = Buffer.isBuffer(file) ? file.toString("base64") : file;
+  // Handle file upload based on type
+  let uploadData: string;
+  if (Buffer.isBuffer(file)) {
+    // Convert buffer to base64 data URL for Cloudinary
+    uploadData = `data:image/png;base64,${file.toString("base64")}`;
+  } else {
+    uploadData = file;
+  }
+
   const result = await cloudinary.uploader.upload(uploadData, uploadOptions);
 
   return {
@@ -147,10 +160,26 @@ export async function uploadGameSystemMediaFromUrl(
   database: Db,
 ): Promise<UploadedMediaAsset> {
   try {
-    // Download the image from URL
-    const response = await fetch(url);
+    // Download the image from URL with proper headers for BGG and other sites
+    const userAgent = process.env["CRAWLER_USER_AGENT"] ?? "SolsticeGameCrawler/1.0";
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": userAgent,
+        Accept: "image/*",
+        "Accept-Language": "en-US,en;q=0.9",
+        Referer:
+          options.source === "bgg"
+            ? "https://boardgamegeek.com/"
+            : options.source === "startplaying"
+              ? "https://startplaying.games/"
+              : "https://solstice.games/",
+      },
+    });
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch image from ${url}: ${response.status} ${response.statusText}`,
+      );
     }
 
     const buffer = Buffer.from(await response.arrayBuffer());
@@ -239,6 +268,25 @@ export async function deleteAllMediaAssets(
   gameSystemId: number,
 ): Promise<void> {
   await deleteMediaAssetsFromStorage(database, gameSystemId);
+}
+
+/**
+ * Create a folder in Cloudinary if it doesn't exist
+ * Note: Cloudinary automatically creates folders during upload, so this is mainly for logging
+ */
+async function ensureFolderExists(folderPath: string): Promise<void> {
+  try {
+    // Cloudinary automatically creates folders during upload
+    // We'll just log the folder structure for tracking purposes
+    console.log(`Preparing folder structure: ${folderPath}`);
+
+    // In a full implementation, you could use the Admin API to create folders explicitly,
+    // but it requires higher-tier Cloudinary plans. The automatic creation during upload
+    // works well for our use case.
+  } catch (error) {
+    console.error("Error ensuring folder exists:", error);
+    // Don't throw here - we want to continue with the upload even if folder creation fails
+  }
 }
 
 /**

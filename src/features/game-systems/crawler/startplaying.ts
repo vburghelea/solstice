@@ -917,6 +917,10 @@ export async function upsertDetail(
             gameSystemId: systemId,
             source: "startplaying",
             moderated: false,
+            // Enhanced metadata for better tracking
+            license: "Crawled from StartPlaying.games",
+            licenseUrl: "https://startplaying.games",
+            originalUrl: url,
           },
           db,
         );
@@ -932,6 +936,8 @@ export async function upsertDetail(
             checksum,
             kind: i === 0 ? "hero" : "gallery",
             moderated: false,
+            license: "Crawled from StartPlaying.games",
+            licenseUrl: "https://startplaying.games",
           });
 
           const inserted = (await db

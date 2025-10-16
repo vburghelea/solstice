@@ -161,7 +161,14 @@ describe("media-assets utility", () => {
         originalUrl: "https://example.com/image.jpg",
       });
 
-      expect(fetch).toHaveBeenCalledWith("https://example.com/image.jpg");
+      expect(fetch).toHaveBeenCalledWith("https://example.com/image.jpg", {
+        headers: {
+          "User-Agent": "SolsticeGameCrawler/1.0",
+          Accept: "image/*",
+          "Accept-Language": "en-US,en;q=0.9",
+          Referer: "https://boardgamegeek.com/",
+        },
+      });
       expect(mockDb.query.gameSystems.findFirst).toHaveBeenCalledWith({
         where: expect.any(Object),
         columns: { name: true, slug: true, sourceOfTruth: true },
@@ -204,7 +211,7 @@ describe("media-assets utility", () => {
           mockDb as never,
         ),
       ).rejects.toThrow(
-        "Failed to fetch image from https://example.com/notfound.jpg: Not Found",
+        "Failed to fetch image from https://example.com/notfound.jpg: 404 Not Found",
       );
     });
 

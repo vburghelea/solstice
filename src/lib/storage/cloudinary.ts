@@ -2,7 +2,7 @@ import { serverOnly } from "@tanstack/react-start";
 import type { UploadApiOptions } from "cloudinary";
 import { createHash } from "crypto";
 
-const getCloudinary = serverOnly(async () => {
+export const getCloudinary = serverOnly(async () => {
   const { v2 } = await import("cloudinary");
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
     process.env;
@@ -44,26 +44,30 @@ export async function uploadImage(
   options: UploadOptions,
 ): Promise<UploadedAsset> {
   const cloudinary = await getCloudinary();
-  const context: Record<string, string> = {
-    moderated: String(options.moderated ?? false),
-    checksum: options.checksum,
-  };
+
+  // Build Cloudinary context with metadata (format: key=value pairs)
+  const contextPairs: string[] = [
+    `moderated=${options.moderated ?? false}`,
+    `checksum=${options.checksum}`,
+  ];
 
   if (options.license) {
-    context["license"] = options.license;
+    contextPairs.push(`license=${options.license}`);
   }
 
   if (options.licenseUrl) {
-    context["license_url"] = options.licenseUrl;
+    contextPairs.push(`license_url=${options.licenseUrl}`);
   }
 
   if (options.kind) {
-    context["kind"] = options.kind;
+    contextPairs.push(`kind=${options.kind}`);
   }
+
+  const context = contextPairs.join("|");
 
   const uploadOptions: UploadApiOptions = {
     resource_type: "image",
-    context,
+    context: context as unknown as Record<string, string>,
   };
 
   const result = await cloudinary.uploader.upload(file, uploadOptions);
@@ -85,4 +89,41 @@ export async function uploadImage(
 export async function deleteImage(publicId: string): Promise<void> {
   const cloudinary = await getCloudinary();
   await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+}
+
+/**
+ * Test Cloudinary API connectivity and configuration
+ */
+export async function testCloudinaryConnection(): Promise<{
+  success: boolean;
+  cloudName?: string;
+  error?: string;
+}> {
+  try {
+    const cloudinary = await getCloudinary();
+
+    // Test API by getting usage info - we'll just test upload functionality instead
+    // since the API might not be accessible with current credentials
+    const testImage =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhMmQZQAAAABJRU5ErkJggg==";
+    await cloudinary.uploader.upload(testImage, {
+      public_id: "test-connection-check",
+      overwrite: true,
+    });
+
+    // Clean up test image
+    await cloudinary.uploader.destroy("test-connection-check");
+
+    return {
+      success: true,
+      cloudName: process.env["CLOUDINARY_CLOUD_NAME"] || "unknown",
+    };
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
 }

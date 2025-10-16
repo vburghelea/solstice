@@ -199,6 +199,7 @@ async function handleBggMediaAssets(
           moderated: false, // BGG assets start as non-moderated
           license: "BGG Fair Use",
           licenseUrl: "https://boardgamegeek.com/wiki/page/Copyright",
+          originalUrl: thing.thumbnail,
         },
         database,
       );
@@ -226,23 +227,29 @@ async function handleBggMediaAssets(
       );
     } catch (error) {
       console.warn(
-        `Failed to upload BGG thumbnail to Cloudinary, falling back to URL:`,
+        `Failed to upload BGG thumbnail to Cloudinary, falling back to URL reference:`,
         error,
       );
-      // Fallback to storing URL only if upload fails
+      console.log(`Note: BGG image URL ${thing.thumbnail} may be expired or blocked`);
+
+      // Fallback to storing URL reference only if upload fails
+      // This creates a database record but doesn't upload to Cloudinary
       await database
         .insert(mediaAssets)
         .values({
           gameSystemId,
-          publicId: `bgg-thumb-${gameSystemId}`,
+          publicId: `bgg-thumb-fallback-${gameSystemId}-${Date.now()}`,
           secureUrl: thing.thumbnail,
           kind: "thumbnail",
           orderIndex: 0,
           moderated: false, // BGG assets start as non-moderated
           license: "BGG Fair Use",
           licenseUrl: "https://boardgamegeek.com/wiki/page/Copyright",
+          checksum: `fallback-${thing.thumbnail.slice(-20)}`, // Create a checksum for the URL
         })
         .onConflictDoNothing();
+
+      console.log(`Created fallback record for BGG thumbnail: ${thing.thumbnail}`);
     }
   }
 
@@ -259,6 +266,7 @@ async function handleBggMediaAssets(
           moderated: false, // BGG assets start as non-moderated
           license: "BGG Fair Use",
           licenseUrl: "https://boardgamegeek.com/wiki/page/Copyright",
+          originalUrl: thing.image,
         },
         database,
       );
@@ -286,23 +294,28 @@ async function handleBggMediaAssets(
       );
     } catch (error) {
       console.warn(
-        `Failed to upload BGG hero image to Cloudinary, falling back to URL:`,
+        `Failed to upload BGG hero image to Cloudinary, falling back to URL reference:`,
         error,
       );
-      // Fallback to storing URL only if upload fails
+      console.log(`Note: BGG image URL ${thing.image} may be expired or blocked`);
+
+      // Fallback to storing URL reference only if upload fails
       await database
         .insert(mediaAssets)
         .values({
           gameSystemId,
-          publicId: `bgg-image-${gameSystemId}`,
+          publicId: `bgg-image-fallback-${gameSystemId}-${Date.now()}`,
           secureUrl: thing.image,
           kind: "hero",
           orderIndex: 1,
           moderated: false, // BGG assets start as non-moderated
           license: "BGG Fair Use",
           licenseUrl: "https://boardgamegeek.com/wiki/page/Copyright",
+          checksum: `fallback-${thing.image.slice(-20)}`, // Create a checksum for the URL
         })
         .onConflictDoNothing();
+
+      console.log(`Created fallback record for BGG hero image: ${thing.image}`);
     }
   }
 }

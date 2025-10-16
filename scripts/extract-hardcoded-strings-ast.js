@@ -54,12 +54,12 @@ function getI18nConfig(parserConfig) {
         .replace("{{ns}}", "")
         .replace(/\/[^\/]*$/, "") || "src/lib/i18n/locales",
     ),
-    tempLocalesDir: path.resolve(
+    outputLocalesDir: path.resolve(
       projectRoot,
       options.resource?.savePath
         ?.replace("{{lng}}", "")
         .replace("{{ns}}", "")
-        .replace(/\/[^\/]*$/, "") || "temp-locales",
+        .replace(/\/[^\/]*$/, "") || "src/lib/i18n/locales",
     ),
 
     // Languages and namespaces
@@ -93,6 +93,11 @@ function getI18nConfig(parserConfig) {
  */
 function inferNamespaceFromPath(filePath, namespaces) {
   const normalizedPath = filePath.replace(/\\/g, "/");
+
+  // Check for components directory - should go to common namespace
+  if (normalizedPath.includes("/components/")) {
+    return "common";
+  }
 
   // Check for feature-based organization
   const featureMatch = normalizedPath.match(/\/features\/([^\/]+)/);
@@ -384,7 +389,7 @@ class ASTStringExtraction {
     console.log("💾 Saving extractions to translation files...");
 
     // Create output directory
-    const outputDir = this.config.tempLocalesDir;
+    const outputDir = this.config.outputLocalesDir;
     if (!existsSync(outputDir)) {
       mkdirSync(outputDir, { recursive: true });
     }
@@ -521,7 +526,7 @@ class ASTStringExtraction {
       });
     }
 
-    console.log(`\n💾 Extractions saved to: ${this.config.tempLocalesDir}`);
+    console.log(`\n💾 Extractions saved to: ${this.config.outputLocalesDir}`);
     console.log("📋 Ready for merge with existing translations");
   }
 }
@@ -576,7 +581,7 @@ merged with existing translations using the merge script.
     console.log("🔧 Debug - Configuration loaded:");
     console.log(`   Languages: ${config.languages.join(", ")}`);
     console.log(`   Namespaces: ${config.namespaces.join(", ")}`);
-    console.log(`   TempLocalesDir: ${config.tempLocalesDir}`);
+    console.log(`   OutputLocalesDir: ${config.outputLocalesDir}`);
 
     // Create and run extractor with loaded configuration
     const extractor = new ASTStringExtraction(config);

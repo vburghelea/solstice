@@ -271,6 +271,40 @@ function getTranslationFiles(language = null) {
   return files;
 }
 
+/**
+ * Load existing translations from disk
+ */
+function loadExistingTranslations() {
+  const existing = {};
+  const config = getI18nConfig();
+
+  // Load only the default language for migration purposes
+  const languages = [config.defaultLanguage];
+
+  for (const lang of languages) {
+    existing[lang] = {};
+
+    for (const ns of config.namespaces) {
+      const filePath = path.join(config.localesDir, lang, `${ns}.json`);
+
+      if (existsSync(filePath)) {
+        try {
+          const content = readFileSync(filePath, "utf8");
+          existing[lang][ns] = JSON.parse(content);
+        } catch (error) {
+          console.warn(`Warning: Could not parse ${filePath}, using empty object`);
+          existing[lang][ns] = {};
+        }
+      } else {
+        existing[lang][ns] = {};
+      }
+    }
+  }
+
+  // Return only the default language translations for easier lookup
+  return existing[config.defaultLanguage];
+}
+
 // Export the configuration
 const config = getI18nConfig();
 export default config;
@@ -282,5 +316,6 @@ export {
   getTranslationFiles,
   inferNamespaceFromPath,
   isValidNamespace,
+  loadExistingTranslations,
   loadParserConfig,
 };

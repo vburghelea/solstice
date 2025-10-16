@@ -278,7 +278,8 @@ async function loadParserConfig() {
  */
 function getLocalesDirectory(parserConfig) {
   const options = parserConfig.options || {};
-  const savePath = options.resource?.savePath || "temp-locales/{{lng}}/{{ns}}.json";
+  const savePath =
+    options.resource?.savePath || "src/lib/i18n/locales/{{lng}}/{{ns}}.json";
 
   // Extract the base directory from the save path
   const baseDir = savePath

@@ -652,10 +652,11 @@ class ASTStringExtractor {
     if (!text || typeof text !== "string") return true;
     const trimmed = text.trim();
 
-    if (trimmed.length < 3) return true;
+    // Very short strings or single characters are likely technical
+    if (trimmed.length <= 2) return true;
 
     const technicalPatterns = [
-      /^[a-zA-Z][a-zA-Z0-9_]*$/, // Variable names
+      /^[a-zA-Z][a-zA-Z0-9_]*$/, // Single variable names (no spaces)
       /^https?:\/\//, // URLs
       /^www\./, // URLs
       /^[{}[\]()]+$/, // Brackets only

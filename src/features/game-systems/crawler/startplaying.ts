@@ -643,6 +643,11 @@ const getCloudinary = serverOnly(async () => {
   return { uploadImage, computeChecksum };
 });
 
+const getEnhancedUpload = serverOnly(async () => {
+  const { uploadGameSystemMediaFromUrl } = await import("~/lib/storage/media-assets");
+  return { uploadGameSystemMediaFromUrl };
+});
+
 async function recordEvent(event: CrawlEventLog) {
   const { db, systemCrawlEvents, gameSystems } = await getDb();
   const system = await db
@@ -689,6 +694,7 @@ export async function upsertDetail(
     publishers,
   } = await getDb();
   const { uploadImage, computeChecksum } = await getCloudinary();
+  const { uploadGameSystemMediaFromUrl } = await getEnhancedUpload();
 
   let existing = await db
     .select({
@@ -901,18 +907,64 @@ export async function upsertDetail(
       if (existingChecksums.has(checksum)) {
         continue;
       }
-      let asset: Awaited<ReturnType<typeof uploadImage>> | null = null;
+
+      let asset: Awaited<ReturnType<typeof uploadGameSystemMediaFromUrl>> | null = null;
       try {
-        asset = await uploadImage(url, {
-          checksum,
-          kind: i === 0 ? "hero" : "gallery",
-          moderated: false,
-        });
+        asset = await uploadGameSystemMediaFromUrl(
+          url,
+          {
+            type: i === 0 ? "hero" : "gallery",
+            gameSystemId: systemId,
+            source: "startplaying",
+            moderated: false,
+          },
+          db,
+        );
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        console.error(`Failed to upload image for ${detail.slug} (${url}): ${message}`);
+        console.error(
+          `Failed to upload enhanced image for ${detail.slug} (${url}): ${message}`,
+        );
+
+        // Fallback to basic upload if enhanced upload fails
+        try {
+          const basicAsset = await uploadImage(url, {
+            checksum,
+            kind: i === 0 ? "hero" : "gallery",
+            moderated: false,
+          });
+
+          const inserted = (await db
+            .insert(mediaAssets)
+            .values({
+              gameSystemId: systemId,
+              publicId: basicAsset.publicId,
+              secureUrl: basicAsset.secureUrl,
+              width: basicAsset.width,
+              height: basicAsset.height,
+              format: basicAsset.format,
+              license: basicAsset.license,
+              licenseUrl: basicAsset.licenseUrl,
+              kind: basicAsset.kind,
+              orderIndex: i,
+              moderated: basicAsset.moderated,
+              checksum: basicAsset.checksum,
+            })
+            .returning()) as { id: number }[];
+          uploadedIds.push(inserted[0]!.id);
+          if (basicAsset.checksum) {
+            existingChecksums.add(basicAsset.checksum);
+          }
+          console.log(`Fallback upload succeeded for ${detail.slug} (${url})`);
+        } catch (fallbackError) {
+          console.error(
+            `Fallback upload also failed for ${detail.slug} (${url}):`,
+            fallbackError,
+          );
+        }
         continue;
       }
+
       const inserted = (await db
         .insert(mediaAssets)
         .values({

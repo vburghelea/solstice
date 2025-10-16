@@ -162,10 +162,13 @@ const bulkUpdateAdminSystemsHandler = async ({
     case "delete": {
       let deletedIds: number[] = [];
 
+      // Delete media assets from both database and Cloudinary first (outside transaction)
+      const { deleteAllMediaAssets } = await import("~/lib/storage/media-assets");
+      for (const gameSystemId of uniqueSystemIds) {
+        await deleteAllMediaAssets(db, gameSystemId);
+      }
+
       await db.transaction(async (tx) => {
-        await tx
-          .delete(mediaAssets)
-          .where(inArray(mediaAssets.gameSystemId, uniqueSystemIds));
         await tx.delete(faqs).where(inArray(faqs.gameSystemId, uniqueSystemIds));
         await tx
           .delete(gameSystemToCategory)

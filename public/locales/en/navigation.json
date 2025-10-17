@@ -8,7 +8,9 @@
     "campaigns": "Campaigns",
     "inbox": "Inbox",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "find_games": "Find games",
+    "game_systems": "Game systems"
   },
   "user": {
     "account": "My Account",
@@ -96,7 +98,15 @@
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "cookies": "Cookie Policy",
-    "copyright": "© {{year}} Roundup Games. All rights reserved."
+    "copyright": "© {{year}} Roundup Games. All rights reserved.",
+    "plan_your_visit": "Plan your visit",
+    "event_calendar": "Event calendar",
+    "find_game_night": "Find a game night",
+    "browse_systems": "Browse systems",
+    "stay_in_touch": "Stay in touch",
+    "resources": "Resources",
+    "about_roundup": "About Roundup",
+    "contact_email": "hello@roundup.games"
   },
   "tabs": {
     "overview": "Overview",
@@ -183,5 +193,188 @@
     "start_by_creating": "Start by creating your first item",
     "no_search_results": "No results found for your search",
     "try_different_filters": "Try different filters or search terms"
+  },
+  "workspaces": {
+    "player": {
+      "title": "Player workspace",
+      "description": "Manage sessions, invitations, and community insights from one responsive hub.",
+      "fallback_label": "Player",
+      "welcome_back": "Welcome back, {{name}}",
+      "welcome_back_generic": "Welcome back",
+      "nav": {
+        "overview": {
+          "label": "Overview",
+          "description": "Track membership, invitations, and your next session at a glance."
+        },
+        "campaigns": {
+          "label": "Campaigns",
+          "description": "Review your active story arcs and plan upcoming beats."
+        },
+        "games": {
+          "label": "Games",
+          "description": "Manage scheduled sessions and update participation."
+        },
+        "events": {
+          "label": "Events",
+          "description": "Browse upcoming gatherings and confirm attendance."
+        },
+        "teams": {
+          "label": "Teams",
+          "description": "Coordinate with your crews and handle invitations."
+        },
+        "inbox": {
+          "label": "Inbox",
+          "description": "Catch up on new announcements and shared threads."
+        },
+        "collaboration": {
+          "label": "Collaboration",
+          "description": "Coordinate with teammates and facilitators without leaving the hub."
+        },
+        "profile": {
+          "label": "Profile",
+          "description": "Review and edit your personal details and preferences."
+        },
+        "settings": {
+          "label": "Settings",
+          "description": "Manage privacy, notifications, and connected accounts."
+        }
+      },
+      "summary": {
+        "membership": "Membership",
+        "active": "Active",
+        "inactive": "Inactive",
+        "membership_active": "Membership active",
+        "no_active_membership": "No active membership",
+        "days_remaining": "{{days}} days remaining",
+        "manage_membership": "Manage membership",
+        "next_session": "Next session",
+        "no_upcoming_games": "No upcoming games scheduled",
+        "view_game_details": "View game details",
+        "community": "Community",
+        "not_on_a_team": "You're not on a team yet",
+        "teams_connected": "{{count}} team{{plural}} connected",
+        "join_a_team": "Join a team to coordinate sessions",
+        "pending_invites": "{{count}} pending invite{{plural}}",
+        "no_pending_invitations": "No pending invitations",
+        "browse_teams": "Browse teams"
+      }
+    },
+    "gm": {
+      "title": "Game Master workspace",
+      "description": "Coordinate campaigns, sessions, and bespoke threads tailored to your tables.",
+      "fallback_label": "Game Master",
+      "welcome_back": "Welcome back, {{name}}",
+      "welcome_back_generic": "Welcome back",
+      "nav": {
+        "overview": {
+          "label": "Overview",
+          "description": "Review prep cues, live feedback, and the B2B pipeline from one command center."
+        },
+        "campaigns": {
+          "label": "Campaigns",
+          "description": "Manage story arcs, dossiers, and campaign health in one place."
+        },
+        "games": {
+          "label": "Games",
+          "description": "Schedule, update, and debrief the sessions on your runway."
+        },
+        "feedback_triage": {
+          "label": "Feedback triage",
+          "description": "Work through debriefs, safety rituals, and upcoming prep checklists."
+        },
+        "shared_inbox": {
+          "label": "Shared inbox",
+          "description": "Coordinate narrative updates and announcements with operations."
+        },
+        "collaboration": {
+          "label": "Collaboration",
+          "description": "Partner with ops and platform teams on bespoke opportunities."
+        }
+      },
+      "summary": {
+        "upcoming_sessions": "Upcoming sessions",
+        "no_sessions_scheduled": "No sessions scheduled",
+        "next_session_detail": "Next: {{name}} • {{datetime}}",
+        "manage_sessions": "Manage sessions",
+        "active_campaigns": "Active campaigns",
+        "campaign_detail": "{{name}} • {{system}}",
+        "draft_next_arc": "Draft your next arc to fill the roster",
+        "view_workspace": "View workspace",
+        "pipeline_attention": "Pipeline attention",
+        "pipeline_detail": "{{escalations}} escalation{{plural}} live • {{total}} total threads",
+        "log_corporate_opportunity": "Log a corporate opportunity to begin tracking",
+        "review_pipeline": "Review pipeline"
+      }
+    },
+    "admin": {
+      "title": "Admin workspace",
+      "description": "Governance, compliance, and platform oversight from one central hub.",
+      "fallback_label": "Administrator",
+      "welcome_back": "Welcome back, {{name}}",
+      "welcome_back_generic": "Welcome back",
+      "nav": {
+        "overview": {
+          "label": "Overview",
+          "description": "System health, user metrics, and operational insights at a glance."
+        },
+        "users": {
+          "label": "Users",
+          "description": "User management, roles, and access control."
+        },
+        "analytics": {
+          "label": "Analytics",
+          "description": "Platform metrics, usage patterns, and performance data."
+        },
+        "settings": {
+          "label": "Settings",
+          "description": "System configuration, feature flags, and platform settings."
+        },
+        "audit_logs": {
+          "label": "Audit logs",
+          "description": "System events, user actions, and compliance records."
+        }
+      },
+      "summary": {
+        "system_health": "System Health",
+        "user_metrics": "User Metrics",
+        "platform_stats": "Platform Statistics",
+        "recent_activity": "Recent Activity"
+      }
+    },
+    "ops": {
+      "title": "Operations workspace",
+      "description": "Event coordination, logistics, and community support from one central hub.",
+      "fallback_label": "Operations",
+      "welcome_back": "Welcome back, {{name}}",
+      "welcome_back_generic": "Welcome back",
+      "nav": {
+        "overview": {
+          "label": "Overview",
+          "description": "Mission control dashboard with upcoming events and task queues."
+        },
+        "events": {
+          "label": "Events",
+          "description": "Event creation, management, and logistics coordination."
+        },
+        "venues": {
+          "label": "Venues",
+          "description": "Venue management, scheduling, and capacity planning."
+        },
+        "staff": {
+          "label": "Staff",
+          "description": "Staff scheduling, assignments, and performance tracking."
+        },
+        "reports": {
+          "label": "Reports",
+          "description": "Operational reports, analytics, and business intelligence."
+        }
+      },
+      "summary": {
+        "upcoming_events": "Upcoming Events",
+        "pending_tasks": "Pending Tasks",
+        "staff_on_duty": "Staff on Duty",
+        "venue_utilization": "Venue Utilization"
+      }
+    }
   }
 }

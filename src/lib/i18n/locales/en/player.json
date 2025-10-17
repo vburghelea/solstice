@@ -7,6 +7,7 @@
       "failed_to_persist_payload": "Failed to persist dashboard payload",
       "failed_to_load_profile": "Failed to load player profile",
       "failed_to_fetch_workspace_stats": "Failed to fetch player workspace stats",
+      "failed_to_fetch_next_scheduled_game": "Failed to fetch the next scheduled game",
       "failed_to_fetch_membership_status": "Failed to fetch membership status",
       "failed_to_update_privacy_settings": "Failed to update privacy settings",
       "failed_to_update_notification_preferences": "Failed to update notification preferences"

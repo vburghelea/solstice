@@ -8,7 +8,9 @@
     "campaigns": "Campaigns",
     "inbox": "Inbox",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "find_games": "Find games",
+    "game_systems": "Game systems"
   },
   "user": {
     "account": "My Account",
@@ -96,7 +98,15 @@
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "cookies": "Cookie Policy",
-    "copyright": "© {{year}} Roundup Games. All rights reserved."
+    "copyright": "© {{year}} Roundup Games. All rights reserved.",
+    "plan_your_visit": "Plan your visit",
+    "event_calendar": "Event calendar",
+    "find_game_night": "Find a game night",
+    "browse_systems": "Browse systems",
+    "stay_in_touch": "Stay in touch",
+    "resources": "Resources",
+    "about_roundup": "About Roundup",
+    "contact_email": "hello@roundup.games"
   },
   "tabs": {
     "overview": "Overview",

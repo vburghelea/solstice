@@ -101,7 +101,7 @@ export function SettingsView() {
     queryFn: async (): Promise<AccountOverviewResult> => {
       const result = await getAccountOverview();
       if (!result.success || !result.data) {
-        throw new Error(result.errors?.[0]?.message || "Failed to load account overview");
+        throw new Error(result.errors?.[0]?.message || t("errors.load_failed"));
       }
       return result.data;
     },
@@ -118,7 +118,7 @@ export function SettingsView() {
     queryFn: async (): Promise<SessionsOverview> => {
       const result = await getSessionsOverview();
       if (!result.success || !result.data) {
-        throw new Error(result.errors?.[0]?.message || "Failed to load sessions");
+        throw new Error(result.errors?.[0]?.message || t("errors.load_sessions"));
       }
       return result.data;
     },
@@ -135,9 +135,7 @@ export function SettingsView() {
     queryFn: async (): Promise<NotificationPreferences> => {
       const result = await getNotificationPreferences();
       if (!result.success || !result.data) {
-        throw new Error(
-          result.errors?.[0]?.message || "Failed to load email preferences",
-        );
+        throw new Error(result.errors?.[0]?.message || t("errors.load_preferences"));
       }
       return result.data;
     },

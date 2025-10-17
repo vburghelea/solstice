@@ -4,51 +4,74 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, CreditCard, ScrollText, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
-const readinessBlocks = [
-  {
-    title: "Founding documents",
-    description:
-      "Customize a charter, code of conduct, and volunteer agreement that reflect your community's values and tone.",
-    icon: ScrollText,
-  },
-  {
-    title: "Financial runway",
-    description:
-      "Budget templates, cashflow trackers, and sample sponsorship decks help you forecast seasons with confidence.",
-    icon: CreditCard,
-  },
-  {
-    title: "People operations",
-    description:
-      "Role descriptions, onboarding checklists, and meeting agendas keep staff, GMs, and volunteers aligned.",
-    icon: UsersIcon,
-  },
-  {
-    title: "Quality standards",
-    description:
-      "Session rubrics and feedback loops ensure that every program meets the Roundup Games seal of care.",
-    icon: CheckCircle2,
-  },
-];
+// Translation-aware constants will be populated in the component
 
 export const Route = createFileRoute("/resources/toolkit")({
   component: CommunityStarterToolkitPage,
 });
 
 function CommunityStarterToolkitPage() {
+  const { t } = useResourcesTranslation();
+
+  // Translation-aware constants
+  const readinessBlocks = [
+    {
+      title: t("toolkit.readiness_blocks.founding_documents.title"),
+      description: t("toolkit.readiness_blocks.founding_documents.description"),
+      icon: ScrollText,
+    },
+    {
+      title: t("toolkit.readiness_blocks.financial_runway.title"),
+      description: t("toolkit.readiness_blocks.financial_runway.description"),
+      icon: CreditCard,
+    },
+    {
+      title: t("toolkit.readiness_blocks.people_operations.title"),
+      description: t("toolkit.readiness_blocks.people_operations.description"),
+      icon: UsersIcon,
+    },
+    {
+      title: t("toolkit.readiness_blocks.quality_standards.title"),
+      description: t("toolkit.readiness_blocks.quality_standards.description"),
+      icon: CheckCircle2,
+    },
+  ];
+
+  const phases = [
+    {
+      title: t("toolkit.phases.weeks_1_2.title"),
+      items: Array.isArray(t("toolkit.phases.weeks_1_2.items"))
+        ? (t("toolkit.phases.weeks_1_2.items") as unknown as string[])
+        : ["Loading items..."],
+    },
+    {
+      title: t("toolkit.phases.weeks_3_4.title"),
+      items: Array.isArray(t("toolkit.phases.weeks_3_4.items"))
+        ? (t("toolkit.phases.weeks_3_4.items") as unknown as string[])
+        : ["Loading items..."],
+    },
+    {
+      title: t("toolkit.phases.weeks_5_6.title"),
+      items: Array.isArray(t("toolkit.phases.weeks_5_6.items"))
+        ? (t("toolkit.phases.weeks_5_6.items") as unknown as string[])
+        : ["Loading items..."],
+    },
+  ];
+
   return (
     <PublicLayout>
       <HeroSection
-        eyebrow="Community starter toolkit"
-        title="Launch your tabletop club with confidence"
-        subtitle="Our toolkit distills the best practices from thriving Roundup Games chapters so you can build momentum in weeks, not months."
+        eyebrow={t("toolkit.hero.eyebrow")}
+        title={t("toolkit.hero.title")}
+        subtitle={t("toolkit.hero.subtitle")}
         backgroundImageSet={RESOURCES_HERO_IMAGE}
-        ctaText="Access the toolkit"
+        ctaText={t("toolkit.hero.cta_text")}
         ctaLink="#download"
         secondaryCta={{
-          text: "Talk to a community coach",
+          text: t("toolkit.hero.secondary_cta"),
           link: "mailto:development@roundup.games?subject=Community%20starter%20support",
         }}
       />
@@ -57,37 +80,40 @@ function CommunityStarterToolkitPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              What's inside
+              {t("toolkit.whats_inside.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Everything you need from day zero to your first marquee event
+              {t("toolkit.whats_inside.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Whether you're spinning up a campus club, a library after-hours program, or
-              a board game café league, this toolkit keeps planning grounded and
-              collaborative. Work through the playbooks in order or jump straight to the
-              templates that match your next milestone.
+              {t("toolkit.whats_inside.description")}
             </p>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70">
               <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                Core documents
+                {t("toolkit.core_documents.title")}
               </h3>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-                <li>• Editable constitution and operating charter</li>
-                <li>• Code of conduct with incident response workflow</li>
-                <li>• Volunteer and Game Master agreements</li>
-                <li>• Accessible membership application and waiver forms</li>
+                {Array.isArray(t("toolkit.core_documents.items")) ? (
+                  (t("toolkit.core_documents.items") as unknown as string[]).map(
+                    (item, index) => <li key={`core-doc-${index}`}>• {item}</li>,
+                  )
+                ) : (
+                  <li key="loading-core-docs">Loading core documents...</li>
+                )}
               </ul>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70">
               <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                Planning tools
+                {t("toolkit.planning_tools.title")}
               </h3>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-                <li>• Budget and grant forecast spreadsheet with cashflow scenarios</li>
-                <li>• Sponsor outreach sequences and pitch deck slides</li>
-                <li>• Event critical path template with role assignments</li>
-                <li>• Risk assessment and safety checklist tailored to tabletop play</li>
+                {Array.isArray(t("toolkit.planning_tools.items")) ? (
+                  (t("toolkit.planning_tools.items") as unknown as string[]).map(
+                    (item, index) => <li key={`planning-tool-${index}`}>• {item}</li>,
+                  )
+                ) : (
+                  <li key="loading-planning-tools">Loading planning tools...</li>
+                )}
               </ul>
             </div>
           </div>
@@ -120,62 +146,45 @@ function CommunityStarterToolkitPage() {
         <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-10">
           <div className="max-w-3xl space-y-3">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              How to use the toolkit
+              {t("toolkit.how_to_use.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              A guided sprint to build community infrastructure
+              {t("toolkit.how_to_use.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Follow our 6-week launch roadmap or adapt the modules to your timeline. Each
-              chapter ends with reflection prompts so your core team can review progress
-              and surface blockers early.
+              {t("toolkit.how_to_use.description")}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              {
-                title: "Weeks 1–2",
-                items: [
-                  "Define community values and inclusive play guidelines",
-                  "Lock a meeting cadence and decision-making model",
-                  "Confirm founding roles and communication channels",
-                ],
-              },
-              {
-                title: "Weeks 3–4",
-                items: [
-                  "Map funding sources and sponsorship prospects",
-                  "Prototype your first flagship event agenda",
-                  "Set up onboarding journeys for players and volunteers",
-                ],
-              },
-              {
-                title: "Weeks 5–6",
-                items: [
-                  "Test safety drills and debrief rituals",
-                  "Plot your next quarter of programming",
-                  "Collect pilot feedback and iterate the charter",
-                ],
-              },
-            ].map((phase) => (
-              <Card
-                key={phase.title}
-                className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70"
-              >
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                    {phase.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-                    {phase.items.map((item) => (
-                      <li key={item}>• {item}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+            {Array.isArray(phases) ? (
+              phases.map((phase) => (
+                <Card
+                  key={phase.title}
+                  className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                      {phase.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
+                      {Array.isArray(phase.items) ? (
+                        phase.items.map((item, index) => (
+                          <li key={`${phase.title}-item-${index}`}>• {item}</li>
+                        ))
+                      ) : (
+                        <li key={`${phase.title}-loading`}>Loading items...</li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full text-center text-gray-500">
+                {t("toolkit.loading.toolkit_phases")}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -185,29 +194,27 @@ function CommunityStarterToolkitPage() {
       >
         <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-10">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Download formats
+            {t("toolkit.downloads.title")}
           </h2>
           <p className="max-w-3xl text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-            Prefer working offline? Grab the editable bundle or individual templates
-            below. Each file stays synced with the latest governance, accessibility, and
-            safety requirements from the Roundup Games development team.
+            {t("toolkit.downloads.description")}
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Complete toolkit (ZIP)
+                  {t("toolkit.downloads.formats.zip.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>All charters, spreadsheets, and policy templates in one archive.</p>
+                <p>{t("toolkit.downloads.formats.zip.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/community-toolkit.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download ZIP
+                    {t("toolkit.downloads.formats.zip.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -215,18 +222,18 @@ function CommunityStarterToolkitPage() {
             <Card className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Charter & governance (DOCX)
+                  {t("toolkit.downloads.formats.docx.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>Editable constitution, code of conduct, and volunteer agreement.</p>
+                <p>{t("toolkit.downloads.formats.docx.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/club-charter.docx"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download DOCX
+                    {t("toolkit.downloads.formats.docx.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -234,32 +241,34 @@ function CommunityStarterToolkitPage() {
             <Card className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Budgets & sponsors (Sheets)
+                  {t("toolkit.downloads.formats.sheets.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>Live spreadsheet for cashflow, grants, and recurring expenses.</p>
+                <p>{t("toolkit.downloads.formats.sheets.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/community-budget-template.xlsx"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Copy spreadsheet
+                    {t("toolkit.downloads.formats.sheets.button")}
                   </a>
                 </Button>
               </CardContent>
             </Card>
           </div>
           <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-            Need help adapting the materials? Email{" "}
-            <a
-              className="text-brand-red font-semibold hover:underline"
-              href="mailto:development@roundup.games?subject=Toolkit%20support"
-            >
-              development@roundup.games
-            </a>{" "}
-            to request a co-working session with our community success team.
+            {t("toolkit.downloads.support.description", {
+              email: (
+                <a
+                  className="text-brand-red font-semibold hover:underline"
+                  href="mailto:development@roundup.games?subject=Toolkit%20support"
+                >
+                  {t("toolkit.downloads.support.email")}
+                </a>
+              ),
+            })}
           </p>
         </div>
       </section>

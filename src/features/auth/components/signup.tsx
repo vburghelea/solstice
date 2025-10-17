@@ -145,7 +145,7 @@ export default function SignupForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <LogoIcon className="size-6" />
               </div>
-              <span className="sr-only">Roundup Games</span>
+              <span className="sr-only">{t("brand_name")}</span>
             </a>
             <h1 className="text-xl font-bold">{t("signup.title")}</h1>
           </div>

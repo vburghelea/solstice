@@ -10,6 +10,7 @@ import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
+import { useCommonTranslation, useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { cn, normalizeText } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
@@ -75,6 +76,8 @@ export const Route = createFileRoute("/search")({
 function SearchPage() {
   const { games, playerFilters } = Route.useLoaderData() as SearchLoaderData;
   const [activeFilters, setActiveFilters] = useState<QuickFilterKey[]>([]);
+  const { t: gt } = useGamesTranslation();
+  const { t: ct } = useCommonTranslation();
 
   const availableFilters = useMemo<QuickFilterDefinition[]>(() => {
     if (!playerFilters) {
@@ -91,7 +94,7 @@ function SearchPage() {
 
       filters.push({
         key: "city",
-        label: `In ${playerFilters.city}`,
+        label: gt("quick_filters.in_city", { city: playerFilters.city }),
         predicate: (game) => {
           const address = game.location?.address ?? "";
           const normalizedAddress = normalizeText(address);
@@ -112,7 +115,7 @@ function SearchPage() {
       );
       filters.push({
         key: "favorites",
-        label: "My favorite systems",
+        label: gt("quick_filters.my_favorite_systems"),
         predicate: (game) => {
           const systemId = game.gameSystem?.id;
           return typeof systemId === "number" && favoriteIds.has(systemId);
@@ -124,7 +127,7 @@ function SearchPage() {
       const languages = playerFilters.languages.map(normalizeText);
       filters.push({
         key: "language",
-        label: "In my language",
+        label: gt("quick_filters.in_my_language"),
         predicate: (game) => {
           if (!game.language) {
             return false;
@@ -141,7 +144,7 @@ function SearchPage() {
       const themes = playerFilters.themes.map(normalizeText);
       filters.push({
         key: "themes",
-        label: "My themes",
+        label: gt("quick_filters.my_themes"),
         predicate: (game) => {
           const categories = (game.gameSystem?.categories ?? []).map(normalizeText);
           if (categories.length === 0) {
@@ -155,7 +158,7 @@ function SearchPage() {
     }
 
     return filters;
-  }, [playerFilters]);
+  }, [playerFilters, gt]);
 
   const filterMap = useMemo(() => {
     return new Map(availableFilters.map((filter) => [filter.key, filter.predicate]));
@@ -212,9 +215,9 @@ function SearchPage() {
         <section className="border-border/60 bg-secondary border-b dark:border-gray-800 dark:bg-gray-950">
           <div className="container mx-auto px-4 py-12 sm:py-16">
             <div className="mx-auto max-w-2xl space-y-3 text-center">
-              <h1 className="font-heading text-4xl sm:text-5xl">All game sessions</h1>
+              <h1 className="font-heading text-4xl sm:text-5xl">{gt("search.title")}</h1>
               <p className="text-muted-foreground text-sm sm:text-base">
-                Plan your next tabletop adventure with public games hosted near you.
+                {gt("search.subtitle")}
               </p>
             </div>
           </div>
@@ -236,11 +239,10 @@ function SearchPage() {
             {!hasGames ? (
               <div className="border-border/70 bg-card/50 mx-auto flex max-w-xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
                 <p className="text-muted-foreground text-base font-medium">
-                  No public games found right now.
+                  {gt("search.no_games.title")}
                 </p>
                 <p className="text-muted-foreground/80 text-sm">
-                  Check back later or create an account to host the first session in your
-                  area.
+                  {gt("search.no_games.subtitle")}
                 </p>
                 <Link
                   to="/auth/signup"
@@ -249,19 +251,23 @@ function SearchPage() {
                     "mt-2 rounded-full",
                   )}
                 >
-                  Become a host
+                  {gt("search.no_games.become_host")}
                 </Link>
               </div>
             ) : (
               <>
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-muted-foreground text-sm">
-                    Showing
-                    <span className="text-foreground ml-1 font-semibold">
-                      {filteredGames.length}
-                    </span>{" "}
-                    {filteredGames.length === 1 ? "session" : "sessions"}
-                    {activeFilters.length > 0 ? " with your quick filters" : ""}
+                    {ct("common.showing_results", {
+                      count: filteredGames.length,
+                      itemType:
+                        filteredGames.length === 1
+                          ? gt("search.session")
+                          : gt("search.sessions"),
+                    })}
+                    {activeFilters.length > 0
+                      ? ` ${gt("search.with_quick_filters")}`
+                      : ""}
                   </p>
                   {activeFilters.length > 0 ? (
                     <button
@@ -269,7 +275,7 @@ function SearchPage() {
                       onClick={clearFilters}
                       className="text-primary dark:text-primary-200 text-sm font-medium hover:underline"
                     >
-                      Clear all
+                      {ct("common.clear_all")}
                     </button>
                   ) : null}
                 </div>
@@ -277,10 +283,10 @@ function SearchPage() {
                 {!hasFilteredGames ? (
                   <div className="border-border/70 bg-card/60 mx-auto flex max-w-2xl flex-col items-center gap-3 rounded-3xl border border-dashed px-8 py-12 text-center transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
                     <p className="text-muted-foreground text-base font-medium">
-                      No sessions match your quick filters yet.
+                      {gt("search.no_filtered_sessions.title")}
                     </p>
                     <p className="text-muted-foreground/80 text-sm">
-                      Try adjusting or clearing filters to browse the full catalogue.
+                      {gt("search.no_filtered_sessions.subtitle")}
                     </p>
                   </div>
                 ) : (

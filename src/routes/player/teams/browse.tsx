@@ -15,6 +15,7 @@ import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import type { TeamListItem } from "~/features/teams/teams.queries";
 import { listTeams, searchTeams } from "~/features/teams/teams.queries";
+import { useTeamsTranslation } from "~/hooks/useTypedTranslation";
 import { useCountries } from "~/shared/hooks/useCountries";
 import { List } from "~/shared/ui/list";
 
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/player/teams/browse")({
 });
 
 function BrowseTeamsPage() {
+  const { t } = useTeamsTranslation();
   const { teams: initialTeams } = Route.useLoaderData();
   const [searchQuery, setSearchQuery] = useState("");
   const { getCountryName } = useCountries();
@@ -65,14 +67,14 @@ function BrowseTeamsPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link to="/player/teams">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to My Teams
+            {t("teams.browse.back_to_my_teams")}
           </Link>
         </Button>
       </div>
 
       <div className="mb-8">
-        <h1 className="text-foreground text-3xl font-bold">Browse Teams</h1>
-        <p className="text-muted-foreground">Discover and join teams in your area</p>
+        <h1 className="text-foreground text-3xl font-bold">{t("teams.browse.title")}</h1>
+        <p className="text-muted-foreground">{t("teams.browse.subtitle")}</p>
       </div>
 
       <div className="mb-6">
@@ -80,7 +82,7 @@ function BrowseTeamsPage() {
           <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             type="search"
-            placeholder="Search teams by name or city..."
+            placeholder={t("teams.browse.search_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="text-muted-foreground pl-10"
@@ -90,8 +92,8 @@ function BrowseTeamsPage() {
 
       {searchQuery && searchErrored ? (
         <DataErrorState
-          title="We couldn’t find teams matching that search"
-          description="Please try again or adjust your search filters."
+          title={t("teams.browse.search_error_title")}
+          description={t("teams.browse.search_error_description")}
           onRetry={() => retrySearch()}
         />
       ) : showSkeletons ? (
@@ -104,11 +106,13 @@ function BrowseTeamsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">No teams found</h3>
+            <h3 className="mb-2 text-lg font-semibold">
+              {t("teams.browse.no_teams_title")}
+            </h3>
             <p className="text-muted-foreground text-center">
               {searchQuery
-                ? "Try a different search term"
-                : "No teams available to browse"}
+                ? t("teams.browse.try_different_search")
+                : t("teams.browse.no_teams_subtitle")}
             </p>
           </CardContent>
         </Card>
@@ -131,7 +135,7 @@ function BrowseTeamsPage() {
                           : ""}
                       </div>
                       <div className="text-muted-foreground mt-1 text-xs">
-                        Members: {teamItem.memberCount}
+                        {t("teams.browse.members")}: {teamItem.memberCount}
                       </div>
                     </div>
                     <Link
@@ -139,7 +143,7 @@ function BrowseTeamsPage() {
                       params={{ teamId: teamItem.team.id }}
                       className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
                     >
-                      View
+                      {t("teams.browse.view")}
                     </Link>
                   </div>
                 </List.Item>
@@ -154,6 +158,7 @@ function BrowseTeamsPage() {
                 key={teamItem.team.id}
                 teamItem={teamItem}
                 getCountryName={getCountryName}
+                t={t}
               />
             ))}
           </div>
@@ -166,9 +171,11 @@ function BrowseTeamsPage() {
 function PublicTeamCard({
   teamItem,
   getCountryName,
+  t,
 }: {
   teamItem: TeamListItem;
   getCountryName: (isoCode: string | null | undefined) => string;
+  t: (key: string) => string;
 }) {
   const { team, memberCount, creator } = teamItem;
 
@@ -196,18 +203,20 @@ function PublicTeamCard({
       <CardContent>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Members</span>
+            <span className="text-muted-foreground">{t("teams.browse.members")}</span>
             <span className="font-medium">{memberCount}</span>
           </div>
           {team.foundedYear && (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Founded</span>
+              <span className="text-muted-foreground">{t("teams.browse.founded")}</span>
               <span className="font-medium">{team.foundedYear}</span>
             </div>
           )}
           {creator && (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Created by</span>
+              <span className="text-muted-foreground">
+                {t("teams.browse.created_by")}
+              </span>
               <span className="truncate font-medium">
                 {creator.name || creator.email}
               </span>
@@ -217,7 +226,7 @@ function PublicTeamCard({
         <div className="mt-4">
           <Button asChild variant="outline" size="sm" className="w-full">
             <Link to="/player/teams/$teamId" params={{ teamId: team.id }}>
-              View Team
+              {t("teams.browse.view_team")}
             </Link>
           </Button>
         </div>

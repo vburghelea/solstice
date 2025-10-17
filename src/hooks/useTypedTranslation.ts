@@ -204,3 +204,24 @@ export const useRolesTranslation = () => {
 export const useSocialTranslation = () => {
   return useNamespaceTranslation("social");
 };
+
+/**
+ * Hook for home translations
+ */
+export const useHomeTranslation = () => {
+  return useNamespaceTranslation("home");
+};
+
+/**
+ * Hook for about translations
+ */
+export const useAboutTranslation = () => {
+  return useNamespaceTranslation("about");
+};
+
+/**
+ * Hook for resources translations
+ */
+export const useResourcesTranslation = () => {
+  return useNamespaceTranslation("resources");
+};

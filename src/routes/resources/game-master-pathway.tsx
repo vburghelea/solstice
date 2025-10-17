@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, Trophy } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
@@ -12,52 +13,44 @@ const cardSurfaceClass =
 const mutedCardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/60";
 
-const milestones = [
-  {
-    title: "Foundation badge",
-    duration: "4 weeks",
-    outcomes: [
-      "Session zero mastery with consent-forward facilitation",
-      "Improvisation drills for character spotlighting",
-      "Safety tool certification and table covenant design",
-    ],
-  },
-  {
-    title: "Campaign architect badge",
-    duration: "6 weeks",
-    outcomes: [
-      "Long-form narrative pacing with arcs and cliffhangers",
-      "Dynamic encounter design rooted in player agency",
-      "Community management for hybrid online/in-person play",
-    ],
-  },
-  {
-    title: "Master storyteller badge",
-    duration: "8 weeks",
-    outcomes: [
-      "Advanced emotional safety facilitation and conflict repair",
-      "Mentorship practicum leading emerging Game Masters",
-      "Performance coaching for live shows and streamed events",
-    ],
-  },
-];
-
 export const Route = createFileRoute("/resources/game-master-pathway")({
   component: GameMasterPathwayPage,
 });
 
 function GameMasterPathwayPage() {
+  const { t } = useResourcesTranslation();
+
+  const resources = [
+    {
+      title: t("game_master_pathway.resources.narrative_workbook.title"),
+      description: t("game_master_pathway.resources.narrative_workbook.description"),
+      button: t("game_master_pathway.resources.narrative_workbook.button"),
+      href: "https://cdn.roundup.games/gm-pathway-narrative-workbook.pdf",
+    },
+    {
+      title: t("game_master_pathway.resources.safety_toolkit.title"),
+      description: t("game_master_pathway.resources.safety_toolkit.description"),
+      button: t("game_master_pathway.resources.safety_toolkit.button"),
+      href: "https://cdn.roundup.games/gm-pathway-safety-toolkit.zip",
+    },
+    {
+      title: t("game_master_pathway.resources.performance_guide.title"),
+      description: t("game_master_pathway.resources.performance_guide.description"),
+      button: t("game_master_pathway.resources.performance_guide.button"),
+      href: "https://cdn.roundup.games/gm-pathway-performance-guide.pdf",
+    },
+  ];
   return (
     <PublicLayout>
       <HeroSection
-        eyebrow="Game Master pathway"
-        title="Level up your storytelling practice"
-        subtitle="A structured curriculum blending narrative craft, safety leadership, and production skills so you can deliver unforgettable campaigns."
+        eyebrow={t("game_master_pathway.hero.eyebrow")}
+        title={t("game_master_pathway.hero.title")}
+        subtitle={t("game_master_pathway.hero.subtitle")}
         backgroundImageSet={RESOURCES_HERO_IMAGE}
-        ctaText="Enroll now"
+        ctaText={t("game_master_pathway.hero.cta_text")}
         ctaLink="#enroll"
         secondaryCta={{
-          text: "Browse session library",
+          text: t("game_master_pathway.hero.secondary_cta"),
           link: "/resources/session-plans",
         }}
       />
@@ -66,39 +59,50 @@ function GameMasterPathwayPage() {
         <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-10">
           <div className="max-w-3xl space-y-3">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Curriculum overview
+              {t("game_master_pathway.curriculum.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Build skills in stages with expert mentorship
+              {t("game_master_pathway.curriculum.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Live clinics, asynchronous workshops, and reflective coaching help you
-              experiment safely and apply new techniques to your home tables. Expect
-              weekly practice prompts, peer feedback circles, and 1:1 sessions with senior
-              GMs.
+              {t("game_master_pathway.curriculum.description")}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {milestones.map((milestone) => (
-              <Card key={milestone.title} className={cardSurfaceClass}>
-                <CardHeader className="space-y-3">
-                  <div className="bg-brand-red/10 text-brand-red dark:bg-brand-red/20 flex size-12 items-center justify-center rounded-full">
-                    <Trophy className="size-6" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                    {milestone.title}
-                  </CardTitle>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Recommended pace: {milestone.duration}
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  {milestone.outcomes.map((outcome) => (
-                    <p key={outcome}>• {outcome}</p>
-                  ))}
-                </CardContent>
-              </Card>
-            ))}
+            {Array.isArray(t("game_master_pathway.curriculum.milestones")) ? (
+              (
+                t("game_master_pathway.curriculum.milestones") as unknown as Array<{
+                  title: string;
+                  duration: string;
+                  outcomes: string[];
+                }>
+              ).map((milestone) => (
+                <Card key={milestone.title} className={cardSurfaceClass}>
+                  <CardHeader className="space-y-3">
+                    <div className="bg-brand-red/10 text-brand-red dark:bg-brand-red/20 flex size-12 items-center justify-center rounded-full">
+                      <Trophy className="size-6" />
+                    </div>
+                    <CardTitle className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
+                      {milestone.title}
+                    </CardTitle>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t("game_master_pathway.curriculum.recommended_pace", {
+                        duration: milestone.duration,
+                      })}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
+                    {milestone.outcomes.map((outcome) => (
+                      <p key={outcome}>• {outcome}</p>
+                    ))}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-3 text-center text-gray-500">
+                Loading curriculum milestones...
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -107,24 +111,30 @@ function GameMasterPathwayPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Learning experience
+              {t("game_master_pathway.learning.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Practice-rich, feedback-heavy coaching journey
+              {t("game_master_pathway.learning.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Every cohort is capped at 16 participants to maintain intimate, high-trust
-              learning environments. You will receive detailed notes on recorded sessions
-              and shadow senior facilitators during live community programs.
+              {t("game_master_pathway.learning.description")}
             </p>
             <div className={mutedCardSurfaceClass + " space-y-3"}>
               <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                Weekly rhythm
+                {t("game_master_pathway.learning.weekly_rhythm.title")}
               </h3>
               <ul className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <li>• Monday: Live clinic with Q&A</li>
-                <li>• Wednesday: Peer practice pods and critique swaps</li>
-                <li>• Friday: Office hours with curriculum designers</li>
+                {Array.isArray(t("game_master_pathway.learning.weekly_rhythm.schedule"))
+                  ? (
+                      t(
+                        "game_master_pathway.learning.weekly_rhythm.schedule",
+                      ) as unknown as string[]
+                    ).map((item, index) => (
+                      <li key={`schedule-item-${index}-${item.slice(0, 20)}`}>
+                        • {item}
+                      </li>
+                    ))
+                  : null}
               </ul>
             </div>
           </div>
@@ -132,29 +142,21 @@ function GameMasterPathwayPage() {
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Portfolio & assessment
+                  {t("game_master_pathway.learning.portfolio.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Graduate with a documented campaign bible, session recordings, and
-                  player feedback reports you can share with venues, production partners,
-                  or future collaborators.
-                </p>
+                <p>{t("game_master_pathway.learning.portfolio.description")}</p>
               </CardContent>
             </Card>
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Alumni network
+                  {t("game_master_pathway.learning.alumni.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Access exclusive casting calls, paid storytelling opportunities, and
-                  collaborative worldbuilding jams with other Roundup-certified Game
-                  Masters.
-                </p>
+                <p>{t("game_master_pathway.learning.alumni.description")}</p>
               </CardContent>
             </Card>
           </div>
@@ -164,75 +166,29 @@ function GameMasterPathwayPage() {
       <section className="bg-secondary py-12 sm:py-16 lg:py-20 dark:bg-gray-950">
         <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-10">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Curriculum modules & resources
+            {t("game_master_pathway.resources.title")}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Card className={cardSurfaceClass}>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Narrative craft workbook
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Exercises for motif development, character arcs, and collaborative scene
-                  framing.
-                </p>
-                <Button asChild variant="outline" className="justify-center">
-                  <a
-                    href="https://cdn.roundup.games/gm-pathway-narrative-workbook.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download PDF
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className={cardSurfaceClass}>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Safety leadership toolkit
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Incident logs, consent scripts, and restorative repair playbooks used in
-                  the pathway.
-                </p>
-                <Button asChild variant="outline" className="justify-center">
-                  <a
-                    href="https://cdn.roundup.games/gm-pathway-safety-toolkit.zip"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download ZIP
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className={cardSurfaceClass}>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Performance coaching guide
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Voice, posture, and camera presence exercises for live and streamed
-                  experiences.
-                </p>
-                <Button asChild variant="outline" className="justify-center">
-                  <a
-                    href="https://cdn.roundup.games/gm-pathway-performance-guide.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download PDF
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
+            {resources.map((resource, index) => (
+              <Card
+                key={`resource-${index}-${resource.title.slice(0, 20)}`}
+                className={cardSurfaceClass}
+              >
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                    {resource.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
+                  <p>{resource.description}</p>
+                  <Button asChild variant="outline" className="justify-center">
+                    <a href={resource.href} target="_blank" rel="noopener noreferrer">
+                      {resource.button}
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -241,58 +197,62 @@ function GameMasterPathwayPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Enrollment details
+              {t("game_master_pathway.enrollment.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Upcoming cohorts and tuition options
+              {t("game_master_pathway.enrollment.title")}
             </h2>
             <ul className="space-y-4 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              <li>• Spring cohort (April 8 start) – hybrid online & Toronto studio</li>
-              <li>
-                • Summer cohort (July 15 start) – fully virtual with regional meetups
-              </li>
-              <li>
-                • Scholarships available for marginalized storytellers and youth mentors
-              </li>
+              {Array.isArray(t("game_master_pathway.enrollment.cohorts"))
+                ? (
+                    t("game_master_pathway.enrollment.cohorts") as unknown as string[]
+                  ).map((cohort, index) => (
+                    <li key={`cohort-${index}-${cohort.slice(0, 20)}`}>• {cohort}</li>
+                  ))
+                : null}
             </ul>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Tuition begins at $480 CAD with flexible installment plans. Partner venues
-              can sponsor spots for their facilitators through the Roundup Development
-              Fund.
+              {t("game_master_pathway.enrollment.tuition")}
             </p>
             <Button asChild className="sm:w-fit">
-              <a href="https://cal.com/roundupgames/gm-intake">Schedule an intake call</a>
+              <a href="https://cal.com/roundupgames/gm-intake">
+                {t("game_master_pathway.enrollment.cta_button")}
+              </a>
             </Button>
           </div>
           <div className={mutedCardSurfaceClass + " space-y-3"}>
             <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-              Certification requirements
+              {t("game_master_pathway.enrollment.requirements.title")}
             </h3>
             <ul className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-              <li>• Complete all milestone projects and reflective journals</li>
-              <li>• Facilitate two supervised community sessions</li>
-              <li>• Maintain active safety certification and background checks</li>
-              <li>• Contribute to the session design library or mentorship pool</li>
+              {Array.isArray(t("game_master_pathway.enrollment.requirements.items"))
+                ? (
+                    t(
+                      "game_master_pathway.enrollment.requirements.items",
+                    ) as unknown as string[]
+                  ).map((item, index) => (
+                    <li key={`requirement-${index}-${item.slice(0, 20)}`}>• {item}</li>
+                  ))
+                : null}
             </ul>
             <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
-              Questions? Email
-              <a
-                className="text-brand-red font-semibold hover:underline"
-                href="mailto:training@roundup.games?subject=GM%20pathway%20question"
-              >
-                training@roundup.games
-              </a>
-              for personalized guidance.
+              {t("game_master_pathway.enrollment.contact.questions", {
+                email: (
+                  <a
+                    className="text-brand-red font-semibold hover:underline"
+                    href="mailto:training@roundup.games?subject=GM%20pathway%20question"
+                  >
+                    {t("game_master_pathway.enrollment.contact.email")}
+                  </a>
+                ),
+              })}
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm leading-relaxed text-gray-600 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
               <div className="flex items-start gap-3">
                 <div className="text-brand-red pt-1">
                   <CheckCircle2 className="size-5" />
                 </div>
-                <p>
-                  Graduates receive a digital badge and placement support with affiliated
-                  cafés, libraries, and convention partners across Canada.
-                </p>
+                <p>{t("game_master_pathway.enrollment.graduate_benefits")}</p>
               </div>
             </div>
           </div>

@@ -21,6 +21,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
 import {
   FEATURE_FLAG_CHANGE_EVENT,
@@ -41,15 +42,13 @@ const curatedFlags: Array<{
 }> = [
   {
     key: WORKSPACE_FEATURE_FLAGS.sharedInbox,
-    label: "Workspace shared inbox",
-    description:
-      "Toggles the shared inbox experience across player, ops, GM, and admin workspaces.",
+    label: "",
+    description: "",
   },
   {
     key: WORKSPACE_FEATURE_FLAGS.collaboration,
-    label: "Cross-persona collaboration workspace",
-    description:
-      "Controls access to the collaboration workspace for role-based dashboards.",
+    label: "",
+    description: "",
   },
 ];
 
@@ -59,6 +58,7 @@ interface CombinedFlag extends FeatureFlagRecord {
 }
 
 function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
+  const { t } = useAdminTranslation();
   const effective = useFeatureFlag(flag.key, flag.environmentValue ?? false);
   const [override, setOverride] = useState<boolean | null>(() => {
     if (typeof window === "undefined") return null;
@@ -85,10 +85,10 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
 
   const environmentLabel =
     flag.environmentValue === null
-      ? "Not set"
+      ? t("feature_flags.console.status.not_set")
       : flag.environmentValue
-        ? "Enabled"
-        : "Disabled";
+        ? t("feature_flags.console.status.enabled")
+        : t("feature_flags.console.status.disabled");
 
   return (
     <div className="border-border bg-surface-default rounded-lg border p-4">
@@ -105,7 +105,7 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
             </p>
           </div>
           <p className="text-body-xs text-muted-foreground mt-1">
-            {flag.description ?? "Custom flag override"}
+            {flag.description ?? t("feature_flags.console.error.custom_flag_description")}
           </p>
         </div>
         <div className="token-gap-xs flex flex-wrap items-center gap-2">
@@ -119,7 +119,12 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
             variant={override === null ? "outline" : override ? "default" : "secondary"}
             className="border-transparent"
           >
-            Override: {override === null ? "None" : override ? "Enabled" : "Disabled"}
+            Override:{" "}
+            {override === null
+              ? t("feature_flags.console.override.none")
+              : override
+                ? t("feature_flags.console.override.enabled")
+                : t("feature_flags.console.override.disabled")}
           </Badge>
         </div>
       </div>
@@ -130,7 +135,7 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
           onClick={() => setFeatureFlagOverride(flag.key, true)}
           className={effective ? "bg-emerald-600 hover:bg-emerald-700" : ""}
         >
-          Enable
+          {t("feature_flags.console.buttons.enable")}
         </Button>
         <Button
           type="button"
@@ -138,7 +143,7 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
           variant={!effective ? "destructive" : "secondary"}
           onClick={() => setFeatureFlagOverride(flag.key, false)}
         >
-          Disable
+          {t("feature_flags.console.buttons.disable")}
         </Button>
         <Button
           type="button"
@@ -147,16 +152,18 @@ function FeatureFlagRow({ flag }: { flag: CombinedFlag }) {
           onClick={() => setFeatureFlagOverride(flag.key, null)}
           className="text-muted-foreground hover:text-foreground"
         >
-          Clear override
+          {t("feature_flags.console.override.clear_override")}
         </Button>
         <span className="text-body-xs text-muted-foreground ml-auto">
-          Effective state:{" "}
+          {t("feature_flags.console.status.effective_state")}{" "}
           <span
             className={
               effective ? "font-medium text-emerald-600" : "text-muted-foreground"
             }
           >
-            {effective ? "Enabled" : "Disabled"}
+            {effective
+              ? t("feature_flags.console.status.enabled")
+              : t("feature_flags.console.status.disabled")}
           </span>
         </span>
       </div>
@@ -182,6 +189,7 @@ function FeatureFlagSkeleton() {
 }
 
 export function AdminFeatureFlagConsole() {
+  const { t } = useAdminTranslation();
   const [customKey, setCustomKey] = useState("");
   const [customFlags, setCustomFlags] = useState<string[]>([]);
   const { data, isLoading, isError, error, refetch, isRefetching } =
@@ -194,8 +202,16 @@ export function AdminFeatureFlagConsole() {
         key: curated.key,
         envKey: curated.key,
         environmentValue: null,
-        label: curated.label,
-        description: curated.description,
+        label:
+          curated.label ||
+          t(
+            `feature_flags.console.curated_flags.${curated.key === WORKSPACE_FEATURE_FLAGS.sharedInbox ? "shared_inbox" : "collaboration"}.label`,
+          ),
+        description:
+          curated.description ||
+          t(
+            `feature_flags.console.curated_flags.${curated.key === WORKSPACE_FEATURE_FLAGS.sharedInbox ? "shared_inbox" : "collaboration"}.description`,
+          ),
       });
     }
     if (data) {
@@ -212,7 +228,7 @@ export function AdminFeatureFlagConsole() {
       }
     }
     return Array.from(map.values()).sort((a, b) => a.key.localeCompare(b.key));
-  }, [customFlags, data]);
+  }, [customFlags, data, t]);
 
   const handleAddCustomFlag = () => {
     const normalized = customKey.trim();
@@ -233,15 +249,17 @@ export function AdminFeatureFlagConsole() {
         <CardHeader className="token-stack-sm">
           <div className="token-gap-xs flex items-center gap-2">
             <AlertTriangleIcon className="text-destructive size-5" aria-hidden />
-            <CardTitle className="text-heading-sm">Feature flags unavailable</CardTitle>
+            <CardTitle className="text-heading-sm">
+              {t("feature_flags.console.error.title")}
+            </CardTitle>
           </div>
           <CardDescription className="text-body-sm text-destructive">
-            {error?.message ?? "We couldn't read the platform flag registry."}
+            {error?.message ?? t("feature_flags.console.error.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={() => refetch()} variant="secondary">
-            Retry
+            {t("feature_flags.console.buttons.retry")}
           </Button>
         </CardContent>
       </Card>
@@ -252,10 +270,11 @@ export function AdminFeatureFlagConsole() {
     <Card className="bg-surface-elevated border-subtle">
       <CardHeader className="token-stack-sm">
         <div className="token-stack-xs">
-          <CardTitle className="text-heading-sm">Feature rollout console</CardTitle>
+          <CardTitle className="text-heading-sm">
+            {t("feature_flags.console.title")}
+          </CardTitle>
           <CardDescription className="text-body-sm text-muted-strong">
-            Manage local overrides for experiments and persona previews without touching
-            production environment variables.
+            {t("feature_flags.console.description")}
           </CardDescription>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -263,12 +282,12 @@ export function AdminFeatureFlagConsole() {
             <Input
               value={customKey}
               onChange={(event) => setCustomKey(event.target.value)}
-              placeholder="Add flag key"
+              placeholder={t("feature_flags.console.placeholders.add_flag_key")}
               className="w-[220px]"
             />
             <Button type="button" variant="outline" onClick={handleAddCustomFlag}>
               <PlusIcon className="mr-1 size-4" aria-hidden />
-              Add
+              {t("feature_flags.console.buttons.add")}
             </Button>
           </div>
           <Button
@@ -283,7 +302,7 @@ export function AdminFeatureFlagConsole() {
             ) : (
               <RefreshCwIcon className="size-4" aria-hidden />
             )}
-            Refresh
+            {t("feature_flags.console.buttons.refresh")}
           </Button>
         </div>
       </CardHeader>
@@ -292,11 +311,10 @@ export function AdminFeatureFlagConsole() {
           <div className="token-stack-sm rounded-lg border border-dashed p-6 text-center">
             <CheckIcon className="mx-auto size-8 text-emerald-500" aria-hidden />
             <p className="text-body-sm text-foreground font-semibold">
-              No feature flags discovered
+              {t("feature_flags.console.empty_state.title")}
             </p>
             <p className="text-body-sm text-muted-strong">
-              Add a flag key to manage overrides or define environment variables prefixed
-              with VITE_FLAG_.
+              {t("feature_flags.console.empty_state.description")}
             </p>
           </div>
         ) : (

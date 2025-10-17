@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { removeUploadedAvatar, uploadAvatar } from "~/features/profile/profile.mutations";
+import { useProfileTranslation } from "~/hooks/useTypedTranslation";
 
 interface AvatarUploadProps {
   name?: string | null;
@@ -20,6 +21,7 @@ export function AvatarUpload({
   image,
   uploadedAvatarPath,
 }: AvatarUploadProps) {
+  const { t } = useProfileTranslation();
   const qc = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -33,9 +35,9 @@ export function AvatarUpload({
         qc.invalidateQueries({ queryKey: ["teamMembers"] }),
         qc.invalidateQueries({ queryKey: ["blocklist"] }),
       ]);
-      toast.success("Avatar updated");
+      toast.success(t("avatar_upload.messages.avatar_updated"));
     },
-    onError: () => toast.error("Failed to upload avatar"),
+    onError: () => toast.error(t("avatar_upload.messages.failed_to_upload_avatar")),
   });
 
   const doRemove = useMutation({
@@ -47,9 +49,9 @@ export function AvatarUpload({
         qc.invalidateQueries({ queryKey: ["teamMembers"] }),
         qc.invalidateQueries({ queryKey: ["blocklist"] }),
       ]);
-      toast.success("Reverted to provider avatar");
+      toast.success(t("avatar_upload.messages.reverted_to_provider_avatar"));
     },
-    onError: () => toast.error("Failed to remove avatar"),
+    onError: () => toast.error(t("avatar_upload.messages.failed_to_remove_avatar")),
   });
 
   async function handleFile(file: File) {
@@ -61,7 +63,7 @@ export function AvatarUpload({
       });
     } catch (err) {
       console.error(err);
-      toast.error("Could not process image");
+      toast.error(t("avatar_upload.messages.could_not_process_image"));
     } finally {
       setIsProcessing(false);
     }
@@ -96,7 +98,9 @@ export function AvatarUpload({
             disabled={isProcessing}
             onClick={() => fileInputRef.current?.click()}
           >
-            {isProcessing ? "Processing..." : "Upload avatar"}
+            {isProcessing
+              ? t("avatar_upload.buttons.processing")
+              : t("avatar_upload.buttons.upload_avatar")}
           </Button>
           {uploadedAvatarPath ? (
             <Button
@@ -105,7 +109,7 @@ export function AvatarUpload({
               onClick={() => doRemove.mutate(undefined)}
               disabled={doRemove.isPending}
             >
-              Use provider avatar
+              {t("avatar_upload.buttons.use_provider_avatar")}
             </Button>
           ) : null}
         </div>

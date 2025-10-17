@@ -1,1 +1,36 @@
-{}
+{
+  "blocklist": {
+    "title": "Blocklist",
+    "description": "Users you have blocked from interacting with you",
+    "loading": "Loading blocklist...",
+    "no_blocked_users": "No blocked users",
+    "no_blocked_users_description": "You haven't blocked any users yet.",
+    "user_count": {
+      "one": "{{count}} user blocked",
+      "other": "{{count}} users blocked"
+    },
+    "buttons": {
+      "unblock": "Unblock",
+      "unblocking": "Unblocking...",
+      "cancel": "Cancel",
+      "confirm_unblock": "Yes, Unblock"
+    },
+    "dialog": {
+      "title": "Unblock User",
+      "description": "Are you sure you want to unblock {{name}}? They will be able to follow you, invite you to games, and interact with you again."
+    },
+    "status": {
+      "blocked": "Blocked"
+    },
+    "reason": "Reason",
+    "blocked_date": "Blocked {{date}}",
+    "toast": {
+      "unblock_success": "User unblocked successfully",
+      "unblock_error": "Failed to unblock user",
+      "load_error": "Failed to load blocklist"
+    }
+  },
+  "errors": {
+    "unexpected_error": "An unexpected error occurred"
+  }
+}

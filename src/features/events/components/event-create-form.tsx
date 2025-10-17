@@ -1038,7 +1038,7 @@ export function EventCreateForm() {
                     <ValidatedCheckbox
                       field={field}
                       label={t("form.fields.allow_waitlist")}
-                      description="Allow registrations to join a waitlist when the event is full"
+                      description={t("form.descriptions.allow_waitlist")}
                     />
                   )}
                 </form.Field>
@@ -1048,7 +1048,7 @@ export function EventCreateForm() {
                     <ValidatedCheckbox
                       field={field}
                       label={t("form.fields.require_membership")}
-                      description="Only allow users with active Roundup Games memberships to register"
+                      description={t("form.descriptions.require_membership")}
                     />
                   )}
                 </form.Field>

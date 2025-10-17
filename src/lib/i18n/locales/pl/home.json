@@ -1,0 +1,89 @@
+{
+  "hero": {
+    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
+    "title": "TODO: Translate \"hero.title\"",
+    "subtitle": "TODO: Translate \"hero.subtitle\"",
+    "cta_text": "TODO: Translate \"hero.cta_text\"",
+    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+  },
+  "explorer_guide": {
+    "eyebrow": "TODO: Translate \"explorer_guide.eyebrow\"",
+    "title": "TODO: Translate \"explorer_guide.title\"",
+    "subtitle": "TODO: Translate \"explorer_guide.subtitle\"",
+    "city_focus_label": "TODO: Translate \"explorer_guide.city_focus_label\"",
+    "browse_all_locations": "TODO: Translate \"explorer_guide.browse_all_locations\"",
+    "location_data_coming_soon": "TODO: Translate \"explorer_guide.location_data_coming_soon\"",
+    "from_your_profile": "TODO: Translate \"explorer_guide.from_your_profile\"",
+    "players_count": "TODO: Translate \"explorer_guide.players_count\"",
+    "location_suggestion": "TODO: Translate \"explorer_guide.location_suggestion\"",
+    "popular_cities": "TODO: Translate \"explorer_guide.popular_cities\"",
+    "how_it_flows": {
+      "title": "TODO: Translate \"explorer_guide.how_it_flows.title\"",
+      "subtitle": "TODO: Translate \"explorer_guide.how_it_flows.subtitle\""
+    },
+    "chapters": "TODO: Translate \"explorer_guide.chapters\"",
+    "themes": {
+      "curated_spotlights": {
+        "title": "TODO: Translate \"explorer_guide.themes.curated_spotlights.title\"",
+        "description": "TODO: Translate \"explorer_guide.themes.curated_spotlights.description\""
+      },
+      "effortless_planning": {
+        "title": "TODO: Translate \"explorer_guide.themes.effortless_planning.title\"",
+        "description": "TODO: Translate \"explorer_guide.themes.effortless_planning.description\""
+      },
+      "trust_first_design": {
+        "title": "TODO: Translate \"explorer_guide.themes.trust_first_design.title\"",
+        "description": "TODO: Translate \"explorer_guide.themes.trust_first_design.description\""
+      }
+    }
+  },
+  "confidence_signals": {
+    "eyebrow": "TODO: Translate \"confidence_signals.eyebrow\"",
+    "title": "TODO: Translate \"confidence_signals.title\"",
+    "subtitle": "TODO: Translate \"confidence_signals.subtitle\"",
+    "safety_tools": {
+      "title": "TODO: Translate \"confidence_signals.safety_tools.title\"",
+      "description": "TODO: Translate \"confidence_signals.safety_tools.description\""
+    },
+    "meet_facilitator": {
+      "title": "TODO: Translate \"confidence_signals.meet_facilitator.title\"",
+      "description": "TODO: Translate \"confidence_signals.meet_facilitator.description\""
+    },
+    "welcoming_spaces": {
+      "title": "TODO: Translate \"confidence_signals.welcoming_spaces.title\"",
+      "description": "TODO: Translate \"confidence_signals.welcoming_spaces.description\""
+    }
+  },
+  "upcoming_events": {
+    "eyebrow": "TODO: Translate \"upcoming_events.eyebrow\"",
+    "title_prefix": "TODO: Translate \"upcoming_events.title_prefix\"",
+    "default_area": "TODO: Translate \"upcoming_events.default_area\"",
+    "subtitle": "TODO: Translate \"upcoming_events.subtitle\"",
+    "no_events_title": "TODO: Translate \"upcoming_events.no_events_title\"",
+    "no_events_subtitle": "TODO: Translate \"upcoming_events.no_events_subtitle\"",
+    "browse_full_calendar": "TODO: Translate \"upcoming_events.browse_full_calendar\""
+  },
+  "story_sessions": {
+    "eyebrow": "TODO: Translate \"story_sessions.eyebrow\"",
+    "title": "TODO: Translate \"story_sessions.title\"",
+    "subtitle": "TODO: Translate \"story_sessions.subtitle\"",
+    "no_sessions_title": "TODO: Translate \"story_sessions.no_sessions_title\"",
+    "no_sessions_subtitle": "TODO: Translate \"story_sessions.no_sessions_subtitle\"",
+    "search_all_games": "TODO: Translate \"story_sessions.search_all_games\""
+  },
+  "trending_systems": {
+    "eyebrow": "TODO: Translate \"trending_systems.eyebrow\"",
+    "title": "TODO: Translate \"trending_systems.title\"",
+    "subtitle": "TODO: Translate \"trending_systems.subtitle\"",
+    "no_systems": "TODO: Translate \"trending_systems.no_systems\"",
+    "sessions_count": "TODO: Translate \"trending_systems.sessions_count\"",
+    "hero_art_pending": "TODO: Translate \"trending_systems.hero_art_pending\"",
+    "description_coming_soon": "TODO: Translate \"trending_systems.description_coming_soon\""
+  },
+  "ready_to_go_deeper": {
+    "title": "TODO: Translate \"ready_to_go_deeper.title\"",
+    "subtitle": "TODO: Translate \"ready_to_go_deeper.subtitle\"",
+    "start_profile": "TODO: Translate \"ready_to_go_deeper.start_profile\"",
+    "have_account": "TODO: Translate \"ready_to_go_deeper.have_account\""
+  }
+}

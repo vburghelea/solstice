@@ -105,7 +105,9 @@ export function GameCard({
           )}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">{t("labels.game_system")}</span>
-            <span className="font-medium">{game.gameSystem?.name || "N/A"}</span>
+            <span className="font-medium">
+              {game.gameSystem?.name || t("status.not_available")}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">{t("labels.language")}</span>

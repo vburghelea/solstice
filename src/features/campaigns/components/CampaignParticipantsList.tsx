@@ -13,6 +13,7 @@ import {
   CampaignApplication,
   CampaignParticipant,
 } from "~/features/campaigns/campaigns.types";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
 
@@ -33,6 +34,7 @@ export function CampaignParticipantsList({
   applications,
   participants,
 }: CampaignParticipantsListProps) {
+  const { t } = useCampaignsTranslation();
   const queryClient = useQueryClient();
 
   const removeParticipantMutation = useMutation<
@@ -42,12 +44,14 @@ export function CampaignParticipantsList({
   >({
     mutationFn: updateCampaignParticipant,
     onSuccess: () => {
-      toast.success("Participant removed successfully!");
+      toast.success(t("campaigns.messages.participant_removed_success"));
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
     },
     onError: (error) => {
-      toast.error(`Failed to remove participant: ${error.message}`);
+      toast.error(
+        t("campaigns.errors.participant_remove_failed", { message: error.message }),
+      );
     },
   });
 
@@ -64,12 +68,14 @@ export function CampaignParticipantsList({
   >({
     mutationFn: removeCampaignParticipantBan,
     onSuccess: () => {
-      toast.success("Participant ban removed successfully!");
+      toast.success(t("campaigns.messages.participant_ban_removed_success"));
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
     },
     onError: (error) => {
-      toast.error(`Failed to remove participant ban: ${error.message}`);
+      toast.error(
+        t("campaigns.errors.participant_ban_remove_failed", { message: error.message }),
+      );
     },
   });
 
@@ -80,12 +86,14 @@ export function CampaignParticipantsList({
   const respondToCampaignApplicationMutation = useMutation({
     mutationFn: respondToCampaignApplication,
     onSuccess: () => {
-      toast.success("Application status updated successfully!");
+      toast.success(t("campaigns.messages.application_status_updated_success"));
       queryClient.invalidateQueries({ queryKey: ["campaignApplications", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
     },
     onError: (error) => {
-      toast.error(`Failed to update application status: ${error.message}`);
+      toast.error(
+        t("campaigns.errors.application_update_failed", { message: error.message }),
+      );
     },
   });
 
@@ -121,11 +129,15 @@ export function CampaignParticipantsList({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Participants ({approvedParticipants.length})</CardTitle>
+          <CardTitle>
+            {t("campaigns.participants_list.participants_title", {
+              count: approvedParticipants.length,
+            })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {approvedParticipants.length === 0 ? (
-            <p>No participants yet.</p>
+            <p>{t("campaigns.participants_list.no_participants")}</p>
           ) : (
             <ul className="space-y-2">
               {approvedParticipants.map((p) => (
@@ -145,8 +157,11 @@ export function CampaignParticipantsList({
                         username={p.user.name || p.user.email}
                       />{" "}
                       {p.userId === campaignOwnerId
-                        ? "(owner)"
-                        : `(${p.role} - ${p.status})`}
+                        ? t("campaigns.participants_list.owner_label")
+                        : t("campaigns.participants_list.role_status", {
+                            role: p.role,
+                            status: p.status,
+                          })}
                     </span>
                   </div>
                   {isOwner &&
@@ -164,8 +179,8 @@ export function CampaignParticipantsList({
                       >
                         {removeParticipantMutation.isPending &&
                         removeParticipantMutation.variables?.data.participantId === p.id
-                          ? "Removing..."
-                          : "Remove"}
+                          ? t("campaigns.participants_list.removing")
+                          : t("campaigns.participants_list.remove")}
                       </Button>
                     )}
                 </li>
@@ -178,7 +193,11 @@ export function CampaignParticipantsList({
       {isOwner && pendingApplications.length > 0 && (
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle>Pending Applications ({pendingApplications.length})</CardTitle>
+            <CardTitle>
+              {t("campaigns.participants_list.pending_applications_title", {
+                count: pendingApplications.length,
+              })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -198,7 +217,9 @@ export function CampaignParticipantsList({
                         userId={p.userId}
                         username={p.user.name || p.user.email}
                       />{" "}
-                      ({p.status})
+                      {t("campaigns.participants_list.status_label", {
+                        status: p.status,
+                      })}
                     </span>
                   </div>
                   <div className="flex space-x-2">
@@ -209,8 +230,8 @@ export function CampaignParticipantsList({
                       disabled={respondToCampaignApplicationMutation.isPending}
                     >
                       {respondToCampaignApplicationMutation.isPending
-                        ? "Approving..."
-                        : "Approve"}
+                        ? t("campaigns.participants_list.approving")
+                        : t("campaigns.participants_list.approve")}
                     </Button>
                     <Button
                       variant="destructive"
@@ -219,8 +240,8 @@ export function CampaignParticipantsList({
                       disabled={respondToCampaignApplicationMutation.isPending}
                     >
                       {respondToCampaignApplicationMutation.isPending
-                        ? "Rejecting..."
-                        : "Reject"}
+                        ? t("campaigns.participants_list.rejecting")
+                        : t("campaigns.participants_list.reject")}
                     </Button>
                   </div>
                 </li>
@@ -234,7 +255,9 @@ export function CampaignParticipantsList({
         <Card className="mt-4">
           <CardHeader>
             <CardTitle>
-              Banned from the Campaign ({rejectedParticipants.length})
+              {t("campaigns.participants_list.banned_title", {
+                count: rejectedParticipants.length,
+              })}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -255,7 +278,10 @@ export function CampaignParticipantsList({
                         userId={p.userId}
                         username={p.user.name || p.user.email}
                       />{" "}
-                      ({p.role} - {p.status})
+                      {t("campaigns.participants_list.role_status", {
+                        role: p.role,
+                        status: p.status,
+                      })}
                     </span>
                   </div>
                   <Button
@@ -269,8 +295,8 @@ export function CampaignParticipantsList({
                   >
                     {removeRejectedParticipantMutation.isPending &&
                     removeRejectedParticipantMutation.variables?.data.id === p.id
-                      ? "Allowing..."
-                      : "Allow"}
+                      ? t("campaigns.participants_list.allowing")
+                      : t("campaigns.participants_list.allow")}
                   </Button>
                 </li>
               ))}

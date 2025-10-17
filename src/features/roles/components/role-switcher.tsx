@@ -76,7 +76,9 @@ export function RoleSwitcher() {
             <Loader2Icon className="mr-2 size-4 animate-spin" aria-hidden="true" />
           ) : null}
           <span className="mr-2 font-medium">
-            {isHydrated ? activePersona.shortLabel : t("switcher.loading")}
+            {isHydrated
+              ? t(`personas.${activePersona.id}.short_label`)
+              : t("switcher.loading")}
           </span>
           <Badge variant="secondary">{t("switcher.badge")}</Badge>
         </Button>
@@ -111,9 +113,11 @@ export function RoleSwitcher() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col">
-                      <span className="text-base font-semibold">{persona.label}</span>
+                      <span className="text-base font-semibold">
+                        {t(`personas.${persona.id}.label`)}
+                      </span>
                       <span className="text-muted-foreground text-sm">
-                        {persona.description}
+                        {t(`personas.${persona.id}.description`)}
                       </span>
                     </div>
                     <Badge variant={isActive ? "default" : "outline"}>

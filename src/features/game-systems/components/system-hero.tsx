@@ -60,7 +60,7 @@ export function SystemHero({
       />
       {!heroBackground && (
         <p className="text-muted-foreground mt-2 text-center text-sm">
-          {t("status.image_pending_moderation")}
+          {t("image_pending_moderation")}
         </p>
       )}
     </div>

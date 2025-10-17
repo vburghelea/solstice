@@ -1,0 +1,980 @@
+{
+  "hero": {
+    "eyebrow": "Resources",
+    "title": "Run unforgettable tabletop programs",
+    "subtitle": "Toolkits, training plans, and certification pathways curated by the Roundup Games development team.",
+    "cta_text": "Browse by category",
+    "secondary_cta": "Request custom support"
+  },
+  "sections": {
+    "club_toolkit": {
+      "title": "Community starter toolkit",
+      "description": "Charters, budget planners, sponsorship decks, and onboarding emails tailored for tabletop clubs and board game cafés.",
+      "actions": {
+        "download_toolkit": "Download toolkit",
+        "view_charter": "View charter template"
+      }
+    },
+    "training": {
+      "title": "Session design library",
+      "description": "Adventure prompts, campaign handbooks, and board game rotation plans curated by experienced Game Masters and event hosts.",
+      "actions": {
+        "browse_plans": "Browse session plans",
+        "watch_clinics": "Watch facilitation clinics"
+      }
+    },
+    "safe_sport": {
+      "title": "Safety & accessibility resources",
+      "description": "Policies, safety briefs, and inclusivity guidelines aligned with Roundup Games community standards.",
+      "actions": {
+        "download_policies": "Download policies",
+        "report_concern": "Report a concern"
+      }
+    }
+  },
+  "certification": {
+    "title": "Certification & education pathways",
+    "subtitle": "Our learning management system keeps your credentials current. Complete the online modules and book practical assessments hosted by provincial partners.",
+    "tracks": {
+      "gm_pathway": {
+        "title": "Game Master pathway",
+        "description": "Self-paced modules covering session zero best practices, safety tools, and campaign pacing—perfect for storytellers leading long-form games.",
+        "cta": "Start GM training"
+      },
+      "host_pathway": {
+        "title": "Community host pathway",
+        "description": "Workshops on event flow, table assignments, and welcoming new players—ideal for café managers and meetup organizers running open play nights.",
+        "cta": "Register for host labs"
+      },
+      "operations_pathway": {
+        "title": "Event operations pathway",
+        "description": "Step-by-step playbooks for scheduling tournaments, coordinating volunteers, and implementing streamlined check-in systems.",
+        "cta": "Download operations kit"
+      }
+    }
+  },
+  "consultation": {
+    "eyebrow": "Need something custom?",
+    "title": "Development staff hours for clubs",
+    "description": "Book a consultation with our staff to review grant applications, event bids, or long-term athlete development plans. We'll work with you to tailor resources and connections for your region.",
+    "actions": {
+      "schedule_meeting": "Schedule a meeting",
+      "connect_hubs": "Connect with regional hubs"
+    },
+    "office_hours": {
+      "title": "Office hours menu",
+      "services": {
+        "funding_strategy": "Funding strategy tune-up",
+        "operations_audit": "Event operations audit",
+        "volunteer_mapping": "Volunteer journey mapping",
+        "conduct_review": "Community code of conduct review"
+      }
+    }
+  },
+  "charter_template": {
+    "hero": {
+      "eyebrow": "Club charter template",
+      "title": "Adaptable governance for tabletop communities",
+      "subtitle": "Use our living charter to formalize expectations, celebrate your shared identity, and welcome newcomers with clarity.",
+      "cta_text": "Copy the template",
+      "secondary_cta": "Request facilitation support"
+    },
+    "why_works": {
+      "eyebrow": "Why this charter works",
+      "title": "Transparent, inclusive guidelines for clubs of any size",
+      "description": "Built alongside administrators, librarians, and café owners, this charter keeps structure approachable. Each clause comes with facilitator notes to help you introduce it to members, plus optional amendments for schools and youth-serving organizations."
+    },
+    "sections": {
+      "mission_values": {
+        "title": "Mission & values",
+        "description": "Anchor your storytelling focus and community promises so everyone knows why this space exists.",
+        "highlights": [
+          "Statement of purpose tailored to tabletop and board gaming",
+          "Commitment to safety, accessibility, and anti-harassment",
+          "Inclusion charter with language for gender-affirming and neurodivergent players"
+        ]
+      },
+      "membership_governance": {
+        "title": "Membership & governance",
+        "description": "Clarify who can join, how decisions are made, and the pathways to leadership roles.",
+        "highlights": [
+          "Membership tiers with benefits and expectations",
+          "Voting structure and annual general meeting checklist",
+          "Conflict resolution ladder and escalation timelines"
+        ]
+      },
+      "programming_safety": {
+        "title": "Programming & safety",
+        "description": "Outline how events are proposed, approved, and evaluated with player wellbeing in mind.",
+        "highlights": [
+          "Session pitch form and selection rubric",
+          "Table facilitator roles, responsibilities, and training modules",
+          "Incident reporting workflow with response benchmarks"
+        ]
+      }
+    },
+    "facilitation": {
+      "eyebrow": "Facilitation notes",
+      "title": "Host a charter review workshop",
+      "description": "Bring staff, volunteers, and community members into the drafting process. Our facilitation guide walks you through a 90-minute workshop covering values, membership flow, and accountability. Use the included slide deck and breakout prompts to co-create language that reflects your campus or region.",
+      "workshop_outline": {
+        "title": "Workshop outline",
+        "items": [
+          "Icebreaker: \"Memorable moments at the table\" circle",
+          "Charter walkthrough with annotation activity",
+          "Small group edits using scenario cards",
+          "Consent-based ratification and next steps"
+        ]
+      },
+      "toolkit": {
+        "title": "Facilitation toolkit",
+        "description": "Includes annotated script, editable slides, and evaluation form to capture feedback from participants.",
+        "button": "Download workshop kit"
+      },
+      "scenario_cards": {
+        "title": "Scenario cards",
+        "description": "Thirty real-world tabletop dilemmas to stress-test your charter language and escalation procedures.",
+        "button": "Download PDF deck"
+      }
+    },
+    "downloads": {
+      "title": "Choose your format",
+      "formats": {
+        "docx": {
+          "title": "Editable document (DOCX)",
+          "description": "Best for committees drafting in Word or Google Docs.",
+          "button": "Download DOCX"
+        },
+        "pdf": {
+          "title": "Printable version (PDF)",
+          "description": "Ready-to-share document with fillable fields for sign-off.",
+          "button": "Download PDF"
+        },
+        "markdown": {
+          "title": "Lightweight constitution (Markdown)",
+          "description": "Use with static sites, Git-based communities, or Notion workspaces.",
+          "button": "Copy Markdown"
+        }
+      },
+      "custom_clause": {
+        "title": "Need a custom clause?",
+        "description": "Our policy specialists can help tailor language for youth programs, public institutions, or multilingual chapters.",
+        "button": "Connect with policy team"
+      }
+    }
+  },
+  "toolkit": {
+    "hero": {
+      "eyebrow": "Community starter toolkit",
+      "title": "Launch your tabletop club with confidence",
+      "subtitle": "Our toolkit distills the best practices from thriving Roundup Games chapters so you can build momentum in weeks, not months.",
+      "cta_text": "Access the toolkit",
+      "secondary_cta": "Talk to a community coach"
+    },
+    "whats_inside": {
+      "eyebrow": "What's inside",
+      "title": "Everything you need from day zero to your first marquee event",
+      "description": "Whether you're spinning up a campus club, a library after-hours program, or a board game café league, this toolkit keeps planning grounded and collaborative. Work through the playbooks in order or jump straight to the templates that match your next milestone."
+    },
+    "core_documents": {
+      "title": "Core documents",
+      "items": [
+        "Editable constitution and operating charter",
+        "Code of conduct with incident response workflow",
+        "Volunteer and Game Master agreements",
+        "Accessible membership application and waiver forms"
+      ]
+    },
+    "planning_tools": {
+      "title": "Planning tools",
+      "items": [
+        "Budget and grant forecast spreadsheet with cashflow scenarios",
+        "Sponsor outreach sequences and pitch deck slides",
+        "Event critical path template with role assignments",
+        "Risk assessment and safety checklist tailored to tabletop play"
+      ]
+    },
+    "readiness_blocks": {
+      "founding_documents": {
+        "title": "Founding documents",
+        "description": "Customize a charter, code of conduct, and volunteer agreement that reflect your community's values and tone."
+      },
+      "financial_runway": {
+        "title": "Financial runway",
+        "description": "Budget templates, cashflow trackers, and sample sponsorship decks help you forecast seasons with confidence."
+      },
+      "people_operations": {
+        "title": "People operations",
+        "description": "Role descriptions, onboarding checklists, and meeting agendas keep staff, GMs, and volunteers aligned."
+      },
+      "quality_standards": {
+        "title": "Quality standards",
+        "description": "Session rubrics and feedback loops ensure that every program meets the Roundup Games seal of care."
+      }
+    },
+    "how_to_use": {
+      "eyebrow": "How to use the toolkit",
+      "title": "A guided sprint to build community infrastructure",
+      "description": "Follow our 6-week launch roadmap or adapt the modules to your timeline. Each chapter ends with reflection prompts so your core team can review progress and surface blockers early."
+    },
+    "phases": {
+      "weeks_1_2": {
+        "title": "Weeks 1–2",
+        "items": [
+          "Define community values and inclusive play guidelines",
+          "Lock a meeting cadence and decision-making model",
+          "Confirm founding roles and communication channels"
+        ]
+      },
+      "weeks_3_4": {
+        "title": "Weeks 3–4",
+        "items": [
+          "Map funding sources and sponsorship prospects",
+          "Prototype your first flagship event agenda",
+          "Set up onboarding journeys for players and volunteers"
+        ]
+      },
+      "weeks_5_6": {
+        "title": "Weeks 5–6",
+        "items": [
+          "Test safety drills and debrief rituals",
+          "Plot your next quarter of programming",
+          "Collect pilot feedback and iterate the charter"
+        ]
+      }
+    },
+    "downloads": {
+      "title": "Download formats",
+      "description": "Prefer working offline? Grab the editable bundle or individual templates below. Each file stays synced with the latest governance, accessibility, and safety requirements from the Roundup Games development team.",
+      "formats": {
+        "zip": {
+          "title": "Complete toolkit (ZIP)",
+          "description": "All charters, spreadsheets, and policy templates in one archive.",
+          "button": "Download ZIP"
+        },
+        "docx": {
+          "title": "Charter & governance (DOCX)",
+          "description": "Editable constitution, code of conduct, and volunteer agreement.",
+          "button": "Download DOCX"
+        },
+        "sheets": {
+          "title": "Budgets & sponsors (Sheets)",
+          "description": "Live spreadsheet for cashflow, grants, and recurring expenses.",
+          "button": "Copy spreadsheet"
+        }
+      },
+      "support": {
+        "description": "Need help adapting the materials? Email {{email}} to request a co-working session with our community success team.",
+        "email": "development@roundup.games"
+      }
+    }
+  },
+  "safety_policies": {
+    "hero": {
+      "eyebrow": "Safety & accessibility policies",
+      "title": "Feel protected at every Roundup gathering",
+      "subtitle": "We design policies with community members, safeguarding experts, and legal advisors so your stories flourish in safe spaces.",
+      "cta_text": "Download policies",
+      "secondary_cta": "Report an urgent concern"
+    },
+    "approach": {
+      "eyebrow": "Our approach",
+      "title": "Policies built with survivors, advocates, and storytellers",
+      "description": "We co-create safety standards with trauma-informed practitioners and marginalized community members. The result is a living framework that reduces harm, prioritizes consent, and keeps data protected across every chapter."
+    },
+    "pillars": {
+      "people_first": {
+        "title": "People-first safeguards",
+        "description": "Trained community stewards, background-checked volunteers, and clear escalation ladders keep every table supported."
+      },
+      "consent_driven": {
+        "title": "Consent-driven play",
+        "description": "Session safety tools, pre-event briefings, and debrief rituals help participants advocate for their needs in real time."
+      },
+      "data_stewardship": {
+        "title": "Data stewardship",
+        "description": "We minimize data collection, encrypt sensitive records, and maintain transparent retention schedules for all programs."
+      }
+    },
+    "policy_library": {
+      "eyebrow": "Policy library",
+      "title": "Cover every stage of the participant journey",
+      "description": "The library is organized by lifecycle—before, during, and after events—so you can quickly find the guidance you need. Each policy includes training checklists, implementation tips, and metrics for auditing effectiveness.",
+      "lifecycle": {
+        "before": {
+          "title": "Before the event",
+          "items": [
+            "Venue risk assessments and accessibility audits",
+            "Volunteer screening and reference checks",
+            "Registration data minimization guidelines"
+          ]
+        },
+        "during": {
+          "title": "During the event",
+          "items": [
+            "Safety brief scripts and red/yellow escalation matrix",
+            "Incident response roles with on-call coverage",
+            "Real-time accessibility adjustments checklist"
+          ]
+        },
+        "after": {
+          "title": "After the event",
+          "items": [
+            "Follow-up protocols and care referrals",
+            "Data retention schedules aligned with privacy law",
+            "Root cause analysis template for incident reviews"
+          ]
+        },
+        "digital": {
+          "title": "Digital portal",
+          "items": [
+            "Platform security posture and encryption standards",
+            "Data subject request workflow",
+            "Vendor due diligence questionnaire"
+          ]
+        }
+      },
+      "timeline": {
+        "title": "Annual review timeline",
+        "description": "Policies undergo triannual review with external advisors specializing in safeguarding, cybersecurity, and disability justice. We publish a change log and invite public comment prior to ratification.",
+        "schedule": [
+          "January: Legal and compliance audit",
+          "May: Community town hall & survey",
+          "September: Accessibility and data security refresh"
+        ]
+      },
+      "transparency": {
+        "title": "Transparency reports",
+        "description": "Biannual reports summarize incident metrics, resolution timelines, and improvement projects. Subscribe to receive updates the moment they publish.",
+        "button": "Join the safety briefing list"
+      }
+    },
+    "downloads": {
+      "title": "Download policy packs",
+      "formats": {
+        "handbook": {
+          "title": "Community safety handbook",
+          "description": "Complete policies for in-person programs, including facilitator scripts.",
+          "button": "Download PDF"
+        },
+        "data_protection": {
+          "title": "Data protection addendum",
+          "description": "Privacy policy, retention schedules, and incident notification templates.",
+          "button": "Download PDF"
+        },
+        "accessibility": {
+          "title": "Accessibility playbook",
+          "description": "Guidelines for sensory-friendly, mobility-aware, and multilingual events.",
+          "button": "Download PDF"
+        }
+      },
+      "custom_policies": {
+        "title": "Need a signed policy for your venue?",
+        "description": "Our legal team can co-author venue-specific agreements or compliance attestations.",
+        "button": "Coordinate with legal"
+      }
+    },
+    "questions": {
+      "title": "Questions or feedback?",
+      "description": "Reach out to safety@roundup.games with policy updates, accessibility requests, or clarifying questions. We respond within 48 hours and can schedule follow-up calls when needed.",
+      "emergency": {
+        "title": "Emergency contacts",
+        "description": "For urgent incidents during an event, call the 24/7 hotline shared with registered coordinators. For digital security concerns, email security@roundup.games to reach our on-call response team."
+      }
+    }
+  },
+  "report_concern": {
+    "hero": {
+      "eyebrow": "Report a concern",
+      "title": "We're here to help—day or night",
+      "subtitle": "Roundup Games takes every report seriously. Reach out so we can keep our community safe, supported, and informed.",
+      "cta_text": "View reporting steps",
+      "secondary_cta": "Visit safety policies"
+    },
+    "reporting_steps": {
+      "eyebrow": "How to report",
+      "title": "We respond quickly and keep you informed",
+      "description": "Follow these steps so we can protect participants and resolve incidents with care. Our team will acknowledge your report, outline next steps, and share updates until the matter is closed.",
+      "steps": [
+        {
+          "title": "Make sure everyone is safe",
+          "description": "If anyone is in immediate danger, contact local emergency services first. Our response team will coordinate follow-up support once the situation is stable."
+        },
+        {
+          "title": "Collect key details",
+          "description": "Write down what happened, when it occurred, who was involved, and any immediate actions taken. Include links, screenshots, or photos if relevant."
+        },
+        {
+          "title": "Reach the right team",
+          "description": "Choose the reporting channel below that matches the concern. If you are unsure, contact the hotline and we will route the request."
+        }
+      ]
+    },
+    "channels": {
+      "eyebrow": "Choose a channel",
+      "title": "Dedicated teams ready to respond",
+      "description": "Use the option that best fits the situation so we can activate the correct responders. If you prefer anonymous reporting, select \"Conduct Response Team\" and indicate that desire in the form.",
+      "contact_label": "Contact",
+      "urgent_safety": {
+        "title": "Urgent safety concern",
+        "description": "Physical harm, harassment, or severe emotional distress happening right now at an event.",
+        "contact": "24/7 Safety Hotline",
+        "action_label": "Call 1-855-ROUNDUP",
+        "notes": "Available for registered coordinators and venue managers. Interpreters and real-time captioning available on request."
+      },
+      "conduct_violation": {
+        "title": "Code of conduct violation",
+        "description": "Reports involving harassment, discrimination, bullying, or repeated disruptive behavior.",
+        "contact": "Conduct Response Team",
+        "action_label": "Email conduct@roundup.games",
+        "notes": "Expect a confirmation within 12 hours and a full follow-up plan within 48 hours."
+      },
+      "data_issue": {
+        "title": "Data or platform issue",
+        "description": "Suspected account compromise, privacy concerns, or bugs exposing sensitive information.",
+        "contact": "Security & Platform Team",
+        "action_label": "Email security@roundup.games",
+        "notes": "Critical vulnerabilities are triaged within two hours. We coordinate responsible disclosure and status updates."
+      },
+      "accessibility_request": {
+        "title": "Accessibility request",
+        "description": "Accommodations, interpretation support, or barrier removal for upcoming programs.",
+        "contact": "Accessibility Desk",
+        "action_label": "Email accessibility@roundup.games",
+        "notes": "We will respond within one business day with next steps or scheduling options."
+      }
+    },
+    "what_to_expect": {
+      "eyebrow": "After you report",
+      "title": "What to expect from our response team",
+      "expectations": [
+        "Acknowledgement receipt with assigned responder within 12 hours",
+        "Tailored safety plan and timeline for next updates",
+        "Options for restorative conversations or formal investigations",
+        "Closure summary with follow-up resources and future prevention steps"
+      ],
+      "live_support": {
+        "title": "Prefer to talk live?",
+        "description": "Schedule a call with a member of the community care team. We can bring in additional specialists based on the nature of your concern.",
+        "action_label": "Book a care conversation"
+      },
+      "anonymous_note": "Anonymous reports are investigated with the same urgency. We will share what actions were taken via a public update when we cannot follow up directly."
+    },
+    "support_resources": {
+      "title": "Support resources",
+      "description": "We partner with local organizations who specialize in mental health, victim services, and restorative processes. If you need additional care, let us know and we will connect you.",
+      "resources": [
+        {
+          "title": "Mental health warmline",
+          "description": "Peer support for stress, burnout, and processing tough sessions.",
+          "action_label": "Call 1-888-555-2222"
+        },
+        {
+          "title": "Restorative circle facilitators",
+          "description": "Independent practitioners trained in trauma-informed, community-led healing.",
+          "action_label": "Request referral"
+        },
+        {
+          "title": "Digital safety clinic",
+          "description": "Security volunteers who help secure devices and accounts after incidents.",
+          "action_label": "Book an appointment"
+        }
+      ]
+    }
+  },
+  "community_host_pathway": {
+    "hero": {
+      "eyebrow": "Community host pathway",
+      "title": "Grow gatherings that feel like home",
+      "subtitle": "Training for event leads, café teams, and volunteers who turn spaces into memorable tabletop destinations.",
+      "cta_text": "Apply for the next cohort",
+      "secondary_cta": "Hire a certified host"
+    },
+    "curriculum": {
+      "eyebrow": "Curriculum tracks",
+      "title": "Build hospitality, logistics, and growth superpowers",
+      "description": "Mix live workshops with shadow shifts at flagship Roundup venues. Hosts leave with repeatable systems, feedback frameworks, and a network of peers to trade playbooks with.",
+      "tracks": [
+        {
+          "title": "Hospitality & inclusivity",
+          "focus": "Designing arrivals, orientations, and table assignments that make every visitor feel welcome from the first hello.",
+          "highlights": [
+            "Front-of-house rituals and sensory-friendly signage",
+            "Pronoun best practices and cultural competency drills",
+            "De-escalation playbook for common venue scenarios"
+          ]
+        },
+        {
+          "title": "Operational excellence",
+          "focus": "Master event logistics—from equipment prep and volunteer wrangling to live troubleshooting and closing procedures.",
+          "highlights": [
+            "Run of show templates with contingency triggers",
+            "Inventory and table layout mapping",
+            "Incident reporting and hand-off protocols"
+          ]
+        },
+        {
+          "title": "Community growth",
+          "focus": "Cultivate membership momentum with outreach, partnerships, and post-event storytelling.",
+          "highlights": [
+            "Social media and newsletter content calendars",
+            "Feedback loop design and retention benchmarks",
+            "Partnership toolkit for cafés, libraries, and schools"
+          ]
+        }
+      ]
+    },
+    "practicum": {
+      "eyebrow": "Learn by doing",
+      "title": "Shadow shifts and practicum support",
+      "description": "Each participant completes two mentored shifts at high-traffic events. You'll practice intake, table transitions, and closings with feedback from senior hosts and community managers.",
+      "checklist_title": "Practicum checklist",
+      "checklist_items": [
+        "Accessibility walkthrough and sensory calibration",
+        "Table turn management and waitlist triage",
+        "Player conflict mediation with restorative options"
+      ],
+      "toolkit_title": "Toolkit downloads",
+      "toolkit_description": "Includes floor plan templates, checklist poster sets, and post-event survey automations.",
+      "toolkit_button": "Download ZIP",
+      "certifications_title": "Optional certifications",
+      "certifications_description": "Add-on workshops cover food handling, first aid, and inclusive programming for youth or seniors."
+    },
+    "playbooks": {
+      "title": "Playbooks & templates",
+      "opening_night": {
+        "title": "Opening night checklist",
+        "description": "Step-by-step run of show for first-time attendees.",
+        "button": "Download PDF"
+      },
+      "volunteer_matrix": {
+        "title": "Volunteer scheduling matrix",
+        "description": "Dynamic spreadsheet for shift assignments and reminder automations.",
+        "button": "Download XLSX"
+      },
+      "retention_kit": {
+        "title": "Retention campaign kit",
+        "description": "Email drips, social captions, and highlight reels to keep players coming back.",
+        "button": "Download ZIP"
+      }
+    },
+    "application": {
+      "eyebrow": "Application process",
+      "title": "Rolling admissions with quarterly start dates",
+      "description": "Submit your application to join the next cohort. We prioritize teams serving marginalized players, rural regions, and new venue launches.",
+      "process_items": [
+        "Virtual info sessions on the first Tuesday of each month",
+        "Application review within five business days",
+        "Group interviews focused on scenario planning",
+        "Scholarships and sliding scale pricing available"
+      ],
+      "action_button": "Start application call",
+      "maintenance_title": "Certification maintenance",
+      "maintenance_items": [
+        "Renew CPR/first aid every two years",
+        "Complete two micro-courses from the facilitation clinic library",
+        "Submit quarterly event metrics and community stories"
+      ],
+      "contact_prompt": "Program questions? Email",
+      "contact_email": "events@roundup.games",
+      "graduate_benefits": "Graduates receive a digital badge and placement support with affiliated cafés, libraries, and convention partners across Canada."
+    }
+  },
+  "event_operations_kit": {
+    "hero": {
+      "eyebrow": "Event operations kit",
+      "title": "Run seamless tabletop events, tournaments, and festivals",
+      "subtitle": "Operational blueprints tested by the Roundup Games events team to help you deliver safe, memorable, and profitable gatherings.",
+      "cta_text": "Download the kit",
+      "secondary_cta": "Book an ops consult"
+    },
+    "operating_system": {
+      "eyebrow": "Operating system",
+      "title": "Templates that scale from pop-ups to multi-day conventions",
+      "description": "Choose the modules you need or deploy the entire kit. We include editable spreadsheets, LiveOps dashboards, and facilitator checklists so your team can collaborate in real time.",
+      "phases": [
+        {
+          "title": "Planning & budgeting",
+          "description": "Capacity models, staffing grids, and cashflow templates keep you in control before tickets even launch.",
+          "bullets": [
+            "Revenue scenarios with sponsorship and merch add-ons",
+            "Volunteer and contractor staffing calculators",
+            "Venue comparison worksheet and risk assessment"
+          ]
+        },
+        {
+          "title": "Event execution",
+          "description": "Minute-by-minute run of show, comms trees, and crisis response cards ensure smooth delivery on event day",
+          "bullets": [
+            "Check-in flow with QR codes and backup lists",
+            "Radio and messaging protocols for floor leads",
+            "Incident escalation matrix and documentation kit"
+          ]
+        },
+        {
+          "title": "Post-event wrap",
+          "description": "Debrief templates, metric dashboards, and outreach scripts help you convert momentum into future growth.",
+          "bullets": [
+            "Stakeholder report outline with financial summary",
+            "Volunteer thank-you automation sequences",
+            "Player survey analysis and retention planner"
+          ]
+        }
+      ]
+    },
+    "liveops": {
+      "eyebrow": "LiveOps dashboard",
+      "title": "Real-time data keeps operations calm and proactive",
+      "description": "Set up our connected spreadsheet dashboard to monitor attendance, table occupancy, volunteer assignments, and incident logs. Integrate with our forms or plug in your own data sources.",
+      "widgets_title": "Dashboard widgets",
+      "widgets": [
+        "Check-in counter with capacity alerts",
+        "Table usage heatmap and queue tracker",
+        "Volunteer staffing board with break reminders"
+      ],
+      "automations_title": "Included automations",
+      "automations_description": "Zapier-ready recipes send SMS alerts to shift leads, trigger inventory restock notifications, and update your post-event reports.",
+      "automations_button": "Download automation pack",
+      "vendor_title": "Vendor management kit",
+      "vendor_description": "Contract templates, insurance checklists, and communication cadences keep partners aligned.",
+      "vendor_button": "Download vendor kit"
+    },
+    "downloads": {
+      "title": "Download the full kit",
+      "operations_bundle": {
+        "title": "Operations bundle (ZIP)",
+        "description": "All templates, dashboards, and policy references in one archive.",
+        "button": "Download ZIP"
+      },
+      "run_of_show": {
+        "title": "Run of show template",
+        "description": "Google Sheets + Excel formats with automated reminders built-in.",
+        "button": "Download XLSX"
+      },
+      "compliance_binder": {
+        "title": "Risk & compliance binder",
+        "description": "Insurance certificates, waivers, and emergency response cards.",
+        "button": "Download PDF"
+      },
+      "support_title": "Need custom automation or staffing support?",
+      "support_description": "Our event operations consultants can co-build dashboards, recruit volunteers, and manage vendor briefs for your next flagship program.",
+      "support_button": "Talk with operations team"
+    }
+  },
+  "session_plans": {
+    "hero": {
+      "eyebrow": "Session design library",
+      "title": "Facilitator-tested sessions for every table",
+      "subtitle": "Download ready-to-run adventures, rotation schedules, and debrief guides built by Roundup Games storytellers.",
+      "cta_text": "Browse collections",
+      "secondary_cta": "Book a design consult"
+    },
+    "collections": {
+      "eyebrow": "Curated playlists",
+      "title": "Mix and match adventures tailored to your goals",
+      "description": "Filter by genre, session length, player experience, or accessibility needs. Each plan lists required materials, facilitation tips, and spotlight moments to help you coach new storytellers.",
+      "story_driven": {
+        "title": "Story-driven campaigns",
+        "description": "Episodic arcs for narrative-focused groups with session zero prompts and safety tool reminders.",
+        "examples": [
+          "Whispers Below: Urban fantasy mystery in four acts",
+          "Voyagers of the Verdant Sea: Hopepunk exploration mini-series",
+          "The Iron Concordat: Political intrigue with rotating spotlight scenes"
+        ]
+      },
+      "quickstart": {
+        "title": "Quickstart one-shots",
+        "description": "Low-prep adventures that fit 90-minute to 2-hour windows—ideal for cafés, clubs, and convention demos.",
+        "examples": [
+          "Aurora Chase: Cooperative puzzle crawl with branching endings",
+          "Signal Lost: Sci-fi rescue featuring fail-forward mechanics",
+          "Hearth & Hollow: Cozy mystery with accessible rules reference"
+        ]
+      },
+      "board_games": {
+        "title": "Board game spotlights",
+        "description": "Curated rotation schedules for modern board games, emphasizing accessibility, theme, and replay variety.",
+        "examples": [
+          "Gateway night: Cascadia, Azul, and Flamecraft with facilitator scripts",
+          "Strategy ladder: Dune Imperium into John Company with prep briefs",
+          "Collab corner: Spirit Island and The Crew with teamwork debrief prompts"
+        ]
+      }
+    },
+    "logistics": {
+      "eyebrow": "What each plan includes",
+      "title": "Plug-and-play logistics for smooth sessions",
+      "description": "Every download provides facilitator briefs, optional safety calibrations, and pacing calls so you can adapt to a wide spectrum of player energy. We also include wrap-up prompts and digital follow-up templates to keep the connection going after game night.",
+      "files_title": "Files in each package",
+      "files": [
+        "Session overview with tone, theme, and content warnings",
+        "Facilitation script with timing cues and spotlight rotations",
+        "Player handouts, map packs, and tokens where applicable",
+        "Debrief questions and survey link for post-event insights"
+      ],
+      "update_cadence": {
+        "title": "Update cadence",
+        "description": "New bundles drop monthly with seasonal events, convention packages, and community submissions curated by the Roundup Games design council."
+      },
+      "accessibility": {
+        "title": "Accessibility notes",
+        "description": "We flag sensory load, reading level, and physical requirements for each plan. Alternates are provided for low-vision, no-dice, and low-audio environments."
+      }
+    },
+    "downloads": {
+      "title": "Download session bundles",
+      "story_driven_pack": {
+        "title": "Story-driven campaign pack",
+        "description": "Includes Whispers Below, Verdant Sea, and Iron Concordat arcs.",
+        "button": "Download ZIP"
+      },
+      "quickstart_bundle": {
+        "title": "Quickstart one-shot bundle",
+        "description": "Includes Aurora Chase, Signal Lost, and Hearth & Hollow adventures.",
+        "button": "Download ZIP"
+      },
+      "board_game_kit": {
+        "title": "Board game spotlight kit",
+        "description": "Rotation schedules, facilitator briefs, and player scorecards.",
+        "button": "Download ZIP"
+      }
+    },
+    "submission": {
+      "title": "Submit your own session plan",
+      "description": "Have a tested adventure or board game night format? Share it with the design council for feedback and potential inclusion in the library.",
+      "button": "Email the design council"
+    }
+  },
+  "facilitation_clinics": {
+    "hero": {
+      "eyebrow": "Facilitation clinics",
+      "title": "On-demand coaching for storytellers and hosts",
+      "subtitle": "Watch master facilitators lead live sessions, then apply the same techniques at your tables with guided practice materials.",
+      "cta_text": "Stream the clinics",
+      "secondary_cta": "Book live coaching"
+    },
+    "format": {
+      "eyebrow": "Clinic format",
+      "title": "Learn by watching real tables in action",
+      "description": "Each clinic pairs a live-recorded session with commentary from Roundup Games facilitators. Pause at reflection markers to practice with your own staff, or use the included discussion prompts to turn the video into a team workshop."
+    },
+    "modules": [
+      {
+        "title": "Setting the table",
+        "duration": "28 minutes",
+        "focus": "Hospitality rituals, onboarding scripts, and accessibility walkthroughs that calm first-session nerves.",
+        "resources": [
+          "Facilitator opening script",
+          "Room layout checklist",
+          "Sensory considerations worksheet"
+        ]
+      },
+      {
+        "title": "Safety tools in motion",
+        "duration": "34 minutes",
+        "focus": "Demonstrations of consent-based safety tools with live debrief and coaching tips for tricky moments.",
+        "resources": [
+          "X-card and Open Door playset",
+          "Lines & Veils sample prompts",
+          "Escalation decision tree"
+        ]
+      },
+      {
+        "title": "Pacing & spotlight management",
+        "duration": "31 minutes",
+        "focus": "Balancing action and reflection, supporting quieter players, and reading the table's energy in real time.",
+        "resources": [
+          "Beat structure worksheet",
+          "Audience engagement tracker",
+          "Post-session reflection form"
+        ]
+      }
+    ],
+    "runtime_label": "Runtime:",
+    "loading_clinics": "Loading facilitation clinics...",
+    "streaming_access": {
+      "eyebrow": "Streaming access",
+      "title": "Watch clinics anytime, anywhere",
+      "description": "Videos are hosted on our private learning portal. Request an access code and you'll receive streaming links, slide decks, and note-taking packets for each clinic. Chapters are timestamped so you can jump straight to the moments you want to review.",
+      "request_access": {
+        "title": "Request access",
+        "description": "Email training@roundup.games with your organization name, preferred clinic, and facilitator roster. We approve requests within two business days.",
+        "button": "Email the training team"
+      }
+    },
+    "discussion_guide": {
+      "title": "Discussion guide",
+      "description": "Turn the clinics into a team learning session with reflection prompts and skill drills for new and experienced facilitators alike.",
+      "button": "Download PDF guide"
+    },
+    "certification_credits": {
+      "title": "Certification credits",
+      "description": "Complete all three clinics and submit reflection assignments to earn continuing education hours recognized by Roundup Games and partner leagues.",
+      "credits": {
+        "hours_per_clinic": "2 CE hours per clinic",
+        "digital_badge": "Digital badge issued within 7 days",
+        "counts_toward": "Counts toward Game Master and Host pathway renewals"
+      }
+    },
+    "downloads": {
+      "title": "Download clinic resources",
+      "opening_rituals": {
+        "title": "Opening rituals packet",
+        "description": "Scripts, table signs, and welcome cards featured in the clinics.",
+        "button": "Download ZIP"
+      },
+      "safety_tools": {
+        "title": "Safety tool kit",
+        "description": "Printable cards, facilitator cheat sheets, and incident log templates.",
+        "button": "Download ZIP"
+      },
+      "spotlight_scheduler": {
+        "title": "Spotlight scheduler",
+        "description": "Editable pacing tracker compatible with Google Sheets and Excel.",
+        "button": "Download XLSX"
+      }
+    },
+    "accessibility": {
+      "title": "Need interpretation services?",
+      "description": "We can arrange live captioning, ASL interpretation, or translation for your team training. Let us know at least two weeks ahead of time.",
+      "button": "Coordinate accessibility support"
+    },
+    "access": {
+      "title": "Access the clinic library",
+      "description": "All clinics include downloadable facilitator guides, reflection prompts, and practice worksheets. Perfect for individual learning or team training sessions.",
+      "cta_button": "Browse all clinics",
+      "coaching_cta": "Book 1:1 coaching session"
+    },
+    "technical": {
+      "title": "Technical requirements",
+      "description": "Clinics stream in HD with closed captions and downloadable transcripts. All materials are provided in accessible formats for screen readers and visual impairments."
+    }
+  },
+  "game_master_pathway": {
+    "hero": {
+      "eyebrow": "Game Master pathway",
+      "title": "Level up your storytelling practice",
+      "subtitle": "A structured curriculum blending narrative craft, safety leadership, and production skills so you can deliver unforgettable campaigns.",
+      "cta_text": "Enroll now",
+      "secondary_cta": "Browse session library"
+    },
+    "curriculum": {
+      "eyebrow": "Curriculum overview",
+      "title": "Build skills in stages with expert mentorship",
+      "description": "Live clinics, asynchronous workshops, and reflective coaching help you experiment safely and apply new techniques to your home tables. Expect weekly practice prompts, peer feedback circles, and 1:1 sessions with senior GMs.",
+      "recommended_pace": "Recommended pace: {{duration}}",
+      "milestones": [
+        {
+          "title": "Foundation badge",
+          "duration": "4 weeks",
+          "outcomes": [
+            "Session zero mastery with consent-forward facilitation",
+            "Improvisation drills for character spotlighting",
+            "Safety tool certification and table covenant design"
+          ]
+        },
+        {
+          "title": "Campaign architect badge",
+          "duration": "6 weeks",
+          "outcomes": [
+            "Long-form narrative pacing with arcs and cliffhangers",
+            "Dynamic encounter design rooted in player agency",
+            "Community management for hybrid online/in-person play"
+          ]
+        },
+        {
+          "title": "Master storyteller badge",
+          "duration": "8 weeks",
+          "outcomes": [
+            "Advanced emotional safety facilitation and conflict repair",
+            "Mentorship practicum leading emerging Game Masters",
+            "Performance coaching for live shows and streamed events"
+          ]
+        }
+      ]
+    },
+    "learning": {
+      "eyebrow": "Learning experience",
+      "title": "Practice-rich, feedback-heavy coaching journey",
+      "description": "Every cohort is capped at 16 participants to maintain intimate, high-trust learning environments. You will receive detailed notes on recorded sessions and shadow senior facilitators during live community programs.",
+      "weekly_rhythm": {
+        "title": "Weekly rhythm",
+        "schedule": [
+          "Monday: Live clinic with Q&A",
+          "Wednesday: Peer practice pods and critique swaps",
+          "Friday: Office hours with curriculum designers"
+        ]
+      },
+      "portfolio": {
+        "title": "Portfolio & assessment",
+        "description": "Graduate with a documented campaign bible, session recordings, and player feedback reports you can share with venues, production partners, or future collaborators."
+      },
+      "alumni": {
+        "title": "Alumni network",
+        "description": "Access exclusive casting calls, paid storytelling opportunities, and collaborative worldbuilding jams with other Roundup-certified Game Masters."
+      }
+    },
+    "resources": {
+      "title": "Curriculum modules & resources",
+      "narrative_workbook": {
+        "title": "Narrative craft workbook",
+        "description": "Exercises for motif development, character arcs, and collaborative scene framing.",
+        "button": "Download PDF"
+      },
+      "safety_toolkit": {
+        "title": "Safety leadership toolkit",
+        "description": "Incident logs, consent scripts, and restorative repair playbooks used in the pathway.",
+        "button": "Download ZIP"
+      },
+      "performance_guide": {
+        "title": "Performance coaching guide",
+        "description": "Voice, posture, and camera presence exercises for live and streamed experiences.",
+        "button": "Download PDF"
+      }
+    },
+    "enrollment": {
+      "eyebrow": "Enrollment details",
+      "title": "Upcoming cohorts and tuition options",
+      "cohorts": [
+        "Spring cohort (April 8 start) – hybrid online & Toronto studio",
+        "Summer cohort (July 15 start) – fully virtual with regional meetups",
+        "Scholarships available for marginalized storytellers and youth mentors"
+      ],
+      "tuition": "Tuition begins at $480 CAD with flexible installment plans. Partner venues can sponsor spots for their facilitators through the Roundup Development Fund.",
+      "cta_button": "Schedule an intake call",
+      "requirements": {
+        "title": "Certification requirements",
+        "items": [
+          "Complete all milestone projects and reflective journals",
+          "Facilitate two supervised community sessions",
+          "Maintain active safety certification and background checks",
+          "Contribute to the session design library or mentorship pool"
+        ]
+      },
+      "contact": {
+        "questions": "Questions? Email {{email}} for personalized guidance.",
+        "email": "training@roundup.games"
+      },
+      "graduate_benefits": "Graduates receive a digital badge and placement support with affiliated cafés, libraries, and convention partners across Canada."
+    }
+  },
+  "community": {
+    "title": "Join the operator community",
+    "description": "Swap troubleshooting tips, share vendor recommendations, and collaborate on multi-region events inside the Roundup Games Operations Collective on Discord.",
+    "action_button": "Request an invite"
+  },
+  "loading": {
+    "phases": "Loading phases...",
+    "curriculum_tracks": "Loading curriculum tracks...",
+    "widgets": "Loading widgets...",
+    "reporting_steps": "Loading reporting steps...",
+    "support_resources": "Loading support resources...",
+    "toolkit_phases": "Loading toolkit phases..."
+  },
+  "report_concern": {
+    "loading": {
+      "reporting_steps": "Loading reporting steps...",
+      "support_resources": "Loading support resources..."
+    }
+  }
+}

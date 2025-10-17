@@ -81,7 +81,7 @@ const TASK_STATUS_BADGE: Record<
   done: "default",
 };
 
-const DEFAULT_OWNER = "Operations";
+// Will be replaced with translation key during component render
 
 export type OpsTaskStatus = "todo" | "in_progress" | "blocked" | "done";
 
@@ -91,7 +91,7 @@ interface OpsTaskDefinition {
   description: string;
   defaultOwner: string;
   ownerOptions: string[];
-  category: "Launch readiness" | "Logistics" | "Marketing" | "Post-event" | "Staffing";
+  category: "launch_readiness" | "logistics" | "marketing" | "post_event" | "staffing";
   defaultStatus: OpsTaskStatus;
   dueDate: Date | null;
 }
@@ -276,9 +276,9 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
       <div className="container mx-auto space-y-6 p-6">
         <Alert>
           <AlertCircleIcon className="size-4" />
-          <AlertTitle>Event not found</AlertTitle>
+          <AlertTitle>{t("event_detail_hardcoded.event_not_found")}</AlertTitle>
           <AlertDescription>
-            This event either no longer exists or you no longer have access to it.
+            {t("event_detail_hardcoded.event_not_found_description")}
           </AlertDescription>
         </Alert>
       </div>
@@ -294,7 +294,7 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
         <div className="space-y-2">
           <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
             <Link to="/ops" className="hover:text-foreground">
-              Ops mission control
+              {t("ui.ops_mission_control")}
             </Link>
             <span aria-hidden="true">/</span>
             <span className="text-foreground">{event.name}</span>
@@ -344,9 +344,11 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
         <Card>
           <CardHeader className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <CardTitle className="text-2xl">Operational outlook</CardTitle>
+              <CardTitle className="text-2xl">
+                {t("event_detail_hardcoded.operational_outlook")}
+              </CardTitle>
               <CardDescription>
-                Daily readiness, capacity signals, and dependent workflows for your team.
+                {t("event_detail_hardcoded.operational_outlook_description")}
               </CardDescription>
             </div>
             <Badge variant="outline" className="text-sm">
@@ -356,15 +358,22 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
           <CardContent className="space-y-6">
             <Tabs defaultValue="tasks">
               <TabsList>
-                <TabsTrigger value="tasks">Task board</TabsTrigger>
-                <TabsTrigger value="timeline">Logistics timeline</TabsTrigger>
+                <TabsTrigger value="tasks">
+                  {t("event_detail_hardcoded.task_board")}
+                </TabsTrigger>
+                <TabsTrigger value="timeline">
+                  {t("event_detail_hardcoded.logistics_timeline")}
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="tasks" className="space-y-4">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <p className="text-muted-foreground inline-flex items-center gap-2 text-sm">
                     <FilterIcon className="size-4" />
                     {isFiltered
-                      ? `Showing ${filteredTasks.length} of ${tasks.length} tasks.`
+                      ? t("ui.showing_tasks_count", {
+                          filtered: filteredTasks.length,
+                          total: tasks.length,
+                        })
                       : t("event_detail.review_tasks")}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
@@ -389,7 +398,10 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                       </SelectContent>
                     </Select>
                     <Badge variant="outline" className="font-normal">
-                      {filteredTasks.length} of {tasks.length}
+                      {t("ui.tasks_count", {
+                        filtered: filteredTasks.length,
+                        total: tasks.length,
+                      })}
                     </Badge>
                   </div>
                 </div>
@@ -411,17 +423,17 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                     onClick={() => clearTaskStateStore()}
                     disabled={!hasTaskOverrides}
                   >
-                    <RefreshCwIcon className="size-4" /> Reset to suggested plan
+                    <RefreshCwIcon className="size-4" /> {t("ui.reset_to_suggested_plan")}
                   </Button>
                   {isFetching ? (
                     <span className="text-muted-foreground inline-flex items-center gap-2 text-sm">
-                      <ClockIcon className="size-4" /> Refreshing event data…
+                      <ClockIcon className="size-4" /> {t("ui.refreshing_event_data")}
                     </span>
                   ) : null}
                 </div>
               </TabsContent>
               <TabsContent value="timeline">
-                <Timeline event={event} tasks={tasks} />
+                <Timeline event={event} tasks={tasks} t={t} />
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -430,19 +442,20 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Attention signals</CardTitle>
+              <CardTitle>{t("event_detail_hardcoded.attention_signals")}</CardTitle>
               <CardDescription>
-                Highlights workstreams that could block launch or on-site execution.
+                {t("event_detail_hardcoded.attention_signals_description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {blockedTasks.length === 0 && inProgressTasks.length === 0 ? (
                 <Alert>
                   <CheckCircle2Icon className="size-4" />
-                  <AlertTitle>All systems nominal</AlertTitle>
+                  <AlertTitle>
+                    {t("event_detail_hardcoded.all_systems_nominal")}
+                  </AlertTitle>
                   <AlertDescription>
-                    No urgent tasks detected. Keep monitoring registrations and vendor
-                    check-ins.
+                    {t("event_detail_hardcoded.all_systems_nominal_description")}
                   </AlertDescription>
                 </Alert>
               ) : null}
@@ -467,16 +480,16 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Operations snapshot</CardTitle>
+              <CardTitle>{t("event_detail_hardcoded.operations_snapshot")}</CardTitle>
               <CardDescription>
-                Quick reference for staffing, marketing, and registration health.
+                {t("event_detail_hardcoded.operations_snapshot_description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-muted-foreground space-y-4 text-sm">
               <SnapshotRow
                 icon={<Users2Icon className="size-4" />}
                 label={t("event_detail.capacity_remaining")}
-                value={formatCapacity(event)}
+                value={formatCapacity(event, t)}
               />
               <SnapshotRow
                 icon={<ClipboardListIcon className="size-4" />}
@@ -617,7 +630,7 @@ function TaskTable({
               <TableCell>
                 <div className="space-y-1">
                   <Badge variant="outline" className="text-xs font-medium">
-                    {task.category}
+                    {t(`event_detail_hardcoded.task_categories.${task.category}`)}
                   </Badge>
                   <p className="text-muted-foreground text-xs">
                     Default owner: {task.defaultOwner}
@@ -697,10 +710,10 @@ function TaskNoteEditor({
             onClick={() => onUpdate("")}
             disabled={note.length === 0}
           >
-            Clear note
+            {t("ui.clear_note")}
           </Button>
           <Button type="button" onClick={() => setIsOpen(false)}>
-            Done
+            {t("ui.done")}
           </Button>
         </div>
       </PopoverContent>
@@ -708,8 +721,16 @@ function TaskNoteEditor({
   );
 }
 
-function Timeline({ event, tasks }: { event: EventWithDetails; tasks: OpsTask[] }) {
-  const timeline = buildTimeline(event, tasks);
+function Timeline({
+  event,
+  tasks,
+  t,
+}: {
+  event: EventWithDetails;
+  tasks: OpsTask[];
+  t: (key: string) => string;
+}) {
+  const timeline = buildTimeline(event, tasks, t);
 
   return (
     <ol className="space-y-4">
@@ -837,37 +858,30 @@ function buildTaskTemplates(
       id: "ops-approval",
       title: t("event_detail.final_approval"),
       description: t("event_detail.final_approval_description"),
-      defaultOwner: event.organizer?.name ?? DEFAULT_OWNER,
-      ownerOptions: buildOwnerOptions(event, [
-        event.organizer?.name ?? "",
-        DEFAULT_OWNER,
-      ]),
-      category: "Launch readiness",
+      defaultOwner:
+        event.organizer?.name ?? t("event_detail_hardcoded.owner_roles.operations"),
+      ownerOptions: buildOwnerOptions(event, [event.organizer?.name ?? "", "Operations"]),
+      category: "launch_readiness",
       defaultStatus: event.isPublic ? "done" : "todo",
       dueDate: marketingKickoffDue,
     },
     {
       id: "ops-marketing",
-      title: "Kickoff marketing campaign",
-      description:
-        "Coordinate social rollout, email inclusion, and paid boosts if allocated.",
+      title: t("task_templates.marketing_kickoff"),
+      description: t("task_templates.marketing_kickoff_description"),
       defaultOwner: "Marketing Ops",
-      ownerOptions: buildOwnerOptions(event, ["Marketing Ops", DEFAULT_OWNER]),
-      category: "Marketing",
+      ownerOptions: buildOwnerOptions(event, ["Marketing Ops", "Operations"]),
+      category: "marketing",
       defaultStatus: event.isPublic ? "in_progress" : "todo",
       dueDate: marketingKickoffDue,
     },
     {
       id: "ops-registration-health",
-      title: "Monitor registration health",
-      description:
-        "Review sign-ups, capacity forecasts, and waitlist inflow each morning.",
-      defaultOwner: DEFAULT_OWNER,
-      ownerOptions: buildOwnerOptions(event, [
-        DEFAULT_OWNER,
-        event.organizer?.name ?? "",
-      ]),
-      category: "Launch readiness",
+      title: t("task_templates.monitor_registration_health"),
+      description: t("task_templates.monitor_registration_health_description"),
+      defaultOwner: t("event_detail_hardcoded.owner_roles.operations"),
+      ownerOptions: buildOwnerOptions(event, ["Operations", event.organizer?.name ?? ""]),
+      category: "launch_readiness",
       defaultStatus: capacityLow
         ? "blocked"
         : event.isRegistrationOpen
@@ -877,15 +891,15 @@ function buildTaskTemplates(
     },
     {
       id: "ops-staffing",
-      title: "Lock staffing & volunteers",
-      description: "Confirm facilitator roster, travel plans, and contingency coverage.",
+      title: t("task_templates.lock_staffing"),
+      description: t("task_templates.lock_staffing_description"),
       defaultOwner: "Field Ops",
       ownerOptions: buildOwnerOptions(event, [
         "Field Ops",
-        DEFAULT_OWNER,
+        "Operations",
         "Volunteer Lead",
       ]),
-      category: "Staffing",
+      category: "staffing",
       defaultStatus:
         differenceInDaysToNow(staffingDue) < 0 &&
         !((event.metadata as Record<string, unknown>)?.["opsStaffingLocked"] === true)
@@ -895,34 +909,31 @@ function buildTaskTemplates(
     },
     {
       id: "ops-vendor",
-      title: "Confirm venue & vendor logistics",
-      description:
-        "Ensure load-in windows, AV support, and insurance certificates are on file.",
+      title: t("task_templates.confirm_vendor_logistics"),
+      description: t("task_templates.confirm_vendor_logistics_description"),
       defaultOwner: "Vendor Relations",
-      ownerOptions: buildOwnerOptions(event, ["Vendor Relations", DEFAULT_OWNER]),
-      category: "Logistics",
+      ownerOptions: buildOwnerOptions(event, ["Vendor Relations", "Operations"]),
+      category: "logistics",
       defaultStatus: differenceInDaysToNow(vendorConfirmDue) < 0 ? "in_progress" : "todo",
       dueDate: vendorConfirmDue,
     },
     {
       id: "ops-onsite-brief",
-      title: "Run-of-show & on-site brief",
-      description:
-        "Share final schedule and assignments with staff 48 hours before doors open.",
-      defaultOwner: DEFAULT_OWNER,
-      ownerOptions: buildOwnerOptions(event, [DEFAULT_OWNER, "Field Ops"]),
-      category: "Logistics",
+      title: t("task_templates.run_show_brief"),
+      description: t("task_templates.run_show_brief_description"),
+      defaultOwner: t("event_detail_hardcoded.owner_roles.operations"),
+      ownerOptions: buildOwnerOptions(event, ["Operations", "Field Ops"]),
+      category: "logistics",
       defaultStatus: differenceInDaysToNow(onSiteBriefing) < 0 ? "in_progress" : "todo",
       dueDate: onSiteBriefing,
     },
     {
       id: "ops-post-event",
-      title: "Post-event debrief & recap",
-      description:
-        "Collect feedback, update success metrics, and share recap with stakeholders.",
+      title: t("task_templates.post_event_debrief"),
+      description: t("task_templates.post_event_debrief_description"),
       defaultOwner: "Insights",
-      ownerOptions: buildOwnerOptions(event, ["Insights", DEFAULT_OWNER]),
-      category: "Post-event",
+      ownerOptions: buildOwnerOptions(event, ["Insights", "Operations"]),
+      category: "post_event",
       defaultStatus: isAfter(new Date(), end) ? "in_progress" : "todo",
       dueDate: postEventDebrief,
     },
@@ -934,7 +945,7 @@ function buildOwnerOptions(
   priority: Array<string | undefined> = [],
 ): string[] {
   const base = [
-    DEFAULT_OWNER,
+    "Operations",
     event.organizer?.name ?? "",
     "Marketing Ops",
     "Field Ops",
@@ -968,7 +979,11 @@ function summarizeTasks(tasks: OpsTask[]) {
   return { total, completed };
 }
 
-function buildTimeline(event: EventWithDetails, tasks: OpsTask[]) {
+function buildTimeline(
+  event: EventWithDetails,
+  tasks: OpsTask[],
+  t: (key: string) => string,
+) {
   const now = new Date();
   const start = new Date(event.startDate);
   const end = new Date(event.endDate);
@@ -978,35 +993,35 @@ function buildTimeline(event: EventWithDetails, tasks: OpsTask[]) {
       id: "timeline-marketing",
       date:
         tasks.find((task) => task.id === "ops-marketing")?.dueDate ?? subDays(start, 35),
-      label: "Marketing launch",
-      description: "Campaign live across paid and owned channels.",
+      label: t("timeline.marketing_launch"),
+      description: t("timeline.marketing_launch_description"),
     },
     {
       id: "timeline-staffing",
       date:
         tasks.find((task) => task.id === "ops-staffing")?.dueDate ?? subDays(start, 21),
-      label: "Staffing locked",
-      description: "Roster confirmed, travel booked, contingencies assigned.",
+      label: t("timeline.staffing_locked"),
+      description: t("timeline.staffing_locked_description"),
     },
     {
       id: "timeline-onsite",
       date:
         tasks.find((task) => task.id === "ops-onsite-brief")?.dueDate ??
         subDays(start, 2),
-      label: "On-site briefing",
-      description: "Final assignments shared; equipment check complete.",
+      label: t("timeline.onsite_briefing"),
+      description: t("timeline.onsite_briefing_description"),
     },
     {
       id: "timeline-event",
       date: start,
-      label: "Event day",
-      description: "Doors open and on-site execution begins.",
+      label: t("timeline.event_day"),
+      description: t("timeline.event_day_description"),
     },
     {
       id: "timeline-debrief",
       date: addDays(end, 2),
-      label: "Post-event debrief",
-      description: "Review KPIs, feedback, and follow-up tasks.",
+      label: t("timeline.post_event_debrief"),
+      description: t("timeline.post_event_debrief_description"),
     },
   ];
 
@@ -1021,24 +1036,27 @@ function buildTimeline(event: EventWithDetails, tasks: OpsTask[]) {
   }));
 }
 
-function formatCapacity(event: EventWithDetails): string {
+function formatCapacity(
+  event: EventWithDetails,
+  t: (key: string, params?: Record<string, unknown>) => string,
+): string {
   if (typeof event.availableSpots === "number") {
     if (event.availableSpots <= 0) {
-      return "Waitlist only";
+      return t("capacity.waitlist_only");
     }
 
-    return `${event.availableSpots} spots remaining`;
+    return t("capacity.spots_remaining", { count: event.availableSpots });
   }
 
   if (event.registrationType === "team") {
-    return "Team cap not set";
+    return t("capacity.team_cap_not_set");
   }
 
   if (event.registrationType === "individual") {
-    return "Participant cap not set";
+    return t("capacity.participant_cap_not_set");
   }
 
-  return "Capacity TBD";
+  return t("capacity.capacity_tbd");
 }
 
 function formatNextMilestone(event: EventWithDetails): string {

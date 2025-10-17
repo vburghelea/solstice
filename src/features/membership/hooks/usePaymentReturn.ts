@@ -65,16 +65,19 @@ export function usePaymentReturn(): PaymentReturnParams {
 /**
  * Get appropriate error message for payment errors
  */
-export function getPaymentErrorMessage(error: string | null): string | null {
+export function getPaymentErrorMessage(
+  error: string | null,
+  t: (key: string, options?: Record<string, unknown>) => string = (key) => key,
+): string | null {
   if (!error) return null;
 
   const errorMessages: Record<string, string> = {
-    canceled: "Payment was canceled",
-    verification_failed: "Payment verification failed",
-    processing_error: "An error occurred while processing your payment",
+    canceled: t("membership.errors.payment.canceled"),
+    verification_failed: t("membership.errors.payment.verification_failed"),
+    processing_error: t("membership.errors.payment.processing_error"),
   };
 
-  return errorMessages[error] || "Payment failed";
+  return errorMessages[error] || t("membership.errors.payment.failed");
 }
 
 /**

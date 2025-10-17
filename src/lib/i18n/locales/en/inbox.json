@@ -9,6 +9,7 @@
     "unable_to_load_description": "Please refresh to retry. Contact the platform team if the issue continues.",
     "beta_badge": "Collaboration beta",
     "open_reporting": "Open cross-namespace reporting",
+    "action_due_prefix": "Due ",
     "sections": {
       "metrics": {
         "title": "Metrics",
@@ -133,7 +134,8 @@
     "send_failed": "Failed to send message",
     "load_failed": "Failed to load messages",
     "delete_failed": "Failed to delete message",
-    "archive_failed": "Failed to archive message"
+    "archive_failed": "Failed to archive message",
+    "load_snapshot_failed": "Failed to load inbox snapshot"
   },
   "success": {
     "message_sent": "Message sent successfully",

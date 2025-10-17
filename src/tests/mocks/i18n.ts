@@ -144,17 +144,27 @@ const mockI18n = {
 
 // Mock useTranslation hook
 export const mockUseTranslation = vi.fn((namespace?: string) => {
-  const getTranslation = (key: string) => {
+  const getTranslation = (key: string, params?: Record<string, unknown>) => {
     // Try namespaced key first, then fallback to non-namespaced
     const namespacedKey = namespace ? `${namespace}.${key}` : key;
-    const translation = mockTranslations[namespacedKey] || mockTranslations[key];
+    let translation = mockTranslations[namespacedKey] || mockTranslations[key];
+
+    // Handle interpolation/parameter substitution
+    if (translation && params && typeof translation === "string") {
+      Object.entries(params).forEach(([param, value]) => {
+        const regex = new RegExp(`{{${param}}}`, "g");
+        translation = translation.replace(regex, String(value));
+      });
+    }
 
     // If no translation found, return the key as-is (this helps debugging)
     return translation || key;
   };
 
   return {
-    t: vi.fn((key: string) => getTranslation(key)),
+    t: vi.fn((key: string, params?: Record<string, unknown>) =>
+      getTranslation(key, params),
+    ),
     i18n: mockI18n,
     ready: true,
   };
@@ -188,6 +198,7 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
   useTeamsTranslation: () => mockUseTranslation("teams"),
   useFormsTranslation: () => mockUseTranslation("forms"),
   useErrorsTranslation: () => mockUseTranslation("errors"),
+  useGameSystemsTranslation: () => mockUseTranslation("game-systems"),
   useAdminTranslation: () => mockUseTranslation("admin"),
   useCampaignsTranslation: () => mockUseTranslation("campaigns"),
   useMembershipTranslation: () => mockUseTranslation("membership"),
@@ -196,7 +207,6 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
   useSettingsTranslation: () => mockUseTranslation("settings"),
   useCollaborationTranslation: () => mockUseTranslation("collaboration"),
   useConsentTranslation: () => mockUseTranslation("consent"),
-  useGameSystemsTranslation: () => mockUseTranslation("game-systems"),
   useGmTranslation: () => mockUseTranslation("gm"),
   useInboxTranslation: () => mockUseTranslation("inbox"),
   useMembersTranslation: () => mockUseTranslation("members"),

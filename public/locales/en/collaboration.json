@@ -1,1 +1,75 @@
-{}
+{
+  "title": "Collaboration",
+  "subtitle": "Cross-namespace collaboration and reporting",
+  "workspace": {
+    "loading": "Loading collaboration insights",
+    "loading_description": "Gathering live metrics across player, ops, GM, and admin workspaces.",
+    "unable_to_load": "Unable to load collaboration data",
+    "unable_to_load_description": "Please refresh to retry. If the issue persists, contact the platform team.",
+    "beta_badge": "Collaboration hub",
+    "title": "Cross-namespace reporting & feedback",
+    "description": "Align across personas without leaving your namespace.",
+    "updated_label": "Updated",
+    "filters": {
+      "all": "All personas"
+    }
+  },
+  "sections": {
+    "metrics": {
+      "title": "Shared reporting metrics",
+      "description": "Trace how experiments in one namespace influence outcomes across the others.",
+      "review_threads": "Review shared threads",
+      "persona_impact": "Persona impact"
+    },
+    "alignment": {
+      "title": "Persona alignment focus",
+      "description": "Surface what each persona is watching and where collaboration needs reinforcement.",
+      "alignment_label": "Alignment",
+      "needs_attention": "Needs attention",
+      "confidence_suffix": "confidence",
+      "key_signals": "Key signals",
+      "open_questions": "Open questions",
+      "signals_description": "Signals and open questions help the team plan the next experiment."
+    },
+    "rhythms": {
+      "title": "Collaboration rhythms",
+      "description": "Rituals that keep personas aligned, linked back to the shared inbox threads powering decisions.",
+      "next_touchpoint": "Next touchpoint",
+      "status": "Status",
+      "linked_threads": "Linked threads"
+    },
+    "feedback": {
+      "title": "Feedback capture loops",
+      "description": "Pulse surveys and quick reactions feed directly into the backlog so platform stewards can respond fast.",
+      "participation": "Participation",
+      "backlog_status": "Backlog status:",
+      "updated": "Updated",
+      "highlights": "Highlights",
+      "quick_reactions": "Quick reactions",
+      "reaction_saved": "Reaction saved to the backlog experiment log — Jordan and Priya will see it in the next governance sync.",
+      "create_account": "Create an account to record reactions that reach the platform team."
+    }
+  },
+  "personas": {
+    "player": "Player",
+    "ops": "Operations",
+    "gm": "Game master",
+    "admin": "Platform admin"
+  },
+  "status": {
+    "triaged": "Triaged",
+    "in_progress": "In progress",
+    "shipped": "Shipped",
+    "on_track": "on track",
+    "at_risk": "at risk",
+    "off_track": "off track"
+  },
+  "sentiment": {
+    "positive": "Positive momentum",
+    "neutral": "Neutral read",
+    "concerned": "Needs follow-up"
+  },
+  "errors": {
+    "load_snapshot_failed": "Failed to load snapshot"
+  }
+}

@@ -218,7 +218,7 @@ export function InviteParticipants({
                 const participantName =
                   participant.user?.name ??
                   participant.user?.email ??
-                  "Pending participant";
+                  t("labels.pending_participant");
 
                 return (
                   <div

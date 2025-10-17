@@ -1,0 +1,291 @@
+{
+  "buttons": {
+    "view_campaign": "TODO: Translate \"buttons.view_campaign\"",
+    "create_campaign": "TODO: Translate \"buttons.create_campaign\"",
+    "update_campaign": "TODO: Translate \"buttons.update_campaign\"",
+    "save": "TODO: Translate \"buttons.save\"",
+    "cancel": "TODO: Translate \"buttons.cancel\"",
+    "invite": "TODO: Translate \"buttons.invite\"",
+    "revoke": "TODO: Translate \"buttons.revoke\"",
+    "accept": "TODO: Translate \"buttons.accept\"",
+    "reject": "TODO: Translate \"buttons.reject\"",
+    "accepting": "TODO: Translate \"buttons.accepting\"",
+    "rejecting": "TODO: Translate \"buttons.rejecting\"",
+    "save_session_zero_details": "TODO: Translate \"buttons.save_session_zero_details\""
+  },
+  "labels": {
+    "campaign_name": "TODO: Translate \"labels.campaign_name\"",
+    "description": "TODO: Translate \"labels.description\"",
+    "game_system": "TODO: Translate \"labels.game_system\"",
+    "language": "TODO: Translate \"labels.language\"",
+    "visibility": "TODO: Translate \"labels.visibility\"",
+    "participants": "TODO: Translate \"labels.participants\"",
+    "game_master": "TODO: Translate \"labels.game_master\"",
+    "time_of_day": "TODO: Translate \"labels.time_of_day\"",
+    "session_duration": "TODO: Translate \"labels.session_duration\"",
+    "recurrence": "TODO: Translate \"labels.recurrence\"",
+    "campaign_status": "TODO: Translate \"labels.campaign_status\"",
+    "expected_duration": "TODO: Translate \"labels.expected_duration\"",
+    "max_players": "TODO: Translate \"labels.max_players\"",
+    "location": "TODO: Translate \"labels.location\"",
+    "safety_tools": "TODO: Translate \"labels.safety_tools\"",
+    "table_rules": "TODO: Translate \"labels.table_rules\"",
+    "session_zero": "TODO: Translate \"labels.session_zero\"",
+    "character_creation": "TODO: Translate \"labels.character_creation\"",
+    "campaign_expectations": "TODO: Translate \"labels.campaign_expectations\"",
+    "table_expectations": "TODO: Translate \"labels.table_expectations\"",
+    "safety_rules": "TODO: Translate \"labels.safety_rules\"",
+    "content_warnings": "TODO: Translate \"labels.content_warnings\"",
+    "search_users": "TODO: Translate \"labels.search_users\"",
+    "invite_by_email": "TODO: Translate \"labels.invite_by_email\"",
+    "pending_invitations": "TODO: Translate \"labels.pending_invitations\""
+  },
+  "participants_list": {
+    "participants_title": "TODO: Translate \"participants_list.participants_title\"",
+    "no_participants": "TODO: Translate \"participants_list.no_participants\"",
+    "owner_label": "TODO: Translate \"participants_list.owner_label\"",
+    "role_status": "TODO: Translate \"participants_list.role_status\"",
+    "removing": "TODO: Translate \"participants_list.removing\"",
+    "remove": "TODO: Translate \"participants_list.remove\"",
+    "pending_applications_title": "TODO: Translate \"participants_list.pending_applications_title\"",
+    "status_label": "TODO: Translate \"participants_list.status_label\"",
+    "approving": "TODO: Translate \"participants_list.approving\"",
+    "approve": "TODO: Translate \"participants_list.approve\"",
+    "rejecting": "TODO: Translate \"participants_list.rejecting\"",
+    "reject": "TODO: Translate \"participants_list.reject\"",
+    "banned_title": "TODO: Translate \"participants_list.banned_title\"",
+    "allowing": "TODO: Translate \"participants_list.allowing\"",
+    "allow": "TODO: Translate \"participants_list.allow\""
+  },
+  "placeholders": {
+    "campaign_name_placeholder": "TODO: Translate \"placeholders.campaign_name_placeholder\"",
+    "search_and_select_game_system": "TODO: Translate \"placeholders.search_and_select_game_system\"",
+    "select_recurrence": "TODO: Translate \"placeholders.select_recurrence\"",
+    "time_of_day_placeholder": "TODO: Translate \"placeholders.time_of_day_placeholder\"",
+    "session_duration_placeholder": "TODO: Translate \"placeholders.session_duration_placeholder\"",
+    "select_language": "TODO: Translate \"placeholders.select_language\"",
+    "select_visibility": "TODO: Translate \"placeholders.select_visibility\"",
+    "safety_tool_placeholder": "TODO: Translate \"placeholders.safety_tool_placeholder\"",
+    "player_boundaries_consent_placeholder": "TODO: Translate \"placeholders.player_boundaries_consent_placeholder\""
+  },
+  "status": {
+    "connections_teammates": "TODO: Translate \"status.connections_teammates\"",
+    "unknown_user": "TODO: Translate \"status.unknown_user\"",
+    "no_pending_invitations": "TODO: Translate \"status.no_pending_invitations\"",
+    "no_campaigns_found": "TODO: Translate \"status.no_campaigns_found\"",
+    "searching": "TODO: Translate \"status.searching\"",
+    "no_users_found": "TODO: Translate \"status.no_users_found\"",
+    "weekly": "TODO: Translate \"status.weekly\"",
+    "biweekly": "TODO: Translate \"status.biweekly\"",
+    "monthly": "TODO: Translate \"status.monthly\"",
+    "one_shot": "TODO: Translate \"status.one_shot\"",
+    "ongoing": "TODO: Translate \"status.ongoing\""
+  },
+  "messages": {
+    "invitation_rejected_success": "TODO: Translate \"messages.invitation_rejected_success\"",
+    "invitation_response_recorded": "TODO: Translate \"messages.invitation_response_recorded\"",
+    "participant_invited_success": "TODO: Translate \"messages.participant_invited_success\"",
+    "invitation_revoked_success": "TODO: Translate \"messages.invitation_revoked_success\"",
+    "campaign_created_success": "TODO: Translate \"messages.campaign_created_success\"",
+    "campaign_updated_success": "TODO: Translate \"messages.campaign_updated_success\"",
+    "participant_removed_success": "TODO: Translate \"messages.participant_removed_success\"",
+    "participant_ban_removed_success": "TODO: Translate \"messages.participant_ban_removed_success\"",
+    "application_status_updated_success": "TODO: Translate \"messages.application_status_updated_success\""
+  },
+  "errors": {
+    "failed_to_reject_invitation": "TODO: Translate \"errors.failed_to_reject_invitation\"",
+    "failed_to_respond_invitation": "TODO: Translate \"errors.failed_to_respond_invitation\"",
+    "unexpected_error": "TODO: Translate \"errors.unexpected_error\"",
+    "failed_to_invite_participant": "TODO: Translate \"errors.failed_to_invite_participant\"",
+    "failed_to_revoke_invitation": "TODO: Translate \"errors.failed_to_revoke_invitation\"",
+    "failed_to_create_campaign": "TODO: Translate \"errors.failed_to_create_campaign\"",
+    "failed_to_update_campaign": "TODO: Translate \"errors.failed_to_update_campaign\"",
+    "participant_remove_failed": "TODO: Translate \"errors.participant_remove_failed\"",
+    "participant_ban_remove_failed": "TODO: Translate \"errors.participant_ban_remove_failed\"",
+    "application_update_failed": "TODO: Translate \"errors.application_update_failed\""
+  },
+  "descriptions": {
+    "campaign_overview": "TODO: Translate \"descriptions.campaign_overview\"",
+    "location": "TODO: Translate \"descriptions.location\"",
+    "participant_requirements": "TODO: Translate \"descriptions.participant_requirements\"",
+    "safety_table_culture": "TODO: Translate \"descriptions.safety_table_culture\"",
+    "visibility_options": "TODO: Translate \"descriptions.visibility_options\""
+  },
+  "form_sections": {
+    "campaign_overview": "TODO: Translate \"form_sections.campaign_overview\"",
+    "schedule_details": "TODO: Translate \"form_sections.schedule_details\"",
+    "participant_requirements": "TODO: Translate \"form_sections.participant_requirements\"",
+    "location": "TODO: Translate \"form_sections.location\"",
+    "safety_table_culture": "TODO: Translate \"form_sections.safety_table_culture\"",
+    "session_zero": "TODO: Translate \"form_sections.session_zero\"",
+    "character_creation": "TODO: Translate \"form_sections.character_creation\"",
+    "campaign_expectations": "TODO: Translate \"form_sections.campaign_expectations\"",
+    "table_expectations": "TODO: Translate \"form_sections.table_expectations\""
+  },
+  "visibility_options": {
+    "description": "TODO: Translate \"visibility_options.description\""
+  },
+  "safety_options": {
+    "no_alcohol": "TODO: Translate \"safety_options.no_alcohol\"",
+    "safe_word_required": "TODO: Translate \"safety_options.safe_word_required\"",
+    "encourage_open_communication": "TODO: Translate \"safety_options.encourage_open_communication\"",
+    "lines_veils": "TODO: Translate \"safety_options.lines_veils\"",
+    "x_card": "TODO: Translate \"safety_options.x_card\"",
+    "script_change": "TODO: Translate \"safety_options.script_change\""
+  },
+  "invitation_status": {
+    "invited": "TODO: Translate \"invitation_status.invited\""
+  },
+  "default_labels": {
+    "view_campaign": "TODO: Translate \"default_labels.view_campaign\""
+  },
+  "titles": {
+    "campaign_invitation": "TODO: Translate \"titles.campaign_invitation\"",
+    "invite_participants": "TODO: Translate \"titles.invite_participants\"",
+    "manage_invitations": "TODO: Translate \"titles.manage_invitations\""
+  },
+  "campaign_fields": {
+    "campaign_name": "TODO: Translate \"campaign_fields.campaign_name\"",
+    "description": "TODO: Translate \"campaign_fields.description\"",
+    "game_system_used": "TODO: Translate \"campaign_fields.game_system_used\"",
+    "recurrence": "TODO: Translate \"campaign_fields.recurrence\"",
+    "time_of_day": "TODO: Translate \"campaign_fields.time_of_day\"",
+    "session_duration_minutes": "TODO: Translate \"campaign_fields.session_duration_minutes\"",
+    "price_per_session_eur": "TODO: Translate \"campaign_fields.price_per_session_eur\"",
+    "language": "TODO: Translate \"campaign_fields.language\"",
+    "visibility": "TODO: Translate \"campaign_fields.visibility\"",
+    "address": "TODO: Translate \"campaign_fields.address\"",
+    "minimum_players": "TODO: Translate \"campaign_fields.minimum_players\"",
+    "maximum_players": "TODO: Translate \"campaign_fields.maximum_players\"",
+    "safety_tool": "TODO: Translate \"campaign_fields.safety_tool\"",
+    "safety_tool_details_optional": "TODO: Translate \"campaign_fields.safety_tool_details_optional\"",
+    "player_boundaries_consent_notes_optional": "TODO: Translate \"campaign_fields.player_boundaries_consent_notes_optional\"",
+    "no_alcohol": "TODO: Translate \"campaign_fields.no_alcohol\"",
+    "safe_word_required": "TODO: Translate \"campaign_fields.safe_word_required\"",
+    "encourage_open_communication": "TODO: Translate \"campaign_fields.encourage_open_communication\""
+  },
+  "validation_messages": {
+    "campaign_name_required": "TODO: Translate \"validation_messages.campaign_name_required\"",
+    "description_required": "TODO: Translate \"validation_messages.description_required\"",
+    "game_system_required": "TODO: Translate \"validation_messages.game_system_required\"",
+    "recurrence_required": "TODO: Translate \"validation_messages.recurrence_required\"",
+    "time_of_day_required": "TODO: Translate \"validation_messages.time_of_day_required\"",
+    "session_duration_required": "TODO: Translate \"validation_messages.session_duration_required\"",
+    "language_required": "TODO: Translate \"validation_messages.language_required\"",
+    "visibility_required": "TODO: Translate \"validation_messages.visibility_required\"",
+    "address_required": "TODO: Translate \"validation_messages.address_required\"",
+    "min_players_required": "TODO: Translate \"validation_messages.min_players_required\"",
+    "max_players_required": "TODO: Translate \"validation_messages.max_players_required\"",
+    "price_optional": "TODO: Translate \"validation_messages.price_optional\""
+  },
+  "session_zero": {
+    "campaign_expectations": {
+      "title": "TODO: Translate \"session_zero.campaign_expectations.title\"",
+      "campaign_style": "TODO: Translate \"session_zero.campaign_expectations.campaign_style\"",
+      "game_difficulty": "TODO: Translate \"session_zero.campaign_expectations.game_difficulty\"",
+      "house_rules": "TODO: Translate \"session_zero.campaign_expectations.house_rules\"",
+      "leveling_up_method": "TODO: Translate \"session_zero.campaign_expectations.leveling_up_method\"",
+      "campaign_length": "TODO: Translate \"session_zero.campaign_expectations.campaign_length\""
+    },
+    "table_expectations": {
+      "title": "TODO: Translate \"session_zero.table_expectations.title\"",
+      "food_drinks_policy": "TODO: Translate \"session_zero.table_expectations.food_drinks_policy\"",
+      "non_table_activities": "TODO: Translate \"session_zero.table_expectations.non_table_activities\"",
+      "unannounced_dice_rolls_policy": "TODO: Translate \"session_zero.table_expectations.unannounced_dice_rolls_policy\"",
+      "pvp_contested_rolls_policy": "TODO: Translate \"session_zero.table_expectations.pvp_contested_rolls_policy\"",
+      "character_secrets_policy": "TODO: Translate \"session_zero.table_expectations.character_secrets_policy\"",
+      "player_absences_policy": "TODO: Translate \"session_zero.table_expectations.player_absences_policy\""
+    },
+    "safety_tools": {
+      "title": "TODO: Translate \"session_zero.safety_tools.title\"",
+      "encourage_open_communication": "TODO: Translate \"session_zero.safety_tools.encourage_open_communication\"",
+      "use_x_card_system": "TODO: Translate \"session_zero.safety_tools.use_x_card_system\"",
+      "x_card_system_details": "TODO: Translate \"session_zero.safety_tools.x_card_system_details\"",
+      "player_boundaries_consent_discussion": "TODO: Translate \"session_zero.safety_tools.player_boundaries_consent_discussion\""
+    },
+    "character_creation": {
+      "title": "TODO: Translate \"session_zero.character_creation.title\"",
+      "character_creation_questions": "TODO: Translate \"session_zero.character_creation.character_creation_questions\"",
+      "feats_allowed": "TODO: Translate \"session_zero.character_creation.feats_allowed\"",
+      "stats_determination_method": "TODO: Translate \"session_zero.character_creation.stats_determination_method\"",
+      "character_context_integration": "TODO: Translate \"session_zero.character_creation.character_context_integration\""
+    },
+    "documented_character_creation_outcome": {
+      "title": "TODO: Translate \"session_zero.documented_character_creation_outcome.title\"",
+      "final_character_creation_decisions": "TODO: Translate \"session_zero.documented_character_creation_outcome.final_character_creation_decisions\""
+    }
+  },
+  "my_campaigns": {
+    "title": "TODO: Translate \"my_campaigns.title\"",
+    "subtitle": "TODO: Translate \"my_campaigns.subtitle\"",
+    "filter_by_status": "TODO: Translate \"my_campaigns.filter_by_status\"",
+    "filter_by_role": "TODO: Translate \"my_campaigns.filter_by_role\"",
+    "create_new_campaign": "TODO: Translate \"my_campaigns.create_new_campaign\"",
+    "no_campaigns_title": "TODO: Translate \"my_campaigns.no_campaigns_title\"",
+    "no_campaigns_subtitle": "TODO: Translate \"my_campaigns.no_campaigns_subtitle\"",
+    "participants": "TODO: Translate \"my_campaigns.participants\"",
+    "pagination": {
+      "page_info": "TODO: Translate \"my_campaigns.pagination.page_info\""
+    },
+    "status_labels": {
+      "active": "TODO: Translate \"my_campaigns.status_labels.active\"",
+      "completed": "TODO: Translate \"my_campaigns.status_labels.completed\"",
+      "on_hold": "TODO: Translate \"my_campaigns.status_labels.on_hold\"",
+      "cancelled": "TODO: Translate \"my_campaigns.status_labels.cancelled\""
+    },
+    "role_labels": {
+      "owner": "TODO: Translate \"my_campaigns.role_labels.owner\"",
+      "player": "TODO: Translate \"my_campaigns.role_labels.player\"",
+      "invited": "TODO: Translate \"my_campaigns.role_labels.invited\"",
+      "requested": "TODO: Translate \"my_campaigns.role_labels.requested\""
+    },
+    "errors": {
+      "load_failed": "TODO: Translate \"my_campaigns.errors.load_failed\""
+    }
+  },
+  "detail": {
+    "invalid_campaign_id": "TODO: Translate \"detail.invalid_campaign_id\"",
+    "failed_to_load_campaign": "TODO: Translate \"detail.failed_to_load_campaign\"",
+    "failed_to_fetch_campaign": "TODO: Translate \"detail.failed_to_fetch_campaign\"",
+    "campaign_not_found": "TODO: Translate \"detail.campaign_not_found\"",
+    "campaign_data_not_found": "TODO: Translate \"detail.campaign_data_not_found\"",
+    "game_session_status_updated": "TODO: Translate \"detail.game_session_status_updated\"",
+    "failed_to_update_game_session_status": "TODO: Translate \"detail.failed_to_update_game_session_status\"",
+    "unexpected_error_updating_game_session": "TODO: Translate \"detail.unexpected_error_updating_game_session\"",
+    "campaign_updated": "TODO: Translate \"detail.campaign_updated\"",
+    "failed_to_update_campaign": "TODO: Translate \"detail.failed_to_update_campaign\"",
+    "unexpected_error_occurred": "TODO: Translate \"detail.unexpected_error_occurred\"",
+    "failed_to_fetch_application_status": "TODO: Translate \"detail.failed_to_fetch_application_status\"",
+    "application_submitted": "TODO: Translate \"detail.application_submitted\"",
+    "failed_to_submit_application": "TODO: Translate \"detail.failed_to_submit_application\"",
+    "unexpected_error_applying": "TODO: Translate \"detail.unexpected_error_applying\"",
+    "mark_campaign_completed": "TODO: Translate \"detail.mark_campaign_completed\"",
+    "cancel_campaign": "TODO: Translate \"detail.cancel_campaign\"",
+    "confirm_cancel_campaign": "TODO: Translate \"detail.confirm_cancel_campaign\"",
+    "open_session_zero": "TODO: Translate \"detail.open_session_zero\"",
+    "exit_edit_mode": "TODO: Translate \"detail.exit_edit_mode\"",
+    "edit_campaign_details": "TODO: Translate \"detail.edit_campaign_details\"",
+    "about_this_campaign": "TODO: Translate \"detail.about_this_campaign\"",
+    "about_description": "TODO: Translate \"detail.about_description\"",
+    "no_description_provided": "TODO: Translate \"detail.no_description_provided\"",
+    "edit_campaign": "TODO: Translate \"detail.edit_campaign\"",
+    "edit_description": "TODO: Translate \"detail.edit_description\"",
+    "game_sessions": "TODO: Translate \"detail.game_sessions\"",
+    "filter_by_status": "TODO: Translate \"detail.filter_by_status\"",
+    "create_session": "TODO: Translate \"detail.create_session\"",
+    "no_game_sessions_found": "TODO: Translate \"detail.no_game_sessions_found\"",
+    "view_game": "TODO: Translate \"detail.view_game\"",
+    "application_pending": "TODO: Translate \"detail.application_pending\"",
+    "application_rejected": "TODO: Translate \"detail.application_rejected\"",
+    "campaign_logistics": "TODO: Translate \"detail.campaign_logistics\"",
+    "logistics_description": "TODO: Translate \"detail.logistics_description\"",
+    "location": "TODO: Translate \"detail.location\"",
+    "location_shared_after_approval": "TODO: Translate \"detail.location_shared_after_approval\"",
+    "not_specified": "TODO: Translate \"detail.not_specified\"",
+    "safety_consent": "TODO: Translate \"detail.safety_consent\"",
+    "safety_description": "TODO: Translate \"detail.safety_description\"",
+    "applying": "TODO: Translate \"detail.applying\"",
+    "apply_to_join": "TODO: Translate \"detail.apply_to_join\"",
+    "price_session": "TODO: Translate \"detail.price_session\""
+  }
+}

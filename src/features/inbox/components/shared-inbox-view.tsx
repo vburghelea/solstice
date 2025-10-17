@@ -52,8 +52,8 @@ export function SharedInboxView(props: SharedInboxViewProps) {
       });
       if (!result.success || !result.data) {
         const message = result.success
-          ? "Failed to load inbox snapshot"
-          : (result.errors[0]?.message ?? "Failed to load inbox snapshot");
+          ? t("errors.load_snapshot_failed")
+          : (result.errors[0]?.message ?? t("errors.load_snapshot_failed"));
         throw new Error(message);
       }
       return result.data;
@@ -458,7 +458,8 @@ function ThreadDetail(props: ThreadDetailProps) {
               {primaryActions.map((action) => {
                 const isOwner = action.ownerPersona === persona;
                 const dueLabel = action.dueAt
-                  ? `Due ${format(new Date(action.dueAt), "MMM d, h:mma")}`
+                  ? t("shared_inbox.action_due_prefix") +
+                    format(new Date(action.dueAt), "MMM d, h:mma")
                   : null;
                 return (
                   <div
@@ -503,7 +504,7 @@ function ThreadDetail(props: ThreadDetailProps) {
                     <div className="space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-foreground text-sm font-semibold">
-                          {author?.name ?? "Unknown"}
+                          {author?.name ?? t("status.unknown_user")}
                         </p>
                         <Badge variant="outline">{author?.roleLabel}</Badge>
                       </div>

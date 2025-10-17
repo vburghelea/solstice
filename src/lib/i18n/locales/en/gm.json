@@ -2,6 +2,10 @@
   "dashboard": {
     "title": "Orchestrate campaigns with cinematic clarity",
     "subtitle": "The studio brings campaign prep, session pacing, and follow-up rituals into a single flow. Prioritize the stories that need attention next.",
+    "loading_error": {
+      "title": "We hit a snag loading the studio",
+      "description": "Some campaign or session data could not be fetched. Refresh to retry or open the classic dashboard views."
+    },
     "feedback_queue_title": "Feedback follow-up queue",
     "feedback_queue_description": "Keep safety tools and post-session reflections flowing for every table."
   },
@@ -39,7 +43,9 @@
     "start_campaign": "Start a campaign",
     "browse_archive": "Browse session archive",
     "session_notes": "Session notes",
-    "open_session_manager": "Open session manager"
+    "open_session_manager": "Open session manager",
+    "open_legacy_view": "Open legacy view",
+    "edit_details": "Edit details"
   },
   "sections": {
     "session_runway": {
@@ -126,6 +132,184 @@
       "prep_checklist_suffix": "prep checklist",
       "prep_checklist_detail": "Double-check spotlights, props, and pre-session surveys before {{time}}.",
       "updated_prefix": "Updated {{time}}"
+    }
+  },
+  "campaign_workspace": {
+    "badge": {
+      "campaign_studio": "Campaign studio"
+    },
+    "narrative_brief": {
+      "title": "Narrative brief",
+      "campaign_pitch": "Campaign pitch",
+      "session_zero_checkpoints": "Session zero checkpoints"
+    },
+    "session_pipeline": {
+      "title": "Session pipeline",
+      "upcoming": "Upcoming",
+      "recent_wraps": "Recent wraps"
+    },
+    "player_dossiers": {
+      "title": "Player dossiers"
+    },
+    "location": {
+      "remote_tbd": "Remote / TBD"
+    },
+    "recurrence": {
+      "custom_cadence": "Custom cadence"
+    },
+    "sessions": {
+      "next_session": "Next session",
+      "not_scheduled": "Not scheduled",
+      "add_gathering": "Add a gathering",
+      "last_debrief": "Last debrief",
+      "awaiting_first_session": "Awaiting first session",
+      "run_session": "Run a session"
+    },
+    "details": {
+      "active_roster": "Active roster",
+      "system": "System",
+      "custom": "Custom",
+      "story_engine_focus": "Story engine in focus"
+    },
+    "expectations": {
+      "tone_difficulty": "Tone & difficulty",
+      "challenge_scope_placeholder": "Set the challenge scope.",
+      "session_cadence": "Session cadence",
+      "arc_length_placeholder": "Document arc length or seasons.",
+      "character_creation": "Character creation",
+      "character_creation_placeholder": "Capture how characters tie into the world.",
+      "house_rules": "House rules",
+      "house_rules_placeholder": "List safety, dice, or homebrew guidance."
+    },
+    "safety": {
+      "player_boundaries_captured": "Player boundaries captured",
+      "document_boundaries": "Document player boundaries and X-card agreements",
+      "attendance_policy_shared": "Attendance policy shared",
+      "clarify_absences": "Clarify how to handle absences and tardiness"
+    },
+    "empty_states": {
+      "no_sessions_scheduled": {
+        "title": "No sessions scheduled",
+        "description": "Queue the next chapter to keep your players immersed.",
+        "action_label": "Plan session"
+      },
+      "no_completed_sessions": {
+        "title": "No completed sessions",
+        "description": "Once you finish a gathering, we'll spotlight the debrief tasks here.",
+        "action_label": "View archive"
+      }
+    },
+    "participants": {
+      "ready": "Ready",
+      "unnamed_player": "Unnamed player"
+    },
+    "description": "Orchestrate this narrative arc, prep rituals, and player energy from a single workspace tailored for the Story Guide.",
+    "active_players": "{{count}} active players",
+    "sections": {
+      "narrative_brief": {
+        "subtitle": "Keep the campaign spine, table rituals, and prep cues close at hand."
+      },
+      "safety_consent": {
+        "title": "Safety & consent",
+        "subtitle": "Align on tools, boundaries, and reminders before and after each session."
+      },
+      "session_pipeline": {
+        "subtitle": "Track what's next and celebrate the story beats you've already delivered."
+      },
+      "player_dossiers": {
+        "subtitle": "Keep tabs on who's at the table, their status, and the invitations in motion."
+      }
+    },
+    "pending_invites": {
+      "count": "{{count}} pending invite{{count, plural, =1 {} other {s}}}",
+      "reminder": "Send a personal note or reminder to finalize the roster before the next session."
+    },
+    "session_card": {
+      "attendees": "{{count}} attendees",
+      "last_updated": "Last updated {{time}}",
+      "review_recap": "Review recap"
+    }
+  },
+  "b2b_pipeline": {
+    "title": "B2B collaboration pipeline",
+    "subtitle": "Follow every corporate opportunity with clear handoffs, story-guide cues, and escalation hooks tied to platform oversight.",
+    "active_opportunities": "{{count}} active opportunities",
+    "focus_cues": {
+      "title": "Focus cues tuned for you",
+      "description": "Highlight urgent narrative threads, live escalations, and renewals at risk without losing sight of the broader pipeline."
+    },
+    "focus_summary": {
+      "active_opportunities": "Active opportunities",
+      "active_opportunities_assistive": "Across every stage",
+      "my_focus": "My focus",
+      "my_focus_assistive": "Urgent & assigned to you",
+      "renewals_at_risk": "Renewals at risk",
+      "renewals_at_risk_assistive": "Needs save plans",
+      "escalations_live": "Escalations live",
+      "escalations_live_assistive": "Monitoring or triggered",
+      "follow_ups_due": "Follow-ups due",
+      "follow_ups_due_assistive": "Within 48 hours"
+    },
+    "empty_state": {
+      "title": "No active B2B threads yet",
+      "description": "As soon as an opportunity is logged, stages, assignments, and escalation hooks will appear here.",
+      "action_label": "Plan corporate pilot"
+    },
+    "focus_toggle": {
+      "my_focus_description": "Urgent, escalated, or at-risk threads assigned to you.",
+      "entire_pipeline_description": "View every in-flight opportunity across teams.",
+      "view_label": "View"
+    },
+    "stage": {
+      "respond_within": "Respond within {{hours}} hrs",
+      "exit_criteria_label": "Exit criteria:",
+      "clear_stage": "Stage is clear. Stay ready for the next narrative handshake.",
+      "no_focus_threads": "No urgent focus threads in this stage."
+    },
+    "opportunity": {
+      "location_tbd": "Location TBD",
+      "point_of_contact": "Point of contact:",
+      "entered_stage_ago": "Entered stage {{duration}} ago",
+      "last_touch": "Last touch {{duration}}",
+      "next_step": "Next step",
+      "follow_up_due": "Follow-up overdue",
+      "follow_up_due_soon": "Follow-up due soon",
+      "follow_up_scheduled": "Follow-up due",
+      "follow_up_status": {
+        "overdue": "Overdue — reconnect now",
+        "due_soon": "Due within 48 hours",
+        "scheduled": "On cadence"
+      },
+      "services_in_scope": "Services in scope",
+      "assigned_partners": "Assigned partners",
+      "escalation_hooks": "Escalation hooks",
+      "no_escalation_hooks": "No escalation hooks configured yet.",
+      "studio_note": "Studio note",
+      "studio_note_placeholder": "Capture decision cues, safety context, or production blockers.",
+      "linked_to": "Linked to {{name}}",
+      "loop_specialists": "Loop additional specialists via Platform Admin"
+    },
+    "assignment_roles": {
+      "story_guide_you": "Story guide (you)"
+    },
+    "escalation": {
+      "escalate_via": "Escalate via {{role}}",
+      "resolve_by": "Resolve by {{date}}",
+      "triggered": "Triggered",
+      "monitoring": "Monitoring"
+    },
+    "note_sync": {
+      "synced": "Synced",
+      "pending_sync": "Pending sync",
+      "syncing": "Syncing…",
+      "offline": "Offline — saved locally",
+      "ready_to_sync": "Ready to sync",
+      "sync_failed": "Sync failed",
+      "conflict_detected": "Conflict detected",
+      "last_updated_by": "Last updated by {{name}} on {{date}}",
+      "accept_platform_update": "Accept platform update",
+      "overwrite_with_note": "Overwrite with my note",
+      "retry_sync": "Retry sync"
     }
   }
 }

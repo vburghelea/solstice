@@ -68,5 +68,8 @@
     "positive": "Positive momentum",
     "neutral": "Neutral read",
     "concerned": "Needs follow-up"
+  },
+  "errors": {
+    "load_snapshot_failed": "Failed to load snapshot"
   }
 }

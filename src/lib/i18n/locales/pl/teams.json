@@ -1,0 +1,125 @@
+{
+  "hero": {
+    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
+    "title": "TODO: Translate \"hero.title\"",
+    "subtitle": "TODO: Translate \"hero.subtitle\"",
+    "cta_text": "TODO: Translate \"hero.cta_text\"",
+    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+  },
+  "pathways": {
+    "university": {
+      "title": "TODO: Translate \"pathways.university.title\"",
+      "description": "TODO: Translate \"pathways.university.description\""
+    },
+    "community": {
+      "title": "TODO: Translate \"pathways.community.title\"",
+      "description": "TODO: Translate \"pathways.community.description\""
+    },
+    "youth": {
+      "title": "TODO: Translate \"pathways.youth.title\"",
+      "description": "TODO: Translate \"pathways.youth.description\""
+    }
+  },
+  "connect_locally": {
+    "eyebrow": "TODO: Translate \"connect_locally.eyebrow\"",
+    "title": "TODO: Translate \"connect_locally.title\"",
+    "description_1": "TODO: Translate \"connect_locally.description_1\"",
+    "description_2": "TODO: Translate \"connect_locally.description_2\"",
+    "email_support": "TODO: Translate \"connect_locally.email_support\"",
+    "list_event": "TODO: Translate \"connect_locally.list_event\""
+  },
+  "information_shared": {
+    "title": "TODO: Translate \"information_shared.title\"",
+    "items": {
+      "contacts": "TODO: Translate \"information_shared.items.contacts\"",
+      "referees": "TODO: Translate \"information_shared.items.referees\"",
+      "equipment": "TODO: Translate \"information_shared.items.equipment\"",
+      "billeting": "TODO: Translate \"information_shared.items.billeting\""
+    },
+    "updated_monthly": "TODO: Translate \"information_shared.updated_monthly\""
+  },
+  "tools": {
+    "title": "TODO: Translate \"tools.title\"",
+    "subtitle": "TODO: Translate \"tools.subtitle\""
+  },
+  "resources": {
+    "club_starter": {
+      "title": "TODO: Translate \"resources.club_starter.title\"",
+      "description": "TODO: Translate \"resources.club_starter.description\""
+    },
+    "practice_library": {
+      "title": "TODO: Translate \"resources.practice_library.title\"",
+      "description": "TODO: Translate \"resources.practice_library.description\""
+    },
+    "safe_sport": {
+      "title": "TODO: Translate \"resources.safe_sport.title\"",
+      "description": "TODO: Translate \"resources.safe_sport.description\""
+    },
+    "open_resource": "TODO: Translate \"resources.open_resource\""
+  },
+  "invitations": {
+    "title": "TODO: Translate \"invitations.title\"",
+    "badge": "TODO: Translate \"invitations.badge\"",
+    "accept": "TODO: Translate \"invitations.accept\"",
+    "accepting": "TODO: Translate \"invitations.accepting\"",
+    "decline": "TODO: Translate \"invitations.decline\"",
+    "declining": "TODO: Translate \"invitations.declining\"",
+    "accepted": "TODO: Translate \"invitations.accepted\"",
+    "declined": "TODO: Translate \"invitations.declined\"",
+    "sent": "TODO: Translate \"invitations.sent\"",
+    "request_created": "TODO: Translate \"invitations.request_created\"",
+    "invited_by": "TODO: Translate \"invitations.invited_by\""
+  },
+  "form": {
+    "fields": {
+      "team_name": "TODO: Translate \"form.fields.team_name\"",
+      "team_description": "TODO: Translate \"form.fields.team_description\"",
+      "role": "TODO: Translate \"form.fields.role\"",
+      "member_email": "TODO: Translate \"form.fields.member_email\""
+    },
+    "placeholders": {
+      "team_name": "TODO: Translate \"form.placeholders.team_name\"",
+      "team_description": "TODO: Translate \"form.placeholders.team_description\"",
+      "member_email": "TODO: Translate \"form.placeholders.member_email\""
+    }
+  },
+  "buttons": {
+    "create_team": "TODO: Translate \"buttons.create_team\"",
+    "invite_member": "TODO: Translate \"buttons.invite_member\"",
+    "join_team": "TODO: Translate \"buttons.join_team\"",
+    "leave_team": "TODO: Translate \"buttons.leave_team\""
+  },
+  "roles": {
+    "owner": "TODO: Translate \"roles.owner\"",
+    "admin": "TODO: Translate \"roles.admin\"",
+    "member": "TODO: Translate \"roles.member\"",
+    "pending": "TODO: Translate \"roles.pending\""
+  },
+  "errors": {
+    "accept_failed": "TODO: Translate \"errors.accept_failed\"",
+    "decline_failed": "TODO: Translate \"errors.decline_failed\"",
+    "create_failed": "TODO: Translate \"errors.create_failed\"",
+    "invite_failed": "TODO: Translate \"errors.invite_failed\""
+  },
+  "status": {
+    "active": "TODO: Translate \"status.active\"",
+    "inactive": "TODO: Translate \"status.inactive\"",
+    "suspended": "TODO: Translate \"status.suspended\""
+  },
+  "browse": {
+    "title": "TODO: Translate \"browse.title\"",
+    "subtitle": "TODO: Translate \"browse.subtitle\"",
+    "back_to_my_teams": "TODO: Translate \"browse.back_to_my_teams\"",
+    "search_placeholder": "TODO: Translate \"browse.search_placeholder\"",
+    "no_teams_title": "TODO: Translate \"browse.no_teams_title\"",
+    "no_teams_subtitle": "TODO: Translate \"browse.no_teams_subtitle\"",
+    "try_different_search": "TODO: Translate \"browse.try_different_search\"",
+    "search_error_title": "TODO: Translate \"browse.search_error_title\"",
+    "search_error_description": "TODO: Translate \"browse.search_error_description\"",
+    "members": "TODO: Translate \"browse.members\"",
+    "founded": "TODO: Translate \"browse.founded\"",
+    "created_by": "TODO: Translate \"browse.created_by\"",
+    "view_team": "TODO: Translate \"browse.view_team\"",
+    "view": "TODO: Translate \"browse.view\""
+  }
+}

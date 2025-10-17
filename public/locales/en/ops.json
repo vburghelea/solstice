@@ -1,1 +1,272 @@
-{}
+{
+  "dashboard": {
+    "title": "Event operations mission control",
+    "subtitle": "Keep approvals, staffing, and marketing signals aligned in one workspace so you can steer live experiences without leaving the dashboard.",
+    "legacy_dashboard_link": "View legacy dashboard",
+    "launch_event": "Launch new event"
+  },
+  "snapshot_cards": {
+    "awaiting_review": "Awaiting review",
+    "awaiting_review_description": "Submissions queued for operations approval",
+    "registration_live": "Registration live",
+    "registration_live_description": "Campaigns actively collecting signups",
+    "confirmed_events": "Confirmed events",
+    "confirmed_events_description": "Published and ready for execution",
+    "capacity_alerts": "Capacity alerts",
+    "capacity_alerts_description": "Tables approaching waitlist thresholds"
+  },
+  "status_messages": {
+    "refreshing_data": "Refreshing data",
+    "refreshing_data_description": "Pulling the latest submissions, staffing counts, and campaign stats."
+  },
+  "tabs": {
+    "approvals_queue": "Approvals queue",
+    "pipeline_health": "Pipeline health"
+  },
+  "empty_states": {
+    "all_triaged": "Every submission has been triaged — enjoy a moment to breathe."
+  },
+  "sections": {
+    "events_awaiting_approval": "Events awaiting go-live",
+    "events_awaiting_description": "Review organizer details, skim logistics, and approve or send back revisions.",
+    "recent_approvals": "Recent approvals"
+  },
+  "table_headers": {
+    "event": "Event",
+    "organizer": "Organizer",
+    "type": "Type",
+    "start": "Start",
+    "location": "Location",
+    "created": "Created",
+    "actions": "Actions"
+  },
+  "actions": {
+    "preview": "Preview",
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "approval_dialog": {
+    "approve_event": "Approve Event",
+    "reject_event": "Reject Event",
+    "approve_description": "Move this event to the operations pipeline for staffing and marketing.",
+    "reject_description": "Return this event to the organizer with feedback.",
+    "confirm_approve": "Approve Event",
+    "confirm_reject": "Reject Event",
+    "approving": "Approving...",
+    "rejecting": "Rejecting...",
+    "success_approved": "Event approved and moved to the operations pipeline",
+    "success_rejected": "Event returned for revisions",
+    "error_update": "Failed to update event",
+    "error_occurred": "An error occurred while updating the event"
+  },
+  "pipeline": {
+    "next_submission": "Approve the next submission",
+    "urgent_logistics": "Urgent logistics check",
+    "monitor_marketing": "Monitor marketing pulse",
+    "review_submission": "Review submission",
+    "open_roster": "Open event roster",
+    "stay_ahead": "Stay ahead of the pipeline",
+    "open_ops_view": "Open ops view",
+    "location_tbd": "Location TBD"
+  },
+  "labels": {
+    "unknown": "Unknown",
+    "not_provided": "Not provided",
+    "tbd": "TBD"
+  },
+  "task_status": {
+    "todo": "To do",
+    "in_progress": "In progress",
+    "blocked": "Needs attention",
+    "done": "Completed"
+  },
+  "event_detail": {
+    "error_fetching": "Something went wrong while fetching the event.",
+    "review_tasks": "Review and annotate operations tasks by workstream.",
+    "filter_aria_label": "Filter tasks by status",
+    "capacity_remaining": "Capacity remaining",
+    "registration_status": "Registration status",
+    "accepting_signups": "Accepting sign-ups",
+    "closed_gated": "Closed or gated",
+    "next_milestone": "Next milestone",
+    "no_tasks_filter": "No tasks match this filter. Adjust the status filter or reset to view the full checklist.",
+    "generate_checklist": "Once this event loads successfully we will generate a suggested operations checklist.",
+    "update_placeholder": "Capture updates, blockers, or context for teammates.",
+    "final_approval": "Final approval & publish",
+    "final_approval_description": "Verify organizer paperwork, then move the event live for marketing."
+  },
+  "hardcoded_strings": {
+    "mission_focus": "Mission focus",
+    "recent_approvals_description": "Keep a pulse on which experiences moved forward and jump back into operations if adjustments are needed.",
+    "no_recent_approvals": "Once events are approved they will appear here with quick links to manage rosters and logistics.",
+    "table_headers": {
+      "event": "Event",
+      "status": "Status",
+      "visibility": "Visibility",
+      "updated": "Updated",
+      "registered": "Registered",
+      "capacity": "Capacity",
+      "start": "Start"
+    },
+    "actions": {
+      "tasks_notes": "Tasks & notes",
+      "view": "View",
+      "manage": "Manage",
+      "adjust": "Adjust"
+    },
+    "visibility": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "pipeline_health": {
+      "title": "Pipeline health",
+      "description": "Monitor registrations, capacity, and readiness for the upcoming slate of events.",
+      "no_events": "No events found in the pipeline. Keep approvals moving to populate this view.",
+      "spots_left": "{{count}} spots left",
+      "unlimited": "Unlimited"
+    },
+    "logistics_watchlist": {
+      "title": "Logistics watchlist",
+      "description": "Upcoming events that need final staffing or marketing coordination.",
+      "no_issues": "All systems are green — keep monitoring registration momentum.",
+      "urgent": "Urgent",
+      "monitor": "Monitor",
+      "spots_remaining": "{{count}} spots remaining · {{days}} days out"
+    },
+    "marketing_hotspots": {
+      "title": "Marketing hotspots",
+      "description": "Cities generating the most volume and near-term activity.",
+      "no_data": "No marketing trends available yet. Approve more events to surface hotspots.",
+      "launching_soon": "{{count}} launching in the next 30 days",
+      "live": "{{count}} live"
+    },
+    "live_command_list": {
+      "title": "Live event command list",
+      "description": "Quick links to adjust staffing or check rosters for imminent experiences.",
+      "no_events": "No live events yet — approvals will populate this list automatically."
+    }
+  },
+  "event_detail_hardcoded": {
+    "ops_mission_control": "Ops mission control",
+    "event_not_found": "Event not found",
+    "event_not_found_description": "This event either no longer exists or you no longer have access to it.",
+    "open_legacy_playbook": "Open legacy playbook",
+    "review_submission_history": "Review submission history",
+    "registered": "registered",
+    "operational_outlook": "Operational outlook",
+    "operational_outlook_description": "Daily readiness, capacity signals, and dependent workflows for your team.",
+    "tasks_complete_count": "{{completed}} of {{total}} tasks complete",
+    "task_board": "Task board",
+    "logistics_timeline": "Logistics timeline",
+    "showing_tasks_count": "Showing {{filtered}} of {{total}} tasks.",
+    "reset_to_suggested_plan": "Reset to suggested plan",
+    "refreshing_event_data": "Refreshing event data…",
+    "attention_signals": "Attention signals",
+    "attention_signals_description": "Highlights workstreams that could block launch or on-site execution.",
+    "all_systems_nominal": "All systems nominal",
+    "all_systems_nominal_description": "No urgent tasks detected. Keep monitoring registrations and vendor check-ins.",
+    "operations_snapshot": "Operations snapshot",
+    "operations_snapshot_description": "Quick reference for staffing, marketing, and registration health.",
+    "schedule_with_organizer": "Schedule with organizer",
+    "default_owner": "Default owner: {{owner}}",
+    "set_status_for_task": "Set status for {{title}}",
+    "assign_owner_for_task": "Assign owner for {{title}}",
+    "edit_note_for_task": "Edit note for {{title}}",
+    "add_note_for_task": "Add note for {{title}}",
+    "clear_note": "Clear note",
+    "done": "Done",
+    "waitlist_only": "Waitlist only",
+    "spots_remaining": "{{count}} spots remaining",
+    "team_cap_not_set": "Team cap not set",
+    "participant_cap_not_set": "Participant cap not set",
+    "capacity_tbd": "Capacity TBD",
+    "event_in_progress_or_complete": "Event in progress or complete",
+    "event_starts_today": "Event starts today",
+    "days_until_doors_open": "{{count}} day{{plural}} until doors open",
+    "task_templates": {
+      "marketing_kickoff": "Kickoff marketing campaign",
+      "marketing_kickoff_description": "Coordinate social rollout, email inclusion, and paid boosts if allocated.",
+      "monitor_registration_health": "Monitor registration health",
+      "monitor_registration_health_description": "Review sign-ups, capacity forecasts, and waitlist inflow each morning.",
+      "lock_staffing": "Lock staffing & volunteers",
+      "lock_staffing_description": "Confirm facilitator roster, travel plans, and contingency coverage.",
+      "confirm_vendor_logistics": "Confirm venue & vendor logistics",
+      "confirm_vendor_logistics_description": "Ensure load-in windows, AV support, and insurance certificates are on file.",
+      "run_show_brief": "Run-of-show & on-site brief",
+      "run_show_brief_description": "Share final schedule and assignments with staff 48 hours before doors open.",
+      "post_event_debrief": "Post-event debrief & recap",
+      "post_event_debrief_description": "Collect feedback, update success metrics, and share recap with stakeholders."
+    },
+    "timeline": {
+      "marketing_launch": "Marketing launch",
+      "marketing_launch_description": "Campaign live across paid and owned channels.",
+      "staffing_locked": "Staffing locked",
+      "staffing_locked_description": "Roster confirmed, travel booked, contingencies assigned.",
+      "onsite_briefing": "On-site briefing",
+      "onsite_briefing_description": "Final assignments shared; equipment check complete.",
+      "event_day": "Event day",
+      "event_day_description": "Doors open and on-site execution begins.",
+      "post_event_debrief": "Post-event debrief",
+      "post_event_debrief_description": "Review KPIs, feedback, and follow-up tasks."
+    },
+    "owner_roles": {
+      "operations": "Operations",
+      "marketing_ops": "Marketing Ops",
+      "field_ops": "Field Ops",
+      "vendor_relations": "Vendor Relations",
+      "insights": "Insights",
+      "volunteer_lead": "Volunteer Lead",
+      "finance_ops": "Finance Ops",
+      "partnerships": "Partnerships"
+    },
+    "task_categories": {
+      "launch_readiness": "Launch readiness",
+      "logistics": "Logistics",
+      "marketing": "Marketing",
+      "post_event": "Post-event",
+      "staffing": "Staffing"
+    },
+    "ui": {
+      "ops_mission_control": "Ops mission control",
+      "showing_tasks_count": "Showing {{filtered}} of {{total}} tasks.",
+      "tasks_count": "{{filtered}} of {{total}}",
+      "reset_to_suggested_plan": "Reset to suggested plan",
+      "refreshing_event_data": "Refreshing event data…",
+      "clear_note": "Clear note",
+      "done": "Done"
+    },
+    "task_templates": {
+      "marketing_kickoff": "Kickoff marketing campaign",
+      "marketing_kickoff_description": "Coordinate social rollout, email inclusion, and paid boosts if allocated.",
+      "monitor_registration_health": "Monitor registration health",
+      "monitor_registration_health_description": "Review sign-ups, capacity forecasts, and waitlist inflow each morning.",
+      "lock_staffing": "Lock staffing & volunteers",
+      "lock_staffing_description": "Confirm facilitator roster, travel plans, and contingency coverage.",
+      "confirm_vendor_logistics": "Confirm venue & vendor logistics",
+      "confirm_vendor_logistics_description": "Ensure load-in windows, AV support, and insurance certificates are on file.",
+      "run_show_brief": "Run-of-show & on-site brief",
+      "run_show_brief_description": "Share final schedule and assignments with staff 48 hours before doors open.",
+      "post_event_debrief": "Post-event debrief & recap",
+      "post_event_debrief_description": "Collect feedback, update success metrics, and share recap with stakeholders."
+    },
+    "timeline": {
+      "marketing_launch": "Marketing launch",
+      "marketing_launch_description": "Campaign live across paid and owned channels.",
+      "staffing_locked": "Staffing locked",
+      "staffing_locked_description": "Roster confirmed, travel booked, contingencies assigned.",
+      "onsite_briefing": "On-site briefing",
+      "onsite_briefing_description": "Final assignments shared; equipment check complete.",
+      "event_day": "Event day",
+      "event_day_description": "Doors open and on-site execution begins.",
+      "post_event_debrief": "Post-event debrief",
+      "post_event_debrief_description": "Review KPIs, feedback, and follow-up tasks."
+    },
+    "capacity": {
+      "waitlist_only": "Waitlist only",
+      "spots_remaining": "{{count}} spots remaining",
+      "team_cap_not_set": "Team cap not set",
+      "participant_cap_not_set": "Participant cap not set",
+      "capacity_tbd": "Capacity TBD"
+    }
+  }
+}

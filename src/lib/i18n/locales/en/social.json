@@ -29,5 +29,8 @@
       "unblock_error": "Failed to unblock user",
       "load_error": "Failed to load blocklist"
     }
+  },
+  "errors": {
+    "unexpected_error": "An unexpected error occurred"
   }
 }

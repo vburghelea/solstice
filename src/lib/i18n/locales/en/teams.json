@@ -1,4 +1,62 @@
 {
+  "hero": {
+    "eyebrow": "Teams & Clubs",
+    "title": "Find your squad or build one from the ground up",
+    "subtitle": "From coast-to-coast, tabletop communities are recruiting hosts, storytellers, rules gurus, and volunteers. Discover groups near you and access the resources to help your program thrive.",
+    "cta_text": "Browse club resources",
+    "secondary_cta": "Start a new club"
+  },
+  "pathways": {
+    "university": {
+      "title": "University & College Clubs",
+      "description": "Campus programs in every region drive competitive play, intramural leagues, and rookie recruitment. Tap into our season planning templates and officiating support."
+    },
+    "community": {
+      "title": "Community & City Leagues",
+      "description": "Adult leagues keep tabletop nights thriving year-round with mixed skill divisions, house tables, and travelling meetup groups. We can help with scheduling, insurance, and grant applications."
+    },
+    "youth": {
+      "title": "Youth & School Programs",
+      "description": "Introduce the sport in classrooms and youth centres with modified rules, inclusive drills, and coach education that scales from introductory sessions to regional jamborees."
+    }
+  },
+  "connect_locally": {
+    "eyebrow": "Connect locally",
+    "title": "Club finder & regional hubs",
+    "description_1": "Our regional coordinators maintain an active directory of university, community, and youth teams. Whether you are relocating, recruiting, or looking for exhibition play, we can link you with the right contacts in seconds.",
+    "description_2": "Hosting a tournament or wanting to scrimmage? Submit your details and we'll broadcast the request to neighbouring programs and officials across the country.",
+    "email_support": "Email regional support",
+    "list_event": "List your event"
+  },
+  "information_shared": {
+    "title": "Information we share",
+    "items": {
+      "contacts": "Club contacts and practice schedules",
+      "referees": "Referee and scorekeeping availability",
+      "equipment": "Equipment loan programs and storage solutions",
+      "billeting": "Billeting networks for travelling teams"
+    },
+    "updated_monthly": "Updated monthly with club submissions"
+  },
+  "tools": {
+    "title": "Tools for every stage",
+    "subtitle": "Jump straight into program building with templates and training content maintained by our development team."
+  },
+  "resources": {
+    "club_starter": {
+      "title": "Club starter toolkit",
+      "description": "Download constitution templates, budget planners, and volunteer role descriptions to launch a sustainable program."
+    },
+    "practice_library": {
+      "title": "Practice & fitness library",
+      "description": "Access progressive training plans, skills videos, and goalkeeper clinics designed by national team staff."
+    },
+    "safe_sport": {
+      "title": "Safe sport & safeguarding",
+      "description": "Stay compliant with national policies covering background checks, injury reporting, and inclusive program design."
+    },
+    "open_resource": "Open resource"
+  },
   "invitations": {
     "title": "Pending Team Invitations",
     "badge": "{{count}} pending",
@@ -47,5 +105,21 @@
     "active": "Active",
     "inactive": "Inactive",
     "suspended": "Suspended"
+  },
+  "browse": {
+    "title": "Browse Teams",
+    "subtitle": "Discover and join teams in your area",
+    "back_to_my_teams": "Back to My Teams",
+    "search_placeholder": "Search teams by name or city...",
+    "no_teams_title": "No teams found",
+    "no_teams_subtitle": "No teams available to browse",
+    "try_different_search": "Try a different search term",
+    "search_error_title": "We couldn't find teams matching that search",
+    "search_error_description": "Please try again or adjust your search filters.",
+    "members": "Members",
+    "founded": "Founded",
+    "created_by": "Created by",
+    "view_team": "View Team",
+    "view": "View"
   }
 }

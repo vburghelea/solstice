@@ -1,0 +1,78 @@
+{
+  "hero": {
+    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
+    "title": "TODO: Translate \"hero.title\"",
+    "subtitle": "TODO: Translate \"hero.subtitle\"",
+    "cta_text": "TODO: Translate \"hero.cta_text\"",
+    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+  },
+  "mission": {
+    "eyebrow": "TODO: Translate \"mission.eyebrow\"",
+    "title": "TODO: Translate \"mission.title\"",
+    "description_1": "TODO: Translate \"mission.description_1\"",
+    "description_2": "TODO: Translate \"mission.description_2\"",
+    "highlights": {
+      "belonging": {
+        "title": "TODO: Translate \"mission.highlights.belonging.title\"",
+        "description": "TODO: Translate \"mission.highlights.belonging.description\""
+      },
+      "storytellers": {
+        "title": "TODO: Translate \"mission.highlights.storytellers.title\"",
+        "description": "TODO: Translate \"mission.highlights.storytellers.description\""
+      },
+      "purpose": {
+        "title": "TODO: Translate \"mission.highlights.purpose.title\"",
+        "description": "TODO: Translate \"mission.highlights.purpose.description\""
+      }
+    }
+  },
+  "vision": {
+    "eyebrow": "TODO: Translate \"vision.eyebrow\"",
+    "title": "TODO: Translate \"vision.title\"",
+    "description_1": "TODO: Translate \"vision.description_1\"",
+    "description_2": "TODO: Translate \"vision.description_2\"",
+    "commitments": "TODO: Translate \"vision.commitments\""
+  },
+  "stories_insights": {
+    "eyebrow": "TODO: Translate \"stories_insights.eyebrow\"",
+    "title": "TODO: Translate \"stories_insights.title\"",
+    "subtitle": "TODO: Translate \"stories_insights.subtitle\"",
+    "articles": {
+      "mission_practice": {
+        "title": "TODO: Translate \"stories_insights.articles.mission_practice.title\"",
+        "description": "TODO: Translate \"stories_insights.articles.mission_practice.description\""
+      },
+      "vision_safety": {
+        "title": "TODO: Translate \"stories_insights.articles.vision_safety.title\"",
+        "description": "TODO: Translate \"stories_insights.articles.vision_safety.description\""
+      },
+      "roadmap_impact": {
+        "title": "TODO: Translate \"stories_insights.articles.roadmap_impact.title\"",
+        "description": "TODO: Translate \"stories_insights.articles.roadmap_impact.description\""
+      }
+    },
+    "publishing_soon": "TODO: Translate \"stories_insights.publishing_soon\""
+  },
+  "feedback": {
+    "eyebrow": "TODO: Translate \"feedback.eyebrow\"",
+    "title": "TODO: Translate \"feedback.title\"",
+    "description": "TODO: Translate \"feedback.description\"",
+    "email": "TODO: Translate \"feedback.email\"",
+    "email_description": "TODO: Translate \"feedback.email_description\"",
+    "topics": {
+      "suggest_system": {
+        "title": "TODO: Translate \"feedback.topics.suggest_system.title\"",
+        "description": "TODO: Translate \"feedback.topics.suggest_system.description\""
+      },
+      "nominate_venue": {
+        "title": "TODO: Translate \"feedback.topics.nominate_venue.title\"",
+        "description": "TODO: Translate \"feedback.topics.nominate_venue.description\""
+      },
+      "report_issue": {
+        "title": "TODO: Translate \"feedback.topics.report_issue.title\"",
+        "description": "TODO: Translate \"feedback.topics.report_issue.description\""
+      }
+    },
+    "feedback_form_soon": "TODO: Translate \"feedback.feedback_form_soon\""
+  }
+}

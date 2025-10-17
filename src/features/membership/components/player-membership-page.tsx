@@ -140,7 +140,7 @@ export function MembershipPage() {
     // Handle errors
     else if (paymentReturn.error) {
       setHasProcessedReturn(true);
-      const errorMessage = getPaymentErrorMessage(paymentReturn.error);
+      const errorMessage = getPaymentErrorMessage(paymentReturn.error, t);
       if (errorMessage) toast.error(errorMessage);
       clearPaymentParams();
     }
@@ -247,7 +247,7 @@ export function MembershipPage() {
                     ? new Date(
                         membershipStatus.currentMembership.endDate,
                       ).toLocaleDateString()
-                    : "N/A",
+                    : t("status.not_available"),
                 })}
               </p>
               {membershipStatus.daysRemaining != null &&

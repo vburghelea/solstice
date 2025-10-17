@@ -1,0 +1,660 @@
+{
+  "hero": {
+    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
+    "title": "TODO: Translate \"hero.title\"",
+    "subtitle": "TODO: Translate \"hero.subtitle\"",
+    "cta_text": "TODO: Translate \"hero.cta_text\"",
+    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+  },
+  "sections": {
+    "club_toolkit": {
+      "title": "TODO: Translate \"sections.club_toolkit.title\"",
+      "description": "TODO: Translate \"sections.club_toolkit.description\"",
+      "actions": {
+        "download_toolkit": "TODO: Translate \"sections.club_toolkit.actions.download_toolkit\"",
+        "view_charter": "TODO: Translate \"sections.club_toolkit.actions.view_charter\""
+      }
+    },
+    "training": {
+      "title": "TODO: Translate \"sections.training.title\"",
+      "description": "TODO: Translate \"sections.training.description\"",
+      "actions": {
+        "browse_plans": "TODO: Translate \"sections.training.actions.browse_plans\"",
+        "watch_clinics": "TODO: Translate \"sections.training.actions.watch_clinics\""
+      }
+    },
+    "safe_sport": {
+      "title": "TODO: Translate \"sections.safe_sport.title\"",
+      "description": "TODO: Translate \"sections.safe_sport.description\"",
+      "actions": {
+        "download_policies": "TODO: Translate \"sections.safe_sport.actions.download_policies\"",
+        "report_concern": "TODO: Translate \"sections.safe_sport.actions.report_concern\""
+      }
+    }
+  },
+  "certification": {
+    "title": "TODO: Translate \"certification.title\"",
+    "subtitle": "TODO: Translate \"certification.subtitle\"",
+    "tracks": {
+      "gm_pathway": {
+        "title": "TODO: Translate \"certification.tracks.gm_pathway.title\"",
+        "description": "TODO: Translate \"certification.tracks.gm_pathway.description\"",
+        "cta": "TODO: Translate \"certification.tracks.gm_pathway.cta\""
+      },
+      "host_pathway": {
+        "title": "TODO: Translate \"certification.tracks.host_pathway.title\"",
+        "description": "TODO: Translate \"certification.tracks.host_pathway.description\"",
+        "cta": "TODO: Translate \"certification.tracks.host_pathway.cta\""
+      },
+      "operations_pathway": {
+        "title": "TODO: Translate \"certification.tracks.operations_pathway.title\"",
+        "description": "TODO: Translate \"certification.tracks.operations_pathway.description\"",
+        "cta": "TODO: Translate \"certification.tracks.operations_pathway.cta\""
+      }
+    }
+  },
+  "consultation": {
+    "eyebrow": "TODO: Translate \"consultation.eyebrow\"",
+    "title": "TODO: Translate \"consultation.title\"",
+    "description": "TODO: Translate \"consultation.description\"",
+    "actions": {
+      "schedule_meeting": "TODO: Translate \"consultation.actions.schedule_meeting\"",
+      "connect_hubs": "TODO: Translate \"consultation.actions.connect_hubs\""
+    },
+    "office_hours": {
+      "title": "TODO: Translate \"consultation.office_hours.title\"",
+      "services": {
+        "funding_strategy": "TODO: Translate \"consultation.office_hours.services.funding_strategy\"",
+        "operations_audit": "TODO: Translate \"consultation.office_hours.services.operations_audit\"",
+        "volunteer_mapping": "TODO: Translate \"consultation.office_hours.services.volunteer_mapping\"",
+        "conduct_review": "TODO: Translate \"consultation.office_hours.services.conduct_review\""
+      }
+    }
+  },
+  "charter_template": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"charter_template.hero.eyebrow\"",
+      "title": "TODO: Translate \"charter_template.hero.title\"",
+      "subtitle": "TODO: Translate \"charter_template.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"charter_template.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"charter_template.hero.secondary_cta\""
+    },
+    "why_works": {
+      "eyebrow": "TODO: Translate \"charter_template.why_works.eyebrow\"",
+      "title": "TODO: Translate \"charter_template.why_works.title\"",
+      "description": "TODO: Translate \"charter_template.why_works.description\""
+    },
+    "sections": {
+      "mission_values": {
+        "title": "TODO: Translate \"charter_template.sections.mission_values.title\"",
+        "description": "TODO: Translate \"charter_template.sections.mission_values.description\"",
+        "highlights": "TODO: Translate \"charter_template.sections.mission_values.highlights\""
+      },
+      "membership_governance": {
+        "title": "TODO: Translate \"charter_template.sections.membership_governance.title\"",
+        "description": "TODO: Translate \"charter_template.sections.membership_governance.description\"",
+        "highlights": "TODO: Translate \"charter_template.sections.membership_governance.highlights\""
+      },
+      "programming_safety": {
+        "title": "TODO: Translate \"charter_template.sections.programming_safety.title\"",
+        "description": "TODO: Translate \"charter_template.sections.programming_safety.description\"",
+        "highlights": "TODO: Translate \"charter_template.sections.programming_safety.highlights\""
+      }
+    },
+    "facilitation": {
+      "eyebrow": "TODO: Translate \"charter_template.facilitation.eyebrow\"",
+      "title": "TODO: Translate \"charter_template.facilitation.title\"",
+      "description": "TODO: Translate \"charter_template.facilitation.description\"",
+      "workshop_outline": {
+        "title": "TODO: Translate \"charter_template.facilitation.workshop_outline.title\"",
+        "items": "TODO: Translate \"charter_template.facilitation.workshop_outline.items\""
+      },
+      "toolkit": {
+        "title": "TODO: Translate \"charter_template.facilitation.toolkit.title\"",
+        "description": "TODO: Translate \"charter_template.facilitation.toolkit.description\"",
+        "button": "TODO: Translate \"charter_template.facilitation.toolkit.button\""
+      },
+      "scenario_cards": {
+        "title": "TODO: Translate \"charter_template.facilitation.scenario_cards.title\"",
+        "description": "TODO: Translate \"charter_template.facilitation.scenario_cards.description\"",
+        "button": "TODO: Translate \"charter_template.facilitation.scenario_cards.button\""
+      }
+    },
+    "downloads": {
+      "title": "TODO: Translate \"charter_template.downloads.title\"",
+      "formats": {
+        "docx": {
+          "title": "TODO: Translate \"charter_template.downloads.formats.docx.title\"",
+          "description": "TODO: Translate \"charter_template.downloads.formats.docx.description\"",
+          "button": "TODO: Translate \"charter_template.downloads.formats.docx.button\""
+        },
+        "pdf": {
+          "title": "TODO: Translate \"charter_template.downloads.formats.pdf.title\"",
+          "description": "TODO: Translate \"charter_template.downloads.formats.pdf.description\"",
+          "button": "TODO: Translate \"charter_template.downloads.formats.pdf.button\""
+        },
+        "markdown": {
+          "title": "TODO: Translate \"charter_template.downloads.formats.markdown.title\"",
+          "description": "TODO: Translate \"charter_template.downloads.formats.markdown.description\"",
+          "button": "TODO: Translate \"charter_template.downloads.formats.markdown.button\""
+        }
+      },
+      "custom_clause": {
+        "title": "TODO: Translate \"charter_template.downloads.custom_clause.title\"",
+        "description": "TODO: Translate \"charter_template.downloads.custom_clause.description\"",
+        "button": "TODO: Translate \"charter_template.downloads.custom_clause.button\""
+      }
+    }
+  },
+  "toolkit": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"toolkit.hero.eyebrow\"",
+      "title": "TODO: Translate \"toolkit.hero.title\"",
+      "subtitle": "TODO: Translate \"toolkit.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"toolkit.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"toolkit.hero.secondary_cta\""
+    },
+    "whats_inside": {
+      "eyebrow": "TODO: Translate \"toolkit.whats_inside.eyebrow\"",
+      "title": "TODO: Translate \"toolkit.whats_inside.title\"",
+      "description": "TODO: Translate \"toolkit.whats_inside.description\""
+    },
+    "core_documents": {
+      "title": "TODO: Translate \"toolkit.core_documents.title\"",
+      "items": "TODO: Translate \"toolkit.core_documents.items\""
+    },
+    "planning_tools": {
+      "title": "TODO: Translate \"toolkit.planning_tools.title\"",
+      "items": "TODO: Translate \"toolkit.planning_tools.items\""
+    },
+    "readiness_blocks": {
+      "founding_documents": {
+        "title": "TODO: Translate \"toolkit.readiness_blocks.founding_documents.title\"",
+        "description": "TODO: Translate \"toolkit.readiness_blocks.founding_documents.description\""
+      },
+      "financial_runway": {
+        "title": "TODO: Translate \"toolkit.readiness_blocks.financial_runway.title\"",
+        "description": "TODO: Translate \"toolkit.readiness_blocks.financial_runway.description\""
+      },
+      "people_operations": {
+        "title": "TODO: Translate \"toolkit.readiness_blocks.people_operations.title\"",
+        "description": "TODO: Translate \"toolkit.readiness_blocks.people_operations.description\""
+      },
+      "quality_standards": {
+        "title": "TODO: Translate \"toolkit.readiness_blocks.quality_standards.title\"",
+        "description": "TODO: Translate \"toolkit.readiness_blocks.quality_standards.description\""
+      }
+    },
+    "how_to_use": {
+      "eyebrow": "TODO: Translate \"toolkit.how_to_use.eyebrow\"",
+      "title": "TODO: Translate \"toolkit.how_to_use.title\"",
+      "description": "TODO: Translate \"toolkit.how_to_use.description\""
+    },
+    "phases": {
+      "weeks_1_2": {
+        "title": "TODO: Translate \"toolkit.phases.weeks_1_2.title\"",
+        "items": "TODO: Translate \"toolkit.phases.weeks_1_2.items\""
+      },
+      "weeks_3_4": {
+        "title": "TODO: Translate \"toolkit.phases.weeks_3_4.title\"",
+        "items": "TODO: Translate \"toolkit.phases.weeks_3_4.items\""
+      },
+      "weeks_5_6": {
+        "title": "TODO: Translate \"toolkit.phases.weeks_5_6.title\"",
+        "items": "TODO: Translate \"toolkit.phases.weeks_5_6.items\""
+      }
+    },
+    "downloads": {
+      "title": "TODO: Translate \"toolkit.downloads.title\"",
+      "description": "TODO: Translate \"toolkit.downloads.description\"",
+      "formats": {
+        "zip": {
+          "title": "TODO: Translate \"toolkit.downloads.formats.zip.title\"",
+          "description": "TODO: Translate \"toolkit.downloads.formats.zip.description\"",
+          "button": "TODO: Translate \"toolkit.downloads.formats.zip.button\""
+        },
+        "docx": {
+          "title": "TODO: Translate \"toolkit.downloads.formats.docx.title\"",
+          "description": "TODO: Translate \"toolkit.downloads.formats.docx.description\"",
+          "button": "TODO: Translate \"toolkit.downloads.formats.docx.button\""
+        },
+        "sheets": {
+          "title": "TODO: Translate \"toolkit.downloads.formats.sheets.title\"",
+          "description": "TODO: Translate \"toolkit.downloads.formats.sheets.description\"",
+          "button": "TODO: Translate \"toolkit.downloads.formats.sheets.button\""
+        }
+      },
+      "support": {
+        "description": "TODO: Translate \"toolkit.downloads.support.description\"",
+        "email": "TODO: Translate \"toolkit.downloads.support.email\""
+      }
+    }
+  },
+  "safety_policies": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"safety_policies.hero.eyebrow\"",
+      "title": "TODO: Translate \"safety_policies.hero.title\"",
+      "subtitle": "TODO: Translate \"safety_policies.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"safety_policies.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"safety_policies.hero.secondary_cta\""
+    },
+    "approach": {
+      "eyebrow": "TODO: Translate \"safety_policies.approach.eyebrow\"",
+      "title": "TODO: Translate \"safety_policies.approach.title\"",
+      "description": "TODO: Translate \"safety_policies.approach.description\""
+    },
+    "pillars": {
+      "people_first": {
+        "title": "TODO: Translate \"safety_policies.pillars.people_first.title\"",
+        "description": "TODO: Translate \"safety_policies.pillars.people_first.description\""
+      },
+      "consent_driven": {
+        "title": "TODO: Translate \"safety_policies.pillars.consent_driven.title\"",
+        "description": "TODO: Translate \"safety_policies.pillars.consent_driven.description\""
+      },
+      "data_stewardship": {
+        "title": "TODO: Translate \"safety_policies.pillars.data_stewardship.title\"",
+        "description": "TODO: Translate \"safety_policies.pillars.data_stewardship.description\""
+      }
+    },
+    "policy_library": {
+      "eyebrow": "TODO: Translate \"safety_policies.policy_library.eyebrow\"",
+      "title": "TODO: Translate \"safety_policies.policy_library.title\"",
+      "description": "TODO: Translate \"safety_policies.policy_library.description\"",
+      "lifecycle": {
+        "before": {
+          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.before.title\"",
+          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.before.items\""
+        },
+        "during": {
+          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.during.title\"",
+          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.during.items\""
+        },
+        "after": {
+          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.after.title\"",
+          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.after.items\""
+        },
+        "digital": {
+          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.digital.title\"",
+          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.digital.items\""
+        }
+      },
+      "timeline": {
+        "title": "TODO: Translate \"safety_policies.policy_library.timeline.title\"",
+        "description": "TODO: Translate \"safety_policies.policy_library.timeline.description\"",
+        "schedule": "TODO: Translate \"safety_policies.policy_library.timeline.schedule\""
+      },
+      "transparency": {
+        "title": "TODO: Translate \"safety_policies.policy_library.transparency.title\"",
+        "description": "TODO: Translate \"safety_policies.policy_library.transparency.description\"",
+        "button": "TODO: Translate \"safety_policies.policy_library.transparency.button\""
+      }
+    },
+    "downloads": {
+      "title": "TODO: Translate \"safety_policies.downloads.title\"",
+      "formats": {
+        "handbook": {
+          "title": "TODO: Translate \"safety_policies.downloads.formats.handbook.title\"",
+          "description": "TODO: Translate \"safety_policies.downloads.formats.handbook.description\"",
+          "button": "TODO: Translate \"safety_policies.downloads.formats.handbook.button\""
+        },
+        "data_protection": {
+          "title": "TODO: Translate \"safety_policies.downloads.formats.data_protection.title\"",
+          "description": "TODO: Translate \"safety_policies.downloads.formats.data_protection.description\"",
+          "button": "TODO: Translate \"safety_policies.downloads.formats.data_protection.button\""
+        },
+        "accessibility": {
+          "title": "TODO: Translate \"safety_policies.downloads.formats.accessibility.title\"",
+          "description": "TODO: Translate \"safety_policies.downloads.formats.accessibility.description\"",
+          "button": "TODO: Translate \"safety_policies.downloads.formats.accessibility.button\""
+        }
+      },
+      "custom_policies": {
+        "title": "TODO: Translate \"safety_policies.downloads.custom_policies.title\"",
+        "description": "TODO: Translate \"safety_policies.downloads.custom_policies.description\"",
+        "button": "TODO: Translate \"safety_policies.downloads.custom_policies.button\""
+      }
+    },
+    "questions": {
+      "title": "TODO: Translate \"safety_policies.questions.title\"",
+      "description": "TODO: Translate \"safety_policies.questions.description\"",
+      "emergency": {
+        "title": "TODO: Translate \"safety_policies.questions.emergency.title\"",
+        "description": "TODO: Translate \"safety_policies.questions.emergency.description\""
+      }
+    }
+  },
+  "report_concern": {
+    "loading": {
+      "reporting_steps": "TODO: Translate \"report_concern.loading.reporting_steps\"",
+      "support_resources": "TODO: Translate \"report_concern.loading.support_resources\""
+    }
+  },
+  "community_host_pathway": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"community_host_pathway.hero.eyebrow\"",
+      "title": "TODO: Translate \"community_host_pathway.hero.title\"",
+      "subtitle": "TODO: Translate \"community_host_pathway.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"community_host_pathway.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"community_host_pathway.hero.secondary_cta\""
+    },
+    "curriculum": {
+      "eyebrow": "TODO: Translate \"community_host_pathway.curriculum.eyebrow\"",
+      "title": "TODO: Translate \"community_host_pathway.curriculum.title\"",
+      "description": "TODO: Translate \"community_host_pathway.curriculum.description\"",
+      "tracks": "TODO: Translate \"community_host_pathway.curriculum.tracks\""
+    },
+    "practicum": {
+      "eyebrow": "TODO: Translate \"community_host_pathway.practicum.eyebrow\"",
+      "title": "TODO: Translate \"community_host_pathway.practicum.title\"",
+      "description": "TODO: Translate \"community_host_pathway.practicum.description\"",
+      "checklist_title": "TODO: Translate \"community_host_pathway.practicum.checklist_title\"",
+      "checklist_items": "TODO: Translate \"community_host_pathway.practicum.checklist_items\"",
+      "toolkit_title": "TODO: Translate \"community_host_pathway.practicum.toolkit_title\"",
+      "toolkit_description": "TODO: Translate \"community_host_pathway.practicum.toolkit_description\"",
+      "toolkit_button": "TODO: Translate \"community_host_pathway.practicum.toolkit_button\"",
+      "certifications_title": "TODO: Translate \"community_host_pathway.practicum.certifications_title\"",
+      "certifications_description": "TODO: Translate \"community_host_pathway.practicum.certifications_description\""
+    },
+    "playbooks": {
+      "title": "TODO: Translate \"community_host_pathway.playbooks.title\"",
+      "opening_night": {
+        "title": "TODO: Translate \"community_host_pathway.playbooks.opening_night.title\"",
+        "description": "TODO: Translate \"community_host_pathway.playbooks.opening_night.description\"",
+        "button": "TODO: Translate \"community_host_pathway.playbooks.opening_night.button\""
+      },
+      "volunteer_matrix": {
+        "title": "TODO: Translate \"community_host_pathway.playbooks.volunteer_matrix.title\"",
+        "description": "TODO: Translate \"community_host_pathway.playbooks.volunteer_matrix.description\"",
+        "button": "TODO: Translate \"community_host_pathway.playbooks.volunteer_matrix.button\""
+      },
+      "retention_kit": {
+        "title": "TODO: Translate \"community_host_pathway.playbooks.retention_kit.title\"",
+        "description": "TODO: Translate \"community_host_pathway.playbooks.retention_kit.description\"",
+        "button": "TODO: Translate \"community_host_pathway.playbooks.retention_kit.button\""
+      }
+    },
+    "application": {
+      "eyebrow": "TODO: Translate \"community_host_pathway.application.eyebrow\"",
+      "title": "TODO: Translate \"community_host_pathway.application.title\"",
+      "description": "TODO: Translate \"community_host_pathway.application.description\"",
+      "process_items": "TODO: Translate \"community_host_pathway.application.process_items\"",
+      "action_button": "TODO: Translate \"community_host_pathway.application.action_button\"",
+      "maintenance_title": "TODO: Translate \"community_host_pathway.application.maintenance_title\"",
+      "maintenance_items": "TODO: Translate \"community_host_pathway.application.maintenance_items\"",
+      "contact_prompt": "TODO: Translate \"community_host_pathway.application.contact_prompt\"",
+      "contact_email": "TODO: Translate \"community_host_pathway.application.contact_email\"",
+      "graduate_benefits": "TODO: Translate \"community_host_pathway.application.graduate_benefits\""
+    }
+  },
+  "event_operations_kit": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"event_operations_kit.hero.eyebrow\"",
+      "title": "TODO: Translate \"event_operations_kit.hero.title\"",
+      "subtitle": "TODO: Translate \"event_operations_kit.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"event_operations_kit.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"event_operations_kit.hero.secondary_cta\""
+    },
+    "operating_system": {
+      "eyebrow": "TODO: Translate \"event_operations_kit.operating_system.eyebrow\"",
+      "title": "TODO: Translate \"event_operations_kit.operating_system.title\"",
+      "description": "TODO: Translate \"event_operations_kit.operating_system.description\"",
+      "phases": "TODO: Translate \"event_operations_kit.operating_system.phases\""
+    },
+    "liveops": {
+      "eyebrow": "TODO: Translate \"event_operations_kit.liveops.eyebrow\"",
+      "title": "TODO: Translate \"event_operations_kit.liveops.title\"",
+      "description": "TODO: Translate \"event_operations_kit.liveops.description\"",
+      "widgets_title": "TODO: Translate \"event_operations_kit.liveops.widgets_title\"",
+      "widgets": "TODO: Translate \"event_operations_kit.liveops.widgets\"",
+      "automations_title": "TODO: Translate \"event_operations_kit.liveops.automations_title\"",
+      "automations_description": "TODO: Translate \"event_operations_kit.liveops.automations_description\"",
+      "automations_button": "TODO: Translate \"event_operations_kit.liveops.automations_button\"",
+      "vendor_title": "TODO: Translate \"event_operations_kit.liveops.vendor_title\"",
+      "vendor_description": "TODO: Translate \"event_operations_kit.liveops.vendor_description\"",
+      "vendor_button": "TODO: Translate \"event_operations_kit.liveops.vendor_button\""
+    },
+    "downloads": {
+      "title": "TODO: Translate \"event_operations_kit.downloads.title\"",
+      "operations_bundle": {
+        "title": "TODO: Translate \"event_operations_kit.downloads.operations_bundle.title\"",
+        "description": "TODO: Translate \"event_operations_kit.downloads.operations_bundle.description\"",
+        "button": "TODO: Translate \"event_operations_kit.downloads.operations_bundle.button\""
+      },
+      "run_of_show": {
+        "title": "TODO: Translate \"event_operations_kit.downloads.run_of_show.title\"",
+        "description": "TODO: Translate \"event_operations_kit.downloads.run_of_show.description\"",
+        "button": "TODO: Translate \"event_operations_kit.downloads.run_of_show.button\""
+      },
+      "compliance_binder": {
+        "title": "TODO: Translate \"event_operations_kit.downloads.compliance_binder.title\"",
+        "description": "TODO: Translate \"event_operations_kit.downloads.compliance_binder.description\"",
+        "button": "TODO: Translate \"event_operations_kit.downloads.compliance_binder.button\""
+      },
+      "support_title": "TODO: Translate \"event_operations_kit.downloads.support_title\"",
+      "support_description": "TODO: Translate \"event_operations_kit.downloads.support_description\"",
+      "support_button": "TODO: Translate \"event_operations_kit.downloads.support_button\""
+    }
+  },
+  "session_plans": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"session_plans.hero.eyebrow\"",
+      "title": "TODO: Translate \"session_plans.hero.title\"",
+      "subtitle": "TODO: Translate \"session_plans.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"session_plans.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"session_plans.hero.secondary_cta\""
+    },
+    "collections": {
+      "eyebrow": "TODO: Translate \"session_plans.collections.eyebrow\"",
+      "title": "TODO: Translate \"session_plans.collections.title\"",
+      "description": "TODO: Translate \"session_plans.collections.description\"",
+      "story_driven": {
+        "title": "TODO: Translate \"session_plans.collections.story_driven.title\"",
+        "description": "TODO: Translate \"session_plans.collections.story_driven.description\"",
+        "examples": "TODO: Translate \"session_plans.collections.story_driven.examples\""
+      },
+      "quickstart": {
+        "title": "TODO: Translate \"session_plans.collections.quickstart.title\"",
+        "description": "TODO: Translate \"session_plans.collections.quickstart.description\"",
+        "examples": "TODO: Translate \"session_plans.collections.quickstart.examples\""
+      },
+      "board_games": {
+        "title": "TODO: Translate \"session_plans.collections.board_games.title\"",
+        "description": "TODO: Translate \"session_plans.collections.board_games.description\"",
+        "examples": "TODO: Translate \"session_plans.collections.board_games.examples\""
+      }
+    },
+    "logistics": {
+      "eyebrow": "TODO: Translate \"session_plans.logistics.eyebrow\"",
+      "title": "TODO: Translate \"session_plans.logistics.title\"",
+      "description": "TODO: Translate \"session_plans.logistics.description\"",
+      "files_title": "TODO: Translate \"session_plans.logistics.files_title\"",
+      "files": "TODO: Translate \"session_plans.logistics.files\"",
+      "update_cadence": {
+        "title": "TODO: Translate \"session_plans.logistics.update_cadence.title\"",
+        "description": "TODO: Translate \"session_plans.logistics.update_cadence.description\""
+      },
+      "accessibility": {
+        "title": "TODO: Translate \"session_plans.logistics.accessibility.title\"",
+        "description": "TODO: Translate \"session_plans.logistics.accessibility.description\""
+      }
+    },
+    "downloads": {
+      "title": "TODO: Translate \"session_plans.downloads.title\"",
+      "story_driven_pack": {
+        "title": "TODO: Translate \"session_plans.downloads.story_driven_pack.title\"",
+        "description": "TODO: Translate \"session_plans.downloads.story_driven_pack.description\"",
+        "button": "TODO: Translate \"session_plans.downloads.story_driven_pack.button\""
+      },
+      "quickstart_bundle": {
+        "title": "TODO: Translate \"session_plans.downloads.quickstart_bundle.title\"",
+        "description": "TODO: Translate \"session_plans.downloads.quickstart_bundle.description\"",
+        "button": "TODO: Translate \"session_plans.downloads.quickstart_bundle.button\""
+      },
+      "board_game_kit": {
+        "title": "TODO: Translate \"session_plans.downloads.board_game_kit.title\"",
+        "description": "TODO: Translate \"session_plans.downloads.board_game_kit.description\"",
+        "button": "TODO: Translate \"session_plans.downloads.board_game_kit.button\""
+      }
+    },
+    "submission": {
+      "title": "TODO: Translate \"session_plans.submission.title\"",
+      "description": "TODO: Translate \"session_plans.submission.description\"",
+      "button": "TODO: Translate \"session_plans.submission.button\""
+    }
+  },
+  "facilitation_clinics": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"facilitation_clinics.hero.eyebrow\"",
+      "title": "TODO: Translate \"facilitation_clinics.hero.title\"",
+      "subtitle": "TODO: Translate \"facilitation_clinics.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"facilitation_clinics.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"facilitation_clinics.hero.secondary_cta\""
+    },
+    "format": {
+      "eyebrow": "TODO: Translate \"facilitation_clinics.format.eyebrow\"",
+      "title": "TODO: Translate \"facilitation_clinics.format.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.format.description\""
+    },
+    "modules": "TODO: Translate \"facilitation_clinics.modules\"",
+    "runtime_label": "TODO: Translate \"facilitation_clinics.runtime_label\"",
+    "loading_clinics": "TODO: Translate \"facilitation_clinics.loading_clinics\"",
+    "streaming_access": {
+      "eyebrow": "TODO: Translate \"facilitation_clinics.streaming_access.eyebrow\"",
+      "title": "TODO: Translate \"facilitation_clinics.streaming_access.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.streaming_access.description\"",
+      "request_access": {
+        "title": "TODO: Translate \"facilitation_clinics.streaming_access.request_access.title\"",
+        "description": "TODO: Translate \"facilitation_clinics.streaming_access.request_access.description\"",
+        "button": "TODO: Translate \"facilitation_clinics.streaming_access.request_access.button\""
+      }
+    },
+    "discussion_guide": {
+      "title": "TODO: Translate \"facilitation_clinics.discussion_guide.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.discussion_guide.description\"",
+      "button": "TODO: Translate \"facilitation_clinics.discussion_guide.button\""
+    },
+    "certification_credits": {
+      "title": "TODO: Translate \"facilitation_clinics.certification_credits.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.certification_credits.description\"",
+      "credits": {
+        "hours_per_clinic": "TODO: Translate \"facilitation_clinics.certification_credits.credits.hours_per_clinic\"",
+        "digital_badge": "TODO: Translate \"facilitation_clinics.certification_credits.credits.digital_badge\"",
+        "counts_toward": "TODO: Translate \"facilitation_clinics.certification_credits.credits.counts_toward\""
+      }
+    },
+    "downloads": {
+      "title": "TODO: Translate \"facilitation_clinics.downloads.title\"",
+      "opening_rituals": {
+        "title": "TODO: Translate \"facilitation_clinics.downloads.opening_rituals.title\"",
+        "description": "TODO: Translate \"facilitation_clinics.downloads.opening_rituals.description\"",
+        "button": "TODO: Translate \"facilitation_clinics.downloads.opening_rituals.button\""
+      },
+      "safety_tools": {
+        "title": "TODO: Translate \"facilitation_clinics.downloads.safety_tools.title\"",
+        "description": "TODO: Translate \"facilitation_clinics.downloads.safety_tools.description\"",
+        "button": "TODO: Translate \"facilitation_clinics.downloads.safety_tools.button\""
+      },
+      "spotlight_scheduler": {
+        "title": "TODO: Translate \"facilitation_clinics.downloads.spotlight_scheduler.title\"",
+        "description": "TODO: Translate \"facilitation_clinics.downloads.spotlight_scheduler.description\"",
+        "button": "TODO: Translate \"facilitation_clinics.downloads.spotlight_scheduler.button\""
+      }
+    },
+    "accessibility": {
+      "title": "TODO: Translate \"facilitation_clinics.accessibility.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.accessibility.description\"",
+      "button": "TODO: Translate \"facilitation_clinics.accessibility.button\""
+    },
+    "access": {
+      "title": "TODO: Translate \"facilitation_clinics.access.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.access.description\"",
+      "cta_button": "TODO: Translate \"facilitation_clinics.access.cta_button\"",
+      "coaching_cta": "TODO: Translate \"facilitation_clinics.access.coaching_cta\""
+    },
+    "technical": {
+      "title": "TODO: Translate \"facilitation_clinics.technical.title\"",
+      "description": "TODO: Translate \"facilitation_clinics.technical.description\""
+    }
+  },
+  "game_master_pathway": {
+    "hero": {
+      "eyebrow": "TODO: Translate \"game_master_pathway.hero.eyebrow\"",
+      "title": "TODO: Translate \"game_master_pathway.hero.title\"",
+      "subtitle": "TODO: Translate \"game_master_pathway.hero.subtitle\"",
+      "cta_text": "TODO: Translate \"game_master_pathway.hero.cta_text\"",
+      "secondary_cta": "TODO: Translate \"game_master_pathway.hero.secondary_cta\""
+    },
+    "curriculum": {
+      "eyebrow": "TODO: Translate \"game_master_pathway.curriculum.eyebrow\"",
+      "title": "TODO: Translate \"game_master_pathway.curriculum.title\"",
+      "description": "TODO: Translate \"game_master_pathway.curriculum.description\"",
+      "recommended_pace": "TODO: Translate \"game_master_pathway.curriculum.recommended_pace\"",
+      "milestones": "TODO: Translate \"game_master_pathway.curriculum.milestones\""
+    },
+    "learning": {
+      "eyebrow": "TODO: Translate \"game_master_pathway.learning.eyebrow\"",
+      "title": "TODO: Translate \"game_master_pathway.learning.title\"",
+      "description": "TODO: Translate \"game_master_pathway.learning.description\"",
+      "weekly_rhythm": {
+        "title": "TODO: Translate \"game_master_pathway.learning.weekly_rhythm.title\"",
+        "schedule": "TODO: Translate \"game_master_pathway.learning.weekly_rhythm.schedule\""
+      },
+      "portfolio": {
+        "title": "TODO: Translate \"game_master_pathway.learning.portfolio.title\"",
+        "description": "TODO: Translate \"game_master_pathway.learning.portfolio.description\""
+      },
+      "alumni": {
+        "title": "TODO: Translate \"game_master_pathway.learning.alumni.title\"",
+        "description": "TODO: Translate \"game_master_pathway.learning.alumni.description\""
+      }
+    },
+    "resources": {
+      "title": "TODO: Translate \"game_master_pathway.resources.title\"",
+      "narrative_workbook": {
+        "title": "TODO: Translate \"game_master_pathway.resources.narrative_workbook.title\"",
+        "description": "TODO: Translate \"game_master_pathway.resources.narrative_workbook.description\"",
+        "button": "TODO: Translate \"game_master_pathway.resources.narrative_workbook.button\""
+      },
+      "safety_toolkit": {
+        "title": "TODO: Translate \"game_master_pathway.resources.safety_toolkit.title\"",
+        "description": "TODO: Translate \"game_master_pathway.resources.safety_toolkit.description\"",
+        "button": "TODO: Translate \"game_master_pathway.resources.safety_toolkit.button\""
+      },
+      "performance_guide": {
+        "title": "TODO: Translate \"game_master_pathway.resources.performance_guide.title\"",
+        "description": "TODO: Translate \"game_master_pathway.resources.performance_guide.description\"",
+        "button": "TODO: Translate \"game_master_pathway.resources.performance_guide.button\""
+      }
+    },
+    "enrollment": {
+      "eyebrow": "TODO: Translate \"game_master_pathway.enrollment.eyebrow\"",
+      "title": "TODO: Translate \"game_master_pathway.enrollment.title\"",
+      "cohorts": "TODO: Translate \"game_master_pathway.enrollment.cohorts\"",
+      "tuition": "TODO: Translate \"game_master_pathway.enrollment.tuition\"",
+      "cta_button": "TODO: Translate \"game_master_pathway.enrollment.cta_button\"",
+      "requirements": {
+        "title": "TODO: Translate \"game_master_pathway.enrollment.requirements.title\"",
+        "items": "TODO: Translate \"game_master_pathway.enrollment.requirements.items\""
+      },
+      "contact": {
+        "questions": "TODO: Translate \"game_master_pathway.enrollment.contact.questions\"",
+        "email": "TODO: Translate \"game_master_pathway.enrollment.contact.email\""
+      },
+      "graduate_benefits": "TODO: Translate \"game_master_pathway.enrollment.graduate_benefits\""
+    }
+  },
+  "community": {
+    "title": "TODO: Translate \"community.title\"",
+    "description": "TODO: Translate \"community.description\"",
+    "action_button": "TODO: Translate \"community.action_button\""
+  },
+  "loading": {
+    "phases": "TODO: Translate \"loading.phases\"",
+    "curriculum_tracks": "TODO: Translate \"loading.curriculum_tracks\"",
+    "widgets": "TODO: Translate \"loading.widgets\"",
+    "reporting_steps": "TODO: Translate \"loading.reporting_steps\"",
+    "support_resources": "TODO: Translate \"loading.support_resources\"",
+    "toolkit_phases": "TODO: Translate \"loading.toolkit_phases\""
+  }
+}

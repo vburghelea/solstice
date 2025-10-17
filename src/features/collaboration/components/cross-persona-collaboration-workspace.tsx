@@ -99,8 +99,8 @@ export function CrossPersonaCollaborationWorkspace(
       });
       if (!result.success || !result.data) {
         const message = result.success
-          ? "Failed to load snapshot"
-          : (result.errors[0]?.message ?? "Failed to load snapshot");
+          ? t("errors.load_snapshot_failed")
+          : (result.errors[0]?.message ?? t("errors.load_snapshot_failed"));
         throw new Error(message);
       }
       return result.data;

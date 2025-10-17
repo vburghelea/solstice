@@ -33,7 +33,18 @@
     "share": "Share",
     "copy": "Copy",
     "continue": "Continue",
-    "finish": "Finish"
+    "finish": "Finish",
+    "send": "Send",
+    "select": "Select",
+    "add_note": "Add note",
+    "sign_in": "Sign in",
+    "create_profile": "Create profile",
+    "sign_out": "Sign out",
+    "signing_out": "Signing out..."
+  },
+  "app": {
+    "title": "Roundup Games",
+    "description": "Tabletop and board game platform for players all over the world!"
   },
   "labels": {
     "email": "Email",
@@ -64,7 +75,36 @@
     "to": "To",
     "price": "Price",
     "quantity": "Quantity",
-    "total": "Total"
+    "total": "Total",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "full_name": "Full Name",
+    "username": "Username",
+    "confirm_password": "Confirm Password",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "bio": "Bio",
+    "address_line_1": "Address Line 1",
+    "address_line_2": "Address Line 2",
+    "zip_code": "ZIP/Postal Code",
+    "company": "Company",
+    "job_title": "Job Title",
+    "birth_date": "Birth Date",
+    "gender": "Gender",
+    "language": "Language",
+    "timezone": "Timezone",
+    "avatar": "Profile Picture",
+    "file": "File",
+    "url": "URL",
+    "link": "Link",
+    "tags": "Tags",
+    "task": "Task",
+    "status": "Status",
+    "owner": "Owner",
+    "due": "Due",
+    "focus": "Focus",
+    "notes": "Notes",
+    "all": "All"
   },
   "placeholders": {
     "email": "Enter your email address",
@@ -75,7 +115,14 @@
     "phone": "Enter your phone number",
     "address": "Enter your address",
     "website": "Enter website URL",
-    "message": "Type your message here..."
+    "message": "Type your message here...",
+    "confirm_password": "Confirm your password",
+    "current_password": "Enter your current password",
+    "new_password": "Enter your new password",
+    "username": "Choose a username",
+    "bio": "Tell us about yourself",
+    "title": "Enter a title",
+    "subject": "Enter a subject"
   },
   "validation": {
     "required": "This field is required",
@@ -83,6 +130,7 @@
     "invalid_phone": "Please enter a valid phone number",
     "password_too_short": "Password must be at least 8 characters",
     "passwords_dont_match": "Passwords do not match",
+    "reset_token_required": "Reset token is required",
     "file_too_large": "File is too large",
     "invalid_format": "Invalid format",
     "min_length": "Must be at least {{count}} characters",
@@ -95,7 +143,9 @@
     "password_required": "Password is required",
     "name_required": "Name is required",
     "confirm_password_required": "Please confirm your password",
-    "name_too_short": "Name must be at least 2 characters"
+    "name_too_short": "Name must be at least 2 characters",
+    "weak_password": "Password is too weak. Please include uppercase, lowercase, numbers, and special characters",
+    "email_already_exists": "An account with this email already exists"
   },
   "errors": {
     "network_error": "Network error. Please check your connection.",
@@ -106,11 +156,16 @@
     "timeout": "Request timeout",
     "connection_failed": "Connection failed",
     "unknown_error": "An unknown error occurred",
+    "unknown_user": "Unknown User",
     "validation_failed": "Validation failed",
     "load_failed": "Failed to load data",
+    "unable_to_load": "Unable to load",
     "save_failed": "Failed to save data",
     "delete_failed": "Failed to delete item",
-    "upload_failed": "Failed to upload file"
+    "upload_failed": "Failed to upload file",
+    "update_failed": "Failed to update item",
+    "create_failed": "Failed to create item",
+    "sign_out_failed": "We couldn't sign you out. Please try again."
   },
   "status": {
     "loading": "Loading...",
@@ -122,12 +177,15 @@
     "cancelled": "Cancelled",
     "active": "Active",
     "inactive": "Inactive",
+    "not_available": "N/A",
     "online": "Online",
     "offline": "Offline",
     "saved": "Saved",
     "updated": "Updated",
     "deleted": "Deleted",
-    "created": "Created"
+    "created": "Created",
+    "never": "Never",
+    "no_tasks_available": "No tasks available"
   },
   "messages": {
     "changes_saved": "Changes saved successfully",
@@ -149,5 +207,135 @@
     "show_less": "Show less",
     "expand": "Expand",
     "collapse": "Collapse"
+  },
+  "dividers": {
+    "or": "Or"
+  },
+  "default_values": {
+    "player_name": "Player"
+  },
+  "brand": {
+    "name": "Roundup Games",
+    "tagline": "At a table near you!",
+    "slogan": "At a table near you!"
+  },
+  "workspace": {
+    "label": "Workspace",
+    "tools": "Workspace tools",
+    "loading": "Loading workspace",
+    "preparing": "Preparing workspace experience...",
+    "navigation": {
+      "close": "Close navigation",
+      "open": "Open navigation",
+      "close_workspace": "Close workspace navigation",
+      "open_workspace": "Open workspace navigation"
+    }
+  },
+  "accessibility": {
+    "select_all_page": "Select all systems on this page",
+    "select_item": "Select {{name}}"
+  },
+  "account": {
+    "label": "Account",
+    "sections": {
+      "privacy": "Privacy",
+      "notifications": "Notifications"
+    }
+  },
+  "footer": {
+    "description": "Stories, campaigns, and community events curated for curious explorers. Start with a city, save your preferences, and we'll connect you when the right table opens up."
+  },
+  "location": {
+    "players_count": "{{count}} players",
+    "country_players": "{{country}} • {{count}} players"
+  },
+  "image": {
+    "cover_art_alt": "{{name}} cover art"
+  },
+  "showing_results": "Showing {{count}} {{itemType}}",
+  "clear_all": "Clear all",
+  "navigation": {
+    "home": "Home",
+    "events": "Events",
+    "find_games": "Find games",
+    "game_systems": "Game systems",
+    "teams": "Teams",
+    "close_navigation": "Close navigation",
+    "open_navigation": "Open navigation"
+  },
+  "footer": {
+    "plan_visit": "Plan your visit",
+    "stay_in_touch": "Stay in touch",
+    "event_calendar": "Event calendar",
+    "find_game_night": "Find a game night",
+    "browse_systems": "Browse systems",
+    "resources": "Resources",
+    "about_roundup": "About Roundup",
+    "contact_email": "hello@roundup.games",
+    "description": "Stories, campaigns, and community events curated for curious explorers. Start with a city, save your preferences, and we'll connect you when the right table opens up."
+  },
+  "hero": {
+    "complete_profile": "Complete your player profile to match with storytellers, venues, and schedules tailored to you.",
+    "save_cities": "Save cities",
+    "follow_storytellers": "Follow storytellers",
+    "book_quickly": "Book quickly"
+  },
+  "b2b_pipeline": {
+    "health": {
+      "on_track": "On track",
+      "needs_attention": "Needs attention",
+      "at_risk": "At risk"
+    },
+    "focus": {
+      "my_focus": "My focus",
+      "entire_pipeline": "Entire pipeline"
+    },
+    "highlight_labels": {
+      "renewal_at_risk": "Renewal at risk",
+      "escalation_active": "Escalation active",
+      "follow_up_overdue": "Follow-up overdue",
+      "follow_up_due_48h": "Follow-up due within 48h",
+      "momentum_check": "Momentum check"
+    }
+  },
+  "roles": {
+    "definitions": {
+      "visitor": {
+        "label": "Visitor",
+        "short_label": "Visit",
+        "description": "Preview public stories, events, and highlights curated for newcomers."
+      },
+      "player": {
+        "label": "Player",
+        "short_label": "Play",
+        "description": "Manage sessions, invitations, and community updates tailored to you.",
+        "restriction_reason": "Sign in to access the player workspace."
+      },
+      "ops": {
+        "label": "Event Operations",
+        "short_label": "Ops",
+        "description": "Coordinate registrations, staffing, and live event workflows in one view.",
+        "restriction_reason": "Operations tools unlock when you're assigned an Event Admin role."
+      },
+      "gm": {
+        "label": "Game Master",
+        "short_label": "GM",
+        "description": "Plan campaigns, curate assets, and gather feedback from your tables.",
+        "restriction_reason": "Request a Game Master assignment to unlock campaign planning tools."
+      },
+      "admin": {
+        "label": "Platform Admin",
+        "short_label": "Admin",
+        "description": "Govern roles, compliance, and system health across the Roundup platform.",
+        "restriction_reason": "Platform administration is limited to authorized compliance stewards."
+      }
+    },
+    "errors": {
+      "persona_not_found": "We couldn't find that persona option.",
+      "persona_locked": "This persona is locked until additional permissions are granted.",
+      "unable_to_switch_persona": "Unable to switch persona right now.",
+      "failed_to_persist_persona_preference": "Failed to persist persona preference",
+      "unable_to_read_persona_preference": "Unable to read persona preference"
+    }
   }
 }

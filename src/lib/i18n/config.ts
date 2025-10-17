@@ -28,6 +28,9 @@ export const i18nConfig = {
     "teams", // Team creation and management
     "forms", // Form validation and input labels
     "errors", // Error messages and error pages
+    "home", // Home page and landing content
+    "about", // About page and company information
+    "resources", // Resources page and toolkits
   ] as const,
 
   // i18next configuration

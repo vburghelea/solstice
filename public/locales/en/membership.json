@@ -1,1 +1,100 @@
-{}
+{
+  "page": {
+    "title": "Membership",
+    "subtitle": "Join Roundup Games and access exclusive member benefits"
+  },
+  "current_status": {
+    "title": "Current Status",
+    "active_membership": "Active Membership",
+    "no_active_membership": "No Active Membership",
+    "join_today_message": "Join today to participate in events and access member benefits",
+    "type": "Type: {{type}}",
+    "expires": "Expires: {{date}}",
+    "days_remaining": "Days Remaining: {{count}}"
+  },
+  "available_plans": {
+    "title": "Available Memberships",
+    "price": "${{price}}",
+    "current_plan": "Current Plan",
+    "purchase": "Purchase",
+    "renew": "Renew",
+    "not_available": "Not Available"
+  },
+  "buttons": {
+    "purchase": "Purchase",
+    "renew": "Renew",
+    "current_plan": "Current Plan",
+    "not_available": "Not Available",
+    "view_options": "View Options"
+  },
+  "mobile_cta": {
+    "choose_membership": "Choose a membership to continue",
+    "view_options": "View Options"
+  },
+  "status": {
+    "processing_payment": "Processing your payment..."
+  },
+  "errors": {
+    "failed_to_fetch_membership_status": "Failed to fetch membership status",
+    "failed_to_fetch_membership_type": "Failed to fetch membership type",
+    "failed_to_fetch_membership_types": "Failed to fetch membership types",
+    "failed_to_create_checkout_session": "Failed to create checkout session",
+    "missing_membership_type_for_checkout": "Missing membership type for checkout session",
+    "missing_checkout_information": "Missing checkout information. Please contact support.",
+    "failed_to_confirm_membership": "Failed to confirm membership",
+    "failed_to_confirm_membership_purchase": "Failed to confirm membership purchase",
+    "error": "Error",
+    "payment": {
+      "canceled": "Payment was canceled",
+      "verification_failed": "Payment verification failed",
+      "processing_error": "An error occurred while processing your payment",
+      "failed": "Payment failed"
+    }
+  },
+  "success": {
+    "membership_purchased_successfully": "Membership purchased successfully!"
+  },
+  "loading": {
+    "title": "Loading..."
+  },
+  "plan_features": {
+    "title": "Available Memberships",
+    "price_display": "${{price}}"
+  },
+  "admin": {
+    "report": {
+      "title": "Memberships Report",
+      "description": "View and export all membership data across the platform",
+      "columns": {
+        "user": "User",
+        "email": "Email",
+        "membership_type": "Membership Type",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "status": "Status",
+        "price": "Price",
+        "payment_id": "Payment ID",
+        "created_at": "Created At"
+      },
+      "filter": {
+        "label": "Status",
+        "options": {
+          "all": "All",
+          "active": "Active",
+          "expired": "Expired",
+          "canceled": "Canceled"
+        }
+      },
+      "actions": {
+        "export_csv": "Export CSV"
+      },
+      "loading": "Loading memberships...",
+      "errors": {
+        "failed_to_load": "Failed to load memberships",
+        "access_denied": "Access Denied",
+        "access_denied_description": "You do not have permission to view this report. Admin access is required.",
+        "error_loading_report": "Error Loading Report"
+      }
+    }
+  }
+}

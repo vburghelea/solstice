@@ -4,26 +4,75 @@
   "sections": {
     "account": {
       "title": "Account Settings",
-      "subtitle": "Manage your profile and account information",
+      "subtitle": "Manage your account security, email preferences, sessions, and connected services",
+      "status": {
+        "title": "Account status",
+        "subtitle": "Overview of your primary account details"
+      },
+      "connected_accounts": {
+        "title": "Connected accounts",
+        "subtitle": "Manage social logins and linked services"
+      },
       "buttons": {
         "save_changes": "Save changes",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "update_password": "Update password",
+        "connect": "Connect",
+        "disconnect": "Disconnect"
       },
       "messages": {
         "saved": "Account settings saved successfully",
         "error": "Failed to save account settings"
+      },
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "password": "Password"
+      },
+      "status_labels": {
+        "verified": "Verified",
+        "not_verified": "Not verified",
+        "set": "Set",
+        "not_configured": "Not configured",
+        "required": "Required",
+        "connected": "Connected",
+        "not_connected": "Not connected"
+      },
+      "providers": {
+        "email_password": "Email & password",
+        "signin_text": "You can sign in with your email and password.",
+        "setup_text": "Set a password to allow email-based sign in.",
+        "connected": {
+          "signin_text": "You can sign in using this provider.",
+          "setup_text": "Connect this provider to sign in without a password."
+        }
       }
     },
     "security": {
       "title": "Security Settings",
       "subtitle": "Manage your password and security preferences",
       "password": {
+        "title": "Change Password",
+        "subtitle": "Update your password to keep your account secure.",
         "current_password": "Current password",
         "new_password": "New password",
         "confirm_new_password": "Confirm new password",
-        "button": "Change password",
-        "success": "Password changed successfully",
-        "error": "Failed to change password"
+        "button": "Update password",
+        "button_loading": "Updating...",
+        "strength_label": "Password strength:",
+        "sign_out_devices": "Sign out of other devices",
+        "sign_out_devices_description": "End active sessions on other browsers and devices",
+        "placeholders": {
+          "current_password": "Enter your current password",
+          "new_password": "Create a strong password",
+          "confirm_password": "Re-enter your new password"
+        },
+        "success": "Password updated",
+        "error": "Failed to update password",
+        "validation": {
+          "mismatch": "New password and confirmation do not match",
+          "requirements_not_met": "Password does not meet requirements"
+        }
       },
       "two_factor": {
         "title": "Two-Factor Authentication",
@@ -34,30 +83,68 @@
       }
     },
     "notifications": {
-      "title": "Notifications",
-      "subtitle": "Manage your notification preferences",
+      "title": "Email Preferences",
+      "subtitle": "Choose which non-critical updates you receive in your inbox.",
       "email_notifications": "Email Notifications",
       "push_notifications": "Push Notifications",
       "preferences": {
-        "marketing": "Marketing emails",
-        "updates": "Product updates",
-        "security": "Security alerts",
-        "messages": "Message notifications"
+        "game_reminders": {
+          "label": "Game reminders",
+          "description": "Reminders 24h and 2h before games you're attending."
+        },
+        "game_updates": {
+          "label": "Game updates",
+          "description": "Emails when a game you're attending is scheduled, updated, or canceled."
+        },
+        "campaign_digests": {
+          "label": "Campaign weekly digest",
+          "description": "Weekly summary of your upcoming campaign sessions."
+        },
+        "campaign_updates": {
+          "label": "Campaign session updates",
+          "description": "Emails when campaign sessions are scheduled, updated, or canceled."
+        },
+        "review_reminders": {
+          "label": "Review reminders",
+          "description": "Reminders to review your GM after games."
+        },
+        "social_notifications": {
+          "label": "Social notifications",
+          "description": "Emails for follows, requests, and other social activity."
+        }
       },
       "buttons": {
         "save": "Save preferences",
+        "saving": "Saving...",
         "reset": "Reset to default"
+      },
+      "errors": {
+        "load_failed": "Unable to load email preferences",
+        "save_failed": "Unable to save preferences",
+        "refresh_page": "Please refresh the page and try again."
       }
     },
     "sessions": {
       "title": "Active Sessions",
-      "subtitle": "Manage your active sessions and devices",
+      "subtitle": "Review browsers and devices that are currently signed in.",
       "current_session": "Current session",
       "device_info": "Device information",
       "last_active": "Last active",
+      "table_headers": {
+        "device": "Device",
+        "location": "Location",
+        "last_active": "Last active",
+        "actions": "Actions"
+      },
+      "session_id": "Session ID:",
+      "unknown_device": "Unknown device",
+      "unknown_location": "Unknown",
+      "this_device": "This device",
+      "current": "Current",
+      "only_current_session": "Only your current session is active.",
       "actions": {
         "revoke": "Revoke",
-        "revoke_all": "Revoke all other sessions"
+        "revoke_all": "Sign out of all other sessions"
       },
       "device_types": {
         "mobile_device": "Mobile device",
@@ -70,6 +157,15 @@
         "linux": "Linux",
         "ios": "iOS",
         "android": "Android"
+      },
+      "status": {
+        "refreshing": "Refreshing session data...",
+        "refreshing_preferences": "Refreshing preferences...",
+        "refreshing_account": "Refreshing account info..."
+      },
+      "errors": {
+        "load_failed": "Unable to load sessions",
+        "refresh_page": "Please refresh the page and try again."
       },
       "confirmation": {
         "revoke_title": "Revoke Session",
@@ -97,12 +193,27 @@
     "save_failed": "Failed to save settings",
     "invalid_password": "Current password is incorrect",
     "password_mismatch": "New passwords do not match",
-    "session_revoke_failed": "Failed to revoke session"
+    "session_revoke_failed": "Failed to revoke session",
+    "load_account": "Unable to load account",
+    "load_sessions": "Unable to load sessions",
+    "load_preferences": "Unable to load email preferences",
+    "save_preferences": "Unable to save preferences",
+    "unlink_account": "Failed to unlink account",
+    "connect_account": "Failed to connect account",
+    "update_password": "Failed to update password. Please try again.",
+    "refresh_page": "Please refresh the page and try again.",
+    "unable_to_update_password": "Unable to update password"
   },
   "success": {
     "settings_saved": "Settings saved successfully",
     "password_changed": "Password changed successfully",
-    "session_revoked": "Session revoked successfully",
-    "all_sessions_revoked": "All other sessions revoked successfully"
+    "password_updated": "Password updated",
+    "session_revoked": "Session revoked",
+    "all_sessions_revoked": "Other sessions revoked",
+    "account_disconnected": "Account disconnected",
+    "email_preferences_updated": "Email preferences updated"
+  },
+  "alerts": {
+    "redirecting_to_provider": "Redirecting to provider..."
   }
 }

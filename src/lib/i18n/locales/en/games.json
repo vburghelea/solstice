@@ -14,12 +14,18 @@
     "update_game": "Update Game",
     "submit_review": "Submit Review"
   },
+  "external_refs": {
+    "startplaying": "StartPlaying",
+    "boardgamegeek": "BoardGameGeek",
+    "wikipedia": "Wikipedia"
+  },
   "labels": {
     "game_system": "Game System",
     "language": "Language",
     "players": "Players",
     "visibility": "Visibility",
     "participants": "Participants",
+    "pending_participant": "Pending participant",
     "date_time": "Date and Time",
     "expected_duration": "Expected Duration (minutes)",
     "price": "Price (EUR) (optional)",
@@ -69,7 +75,8 @@
     "unexpected_error": "An unexpected error occurred.",
     "failed_to_invite_participant": "Failed to invite participant",
     "failed_to_revoke_invitation": "Failed to revoke invitation",
-    "failed_to_submit_review": "Failed to submit review"
+    "failed_to_submit_review": "Failed to submit review",
+    "search_failed": "Failed to search game systems"
   },
   "descriptions": {
     "session_overview": "Share the essentials players need before they RSVP.",
@@ -139,5 +146,201 @@
     "choose_max_three": "Choose up to 3 of 10",
     "submitting": "Submitting...",
     "placeholder_comment": "What stood out in this session?"
+  },
+  "participants_list": {
+    "participants_title": "Participants ({{count}})",
+    "pending_applications_title": "Pending Applications ({{count}})",
+    "banned_title": "Banned from the Game ({{count}})",
+    "no_participants": "No participants yet.",
+    "owner_label": "(owner)",
+    "role_status": "({{role}} - {{status}})",
+    "buttons": {
+      "remove": "Remove",
+      "removing": "Removing...",
+      "approve": "Approve",
+      "approving": "Approving...",
+      "reject": "Reject",
+      "rejecting": "Rejecting...",
+      "allow": "Allow",
+      "allowing": "Allowing..."
+    },
+    "success_messages": {
+      "participant_removed": "Participant removed successfully!",
+      "ban_removed": "Participant ban removed successfully!",
+      "application_updated": "Application status updated successfully!"
+    },
+    "error_messages": {
+      "failed_to_remove": "Failed to remove participant: {{error}}",
+      "failed_to_remove_ban": "Failed to remove participant ban: {{error}}",
+      "failed_to_update_application": "Failed to update application status: {{error}}"
+    }
+  },
+  "list_item": {
+    "free": "Free",
+    "original_system": "Original system",
+    "campaign_part": "Part of an ongoing campaign",
+    "hosted_by": "Hosted by {{name}}",
+    "hosted_by_community": "Hosted by a community GM",
+    "view_details": "View details",
+    "joined_count": "{{count}} joined",
+    "session_duration": "{{duration}} session",
+    "duration_formats": {
+      "hours_minutes": "~{{hours}}h {{minutes}}m adventure",
+      "hours_only": "~{{hours}}h adventure",
+      "minutes_only": "~{{minutes}}m adventure"
+    }
+  },
+  "quick_filters": {
+    "in_city": "In {{city}}",
+    "my_favorite_systems": "My favorite systems",
+    "in_my_language": "In my language",
+    "my_themes": "My themes"
+  },
+  "search": {
+    "title": "All game sessions",
+    "subtitle": "Plan your next tabletop adventure with public games hosted near you.",
+    "session": "session",
+    "sessions": "sessions",
+    "with_quick_filters": "with your quick filters",
+    "no_games": {
+      "title": "No public games found right now.",
+      "subtitle": "Check back later or create an account to host the first session in your area.",
+      "become_host": "Become a host"
+    },
+    "no_filtered_sessions": {
+      "title": "No sessions match your quick filters yet.",
+      "subtitle": "Try adjusting or clearing filters to browse the full catalogue."
+    }
+  },
+  "game_detail": {
+    "unavailable": {
+      "title": "Session unavailable",
+      "message": "The game you were looking for is no longer accepting players or may have been removed.",
+      "browse_games": "Browse all games",
+      "visit_homepage": "Visit homepage"
+    },
+    "badges": {
+      "public_session": "Public session",
+      "ongoing_campaign": "Ongoing campaign"
+    },
+    "hosted_by": "Hosted by",
+    "community_gm": "Community GM",
+    "community_rating": "Community rating: {{rating}}/5",
+    "new_to_community": "New to the Roundup Games community",
+    "request_seat": "Request a seat",
+    "applying": "Applying...",
+    "sign_in_to_apply": "Sign in to apply",
+    "sections": {
+      "table_briefing": {
+        "eyebrow": "Table briefing",
+        "title": "About this session",
+        "subtitle": "Get a feel for the table vibe before you request a seat.",
+        "no_details": "The game organizer hasn't shared additional details yet.",
+        "ongoing_campaign": "Part of an ongoing campaign",
+        "one_shot": "One-shot friendly for curious players"
+      },
+      "session_logistics": {
+        "eyebrow": "Session logistics",
+        "title": "Arrival checklist",
+        "subtitle": "Everything you need to know before joining the table.",
+        "date_time": "Date & time",
+        "language": "Language",
+        "price": "Price",
+        "players": "Players",
+        "seats_available": "Seats available",
+        "seats_open": "{{count}} open",
+        "contact_gm": "Contact GM",
+        "duration": "Duration",
+        "minutes": "{{count}} min",
+        "gm_will_confirm": "GM will confirm",
+        "meeting_details_notice": "Precise meeting details are shared once your seat is confirmed."
+      },
+      "venue_details": {
+        "eyebrow": "Where we're meeting",
+        "title": "Venue details",
+        "subtitle": "We share exact instructions with approved players."
+      },
+      "art_inspiration": {
+        "eyebrow": "Art & inspiration",
+        "title": "Visual mood board",
+        "subtitle": "Approved imagery curated for {{systemName}}.",
+        "this_system": "this system",
+        "game_system": "Game system",
+        "artwork_alt": "{{systemName}} artwork",
+        "licensed": "Licensed: {{license}}",
+        "view_details": "View details"
+      },
+      "safety_tools": {
+        "eyebrow": "Safety tools",
+        "title": "Table expectations",
+        "subtitle": "Tools and boundaries shared by the game organizer."
+      },
+      "system_spotlight": {
+        "eyebrow": "System spotlight",
+        "title": "About {{systemName}}",
+        "subtitle": "Pulled from the Roundup Games system library.",
+        "show_details": "Show details",
+        "hide_details": "Hide details",
+        "categories": "Categories",
+        "mechanics": "Mechanics",
+        "external_references": "External references",
+        "no_summary": "We're still gathering lore for this system—check back soon.",
+        "explore_full_profile": "Explore the full system profile &raquo;"
+      },
+      "host_snapshot": {
+        "eyebrow": "Host snapshot",
+        "title": "Game organizer",
+        "subtitle": "Meet your storyteller before you arrive.",
+        "organizer_details_soon": "We'll share the organizer's details once the schedule is confirmed."
+      },
+      "system_facts": {
+        "eyebrow": "System quick facts",
+        "title": "Ruleset overview",
+        "players": "Players",
+        "optimal_table": "Optimal table",
+        "average_session": "Average session",
+        "first_published": "First published",
+        "age_rating": "Age rating",
+        "age_rating_tooltip": "Recommended minimum age based on content themes and mechanics.",
+        "complexity": "Complexity",
+        "players_suffix": "{{count}} players"
+      },
+      "reserve_seat": {
+        "eyebrow": "Ready to join?",
+        "title": "Reserve your seat",
+        "cost_per_player": "Cost per player:",
+        "applications_closed": "Applications for this session are currently closed.",
+        "apply_to_join": "Apply to join"
+      }
+    }
+  },
+  "my_games": {
+    "title": "My Games",
+    "subtitle": "Manage your game sessions",
+    "filter_by_status": "Filter by status",
+    "filter_by_role": "Filter by role",
+    "create_new_game": "Create New Game",
+    "no_games_title": "No games yet",
+    "no_games_subtitle": "Create your first game session to get started",
+    "pagination": {
+      "page_info": "Page {{current}} of {{total}} • {{count}} total"
+    },
+    "status_labels": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "canceled": "Canceled"
+    },
+    "role_labels": {
+      "owner": "Organizer",
+      "player": "Participant",
+      "invited": "Invitee",
+      "requested": "Requested"
+    },
+    "errors": {
+      "load_failed": "Failed to load games.",
+      "update_failed": "Failed to update status",
+      "unexpected_error": "An unexpected error occurred",
+      "status_updated": "Game status updated"
+    }
   }
 }

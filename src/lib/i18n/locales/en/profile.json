@@ -1,4 +1,8 @@
 {
+  "onboarding": {
+    "title": "Complete Your Player Profile",
+    "description": "Provide these details to finish onboarding and unlock the player workspace."
+  },
   "basic_information": {
     "title": "Basic Information",
     "description": "Your personal details and contact information"
@@ -45,7 +49,8 @@
     "identity_tags": "Identity Tags",
     "preferred_game_themes": "Preferred Game Themes",
     "favorite_systems": "Favorite Systems",
-    "avoided_systems": "Avoided Systems"
+    "avoided_systems": "Avoided Systems",
+    "time": "Time"
   },
   "placeholders": {
     "profile_name": "choose a unique username",
@@ -111,7 +116,9 @@
     "allow_team_captains_invitations": "Allow team captains to send me invitations",
     "only_allow_invites_from_connections": "Only allow invites from connections",
     "allow_follows": "Allow other users to follow you",
-    "allow_others_to_follow": "Allow others to follow me"
+    "allow_others_to_follow": "Allow others to follow me",
+    "show_email_to_team_members": "Show my email address to team members",
+    "show_phone_to_team_members": "Show my phone number to team members"
   },
   "status": {
     "loading_profile": "Loading profile...",
@@ -173,6 +180,12 @@
     "game_themes": "Add game themes you prefer",
     "experience_level": "Select your experience level"
   },
+  "hero_section": {
+    "complete_profile_prompt": "Complete your player profile to match with storytellers, venues, and schedules tailored to you.",
+    "save_cities": "Save cities",
+    "follow_storytellers": "Follow storytellers",
+    "book_quickly": "Book quickly"
+  },
   "gender_options": {
     "male": "Male",
     "female": "Female",
@@ -214,5 +227,121 @@
     "not_specified": "Not specified",
     "yes": "Yes",
     "no": "No"
+  },
+  "game_preferences_step": {
+    "favorite_systems_title": "Favorite Game Systems",
+    "favorite_systems_placeholder": "Search and add favorite game systems...",
+    "avoid_systems_title": "Game Systems to Avoid",
+    "avoid_systems_placeholder": "Search and add game systems to avoid..."
+  },
+  "complete_profile_form": {
+    "steps": {
+      "personal_information": {
+        "title": "Personal Information",
+        "description": "Basic information about you"
+      },
+      "additional_information": {
+        "title": "Additional Information",
+        "description": "More details about your gaming preferences and experience"
+      },
+      "privacy_settings": {
+        "title": "Privacy Settings",
+        "description": "Control what information is visible to others"
+      },
+      "game_preferences": {
+        "title": "Game Preferences",
+        "description": "Select your favorite and least favorite game systems"
+      }
+    },
+    "loading_profile": "Loading profile...",
+    "failed_to_load_profile": "Failed to load profile. Please try again.",
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "complete_profile": "Complete Profile",
+      "completing_profile": "Completing Profile..."
+    },
+    "fields": {
+      "profile_name": {
+        "label": "Profile Name",
+        "placeholder": "choose a unique username",
+        "description": "This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
+      },
+      "gender": {
+        "label": "Gender (optional)",
+        "placeholder": "Select gender"
+      },
+      "pronouns": {
+        "label": "Pronouns (optional)",
+        "placeholder": "e.g., they/them, she/her, he/him"
+      },
+      "phone": {
+        "label": "Phone Number (optional)",
+        "placeholder": "+49 1512 3456789"
+      },
+      "city": {
+        "label": "City (optional)",
+        "placeholder": "Berlin"
+      },
+      "country": {
+        "label": "Country (optional)",
+        "placeholder": "Search for a country"
+      },
+      "languages": {
+        "label": "Languages (optional)",
+        "placeholder": "Add languages you speak"
+      },
+      "identity_tags": {
+        "label": "Identity Tags (optional)",
+        "placeholder": "Add identity tags that represent you"
+      },
+      "preferred_game_themes": {
+        "label": "Preferred Game Themes (optional)",
+        "placeholder": "Add game themes you prefer"
+      },
+      "experience_level": {
+        "label": "Overall Experience Level (optional)",
+        "placeholder": "Select your experience level"
+      },
+      "calendar_availability": {
+        "label": "Calendar Availability (optional)",
+        "description": "Click and drag to select your available time slots each week."
+      }
+    },
+    "privacy_settings_intro": "Choose what information other members can see about you.",
+    "privacy_checkboxes": {
+      "show_email_to_team_members": "Show my email address to team members",
+      "show_phone_to_team_members": "Show my phone number to team members",
+      "show_location_to_others": "Show my location (city/country) to others",
+      "show_languages_to_others": "Show my languages to others",
+      "show_game_preferences_to_others": "Show my game preferences to others",
+      "allow_team_invitations": "Allow team captains to send me invitations",
+      "only_allow_invites_from_connections": "Only allow invites from connections",
+      "allow_follows": "Allow others to follow me"
+    },
+    "errors": {
+      "failed_to_save_profile": "Failed to save profile",
+      "unable_to_verify_profile_name": "Unable to verify profile name. Please try again.",
+      "profile_name_taken": "That profile name is already taken",
+      "failed_to_reserve_profile_name": "Failed to reserve profile name",
+      "unexpected_error": "An unexpected error occurred. Please try again."
+    }
+  },
+  "avatar_upload": {
+    "buttons": {
+      "upload_avatar": "Upload avatar",
+      "use_provider_avatar": "Use provider avatar",
+      "processing": "Processing..."
+    },
+    "messages": {
+      "avatar_updated": "Avatar updated",
+      "failed_to_upload_avatar": "Failed to upload avatar",
+      "reverted_to_provider_avatar": "Reverted to provider avatar",
+      "failed_to_remove_avatar": "Failed to remove avatar",
+      "could_not_process_image": "Could not process image"
+    },
+    "errors": {
+      "canvas_not_supported": "Canvas not supported"
+    }
   }
 }

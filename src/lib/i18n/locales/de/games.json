@@ -1,0 +1,346 @@
+{
+  "buttons": {
+    "view_game": "TODO: Translate \"buttons.view_game\"",
+    "mark_completed": "TODO: Translate \"buttons.mark_completed\"",
+    "cancel_session": "TODO: Translate \"buttons.cancel_session\"",
+    "revoke": "TODO: Translate \"buttons.revoke\"",
+    "accept": "TODO: Translate \"buttons.accept\"",
+    "reject": "TODO: Translate \"buttons.reject\"",
+    "accepting": "TODO: Translate \"buttons.accepting\"",
+    "rejecting": "TODO: Translate \"buttons.rejecting\"",
+    "invite": "TODO: Translate \"buttons.invite\"",
+    "cancel": "TODO: Translate \"buttons.cancel\"",
+    "create_game": "TODO: Translate \"buttons.create_game\"",
+    "update_game": "TODO: Translate \"buttons.update_game\"",
+    "submit_review": "TODO: Translate \"buttons.submit_review\""
+  },
+  "external_refs": {
+    "startplaying": "TODO: Translate \"external_refs.startplaying\"",
+    "boardgamegeek": "TODO: Translate \"external_refs.boardgamegeek\"",
+    "wikipedia": "TODO: Translate \"external_refs.wikipedia\""
+  },
+  "labels": {
+    "game_system": "TODO: Translate \"labels.game_system\"",
+    "language": "TODO: Translate \"labels.language\"",
+    "players": "TODO: Translate \"labels.players\"",
+    "visibility": "TODO: Translate \"labels.visibility\"",
+    "participants": "TODO: Translate \"labels.participants\"",
+    "pending_participant": "TODO: Translate \"labels.pending_participant\"",
+    "date_time": "TODO: Translate \"labels.date_time\"",
+    "expected_duration": "TODO: Translate \"labels.expected_duration\"",
+    "price": "TODO: Translate \"labels.price\"",
+    "game_session_name": "TODO: Translate \"labels.game_session_name\"",
+    "description": "TODO: Translate \"labels.description\"",
+    "game_system_used": "TODO: Translate \"labels.game_system_used\"",
+    "address": "TODO: Translate \"labels.address\"",
+    "minimum_players": "TODO: Translate \"labels.minimum_players\"",
+    "maximum_players": "TODO: Translate \"labels.maximum_players\"",
+    "search_users": "TODO: Translate \"labels.search_users\"",
+    "invite_by_email": "TODO: Translate \"labels.invite_by_email\"",
+    "pending_invitations": "TODO: Translate \"labels.pending_invitations\"",
+    "safety_tool": "TODO: Translate \"labels.safety_tool\"",
+    "safety_tool_details": "TODO: Translate \"labels.safety_tool_details\"",
+    "player_boundaries_consent": "TODO: Translate \"labels.player_boundaries_consent\""
+  },
+  "placeholders": {
+    "game_session_name": "TODO: Translate \"placeholders.game_session_name\"",
+    "search_and_select_game_system": "TODO: Translate \"placeholders.search_and_select_game_system\"",
+    "select_language": "TODO: Translate \"placeholders.select_language\"",
+    "select_visibility": "TODO: Translate \"placeholders.select_visibility\"",
+    "select_safety_tool": "TODO: Translate \"placeholders.select_safety_tool\"",
+    "safety_tool_details": "TODO: Translate \"placeholders.safety_tool_details\"",
+    "player_boundaries_consent": "TODO: Translate \"placeholders.player_boundaries_consent\"",
+    "search_users": "TODO: Translate \"placeholders.search_users\"",
+    "enter_name": "TODO: Translate \"placeholders.enter_name\"",
+    "enter_email": "TODO: Translate \"placeholders.enter_email\""
+  },
+  "status": {
+    "connections_teammates": "TODO: Translate \"status.connections_teammates\"",
+    "unknown_user": "TODO: Translate \"status.unknown_user\"",
+    "no_pending_invitations": "TODO: Translate \"status.no_pending_invitations\"",
+    "no_games_found": "TODO: Translate \"status.no_games_found\"",
+    "searching": "TODO: Translate \"status.searching\"",
+    "no_users_found": "TODO: Translate \"status.no_users_found\""
+  },
+  "messages": {
+    "invitation_rejected_success": "TODO: Translate \"messages.invitation_rejected_success\"",
+    "invitation_response_recorded": "TODO: Translate \"messages.invitation_response_recorded\"",
+    "participant_invited_success": "TODO: Translate \"messages.participant_invited_success\"",
+    "invitation_revoked_success": "TODO: Translate \"messages.invitation_revoked_success\"",
+    "review_submitted_success": "TODO: Translate \"messages.review_submitted_success\""
+  },
+  "errors": {
+    "failed_to_reject_invitation": "TODO: Translate \"errors.failed_to_reject_invitation\"",
+    "failed_to_respond_invitation": "TODO: Translate \"errors.failed_to_respond_invitation\"",
+    "unexpected_error": "TODO: Translate \"errors.unexpected_error\"",
+    "failed_to_invite_participant": "TODO: Translate \"errors.failed_to_invite_participant\"",
+    "failed_to_revoke_invitation": "TODO: Translate \"errors.failed_to_revoke_invitation\"",
+    "failed_to_submit_review": "TODO: Translate \"errors.failed_to_submit_review\"",
+    "search_failed": "TODO: Translate \"errors.search_failed\""
+  },
+  "descriptions": {
+    "session_overview": "TODO: Translate \"descriptions.session_overview\"",
+    "participant_requirements": "TODO: Translate \"descriptions.participant_requirements\"",
+    "location": "TODO: Translate \"descriptions.location\"",
+    "safety_table_culture": "TODO: Translate \"descriptions.safety_table_culture\"",
+    "manage_invitations": "TODO: Translate \"descriptions.manage_invitations\"",
+    "invite_participants": "TODO: Translate \"descriptions.invite_participants\"",
+    "game_invitation": "TODO: Translate \"descriptions.game_invitation\""
+  },
+  "form_sections": {
+    "session_overview": "TODO: Translate \"form_sections.session_overview\"",
+    "participant_requirements": "TODO: Translate \"form_sections.participant_requirements\"",
+    "location": "TODO: Translate \"form_sections.location\"",
+    "safety_table_culture": "TODO: Translate \"form_sections.safety_table_culture\""
+  },
+  "visibility_options": {
+    "description": "TODO: Translate \"visibility_options.description\""
+  },
+  "safety_options": {
+    "no_alcohol": "TODO: Translate \"safety_options.no_alcohol\"",
+    "safe_word_required": "TODO: Translate \"safety_options.safe_word_required\"",
+    "encourage_open_communication": "TODO: Translate \"safety_options.encourage_open_communication\""
+  },
+  "confirmation": {
+    "cancel_session": "TODO: Translate \"confirmation.cancel_session\""
+  },
+  "invitation_status": {
+    "invited": "TODO: Translate \"invitation_status.invited\""
+  },
+  "languages": {
+    "english": "TODO: Translate \"languages.english\"",
+    "chinese": "TODO: Translate \"languages.chinese\"",
+    "hindi": "TODO: Translate \"languages.hindi\"",
+    "spanish": "TODO: Translate \"languages.spanish\"",
+    "french": "TODO: Translate \"languages.french\"",
+    "arabic": "TODO: Translate \"languages.arabic\"",
+    "bengali": "TODO: Translate \"languages.bengali\"",
+    "russian": "TODO: Translate \"languages.russian\""
+  },
+  "validation_errors": {
+    "game_session_name_required": "TODO: Translate \"validation_errors.game_session_name_required\"",
+    "description_required": "TODO: Translate \"validation_errors.description_required\"",
+    "game_system_required": "TODO: Translate \"validation_errors.game_system_required\"",
+    "duration_required": "TODO: Translate \"validation_errors.duration_required\"",
+    "price_optional": "TODO: Translate \"validation_errors.price_optional\"",
+    "language_required": "TODO: Translate \"validation_errors.language_required\"",
+    "visibility_required": "TODO: Translate \"validation_errors.visibility_required\"",
+    "min_players_required": "TODO: Translate \"validation_errors.min_players_required\"",
+    "max_players_required": "TODO: Translate \"validation_errors.max_players_required\"",
+    "address_required": "TODO: Translate \"validation_errors.address_required\""
+  },
+  "titles": {
+    "invite_participants": "TODO: Translate \"titles.invite_participants\"",
+    "manage_invitations": "TODO: Translate \"titles.manage_invitations\"",
+    "game_invitation": "TODO: Translate \"titles.game_invitation\"",
+    "review_gm": "TODO: Translate \"titles.review_gm\""
+  },
+  "combobox": {
+    "empty_message": "TODO: Translate \"combobox.empty_message\"",
+    "no_results_message": "TODO: Translate \"combobox.no_results_message\""
+  },
+  "review_labels": {
+    "rate_gm": "TODO: Translate \"review_labels.rate_gm\"",
+    "select_strengths": "TODO: Translate \"review_labels.select_strengths\"",
+    "comments_optional": "TODO: Translate \"review_labels.comments_optional\"",
+    "choose_max_three": "TODO: Translate \"review_labels.choose_max_three\"",
+    "submitting": "TODO: Translate \"review_labels.submitting\"",
+    "placeholder_comment": "TODO: Translate \"review_labels.placeholder_comment\""
+  },
+  "participants_list": {
+    "participants_title": "TODO: Translate \"participants_list.participants_title\"",
+    "pending_applications_title": "TODO: Translate \"participants_list.pending_applications_title\"",
+    "banned_title": "TODO: Translate \"participants_list.banned_title\"",
+    "no_participants": "TODO: Translate \"participants_list.no_participants\"",
+    "owner_label": "TODO: Translate \"participants_list.owner_label\"",
+    "role_status": "TODO: Translate \"participants_list.role_status\"",
+    "buttons": {
+      "remove": "TODO: Translate \"participants_list.buttons.remove\"",
+      "removing": "TODO: Translate \"participants_list.buttons.removing\"",
+      "approve": "TODO: Translate \"participants_list.buttons.approve\"",
+      "approving": "TODO: Translate \"participants_list.buttons.approving\"",
+      "reject": "TODO: Translate \"participants_list.buttons.reject\"",
+      "rejecting": "TODO: Translate \"participants_list.buttons.rejecting\"",
+      "allow": "TODO: Translate \"participants_list.buttons.allow\"",
+      "allowing": "TODO: Translate \"participants_list.buttons.allowing\""
+    },
+    "success_messages": {
+      "participant_removed": "TODO: Translate \"participants_list.success_messages.participant_removed\"",
+      "ban_removed": "TODO: Translate \"participants_list.success_messages.ban_removed\"",
+      "application_updated": "TODO: Translate \"participants_list.success_messages.application_updated\""
+    },
+    "error_messages": {
+      "failed_to_remove": "TODO: Translate \"participants_list.error_messages.failed_to_remove\"",
+      "failed_to_remove_ban": "TODO: Translate \"participants_list.error_messages.failed_to_remove_ban\"",
+      "failed_to_update_application": "TODO: Translate \"participants_list.error_messages.failed_to_update_application\""
+    }
+  },
+  "list_item": {
+    "free": "TODO: Translate \"list_item.free\"",
+    "original_system": "TODO: Translate \"list_item.original_system\"",
+    "campaign_part": "TODO: Translate \"list_item.campaign_part\"",
+    "hosted_by": "TODO: Translate \"list_item.hosted_by\"",
+    "hosted_by_community": "TODO: Translate \"list_item.hosted_by_community\"",
+    "view_details": "TODO: Translate \"list_item.view_details\"",
+    "joined_count": "TODO: Translate \"list_item.joined_count\"",
+    "session_duration": "TODO: Translate \"list_item.session_duration\"",
+    "duration_formats": {
+      "hours_minutes": "TODO: Translate \"list_item.duration_formats.hours_minutes\"",
+      "hours_only": "TODO: Translate \"list_item.duration_formats.hours_only\"",
+      "minutes_only": "TODO: Translate \"list_item.duration_formats.minutes_only\""
+    }
+  },
+  "quick_filters": {
+    "in_city": "TODO: Translate \"quick_filters.in_city\"",
+    "my_favorite_systems": "TODO: Translate \"quick_filters.my_favorite_systems\"",
+    "in_my_language": "TODO: Translate \"quick_filters.in_my_language\"",
+    "my_themes": "TODO: Translate \"quick_filters.my_themes\""
+  },
+  "search": {
+    "title": "TODO: Translate \"search.title\"",
+    "subtitle": "TODO: Translate \"search.subtitle\"",
+    "session": "TODO: Translate \"search.session\"",
+    "sessions": "TODO: Translate \"search.sessions\"",
+    "with_quick_filters": "TODO: Translate \"search.with_quick_filters\"",
+    "no_games": {
+      "title": "TODO: Translate \"search.no_games.title\"",
+      "subtitle": "TODO: Translate \"search.no_games.subtitle\"",
+      "become_host": "TODO: Translate \"search.no_games.become_host\""
+    },
+    "no_filtered_sessions": {
+      "title": "TODO: Translate \"search.no_filtered_sessions.title\"",
+      "subtitle": "TODO: Translate \"search.no_filtered_sessions.subtitle\""
+    }
+  },
+  "game_detail": {
+    "unavailable": {
+      "title": "TODO: Translate \"game_detail.unavailable.title\"",
+      "message": "TODO: Translate \"game_detail.unavailable.message\"",
+      "browse_games": "TODO: Translate \"game_detail.unavailable.browse_games\"",
+      "visit_homepage": "TODO: Translate \"game_detail.unavailable.visit_homepage\""
+    },
+    "badges": {
+      "public_session": "TODO: Translate \"game_detail.badges.public_session\"",
+      "ongoing_campaign": "TODO: Translate \"game_detail.badges.ongoing_campaign\""
+    },
+    "hosted_by": "TODO: Translate \"game_detail.hosted_by\"",
+    "community_gm": "TODO: Translate \"game_detail.community_gm\"",
+    "community_rating": "TODO: Translate \"game_detail.community_rating\"",
+    "new_to_community": "TODO: Translate \"game_detail.new_to_community\"",
+    "request_seat": "TODO: Translate \"game_detail.request_seat\"",
+    "applying": "TODO: Translate \"game_detail.applying\"",
+    "sign_in_to_apply": "TODO: Translate \"game_detail.sign_in_to_apply\"",
+    "sections": {
+      "table_briefing": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.table_briefing.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.table_briefing.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.table_briefing.subtitle\"",
+        "no_details": "TODO: Translate \"game_detail.sections.table_briefing.no_details\"",
+        "ongoing_campaign": "TODO: Translate \"game_detail.sections.table_briefing.ongoing_campaign\"",
+        "one_shot": "TODO: Translate \"game_detail.sections.table_briefing.one_shot\""
+      },
+      "session_logistics": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.session_logistics.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.session_logistics.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.session_logistics.subtitle\"",
+        "date_time": "TODO: Translate \"game_detail.sections.session_logistics.date_time\"",
+        "language": "TODO: Translate \"game_detail.sections.session_logistics.language\"",
+        "price": "TODO: Translate \"game_detail.sections.session_logistics.price\"",
+        "players": "TODO: Translate \"game_detail.sections.session_logistics.players\"",
+        "seats_available": "TODO: Translate \"game_detail.sections.session_logistics.seats_available\"",
+        "seats_open": "TODO: Translate \"game_detail.sections.session_logistics.seats_open\"",
+        "contact_gm": "TODO: Translate \"game_detail.sections.session_logistics.contact_gm\"",
+        "duration": "TODO: Translate \"game_detail.sections.session_logistics.duration\"",
+        "minutes": "TODO: Translate \"game_detail.sections.session_logistics.minutes\"",
+        "gm_will_confirm": "TODO: Translate \"game_detail.sections.session_logistics.gm_will_confirm\"",
+        "meeting_details_notice": "TODO: Translate \"game_detail.sections.session_logistics.meeting_details_notice\""
+      },
+      "venue_details": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.venue_details.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.venue_details.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.venue_details.subtitle\""
+      },
+      "art_inspiration": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.art_inspiration.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.art_inspiration.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.art_inspiration.subtitle\"",
+        "this_system": "TODO: Translate \"game_detail.sections.art_inspiration.this_system\"",
+        "game_system": "TODO: Translate \"game_detail.sections.art_inspiration.game_system\"",
+        "artwork_alt": "TODO: Translate \"game_detail.sections.art_inspiration.artwork_alt\"",
+        "licensed": "TODO: Translate \"game_detail.sections.art_inspiration.licensed\"",
+        "view_details": "TODO: Translate \"game_detail.sections.art_inspiration.view_details\""
+      },
+      "safety_tools": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.safety_tools.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.safety_tools.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.safety_tools.subtitle\""
+      },
+      "system_spotlight": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.system_spotlight.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.system_spotlight.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.system_spotlight.subtitle\"",
+        "show_details": "TODO: Translate \"game_detail.sections.system_spotlight.show_details\"",
+        "hide_details": "TODO: Translate \"game_detail.sections.system_spotlight.hide_details\"",
+        "categories": "TODO: Translate \"game_detail.sections.system_spotlight.categories\"",
+        "mechanics": "TODO: Translate \"game_detail.sections.system_spotlight.mechanics\"",
+        "external_references": "TODO: Translate \"game_detail.sections.system_spotlight.external_references\"",
+        "no_summary": "TODO: Translate \"game_detail.sections.system_spotlight.no_summary\"",
+        "explore_full_profile": "TODO: Translate \"game_detail.sections.system_spotlight.explore_full_profile\""
+      },
+      "host_snapshot": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.host_snapshot.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.host_snapshot.title\"",
+        "subtitle": "TODO: Translate \"game_detail.sections.host_snapshot.subtitle\"",
+        "organizer_details_soon": "TODO: Translate \"game_detail.sections.host_snapshot.organizer_details_soon\""
+      },
+      "system_facts": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.system_facts.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.system_facts.title\"",
+        "players": "TODO: Translate \"game_detail.sections.system_facts.players\"",
+        "optimal_table": "TODO: Translate \"game_detail.sections.system_facts.optimal_table\"",
+        "average_session": "TODO: Translate \"game_detail.sections.system_facts.average_session\"",
+        "first_published": "TODO: Translate \"game_detail.sections.system_facts.first_published\"",
+        "age_rating": "TODO: Translate \"game_detail.sections.system_facts.age_rating\"",
+        "age_rating_tooltip": "TODO: Translate \"game_detail.sections.system_facts.age_rating_tooltip\"",
+        "complexity": "TODO: Translate \"game_detail.sections.system_facts.complexity\"",
+        "players_suffix": "TODO: Translate \"game_detail.sections.system_facts.players_suffix\""
+      },
+      "reserve_seat": {
+        "eyebrow": "TODO: Translate \"game_detail.sections.reserve_seat.eyebrow\"",
+        "title": "TODO: Translate \"game_detail.sections.reserve_seat.title\"",
+        "cost_per_player": "TODO: Translate \"game_detail.sections.reserve_seat.cost_per_player\"",
+        "applications_closed": "TODO: Translate \"game_detail.sections.reserve_seat.applications_closed\"",
+        "apply_to_join": "TODO: Translate \"game_detail.sections.reserve_seat.apply_to_join\""
+      }
+    }
+  },
+  "my_games": {
+    "title": "TODO: Translate \"my_games.title\"",
+    "subtitle": "TODO: Translate \"my_games.subtitle\"",
+    "filter_by_status": "TODO: Translate \"my_games.filter_by_status\"",
+    "filter_by_role": "TODO: Translate \"my_games.filter_by_role\"",
+    "create_new_game": "TODO: Translate \"my_games.create_new_game\"",
+    "no_games_title": "TODO: Translate \"my_games.no_games_title\"",
+    "no_games_subtitle": "TODO: Translate \"my_games.no_games_subtitle\"",
+    "pagination": {
+      "page_info": "TODO: Translate \"my_games.pagination.page_info\""
+    },
+    "status_labels": {
+      "scheduled": "TODO: Translate \"my_games.status_labels.scheduled\"",
+      "completed": "TODO: Translate \"my_games.status_labels.completed\"",
+      "canceled": "TODO: Translate \"my_games.status_labels.canceled\""
+    },
+    "role_labels": {
+      "owner": "TODO: Translate \"my_games.role_labels.owner\"",
+      "player": "TODO: Translate \"my_games.role_labels.player\"",
+      "invited": "TODO: Translate \"my_games.role_labels.invited\"",
+      "requested": "TODO: Translate \"my_games.role_labels.requested\""
+    },
+    "errors": {
+      "load_failed": "TODO: Translate \"my_games.errors.load_failed\"",
+      "update_failed": "TODO: Translate \"my_games.errors.update_failed\"",
+      "unexpected_error": "TODO: Translate \"my_games.errors.unexpected_error\"",
+      "status_updated": "TODO: Translate \"my_games.errors.status_updated\""
+    }
+  }
+}

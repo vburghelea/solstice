@@ -1,6 +1,61 @@
 {
   "title": "Inbox",
   "subtitle": "Manage your messages and notifications",
+  "shared_inbox": {
+    "title": "Shared Inbox",
+    "loading": "Loading shared inbox",
+    "loading_description": "Pulling live threads and persona metrics for the {{persona}} workspace.",
+    "unable_to_load": "Unable to load shared inbox",
+    "unable_to_load_description": "Please refresh to retry. Contact the platform team if the issue continues.",
+    "beta_badge": "Collaboration beta",
+    "open_reporting": "Open cross-namespace reporting",
+    "action_due_prefix": "Due ",
+    "sections": {
+      "metrics": {
+        "title": "Metrics",
+        "description": "Key performance indicators and usage statistics"
+      },
+      "filters": {
+        "title": "Filters",
+        "description": "Focus the inbox by workflow or escalation type."
+      },
+      "tips": {
+        "title": "Collaboration tips",
+        "description": "Align expectations when multiple personas share the thread."
+      },
+      "threads": {
+        "title": "Threads",
+        "no_threads": "No threads yet",
+        "no_threads_description": "Switch filters or invite collaborators to start a shared conversation.",
+        "log_note": "Log internal note",
+        "select_thread": "Select a thread",
+        "select_thread_description": "Choose a conversation to view cross-persona context, notes, and action items."
+      }
+    },
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "status": {
+      "open": "Open",
+      "waiting": "Waiting on response",
+      "resolved": "Resolved"
+    },
+    "threads_awaiting": {
+      "one": "{{count}} thread awaiting your attention.",
+      "other": "{{count}} threads awaiting your attention."
+    },
+    "thread_detail": {
+      "action_items": "Action items",
+      "priority_label": "Priority:",
+      "last_updated": "Last updated",
+      "reply_to_thread": "Reply to thread",
+      "add_follow_up": "Add follow-up task",
+      "owner_label": "Yours",
+      "status_label": "Status:"
+    }
+  },
   "status_labels": {
     "open": "Open",
     "waiting_on_response": "Waiting on response",
@@ -79,7 +134,8 @@
     "send_failed": "Failed to send message",
     "load_failed": "Failed to load messages",
     "delete_failed": "Failed to delete message",
-    "archive_failed": "Failed to archive message"
+    "archive_failed": "Failed to archive message",
+    "load_snapshot_failed": "Failed to load inbox snapshot"
   },
   "success": {
     "message_sent": "Message sent successfully",

@@ -40,6 +40,23 @@
     "invite_by_email": "Invite by Email",
     "pending_invitations": "Pending invitations"
   },
+  "participants_list": {
+    "participants_title": "Participants ({{count}})",
+    "no_participants": "No participants yet.",
+    "owner_label": "(owner)",
+    "role_status": "({role} - {{status}})",
+    "removing": "Removing...",
+    "remove": "Remove",
+    "pending_applications_title": "Pending Applications ({{count}})",
+    "status_label": "({{status}})",
+    "approving": "Approving...",
+    "approve": "Approve",
+    "rejecting": "Rejecting...",
+    "reject": "Reject",
+    "banned_title": "Banned from the Campaign ({{count}})",
+    "allowing": "Allowing...",
+    "allow": "Allow"
+  },
   "placeholders": {
     "campaign_name": "Enter campaign name",
     "description": "Enter campaign description",
@@ -67,7 +84,10 @@
     "participant_invited_success": "Participant invited successfully!",
     "invitation_revoked_success": "Invitation revoked successfully!",
     "campaign_created_success": "Campaign created successfully!",
-    "campaign_updated_success": "Campaign updated successfully!"
+    "campaign_updated_success": "Campaign updated successfully!",
+    "participant_removed_success": "Participant removed successfully!",
+    "participant_ban_removed_success": "Participant ban removed successfully!",
+    "application_status_updated_success": "Application status updated successfully!"
   },
   "errors": {
     "failed_to_reject_invitation": "Failed to reject invitation",
@@ -76,7 +96,10 @@
     "failed_to_invite_participant": "Failed to invite participant",
     "failed_to_revoke_invitation": "Failed to revoke invitation",
     "failed_to_create_campaign": "Failed to create campaign",
-    "failed_to_update_campaign": "Failed to update campaign"
+    "failed_to_update_campaign": "Failed to update campaign",
+    "participant_remove_failed": "Failed to remove participant: {{message}}",
+    "participant_ban_remove_failed": "Failed to remove participant ban: {{message}}",
+    "application_update_failed": "Failed to update application status: {{message}}"
   },
   "descriptions": {
     "campaign_overview": "Basic information about your campaign.",
@@ -212,5 +235,78 @@
       "title": "Documented Character Creation Outcome",
       "final_character_creation_decisions": "Final Character Creation Decisions"
     }
+  },
+  "my_campaigns": {
+    "title": "My Campaigns",
+    "subtitle": "Manage your campaign sessions",
+    "filter_by_status": "Filter by status",
+    "filter_by_role": "Filter by role",
+    "create_new_campaign": "Create New Campaign",
+    "no_campaigns_title": "No campaigns yet",
+    "no_campaigns_subtitle": "Create your first campaign to get started",
+    "participants": "participants",
+    "pagination": {
+      "page_info": "Page {{current}} of {{total}} • {{count}} total"
+    },
+    "status_labels": {
+      "active": "Active",
+      "completed": "Completed",
+      "on_hold": "On Hold",
+      "cancelled": "Cancelled"
+    },
+    "role_labels": {
+      "owner": "Organizer",
+      "player": "Participant",
+      "invited": "Invitee",
+      "requested": "Requested"
+    },
+    "errors": {
+      "load_failed": "Failed to load campaigns."
+    }
+  },
+  "detail": {
+    "invalid_campaign_id": "Invalid campaign ID format.",
+    "failed_to_load_campaign": "Failed to load campaign details.",
+    "failed_to_fetch_campaign": "Failed to fetch campaign",
+    "campaign_not_found": "Campaign not found",
+    "campaign_data_not_found": "Campaign data not found",
+    "game_session_status_updated": "Game session status updated successfully!",
+    "failed_to_update_game_session_status": "Failed to update game session status",
+    "unexpected_error_updating_game_session": "An unexpected error occurred while updating game session status",
+    "campaign_updated": "Campaign updated successfully",
+    "failed_to_update_campaign": "Failed to update campaign",
+    "unexpected_error_occurred": "An unexpected error occurred",
+    "failed_to_fetch_application_status": "Failed to fetch your application status.",
+    "application_submitted": "Application submitted successfully!",
+    "failed_to_submit_application": "Failed to submit application.",
+    "unexpected_error_applying": "An unexpected error occurred while applying.",
+    "mark_campaign_completed": "Mark campaign as completed",
+    "cancel_campaign": "Cancel this campaign",
+    "confirm_cancel_campaign": "Are you sure you want to cancel this campaign?",
+    "open_session_zero": "Open session zero notes",
+    "exit_edit_mode": "Exit edit mode",
+    "edit_campaign_details": "Edit campaign details",
+    "about_this_campaign": "About this campaign",
+    "about_description": "Summarize the tone, arc, and player expectations.",
+    "no_description_provided": "The organizer hasn't shared additional campaign context yet.",
+    "edit_campaign": "Edit campaign",
+    "edit_description": "Update the overarching details for your ongoing story.",
+    "game_sessions": "Game sessions",
+    "filter_by_status": "Filter by status",
+    "create_session": "Create session",
+    "no_game_sessions_found": "No game sessions found for this campaign with the selected status.",
+    "view_game": "View Game",
+    "application_pending": "Your application is pending review.",
+    "application_rejected": "Your application was rejected.",
+    "campaign_logistics": "Campaign logistics",
+    "logistics_description": "Keep everyone aligned on cadence and table shape.",
+    "location": "Location",
+    "location_shared_after_approval": "Shared after your seat is approved.",
+    "not_specified": "Not specified",
+    "safety_consent": "Safety & consent",
+    "safety_description": "Consistency for every session in the campaign.",
+    "applying": "Applying...",
+    "apply_to_join": "Apply to join",
+    "price_session": "Price/session"
   }
 }

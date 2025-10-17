@@ -399,25 +399,29 @@ export function OpsOverviewDashboard() {
             <CardHeader className="space-y-1">
               <CardTitle>{t("sections.recent_approvals")}</CardTitle>
               <CardDescription>
-                Keep a pulse on which experiences moved forward and jump back into
-                operations if adjustments are needed.
+                {t("hardcoded_strings.recent_approvals_description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {recentlyReviewed.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  Once events are approved they will appear here with quick links to
-                  manage rosters and logistics.
+                  {t("hardcoded_strings.no_recent_approvals")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Visibility</TableHead>
-                      <TableHead>Updated</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.event")}</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.status")}</TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.visibility")}
+                      </TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.updated")}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("hardcoded_strings.actions.view")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -431,7 +435,9 @@ export function OpsOverviewDashboard() {
                         </TableCell>
                         <TableCell>
                           <Badge variant={event.isPublic ? "default" : "secondary"}>
-                            {event.isPublic ? "Public" : "Private"}
+                            {event.isPublic
+                              ? t("hardcoded_strings.visibility.public")
+                              : t("hardcoded_strings.visibility.private")}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -449,12 +455,12 @@ export function OpsOverviewDashboard() {
                                 to="/ops/events/$eventId"
                                 params={{ eventId: event.id }}
                               >
-                                Tasks & notes
+                                {t("hardcoded_strings.actions.tasks_notes")}
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
                               <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                View
+                                {t("hardcoded_strings.actions.view")}
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
@@ -462,7 +468,7 @@ export function OpsOverviewDashboard() {
                                 to="/ops/events/$eventId/manage"
                                 params={{ eventId: event.id }}
                               >
-                                Manage
+                                {t("hardcoded_strings.actions.manage")}
                               </Link>
                             </Button>
                           </div>
@@ -479,28 +485,32 @@ export function OpsOverviewDashboard() {
         <TabsContent value="pipeline" className="space-y-4">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle>Pipeline health</CardTitle>
+              <CardTitle>{t("hardcoded_strings.pipeline_health.title")}</CardTitle>
               <CardDescription>
-                Monitor registrations, capacity, and readiness for the upcoming slate of
-                events.
+                {t("hardcoded_strings.pipeline_health.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {pipelineList.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  No events found in the pipeline. Keep approvals moving to populate this
-                  view.
+                  {t("hardcoded_strings.pipeline_health.no_events")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Registered</TableHead>
-                      <TableHead>Capacity</TableHead>
-                      <TableHead>Start</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.event")}</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.status")}</TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.registered")}
+                      </TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.capacity")}
+                      </TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.start")}</TableHead>
+                      <TableHead className="text-right">
+                        {t("hardcoded_strings.actions.view")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -561,11 +571,13 @@ export function OpsOverviewDashboard() {
                                     : "text-muted-foreground",
                                 )}
                               >
-                                {availableSpots} spots left
+                                {t("hardcoded_strings.pipeline_health.spots_left", {
+                                  count: availableSpots,
+                                })}
                               </span>
                             ) : (
                               <span className="text-muted-foreground text-sm">
-                                Unlimited
+                                {t("hardcoded_strings.pipeline_health.unlimited")}
                               </span>
                             )}
                           </TableCell>
@@ -581,7 +593,7 @@ export function OpsOverviewDashboard() {
                                   to="/ops/events/$eventId"
                                   params={{ eventId: event.id }}
                                 >
-                                  Tasks & notes
+                                  {t("hardcoded_strings.actions.tasks_notes")}
                                 </Link>
                               </Button>
                               <Button asChild size="sm" variant="outline">
@@ -589,12 +601,12 @@ export function OpsOverviewDashboard() {
                                   to="/ops/events/$eventId/manage"
                                   params={{ eventId: event.id }}
                                 >
-                                  Manage
+                                  {t("hardcoded_strings.actions.manage")}
                                 </Link>
                               </Button>
                               <Button asChild size="sm" variant="ghost">
                                 <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                  View
+                                  {t("hardcoded_strings.actions.view")}
                                 </Link>
                               </Button>
                             </div>
@@ -610,15 +622,15 @@ export function OpsOverviewDashboard() {
 
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle>Logistics watchlist</CardTitle>
+              <CardTitle>{t("hardcoded_strings.logistics_watchlist.title")}</CardTitle>
               <CardDescription>
-                Upcoming events that need final staffing or marketing coordination.
+                {t("hardcoded_strings.logistics_watchlist.description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {attentionItems.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  All systems are green — keep monitoring registration momentum.
+                  {t("hardcoded_strings.logistics_watchlist.no_issues")}
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -633,16 +645,15 @@ export function OpsOverviewDashboard() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle>Marketing hotspots</CardTitle>
+                <CardTitle>{t("hardcoded_strings.marketing_hotspots.title")}</CardTitle>
                 <CardDescription>
-                  Cities generating the most volume and near-term activity.
+                  {t("hardcoded_strings.marketing_hotspots.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {marketingBreakdown.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    No marketing trends available yet. Approve more events to surface
-                    hotspots.
+                    {t("hardcoded_strings.marketing_hotspots.no_data")}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -651,10 +662,16 @@ export function OpsOverviewDashboard() {
                         <div>
                           <p className="font-medium">{location}</p>
                           <p className="text-muted-foreground text-xs">
-                            {stats.upcoming} launching in the next 30 days
+                            {t("hardcoded_strings.marketing_hotspots.launching_soon", {
+                              count: stats.upcoming,
+                            })}
                           </p>
                         </div>
-                        <Badge variant="outline">{stats.total} live</Badge>
+                        <Badge variant="outline">
+                          {t("hardcoded_strings.marketing_hotspots.live", {
+                            count: stats.total,
+                          })}
+                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -664,16 +681,15 @@ export function OpsOverviewDashboard() {
 
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle>Live event command list</CardTitle>
+                <CardTitle>{t("hardcoded_strings.live_command_list.title")}</CardTitle>
                 <CardDescription>
-                  Quick links to adjust staffing or check rosters for imminent
-                  experiences.
+                  {t("hardcoded_strings.live_command_list.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {liveEvents.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    No live events yet — approvals will populate this list automatically.
+                    {t("hardcoded_strings.live_command_list.no_events")}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -683,7 +699,7 @@ export function OpsOverviewDashboard() {
                           <p className="leading-tight font-medium">{event.name}</p>
                           <p className="text-muted-foreground text-xs">
                             {format(new Date(event.startDate), "MMM d")} ·{" "}
-                            {event.city ?? "Location TBD"}
+                            {event.city ?? t("labels.tbd")}
                           </p>
                         </div>
                         <Button asChild size="sm" variant="outline">
@@ -691,7 +707,7 @@ export function OpsOverviewDashboard() {
                             to="/ops/events/$eventId/manage"
                             params={{ eventId: event.id }}
                           >
-                            Adjust
+                            {t("hardcoded_strings.actions.adjust")}
                           </Link>
                         </Button>
                       </div>
@@ -743,6 +759,7 @@ export function OpsOverviewDashboard() {
 }
 
 function FocusBanner({ target }: { target: FocusTarget }) {
+  const { t } = useOpsTranslation();
   const toneStyles: Record<FocusTone, string> = {
     default: "border-primary/30 bg-primary/5",
     warning: "border-amber-200 bg-amber-50",
@@ -769,7 +786,7 @@ function FocusBanner({ target }: { target: FocusTarget }) {
           <div className="mt-0.5">{toneIcon[target.tone]}</div>
           <div className="space-y-1">
             <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-              Mission focus
+              {t("hardcoded_strings.mission_focus")}
             </p>
             <h2 className="text-xl leading-tight font-semibold">{target.title}</h2>
             <p className="text-muted-foreground text-sm">{target.description}</p>
@@ -818,6 +835,7 @@ function SnapshotCard({
 }
 
 function WatchlistItem({ item }: { item: OpsAttentionItem }) {
+  const { t } = useOpsTranslation();
   const tone = item.severity === "critical" ? "destructive" : "secondary";
   const daysUntilStart = differenceInCalendarDays(item.startDate, new Date());
 
@@ -827,17 +845,22 @@ function WatchlistItem({ item }: { item: OpsAttentionItem }) {
         <div>
           <p className="leading-tight font-medium">{item.name}</p>
           <p className="text-muted-foreground text-xs">
-            {format(item.startDate, "MMM d")} · {item.city ?? "Location TBD"}
+            {format(item.startDate, "MMM d")} · {item.city ?? t("labels.tbd")}
           </p>
         </div>
         <Badge variant={tone} className="capitalize">
-          {item.severity === "critical" ? "Urgent" : "Monitor"}
+          {item.severity === "critical"
+            ? t("hardcoded_strings.logistics_watchlist.urgent")
+            : t("hardcoded_strings.logistics_watchlist.monitor")}
         </Badge>
       </div>
       <p className="text-muted-foreground text-sm">{item.message}</p>
       {typeof item.availableSpots === "number" ? (
         <p className="text-xs font-medium">
-          {item.availableSpots} spots remaining · {Math.max(daysUntilStart, 0)} days out
+          {t("hardcoded_strings.logistics_watchlist.spots_remaining", {
+            count: item.availableSpots,
+            days: Math.max(daysUntilStart, 0),
+          })}
         </p>
       ) : null}
     </div>

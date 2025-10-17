@@ -23,6 +23,7 @@ import navigationEn from "./locales/en/navigation.json";
 import opsEn from "./locales/en/ops.json";
 import playerEn from "./locales/en/player.json";
 import profileEn from "./locales/en/profile.json";
+import resourcesEn from "./locales/en/resources.json";
 import reviewsEn from "./locales/en/reviews.json";
 import rolesEn from "./locales/en/roles.json";
 import settingsEn from "./locales/en/settings.json";
@@ -50,6 +51,7 @@ const resources = {
     ops: opsEn,
     player: playerEn,
     profile: profileEn,
+    resources: resourcesEn,
     reviews: reviewsEn,
     roles: rolesEn,
     settings: settingsEn,

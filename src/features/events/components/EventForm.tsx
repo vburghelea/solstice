@@ -15,6 +15,7 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 import { baseCreateEventSchema } from "~/db/schema/events.schema";
 import { createEventSchema } from "~/features/events/events.schemas";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 
 type CreateEventInput = z.infer<typeof createEventSchema>;
 
@@ -41,6 +42,7 @@ function getNextDayString(dateString: string) {
 }
 
 export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormProps) {
+  const { t } = useEventsTranslation();
   const computedStartDate = initialValues?.startDate ?? getDateInputString(7);
   const computedEndDate = initialValues?.endDate ?? getNextDayString(computedStartDate);
   const defaults = {
@@ -107,7 +109,9 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
   }) =>
     meta.isTouched && meta.errors.length > 0 ? (
       <p className="text-destructive mt-1 text-sm">
-        {meta.errors.map((e) => (typeof e === "string" ? e : "Invalid value")).join(", ")}
+        {meta.errors
+          .map((e) => (typeof e === "string" ? e : t("validation.invalid_value")))
+          .join(", ")}
       </p>
     ) : null;
 
@@ -135,7 +139,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
       >
         {(field) => (
           <div>
-            <Label htmlFor={field.name}>Event Name</Label>
+            <Label htmlFor={field.name}>{t("form.fields.name")}</Label>
             <Input
               id={field.name}
               name={field.name}
@@ -150,7 +154,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 }
               }}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Awesome Summer Tournament"
+              placeholder={t("form.placeholders.name")}
             />
             {renderFieldError(field.state.meta)}
           </div>
@@ -173,7 +177,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Slug</Label>
+              <Label htmlFor={field.name}>{t("form.fields.slug")}</Label>
               <Input
                 id={field.name}
                 name={field.name}
@@ -181,7 +185,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="awesome-summer-tournament"
+                placeholder={t("form.placeholders.slug")}
               />
               {renderFieldError(field.state.meta)}
             </div>
@@ -191,7 +195,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="type">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Type</Label>
+              <Label htmlFor={field.name}>{t("form.fields.type")}</Label>
               <Select
                 value={field.state.value as string}
                 onValueChange={(val: string) =>
@@ -199,15 +203,15 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder={t("select.select_type")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tournament">Tournament</SelectItem>
-                  <SelectItem value="league">League</SelectItem>
-                  <SelectItem value="camp">Camp</SelectItem>
-                  <SelectItem value="clinic">Clinic</SelectItem>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="tournament">{t("types.tournament")}</SelectItem>
+                  <SelectItem value="league">{t("types.league")}</SelectItem>
+                  <SelectItem value="camp">{t("types.camp")}</SelectItem>
+                  <SelectItem value="clinic">{t("types.clinic")}</SelectItem>
+                  <SelectItem value="social">{t("types.social")}</SelectItem>
+                  <SelectItem value="other">{t("types.other")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -219,7 +223,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="startDate">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Start Date</Label>
+              <Label htmlFor={field.name}>{t("form.fields.start_date")}</Label>
               <Input
                 id={field.name}
                 type="date"
@@ -245,7 +249,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="endDate">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>End Date</Label>
+              <Label htmlFor={field.name}>{t("form.fields.end_date")}</Label>
               <Input
                 id={field.name}
                 type="date"
@@ -265,7 +269,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="registrationType">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Registration Type</Label>
+              <Label htmlFor={field.name}>{t("form.fields.registration_type")}</Label>
               <Select
                 value={field.state.value as string}
                 onValueChange={(val: string) =>
@@ -273,12 +277,14 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select registration type" />
+                  <SelectValue placeholder={t("select.select_registration_type")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="team">Team</SelectItem>
-                  <SelectItem value="individual">Individual</SelectItem>
-                  <SelectItem value="both">Both</SelectItem>
+                  <SelectItem value="team">{t("registration_types.team")}</SelectItem>
+                  <SelectItem value="individual">
+                    {t("registration_types.individual")}
+                  </SelectItem>
+                  <SelectItem value="both">{t("registration_types.both")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -289,7 +295,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
           <form.Field name="maxTeams">
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Max Teams</Label>
+                <Label htmlFor={field.name}>{t("form.fields.max_teams")}</Label>
                 <Input
                   id={field.name}
                   type="number"
@@ -308,7 +314,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
           <form.Field name="maxParticipants">
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Max Participants</Label>
+                <Label htmlFor={field.name}>{t("form.fields.max_participants")}</Label>
                 <Input
                   id={field.name}
                   type="number"
@@ -331,7 +337,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="teamRegistrationFee">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Team Fee (USD)</Label>
+              <Label htmlFor={field.name}>{t("form.fields.team_fee")}</Label>
               <Input
                 id={field.name}
                 type="number"
@@ -355,7 +361,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="individualRegistrationFee">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Individual Fee (USD)</Label>
+              <Label htmlFor={field.name}>{t("form.fields.individual_fee")}</Label>
               <Input
                 id={field.name}
                 type="number"
@@ -382,14 +388,14 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="city">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>City</Label>
+              <Label htmlFor={field.name}>{t("form.fields.city")}</Label>
               <Input
                 id={field.name}
                 type="text"
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Berlin"
+                placeholder={t("form.placeholders.city")}
               />
             </div>
           )}
@@ -397,7 +403,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="province">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Province/State</Label>
+              <Label htmlFor={field.name}>{t("form.fields.province")}</Label>
               <Input
                 id={field.name}
                 type="text"
@@ -412,8 +418,8 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
           {(field) => (
             <ValidatedCountryCombobox
               field={field}
-              label="Country"
-              placeholder="Search for a country"
+              label={t("form.fields.country")}
+              placeholder={t("form.placeholders.country")}
               valueFormat="label"
             />
           )}
@@ -423,14 +429,14 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
       <form.Field name="shortDescription">
         {(field) => (
           <div>
-            <Label htmlFor={field.name}>Short Description</Label>
+            <Label htmlFor={field.name}>{t("form.fields.short_description")}</Label>
             <Input
               id={field.name}
               type="text"
               value={field.state.value as string}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="One-line summary for cards and previews"
+              placeholder={t("form.placeholders.short_description_card")}
             />
           </div>
         )}
@@ -439,13 +445,13 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
       <form.Field name="description">
         {(field) => (
           <div>
-            <Label htmlFor={field.name}>Description</Label>
+            <Label htmlFor={field.name}>{t("form.fields.description")}</Label>
             <Textarea
               id={field.name}
               value={(field.state.value as string) ?? ""}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Share key details, schedule, and what to expect"
+              placeholder={t("form.placeholders.description_details")}
               rows={6}
             />
           </div>
@@ -456,14 +462,14 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
         <form.Field name="contactEmail">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Contact Email</Label>
+              <Label htmlFor={field.name}>{t("form.fields.contact_email")}</Label>
               <Input
                 id={field.name}
                 type="email"
                 value={field.state.value as string}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="event@beispiel.de"
+                placeholder={t("form.placeholders.contact_email")}
               />
             </div>
           )}
@@ -472,8 +478,8 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
           {(field) => (
             <ValidatedPhoneInput
               field={field}
-              label="Contact Phone"
-              placeholder="+49 1512 3456789"
+              label={t("form.fields.contact_phone")}
+              placeholder={t("form.placeholders.contact_phone")}
             />
           )}
         </form.Field>
@@ -481,7 +487,7 @@ export function EventForm({ initialValues, onSubmit, isSubmitting }: EventFormPr
 
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create Event"}
+          {isSubmitting ? t("buttons.creating") : t("buttons.create")}
         </Button>
       </div>
     </form>

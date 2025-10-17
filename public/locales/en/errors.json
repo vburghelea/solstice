@@ -117,6 +117,22 @@
     "oauth_failed": {
       "title": "OAuth Failed",
       "message": "Failed to authenticate with the selected provider."
+    },
+    "not_authenticated": {
+      "title": "Not Authenticated",
+      "message": "You need to be logged in to access this resource."
+    },
+    "user_not_authenticated": {
+      "title": "User Not Authenticated",
+      "message": "Please sign in to continue."
+    },
+    "admin_access_required": {
+      "title": "Admin Access Required",
+      "message": "You need administrator privileges to access this resource."
+    },
+    "not_authorized": {
+      "title": "Not Authorized",
+      "message": "You don't have permission to perform this action."
     }
   },
   "database": {
@@ -135,6 +151,74 @@
     "duplicate_entry": {
       "title": "Duplicate Entry",
       "message": "This entry already exists."
+    },
+    "database_error": {
+      "title": "Database Error",
+      "message": "A database error occurred. Please try again later."
+    },
+    "failed_to_fetch_members": {
+      "title": "Failed to Fetch Members",
+      "message": "Failed to fetch members"
+    },
+    "failed_to_list_pending_reviews": {
+      "title": "Failed to List Pending Reviews",
+      "message": "Failed to list pending reviews"
+    },
+    "no_data_provided": {
+      "title": "No Data Provided",
+      "message": "No data provided"
+    },
+    "failed_to_update_profile": {
+      "title": "Failed to Update Profile",
+      "message": "Failed to update profile"
+    },
+    "failed_to_complete_profile": {
+      "title": "Failed to Complete Profile",
+      "message": "Failed to complete profile"
+    },
+    "invalid_image_data_format": {
+      "title": "Invalid Image Data",
+      "message": "Invalid image data format"
+    },
+    "invalid_image_payload": {
+      "title": "Invalid Image Payload",
+      "message": "Invalid image payload"
+    },
+    "image_too_large": {
+      "title": "Image Too Large",
+      "message": "Image too large (max 1MB)"
+    },
+    "failed_to_upload_avatar": {
+      "title": "Failed to Upload Avatar",
+      "message": "Failed to upload avatar"
+    },
+    "failed_to_remove_avatar": {
+      "title": "Failed to Remove Avatar",
+      "message": "Failed to remove avatar"
+    },
+    "failed_to_update_privacy_settings": {
+      "title": "Failed to Update Privacy Settings",
+      "message": "Failed to update privacy settings"
+    },
+    "server_error": {
+      "title": "Server Error",
+      "message": "An internal server error occurred. Please try again later."
+    },
+    "fetch_failed": {
+      "title": "Fetch Failed",
+      "message": "Failed to fetch {{resource}}. Please try again later."
+    },
+    "create_failed": {
+      "title": "Create Failed",
+      "message": "Failed to create {{resource}}. Please try again."
+    },
+    "update_failed": {
+      "title": "Update Failed",
+      "message": "Failed to update {{resource}}. Please try again."
+    },
+    "delete_failed": {
+      "title": "Delete Failed",
+      "message": "Failed to delete {{resource}}. Please try again."
     }
   },
   "file": {
@@ -174,34 +258,6 @@
     }
   },
   "general": {
-    "unknown_error": {
-      "title": "Unknown Error",
-      "message": "An unexpected error occurred. Please try again."
-    },
-    "server_error": {
-      "title": "Server Error",
-      "message": "Something went wrong on our end. Please try again later."
-    },
-    "load_failed": {
-      "title": "Load Failed",
-      "message": "Failed to load the requested data."
-    },
-    "save_failed": {
-      "title": "Save Failed",
-      "message": "Failed to save your changes. Please try again."
-    },
-    "delete_failed": {
-      "title": "Delete Failed",
-      "message": "Failed to delete the item. Please try again."
-    },
-    "update_failed": {
-      "title": "Update Failed",
-      "message": "Failed to update the item. Please try again."
-    },
-    "create_failed": {
-      "title": "Create Failed",
-      "message": "Failed to create the item. Please try again."
-    },
     "invalid_request": {
       "title": "Invalid Request",
       "message": "The request was invalid or malformed."

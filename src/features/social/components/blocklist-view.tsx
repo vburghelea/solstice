@@ -63,7 +63,7 @@ export function BlocklistView() {
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "An unexpected error occurred";
+        error instanceof Error ? error.message : t("errors.unexpected_error");
       toast.error(errorMessage);
     } finally {
       setUnblockingUserId(null);

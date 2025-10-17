@@ -21,6 +21,7 @@ import type {
   PersonaResolution,
   PersonaState,
 } from "~/features/roles/persona.types";
+import { useCommonTranslation } from "~/hooks/useTypedTranslation";
 
 const STORAGE_KEY = "roundup.activePersona";
 const DEFAULT_GUEST_RESOLUTION = getGuestPersonaResolution();
@@ -49,6 +50,7 @@ export function RoleSwitcherProvider({
   onSwitch,
   children,
 }: RoleSwitcherProviderProps) {
+  const { t } = useCommonTranslation();
   const preferredPersonaRef = useRef<PersonaId | null>(readStoredPersona());
   const [resolution, dispatchResolution] = useReducer(
     resolutionReducer,
@@ -98,15 +100,12 @@ export function RoleSwitcherProvider({
       const persona = resolution.personas.find((item) => item.id === personaId);
 
       if (!persona) {
-        setError("We couldn't find that persona option.");
+        setError(t("roles.errors.persona_not_found"));
         return;
       }
 
       if (!isPersonaAvailable(persona)) {
-        setError(
-          persona.availabilityReason ??
-            "This persona is locked until additional permissions are granted.",
-        );
+        setError(persona.availabilityReason ?? t("roles.errors.persona_locked"));
         return;
       }
 
@@ -137,13 +136,13 @@ export function RoleSwitcherProvider({
         setError(
           switchError instanceof Error
             ? switchError.message
-            : "Unable to switch persona right now.",
+            : t("roles.errors.unable_to_switch_persona"),
         );
       } finally {
         setStatus("idle");
       }
     },
-    [onSwitch, persistPreference, resolution, setResolution],
+    [onSwitch, persistPreference, resolution, setResolution, t],
   );
 
   const value = useMemo<RoleSwitcherContextValue>(

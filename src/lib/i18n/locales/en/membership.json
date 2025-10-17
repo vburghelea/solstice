@@ -36,13 +36,20 @@
   },
   "errors": {
     "failed_to_fetch_membership_status": "Failed to fetch membership status",
+    "failed_to_fetch_membership_type": "Failed to fetch membership type",
     "failed_to_fetch_membership_types": "Failed to fetch membership types",
     "failed_to_create_checkout_session": "Failed to create checkout session",
     "missing_membership_type_for_checkout": "Missing membership type for checkout session",
     "missing_checkout_information": "Missing checkout information. Please contact support.",
     "failed_to_confirm_membership": "Failed to confirm membership",
     "failed_to_confirm_membership_purchase": "Failed to confirm membership purchase",
-    "error": "Error"
+    "error": "Error",
+    "payment": {
+      "canceled": "Payment was canceled",
+      "verification_failed": "Payment verification failed",
+      "processing_error": "An error occurred while processing your payment",
+      "failed": "Payment failed"
+    }
   },
   "success": {
     "membership_purchased_successfully": "Membership purchased successfully!"

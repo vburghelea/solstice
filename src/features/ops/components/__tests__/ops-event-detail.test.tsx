@@ -31,6 +31,90 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
+// Import real locale data
+import commonTranslations from "~/lib/i18n/locales/en/common.json";
+import opsTranslations from "~/lib/i18n/locales/en/ops.json";
+
+vi.mock("~/hooks/useTypedTranslation", () => ({
+  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
+  useOpsTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) => {
+      // Helper function to get nested value from object using dot notation
+      const getNestedValue = (obj: Record<string, unknown>, path: string): string => {
+        const keys = path.split(".");
+        let current: unknown = obj;
+
+        for (const k of keys) {
+          if (
+            current &&
+            typeof current === "object" &&
+            current !== null &&
+            k in current
+          ) {
+            current = (current as Record<string, unknown>)[k];
+          } else {
+            return key; // Return key if not found
+          }
+        }
+
+        return typeof current === "string" ? current : key;
+      };
+
+      // Try to get the value from the translations
+      let result = getNestedValue(opsTranslations, key);
+
+      // If not found, try the event_detail_hardcoded nested structure
+      if (result === key) {
+        result = getNestedValue(opsTranslations, `event_detail_hardcoded.${key}`);
+      }
+
+      // Handle interpolation for template strings
+      if (options && typeof result === "string") {
+        result = result.replace(/\{\{(\w+)\}\}/g, (match, param) => {
+          return String(options[param] || match);
+        });
+      }
+
+      return result;
+    },
+  }),
+  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
+  useCommonTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) => {
+      const getNestedValue = (obj: Record<string, unknown>, path: string): string => {
+        const keys = path.split(".");
+        let current: unknown = obj;
+
+        for (const k of keys) {
+          if (
+            current &&
+            typeof current === "object" &&
+            current !== null &&
+            k in current
+          ) {
+            current = (current as Record<string, unknown>)[k];
+          } else {
+            return key;
+          }
+        }
+
+        return typeof current === "string" ? current : key;
+      };
+
+      let result = getNestedValue(commonTranslations, key);
+
+      // Handle interpolation for template strings
+      if (options && typeof result === "string") {
+        result = result.replace(/\{\{(\w+)\}\}/g, (match, param) => {
+          return String(options[param] || match);
+        });
+      }
+
+      return result;
+    },
+  }),
+}));
+
 vi.mock("~/components/ui/SafeLink", () => ({
   SafeLink: ({
     to,

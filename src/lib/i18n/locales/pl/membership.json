@@ -1,0 +1,100 @@
+{
+  "page": {
+    "title": "TODO: Translate \"page.title\"",
+    "subtitle": "TODO: Translate \"page.subtitle\""
+  },
+  "current_status": {
+    "title": "TODO: Translate \"current_status.title\"",
+    "active_membership": "TODO: Translate \"current_status.active_membership\"",
+    "no_active_membership": "TODO: Translate \"current_status.no_active_membership\"",
+    "join_today_message": "TODO: Translate \"current_status.join_today_message\"",
+    "type": "TODO: Translate \"current_status.type\"",
+    "expires": "TODO: Translate \"current_status.expires\"",
+    "days_remaining": "TODO: Translate \"current_status.days_remaining\""
+  },
+  "available_plans": {
+    "title": "TODO: Translate \"available_plans.title\"",
+    "price": "TODO: Translate \"available_plans.price\"",
+    "current_plan": "TODO: Translate \"available_plans.current_plan\"",
+    "purchase": "TODO: Translate \"available_plans.purchase\"",
+    "renew": "TODO: Translate \"available_plans.renew\"",
+    "not_available": "TODO: Translate \"available_plans.not_available\""
+  },
+  "buttons": {
+    "purchase": "TODO: Translate \"buttons.purchase\"",
+    "renew": "TODO: Translate \"buttons.renew\"",
+    "current_plan": "TODO: Translate \"buttons.current_plan\"",
+    "not_available": "TODO: Translate \"buttons.not_available\"",
+    "view_options": "TODO: Translate \"buttons.view_options\""
+  },
+  "mobile_cta": {
+    "choose_membership": "TODO: Translate \"mobile_cta.choose_membership\"",
+    "view_options": "TODO: Translate \"mobile_cta.view_options\""
+  },
+  "status": {
+    "processing_payment": "TODO: Translate \"status.processing_payment\""
+  },
+  "errors": {
+    "failed_to_fetch_membership_status": "TODO: Translate \"errors.failed_to_fetch_membership_status\"",
+    "failed_to_fetch_membership_type": "TODO: Translate \"errors.failed_to_fetch_membership_type\"",
+    "failed_to_fetch_membership_types": "TODO: Translate \"errors.failed_to_fetch_membership_types\"",
+    "failed_to_create_checkout_session": "TODO: Translate \"errors.failed_to_create_checkout_session\"",
+    "missing_membership_type_for_checkout": "TODO: Translate \"errors.missing_membership_type_for_checkout\"",
+    "missing_checkout_information": "TODO: Translate \"errors.missing_checkout_information\"",
+    "failed_to_confirm_membership": "TODO: Translate \"errors.failed_to_confirm_membership\"",
+    "failed_to_confirm_membership_purchase": "TODO: Translate \"errors.failed_to_confirm_membership_purchase\"",
+    "error": "TODO: Translate \"errors.error\"",
+    "payment": {
+      "canceled": "TODO: Translate \"errors.payment.canceled\"",
+      "verification_failed": "TODO: Translate \"errors.payment.verification_failed\"",
+      "processing_error": "TODO: Translate \"errors.payment.processing_error\"",
+      "failed": "TODO: Translate \"errors.payment.failed\""
+    }
+  },
+  "success": {
+    "membership_purchased_successfully": "TODO: Translate \"success.membership_purchased_successfully\""
+  },
+  "loading": {
+    "title": "TODO: Translate \"loading.title\""
+  },
+  "plan_features": {
+    "title": "TODO: Translate \"plan_features.title\"",
+    "price_display": "TODO: Translate \"plan_features.price_display\""
+  },
+  "admin": {
+    "report": {
+      "title": "TODO: Translate \"admin.report.title\"",
+      "description": "TODO: Translate \"admin.report.description\"",
+      "columns": {
+        "user": "TODO: Translate \"admin.report.columns.user\"",
+        "email": "TODO: Translate \"admin.report.columns.email\"",
+        "membership_type": "TODO: Translate \"admin.report.columns.membership_type\"",
+        "start_date": "TODO: Translate \"admin.report.columns.start_date\"",
+        "end_date": "TODO: Translate \"admin.report.columns.end_date\"",
+        "status": "TODO: Translate \"admin.report.columns.status\"",
+        "price": "TODO: Translate \"admin.report.columns.price\"",
+        "payment_id": "TODO: Translate \"admin.report.columns.payment_id\"",
+        "created_at": "TODO: Translate \"admin.report.columns.created_at\""
+      },
+      "filter": {
+        "label": "TODO: Translate \"admin.report.filter.label\"",
+        "options": {
+          "all": "TODO: Translate \"admin.report.filter.options.all\"",
+          "active": "TODO: Translate \"admin.report.filter.options.active\"",
+          "expired": "TODO: Translate \"admin.report.filter.options.expired\"",
+          "canceled": "TODO: Translate \"admin.report.filter.options.canceled\""
+        }
+      },
+      "actions": {
+        "export_csv": "TODO: Translate \"admin.report.actions.export_csv\""
+      },
+      "loading": "TODO: Translate \"admin.report.loading\"",
+      "errors": {
+        "failed_to_load": "TODO: Translate \"admin.report.errors.failed_to_load\"",
+        "access_denied": "TODO: Translate \"admin.report.errors.access_denied\"",
+        "access_denied_description": "TODO: Translate \"admin.report.errors.access_denied_description\"",
+        "error_loading_report": "TODO: Translate \"admin.report.errors.error_loading_report\""
+      }
+    }
+  }
+}

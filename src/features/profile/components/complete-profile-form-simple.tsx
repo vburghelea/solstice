@@ -18,6 +18,7 @@ import {
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
+import { useProfileTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 import {
   experienceLevelOptions,
@@ -40,38 +41,40 @@ import {
 import { AvailabilityEditor } from "./availability-editor";
 import { GamePreferencesStep } from "./game-preferences-step";
 
-const STEPS = [
-  {
-    id: "personal",
-    title: "Personal Information",
-    description: "Basic information about you",
-  },
-  {
-    id: "additional",
-    title: "Additional Information",
-    description: "More details about your gaming preferences and experience",
-  },
-  {
-    id: "privacy",
-    title: "Privacy Settings",
-    description: "Control what information is visible to others",
-  },
-  {
-    id: "game-preferences",
-    title: "Game Preferences",
-    description: "Select your favorite and least favorite game systems",
-  },
-] as const;
-
-type StepId = (typeof STEPS)[number]["id"];
-
 interface ProfileFormInnerProps {
   initialData: UserProfile;
 }
 
 function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
+  const { t } = useProfileTranslation();
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const STEPS = [
+    {
+      id: "personal",
+      title: t("complete_profile_form.steps.personal_information.title"),
+      description: t("complete_profile_form.steps.personal_information.description"),
+    },
+    {
+      id: "additional",
+      title: t("complete_profile_form.steps.additional_information.title"),
+      description: t("complete_profile_form.steps.additional_information.description"),
+    },
+    {
+      id: "privacy",
+      title: t("complete_profile_form.steps.privacy_settings.title"),
+      description: t("complete_profile_form.steps.privacy_settings.description"),
+    },
+    {
+      id: "game-preferences",
+      title: t("complete_profile_form.steps.game_preferences.title"),
+      description: t("complete_profile_form.steps.game_preferences.description"),
+    },
+  ] as const;
+
+  type StepId = (typeof STEPS)[number]["id"];
+
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
   const [nameAvailability, setNameAvailability] = useState<{
@@ -126,11 +129,13 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
           await invalidateProfileCaches(queryClient, result.data?.id ?? initialData.id);
           router.navigate({ to: "/player" });
         } else {
-          const errorMessage = result.errors?.[0]?.message || "Failed to save profile";
+          const errorMessage =
+            result.errors?.[0]?.message ||
+            t("complete_profile_form.errors.failed_to_save_profile");
           setError(errorMessage);
         }
       } catch (err) {
-        setError("An unexpected error occurred. Please try again.");
+        setError(t("complete_profile_form.errors.unexpected_error"));
         console.error("Profile submission error:", err);
       }
     },
@@ -195,7 +200,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
       if (!result.success) {
         const message =
           result.errors?.[0]?.message ||
-          "Unable to verify profile name. Please try again.";
+          t("complete_profile_form.errors.unable_to_verify_profile_name");
         updateNameFieldMeta([message], { isValidating: false });
         setNameAvailability(null);
         setError(message);
@@ -203,7 +208,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
       }
 
       if (!result.data.available) {
-        const message = "That profile name is already taken";
+        const message = t("complete_profile_form.errors.profile_name_taken");
         updateNameFieldMeta([message], { isValidating: false });
         setNameAvailability({ normalizedName, available: false });
         setError(message);
@@ -218,7 +223,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
       const message =
         err instanceof Error
           ? err.message
-          : "Unable to verify profile name. Please try again.";
+          : t("complete_profile_form.errors.unable_to_verify_profile_name");
       updateNameFieldMeta([message], { isValidating: false });
       setNameAvailability(null);
       setError(message);
@@ -238,7 +243,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
       const result = await updateUserProfile({ data: { name: sanitizedName } });
 
       if (!result.success) {
-        const message = result.errors?.[0]?.message || "Failed to reserve profile name";
+        const message =
+          result.errors?.[0]?.message ||
+          t("complete_profile_form.errors.failed_to_reserve_profile_name");
         updateNameFieldMeta([message], { isValidating: false });
         setError(message);
         setNameAvailability(null);
@@ -308,11 +315,11 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
   const isLastStep = currentStepIndex === STEPS.length - 1;
 
   const genderOptions = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "non-binary", label: "Non-binary" },
-    { value: "other", label: "Other" },
-    { value: "prefer-not-to-say", label: "Prefer not to say" },
+    { value: "male", label: t("gender_options.male") },
+    { value: "female", label: t("gender_options.female") },
+    { value: "non-binary", label: t("gender_options.non_binary") },
+    { value: "other", label: t("gender_options.other") },
+    { value: "prefer-not-to-say", label: t("gender_options.prefer_not_to_say") },
   ];
 
   const mappedExperienceLevelOptions = experienceLevelOptions.map((level) => ({
@@ -395,9 +402,13 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Profile Name"
-                      placeholder="choose a unique username"
-                      description="This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
+                      label={t("complete_profile_form.fields.profile_name.label")}
+                      placeholder={t(
+                        "complete_profile_form.fields.profile_name.placeholder",
+                      )}
+                      description={t(
+                        "complete_profile_form.fields.profile_name.description",
+                      )}
                       autoComplete="username"
                       maxLength={30}
                       required
@@ -424,9 +435,11 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedSelect
                       field={field}
-                      label="Gender (optional)"
+                      label={t("complete_profile_form.fields.gender.label")}
                       options={genderOptions}
-                      placeholderText="Select gender"
+                      placeholderText={t(
+                        "complete_profile_form.fields.gender.placeholder",
+                      )}
                     />
                   )}
                 </form.Field>
@@ -435,8 +448,8 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Pronouns (optional)"
-                      placeholder="e.g., they/them, she/her, he/him"
+                      label={t("complete_profile_form.fields.pronouns.label")}
+                      placeholder={t("complete_profile_form.fields.pronouns.placeholder")}
                     />
                   )}
                 </form.Field>
@@ -445,8 +458,8 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedPhoneInput
                       field={field}
-                      label="Phone Number (optional)"
-                      placeholder="+49 1512 3456789"
+                      label={t("complete_profile_form.fields.phone.label")}
+                      placeholder={t("complete_profile_form.fields.phone.placeholder")}
                     />
                   )}
                 </form.Field>
@@ -454,8 +467,8 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="City (optional)"
-                      placeholder="Berlin"
+                      label={t("complete_profile_form.fields.city.label")}
+                      placeholder={t("complete_profile_form.fields.city.placeholder")}
                     />
                   )}
                 </form.Field>
@@ -463,8 +476,8 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedCountryCombobox
                       field={field}
-                      label="Country (optional)"
-                      placeholder="Search for a country"
+                      label={t("complete_profile_form.fields.country.label")}
+                      placeholder={t("complete_profile_form.fields.country.placeholder")}
                       valueFormat="label"
                     />
                   )}
@@ -478,7 +491,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                 <form.Field name="languages">
                   {(field) => (
                     <div>
-                      <Label>Languages (optional)</Label>
+                      <Label>{t("complete_profile_form.fields.languages.label")}</Label>
                       <TagInput
                         tags={
                           field.state.value?.map((lang) => ({
@@ -498,7 +511,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                           );
                           field.handleChange(newLanguages);
                         }}
-                        placeholder="Add languages you speak"
+                        placeholder={t(
+                          "complete_profile_form.fields.languages.placeholder",
+                        )}
                         availableSuggestions={mappedLanguageOptions}
                       />
                     </div>
@@ -508,7 +523,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                 <form.Field name="identityTags">
                   {(field) => (
                     <div>
-                      <Label>Identity Tags (optional)</Label>
+                      <Label>
+                        {t("complete_profile_form.fields.identity_tags.label")}
+                      </Label>
                       <TagInput
                         tags={
                           field.state.value?.map((tag) => ({ id: tag, name: tag })) || []
@@ -523,7 +540,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                           );
                           field.handleChange(newTags);
                         }}
-                        placeholder="Add identity tags that represent you"
+                        placeholder={t(
+                          "complete_profile_form.fields.identity_tags.placeholder",
+                        )}
                         availableSuggestions={mappedIdentityTagOptions}
                       />
                     </div>
@@ -533,7 +552,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                 <form.Field name="preferredGameThemes">
                   {(field) => (
                     <div>
-                      <Label>Preferred Game Themes (optional)</Label>
+                      <Label>
+                        {t("complete_profile_form.fields.preferred_game_themes.label")}
+                      </Label>
                       <TagInput
                         tags={
                           field.state.value?.map((theme) => ({
@@ -551,7 +572,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                           );
                           field.handleChange(newThemes);
                         }}
-                        placeholder="Add game themes you prefer"
+                        placeholder={t(
+                          "complete_profile_form.fields.preferred_game_themes.placeholder",
+                        )}
                         availableSuggestions={mappedGameThemeOptions}
                       />
                     </div>
@@ -562,9 +585,11 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   {(field) => (
                     <ValidatedSelect
                       field={field}
-                      label="Overall Experience Level (optional)"
+                      label={t("complete_profile_form.fields.experience_level.label")}
                       options={mappedExperienceLevelOptions}
-                      placeholderText="Select your experience level"
+                      placeholderText={t(
+                        "complete_profile_form.fields.experience_level.placeholder",
+                      )}
                     />
                   )}
                 </form.Field>
@@ -572,9 +597,13 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                 <form.Field name="calendarAvailability">
                   {(field) => (
                     <div>
-                      <Label>Calendar Availability (optional)</Label>
+                      <Label>
+                        {t("complete_profile_form.fields.calendar_availability.label")}
+                      </Label>
                       <p className="text-muted-foreground text-sm">
-                        Click and drag to select your available time slots each week.
+                        {t(
+                          "complete_profile_form.fields.calendar_availability.description",
+                        )}
                       </p>
                       <AvailabilityEditor
                         value={field.state.value ?? defaultAvailabilityData}
@@ -605,7 +634,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
               <>
                 <div className="space-y-4">
                   <p className="text-muted-foreground text-sm">
-                    Choose what information other members can see about you.
+                    {t("complete_profile_form.privacy_settings_intro")}
                   </p>
 
                   <Separator />
@@ -614,7 +643,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my email address to team members"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.show_email_to_team_members",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -623,7 +654,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my phone number to team members"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.show_phone_to_team_members",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -632,7 +665,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my location (city/country) to others"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.show_location_to_others",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -641,7 +676,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my languages to others"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.show_languages_to_others",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -650,7 +687,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my game preferences to others"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.show_game_preferences_to_others",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -659,7 +698,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Allow team captains to send me invitations"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.allow_team_invitations",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -668,7 +709,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Only allow invites from connections"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.only_allow_invites_from_connections",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -677,7 +720,9 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Allow others to follow me"
+                        label={t(
+                          "complete_profile_form.privacy_checkboxes.allow_follows",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -700,15 +745,15 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                     : "border-input bg-background hover:bg-accent hover:text-accent-foreground border",
                 )}
               >
-                Previous
+                {t("complete_profile_form.navigation.previous")}
               </button>
 
               {isLastStep ? (
                 <FormSubmitButton
                   isSubmitting={form.state.isSubmitting}
-                  loadingText="Completing Profile..."
+                  loadingText={t("complete_profile_form.navigation.completing_profile")}
                 >
-                  Complete Profile
+                  {t("complete_profile_form.navigation.complete_profile")}
                 </FormSubmitButton>
               ) : (
                 <button
@@ -716,7 +761,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
                   onClick={goToNextStep}
                   className="text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
                 >
-                  Next
+                  {t("complete_profile_form.navigation.next")}
                 </button>
               )}
             </div>
@@ -728,17 +773,18 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
 }
 
 export function CompleteProfileForm() {
+  const { t } = useProfileTranslation();
   const { data: userProfileData, isLoading: isLoadingUserProfile } = useQuery({
     queryKey: ["userProfile"],
     queryFn: () => getUserProfile({}),
   });
 
   if (isLoadingUserProfile) {
-    return <div>Loading profile...</div>;
+    return <div>{t("complete_profile_form.loading_profile")}</div>;
   }
 
   if (!userProfileData?.success || !userProfileData.data) {
-    return <div>Failed to load profile. Please try again.</div>;
+    return <div>{t("complete_profile_form.failed_to_load_profile")}</div>;
   }
 
   return <ProfileFormInner initialData={userProfileData.data} />;

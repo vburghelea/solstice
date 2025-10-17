@@ -16,79 +16,126 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useAdminInsights } from "~/features/admin/insights/admin-insights.queries";
-import {
-  RoleWorkspaceLayout,
-  type RoleWorkspaceNavItem,
-} from "~/features/layouts/role-workspace-layout";
+import { RoleWorkspaceLayout } from "~/features/layouts/role-workspace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
+import { useNavigationTranslation } from "~/hooks/useTypedTranslation";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
 import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
 import { useFeatureFlag } from "~/lib/feature-flags";
 
-const BASE_ADMIN_NAVIGATION: RoleWorkspaceNavItem[] = [
-  {
-    label: "Overview",
-    to: "/admin",
-    icon: Home,
-    exact: true,
-    description:
-      "Review governance posture, alerts, and organization-wide impacts at a glance.",
-  },
-  {
-    label: "Insights",
-    to: "/admin/insights",
-    icon: LineChart,
-    description: "Audit KPIs, uptime, and membership health across the platform.",
-  },
-  {
-    label: "Systems",
-    to: "/admin/systems",
-    icon: Layers,
-    description: "Curate rulesets, manage crawls, and moderate media.",
-  },
-  {
-    label: "Users",
-    to: "/admin/users",
-    icon: Users,
-    inMobileNav: false,
-    description: "Manage roles, MFA enrollment, and compliance exports.",
-  },
-  {
-    label: "Security",
-    to: "/admin/security",
-    icon: Shield,
-    inMobileNav: false,
-    description: "Monitor privileged actions, incidents, and security toggles.",
-  },
-  {
-    label: "Feature flags",
-    to: "/admin/feature-flags",
-    icon: Flag,
-    inMobileNav: false,
-    description: "Coordinate rollout plans and targeted experiments for your teams.",
-  },
-  {
-    label: "Shared inbox",
-    to: "/admin/inbox",
-    icon: Inbox,
-    description: "Coordinate escalations and platform-wide announcements.",
-  },
-  {
-    label: "Collaboration",
-    to: "/admin/collaboration",
-    icon: Workflow,
-    description: "Work side-by-side with ops and GMs on active initiatives.",
-  },
-  {
-    label: "Event review",
-    to: "/admin/events-review",
-    icon: AlertCircle,
-    inMobileNav: false,
-    description: "Approve or escalate upcoming experiences before they go live.",
-  },
-];
+function AdminNamespaceShell() {
+  const { t } = useNavigationTranslation();
+  const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
+  const loadResolution = useServerFn(resolvePersonaResolution);
+  const { user } = Route.useRouteContext();
+  const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
+  const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
+
+  const baseAdminNavigation = useMemo(
+    () => [
+      {
+        label: t("workspaces.admin.nav.overview.label"),
+        to: "/admin",
+        icon: Home,
+        exact: true,
+        description: t("workspaces.admin.nav.overview.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.analytics.label"),
+        to: "/admin/insights",
+        icon: LineChart,
+        description: t("workspaces.admin.nav.analytics.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.settings.label"),
+        to: "/admin/systems",
+        icon: Layers,
+        description: t("workspaces.admin.nav.settings.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.users.label"),
+        to: "/admin/users",
+        icon: Users,
+        inMobileNav: false,
+        description: t("workspaces.admin.nav.users.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.audit_logs.label"),
+        to: "/admin/security",
+        icon: Shield,
+        inMobileNav: false,
+        description: t("workspaces.admin.nav.audit_logs.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.settings.label"),
+        to: "/admin/feature-flags",
+        icon: Flag,
+        inMobileNav: false,
+        description: t("workspaces.admin.nav.settings.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.overview.label"),
+        to: "/admin/inbox",
+        icon: Inbox,
+        description: t("workspaces.admin.nav.overview.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.overview.label"),
+        to: "/admin/collaboration",
+        icon: Workflow,
+        description: t("workspaces.admin.nav.overview.description"),
+      },
+      {
+        label: t("workspaces.admin.nav.audit_logs.label"),
+        to: "/admin/events-review",
+        icon: AlertCircle,
+        inMobileNav: false,
+        description: t("workspaces.admin.nav.audit_logs.description"),
+      },
+    ],
+    [t],
+  );
+
+  const navigationItems = useMemo(() => {
+    return baseAdminNavigation.filter((item) => {
+      if (item.to === "/admin/inbox") {
+        return showSharedInbox;
+      }
+
+      if (item.to === "/admin/collaboration") {
+        return showCollaboration;
+      }
+
+      return true;
+    });
+  }, [baseAdminNavigation, showCollaboration, showSharedInbox]);
+
+  const workspaceSubtitle = user?.name
+    ? t("workspaces.admin.welcome_back", { name: user.name })
+    : t("workspaces.admin.welcome_back_generic");
+  const workspaceLabel = user?.name ? user.name : t("workspaces.admin.fallback_label");
+
+  return (
+    <RoleSwitcherProvider
+      initialResolution={resolution}
+      onSwitch={async (personaId) =>
+        loadResolution({ data: { preferredPersonaId: personaId, forceRefresh: true } })
+      }
+    >
+      <RoleWorkspaceLayout
+        title={t("workspaces.admin.title")}
+        description={t("workspaces.admin.description")}
+        navItems={navigationItems}
+        fallbackLabel={t("workspaces.admin.fallback_label")}
+        subtitle={workspaceSubtitle}
+        workspaceLabel={workspaceLabel}
+        headerSlot={<AdminWorkspaceSummary />}
+      ></RoleWorkspaceLayout>
+    </RoleSwitcherProvider>
+  );
+}
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async ({ context, location }) => {
@@ -101,51 +148,8 @@ export const Route = createFileRoute("/admin")({
   component: AdminNamespaceShell,
 });
 
-function AdminNamespaceShell() {
-  const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
-  const loadResolution = useServerFn(resolvePersonaResolution);
-  const { user } = Route.useRouteContext();
-  const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
-  const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
-
-  const navigationItems = useMemo(() => {
-    return BASE_ADMIN_NAVIGATION.filter((item) => {
-      if (item.to === "/admin/inbox") {
-        return showSharedInbox;
-      }
-
-      if (item.to === "/admin/collaboration") {
-        return showCollaboration;
-      }
-
-      return true;
-    });
-  }, [showCollaboration, showSharedInbox]);
-
-  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
-  const workspaceLabel = user?.name ? `${user.name}` : "Admin";
-
-  return (
-    <RoleSwitcherProvider
-      initialResolution={resolution}
-      onSwitch={async (personaId) =>
-        loadResolution({ data: { preferredPersonaId: personaId, forceRefresh: true } })
-      }
-    >
-      <RoleWorkspaceLayout
-        title="Administration workspace"
-        description="Coordinate governance, permissions, and platform-wide alerts for your organization."
-        navItems={navigationItems}
-        fallbackLabel="Platform admin"
-        subtitle={workspaceSubtitle}
-        workspaceLabel={workspaceLabel}
-        headerSlot={<AdminWorkspaceSummary />}
-      ></RoleWorkspaceLayout>
-    </RoleSwitcherProvider>
-  );
-}
-
 function AdminWorkspaceSummary() {
+  const { t } = useNavigationTranslation();
   const { data, isLoading, error } = useAdminInsights({
     staleTime: 60_000,
     retry: false,
@@ -160,7 +164,9 @@ function AdminWorkspaceSummary() {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Platform health</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("workspaces.admin.summary.system_health")}
+          </CardTitle>
           <LineChart className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
@@ -174,17 +180,21 @@ function AdminWorkspaceSummary() {
               <span>{headlineKpi.supportingCopy}</span>
             </>
           ) : (
-            <span>{error ? error.message : "No KPIs available"}</span>
+            <span>
+              {error ? error.message : t("workspaces.admin.summary.user_metrics")}
+            </span>
           )}
           <Link to="/admin/insights" className="text-primary text-xs font-medium">
-            View insights
+            {t("workspaces.admin.summary.analytics")}
           </Link>
         </CardContent>
       </Card>
 
       <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Active alerts</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("workspaces.admin.summary.platform_stats")}
+          </CardTitle>
           <AlertCircle className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
@@ -195,18 +205,20 @@ function AdminWorkspaceSummary() {
               <span className="text-foreground font-medium">{activeAlerts[0].name}</span>
               <span>{activeAlerts[0].threshold}</span>
               <Link to="/admin/security" className="text-primary text-xs font-medium">
-                Investigate alert
+                {t("workspaces.admin.summary.recent_activity")}
               </Link>
             </>
           ) : (
-            <span>All monitors are stable</span>
+            <span>{t("workspaces.admin.summary.system_health")}</span>
           )}
         </CardContent>
       </Card>
 
       <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Impact focus</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("workspaces.admin.summary.user_metrics")}
+          </CardTitle>
           <Users className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
@@ -223,7 +235,7 @@ function AdminWorkspaceSummary() {
               </span>
             </>
           ) : (
-            <span>No major shifts detected</span>
+            <span>{t("workspaces.admin.summary.platform_stats")}</span>
           )}
         </CardContent>
       </Card>

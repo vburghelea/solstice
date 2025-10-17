@@ -11,18 +11,23 @@ import {
   sanitizeProfileName,
   validateProfileNameValue,
 } from "~/features/profile/profile.utils";
+import { useAuthTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
-import { signupFormFields } from "../auth.schemas";
+import { createSignupFormFields } from "../auth.schemas";
 
 export default function SignupForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const router = useRouter();
   const redirectUrl = "/player"; // Default redirect after signup
+  const { t } = useAuthTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Create translation-aware form validators
+  const signupFormFields = createSignupFormFields(t);
 
   const form = useAppForm({
     defaultValues: {
@@ -51,7 +56,7 @@ export default function SignupForm() {
 
         if (!sanitizedInput || !nameValidation.success) {
           const message = nameValidation.success
-            ? "Profile name must contain allowed characters"
+            ? t("signup.errors.invalid_name")
             : nameValidation.error;
           setNameError(message);
           form.setFieldValue("name", sanitizedInput);
@@ -71,7 +76,7 @@ export default function SignupForm() {
         if (!availabilityResult.success) {
           const message =
             availabilityResult.errors?.[0]?.message ||
-            "Unable to verify profile name. Please try again.";
+            t("signup.errors.unable_to_verify_name");
           setNameError(message);
           form.setFieldValue("name", sanitizedName);
           setIsLoading(false);
@@ -79,7 +84,7 @@ export default function SignupForm() {
         }
 
         if (!availabilityResult.data.available) {
-          setNameError("That profile name is already taken");
+          setNameError(t("signup.errors.profile_name_taken"));
           form.setFieldValue("name", sanitizedName);
           setIsLoading(false);
           return;
@@ -110,7 +115,7 @@ export default function SignupForm() {
         await navigate({ to: redirectUrl });
       } catch (error) {
         // Error handling
-        setErrorMessage((error as Error)?.message || "Signup failed");
+        setErrorMessage((error as Error)?.message || t("signup.errors.signup_failed"));
         // Keep form values but reset submitting state by resetting with current values
         form.reset({
           name: form.state.values.name,
@@ -142,7 +147,7 @@ export default function SignupForm() {
               </div>
               <span className="sr-only">Roundup Games</span>
             </a>
-            <h1 className="text-xl font-bold">Sign up for Roundup Games</h1>
+            <h1 className="text-xl font-bold">{t("signup.title")}</h1>
           </div>
           <div className="flex flex-col gap-5">
             <form.Field
@@ -154,9 +159,9 @@ export default function SignupForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Name"
+                  label={t("signup.labels.name")}
                   type="text"
-                  placeholder="John Doe"
+                  placeholder={t("signup.placeholders.name")}
                   autoComplete="name"
                   autoFocus
                 />
@@ -171,9 +176,9 @@ export default function SignupForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Email"
+                  label={t("signup.labels.email")}
                   type="email"
-                  placeholder="hello@example.com"
+                  placeholder={t("signup.placeholders.email")}
                   autoComplete="email"
                 />
               )}
@@ -187,9 +192,9 @@ export default function SignupForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Password"
+                  label={t("signup.labels.password")}
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("signup.placeholders.password")}
                   autoComplete="new-password"
                 />
               )}
@@ -202,7 +207,7 @@ export default function SignupForm() {
                   const password = fieldApi.form.getFieldValue("password");
                   // Only validate if both fields have values
                   if (value && password && value !== password) {
-                    return "Passwords do not match";
+                    return t("common.validation.passwords_dont_match");
                   }
                   return undefined;
                 },
@@ -211,9 +216,9 @@ export default function SignupForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Confirm Password"
+                  label={t("signup.labels.confirm_password")}
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder={t("signup.placeholders.confirm_password")}
                   autoComplete="new-password"
                 />
               )}
@@ -222,9 +227,9 @@ export default function SignupForm() {
               isSubmitting={form.state.isSubmitting || isLoading}
               className="mt-2 w-full"
               size="lg"
-              loadingText="Signing up..."
+              loadingText={t("signup.buttons.signing_up")}
             >
-              Sign up
+              {t("signup.buttons.create_account")}
             </FormSubmitButton>
           </div>
           {errorMessage && (
@@ -232,7 +237,7 @@ export default function SignupForm() {
           )}
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
-              Or
+              {t("common.dividers.or")}
             </span>
           </div>
           <Button
@@ -254,14 +259,16 @@ export default function SignupForm() {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onError: (ctx: any) => {
                     setIsLoading(false);
-                    setErrorMessage(ctx.error?.message || "OAuth signup failed");
+                    setErrorMessage(
+                      ctx.error?.message || t("signup.errors.oauth_signup_failed"),
+                    );
                   },
                 },
               )
             }
           >
             <GoogleIcon />
-            Sign up with Google
+            {t("signup.oauth.signup_with_google")}
           </Button>
           <Button
             variant="outline"
@@ -282,7 +289,9 @@ export default function SignupForm() {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onError: (ctx: any) => {
                     setIsLoading(false);
-                    setErrorMessage(ctx.error?.message || "OAuth signup failed");
+                    setErrorMessage(
+                      ctx.error?.message || t("signup.errors.oauth_signup_failed"),
+                    );
                   },
                 },
               )
@@ -307,15 +316,15 @@ export default function SignupForm() {
               <path d="M4.5 10c.98-.98.98-2.52 0-3.5-.98-.98-2.52-.98-3.5 0-.98.98-.98 2.52 0 3.5.98.98 2.52.98 3.5 0Z" />
               <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" />
             </svg>
-            Sign up with Discord
+            {t("signup.oauth.signup_with_discord")}
           </Button>
         </div>
       </form>
 
       <div className="text-center text-sm">
-        Already have an account?{" "}
+        {t("signup.buttons.have_account")}{" "}
         <Link to="/auth/login" className="underline underline-offset-4">
-          Login
+          {t("signup.buttons.login")}
         </Link>
       </div>
     </div>

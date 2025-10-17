@@ -14,7 +14,7 @@ export const useTypedTranslation = (ns?: Namespace | Namespace[]) => {
       t(key, options as Record<string, unknown>),
     changeLanguage: i18n.changeLanguage,
     currentLanguage: i18n.language as SupportedLanguage,
-    isRTL: i18n.dir() === "rtl",
+    isRTL: typeof i18n.dir === "function" ? i18n.dir() === "rtl" : false,
     supportedLanguages: i18n.languages.filter((lang): lang is SupportedLanguage =>
       ["en", "de", "pl"].includes(lang),
     ),
@@ -32,7 +32,7 @@ export const useNamespaceTranslation = <T extends Namespace>(namespace: T) => {
       t(key, options as Record<string, unknown>),
     changeLanguage: i18n.changeLanguage,
     currentLanguage: i18n.language as SupportedLanguage,
-    isRTL: i18n.dir() === "rtl",
+    isRTL: typeof i18n.dir === "function" ? i18n.dir() === "rtl" : false,
     namespace,
   };
 };

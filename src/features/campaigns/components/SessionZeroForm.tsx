@@ -6,6 +6,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { sessionZeroSchema } from "~/features/campaigns/campaigns.schemas";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { type SessionZeroDataType } from "../campaigns.types";
 
 interface SessionZeroFormProps {
@@ -27,6 +28,7 @@ export function SessionZeroForm({
   isSubmitting,
   isOwner,
 }: SessionZeroFormProps) {
+  const { t } = useCampaignsTranslation();
   const form = useForm({
     defaultValues: JSON.parse(JSON.stringify(initialValues)),
     onSubmit: async ({ value }) => {
@@ -46,13 +48,13 @@ export function SessionZeroForm({
       {/* Campaign Expectations */}
       <fieldset className="space-y-4 rounded-md border p-4">
         <legend className="text-lg font-semibold text-gray-300">
-          Campaign Expectations
+          {t("session_zero.campaign_expectations.title")}
         </legend>
         <form.Field name="sessionZeroData.campaignExpectations.style">
           {(field) => (
             <div>
               <Label htmlFor={field.name}>
-                Campaign Style (e.g., High Fantasy, Dark & Gritty)
+                {t("session_zero.campaign_expectations.campaign_style")}
               </Label>
               <Textarea
                 id={field.name}
@@ -70,7 +72,7 @@ export function SessionZeroForm({
           {(field) => (
             <div>
               <Label htmlFor={field.name}>
-                Game Difficulty (e.g., Lethal, Forgiving)
+                {t("session_zero.campaign_expectations.game_difficulty")}
               </Label>
               <Textarea
                 id={field.name}
@@ -87,7 +89,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.campaignExpectations.houseRules">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>House Rules / Homebrew Content</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.campaign_expectations.house_rules")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -103,7 +107,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.campaignExpectations.levelingUp">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Leveling Up Method (XP or Milestones)</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.campaign_expectations.leveling_up_method")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -120,7 +126,7 @@ export function SessionZeroForm({
           {(field) => (
             <div>
               <Label htmlFor={field.name}>
-                Campaign Length (e.g., One-shot, Long-running)
+                {t("session_zero.campaign_expectations.campaign_length")}
               </Label>
               <Textarea
                 id={field.name}
@@ -139,12 +145,14 @@ export function SessionZeroForm({
       {/* Table Expectations */}
       <fieldset className="space-y-4 rounded-md border p-4">
         <legend className="text-lg font-semibold text-gray-300">
-          Table Expectations
+          {t("session_zero.table_expectations.title")}
         </legend>
         <form.Field name="sessionZeroData.tableExpectations.foodDrinks">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Food and Drinks Policy</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.table_expectations.food_drinks_policy")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -161,7 +169,7 @@ export function SessionZeroForm({
           {(field) => (
             <div>
               <Label htmlFor={field.name}>
-                Non-Table Activities (e.g., Phone Use, Side Conversations)
+                {t("session_zero.table_expectations.non_table_activities")}
               </Label>
               <Textarea
                 id={field.name}
@@ -178,7 +186,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.tableExpectations.diceRolls">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Unannounced Dice Rolls Policy</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.table_expectations.unannounced_dice_rolls_policy")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -194,7 +204,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.tableExpectations.pvp">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>PVP and Contested Rolls Policy</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.table_expectations.pvp_contested_rolls_policy")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -210,7 +222,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.tableExpectations.characterSecrets">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Character Secrets Policy</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.table_expectations.character_secrets_policy")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -226,7 +240,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.tableExpectations.playerAbsences">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Player Absences Policy</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.table_expectations.player_absences_policy")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -243,7 +259,9 @@ export function SessionZeroForm({
 
       {/* Safety Tools */}
       <fieldset className="space-y-4 rounded-md border p-4">
-        <legend className="text-lg font-semibold text-gray-300">Safety Tools</legend>
+        <legend className="text-lg font-semibold text-gray-300">
+          {t("session_zero.safety_tools.title")}
+        </legend>
         <form.Field name="sessionZeroData.safetyTools.openCommunication">
           {(field) => (
             <div className="flex items-center space-x-2">
@@ -254,7 +272,9 @@ export function SessionZeroForm({
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
-              <Label htmlFor={field.name}>Encourage Open Communication</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.safety_tools.encourage_open_communication")}
+              </Label>
             </div>
           )}
         </form.Field>
@@ -268,14 +288,18 @@ export function SessionZeroForm({
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
-              <Label htmlFor={field.name}>Use X-Card System</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.safety_tools.use_x_card_system")}
+              </Label>
             </div>
           )}
         </form.Field>
         <form.Field name="sessionZeroData.safetyTools.xCardDetails">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>X-Card System Details (if applicable)</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.safety_tools.x_card_system_details")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -291,7 +315,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.safetyTools.playerBoundariesConsent">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Player Boundaries and Consent Discussion</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.safety_tools.player_boundaries_consent_discussion")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -309,13 +335,13 @@ export function SessionZeroForm({
       {/* Character Creation */}
       <fieldset className="space-y-4 rounded-md border p-4">
         <legend className="text-lg font-semibold text-gray-300">
-          Character Creation
+          {t("session_zero.character_creation.title")}
         </legend>
         <form.Field name="sessionZeroData.characterCreation.creationQuestions">
           {(field) => (
             <div>
               <Label htmlFor={field.name}>
-                Character Creation Questions (e.g., Starting Level, Equipment)
+                {t("session_zero.character_creation.character_creation_questions")}
               </Label>
               <Textarea
                 id={field.name}
@@ -339,7 +365,9 @@ export function SessionZeroForm({
                 onBlur={field.handleBlur}
                 disabled={!isOwner}
               />
-              <Label htmlFor={field.name}>Feats Allowed</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.character_creation.feats_allowed")}
+              </Label>
             </div>
           )}
         </form.Field>
@@ -347,7 +375,7 @@ export function SessionZeroForm({
           {(field) => (
             <div>
               <Label htmlFor={field.name}>
-                Stats Determination Method (e.g., Rolling, Point-Buy)
+                {t("session_zero.character_creation.stats_determination_method")}
               </Label>
               <Textarea
                 id={field.name}
@@ -364,7 +392,9 @@ export function SessionZeroForm({
         <form.Field name="sessionZeroData.characterCreation.contextIntegration">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Character Context and Integration</Label>
+              <Label htmlFor={field.name}>
+                {t("session_zero.character_creation.character_context_integration")}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -382,12 +412,16 @@ export function SessionZeroForm({
       {/* Character Creation Outcome (separate text field) */}
       <fieldset className="space-y-4 rounded-md border p-4">
         <legend className="text-lg font-semibold text-gray-300">
-          Documented Character Creation Outcome
+          {t("session_zero.documented_character_creation_outcome.title")}
         </legend>
         <form.Field name="characterCreationOutcome">
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Final Character Creation Decisions</Label>
+              <Label htmlFor={field.name}>
+                {t(
+                  "session_zero.documented_character_creation_outcome.final_character_creation_decisions",
+                )}
+              </Label>
               <Textarea
                 id={field.name}
                 value={field.state.value || ""}
@@ -406,7 +440,7 @@ export function SessionZeroForm({
       {isOwner && (
         <div className="flex justify-end">
           <FormSubmitButton isSubmitting={isSubmitting}>
-            Save Session Zero Details
+            {t("buttons.save_session_zero_details")}
           </FormSubmitButton>
         </div>
       )}

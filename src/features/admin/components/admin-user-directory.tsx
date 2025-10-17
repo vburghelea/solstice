@@ -81,6 +81,7 @@ import {
   type RoleUserSearchResult,
 } from "~/features/roles";
 import { canDeleteUsers } from "~/features/roles/permission.service";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import {
   useAdminUserDirectory,
   useExportComplianceReport,
@@ -89,19 +90,21 @@ import {
   type AdminUserRecord,
 } from "../users/admin-user-directory.queries";
 
-const membershipLabels: Record<AdminMembershipStatus, string> = {
-  active: "Active",
-  expired: "Expired",
-  canceled: "Canceled",
-  none: "No membership",
-};
-
 const membershipTone: Record<AdminMembershipStatus, string> = {
   active: "bg-emerald-500/10 text-emerald-600",
   expired: "bg-amber-500/10 text-amber-600",
   canceled: "bg-destructive/10 text-destructive",
   none: "bg-muted text-muted-foreground",
 };
+
+const getMembershipLabels = (
+  t: (key: string) => string,
+): Record<AdminMembershipStatus, string> => ({
+  active: t("admin.user_directory.membership.status.active"),
+  expired: t("admin.user_directory.membership.status.expired"),
+  canceled: t("admin.user_directory.membership.status.canceled"),
+  none: t("admin.user_directory.membership.status.none"),
+});
 
 function DirectorySkeleton() {
   return (
@@ -198,11 +201,12 @@ function RiskBadge({
 function buildColumns(
   canDeleteUser: boolean,
   setUserToDelete: (user: AdminUserRecord) => void,
+  adminT: (key: string) => string,
 ): ColumnDef<AdminUserRecord>[] {
   return [
     {
       accessorKey: "name",
-      header: "User",
+      header: adminT("user_directory.tables.headers.user"),
       cell: ({ row }) => {
         const record = row.original;
         return (
@@ -232,10 +236,11 @@ function buildColumns(
     },
     {
       accessorKey: "membershipStatus",
-      header: "Membership",
+      header: adminT("user_directory.tables.headers.membership"),
       cell: ({ row }) => {
         const record = row.original;
         const tone = membershipTone[record.membershipStatus];
+        const membershipLabels = getMembershipLabels(adminT);
         return (
           <div className="token-stack-xs">
             <Badge variant="outline" className={cn("border-transparent", tone)}>
@@ -243,8 +248,10 @@ function buildColumns(
             </Badge>
             {record.membershipExpiresAt ? (
               <span className="text-body-xs text-muted-foreground">
-                Expires{" "}
-                {formatDistanceToNow(record.membershipExpiresAt, { addSuffix: true })}
+                {adminT("user_directory.membership.expires").replace(
+                  "{{time}}",
+                  formatDistanceToNow(record.membershipExpiresAt, { addSuffix: true }),
+                )}
               </span>
             ) : null}
           </div>
@@ -253,12 +260,14 @@ function buildColumns(
     },
     {
       accessorKey: "roles",
-      header: "Roles",
+      header: adminT("user_directory.tables.headers.roles"),
       cell: ({ row }) => {
         const record = row.original;
         if (record.roles.length === 0) {
           return (
-            <span className="text-body-xs text-muted-foreground">No assignments</span>
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.roles.no_assignments")}
+            </span>
           );
         }
         return (
@@ -281,11 +290,15 @@ function buildColumns(
     },
     {
       accessorKey: "roleAssignedAt",
-      header: "Role Assigned",
+      header: adminT("user_directory.tables.headers.role_assigned"),
       cell: ({ row }) => {
         const record = row.original;
         if (record.roles.length === 0) {
-          return <span className="text-body-xs text-muted-foreground">Never</span>;
+          return (
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.activity.no_activity")}
+            </span>
+          );
         }
         // Get the most recent role assignment
         const mostRecentRole = record.roles.reduce((latest, current) =>
@@ -302,7 +315,7 @@ function buildColumns(
     },
     {
       accessorKey: "mfaEnrolled",
-      header: "MFA",
+      header: adminT("user_directory.tables.headers.mfa"),
       cell: ({ row }) => {
         const { mfaEnrolled } = row.original;
         return (
@@ -312,32 +325,38 @@ function buildColumns(
             ) : (
               <ShieldOffIcon aria-hidden className="text-destructive size-4" />
             )}
-            {mfaEnrolled ? "Enforced" : "Missing"}
+            {mfaEnrolled
+              ? adminT("user_directory.mfa.enforced")
+              : adminT("user_directory.mfa.missing")}
           </span>
         );
       },
     },
     {
       accessorKey: "lastActiveAt",
-      header: "Last active",
+      header: adminT("user_directory.tables.headers.last_active"),
       cell: ({ row }) => {
         const { lastActiveAt } = row.original;
         return (
           <span className="text-body-sm text-muted-foreground">
             {lastActiveAt
               ? formatDistanceToNow(lastActiveAt, { addSuffix: true })
-              : "No activity"}
+              : adminT("user_directory.activity.no_activity")}
           </span>
         );
       },
     },
     {
       accessorKey: "riskFlags",
-      header: "Risk",
+      header: adminT("user_directory.tables.headers.risk"),
       cell: ({ row }) => {
         const { riskFlags } = row.original;
         if (riskFlags.length === 0) {
-          return <span className="text-body-xs text-muted-foreground">Clear</span>;
+          return (
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.risk.clear")}
+            </span>
+          );
         }
         return (
           <div className="flex flex-wrap gap-1">
@@ -354,12 +373,14 @@ function buildColumns(
     },
     {
       accessorKey: "auditTrail",
-      header: "Latest activity",
+      header: adminT("user_directory.tables.headers.latest_activity"),
       cell: ({ row }) => {
         const { auditTrail } = row.original;
         if (auditTrail.length === 0) {
           return (
-            <span className="text-body-xs text-muted-foreground">No recent events</span>
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.activity.no_recent_events")}
+            </span>
           );
         }
         const [latest] = auditTrail;
@@ -377,7 +398,7 @@ function buildColumns(
       ? [
           {
             id: "actions",
-            header: "Actions",
+            header: adminT("user_directory.tables.headers.actions"),
             cell: ({ row }: { row: { original: AdminUserRecord } }) => {
               const record = row.original;
               return (
@@ -388,7 +409,7 @@ function buildColumns(
                   className="flex items-center gap-1"
                 >
                   <UserX className="h-4 w-4" />
-                  Delete
+                  {adminT("user_directory.buttons.delete")}
                 </Button>
               );
             },
@@ -399,6 +420,8 @@ function buildColumns(
 }
 
 export function AdminUserDirectory() {
+  const { t: adminT } = useAdminTranslation();
+
   // Get current user from route context
   const { user: currentUser } = useRouteContext({ from: "/admin/users" }) as {
     user: { id: string } | null;
@@ -584,8 +607,8 @@ export function AdminUserDirectory() {
   }, [isClient, roleData, currentUser]);
 
   const columns = useMemo(
-    () => buildColumns(canDeleteUser, setUserToDelete),
-    [canDeleteUser, setUserToDelete],
+    () => buildColumns(canDeleteUser, setUserToDelete, adminT),
+    [canDeleteUser, setUserToDelete, adminT],
   );
 
   const handleDialogOpenChange = (open: boolean) => {
@@ -684,10 +707,11 @@ export function AdminUserDirectory() {
         <CardHeader className="token-stack-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="token-stack-xs">
-              <CardTitle className="text-heading-sm">User governance</CardTitle>
+              <CardTitle className="text-heading-sm">
+                {adminT("user_directory.title")}
+              </CardTitle>
               <CardDescription className="text-body-sm text-muted-strong">
-                Track membership coverage, role assignments, and MFA enforcement for your
-                compliance lens.
+                {adminT("user_directory.subtitle")}
               </CardDescription>
             </div>
             {isClient && (
@@ -695,7 +719,7 @@ export function AdminUserDirectory() {
                 <DialogTrigger asChild>
                   <Button className="w-full sm:w-auto">
                     <PlusIcon className="mr-2 h-4 w-4" />
-                    Assign Role
+                    {adminT("user_directory.buttons.assign_role")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg">

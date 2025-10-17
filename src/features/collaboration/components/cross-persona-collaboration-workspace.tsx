@@ -21,28 +21,7 @@ import type {
   PersonaAlignmentSummary,
 } from "~/features/collaboration/types";
 import type { PersonaId } from "~/features/inbox/types";
-
-const PERSONA_META: Record<PersonaId, { label: string; accent: string }> = {
-  player: { label: "Player", accent: "bg-sky-500/10 text-sky-700 border-sky-500/40" },
-  ops: {
-    label: "Operations",
-    accent: "bg-amber-500/15 text-amber-700 border-amber-500/40",
-  },
-  gm: {
-    label: "Game master",
-    accent: "bg-purple-500/10 text-purple-700 border-purple-500/40",
-  },
-  admin: {
-    label: "Platform admin",
-    accent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/40",
-  },
-};
-
-const STATUS_LABEL: Record<FeedbackLoopEntry["backlogStatus"], string> = {
-  triaged: "Triaged",
-  "in-progress": "In progress",
-  shipped: "Shipped",
-};
+import { useCollaborationTranslation } from "~/hooks/useTypedTranslation";
 
 const SENTIMENT_STYLE: Record<FeedbackLoopEntry["sentiment"], string> = {
   positive: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
@@ -77,6 +56,32 @@ export function CrossPersonaCollaborationWorkspace(
     previewMessage,
     inboxPathOverride,
   } = props;
+  const { t } = useCollaborationTranslation();
+
+  const PERSONA_META: Record<PersonaId, { label: string; accent: string }> = {
+    player: {
+      label: t("personas.player"),
+      accent: "bg-sky-500/10 text-sky-700 border-sky-500/40",
+    },
+    ops: {
+      label: t("personas.ops"),
+      accent: "bg-amber-500/15 text-amber-700 border-amber-500/40",
+    },
+    gm: {
+      label: t("personas.gm"),
+      accent: "bg-purple-500/10 text-purple-700 border-purple-500/40",
+    },
+    admin: {
+      label: t("personas.admin"),
+      accent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/40",
+    },
+  };
+
+  const STATUS_LABEL: Record<FeedbackLoopEntry["backlogStatus"], string> = {
+    triaged: t("status.triaged"),
+    "in-progress": t("status.in_progress"),
+    shipped: t("status.shipped"),
+  };
   const [personaFilter, setPersonaFilter] = useState<PersonaId | "all">(
     activePersona ?? "all",
   );
@@ -123,9 +128,9 @@ export function CrossPersonaCollaborationWorkspace(
     return (
       <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
         <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
-          <CardTitle className="text-lg">Loading collaboration insights</CardTitle>
+          <CardTitle className="text-lg">{t("workspace.loading")}</CardTitle>
           <CardDescription className="max-w-md">
-            Gathering live metrics across player, ops, GM, and admin workspaces.
+            {t("workspace.loading_description")}
           </CardDescription>
         </Card>
       </div>
@@ -136,9 +141,9 @@ export function CrossPersonaCollaborationWorkspace(
     return (
       <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
         <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
-          <CardTitle className="text-lg">Unable to load collaboration data</CardTitle>
+          <CardTitle className="text-lg">{t("workspace.unable_to_load")}</CardTitle>
           <CardDescription className="max-w-md">
-            Please refresh to retry. If the issue persists, contact the platform team.
+            {t("workspace.unable_to_load_description")}
           </CardDescription>
         </Card>
       </div>
@@ -159,11 +164,11 @@ export function CrossPersonaCollaborationWorkspace(
       ) : null}
       <header className="space-y-4">
         <Badge variant="outline" className="text-xs tracking-wide uppercase">
-          Collaboration hub
+          {t("workspace.beta_badge")}
         </Badge>
         <div className="space-y-2">
           <h1 className="text-foreground text-2xl font-semibold sm:text-3xl">
-            Cross-namespace reporting & feedback
+            {t("workspace.title")}
           </h1>
           <p className="text-muted-foreground max-w-3xl text-sm sm:text-base">
             {snapshot.summary}
@@ -172,13 +177,11 @@ export function CrossPersonaCollaborationWorkspace(
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
           <span className="text-muted-foreground">
-            Updated{" "}
+            {t("workspace.updated_label")}{" "}
             {formatDistanceToNow(new Date(snapshot.updatedAt), { addSuffix: true })}
           </span>
           <Separator orientation="vertical" className="h-4" />
-          <span className="text-muted-foreground">
-            Align across personas without leaving your namespace.
-          </span>
+          <span className="text-muted-foreground">{t("workspace.description")}</span>
         </div>
       </header>
 
@@ -188,7 +191,7 @@ export function CrossPersonaCollaborationWorkspace(
           size="sm"
           onClick={() => setPersonaFilter("all")}
         >
-          All personas
+          {t("workspace.filters.all")}
         </Button>
         {Object.entries(PERSONA_META).map(([id, meta]) => {
           const personaId = id as PersonaId;
@@ -209,9 +212,11 @@ export function CrossPersonaCollaborationWorkspace(
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold sm:text-xl">Shared reporting metrics</h2>
+            <h2 className="text-lg font-semibold sm:text-xl">
+              {t("sections.metrics.title")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              Trace how experiments in one namespace influence outcomes across the others.
+              {t("sections.metrics.description")}
             </p>
           </div>
           <Button
@@ -222,10 +227,10 @@ export function CrossPersonaCollaborationWorkspace(
             aria-disabled={disableInboxLink}
           >
             {disableInboxLink ? (
-              <span>Review shared threads</span>
+              <span>{t("sections.metrics.review_threads")}</span>
             ) : (
               <Link to={inboxPathOverride ?? `/${activePersona}/inbox`}>
-                Review shared threads
+                {t("sections.metrics.review_threads")}
               </Link>
             )}
           </Button>
@@ -251,7 +256,7 @@ export function CrossPersonaCollaborationWorkspace(
               </CardHeader>
               <CardContent className="mt-auto space-y-2">
                 <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                  Persona impact
+                  {t("sections.metrics.persona_impact")}
                 </p>
                 <div className="space-y-2">
                   {metric.personaBreakdown.map((slice) => (
@@ -289,10 +294,11 @@ export function CrossPersonaCollaborationWorkspace(
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold sm:text-xl">Persona alignment focus</h2>
+            <h2 className="text-lg font-semibold sm:text-xl">
+              {t("sections.alignment.title")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              Surface what each persona is watching and where collaboration needs
-              reinforcement.
+              {t("sections.alignment.description")}
             </p>
           </div>
         </div>
@@ -317,25 +323,25 @@ export function CrossPersonaCollaborationWorkspace(
                       )}
                     >
                       {alignment.confidence === "watch"
-                        ? "Needs attention"
-                        : `${alignment.confidence} confidence`}
+                        ? t("sections.alignment.needs_attention")
+                        : `${alignment.confidence} ${t("sections.alignment.confidence_suffix")}`}
                     </span>
                   </div>
                   <span className="text-muted-foreground text-sm font-medium">
-                    Alignment {alignment.alignmentScore}%
+                    {t("sections.alignment.alignment_label")} {alignment.alignmentScore}%
                   </span>
                 </div>
                 <div>
                   <CardTitle className="text-base">{alignment.focus}</CardTitle>
                   <CardDescription>
-                    Signals and open questions help the team plan the next experiment.
+                    {t("sections.alignment.signals_description")}
                   </CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                    Key signals
+                    {t("sections.alignment.key_signals")}
                   </p>
                   <ul className="mt-2 space-y-2 text-sm">
                     {alignment.keySignals.map((signal) => (
@@ -347,7 +353,7 @@ export function CrossPersonaCollaborationWorkspace(
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                    Open questions
+                    {t("sections.alignment.open_questions")}
                   </p>
                   <ul className="mt-2 space-y-2 text-sm">
                     {alignment.openQuestions.map((question) => (
@@ -369,10 +375,11 @@ export function CrossPersonaCollaborationWorkspace(
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold sm:text-xl">Collaboration rhythms</h2>
+            <h2 className="text-lg font-semibold sm:text-xl">
+              {t("sections.rhythms.title")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              Rituals that keep personas aligned, linked back to the shared inbox threads
-              powering decisions.
+              {t("sections.rhythms.description")}
             </p>
           </div>
         </div>
@@ -398,13 +405,17 @@ export function CrossPersonaCollaborationWorkspace(
               </CardHeader>
               <CardContent className="mt-auto space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Next touchpoint</span>
+                  <span className="text-muted-foreground">
+                    {t("sections.rhythms.next_touchpoint")}
+                  </span>
                   <span className="text-foreground font-medium">
                     {format(new Date(rhythm.nextSessionAt), "MMM d, h:mma")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Status</span>
+                  <span className="text-muted-foreground">
+                    {t("sections.rhythms.status")}
+                  </span>
                   <Badge
                     variant="secondary"
                     className={cn(
@@ -415,12 +426,12 @@ export function CrossPersonaCollaborationWorkspace(
                           : "bg-destructive/10 text-destructive",
                     )}
                   >
-                    {rhythm.status.replace("-", " ")}
+                    {t(`status.${rhythm.status.replace("-", "_")}`)}
                   </Badge>
                 </div>
                 <div className="space-y-2">
                   <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                    Linked threads
+                    {t("sections.rhythms.linked_threads")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {rhythm.linkedThreads.map((threadId) => (
@@ -439,10 +450,11 @@ export function CrossPersonaCollaborationWorkspace(
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold sm:text-xl">Feedback capture loops</h2>
+            <h2 className="text-lg font-semibold sm:text-xl">
+              {t("sections.feedback.title")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              Pulse surveys and quick reactions feed directly into the backlog so platform
-              stewards can respond fast.
+              {t("sections.feedback.description")}
             </p>
           </div>
         </div>
@@ -465,11 +477,7 @@ export function CrossPersonaCollaborationWorkspace(
                       SENTIMENT_STYLE[entry.sentiment],
                     )}
                   >
-                    {entry.sentiment === "concerned"
-                      ? "Needs follow-up"
-                      : entry.sentiment === "neutral"
-                        ? "Neutral read"
-                        : "Positive momentum"}
+                    {t(`sentiment.${entry.sentiment}`)}
                   </span>
                 </div>
                 <div>
@@ -480,15 +488,16 @@ export function CrossPersonaCollaborationWorkspace(
               <CardContent className="mt-auto space-y-4">
                 <div className="flex flex-wrap items-center gap-3 text-xs">
                   <span className="text-muted-foreground">
-                    Participation {entry.participationRate}
+                    {t("sections.feedback.participation")} {entry.participationRate}
                   </span>
                   <Separator orientation="vertical" className="hidden h-4 sm:block" />
                   <span className="text-muted-foreground">
-                    Backlog status: {STATUS_LABEL[entry.backlogStatus]}
+                    {t("sections.feedback.backlog_status")}{" "}
+                    {STATUS_LABEL[entry.backlogStatus]}
                   </span>
                   <Separator orientation="vertical" className="hidden h-4 sm:block" />
                   <span className="text-muted-foreground">
-                    Updated{" "}
+                    {t("sections.feedback.updated")}{" "}
                     {formatDistanceToNow(new Date(entry.lastUpdatedAt), {
                       addSuffix: true,
                     })}
@@ -496,7 +505,7 @@ export function CrossPersonaCollaborationWorkspace(
                 </div>
                 <div className="space-y-2">
                   <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                    Highlights
+                    {t("sections.feedback.highlights")}
                   </p>
                   <ul className="space-y-2 text-sm">
                     {entry.insights.map((insight) => (
@@ -508,7 +517,7 @@ export function CrossPersonaCollaborationWorkspace(
                 </div>
                 <div className="space-y-3">
                   <p className="text-muted-foreground text-xs tracking-wide uppercase">
-                    Quick reactions
+                    {t("sections.feedback.quick_reactions")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {entry.quickReactions.map((reaction) => {
@@ -546,13 +555,12 @@ export function CrossPersonaCollaborationWorkspace(
                   </div>
                   {selectedReaction && selectedReaction.startsWith(`${entry.id}-`) ? (
                     <p className="text-muted-foreground text-xs">
-                      Reaction saved to the backlog experiment log — Jordan and Priya will
-                      see it in the next governance sync.
+                      {t("sections.feedback.reaction_saved")}
                     </p>
                   ) : null}
                   {isPreview ? (
                     <p className="text-muted-foreground text-xs">
-                      Create an account to record reactions that reach the platform team.
+                      {t("sections.feedback.create_account")}
                     </p>
                   ) : null}
                 </div>

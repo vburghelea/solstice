@@ -18,12 +18,7 @@ import { cn } from "~/shared/lib/utils";
 
 import { getSharedInboxSnapshot } from "~/features/inbox/shared-inbox.queries";
 import { type PersonaId, type SharedInboxThread } from "~/features/inbox/types";
-
-const THREAD_STATUS_LABEL: Record<SharedInboxThread["status"], string> = {
-  open: "Open",
-  waiting: "Waiting on response",
-  resolved: "Resolved",
-};
+import { useInboxTranslation } from "~/hooks/useTypedTranslation";
 
 const THREAD_PRIORITY_STYLE: Record<SharedInboxThread["priority"], string> = {
   high: "bg-destructive/10 text-destructive border-destructive/20",
@@ -43,6 +38,8 @@ type SharedInboxViewProps = {
 
 export function SharedInboxView(props: SharedInboxViewProps) {
   const { persona, userName, userId, mode = "interactive", previewMessage } = props;
+  const { t } = useInboxTranslation();
+
   const {
     data: snapshot,
     isLoading,
@@ -132,9 +129,9 @@ export function SharedInboxView(props: SharedInboxViewProps) {
     return (
       <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
         <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
-          <CardTitle className="text-lg">Loading shared inbox</CardTitle>
+          <CardTitle className="text-lg">{t("shared_inbox.loading")}</CardTitle>
           <CardDescription className="max-w-md">
-            Pulling live threads and persona metrics for the {persona} workspace.
+            {t("shared_inbox.loading_description", { persona })}
           </CardDescription>
         </Card>
       </div>
@@ -145,9 +142,9 @@ export function SharedInboxView(props: SharedInboxViewProps) {
     return (
       <div className="container mx-auto space-y-6 px-4 py-6 sm:py-8">
         <Card className="flex flex-col items-center gap-3 px-8 py-10 text-center">
-          <CardTitle className="text-lg">Unable to load shared inbox</CardTitle>
+          <CardTitle className="text-lg">{t("shared_inbox.unable_to_load")}</CardTitle>
           <CardDescription className="max-w-md">
-            Please refresh to retry. Contact the platform team if the issue continues.
+            {t("shared_inbox.unable_to_load_description")}
           </CardDescription>
         </Card>
       </div>
@@ -166,7 +163,7 @@ export function SharedInboxView(props: SharedInboxViewProps) {
       ) : null}
       <header className="space-y-3">
         <Badge variant="outline" className="text-xs tracking-wide uppercase">
-          Collaboration beta
+          {t("shared_inbox.beta_badge")}
         </Badge>
         <div className="space-y-1">
           <h1 className="text-foreground text-2xl font-semibold sm:text-3xl">
@@ -182,7 +179,9 @@ export function SharedInboxView(props: SharedInboxViewProps) {
         </p>
         <div>
           <Button asChild size="sm" variant="outline">
-            <Link to={`/${persona}/collaboration`}>Open cross-namespace reporting</Link>
+            <Link to={`/${persona}/collaboration`}>
+              {t("shared_inbox.open_reporting")}
+            </Link>
           </Button>
         </div>
       </header>
@@ -223,9 +222,11 @@ export function SharedInboxView(props: SharedInboxViewProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Filters</CardTitle>
+              <CardTitle className="text-lg">
+                {t("shared_inbox.sections.filters.title")}
+              </CardTitle>
               <CardDescription>
-                Focus the inbox by workflow or escalation type.
+                {t("shared_inbox.sections.filters.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -247,17 +248,20 @@ export function SharedInboxView(props: SharedInboxViewProps) {
                 })}
               </div>
               <p className="text-muted-foreground text-xs">
-                {unreadCount} thread{unreadCount === 1 ? "" : "s"} awaiting your
-                attention.
+                {unreadCount === 1
+                  ? t("shared_inbox.threads_awaiting.one", { count: unreadCount })
+                  : t("shared_inbox.threads_awaiting.other", { count: unreadCount })}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Collaboration tips</CardTitle>
+              <CardTitle className="text-lg">
+                {t("shared_inbox.sections.tips.title")}
+              </CardTitle>
               <CardDescription>
-                Align expectations when multiple personas share the thread.
+                {t("shared_inbox.sections.tips.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -275,22 +279,26 @@ export function SharedInboxView(props: SharedInboxViewProps) {
 
         <section className="space-y-4 lg:col-span-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-foreground text-lg font-semibold">Threads</h2>
+            <h2 className="text-foreground text-lg font-semibold">
+              {t("shared_inbox.sections.threads.title")}
+            </h2>
             <Button
               variant="outline"
               size="sm"
               disabled={isPreview}
               aria-disabled={isPreview}
             >
-              Log internal note
+              {t("shared_inbox.sections.threads.log_note")}
             </Button>
           </div>
           <div className="space-y-3">
             {filteredThreads.length === 0 ? (
               <Card className="items-center justify-center gap-2 px-6 py-8 text-center">
-                <CardTitle className="text-base">No threads yet</CardTitle>
+                <CardTitle className="text-base">
+                  {t("shared_inbox.sections.threads.no_threads")}
+                </CardTitle>
                 <CardDescription>
-                  Switch filters or invite collaborators to start a shared conversation.
+                  {t("shared_inbox.sections.threads.no_threads_description")}
                 </CardDescription>
               </Card>
             ) : (
@@ -301,6 +309,7 @@ export function SharedInboxView(props: SharedInboxViewProps) {
                   thread={thread}
                   isActive={thread.id === activeThreadId}
                   onSelect={() => setSelectedThreadId(thread.id)}
+                  t={t}
                 />
               ))
             )}
@@ -313,13 +322,15 @@ export function SharedInboxView(props: SharedInboxViewProps) {
               persona={persona}
               thread={selectedThread}
               isPreview={isPreview}
+              t={t}
             />
           ) : (
             <Card className="items-center justify-center gap-2 px-6 py-10 text-center">
-              <CardTitle className="text-base">Select a thread</CardTitle>
+              <CardTitle className="text-base">
+                {t("shared_inbox.sections.threads.select_thread")}
+              </CardTitle>
               <CardDescription>
-                Choose a conversation to view cross-persona context, notes, and action
-                items.
+                {t("shared_inbox.sections.threads.select_thread_description")}
               </CardDescription>
             </Card>
           )}
@@ -334,10 +345,11 @@ type ThreadListItemProps = {
   thread: SharedInboxThread;
   isActive: boolean;
   onSelect: () => void;
+  t: (key: string, params?: Record<string, unknown>) => string;
 };
 
 function ThreadListItem(props: ThreadListItemProps) {
-  const { persona, thread, isActive, onSelect } = props;
+  const { persona, thread, isActive, onSelect, t } = props;
   const latestUpdate = formatDistanceToNow(new Date(thread.updatedAt), {
     addSuffix: true,
   });
@@ -367,12 +379,12 @@ function ThreadListItem(props: ThreadListItemProps) {
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className={THREAD_PRIORITY_STYLE[thread.priority]}>
               {thread.priority === "high"
-                ? "High"
+                ? t("shared_inbox.priority.high")
                 : thread.priority === "medium"
-                  ? "Medium"
-                  : "Low"}
+                  ? t("shared_inbox.priority.medium")
+                  : t("shared_inbox.priority.low")}
             </Badge>
-            <Badge variant="outline">{THREAD_STATUS_LABEL[thread.status]}</Badge>
+            <Badge variant="outline">{t(`shared_inbox.status.${thread.status}`)}</Badge>
             {thread.tags.map((tag) => (
               <Badge key={tag} variant="secondary">
                 {tag}
@@ -390,10 +402,11 @@ type ThreadDetailProps = {
   persona: PersonaId;
   thread: SharedInboxThread;
   isPreview: boolean;
+  t: (key: string, params?: Record<string, unknown>) => string;
 };
 
 function ThreadDetail(props: ThreadDetailProps) {
-  const { persona, thread, isPreview } = props;
+  const { persona, thread, isPreview, t } = props;
   const participantsById = useMemo(() => {
     return thread.participants.reduce<
       Record<string, (typeof thread.participants)[number]>
@@ -413,9 +426,9 @@ function ThreadDetail(props: ThreadDetailProps) {
             {thread.subject}
           </CardTitle>
           <CardDescription className="flex flex-wrap gap-2">
-            <Badge variant="outline">{THREAD_STATUS_LABEL[thread.status]}</Badge>
+            <Badge variant="outline">{t(`shared_inbox.status.${thread.status}`)}</Badge>
             <Badge variant="outline" className={THREAD_PRIORITY_STYLE[thread.priority]}>
-              Priority: {thread.priority}
+              {t("shared_inbox.thread_detail.priority_label")} {thread.priority}
             </Badge>
           </CardDescription>
         </div>
@@ -438,7 +451,9 @@ function ThreadDetail(props: ThreadDetailProps) {
       <CardContent className="space-y-6 pb-6">
         {primaryActions.length > 0 ? (
           <div className="bg-accent/30 space-y-3 rounded-lg border p-4">
-            <p className="text-foreground text-sm font-semibold">Action items</p>
+            <p className="text-foreground text-sm font-semibold">
+              {t("shared_inbox.thread_detail.action_items")}
+            </p>
             <div className="space-y-2">
               {primaryActions.map((action) => {
                 const isOwner = action.ownerPersona === persona;
@@ -451,11 +466,14 @@ function ThreadDetail(props: ThreadDetailProps) {
                     className="border-border/60 bg-background/70 flex flex-wrap items-center gap-2 rounded-md border border-dashed px-3 py-2"
                   >
                     <Badge variant={isOwner ? "default" : "outline"}>
-                      {isOwner ? "Yours" : action.ownerPersona}
+                      {isOwner
+                        ? t("shared_inbox.thread_detail.owner_label")
+                        : action.ownerPersona}
                     </Badge>
                     <span className="text-foreground text-sm">{action.label}</span>
                     <span className="text-muted-foreground text-xs">
-                      Status: {action.status.replace("-", " ")}
+                      {t("shared_inbox.thread_detail.status_label")}{" "}
+                      {action.status.replace("-", " ")}
                     </span>
                     {dueLabel ? (
                       <span className="text-muted-foreground text-xs">{dueLabel}</span>
@@ -529,14 +547,14 @@ function ThreadDetail(props: ThreadDetailProps) {
       <Separator />
       <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
         <p className="text-muted-foreground text-xs">
-          Last updated{" "}
+          {t("shared_inbox.thread_detail.last_updated")}{" "}
           {formatDistanceToNow(new Date(thread.updatedAt), {
             addSuffix: true,
           })}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" disabled={isPreview} aria-disabled={isPreview}>
-            Reply to thread
+            {t("shared_inbox.thread_detail.reply_to_thread")}
           </Button>
           <Button
             variant="outline"
@@ -544,7 +562,7 @@ function ThreadDetail(props: ThreadDetailProps) {
             disabled={isPreview}
             aria-disabled={isPreview}
           >
-            Add follow-up task
+            {t("shared_inbox.thread_detail.add_follow_up")}
           </Button>
         </div>
       </div>

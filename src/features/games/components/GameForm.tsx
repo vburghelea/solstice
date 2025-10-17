@@ -25,6 +25,7 @@ import {
   updateGameInputSchema,
 } from "~/features/games/games.schemas";
 import { useGameSystemSearch } from "~/features/games/hooks/useGameSystemSearch";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -74,6 +75,7 @@ export function GameForm({
   onCancelEdit,
   serverErrors,
 }: GameFormProps) {
+  const { t } = useGamesTranslation();
   const defaults = {
     gameSystemId: initialValues?.gameSystemId,
     name: initialValues?.name ?? "",
@@ -251,14 +253,14 @@ export function GameForm({
 
   // Most spoken languages in the world
   const languageOptions = [
-    { value: "en", label: "English" },
-    { value: "zh", label: "Chinese" },
-    { value: "hi", label: "Hindi" },
-    { value: "es", label: "Spanish" },
-    { value: "fr", label: "French" },
-    { value: "ar", label: "Arabic" },
-    { value: "bn", label: "Bengali" },
-    { value: "ru", label: "Russian" },
+    { value: "en", label: t("languages.english") },
+    { value: "zh", label: t("languages.chinese") },
+    { value: "hi", label: t("languages.hindi") },
+    { value: "es", label: t("languages.spanish") },
+    { value: "fr", label: t("languages.french") },
+    { value: "ar", label: t("languages.arabic") },
+    { value: "bn", label: t("languages.bengali") },
+    { value: "ru", label: t("languages.russian") },
   ];
 
   // Parse server errors and map them to field paths
@@ -299,8 +301,8 @@ export function GameForm({
       className="space-y-8"
     >
       <FormSection
-        title="Session overview"
-        description="Share the essentials players need before they RSVP."
+        title={t("form_sections.session_overview")}
+        description={t("descriptions.session_overview")}
         contentClassName="space-y-6"
       >
         <form.Field
@@ -327,7 +329,7 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Game Session Name</Label>
+              <Label htmlFor={field.name}>{t("labels.game_session_name")}</Label>
               <input
                 id={field.name}
                 name={field.name}
@@ -337,7 +339,7 @@ export function GameForm({
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   field.handleChange(event.target.value)
                 }
-                placeholder="Enter a compelling name for your planned game session"
+                placeholder={t("placeholders.game_session_name")}
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {(field.state.meta.errors?.length > 0 ||
@@ -350,7 +352,7 @@ export function GameForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "The game session name is what most players see first when looking for adventure, make sure it's compelling.",
+                        : t("validation_errors.game_session_name_required"),
                     )
                     .join(", ")}
                 </p>
@@ -380,7 +382,7 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Description</Label>
+              <Label htmlFor={field.name}>{t("labels.description")}</Label>
               <Textarea
                 id={field.name}
                 name={field.name}
@@ -401,7 +403,7 @@ export function GameForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Please add a game session description that sets the tone for what players should expect.",
+                        : t("validation_errors.description_required"),
                     )
                     .join(", ")}
                 </p>
@@ -431,7 +433,7 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Game System Used</Label>
+              <Label htmlFor={field.name}>{t("labels.game_system_used")}</Label>
               {isCampaignGame ? (
                 <p className="text-muted-foreground mt-1 text-sm">
                   {gameSystemName && gameSystemName.trim().length > 0
@@ -442,7 +444,7 @@ export function GameForm({
                 <GameSystemCombobox
                   label="" // Label is already rendered above
                   options={gameSystemOptions}
-                  placeholder="Search and select the game system you want to use"
+                  placeholder={t("placeholders.search_and_select_game_system")}
                   value={field.state.value?.toString() ?? ""}
                   onValueChange={(value) => {
                     const parsedValue = Number.parseInt(value, 10);
@@ -481,7 +483,7 @@ export function GameForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Please select a game system for your session.",
+                        : t("validation_errors.game_system_required"),
                     )
                     .join(", ")}
                 </p>
@@ -509,7 +511,7 @@ export function GameForm({
             },
           }}
         >
-          {(field) => <DateTimePicker field={field} label="Date and Time" />}
+          {(field) => <DateTimePicker field={field} label={t("labels.date_time")} />}
         </form.Field>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -534,7 +536,7 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Expected Duration (minutes)</Label>
+                <Label htmlFor={field.name}>{t("labels.expected_duration")}</Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -558,7 +560,7 @@ export function GameForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Enter a game duration in minutes to let others know how much time to reserve for this.",
+                          : t("validation_errors.duration_required"),
                       )
                       .join(", ")}
                   </p>
@@ -586,7 +588,7 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Price (EUR) (optional)</Label>
+                <Label htmlFor={field.name}>{t("labels.price")}</Label>
                 <div className="relative mt-1">
                   <span className="text-muted-foreground absolute inset-y-0 left-0 flex items-center pl-3">
                     €
@@ -611,7 +613,7 @@ export function GameForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "If you want to add a cover charge for the game, specify it here.",
+                          : t("validation_errors.price_optional"),
                       )
                       .join(", ")}
                   </p>
@@ -643,13 +645,13 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Language</Label>
+                <Label htmlFor={field.name}>{t("labels.language")}</Label>
                 <Select
                   value={field.state.value as string}
                   onValueChange={(value) => field.handleChange(value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a language" />
+                    <SelectValue placeholder={t("placeholders.select_language")} />
                   </SelectTrigger>
                   <SelectContent>
                     {languageOptions.map((lang) => (
@@ -665,7 +667,7 @@ export function GameForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Choose the language that the game system you chose will be played in.",
+                          : t("validation_errors.language_required"),
                       )
                       .join(", ")}
                   </p>
@@ -695,7 +697,7 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Visibility</Label>
+                <Label htmlFor={field.name}>{t("labels.visibility")}</Label>
                 <Select
                   value={field.state.value as string}
                   onValueChange={(value: "public" | "protected" | "private") =>
@@ -703,14 +705,14 @@ export function GameForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select visibility" />
+                    <SelectValue placeholder={t("placeholders.select_visibility")} />
                   </SelectTrigger>
                   <SelectContent>
                     {visibilityEnum.enumValues.map(
                       (v: (typeof visibilityEnum.enumValues)[number]) => (
                         <SelectItem key={v} value={v}>
                           {v === "protected"
-                            ? "Connections & Teammates"
+                            ? t("status.connections_teammates")
                             : v.charAt(0).toUpperCase() + v.slice(1)}
                         </SelectItem>
                       ),
@@ -723,7 +725,7 @@ export function GameForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Pick a visibility value that allows you to find the right people efficiently.",
+                          : t("validation_errors.visibility_required"),
                       )
                       .join(", ")}
                   </p>
@@ -733,16 +735,14 @@ export function GameForm({
           </form.Field>
         </div>
         <p className="text-muted-foreground text-sm">
-          Visibility options: Public (visible to everyone), Connections & Teammates
-          (visible to your followers, the people you follow, and active teammates),
-          Private (visible only to invited players)
+          {t("visibility_options.description")}
         </p>
       </FormSection>
 
       {/* Minimum and Maximum Players */}
       <FormSection
-        title="Participant requirements"
-        description="Optional guidelines that help players self-select into the right tables."
+        title={t("form_sections.participant_requirements")}
+        description={t("descriptions.participant_requirements")}
         contentClassName="space-y-6"
       >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -765,7 +765,7 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Minimum Players</Label>
+                <Label htmlFor={field.name}>{t("labels.minimum_players")}</Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -785,7 +785,7 @@ export function GameForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "We need to know how many people are expected to participate.",
+                          : t("validation_errors.min_players_required"),
                       )
                       .join(", ")}
                   </p>
@@ -813,7 +813,7 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Maximum Players</Label>
+                <Label htmlFor={field.name}>{t("labels.maximum_players")}</Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -833,7 +833,7 @@ export function GameForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "We need to know how many people are expected to participate.",
+                          : t("validation_errors.max_players_required"),
                       )
                       .join(", ")}
                   </p>
@@ -845,8 +845,8 @@ export function GameForm({
       </FormSection>
 
       <FormSection
-        title="Location"
-        description="Let players know where the session will take place."
+        title={t("form_sections.location")}
+        description={t("descriptions.location")}
         contentClassName="space-y-6"
       >
         <form.Field
@@ -870,7 +870,7 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Address</Label>
+              <Label htmlFor={field.name}>{t("labels.address")}</Label>
               <input
                 id={field.name}
                 name={field.name}
@@ -892,7 +892,7 @@ export function GameForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Enter the address of the location where the game session will take place.",
+                        : t("validation_errors.address_required"),
                     )
                     .join(", ")}
                 </p>
@@ -958,8 +958,8 @@ export function GameForm({
       </FormSection>
 
       <FormSection
-        title="Safety & table culture"
-        description="Optional expectations that set the tone for how you'll play together."
+        title={t("form_sections.safety_table_culture")}
+        description={t("descriptions.safety_table_culture")}
         contentClassName="space-y-6"
       >
         <form.Field
@@ -986,7 +986,7 @@ export function GameForm({
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
-              <Label htmlFor={field.name}>No Alcohol</Label>
+              <Label htmlFor={field.name}>{t("safety_options.no_alcohol")}</Label>
             </div>
           )}
         </form.Field>
@@ -1014,7 +1014,7 @@ export function GameForm({
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
-              <Label htmlFor={field.name}>Safe Word Required</Label>
+              <Label htmlFor={field.name}>{t("safety_options.safe_word_required")}</Label>
             </div>
           )}
         </form.Field>
@@ -1040,7 +1040,9 @@ export function GameForm({
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
-              <Label htmlFor={field.name}>Encourage Open Communication</Label>
+              <Label htmlFor={field.name}>
+                {t("safety_options.encourage_open_communication")}
+              </Label>
             </div>
           )}
         </form.Field>
@@ -1062,7 +1064,7 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label>Safety Tool</Label>
+                <Label>{t("labels.safety_tool")}</Label>
                 <Select
                   value={(field.state.value as string | null) ?? "none"}
                   onValueChange={(v) =>
@@ -1074,7 +1076,7 @@ export function GameForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a safety tool" />
+                    <SelectValue placeholder={t("placeholders.select_safety_tool")} />
                   </SelectTrigger>
                   <SelectContent>
                     {xCardSystemEnum.options.map(
@@ -1108,14 +1110,14 @@ export function GameForm({
           >
             {(field) => (
               <div>
-                <Label>Safety Tool Details (optional)</Label>
+                <Label>{t("labels.safety_tool_details")}</Label>
                 <Textarea
                   value={(field.state.value as string | null) ?? ""}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
                     field.handleChange(event.target.value || null)
                   }
                   onBlur={field.handleBlur}
-                  placeholder="Any specifics about the chosen safety tool"
+                  placeholder={t("placeholders.safety_tool_details")}
                   rows={3}
                 />
               </div>
@@ -1139,14 +1141,14 @@ export function GameForm({
         >
           {(field) => (
             <div>
-              <Label>Player Boundaries / Consent Notes (optional)</Label>
+              <Label>{t("labels.player_boundaries_consent")}</Label>
               <Textarea
                 value={(field.state.value as string | null) ?? ""}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
                   field.handleChange(event.target.value || null)
                 }
                 onBlur={field.handleBlur}
-                placeholder="Any boundaries or consent notes players should be aware of"
+                placeholder={t("placeholders.player_boundaries_consent")}
                 rows={3}
               />
             </div>
@@ -1157,15 +1159,15 @@ export function GameForm({
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         {onCancelEdit ? (
           <Button variant="outline" onClick={onCancelEdit}>
-            Cancel
+            {t("buttons.cancel")}
           </Button>
         ) : (
           <Button variant="outline" asChild>
-            <Link to="/player/games">Cancel</Link>
+            <Link to="/player/games">{t("buttons.cancel")}</Link>
           </Button>
         )}
         <FormSubmitButton isSubmitting={isSubmitting}>
-          {initialValues?.id ? "Update Game" : "Create Game"}
+          {initialValues?.id ? t("buttons.update_game") : t("buttons.create_game")}
         </FormSubmitButton>
       </div>
     </form>

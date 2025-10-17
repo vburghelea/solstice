@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { useProfileTranslation } from "~/hooks/useTypedTranslation";
 
 import { updateUserProfile } from "../profile.mutations";
 import { getUserGameSystemPreferences } from "../profile.queries";
@@ -42,6 +43,7 @@ const defaultProfile: ProfileInputType = {
 };
 
 export function ProfileForm() {
+  const { t } = useProfileTranslation();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { user } = RootRoute.useRouteContext();
@@ -131,11 +133,12 @@ export function ProfileForm() {
           await queryClient.invalidateQueries({ queryKey: ["user"] });
           router.invalidate();
         } else {
-          const errorMessage = result.errors?.[0]?.message || "Failed to save profile";
+          const errorMessage =
+            result.errors?.[0]?.message || t("errors.failed_to_save_profile");
           setError(errorMessage);
         }
       } catch (err) {
-        setError("An unexpected error occurred. Please try again.");
+        setError(t("errors.unexpected_error"));
         console.error("Profile submission error:", err);
       } finally {
         setIsSubmitting(false);
@@ -205,8 +208,8 @@ export function ProfileForm() {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-            <CardDescription>Basic information about you</CardDescription>
+            <CardTitle>{t("personal_information.title")}</CardTitle>
+            <CardDescription>{t("personal_information.description")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form.AppField
@@ -214,15 +217,18 @@ export function ProfileForm() {
               children={(field) => (
                 <field.ValidatedSelect
                   field={field}
-                  label="Gender (optional)"
+                  label={t("optional_fields.gender")}
                   options={[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
-                    { value: "non-binary", label: "Non-binary" },
-                    { value: "other", label: "Other" },
-                    { value: "prefer-not-to-say", label: "Prefer not to say" },
+                    { value: "male", label: t("gender_options.male") },
+                    { value: "female", label: t("gender_options.female") },
+                    { value: "non-binary", label: t("gender_options.non_binary") },
+                    { value: "other", label: t("gender_options.other") },
+                    {
+                      value: "prefer-not-to-say",
+                      label: t("gender_options.prefer_not_to_say"),
+                    },
                   ]}
-                  placeholderText="Select gender"
+                  placeholderText={t("placeholders.gender")}
                 />
               )}
             />
@@ -232,8 +238,8 @@ export function ProfileForm() {
               children={(field) => (
                 <field.ValidatedInput
                   field={field}
-                  label="Pronouns (optional)"
-                  placeholder="e.g., they/them, she/her, he/him"
+                  label={t("optional_fields.pronouns")}
+                  placeholder={t("placeholders_optional.pronouns")}
                 />
               )}
             />
@@ -243,8 +249,8 @@ export function ProfileForm() {
               children={(field) => (
                 <field.ValidatedPhoneInput
                   field={field}
-                  label="Phone Number (optional)"
-                  placeholder="+49 1512 3456789"
+                  label={t("optional_fields.phone")}
+                  placeholder={t("placeholders.phone_number")}
                 />
               )}
             />
@@ -253,9 +259,9 @@ export function ProfileForm() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Game Preferences</CardTitle>
+            <CardTitle>{t("form_steps.game_preferences.title")}</CardTitle>
             <CardDescription>
-              Select your favorite and least favorite game systems
+              {t("form_steps.game_preferences.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -276,10 +282,8 @@ export function ProfileForm() {
 
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Privacy Settings</CardTitle>
-            <CardDescription>
-              Control what information is visible to others
-            </CardDescription>
+            <CardTitle>{t("form_steps.privacy.title")}</CardTitle>
+            <CardDescription>{t("form_steps.privacy.description")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form.AppField
@@ -287,7 +291,7 @@ export function ProfileForm() {
               children={(field) => (
                 <field.ValidatedCheckbox
                   field={field}
-                  label="Show my email address to team members"
+                  label={t("privacy_options.show_email_to_teammates")}
                 />
               )}
             />
@@ -297,7 +301,7 @@ export function ProfileForm() {
               children={(field) => (
                 <field.ValidatedCheckbox
                   field={field}
-                  label="Show my phone number to team members"
+                  label={t("privacy_options.show_phone_to_teammates")}
                 />
               )}
             />
@@ -307,7 +311,7 @@ export function ProfileForm() {
               children={(field) => (
                 <field.ValidatedCheckbox
                   field={field}
-                  label="Allow team captains to send me invitations"
+                  label={t("privacy_options.allow_team_captains_invitations")}
                 />
               )}
             />
@@ -319,10 +323,10 @@ export function ProfileForm() {
             {isSubmitting ? (
               <>
                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t("buttons.saving")}
               </>
             ) : (
-              "Save Changes"
+              t("buttons.save_changes")
             )}
           </Button>
         </div>

@@ -48,6 +48,7 @@ import { listPendingGMReviews } from "~/features/reviews/reviews.queries";
 import type { PendingGMReviewItem } from "~/features/reviews/reviews.types";
 import { updateNotificationPreferences } from "~/features/settings/settings.mutations";
 import { getUserTeams } from "~/features/teams/teams.queries";
+import { useCommonTranslation, usePlayerTranslation } from "~/hooks/useTypedTranslation";
 import type { AuthUser } from "~/lib/auth/types";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import type { OperationResult } from "~/shared/types/common";
@@ -143,9 +144,9 @@ function formatTimeDistance(date: Date) {
   return `in ${days}d`;
 }
 
-function initialsFromName(name?: string | null) {
+function initialsFromName(name?: string | null, defaultInitial = "P") {
   if (!name) {
-    return "P";
+    return defaultInitial;
   }
   const [first, second] = name.split(" ");
   if (first && second) {
@@ -154,7 +155,7 @@ function initialsFromName(name?: string | null) {
   if (first) {
     return first.slice(0, 2).toUpperCase();
   }
-  return "P";
+  return defaultInitial;
 }
 
 function normalizePendingReview(entry: unknown): PendingGMReviewItem | null {
@@ -224,6 +225,8 @@ function normalizePendingReview(entry: unknown): PendingGMReviewItem | null {
 }
 
 export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
+  const { t: playerT } = usePlayerTranslation();
+  const { t: commonT } = useCommonTranslation();
   const queryClient = useQueryClient();
   const [showSpotlight, setShowSpotlight] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -247,7 +250,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
     queryFn: async () => {
       const result = await getUserProfile();
       if (!result.success || !result.data) {
-        throw new Error(result.errors?.[0]?.message ?? "Failed to load player profile");
+        throw new Error(
+          result.errors?.[0]?.message ??
+            playerT("dashboard.errors.failed_to_load_profile"),
+        );
       }
       return {
         profileComplete: result.data.profileComplete ?? false,
@@ -283,7 +289,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         const message =
           "errors" in result && result.errors?.[0]?.message
             ? result.errors[0]?.message
-            : "Failed to fetch player workspace stats";
+            : playerT("dashboard.errors.failed_to_fetch_workspace_stats");
         throw new Error(message);
       }
       return result.data;
@@ -312,7 +318,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         const message =
           "errors" in result && result.errors?.[0]?.message
             ? result.errors[0]?.message
-            : "Failed to fetch membership status";
+            : playerT("dashboard.errors.failed_to_fetch_membership_status");
         throw new Error(message);
       }
       return result.data ?? null;
@@ -447,12 +453,14 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
   }, [isAuthenticated, pendingReviews]);
 
   const teamCount = userTeams.length;
-  const membershipLabel = membershipStatus?.hasMembership ? "Active" : "Inactive";
+  const membershipLabel = membershipStatus?.hasMembership
+    ? playerT("dashboard.membership.status_active")
+    : playerT("dashboard.membership.status_inactive");
   const membershipDetail = membershipStatus?.hasMembership
     ? membershipStatus.daysRemaining
       ? `${membershipStatus.daysRemaining} days remaining`
-      : "Membership active"
-    : "No active membership";
+      : playerT("dashboard.membership.active")
+    : playerT("dashboard.membership.no_active_membership");
 
   const campaignsSummary = workspaceStats?.campaigns ?? {
     owned: 0,
@@ -499,7 +507,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       const result = await updatePrivacySettings({ data: payload });
       if (!result.success || !result.data?.privacySettings) {
         throw new Error(
-          result.errors?.[0]?.message || "Failed to update privacy settings",
+          result.errors?.[0]?.message ||
+            playerT("dashboard.errors.failed_to_update_privacy_settings"),
         );
       }
       return mergePrivacySettings(result.data.privacySettings);
@@ -568,7 +577,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
       const result = await updateNotificationPreferences({ data: payload });
       if (!result.success || !result.data) {
         throw new Error(
-          result.errors?.[0]?.message || "Failed to update notification preferences",
+          result.errors?.[0]?.message ||
+            playerT("dashboard.errors.failed_to_update_notification_preferences"),
         );
       }
       return mergeNotificationPreferences(result.data);
@@ -631,33 +641,39 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <CardHeader className="relative z-10 space-y-4 sm:space-y-6">
             <div className="flex items-center gap-4">
               <Avatar
-                name={user?.name ?? "Player"}
-                fallback={initialsFromName(user?.name)}
+                name={user?.name ?? commonT("default_values.player_name")}
+                fallback={initialsFromName(
+                  user?.name,
+                  playerT("dashboard.persona_initial"),
+                )}
                 className="h-12 w-12 border border-white/20 shadow-sm"
               />
               <div>
                 <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                  Player HQ
+                  {playerT("ui.headquarters.title")}
                 </p>
                 <h1 className="text-foreground text-2xl font-semibold sm:text-3xl">
-                  Welcome back
+                  {playerT("ui.welcome_back")}
                   {user?.name?.trim() ? `, ${user.name.trim()}` : ""}
                 </h1>
               </div>
             </div>
             <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
-              Stay on top of sessions, invitations, and community highlights. Everything
-              you need to feel connected is organized here.
+              {playerT("ui.subtitle")}
             </p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <Badge variant="outline" className="border-primary/40 text-primary">
-                <CheckCircle2 className="mr-2 h-3.5 w-3.5" /> Privacy controls ready
+                <CheckCircle2 className="mr-2 h-3.5 w-3.5" />{" "}
+                {playerT("ui.badges.privacy_ready")}
               </Badge>
               <Badge
                 variant="secondary"
                 className="bg-secondary/60 text-secondary-foreground"
               >
-                {teamCount} team{teamCount === 1 ? "" : "s"} synced
+                {playerT("ui.teams_synced", {
+                  count: teamCount,
+                  plural: teamCount === 1 ? "" : "s",
+                })}
               </Badge>
             </div>
           </CardHeader>
@@ -665,7 +681,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             <CardContent className="bg-background/70 relative z-10 border-t border-white/10 p-4 sm:p-6">
               <div className="text-primary flex items-center gap-2 text-xs font-semibold tracking-widest uppercase sm:text-sm">
                 <ScrollText className="h-4 w-4" />
-                Review reminders
+                {playerT("ui.review_reminders.title")}
               </div>
               <div className="mt-3 space-y-2">
                 {pendingReviews.map((review) => (
@@ -679,11 +695,14 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                         {review.gameName}
                       </span>
                       <span className="text-muted-foreground mt-1 text-xs">
-                        {`Review ${review.gm.name ?? "your GM"} • ${formatDateAndTime(review.dateTime)}`}
+                        {playerT("ui.review_gm", {
+                          gmName: review.gm.name ?? "your GM",
+                          date: formatDateAndTime(review.dateTime),
+                        })}
                       </span>
                     </div>
                     <span className="text-primary group-hover:text-primary/80 text-xs font-semibold tracking-widest uppercase transition">
-                      Start
+                      {playerT("ui.start_review")}
                     </span>
                   </Link>
                 ))}
@@ -694,26 +713,28 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader className="space-y-3">
             <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-              <Trophy className="h-4 w-4" /> Your control center
+              <Trophy className="h-4 w-4" /> {playerT("ui.control_center.title")}
             </CardTitle>
-            <CardDescription>
-              Tune visibility, stay notified, and jump into actions without leaving HQ.
-            </CardDescription>
+            <CardDescription>{playerT("ui.control_center.subtitle")}</CardDescription>
             <Badge
               variant={profileComplete ? "secondary" : "outline"}
               className="border-primary/30 w-fit text-xs font-semibold tracking-widest uppercase"
             >
-              {profileComplete ? "Profile dialed in" : "Profile steps remaining"}
+              {profileComplete
+                ? playerT("ui.badges.profile_complete")
+                : playerT("ui.badges.profile_steps_remaining")}
             </Badge>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Privacy
+                {commonT("account.sections.privacy")}
               </p>
               <QuickToggle
-                label="Only allow invites from connections"
-                description="Gate new invitations to trusted contacts."
+                label={playerT("dashboard.privacy.invites_from_connections.label")}
+                description={playerT(
+                  "dashboard.privacy.invites_from_connections.description",
+                )}
                 checked={privacySettings.allowInvitesOnlyFromConnections ?? false}
                 disabled={privacyMutation.isPending}
                 onCheckedChange={(value) => {
@@ -723,8 +744,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 }}
               />
               <QuickToggle
-                label="Allow follow requests"
-                description="Let community members follow your updates."
+                label={playerT("dashboard.privacy.follow_requests.label")}
+                description={playerT("dashboard.privacy.follow_requests.description")}
                 checked={privacySettings.allowFollows}
                 disabled={privacyMutation.isPending}
                 onCheckedChange={(value) => {
@@ -735,11 +756,13 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             <Separator />
             <div className="space-y-3">
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Notifications
+                {commonT("account.sections.notifications")}
               </p>
               <QuickToggle
-                label="Game reminders"
-                description="Get nudges before sessions start."
+                label={playerT("dashboard.notifications.game_reminders.label")}
+                description={playerT(
+                  "dashboard.notifications.game_reminders.description",
+                )}
                 checked={notificationPreferences.gameReminders}
                 disabled={notificationMutation.isPending}
                 onCheckedChange={(value) => {
@@ -747,8 +770,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 }}
               />
               <QuickToggle
-                label="Review reminders"
-                description="Stay accountable to your game organizers."
+                label={playerT("dashboard.notifications.review_reminders.label")}
+                description={playerT(
+                  "dashboard.notifications.review_reminders.description",
+                )}
                 checked={notificationPreferences.reviewReminders}
                 disabled={notificationMutation.isPending}
                 onCheckedChange={(value) => {
@@ -771,7 +796,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     });
                   }}
                 >
-                  <Users className="h-4 w-4" /> Edit profile
+                  <Users className="h-4 w-4" />{" "}
+                  {playerT("dashboard.actions.edit_profile")}
                 </Link>
               </Button>
               <Button asChild className="w-full justify-center gap-2 text-center">
@@ -784,7 +810,9 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   }}
                 >
                   <CreditCard className="h-4 w-4" />
-                  {membershipStatus?.hasMembership ? "Manage plan" : "Start membership"}
+                  {membershipStatus?.hasMembership
+                    ? playerT("dashboard.actions.manage_plan")
+                    : playerT("dashboard.actions.start_membership")}
                 </Link>
               </Button>
               <Button
@@ -800,7 +828,8 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     });
                   }}
                 >
-                  <Calendar className="h-4 w-4" /> Find games
+                  <Calendar className="h-4 w-4" />{" "}
+                  {playerT("dashboard.actions.find_games")}
                 </Link>
               </Button>
             </div>
@@ -813,16 +842,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Next up
+                {playerT("ui.upcoming.title")}
               </p>
               <CardTitle className="text-foreground text-xl font-semibold">
-                {nextGame ? nextGame.name : "No upcoming games"}
+                {nextGame ? nextGame.name : playerT("dashboard.upcoming_games.no_games")}
               </CardTitle>
             </div>
             <Badge variant="outline" className="border-muted text-xs font-medium">
               {nextGame
                 ? formatTimeDistance(new Date(nextGame.dateTime))
-                : "Stay available"}
+                : playerT("dashboard.upcoming_games.stay_available")}
             </Badge>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -832,20 +861,24 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   {formatDateAndTime(nextGame.dateTime)} · {nextGame.location.address}
                 </p>
                 <Button asChild>
-                  <Link to={`/player/games/${nextGame.id}`}>Open session briefing</Link>
+                  <Link to={`/player/games/${nextGame.id}`}>
+                    {playerT("dashboard.actions.open_session_briefing")}
+                  </Link>
                 </Button>
               </div>
             ) : (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-muted-foreground text-sm">
-                  Keep your calendar flexible and claim a spot in the next adventure.
+                  {playerT("ui.flexible_calendar")}
                 </p>
                 <Button
                   asChild
                   variant="outline"
                   className="border-muted/40 bg-muted/20 text-foreground hover:bg-muted/30"
                 >
-                  <Link to="/search">Discover sessions</Link>
+                  <Link to="/search">
+                    {playerT("dashboard.actions.discover_sessions")}
+                  </Link>
                 </Button>
               </div>
             )}
@@ -854,16 +887,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader>
             <CardTitle className="text-foreground text-base font-semibold">
-              Relationship health
+              {playerT("ui.relationship_health.title")}
             </CardTitle>
             <CardDescription>
-              A quick pulse on how you're staying connected across the community.
+              {playerT("ui.relationship_health.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Membership
+                {playerT("ui.membership_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">
                 {membershipLabel}
@@ -872,37 +905,39 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             </div>
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Pending reviews
+                {playerT("ui.pending_reviews_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">
                 {pendingReviewsCount}
               </p>
               <p className="text-muted-foreground text-sm">
                 {pendingReviewsCount === 0
-                  ? "You're all caught up"
-                  : "Share your table stories"}
+                  ? playerT("dashboard.pending_reviews.all_caught_up")
+                  : playerT("dashboard.pending_reviews.share_stories")}
               </p>
             </div>
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Teams
+                {playerT("ui.teams_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">{teamCount}</p>
               <p className="text-muted-foreground text-sm">
-                {teamCount === 0 ? "Join a crew" : "Active teams you're with"}
+                {teamCount === 0
+                  ? playerT("dashboard.teams.join_crew")
+                  : playerT("dashboard.teams.active_teams")}
               </p>
             </div>
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                Upcoming events
+                {playerT("ui.upcoming_events_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">
                 {upcomingEvents.length}
               </p>
               <p className="text-muted-foreground text-sm">
                 {upcomingEvents.length === 0
-                  ? "Watch the calendar"
-                  : "Opportunities waiting"}
+                  ? playerT("dashboard.teams.watch_calendar")
+                  : playerT("dashboard.teams.opportunities_waiting")}
               </p>
             </div>
           </CardContent>
@@ -913,25 +948,25 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader>
             <CardTitle className="text-foreground text-base font-semibold">
-              Campaign commitments
+              {playerT("ui.campaign_commitments.title")}
             </CardTitle>
             <CardDescription>
-              Track how you lead and participate so nothing slips.
+              {playerT("ui.campaign_commitments.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             <StatPill
-              label="Organizer"
+              label={playerT("dashboard.stats.organizer")}
               value={campaignsSummary.owned}
               icon={<ScrollText className="h-4 w-4" />}
             />
             <StatPill
-              label="Player"
+              label={playerT("dashboard.stats.player")}
               value={campaignsSummary.member}
               icon={<Users className="h-4 w-4" />}
             />
             <StatPill
-              label="Invites"
+              label={playerT("dashboard.stats.invites")}
               value={campaignsSummary.pendingInvites}
               icon={<Calendar className="h-4 w-4" />}
             />
@@ -940,25 +975,23 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader>
             <CardTitle className="text-foreground text-base font-semibold">
-              Game roster
+              {playerT("ui.game_roster.title")}
             </CardTitle>
-            <CardDescription>
-              Know where you're leading, playing, and queued to join next.
-            </CardDescription>
+            <CardDescription>{playerT("ui.game_roster.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             <StatPill
-              label="Organizer"
+              label={playerT("dashboard.stats.organizer")}
               value={gamesSummary.owned}
               icon={<Swords className="h-4 w-4" />}
             />
             <StatPill
-              label="Player"
+              label={playerT("dashboard.stats.player")}
               value={gamesSummary.member}
               icon={<Users className="h-4 w-4" />}
             />
             <StatPill
-              label="Invites"
+              label={playerT("dashboard.stats.invites")}
               value={gamesSummary.pendingInvites}
               icon={<Calendar className="h-4 w-4" />}
             />
@@ -971,11 +1004,9 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <CardTitle className="text-foreground text-base font-semibold">
-                Events worth exploring
+                {playerT("ui.events_exploring.title")}
               </CardTitle>
-              <CardDescription>
-                Recommendations refresh automatically as new sessions go live.
-              </CardDescription>
+              <CardDescription>{playerT("ui.events_exploring.subtitle")}</CardDescription>
             </div>
             <Button asChild variant="ghost" className="text-primary hover:text-primary">
               <Link
@@ -986,13 +1017,13 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   });
                 }}
               >
-                See all events
+                {playerT("dashboard.actions.see_all_events")}
               </Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             {upcomingEvents.length === 0 ? (
-              <EmptyState message="No featured events right now." />
+              <EmptyState message={playerT("dashboard.empty_states.no_events")} />
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {upcomingEvents.map((event) => (
@@ -1019,15 +1050,15 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <Card className="border-muted-foreground/20">
             <CardHeader>
               <CardTitle className="text-foreground text-base font-semibold">
-                Connections radar
+                {playerT("ui.connections_radar.title")}
               </CardTitle>
               <CardDescription>
-                Spotlight on crews that rely on you for momentum this week.
+                {playerT("ui.connections_radar.subtitle")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {topTeams.length === 0 ? (
-                <EmptyState message="No teams synced yet. Join a crew to get started." />
+                <EmptyState message={playerT("dashboard.empty_states.no_teams")} />
               ) : (
                 <div className="space-y-3">
                   {topTeams.map((team) => (
@@ -1040,12 +1071,12 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                         <p className="text-foreground text-sm font-medium">{team.name}</p>
                         <p className="text-muted-foreground text-xs">
                           {team.role === "owner"
-                            ? "You lead this team"
+                            ? playerT("dashboard.teams_section.you_lead")
                             : `Role: ${team.role}`}
                         </p>
                       </div>
                       <Badge variant="outline" className="text-xs font-semibold">
-                        {team.memberCount} members
+                        {playerT("ui.members_count", { count: team.memberCount })}
                       </Badge>
                     </Link>
                   ))}
@@ -1064,15 +1095,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     });
                   }}
                 >
-                  Manage teams
+                  {playerT("dashboard.actions.manage_teams")}
                 </Link>
               </Button>
               {showSpotlight ? (
                 <div className="border-primary/40 bg-primary/5 rounded-lg border px-3 py-3 text-sm">
-                  <p className="text-primary font-medium">Beta preview</p>
+                  <p className="text-primary font-medium">
+                    {playerT("ui.beta_preview.title")}
+                  </p>
                   <p className="text-muted-foreground">
-                    Advanced teammate recommendations are warming up. Expect curated
-                    boosts soon.
+                    {playerT("ui.beta_preview.description")}
                   </p>
                 </div>
               ) : null}
@@ -1081,26 +1113,27 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <Card className="border-muted-foreground/20">
             <CardHeader>
               <CardTitle className="text-foreground text-base font-semibold">
-                Focus spotlight
+                {playerT("ui.focus_spotlight.title")}
               </CardTitle>
-              <CardDescription>
-                Highlights unlock gradually as we pilot player-first experiments.
-              </CardDescription>
+              <CardDescription>{playerT("ui.focus_spotlight.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent>
               {showSpotlight ? (
                 <div className="space-y-3">
                   <p className="text-foreground text-sm font-medium">
-                    Early access: collaborative calendar sync
+                    {playerT("ui.calendar_sync.title")}
                   </p>
                   <p className="text-muted-foreground text-sm">
-                    Enable calendar sharing so trusted friends can nudge you when they're
-                    planning a session that fits your vibe.
+                    {playerT("ui.calendar_sync.description")}
                   </p>
-                  <Button className="w-full">Join the pilot</Button>
+                  <Button className="w-full">
+                    {playerT("ui.calendar_sync.join_pilot")}
+                  </Button>
                 </div>
               ) : (
-                <EmptyState message="Stay tuned. A new experiment is loading." />
+                <EmptyState
+                  message={playerT("dashboard.empty_states.experiment_loading")}
+                />
               )}
             </CardContent>
           </Card>

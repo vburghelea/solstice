@@ -1,46 +1,123 @@
 import { vi } from "vitest";
 
-// Mock translations for common keys
-const mockTranslations: Record<string, string> = {
-  // Auth translations (these match what the component actually calls)
-  "auth.login.welcome_back": "Welcome back to Roundup Games",
-  "auth.buttons.login": "Login",
-  "auth.buttons.logging_in": "Logging in...",
-  "auth.buttons.forgot_password": "Forgot Password?",
-  "auth.login.buttons.no_account": "Don't have an account?",
-  "auth.login.buttons.sign_up": "Sign up",
-  "auth.login.oauth.login_with_google": "Login with Google",
-  "auth.login.oauth.login_with_discord": "Login with Discord",
-  "auth.login.oauth.or_continue_with": "Or",
-  "auth.login.errors.invalid_credentials": "Invalid email or password",
-  "auth.login.errors.oauth_failed": "OAuth login failed",
+// Import actual translation files directly
+import adminTranslations from "../../lib/i18n/locales/en/admin.json";
+import authTranslations from "../../lib/i18n/locales/en/auth.json";
+import campaignsTranslations from "../../lib/i18n/locales/en/campaigns.json";
+import collaborationTranslations from "../../lib/i18n/locales/en/collaboration.json";
+import commonTranslations from "../../lib/i18n/locales/en/common.json";
+import errorsTranslations from "../../lib/i18n/locales/en/errors.json";
+import eventsTranslations from "../../lib/i18n/locales/en/events.json";
+import formsTranslations from "../../lib/i18n/locales/en/forms.json";
+import gameSystemsTranslations from "../../lib/i18n/locales/en/game-systems.json";
+import gamesTranslations from "../../lib/i18n/locales/en/games.json";
+import inboxTranslations from "../../lib/i18n/locales/en/inbox.json";
+import membershipTranslations from "../../lib/i18n/locales/en/membership.json";
+import navigationTranslations from "../../lib/i18n/locales/en/navigation.json";
+import opsTranslations from "../../lib/i18n/locales/en/ops.json";
+import playerTranslations from "../../lib/i18n/locales/en/player.json";
+import profileTranslations from "../../lib/i18n/locales/en/profile.json";
+import rolesTranslations from "../../lib/i18n/locales/en/roles.json";
+import settingsTranslations from "../../lib/i18n/locales/en/settings.json";
+import teamsTranslations from "../../lib/i18n/locales/en/teams.json";
 
-  // Common translations
-  "common.labels.email": "Email",
-  "common.labels.password": "Password",
-  "common.placeholders.email": "hello@example.com",
-  "common.placeholders.password": "Password",
-  "common.validation.invalid_email": "Invalid email",
-  "common.validation.password_required": "Password is required",
+// Flatten nested JSON structure to dot notation
+function flattenTranslations(
+  obj: Record<string, unknown>,
+  prefix = "",
+): Record<string, string> {
+  const translations: Record<string, string> = {};
+
+  Object.keys(obj).forEach((key) => {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (typeof obj[key] === "object" && obj[key] !== null) {
+      Object.assign(
+        translations,
+        flattenTranslations(obj[key] as Record<string, unknown>, fullKey),
+      );
+    } else {
+      translations[fullKey] = obj[key] as string;
+    }
+  });
+
+  return translations;
+}
+
+// Combine and flatten all translation files
+const flattenedTranslations: Record<string, string> = {
+  ...flattenTranslations(commonTranslations, "common"),
+  ...flattenTranslations(authTranslations, "auth"),
+  ...flattenTranslations(gamesTranslations, "games"),
+  ...flattenTranslations(eventsTranslations, "events"),
+  ...flattenTranslations(teamsTranslations, "teams"),
+  ...flattenTranslations(campaignsTranslations, "campaigns"),
+  ...flattenTranslations(profileTranslations, "profile"),
+  ...flattenTranslations(collaborationTranslations, "collaboration"),
+  ...flattenTranslations(gameSystemsTranslations, "game-systems"),
+  ...flattenTranslations(settingsTranslations, "settings"),
+  ...flattenTranslations(inboxTranslations, "inbox"),
+  ...flattenTranslations(membershipTranslations, "membership"),
+  ...flattenTranslations(navigationTranslations, "navigation"),
+  ...flattenTranslations(formsTranslations, "forms"),
+  ...flattenTranslations(errorsTranslations, "errors"),
+  ...flattenTranslations(rolesTranslations, "roles"),
+  ...flattenTranslations(playerTranslations, "player"),
+  ...flattenTranslations(opsTranslations, "ops"),
+  ...flattenTranslations(adminTranslations, "admin"),
+};
+
+// Create mock translations that include both namespaced and common keys for test compatibility
+const mockTranslations: Record<string, string> = {
+  // Include all flattened translations (namespaced)
+  ...flattenedTranslations,
+
+  // Also include common keys without namespace for backward compatibility
+  ...flattenTranslations(commonTranslations, ""),
 
   // Support both namespaced and non-namespaced keys for compatibility
-  "login.welcome_back": "Welcome back to Roundup Games",
-  "buttons.login": "Login",
-  "buttons.logging_in": "Logging in...",
-  "buttons.forgot_password": "Forgot Password?",
-  "buttons.no_account": "Don't have an account?",
-  "buttons.sign_up": "Sign up",
-  "login.oauth.login_with_google": "Login with Google",
-  "login.oauth.login_with_discord": "Login with Discord",
-  "login.oauth.or_continue_with": "Or",
-  "login.errors.invalid_credentials": "Invalid email or password",
-  "login.errors.oauth_failed": "OAuth login failed",
-  "labels.email": "Email",
-  "labels.password": "Password",
-  "placeholders.email": "hello@example.com",
-  "placeholders.password": "Password",
-  "validation.invalid_email": "Invalid email",
-  "validation.password_required": "Password is required",
+  "login.welcome_back": authTranslations.login.welcome_back,
+  "buttons.login": authTranslations.login.buttons.login,
+  "buttons.logging_in": authTranslations.login.buttons.logging_in,
+  "buttons.forgot_password": authTranslations.login.buttons.forgot_password,
+  "buttons.no_account": authTranslations.login.buttons.no_account,
+  "buttons.sign_up": authTranslations.login.buttons.sign_up,
+  "login.oauth.login_with_google": authTranslations.login.oauth.login_with_google,
+  "login.oauth.login_with_discord": authTranslations.login.oauth.login_with_discord,
+  "login.oauth.or_continue_with": authTranslations.login.oauth.or_continue_with,
+  "login.errors.invalid_credentials": authTranslations.login.errors.invalid_credentials,
+  "login.errors.oauth_failed": authTranslations.login.errors.oauth_failed,
+  "labels.email": authTranslations.signup.labels.email,
+  "labels.password": authTranslations.signup.labels.password,
+  "placeholders.email": authTranslations.signup.placeholders.email,
+  "placeholders.password": authTranslations.signup.placeholders.password,
+  "validation.invalid_email": commonTranslations.validation.invalid_email,
+  "validation.password_required": commonTranslations.validation.password_required,
+  // Player translations
+  "player.ui.welcome_back": playerTranslations.dashboard.ui.welcome_back,
+  "player.dashboard.ui.connections_radar.title":
+    playerTranslations.dashboard.ui.connections_radar.title,
+  "player.dashboard.privacy.invites_from_connections.label":
+    playerTranslations.dashboard.privacy.invites_from_connections.label,
+  "player.dashboard.notifications.review_reminders.description":
+    playerTranslations.dashboard.notifications.review_reminders.description,
+  "player.dashboard.ui.calendar_sync.join_pilot":
+    playerTranslations.dashboard.ui.calendar_sync.join_pilot,
+  "player.dashboard.actions.edit_profile":
+    playerTranslations.dashboard.actions.edit_profile,
+  "player.ui.membership_label": playerTranslations.dashboard.ui.membership_label,
+  "player.ui.focus_spotlight.title":
+    playerTranslations.dashboard.ui.focus_spotlight.title,
+  "player.ui.focus_spotlight.subtitle":
+    playerTranslations.dashboard.ui.focus_spotlight.subtitle,
+  "player.ui.calendar_sync.title": playerTranslations.dashboard.ui.calendar_sync.title,
+  "player.ui.calendar_sync.description":
+    playerTranslations.dashboard.ui.calendar_sync.description,
+  "player.dashboard.empty_states.experiment_loading":
+    playerTranslations.dashboard.empty_states.experiment_loading,
+  "player.ui.headquarters.title": playerTranslations.dashboard.ui.headquarters.title,
+  "player.ui.subtitle": playerTranslations.dashboard.ui.subtitle,
+  "player.ui.badges.privacy_ready": playerTranslations.dashboard.ui.badges.privacy_ready,
+  "player.ui.teams_synced": playerTranslations.dashboard.ui.teams_synced,
 };
 
 // Mock i18next instance for tests
@@ -70,7 +147,10 @@ export const mockUseTranslation = vi.fn((namespace?: string) => {
   const getTranslation = (key: string) => {
     // Try namespaced key first, then fallback to non-namespaced
     const namespacedKey = namespace ? `${namespace}.${key}` : key;
-    return mockTranslations[namespacedKey] || mockTranslations[key] || key;
+    const translation = mockTranslations[namespacedKey] || mockTranslations[key];
+
+    // If no translation found, return the key as-is (this helps debugging)
+    return translation || key;
   };
 
   return {

@@ -8,29 +8,53 @@ import { i18nConfig } from "./config";
 import adminEn from "./locales/en/admin.json";
 import authEn from "./locales/en/auth.json";
 import campaignsEn from "./locales/en/campaigns.json";
+import collaborationEn from "./locales/en/collaboration.json";
 import commonEn from "./locales/en/common.json";
+import consentEn from "./locales/en/consent.json";
+import errorsEn from "./locales/en/errors.json";
 import eventsEn from "./locales/en/events.json";
+import formsEn from "./locales/en/forms.json";
+import gameSystemsEn from "./locales/en/game-systems.json";
 import gamesEn from "./locales/en/games.json";
+import gmEn from "./locales/en/gm.json";
+import inboxEn from "./locales/en/inbox.json";
 import membershipEn from "./locales/en/membership.json";
+import navigationEn from "./locales/en/navigation.json";
+import opsEn from "./locales/en/ops.json";
 import playerEn from "./locales/en/player.json";
 import profileEn from "./locales/en/profile.json";
+import reviewsEn from "./locales/en/reviews.json";
+import rolesEn from "./locales/en/roles.json";
 import settingsEn from "./locales/en/settings.json";
+import socialEn from "./locales/en/social.json";
 import teamsEn from "./locales/en/teams.json";
 
 // Resources with English as fallback
 const resources = {
   en: {
-    common: commonEn,
-    auth: authEn,
-    games: gamesEn,
-    events: eventsEn,
-    teams: teamsEn,
-    player: playerEn,
     admin: adminEn,
+    auth: authEn,
     campaigns: campaignsEn,
+    collaboration: collaborationEn,
+    common: commonEn,
+    consent: consentEn,
+    errors: errorsEn,
+    events: eventsEn,
+    forms: formsEn,
+    "game-systems": gameSystemsEn,
+    games: gamesEn,
+    gm: gmEn,
+    inbox: inboxEn,
     membership: membershipEn,
-    settings: settingsEn,
+    navigation: navigationEn,
+    ops: opsEn,
+    player: playerEn,
     profile: profileEn,
+    reviews: reviewsEn,
+    roles: rolesEn,
+    settings: settingsEn,
+    social: socialEn,
+    teams: teamsEn,
   },
 };
 

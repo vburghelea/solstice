@@ -1,4 +1,5 @@
 import { HeroSection } from "~/components/ui/hero-section";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
 interface SystemHeroProps {
@@ -14,6 +15,7 @@ export function SystemHero({
   heroUrl,
   renderBackground = true,
 }: SystemHeroProps) {
+  const { t } = useGameSystemsTranslation();
   const heroBackground = heroUrl
     ? createResponsiveCloudinaryImage(heroUrl, {
         transformation: {
@@ -58,7 +60,7 @@ export function SystemHero({
       />
       {!heroBackground && (
         <p className="text-muted-foreground mt-2 text-center text-sm">
-          Image pending moderation
+          {t("status.image_pending_moderation")}
         </p>
       )}
     </div>

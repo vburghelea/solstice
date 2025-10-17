@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { acceptTeamInvite, declineTeamInvite } from "~/features/teams/teams.mutations";
 import type { PendingTeamInvite } from "~/features/teams/teams.queries";
+import { useTeamsTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 export interface TeamInvitationsSectionProps {
@@ -13,6 +14,7 @@ export interface TeamInvitationsSectionProps {
 }
 
 export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps) {
+  const { t } = useTeamsTranslation();
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -34,12 +36,12 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
       return { previousInvites, teamId };
     },
     onSuccess: () => {
-      setFeedback({ type: "success", message: "Invitation accepted." });
+      setFeedback({ type: "success", message: t("invitations.accepted") });
     },
     onError: (error, _teamId, context) => {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to accept invitation.",
+        message: error instanceof Error ? error.message : t("errors.accept_failed"),
       });
       if (context?.previousInvites) {
         queryClient.setQueryData(["pendingTeamInvites"], context.previousInvites);
@@ -65,12 +67,12 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
       return { previousInvites, teamId };
     },
     onSuccess: () => {
-      setFeedback({ type: "success", message: "Invitation declined." });
+      setFeedback({ type: "success", message: t("invitations.declined") });
     },
     onError: (error, _teamId, context) => {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to decline invitation.",
+        message: error instanceof Error ? error.message : t("errors.decline_failed"),
       });
       if (context?.previousInvites) {
         queryClient.setQueryData(["pendingTeamInvites"], context.previousInvites);
@@ -94,9 +96,9 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl">Pending Team Invitations</CardTitle>
+        <CardTitle className="text-xl">{t("invitations.title")}</CardTitle>
         <Badge variant="secondary" className="tracking-wide uppercase">
-          {invites.length} pending
+          {t("invitations.badge", { count: invites.length })}
         </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -123,9 +125,9 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
 
           const activityTimestamp = invitedAt || requestedAt;
           const activityLabel = invitedAt
-            ? "Invitation sent"
+            ? t("invitations.sent")
             : requestedAt
-              ? "Request created"
+              ? t("invitations.request_created")
               : null;
 
           const isProcessing =
@@ -149,7 +151,7 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
                   )}
                   {invite.inviter?.name && (
                     <p className="text-muted-foreground mt-2 text-sm">
-                      Invited by {invite.inviter.name}
+                      {t("invitations.invited_by", { name: invite.inviter.name })}
                     </p>
                   )}
                 </div>
@@ -162,7 +164,9 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
                     }
                     disabled={isProcessing}
                   >
-                    {acceptInviteMutation.isPending ? "Accepting..." : "Accept"}
+                    {acceptInviteMutation.isPending
+                      ? t("invitations.accepting")
+                      : t("invitations.accept")}
                   </Button>
                   <Button
                     variant="outline"
@@ -171,7 +175,9 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
                     }
                     disabled={isProcessing}
                   >
-                    {declineInviteMutation.isPending ? "Declining..." : "Decline"}
+                    {declineInviteMutation.isPending
+                      ? t("invitations.declining")
+                      : t("invitations.decline")}
                   </Button>
                 </div>
               </CardContent>

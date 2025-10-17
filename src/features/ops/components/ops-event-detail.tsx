@@ -59,16 +59,17 @@ import type {
   EventWithDetails,
 } from "~/features/events/events.types";
 import { opsCapacityThreshold } from "~/features/ops/components/use-ops-events-data";
+import { useCommonTranslation, useOpsTranslation } from "~/hooks/useTypedTranslation";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { useLocalStorage } from "~/shared/hooks/useLocalStorage";
 import { cn } from "~/shared/lib/utils";
 
-const TASK_STATUS_LABELS = {
-  todo: "To do",
-  in_progress: "In progress",
-  blocked: "Needs attention",
-  done: "Completed",
-} as const;
+const getTaskStatusLabels = (t: (key: string) => string) => ({
+  todo: t("task_status.todo"),
+  in_progress: t("task_status.in_progress"),
+  blocked: t("task_status.blocked"),
+  done: t("task_status.done"),
+});
 
 const TASK_STATUS_BADGE: Record<
   OpsTaskStatus,
@@ -113,13 +114,19 @@ type OpsTaskStore = Record<string, OpsTaskStoreValue>;
 
 type NormalizedTaskStore = Record<string, OpsTaskPersistedState>;
 
-const TASK_FILTER_OPTIONS: Array<{ value: OpsTaskStatus | "all"; label: string }> = [
-  { value: "all", label: "All tasks" },
-  ...Object.entries(TASK_STATUS_LABELS).map(([value, label]) => ({
-    value: value as OpsTaskStatus,
-    label,
-  })),
-];
+const getTaskFilterOptions = (
+  t: (key: string) => string,
+  commonT: (key: string) => string,
+): Array<{ value: OpsTaskStatus | "all"; label: string }> => {
+  const taskStatusLabels = getTaskStatusLabels(t);
+  return [
+    { value: "all", label: commonT("buttons.all") },
+    ...Object.entries(taskStatusLabels).map(([value, label]) => ({
+      value: value as OpsTaskStatus,
+      label,
+    })),
+  ];
+};
 
 function isTaskStatus(value: string): value is OpsTaskStatus {
   return ["todo", "in_progress", "blocked", "done"].includes(value);
@@ -130,6 +137,9 @@ interface OpsEventDetailProps {
 }
 
 export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
+  const { t } = useOpsTranslation();
+  const { t: commonT } = useCommonTranslation();
+
   const {
     data: eventResult,
     isLoading,
@@ -150,13 +160,16 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
     "all",
   );
 
+  const taskStatusLabels = useMemo(() => getTaskStatusLabels(t), [t]);
+  const taskFilterOptions = useMemo(() => getTaskFilterOptions(t, commonT), [t, commonT]);
+
   const taskTemplates = useMemo<OpsTaskDefinition[]>(() => {
     if (!event) {
       return [];
     }
 
-    return buildTaskTemplates(event);
-  }, [event]);
+    return buildTaskTemplates(event, t);
+  }, [event, t]);
 
   const templateMap = useMemo(() => {
     return new Map(taskTemplates.map((task) => [task.id, task]));
@@ -249,9 +262,9 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
       <div className="container mx-auto space-y-6 p-6">
         <Alert variant="destructive">
           <AlertCircleIcon className="size-4" />
-          <AlertTitle>Unable to load event</AlertTitle>
+          <AlertTitle>{commonT("errors.unable_to_load")}</AlertTitle>
           <AlertDescription>
-            {error.message || "Something went wrong while fetching the event."}
+            {error.message || t("event_detail.error_fetching")}
           </AlertDescription>
         </Alert>
       </div>
@@ -352,7 +365,7 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                     <FilterIcon className="size-4" />
                     {isFiltered
                       ? `Showing ${filteredTasks.length} of ${tasks.length} tasks.`
-                      : "Review and annotate operations tasks by workstream."}
+                      : t("event_detail.review_tasks")}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Select
@@ -363,12 +376,12 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                     >
                       <SelectTrigger
                         className="w-full min-w-40 sm:w-48"
-                        aria-label="Filter tasks by status"
+                        aria-label={t("event_detail.filter_aria_label")}
                       >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {TASK_FILTER_OPTIONS.map((option) => (
+                        {taskFilterOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -386,6 +399,9 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                   onOwnerChange={handleOwnerChange}
                   onNoteChange={handleNoteChange}
                   isFiltered={isFiltered}
+                  t={t}
+                  commonT={commonT}
+                  taskStatusLabels={taskStatusLabels}
                 />
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -459,19 +475,21 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
             <CardContent className="text-muted-foreground space-y-4 text-sm">
               <SnapshotRow
                 icon={<Users2Icon className="size-4" />}
-                label="Capacity remaining"
+                label={t("event_detail.capacity_remaining")}
                 value={formatCapacity(event)}
               />
               <SnapshotRow
                 icon={<ClipboardListIcon className="size-4" />}
-                label="Registration status"
+                label={t("event_detail.registration_status")}
                 value={
-                  event.isRegistrationOpen ? "Accepting sign-ups" : "Closed or gated"
+                  event.isRegistrationOpen
+                    ? t("event_detail.accepting_signups")
+                    : t("event_detail.closed_gated")
                 }
               />
               <SnapshotRow
                 icon={<ClockIcon className="size-4" />}
-                label="Next milestone"
+                label={t("event_detail.next_milestone")}
                 value={formatNextMilestone(event)}
               />
             </CardContent>
@@ -488,22 +506,28 @@ function TaskTable({
   onOwnerChange,
   onNoteChange,
   isFiltered,
+  t,
+  commonT,
+  taskStatusLabels,
 }: {
   tasks: OpsTask[];
   onStatusChange: (taskId: string, status: OpsTaskStatus) => void;
   onOwnerChange: (taskId: string, owner: string) => void;
   onNoteChange: (taskId: string, note: string) => void;
   isFiltered: boolean;
+  t: (key: string) => string;
+  commonT: (key: string) => string;
+  taskStatusLabels: Record<string, string>;
 }) {
   if (tasks.length === 0) {
     return (
       <Alert>
         <AlertCircleIcon className="size-4" />
-        <AlertTitle>No tasks available</AlertTitle>
+        <AlertTitle>{commonT("status.no_tasks_available")}</AlertTitle>
         <AlertDescription>
           {isFiltered
-            ? "No tasks match this filter. Adjust the status filter or reset to view the full checklist."
-            : "Once this event loads successfully we will generate a suggested operations checklist."}
+            ? t("event_detail.no_tasks_filter")
+            : t("event_detail.generate_checklist")}
         </AlertDescription>
       </Alert>
     );
@@ -514,12 +538,12 @@ function TaskTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40">
-            <TableHead className="w-[28%]">Task</TableHead>
-            <TableHead className="w-[16%]">Status</TableHead>
-            <TableHead className="w-[16%]">Owner</TableHead>
-            <TableHead className="w-[18%]">Due</TableHead>
-            <TableHead className="w-[12%]">Focus</TableHead>
-            <TableHead className="w-[10%]">Notes</TableHead>
+            <TableHead className="w-[28%]">{commonT("labels.task")}</TableHead>
+            <TableHead className="w-[16%]">{commonT("labels.status")}</TableHead>
+            <TableHead className="w-[16%]">{commonT("labels.owner")}</TableHead>
+            <TableHead className="w-[18%]">{commonT("labels.due")}</TableHead>
+            <TableHead className="w-[12%]">{commonT("labels.focus")}</TableHead>
+            <TableHead className="w-[10%]">{commonT("labels.notes")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -533,7 +557,7 @@ function TaskTable({
               </TableCell>
               <TableCell>
                 <Badge variant={TASK_STATUS_BADGE[task.status]}>
-                  {TASK_STATUS_LABELS[task.status]}
+                  {taskStatusLabels[task.status]}
                 </Badge>
                 <Select
                   value={task.status}
@@ -548,7 +572,7 @@ function TaskTable({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(TASK_STATUS_LABELS).map(([value, label]) => (
+                    {Object.entries(taskStatusLabels).map(([value, label]) => (
                       <SelectItem key={value} value={value}>
                         {label}
                       </SelectItem>
@@ -606,6 +630,8 @@ function TaskTable({
                   taskTitle={task.title}
                   note={task.note}
                   onUpdate={(value) => onNoteChange(task.id, value)}
+                  t={t}
+                  commonT={commonT}
                 />
               </TableCell>
             </TableRow>
@@ -621,16 +647,20 @@ function TaskNoteEditor({
   taskTitle,
   note,
   onUpdate,
+  t,
+  commonT,
 }: {
   taskId: string;
   taskTitle: string;
   note: string;
   onUpdate: (value: string) => void;
+  t: (key: string) => string;
+  commonT: (key: string) => string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const preview = note.trim();
-  const buttonLabel = preview.length > 0 ? preview : "Add note";
+  const buttonLabel = preview.length > 0 ? preview : commonT("actions.add_note");
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -651,11 +681,11 @@ function TaskNoteEditor({
       </PopoverTrigger>
       <PopoverContent className="space-y-3" align="start">
         <div className="space-y-2">
-          <Label htmlFor={`task-note-${taskId}`}>Notes</Label>
+          <Label htmlFor={`task-note-${taskId}`}>{commonT("labels.notes")}</Label>
           <Textarea
             id={`task-note-${taskId}`}
             value={note}
-            placeholder="Capture updates, blockers, or context for teammates."
+            placeholder={t("event_detail.update_placeholder")}
             onChange={(event) => onUpdate(event.target.value)}
             rows={4}
           />
@@ -782,7 +812,10 @@ function normalizeTaskState(
   return normalized;
 }
 
-function buildTaskTemplates(event: EventWithDetails): OpsTaskDefinition[] {
+function buildTaskTemplates(
+  event: EventWithDetails,
+  t: (key: string) => string,
+): OpsTaskDefinition[] {
   const start = new Date(event.startDate);
   const end = new Date(event.endDate);
   const registrationOpens = event.registrationOpensAt
@@ -802,8 +835,8 @@ function buildTaskTemplates(event: EventWithDetails): OpsTaskDefinition[] {
   return [
     {
       id: "ops-approval",
-      title: "Final approval & publish",
-      description: "Verify organizer paperwork, then move the event live for marketing.",
+      title: t("event_detail.final_approval"),
+      description: t("event_detail.final_approval_description"),
       defaultOwner: event.organizer?.name ?? DEFAULT_OWNER,
       ownerOptions: buildOwnerOptions(event, [
         event.organizer?.name ?? "",

@@ -11,7 +11,7 @@ export const loginFormSchema = z.object({
 export type LoginFormData = z.infer<typeof loginFormSchema>;
 
 /**
- * Base signup form field schemas
+ * Base signup form field schemas (kept with hardcoded messages for server-side compatibility)
  */
 export const signupFormFieldSchemas = {
   name: z
@@ -27,7 +27,95 @@ export const signupFormFieldSchemas = {
 };
 
 /**
- * Signup form field validators for TanStack Form
+ * Translation function type for form validators
+ */
+export type TranslationFunction = (
+  key: string,
+  options?: Record<string, unknown>,
+) => string;
+
+/**
+ * Create signup form field validators with translation support
+ */
+export const createSignupFormFields = (t: TranslationFunction) => ({
+  name: ({ value }: { value: string }) => {
+    try {
+      signupFormFieldSchemas.name.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        // Map specific error messages to translation keys
+        if (errorMessage?.includes("Name is required")) {
+          return t("common.validation.name_required");
+        }
+        if (errorMessage?.includes("Name must be at least 2 characters")) {
+          return t("common.validation.name_too_short");
+        }
+        return t("common.validation.invalid_format");
+      }
+      return t("common.validation.invalid_format");
+    }
+  },
+  email: ({ value }: { value: string }) => {
+    try {
+      signupFormFieldSchemas.email.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        // Map specific error messages to translation keys
+        if (errorMessage?.includes("Email is required")) {
+          return t("common.validation.email_required");
+        }
+        if (errorMessage?.includes("Please enter a valid email")) {
+          return t("common.validation.invalid_email");
+        }
+        return t("common.validation.invalid_format");
+      }
+      return t("common.validation.invalid_format");
+    }
+  },
+  password: ({ value }: { value: string }) => {
+    try {
+      signupFormFieldSchemas.password.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        // Map specific error messages to translation keys
+        if (errorMessage?.includes("Password is required")) {
+          return t("common.validation.password_required");
+        }
+        if (errorMessage?.includes("Password must be at least 8 characters")) {
+          return t("common.validation.password_too_short");
+        }
+        return t("common.validation.invalid_format");
+      }
+      return t("common.validation.invalid_format");
+    }
+  },
+  confirmPassword: ({ value }: { value: string }) => {
+    try {
+      signupFormFieldSchemas.confirmPassword.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        // Map specific error messages to translation keys
+        if (errorMessage?.includes("Please confirm your password")) {
+          return t("common.validation.confirm_password_required");
+        }
+        return t("common.validation.invalid_format");
+      }
+      return t("common.validation.confirm_password_required");
+    }
+  },
+});
+
+/**
+ * Legacy signup form field validators (kept for backward compatibility)
+ * @deprecated Use createSignupFormFields(t) instead
  */
 export const signupFormFields = {
   name: ({ value }: { value: string }) => {

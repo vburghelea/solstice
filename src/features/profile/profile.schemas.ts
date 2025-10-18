@@ -70,7 +70,6 @@ export const completeProfileInputSchema = profileInputSchema.extend({
   name: profileNameSchema,
   gender: z.string(),
   pronouns: z.string(),
-  phone: z.string(),
   privacySettings: privacySettingsSchema,
 });
 

@@ -293,27 +293,59 @@ export const uploadImageHandler = async ({
 }: {
   data: import("./game-systems.schemas").UploadImageInput;
 }) => {
-  const [{ getDb }, { mediaAssets }, cloudinary] = await Promise.all([
+  const [{ getDb }, { mediaAssets, gameSystems }] = await Promise.all([
     import("~/db/server-helpers"),
     import("~/db/schema"),
-    import("~/lib/storage/cloudinary"),
   ]);
   type MediaAsset = typeof mediaAssets.$inferSelect;
   const db = await getDb();
+  const { eq } = await import("drizzle-orm");
 
-  const uploaded = await cloudinary.uploadImage(data.url, {
-    checksum: cloudinary.computeChecksum(data.url),
-    ...(data.license ? { license: data.license } : {}),
-    ...(data.licenseUrl ? { licenseUrl: data.licenseUrl } : {}),
-    kind: data.kind,
+  // Get game system information for enhanced metadata
+  const gameSystem = await db.query.gameSystems.findFirst({
+    where: eq(gameSystems.id, data.systemId),
+    columns: { name: true, slug: true, sourceOfTruth: true },
   });
+
+  if (!gameSystem) {
+    throw new Error(`Game system with ID ${data.systemId} not found`);
+  }
+
+  // Use enhanced upload function with proper metadata and folder structure
+  const { uploadGameSystemMediaFromUrl } = await import("~/lib/storage/media-assets");
+  const uploadOptions: import("~/lib/storage/media-assets").MediaUploadOptions = {
+    type: data.kind as "thumbnail" | "hero" | "gallery" | "cover",
+    gameSystemId: data.systemId,
+    source: "manual", // Manual uploads
+    moderated: false, // Manual uploads start as non-moderated
+    originalUrl: data.url,
+  };
+
+  // Add optional license fields if provided
+  if (data.license) {
+    uploadOptions.license = data.license;
+  }
+  if (data.licenseUrl) {
+    uploadOptions.licenseUrl = data.licenseUrl;
+  }
+
+  const uploaded = await uploadGameSystemMediaFromUrl(data.url, uploadOptions, db);
 
   const [asset] = (await db
     .insert(mediaAssets)
     .values({
       gameSystemId: data.systemId,
       orderIndex: 0,
-      ...uploaded,
+      publicId: uploaded.publicId,
+      secureUrl: uploaded.secureUrl,
+      width: uploaded.width,
+      height: uploaded.height,
+      format: uploaded.format,
+      license: uploaded.license,
+      licenseUrl: uploaded.licenseUrl,
+      kind: uploaded.kind,
+      moderated: uploaded.moderated,
+      checksum: uploaded.checksum,
     })
     .returning()) as MediaAsset[];
 

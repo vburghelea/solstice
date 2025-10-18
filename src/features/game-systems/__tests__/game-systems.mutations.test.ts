@@ -42,12 +42,40 @@ const fakeDb = {
     })),
   })),
   query: {
+    gameSystems: {
+      findFirst: vi.fn(() =>
+        Promise.resolve({
+          id: 1,
+          name: "Test Game System",
+          slug: "test-game-system",
+          sourceOfTruth: "manual",
+        }),
+      ),
+    },
     gameSystemCategories: { findFirst: vi.fn() },
     gameSystemMechanics: { findFirst: vi.fn() },
   },
 };
 
 vi.mock("~/db/server-helpers", () => ({ getDb: vi.fn(() => fakeDb) }));
+vi.mock("~/lib/storage/media-assets", () => ({
+  uploadGameSystemMediaFromUrl: vi.fn(() =>
+    Promise.resolve({
+      publicId: "pid",
+      secureUrl: "http://cloudinary.test/pid.jpg",
+      width: 100,
+      height: 100,
+      format: "jpg",
+      checksum: "abc123",
+      license: undefined,
+      licenseUrl: undefined,
+      kind: "hero",
+      moderated: false,
+      gameSystemId: 1,
+      source: "manual",
+    }),
+  ),
+}));
 vi.mock("~/db/schema", () => ({
   gameSystems: {
     id: "id",

@@ -64,7 +64,7 @@ function SystemDetailPage() {
               style={{
                 backgroundImage: `url('${heroBackground.src}')`,
                 backgroundPosition: "center top",
-                backgroundSize: "cover",
+                backgroundSize: "contain",
               }}
               aria-hidden="true"
             />

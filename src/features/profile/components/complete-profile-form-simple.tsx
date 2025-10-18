@@ -31,7 +31,7 @@ import { invalidateProfileCaches } from "../profile.cache";
 import { completeUserProfile, updateUserProfile } from "../profile.mutations";
 import { checkProfileNameAvailability, getUserProfile } from "../profile.queries";
 import { type CompleteProfileInputType, type ProfileInputType } from "../profile.schemas";
-import type { UserProfile } from "../profile.types";
+import type { ProfileError, UserProfile } from "../profile.types";
 import { defaultPrivacySettings } from "../profile.types";
 import {
   normalizeProfileName,
@@ -77,6 +77,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
 
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
   const [nameAvailability, setNameAvailability] = useState<{
     normalizedName: string;
     available: boolean;
@@ -104,6 +105,8 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     defaultValues: formDefaultValues as ProfileInputType,
     onSubmit: async ({ value }) => {
       setError(null);
+      setValidationErrors({});
+
       try {
         const validation = await validateProfileName();
         if (!validation.success) {
@@ -282,6 +285,10 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     }
 
     setCurrentStep(stepId);
+    // Clear general error when navigating, but keep validation errors for highlighting
+    if (Object.keys(validationErrors).length === 0) {
+      setError(null);
+    }
   };
 
   const goToNextStep = async () => {
@@ -308,6 +315,7 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
       setError(null);
+      setValidationErrors({});
       setCurrentStep(STEPS[prevIndex].id);
     }
   };
@@ -346,33 +354,61 @@ function ProfileFormInner({ initialData }: ProfileFormInnerProps) {
     <div className="space-y-6">
       {/* Step indicators */}
       <div className="flex justify-between">
-        {STEPS.map((step, index) => (
-          <button
-            key={step.id}
-            onClick={() => void goToStep(step.id)}
-            className={cn(
-              "flex items-center gap-2 text-sm font-medium transition-colors",
-              index <= currentStepIndex ? "text-primary" : "text-muted-foreground",
-              "hover:text-primary",
-            )}
-            type="button"
-          >
-            <div
+        {STEPS.map((step, index) => {
+          const hasErrors =
+            validationErrors[step.id] && validationErrors[step.id].length > 0;
+          return (
+            <button
+              key={step.id}
+              onClick={() => void goToStep(step.id)}
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
-                index <= currentStepIndex
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-muted-foreground",
+                "flex items-center gap-2 text-sm font-medium transition-colors",
+                hasErrors
+                  ? "text-destructive"
+                  : index <= currentStepIndex
+                    ? "text-primary"
+                    : "text-muted-foreground",
+                "hover:text-primary",
               )}
+              type="button"
             >
-              {index + 1}
-            </div>
-            <span className="hidden sm:inline">{step.title}</span>
-          </button>
-        ))}
+              <div
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
+                  hasErrors
+                    ? "border-destructive bg-destructive text-destructive-foreground"
+                    : index <= currentStepIndex
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-muted-foreground",
+                )}
+              >
+                {index + 1}
+              </div>
+              <span className="hidden sm:inline">{step.title}</span>
+              {hasErrors && (
+                <span className="relative ml-1">
+                  <span className="bg-destructive absolute inline-flex h-2 w-2 animate-ping rounded-full opacity-75"></span>
+                  <span className="bg-destructive relative inline-flex h-2 w-2 rounded-full"></span>
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {error && (
+      {/* Validation errors by step */}
+      {validationErrors[currentStep] && validationErrors[currentStep].length > 0 && (
+        <div className="bg-destructive/10 border-destructive/20 rounded-md border p-4">
+          <h4 className="text-destructive mb-2 font-medium">Please fix these errors:</h4>
+          <ul className="text-destructive list-inside list-disc space-y-1 text-sm">
+            {validationErrors[currentStep].map((errorMsg) => (
+              <li key={errorMsg}>{errorMsg}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {error && Object.keys(validationErrors).length === 0 && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
           {error}
         </div>

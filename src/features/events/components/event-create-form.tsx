@@ -1,6 +1,6 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import {
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
+import type { AuthUser } from "~/lib/auth/types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { createEvent, uploadEventImage } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
@@ -84,12 +85,12 @@ function getNextDayString(dateString: string) {
   return date.toISOString().split("T")[0];
 }
 
-// Remove explicit type definition and let Zod infer it
-// type EventFormData = z.infer<ReturnType<typeof eventFormSchema>>;
+interface EventCreateFormProps {
+  user: AuthUser;
+}
 
-export function EventCreateForm() {
+export function EventCreateForm({ user }: EventCreateFormProps) {
   const navigate = useNavigate();
-  const { user } = useRouteContext({ from: "/player/events/create" });
   const isAdminUser = useMemo(() => isAdminClient(user), [user]);
   const { t } = useEventsTranslation();
   const [currentStep, setCurrentStep] = useState(0);

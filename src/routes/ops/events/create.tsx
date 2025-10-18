@@ -17,6 +17,8 @@ export const Route = createFileRoute("/ops/events/create")({
 });
 
 function CreateEventPage() {
+  const { user } = Route.useRouteContext();
+
   return (
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center gap-4">
@@ -28,7 +30,7 @@ function CreateEventPage() {
         </Button>
       </div>
 
-      <EventCreateForm />
+      <EventCreateForm user={user} />
     </div>
   );
 }

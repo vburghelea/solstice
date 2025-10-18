@@ -262,6 +262,9 @@
     },
     "errors": {
       "load_failed": "Failed to load campaigns."
+    },
+    "list": {
+      "view_button": "View"
     }
   },
   "detail": {
@@ -308,5 +311,9 @@
     "applying": "Applying...",
     "apply_to_join": "Apply to join",
     "price_session": "Price/session"
+  },
+  "validation": {
+    "campaign_name_required": "Campaign name is required",
+    "description_required": "Description is required"
   }
 }

@@ -209,9 +209,7 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
   useConsentTranslation: () => mockUseTranslation("consent"),
   useGmTranslation: () => mockUseTranslation("gm"),
   useInboxTranslation: () => mockUseTranslation("inbox"),
-  useMembersTranslation: () => mockUseTranslation("members"),
   useOpsTranslation: () => mockUseTranslation("ops"),
-  useReviewsTranslation: () => mockUseTranslation("reviews"),
   useRolesTranslation: () => mockUseTranslation("roles"),
   useSocialTranslation: () => mockUseTranslation("social"),
 }));

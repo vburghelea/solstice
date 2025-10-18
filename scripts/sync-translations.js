@@ -52,6 +52,13 @@ function getNestedKeys(obj, prefix = "") {
   return keys;
 }
 
+function getNestedValue(obj, key) {
+  const keys = key.split(".");
+  return keys.reduce((current, keyPart) => {
+    return current && typeof current === "object" ? current[keyPart] : undefined;
+  }, obj);
+}
+
 function setNestedValue(obj, key, value) {
   const keys = key.split(".");
   const lastKey = keys.pop();
@@ -107,10 +114,11 @@ async function syncTranslations() {
       const referenceKeys = getNestedKeys(referenceTranslations[ns]);
       const langKeys = getNestedKeys(translations);
 
-      // Add missing keys with placeholder value
+      // Add missing keys with placeholder value (only if key doesn't exist)
       let addedCount = 0;
       for (const key of referenceKeys) {
-        if (!langKeys.includes(key)) {
+        const existingValue = getNestedValue(translations, key);
+        if (existingValue === undefined) {
           setNestedValue(translations, key, `TODO: Translate "${key}"`);
           addedCount++;
         }

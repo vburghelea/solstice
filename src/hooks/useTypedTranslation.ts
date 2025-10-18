@@ -171,24 +171,10 @@ export const useInboxTranslation = () => {
 };
 
 /**
- * Hook for members translations
- */
-export const useMembersTranslation = () => {
-  return useNamespaceTranslation("members");
-};
-
-/**
  * Hook for ops translations
  */
 export const useOpsTranslation = () => {
   return useNamespaceTranslation("ops");
-};
-
-/**
- * Hook for reviews translations
- */
-export const useReviewsTranslation = () => {
-  return useNamespaceTranslation("reviews");
 };
 
 /**

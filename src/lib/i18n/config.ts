@@ -16,12 +16,10 @@ export const i18nConfig = {
     "gm", // Game master tools and features
     "inbox", // Messaging and notifications
     "layouts", // Layout components and structure
-    "members", // Member management and profiles
     "membership", // Membership plans and billing
     "ops", // Operations and system management
     "player", // Player dashboard and profile
     "profile", // User profile management
-    "reviews", // Game and campaign reviews
     "roles", // Role management and permissions
     "settings", // Application and user settings
     "social", // Social features and interactions
@@ -62,10 +60,9 @@ export const i18nConfig = {
     transKeepBasicHtmlNodesFor: ["br", "strong", "i", "em", "span"],
   },
 
-  // Debug mode (disable in production)
+  // Debug mode (development only)
   debug: process.env["NODE_ENV"] === "development",
-} as const;
+};
 
-export type SupportedLanguage = (typeof i18nConfig.supportedLanguages)[number];
 export type Namespace = (typeof i18nConfig.namespaces)[number];
-export type TranslationKey = `${string}.${string}`;
+export type SupportedLanguage = (typeof i18nConfig.supportedLanguages)[number];

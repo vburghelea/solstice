@@ -44,9 +44,9 @@ import {
   defaultNotificationPreferences,
   defaultPrivacySettings,
 } from "~/features/profile/profile.types";
-import { listPendingGMReviews } from "~/features/reviews/reviews.queries";
-import type { PendingGMReviewItem } from "~/features/reviews/reviews.types";
 import { updateNotificationPreferences } from "~/features/settings/settings.mutations";
+import { listPendingGMReviews } from "~/features/social/social.queries";
+import type { PendingGMReviewItem } from "~/features/social/social.types";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { useCommonTranslation, usePlayerTranslation } from "~/hooks/useTypedTranslation";
 import type { AuthUser } from "~/lib/auth/types";

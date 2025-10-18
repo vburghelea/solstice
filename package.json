@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "pnpm i18n:copy && vite build",
     "start": "node .output/server/index.mjs",
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
@@ -33,16 +33,9 @@
     "docs:reference": "typedoc",
     "docs:erd": "node scripts/generate-erd.js",
     "docs:all": "pnpm docs:reference && pnpm docs:erd",
-    "i18n:extract": "node scripts/extract-hardcoded-strings-ast.js",
     "i18n:validate": "node scripts/validate-translations.js",
     "i18n:sync": "node scripts/sync-translations.js",
-    "i18n:generate-types": "node scripts/generate-translation-types.js",
-    "i18n:fix-whitespace": "node scripts/fix-whitespace-multiline.js",
-    "i18n:migrate": "node scripts/apply-ast-migration.js",
-    "i18n:migrate:dry-run": "node scripts/apply-ast-migration.js --dry-run",
-    "i18n:migrate:apply": "node scripts/apply-ast-migration.js --apply",
-    "i18n:migrate:test": "node scripts/simple-migration-test.js",
-    "i18n:analyze": "node scripts/simple-i18n-migration.js"
+    "i18n:copy": "cp -rf src/lib/i18n/locales/* public/locales/"
   },
   "dependencies": {
     "@c15t/backend": "^1.6.0",

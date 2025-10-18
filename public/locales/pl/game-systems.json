@@ -556,6 +556,10 @@
         },
         "selected_count": "TODO: Translate \"admin.table.bulk_actions.selected_count\""
       }
+    },
+    "admin_catalog": {
+      "title": "TODO: Translate \"admin.admin_catalog.title\"",
+      "description": "TODO: Translate \"admin.admin_catalog.description\""
     }
   }
 }

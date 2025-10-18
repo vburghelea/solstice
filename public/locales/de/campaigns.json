@@ -241,6 +241,9 @@
     },
     "errors": {
       "load_failed": "TODO: Translate \"my_campaigns.errors.load_failed\""
+    },
+    "list": {
+      "view_button": "TODO: Translate \"my_campaigns.list.view_button\""
     }
   },
   "detail": {
@@ -287,5 +290,9 @@
     "applying": "TODO: Translate \"detail.applying\"",
     "apply_to_join": "TODO: Translate \"detail.apply_to_join\"",
     "price_session": "TODO: Translate \"detail.price_session\""
+  },
+  "validation": {
+    "campaign_name_required": "TODO: Translate \"validation.campaign_name_required\"",
+    "description_required": "TODO: Translate \"validation.description_required\""
   }
 }

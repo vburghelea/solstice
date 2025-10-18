@@ -24,7 +24,6 @@ import opsEn from "./locales/en/ops.json";
 import playerEn from "./locales/en/player.json";
 import profileEn from "./locales/en/profile.json";
 import resourcesEn from "./locales/en/resources.json";
-import reviewsEn from "./locales/en/reviews.json";
 import rolesEn from "./locales/en/roles.json";
 import settingsEn from "./locales/en/settings.json";
 import socialEn from "./locales/en/social.json";
@@ -52,7 +51,6 @@ const resources = {
     player: playerEn,
     profile: profileEn,
     resources: resourcesEn,
-    reviews: reviewsEn,
     roles: rolesEn,
     settings: settingsEn,
     social: socialEn,

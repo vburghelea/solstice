@@ -341,6 +341,10 @@
       "update_failed": "TODO: Translate \"my_games.errors.update_failed\"",
       "unexpected_error": "TODO: Translate \"my_games.errors.unexpected_error\"",
       "status_updated": "TODO: Translate \"my_games.errors.status_updated\""
+    },
+    "list": {
+      "participants_count": "TODO: Translate \"my_games.list.participants_count\"",
+      "view_button": "TODO: Translate \"my_games.list.view_button\""
     }
   }
 }

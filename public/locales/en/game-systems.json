@@ -556,6 +556,10 @@
         },
         "selected_count": "{{count}} selected"
       }
+    },
+    "admin_catalog": {
+      "title": "System catalog",
+      "description": "Audit crawler health, editorial readiness, and media moderation across every published ruleset."
     }
   }
 }

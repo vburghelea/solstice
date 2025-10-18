@@ -4,6 +4,7 @@ import {
   AdminSystemsPage,
   adminSystemsSearchSchema,
 } from "~/features/game-systems/admin/views/admin-systems-page";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { requireRole } from "~/lib/auth/middleware/role-guard";
 
 export const Route = createFileRoute("/admin/systems/")({
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/admin/systems/")({
 });
 
 function AdminSystemsRoute() {
+  const { t } = useGameSystemsTranslation();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -27,8 +29,8 @@ function AdminSystemsRoute() {
       search={search}
       navigate={navigate}
       detailRoute="/admin/systems/$systemId"
-      headerTitle="System catalog"
-      headerDescription="Audit crawler health, editorial readiness, and media moderation across every published ruleset."
+      headerTitle={t("admin_catalog.title")}
+      headerDescription={t("admin_catalog.description")}
       className="space-y-6 p-6 lg:p-8"
     />
   );

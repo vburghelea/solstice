@@ -262,6 +262,9 @@
     },
     "errors": {
       "load_failed": "Failed to load campaigns."
+    },
+    "list": {
+      "view_button": "View"
     }
   },
   "detail": {

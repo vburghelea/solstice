@@ -2,7 +2,7 @@
  * AUTO-GENERATED: TypeScript types for translation keys
  * Generated from: src/lib/i18n/locales/en/*.json
  * DO NOT EDIT MANUALLY - run "pnpm i18n:generate-types" to regenerate
- * Generated: 2025-10-17T22:30:40.223Z
+ * Generated: 2025-10-18T11:26:46.966Z
  */
 
 /**
@@ -640,6 +640,7 @@ export type AllTranslationKeys =
   | "campaigns.my_campaigns.errors.load_failed"
   | "campaigns.my_campaigns.filter_by_role"
   | "campaigns.my_campaigns.filter_by_status"
+  | "campaigns.my_campaigns.list.view_button"
   | "campaigns.my_campaigns.no_campaigns_subtitle"
   | "campaigns.my_campaigns.no_campaigns_title"
   | "campaigns.my_campaigns.pagination.page_info"
@@ -1320,6 +1321,8 @@ export type AllTranslationKeys =
   | "events.validation.slug_required"
   | "events.validation.start_date_required"
   | "events.validation.valid_etransfer_email"
+  | "game-systems.admin.admin_catalog.description"
+  | "game-systems.admin.admin_catalog.title"
   | "game-systems.admin.editor.actions.add_faq"
   | "game-systems.admin.editor.actions.add_mapping"
   | "game-systems.admin.editor.actions.approve_cms_copy"
@@ -1951,6 +1954,8 @@ export type AllTranslationKeys =
   | "games.my_games.errors.update_failed"
   | "games.my_games.filter_by_role"
   | "games.my_games.filter_by_status"
+  | "games.my_games.list.participants_count"
+  | "games.my_games.list.view_button"
   | "games.my_games.no_games_subtitle"
   | "games.my_games.no_games_title"
   | "games.my_games.pagination.page_info"
@@ -4226,7 +4231,9 @@ export type GamesTranslationKeys =
   | "games.my_games.errors.load_failed"
   | "games.my_games.errors.update_failed"
   | "games.my_games.errors.unexpected_error"
-  | "games.my_games.errors.status_updated";
+  | "games.my_games.errors.status_updated"
+  | "games.my_games.list.participants_count"
+  | "games.my_games.list.view_button";
 
 export type EventsTranslationKeys =
   | "events.create.title"
@@ -5114,6 +5121,7 @@ export type CampaignsTranslationKeys =
   | "campaigns.my_campaigns.role_labels.invited"
   | "campaigns.my_campaigns.role_labels.requested"
   | "campaigns.my_campaigns.errors.load_failed"
+  | "campaigns.my_campaigns.list.view_button"
   | "campaigns.detail.invalid_campaign_id"
   | "campaigns.detail.failed_to_load_campaign"
   | "campaigns.detail.failed_to_fetch_campaign"
@@ -6210,7 +6218,9 @@ export type GamesystemsTranslationKeys =
   | "game-systems.admin.table.bulk_actions.buttons.queue_recrawl"
   | "game-systems.admin.table.bulk_actions.buttons.deactivate"
   | "game-systems.admin.table.bulk_actions.buttons.delete"
-  | "game-systems.admin.table.bulk_actions.selected_count";
+  | "game-systems.admin.table.bulk_actions.selected_count"
+  | "game-systems.admin.admin_catalog.title"
+  | "game-systems.admin.admin_catalog.description";
 
 export type GmTranslationKeys =
   | "gm.dashboard.title"

@@ -21,6 +21,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { visibilityEnum } from "~/db/schema/shared.schema";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import {
+  createGameFormFields,
   createGameInputSchema,
   updateGameInputSchema,
 } from "~/features/games/games.schemas";
@@ -76,6 +77,7 @@ export function GameForm({
   serverErrors,
 }: GameFormProps) {
   const { t } = useGamesTranslation();
+  const gameFieldValidators = createGameFormFields(t);
   const defaults = {
     gameSystemId: initialValues?.gameSystemId,
     name: initialValues?.name ?? "",
@@ -315,15 +317,7 @@ export function GameForm({
                   return undefined;
                 }
               }
-              try {
-                const schema = initialValues
-                  ? updateGameInputSchema
-                  : createGameInputSchema;
-                schema.shape.name.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
+              return gameFieldValidators.name({ value });
             },
           }}
         >
@@ -371,12 +365,7 @@ export function GameForm({
                   return undefined;
                 }
               }
-              try {
-                createGameInputSchema.shape.description.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
+              return gameFieldValidators.description({ value });
             },
           }}
         >
@@ -422,12 +411,7 @@ export function GameForm({
                   return undefined;
                 }
               }
-              try {
-                createGameInputSchema.shape.gameSystemId.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
+              return gameFieldValidators.gameSystemId({ value: Number(value) });
             },
           }}
         >
@@ -502,12 +486,7 @@ export function GameForm({
                   return undefined;
                 }
               }
-              try {
-                createGameInputSchema.shape.dateTime.parse(value);
-                return undefined;
-              } catch (error: unknown) {
-                return (error as z.ZodError).errors[0]?.message;
-              }
+              return gameFieldValidators.dateTime({ value });
             },
           }}
         >
@@ -525,12 +504,7 @@ export function GameForm({
                     return undefined;
                   }
                 }
-                try {
-                  createGameInputSchema.shape.expectedDuration.parse(value);
-                  return undefined;
-                } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
-                }
+                return gameFieldValidators.expectedDuration({ value: Number(value) });
               },
             }}
           >
@@ -634,12 +608,7 @@ export function GameForm({
                     return undefined;
                   }
                 }
-                try {
-                  createGameInputSchema.shape.language.parse(value);
-                  return undefined;
-                } catch (error: unknown) {
-                  return (error as z.ZodError).errors[0]?.message;
-                }
+                return gameFieldValidators.language({ value });
               },
             }}
           >

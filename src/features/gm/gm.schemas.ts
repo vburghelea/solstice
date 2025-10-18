@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tCommon } from "~/lib/i18n/server-translations";
 
 export const gmPipelineStageIdSchema = z.enum([
   "discovery",
@@ -13,12 +14,12 @@ export const gmPipelineRoleSchema = z.enum(["story_guide", "ops", "platform_admi
 export const gmPipelineNoteUpdateOutcomeSchema = z.enum(["updated", "conflict"]);
 
 export const updateGmPipelineNoteSchema = z.object({
-  opportunityId: z.string().min(1, "Opportunity id is required"),
-  noteId: z.string().min(1, "Note id is required"),
+  opportunityId: z.string().min(1, tCommon("validation.opportunity_id_required")),
+  noteId: z.string().min(1, tCommon("validation.note_id_required")),
   content: z
     .string()
     .trim()
-    .min(1, "Add a little context before saving")
-    .max(2000, "Notes are limited to 2000 characters"),
+    .min(1, tCommon("validation.note_context_required"))
+    .max(2000, tCommon("validation.note_character_limit")),
   lastSyncedAt: z.string().datetime().nullable(),
 });

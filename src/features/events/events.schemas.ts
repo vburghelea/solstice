@@ -1,5 +1,14 @@
 import { z } from "zod";
 import { baseCreateEventSchema, createEventInputSchema } from "~/db/schema/events.schema";
+import { tCommon } from "~/lib/i18n/server-translations";
+
+/**
+ * Translation function type for form validators
+ */
+export type TranslationFunction = (
+  key: string,
+  options?: Record<string, unknown>,
+) => string;
 
 // Query schemas
 export const listEventsSchema = z
@@ -100,7 +109,7 @@ export const cancelEventRegistrationSchema = z.object({
 export type CancelEventRegistrationInput = z.infer<typeof cancelEventRegistrationSchema>;
 
 export const uploadEventImageSchema = z.object({
-  file: z.string().min(1, "Image data is required"),
+  file: z.string().min(1, tCommon("validation.image_data_required")),
   kind: z.enum(["logo", "banner"]),
 });
 export type UploadEventImageInput = z.infer<typeof uploadEventImageSchema>;
@@ -129,3 +138,30 @@ export const updateEventRegistrationStatusSchema = z.object({
 export type UpdateEventRegistrationStatusInput = z.infer<
   typeof updateEventRegistrationStatusSchema
 >;
+
+/**
+ * Create upload event image field validators with translation support
+ */
+export const createUploadEventImageFields = (t: TranslationFunction) => ({
+  file: ({ value }: { value: string }) => {
+    if (!value || value.trim() === "") {
+      return t("common.validation.image_data_required");
+    }
+    return undefined;
+  },
+  kind: ({ value }: { value: string }) => {
+    if (!["logo", "banner"].includes(value)) {
+      return t("common.validation.invalid_format");
+    }
+    return undefined;
+  },
+});
+
+/**
+ * Create upload event image schema with translation support
+ */
+export const createUploadEventImageSchema = (t: TranslationFunction) =>
+  z.object({
+    file: z.string().min(1, t("common.validation.image_data_required")),
+    kind: z.enum(["logo", "banner"]),
+  });

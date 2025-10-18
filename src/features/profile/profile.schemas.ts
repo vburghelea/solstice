@@ -1,15 +1,26 @@
 import { z } from "zod";
+import { tCommon } from "~/lib/i18n/server-translations";
 import { experienceLevelOptions } from "~/shared/types/common";
 
-export const profileNameSchema = z
+/**
+ * Translation function type for form validators
+ */
+export type TranslationFunction = (
+  key: string,
+  options?: Record<string, unknown>,
+) => string;
+
+/**
+ * Base profile name schema with server-side translations
+ */
+export const baseProfileNameSchema = z
   .string()
   .trim()
-  .min(3, "Profile name must be at least 3 characters")
-  .max(30, "Profile name must be 30 characters or less")
-  .regex(
-    /^[A-Za-z0-9._-]+$/,
-    "Profile name can only contain letters, numbers, periods, underscores, and hyphens",
-  );
+  .min(3, tCommon("validation.profile_name_too_short"))
+  .max(30, tCommon("validation.profile_name_too_long"))
+  .regex(/^[A-Za-z0-9._-]+$/, tCommon("validation.profile_name_invalid_chars"));
+
+export const profileNameSchema = baseProfileNameSchema;
 
 export const privacySettingsSchema = z.object({
   showEmail: z.boolean(),
@@ -97,3 +108,41 @@ export const listUserLocationsSchema = z
   .optional();
 
 export type ListUserLocationsInput = z.infer<typeof listUserLocationsSchema>;
+
+/**
+ * Create profile name field validators with translation support
+ */
+export const createProfileNameFields = (t: TranslationFunction) => ({
+  name: ({ value }: { value: string }) => {
+    try {
+      baseProfileNameSchema.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("at least 3 characters")) {
+          return t("common.validation.profile_name_too_short");
+        }
+        if (errorMessage?.includes("30 characters or less")) {
+          return t("common.validation.profile_name_too_long");
+        }
+        if (errorMessage?.includes("can only contain")) {
+          return t("common.validation.profile_name_invalid_chars");
+        }
+        return t("common.validation.invalid_format");
+      }
+      return t("common.validation.invalid_format");
+    }
+  },
+});
+
+/**
+ * Create profile name schema with translation support
+ */
+export const createProfileNameSchema = (t: TranslationFunction) =>
+  z
+    .string()
+    .trim()
+    .min(3, t("common.validation.profile_name_too_short"))
+    .max(30, t("common.validation.profile_name_too_long"))
+    .regex(/^[A-Za-z0-9._-]+$/, t("common.validation.profile_name_invalid_chars"));

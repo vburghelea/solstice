@@ -1,11 +1,15 @@
 import { z } from "zod";
+import { tCommon } from "~/lib/i18n/server-translations";
 
 /**
- * Login form validation schema
+ * Login form validation schema with server-side translations
  */
 export const loginFormSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
-  password: z.string().min(1, "Password is required"),
+  email: z
+    .string()
+    .min(1, tCommon("validation.email_required"))
+    .email(tCommon("validation.invalid_email")),
+  password: z.string().min(1, tCommon("validation.password_required")),
 });
 
 export type LoginFormData = z.infer<typeof loginFormSchema>;
@@ -52,19 +56,22 @@ export const createLoginFormFields = (t: TranslationFunction) => ({
 });
 
 /**
- * Base signup form field schemas (kept with hardcoded messages for server-side compatibility)
+ * Base signup form field schemas with server-side translations
  */
 export const signupFormFieldSchemas = {
   name: z
     .string()
-    .min(1, "Name is required")
-    .min(2, "Name must be at least 2 characters"),
-  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+    .min(1, tCommon("validation.name_required"))
+    .min(2, tCommon("validation.name_too_short")),
+  email: z
+    .string()
+    .min(1, tCommon("validation.email_required"))
+    .email(tCommon("validation.invalid_email")),
   password: z
     .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
+    .min(1, tCommon("validation.password_required"))
+    .min(8, tCommon("validation.password_too_short")),
+  confirmPassword: z.string().min(1, tCommon("validation.confirm_password_required")),
 };
 
 /**
@@ -211,7 +218,7 @@ export const signupFormFields = {
 export const signupFormSchema = z
   .object(signupFormFieldSchemas)
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: tCommon("validation.passwords_dont_match"),
     path: ["confirmPassword"],
   });
 
@@ -232,7 +239,10 @@ export const createSignupFormSchema = (t: TranslationFunction) =>
  * Password reset request form validation schema
  */
 export const passwordResetRequestSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
+  email: z
+    .string()
+    .min(1, tCommon("validation.email_required"))
+    .email(tCommon("validation.invalid_email")),
 });
 
 /**
@@ -240,15 +250,15 @@ export const passwordResetRequestSchema = z.object({
  */
 export const resetPasswordSchema = z
   .object({
-    token: z.string().min(1, "Reset token is required"),
+    token: z.string().min(1, tCommon("validation.reset_token_required")),
     password: z
       .string()
-      .min(1, "Password is required")
-      .min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
+      .min(1, tCommon("validation.password_required"))
+      .min(8, tCommon("validation.password_too_short")),
+    confirmPassword: z.string().min(1, tCommon("validation.confirm_password_required")),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: tCommon("validation.passwords_dont_match"),
     path: ["confirmPassword"],
   });
 
@@ -277,14 +287,14 @@ export const createPasswordResetRequestFields = (t: TranslationFunction) => ({
   },
 });
 
-// Create base schema for field validation (without refine)
+// Create base schema for field validation (without refine) with server-side translations
 const baseResetPasswordSchema = z.object({
-  token: z.string().min(1, "Reset token is required"),
+  token: z.string().min(1, tCommon("validation.reset_token_required")),
   password: z
     .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
+    .min(1, tCommon("validation.password_required"))
+    .min(8, tCommon("validation.password_too_short")),
+  confirmPassword: z.string().min(1, tCommon("validation.confirm_password_required")),
 });
 
 /**

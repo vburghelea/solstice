@@ -121,6 +121,7 @@ function EventOperationsKitPage() {
                   ? (
                       t("event_operations_kit.liveops.widgets") as unknown as string[]
                     ).map((widget, index) => (
+                      // eslint-disable-next-line @eslint-react/no-array-index-key
                       <li key={`widget-${index}-${widget.slice(0, 20)}`}>• {widget}</li>
                     ))
                   : null}

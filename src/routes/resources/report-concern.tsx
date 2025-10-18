@@ -200,6 +200,7 @@ function ReportConcernPage() {
                 ? (
                     t("report_concern.what_to_expect.expectations") as unknown as string[]
                   ).map((expectation, index) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     <li key={`expectation-${index}-${expectation.slice(0, 20)}`}>
                       • {expectation}
                     </li>

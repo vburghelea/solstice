@@ -143,6 +143,7 @@ function SessionPlansPage() {
                 {Array.isArray(t("session_plans.logistics.files"))
                   ? (t("session_plans.logistics.files") as unknown as string[]).map(
                       (file, index) => (
+                        // eslint-disable-next-line @eslint-react/no-array-index-key
                         <li key={`file-${index}-${file.slice(0, 20)}`}>• {file}</li>
                       ),
                     )
@@ -183,6 +184,7 @@ function SessionPlansPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {downloadBundles.map((bundle, index) => (
               <Card
+                // eslint-disable-next-line @eslint-react/no-array-index-key
                 key={`bundle-${index}-${bundle.title.slice(0, 20)}`}
                 className={cardSurfaceClass}
               >

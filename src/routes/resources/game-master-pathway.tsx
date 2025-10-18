@@ -130,6 +130,7 @@ function GameMasterPathwayPage() {
                         "game_master_pathway.learning.weekly_rhythm.schedule",
                       ) as unknown as string[]
                     ).map((item, index) => (
+                      // eslint-disable-next-line @eslint-react/no-array-index-key
                       <li key={`schedule-item-${index}-${item.slice(0, 20)}`}>
                         • {item}
                       </li>
@@ -171,6 +172,7 @@ function GameMasterPathwayPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {resources.map((resource, index) => (
               <Card
+                // eslint-disable-next-line @eslint-react/no-array-index-key
                 key={`resource-${index}-${resource.title.slice(0, 20)}`}
                 className={cardSurfaceClass}
               >
@@ -207,6 +209,7 @@ function GameMasterPathwayPage() {
                 ? (
                     t("game_master_pathway.enrollment.cohorts") as unknown as string[]
                   ).map((cohort, index) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     <li key={`cohort-${index}-${cohort.slice(0, 20)}`}>• {cohort}</li>
                   ))
                 : null}
@@ -231,6 +234,7 @@ function GameMasterPathwayPage() {
                       "game_master_pathway.enrollment.requirements.items",
                     ) as unknown as string[]
                   ).map((item, index) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     <li key={`requirement-${index}-${item.slice(0, 20)}`}>• {item}</li>
                   ))
                 : null}

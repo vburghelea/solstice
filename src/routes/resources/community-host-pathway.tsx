@@ -120,6 +120,7 @@ function CommunityHostPathwayPage() {
                         "community_host_pathway.practicum.checklist_items",
                       ) as unknown as string[]
                     ).map((item, index) => (
+                      // eslint-disable-next-line @eslint-react/no-array-index-key
                       <li key={`checklist-item-${index}-${item.slice(0, 20)}`}>
                         • {item}
                       </li>
@@ -213,6 +214,7 @@ function CommunityHostPathwayPage() {
                       "community_host_pathway.application.process_items",
                     ) as unknown as string[]
                   ).map((item, index) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     <li key={`process-item-${index}-${item.slice(0, 20)}`}>• {item}</li>
                   ))
                 : null}
@@ -234,6 +236,7 @@ function CommunityHostPathwayPage() {
                       "community_host_pathway.application.maintenance_items",
                     ) as unknown as string[]
                   ).map((item, index) => (
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     <li key={`maintenance-item-${index}-${item.slice(0, 20)}`}>
                       • {item}
                     </li>

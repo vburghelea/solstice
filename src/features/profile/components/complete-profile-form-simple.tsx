@@ -31,7 +31,7 @@ import { invalidateProfileCaches } from "../profile.cache";
 import { completeUserProfile, updateUserProfile } from "../profile.mutations";
 import { checkProfileNameAvailability, getUserProfile } from "../profile.queries";
 import { type CompleteProfileInputType, type ProfileInputType } from "../profile.schemas";
-import type { ProfileError, UserProfile } from "../profile.types";
+import type { UserProfile } from "../profile.types";
 import { defaultPrivacySettings } from "../profile.types";
 import {
   normalizeProfileName,

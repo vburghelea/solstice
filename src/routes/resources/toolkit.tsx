@@ -95,6 +95,7 @@ function CommunityStarterToolkitPage() {
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
                 {Array.isArray(t("toolkit.core_documents.items")) ? (
                   (t("toolkit.core_documents.items") as unknown as string[]).map(
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     (item, index) => <li key={`core-doc-${index}`}>• {item}</li>,
                   )
                 ) : (
@@ -109,6 +110,7 @@ function CommunityStarterToolkitPage() {
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
                 {Array.isArray(t("toolkit.planning_tools.items")) ? (
                   (t("toolkit.planning_tools.items") as unknown as string[]).map(
+                    // eslint-disable-next-line @eslint-react/no-array-index-key
                     (item, index) => <li key={`planning-tool-${index}`}>• {item}</li>,
                   )
                 ) : (
@@ -171,6 +173,7 @@ function CommunityStarterToolkitPage() {
                     <ul className="space-y-2 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
                       {Array.isArray(phase.items) ? (
                         phase.items.map((item, index) => (
+                          // eslint-disable-next-line @eslint-react/no-array-index-key
                           <li key={`${phase.title}-item-${index}`}>• {item}</li>
                         ))
                       ) : (

@@ -1,4 +1,5 @@
 import { CampaignListItem } from "~/features/campaigns/campaigns.types";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { CampaignCard } from "./CampaignCard";
 
 interface CampaignListProps {
@@ -6,8 +7,10 @@ interface CampaignListProps {
 }
 
 export function CampaignList({ campaigns }: CampaignListProps) {
+  const { t } = useCampaignsTranslation();
+
   if (campaigns.length === 0) {
-    return <p className="text-muted-foreground">No campaigns found. Create one!</p>;
+    return <p className="text-muted-foreground">{t("status.no_campaigns_found")}</p>;
   }
 
   return (

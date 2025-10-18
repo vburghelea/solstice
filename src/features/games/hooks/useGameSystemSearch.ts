@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 
 import { searchGameSystems } from "~/features/games/games.queries";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { useDebounce } from "~/shared/hooks/useDebounce";
 
 type GameSystemSearchResult = {
@@ -36,6 +37,7 @@ export function useGameSystemSearch({
   minSearchLength = 3,
   debounceMs = 500,
 }: UseGameSystemSearchOptions = {}): UseGameSystemSearchResult {
+  const { t } = useGamesTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, debounceMs);
   const normalizedSearch = debouncedSearchTerm.trim();
@@ -49,7 +51,7 @@ export function useGameSystemSearch({
       });
 
       if (!result.success) {
-        throw new Error(result.errors?.[0]?.message ?? "Failed to search game systems");
+        throw new Error(result.errors?.[0]?.message ?? t("errors.search_failed"));
       }
 
       return result.data;
@@ -82,7 +84,7 @@ export function useGameSystemSearch({
     isLoading: queryEnabled ? isPending : false,
     isFetching,
     isError,
-    error: isError ? (error ?? new Error("Unknown error")) : null,
+    error: isError ? (error ?? new Error(t("errors.unknown_error"))) : null,
     refetch,
   };
 }

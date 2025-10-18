@@ -12,6 +12,7 @@ import {
 } from "~/components/ui/card";
 import type { GameSystemListItem } from "~/features/game-systems/game-systems.types";
 import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { cn } from "~/shared/lib/utils";
 
@@ -20,6 +21,7 @@ interface SystemCardProps {
 }
 
 export function SystemCard({ system }: SystemCardProps) {
+  const { t } = useGameSystemsTranslation();
   const heroAlt = `${system.name} hero artwork`;
   const playersLabel = formatPlayerCountLabel(system);
 
@@ -43,7 +45,7 @@ export function SystemCard({ system }: SystemCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm text-slate-200 dark:text-slate-100">
-              Hero art pending moderation
+              {t("status.pending_moderation")}
             </div>
           )}
         </div>
@@ -60,11 +62,16 @@ export function SystemCard({ system }: SystemCardProps) {
         <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs font-medium tracking-wide uppercase dark:text-gray-400">
           <span>{playersLabel}</span>
           <span className="bg-border h-2 w-[1px]" aria-hidden />
-          <span>Publisher: {system.publisher ? system.publisher.name : "TBD"}</span>
+          <span>
+            {t("labels.publisher")}:{" "}
+            {system.publisher ? system.publisher.name : t("status.tbd")}
+          </span>
           {system.yearReleased ? (
             <>
               <span className="bg-border h-2 w-[1px]" aria-hidden />
-              <span>Released {system.yearReleased}</span>
+              <span>
+                {t("labels.released")} {system.yearReleased}
+              </span>
             </>
           ) : null}
         </div>
@@ -82,7 +89,7 @@ export function SystemCard({ system }: SystemCardProps) {
             ))
           ) : (
             <Badge variant="outline" className="dark:border-gray-600 dark:text-gray-300">
-              Taxonomy pending
+              {t("status.taxonomy_pending")}
             </Badge>
           )}
         </div>
@@ -107,7 +114,7 @@ export function SystemCard({ system }: SystemCardProps) {
           params={{ slug: system.slug }}
           className={cn(buttonVariants({ size: "sm" }), "ml-auto")}
         >
-          View details
+          {t("buttons.view_details")}
         </Link>
       </CardFooter>
     </Card>

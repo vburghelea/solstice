@@ -1,0 +1,579 @@
+{
+  "overview": {
+    "title": "TODO: Translate \"overview.title\"",
+    "subtitle": "TODO: Translate \"overview.subtitle\"",
+    "cards": {
+      "user_governance": {
+        "title": "TODO: Translate \"overview.cards.user_governance.title\"",
+        "description": "TODO: Translate \"overview.cards.user_governance.description\"",
+        "description_detail": "TODO: Translate \"overview.cards.user_governance.description_detail\"",
+        "link_text": "TODO: Translate \"overview.cards.user_governance.link_text\""
+      },
+      "feature_rollouts": {
+        "title": "TODO: Translate \"overview.cards.feature_rollouts.title\"",
+        "description": "TODO: Translate \"overview.cards.feature_rollouts.description\"",
+        "description_detail": "TODO: Translate \"overview.cards.feature_rollouts.description_detail\"",
+        "link_text": "TODO: Translate \"overview.cards.feature_rollouts.link_text\""
+      },
+      "security_posture": {
+        "title": "TODO: Translate \"overview.cards.security_posture.title\"",
+        "description": "TODO: Translate \"overview.cards.security_posture.description\"",
+        "description_detail": "TODO: Translate \"overview.cards.security_posture.description_detail\"",
+        "link_text": "TODO: Translate \"overview.cards.security_posture.link_text\""
+      },
+      "live_insights_preview": {
+        "title": "TODO: Translate \"overview.cards.live_insights_preview.title\"",
+        "description": "TODO: Translate \"overview.cards.live_insights_preview.description\""
+      }
+    }
+  },
+  "insights": {
+    "title": "TODO: Translate \"insights.title\"",
+    "subtitle": "TODO: Translate \"insights.subtitle\"",
+    "buttons": {
+      "refresh": "TODO: Translate \"insights.buttons.refresh\"",
+      "refreshing": "TODO: Translate \"insights.buttons.refreshing\"",
+      "retry": "TODO: Translate \"insights.buttons.retry\""
+    },
+    "errors": {
+      "unable_to_load": "TODO: Translate \"insights.errors.unable_to_load\"",
+      "error_message": "TODO: Translate \"insights.errors.error_message\""
+    },
+    "sections": {
+      "incident_timeline": {
+        "title": "TODO: Translate \"insights.sections.incident_timeline.title\"",
+        "description": "TODO: Translate \"insights.sections.incident_timeline.description\"",
+        "no_incidents": "TODO: Translate \"insights.sections.incident_timeline.no_incidents\"",
+        "no_incidents_description": "TODO: Translate \"insights.sections.incident_timeline.no_incidents_description\""
+      },
+      "live_alerting": {
+        "title": "TODO: Translate \"insights.sections.live_alerting.title\"",
+        "description": "TODO: Translate \"insights.sections.live_alerting.description\""
+      },
+      "persona_impact": {
+        "title": "TODO: Translate \"insights.sections.persona_impact.title\"",
+        "description": "TODO: Translate \"insights.sections.persona_impact.description\""
+      }
+    },
+    "status": {
+      "steady": "TODO: Translate \"insights.status.steady\"",
+      "trending_up": "TODO: Translate \"insights.status.trending_up\"",
+      "needs_attention": "TODO: Translate \"insights.status.needs_attention\"",
+      "momentum_building": "TODO: Translate \"insights.status.momentum_building\"",
+      "requires_intervention": "TODO: Translate \"insights.status.requires_intervention\"",
+      "holding_steady": "TODO: Translate \"insights.status.holding_steady\""
+    },
+    "alerts": {
+      "status": {
+        "active": "TODO: Translate \"insights.alerts.status.active\"",
+        "paused": "TODO: Translate \"insights.alerts.status.paused\""
+      },
+      "triggered": "TODO: Translate \"insights.alerts.triggered\"",
+      "awaiting_first_trigger": "TODO: Translate \"insights.alerts.awaiting_first_trigger\""
+    },
+    "incidents": {
+      "duration": {
+        "minutes": "TODO: Translate \"insights.incidents.duration.minutes\"",
+        "less_than_minute": "TODO: Translate \"insights.incidents.duration.less_than_minute\"",
+        "in_progress": "TODO: Translate \"insights.incidents.duration.in_progress\""
+      },
+      "resolved": "TODO: Translate \"insights.incidents.resolved\"",
+      "http_status": "TODO: Translate \"insights.incidents.http_status\""
+    }
+  },
+  "events_review": {
+    "title": "TODO: Translate \"events_review.title\"",
+    "subtitle": "TODO: Translate \"events_review.subtitle\"",
+    "buttons": {
+      "view_all_events": "TODO: Translate \"events_review.buttons.view_all_events\"",
+      "approve": "TODO: Translate \"events_review.buttons.approve\"",
+      "reject": "TODO: Translate \"events_review.buttons.reject\"",
+      "view": "TODO: Translate \"events_review.buttons.view\"",
+      "manage": "TODO: Translate \"events_review.buttons.manage\""
+    },
+    "tabs": {
+      "pending_approval": "TODO: Translate \"events_review.tabs.pending_approval\"",
+      "recently_reviewed": "TODO: Translate \"events_review.tabs.recently_reviewed\""
+    },
+    "sections": {
+      "awaiting_approval": {
+        "title": "TODO: Translate \"events_review.sections.awaiting_approval.title\"",
+        "description": "TODO: Translate \"events_review.sections.awaiting_approval.description\""
+      },
+      "recently_reviewed": {
+        "title": "TODO: Translate \"events_review.sections.recently_reviewed.title\"",
+        "description": "TODO: Translate \"events_review.sections.recently_reviewed.description\""
+      }
+    },
+    "tables": {
+      "headers": {
+        "event_name": "TODO: Translate \"events_review.tables.headers.event_name\"",
+        "organizer": "TODO: Translate \"events_review.tables.headers.organizer\"",
+        "type": "TODO: Translate \"events_review.tables.headers.type\"",
+        "date": "TODO: Translate \"events_review.tables.headers.date\"",
+        "location": "TODO: Translate \"events_review.tables.headers.location\"",
+        "created": "TODO: Translate \"events_review.tables.headers.created\"",
+        "actions": "TODO: Translate \"events_review.tables.headers.actions\"",
+        "status": "TODO: Translate \"events_review.tables.headers.status\"",
+        "visibility": "TODO: Translate \"events_review.tables.headers.visibility\""
+      }
+    },
+    "status": {
+      "public": "TODO: Translate \"events_review.status.public\"",
+      "private": "TODO: Translate \"events_review.status.private\""
+    },
+    "empty_states": {
+      "no_pending_approval": "TODO: Translate \"events_review.empty_states.no_pending_approval\"",
+      "no_recently_reviewed": "TODO: Translate \"events_review.empty_states.no_recently_reviewed\""
+    },
+    "alerts": {
+      "all_caught_up": {
+        "title": "TODO: Translate \"events_review.alerts.all_caught_up.title\"",
+        "description": "TODO: Translate \"events_review.alerts.all_caught_up.description\""
+      }
+    },
+    "dialog": {
+      "approve_title": "TODO: Translate \"events_review.dialog.approve_title\"",
+      "reject_title": "TODO: Translate \"events_review.dialog.reject_title\"",
+      "approve_description": "TODO: Translate \"events_review.dialog.approve_description\"",
+      "reject_description": "TODO: Translate \"events_review.dialog.reject_description\"",
+      "buttons": {
+        "cancel": "TODO: Translate \"events_review.dialog.buttons.cancel\""
+      }
+    },
+    "organizer": {
+      "unknown": "TODO: Translate \"events_review.organizer.unknown\"",
+      "not_provided": "TODO: Translate \"events_review.organizer.not_provided\""
+    },
+    "hardcoded_strings": {
+      "approve_and_made_public": "TODO: Translate \"events_review.hardcoded_strings.approve_and_made_public\"",
+      "failed_to_update_event": "TODO: Translate \"events_review.hardcoded_strings.failed_to_update_event\"",
+      "error_updating_event": "TODO: Translate \"events_review.hardcoded_strings.error_updating_event\""
+    }
+  },
+  "user_directory": {
+    "title": "TODO: Translate \"user_directory.title\"",
+    "subtitle": "TODO: Translate \"user_directory.subtitle\"",
+    "buttons": {
+      "assign_role": "TODO: Translate \"user_directory.buttons.assign_role\"",
+      "retry": "TODO: Translate \"user_directory.buttons.retry\"",
+      "refresh": "TODO: Translate \"user_directory.buttons.refresh\"",
+      "delete": "TODO: Translate \"user_directory.buttons.delete\"",
+      "export_csv": "TODO: Translate \"user_directory.buttons.export_csv\"",
+      "require_mfa": "TODO: Translate \"user_directory.buttons.require_mfa\"",
+      "mfa_enforced": "TODO: Translate \"user_directory.buttons.mfa_enforced\""
+    },
+    "sections": {
+      "role_summary": {
+        "title": "TODO: Translate \"user_directory.sections.role_summary.title\"",
+        "description": "TODO: Translate \"user_directory.sections.role_summary.description\""
+      },
+      "current_assignments": {
+        "title": "TODO: Translate \"user_directory.sections.current_assignments.title\"",
+        "description": "TODO: Translate \"user_directory.sections.current_assignments.description\""
+      }
+    },
+    "tables": {
+      "headers": {
+        "user": "TODO: Translate \"user_directory.tables.headers.user\"",
+        "membership": "TODO: Translate \"user_directory.tables.headers.membership\"",
+        "roles": "TODO: Translate \"user_directory.tables.headers.roles\"",
+        "role_assigned": "TODO: Translate \"user_directory.tables.headers.role_assigned\"",
+        "mfa": "TODO: Translate \"user_directory.tables.headers.mfa\"",
+        "last_active": "TODO: Translate \"user_directory.tables.headers.last_active\"",
+        "risk": "TODO: Translate \"user_directory.tables.headers.risk\"",
+        "latest_activity": "TODO: Translate \"user_directory.tables.headers.latest_activity\"",
+        "actions": "TODO: Translate \"user_directory.tables.headers.actions\"",
+        "role": "TODO: Translate \"user_directory.tables.headers.role\"",
+        "scope": "TODO: Translate \"user_directory.tables.headers.scope\"",
+        "assigned_by": "TODO: Translate \"user_directory.tables.headers.assigned_by\"",
+        "assigned_at": "TODO: Translate \"user_directory.tables.headers.assigned_at\"",
+        "expires": "TODO: Translate \"user_directory.tables.headers.expires\"",
+        "notes": "TODO: Translate \"user_directory.tables.headers.notes\""
+      }
+    },
+    "membership": {
+      "status": {
+        "active": "TODO: Translate \"user_directory.membership.status.active\"",
+        "expired": "TODO: Translate \"user_directory.membership.status.expired\"",
+        "canceled": "TODO: Translate \"user_directory.membership.status.canceled\"",
+        "none": "TODO: Translate \"user_directory.membership.status.none\""
+      },
+      "expires": "TODO: Translate \"user_directory.membership.expires\""
+    },
+    "mfa": {
+      "enforced": "TODO: Translate \"user_directory.mfa.enforced\"",
+      "missing": "TODO: Translate \"user_directory.mfa.missing\""
+    },
+    "risk": {
+      "clear": "TODO: Translate \"user_directory.risk.clear\""
+    },
+    "activity": {
+      "no_activity": "TODO: Translate \"user_directory.activity.no_activity\"",
+      "no_recent_events": "TODO: Translate \"user_directory.activity.no_recent_events\""
+    },
+    "roles": {
+      "no_assignments": "TODO: Translate \"user_directory.roles.no_assignments\"",
+      "assigned": "TODO: Translate \"user_directory.roles.assigned\""
+    },
+    "role_summary": {
+      "assigned_count": "TODO: Translate \"user_directory.role_summary.assigned_count\""
+    },
+    "form": {
+      "assign_role": {
+        "title": "TODO: Translate \"user_directory.form.assign_role.title\"",
+        "description": "TODO: Translate \"user_directory.form.assign_role.description\"",
+        "fields": {
+          "user": "TODO: Translate \"user_directory.form.assign_role.fields.user\"",
+          "role": "TODO: Translate \"user_directory.form.assign_role.fields.role\"",
+          "team_scope": "TODO: Translate \"user_directory.form.assign_role.fields.team_scope\"",
+          "event_scope": "TODO: Translate \"user_directory.form.assign_role.fields.event_scope\"",
+          "expiration": "TODO: Translate \"user_directory.form.assign_role.fields.expiration\"",
+          "notes": "TODO: Translate \"user_directory.form.assign_role.fields.notes\""
+        },
+        "placeholders": {
+          "search_users": "TODO: Translate \"user_directory.form.assign_role.placeholders.search_users\"",
+          "team_id": "TODO: Translate \"user_directory.form.assign_role.placeholders.team_id\"",
+          "event_id": "TODO: Translate \"user_directory.form.assign_role.placeholders.event_id\"",
+          "add_context": "TODO: Translate \"user_directory.form.assign_role.placeholders.add_context\""
+        },
+        "hints": {
+          "team_scope": "TODO: Translate \"user_directory.form.assign_role.hints.team_scope\"",
+          "event_scope": "TODO: Translate \"user_directory.form.assign_role.hints.event_scope\"",
+          "expiration": "TODO: Translate \"user_directory.form.assign_role.hints.expiration\""
+        },
+        "validation": {
+          "select_user": "TODO: Translate \"user_directory.form.assign_role.validation.select_user\"",
+          "select_role": "TODO: Translate \"user_directory.form.assign_role.validation.select_role\""
+        },
+        "buttons": {
+          "assign_role": "TODO: Translate \"user_directory.form.assign_role.buttons.assign_role\""
+        }
+      },
+      "filters": {
+        "membership": "TODO: Translate \"user_directory.form.filters.membership\"",
+        "all_memberships": "TODO: Translate \"user_directory.form.filters.all_memberships\"",
+        "filter_by_role": "TODO: Translate \"user_directory.form.filters.filter_by_role\"",
+        "all_roles": "TODO: Translate \"user_directory.form.filters.all_roles\""
+      },
+      "select_role_placeholder": "TODO: Translate \"user_directory.form.select_role_placeholder\"",
+      "buttons": {
+        "retry": "TODO: Translate \"user_directory.form.buttons.retry\""
+      }
+    },
+    "search": {
+      "placeholder": "TODO: Translate \"user_directory.search.placeholder\"",
+      "no_users_found": "TODO: Translate \"user_directory.search.no_users_found\"",
+      "searching_users": "TODO: Translate \"user_directory.search.searching_users\""
+    },
+    "export": {
+      "filename": "TODO: Translate \"user_directory.export.filename\"",
+      "success": "TODO: Translate \"user_directory.export.success\"",
+      "pending": "TODO: Translate \"user_directory.export.pending\""
+    },
+    "loading": {
+      "refreshing": "TODO: Translate \"user_directory.loading.refreshing\""
+    },
+    "errors": {
+      "unable_to_load": "TODO: Translate \"user_directory.errors.unable_to_load\"",
+      "service_unavailable": "TODO: Translate \"user_directory.errors.service_unavailable\"",
+      "assign_role_failed": "TODO: Translate \"user_directory.errors.assign_role_failed\"",
+      "remove_role_assignment_failed": "TODO: Translate \"user_directory.errors.remove_role_assignment_failed\"",
+      "delete_user_failed": "TODO: Translate \"user_directory.errors.delete_user_failed\"",
+      "export_compliance_report_failed": "TODO: Translate \"user_directory.errors.export_compliance_report_failed\"",
+      "search_users_failed": "TODO: Translate \"user_directory.errors.search_users_failed\"",
+      "load_role_management_data_failed": "TODO: Translate \"user_directory.errors.load_role_management_data_failed\"",
+      "load_failed": "TODO: Translate \"user_directory.errors.load_failed\""
+    },
+    "messages": {
+      "role_assigned_success": "TODO: Translate \"user_directory.messages.role_assigned_success\"",
+      "role_assignment_removed": "TODO: Translate \"user_directory.messages.role_assignment_removed\"",
+      "user_permanently_deleted": "TODO: Translate \"user_directory.messages.user_permanently_deleted\"",
+      "compliance_report_exported": "TODO: Translate \"user_directory.messages.compliance_report_exported\""
+    },
+    "dialogs": {
+      "remove_assignment": {
+        "title": "TODO: Translate \"user_directory.dialogs.remove_assignment.title\"",
+        "description": "TODO: Translate \"user_directory.dialogs.remove_assignment.description\"",
+        "buttons": {
+          "remove_access": "TODO: Translate \"user_directory.dialogs.remove_assignment.buttons.remove_access\""
+        }
+      },
+      "delete_user": {
+        "title": "TODO: Translate \"user_directory.dialogs.delete_user.title\"",
+        "warning": "TODO: Translate \"user_directory.dialogs.delete_user.warning\"",
+        "warning_text": "TODO: Translate \"user_directory.dialogs.delete_user.warning_text\"",
+        "warning_description": "TODO: Translate \"user_directory.dialogs.delete_user.warning_description\"",
+        "sections": {
+          "data_to_delete_title": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete_title\"",
+          "data_to_delete": {
+            "profile": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.profile\"",
+            "memberships": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.memberships\"",
+            "games": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.games\"",
+            "events": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.events\"",
+            "campaigns": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.campaigns\"",
+            "teams": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.teams\"",
+            "notifications": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.notifications\"",
+            "roles": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.roles\""
+          },
+          "impact_title": "TODO: Translate \"user_directory.dialogs.delete_user.sections.impact_title\"",
+          "impact_description": "TODO: Translate \"user_directory.dialogs.delete_user.sections.impact_description\"",
+          "confirmation_title": "TODO: Translate \"user_directory.dialogs.delete_user.sections.confirmation_title\""
+        },
+        "data_to_delete": {
+          "title": "TODO: Translate \"user_directory.dialogs.delete_user.data_to_delete.title\"",
+          "items": "TODO: Translate \"user_directory.dialogs.delete_user.data_to_delete.items\""
+        },
+        "impact_on_others": {
+          "title": "TODO: Translate \"user_directory.dialogs.delete_user.impact_on_others.title\"",
+          "description": "TODO: Translate \"user_directory.dialogs.delete_user.impact_on_others.description\""
+        },
+        "confirmation": {
+          "title": "TODO: Translate \"user_directory.dialogs.delete_user.confirmation.title\"",
+          "instruction": "TODO: Translate \"user_directory.dialogs.delete_user.confirmation.instruction\"",
+          "placeholder": "TODO: Translate \"user_directory.dialogs.delete_user.confirmation.placeholder\""
+        },
+        "buttons": {
+          "delete_permanently": "TODO: Translate \"user_directory.dialogs.delete_user.buttons.delete_permanently\""
+        }
+      }
+    },
+    "scope": {
+      "global": "TODO: Translate \"user_directory.scope.global\"",
+      "team": "TODO: Translate \"user_directory.scope.team\"",
+      "event": "TODO: Translate \"user_directory.scope.event\""
+    },
+    "assigned_by": {
+      "system": "TODO: Translate \"user_directory.assigned_by.system\""
+    },
+    "permissions": {
+      "none_configured": "TODO: Translate \"user_directory.permissions.none_configured\""
+    },
+    "descriptions": {
+      "no_description": "TODO: Translate \"user_directory.descriptions.no_description\""
+    },
+    "misc": {
+      "permissions": "TODO: Translate \"user_directory.misc.permissions\"",
+      "no_expiration": "TODO: Translate \"user_directory.misc.no_expiration\"",
+      "remove_access": "TODO: Translate \"user_directory.misc.remove_access\""
+    }
+  },
+  "social_audits": {
+    "title": "TODO: Translate \"social_audits.title\"",
+    "description": "TODO: Translate \"social_audits.description\"",
+    "filters": {
+      "action": "TODO: Translate \"social_audits.filters.action\"",
+      "actor_user_id": "TODO: Translate \"social_audits.filters.actor_user_id\"",
+      "target_user_id": "TODO: Translate \"social_audits.filters.target_user_id\"",
+      "any": "TODO: Translate \"social_audits.filters.any\"",
+      "apply_filters": "TODO: Translate \"social_audits.filters.apply_filters\"",
+      "user_id_placeholder": "TODO: Translate \"social_audits.filters.user_id_placeholder\""
+    },
+    "table_headers": {
+      "date": "TODO: Translate \"social_audits.table_headers.date\"",
+      "action": "TODO: Translate \"social_audits.table_headers.action\"",
+      "actor": "TODO: Translate \"social_audits.table_headers.actor\"",
+      "target": "TODO: Translate \"social_audits.table_headers.target\"",
+      "ui_surface": "TODO: Translate \"social_audits.table_headers.ui_surface\"",
+      "reason": "TODO: Translate \"social_audits.table_headers.reason\""
+    },
+    "pagination": {
+      "page_info": "TODO: Translate \"social_audits.pagination.page_info\"",
+      "previous": "TODO: Translate \"social_audits.pagination.previous\"",
+      "next": "TODO: Translate \"social_audits.pagination.next\""
+    },
+    "loading": "TODO: Translate \"social_audits.loading\"",
+    "no_data": {
+      "no_audit_rows": "TODO: Translate \"social_audits.no_data.no_audit_rows\""
+    },
+    "actions": {
+      "follow": "TODO: Translate \"social_audits.actions.follow\"",
+      "unfollow": "TODO: Translate \"social_audits.actions.unfollow\"",
+      "block": "TODO: Translate \"social_audits.actions.block\"",
+      "unblock": "TODO: Translate \"social_audits.actions.unblock\""
+    },
+    "no_user_data": "TODO: Translate \"social_audits.no_user_data\""
+  },
+  "navigation": {
+    "aria_label": "TODO: Translate \"navigation.aria_label\"",
+    "items": {
+      "insights": {
+        "label": "TODO: Translate \"navigation.items.insights.label\"",
+        "description": "TODO: Translate \"navigation.items.insights.description\""
+      },
+      "users": {
+        "label": "TODO: Translate \"navigation.items.users.label\"",
+        "description": "TODO: Translate \"navigation.items.users.description\""
+      },
+      "security": {
+        "label": "TODO: Translate \"navigation.items.security.label\"",
+        "description": "TODO: Translate \"navigation.items.security.description\""
+      },
+      "feature_flags": {
+        "label": "TODO: Translate \"navigation.items.feature_flags.label\"",
+        "description": "TODO: Translate \"navigation.items.feature_flags.description\""
+      }
+    }
+  },
+  "security_center": {
+    "title": "TODO: Translate \"security_center.title\"",
+    "subtitle": "TODO: Translate \"security_center.subtitle\"",
+    "description": "TODO: Translate \"security_center.description\"",
+    "actions": {
+      "refresh_snapshot": "TODO: Translate \"security_center.actions.refresh_snapshot\"",
+      "refreshing": "TODO: Translate \"security_center.actions.refreshing\"",
+      "enable_safeguard": "TODO: Translate \"security_center.actions.enable_safeguard\"",
+      "disable_safeguard": "TODO: Translate \"security_center.actions.disable_safeguard\"",
+      "confirm": "TODO: Translate \"security_center.actions.confirm\"",
+      "cancel": "TODO: Translate \"security_center.actions.cancel\""
+    },
+    "dialog": {
+      "confirmation_title": "TODO: Translate \"security_center.dialog.confirmation_title\"",
+      "enable_description": "TODO: Translate \"security_center.dialog.enable_description\"",
+      "disable_description": "TODO: Translate \"security_center.dialog.disable_description\"",
+      "provide_context": "TODO: Translate \"security_center.dialog.provide_context\"",
+      "document_why_change_necessary": "TODO: Translate \"security_center.dialog.document_why_change_necessary\"",
+      "validation": {
+        "min_12_characters": "TODO: Translate \"security_center.dialog.validation.min_12_characters\""
+      }
+    },
+    "status": {
+      "stable_governance_posture": "TODO: Translate \"security_center.status.stable_governance_posture\"",
+      "heightened_monitoring": "TODO: Translate \"security_center.status.heightened_monitoring\"",
+      "improving": "TODO: Translate \"security_center.status.improving\"",
+      "declining": "TODO: Translate \"security_center.status.declining\"",
+      "flat": "TODO: Translate \"security_center.status.flat\"",
+      "enforced": "TODO: Translate \"security_center.status.enforced\"",
+      "disabled": "TODO: Translate \"security_center.status.disabled\""
+    },
+    "sections": {
+      "critical_safeguards": {
+        "title": "TODO: Translate \"security_center.sections.critical_safeguards.title\"",
+        "description": "TODO: Translate \"security_center.sections.critical_safeguards.description\""
+      },
+      "active_incidents": {
+        "title": "TODO: Translate \"security_center.sections.active_incidents.title\"",
+        "description": "TODO: Translate \"security_center.sections.active_incidents.description\""
+      },
+      "compliance_checklist": {
+        "title": "TODO: Translate \"security_center.sections.compliance_checklist.title\"",
+        "description": "TODO: Translate \"security_center.sections.compliance_checklist.description\""
+      },
+      "privileged_action_log": {
+        "title": "TODO: Translate \"security_center.sections.privileged_action_log.title\"",
+        "description": "TODO: Translate \"security_center.sections.privileged_action_log.description\""
+      }
+    },
+    "labels": {
+      "score_calculated_across_pillars": "TODO: Translate \"security_center.labels.score_calculated_across_pillars\"",
+      "last_reviewed": "TODO: Translate \"security_center.labels.last_reviewed\"",
+      "over_the_last_days": "TODO: Translate \"security_center.labels.over_the_last_days\"",
+      "impact": "TODO: Translate \"security_center.labels.impact\"",
+      "persona_impact": "TODO: Translate \"security_center.labels.persona_impact\"",
+      "effort": "TODO: Translate \"security_center.labels.effort\"",
+      "actor": "TODO: Translate \"security_center.labels.actor\"",
+      "risk_level": "TODO: Translate \"security_center.labels.risk_level\""
+    },
+    "status_indicators": {
+      "all_clear": "TODO: Translate \"security_center.status_indicators.all_clear\"",
+      "no_unresolved_incidents": "TODO: Translate \"security_center.status_indicators.no_unresolved_incidents\"",
+      "investigating": "TODO: Translate \"security_center.status_indicators.investigating\"",
+      "mitigated": "TODO: Translate \"security_center.status_indicators.mitigated\"",
+      "resolved": "TODO: Translate \"security_center.status_indicators.resolved\""
+    },
+    "messages": {
+      "unable_to_load_security_posture": "TODO: Translate \"security_center.messages.unable_to_load_security_posture\"",
+      "could_not_retrieve_governance_safeguards": "TODO: Translate \"security_center.messages.could_not_retrieve_governance_safeguards\"",
+      "enabled_or_disabled_control": "TODO: Translate \"security_center.messages.enabled_or_disabled_control\"",
+      "no_recent_privileged_changes": "TODO: Translate \"security_center.messages.no_recent_privileged_changes\"",
+      "unable_to_update_control": "TODO: Translate \"security_center.messages.unable_to_update_control\""
+    },
+    "controls": {
+      "enforced": "TODO: Translate \"security_center.controls.enforced\"",
+      "disabled": "TODO: Translate \"security_center.controls.disabled\"",
+      "enable_control": "TODO: Translate \"security_center.controls.enable_control\"",
+      "disable_control": "TODO: Translate \"security_center.controls.disable_control\"",
+      "last_reviewed_by": "TODO: Translate \"security_center.controls.last_reviewed_by\""
+    },
+    "taxonomy": {
+      "category": "TODO: Translate \"security_center.taxonomy.category\"",
+      "mechanic": "TODO: Translate \"security_center.taxonomy.mechanic\""
+    },
+    "hardcoded_strings": {
+      "unable_to_load_security_posture": "TODO: Translate \"security_center.hardcoded_strings.unable_to_load_security_posture\"",
+      "could_not_retrieve_governance_safeguards": "TODO: Translate \"security_center.hardcoded_strings.could_not_retrieve_governance_safeguards\"",
+      "enabled": "TODO: Translate \"security_center.hardcoded_strings.enabled\"",
+      "disabled": "TODO: Translate \"security_center.hardcoded_strings.disabled\"",
+      "critical": "TODO: Translate \"security_center.hardcoded_strings.critical\"",
+      "high": "TODO: Translate \"security_center.hardcoded_strings.high\"",
+      "medium": "TODO: Translate \"security_center.hardcoded_strings.medium\"",
+      "enforced": "TODO: Translate \"security_center.hardcoded_strings.enforced\"",
+      "last_reviewed_by_next_review": "TODO: Translate \"security_center.hardcoded_strings.last_reviewed_by_next_review\"",
+      "disable_control": "TODO: Translate \"security_center.hardcoded_strings.disable_control\"",
+      "enable_control": "TODO: Translate \"security_center.hardcoded_strings.enable_control\"",
+      "investigating": "TODO: Translate \"security_center.hardcoded_strings.investigating\"",
+      "mitigated": "TODO: Translate \"security_center.hardcoded_strings.mitigated\"",
+      "resolved": "TODO: Translate \"security_center.hardcoded_strings.resolved\"",
+      "all_clear": "TODO: Translate \"security_center.hardcoded_strings.all_clear\"",
+      "no_unresolved_incidents_require_attention": "TODO: Translate \"security_center.hardcoded_strings.no_unresolved_incidents_require_attention\"",
+      "detected_resolved": "TODO: Translate \"security_center.hardcoded_strings.detected_resolved\"",
+      "effort": "TODO: Translate \"security_center.hardcoded_strings.effort\"",
+      "persona_impact": "TODO: Translate \"security_center.hardcoded_strings.persona_impact\"",
+      "no_recent_privileged_changes_recorded": "TODO: Translate \"security_center.hardcoded_strings.no_recent_privileged_changes_recorded\"",
+      "confirm_safeguard_ready_before_enabling": "TODO: Translate \"security_center.hardcoded_strings.confirm_safeguard_ready_before_enabling\"",
+      "disabling_control_removes_guardrails": "TODO: Translate \"security_center.hardcoded_strings.disabling_control_removes_guardrails\"",
+      "provide_context_for_audit_log": "TODO: Translate \"security_center.hardcoded_strings.provide_context_for_audit_log\"",
+      "document_why_change_necessary": "TODO: Translate \"security_center.hardcoded_strings.document_why_change_necessary\"",
+      "please_include_at_least_12_characters": "TODO: Translate \"security_center.hardcoded_strings.please_include_at_least_12_characters\"",
+      "cancel": "TODO: Translate \"security_center.hardcoded_strings.cancel\"",
+      "confirm": "TODO: Translate \"security_center.hardcoded_strings.confirm\""
+    }
+  },
+  "feature_flags": {
+    "console": {
+      "title": "TODO: Translate \"feature_flags.console.title\"",
+      "description": "TODO: Translate \"feature_flags.console.description\"",
+      "curated_flags": {
+        "shared_inbox": {
+          "label": "TODO: Translate \"feature_flags.console.curated_flags.shared_inbox.label\"",
+          "description": "TODO: Translate \"feature_flags.console.curated_flags.shared_inbox.description\""
+        },
+        "collaboration": {
+          "label": "TODO: Translate \"feature_flags.console.curated_flags.collaboration.label\"",
+          "description": "TODO: Translate \"feature_flags.console.curated_flags.collaboration.description\""
+        }
+      },
+      "status": {
+        "not_set": "TODO: Translate \"feature_flags.console.status.not_set\"",
+        "enabled": "TODO: Translate \"feature_flags.console.status.enabled\"",
+        "disabled": "TODO: Translate \"feature_flags.console.status.disabled\"",
+        "effective_state": "TODO: Translate \"feature_flags.console.status.effective_state\""
+      },
+      "override": {
+        "none": "TODO: Translate \"feature_flags.console.override.none\"",
+        "enabled": "TODO: Translate \"feature_flags.console.override.enabled\"",
+        "disabled": "TODO: Translate \"feature_flags.console.override.disabled\"",
+        "clear_override": "TODO: Translate \"feature_flags.console.override.clear_override\""
+      },
+      "buttons": {
+        "enable": "TODO: Translate \"feature_flags.console.buttons.enable\"",
+        "disable": "TODO: Translate \"feature_flags.console.buttons.disable\"",
+        "refresh": "TODO: Translate \"feature_flags.console.buttons.refresh\"",
+        "add": "TODO: Translate \"feature_flags.console.buttons.add\"",
+        "retry": "TODO: Translate \"feature_flags.console.buttons.retry\""
+      },
+      "placeholders": {
+        "add_flag_key": "TODO: Translate \"feature_flags.console.placeholders.add_flag_key\""
+      },
+      "empty_state": {
+        "title": "TODO: Translate \"feature_flags.console.empty_state.title\"",
+        "description": "TODO: Translate \"feature_flags.console.empty_state.description\""
+      },
+      "error": {
+        "title": "TODO: Translate \"feature_flags.console.error.title\"",
+        "description": "TODO: Translate \"feature_flags.console.error.description\"",
+        "custom_flag_description": "TODO: Translate \"feature_flags.console.error.custom_flag_description\""
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { FlagIcon, LineChartIcon, ShieldAlertIcon, UsersIcon } from "lucide-react";
 
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 interface AdminNavItem {
@@ -11,41 +12,46 @@ interface AdminNavItem {
   icon: typeof LineChartIcon;
 }
 
-const NAV_ITEMS: AdminNavItem[] = [
-  {
-    to: "/admin/insights",
-    label: "Insights",
-    description: "System KPIs, incidents, and alerting",
-    icon: LineChartIcon,
-  },
-  {
-    to: "/admin/users",
-    label: "Users",
-    description: "Roles, membership, and MFA coverage",
-    icon: UsersIcon,
-  },
-  {
-    to: "/admin/security",
-    label: "Security",
-    description: "Safeguards, incidents, and audit logs",
-    icon: ShieldAlertIcon,
-  },
-  {
-    to: "/admin/feature-flags",
-    label: "Feature flags",
-    description: "Persona rollouts and experiments",
-    icon: FlagIcon,
-  },
-];
+function useNavItems(): AdminNavItem[] {
+  const { t } = useAdminTranslation();
+  return [
+    {
+      to: "/admin/insights",
+      label: t("navigation.items.insights.label"),
+      description: t("navigation.items.insights.description"),
+      icon: LineChartIcon,
+    },
+    {
+      to: "/admin/users",
+      label: t("navigation.items.users.label"),
+      description: t("navigation.items.users.description"),
+      icon: UsersIcon,
+    },
+    {
+      to: "/admin/security",
+      label: t("navigation.items.security.label"),
+      description: t("navigation.items.security.description"),
+      icon: ShieldAlertIcon,
+    },
+    {
+      to: "/admin/feature-flags",
+      label: t("navigation.items.feature_flags.label"),
+      description: t("navigation.items.feature_flags.description"),
+      icon: FlagIcon,
+    },
+  ];
+}
 
 export function AdminConsoleNavigation() {
   const location = useRouterState({ select: (state) => state.location.pathname });
+  const { t } = useAdminTranslation();
+  const navItems = useNavItems();
   return (
     <nav
       className="token-gap-sm grid gap-3 md:grid-cols-2 lg:grid-cols-4"
-      aria-label="Admin navigation"
+      aria-label={t("navigation.aria_label")}
     >
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = location.startsWith(item.to);
         return (

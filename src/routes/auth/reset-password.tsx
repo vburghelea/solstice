@@ -5,6 +5,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { LogoIcon } from "~/components/ui/icons";
 import { resetPassword } from "~/features/auth/auth.mutations";
+import { useAuthTranslation } from "~/hooks/useTypedTranslation";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 
 export const Route = createFileRoute("/auth/reset-password")({
@@ -13,16 +14,17 @@ export const Route = createFileRoute("/auth/reset-password")({
 });
 
 function ResetPasswordForm() {
+  const { t } = useAuthTranslation();
   const navigate = useNavigate();
   const { token = null } = Route.useSearch();
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (!token) {
-      toast.error("No reset token found. Please request a new reset link.");
+      toast.error(t("password_reset.no_token"));
       navigate({ to: "/auth/forgot-password" });
     }
-  }, [token, navigate]);
+  }, [token, navigate, t]);
 
   const form = useAppForm({
     defaultValues: {
@@ -36,7 +38,7 @@ function ResetPasswordForm() {
           data: { ...value, token: token as string },
         });
         if (result.success) {
-          toast.success("Password reset successfully! You can now log in.");
+          toast.success(t("password_reset.success"));
           navigate({ to: "/auth/login" });
         } else {
           throw new Error(result.errors?.[0]?.message || "Failed to reset password.");
@@ -64,9 +66,9 @@ function ResetPasswordForm() {
               </div>
               <span className="sr-only">Roundup Games</span>
             </a>
-            <h1 className="text-xl font-bold">Reset your password</h1>
+            <h1 className="text-xl font-bold">{t("password_reset.title")}</h1>
             <p className="text-muted-foreground text-center text-sm">
-              Enter your new password below.
+              {t("password_reset.subtitle")}
             </p>
           </div>
           <div className="flex flex-col gap-5">
@@ -74,9 +76,9 @@ function ResetPasswordForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="New Password"
+                  label={t("password_reset.fields.new_password")}
                   type="password"
-                  placeholder="Enter new password"
+                  placeholder={t("password_reset.fields.new_password_placeholder")}
                   autoFocus
                 />
               )}
@@ -85,9 +87,9 @@ function ResetPasswordForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Confirm New Password"
+                  label={t("password_reset.fields.confirm_password")}
                   type="password"
-                  placeholder="Confirm new password"
+                  placeholder={t("password_reset.fields.confirm_password_placeholder")}
                 />
               )}
             </form.Field>
@@ -95,9 +97,9 @@ function ResetPasswordForm() {
               isSubmitting={form.state.isSubmitting}
               className="w-full"
               size="lg"
-              loadingText="Resetting..."
+              loadingText={t("password_reset.loading")}
             >
-              Reset Password
+              {t("password_reset.button")}
             </FormSubmitButton>
           </div>
           {errorMessage && (

@@ -13,6 +13,7 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";
+import { useGmTranslation } from "~/hooks/useTypedTranslation";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
@@ -28,6 +29,7 @@ export function GameMasterCampaignWorkspace({
   upcomingSessions,
   completedSessions,
 }: GameMasterCampaignWorkspaceProps) {
+  const { t } = useGmTranslation();
   const nextSession = upcomingSessions[0] ?? null;
   const lastCompleted = completedSessions[0] ?? null;
   const activePlayers = campaign.participants.filter(
@@ -43,21 +45,26 @@ export function GameMasterCampaignWorkspace({
         <div className="relative z-10 space-y-6 p-6 sm:p-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="space-y-3">
-              <Badge className="bg-white/15 text-white">Campaign studio</Badge>
+              <Badge className="bg-white/15 text-white">
+                {t("campaign_workspace.badge.campaign_studio")}
+              </Badge>
               <h1 className="text-3xl font-semibold sm:text-4xl">{campaign.name}</h1>
               <p className="max-w-3xl text-base text-white/80 sm:text-lg">
-                Orchestrate this narrative arc, prep rituals, and player energy from a
-                single workspace tailored for the Story Guide.
+                {t("campaign_workspace.description")}
               </p>
               <div className="flex flex-wrap gap-3 text-sm text-white/80">
                 <MetaPill icon={<MapPinIcon className="size-3.5" />}>
-                  {campaign.location?.address ?? "Remote / TBD"}
+                  {campaign.location?.address ??
+                    t("campaign_workspace.location.remote_tbd")}
                 </MetaPill>
                 <MetaPill icon={<CalendarCheck2Icon className="size-3.5" />}>
-                  {campaign.recurrence ?? "Custom cadence"}
+                  {campaign.recurrence ??
+                    t("campaign_workspace.recurrence.custom_cadence")}
                 </MetaPill>
                 <MetaPill icon={<Users2Icon className="size-3.5" />}>
-                  {activePlayers.length} active players
+                  {t("campaign_workspace.active_players", {
+                    count: activePlayers.length,
+                  })}
                 </MetaPill>
               </div>
             </div>
@@ -76,7 +83,7 @@ export function GameMasterCampaignWorkspace({
                     to="/gm/campaigns/$campaignId"
                     params={{ campaignId: campaign.id }}
                   >
-                    Open legacy view
+                    {t("actions.open_legacy_view")}
                   </Link>
                 </Button>
                 <Button
@@ -86,7 +93,7 @@ export function GameMasterCampaignWorkspace({
                   className="text-primary bg-white"
                 >
                   <Link to="/gm/games/create" search={{ campaignId: campaign.id }}>
-                    Schedule session
+                    {t("actions.schedule_session")}
                   </Link>
                 </Button>
               </div>
@@ -95,14 +102,20 @@ export function GameMasterCampaignWorkspace({
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatTile
-              label="Next session"
+              label={t("campaign_workspace.sessions.next_session")}
               value={
-                nextSession ? formatDateAndTime(nextSession.dateTime) : "Not scheduled"
+                nextSession
+                  ? formatDateAndTime(nextSession.dateTime)
+                  : t("campaign_workspace.sessions.not_scheduled")
               }
-              assistive={nextSession ? nextSession.name : "Add a gathering"}
+              assistive={
+                nextSession
+                  ? nextSession.name
+                  : t("campaign_workspace.sessions.add_gathering")
+              }
             />
             <StatTile
-              label="Last debrief"
+              label={t("campaign_workspace.sessions.last_debrief")}
               value={
                 lastCompleted
                   ? formatDistanceToNow(
@@ -111,19 +124,23 @@ export function GameMasterCampaignWorkspace({
                         addSuffix: true,
                       },
                     )
-                  : "Awaiting first session"
+                  : t("campaign_workspace.sessions.awaiting_first_session")
               }
-              assistive={lastCompleted ? lastCompleted.name : "Run a session"}
+              assistive={
+                lastCompleted
+                  ? lastCompleted.name
+                  : t("campaign_workspace.sessions.run_session")
+              }
             />
             <StatTile
-              label="Active roster"
+              label={t("campaign_workspace.details.active_roster")}
               value={`${activePlayers.length}`}
               assistive={`+${pendingInvites.length} invite${pendingInvites.length === 1 ? "" : "s"}`}
             />
             <StatTile
-              label="System"
-              value={campaign.gameSystem?.name ?? "Custom"}
-              assistive="Story engine in focus"
+              label={t("campaign_workspace.details.system")}
+              value={campaign.gameSystem?.name ?? t("campaign_workspace.details.custom")}
+              assistive={t("campaign_workspace.details.story_engine_focus")}
             />
           </div>
         </div>
@@ -134,20 +151,24 @@ export function GameMasterCampaignWorkspace({
         <Card className="border-muted-foreground/10 bg-muted/20 backdrop-blur">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
-              <CardTitle className="text-2xl">Narrative brief</CardTitle>
+              <CardTitle className="text-2xl">
+                {t("campaign_workspace.narrative_brief.title")}
+              </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Keep the campaign spine, table rituals, and prep cues close at hand.
+                {t("campaign_workspace.sections.narrative_brief.subtitle")}
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
               <Link to="/gm/campaigns/$campaignId" params={{ campaignId: campaign.id }}>
-                Edit details
+                {t("actions.edit_details")}
               </Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-6 text-sm leading-relaxed">
             <section className="space-y-2">
-              <h3 className="text-foreground text-base font-semibold">Campaign pitch</h3>
+              <h3 className="text-foreground text-base font-semibold">
+                {t("campaign_workspace.narrative_brief.campaign_pitch")}
+              </h3>
               <p className="text-muted-foreground whitespace-pre-wrap">
                 {campaign.description}
               </p>
@@ -155,31 +176,32 @@ export function GameMasterCampaignWorkspace({
 
             <div className="grid gap-4 md:grid-cols-2">
               <StoryNote
-                title="Tone & difficulty"
+                title={t("campaign_workspace.expectations.tone_difficulty")}
                 body={
-                  campaign.campaignExpectations?.difficulty ?? "Set the challenge scope."
+                  campaign.campaignExpectations?.difficulty ??
+                  t("campaign_workspace.expectations.challenge_scope_placeholder")
                 }
               />
               <StoryNote
-                title="Session cadence"
+                title={t("campaign_workspace.expectations.session_cadence")}
                 body={
                   campaign.campaignExpectations?.campaignLength ??
-                  "Document arc length or seasons."
+                  t("campaign_workspace.expectations.arc_length_placeholder")
                 }
               />
               <StoryNote
-                title="Character creation"
+                title={t("campaign_workspace.expectations.character_creation")}
                 body={
                   campaign.characterCreationOutcome ??
                   campaign.sessionZeroData?.characterCreation?.contextIntegration ??
-                  "Capture how characters tie into the world."
+                  t("campaign_workspace.expectations.character_creation_placeholder")
                 }
               />
               <StoryNote
-                title="House rules"
+                title={t("campaign_workspace.expectations.house_rules")}
                 body={
                   campaign.campaignExpectations?.houseRules ??
-                  "List safety, dice, or homebrew guidance."
+                  t("campaign_workspace.expectations.house_rules_placeholder")
                 }
               />
             </div>
@@ -188,9 +210,11 @@ export function GameMasterCampaignWorkspace({
 
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl">Safety & consent</CardTitle>
+            <CardTitle className="text-2xl">
+              {t("campaign_workspace.sections.safety_consent.title")}
+            </CardTitle>
             <p className="text-muted-foreground text-sm">
-              Align on tools, boundaries, and reminders before and after each session.
+              {t("campaign_workspace.sections.safety_consent.subtitle")}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -198,18 +222,20 @@ export function GameMasterCampaignWorkspace({
             <div className="bg-muted flex flex-col gap-3 rounded-2xl p-4 text-sm">
               <div className="flex items-center gap-2">
                 <ShieldCheckIcon className="text-primary size-4" />
-                <span className="font-medium">Session zero checkpoints</span>
+                <span className="font-medium">
+                  {t("campaign_workspace.narrative_brief.session_zero_checkpoints")}
+                </span>
               </div>
               <ul className="text-muted-foreground list-disc space-y-1 pl-5">
                 <li>
                   {campaign.sessionZeroData?.safetyTools?.playerBoundariesConsent
-                    ? "Player boundaries captured"
-                    : "Document player boundaries and X-card agreements"}
+                    ? t("campaign_workspace.safety.player_boundaries_captured")
+                    : t("campaign_workspace.safety.document_boundaries")}
                 </li>
                 <li>
                   {campaign.sessionZeroData?.tableExpectations?.playerAbsences
-                    ? "Attendance policy shared"
-                    : "Clarify how to handle absences and tardiness"}
+                    ? t("campaign_workspace.safety.attendance_policy_shared")
+                    : t("campaign_workspace.safety.clarify_absences")}
                 </li>
               </ul>
             </div>
@@ -220,20 +246,28 @@ export function GameMasterCampaignWorkspace({
       <section className="grid gap-6 lg:grid-cols-[3fr,2fr]">
         <Card className="lg:col-span-1">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl">Session pipeline</CardTitle>
+            <CardTitle className="text-2xl">
+              {t("campaign_workspace.session_pipeline.title")}
+            </CardTitle>
             <p className="text-muted-foreground text-sm">
-              Track what’s next and celebrate the story beats you’ve already delivered.
+              {t("campaign_workspace.sections.session_pipeline.subtitle")}
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <h3 className="text-foreground text-base font-semibold">Upcoming</h3>
+              <h3 className="text-foreground text-base font-semibold">
+                {t("campaign_workspace.session_pipeline.upcoming")}
+              </h3>
               {upcomingSessions.length === 0 ? (
                 <EmptyState
-                  title="No sessions scheduled"
-                  description="Queue the next chapter to keep your players immersed."
+                  title={t("campaign_workspace.empty_states.no_sessions_scheduled.title")}
+                  description={t(
+                    "campaign_workspace.empty_states.no_sessions_scheduled.description",
+                  )}
                   actionHref="/gm/games/create"
-                  actionLabel="Plan session"
+                  actionLabel={t(
+                    "campaign_workspace.empty_states.no_sessions_scheduled.action_label",
+                  )}
                 />
               ) : (
                 <div className="grid gap-4 xl:grid-cols-2">
@@ -250,13 +284,19 @@ export function GameMasterCampaignWorkspace({
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-foreground text-base font-semibold">Recent wraps</h3>
+              <h3 className="text-foreground text-base font-semibold">
+                {t("campaign_workspace.session_pipeline.recent_wraps")}
+              </h3>
               {completedSessions.length === 0 ? (
                 <EmptyState
-                  title="No completed sessions"
-                  description="Once you finish a gathering, we’ll spotlight the debrief tasks here."
+                  title={t("campaign_workspace.empty_states.no_completed_sessions.title")}
+                  description={t(
+                    "campaign_workspace.empty_states.no_completed_sessions.description",
+                  )}
                   actionHref="/gm/games"
-                  actionLabel="View archive"
+                  actionLabel={t(
+                    "campaign_workspace.empty_states.no_completed_sessions.action_label",
+                  )}
                 />
               ) : (
                 <div className="grid gap-4 xl:grid-cols-2">
@@ -271,10 +311,11 @@ export function GameMasterCampaignWorkspace({
 
         <Card className="lg:col-span-1">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl">Player dossiers</CardTitle>
+            <CardTitle className="text-2xl">
+              {t("campaign_workspace.player_dossiers.title")}
+            </CardTitle>
             <p className="text-muted-foreground text-sm">
-              Keep tabs on who’s at the table, their status, and the invitations in
-              motion.
+              {t("campaign_workspace.sections.player_dossiers.subtitle")}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -286,12 +327,12 @@ export function GameMasterCampaignWorkspace({
             {pendingInvites.length > 0 ? (
               <div className="rounded-2xl bg-amber-500/10 p-4 text-sm">
                 <p className="font-medium text-amber-600">
-                  {pendingInvites.length} pending invite
-                  {pendingInvites.length === 1 ? "" : "s"}
+                  {t("campaign_workspace.pending_invites.count", {
+                    count: pendingInvites.length,
+                  })}
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  Send a personal note or reminder to finalize the roster before the next
-                  session.
+                  {t("campaign_workspace.pending_invites.reminder")}
                 </p>
               </div>
             ) : null}
@@ -374,6 +415,7 @@ interface SessionSummaryChipProps {
 }
 
 function SessionSummaryChip({ session }: SessionSummaryChipProps) {
+  const { t } = useGmTranslation();
   const completedAt = session.updatedAt ?? session.dateTime;
   return (
     <div className="border-border/60 bg-muted/40 flex flex-col gap-2 rounded-2xl border p-4">
@@ -384,14 +426,19 @@ function SessionSummaryChip({ session }: SessionSummaryChipProps) {
         </Badge>
       </div>
       <p className="text-muted-foreground text-xs">
-        {formatDateAndTime(session.dateTime)} • {session.participantCount} attendees
+        {formatDateAndTime(session.dateTime)} •{" "}
+        {t("campaign_workspace.session_card.attendees", {
+          count: session.participantCount,
+        })}
       </p>
       <p className="text-muted-foreground text-xs">
-        Last updated {formatDistanceToNow(new Date(completedAt), { addSuffix: true })}
+        {t("campaign_workspace.session_card.last_updated", {
+          time: formatDistanceToNow(new Date(completedAt), { addSuffix: true }),
+        })}
       </p>
       <Button asChild variant="ghost" size="sm" className="self-start px-0 text-xs">
         <Link to="/gm/games/$gameId" params={{ gameId: session.id }}>
-          Review recap
+          {t("campaign_workspace.session_card.review_recap")}
         </Link>
       </Button>
     </div>
@@ -403,7 +450,11 @@ interface PlayerChipProps {
 }
 
 function PlayerChip({ participant }: PlayerChipProps) {
-  const statusCopy = participant.status === "approved" ? "Ready" : participant.status;
+  const { t } = useGmTranslation();
+  const statusCopy =
+    participant.status === "approved"
+      ? t("campaign_workspace.participants.ready")
+      : participant.status;
   return (
     <div
       className={cn(
@@ -414,7 +465,9 @@ function PlayerChip({ participant }: PlayerChipProps) {
       )}
     >
       <span className="font-medium">
-        {participant.user?.name ?? participant.user?.email ?? "Unnamed player"}
+        {participant.user?.name ??
+          participant.user?.email ??
+          t("campaign_workspace.participants.unnamed_player")}
       </span>
       <Badge variant="secondary" className="rounded-full text-[0.65rem] capitalize">
         {statusCopy}

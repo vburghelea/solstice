@@ -1,4 +1,5 @@
 import type { GameListItem } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import type { GameCardLinkConfig } from "./GameCard";
 import { GameCard } from "./GameCard";
 
@@ -8,8 +9,9 @@ interface GameListProps {
 }
 
 export function GameList({ games, getViewLink }: GameListProps) {
+  const { t } = useGamesTranslation();
   if (games.length === 0) {
-    return <p className="text-muted-foreground">No games found. Create one!</p>;
+    return <p className="text-muted-foreground">{t("status.no_games_found")}</p>;
   }
 
   return (

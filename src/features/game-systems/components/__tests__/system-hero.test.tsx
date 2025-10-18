@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "~/tests/utils";
 import { SystemHero } from "../system-hero";
 
+// The i18n mock is already set up in src/tests/mocks/i18n.ts
+// This will load the actual locale data from the JSON files
+
 describe("SystemHero", () => {
   it("shows hero image when url provided", () => {
     const { container } = render(

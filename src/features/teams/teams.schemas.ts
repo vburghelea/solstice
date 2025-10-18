@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tCommon } from "~/lib/i18n/server-translations";
 
 // Query schemas
 export const getTeamSchema = z.object({
@@ -39,17 +40,14 @@ export type SearchTeamsInput = z.infer<typeof searchTeamsSchema>;
 
 // Mutation schemas
 export const createTeamSchema = z.object({
-  name: z.string().min(1, "Team name is required"),
+  name: z.string().min(1, tCommon("validation.team_name_required")),
   slug: z
     .string()
-    .min(1, "A unique URL slug is required")
-    .regex(
-      /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers, and hyphens",
-    ),
+    .min(1, tCommon("validation.url_slug_required"))
+    .regex(/^[a-z0-9-]+$/, tCommon("validation.slug_format_invalid")),
   description: z.string().optional(),
   city: z.string().optional(),
-  country: z.string().length(3, "Country must be a 3-letter ISO code").optional(),
+  country: z.string().length(3, tCommon("validation.country_iso_code")).optional(),
   primaryColor: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/)

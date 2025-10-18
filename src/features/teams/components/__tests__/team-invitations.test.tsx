@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PendingTeamInvite } from "~/features/teams/teams.queries";
 import { TeamInvitationsSection } from "../team-invitations";
 
+// Import i18n mocks to ensure translations work in tests
+import "~/tests/mocks/i18n";
+
 const acceptTeamInviteMock = vi.fn();
 const declineTeamInviteMock = vi.fn();
 

@@ -1,0 +1,353 @@
+{
+  "create": {
+    "title": "TODO: Translate \"create.title\"",
+    "subtitle": "TODO: Translate \"create.subtitle\"",
+    "steps": {
+      "basic_info": {
+        "title": "TODO: Translate \"create.steps.basic_info.title\"",
+        "description": "TODO: Translate \"create.steps.basic_info.description\""
+      },
+      "location_dates": {
+        "title": "TODO: Translate \"create.steps.location_dates.title\"",
+        "description": "TODO: Translate \"create.steps.location_dates.description\""
+      },
+      "registration": {
+        "title": "TODO: Translate \"create.steps.registration.title\"",
+        "description": "TODO: Translate \"create.steps.registration.description\""
+      },
+      "details": {
+        "title": "TODO: Translate \"create.steps.details.title\"",
+        "description": "TODO: Translate \"create.steps.details.description\""
+      }
+    }
+  },
+  "form": {
+    "fields": {
+      "name": "TODO: Translate \"form.fields.name\"",
+      "slug": "TODO: Translate \"form.fields.slug\"",
+      "short_description": "TODO: Translate \"form.fields.short_description\"",
+      "description": "TODO: Translate \"form.fields.description\"",
+      "type": "TODO: Translate \"form.fields.type\"",
+      "status": "TODO: Translate \"form.fields.status\"",
+      "logo": "TODO: Translate \"form.fields.logo\"",
+      "logo_url": "TODO: Translate \"form.fields.logo_url\"",
+      "banner": "TODO: Translate \"form.fields.banner\"",
+      "banner_url": "TODO: Translate \"form.fields.banner_url\"",
+      "venue_name": "TODO: Translate \"form.fields.venue_name\"",
+      "venue_address": "TODO: Translate \"form.fields.venue_address\"",
+      "city": "TODO: Translate \"form.fields.city\"",
+      "province": "TODO: Translate \"form.fields.province\"",
+      "country": "TODO: Translate \"form.fields.country\"",
+      "postal_code": "TODO: Translate \"form.fields.postal_code\"",
+      "location_notes": "TODO: Translate \"form.fields.location_notes\"",
+      "start_date": "TODO: Translate \"form.fields.start_date\"",
+      "end_date": "TODO: Translate \"form.fields.end_date\"",
+      "registration_opens": "TODO: Translate \"form.fields.registration_opens\"",
+      "registration_closes": "TODO: Translate \"form.fields.registration_closes\"",
+      "registration_type": "TODO: Translate \"form.fields.registration_type\"",
+      "max_teams": "TODO: Translate \"form.fields.max_teams\"",
+      "max_participants": "TODO: Translate \"form.fields.max_participants\"",
+      "min_players_per_team": "TODO: Translate \"form.fields.min_players_per_team\"",
+      "max_players_per_team": "TODO: Translate \"form.fields.max_players_per_team\"",
+      "team_fee": "TODO: Translate \"form.fields.team_fee\"",
+      "individual_fee": "TODO: Translate \"form.fields.individual_fee\"",
+      "early_bird_discount": "TODO: Translate \"form.fields.early_bird_discount\"",
+      "early_bird_deadline": "TODO: Translate \"form.fields.early_bird_deadline\"",
+      "allow_etransfer": "TODO: Translate \"form.fields.allow_etransfer\"",
+      "etransfer_recipient": "TODO: Translate \"form.fields.etransfer_recipient\"",
+      "etransfer_instructions": "TODO: Translate \"form.fields.etransfer_instructions\"",
+      "allow_waitlist": "TODO: Translate \"form.fields.allow_waitlist\"",
+      "require_membership": "TODO: Translate \"form.fields.require_membership\"",
+      "contact_email": "TODO: Translate \"form.fields.contact_email\"",
+      "contact_phone": "TODO: Translate \"form.fields.contact_phone\"",
+      "website": "TODO: Translate \"form.fields.website\"",
+      "public_event": "TODO: Translate \"form.fields.public_event\"",
+      "featured_event": "TODO: Translate \"form.fields.featured_event\""
+    },
+    "placeholders": {
+      "name": "TODO: Translate \"form.placeholders.name\"",
+      "slug": "TODO: Translate \"form.placeholders.slug\"",
+      "short_description": "TODO: Translate \"form.placeholders.short_description\"",
+      "description": "TODO: Translate \"form.placeholders.description\"",
+      "logo_url": "TODO: Translate \"form.placeholders.logo_url\"",
+      "banner_url": "TODO: Translate \"form.placeholders.banner_url\"",
+      "venue_name": "TODO: Translate \"form.placeholders.venue_name\"",
+      "venue_address": "TODO: Translate \"form.placeholders.venue_address\"",
+      "city": "TODO: Translate \"form.placeholders.city\"",
+      "country": "TODO: Translate \"form.placeholders.country\"",
+      "postal_code": "TODO: Translate \"form.placeholders.postal_code\"",
+      "location_notes": "TODO: Translate \"form.placeholders.location_notes\"",
+      "contact_email": "TODO: Translate \"form.placeholders.contact_email\"",
+      "contact_phone": "TODO: Translate \"form.placeholders.contact_phone\"",
+      "website": "TODO: Translate \"form.placeholders.website\"",
+      "etransfer_instructions": "TODO: Translate \"form.placeholders.etransfer_instructions\"",
+      "short_description_card": "TODO: Translate \"form.placeholders.short_description_card\"",
+      "description_details": "TODO: Translate \"form.placeholders.description_details\""
+    },
+    "descriptions": {
+      "slug": "TODO: Translate \"form.descriptions.slug\"",
+      "short_description": "TODO: Translate \"form.descriptions.short_description\"",
+      "logo": "TODO: Translate \"form.descriptions.logo\"",
+      "banner": "TODO: Translate \"form.descriptions.banner\"",
+      "logo_helper": "TODO: Translate \"form.descriptions.logo_helper\"",
+      "banner_helper": "TODO: Translate \"form.descriptions.banner_helper\"",
+      "early_bird_discount": "TODO: Translate \"form.descriptions.early_bird_discount\"",
+      "etransfer_recipient": "TODO: Translate \"form.descriptions.etransfer_recipient\"",
+      "public_event_admin": "TODO: Translate \"form.descriptions.public_event_admin\"",
+      "public_event_user": "TODO: Translate \"form.descriptions.public_event_user\"",
+      "featured_event": "TODO: Translate \"form.descriptions.featured_event\"",
+      "allow_waitlist": "TODO: Translate \"form.descriptions.allow_waitlist\"",
+      "require_membership": "TODO: Translate \"form.descriptions.require_membership\""
+    },
+    "sections": {
+      "branding": {
+        "title": "TODO: Translate \"form.sections.branding.title\"",
+        "description": "TODO: Translate \"form.sections.branding.description\""
+      },
+      "pricing": {
+        "title": "TODO: Translate \"form.sections.pricing.title\""
+      },
+      "early_bird": {
+        "title": "TODO: Translate \"form.sections.early_bird.title\""
+      },
+      "alternate_payment": {
+        "title": "TODO: Translate \"form.sections.alternate_payment.title\""
+      },
+      "contact_info": {
+        "title": "TODO: Translate \"form.sections.contact_info.title\""
+      },
+      "visibility": {
+        "title": "TODO: Translate \"form.sections.visibility.title\""
+      }
+    }
+  },
+  "buttons": {
+    "previous": "TODO: Translate \"buttons.previous\"",
+    "next": "TODO: Translate \"buttons.next\"",
+    "create": "TODO: Translate \"buttons.create\"",
+    "creating": "TODO: Translate \"buttons.creating\""
+  },
+  "select": {
+    "select_type": "TODO: Translate \"select.select_type\"",
+    "select_registration_type": "TODO: Translate \"select.select_registration_type\""
+  },
+  "types": {
+    "tournament": "TODO: Translate \"types.tournament\"",
+    "league": "TODO: Translate \"types.league\"",
+    "camp": "TODO: Translate \"types.camp\"",
+    "clinic": "TODO: Translate \"types.clinic\"",
+    "social": "TODO: Translate \"types.social\"",
+    "other": "TODO: Translate \"types.other\""
+  },
+  "status": {
+    "draft": "TODO: Translate \"status.draft\"",
+    "published": "TODO: Translate \"status.published\"",
+    "registration_open": "TODO: Translate \"status.registration_open\""
+  },
+  "registration_types": {
+    "team": "TODO: Translate \"registration_types.team\"",
+    "individual": "TODO: Translate \"registration_types.individual\"",
+    "both": "TODO: Translate \"registration_types.both\""
+  },
+  "alerts": {
+    "admin_approval": {
+      "title": "TODO: Translate \"alerts.admin_approval.title\"",
+      "description": "TODO: Translate \"alerts.admin_approval.description\""
+    },
+    "approval_process": {
+      "description": "TODO: Translate \"alerts.approval_process.description\""
+    }
+  },
+  "validation": {
+    "name_required": "TODO: Translate \"validation.name_required\"",
+    "slug_required": "TODO: Translate \"validation.slug_required\"",
+    "slug_format": "TODO: Translate \"validation.slug_format\"",
+    "short_description_max": "TODO: Translate \"validation.short_description_max\"",
+    "start_date_required": "TODO: Translate \"validation.start_date_required\"",
+    "end_date_required": "TODO: Translate \"validation.end_date_required\"",
+    "etransfer_recipient_required": "TODO: Translate \"validation.etransfer_recipient_required\"",
+    "early_bird_deadline_required": "TODO: Translate \"validation.early_bird_deadline_required\"",
+    "early_bird_discount_required": "TODO: Translate \"validation.early_bird_discount_required\"",
+    "valid_etransfer_email": "TODO: Translate \"validation.valid_etransfer_email\"",
+    "invalid_value": "TODO: Translate \"validation.invalid_value\""
+  },
+  "upload": {
+    "logo_uploading": "TODO: Translate \"upload.logo_uploading\"",
+    "banner_uploading": "TODO: Translate \"upload.banner_uploading\"",
+    "logo_success": "TODO: Translate \"upload.logo_success\"",
+    "banner_success": "TODO: Translate \"upload.banner_success\"",
+    "logo_failed": "TODO: Translate \"upload.logo_failed\"",
+    "banner_failed": "TODO: Translate \"upload.banner_failed\"",
+    "wait_for_upload": "TODO: Translate \"upload.wait_for_upload\"",
+    "file_read_failed": "TODO: Translate \"upload.file_read_failed\""
+  },
+  "success": {
+    "created": "TODO: Translate \"success.created\"",
+    "created_pending_approval": "TODO: Translate \"success.created_pending_approval\""
+  },
+  "errors": {
+    "create_failed": "TODO: Translate \"errors.create_failed\"",
+    "upload_failed": "TODO: Translate \"errors.upload_failed\"",
+    "validation_error": "TODO: Translate \"errors.validation_error\"",
+    "creation_error": "TODO: Translate \"errors.creation_error\"",
+    "load_failed": "TODO: Translate \"errors.load_failed\""
+  },
+  "list": {
+    "filter_title": "TODO: Translate \"list.filter_title\"",
+    "labels": {
+      "event_type": "TODO: Translate \"list.labels.event_type\"",
+      "status": "TODO: Translate \"list.labels.status\"",
+      "city": "TODO: Translate \"list.labels.city\"",
+      "country": "TODO: Translate \"list.labels.country\"",
+      "sort_by": "TODO: Translate \"list.labels.sort_by\"",
+      "sort_order": "TODO: Translate \"list.labels.sort_order\""
+    },
+    "placeholders": {
+      "all_types": "TODO: Translate \"list.placeholders.all_types\"",
+      "all_statuses": "TODO: Translate \"list.placeholders.all_statuses\"",
+      "filter_by_city": "TODO: Translate \"list.placeholders.filter_by_city\"",
+      "all_countries": "TODO: Translate \"list.placeholders.all_countries\""
+    },
+    "options": {
+      "tournament": "TODO: Translate \"list.options.tournament\"",
+      "league": "TODO: Translate \"list.options.league\"",
+      "camp": "TODO: Translate \"list.options.camp\"",
+      "clinic": "TODO: Translate \"list.options.clinic\"",
+      "social": "TODO: Translate \"list.options.social\"",
+      "other": "TODO: Translate \"list.options.other\"",
+      "published": "TODO: Translate \"list.options.published\"",
+      "registration_open": "TODO: Translate \"list.options.registration_open\"",
+      "registration_closed": "TODO: Translate \"list.options.registration_closed\"",
+      "in_progress": "TODO: Translate \"list.options.in_progress\"",
+      "completed": "TODO: Translate \"list.options.completed\"",
+      "start_date": "TODO: Translate \"list.options.start_date\"",
+      "name": "TODO: Translate \"list.options.name\"",
+      "recently_added": "TODO: Translate \"list.options.recently_added\"",
+      "ascending": "TODO: Translate \"list.options.ascending\"",
+      "descending": "TODO: Translate \"list.options.descending\""
+    },
+    "empty_state": "TODO: Translate \"list.empty_state\"",
+    "registration": {
+      "open": "TODO: Translate \"list.registration.open\"",
+      "spots_left": "TODO: Translate \"list.registration.spots_left\"",
+      "registered": "TODO: Translate \"list.registration.registered\"",
+      "type_label": "TODO: Translate \"list.registration.type_label\""
+    },
+    "pagination": {
+      "showing": "TODO: Translate \"list.pagination.showing\"",
+      "previous": "TODO: Translate \"list.pagination.previous\"",
+      "next": "TODO: Translate \"list.pagination.next\""
+    },
+    "actions": {
+      "view_details": "TODO: Translate \"list.actions.view_details\""
+    }
+  },
+  "list_item": {
+    "free": "TODO: Translate \"list_item.free\"",
+    "capacity_tbd": "TODO: Translate \"list_item.capacity_tbd\"",
+    "date_tbd": "TODO: Translate \"list_item.date_tbd\"",
+    "spots_left": "TODO: Translate \"list_item.spots_left\""
+  },
+  "minimal_form": {
+    "title": "TODO: Translate \"minimal_form.title\"",
+    "description": "TODO: Translate \"minimal_form.description\"",
+    "test_button": "TODO: Translate \"minimal_form.test_button\""
+  },
+  "detail": {
+    "event_not_found": "TODO: Translate \"detail.event_not_found\"",
+    "dates": "TODO: Translate \"detail.dates\"",
+    "type": "TODO: Translate \"detail.type\"",
+    "status": "TODO: Translate \"detail.status\"",
+    "registration": "TODO: Translate \"detail.registration\"",
+    "open": "TODO: Translate \"detail.open\"",
+    "closed": "TODO: Translate \"detail.closed\"",
+    "spots_left": "TODO: Translate \"detail.spots_left\"",
+    "registrations": "TODO: Translate \"detail.registrations\"",
+    "no_registrations": "TODO: Translate \"detail.no_registrations\"",
+    "confirm": "TODO: Translate \"detail.confirm\"",
+    "waitlist": "TODO: Translate \"detail.waitlist\"",
+    "cancel": "TODO: Translate \"detail.cancel\"",
+    "actions": {
+      "publish": "TODO: Translate \"detail.actions.publish\"",
+      "open_registration": "TODO: Translate \"detail.actions.open_registration\"",
+      "close_registration": "TODO: Translate \"detail.actions.close_registration\"",
+      "start": "TODO: Translate \"detail.actions.start\"",
+      "complete": "TODO: Translate \"detail.actions.complete\"",
+      "cancel": "TODO: Translate \"detail.actions.cancel\""
+    },
+    "success": {
+      "event_updated": "TODO: Translate \"detail.success.event_updated\"",
+      "registration_updated": "TODO: Translate \"detail.success.registration_updated\""
+    },
+    "errors": {
+      "update_failed": "TODO: Translate \"detail.errors.update_failed\"",
+      "registration_update_failed": "TODO: Translate \"detail.errors.registration_update_failed\""
+    }
+  },
+  "registration": {
+    "event_not_found": "TODO: Translate \"registration.event_not_found\"",
+    "event_not_available": "TODO: Translate \"registration.event_not_available\"",
+    "back_to_events": "TODO: Translate \"registration.back_to_events\"",
+    "already_registered": "TODO: Translate \"registration.already_registered\"",
+    "already_registered_description": "TODO: Translate \"registration.already_registered_description\"",
+    "back_to_event_details": "TODO: Translate \"registration.back_to_event_details\"",
+    "view_event_details": "TODO: Translate \"registration.view_event_details\"",
+    "register_for_event": "TODO: Translate \"registration.register_for_event\"",
+    "register_description": "TODO: Translate \"registration.register_description\"",
+    "registration_type": "TODO: Translate \"registration.registration_type\"",
+    "individual_registration": "TODO: Translate \"registration.individual_registration\"",
+    "team_registration": "TODO: Translate \"registration.team_registration\"",
+    "register_as_individual": "TODO: Translate \"registration.register_as_individual\"",
+    "register_entire_team": "TODO: Translate \"registration.register_entire_team\"",
+    "select_team": "TODO: Translate \"registration.select_team\"",
+    "select_team_placeholder": "TODO: Translate \"registration.select_team_placeholder\"",
+    "join_create_team": "TODO: Translate \"registration.join_create_team\"",
+    "need_team_to_register": "TODO: Translate \"registration.need_team_to_register\"",
+    "additional_info": "TODO: Translate \"registration.additional_info\"",
+    "additional_info_placeholder": "TODO: Translate \"registration.additional_info_placeholder\"",
+    "payment_method": "TODO: Translate \"registration.payment_method\"",
+    "square_checkout": "TODO: Translate \"registration.square_checkout\"",
+    "etransfer": "TODO: Translate \"registration.etransfer\"",
+    "pay_securely_online": "TODO: Translate \"registration.pay_securely_online\"",
+    "submit_send_payment_manually": "TODO: Translate \"registration.submit_send_payment_manually\"",
+    "etransfer_instructions": "TODO: Translate \"registration.etransfer_instructions\"",
+    "send_payment_to": "TODO: Translate \"registration.send_payment_to\"",
+    "no_payment_required": "TODO: Translate \"registration.no_payment_required\"",
+    "no_payment_description": "TODO: Translate \"registration.no_payment_description\"",
+    "terms_and_conditions": "TODO: Translate \"registration.terms_and_conditions\"",
+    "agree_terms": "TODO: Translate \"registration.agree_terms\"",
+    "agree_terms_description": "TODO: Translate \"registration.agree_terms_description\"",
+    "accept_liability_waiver": "TODO: Translate \"registration.accept_liability_waiver\"",
+    "accept_waiver_description": "TODO: Translate \"registration.accept_waiver_description\"",
+    "submitting": "TODO: Translate \"registration.submitting\"",
+    "awaiting_etransfer": "TODO: Translate \"registration.awaiting_etransfer\"",
+    "complete_registration": "TODO: Translate \"registration.complete_registration\"",
+    "finish_etransfer": "TODO: Translate \"registration.finish_etransfer\"",
+    "send_payment_finalize": "TODO: Translate \"registration.send_payment_finalize\"",
+    "recipient_email": "TODO: Translate \"registration.recipient_email\"",
+    "instructions": "TODO: Translate \"registration.instructions\"",
+    "see_event_instructions": "TODO: Translate \"registration.see_event_instructions\"",
+    "payment_received_confirmation": "TODO: Translate \"registration.payment_received_confirmation\"",
+    "return_to_dashboard": "TODO: Translate \"registration.return_to_dashboard\"",
+    "event_overview": "TODO: Translate \"registration.event_overview\"",
+    "status": "TODO: Translate \"registration.status\"",
+    "registered": "TODO: Translate \"registration.registered\"",
+    "spots_remaining": "TODO: Translate \"registration.spots_remaining\"",
+    "registration_fees": "TODO: Translate \"registration.registration_fees\"",
+    "current_fee": "TODO: Translate \"registration.current_fee\"",
+    "early_bird_applied": "TODO: Translate \"registration.early_bird_applied\"",
+    "participant_information": "TODO: Translate \"registration.participant_information\"",
+    "unknown_participant": "TODO: Translate \"registration.unknown_participant\"",
+    "no_email_available": "TODO: Translate \"registration.no_email_available\"",
+    "registration_failed": "TODO: Translate \"registration.registration_failed\"",
+    "redirecting_to_square": "TODO: Translate \"registration.redirecting_to_square\"",
+    "registration_submitted": "TODO: Translate \"registration.registration_submitted\"",
+    "registration_completed": "TODO: Translate \"registration.registration_completed\"",
+    "error_during_registration": "TODO: Translate \"registration.error_during_registration\"",
+    "already_submitted": "TODO: Translate \"registration.already_submitted\"",
+    "accept_all_terms": "TODO: Translate \"registration.accept_all_terms\"",
+    "select_a_team": "TODO: Translate \"registration.select_a_team\"",
+    "registration_open": "TODO: Translate \"registration.registration_open\"",
+    "registration_closed": "TODO: Translate \"registration.registration_closed\""
+  }
+}

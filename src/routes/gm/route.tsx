@@ -10,58 +10,15 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import { listGamesWithCount } from "~/features/games/games.queries";
 import { listGmB2bPipeline } from "~/features/gm/gm.queries";
-import {
-  RoleWorkspaceLayout,
-  type RoleWorkspaceNavItem,
-} from "~/features/layouts/role-workspace-layout";
+import { RoleWorkspaceLayout } from "~/features/layouts/role-workspace-layout";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
+import { useNavigationTranslation } from "~/hooks/useTypedTranslation";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
 import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
 import { useFeatureFlag } from "~/lib/feature-flags";
 import { formatDateAndTime } from "~/shared/lib/datetime";
-
-const BASE_GM_NAVIGATION: RoleWorkspaceNavItem[] = [
-  {
-    label: "Overview",
-    to: "/gm",
-    icon: Home,
-    exact: true,
-    description:
-      "Review prep cues, live feedback, and the B2B pipeline from one command center.",
-  },
-  {
-    label: "Campaigns",
-    to: "/gm/campaigns",
-    icon: ScrollText,
-    description: "Manage story arcs, dossiers, and campaign health in one place.",
-  },
-  {
-    label: "Games",
-    to: "/gm/games",
-    icon: Gamepad2,
-    description: "Schedule, update, and debrief the sessions on your runway.",
-  },
-  {
-    label: "Feedback triage",
-    to: "/gm/feedback",
-    icon: ClipboardList,
-    description: "Work through debriefs, safety rituals, and upcoming prep checklists.",
-  },
-  {
-    label: "Shared inbox",
-    to: "/gm/inbox",
-    icon: Inbox,
-    description: "Coordinate narrative updates and announcements with operations.",
-  },
-  {
-    label: "Collaboration",
-    to: "/gm/collaboration",
-    icon: Users2,
-    description: "Partner with ops and platform teams on bespoke opportunities.",
-  },
-];
 
 type GamesQueryResult = Awaited<ReturnType<typeof listGamesWithCount>>;
 type GamesQuerySuccess = Extract<GamesQueryResult, { success: true }>;
@@ -82,14 +39,58 @@ export const Route = createFileRoute("/gm")({
 });
 
 function GameMasterNamespaceShell() {
+  const { t } = useNavigationTranslation();
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
   const { user } = Route.useRouteContext();
   const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
   const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
 
+  const baseGmNavigation = useMemo(
+    () => [
+      {
+        label: t("workspaces.gm.nav.overview.label"),
+        to: "/gm",
+        icon: Home,
+        exact: true,
+        description: t("workspaces.gm.nav.overview.description"),
+      },
+      {
+        label: t("workspaces.gm.nav.campaigns.label"),
+        to: "/gm/campaigns",
+        icon: ScrollText,
+        description: t("workspaces.gm.nav.campaigns.description"),
+      },
+      {
+        label: t("workspaces.gm.nav.games.label"),
+        to: "/gm/games",
+        icon: Gamepad2,
+        description: t("workspaces.gm.nav.games.description"),
+      },
+      {
+        label: t("workspaces.gm.nav.feedback_triage.label"),
+        to: "/gm/feedback",
+        icon: ClipboardList,
+        description: t("workspaces.gm.nav.feedback_triage.description"),
+      },
+      {
+        label: t("workspaces.gm.nav.shared_inbox.label"),
+        to: "/gm/inbox",
+        icon: Inbox,
+        description: t("workspaces.gm.nav.shared_inbox.description"),
+      },
+      {
+        label: t("workspaces.gm.nav.collaboration.label"),
+        to: "/gm/collaboration",
+        icon: Users2,
+        description: t("workspaces.gm.nav.collaboration.description"),
+      },
+    ],
+    [t],
+  );
+
   const navigationItems = useMemo(() => {
-    return BASE_GM_NAVIGATION.filter((item) => {
+    return baseGmNavigation.filter((item) => {
       if (item.to === "/gm/inbox") {
         return showSharedInbox;
       }
@@ -100,10 +101,12 @@ function GameMasterNamespaceShell() {
 
       return true;
     });
-  }, [showCollaboration, showSharedInbox]);
+  }, [baseGmNavigation, showCollaboration, showSharedInbox]);
 
-  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
-  const workspaceLabel = user?.name ? `${user.name}` : "Game Master";
+  const workspaceSubtitle = user?.name
+    ? t("workspaces.gm.welcome_back", { name: user.name })
+    : t("workspaces.gm.welcome_back_generic");
+  const workspaceLabel = user?.name ? user.name : t("workspaces.gm.fallback_label");
 
   return (
     <RoleSwitcherProvider
@@ -113,10 +116,10 @@ function GameMasterNamespaceShell() {
       }
     >
       <RoleWorkspaceLayout
-        title="Game Master workspace"
-        description="Coordinate campaigns, sessions, and bespoke threads tailored to your tables."
+        title={t("workspaces.gm.title")}
+        description={t("workspaces.gm.description")}
         navItems={navigationItems}
-        fallbackLabel="Game Master"
+        fallbackLabel={t("workspaces.gm.fallback_label")}
         subtitle={workspaceSubtitle}
         workspaceLabel={workspaceLabel}
         headerSlot={<GameMasterWorkspaceSummary />}
@@ -126,6 +129,7 @@ function GameMasterNamespaceShell() {
 }
 
 function GameMasterWorkspaceSummary() {
+  const { t } = useNavigationTranslation();
   const toError = (error: unknown): Error | null => {
     if (!error) {
       return null;
@@ -227,30 +231,36 @@ function GameMasterWorkspaceSummary() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <SummaryCard
-        title="Upcoming sessions"
+        title={t("workspaces.gm.summary.upcoming_sessions")}
         isLoading={upcomingSessionsQuery.isLoading}
         error={toError(upcomingSessionsQuery.error)}
         value={upcomingSessionsCount}
         description={
           nextSession
-            ? `Next: ${nextSession.name} • ${formatDateAndTime(nextSession.dateTime)}`
-            : "No sessions scheduled"
+            ? t("workspaces.gm.summary.next_session_detail", {
+                name: nextSession.name,
+                datetime: formatDateAndTime(nextSession.dateTime),
+              })
+            : t("workspaces.gm.summary.no_sessions_scheduled")
         }
         cta={
           <Link to="/gm/games" className="text-primary text-xs font-medium">
-            Manage sessions
+            {t("workspaces.gm.summary.manage_sessions")}
           </Link>
         }
       />
       <SummaryCard
-        title="Active campaigns"
+        title={t("workspaces.gm.summary.active_campaigns")}
         isLoading={campaignsQuery.isLoading}
         error={toError(campaignsQuery.error)}
         value={activeCampaignsCount}
         description={
           highlightedCampaign
-            ? `${highlightedCampaign.name} • ${highlightedCampaignSystem}`
-            : "Draft your next arc to fill the roster"
+            ? t("workspaces.gm.summary.campaign_detail", {
+                name: highlightedCampaign.name,
+                system: highlightedCampaignSystem,
+              })
+            : t("workspaces.gm.summary.draft_next_arc")
         }
         cta={
           highlightedCampaign ? (
@@ -259,25 +269,29 @@ function GameMasterWorkspaceSummary() {
               params={{ campaignId: highlightedCampaign.id }}
               className="text-primary text-xs font-medium"
             >
-              View workspace
+              {t("workspaces.gm.summary.view_workspace")}
             </Link>
           ) : undefined
         }
       />
       <SummaryCard
-        title="Pipeline attention"
+        title={t("workspaces.gm.summary.pipeline_attention")}
         isLoading={pipelineQuery.isLoading}
         error={toError(pipelineQuery.error)}
         value={opportunitiesNeedingAttention}
         description={
           pipelineSnapshot
-            ? `${activeEscalations} escalation${activeEscalations === 1 ? "" : "s"} live • ${pipelineOpportunities.length} total threads`
-            : "Log a corporate opportunity to begin tracking"
+            ? t("workspaces.gm.summary.pipeline_detail", {
+                escalations: activeEscalations,
+                plural: activeEscalations === 1 ? "" : "s",
+                total: pipelineOpportunities.length,
+              })
+            : t("workspaces.gm.summary.log_corporate_opportunity")
         }
         cta={
           pipelineSnapshot ? (
             <Link to="/gm" className="text-primary text-xs font-medium">
-              Review pipeline
+              {t("workspaces.gm.summary.review_pipeline")}
             </Link>
           ) : undefined
         }

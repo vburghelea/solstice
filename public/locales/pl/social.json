@@ -1,0 +1,36 @@
+{
+  "blocklist": {
+    "title": "TODO: Translate \"blocklist.title\"",
+    "description": "TODO: Translate \"blocklist.description\"",
+    "loading": "TODO: Translate \"blocklist.loading\"",
+    "no_blocked_users": "TODO: Translate \"blocklist.no_blocked_users\"",
+    "no_blocked_users_description": "TODO: Translate \"blocklist.no_blocked_users_description\"",
+    "user_count": {
+      "one": "TODO: Translate \"blocklist.user_count.one\"",
+      "other": "TODO: Translate \"blocklist.user_count.other\""
+    },
+    "buttons": {
+      "unblock": "TODO: Translate \"blocklist.buttons.unblock\"",
+      "unblocking": "TODO: Translate \"blocklist.buttons.unblocking\"",
+      "cancel": "TODO: Translate \"blocklist.buttons.cancel\"",
+      "confirm_unblock": "TODO: Translate \"blocklist.buttons.confirm_unblock\""
+    },
+    "dialog": {
+      "title": "TODO: Translate \"blocklist.dialog.title\"",
+      "description": "TODO: Translate \"blocklist.dialog.description\""
+    },
+    "status": {
+      "blocked": "TODO: Translate \"blocklist.status.blocked\""
+    },
+    "reason": "TODO: Translate \"blocklist.reason\"",
+    "blocked_date": "TODO: Translate \"blocklist.blocked_date\"",
+    "toast": {
+      "unblock_success": "TODO: Translate \"blocklist.toast.unblock_success\"",
+      "unblock_error": "TODO: Translate \"blocklist.toast.unblock_error\"",
+      "load_error": "TODO: Translate \"blocklist.toast.load_error\""
+    }
+  },
+  "errors": {
+    "unexpected_error": "TODO: Translate \"errors.unexpected_error\""
+  }
+}

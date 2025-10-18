@@ -26,6 +26,7 @@ import {
 } from "~/features/campaigns/campaigns.schemas";
 import { GameSystemCombobox } from "~/features/games/components/GameSystemCombobox";
 import { useGameSystemSearch } from "~/features/games/hooks/useGameSystemSearch";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -62,6 +63,7 @@ export function CampaignForm({
   isGameSystemReadOnly,
   gameSystemName,
 }: CampaignFormProps) {
+  const { t } = useCampaignsTranslation();
   const defaults = {
     gameSystemId: initialValues?.gameSystemId ?? undefined,
     name: initialValues?.name ?? "",
@@ -140,8 +142,8 @@ export function CampaignForm({
       className="space-y-8"
     >
       <FormSection
-        title="Campaign overview"
-        description="Share the essentials players need to understand your ongoing story."
+        title={t("form_sections.campaign_overview")}
+        description={t("descriptions.campaign_overview")}
         contentClassName="space-y-6"
       >
         <form.Field
@@ -168,7 +170,7 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Campaign Name</Label>
+              <Label htmlFor={field.name}>{t("campaign_fields.campaign_name")}</Label>
               <input
                 id={field.name}
                 name={field.name}
@@ -178,7 +180,7 @@ export function CampaignForm({
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   field.handleChange(event.target.value)
                 }
-                placeholder="Enter a compelling name for your planned campaign"
+                placeholder={t("placeholders.campaign_name_placeholder")}
                 className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               {field.state.meta.errors?.length > 0 && (
@@ -187,7 +189,7 @@ export function CampaignForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "The campaign name is what most players see first when looking for adventure, make sure it's compelling.",
+                        : t("validation_messages.campaign_name_required"),
                     )
                     .join(", ")}
                 </p>
@@ -217,7 +219,7 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Description</Label>
+              <Label htmlFor={field.name}>{t("labels.description")}</Label>
               <Textarea
                 id={field.name}
                 name={field.name}
@@ -234,7 +236,7 @@ export function CampaignForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Please add a campaign description that sets the tone for what players should expect.",
+                        : t("validation_messages.description_required"),
                     )
                     .join(", ")}
                 </p>
@@ -264,14 +266,14 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Game System Used</Label>
+              <Label htmlFor={field.name}>{t("campaign_fields.game_system_used")}</Label>
               {isGameSystemReadOnly ? (
                 <p className="text-muted-foreground mt-1 text-sm">{gameSystemName}</p>
               ) : (
                 <GameSystemCombobox
                   label="" // Label is already rendered above
                   options={gameSystemOptions}
-                  placeholder="Search and select the game system you want to use"
+                  placeholder={t("placeholders.search_and_select_game_system")}
                   value={field.state.value?.toString() ?? ""}
                   onValueChange={(value) => {
                     const parsedValue = Number.parseInt(value, 10);
@@ -309,7 +311,7 @@ export function CampaignForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Please select a game system for your campaign.",
+                        : t("validation_messages.game_system_required"),
                     )
                     .join(", ")}
                 </p>
@@ -340,7 +342,7 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Recurrence</Label>
+                <Label htmlFor={field.name}>{t("campaign_fields.recurrence")}</Label>
                 <Select
                   value={field.state.value as string}
                   onValueChange={(value: "weekly" | "bi-weekly" | "monthly") =>
@@ -348,12 +350,12 @@ export function CampaignForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select recurrence" />
+                    <SelectValue placeholder={t("placeholders.select_recurrence")} />
                   </SelectTrigger>
                   <SelectContent>
                     {campaignRecurrenceEnum.enumValues.map((v) => (
                       <SelectItem key={v} value={v}>
-                        {v.charAt(0).toUpperCase() + v.slice(1)}
+                        {t(`status.${v}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -364,7 +366,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Choose the recurrence for your campaign.",
+                          : t("validation_messages.recurrence_required"),
                       )
                       .join(", ")}
                   </p>
@@ -394,7 +396,7 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Time of Day</Label>
+                <Label htmlFor={field.name}>{t("campaign_fields.time_of_day")}</Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -404,7 +406,7 @@ export function CampaignForm({
                   onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     field.handleChange(event.target.value)
                   }
-                  placeholder="e.g., Evenings, Afternoons"
+                  placeholder={t("placeholders.time_of_day_placeholder")}
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 {field.state.meta.errors?.length > 0 && (
@@ -413,7 +415,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Specify the general time of day for your campaign sessions.",
+                          : t("validation_messages.time_of_day_required"),
                       )
                       .join(", ")}
                   </p>
@@ -445,7 +447,9 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Session Duration (minutes)</Label>
+                <Label htmlFor={field.name}>
+                  {t("campaign_fields.session_duration_minutes")}
+                </Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -461,7 +465,7 @@ export function CampaignForm({
                       event.target.value ? Number(event.target.value) : undefined,
                     )
                   }
-                  placeholder="e.g., 180, 240"
+                  placeholder={t("placeholders.session_duration_placeholder")}
                   className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 {field.state.meta.errors?.length > 0 && (
@@ -470,7 +474,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Specify the typical duration of a single session within the campaign.",
+                          : t("validation_messages.session_duration_required"),
                       )
                       .join(", ")}
                   </p>
@@ -498,7 +502,9 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Price per session (EUR) (optional)</Label>
+                <Label htmlFor={field.name}>
+                  {t("campaign_fields.price_per_session_eur")}
+                </Label>
                 <div className="relative mt-1">
                   <span className="text-muted-foreground absolute inset-y-0 left-0 flex items-center pl-3">
                     €
@@ -523,7 +529,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "If you want to add a cover charge for the campaign session, specify it here.",
+                          : t("validation_messages.price_optional"),
                       )
                       .join(", ")}
                   </p>
@@ -555,13 +561,13 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Language</Label>
+                <Label htmlFor={field.name}>{t("campaign_fields.language")}</Label>
                 <Select
                   value={field.state.value ?? ""}
                   onValueChange={(value) => field.handleChange(value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a language" />
+                    <SelectValue placeholder={t("placeholders.select_language")} />
                   </SelectTrigger>
                   <SelectContent>
                     {languageOptions.map((lang) => (
@@ -577,7 +583,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Choose the primary language for communication within the campaign.",
+                          : t("validation_messages.language_required"),
                       )
                       .join(", ")}
                   </p>
@@ -607,7 +613,7 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Visibility</Label>
+                <Label htmlFor={field.name}>{t("campaign_fields.visibility")}</Label>
                 <Select
                   value={field.state.value as string}
                   onValueChange={(value: "public" | "protected" | "private") =>
@@ -615,14 +621,14 @@ export function CampaignForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select visibility" />
+                    <SelectValue placeholder={t("placeholders.select_visibility")} />
                   </SelectTrigger>
                   <SelectContent>
                     {visibilityEnum.enumValues.map(
                       (v: (typeof visibilityEnum.enumValues)[number]) => (
                         <SelectItem key={v} value={v}>
                           {v === "protected"
-                            ? "Connections & Teammates"
+                            ? t("status.connections_teammates")
                             : v.charAt(0).toUpperCase() + v.slice(1)}
                         </SelectItem>
                       ),
@@ -635,7 +641,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "Pick a visibility value that allows you to find the right people efficiently.",
+                          : t("validation_messages.visibility_required"),
                       )
                       .join(", ")}
                   </p>
@@ -646,14 +652,12 @@ export function CampaignForm({
         </div>
       </FormSection>
       <p className="text-muted-foreground mt-2 text-sm">
-        Visibility options: Public (visible to everyone), Connections & Teammates (visible
-        to your followers, the people you follow, and active teammates), Private (visible
-        only to invited players)
+        {t("descriptions.visibility_options")}
       </p>
 
       <FormSection
-        title="Location"
-        description="Let players know where your group will gather."
+        title={t("form_sections.location")}
+        description={t("descriptions.location_details")}
         contentClassName="space-y-6"
       >
         <form.Field
@@ -677,7 +681,7 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label htmlFor={field.name}>Address</Label>
+              <Label htmlFor={field.name}>{t("campaign_fields.address")}</Label>
               <input
                 id={field.name}
                 name={field.name}
@@ -695,7 +699,7 @@ export function CampaignForm({
                     .map((error) =>
                       typeof error === "string"
                         ? error
-                        : "Enter the address of the location where the campaign sessions will take place.",
+                        : t("validation_messages.address_required"),
                     )
                     .join(", ")}
                 </p>
@@ -761,8 +765,8 @@ export function CampaignForm({
       </FormSection>
 
       <FormSection
-        title="Participant requirements"
-        description="Optional guidelines that help players gauge whether the campaign is a fit."
+        title={t("form_sections.participant_requirements")}
+        description={t("descriptions.participant_requirements")}
         contentClassName="space-y-6"
       >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -785,7 +789,7 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Minimum Players</Label>
+                <Label htmlFor={field.name}>{t("campaign_fields.minimum_players")}</Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -805,7 +809,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "We need to know how many people are expected to participate.",
+                          : t("validation_messages.min_players_required"),
                       )
                       .join(", ")}
                   </p>
@@ -833,7 +837,7 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label htmlFor={field.name}>Maximum Players</Label>
+                <Label htmlFor={field.name}>{t("campaign_fields.maximum_players")}</Label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -853,7 +857,7 @@ export function CampaignForm({
                       .map((error) =>
                         typeof error === "string"
                           ? error
-                          : "We need to know how many people are expected to participate.",
+                          : t("validation_messages.max_players_required"),
                       )
                       .join(", ")}
                   </p>
@@ -865,8 +869,8 @@ export function CampaignForm({
       </FormSection>
 
       <FormSection
-        title="Safety & table culture"
-        description="Optional expectations to set the tone for how you'll play together."
+        title={t("form_sections.safety_table_culture")}
+        description={t("descriptions.safety_table_culture")}
         contentClassName="space-y-6"
       >
         <form.Field
@@ -893,7 +897,7 @@ export function CampaignForm({
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
-              <Label htmlFor={field.name}>No Alcohol</Label>
+              <Label htmlFor={field.name}>{t("campaign_fields.no_alcohol")}</Label>
             </div>
           )}
         </form.Field>
@@ -921,7 +925,9 @@ export function CampaignForm({
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
-              <Label htmlFor={field.name}>Safe Word Required</Label>
+              <Label htmlFor={field.name}>
+                {t("campaign_fields.safe_word_required")}
+              </Label>
             </div>
           )}
         </form.Field>
@@ -947,7 +953,9 @@ export function CampaignForm({
                 onCheckedChange={(checked) => field.handleChange(!!checked)}
                 onBlur={field.handleBlur}
               />
-              <Label htmlFor={field.name}>Encourage Open Communication</Label>
+              <Label htmlFor={field.name}>
+                {t("campaign_fields.encourage_open_communication")}
+              </Label>
             </div>
           )}
         </form.Field>
@@ -969,7 +977,7 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label>Safety Tool</Label>
+                <Label>{t("campaign_fields.safety_tool")}</Label>
                 <Select
                   value={(field.state.value as string | null) ?? "none"}
                   onValueChange={(v) =>
@@ -981,7 +989,9 @@ export function CampaignForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a safety tool" />
+                    <SelectValue
+                      placeholder={t("placeholders.safety_tool_placeholder")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {xCardSystemEnum.options.map(
@@ -1015,14 +1025,14 @@ export function CampaignForm({
           >
             {(field) => (
               <div>
-                <Label>Safety Tool Details (optional)</Label>
+                <Label>{t("campaign_fields.safety_tool_details_optional")}</Label>
                 <Textarea
                   value={(field.state.value as string | null) ?? ""}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
                     field.handleChange(event.target.value || null)
                   }
                   onBlur={field.handleBlur}
-                  placeholder="Any specifics about the chosen safety tool"
+                  placeholder={t("placeholders.safety_tool_placeholder")}
                   rows={3}
                 />
               </div>
@@ -1046,14 +1056,16 @@ export function CampaignForm({
         >
           {(field) => (
             <div>
-              <Label>Player Boundaries / Consent Notes (optional)</Label>
+              <Label>
+                {t("campaign_fields.player_boundaries_consent_notes_optional")}
+              </Label>
               <Textarea
                 value={(field.state.value as string | null) ?? ""}
                 onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
                   field.handleChange(event.target.value || null)
                 }
                 onBlur={field.handleBlur}
-                placeholder="Any boundaries or consent notes players should be aware of"
+                placeholder={t("placeholders.player_boundaries_consent_placeholder")}
                 rows={3}
               />
             </div>
@@ -1064,15 +1076,15 @@ export function CampaignForm({
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
         {onCancelEdit ? (
           <Button variant="outline" onClick={onCancelEdit}>
-            Cancel
+            {t("buttons.cancel")}
           </Button>
         ) : (
           <Button variant="outline" asChild>
-            <Link to="/player/campaigns">Cancel</Link>
+            <Link to="/player/campaigns">{t("buttons.cancel")}</Link>
           </Button>
         )}
         <FormSubmitButton isSubmitting={isSubmitting}>
-          {initialValues ? "Update Campaign" : "Create Campaign"}
+          {initialValues ? t("buttons.update_campaign") : t("buttons.create_campaign")}
         </FormSubmitButton>
       </div>
     </form>

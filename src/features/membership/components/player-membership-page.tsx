@@ -25,9 +25,11 @@ import {
   getUserMembershipStatus,
   listMembershipTypes,
 } from "~/features/membership/membership.queries";
+import { useMembershipTranslation } from "~/hooks/useTypedTranslation";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export function MembershipPage() {
+  const { t } = useMembershipTranslation();
   const [processingPayment, setProcessingPayment] = useState(false);
   const paymentReturn = usePaymentReturn();
   const [hasProcessedReturn, setHasProcessedReturn] = useState(false);
@@ -38,7 +40,7 @@ export function MembershipPage() {
       const result = await getUserMembershipStatus();
       if (!result.success) {
         throw new Error(
-          result.errors?.[0]?.message || "Failed to fetch membership status",
+          result.errors?.[0]?.message || t("errors.failed_to_fetch_membership_status"),
         );
       }
       return result.data || null;
@@ -53,7 +55,7 @@ export function MembershipPage() {
       const result = await listMembershipTypes();
       if (!result.success) {
         throw new Error(
-          result.errors?.[0]?.message || "Failed to fetch membership types",
+          result.errors?.[0]?.message || t("errors.failed_to_fetch_membership_types"),
         );
       }
       return result.data || [];
@@ -75,20 +77,22 @@ export function MembershipPage() {
         );
 
         if (result.success) {
-          toast.success("Membership purchased successfully!");
+          toast.success(t("success.membership_purchased_successfully"));
           clearPaymentParams();
           await refetchMembershipStatus();
         } else {
-          toast.error(result.errors?.[0]?.message || "Failed to confirm membership");
+          toast.error(
+            result.errors?.[0]?.message || t("errors.failed_to_confirm_membership"),
+          );
         }
       } catch (error) {
         console.error("Error confirming membership:", error);
-        toast.error("Failed to confirm membership purchase");
+        toast.error(t("errors.failed_to_confirm_membership_purchase"));
       } finally {
         setProcessingPayment(false);
       }
     },
-    [refetchMembershipStatus],
+    [refetchMembershipStatus, t],
   );
 
   const handleMockPaymentReturn = useCallback(
@@ -106,7 +110,7 @@ export function MembershipPage() {
     if (paymentReturn.isMockCheckout && paymentReturn.sessionId) {
       if (!paymentReturn.membershipTypeId) {
         setHasProcessedReturn(true);
-        toast.error("Missing membership type for checkout session");
+        toast.error(t("errors.missing_membership_type_for_checkout"));
         clearPaymentParams();
         return;
       }
@@ -121,7 +125,7 @@ export function MembershipPage() {
     else if (paymentReturn.success && paymentReturn.paymentId) {
       if (!paymentReturn.sessionId || !paymentReturn.membershipTypeId) {
         setHasProcessedReturn(true);
-        toast.error("Missing checkout information. Please contact support.");
+        toast.error(t("errors.missing_checkout_information"));
         clearPaymentParams();
         return;
       }
@@ -136,11 +140,11 @@ export function MembershipPage() {
     // Handle errors
     else if (paymentReturn.error) {
       setHasProcessedReturn(true);
-      const errorMessage = getPaymentErrorMessage(paymentReturn.error);
+      const errorMessage = getPaymentErrorMessage(paymentReturn.error, t);
       if (errorMessage) toast.error(errorMessage);
       clearPaymentParams();
     }
-  }, [hasProcessedReturn, paymentReturn, handleMockPaymentReturn, confirmPurchase]);
+  }, [hasProcessedReturn, paymentReturn, handleMockPaymentReturn, confirmPurchase, t]);
 
   // Process payment return using useEffect
   useEffect(() => {
@@ -164,11 +168,13 @@ export function MembershipPage() {
         // Redirect to checkout URL
         window.location.href = result.data.checkoutUrl;
       } else {
-        toast.error(result.errors?.[0]?.message || "Failed to create checkout session");
+        toast.error(
+          result.errors?.[0]?.message || t("errors.failed_to_create_checkout_session"),
+        );
       }
     } catch (error) {
       console.error("Error creating checkout session:", error);
-      toast.error("Failed to create checkout session");
+      toast.error(t("errors.failed_to_create_checkout_session"));
     }
   };
 
@@ -185,7 +191,7 @@ export function MembershipPage() {
       <div className="container mx-auto py-8">
         <Card className="border-destructive">
           <CardHeader>
-            <CardTitle className="text-foreground">Error</CardTitle>
+            <CardTitle className="text-foreground">{t("errors.error")}</CardTitle>
             <CardDescription>
               {membershipStatusQuery.error?.message ||
                 membershipTypesQuery.error?.message}
@@ -206,7 +212,7 @@ export function MembershipPage() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="h-8 w-8 animate-spin" />
-              <p>Processing your payment...</p>
+              <p>{t("status.processing_payment")}</p>
             </div>
           </CardContent>
         </Card>
@@ -216,45 +222,50 @@ export function MembershipPage() {
 
   return (
     <div className="container mx-auto py-8 pb-28 lg:pb-8">
-      <h1 className="text-foreground mb-8 text-3xl font-bold">Membership</h1>
-      <p className="text-muted-foreground mb-6">
-        Join Roundup Games and access exclusive member benefits
-      </p>
+      <h1 className="text-foreground mb-8 text-3xl font-bold">{t("page.title")}</h1>
+      <p className="text-muted-foreground mb-6">{t("page.subtitle")}</p>
 
       {/* Current Membership Status */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-foreground">Current Status</CardTitle>
+          <CardTitle className="text-foreground">{t("current_status.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           {membershipStatus?.hasMembership ? (
             <div className="space-y-2">
               <p className="text-admin-status-active-text text-lg font-semibold">
-                Active Membership
+                {t("current_status.active_membership")}
               </p>
               <p className="text-muted-foreground text-sm">
-                Type: {membershipStatus.currentMembership?.membershipType.name}
+                {t("current_status.type", {
+                  type: membershipStatus.currentMembership?.membershipType.name,
+                })}
               </p>
               <p className="text-muted-foreground text-sm">
-                Expires:{" "}
-                {membershipStatus.currentMembership
-                  ? new Date(
-                      membershipStatus.currentMembership.endDate,
-                    ).toLocaleDateString()
-                  : "N/A"}
+                {t("current_status.expires", {
+                  date: membershipStatus.currentMembership
+                    ? new Date(
+                        membershipStatus.currentMembership.endDate,
+                      ).toLocaleDateString()
+                    : t("status.not_available"),
+                })}
               </p>
               {membershipStatus.daysRemaining != null &&
                 membershipStatus.daysRemaining > 0 && (
                   <p className="text-muted-foreground text-sm">
-                    Days Remaining: {membershipStatus.daysRemaining}
+                    {t("current_status.days_remaining", {
+                      count: membershipStatus.daysRemaining,
+                    })}
                   </p>
                 )}
             </div>
           ) : (
             <div>
-              <p className="text-lg font-semibold">No Active Membership</p>
+              <p className="text-lg font-semibold">
+                {t("current_status.no_active_membership")}
+              </p>
               <p className="text-muted-foreground text-sm">
-                Join today to participate in events and access member benefits
+                {t("current_status.join_today_message")}
               </p>
             </div>
           )}
@@ -263,7 +274,7 @@ export function MembershipPage() {
 
       {/* Available Memberships */}
       <div id="plans">
-        <h2 className="mb-4 text-2xl font-bold">Available Memberships</h2>
+        <h2 className="mb-4 text-2xl font-bold">{t("available_plans.title")}</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {membershipTypes.map((type) => {
             const isCurrent =
@@ -284,7 +295,7 @@ export function MembershipPage() {
                 <CardFooter>
                   {isCurrent ? (
                     <Button className="w-full" disabled>
-                      Current Plan
+                      {t("buttons.current_plan")}
                     </Button>
                   ) : canPurchase ? (
                     <Button
@@ -294,12 +305,12 @@ export function MembershipPage() {
                     >
                       {membershipStatus?.hasMembership &&
                       (membershipStatus.daysRemaining ?? 0) <= 30
-                        ? "Renew"
-                        : "Purchase"}
+                        ? t("buttons.renew")
+                        : t("buttons.purchase")}
                     </Button>
                   ) : (
                     <Button className="w-full" disabled>
-                      Not Available
+                      {t("buttons.not_available")}
                     </Button>
                   )}
                 </CardFooter>
@@ -314,14 +325,14 @@ export function MembershipPage() {
         {membershipTypes.length > 0 && (
           <StickyActionBar>
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-              <div className="text-sm">Choose a membership to continue</div>
+              <div className="text-sm">{t("mobile_cta.choose_membership")}</div>
               <Button
                 onClick={() => {
                   const el = document.getElementById("plans");
                   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
                 }}
               >
-                View Options
+                {t("mobile_cta.view_options")}
               </Button>
             </div>
           </StickyActionBar>

@@ -1,10 +1,12 @@
 "use client";
 
 import { useConsentManager } from "@c15t/react";
+import { useConsentTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 export function CookiePreferencesTrigger({ className }: { className?: string }) {
   const { setIsPrivacyDialogOpen } = useConsentManager();
+  const { t } = useConsentTranslation();
 
   return (
     <button
@@ -16,7 +18,7 @@ export function CookiePreferencesTrigger({ className }: { className?: string }) 
       )}
       onClick={() => setIsPrivacyDialogOpen(true)}
     >
-      Cookie preferences
+      {t("buttons.cookie_preferences")}
     </button>
   );
 }

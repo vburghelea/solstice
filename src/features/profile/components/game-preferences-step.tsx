@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useProfileTranslation } from "~/hooks/useTypedTranslation";
 import { GameTagInput } from "~/shared/ui/game-tag-input";
 
 const EMPTY_GAME_SYSTEM_ARRAY: { id: number; name: string }[] = [];
@@ -15,6 +16,7 @@ export function GamePreferencesStep({
     toAvoid: { id: number; name: string }[],
   ) => void;
 }) {
+  const { t } = useProfileTranslation();
   const [favorites, setFavorites] = useState(initialFavorites);
   const [toAvoid, setToAvoid] = useState(initialToAvoid);
 
@@ -61,22 +63,26 @@ export function GamePreferencesStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="mb-2 text-lg font-medium">Favorite Game Systems</h3>
+        <h3 className="mb-2 text-lg font-medium">
+          {t("game_preferences_step.favorite_systems_title")}
+        </h3>
         <GameTagInput
           tags={favorites}
           onAddTag={handleAddFavorite}
           onRemoveTag={handleRemoveFavorite}
-          placeholder="Search and add favorite game systems..."
+          placeholder={t("game_preferences_step.favorite_systems_placeholder")}
         />
       </div>
 
       <div>
-        <h3 className="mb-2 text-lg font-medium">Game Systems to Avoid</h3>
+        <h3 className="mb-2 text-lg font-medium">
+          {t("game_preferences_step.avoid_systems_title")}
+        </h3>
         <GameTagInput
           tags={toAvoid}
           onAddTag={handleAddToAvoid}
           onRemoveTag={handleRemoveFromToAvoid}
-          placeholder="Search and add game systems to avoid..."
+          placeholder={t("game_preferences_step.avoid_systems_placeholder")}
           isDestructive={true}
         />
       </div>

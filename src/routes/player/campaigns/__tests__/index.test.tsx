@@ -18,6 +18,9 @@ vi.mock("~/features/campaigns/campaigns.queries", () => ({
   listCampaignsWithCount: vi.fn(),
 }));
 
+// The i18n mock is already set up in src/tests/mocks/i18n.ts
+// This will load the actual locale data from the JSON files
+
 describe("CampaignsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -74,7 +77,7 @@ describe("CampaignsPage", () => {
     // so names can appear multiple times. Assert at least once.
     expect(screen.getAllByText(MOCK_CAMPAIGN.name).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Another Campaign").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/View Campaign/i)).toHaveLength(2);
+    expect(screen.getAllByText(/View Campaign/i)).toHaveLength(4);
 
     // When campaigns are present, only the header link should exist
     const createLinks = screen.getAllByRole("link", { name: /Create New Campaign/i });

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
@@ -12,58 +13,23 @@ const cardSurfaceClass =
 const mutedCardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/60";
 
-const clinicModules = [
-  {
-    title: "Setting the table",
-    duration: "28 minutes",
-    focus:
-      "Hospitality rituals, onboarding scripts, and accessibility walkthroughs that calm first-session nerves.",
-    resources: [
-      "Facilitator opening script",
-      "Room layout checklist",
-      "Sensory considerations worksheet",
-    ],
-  },
-  {
-    title: "Safety tools in motion",
-    duration: "34 minutes",
-    focus:
-      "Demonstrations of consent-based safety tools with live debrief and coaching tips for tricky moments.",
-    resources: [
-      "X-card and Open Door playset",
-      "Lines & Veils sample prompts",
-      "Escalation decision tree",
-    ],
-  },
-  {
-    title: "Pacing & spotlight management",
-    duration: "31 minutes",
-    focus:
-      "Balancing action and reflection, supporting quieter players, and reading the table's energy in real time.",
-    resources: [
-      "Beat structure worksheet",
-      "Audience engagement tracker",
-      "Post-session reflection form",
-    ],
-  },
-];
-
 export const Route = createFileRoute("/resources/facilitation-clinics")({
   component: FacilitationClinicsPage,
 });
 
 function FacilitationClinicsPage() {
+  const { t } = useResourcesTranslation();
   return (
     <PublicLayout>
       <HeroSection
-        eyebrow="Facilitation clinics"
-        title="On-demand coaching for storytellers and hosts"
-        subtitle="Watch master facilitators lead live sessions, then apply the same techniques at your tables with guided practice materials."
+        eyebrow={t("facilitation_clinics.hero.eyebrow")}
+        title={t("facilitation_clinics.hero.title")}
+        subtitle={t("facilitation_clinics.hero.subtitle")}
         backgroundImageSet={RESOURCES_HERO_IMAGE}
-        ctaText="Stream the clinics"
+        ctaText={t("facilitation_clinics.hero.cta_text")}
         ctaLink="#clinic-library"
         secondaryCta={{
-          text: "Book live coaching",
+          text: t("facilitation_clinics.hero.secondary_cta"),
           link: "mailto:training@roundup.games?subject=Facilitation%20coaching",
         }}
       />
@@ -72,42 +38,52 @@ function FacilitationClinicsPage() {
         <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-10">
           <div className="max-w-3xl space-y-3">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Clinic format
+              {t("facilitation_clinics.format.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Learn by watching real tables in action
+              {t("facilitation_clinics.format.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Each clinic pairs a live-recorded session with commentary from Roundup Games
-              facilitators. Pause at reflection markers to practice with your own staff,
-              or use the included discussion prompts to turn the video into a team
-              workshop.
+              {t("facilitation_clinics.format.description")}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {clinicModules.map((module) => (
-              <Card key={module.title} className={cardSurfaceClass}>
-                <CardHeader className="space-y-3">
-                  <div className="bg-brand-red/10 text-brand-red dark:bg-brand-red/20 flex size-12 items-center justify-center rounded-full">
-                    <CalendarIcon className="size-6" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                    {module.title}
-                  </CardTitle>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Runtime: {module.duration}
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  <p>{module.focus}</p>
-                  <ul className="space-y-2">
-                    {module.resources.map((resource) => (
-                      <li key={resource}>• {resource}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+            {Array.isArray(t("facilitation_clinics.modules")) ? (
+              (
+                t("facilitation_clinics.modules") as unknown as Array<{
+                  title: string;
+                  duration: string;
+                  focus: string;
+                  resources: string[];
+                }>
+              ).map((module) => (
+                <Card key={module.title} className={cardSurfaceClass}>
+                  <CardHeader className="space-y-3">
+                    <div className="bg-brand-red/10 text-brand-red dark:bg-brand-red/20 flex size-12 items-center justify-center rounded-full">
+                      <CalendarIcon className="size-6" />
+                    </div>
+                    <CardTitle className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
+                      {module.title}
+                    </CardTitle>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t("facilitation_clinics.runtime_label")} {module.duration}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
+                    <p>{module.focus}</p>
+                    <ul className="space-y-2">
+                      {module.resources.map((resource) => (
+                        <li key={resource}>• {resource}</li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-3 text-center text-gray-500">
+                {t("facilitation_clinics.loading_clinics")}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -119,29 +95,24 @@ function FacilitationClinicsPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Streaming access
+              {t("facilitation_clinics.streaming_access.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Watch clinics anytime, anywhere
+              {t("facilitation_clinics.streaming_access.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Videos are hosted on our private learning portal. Request an access code and
-              you’ll receive streaming links, slide decks, and note-taking packets for
-              each clinic. Chapters are timestamped so you can jump straight to the
-              moments you want to review.
+              {t("facilitation_clinics.streaming_access.description")}
             </p>
             <div className={mutedCardSurfaceClass + " space-y-3"}>
               <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                Request access
+                {t("facilitation_clinics.streaming_access.request_access.title")}
               </h3>
               <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                Email training@roundup.games with your organization name, preferred
-                clinic, and facilitator roster. We approve requests within two business
-                days.
+                {t("facilitation_clinics.streaming_access.request_access.description")}
               </p>
               <Button asChild className="sm:w-fit">
                 <a href="mailto:training@roundup.games?subject=Facilitation%20clinic%20access">
-                  Email the training team
+                  {t("facilitation_clinics.streaming_access.request_access.button")}
                 </a>
               </Button>
             </div>
@@ -150,21 +121,18 @@ function FacilitationClinicsPage() {
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Discussion guide
+                  {t("facilitation_clinics.discussion_guide.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Turn the clinics into a team learning session with reflection prompts
-                  and skill drills for new and experienced facilitators alike.
-                </p>
+                <p>{t("facilitation_clinics.discussion_guide.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/facilitation-clinic-discussion-guide.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download PDF guide
+                    {t("facilitation_clinics.discussion_guide.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -172,20 +140,25 @@ function FacilitationClinicsPage() {
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Certification credits
+                  {t("facilitation_clinics.certification_credits.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Complete all three clinics and submit reflection assignments to earn
-                  continuing education hours recognized by Roundup Games and partner
-                  leagues.
-                </p>
+                <p>{t("facilitation_clinics.certification_credits.description")}</p>
                 <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900/60">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
-                    • 2 CE hours per clinic
-                    <br />• Digital badge issued within 7 days
-                    <br />• Counts toward Game Master and Host pathway renewals
+                    •{" "}
+                    {t(
+                      "facilitation_clinics.certification_credits.credits.hours_per_clinic",
+                    )}
+                    <br />•{" "}
+                    {t(
+                      "facilitation_clinics.certification_credits.credits.digital_badge",
+                    )}
+                    <br />•{" "}
+                    {t(
+                      "facilitation_clinics.certification_credits.credits.counts_toward",
+                    )}
                   </p>
                 </div>
               </CardContent>
@@ -197,24 +170,24 @@ function FacilitationClinicsPage() {
       <section className="bg-secondary py-12 sm:py-16 lg:py-20 dark:bg-gray-950">
         <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-10">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Download clinic resources
+            {t("facilitation_clinics.downloads.title")}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card className={cardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Opening rituals packet
+                  {t("facilitation_clinics.downloads.opening_rituals.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>Scripts, table signs, and welcome cards featured in the clinics.</p>
+                <p>{t("facilitation_clinics.downloads.opening_rituals.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/facilitation-opening-rituals.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download ZIP
+                    {t("facilitation_clinics.downloads.opening_rituals.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -222,20 +195,18 @@ function FacilitationClinicsPage() {
             <Card className={cardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Safety tool kit
+                  {t("facilitation_clinics.downloads.safety_tools.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Printable cards, facilitator cheat sheets, and incident log templates.
-                </p>
+                <p>{t("facilitation_clinics.downloads.safety_tools.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/facilitation-safety-tools.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download ZIP
+                    {t("facilitation_clinics.downloads.safety_tools.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -243,18 +214,20 @@ function FacilitationClinicsPage() {
             <Card className={cardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Spotlight scheduler
+                  {t("facilitation_clinics.downloads.spotlight_scheduler.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>Editable pacing tracker compatible with Google Sheets and Excel.</p>
+                <p>
+                  {t("facilitation_clinics.downloads.spotlight_scheduler.description")}
+                </p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/facilitation-spotlight-scheduler.xlsx"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download XLSX
+                    {t("facilitation_clinics.downloads.spotlight_scheduler.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -264,16 +237,15 @@ function FacilitationClinicsPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                  Need interpretation services?
+                  {t("facilitation_clinics.accessibility.title")}
                 </h3>
                 <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  We can arrange live captioning, ASL interpretation, or translation for
-                  your team training. Let us know at least two weeks ahead of time.
+                  {t("facilitation_clinics.accessibility.description")}
                 </p>
               </div>
               <Button asChild className="sm:w-auto">
                 <a href="mailto:accessibility@roundup.games?subject=Clinic%20accessibility">
-                  Coordinate accessibility support
+                  {t("facilitation_clinics.accessibility.button")}
                 </a>
               </Button>
             </div>

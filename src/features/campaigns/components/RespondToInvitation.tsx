@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/card";
 import { respondToCampaignInvitation } from "~/features/campaigns/campaigns.mutations";
 import type { CampaignParticipant } from "~/features/campaigns/campaigns.types";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { OperationResult } from "~/shared/types/common";
 
 interface RespondToInvitationProps {
@@ -17,6 +18,7 @@ interface RespondToInvitationProps {
 }
 
 export function RespondToInvitation({ participant }: RespondToInvitationProps) {
+  const { t } = useCampaignsTranslation();
   const queryClient = useQueryClient();
 
   const respondMutation = useMutation<
@@ -27,7 +29,7 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
     mutationFn: respondToCampaignInvitation,
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("Invitation response recorded.");
+        toast.success(t("messages.invitation_response_recorded"));
         await queryClient.invalidateQueries({
           queryKey: ["campaign", participant.campaignId],
         });
@@ -36,11 +38,13 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
         });
         await queryClient.invalidateQueries({ queryKey: ["currentUser"] }); // Invalidate currentUser query
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to respond to invitation.");
+        toast.error(
+          data.errors?.[0]?.message || t("errors.failed_to_respond_invitation"),
+        );
       }
     },
     onError: (error) => {
-      toast.error(error.message || "An unexpected error occurred.");
+      toast.error(error.message || t("errors.unexpected_error"));
     },
   });
 
@@ -55,10 +59,8 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Campaign Invitation</CardTitle>
-        <CardDescription>
-          You have been invited to this campaign. Please accept or reject the invitation.
-        </CardDescription>
+        <CardTitle>{t("titles.campaign_invitation")}</CardTitle>
+        <CardDescription>{t("descriptions.campaign_invitation")}</CardDescription>
       </CardHeader>
       <CardContent className="flex gap-4">
         <Button
@@ -68,8 +70,8 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
         >
           {respondMutation.isPending &&
           respondMutation.variables?.data.action === "accept"
-            ? "Accepting..."
-            : "Accept"}
+            ? t("buttons.accepting")
+            : t("buttons.accept")}
         </Button>
         <Button
           onClick={handleReject}
@@ -79,8 +81,8 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
         >
           {respondMutation.isPending &&
           respondMutation.variables?.data.action === "reject"
-            ? "Rejecting..."
-            : "Reject"}
+            ? t("buttons.rejecting")
+            : t("buttons.reject")}
         </Button>
       </CardContent>
     </Card>

@@ -6,6 +6,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import type { AvailabilityData, DayAvailability } from "~/db/schema/auth.schema";
+import { useProfileTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 import { AVAILABILITY_CONFIG } from "~/shared/types/common";
 import {
@@ -183,6 +184,7 @@ function AvailabilityEditorGrid({
   dayLabelFormatter = defaultDayLabelFormatter,
   testId = "availability-editor",
 }: AvailabilityEditorGridProps) {
+  const { t } = useProfileTranslation();
   const [dragState, setDragState] = useState<DragState>({ ...DEFAULT_DRAG_STATE });
 
   const handlePointerUp = useCallback(() => {
@@ -294,7 +296,9 @@ function AvailabilityEditorGrid({
         style={{ minWidth: `${editorMinWidthRem.toFixed(2)}rem` }}
       >
         <div className={cn("grid items-end", labelColumnClassName)}>
-          <div className="text-muted-foreground text-xs font-medium sm:text-sm">Time</div>
+          <div className="text-muted-foreground text-xs font-medium sm:text-sm">
+            {t("labels.time")}
+          </div>
           <div
             className="grid gap-1"
             style={{

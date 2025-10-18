@@ -9,23 +9,29 @@ import {
 } from "~/features/events/events.mutations";
 import type { EventRegistrationListItem } from "~/features/events/events.queries";
 import { getEvent, listEventRegistrations } from "~/features/events/events.queries";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 
 export const Route = createFileRoute("/player/events/$eventId")({
   component: DashboardEventDetailPage,
 });
 
-const STATUS_ACTIONS = [
-  { label: "Publish", status: "published" },
-  { label: "Open Registration", status: "registration_open" },
-  { label: "Close Registration", status: "registration_closed" },
-  { label: "Start", status: "in_progress" },
-  { label: "Complete", status: "completed" },
-  { label: "Cancel", status: "canceled", variant: "destructive" as const },
-] as const;
-
 function DashboardEventDetailPage() {
+  const { t } = useEventsTranslation();
   const { eventId } = Route.useParams();
   const qc = useQueryClient();
+
+  const statusActions = [
+    { label: t("detail.actions.publish"), status: "published" },
+    { label: t("detail.actions.open_registration"), status: "registration_open" },
+    { label: t("detail.actions.close_registration"), status: "registration_closed" },
+    { label: t("detail.actions.start"), status: "in_progress" },
+    { label: t("detail.actions.complete"), status: "completed" },
+    {
+      label: t("detail.actions.cancel"),
+      status: "canceled",
+      variant: "destructive" as const,
+    },
+  ] as const;
 
   const { data } = useSuspenseQuery({
     queryKey: ["event", eventId, "dashboard"],
@@ -38,13 +44,13 @@ function DashboardEventDetailPage() {
     mutationFn: updateEvent,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success("Event updated");
+        toast.success(t("detail.success.event_updated"));
       } else {
-        toast.error(res.errors?.[0]?.message || "Failed to update event");
+        toast.error(res.errors?.[0]?.message || t("detail.errors.update_failed"));
       }
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to update event");
+      toast.error(err instanceof Error ? err.message : t("detail.errors.update_failed"));
     },
   });
 
@@ -63,19 +69,25 @@ function DashboardEventDetailPage() {
     mutationFn: updateEventRegistrationStatus,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success("Registration updated");
+        toast.success(t("detail.success.registration_updated"));
         qc.invalidateQueries({ queryKey: ["event", eventId, "registrations"] });
       } else {
-        toast.error(res.errors?.[0]?.message || "Failed to update registration");
+        toast.error(
+          res.errors?.[0]?.message || t("detail.errors.registration_update_failed"),
+        );
       }
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to update registration");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : t("detail.errors.registration_update_failed"),
+      );
     },
   });
 
   if (!event) {
-    return <div className="p-6">Event not found</div>;
+    return <div className="p-6">{t("detail.event_not_found")}</div>;
   }
 
   return (
@@ -87,21 +99,26 @@ function DashboardEventDetailPage() {
         <CardContent className="space-y-4">
           <div className="text-muted-foreground text-sm">
             <p>
-              Dates: {new Date(event.startDate).toLocaleDateString()} —{" "}
+              {t("detail.dates")}: {new Date(event.startDate).toLocaleDateString()} —{" "}
               {new Date(event.endDate).toLocaleDateString()}
             </p>
-            <p className="capitalize">Type: {event.type}</p>
-            <p className="capitalize">Status: {event.status}</p>
+            <p className="capitalize">
+              {t("detail.type")}: {event.type}
+            </p>
+            <p className="capitalize">
+              {t("detail.status")}: {event.status}
+            </p>
             <p>
-              Registration: {event.isRegistrationOpen ? "Open" : "Closed"}
+              {t("detail.registration")}:{" "}
+              {event.isRegistrationOpen ? t("detail.open") : t("detail.closed")}
               {typeof event.availableSpots === "number"
-                ? ` • ${event.availableSpots} spots left`
+                ? ` • ${t("detail.spots_left", { count: event.availableSpots })}`
                 : ""}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {STATUS_ACTIONS.map((a) => {
+            {statusActions.map((a) => {
               const variant =
                 a.status === "canceled" ? ("destructive" as const) : ("outline" as const);
               return (
@@ -124,11 +141,13 @@ function DashboardEventDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-foreground">Registrations</CardTitle>
+          <CardTitle className="text-foreground">{t("detail.registrations")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {registrations.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No registrations yet.</p>
+            <p className="text-muted-foreground text-sm">
+              {t("detail.no_registrations")}
+            </p>
           ) : (
             <div className="divide-y rounded-md border">
               {registrations.map((r) => (
@@ -159,7 +178,7 @@ function DashboardEventDetailPage() {
                       }
                       disabled={regMutation.isPending}
                     >
-                      Confirm
+                      {t("detail.confirm")}
                     </Button>
                     <Button
                       size="sm"
@@ -171,7 +190,7 @@ function DashboardEventDetailPage() {
                       }
                       disabled={regMutation.isPending}
                     >
-                      Waitlist
+                      {t("detail.waitlist")}
                     </Button>
                     <Button
                       size="sm"
@@ -183,7 +202,7 @@ function DashboardEventDetailPage() {
                       }
                       disabled={regMutation.isPending}
                     >
-                      Cancel
+                      {t("detail.cancel")}
                     </Button>
                   </div>
                 </div>

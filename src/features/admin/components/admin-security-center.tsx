@@ -37,6 +37,7 @@ import {
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Textarea } from "~/components/ui/textarea";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 import {
@@ -144,6 +145,7 @@ function formatTimestamp(value: Date) {
 }
 
 export function AdminSecurityCenter() {
+  const { t } = useAdminTranslation();
   const [pendingControl, setPendingControl] = useState<PendingControl | null>(null);
   const [reason, setReason] = useState("");
   const windowDays = 30;
@@ -160,10 +162,13 @@ export function AdminSecurityCenter() {
     return (
       <Alert variant="destructive" role="alert">
         <AlertCircleIcon aria-hidden className="size-5" />
-        <AlertTitle>Unable to load security posture</AlertTitle>
+        <AlertTitle>
+          {t("security_center.hardcoded_strings.unable_to_load_security_posture")}
+        </AlertTitle>
         <AlertDescription>
-          We could not retrieve governance safeguards. Refresh the page or contact the
-          platform engineering team.
+          {t(
+            "security_center.hardcoded_strings.could_not_retrieve_governance_safeguards",
+          )}
         </AlertDescription>
       </Alert>
     );
@@ -193,20 +198,23 @@ export function AdminSecurityCenter() {
         reason: reason.trim(),
       });
       toast.success(
-        `${pendingControl.nextEnabled ? "Enabled" : "Disabled"} ${pendingControl.control.label}`,
+        `${pendingControl.nextEnabled ? t("security_center.hardcoded_strings.enabled") : t("security_center.hardcoded_strings.disabled")} ${pendingControl.control.label}`,
       );
       setPendingControl(null);
       setReason("");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to update control";
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("security_center.messages.unable_to_update_control");
       toast.error(message);
     }
   }
 
   const isReasonValid = reason.trim().length >= 12;
   const dialogLabel = pendingControl?.nextEnabled
-    ? "Enable safeguard"
-    : "Disable safeguard";
+    ? t("security_center.actions.enable_safeguard")
+    : t("security_center.actions.disable_safeguard");
   const ControlIcon = summary.status === "stable" ? ShieldCheckIcon : ShieldAlertIcon;
 
   return (
@@ -214,14 +222,13 @@ export function AdminSecurityCenter() {
       <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="token-stack-xs">
           <p className="text-body-xs text-muted-foreground tracking-wide uppercase">
-            Security posture
+            {t("security_center.title")}
           </p>
           <h1 className="text-heading-sm text-foreground font-semibold">
-            Steward safeguards for the governance console
+            {t("security_center.subtitle")}
           </h1>
           <p className="text-body-sm text-muted-strong max-w-2xl">
-            Track platform defenses, guide incident review, and confirm that privileged
-            controls respect admins' need for auditable guardrails.
+            {t("security_center.description")}
           </p>
         </div>
         <Button
@@ -235,7 +242,7 @@ export function AdminSecurityCenter() {
           ) : (
             <RefreshCwIcon className="mr-2 size-4" />
           )}
-          Refresh snapshot
+          {t("security_center.actions.refresh_snapshot")}
         </Button>
       </header>
 
@@ -244,8 +251,8 @@ export function AdminSecurityCenter() {
           <CardTitle className="text-heading-xs flex items-center gap-2">
             <ControlIcon aria-hidden className="size-5" />
             {summary.status === "stable"
-              ? "Stable governance posture"
-              : "Heightened monitoring"}
+              ? t("security_center.status.stable_governance_posture")
+              : t("security_center.status.heightened_monitoring")}
           </CardTitle>
           <CardDescription className="text-body-sm text-muted-strong">
             {summary.narrative}
@@ -263,10 +270,10 @@ export function AdminSecurityCenter() {
               <ArrowRightIcon aria-hidden className="text-muted-foreground size-4" />
               <span>
                 {summary.direction === "up"
-                  ? "Improving"
+                  ? t("security_center.status.improving")
                   : summary.direction === "down"
-                    ? "Declining"
-                    : "Flat"}{" "}
+                    ? t("security_center.status.declining")
+                    : t("security_center.status.flat")}{" "}
                 by <strong>{summary.change.toFixed(1)}%</strong> over the last{" "}
                 {data.windowDays} days
               </span>
@@ -281,10 +288,11 @@ export function AdminSecurityCenter() {
 
       <Card className="bg-surface-elevated border-subtle">
         <CardHeader className="token-stack-sm">
-          <CardTitle className="text-heading-xs">Critical safeguards</CardTitle>
+          <CardTitle className="text-heading-xs">
+            {t("security_center.sections.critical_safeguards.title")}
+          </CardTitle>
           <CardDescription className="text-body-sm text-muted-strong">
-            Confirm platform-wide controls before enabling or disabling access for
-            privileged personas.
+            {t("security_center.sections.critical_safeguards.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="token-stack-md">
@@ -332,7 +340,9 @@ export function AdminSecurityCenter() {
                             : "bg-destructive/10 text-destructive",
                         )}
                       >
-                        {isEnabled ? "Enforced" : "Disabled"}
+                        {isEnabled
+                          ? t("security_center.status.enforced")
+                          : t("security_center.status.disabled")}
                       </Badge>
                     </div>
                     <Button
@@ -345,7 +355,9 @@ export function AdminSecurityCenter() {
                       onClick={() => openConfirmation(control, !isEnabled)}
                     >
                       <ActionIcon aria-hidden className="size-4" />
-                      {isEnabled ? "Disable control" : "Enable control"}
+                      {isEnabled
+                        ? t("security_center.controls.disable_control")
+                        : t("security_center.controls.enable_control")}
                     </Button>
                   </div>
                 </div>
@@ -359,21 +371,22 @@ export function AdminSecurityCenter() {
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-sm">
             <CardTitle className="text-heading-xs flex items-center gap-2">
-              <SirenIcon aria-hidden className="text-destructive size-5" /> Active
-              incidents
+              <SirenIcon aria-hidden className="text-destructive size-5" />{" "}
+              {t("security_center.sections.active_incidents.title")}
             </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Prioritize mitigations that shield visitor, player, and operations trust
-              while admins monitor the console.
+              {t("security_center.sections.active_incidents.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">
             {activeIncidents.length === 0 ? (
               <Alert className="border-emerald-500/40 bg-emerald-500/10">
                 <CheckCircle2Icon aria-hidden className="size-5 text-emerald-600" />
-                <AlertTitle>All clear</AlertTitle>
+                <AlertTitle>
+                  {t("security_center.status_indicators.all_clear")}
+                </AlertTitle>
                 <AlertDescription>
-                  No unresolved incidents require attention right now.
+                  {t("security_center.status_indicators.no_unresolved_incidents")}
                 </AlertDescription>
               </Alert>
             ) : (
@@ -408,10 +421,10 @@ export function AdminSecurityCenter() {
                         )}
                       >
                         {incident.status === "investigating"
-                          ? "Investigating"
+                          ? t("security_center.status_indicators.investigating")
                           : incident.status === "mitigated"
-                            ? "Mitigated"
-                            : "Resolved"}
+                            ? t("security_center.status_indicators.mitigated")
+                            : t("security_center.status_indicators.resolved")}
                       </span>
                     </div>
                     <p className="text-body-sm text-muted-strong mt-2">
@@ -434,11 +447,11 @@ export function AdminSecurityCenter() {
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-sm">
             <CardTitle className="text-heading-xs flex items-center gap-2">
-              <ClipboardListIcon aria-hidden className="size-5" /> Compliance checklist
+              <ClipboardListIcon aria-hidden className="size-5" />{" "}
+              {t("security_center.sections.compliance_checklist.title")}
             </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Sequence the next best actions so audits stay fast and defensible for
-              admins.
+              {t("security_center.sections.compliance_checklist.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">
@@ -464,8 +477,15 @@ export function AdminSecurityCenter() {
                   </Badge>
                 </div>
                 <div className="text-body-xs text-muted-foreground mt-3 flex flex-wrap items-center gap-3">
-                  <span>Effort: {recommendation.effort}</span>
-                  <span>Persona impact: {recommendation.personaImpact}</span>
+                  <span>
+                    {t("security_center.labels.effort", {
+                      effort: recommendation.effort,
+                    })}
+                  </span>
+                  <span>
+                    {t("security_center.labels.persona_impact")}:{" "}
+                    {recommendation.personaImpact}
+                  </span>
                 </div>
               </div>
             ))}
@@ -476,10 +496,11 @@ export function AdminSecurityCenter() {
       <Card className="bg-surface-elevated border-subtle">
         <CardHeader className="token-stack-sm">
           <CardTitle className="text-heading-xs flex items-center gap-2">
-            <ShieldAlertIcon aria-hidden className="size-5" /> Privileged action log
+            <ShieldAlertIcon aria-hidden className="size-5" />{" "}
+            {t("security_center.sections.privileged_action_log.title")}
           </CardTitle>
           <CardDescription className="text-body-sm text-muted-strong">
-            Review the latest manual and automated changes to confirm audit readiness.
+            {t("security_center.sections.privileged_action_log.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="token-stack-sm">
@@ -491,7 +512,7 @@ export function AdminSecurityCenter() {
                   className="text-muted-foreground mx-auto mb-2 size-6"
                 />
                 <p className="text-body-sm text-muted-foreground">
-                  No recent privileged changes have been recorded in this window.
+                  {t("security_center.messages.no_recent_privileged_changes")}
                 </p>
               </div>
             ) : (
@@ -518,7 +539,9 @@ export function AdminSecurityCenter() {
                     </p>
                   </div>
                   <div className="token-stack-xs items-end">
-                    <span className="text-body-xs text-muted-foreground">Actor</span>
+                    <span className="text-body-xs text-muted-foreground">
+                      {t("security_center.labels.actor")}
+                    </span>
                     <span className="text-body-sm font-semibold">{event.actor}</span>
                     <span
                       className={cn(
@@ -526,7 +549,8 @@ export function AdminSecurityCenter() {
                         riskTone[event.riskLevel],
                       )}
                     >
-                      {event.riskLevel.toUpperCase()} RISK
+                      {event.riskLevel.toUpperCase()}{" "}
+                      {t("security_center.labels.risk_level")}
                     </span>
                   </div>
                 </div>
@@ -545,30 +569,30 @@ export function AdminSecurityCenter() {
             <AlertDialogTitle>{dialogLabel}</AlertDialogTitle>
             <AlertDialogDescription>
               {pendingControl?.nextEnabled
-                ? "Confirm the safeguard is ready before enabling it for all privileged personas."
-                : "Disabling this control removes real-time guardrails. Capture justification for the audit trail."}
+                ? t("security_center.dialog.confirm_enable_safeguard")
+                : t("security_center.dialog.confirm_disable_control")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="token-stack-sm">
             <p className="text-body-sm text-muted-strong">
-              Provide context for the audit log so we can trace stewardship decisions.
+              {t("security_center.dialog.provide_context")}
             </p>
             <Textarea
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               minLength={12}
               rows={4}
-              placeholder="Document why this change is necessary, the expected impact, and mitigation steps."
+              placeholder={t("security_center.dialog.document_why_change_necessary")}
             />
             {!isReasonValid ? (
               <p className="text-body-xs text-destructive">
-                Please include at least 12 characters so the rationale is audit-ready.
+                {t("security_center.dialog.validation.min_12_characters")}
               </p>
             ) : null}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setPendingControl(null)}>
-              Cancel
+              {t("security_center.actions.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={!isReasonValid || updateControl.isPending}
@@ -579,7 +603,7 @@ export function AdminSecurityCenter() {
               ) : (
                 <ShieldAlertIcon aria-hidden className="mr-2 size-4" />
               )}
-              Confirm
+              {t("security_center.actions.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

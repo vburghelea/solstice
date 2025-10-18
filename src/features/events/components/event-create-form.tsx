@@ -1,6 +1,6 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -23,30 +23,47 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
+import type { AuthUser } from "~/lib/auth/types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { createEvent, uploadEventImage } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
 
-const EVENT_TYPE_OPTIONS = [
-  { value: "tournament", label: "Tournament" },
-  { value: "league", label: "League" },
-  { value: "camp", label: "Training Camp" },
-  { value: "clinic", label: "Skills Clinic" },
-  { value: "social", label: "Social Event" },
-  { value: "other", label: "Other" },
-];
+// Let the form schema infer the type
+type EventFormData = Record<string, unknown>; // We'll let Zod handle validation
 
-const EVENT_STATUS_OPTIONS = [
-  { value: "draft", label: "Draft (Not visible)" },
-  { value: "published", label: "Published (Visible)" },
-  { value: "registration_open", label: "Registration Open" },
-];
+function getEventTypeOptions(
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  return [
+    { value: "tournament", label: t("types.tournament") },
+    { value: "league", label: t("types.league") },
+    { value: "camp", label: t("types.camp") },
+    { value: "clinic", label: t("types.clinic") },
+    { value: "social", label: t("types.social") },
+    { value: "other", label: t("types.other") },
+  ];
+}
 
-const REGISTRATION_TYPE_OPTIONS = [
-  { value: "team", label: "Team" },
-  { value: "individual", label: "Individual" },
-  { value: "both", label: "Team & Individual" },
-];
+function getEventStatusOptions(
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  return [
+    { value: "draft", label: t("status.draft") },
+    { value: "published", label: t("status.published") },
+    { value: "registration_open", label: t("status.registration_open") },
+  ];
+}
+
+function getRegistrationTypeOptions(
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  return [
+    { value: "team", label: t("registration_types.team") },
+    { value: "individual", label: t("registration_types.individual") },
+    { value: "both", label: t("registration_types.both") },
+  ];
+}
 
 function Separator() {
   return <div className="border-t" />;
@@ -68,92 +85,14 @@ function getNextDayString(dateString: string) {
   return date.toISOString().split("T")[0];
 }
 
-const eventFormSchema = z
-  .object({
-    name: z.string().min(1, "Event name is required").max(255),
-    slug: z
-      .string()
-      .min(1, "URL slug is required")
-      .max(255)
-      .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
-    description: z.string().optional(),
-    shortDescription: z
-      .string()
-      .max(500, "Short description must be under 500 characters")
-      .optional(),
-    type: z.enum(["tournament", "league", "camp", "clinic", "social", "other"]),
-    status: z.enum(["draft", "published", "registration_open"]),
-    logoUrl: z.string().url().optional().or(z.literal("")),
-    bannerUrl: z.string().url().optional().or(z.literal("")),
-    venueName: z.string().max(255).optional(),
-    venueAddress: z.string().optional(),
-    city: z.string().max(100).optional(),
-    country: z.string().max(50).optional(),
-    postalCode: z.string().max(10).optional(),
-    locationNotes: z.string().optional(),
-    startDate: z.string().min(1, "Start date is required"),
-    endDate: z.string().min(1, "End date is required"),
-    registrationOpensAt: z.string().optional(),
-    registrationClosesAt: z.string().optional(),
-    registrationType: z.enum(["team", "individual", "both"]),
-    maxTeams: z.number().min(1).optional(),
-    maxParticipants: z.number().min(1).optional(),
-    minPlayersPerTeam: z.number().min(1).default(7),
-    maxPlayersPerTeam: z.number().min(1).default(21),
-    teamRegistrationFee: z.number().min(0).default(0),
-    individualRegistrationFee: z.number().min(0).default(0),
-    earlyBirdDiscount: z.number().min(0).max(100).default(0),
-    earlyBirdDeadline: z.string().optional(),
-    contactEmail: z.string().email().optional(),
-    contactPhone: z.string().optional(),
-    websiteUrl: z.string().url().optional().or(z.literal("")),
-    isPublic: z.boolean().default(true),
-    isFeatured: z.boolean().default(false),
-    allowWaitlist: z.boolean().default(false),
-    requireMembership: z.boolean().default(false),
-    allowEtransfer: z.boolean().default(false),
-    etransferRecipient: z
-      .string()
-      .email("Enter a valid e-transfer email")
-      .optional()
-      .or(z.literal("")),
-    etransferInstructions: z.string().max(2000).optional(),
-  })
-  .superRefine((values, ctx) => {
-    if (values.allowEtransfer) {
-      const recipient = values.etransferRecipient?.trim() ?? "";
-      if (!recipient) {
-        ctx.addIssue({
-          path: ["etransferRecipient"],
-          code: z.ZodIssueCode.custom,
-          message: "E-transfer recipient email is required when e-transfer is enabled",
-        });
-      }
-    }
+interface EventCreateFormProps {
+  user: AuthUser;
+}
 
-    if (values.earlyBirdDiscount > 0 && !values.earlyBirdDeadline) {
-      ctx.addIssue({
-        path: ["earlyBirdDeadline"],
-        code: z.ZodIssueCode.custom,
-        message: "Early bird deadline is required when a discount is provided",
-      });
-    }
-
-    if (values.earlyBirdDiscount === 0 && values.earlyBirdDeadline) {
-      ctx.addIssue({
-        path: ["earlyBirdDiscount"],
-        code: z.ZodIssueCode.custom,
-        message: "Set a discount percentage or remove the deadline",
-      });
-    }
-  });
-
-type EventFormData = z.infer<typeof eventFormSchema>;
-
-export function EventCreateForm() {
+export function EventCreateForm({ user }: EventCreateFormProps) {
   const navigate = useNavigate();
-  const { user } = useRouteContext({ from: "/player/events/create" });
   const isAdminUser = useMemo(() => isAdminClient(user), [user]);
+  const { t } = useEventsTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const slugManuallyEditedRef = useRef(false);
   const defaultStartDate = useMemo(() => getDateInputString(7), []);
@@ -162,13 +101,101 @@ export function EventCreateForm() {
     [defaultStartDate],
   );
 
-  const defaultValues: EventFormData = {
+  const eventFormSchema = useMemo(
+    () =>
+      z
+        .object({
+          name: z.string().min(1, t("validation.name_required")).max(255),
+          slug: z
+            .string()
+            .min(1, t("validation.slug_required"))
+            .max(255)
+            .regex(/^[a-z0-9-]+$/, t("validation.slug_format")),
+          description: z.string().optional(),
+          shortDescription: z
+            .string()
+            .max(500, t("validation.short_description_max"))
+            .optional(),
+          type: z.enum(["tournament", "league", "camp", "clinic", "social", "other"]),
+          status: z.enum(["draft", "published", "registration_open"]),
+          logoUrl: z.string().url().optional().or(z.literal("")),
+          bannerUrl: z.string().url().optional().or(z.literal("")),
+          venueName: z.string().max(255).optional(),
+          venueAddress: z.string().optional(),
+          city: z.string().max(100).optional(),
+          country: z.string().max(50).optional(),
+          postalCode: z.string().max(10).optional(),
+          locationNotes: z.string().optional(),
+          startDate: z.string().min(1, t("validation.start_date_required")),
+          endDate: z.string().min(1, t("validation.end_date_required")),
+          registrationOpensAt: z.string().optional(),
+          registrationClosesAt: z.string().optional(),
+          registrationType: z.enum(["team", "individual", "both"]),
+          maxTeams: z.number().min(1).optional(),
+          maxParticipants: z.number().min(1).optional(),
+          minPlayersPerTeam: z.number().min(1).default(7),
+          maxPlayersPerTeam: z.number().min(1).default(21),
+          teamRegistrationFee: z.number().min(0).default(0),
+          individualRegistrationFee: z.number().min(0).default(0),
+          earlyBirdDiscount: z.number().min(0).max(100).default(0),
+          earlyBirdDeadline: z.string().optional(),
+          contactEmail: z.string().email().optional(),
+          contactPhone: z.string().optional(),
+          websiteUrl: z.string().url().optional().or(z.literal("")),
+          isPublic: z.boolean().default(true),
+          isFeatured: z.boolean().default(false),
+          allowWaitlist: z.boolean().default(false),
+          requireMembership: z.boolean().default(false),
+          allowEtransfer: z.boolean().default(false),
+          etransferRecipient: z
+            .string()
+            .email(t("validation.valid_etransfer_email"))
+            .optional()
+            .or(z.literal("")),
+          etransferInstructions: z.string().max(2000).optional(),
+        })
+        .superRefine((values, ctx) => {
+          if (values.allowEtransfer) {
+            const recipient = values.etransferRecipient?.trim() ?? "";
+            if (!recipient) {
+              ctx.addIssue({
+                path: ["etransferRecipient"],
+                code: z.ZodIssueCode.custom,
+                message: t("validation.etransfer_recipient_required"),
+              });
+            }
+          }
+
+          if (values.earlyBirdDiscount > 0 && !values.earlyBirdDeadline) {
+            ctx.addIssue({
+              path: ["earlyBirdDeadline"],
+              code: z.ZodIssueCode.custom,
+              message: t("validation.early_bird_deadline_required"),
+            });
+          }
+
+          if (values.earlyBirdDiscount === 0 && values.earlyBirdDeadline) {
+            ctx.addIssue({
+              path: ["earlyBirdDiscount"],
+              code: z.ZodIssueCode.custom,
+              message: t("validation.early_bird_discount_required"),
+            });
+          }
+        }),
+    [t],
+  );
+
+  const EVENT_TYPE_OPTIONS = useMemo(() => getEventTypeOptions(t), [t]);
+  const EVENT_STATUS_OPTIONS = useMemo(() => getEventStatusOptions(t), [t]);
+  const REGISTRATION_TYPE_OPTIONS = useMemo(() => getRegistrationTypeOptions(t), [t]);
+
+  const defaultValues = {
     name: "",
     slug: "",
     description: "",
     shortDescription: "",
-    type: "tournament",
-    status: "draft",
+    type: "tournament" as const,
+    status: "draft" as const,
     venueName: "",
     venueAddress: "",
     city: "Berlin",
@@ -179,9 +206,9 @@ export function EventCreateForm() {
     endDate: defaultEndDate,
     registrationOpensAt: "",
     registrationClosesAt: "",
-    registrationType: "team",
-    maxTeams: undefined,
-    maxParticipants: undefined,
+    registrationType: "team" as const,
+    maxTeams: undefined as number | undefined,
+    maxParticipants: undefined as number | undefined,
     minPlayersPerTeam: 7,
     maxPlayersPerTeam: 21,
     teamRegistrationFee: 0,
@@ -206,7 +233,7 @@ export function EventCreateForm() {
     defaultValues,
     onSubmit: async ({ value }) => {
       if (isLogoUploading || isBannerUploading) {
-        toast.info("Please wait for image uploads to complete before submitting.");
+        toast.info(t("upload.wait_for_upload"));
         return;
       }
 
@@ -214,7 +241,7 @@ export function EventCreateForm() {
 
       if (!validationResult.success) {
         const firstIssue = validationResult.error.issues[0];
-        toast.error(firstIssue?.message ?? "Please fix the highlighted fields.");
+        toast.error(firstIssue?.message ?? t("errors.validation_error"));
         return;
       }
 
@@ -229,7 +256,7 @@ export function EventCreateForm() {
           ? parsed.bannerUrl.trim()
           : undefined;
 
-      const formData: EventFormData = {
+      const formData = {
         ...parsed,
         teamRegistrationFee: Math.round((parsed.teamRegistrationFee || 0) * 100),
         individualRegistrationFee: Math.round(
@@ -279,7 +306,7 @@ export function EventCreateForm() {
     })) as EventOperationResult<{ url: string; publicId: string }>;
 
     if (!result.success) {
-      throw new Error(result.errors[0]?.message ?? "Failed to upload image");
+      throw new Error(result.errors[0]?.message ?? t("errors.upload_failed"));
     }
 
     return result.data.url;
@@ -294,10 +321,10 @@ export function EventCreateForm() {
     mutationFn: (file) => uploadEventAsset(file, "logo"),
     onSuccess: (url) => {
       form.setFieldValue("logoUrl", url);
-      toast.success("Logo uploaded successfully");
+      toast.success(t("upload.logo_success"));
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to upload logo");
+      toast.error(error.message || t("upload.logo_failed"));
       form.setFieldValue("logoUrl", logoPreviousUrlRef.current ?? "");
     },
   });
@@ -306,10 +333,10 @@ export function EventCreateForm() {
     mutationFn: (file) => uploadEventAsset(file, "banner"),
     onSuccess: (url) => {
       form.setFieldValue("bannerUrl", url);
-      toast.success("Banner uploaded successfully");
+      toast.success(t("upload.banner_success"));
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to upload banner");
+      toast.error(error.message || t("upload.banner_failed"));
       form.setFieldValue("bannerUrl", bannerPreviousUrlRef.current ?? "");
     },
   });
@@ -380,23 +407,21 @@ export function EventCreateForm() {
       createEvent({ data }) as Promise<EventOperationResult<EventWithDetails>>,
     onSuccess: (result) => {
       if (!result.success) {
-        const errorMessage = result.errors[0]?.message ?? "Failed to create event";
+        const errorMessage = result.errors[0]?.message ?? t("errors.create_failed");
         toast.error(errorMessage);
         return;
       }
 
       if (!isAdminUser && formState.values.isPublic) {
-        toast.success(
-          "Event created! It will be reviewed by an admin before becoming public.",
-        );
+        toast.success(t("success.created_pending_approval"));
       } else {
-        toast.success("Event created successfully!");
+        toast.success(t("success.created"));
       }
 
       navigate({ to: "/events/$slug", params: { slug: result.data.slug } });
     },
     onError: (error) => {
-      toast.error("An error occurred while creating the event");
+      toast.error(t("errors.creation_error"));
       console.error(error);
     },
   });
@@ -404,10 +429,22 @@ export function EventCreateForm() {
   const isUploadingAssets = isLogoUploading || isBannerUploading;
 
   const steps = [
-    { title: "Basic Info", description: "Event name and description" },
-    { title: "Location & Dates", description: "Where and when" },
-    { title: "Registration", description: "Registration settings and pricing" },
-    { title: "Additional Details", description: "Contact info and settings" },
+    {
+      title: t("create.steps.basic_info.title"),
+      description: t("create.steps.basic_info.description"),
+    },
+    {
+      title: t("create.steps.location_dates.title"),
+      description: t("create.steps.location_dates.description"),
+    },
+    {
+      title: t("create.steps.registration.title"),
+      description: t("create.steps.registration.description"),
+    },
+    {
+      title: t("create.steps.details.title"),
+      description: t("create.steps.details.description"),
+    },
   ];
 
   const canProceedToNext = () => {
@@ -424,11 +461,8 @@ export function EventCreateForm() {
   return (
     <Card className="mx-auto max-w-4xl">
       <CardHeader>
-        <CardTitle>Create New Event</CardTitle>
-        <CardDescription>
-          Fill in the details to create a new Roundup Games event. You can save as draft
-          and publish later.
-        </CardDescription>
+        <CardTitle>{t("create.title")}</CardTitle>
+        <CardDescription>{t("create.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-8">
@@ -486,8 +520,8 @@ export function EventCreateForm() {
                 {(field) => (
                   <ValidatedInput
                     field={field}
-                    label="Event Name"
-                    placeholder="2024 Summer Championship"
+                    label={t("form.fields.name")}
+                    placeholder={t("form.placeholders.name")}
                     required
                     onValueChange={(value) => {
                       field.handleChange(value);
@@ -503,9 +537,9 @@ export function EventCreateForm() {
                 {(field) => (
                   <ValidatedInput
                     field={field}
-                    label="URL Slug"
-                    placeholder="2024-summer-championship"
-                    description="This will be used in the event URL"
+                    label={t("form.fields.slug")}
+                    placeholder={t("form.placeholders.slug")}
+                    description={t("form.descriptions.slug")}
                     required
                     onValueChange={(value) => {
                       field.handleChange(value);
@@ -521,9 +555,9 @@ export function EventCreateForm() {
                 {(field) => (
                   <ValidatedInput
                     field={field}
-                    label="Short Description"
-                    placeholder="Brief description for event cards and previews"
-                    description="Max 500 characters"
+                    label={t("form.fields.short_description")}
+                    placeholder={t("form.placeholders.short_description")}
+                    description={t("form.descriptions.short_description")}
                     maxLength={500}
                   />
                 )}
@@ -532,13 +566,13 @@ export function EventCreateForm() {
               <form.Field name="description">
                 {(field) => (
                   <div className="space-y-2">
-                    <Label htmlFor={field.name}>Full Description</Label>
+                    <Label htmlFor={field.name}>{t("form.fields.description")}</Label>
                     <Textarea
                       id={field.name}
                       value={field.state.value ?? ""}
                       onChange={(event) => field.handleChange(event.target.value)}
                       onBlur={field.handleBlur}
-                      placeholder="Detailed event description..."
+                      placeholder={t("form.placeholders.description")}
                       rows={6}
                       className="resize-none"
                     />
@@ -554,10 +588,11 @@ export function EventCreateForm() {
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Branding</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("form.sections.branding.title")}
+                </h3>
                 <p className="text-muted-foreground text-sm">
-                  Add visuals to personalize your event. Upload images or paste URLs for
-                  assets you already host.
+                  {t("form.sections.branding.description")}
                 </p>
 
                 <form.Field name="logoUrl">
@@ -565,22 +600,22 @@ export function EventCreateForm() {
                     <div className="space-y-3">
                       <ValidatedFileUpload
                         field={field}
-                        label="Event Logo"
+                        label={t("form.fields.logo")}
                         accept="image/*"
                         maxSizeMb={5}
                         helperText={
                           isLogoUploading
-                            ? "Uploading logo..."
-                            : "Ideal size is a square PNG or JPG up to 5MB."
+                            ? t("upload.logo_uploading")
+                            : t("form.descriptions.logo_helper")
                         }
-                        description="Displayed on compact cards and featured sections."
+                        description={t("form.descriptions.logo")}
                       />
                       <ValidatedInput
                         field={field}
                         type="url"
-                        label="Logo URL (optional)"
-                        placeholder="https://cdn.example.com/event-logo.png"
-                        description="Paste a hosted logo URL if you already have one."
+                        label={t("form.fields.logo_url")}
+                        placeholder={t("form.placeholders.logo_url")}
+                        description={t("form.descriptions.logo")}
                       />
                     </div>
                   )}
@@ -591,22 +626,22 @@ export function EventCreateForm() {
                     <div className="space-y-3">
                       <ValidatedFileUpload
                         field={field}
-                        label="Hero Banner"
+                        label={t("form.fields.banner")}
                         accept="image/*"
                         maxSizeMb={8}
                         helperText={
                           isBannerUploading
-                            ? "Uploading banner..."
-                            : "Use a wide image (16:9) up to 8MB for the event hero."
+                            ? t("upload.banner_uploading")
+                            : t("form.descriptions.banner_helper")
                         }
-                        description="Shown on the public event page and featured listings."
+                        description={t("form.descriptions.banner")}
                       />
                       <ValidatedInput
                         field={field}
                         type="url"
-                        label="Banner URL (optional)"
-                        placeholder="https://cdn.example.com/event-banner.jpg"
-                        description="Paste a hosted banner URL if you've already uploaded one."
+                        label={t("form.fields.banner_url")}
+                        placeholder={t("form.placeholders.banner_url")}
+                        description={t("form.descriptions.banner")}
                       />
                     </div>
                   )}
@@ -618,7 +653,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedSelect
                       field={field}
-                      label="Event Type"
+                      label={t("form.fields.type")}
                       options={EVENT_TYPE_OPTIONS}
                       required
                     />
@@ -629,7 +664,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedSelect
                       field={field}
-                      label="Initial Status"
+                      label={t("form.fields.status")}
                       options={EVENT_STATUS_OPTIONS}
                       required
                     />
@@ -646,8 +681,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Venue Name"
-                      placeholder="Community Sports Complex"
+                      label={t("form.fields.venue_name")}
+                      placeholder={t("form.placeholders.venue_name")}
                     />
                   )}
                 </form.Field>
@@ -656,8 +691,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Venue Address"
-                      placeholder="Karl-Marx-Straße 1"
+                      label={t("form.fields.venue_address")}
+                      placeholder={t("form.placeholders.venue_address")}
                     />
                   )}
                 </form.Field>
@@ -666,7 +701,11 @@ export function EventCreateForm() {
               <div className="grid gap-4 md:grid-cols-3">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Berlin" />
+                    <ValidatedInput
+                      field={field}
+                      label={t("form.fields.city")}
+                      placeholder={t("form.placeholders.city")}
+                    />
                   )}
                 </form.Field>
 
@@ -674,8 +713,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedCountryCombobox
                       field={field}
-                      label="Country"
-                      placeholder="Search for a country"
+                      label={t("form.fields.country")}
+                      placeholder={t("form.placeholders.country")}
                       valueFormat="label"
                     />
                   )}
@@ -685,8 +724,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Postal Code"
-                      placeholder="10115"
+                      label={t("form.fields.postal_code")}
+                      placeholder={t("form.placeholders.postal_code")}
                     />
                   )}
                 </form.Field>
@@ -695,13 +734,13 @@ export function EventCreateForm() {
               <form.Field name="locationNotes">
                 {(field) => (
                   <div className="space-y-2">
-                    <Label htmlFor={field.name}>Location Notes</Label>
+                    <Label htmlFor={field.name}>{t("form.fields.location_notes")}</Label>
                     <Textarea
                       id={field.name}
                       value={field.state.value ?? ""}
                       onChange={(event) => field.handleChange(event.target.value)}
                       onBlur={field.handleBlur}
-                      placeholder="Parking information, directions, accessibility notes..."
+                      placeholder={t("form.placeholders.location_notes")}
                       rows={3}
                       className="resize-none"
                     />
@@ -721,7 +760,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Start Date"
+                      label={t("form.fields.start_date")}
                       type="date"
                       required
                       onValueChange={(value) => {
@@ -743,7 +782,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="End Date"
+                      label={t("form.fields.end_date")}
                       type="date"
                       required
                       {...(formState.values.startDate
@@ -759,7 +798,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Registration Opens"
+                      label={t("form.fields.registration_opens")}
                       type="date"
                     />
                   )}
@@ -769,7 +808,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Registration Closes"
+                      label={t("form.fields.registration_closes")}
                       type="date"
                     />
                   )}
@@ -784,7 +823,7 @@ export function EventCreateForm() {
                 {(field) => (
                   <ValidatedSelect
                     field={field}
-                    label="Registration Type"
+                    label={t("form.fields.registration_type")}
                     options={REGISTRATION_TYPE_OPTIONS}
                     required
                   />
@@ -796,7 +835,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Maximum Teams"
+                      label={t("form.fields.max_teams")}
                       type="number"
                       min={1}
                       onValueChange={(value) => {
@@ -812,7 +851,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Maximum Participants"
+                      label={t("form.fields.max_participants")}
                       type="number"
                       min={1}
                       onValueChange={(value) => {
@@ -830,7 +869,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Minimum Players per Team"
+                      label={t("form.fields.min_players_per_team")}
                       type="number"
                       min={1}
                       onValueChange={(value) => {
@@ -846,7 +885,7 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Maximum Players per Team"
+                      label={t("form.fields.max_players_per_team")}
                       type="number"
                       min={1}
                       onValueChange={(value) => {
@@ -862,13 +901,15 @@ export function EventCreateForm() {
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Pricing</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("form.sections.pricing.title")}
+                </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <form.Field name="teamRegistrationFee">
                     {(field) => (
                       <ValidatedInput
                         field={field}
-                        label="Team Registration Fee ($)"
+                        label={t("form.fields.team_fee")}
                         type="number"
                         min={0}
                         step="0.01"
@@ -885,7 +926,7 @@ export function EventCreateForm() {
                     {(field) => (
                       <ValidatedInput
                         field={field}
-                        label="Individual Registration Fee ($)"
+                        label={t("form.fields.individual_fee")}
                         type="number"
                         min={0}
                         step="0.01"
@@ -901,13 +942,15 @@ export function EventCreateForm() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Early Bird Discount</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("form.sections.early_bird.title")}
+                </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <form.Field name="earlyBirdDiscount">
                     {(field) => (
                       <ValidatedInput
                         field={field}
-                        label="Discount Percentage"
+                        label={t("form.fields.early_bird_discount")}
                         type="number"
                         min={0}
                         max={100}
@@ -916,7 +959,7 @@ export function EventCreateForm() {
                             value === "" ? undefined : Number.parseInt(value, 10);
                           field.handleChange(nextValue as unknown as number);
                         }}
-                        description="Percentage discount for early registration"
+                        description={t("form.descriptions.early_bird_discount")}
                       />
                     )}
                   </form.Field>
@@ -925,7 +968,7 @@ export function EventCreateForm() {
                     {(field) => (
                       <ValidatedInput
                         field={field}
-                        label="Early Bird Deadline"
+                        label={t("form.fields.early_bird_deadline")}
                         type="date"
                         disabled={!formState.values.earlyBirdDiscount}
                       />
@@ -937,13 +980,15 @@ export function EventCreateForm() {
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Alternate Payment Options</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("form.sections.alternate_payment.title")}
+                </h3>
                 <form.Field name="allowEtransfer">
                   {(field) => (
                     <ValidatedCheckbox
                       field={field}
-                      label="Allow Interac e-Transfer"
-                      description="Let registrants choose e-transfer instead of Square checkout"
+                      label={t("form.fields.allow_etransfer")}
+                      description={t("form.descriptions.etransfer_recipient")}
                     />
                   )}
                 </form.Field>
@@ -953,11 +998,11 @@ export function EventCreateForm() {
                     {(field) => (
                       <ValidatedInput
                         field={field}
-                        label="E-transfer Recipient Email"
+                        label={t("form.fields.etransfer_recipient")}
                         type="email"
                         disabled={!formState.values.allowEtransfer}
                         onValueChange={(value) => field.handleChange(value ?? "")}
-                        description="Where e-transfer payments should be sent"
+                        description={t("form.descriptions.etransfer_recipient")}
                       />
                     )}
                   </form.Field>
@@ -967,11 +1012,11 @@ export function EventCreateForm() {
                   {(field) => (
                     <div className="space-y-2">
                       <Label htmlFor="etransferInstructions">
-                        E-transfer Instructions
+                        {t("form.fields.etransfer_instructions")}
                       </Label>
                       <Textarea
                         id="etransferInstructions"
-                        placeholder="Include the security question, expected password, or any other notes for e-transfer payments."
+                        placeholder={t("form.placeholders.etransfer_instructions")}
                         value={field.state.value ?? ""}
                         onChange={(event) => field.handleChange(event.target.value)}
                         onBlur={field.handleBlur}
@@ -993,8 +1038,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedCheckbox
                       field={field}
-                      label="Allow Waitlist"
-                      description="Allow registrations to join a waitlist when the event is full"
+                      label={t("form.fields.allow_waitlist")}
+                      description={t("form.descriptions.allow_waitlist")}
                     />
                   )}
                 </form.Field>
@@ -1003,8 +1048,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedCheckbox
                       field={field}
-                      label="Require Active Membership"
-                      description="Only allow users with active Roundup Games memberships to register"
+                      label={t("form.fields.require_membership")}
+                      description={t("form.descriptions.require_membership")}
                     />
                   )}
                 </form.Field>
@@ -1015,15 +1060,17 @@ export function EventCreateForm() {
           {currentStep === 3 && (
             <div className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Contact Information</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("form.sections.contact_info.title")}
+                </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <form.Field name="contactEmail">
                     {(field) => (
                       <ValidatedInput
                         field={field}
-                        label="Contact Email"
+                        label={t("form.fields.contact_email")}
                         type="email"
-                        placeholder="event@beispiel.de"
+                        placeholder={t("form.placeholders.contact_email")}
                       />
                     )}
                   </form.Field>
@@ -1032,8 +1079,8 @@ export function EventCreateForm() {
                     {(field) => (
                       <ValidatedPhoneInput
                         field={field}
-                        label="Contact Phone"
-                        placeholder="+49 1512 3456789"
+                        label={t("form.fields.contact_phone")}
+                        placeholder={t("form.placeholders.contact_phone")}
                       />
                     )}
                   </form.Field>
@@ -1043,9 +1090,9 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Event Website"
+                      label={t("form.fields.website")}
                       type="url"
-                      placeholder="https://beispiel.de/event"
+                      placeholder={t("form.placeholders.website")}
                     />
                   )}
                 </form.Field>
@@ -1054,16 +1101,16 @@ export function EventCreateForm() {
               <Separator />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Visibility Settings</h3>
+                <h3 className="text-lg font-semibold">
+                  {t("form.sections.visibility.title")}
+                </h3>
 
                 {!isAdminUser && (
                   <Alert>
                     <InfoIcon className="h-4 w-4" />
-                    <AlertTitle>Admin Approval Required</AlertTitle>
+                    <AlertTitle>{t("alerts.admin_approval.title")}</AlertTitle>
                     <AlertDescription>
-                      Your event will be created as a draft and will require admin
-                      approval before it becomes publicly visible. You can still manage
-                      and edit your event while it's pending approval.
+                      {t("alerts.admin_approval.description")}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -1072,11 +1119,11 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedCheckbox
                       field={field}
-                      label="Public Event"
+                      label={t("form.fields.public_event")}
                       description={
                         isAdminUser
-                          ? "Make this event visible to everyone"
-                          : "Request public visibility (requires admin approval)"
+                          ? t("form.descriptions.public_event_admin")
+                          : t("form.descriptions.public_event_user")
                       }
                       disabled={!isAdminUser}
                     />
@@ -1087,8 +1134,8 @@ export function EventCreateForm() {
                   {(field) => (
                     <ValidatedCheckbox
                       field={field}
-                      label="Featured Event"
-                      description="Highlight this event on the homepage and in search results"
+                      label={t("form.fields.featured_event")}
+                      description={t("form.descriptions.featured_event")}
                       disabled={!isAdminUser}
                     />
                   )}
@@ -1099,9 +1146,7 @@ export function EventCreateForm() {
                 <Alert className="border-amber-200 bg-amber-50 text-amber-900">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <AlertDescription>
-                    After creating your event, an administrator will review it and approve
-                    it for public visibility. You'll be notified once your event is
-                    approved.
+                    {t("alerts.approval_process.description")}
                   </AlertDescription>
                 </Alert>
               )}
@@ -1116,7 +1161,7 @@ export function EventCreateForm() {
               disabled={currentStep === 0}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Previous
+              {t("buttons.previous")}
             </Button>
 
             {currentStep < steps.length - 1 ? (
@@ -1127,16 +1172,16 @@ export function EventCreateForm() {
                 }
                 disabled={!canProceedToNext() || isUploadingAssets}
               >
-                Next
+                {t("buttons.next")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
               <FormSubmitButton
                 isSubmitting={createMutation.isPending}
-                loadingText="Creating..."
+                loadingText={t("buttons.creating")}
                 disabled={!formState.canSubmit || isUploadingAssets}
               >
-                Create Event
+                {t("buttons.create")}
               </FormSubmitButton>
             )}
           </div>

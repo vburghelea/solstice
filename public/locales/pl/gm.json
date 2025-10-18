@@ -1,0 +1,315 @@
+{
+  "dashboard": {
+    "title": "TODO: Translate \"dashboard.title\"",
+    "subtitle": "TODO: Translate \"dashboard.subtitle\"",
+    "loading_error": {
+      "title": "TODO: Translate \"dashboard.loading_error.title\"",
+      "description": "TODO: Translate \"dashboard.loading_error.description\""
+    },
+    "feedback_queue_title": "TODO: Translate \"dashboard.feedback_queue_title\"",
+    "feedback_queue_description": "TODO: Translate \"dashboard.feedback_queue_description\""
+  },
+  "stats": {
+    "upcoming_sessions": "TODO: Translate \"stats.upcoming_sessions\"",
+    "upcoming_sessions_assistive": "TODO: Translate \"stats.upcoming_sessions_assistive\"",
+    "active_campaigns": "TODO: Translate \"stats.active_campaigns\"",
+    "active_campaigns_assistive": "TODO: Translate \"stats.active_campaigns_assistive\"",
+    "players_engaged": "TODO: Translate \"stats.players_engaged\"",
+    "players_engaged_assistive": "TODO: Translate \"stats.players_engaged_assistive\"",
+    "campaign_linked_sessions": "TODO: Translate \"stats.campaign_linked_sessions\"",
+    "campaign_linked_sessions_assistive": "TODO: Translate \"stats.campaign_linked_sessions_assistive\""
+  },
+  "empty_states": {
+    "no_sessions": {
+      "title": "TODO: Translate \"empty_states.no_sessions.title\"",
+      "description": "TODO: Translate \"empty_states.no_sessions.description\"",
+      "action_label": "TODO: Translate \"empty_states.no_sessions.action_label\""
+    },
+    "no_campaigns": {
+      "title": "TODO: Translate \"empty_states.no_campaigns.title\"",
+      "description": "TODO: Translate \"empty_states.no_campaigns.description\"",
+      "action_label": "TODO: Translate \"empty_states.no_campaigns.action_label\""
+    },
+    "no_followups": {
+      "title": "TODO: Translate \"empty_states.no_followups.title\"",
+      "description": "TODO: Translate \"empty_states.no_followups.description\"",
+      "action_label": "TODO: Translate \"empty_states.no_followups.action_label\""
+    }
+  },
+  "actions": {
+    "open_studio": "TODO: Translate \"actions.open_studio\"",
+    "open_triage_board": "TODO: Translate \"actions.open_triage_board\"",
+    "schedule_session": "TODO: Translate \"actions.schedule_session\"",
+    "start_campaign": "TODO: Translate \"actions.start_campaign\"",
+    "browse_archive": "TODO: Translate \"actions.browse_archive\"",
+    "session_notes": "TODO: Translate \"actions.session_notes\"",
+    "open_session_manager": "TODO: Translate \"actions.open_session_manager\"",
+    "open_legacy_view": "TODO: Translate \"actions.open_legacy_view\"",
+    "edit_details": "TODO: Translate \"actions.edit_details\""
+  },
+  "sections": {
+    "session_runway": {
+      "title": "TODO: Translate \"sections.session_runway.title\"",
+      "description": "TODO: Translate \"sections.session_runway.description\""
+    },
+    "campaign_pulse": {
+      "title": "TODO: Translate \"sections.campaign_pulse.title\"",
+      "description": "TODO: Translate \"sections.campaign_pulse.description\""
+    }
+  },
+  "session_types": {
+    "standalone": "TODO: Translate \"session_types.standalone\""
+  },
+  "badges": {
+    "upcoming_touchpoints": "TODO: Translate \"badges.upcoming_touchpoints\""
+  },
+  "labels": {
+    "participants": "TODO: Translate \"labels.participants\"",
+    "updated": "TODO: Translate \"labels.updated\"",
+    "session": "TODO: Translate \"labels.session\"",
+    "debrief": "TODO: Translate \"labels.debrief\"",
+    "recap": "TODO: Translate \"labels.recap\"",
+    "collect_safety": "TODO: Translate \"labels.collect_safety\"",
+    "capture_highlights": "TODO: Translate \"labels.capture_highlights\""
+  },
+  "feedback_triage": {
+    "title": "TODO: Translate \"feedback_triage.title\"",
+    "subtitle": "TODO: Translate \"feedback_triage.subtitle\"",
+    "badge": "TODO: Translate \"feedback_triage.badge\"",
+    "back_to_studio": "TODO: Translate \"feedback_triage.back_to_studio\"",
+    "stats": {
+      "debriefs_queued": "TODO: Translate \"feedback_triage.stats.debriefs_queued\"",
+      "safety_checkpoints": "TODO: Translate \"feedback_triage.stats.safety_checkpoints\"",
+      "upcoming_nudges": "TODO: Translate \"feedback_triage.stats.upcoming_nudges\""
+    },
+    "actions": {
+      "create_feedback_task": "TODO: Translate \"feedback_triage.actions.create_feedback_task\"",
+      "open_recap": "TODO: Translate \"feedback_triage.actions.open_recap\"",
+      "open_campaign": "TODO: Translate \"feedback_triage.actions.open_campaign\"",
+      "session_details": "TODO: Translate \"feedback_triage.actions.session_details\""
+    },
+    "columns": {
+      "debriefs": {
+        "title": "TODO: Translate \"feedback_triage.columns.debriefs.title\"",
+        "description": "TODO: Translate \"feedback_triage.columns.debriefs.description\"",
+        "empty": {
+          "title": "TODO: Translate \"feedback_triage.columns.debriefs.empty.title\"",
+          "description": "TODO: Translate \"feedback_triage.columns.debriefs.empty.description\""
+        }
+      },
+      "safety_checkin": {
+        "title": "TODO: Translate \"feedback_triage.columns.safety_checkin.title\"",
+        "description": "TODO: Translate \"feedback_triage.columns.safety_checkin.description\"",
+        "empty": {
+          "title": "TODO: Translate \"feedback_triage.columns.safety_checkin.empty.title\"",
+          "description": "TODO: Translate \"feedback_triage.columns.safety_checkin.empty.description\""
+        }
+      },
+      "upcoming_nudges": {
+        "title": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.title\"",
+        "description": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.description\"",
+        "empty": {
+          "title": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.empty.title\"",
+          "description": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.empty.description\""
+        }
+      }
+    },
+    "severity": {
+      "overdue": "TODO: Translate \"feedback_triage.severity.overdue\"",
+      "attention": "TODO: Translate \"feedback_triage.severity.attention\"",
+      "on_track": "TODO: Translate \"feedback_triage.severity.on_track\""
+    },
+    "tasks": {
+      "collect_surveys": "TODO: Translate \"feedback_triage.tasks.collect_surveys\"",
+      "completed_prefix": "TODO: Translate \"feedback_triage.tasks.completed_prefix\"",
+      "starts_prefix": "TODO: Translate \"feedback_triage.tasks.starts_prefix\"",
+      "started_prefix": "TODO: Translate \"feedback_triage.tasks.started_prefix\"",
+      "capture_boundaries": "TODO: Translate \"feedback_triage.tasks.capture_boundaries\"",
+      "boundaries_documented": "TODO: Translate \"feedback_triage.tasks.boundaries_documented\"",
+      "confirm_safety_tool": "TODO: Translate \"feedback_triage.tasks.confirm_safety_tool\"",
+      "safety_tooling_confirmed": "TODO: Translate \"feedback_triage.tasks.safety_tooling_confirmed\"",
+      "safety_sweep_suffix": "TODO: Translate \"feedback_triage.tasks.safety_sweep_suffix\"",
+      "prep_checklist_suffix": "TODO: Translate \"feedback_triage.tasks.prep_checklist_suffix\"",
+      "prep_checklist_detail": "TODO: Translate \"feedback_triage.tasks.prep_checklist_detail\"",
+      "updated_prefix": "TODO: Translate \"feedback_triage.tasks.updated_prefix\""
+    }
+  },
+  "campaign_workspace": {
+    "badge": {
+      "campaign_studio": "TODO: Translate \"campaign_workspace.badge.campaign_studio\""
+    },
+    "narrative_brief": {
+      "title": "TODO: Translate \"campaign_workspace.narrative_brief.title\"",
+      "campaign_pitch": "TODO: Translate \"campaign_workspace.narrative_brief.campaign_pitch\"",
+      "session_zero_checkpoints": "TODO: Translate \"campaign_workspace.narrative_brief.session_zero_checkpoints\""
+    },
+    "session_pipeline": {
+      "title": "TODO: Translate \"campaign_workspace.session_pipeline.title\"",
+      "upcoming": "TODO: Translate \"campaign_workspace.session_pipeline.upcoming\"",
+      "recent_wraps": "TODO: Translate \"campaign_workspace.session_pipeline.recent_wraps\""
+    },
+    "player_dossiers": {
+      "title": "TODO: Translate \"campaign_workspace.player_dossiers.title\""
+    },
+    "location": {
+      "remote_tbd": "TODO: Translate \"campaign_workspace.location.remote_tbd\""
+    },
+    "recurrence": {
+      "custom_cadence": "TODO: Translate \"campaign_workspace.recurrence.custom_cadence\""
+    },
+    "sessions": {
+      "next_session": "TODO: Translate \"campaign_workspace.sessions.next_session\"",
+      "not_scheduled": "TODO: Translate \"campaign_workspace.sessions.not_scheduled\"",
+      "add_gathering": "TODO: Translate \"campaign_workspace.sessions.add_gathering\"",
+      "last_debrief": "TODO: Translate \"campaign_workspace.sessions.last_debrief\"",
+      "awaiting_first_session": "TODO: Translate \"campaign_workspace.sessions.awaiting_first_session\"",
+      "run_session": "TODO: Translate \"campaign_workspace.sessions.run_session\""
+    },
+    "details": {
+      "active_roster": "TODO: Translate \"campaign_workspace.details.active_roster\"",
+      "system": "TODO: Translate \"campaign_workspace.details.system\"",
+      "custom": "TODO: Translate \"campaign_workspace.details.custom\"",
+      "story_engine_focus": "TODO: Translate \"campaign_workspace.details.story_engine_focus\""
+    },
+    "expectations": {
+      "tone_difficulty": "TODO: Translate \"campaign_workspace.expectations.tone_difficulty\"",
+      "challenge_scope_placeholder": "TODO: Translate \"campaign_workspace.expectations.challenge_scope_placeholder\"",
+      "session_cadence": "TODO: Translate \"campaign_workspace.expectations.session_cadence\"",
+      "arc_length_placeholder": "TODO: Translate \"campaign_workspace.expectations.arc_length_placeholder\"",
+      "character_creation": "TODO: Translate \"campaign_workspace.expectations.character_creation\"",
+      "character_creation_placeholder": "TODO: Translate \"campaign_workspace.expectations.character_creation_placeholder\"",
+      "house_rules": "TODO: Translate \"campaign_workspace.expectations.house_rules\"",
+      "house_rules_placeholder": "TODO: Translate \"campaign_workspace.expectations.house_rules_placeholder\""
+    },
+    "safety": {
+      "player_boundaries_captured": "TODO: Translate \"campaign_workspace.safety.player_boundaries_captured\"",
+      "document_boundaries": "TODO: Translate \"campaign_workspace.safety.document_boundaries\"",
+      "attendance_policy_shared": "TODO: Translate \"campaign_workspace.safety.attendance_policy_shared\"",
+      "clarify_absences": "TODO: Translate \"campaign_workspace.safety.clarify_absences\""
+    },
+    "empty_states": {
+      "no_sessions_scheduled": {
+        "title": "TODO: Translate \"campaign_workspace.empty_states.no_sessions_scheduled.title\"",
+        "description": "TODO: Translate \"campaign_workspace.empty_states.no_sessions_scheduled.description\"",
+        "action_label": "TODO: Translate \"campaign_workspace.empty_states.no_sessions_scheduled.action_label\""
+      },
+      "no_completed_sessions": {
+        "title": "TODO: Translate \"campaign_workspace.empty_states.no_completed_sessions.title\"",
+        "description": "TODO: Translate \"campaign_workspace.empty_states.no_completed_sessions.description\"",
+        "action_label": "TODO: Translate \"campaign_workspace.empty_states.no_completed_sessions.action_label\""
+      }
+    },
+    "participants": {
+      "ready": "TODO: Translate \"campaign_workspace.participants.ready\"",
+      "unnamed_player": "TODO: Translate \"campaign_workspace.participants.unnamed_player\""
+    },
+    "description": "TODO: Translate \"campaign_workspace.description\"",
+    "active_players": "TODO: Translate \"campaign_workspace.active_players\"",
+    "sections": {
+      "narrative_brief": {
+        "subtitle": "TODO: Translate \"campaign_workspace.sections.narrative_brief.subtitle\""
+      },
+      "safety_consent": {
+        "title": "TODO: Translate \"campaign_workspace.sections.safety_consent.title\"",
+        "subtitle": "TODO: Translate \"campaign_workspace.sections.safety_consent.subtitle\""
+      },
+      "session_pipeline": {
+        "subtitle": "TODO: Translate \"campaign_workspace.sections.session_pipeline.subtitle\""
+      },
+      "player_dossiers": {
+        "subtitle": "TODO: Translate \"campaign_workspace.sections.player_dossiers.subtitle\""
+      }
+    },
+    "pending_invites": {
+      "count": "TODO: Translate \"campaign_workspace.pending_invites.count\"",
+      "reminder": "TODO: Translate \"campaign_workspace.pending_invites.reminder\""
+    },
+    "session_card": {
+      "attendees": "TODO: Translate \"campaign_workspace.session_card.attendees\"",
+      "last_updated": "TODO: Translate \"campaign_workspace.session_card.last_updated\"",
+      "review_recap": "TODO: Translate \"campaign_workspace.session_card.review_recap\""
+    }
+  },
+  "b2b_pipeline": {
+    "title": "TODO: Translate \"b2b_pipeline.title\"",
+    "subtitle": "TODO: Translate \"b2b_pipeline.subtitle\"",
+    "active_opportunities": "TODO: Translate \"b2b_pipeline.active_opportunities\"",
+    "focus_cues": {
+      "title": "TODO: Translate \"b2b_pipeline.focus_cues.title\"",
+      "description": "TODO: Translate \"b2b_pipeline.focus_cues.description\""
+    },
+    "focus_summary": {
+      "active_opportunities": "TODO: Translate \"b2b_pipeline.focus_summary.active_opportunities\"",
+      "active_opportunities_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.active_opportunities_assistive\"",
+      "my_focus": "TODO: Translate \"b2b_pipeline.focus_summary.my_focus\"",
+      "my_focus_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.my_focus_assistive\"",
+      "renewals_at_risk": "TODO: Translate \"b2b_pipeline.focus_summary.renewals_at_risk\"",
+      "renewals_at_risk_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.renewals_at_risk_assistive\"",
+      "escalations_live": "TODO: Translate \"b2b_pipeline.focus_summary.escalations_live\"",
+      "escalations_live_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.escalations_live_assistive\"",
+      "follow_ups_due": "TODO: Translate \"b2b_pipeline.focus_summary.follow_ups_due\"",
+      "follow_ups_due_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.follow_ups_due_assistive\""
+    },
+    "empty_state": {
+      "title": "TODO: Translate \"b2b_pipeline.empty_state.title\"",
+      "description": "TODO: Translate \"b2b_pipeline.empty_state.description\"",
+      "action_label": "TODO: Translate \"b2b_pipeline.empty_state.action_label\""
+    },
+    "focus_toggle": {
+      "my_focus_description": "TODO: Translate \"b2b_pipeline.focus_toggle.my_focus_description\"",
+      "entire_pipeline_description": "TODO: Translate \"b2b_pipeline.focus_toggle.entire_pipeline_description\"",
+      "view_label": "TODO: Translate \"b2b_pipeline.focus_toggle.view_label\""
+    },
+    "stage": {
+      "respond_within": "TODO: Translate \"b2b_pipeline.stage.respond_within\"",
+      "exit_criteria_label": "TODO: Translate \"b2b_pipeline.stage.exit_criteria_label\"",
+      "clear_stage": "TODO: Translate \"b2b_pipeline.stage.clear_stage\"",
+      "no_focus_threads": "TODO: Translate \"b2b_pipeline.stage.no_focus_threads\""
+    },
+    "opportunity": {
+      "location_tbd": "TODO: Translate \"b2b_pipeline.opportunity.location_tbd\"",
+      "point_of_contact": "TODO: Translate \"b2b_pipeline.opportunity.point_of_contact\"",
+      "entered_stage_ago": "TODO: Translate \"b2b_pipeline.opportunity.entered_stage_ago\"",
+      "last_touch": "TODO: Translate \"b2b_pipeline.opportunity.last_touch\"",
+      "next_step": "TODO: Translate \"b2b_pipeline.opportunity.next_step\"",
+      "follow_up_due": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_due\"",
+      "follow_up_due_soon": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_due_soon\"",
+      "follow_up_scheduled": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_scheduled\"",
+      "follow_up_status": {
+        "overdue": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_status.overdue\"",
+        "due_soon": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_status.due_soon\"",
+        "scheduled": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_status.scheduled\""
+      },
+      "services_in_scope": "TODO: Translate \"b2b_pipeline.opportunity.services_in_scope\"",
+      "assigned_partners": "TODO: Translate \"b2b_pipeline.opportunity.assigned_partners\"",
+      "escalation_hooks": "TODO: Translate \"b2b_pipeline.opportunity.escalation_hooks\"",
+      "no_escalation_hooks": "TODO: Translate \"b2b_pipeline.opportunity.no_escalation_hooks\"",
+      "studio_note": "TODO: Translate \"b2b_pipeline.opportunity.studio_note\"",
+      "studio_note_placeholder": "TODO: Translate \"b2b_pipeline.opportunity.studio_note_placeholder\"",
+      "linked_to": "TODO: Translate \"b2b_pipeline.opportunity.linked_to\"",
+      "loop_specialists": "TODO: Translate \"b2b_pipeline.opportunity.loop_specialists\""
+    },
+    "assignment_roles": {
+      "story_guide_you": "TODO: Translate \"b2b_pipeline.assignment_roles.story_guide_you\""
+    },
+    "escalation": {
+      "escalate_via": "TODO: Translate \"b2b_pipeline.escalation.escalate_via\"",
+      "resolve_by": "TODO: Translate \"b2b_pipeline.escalation.resolve_by\"",
+      "triggered": "TODO: Translate \"b2b_pipeline.escalation.triggered\"",
+      "monitoring": "TODO: Translate \"b2b_pipeline.escalation.monitoring\""
+    },
+    "note_sync": {
+      "synced": "TODO: Translate \"b2b_pipeline.note_sync.synced\"",
+      "pending_sync": "TODO: Translate \"b2b_pipeline.note_sync.pending_sync\"",
+      "syncing": "TODO: Translate \"b2b_pipeline.note_sync.syncing\"",
+      "offline": "TODO: Translate \"b2b_pipeline.note_sync.offline\"",
+      "ready_to_sync": "TODO: Translate \"b2b_pipeline.note_sync.ready_to_sync\"",
+      "sync_failed": "TODO: Translate \"b2b_pipeline.note_sync.sync_failed\"",
+      "conflict_detected": "TODO: Translate \"b2b_pipeline.note_sync.conflict_detected\"",
+      "last_updated_by": "TODO: Translate \"b2b_pipeline.note_sync.last_updated_by\"",
+      "accept_platform_update": "TODO: Translate \"b2b_pipeline.note_sync.accept_platform_update\"",
+      "overwrite_with_note": "TODO: Translate \"b2b_pipeline.note_sync.overwrite_with_note\"",
+      "retry_sync": "TODO: Translate \"b2b_pipeline.note_sync.retry_sync\""
+    }
+  }
+}

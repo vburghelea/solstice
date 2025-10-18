@@ -49,9 +49,11 @@ import type {
   EventOperationResult,
   EventWithDetails,
 } from "~/features/events/events.types";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export function EventsReviewDashboard() {
+  const { t } = useAdminTranslation();
   const queryClient = useQueryClient();
   const [approvalDialog, setApprovalDialog] = useState<{
     isOpen: boolean;
@@ -118,7 +120,11 @@ export function EventsReviewDashboard() {
       ),
     onSuccess: (result, { approve }) => {
       if (result.success) {
-        toast.success(approve ? "Event approved and made public!" : "Event rejected");
+        toast.success(
+          approve
+            ? t("events_review.buttons.approve") + " and made public!"
+            : t("events_review.buttons.reject"),
+        );
         queryClient.invalidateQueries({ queryKey: ["events"] });
         setApprovalDialog({
           isOpen: false,
@@ -159,22 +165,22 @@ export function EventsReviewDashboard() {
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Event Review</h1>
-          <p className="text-muted-foreground">
-            Review and approve events submitted by members
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("events_review.title")}
+          </h1>
+          <p className="text-muted-foreground">{t("events_review.subtitle")}</p>
         </div>
         <Button asChild variant="outline">
-          <Link to="/player/events">View All Events</Link>
+          <Link to="/player/events">{t("events_review.buttons.view_all_events")}</Link>
         </Button>
       </div>
 
       {pendingList.length === 0 && (
         <Alert>
           <CheckCircleIcon className="h-4 w-4" />
-          <AlertTitle>All caught up!</AlertTitle>
+          <AlertTitle>{t("events_review.alerts.all_caught_up.title")}</AlertTitle>
           <AlertDescription>
-            There are no events pending approval at this time.
+            {t("events_review.alerts.all_caught_up.description")}
           </AlertDescription>
         </Alert>
       )}
@@ -182,36 +188,42 @@ export function EventsReviewDashboard() {
       <Tabs defaultValue="pending">
         <TabsList>
           <TabsTrigger value="pending">
-            Pending Approval
+            {t("events_review.tabs.pending_approval")}
             {pendingList.length > 0 && (
               <Badge variant="destructive" className="ml-2">
                 {pendingList.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="reviewed">Recently Reviewed</TabsTrigger>
+          <TabsTrigger value="reviewed">
+            {t("events_review.tabs.recently_reviewed")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="space-y-4">
           {pendingList.length > 0 ? (
             <Card>
               <CardHeader>
-                <CardTitle>Events Awaiting Approval</CardTitle>
+                <CardTitle>
+                  {t("events_review.sections.awaiting_approval.title")}
+                </CardTitle>
                 <CardDescription>
-                  Review these events and approve them to make them public
+                  {t("events_review.sections.awaiting_approval.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event Name</TableHead>
-                      <TableHead>Organizer</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Location</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>
+                        {t("events_review.tables.headers.event_name")}
+                      </TableHead>
+                      <TableHead>{t("events_review.tables.headers.organizer")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.type")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.date")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.location")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.created")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -232,10 +244,12 @@ export function EventsReviewDashboard() {
                             <UserIcon className="text-muted-foreground h-4 w-4" />
                             <div>
                               <div className="text-sm">
-                                {event.organizer?.name ?? "Unknown"}
+                                {event.organizer?.name ??
+                                  t("events_review.organizer.unknown")}
                               </div>
                               <div className="text-muted-foreground text-xs">
-                                {event.organizer?.email ?? "Not provided"}
+                                {event.organizer?.email ??
+                                  t("events_review.organizer.not_provided")}
                               </div>
                             </div>
                           </div>
@@ -284,7 +298,7 @@ export function EventsReviewDashboard() {
                               }
                             >
                               <CheckCircleIcon className="mr-1 h-4 w-4" />
-                              Approve
+                              {t("events_review.buttons.approve")}
                             </Button>
                             <Button
                               size="sm"
@@ -294,7 +308,7 @@ export function EventsReviewDashboard() {
                               }
                             >
                               <XCircleIcon className="mr-1 h-4 w-4" />
-                              Reject
+                              {t("events_review.buttons.reject")}
                             </Button>
                           </div>
                         </TableCell>
@@ -307,7 +321,9 @@ export function EventsReviewDashboard() {
           ) : (
             <Card className="p-8 text-center">
               <ClockIcon className="text-muted-foreground mx-auto h-12 w-12" />
-              <p className="text-muted-foreground mt-2">No events pending approval</p>
+              <p className="text-muted-foreground mt-2">
+                {t("events_review.empty_states.no_pending_approval")}
+              </p>
             </Card>
           )}
         </TabsContent>
@@ -316,21 +332,27 @@ export function EventsReviewDashboard() {
           {approvedList.length > 0 ? (
             <Card>
               <CardHeader>
-                <CardTitle>Recently Reviewed Events</CardTitle>
+                <CardTitle>
+                  {t("events_review.sections.recently_reviewed.title")}
+                </CardTitle>
                 <CardDescription>
-                  Events that have been recently approved or published
+                  {t("events_review.sections.recently_reviewed.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event Name</TableHead>
-                      <TableHead>Organizer</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Visibility</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>
+                        {t("events_review.tables.headers.event_name")}
+                      </TableHead>
+                      <TableHead>{t("events_review.tables.headers.organizer")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.status")}</TableHead>
+                      <TableHead>{t("events_review.tables.headers.date")}</TableHead>
+                      <TableHead>
+                        {t("events_review.tables.headers.visibility")}
+                      </TableHead>
+                      <TableHead>{t("events_review.tables.headers.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -339,7 +361,8 @@ export function EventsReviewDashboard() {
                         <TableCell className="font-medium">{event.name}</TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            {event.organizer?.name ?? "Unknown"}
+                            {event.organizer?.name ??
+                              t("events_review.organizer.unknown")}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -352,14 +375,16 @@ export function EventsReviewDashboard() {
                         </TableCell>
                         <TableCell>
                           <Badge variant={event.isPublic ? "default" : "secondary"}>
-                            {event.isPublic ? "Public" : "Private"}
+                            {event.isPublic
+                              ? t("events_review.status.public")
+                              : t("events_review.status.private")}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button asChild size="sm" variant="outline">
                               <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                View
+                                {t("events_review.buttons.view")}
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
@@ -367,7 +392,7 @@ export function EventsReviewDashboard() {
                                 to="/ops/events/$eventId/manage"
                                 params={{ eventId: event.id }}
                               >
-                                Manage
+                                {t("events_review.buttons.manage")}
                               </Link>
                             </Button>
                           </div>
@@ -380,7 +405,9 @@ export function EventsReviewDashboard() {
             </Card>
           ) : (
             <Card className="p-8 text-center">
-              <p className="text-muted-foreground">No recently reviewed events</p>
+              <p className="text-muted-foreground">
+                {t("events_review.empty_states.no_recently_reviewed")}
+              </p>
             </Card>
           )}
         </TabsContent>
@@ -394,16 +421,24 @@ export function EventsReviewDashboard() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {approvalDialog.action === "approve" ? "Approve Event" : "Reject Event"}
+              {approvalDialog.action === "approve"
+                ? t("events_review.dialog.approve_title")
+                : t("events_review.dialog.reject_title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {approvalDialog.action === "approve"
-                ? `Are you sure you want to approve "${approvalDialog.eventName}"? This will make the event publicly visible.`
-                : `Are you sure you want to reject "${approvalDialog.eventName}"? The organizer will need to make changes and resubmit.`}
+                ? t("events_review.dialog.approve_description", {
+                    eventName: approvalDialog.eventName,
+                  })
+                : t("events_review.dialog.reject_description", {
+                    eventName: approvalDialog.eventName,
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>
+              {t("events_review.dialog.buttons.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApprovalAction}
               className={
@@ -412,7 +447,9 @@ export function EventsReviewDashboard() {
                   : ""
               }
             >
-              {approvalDialog.action === "approve" ? "Approve" : "Reject"}
+              {approvalDialog.action === "approve"
+                ? t("events_review.buttons.approve")
+                : t("events_review.buttons.reject")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

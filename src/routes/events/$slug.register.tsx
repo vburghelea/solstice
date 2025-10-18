@@ -50,6 +50,7 @@ import type {
 } from "~/features/events/events.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
 import { getUserTeams } from "~/features/teams/teams.queries";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import type { User } from "~/lib/auth/types";
 import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
 
@@ -78,6 +79,7 @@ export const Route = createFileRoute("/events/$slug/register")({
 });
 
 function EventRegistrationPage() {
+  const { t } = useEventsTranslation();
   const { slug } = Route.useParams();
   const { user } = useRouteContext({ from: "/events/$slug/register" });
   const navigate = useNavigate();
@@ -149,31 +151,29 @@ function EventRegistrationPage() {
       unwrapServerFnResult(callServerFn(registerForEvent, payload)),
     onSuccess: (result) => {
       if (!result.success) {
-        toast.error(result.errors?.[0]?.message || "Registration failed");
+        toast.error(result.errors?.[0]?.message || t("registration.registration_failed"));
         return;
       }
 
       const payment = result.data.payment;
 
       if (payment?.method === "square") {
-        toast.success("Redirecting to Square checkout...");
+        toast.success(t("registration.redirecting_to_square"));
         window.location.assign(payment.checkoutUrl);
         return;
       }
 
       if (payment?.method === "etransfer") {
         setConfirmation(payment);
-        toast.success(
-          "Registration submitted! Follow the e-transfer instructions below.",
-        );
+        toast.success(t("registration.registration_submitted"));
         return;
       }
 
-      toast.success("Registration completed!");
+      toast.success(t("registration.registration_completed"));
       navigate({ to: "/player/events" });
     },
     onError: (error) => {
-      toast.error("An error occurred during registration");
+      toast.error(t("registration.error_during_registration"));
       console.error(error);
     },
   });
@@ -231,16 +231,13 @@ function EventRegistrationPage() {
       <PublicLayout>
         <div className="container mx-auto px-4 py-16">
           <Alert variant="destructive">
-            <AlertTitle>Event Not Found</AlertTitle>
-            <AlertDescription>
-              The event you're trying to register for doesn't exist or is not publicly
-              available.
-            </AlertDescription>
+            <AlertTitle>{t("registration.event_not_found")}</AlertTitle>
+            <AlertDescription>{t("registration.event_not_available")}</AlertDescription>
           </Alert>
           <Button asChild className="mt-6">
             <Link to="/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Events
+              {t("registration.back_to_events")}
             </Link>
           </Button>
         </div>
@@ -256,17 +253,17 @@ function EventRegistrationPage() {
 
   const handleSubmit = () => {
     if (confirmation?.method === "etransfer") {
-      toast.info("You've already submitted this registration.");
+      toast.info(t("registration.already_submitted"));
       return;
     }
 
     if (!termsAccepted || !waiverAccepted) {
-      toast.error("Please accept all terms and conditions");
+      toast.error(t("registration.accept_all_terms"));
       return;
     }
 
     if (registrationType === "team" && !selectedTeamId) {
-      toast.error("Please select a team");
+      toast.error(t("registration.select_a_team"));
       return;
     }
 
@@ -299,19 +296,19 @@ function EventRegistrationPage() {
         <div className="container mx-auto px-4 py-16">
           <Alert>
             <CheckCircleIcon className="h-4 w-4" />
-            <AlertTitle>Already Registered</AlertTitle>
+            <AlertTitle>{t("registration.already_registered")}</AlertTitle>
             <AlertDescription>
-              You are already registered for this event.
+              {t("registration.already_registered_description")}
             </AlertDescription>
           </Alert>
           <div className="mt-6 flex gap-2">
             <Button asChild>
               <Link to="/events/$slug" params={{ slug }}>
-                View Event Details
+                {t("registration.view_event_details")}
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/events">Back to Events</Link>
+              <Link to="/events">{t("registration.back_to_events")}</Link>
             </Button>
           </div>
         </div>
@@ -326,7 +323,7 @@ function EventRegistrationPage() {
           <Button asChild variant="ghost" size="sm">
             <Link to="/events/$slug" params={{ slug }}>
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Event Details
+              {t("registration.back_to_event_details")}
             </Link>
           </Button>
         </div>
@@ -335,9 +332,11 @@ function EventRegistrationPage() {
           <div className="space-y-6 lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Register for {event.name}</CardTitle>
+                <CardTitle>
+                  {t("registration.register_for_event", { eventName: event.name })}
+                </CardTitle>
                 <CardDescription>
-                  Complete the form below to register for this event
+                  {t("registration.register_description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -345,7 +344,7 @@ function EventRegistrationPage() {
                   event.registrationType === "team" ||
                   event.registrationType === "both") && (
                   <div className="space-y-3">
-                    <Label>Registration Type</Label>
+                    <Label>{t("registration.registration_type")}</Label>
                     <RadioGroup
                       value={registrationType}
                       onValueChange={(value: string) => {
@@ -364,7 +363,7 @@ function EventRegistrationPage() {
                               htmlFor="individual"
                               className="cursor-pointer font-normal"
                             >
-                              Individual Registration
+                              {t("registration.individual_registration")}
                               <span className="text-muted-foreground ml-2 text-sm">
                                 ${fee.discounted.toFixed(2)}
                                 {fee.hasDiscount && (
@@ -375,7 +374,7 @@ function EventRegistrationPage() {
                               </span>
                             </Label>
                             <p className="text-muted-foreground text-sm">
-                              Register as an individual player
+                              {t("registration.register_as_individual")}
                             </p>
                           </div>
                         </div>
@@ -387,13 +386,13 @@ function EventRegistrationPage() {
                           <RadioGroupItem value="team" id="team" />
                           <div className="grid gap-1.5 leading-none">
                             <Label htmlFor="team" className="cursor-pointer font-normal">
-                              Team Registration
+                              {t("registration.team_registration")}
                               <span className="text-muted-foreground ml-2 text-sm">
                                 ${((event.teamRegistrationFee ?? 0) / 100).toFixed(2)}
                               </span>
                             </Label>
                             <p className="text-muted-foreground text-sm">
-                              Register your entire team
+                              {t("registration.register_entire_team")}
                             </p>
                           </div>
                         </div>
@@ -404,17 +403,21 @@ function EventRegistrationPage() {
 
                 {registrationType === "team" && (
                   <div className="space-y-3">
-                    <Label>Select Team</Label>
+                    <Label>{t("registration.select_team")}</Label>
                     {userTeams && userTeams.length > 0 ? (
                       <Select
                         value={selectedTeamId}
                         onValueChange={(value) => setSelectedTeamId(value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a team" />
+                          <SelectValue
+                            placeholder={t("registration.select_team_placeholder")}
+                          />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Select a team</SelectItem>
+                          <SelectItem value="">
+                            {t("registration.select_team_placeholder")}
+                          </SelectItem>
                           {userTeams.map((entry) => (
                             <SelectItem key={entry.team.id} value={entry.team.id}>
                               {entry.team.name}
@@ -428,9 +431,9 @@ function EventRegistrationPage() {
                     ) : (
                       <Alert>
                         <AlertDescription>
-                          You need to be part of a team to register as a team. {""}
+                          {t("registration.need_team_to_register")} {""}
                           <Link to="/player/teams" className="underline">
-                            Join or create a team
+                            {t("registration.join_create_team")}
                           </Link>
                         </AlertDescription>
                       </Alert>
@@ -442,12 +445,12 @@ function EventRegistrationPage() {
 
                 <div className="space-y-3">
                   <Label htmlFor="additional-info">
-                    Additional Information (optional)
+                    {t("registration.additional_info")}
                   </Label>
                   <Textarea
                     id="additional-info"
                     className="min-h-[100px]"
-                    placeholder="Any dietary restrictions, accessibility needs, or other information..."
+                    placeholder={t("registration.additional_info_placeholder")}
                     value={additionalInfo}
                     onChange={(event) => setAdditionalInfo(event.target.value)}
                   />
@@ -457,7 +460,7 @@ function EventRegistrationPage() {
 
                 {requiresPayment ? (
                   <div className="space-y-3">
-                    <h3 className="font-semibold">Payment Method</h3>
+                    <h3 className="font-semibold">{t("registration.payment_method")}</h3>
                     <RadioGroup
                       value={effectivePaymentMethod}
                       onValueChange={(value: string) => {
@@ -474,13 +477,13 @@ function EventRegistrationPage() {
                             htmlFor="payment-square"
                             className="cursor-pointer font-normal"
                           >
-                            Square Checkout
+                            {t("registration.square_checkout")}
                             <span className="text-muted-foreground ml-2 text-sm">
                               ${fee.discounted.toFixed(2)}
                             </span>
                           </Label>
                           <p className="text-muted-foreground text-sm">
-                            Pay securely online with credit or debit card.
+                            {t("registration.pay_securely_online")}
                           </p>
                         </div>
                       </div>
@@ -493,13 +496,13 @@ function EventRegistrationPage() {
                               htmlFor="payment-etransfer"
                               className="cursor-pointer font-normal"
                             >
-                              Interac e-Transfer
+                              {t("registration.etransfer")}
                               <span className="text-muted-foreground ml-2 text-sm">
                                 ${fee.discounted.toFixed(2)}
                               </span>
                             </Label>
                             <p className="text-muted-foreground text-sm">
-                              Submit now and send payment manually after this form.
+                              {t("registration.submit_send_payment_manually")}
                             </p>
                           </div>
                         </div>
@@ -508,15 +511,16 @@ function EventRegistrationPage() {
 
                     {effectivePaymentMethod === "etransfer" && event.allowEtransfer && (
                       <Alert>
-                        <AlertTitle>E-transfer Instructions</AlertTitle>
+                        <AlertTitle>
+                          {t("registration.etransfer_instructions")}
+                        </AlertTitle>
                         <AlertDescription className="space-y-2">
                           <p>
-                            Send payment to
-                            <span className="font-semibold">
-                              {" "}
-                              {event.etransferRecipient ?? "the designated email"}
-                            </span>
-                            . Include your name and the event in the message.
+                            {t("registration.send_payment_to", {
+                              recipient:
+                                event.etransferRecipient ??
+                                t("registration.see_event_instructions"),
+                            })}
                           </p>
                           {event.etransferInstructions && (
                             <p>{event.etransferInstructions}</p>
@@ -527,10 +531,9 @@ function EventRegistrationPage() {
                   </div>
                 ) : (
                   <Alert>
-                    <AlertTitle>No Payment Required</AlertTitle>
+                    <AlertTitle>{t("registration.no_payment_required")}</AlertTitle>
                     <AlertDescription>
-                      This registration does not require payment. Submit the form to
-                      finish.
+                      {t("registration.no_payment_description")}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -538,7 +541,9 @@ function EventRegistrationPage() {
                 <Separator />
 
                 <div className="space-y-3">
-                  <h3 className="font-semibold">Terms and Conditions</h3>
+                  <h3 className="font-semibold">
+                    {t("registration.terms_and_conditions")}
+                  </h3>
 
                   <div className="flex items-start space-x-2">
                     <Checkbox
@@ -550,10 +555,10 @@ function EventRegistrationPage() {
                     />
                     <div className="grid gap-1.5 leading-none">
                       <Label htmlFor="terms" className="cursor-pointer font-normal">
-                        I agree to the event terms and code of conduct
+                        {t("registration.agree_terms")}
                       </Label>
                       <p className="text-muted-foreground text-sm">
-                        You must agree to these terms to participate in the event.
+                        {t("registration.agree_terms_description")}
                       </p>
                     </div>
                   </div>
@@ -568,10 +573,10 @@ function EventRegistrationPage() {
                     />
                     <div className="grid gap-1.5 leading-none">
                       <Label htmlFor="waiver" className="cursor-pointer font-normal">
-                        I have read and accepted the liability waiver
+                        {t("registration.accept_liability_waiver")}
                       </Label>
                       <p className="text-muted-foreground text-sm">
-                        Every participant must accept the waiver before registering.
+                        {t("registration.accept_waiver_description")}
                       </p>
                     </div>
                   </div>
@@ -580,10 +585,10 @@ function EventRegistrationPage() {
                 <div className="flex justify-end">
                   <Button onClick={handleSubmit} disabled={submitDisabled}>
                     {registrationMutation.isPending
-                      ? "Submitting..."
+                      ? t("registration.submitting")
                       : confirmation?.method === "etransfer"
-                        ? "Awaiting E-Transfer"
-                        : "Complete Registration"}
+                        ? t("registration.awaiting_etransfer")
+                        : t("registration.complete_registration")}
                   </Button>
                 </div>
               </CardContent>
@@ -594,21 +599,22 @@ function EventRegistrationPage() {
             {confirmation?.method === "etransfer" && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Finish Your E-transfer</CardTitle>
+                  <CardTitle>{t("registration.finish_etransfer")}</CardTitle>
                   <CardDescription>
-                    Send your payment to finalize the registration.
+                    {t("registration.send_payment_finalize")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
                   <div>
-                    <p className="font-medium">Recipient Email</p>
+                    <p className="font-medium">{t("registration.recipient_email")}</p>
                     <p className="text-muted-foreground">
-                      {event.etransferRecipient ?? "See event instructions"}
+                      {event.etransferRecipient ??
+                        t("registration.see_event_instructions")}
                     </p>
                   </div>
                   {event.etransferInstructions && (
                     <div>
-                      <p className="font-medium">Instructions</p>
+                      <p className="font-medium">{t("registration.instructions")}</p>
                       <p className="text-muted-foreground whitespace-pre-line">
                         {event.etransferInstructions}
                       </p>
@@ -616,19 +622,20 @@ function EventRegistrationPage() {
                   )}
                   <Alert>
                     <AlertDescription>
-                      Once the payment is received, an administrator will mark your
-                      registration as paid.
+                      {t("registration.payment_received_confirmation")}
                     </AlertDescription>
                   </Alert>
                   <Button asChild variant="outline">
-                    <Link to="/player/events">Return to Dashboard</Link>
+                    <Link to="/player/events">
+                      {t("registration.return_to_dashboard")}
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
             )}
             <Card>
               <CardHeader>
-                <CardTitle>Event Overview</CardTitle>
+                <CardTitle>{t("registration.event_overview")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm">
                 <div className="space-y-3">
@@ -663,22 +670,22 @@ function EventRegistrationPage() {
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span>Status</span>
+                    <span>{t("registration.status")}</span>
                     <Badge variant={event.isRegistrationOpen ? "outline" : "secondary"}>
                       {event.isRegistrationOpen
-                        ? "Registration open"
-                        : "Registration closed"}
+                        ? t("registration.registration_open")
+                        : t("registration.registration_closed")}
                     </Badge>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span>Registered</span>
+                    <span>{t("registration.registered")}</span>
                     <span>{event.registrationCount}</span>
                   </div>
 
                   {event.availableSpots !== undefined && (
                     <div className="flex items-center justify-between">
-                      <span>Spots remaining</span>
+                      <span>{t("registration.spots_remaining")}</span>
                       <span>{event.availableSpots}</span>
                     </div>
                   )}
@@ -687,14 +694,16 @@ function EventRegistrationPage() {
                 <Separator />
 
                 <div className="space-y-2">
-                  <h4 className="font-medium">Registration Fees</h4>
+                  <h4 className="font-medium">{t("registration.registration_fees")}</h4>
                   <div className="flex items-center justify-between">
-                    <span>Current Fee</span>
+                    <span>{t("registration.current_fee")}</span>
                     <span className="font-semibold">${fee.discounted.toFixed(2)}</span>
                   </div>
                   {fee.hasDiscount && (
                     <p className="text-muted-foreground text-sm">
-                      Early bird discount applied ({fee.discountPercentage}% off)
+                      {t("registration.early_bird_applied", {
+                        percentage: fee.discountPercentage,
+                      })}
                     </p>
                   )}
                 </div>
@@ -703,14 +712,18 @@ function EventRegistrationPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Participant Information</CardTitle>
+                <CardTitle>{t("registration.participant_information")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div>
-                  {userProfile?.name ?? userProfile?.email ?? "Unknown participant"}
+                  {userProfile?.name ??
+                    userProfile?.email ??
+                    t("registration.unknown_participant")}
                 </div>
                 <div className="text-muted-foreground">
-                  {userProfile?.email ?? user?.email ?? "No email available"}
+                  {userProfile?.email ??
+                    user?.email ??
+                    t("registration.no_email_available")}
                 </div>
               </CardContent>
             </Card>

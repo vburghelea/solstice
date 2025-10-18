@@ -1,0 +1,150 @@
+{
+  "dashboard": {
+    "title": "TODO: Translate \"dashboard.title\"",
+    "welcome": "TODO: Translate \"dashboard.welcome\"",
+    "errors": {
+      "failed_to_parse_payload": "TODO: Translate \"dashboard.errors.failed_to_parse_payload\"",
+      "failed_to_persist_payload": "TODO: Translate \"dashboard.errors.failed_to_persist_payload\"",
+      "failed_to_load_profile": "TODO: Translate \"dashboard.errors.failed_to_load_profile\"",
+      "failed_to_fetch_workspace_stats": "TODO: Translate \"dashboard.errors.failed_to_fetch_workspace_stats\"",
+      "failed_to_fetch_next_scheduled_game": "TODO: Translate \"dashboard.errors.failed_to_fetch_next_scheduled_game\"",
+      "failed_to_fetch_membership_status": "TODO: Translate \"dashboard.errors.failed_to_fetch_membership_status\"",
+      "failed_to_update_privacy_settings": "TODO: Translate \"dashboard.errors.failed_to_update_privacy_settings\"",
+      "failed_to_update_notification_preferences": "TODO: Translate \"dashboard.errors.failed_to_update_notification_preferences\""
+    },
+    "privacy": {
+      "invites_from_connections": {
+        "label": "TODO: Translate \"dashboard.privacy.invites_from_connections.label\"",
+        "description": "TODO: Translate \"dashboard.privacy.invites_from_connections.description\""
+      },
+      "follow_requests": {
+        "label": "TODO: Translate \"dashboard.privacy.follow_requests.label\"",
+        "description": "TODO: Translate \"dashboard.privacy.follow_requests.description\""
+      }
+    },
+    "notifications": {
+      "game_reminders": {
+        "label": "TODO: Translate \"dashboard.notifications.game_reminders.label\"",
+        "description": "TODO: Translate \"dashboard.notifications.game_reminders.description\""
+      },
+      "review_reminders": {
+        "label": "TODO: Translate \"dashboard.notifications.review_reminders.label\"",
+        "description": "TODO: Translate \"dashboard.notifications.review_reminders.description\""
+      }
+    },
+    "membership": {
+      "status_active": "TODO: Translate \"dashboard.membership.status_active\"",
+      "status_inactive": "TODO: Translate \"dashboard.membership.status_inactive\"",
+      "active": "TODO: Translate \"dashboard.membership.active\"",
+      "no_active_membership": "TODO: Translate \"dashboard.membership.no_active_membership\"",
+      "manage_plan": "TODO: Translate \"dashboard.membership.manage_plan\"",
+      "start_membership": "TODO: Translate \"dashboard.membership.start_membership\""
+    },
+    "upcoming_games": {
+      "no_games": "TODO: Translate \"dashboard.upcoming_games.no_games\"",
+      "stay_available": "TODO: Translate \"dashboard.upcoming_games.stay_available\""
+    },
+    "pending_reviews": {
+      "all_caught_up": "TODO: Translate \"dashboard.pending_reviews.all_caught_up\"",
+      "share_stories": "TODO: Translate \"dashboard.pending_reviews.share_stories\""
+    },
+    "teams": {
+      "join_crew": "TODO: Translate \"dashboard.teams.join_crew\"",
+      "active_teams": "TODO: Translate \"dashboard.teams.active_teams\"",
+      "watch_calendar": "TODO: Translate \"dashboard.teams.watch_calendar\"",
+      "opportunities_waiting": "TODO: Translate \"dashboard.teams.opportunities_waiting\""
+    },
+    "stats": {
+      "organizer": "TODO: Translate \"dashboard.stats.organizer\"",
+      "player": "TODO: Translate \"dashboard.stats.player\"",
+      "invites": "TODO: Translate \"dashboard.stats.invites\""
+    },
+    "empty_states": {
+      "no_events": "TODO: Translate \"dashboard.empty_states.no_events\"",
+      "no_teams": "TODO: Translate \"dashboard.empty_states.no_teams\"",
+      "experiment_loading": "TODO: Translate \"dashboard.empty_states.experiment_loading\""
+    },
+    "profile": {
+      "complete": "TODO: Translate \"dashboard.profile.complete\"",
+      "steps_remaining": "TODO: Translate \"dashboard.profile.steps_remaining\""
+    },
+    "teams_section": {
+      "you_lead": "TODO: Translate \"dashboard.teams_section.you_lead\""
+    },
+    "persona_initial": "TODO: Translate \"dashboard.persona_initial\"",
+    "ui": {
+      "welcome_back": "TODO: Translate \"dashboard.ui.welcome_back\"",
+      "subtitle": "TODO: Translate \"dashboard.ui.subtitle\"",
+      "badges": {
+        "privacy_ready": "TODO: Translate \"dashboard.ui.badges.privacy_ready\"",
+        "profile_complete": "TODO: Translate \"dashboard.ui.badges.profile_complete\"",
+        "profile_steps_remaining": "TODO: Translate \"dashboard.ui.badges.profile_steps_remaining\""
+      },
+      "headquarters": {
+        "title": "TODO: Translate \"dashboard.ui.headquarters.title\""
+      },
+      "control_center": {
+        "title": "TODO: Translate \"dashboard.ui.control_center.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.control_center.subtitle\""
+      },
+      "teams_synced": "TODO: Translate \"dashboard.ui.teams_synced\"",
+      "review_reminders": {
+        "title": "TODO: Translate \"dashboard.ui.review_reminders.title\""
+      },
+      "relationship_health": {
+        "title": "TODO: Translate \"dashboard.ui.relationship_health.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.relationship_health.subtitle\""
+      },
+      "upcoming": {
+        "title": "TODO: Translate \"dashboard.ui.upcoming.title\""
+      },
+      "membership_label": "TODO: Translate \"dashboard.ui.membership_label\"",
+      "pending_reviews_label": "TODO: Translate \"dashboard.ui.pending_reviews_label\"",
+      "teams_label": "TODO: Translate \"dashboard.ui.teams_label\"",
+      "upcoming_events_label": "TODO: Translate \"dashboard.ui.upcoming_events_label\"",
+      "campaign_commitments": {
+        "title": "TODO: Translate \"dashboard.ui.campaign_commitments.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.campaign_commitments.subtitle\""
+      },
+      "game_roster": {
+        "title": "TODO: Translate \"dashboard.ui.game_roster.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.game_roster.subtitle\""
+      },
+      "events_exploring": {
+        "title": "TODO: Translate \"dashboard.ui.events_exploring.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.events_exploring.subtitle\""
+      },
+      "connections_radar": {
+        "title": "TODO: Translate \"dashboard.ui.connections_radar.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.connections_radar.subtitle\""
+      },
+      "focus_spotlight": {
+        "title": "TODO: Translate \"dashboard.ui.focus_spotlight.title\"",
+        "subtitle": "TODO: Translate \"dashboard.ui.focus_spotlight.subtitle\""
+      },
+      "flexible_calendar": "TODO: Translate \"dashboard.ui.flexible_calendar\"",
+      "open_session_briefing": "TODO: Translate \"dashboard.ui.open_session_briefing\"",
+      "discover_sessions": "TODO: Translate \"dashboard.ui.discover_sessions\"",
+      "manage_teams": "TODO: Translate \"dashboard.ui.manage_teams\"",
+      "see_all_events": "TODO: Translate \"dashboard.ui.see_all_events\"",
+      "review_gm": "TODO: Translate \"dashboard.ui.review_gm\"",
+      "start_review": "TODO: Translate \"dashboard.ui.start_review\"",
+      "members_count": "TODO: Translate \"dashboard.ui.members_count\"",
+      "beta_preview": {
+        "title": "TODO: Translate \"dashboard.ui.beta_preview.title\"",
+        "description": "TODO: Translate \"dashboard.ui.beta_preview.description\""
+      },
+      "calendar_sync": {
+        "title": "TODO: Translate \"dashboard.ui.calendar_sync.title\"",
+        "description": "TODO: Translate \"dashboard.ui.calendar_sync.description\"",
+        "join_pilot": "TODO: Translate \"dashboard.ui.calendar_sync.join_pilot\""
+      }
+    },
+    "actions": {
+      "edit_profile": "TODO: Translate \"dashboard.actions.edit_profile\"",
+      "manage_plan": "TODO: Translate \"dashboard.actions.manage_plan\"",
+      "start_membership": "TODO: Translate \"dashboard.actions.start_membership\"",
+      "find_games": "TODO: Translate \"dashboard.actions.find_games\""
+    }
+  }
+}

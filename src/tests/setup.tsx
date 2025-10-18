@@ -11,6 +11,7 @@ import "@testing-library/jest-dom";
 import { beforeEach, vi } from "vitest";
 import { setupCampaignMocks } from "~/tests/mocks/campaigns";
 import { setupGameMocks } from "~/tests/mocks/games";
+import "~/tests/mocks/i18n"; // Initialize i18n mocks
 import { mockReactQuery, setupReactQueryMocks } from "~/tests/mocks/react-query";
 
 // Polyfill Web Crypto for environments where it is missing

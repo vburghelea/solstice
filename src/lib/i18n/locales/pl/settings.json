@@ -1,0 +1,219 @@
+{
+  "title": "TODO: Translate \"title\"",
+  "subtitle": "TODO: Translate \"subtitle\"",
+  "sections": {
+    "account": {
+      "title": "TODO: Translate \"sections.account.title\"",
+      "subtitle": "TODO: Translate \"sections.account.subtitle\"",
+      "status": {
+        "title": "TODO: Translate \"sections.account.status.title\"",
+        "subtitle": "TODO: Translate \"sections.account.status.subtitle\""
+      },
+      "connected_accounts": {
+        "title": "TODO: Translate \"sections.account.connected_accounts.title\"",
+        "subtitle": "TODO: Translate \"sections.account.connected_accounts.subtitle\""
+      },
+      "buttons": {
+        "save_changes": "TODO: Translate \"sections.account.buttons.save_changes\"",
+        "cancel": "TODO: Translate \"sections.account.buttons.cancel\"",
+        "update_password": "TODO: Translate \"sections.account.buttons.update_password\"",
+        "connect": "TODO: Translate \"sections.account.buttons.connect\"",
+        "disconnect": "TODO: Translate \"sections.account.buttons.disconnect\""
+      },
+      "messages": {
+        "saved": "TODO: Translate \"sections.account.messages.saved\"",
+        "error": "TODO: Translate \"sections.account.messages.error\""
+      },
+      "fields": {
+        "name": "TODO: Translate \"sections.account.fields.name\"",
+        "email": "TODO: Translate \"sections.account.fields.email\"",
+        "password": "TODO: Translate \"sections.account.fields.password\""
+      },
+      "status_labels": {
+        "verified": "TODO: Translate \"sections.account.status_labels.verified\"",
+        "not_verified": "TODO: Translate \"sections.account.status_labels.not_verified\"",
+        "set": "TODO: Translate \"sections.account.status_labels.set\"",
+        "not_configured": "TODO: Translate \"sections.account.status_labels.not_configured\"",
+        "required": "TODO: Translate \"sections.account.status_labels.required\"",
+        "connected": "TODO: Translate \"sections.account.status_labels.connected\"",
+        "not_connected": "TODO: Translate \"sections.account.status_labels.not_connected\""
+      },
+      "providers": {
+        "email_password": "TODO: Translate \"sections.account.providers.email_password\"",
+        "signin_text": "TODO: Translate \"sections.account.providers.signin_text\"",
+        "setup_text": "TODO: Translate \"sections.account.providers.setup_text\"",
+        "connected": {
+          "signin_text": "TODO: Translate \"sections.account.providers.connected.signin_text\"",
+          "setup_text": "TODO: Translate \"sections.account.providers.connected.setup_text\""
+        }
+      }
+    },
+    "security": {
+      "title": "TODO: Translate \"sections.security.title\"",
+      "subtitle": "TODO: Translate \"sections.security.subtitle\"",
+      "password": {
+        "title": "TODO: Translate \"sections.security.password.title\"",
+        "subtitle": "TODO: Translate \"sections.security.password.subtitle\"",
+        "current_password": "TODO: Translate \"sections.security.password.current_password\"",
+        "new_password": "TODO: Translate \"sections.security.password.new_password\"",
+        "confirm_new_password": "TODO: Translate \"sections.security.password.confirm_new_password\"",
+        "button": "TODO: Translate \"sections.security.password.button\"",
+        "button_loading": "TODO: Translate \"sections.security.password.button_loading\"",
+        "strength_label": "TODO: Translate \"sections.security.password.strength_label\"",
+        "sign_out_devices": "TODO: Translate \"sections.security.password.sign_out_devices\"",
+        "sign_out_devices_description": "TODO: Translate \"sections.security.password.sign_out_devices_description\"",
+        "placeholders": {
+          "current_password": "TODO: Translate \"sections.security.password.placeholders.current_password\"",
+          "new_password": "TODO: Translate \"sections.security.password.placeholders.new_password\"",
+          "confirm_password": "TODO: Translate \"sections.security.password.placeholders.confirm_password\""
+        },
+        "success": "TODO: Translate \"sections.security.password.success\"",
+        "error": "TODO: Translate \"sections.security.password.error\"",
+        "validation": {
+          "mismatch": "TODO: Translate \"sections.security.password.validation.mismatch\"",
+          "requirements_not_met": "TODO: Translate \"sections.security.password.validation.requirements_not_met\""
+        }
+      },
+      "two_factor": {
+        "title": "TODO: Translate \"sections.security.two_factor.title\"",
+        "enabled": "TODO: Translate \"sections.security.two_factor.enabled\"",
+        "disabled": "TODO: Translate \"sections.security.two_factor.disabled\"",
+        "enable": "TODO: Translate \"sections.security.two_factor.enable\"",
+        "disable": "TODO: Translate \"sections.security.two_factor.disable\""
+      }
+    },
+    "notifications": {
+      "title": "TODO: Translate \"sections.notifications.title\"",
+      "subtitle": "TODO: Translate \"sections.notifications.subtitle\"",
+      "email_notifications": "TODO: Translate \"sections.notifications.email_notifications\"",
+      "push_notifications": "TODO: Translate \"sections.notifications.push_notifications\"",
+      "preferences": {
+        "game_reminders": {
+          "label": "TODO: Translate \"sections.notifications.preferences.game_reminders.label\"",
+          "description": "TODO: Translate \"sections.notifications.preferences.game_reminders.description\""
+        },
+        "game_updates": {
+          "label": "TODO: Translate \"sections.notifications.preferences.game_updates.label\"",
+          "description": "TODO: Translate \"sections.notifications.preferences.game_updates.description\""
+        },
+        "campaign_digests": {
+          "label": "TODO: Translate \"sections.notifications.preferences.campaign_digests.label\"",
+          "description": "TODO: Translate \"sections.notifications.preferences.campaign_digests.description\""
+        },
+        "campaign_updates": {
+          "label": "TODO: Translate \"sections.notifications.preferences.campaign_updates.label\"",
+          "description": "TODO: Translate \"sections.notifications.preferences.campaign_updates.description\""
+        },
+        "review_reminders": {
+          "label": "TODO: Translate \"sections.notifications.preferences.review_reminders.label\"",
+          "description": "TODO: Translate \"sections.notifications.preferences.review_reminders.description\""
+        },
+        "social_notifications": {
+          "label": "TODO: Translate \"sections.notifications.preferences.social_notifications.label\"",
+          "description": "TODO: Translate \"sections.notifications.preferences.social_notifications.description\""
+        }
+      },
+      "buttons": {
+        "save": "TODO: Translate \"sections.notifications.buttons.save\"",
+        "saving": "TODO: Translate \"sections.notifications.buttons.saving\"",
+        "reset": "TODO: Translate \"sections.notifications.buttons.reset\""
+      },
+      "errors": {
+        "load_failed": "TODO: Translate \"sections.notifications.errors.load_failed\"",
+        "save_failed": "TODO: Translate \"sections.notifications.errors.save_failed\"",
+        "refresh_page": "TODO: Translate \"sections.notifications.errors.refresh_page\""
+      }
+    },
+    "sessions": {
+      "title": "TODO: Translate \"sections.sessions.title\"",
+      "subtitle": "TODO: Translate \"sections.sessions.subtitle\"",
+      "current_session": "TODO: Translate \"sections.sessions.current_session\"",
+      "device_info": "TODO: Translate \"sections.sessions.device_info\"",
+      "last_active": "TODO: Translate \"sections.sessions.last_active\"",
+      "table_headers": {
+        "device": "TODO: Translate \"sections.sessions.table_headers.device\"",
+        "location": "TODO: Translate \"sections.sessions.table_headers.location\"",
+        "last_active": "TODO: Translate \"sections.sessions.table_headers.last_active\"",
+        "actions": "TODO: Translate \"sections.sessions.table_headers.actions\""
+      },
+      "session_id": "TODO: Translate \"sections.sessions.session_id\"",
+      "unknown_device": "TODO: Translate \"sections.sessions.unknown_device\"",
+      "unknown_location": "TODO: Translate \"sections.sessions.unknown_location\"",
+      "this_device": "TODO: Translate \"sections.sessions.this_device\"",
+      "current": "TODO: Translate \"sections.sessions.current\"",
+      "only_current_session": "TODO: Translate \"sections.sessions.only_current_session\"",
+      "actions": {
+        "revoke": "TODO: Translate \"sections.sessions.actions.revoke\"",
+        "revoke_all": "TODO: Translate \"sections.sessions.actions.revoke_all\""
+      },
+      "device_types": {
+        "mobile_device": "TODO: Translate \"sections.sessions.device_types.mobile_device\"",
+        "desktop": "TODO: Translate \"sections.sessions.device_types.desktop\"",
+        "tablet": "TODO: Translate \"sections.sessions.device_types.tablet\""
+      },
+      "platforms": {
+        "macos": "TODO: Translate \"sections.sessions.platforms.macos\"",
+        "windows": "TODO: Translate \"sections.sessions.platforms.windows\"",
+        "linux": "TODO: Translate \"sections.sessions.platforms.linux\"",
+        "ios": "TODO: Translate \"sections.sessions.platforms.ios\"",
+        "android": "TODO: Translate \"sections.sessions.platforms.android\""
+      },
+      "status": {
+        "refreshing": "TODO: Translate \"sections.sessions.status.refreshing\"",
+        "refreshing_preferences": "TODO: Translate \"sections.sessions.status.refreshing_preferences\"",
+        "refreshing_account": "TODO: Translate \"sections.sessions.status.refreshing_account\""
+      },
+      "errors": {
+        "load_failed": "TODO: Translate \"sections.sessions.errors.load_failed\"",
+        "refresh_page": "TODO: Translate \"sections.sessions.errors.refresh_page\""
+      },
+      "confirmation": {
+        "revoke_title": "TODO: Translate \"sections.sessions.confirmation.revoke_title\"",
+        "revoke_message": "TODO: Translate \"sections.sessions.confirmation.revoke_message\"",
+        "revoke_all_title": "TODO: Translate \"sections.sessions.confirmation.revoke_all_title\"",
+        "revoke_all_message": "TODO: Translate \"sections.sessions.confirmation.revoke_all_message\""
+      }
+    },
+    "privacy": {
+      "title": "TODO: Translate \"sections.privacy.title\"",
+      "subtitle": "TODO: Translate \"sections.privacy.subtitle\"",
+      "profile_visibility": "TODO: Translate \"sections.privacy.profile_visibility\"",
+      "data_sharing": "TODO: Translate \"sections.privacy.data_sharing\"",
+      "preferences": {
+        "public_profile": "TODO: Translate \"sections.privacy.preferences.public_profile\"",
+        "show_email": "TODO: Translate \"sections.privacy.preferences.show_email\"",
+        "show_activity": "TODO: Translate \"sections.privacy.preferences.show_activity\"",
+        "analytics": "TODO: Translate \"sections.privacy.preferences.analytics\"",
+        "personalization": "TODO: Translate \"sections.privacy.preferences.personalization\""
+      }
+    }
+  },
+  "errors": {
+    "load_failed": "TODO: Translate \"errors.load_failed\"",
+    "save_failed": "TODO: Translate \"errors.save_failed\"",
+    "invalid_password": "TODO: Translate \"errors.invalid_password\"",
+    "password_mismatch": "TODO: Translate \"errors.password_mismatch\"",
+    "session_revoke_failed": "TODO: Translate \"errors.session_revoke_failed\"",
+    "load_account": "TODO: Translate \"errors.load_account\"",
+    "load_sessions": "TODO: Translate \"errors.load_sessions\"",
+    "load_preferences": "TODO: Translate \"errors.load_preferences\"",
+    "save_preferences": "TODO: Translate \"errors.save_preferences\"",
+    "unlink_account": "TODO: Translate \"errors.unlink_account\"",
+    "connect_account": "TODO: Translate \"errors.connect_account\"",
+    "update_password": "TODO: Translate \"errors.update_password\"",
+    "refresh_page": "TODO: Translate \"errors.refresh_page\"",
+    "unable_to_update_password": "TODO: Translate \"errors.unable_to_update_password\""
+  },
+  "success": {
+    "settings_saved": "TODO: Translate \"success.settings_saved\"",
+    "password_changed": "TODO: Translate \"success.password_changed\"",
+    "password_updated": "TODO: Translate \"success.password_updated\"",
+    "session_revoked": "TODO: Translate \"success.session_revoked\"",
+    "all_sessions_revoked": "TODO: Translate \"success.all_sessions_revoked\"",
+    "account_disconnected": "TODO: Translate \"success.account_disconnected\"",
+    "email_preferences_updated": "TODO: Translate \"success.email_preferences_updated\""
+  },
+  "alerts": {
+    "redirecting_to_provider": "TODO: Translate \"alerts.redirecting_to_provider\""
+  }
+}

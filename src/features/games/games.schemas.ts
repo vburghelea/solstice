@@ -7,21 +7,30 @@ import {
   visibilityEnum,
 } from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 
+import { tCommon } from "~/lib/i18n/server-translations";
 import {
   locationSchema,
   minimumRequirementsSchema,
   safetyRulesSchema,
 } from "~/shared/schemas/common";
 
+/**
+ * Translation function type for form validators
+ */
+export type TranslationFunction = (
+  key: string,
+  options?: Record<string, unknown>,
+) => string;
+
 export const createGameInputSchema = z.object({
   gameSystemId: z.number().int().positive(),
   ownerId: z.string().optional(),
-  name: z.string().min(1, "Game session name is required"),
+  name: z.string().min(1, tCommon("validation.game_name_required")),
   dateTime: z.string().datetime(), // ISO string
-  description: z.string().min(1, "Description is required"),
+  description: z.string().min(1, tCommon("validation.description_required")),
   expectedDuration: z.number().positive(), // in hours
   price: z.number().optional(),
-  language: z.string().min(1, "Language is required"),
+  language: z.string().min(1, tCommon("validation.language_required")),
   location: locationSchema,
   minimumRequirements: minimumRequirementsSchema.optional(),
   visibility: z.enum(visibilityEnum.enumValues).default("public"), // Changed to visibilityEnum
@@ -30,12 +39,12 @@ export const createGameInputSchema = z.object({
 });
 
 export const updateGameInputSchema = createGameInputSchema.partial().extend({
-  id: z.string().min(1),
+  id: z.string().min(1, tCommon("validation.required")),
   status: z.enum(gameStatusEnum.enumValues).optional(),
 });
 
 export const getGameSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1, tCommon("validation.required")),
 });
 
 export const listGamesSchema = z
@@ -59,7 +68,7 @@ export const listGamesSchema = z
   .default({});
 
 export const searchGamesSchema = z.object({
-  query: z.string().min(3, "Search term must be at least 3 characters"),
+  query: z.string().min(3, tCommon("validation.search_term_too_short", { count: 3 })),
 });
 
 export const addGameParticipantInputSchema = z.object({
@@ -111,7 +120,7 @@ export type UpdateGameParticipantInput = z.infer<typeof updateGameParticipantInp
 export type RemoveGameParticipantInput = z.infer<typeof removeGameParticipantInputSchema>;
 export type ApplyToGameInput = z.infer<typeof applyToGameInputSchema>;
 export const searchUsersForInvitationSchema = z.object({
-  query: z.string().min(4, "Search term must be at least 4 characters"),
+  query: z.string().min(4, tCommon("validation.search_term_too_short", { count: 4 })),
 });
 
 export type InviteToGameInput = z.infer<typeof inviteToGameInputSchema>;
@@ -197,3 +206,224 @@ export const getGameApplicationForUserInputSchema = z.object({
 export type GetGameApplicationForUserInput = z.infer<
   typeof getGameApplicationForUserInputSchema
 >;
+
+/**
+ * Base game form field schemas with server-side translations
+ */
+export const baseGameFormFieldSchemas = {
+  gameSystemId: z.number().int().positive(),
+  name: z.string().min(1, tCommon("validation.game_name_required")),
+  dateTime: z.string().datetime(),
+  description: z.string().min(1, tCommon("validation.description_required")),
+  expectedDuration: z.number().positive(),
+  price: z.number().optional(),
+  language: z.string().min(1, tCommon("validation.language_required")),
+  location: locationSchema,
+  minimumRequirements: minimumRequirementsSchema.optional(),
+  visibility: z.enum(visibilityEnum.enumValues).default("public"),
+  safetyRules: safetyRulesSchema.optional(),
+  campaignId: z.string().optional(),
+};
+
+/**
+ * Create game form field validators with translation support
+ */
+export const createGameFormFields = (t: TranslationFunction) => ({
+  gameSystemId: ({ value }: { value: number }) => {
+    try {
+      baseGameFormFieldSchemas.gameSystemId.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("positive")) {
+          return t("common.validation.positive_number");
+        }
+        if (errorMessage?.includes("integer")) {
+          return t("common.validation.invalid_number");
+        }
+        return t("common.validation.invalid_format");
+      }
+      return t("common.validation.invalid_format");
+    }
+  },
+  name: ({ value }: { value: string }) => {
+    try {
+      baseGameFormFieldSchemas.name.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("Game session name is required")) {
+          return t("common.validation.game_name_required");
+        }
+        return t("common.validation.required");
+      }
+      return t("common.validation.required");
+    }
+  },
+  dateTime: ({ value }: { value: string }) => {
+    try {
+      baseGameFormFieldSchemas.dateTime.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return t("common.validation.invalid_date");
+      }
+      return t("common.validation.invalid_date");
+    }
+  },
+  description: ({ value }: { value: string }) => {
+    try {
+      baseGameFormFieldSchemas.description.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("Description is required")) {
+          return t("common.validation.description_required");
+        }
+        return t("common.validation.required");
+      }
+      return t("common.validation.required");
+    }
+  },
+  expectedDuration: ({ value }: { value: number }) => {
+    try {
+      baseGameFormFieldSchemas.expectedDuration.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        if (value <= 0) {
+          return t("common.validation.positive_number");
+        }
+        return t("common.validation.invalid_number");
+      }
+      return t("common.validation.invalid_number");
+    }
+  },
+  language: ({ value }: { value: string }) => {
+    try {
+      baseGameFormFieldSchemas.language.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("Language is required")) {
+          return t("common.validation.language_required");
+        }
+        return t("common.validation.required");
+      }
+      return t("common.validation.required");
+    }
+  },
+  location: ({ value }: { value: unknown }) => {
+    if (!value || typeof value !== "object") {
+      return t("common.validation.invalid_format");
+    }
+    return undefined;
+  },
+});
+
+/**
+ * Create search games field validators with translation support
+ */
+export const createSearchGamesFields = (t: TranslationFunction) => ({
+  query: ({ value }: { value: string }) => {
+    try {
+      searchGamesSchema.shape.query.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("at least 3 characters")) {
+          return t("common.validation.search_term_too_short", { count: 3 });
+        }
+        return t("common.validation.min_length", { count: 3 });
+      }
+      return t("common.validation.min_length", { count: 3 });
+    }
+  },
+});
+
+/**
+ * Create invite to game field validators with translation support
+ */
+export const createInviteToGameFields = (t: TranslationFunction) => ({
+  gameId: ({ value }: { value: string }) => {
+    if (!value || value.trim() === "") {
+      return t("common.validation.required");
+    }
+    return undefined;
+  },
+  userId: ({ value }: { value: string }) => {
+    if (!value) {
+      // Check if email is provided instead
+      return undefined; // Will be handled by refine
+    }
+    return undefined;
+  },
+  email: ({ value }: { value: string }) => {
+    if (!value) {
+      // Check if userId is provided instead
+      return undefined; // Will be handled by refine
+    }
+    // Simple email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      return t("common.validation.invalid_email");
+    }
+    return undefined;
+  },
+  name: () => {
+    return undefined; // Optional field
+  },
+  role: ({ value }: { value: string }) => {
+    if (
+      !value ||
+      !participantRoleEnum.enumValues.includes(
+        value as (typeof participantRoleEnum.enumValues)[number],
+      )
+    ) {
+      return t("common.validation.invalid_format");
+    }
+    return undefined;
+  },
+});
+
+/**
+ * Create invite to game schema with translation support
+ */
+export const createInviteToGameSchema = (t: TranslationFunction) =>
+  z
+    .object({
+      gameId: z.string().min(1),
+      userId: z.string().min(1).optional(),
+      email: z.string().email().optional(),
+      name: z.string().optional(),
+      role: z.enum(participantRoleEnum.enumValues).default("invited"),
+    })
+    .refine((data) => data.userId || data.email, {
+      message: t("common.validation.either_user_email_required"),
+    });
+
+/**
+ * Create search users for invitation field validators with translation support
+ */
+export const createSearchUsersForInvitationFields = (t: TranslationFunction) => ({
+  query: ({ value }: { value: string }) => {
+    try {
+      searchUsersForInvitationSchema.shape.query.parse(value);
+      return undefined;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errorMessage = error.errors?.[0]?.message;
+        if (errorMessage?.includes("at least 4 characters")) {
+          return t("common.validation.search_term_too_short", { count: 4 });
+        }
+        return t("common.validation.min_length", { count: 4 });
+      }
+      return t("common.validation.min_length", { count: 4 });
+    }
+  },
+});

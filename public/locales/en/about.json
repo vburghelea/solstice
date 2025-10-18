@@ -1,0 +1,83 @@
+{
+  "hero": {
+    "eyebrow": "About Roundup Games",
+    "title": "A platform for local-first gatherings around tabletop and board games.",
+    "subtitle": "We exist to make it easier for every visitor to step into a lively room, roll some dice, and leave knowing more people who care about their stories.",
+    "cta_text": "Explore our programs",
+    "secondary_cta": "Meet our teams"
+  },
+  "mission": {
+    "eyebrow": "Our mission",
+    "title": "Combat loneliness with joyful, real-life play",
+    "description_1": "Roundup Games was built for people who crave connection as much as they crave clever mechanics and collaborative storytelling. We nurture local-first experiences that are warm, low-pressure, and thoughtfully facilitated so you can arrive as you are and immediately feel seen.",
+    "description_2": "By hosting skill-sharing sessions, mentorship circles, and rotating campaigns, we give storytellers the room they need to hone their craft while introducing audiences to bold new worlds. Every initiative we ship is guided by the belief that play is a basic human need—and one of the most powerful antidotes to boredom and isolation.",
+    "highlights": {
+      "belonging": {
+        "title": "Belonging at every table",
+        "description": "We connect newcomers, veterans, and curious visitors with welcoming hosts so no one has to face another quiet evening alone."
+      },
+      "storytellers": {
+        "title": "Stages for storytellers",
+        "description": "Roundup Games creates rehearsal-ready spaces where Game Masters can practice their craft, receive coaching, and showcase their narratives to engaged audiences."
+      },
+      "purpose": {
+        "title": "Play with purpose",
+        "description": "Every gathering is designed to spark laughter, curiosity, and long-term friendships through thoughtfully curated tabletop and board game experiences."
+      }
+    }
+  },
+  "vision": {
+    "eyebrow": "Our vision",
+    "title": "Safety-first design for gatherings and data",
+    "description_1": "Trust is the foundation of every Roundup experience. We create brave spaces where participants can immerse themselves in narrative without worrying about physical, emotional, or digital harm. That commitment starts with trained staff on the floor and extends to how we store, permission, and act on your information behind the scenes.",
+    "description_2": "Our platform is continually evolving to meet the expectations of our community and partners. We invest in transparent reporting, responsible AI tooling, and collaborative policy reviews with experts in safeguarding, accessibility, and cyber security.",
+    "commitments": [
+      "Dedicated community stewards and trained facilitators at every sanctioned event.",
+      "Safety tools—from consent check-ins to debrief circles—woven into session design.",
+      "Privacy-first data practices with encrypted storage, minimal retention, and transparent governance.",
+      "Continuous audits with partners who specialize in safeguarding vulnerable communities."
+    ]
+  },
+  "stories_insights": {
+    "eyebrow": "Stories & insights",
+    "title": "Articles coming soon",
+    "subtitle": "We're assembling a library of essays, interviews, and progress updates so you can follow how the Roundup Games vision becomes reality across different regions.",
+    "articles": {
+      "mission_practice": {
+        "title": "Mission in practice",
+        "description": "Stories from local chapters turning empty Wednesday nights into vibrant, cross-generational meetups."
+      },
+      "vision_safety": {
+        "title": "Vision and safety standards",
+        "description": "Deep dives into the policies, partners, and tools that keep our community feeling brave and respected."
+      },
+      "roadmap_impact": {
+        "title": "Roadmap & impact reports",
+        "description": "Quarterly updates on new platform features, regional launches, and the metrics guiding our decisions."
+      }
+    },
+    "publishing_soon": "Publishing soon"
+  },
+  "feedback": {
+    "eyebrow": "Share your voice",
+    "title": "Feedback channels opening soon",
+    "description": "We're designing a feedback portal where you can champion new ideas, flag concerns, and help us refine every experience. Until it launches, you can email",
+    "email": "hello@roundup.games",
+    "email_description": "and our community team will route your note to the right people.",
+    "topics": {
+      "suggest_system": {
+        "title": "Suggest a new game system",
+        "description": "Help us feature rulesets and universes that excite your tables and broaden our library of adventures."
+      },
+      "nominate_venue": {
+        "title": "Nominate a venue",
+        "description": "Tell us about cafés, libraries, and community halls that would make incredible gathering points."
+      },
+      "report_issue": {
+        "title": "Report a platform issue",
+        "description": "Share bugs, accessibility concerns, or content requests so we can keep improving the digital experience."
+      }
+    },
+    "feedback_form_soon": "Feedback form launching soon"
+  }
+}

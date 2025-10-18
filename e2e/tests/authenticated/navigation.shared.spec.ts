@@ -23,7 +23,6 @@ test.describe("Navigation (Authenticated)", () => {
       { name: "Dashboard", url: "/player" },
       { name: "Teams", url: "/player/teams" },
       { name: "Events", url: "/player/events" },
-      { name: "Members", url: "/player/members" },
       // Reports link is only visible for admin users with specific roles
     ];
 
@@ -99,7 +98,6 @@ test.describe("Navigation (Authenticated)", () => {
       "/player/profile",
       "/player/teams",
       "/player/events",
-      "/player/members",
       "/player/reports",
       "/player/settings",
     ];
@@ -119,8 +117,6 @@ test.describe("Navigation (Authenticated)", () => {
         await expect(page.getByRole("heading", { name: "My Teams" })).toBeVisible();
       } else if (url === "/player/events") {
         await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
-      } else if (url === "/player/members") {
-        await expect(page.getByRole("heading", { name: "Members" })).toBeVisible();
       } else if (url === "/player/settings") {
         await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
       }

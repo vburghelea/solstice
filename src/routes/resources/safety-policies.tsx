@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, Info, PenSquareIcon, UsersIcon } from "~/components/ui/icons";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
 const cardSurfaceClass =
@@ -12,43 +13,76 @@ const cardSurfaceClass =
 const mutedCardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/60";
 
-const policyPillars = [
-  {
-    title: "People-first safeguards",
-    description:
-      "Trained community stewards, background-checked volunteers, and clear escalation ladders keep every table supported.",
-    icon: UsersIcon,
-  },
-  {
-    title: "Consent-driven play",
-    description:
-      "Session safety tools, pre-event briefings, and debrief rituals help participants advocate for their needs in real time.",
-    icon: CheckCircle2,
-  },
-  {
-    title: "Data stewardship",
-    description:
-      "We minimize data collection, encrypt sensitive records, and maintain transparent retention schedules for all programs.",
-    icon: PenSquareIcon,
-  },
-];
+// Translation-aware constants will be populated in the component
 
 export const Route = createFileRoute("/resources/safety-policies")({
   component: SafetyPoliciesPage,
 });
 
 function SafetyPoliciesPage() {
+  const { t } = useResourcesTranslation();
+
+  // Translation-aware constants
+  const policyPillars = [
+    {
+      title: t("safety_policies.pillars.people_first.title"),
+      description: t("safety_policies.pillars.people_first.description"),
+      icon: UsersIcon,
+    },
+    {
+      title: t("safety_policies.pillars.consent_driven.title"),
+      description: t("safety_policies.pillars.consent_driven.description"),
+      icon: CheckCircle2,
+    },
+    {
+      title: t("safety_policies.pillars.data_stewardship.title"),
+      description: t("safety_policies.pillars.data_stewardship.description"),
+      icon: PenSquareIcon,
+    },
+  ];
+
+  const lifecycleSections = [
+    {
+      key: "before",
+      data: t("safety_policies.policy_library.lifecycle.before") as unknown as {
+        title: string;
+        items: string[];
+      },
+    },
+    {
+      key: "during",
+      data: t("safety_policies.policy_library.lifecycle.during") as unknown as {
+        title: string;
+        items: string[];
+      },
+    },
+    {
+      key: "after",
+      data: t("safety_policies.policy_library.lifecycle.after") as unknown as {
+        title: string;
+        items: string[];
+      },
+    },
+    {
+      key: "digital",
+      data: t("safety_policies.policy_library.lifecycle.digital") as unknown as {
+        title: string;
+        items: string[];
+      },
+    },
+  ];
+
   return (
     <PublicLayout>
       <HeroSection
-        eyebrow="Safety & accessibility policies"
-        title="Feel protected at every Roundup gathering"
-        subtitle="We design policies with community members, safeguarding experts, and legal advisors so your stories flourish in safe spaces."
+        eyebrow={t("safety_policies.hero.eyebrow")}
+        title={t("safety_policies.hero.title")}
+        subtitle={t("safety_policies.hero.subtitle")}
         backgroundImageSet={RESOURCES_HERO_IMAGE}
-        ctaText="Download policies"
+        ctaText={t("safety_policies.hero.cta_text")}
         ctaLink="#policy-downloads"
         secondaryCta={{
-          text: "Report an urgent concern",
+          text: t("safety_policies.hero.secondary_cta"),
           link: "/resources/report-concern",
         }}
       />
@@ -57,16 +91,13 @@ function SafetyPoliciesPage() {
         <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-10">
           <div className="max-w-3xl space-y-3">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Our approach
+              {t("safety_policies.approach.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Policies built with survivors, advocates, and storytellers
+              {t("safety_policies.approach.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              We co-create safety standards with trauma-informed practitioners and
-              marginalized community members. The result is a living framework that
-              reduces harm, prioritizes consent, and keeps data protected across every
-              chapter.
+              {t("safety_policies.approach.description")}
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -93,102 +124,73 @@ function SafetyPoliciesPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Policy library
+              {t("safety_policies.policy_library.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Cover every stage of the participant journey
+              {t("safety_policies.policy_library.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              The library is organized by lifecycle—before, during, and after events—so
-              you can quickly find the guidance you need. Each policy includes training
-              checklists, implementation tips, and metrics for auditing effectiveness.
+              {t("safety_policies.policy_library.description")}
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Card className={mutedCardSurfaceClass}>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                    Before the event
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  <p>• Venue risk assessments and accessibility audits</p>
-                  <p>• Volunteer screening and reference checks</p>
-                  <p>• Registration data minimization guidelines</p>
-                </CardContent>
-              </Card>
-              <Card className={mutedCardSurfaceClass}>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                    During the event
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  <p>• Safety brief scripts and red/yellow escalation matrix</p>
-                  <p>• Incident response roles with on-call coverage</p>
-                  <p>• Real-time accessibility adjustments checklist</p>
-                </CardContent>
-              </Card>
-              <Card className={mutedCardSurfaceClass}>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                    After the event
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  <p>• Follow-up protocols and care referrals</p>
-                  <p>• Data retention schedules aligned with privacy law</p>
-                  <p>• Root cause analysis template for incident reviews</p>
-                </CardContent>
-              </Card>
-              <Card className={mutedCardSurfaceClass}>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                    Digital portal
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  <p>• Platform security posture and encryption standards</p>
-                  <p>• Data subject request workflow</p>
-                  <p>• Vendor due diligence questionnaire</p>
-                </CardContent>
-              </Card>
+              {lifecycleSections.map((section) => (
+                <Card key={section.key} className={mutedCardSurfaceClass}>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                      {section.data.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
+                    {Array.isArray(section.data.items)
+                      ? section.data.items.map((item: string) => (
+                          <p key={item}>• {item}</p>
+                        ))
+                      : null}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
           <div className="space-y-4">
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Annual review timeline
+                  {t("safety_policies.policy_library.timeline.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Policies undergo triannual review with external advisors specializing in
-                  safeguarding, cybersecurity, and disability justice. We publish a change
-                  log and invite public comment prior to ratification.
-                </p>
+                <p>{t("safety_policies.policy_library.timeline.description")}</p>
                 <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
-                  • January: Legal and compliance audit
-                  <br />• May: Community town hall & survey
-                  <br />• September: Accessibility and data security refresh
+                  {Array.isArray(t("safety_policies.policy_library.timeline.schedule"))
+                    ? (
+                        t(
+                          "safety_policies.policy_library.timeline.schedule",
+                        ) as unknown as string[]
+                      ).map((item, index, arr) => (
+                        <span key={item}>
+                          • {item}
+                          {index < arr.length - 1 && (
+                            <>
+                              <br />
+                            </>
+                          )}
+                        </span>
+                      ))
+                    : null}
                 </div>
               </CardContent>
             </Card>
             <Card className={mutedCardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Transparency reports
+                  {t("safety_policies.policy_library.transparency.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Biannual reports summarize incident metrics, resolution timelines, and
-                  improvement projects. Subscribe to receive updates the moment they
-                  publish.
-                </p>
+                <p>{t("safety_policies.policy_library.transparency.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a href="mailto:safety@roundup.games?subject=Transparency%20reports">
-                    Join the safety briefing list
+                    {t("safety_policies.policy_library.transparency.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -203,26 +205,24 @@ function SafetyPoliciesPage() {
       >
         <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-10">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Download policy packs
+            {t("safety_policies.downloads.title")}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card className={cardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Community safety handbook
+                  {t("safety_policies.downloads.formats.handbook.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Complete policies for in-person programs, including facilitator scripts.
-                </p>
+                <p>{t("safety_policies.downloads.formats.handbook.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/community-safety-handbook.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download PDF
+                    {t("safety_policies.downloads.formats.handbook.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -230,13 +230,12 @@ function SafetyPoliciesPage() {
             <Card className={cardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Data protection addendum
+                  {t("safety_policies.downloads.formats.data_protection.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
                 <p>
-                  Privacy policy, retention schedules, and incident notification
-                  templates.
+                  {t("safety_policies.downloads.formats.data_protection.description")}
                 </p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
@@ -244,7 +243,7 @@ function SafetyPoliciesPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download PDF
+                    {t("safety_policies.downloads.formats.data_protection.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -252,21 +251,18 @@ function SafetyPoliciesPage() {
             <Card className={cardSurfaceClass}>
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                  Accessibility playbook
+                  {t("safety_policies.downloads.formats.accessibility.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                <p>
-                  Guidelines for sensory-friendly, mobility-aware, and multilingual
-                  events.
-                </p>
+                <p>{t("safety_policies.downloads.formats.accessibility.description")}</p>
                 <Button asChild variant="outline" className="justify-center">
                   <a
                     href="https://cdn.roundup.games/accessibility-playbook.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Download PDF
+                    {t("safety_policies.downloads.formats.accessibility.button")}
                   </a>
                 </Button>
               </CardContent>
@@ -276,16 +272,15 @@ function SafetyPoliciesPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                  Need a signed policy for your venue?
+                  {t("safety_policies.downloads.custom_policies.title")}
                 </h3>
                 <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  Our legal team can co-author venue-specific agreements or compliance
-                  attestations.
+                  {t("safety_policies.downloads.custom_policies.description")}
                 </p>
               </div>
               <Button asChild className="sm:w-auto">
                 <a href="mailto:legal@roundup.games?subject=Venue%20policy%20support">
-                  Coordinate with legal
+                  {t("safety_policies.downloads.custom_policies.button")}
                 </a>
               </Button>
             </div>
@@ -296,12 +291,10 @@ function SafetyPoliciesPage() {
       <section className="bg-white py-12 sm:py-16 lg:py-20 dark:bg-gray-950">
         <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-10">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-            Questions or feedback?
+            {t("safety_policies.questions.title")}
           </h2>
           <p className="max-w-3xl text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-            Reach out to safety@roundup.games with policy updates, accessibility requests,
-            or clarifying questions. We respond within 48 hours and can schedule follow-up
-            calls when needed.
+            {t("safety_policies.questions.description")}
           </p>
           <div className={mutedCardSurfaceClass}>
             <div className="flex items-start gap-4">
@@ -310,12 +303,10 @@ function SafetyPoliciesPage() {
               </div>
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-gray-50">
-                  Emergency contacts
+                  {t("safety_policies.questions.emergency.title")}
                 </h3>
                 <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                  For urgent incidents during an event, call the 24/7 hotline shared with
-                  registered coordinators. For digital security concerns, email
-                  security@roundup.games to reach our on-call response team.
+                  {t("safety_policies.questions.emergency.description")}
                 </p>
               </div>
             </div>

@@ -22,6 +22,7 @@ import type {
   GameSystemListItem,
 } from "~/features/game-systems/game-systems.types";
 import { PublicLayout } from "~/features/layouts/public-layout";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 
 const SYSTEMS_PER_PAGE = 20;
 
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/systems/")({
 });
 
 function SystemsBrowsePage() {
+  const { t } = useGameSystemsTranslation();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -95,10 +97,9 @@ function SystemsBrowsePage() {
     <PublicLayout>
       <section className="bg-secondary text-secondary-foreground py-16 dark:bg-gray-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-semibold sm:text-4xl">Explore Game Systems</h1>
+          <h1 className="text-3xl font-semibold sm:text-4xl">{t("browse.title")}</h1>
           <p className="text-secondary-foreground/80 dark:text-secondary-foreground/70 mt-4 max-w-2xl text-sm sm:text-base">
-            Browse tabletop rulesets with curated hero art, taxonomy, and key details. Use
-            the search box or pick a category to narrow the catalog.
+            {t("browse.subtitle")}
           </p>
         </div>
       </section>
@@ -125,10 +126,8 @@ function SystemsBrowsePage() {
           {systems.length === 0 && !systemsQuery.isLoading ? (
             <Card className="border-dashed text-center dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
               <CardHeader>
-                <CardTitle>No systems found</CardTitle>
-                <CardDescription>
-                  Clear your filters or try a different name to browse the full catalog.
-                </CardDescription>
+                <CardTitle>{t("browse.no_systems.title")}</CardTitle>
+                <CardDescription>{t("browse.no_systems.subtitle")}</CardDescription>
               </CardHeader>
             </Card>
           ) : null}
@@ -164,6 +163,8 @@ function FilterPanel({
   onSubmit,
   onReset,
 }: FilterPanelProps) {
+  const { t } = useGameSystemsTranslation();
+
   const selectedCategoryTags = useMemo(() => {
     const lookup = new Map(
       filters.categories.map((category) => [String(category.id), category]),
@@ -196,10 +197,8 @@ function FilterPanel({
     <Card>
       <CardHeader className="gap-4">
         <div>
-          <CardTitle>Find a system</CardTitle>
-          <CardDescription>
-            Search by name or filter by category to discover new systems.
-          </CardDescription>
+          <CardTitle>{t("filter.title")}</CardTitle>
+          <CardDescription>{t("filter.description")}</CardDescription>
         </div>
       </CardHeader>
       <CardContent>
@@ -210,11 +209,11 @@ function FilterPanel({
                 className="text-foreground text-sm font-medium"
                 htmlFor="system-search"
               >
-                Search
+                {t("filter.search_label")}
               </label>
               <Input
                 id="system-search"
-                placeholder="Search by name"
+                placeholder={t("filter.search_placeholder")}
                 value={formState.q}
                 onChange={(event) =>
                   setFormState((prev) => ({ ...prev, q: event.target.value }))
@@ -227,17 +226,17 @@ function FilterPanel({
                 className="text-foreground text-sm font-medium"
                 htmlFor="categories-select"
               >
-                Categories
+                {t("filter.categories_label")}
               </label>
               <CategoryTagInput
                 id="categories-select"
                 tags={selectedCategoryTags}
                 onAddTag={handleAddCategory}
                 onRemoveTag={handleRemoveCategory}
-                placeholder="Type to search categories"
+                placeholder={t("filter.categories_placeholder")}
               />
               <p className="text-muted-foreground text-xs">
-                Use tags to combine multiple categories in your search.
+                {t("filter.categories_help")}
               </p>
             </div>
           </div>
@@ -251,10 +250,10 @@ function FilterPanel({
                 onClick={onReset}
                 disabled={isSubmitting}
               >
-                Clear
+                {t("filter.clear_button")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                Apply filters
+                {t("filter.apply_button")}
               </Button>
             </div>
           </div>
@@ -273,15 +272,21 @@ function ResultsSummary({
   total: number;
   isFetching: boolean;
 }) {
+  const { t } = useGameSystemsTranslation();
+
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <div className="text-muted-foreground text-sm">
-        Showing <span className="text-foreground font-semibold">{systemsCount}</span> of
-        <span className="text-foreground font-semibold"> {total}</span> published systems.
+        {t("results.showing", {
+          count: systemsCount,
+          total: total,
+          itemType:
+            systemsCount === 1 ? t("results.item_singular") : t("results.item_plural"),
+        })}
       </div>
       {isFetching ? (
         <span className="text-muted-foreground text-xs tracking-wide uppercase">
-          Updating results…
+          {t("results.updating")}
         </span>
       ) : null}
     </div>
@@ -329,6 +334,7 @@ function PaginationControls({
   isLoading: boolean;
   onChange: (page: number) => void;
 }) {
+  const { t } = useGameSystemsTranslation();
   const previousDisabled = currentPage <= 1 || isLoading;
   const nextDisabled = currentPage >= totalPages || isLoading;
 
@@ -341,11 +347,13 @@ function PaginationControls({
         disabled={previousDisabled}
         onClick={() => onChange(currentPage - 1)}
       >
-        Previous
+        {t("pagination.previous")}
       </Button>
       <span className="text-muted-foreground text-sm">
-        Page <span className="text-foreground font-semibold">{currentPage}</span> of
-        <span className="text-foreground font-semibold"> {totalPages}</span>
+        {t("pagination.page_info", {
+          current: currentPage,
+          total: totalPages,
+        })}
       </span>
       <Button
         type="button"
@@ -354,7 +362,7 @@ function PaginationControls({
         disabled={nextDisabled}
         onClick={() => onChange(currentPage + 1)}
       >
-        Next
+        {t("pagination.next")}
       </Button>
     </div>
   );
@@ -367,10 +375,14 @@ function ActiveFilterSummary({
   formState: FiltersFormState;
   filters: AvailableGameSystemFilters;
 }) {
+  const { t } = useGameSystemsTranslation();
   const activeBadges: Array<{ key: string; label: string }> = [];
 
   if (formState.q.trim()) {
-    activeBadges.push({ key: "search", label: `Search: "${formState.q.trim()}"` });
+    activeBadges.push({
+      key: "search",
+      label: t("filter.active_search", { query: formState.q.trim() }),
+    });
   }
 
   if (formState.categoryIds.length) {
@@ -379,11 +391,16 @@ function ActiveFilterSummary({
       .map((item) => item.name)
       .slice(0, 3)
       .join(", ");
-    activeBadges.push({ key: "categories", label: `Categories: ${names}` });
+    activeBadges.push({
+      key: "categories",
+      label: t("filter.active_categories", { names }),
+    });
   }
 
   if (activeBadges.length === 0) {
-    return <span className="text-muted-foreground text-xs">All systems</span>;
+    return (
+      <span className="text-muted-foreground text-xs">{t("filter.all_systems")}</span>
+    );
   }
 
   return (

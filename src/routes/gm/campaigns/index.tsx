@@ -18,6 +18,10 @@ import { participantRoleEnum } from "~/db/schema/shared.schema";
 import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
+import {
+  useCampaignsTranslation,
+  useCommonTranslation,
+} from "~/hooks/useTypedTranslation";
 import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/gm/campaigns/")({
@@ -41,6 +45,8 @@ export const Route = createFileRoute("/gm/campaigns/")({
 });
 
 function CampaignsPage() {
+  const { t: tCampaigns } = useCampaignsTranslation();
+  const { t: tCommon } = useCommonTranslation();
   const {
     status = "active",
     userRole,
@@ -58,7 +64,7 @@ function CampaignsPage() {
         data: { filters: { status, userRole }, page, pageSize },
       });
       if (!result.success) {
-        toast.error("Failed to load campaigns.");
+        toast.error(tCampaigns("my_campaigns.errors.load_failed"));
         return {
           success: false,
           errors: [{ code: "FETCH_ERROR", message: "Failed to load campaigns" }],
@@ -77,8 +83,10 @@ function CampaignsPage() {
     <div className="container mx-auto p-4 sm:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Campaigns</h1>
-          <p className="text-muted-foreground">Manage your campaign sessions</p>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">
+            {tCampaigns("my_campaigns.title")}
+          </h1>
+          <p className="text-muted-foreground">{tCampaigns("my_campaigns.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Select
@@ -93,7 +101,7 @@ function CampaignsPage() {
             }}
           >
             <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={tCampaigns("my_campaigns.filter_by_status")} />
             </SelectTrigger>
             <SelectContent>
               {campaignStatusEnum.enumValues.map((status) => (
@@ -115,18 +123,18 @@ function CampaignsPage() {
             }}
           >
             <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
-              <SelectValue placeholder="Filter by role" />
+              <SelectValue placeholder={tCampaigns("my_campaigns.filter_by_role")} />
             </SelectTrigger>
             <SelectContent>
               {participantRoleEnum.enumValues.map((role) => (
                 <SelectItem key={role} value={role}>
                   {role === "owner"
-                    ? "Organizer"
+                    ? tCampaigns("my_campaigns.role_labels.owner")
                     : role === "player"
-                      ? "Participant"
+                      ? tCampaigns("my_campaigns.role_labels.player")
                       : role === "invited"
-                        ? "Invitee"
-                        : "Requested"}
+                        ? tCampaigns("my_campaigns.role_labels.invited")
+                        : tCampaigns("my_campaigns.role_labels.requested")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -134,7 +142,7 @@ function CampaignsPage() {
           <Button asChild>
             <Link to="/gm/campaigns/create">
               <PlusIcon className="mr-2 h-4 w-4" />
-              Create New Campaign
+              {tCampaigns("my_campaigns.create_new_campaign")}
             </Link>
           </Button>
         </div>
@@ -144,14 +152,16 @@ function CampaignsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Gamepad2 className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">No campaigns yet</h3>
+            <h3 className="mb-2 text-lg font-semibold">
+              {tCampaigns("my_campaigns.no_campaigns_title")}
+            </h3>
             <p className="text-muted-foreground mb-4 text-center">
-              Create your first campaign to get started
+              {tCampaigns("my_campaigns.no_campaigns_subtitle")}
             </p>
             <Button asChild>
               <Link to="/gm/campaigns/create">
                 <PlusIcon className="mr-2 h-4 w-4" />
-                Create New Campaign
+                {tCampaigns("my_campaigns.create_new_campaign")}
               </Link>
             </Button>
           </CardContent>
@@ -184,7 +194,7 @@ function CampaignsPage() {
                       params={{ campaignId: c.id }}
                       className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
                     >
-                      View
+                      {tCampaigns("list.view_button")}
                       <ChevronRight className="h-4 w-4" />
                     </Link>
                   </div>
@@ -212,7 +222,11 @@ function CampaignsPage() {
       )}
       <div className="mt-6 flex items-center justify-between">
         <div className="text-muted-foreground text-sm">
-          Page {page} of {totalPages} • {totalCount} total
+          {tCampaigns("my_campaigns.pagination.page_info", {
+            current: page,
+            total: totalPages,
+            count: totalCount,
+          })}
         </div>
         <div className="flex gap-2">
           <Button
@@ -225,7 +239,7 @@ function CampaignsPage() {
             }
             disabled={page <= 1}
           >
-            Previous
+            {tCommon("buttons.previous")}
           </Button>
           <Button
             variant="outline"
@@ -242,7 +256,7 @@ function CampaignsPage() {
             }
             disabled={page >= totalPages}
           >
-            Next
+            {tCommon("buttons.next")}
           </Button>
         </div>
       </div>

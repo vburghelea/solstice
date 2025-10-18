@@ -13,6 +13,7 @@ import {
 } from "~/components/ui/card";
 import { removeCampaignParticipant } from "~/features/campaigns/campaigns.mutations";
 import { CampaignParticipant } from "~/features/campaigns/campaigns.types";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 
 interface ManageInvitationsProps {
   campaignId: string;
@@ -20,20 +21,21 @@ interface ManageInvitationsProps {
 }
 
 export function ManageInvitations({ campaignId, invitations }: ManageInvitationsProps) {
+  const { t } = useCampaignsTranslation();
   const queryClient = useQueryClient();
 
   const rejectInvitationMutation = useMutation({
     mutationFn: removeCampaignParticipant, // This will be used for rejecting (deleting the entry)
     onSuccess: (data) => {
       if (data.success) {
-        toast.success("Invitation rejected successfully!");
+        toast.success(t("messages.invitation_rejected_success"));
         queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to reject invitation");
+        toast.error(data.errors?.[0]?.message || t("errors.failed_to_reject_invitation"));
       }
     },
     onError: (error) => {
-      toast.error(`Failed to reject invitation: ${error.message}`);
+      toast.error(`${t("errors.failed_to_reject_invitation")}: ${error.message}`);
     },
   });
 
@@ -48,12 +50,14 @@ export function ManageInvitations({ campaignId, invitations }: ManageInvitations
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Manage Invitations</CardTitle>
-        <CardDescription>Review and process pending invitations.</CardDescription>
+        <CardTitle>{t("titles.manage_invitations")}</CardTitle>
+        <CardDescription>{t("descriptions.manage_invitations")}</CardDescription>
       </CardHeader>
       <CardContent>
         {invitations.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No pending invitations.</p>
+          <p className="text-muted-foreground text-sm">
+            {t("status.no_pending_invitations")}
+          </p>
         ) : (
           <ul className="bg-background max-h-60 overflow-y-auto rounded-md border p-2">
             {invitations.map((invitation) => (
@@ -77,11 +81,14 @@ export function ManageInvitations({ campaignId, invitations }: ManageInvitations
                           userId={invitation.user.id}
                           username={invitation.user.name || invitation.user.email}
                         />{" "}
-                        (Invited - {invitation.status})
+                        ({t("invitation_status.invited")} - {invitation.status})
                       </span>
                     </>
                   ) : (
-                    <span>Unknown User (Invited - {invitation.status})</span>
+                    <span>
+                      {t("status.unknown_user")} ({t("invitation_status.invited")} -{" "}
+                      {invitation.status})
+                    </span>
                   )}
                 </div>
                 <div className="flex space-x-2">
@@ -94,7 +101,7 @@ export function ManageInvitations({ campaignId, invitations }: ManageInvitations
                     {rejectInvitationMutation.isPending ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      "Revoke"
+                      t("buttons.revoke")
                     )}
                   </Button>
                 </div>

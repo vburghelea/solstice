@@ -15,6 +15,7 @@ import { RoleBadge } from "~/components/ui/RoleBadge";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 
@@ -43,6 +44,7 @@ export function GameCard({
   onUpdateStatus,
   viewLink,
 }: GameCardProps) {
+  const { t } = useGamesTranslation();
   const formattedDateTime = formatDateAndTime(game.dateTime);
 
   const canCancel = game.status !== "completed" && game.status !== "canceled";
@@ -53,7 +55,7 @@ export function GameCard({
     to: viewLink?.to ?? "/player/games/$gameId",
     params: viewLink?.params ?? { gameId: game.id },
     from: viewLink?.from ?? "/player/games",
-    label: viewLink?.label ?? "View Game",
+    label: viewLink?.label ?? t("buttons.view_game"),
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };
 
@@ -102,30 +104,32 @@ export function GameCard({
             </div>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Game System</span>
-            <span className="font-medium">{game.gameSystem?.name || "N/A"}</span>
+            <span className="text-muted-foreground">{t("labels.game_system")}</span>
+            <span className="font-medium">
+              {game.gameSystem?.name || t("status.not_available")}
+            </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Language</span>
+            <span className="text-muted-foreground">{t("labels.language")}</span>
             <LanguageTag language={game.language} className="text-[0.7rem]" />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Players</span>
+            <span className="text-muted-foreground">{t("labels.players")}</span>
             <span className="font-medium">
               {game.minimumRequirements?.minPlayers || "?"} -{" "}
               {game.minimumRequirements?.maxPlayers || "?"}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Visibility</span>
+            <span className="text-muted-foreground">{t("labels.visibility")}</span>
             {game.visibility === "protected" ? (
-              <Badge variant="secondary">Connections &amp; Teammates</Badge>
+              <Badge variant="secondary">{t("status.connections_teammates")}</Badge>
             ) : (
               <span className="font-medium capitalize">{game.visibility}</span>
             )}
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Participants</span>
+            <span className="text-muted-foreground">{t("labels.participants")}</span>
             <span className="font-medium">{game.participantCount}</span>
           </div>
         </div>
@@ -137,7 +141,7 @@ export function GameCard({
               {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
               {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             >
-              {resolvedLink.label ?? "View Game"}
+              {resolvedLink.label ?? t("buttons.view_game")}
             </Link>
           </Button>
         </div>
@@ -155,7 +159,7 @@ export function GameCard({
                 }
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Mark Completed
+                {t("buttons.mark_completed")}
               </Button>
             )}
             {canCancel && (
@@ -164,13 +168,13 @@ export function GameCard({
                 size="sm"
                 className="flex-2"
                 onClick={() => {
-                  if (window.confirm("Are you sure you want to cancel this session?")) {
+                  if (window.confirm(t("confirmation.cancel_session"))) {
                     onUpdateStatus({ data: { gameId: game.id, status: "canceled" } });
                   }
                 }}
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Cancel Session
+                {t("buttons.cancel_session")}
               </Button>
             )}
           </div>

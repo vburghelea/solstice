@@ -1,5 +1,6 @@
 import { Calendar, Users } from "lucide-react";
 import type { EventWithDetails } from "~/features/events/events.types";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import { List } from "~/shared/ui/list";
 
 interface EventListItemProps {
@@ -8,17 +9,18 @@ interface EventListItemProps {
 }
 
 export function EventListItem({ event, cta }: EventListItemProps) {
+  const { t } = useEventsTranslation();
   const formattedDate = (event as unknown as { startDate?: string }).startDate
     ? new Date(event.startDate).toLocaleDateString()
-    : "TBD";
+    : t("list_item.date_tbd");
   const feeCents =
     event.registrationType === "team"
       ? event.teamRegistrationFee
       : event.individualRegistrationFee;
-  const price = feeCents ? `$${(feeCents / 100).toFixed(2)}` : "Free";
+  const price = feeCents ? `$${(feeCents / 100).toFixed(2)}` : t("list_item.free");
   const spots =
     typeof event.availableSpots === "number"
-      ? `${event.availableSpots} spots left`
+      ? t("list_item.spots_left", { count: event.availableSpots })
       : undefined;
 
   return (
@@ -38,13 +40,15 @@ export function EventListItem({ event, cta }: EventListItemProps) {
               <Calendar className="h-3.5 w-3.5" /> {formattedDate}
             </span>
             <span className="inline-flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" /> {spots || "Capacity TBD"}
+              <Users className="h-3.5 w-3.5" /> {spots || t("list_item.capacity_tbd")}
             </span>
             <span className="inline-flex items-center gap-1">{price}</span>
             <span
               className={event.isRegistrationOpen ? "text-emerald-700" : "text-amber-700"}
             >
-              {event.isRegistrationOpen ? "Registration Open" : "Registration Closed"}
+              {event.isRegistrationOpen
+                ? t("list.registration.open")
+                : t("list.registration.closed")}
             </span>
           </div>
         </div>

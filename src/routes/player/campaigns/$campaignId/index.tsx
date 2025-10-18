@@ -57,6 +57,7 @@ import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGameSessionsByCampaignId } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
 import { getRelationshipSnapshot } from "~/features/social";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { useRateLimitedServerFn } from "~/lib/pacer";
 import { HeroBackgroundImage } from "~/shared/components/hero-background-image";
 import { InfoItem } from "~/shared/components/info-item";
@@ -128,6 +129,7 @@ type OwnerAction = {
 };
 
 function CampaignDetailsPage() {
+  const { t } = useCampaignsTranslation();
   const queryClient = useQueryClient();
   const { campaignId } = Route.useParams();
   const { user: currentUser } = Route.useRouteContext();
@@ -155,10 +157,12 @@ function CampaignDetailsPage() {
     queryFn: async () => {
       const result = await getCampaign({ data: { id: campaignId } });
       if (!result.success) {
-        throw new Error(result.errors?.[0]?.message || "Failed to fetch campaign");
+        throw new Error(
+          result.errors?.[0]?.message || t("detail.failed_to_fetch_campaign"),
+        );
       }
       if (!result.data) {
-        throw new Error("Campaign data not found");
+        throw new Error(t("detail.campaign_data_not_found"));
       }
       return result.data;
     },
@@ -215,7 +219,7 @@ function CampaignDetailsPage() {
       await rlUpdateGameSessionStatus(vars),
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("Game session status updated successfully!");
+        toast.success(t("detail.game_session_status_updated"));
         queryClient.invalidateQueries({
           queryKey: ["campaignGameSessions", campaignId, statusFilter],
         });
@@ -234,14 +238,13 @@ function CampaignDetailsPage() {
           // ignore cache invalidation errors
         }
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to update game session status");
+        toast.error(
+          data.errors?.[0]?.message || t("detail.failed_to_update_game_session_status"),
+        );
       }
     },
     onError: (error) => {
-      toast.error(
-        error.message ||
-          "An unexpected error occurred while updating game session status",
-      );
+      toast.error(error.message || t("detail.unexpected_error_updating_game_session"));
     },
   });
 
@@ -249,15 +252,15 @@ function CampaignDetailsPage() {
     mutationFn: updateCampaign,
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("Campaign updated successfully");
+        toast.success(t("detail.campaign_updated"));
         await queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
         setIsEditing(false);
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to update campaign");
+        toast.error(data.errors?.[0]?.message || t("detail.failed_to_update_campaign"));
       }
     },
     onError: (error) => {
-      toast.error(error.message || "An unexpected error occurred");
+      toast.error(error.message || t("detail.unexpected_error_occurred"));
     },
   });
 
@@ -288,7 +291,7 @@ function CampaignDetailsPage() {
 
       if (!result.success) {
         toast.error(
-          result.errors?.[0]?.message || "Failed to fetch your application status.",
+          result.errors?.[0]?.message || t("detail.failed_to_fetch_application_status"),
         );
         return null;
       }
@@ -303,18 +306,20 @@ function CampaignDetailsPage() {
     mutationFn: applyToCampaign,
     onSuccess: (data) => {
       if (data.success) {
-        toast.success("Application submitted successfully!");
+        toast.success(t("detail.application_submitted"));
         queryClient.invalidateQueries({
           queryKey: ["userCampaignApplication", campaignId, currentUser?.id],
         });
         queryClient.invalidateQueries({ queryKey: ["campaignApplications", campaignId] }); // Invalidate owner's view
         queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] }); // Invalidate participants list
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to submit application.");
+        toast.error(
+          data.errors?.[0]?.message || t("detail.failed_to_submit_application"),
+        );
       }
     },
     onError: (error) => {
-      toast.error(error.message || "An unexpected error occurred while applying.");
+      toast.error(error.message || t("detail.unexpected_error_applying"));
     },
   });
 
@@ -353,7 +358,7 @@ function CampaignDetailsPage() {
   }
 
   if (!campaign) {
-    return <div>Campaign not found</div>;
+    return <div>{t("detail.campaign_not_found")}</div>;
   }
 
   const hasPendingApplication = userApplication?.status === "pending";
@@ -409,7 +414,7 @@ function CampaignDetailsPage() {
   if (isOwner && campaign.status === "active") {
     ownerActions.push({
       key: "complete",
-      label: "Mark campaign as completed",
+      label: t("detail.mark_campaign_completed"),
       icon: CheckCircle2,
       onClick: () =>
         updateCampaignMutation.mutate({
@@ -419,10 +424,10 @@ function CampaignDetailsPage() {
     });
     ownerActions.push({
       key: "cancel",
-      label: "Cancel this campaign",
+      label: t("detail.cancel_campaign"),
       icon: XCircle,
       onClick: () => {
-        if (window.confirm("Are you sure you want to cancel this campaign?")) {
+        if (window.confirm(t("detail.confirm_cancel_campaign"))) {
           updateCampaignMutation.mutate({
             data: { id: campaignId, status: "canceled" },
           });
@@ -435,14 +440,14 @@ function CampaignDetailsPage() {
   if (isOwner) {
     ownerActions.push({
       key: "session-zero",
-      label: "Open session zero notes",
+      label: t("detail.open_session_zero"),
       icon: ScrollText,
       to: "/player/campaigns/$campaignId/zero",
       params: { campaignId },
     });
     ownerActions.push({
       key: "edit",
-      label: isEditing ? "Exit edit mode" : "Edit campaign details",
+      label: isEditing ? t("detail.exit_edit_mode") : t("detail.edit_campaign_details"),
       icon: isEditing ? Undo2 : PenSquareIcon,
       onClick: () => setIsEditing((prev) => !prev),
       disabled: updateCampaignMutation.isPending,
@@ -497,7 +502,9 @@ function CampaignDetailsPage() {
                     }
                     disabled={applyToCampaignMutation.isPending}
                   >
-                    {applyToCampaignMutation.isPending ? "Applying..." : "Apply to join"}
+                    {applyToCampaignMutation.isPending
+                      ? t("detail.applying")
+                      : t("detail.apply_to_join")}
                   </Button>
                 ) : null}
               </div>
@@ -557,11 +564,11 @@ function CampaignDetailsPage() {
         <div className="mx-auto w-full max-w-6xl space-y-6 px-4 sm:px-6 lg:px-8">
           {hasPendingApplication ? (
             <p className="text-muted-foreground text-sm">
-              Your application is pending review.
+              {t("detail.application_pending")}
             </p>
           ) : null}
           {hasRejectedApplication ? (
-            <p className="text-destructive text-sm">Your application was rejected.</p>
+            <p className="text-destructive text-sm">{t("detail.application_rejected")}</p>
           ) : null}
 
           <div
@@ -581,10 +588,8 @@ function CampaignDetailsPage() {
               {isEditing ? (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Edit campaign</CardTitle>
-                    <CardDescription>
-                      Update the overarching details for your ongoing story.
-                    </CardDescription>
+                    <CardTitle>{t("detail.edit_campaign")}</CardTitle>
+                    <CardDescription>{t("detail.edit_description")}</CardDescription>
                   </CardHeader>
                   <CardContent className="px-0 pb-0">
                     <div className="px-4 pb-6 sm:px-6">
@@ -620,10 +625,8 @@ function CampaignDetailsPage() {
               ) : (
                 <Card>
                   <CardHeader>
-                    <CardTitle>About this campaign</CardTitle>
-                    <CardDescription>
-                      Summarize the tone, arc, and player expectations.
-                    </CardDescription>
+                    <CardTitle>{t("detail.about_this_campaign")}</CardTitle>
+                    <CardDescription>{t("detail.about_description")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {campaign.description ? (
@@ -632,7 +635,7 @@ function CampaignDetailsPage() {
                       </p>
                     ) : (
                       <p className="text-muted-foreground">
-                        The organizer hasn't shared additional campaign context yet.
+                        {t("detail.no_description_provided")}
                       </p>
                     )}
                   </CardContent>
@@ -642,7 +645,9 @@ function CampaignDetailsPage() {
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-foreground">Game sessions</CardTitle>
+                    <CardTitle className="text-foreground">
+                      {t("detail.game_sessions")}
+                    </CardTitle>
                     <div className="flex items-center gap-4">
                       <Select
                         value={statusFilter}
@@ -655,7 +660,7 @@ function CampaignDetailsPage() {
                         }}
                       >
                         <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by status" />
+                          <SelectValue placeholder={t("detail.filter_by_status")} />
                         </SelectTrigger>
                         <SelectContent>
                           {gameStatusEnum.enumValues.map((status) => (
@@ -668,7 +673,7 @@ function CampaignDetailsPage() {
                       {isOwner ? (
                         <Button size="sm" asChild>
                           <Link to="/player/games/create" search={{ campaignId }}>
-                            Create session
+                            {t("detail.create_session")}
                           </Link>
                         </Button>
                       ) : null}
@@ -683,7 +688,7 @@ function CampaignDetailsPage() {
                   ) : null}
                   {gameSessions.length === 0 ? (
                     <p className="text-muted-foreground">
-                      No game sessions found for this campaign with the selected status.
+                      {t("detail.no_game_sessions_found")}
                     </p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -697,7 +702,7 @@ function CampaignDetailsPage() {
                             to: "/player/games/$gameId",
                             params: { gameId: gameSession.id },
                             from: "/player/campaigns/$campaignId",
-                            label: "View Game",
+                            label: t("detail.view_game"),
                           }}
                         />
                       ))}
@@ -752,10 +757,8 @@ function CampaignDetailsPage() {
             >
               <Card>
                 <CardHeader>
-                  <CardTitle>Campaign logistics</CardTitle>
-                  <CardDescription>
-                    Keep everyone aligned on cadence and table shape.
-                  </CardDescription>
+                  <CardTitle>{t("detail.campaign_logistics")}</CardTitle>
+                  <CardDescription>{t("detail.logistics_description")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-6 sm:grid-cols-2">
@@ -775,15 +778,17 @@ function CampaignDetailsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Location</CardTitle>
-                  <CardDescription>Shared after your seat is approved.</CardDescription>
+                  <CardTitle>{t("detail.location")}</CardTitle>
+                  <CardDescription>
+                    {t("detail.location_shared_after_approval")}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-start gap-3 text-sm">
                     <MapPinIcon className="text-muted-foreground mt-1 h-4 w-4" />
                     <div>
                       <p className="text-foreground font-medium">
-                        {campaign.location?.address || "Not specified"}
+                        {campaign.location?.address || t("detail.not_specified")}
                       </p>
                       {campaign.location?.address ? (
                         <SafeAddressLink address={campaign.location.address} />
@@ -795,10 +800,8 @@ function CampaignDetailsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Safety & consent</CardTitle>
-                  <CardDescription>
-                    Consistency for every session in the campaign.
-                  </CardDescription>
+                  <CardTitle>{t("detail.safety_consent")}</CardTitle>
+                  <CardDescription>{t("detail.safety_description")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <SafetyRulesView safetyRules={campaign.safetyRules} />
@@ -813,14 +816,16 @@ function CampaignDetailsPage() {
         <StickyActionBar>
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
             <div className="text-sm">
-              Price/session: {priceLabel}
+              {t("detail.price_session")}: {priceLabel}
               {playersRange ? ` • ${playersRange}` : ""}
             </div>
             <Button
               onClick={() => applyToCampaignMutation.mutate({ data: { campaignId } })}
               disabled={applyToCampaignMutation.isPending}
             >
-              {applyToCampaignMutation.isPending ? "Applying..." : "Apply to join"}
+              {applyToCampaignMutation.isPending
+                ? t("detail.applying")
+                : t("detail.apply_to_join")}
             </Button>
           </div>
         </StickyActionBar>

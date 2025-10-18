@@ -7,6 +7,7 @@ import {
   visibilityEnum,
 } from "~/db/schema/shared.schema"; // Added applicationStatusEnum
 
+import { tCampaigns, tCommon } from "~/lib/i18n/server-translations";
 import {
   locationSchema,
   minimumRequirementsSchema,
@@ -54,8 +55,8 @@ export const sessionZeroSchema = z.object({
 });
 
 export const createCampaignInputSchema = z.object({
-  name: z.string().min(1, "Campaign name is required"),
-  description: z.string().min(1, "Description is required"),
+  name: z.string().min(1, tCampaigns("validation.campaign_name_required")),
+  description: z.string().min(1, tCampaigns("validation.description_required")),
   images: z.array(z.string()).nullable().optional(),
   gameSystemId: z.number().int().positive(),
   ownerId: z.string().optional(),
@@ -63,7 +64,7 @@ export const createCampaignInputSchema = z.object({
   timeOfDay: z.string(),
   sessionDuration: z.number().positive(),
   pricePerSession: z.number().nullable().optional(),
-  language: z.string().min(1, "Language is required"),
+  language: z.string().min(1, tCommon("validation.language_required")),
   location: locationSchema.optional(),
   minimumRequirements: minimumRequirementsSchema.optional(),
   visibility: z.enum(visibilityEnum.enumValues), // Changed to visibilityEnum

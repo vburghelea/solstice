@@ -40,6 +40,7 @@ import {
   upsertCmsContent,
 } from "~/features/game-systems/game-systems.mutations";
 import type { GameSystemTag } from "~/features/game-systems/game-systems.types";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
@@ -67,15 +68,17 @@ type ExternalMappingRequest = {
 
 type RecrawlSourceOption = "manual" | ExternalSourceOption;
 
-const TABS = [
-  { value: "overview", label: "Overview" },
-  { value: "content", label: "Content" },
-  { value: "media", label: "Media" },
-  { value: "taxonomy", label: "Taxonomy" },
-  { value: "crawl", label: "Crawl" },
-] as const;
+function createTabs(t: (key: string) => string) {
+  return [
+    { value: "overview", label: t("admin.editor.tabs.overview") },
+    { value: "content", label: t("admin.editor.tabs.content") },
+    { value: "media", label: t("admin.editor.tabs.media") },
+    { value: "taxonomy", label: t("admin.editor.tabs.taxonomy") },
+    { value: "crawl", label: t("admin.editor.tabs.crawl") },
+  ] as const;
+}
 
-export type AdminSystemEditorTab = (typeof TABS)[number]["value"];
+export type AdminSystemEditorTab = ReturnType<typeof createTabs>[number]["value"];
 
 export const DEFAULT_SYSTEM_EDITOR_TAB: AdminSystemEditorTab = "overview";
 
@@ -92,11 +95,13 @@ export function SystemEditor({
   onTabChange,
   onSystemChange,
 }: SystemEditorProps) {
+  const { t } = useGameSystemsTranslation();
   const queryClient = useQueryClient();
-  const updatedRelative = formatSystemRelativeTime(system.updatedAt);
+  const updatedRelative = formatSystemRelativeTime(system.updatedAt, { t });
+  const tabs = createTabs(t);
   const statusPills =
     system.statusFlags.length === 0 ? (
-      <Badge variant="secondary">Publish ready</Badge>
+      <Badge variant="secondary">{t("admin.editor.status.publish_ready")}</Badge>
     ) : (
       system.statusFlags.map((flag) => <SystemStatusPill key={flag} flag={flag} />)
     );
@@ -104,12 +109,12 @@ export function SystemEditor({
   const refreshSystem = useCallback(async () => {
     const next = await getAdminGameSystem({ data: { systemId: system.id } });
     if (!next) {
-      throw new Error("System not found after update.");
+      throw new Error(t("admin.editor.hardcoded_strings.system_not_found_after_update"));
     }
     onSystemChange(next);
     await queryClient.invalidateQueries({ queryKey: ["admin-game-systems"] });
     return next;
-  }, [system.id, onSystemChange, queryClient]);
+  }, [system.id, onSystemChange, queryClient, t]);
 
   const moderateMutation = useMutation({
     mutationFn: async ({
@@ -123,11 +128,13 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: () => {
-      toast.success("Media moderation updated");
+      toast.success(t("admin.editor.messages.media_moderation_updated"));
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to update moderation";
+        error instanceof Error
+          ? error.message
+          : t("admin.errors.failed_to_update_moderation");
       toast.error(message);
     },
   });
@@ -138,11 +145,13 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: () => {
-      toast.success("Hero image updated");
+      toast.success(t("admin.editor.messages.hero_image_updated"));
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to update hero image";
+        error instanceof Error
+          ? error.message
+          : t("admin.errors.failed_to_update_hero_image");
       toast.error(message);
     },
   });
@@ -168,10 +177,13 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: () => {
-      toast.success("External tag mapped");
+      toast.success(t("admin.editor.hardcoded_strings.external_tag_mapped"));
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Failed to map tag";
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.editor.hardcoded_strings.failed_to_map_tag");
       toast.error(message);
     },
   });
@@ -187,10 +199,13 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: () => {
-      toast.success("Recrawl queued");
+      toast.success(t("admin.editor.hardcoded_strings.recrawl_queued"));
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Failed to queue recrawl";
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.editor.hardcoded_strings.failed_to_queue_recrawl");
       toast.error(message);
     },
   });
@@ -201,11 +216,17 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: (_, variables) => {
-      toast.success(variables.publish ? "System published" : "System reverted to draft");
+      toast.success(
+        variables.publish
+          ? t("admin.editor.hardcoded_strings.system_published")
+          : t("admin.editor.hardcoded_strings.system_reverted_to_draft"),
+      );
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to update publish status";
+        error instanceof Error
+          ? error.message
+          : t("admin.editor.hardcoded_strings.failed_to_update_publish_status");
       toast.error(message);
     },
   });
@@ -216,11 +237,17 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: (_, variables) => {
-      toast.success(variables.approved ? "CMS copy approved" : "CMS approval revoked");
+      toast.success(
+        variables.approved
+          ? t("admin.editor.hardcoded_strings.cms_copy_approved")
+          : t("admin.editor.hardcoded_strings.cms_approval_revoked"),
+      );
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to update CMS approval";
+        error instanceof Error
+          ? error.message
+          : t("admin.editor.hardcoded_strings.failed_to_update_cms_approval");
       toast.error(message);
     },
   });
@@ -239,11 +266,13 @@ export function SystemEditor({
       return refreshSystem();
     },
     onSuccess: () => {
-      toast.success("CMS content saved");
+      toast.success(t("admin.editor.hardcoded_strings.cms_content_saved"));
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to save CMS content";
+        error instanceof Error
+          ? error.message
+          : t("admin.editor.hardcoded_strings.failed_to_save_cms_content");
       toast.error(message);
     },
   });
@@ -255,8 +284,10 @@ export function SystemEditor({
           <div className="space-y-1">
             <h1 className="text-card-foreground text-2xl font-semibold">{system.name}</h1>
             <p className="text-muted-foreground text-sm">
-              Last updated {updatedRelative} • Slug:{" "}
-              <span className="text-card-foreground/80 font-mono">{system.slug}</span>
+              {t("admin.editor.hardcoded_strings.last_updated_relative", {
+                relative: updatedRelative,
+                slug: system.slug,
+              })}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs tracking-wide uppercase">
@@ -264,7 +295,7 @@ export function SystemEditor({
           </div>
         </CardContent>
         <CardFooter className="bg-muted/40 flex flex-wrap gap-2 border-t p-4">
-          {TABS.map((tab) => {
+          {tabs.map((tab) => {
             const isActive = tab.value === activeTab;
             return (
               <Button
@@ -291,6 +322,7 @@ export function SystemEditor({
             onToggleApproval={(approved) => cmsApprovalMutation.mutate({ approved })}
             isPublishing={publishMutation.isPending}
             isApprovalPending={cmsApprovalMutation.isPending}
+            t={t}
           />
         ) : null}
         {activeTab === "content" ? (
@@ -298,6 +330,7 @@ export function SystemEditor({
             system={system}
             onSave={(payload) => cmsContentMutation.mutate(payload)}
             isSaving={cmsContentMutation.isPending}
+            t={t}
           />
         ) : null}
         {activeTab === "media" ? (
@@ -309,6 +342,7 @@ export function SystemEditor({
             onSelectHero={(mediaId) => heroMutation.mutate({ mediaId })}
             isUpdatingModeration={moderateMutation.isPending}
             isUpdatingHero={heroMutation.isPending}
+            t={t}
           />
         ) : null}
         {activeTab === "taxonomy" ? (
@@ -316,6 +350,7 @@ export function SystemEditor({
             system={system}
             onMapExternalTag={(input) => externalMappingMutation.mutate(input)}
             isMapping={externalMappingMutation.isPending}
+            t={t}
           />
         ) : null}
         {activeTab === "crawl" ? (
@@ -324,6 +359,7 @@ export function SystemEditor({
             system={system}
             onRequestRecrawl={(source) => recrawlMutation.mutate({ source })}
             isRecrawlPending={recrawlMutation.isPending}
+            t={t}
           />
         ) : null}
       </section>
@@ -337,55 +373,70 @@ function OverviewTab({
   onToggleApproval,
   isPublishing,
   isApprovalPending,
+  t,
 }: {
   system: AdminGameSystemDetail;
   onPublish: (publish: boolean) => void;
   onToggleApproval: (approved: boolean) => void;
   isPublishing: boolean;
   isApprovalPending: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Publication status</CardTitle>
+          <CardTitle>{t("admin.editor.hardcoded_strings.publication_status")}</CardTitle>
           <CardDescription>
-            Track CMS approvals and public visibility. Actions become available once
-            moderation tooling ships.
+            {t(
+              "admin.editor.hardcoded_strings.track_cms_approvals_and_public_visibility",
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <StatusRow
-            label="Published"
-            value={system.isPublished ? "Published" : "Draft"}
+            label={t("admin.editor.hardcoded_strings.published")}
+            value={
+              system.isPublished
+                ? t("admin.editor.hardcoded_strings.published")
+                : t("admin.editor.hardcoded_strings.draft")
+            }
             highlight={system.isPublished}
           />
           <StatusRow
-            label="CMS approval"
-            value={system.cmsApproved ? "Approved" : "Needs approval"}
+            label={t("admin.editor.hardcoded_strings.cms_approval")}
+            value={
+              system.cmsApproved
+                ? t("admin.editor.hardcoded_strings.approved")
+                : t("admin.editor.hardcoded_strings.needs_approval")
+            }
             highlight={system.cmsApproved}
           />
           <StatusRow
-            label="Summary source"
-            value={system.summarySource ? system.summarySource.toUpperCase() : "Missing"}
+            label={t("admin.editor.hardcoded_strings.summary_source")}
+            value={
+              system.summarySource
+                ? system.summarySource.toUpperCase()
+                : t("admin.editor.hardcoded_strings.missing")
+            }
             highlight={Boolean(system.hasSummary)}
           />
           <StatusRow
-            label="Categories"
+            label={t("admin.editor.hardcoded_strings.categories")}
             value={String(system.categoryCount)}
             highlight={system.categoryCount > 0}
           />
           <StatusRow
-            label="Unmoderated media"
+            label={t("admin.editor.hardcoded_strings.unmoderated_media")}
             value={String(system.unmoderatedMediaCount)}
             highlight={system.unmoderatedMediaCount === 0}
           />
           <StatusRow
-            label="Last approval"
+            label={t("admin.editor.hardcoded_strings.last_approval")}
             value={
               system.lastApprovedAt
-                ? `${formatDateAndTime(system.lastApprovedAt)} (${formatSystemRelativeTime(system.lastApprovedAt)})`
-                : "Never"
+                ? `${formatDateAndTime(system.lastApprovedAt)} (${formatSystemRelativeTime(system.lastApprovedAt, { t })})`
+                : t("admin.editor.hardcoded_strings.never")
             }
           />
         </CardContent>
@@ -398,10 +449,10 @@ function OverviewTab({
             variant={system.isPublished ? "outline" : "default"}
           >
             {isPublishing
-              ? "Saving…"
+              ? t("admin.editor.hardcoded_strings.saving")
               : system.isPublished
-                ? "Revert to draft"
-                : "Publish system"}
+                ? t("admin.editor.hardcoded_strings.revert_to_draft")
+                : t("admin.editor.hardcoded_strings.publish_system")}
           </Button>
           <Button
             type="button"
@@ -411,43 +462,48 @@ function OverviewTab({
             disabled={isApprovalPending || isPublishing}
           >
             {isApprovalPending
-              ? "Saving…"
+              ? t("admin.editor.hardcoded_strings.saving")
               : system.cmsApproved
-                ? "Revoke approval"
-                : "Approve CMS copy"}
+                ? t("admin.editor.hardcoded_strings.revoke_approval")
+                : t("admin.editor.hardcoded_strings.approve_cms_copy")}
           </Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Crawl summary</CardTitle>
+          <CardTitle>{t("admin.editor.hardcoded_strings.crawl_summary")}</CardTitle>
           <CardDescription>
-            Monitor crawler outcomes and last successful enrichments before triggering a
-            recrawl.
+            {t("admin.editor.hardcoded_strings.monitor_crawler_outcomes")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           <StatusRow
-            label="Status"
-            value={formatSystemCrawlStatus(system.crawlStatus)}
+            label={t("admin.editor.hardcoded_strings.status")}
+            value={formatSystemCrawlStatus(system.crawlStatus, t)}
             highlight={system.crawlStatus === "success"}
           />
           <StatusRow
-            label="Last crawled"
+            label={t("admin.editor.hardcoded_strings.last_crawled")}
             value={
-              system.lastCrawledAt ? formatDateAndTime(system.lastCrawledAt) : "Never"
+              system.lastCrawledAt
+                ? formatDateAndTime(system.lastCrawledAt)
+                : t("admin.editor.hardcoded_strings.never_crawled")
             }
           />
           <StatusRow
-            label="Last success"
+            label={t("admin.editor.hardcoded_strings.last_success")}
             value={
-              system.lastSuccessAt ? formatDateAndTime(system.lastSuccessAt) : "Never"
+              system.lastSuccessAt
+                ? formatDateAndTime(system.lastSuccessAt)
+                : t("admin.editor.hardcoded_strings.never_crawled")
             }
           />
           {system.errorMessage ? (
             <div className="border-destructive/40 bg-destructive/5 text-destructive rounded-md border px-3 py-2">
-              <p className="text-xs font-medium tracking-wide uppercase">Last error</p>
+              <p className="text-xs font-medium tracking-wide uppercase">
+                {t("admin.editor.hardcoded_strings.last_error")}
+              </p>
               <p className="text-sm leading-snug">{system.errorMessage}</p>
             </div>
           ) : null}
@@ -456,13 +512,13 @@ function OverviewTab({
 
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>External references</CardTitle>
+          <CardTitle>{t("admin.editor.hardcoded_strings.external_references")}</CardTitle>
           <CardDescription>
-            Normalized IDs help cross-link crawlers and taxonomy mapping.
+            {t("admin.editor.hardcoded_strings.normalized_ids_help_cross_link")}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
-          {renderExternalRefs(system)}
+          {renderExternalRefs(system, t)}
         </CardContent>
       </Card>
     </div>
@@ -517,6 +573,7 @@ function ContentTab({
   system,
   onSave,
   isSaving,
+  t,
 }: {
   system: AdminGameSystemDetail;
   onSave: (input: {
@@ -524,6 +581,7 @@ function ContentTab({
     faqs?: { question: string; answer: string }[];
   }) => void;
   isSaving: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [description, setDescription] = useState(system.descriptionCms ?? "");
   const [faqDrafts, setFaqDrafts] = useState<EditableFaq[]>(() =>
@@ -617,7 +675,7 @@ function ContentTab({
   const handleCopyScrapedDescription = () => {
     if (!system.descriptionScraped) return;
     setDescription(system.descriptionScraped);
-    toast.success("Scraped description copied to CMS override");
+    toast.success(t("admin.editor.messages.scraped_description_copied_to_cms"));
   };
 
   const handleCopyScrapedFaq = (faq: AdminGameSystemDetail["scrapedFaqs"][number]) => {
@@ -629,7 +687,7 @@ function ContentTab({
         (entry) => entry.question === question && entry.answer === answer,
       );
       if (alreadyExists) {
-        toast.info("FAQ already present in CMS overrides");
+        toast.info(t("admin.editor.messages.faq_already_present_in_cms_overrides"));
         return previous;
       }
       return [
@@ -650,7 +708,7 @@ function ContentTab({
         answer: faq.answer,
       })),
     );
-    toast.success("Scraped FAQs copied into CMS overrides");
+    toast.success(t("admin.editor.messages.scraped_faqs_copied_to_cms"));
   };
 
   return (
@@ -658,14 +716,18 @@ function ContentTab({
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>CMS copy</CardTitle>
+            <CardTitle>{t("admin.editor.hardcoded_strings.cms_copy_title")}</CardTitle>
             <CardDescription>
-              Manual synopsis authored by the content team.
+              {t(
+                "admin.editor.hardcoded_strings.manual_synopsis_authored_by_content_team",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="cms-description">CMS description</Label>
+              <Label htmlFor="cms-description">
+                {t("admin.editor.hardcoded_strings.cms_description")}
+              </Label>
               <Textarea
                 id="cms-description"
                 value={description}
@@ -673,21 +735,24 @@ function ContentTab({
                   setDescription(event.target.value)
                 }
                 rows={10}
-                placeholder="Craft the narrative players should see."
+                placeholder={t(
+                  "admin.editor.hardcoded_strings.craft_narrative_players_should_see",
+                )}
               />
             </div>
             <p className="text-muted-foreground text-xs">
-              Saving overrides crawler copy and resets CMS approval until a reviewer signs
-              off.
+              {t("admin.editor.hardcoded_strings.saving_overrides_crawler_copy")}
             </p>
           </CardContent>
           <CardFooter className="bg-muted/40 flex flex-col gap-3 border-t p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-muted-foreground text-xs">
               {hasIncompleteFaq
-                ? "Complete both question and answer for each FAQ before saving."
+                ? t("admin.editor.hardcoded_strings.complete_both_question_and_answer")
                 : isDirty
-                  ? "Unsaved changes will replace the current CMS overrides."
-                  : "No CMS changes to save."}
+                  ? t(
+                      "admin.editor.hardcoded_strings.unsaved_changes_will_replace_cms_overrides",
+                    )
+                  : t("admin.editor.hardcoded_strings.no_cms_changes_to_save")}
             </div>
             <div className="flex gap-2">
               <Button
@@ -697,10 +762,12 @@ function ContentTab({
                 onClick={handleReset}
                 disabled={!isDirty || isSaving}
               >
-                Reset
+                {t("admin.editor.hardcoded_strings.reset")}
               </Button>
               <Button type="button" size="sm" onClick={handleSave} disabled={!canSave}>
-                {isSaving ? "Saving…" : "Save CMS content"}
+                {isSaving
+                  ? t("admin.editor.hardcoded_strings.saving")
+                  : t("admin.editor.hardcoded_strings.save_cms_content")}
               </Button>
             </div>
           </CardFooter>
@@ -709,18 +776,16 @@ function ContentTab({
         <Card>
           <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <CardTitle>CMS FAQs</CardTitle>
-              <CardDescription>
-                Curate the questions that appear on public detail pages.
-              </CardDescription>
+              <CardTitle>{t("admin.editor.sections.cms_faqs")}</CardTitle>
+              <CardDescription>{t("admin.editor.descriptions.cms_faqs")}</CardDescription>
             </div>
             <Button type="button" size="sm" variant="outline" onClick={handleAddFaq}>
-              Add FAQ
+              {t("admin.editor.actions.add_faq")}
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
             {faqDrafts.length === 0 ? (
-              <PlaceholderMessage message="No CMS FAQs yet." />
+              <PlaceholderMessage message={t("admin.editor.messages.no_cms_faqs_yet")} />
             ) : (
               <div className="space-y-3">
                 {faqDrafts.map((faq, index) => (
@@ -729,7 +794,11 @@ function ContentTab({
                     className="bg-muted/40 space-y-3 rounded-md border p-4"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold">FAQ {index + 1}</p>
+                      <p className="text-sm font-semibold">
+                        {t("admin.editor.hardcoded_strings.faq_number", {
+                          number: index + 1,
+                        })}
+                      </p>
                       <Button
                         type="button"
                         variant="ghost"
@@ -737,22 +806,28 @@ function ContentTab({
                         className="text-muted-foreground hover:text-destructive"
                         onClick={() => handleRemoveFaq(faq.key)}
                       >
-                        Remove
+                        {t("admin.editor.actions.remove")}
                       </Button>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`faq-question-${faq.key}`}>Question</Label>
+                      <Label htmlFor={`faq-question-${faq.key}`}>
+                        {t("admin.editor.labels.question")}
+                      </Label>
                       <Input
                         id={`faq-question-${faq.key}`}
                         value={faq.question}
                         onChange={(event: ChangeEvent<HTMLInputElement>) =>
                           handleFaqChange(faq.key, "question", event.target.value)
                         }
-                        placeholder="What should players ask?"
+                        placeholder={t(
+                          "admin.editor.placeholders.what_should_players_ask",
+                        )}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`faq-answer-${faq.key}`}>Answer</Label>
+                      <Label htmlFor={`faq-answer-${faq.key}`}>
+                        {t("admin.editor.labels.answer")}
+                      </Label>
                       <Textarea
                         id={`faq-answer-${faq.key}`}
                         value={faq.answer}
@@ -760,7 +835,9 @@ function ContentTab({
                           handleFaqChange(faq.key, "answer", event.target.value)
                         }
                         rows={4}
-                        placeholder="Provide the curated response."
+                        placeholder={t(
+                          "admin.editor.placeholders.provide_curated_response",
+                        )}
                       />
                     </div>
                   </div>
@@ -775,9 +852,9 @@ function ContentTab({
         <Card>
           <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <CardTitle>Enriched description</CardTitle>
+              <CardTitle>{t("admin.editor.sections.enriched_description")}</CardTitle>
               <CardDescription>
-                Latest crawler output available for review.
+                {t("admin.editor.descriptions.enriched_description")}
               </CardDescription>
             </div>
             <Button
@@ -787,14 +864,14 @@ function ContentTab({
               onClick={handleCopyScrapedDescription}
               disabled={!hasScrapedContent}
             >
-              Copy to CMS
+              {t("admin.editor.actions.copy_to_cms")}
             </Button>
           </CardHeader>
           <CardContent>
             <p className="text-sm leading-relaxed whitespace-pre-wrap">
               {hasScrapedContent
                 ? system.descriptionScraped
-                : "No crawler description captured."}
+                : t("admin.editor.messages.no_crawler_description")}
             </p>
           </CardContent>
         </Card>
@@ -802,9 +879,9 @@ function ContentTab({
         <Card>
           <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <CardTitle>Scraped FAQs</CardTitle>
+              <CardTitle>{t("admin.editor.sections.scraped_faqs")}</CardTitle>
               <CardDescription>
-                Promote vetted crawler content into the CMS overrides.
+                {t("admin.editor.descriptions.scraped_faqs")}
               </CardDescription>
             </div>
             <Button
@@ -814,12 +891,14 @@ function ContentTab({
               onClick={handleCopyAllScrapedFaqs}
               disabled={system.scrapedFaqs.length === 0}
             >
-              Copy all to CMS
+              {t("admin.editor.actions.copy_all_to_cms")}
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
             {system.scrapedFaqs.length === 0 ? (
-              <PlaceholderMessage message="No scraped FAQs available." />
+              <PlaceholderMessage
+                message={t("admin.editor.messages.no_scraped_faqs_available")}
+              />
             ) : (
               <div className="space-y-3">
                 {system.scrapedFaqs.map((faq) => (
@@ -845,7 +924,7 @@ function ContentTab({
                         variant="ghost"
                         onClick={() => handleCopyScrapedFaq(faq)}
                       >
-                        Copy
+                        {t("common.buttons.copy")}
                       </Button>
                     </div>
                     <p className="text-muted-foreground text-sm whitespace-pre-wrap">
@@ -860,14 +939,18 @@ function ContentTab({
 
         <Card>
           <CardHeader>
-            <CardTitle>Source of truth</CardTitle>
-            <CardDescription>Defines which upstream dataset wins merges.</CardDescription>
+            <CardTitle>{t("admin.editor.sections.source_of_truth")}</CardTitle>
+            <CardDescription>
+              {t("admin.editor.descriptions.source_of_truth")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="text-sm">
-            <p className="font-semibold">{system.sourceOfTruth ?? "Unset"}</p>
+            <p className="font-semibold">
+              {system.sourceOfTruth ??
+                t("admin.editor.dialog_labels.source_of_truth_unset")}
+            </p>
             <p className="text-muted-foreground mt-2">
-              Adjust this setting when aligning manual content with the preferred crawler
-              payload.
+              {t("admin.editor.descriptions.source_of_truth_adjustment")}
             </p>
           </CardContent>
         </Card>
@@ -882,12 +965,14 @@ function MediaTab({
   onSelectHero,
   isUpdatingModeration,
   isUpdatingHero,
+  t,
 }: {
   system: AdminGameSystemDetail;
   onToggleModeration: (mediaId: number, moderated: boolean) => void;
   onSelectHero: (mediaId: number) => void;
   isUpdatingModeration: boolean;
   isUpdatingHero: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const hero = system.heroImage;
 
@@ -895,11 +980,8 @@ function MediaTab({
     <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
       <Card>
         <CardHeader>
-          <CardTitle>Hero image</CardTitle>
-          <CardDescription>
-            Select the promotional image shown on public pages. Moderation tools arrive in
-            the next iteration.
-          </CardDescription>
+          <CardTitle>{t("admin.editor.sections.hero_image")}</CardTitle>
+          <CardDescription>{t("admin.editor.descriptions.hero_image")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {hero ? (
@@ -907,19 +989,27 @@ function MediaTab({
               <CloudinaryImage
                 imageUrl={hero.secureUrl}
                 transform={{ width: 1200, height: 600 }}
-                alt={`${system.name} hero artwork`}
+                alt={t("admin.editor.aria_labels.hero_artwork", {
+                  systemName: system.name,
+                })}
                 className="h-64 w-full object-cover"
               />
             </div>
           ) : (
-            <PlaceholderMessage message="No hero selected yet." />
+            <PlaceholderMessage
+              message={t("admin.editor.messages.no_hero_selected_yet")}
+            />
           )}
 
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <Badge variant={hero && hero.moderated ? "secondary" : "outline"}>
-              {hero && hero.moderated ? "Moderated" : "Needs review"}
+              {hero && hero.moderated
+                ? t("admin.editor.labels.moderated")
+                : t("admin.editor.labels.needs_review")}
             </Badge>
-            <Badge variant="outline">{system.unmoderatedMediaCount} pending</Badge>
+            <Badge variant="outline">
+              {system.unmoderatedMediaCount} {t("admin.editor.labels.pending")}
+            </Badge>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -930,10 +1020,12 @@ function MediaTab({
               disabled={!hero || isUpdatingModeration}
               onClick={() => hero && onToggleModeration(hero.id, !hero.moderated)}
             >
-              {hero && hero.moderated ? "Mark as pending" : "Mark as reviewed"}
+              {hero && hero.moderated
+                ? t("admin.editor.actions.mark_as_pending")
+                : t("admin.editor.actions.mark_as_reviewed")}
             </Button>
             <Button type="button" variant="outline" size="sm" disabled>
-              Upload image (coming soon)
+              {t("admin.editor.actions.upload_image")}
             </Button>
           </div>
         </CardContent>
@@ -941,14 +1033,14 @@ function MediaTab({
 
       <Card>
         <CardHeader>
-          <CardTitle>Gallery assets</CardTitle>
+          <CardTitle>{t("admin.editor.sections.gallery_assets")}</CardTitle>
           <CardDescription>
-            Review scraped media before promoting to hero.
+            {t("admin.editor.descriptions.gallery_assets")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           {system.gallery.length === 0 ? (
-            <PlaceholderMessage message="Gallery is empty." />
+            <PlaceholderMessage message={t("admin.editor.messages.gallery_is_empty")} />
           ) : (
             <ul className="space-y-2">
               {system.gallery.map((asset) => (
@@ -958,7 +1050,7 @@ function MediaTab({
                 >
                   <div className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-medium">
-                      Asset #{asset.id}
+                      {t("admin.editor.labels.asset_number", { id: asset.id })}
                     </span>
                     <span className="text-muted-foreground text-xs">
                       {asset.secureUrl}
@@ -966,7 +1058,9 @@ function MediaTab({
                   </div>
                   <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3">
                     <Badge variant={asset.moderated ? "secondary" : "outline"}>
-                      {asset.moderated ? "Moderated" : "Needs review"}
+                      {asset.moderated
+                        ? t("admin.editor.labels.moderated")
+                        : t("admin.editor.labels.needs_review")}
                     </Badge>
                     <div className="flex flex-wrap justify-end gap-2">
                       <Button
@@ -976,7 +1070,9 @@ function MediaTab({
                         disabled={isUpdatingHero || system.heroImage?.id === asset.id}
                         onClick={() => onSelectHero(asset.id)}
                       >
-                        {system.heroImage?.id === asset.id ? "Current hero" : "Set hero"}
+                        {system.heroImage?.id === asset.id
+                          ? t("admin.editor.actions.current_hero")
+                          : t("admin.editor.actions.set_hero")}
                       </Button>
                       <Button
                         type="button"
@@ -985,7 +1081,9 @@ function MediaTab({
                         disabled={isUpdatingModeration}
                         onClick={() => onToggleModeration(asset.id, !asset.moderated)}
                       >
-                        {asset.moderated ? "Mark pending" : "Mark reviewed"}
+                        {asset.moderated
+                          ? t("admin.editor.actions.mark_pending")
+                          : t("admin.editor.actions.mark_reviewed")}
                       </Button>
                     </div>
                   </div>
@@ -1003,10 +1101,12 @@ function TaxonomyTab({
   system,
   onMapExternalTag,
   isMapping,
+  t,
 }: {
   system: AdminGameSystemDetail;
   onMapExternalTag: (input: ExternalMappingRequest) => void;
   isMapping: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [mechanicFilter, setMechanicFilter] = useState("");
@@ -1024,9 +1124,9 @@ function TaxonomyTab({
         <CardHeader className="gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <CardTitle>Categories</CardTitle>
+              <CardTitle>{t("admin.editor.sections.categories")}</CardTitle>
               <CardDescription>
-                Canonical browse tags applied to this system.
+                {t("admin.editor.descriptions.categories")}
               </CardDescription>
             </div>
             {system.categories.length > 0 ? (
@@ -1035,7 +1135,7 @@ function TaxonomyTab({
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   setCategoryFilter(event.target.value)
                 }
-                placeholder="Filter categories"
+                placeholder={t("admin.editor.placeholders.filter_categories")}
                 className="w-full max-w-xs"
               />
             ) : null}
@@ -1043,9 +1143,13 @@ function TaxonomyTab({
         </CardHeader>
         <CardContent className="space-y-3">
           {system.categories.length === 0 ? (
-            <PlaceholderMessage message="No categories assigned." />
+            <PlaceholderMessage
+              message={t("admin.editor.messages.no_categories_assigned")}
+            />
           ) : filteredCategories.length === 0 ? (
-            <PlaceholderMessage message="No categories match your filter." />
+            <PlaceholderMessage
+              message={t("admin.editor.messages.no_categories_match_filter")}
+            />
           ) : (
             <div className="grid gap-3">
               {filteredCategories.map((category) => (
@@ -1064,6 +1168,7 @@ function TaxonomyTab({
                     })
                   }
                   isPending={isMapping}
+                  t={t}
                 />
               ))}
             </div>
@@ -1075,9 +1180,9 @@ function TaxonomyTab({
         <CardHeader className="gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <CardTitle>Mechanics</CardTitle>
+              <CardTitle>{t("admin.editor.sections.mechanics")}</CardTitle>
               <CardDescription>
-                Gameplay mechanics sourced from partner catalogs.
+                {t("admin.editor.descriptions.mechanics")}
               </CardDescription>
             </div>
             {system.mechanics.length > 0 ? (
@@ -1086,7 +1191,7 @@ function TaxonomyTab({
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   setMechanicFilter(event.target.value)
                 }
-                placeholder="Filter mechanics"
+                placeholder={t("admin.editor.placeholders.filter_mechanics")}
                 className="w-full max-w-xs"
               />
             ) : null}
@@ -1094,9 +1199,13 @@ function TaxonomyTab({
         </CardHeader>
         <CardContent className="space-y-3">
           {system.mechanics.length === 0 ? (
-            <PlaceholderMessage message="Mechanics pending mapping." />
+            <PlaceholderMessage
+              message={t("admin.editor.messages.mechanics_pending_mapping")}
+            />
           ) : filteredMechanics.length === 0 ? (
-            <PlaceholderMessage message="No mechanics match your filter." />
+            <PlaceholderMessage
+              message={t("admin.editor.messages.no_mechanics_match_filter")}
+            />
           ) : (
             <div className="grid gap-3">
               {filteredMechanics.map((mechanic) => (
@@ -1115,6 +1224,7 @@ function TaxonomyTab({
                     })
                   }
                   isPending={isMapping}
+                  t={t}
                 />
               ))}
             </div>
@@ -1131,6 +1241,7 @@ function CanonicalMappingCard({
   mappings,
   onSubmit,
   isPending,
+  t,
 }: {
   type: "category" | "mechanic";
   canonical: GameSystemTag;
@@ -1141,6 +1252,7 @@ function CanonicalMappingCard({
     confidence: number;
   }) => void;
   isPending: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [source, setSource] = useState<ExternalSourceOption>("startplaying");
   const [externalTag, setExternalTag] = useState("");
@@ -1161,7 +1273,7 @@ function CanonicalMappingCard({
         <CardTitle className="text-base font-semibold">
           {canonical.name}
           <span className="text-muted-foreground ml-2 text-xs tracking-wide uppercase">
-            {type === "category" ? "Category" : "Mechanic"}
+            {t(`admin.editor.taxonomy.${type}`)}
           </span>
         </CardTitle>
         {canonical.description ? (
@@ -1170,7 +1282,9 @@ function CanonicalMappingCard({
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         {mappings.length === 0 ? (
-          <PlaceholderMessage message="No external mappings yet." />
+          <PlaceholderMessage
+            message={t("admin.editor.messages.no_external_mappings_yet")}
+          />
         ) : (
           <div className="flex flex-wrap gap-2">
             {mappings.map((mapping) => (
@@ -1197,12 +1311,16 @@ function CanonicalMappingCard({
             onValueChange={(value: ExternalSourceOption) => setSource(value)}
           >
             <SelectTrigger className="sm:w-40">
-              <SelectValue placeholder="Source" />
+              <SelectValue placeholder={t("admin.editor.labels.source")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="startplaying">StartPlaying</SelectItem>
-              <SelectItem value="bgg">BoardGameGeek</SelectItem>
-              <SelectItem value="wikipedia">Wikipedia</SelectItem>
+              <SelectItem value="startplaying">
+                {t("admin.editor.sources.startplaying")}
+              </SelectItem>
+              <SelectItem value="bgg">{t("admin.editor.sources.bgg")}</SelectItem>
+              <SelectItem value="wikipedia">
+                {t("admin.editor.sources.wikipedia")}
+              </SelectItem>
             </SelectContent>
           </Select>
           <Input
@@ -1210,7 +1328,7 @@ function CanonicalMappingCard({
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               setExternalTag(event.target.value)
             }
-            placeholder="External tag"
+            placeholder={t("admin.editor.placeholders.external_tag")}
             className="flex-1"
           />
           <Input
@@ -1223,10 +1341,10 @@ function CanonicalMappingCard({
               setConfidence(Number.isNaN(value) ? 0 : value);
             }}
             className="w-24"
-            aria-label="Confidence (0-100)"
+            aria-label={t("admin.editor.dialog_labels.confidence_0_100")}
           />
           <Button type="submit" size="sm" disabled={isPending || !externalTag.trim()}>
-            Add mapping
+            {t("admin.editor.actions.add_mapping")}
           </Button>
         </form>
       </CardFooter>
@@ -1239,11 +1357,13 @@ function RecrawlControls({
   onSourceChange,
   onSubmit,
   isPending,
+  t,
 }: {
   source: RecrawlSourceOption;
   onSourceChange: (source: RecrawlSourceOption) => void;
   onSubmit: () => void;
   isPending: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   return (
     <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
@@ -1252,17 +1372,21 @@ function RecrawlControls({
         onValueChange={(value) => onSourceChange(value as RecrawlSourceOption)}
       >
         <SelectTrigger className="w-full min-w-[180px] sm:w-48">
-          <SelectValue placeholder="Choose source" />
+          <SelectValue placeholder={t("admin.editor.placeholders.choose_source")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="manual">Manual (no source)</SelectItem>
-          <SelectItem value="startplaying">StartPlaying</SelectItem>
-          <SelectItem value="bgg">BoardGameGeek</SelectItem>
-          <SelectItem value="wikipedia">Wikipedia</SelectItem>
+          <SelectItem value="manual">{t("admin.editor.sources.manual")}</SelectItem>
+          <SelectItem value="startplaying">
+            {t("admin.editor.sources.startplaying")}
+          </SelectItem>
+          <SelectItem value="bgg">{t("admin.editor.sources.bgg")}</SelectItem>
+          <SelectItem value="wikipedia">{t("admin.editor.sources.wikipedia")}</SelectItem>
         </SelectContent>
       </Select>
       <Button type="button" size="sm" onClick={onSubmit} disabled={isPending}>
-        {isPending ? "Queueing…" : "Queue recrawl"}
+        {isPending
+          ? t("admin.editor.actions.queueing")
+          : t("admin.editor.actions.queue_recrawl")}
       </Button>
     </div>
   );
@@ -1273,11 +1397,13 @@ function CrawlTab({
   system,
   onRequestRecrawl,
   isRecrawlPending,
+  t,
 }: {
   events: AdminGameSystemCrawlEvent[];
   system: AdminGameSystemDetail;
   onRequestRecrawl: (source: RecrawlSourceOption) => void;
   isRecrawlPending: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const [source, setSource] = useState<RecrawlSourceOption>("manual");
 
@@ -1290,10 +1416,9 @@ function CrawlTab({
       <Card>
         <CardHeader className="flex flex-col gap-3">
           <div>
-            <CardTitle>Crawl history</CardTitle>
+            <CardTitle>{t("admin.editor.sections.crawl_history")}</CardTitle>
             <CardDescription>
-              Trigger a recrawl from a specific source to populate history and refresh
-              metadata.
+              {t("admin.editor.descriptions.crawl_history")}
             </CardDescription>
           </div>
           <RecrawlControls
@@ -1301,10 +1426,11 @@ function CrawlTab({
             onSourceChange={setSource}
             onSubmit={handleRecrawl}
             isPending={isRecrawlPending}
+            t={t}
           />
         </CardHeader>
         <CardContent>
-          <PlaceholderMessage message="No crawl history recorded yet." />
+          <PlaceholderMessage message={t("admin.editor.messages.no_crawl_history")} />
         </CardContent>
       </Card>
     );
@@ -1315,9 +1441,11 @@ function CrawlTab({
       <CardHeader className="flex flex-col gap-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle>Crawl history</CardTitle>
+            <CardTitle>{t("admin.editor.sections.crawl_history")}</CardTitle>
             <CardDescription>
-              Latest crawler executions for {system.name}.
+              {t("admin.editor.messages.latest_crawler_executions", {
+                systemName: system.name,
+              })}
             </CardDescription>
           </div>
           <RecrawlControls
@@ -1325,6 +1453,7 @@ function CrawlTab({
             onSourceChange={setSource}
             onSubmit={handleRecrawl}
             isPending={isRecrawlPending}
+            t={t}
           />
         </div>
       </CardHeader>
@@ -1332,12 +1461,12 @@ function CrawlTab({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Source</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Severity</TableHead>
-              <TableHead>Started</TableHead>
-              <TableHead>Finished</TableHead>
-              <TableHead>HTTP</TableHead>
+              <TableHead>{t("admin.editor.labels.source")}</TableHead>
+              <TableHead>{t("admin.editor.labels.status")}</TableHead>
+              <TableHead>{t("admin.editor.labels.severity")}</TableHead>
+              <TableHead>{t("admin.editor.labels.started")}</TableHead>
+              <TableHead>{t("admin.editor.labels.finished")}</TableHead>
+              <TableHead>{t("admin.editor.labels.http")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -1360,7 +1489,7 @@ function CrawlTab({
                   <div className="flex flex-col text-sm">
                     <span>{formatDateAndTime(event.startedAt)}</span>
                     <span className="text-muted-foreground text-xs">
-                      {formatSystemRelativeTime(event.startedAt)}
+                      {formatSystemRelativeTime(event.startedAt, { t })}
                     </span>
                   </div>
                 </TableCell>
@@ -1368,7 +1497,7 @@ function CrawlTab({
                   <div className="flex flex-col text-sm">
                     <span>{formatDateAndTime(event.finishedAt)}</span>
                     <span className="text-muted-foreground text-xs">
-                      {formatSystemRelativeTime(event.finishedAt)}
+                      {formatSystemRelativeTime(event.finishedAt, { t })}
                     </span>
                   </div>
                 </TableCell>
@@ -1416,12 +1545,16 @@ function PlaceholderMessage({ message }: { message: string }) {
   );
 }
 
-function renderExternalRefs(system: AdminGameSystemDetail) {
+function renderExternalRefs(system: AdminGameSystemDetail, t: (key: string) => string) {
   const refs = system.externalRefs ?? {};
   const entries = Object.entries(refs);
 
   if (entries.length === 0) {
-    return <PlaceholderMessage message="No external references captured." />;
+    return (
+      <PlaceholderMessage
+        message={t("admin.editor.hardcoded_strings.no_external_references")}
+      />
+    );
   }
 
   return entries.map(([key, value]) => (
@@ -1432,4 +1565,4 @@ function renderExternalRefs(system: AdminGameSystemDetail) {
   ));
 }
 
-export const ADMIN_SYSTEM_EDITOR_TABS = TABS;
+export const ADMIN_SYSTEM_EDITOR_TABS = createTabs(() => "");

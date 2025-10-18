@@ -22,18 +22,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { createManualGameSystem } from "../game-systems-admin.mutations";
 import {
   DEFAULT_SYSTEM_DETAIL_ROUTE,
   type SystemDetailRoute,
 } from "../lib/system-routes";
 
+// These will be updated with translation function inside the component
 const EXTERNAL_SOURCE_OPTIONS = [
-  { value: "none", label: "None" },
-  { value: "startplaying", label: "StartPlaying" },
-  { value: "bgg", label: "BoardGameGeek" },
-  { value: "wikipedia", label: "Wikipedia" },
-  { value: "custom", label: "Custom" },
+  { value: "none", translationKey: "options.none" },
+  { value: "startplaying", translationKey: "options.startplaying" },
+  { value: "bgg", translationKey: "options.bgg" },
+  { value: "wikipedia", translationKey: "options.wikipedia" },
+  { value: "custom", translationKey: "options.custom" },
 ] as const;
 
 type ExternalSourceOption = (typeof EXTERNAL_SOURCE_OPTIONS)[number]["value"];
@@ -63,6 +65,7 @@ export function ManualSystemCreateDialog({
   onCreated,
   detailRoute = DEFAULT_SYSTEM_DETAIL_ROUTE,
 }: ManualSystemCreateDialogProps) {
+  const { t } = useGameSystemsTranslation();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -128,23 +131,29 @@ export function ManualSystemCreateDialog({
     },
     onSuccess: ({ result, payload }) => {
       const targetId = result?.id;
-      toast.success(`Created “${payload.name}”`, {
-        description: "Manual systems start as drafts until you publish them.",
-        action:
-          typeof targetId === "number"
-            ? {
-                label: "Edit",
-                onClick: () => navigateToSystemDetail(String(targetId)),
-              }
-            : undefined,
-      });
+      toast.success(
+        t("admin.manual_system_dialog.messages.create_success", { name: payload.name }),
+        {
+          description: t("admin.manual_system_dialog.messages.create_description"),
+          action:
+            typeof targetId === "number"
+              ? {
+                  label: t("admin.manual_system_dialog.messages.create_action"),
+                  onClick: () => navigateToSystemDetail(String(targetId)),
+                }
+              : undefined,
+        },
+      );
       setFormState(INITIAL_FORM_STATE);
       setOpen(false);
       onCreated?.();
       void queryClient.invalidateQueries({ queryKey: ["admin-game-systems"] });
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Failed to create system.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("admin.manual_system_dialog.messages.create_failed");
       toast.error(message);
     },
   });
@@ -164,6 +173,16 @@ export function ManualSystemCreateDialog({
   const showSourceFields = formState.sourceKind !== "none";
   const showCustomKey = formState.sourceKind === "custom";
 
+  // Memoized source options with translations
+  const externalSourceOptions = useMemo(
+    () =>
+      EXTERNAL_SOURCE_OPTIONS.map((option) => ({
+        ...option,
+        label: t(`admin.manual_system_dialog.${option.translationKey}`),
+      })),
+    [t],
+  );
+
   return (
     <Dialog
       open={open}
@@ -177,20 +196,22 @@ export function ManualSystemCreateDialog({
     >
       <DialogTrigger asChild>
         <Button size="sm" variant="default">
-          Add manual system
+          {t("admin.manual_system_dialog.button")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <DialogHeader className="space-y-2 text-left">
-            <DialogTitle>Add manual game system</DialogTitle>
+            <DialogTitle>{t("admin.manual_system_dialog.title")}</DialogTitle>
             <DialogDescription>
-              Create a CMS-owned system with optional crawl metadata.
+              {t("admin.manual_system_dialog.description")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1">
-              <Label htmlFor="manual-system-name">System name</Label>
+              <Label htmlFor="manual-system-name">
+                {t("admin.manual_system_dialog.fields.system_name")}
+              </Label>
               <Input
                 id="manual-system-name"
                 value={formState.name}
@@ -200,12 +221,14 @@ export function ManualSystemCreateDialog({
                     name: event.target.value,
                   }))
                 }
-                placeholder="e.g., The Wild Beyond the Witchlight"
+                placeholder={t("admin.manual_system_dialog.placeholders.system_name")}
                 required
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="manual-system-source">External source</Label>
+              <Label htmlFor="manual-system-source">
+                {t("admin.manual_system_dialog.fields.external_source")}
+              </Label>
               <Select
                 value={formState.sourceKind}
                 onValueChange={(next) =>
@@ -216,10 +239,14 @@ export function ManualSystemCreateDialog({
                 }
               >
                 <SelectTrigger id="manual-system-source">
-                  <SelectValue placeholder="Select source" />
+                  <SelectValue
+                    placeholder={t(
+                      "admin.manual_system_dialog.placeholders.select_source",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {EXTERNAL_SOURCE_OPTIONS.map((option) => (
+                  {externalSourceOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -231,8 +258,8 @@ export function ManualSystemCreateDialog({
               <div className="space-y-1">
                 <Label htmlFor="manual-system-reference">
                   {formState.sourceKind === "custom"
-                    ? "Reference value"
-                    : "External reference"}
+                    ? t("admin.manual_system_dialog.fields.reference_value")
+                    : t("admin.manual_system_dialog.fields.external_reference")}
                 </Label>
                 <Input
                   id="manual-system-reference"
@@ -245,10 +272,10 @@ export function ManualSystemCreateDialog({
                   }
                   placeholder={
                     formState.sourceKind === "bgg"
-                      ? "Enter BGG thing ID"
+                      ? t("admin.manual_system_dialog.placeholders.bgg_id")
                       : formState.sourceKind === "wikipedia"
-                        ? "Enter Wikipedia URL"
-                        : "Enter external identifier"
+                        ? t("admin.manual_system_dialog.placeholders.wikipedia_url")
+                        : t("admin.manual_system_dialog.placeholders.external_identifier")
                   }
                   required
                 />
@@ -256,7 +283,9 @@ export function ManualSystemCreateDialog({
             ) : null}
             {showCustomKey ? (
               <div className="space-y-1">
-                <Label htmlFor="manual-system-custom-key">Custom source key</Label>
+                <Label htmlFor="manual-system-custom-key">
+                  {t("admin.manual_system_dialog.fields.custom_source_key")}
+                </Label>
                 <Input
                   id="manual-system-custom-key"
                   value={formState.customKey}
@@ -266,7 +295,7 @@ export function ManualSystemCreateDialog({
                       customKey: event.target.value,
                     }))
                   }
-                  placeholder="e.g., driveThruRPG"
+                  placeholder={t("admin.manual_system_dialog.placeholders.custom_key")}
                   required
                 />
               </div>
@@ -283,7 +312,7 @@ export function ManualSystemCreateDialog({
                 }
               />
               <Label htmlFor="manual-system-queue-recrawl" className="cursor-pointer">
-                Queue an initial recrawl
+                {t("admin.manual_system_dialog.checkbox.queue_recrawl")}
               </Label>
             </div>
           </div>
@@ -294,10 +323,12 @@ export function ManualSystemCreateDialog({
               onClick={resetAndClose}
               disabled={mutation.isPending}
             >
-              Cancel
+              {t("admin.manual_system_dialog.buttons.cancel")}
             </Button>
             <Button type="submit" disabled={!canSubmit || mutation.isPending}>
-              {mutation.isPending ? "Creating..." : "Create"}
+              {mutation.isPending
+                ? t("admin.manual_system_dialog.buttons.creating")
+                : t("admin.manual_system_dialog.buttons.create")}
             </Button>
           </DialogFooter>
         </form>

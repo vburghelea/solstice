@@ -7,6 +7,7 @@ import type { GameListItem } from "~/features/games/games.types";
 import { GameMasterDashboard } from "~/features/gm/components/game-master-dashboard";
 import { listGmB2bPipeline } from "~/features/gm/gm.queries";
 import type { GmPipelineSnapshot } from "~/features/gm/gm.types";
+import { useGmTranslation } from "~/hooks/useTypedTranslation";
 import type { OperationResult } from "~/shared/types/common";
 
 const UPCOMING_SESSION_PAGE_SIZE = 6;
@@ -58,6 +59,7 @@ export function GameMasterDashboardContainer({
 }: {
   readonly initialData?: GameMasterDashboardInitialData;
 }) {
+  const { t } = useGmTranslation();
   const scheduledGamesInitialData = initialData?.scheduledGamesResult;
   const campaignsInitialData = initialData?.activeCampaignsResult;
   const pipelineInitialData = initialData?.pipelineResult;
@@ -134,11 +136,8 @@ export function GameMasterDashboardContainer({
     <div className="space-y-6">
       {hasError ? (
         <Alert variant="destructive">
-          <AlertTitle>We hit a snag loading the studio</AlertTitle>
-          <AlertDescription>
-            Some campaign or session data could not be fetched. Refresh to retry or open
-            the classic dashboard views.
-          </AlertDescription>
+          <AlertTitle>{t("dashboard.loading_error.title")}</AlertTitle>
+          <AlertDescription>{t("dashboard.loading_error.description")}</AlertDescription>
         </Alert>
       ) : null}
       <GameMasterDashboard

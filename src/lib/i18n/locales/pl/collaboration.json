@@ -1,0 +1,75 @@
+{
+  "title": "TODO: Translate \"title\"",
+  "subtitle": "TODO: Translate \"subtitle\"",
+  "workspace": {
+    "loading": "TODO: Translate \"workspace.loading\"",
+    "loading_description": "TODO: Translate \"workspace.loading_description\"",
+    "unable_to_load": "TODO: Translate \"workspace.unable_to_load\"",
+    "unable_to_load_description": "TODO: Translate \"workspace.unable_to_load_description\"",
+    "beta_badge": "TODO: Translate \"workspace.beta_badge\"",
+    "title": "TODO: Translate \"workspace.title\"",
+    "description": "TODO: Translate \"workspace.description\"",
+    "updated_label": "TODO: Translate \"workspace.updated_label\"",
+    "filters": {
+      "all": "TODO: Translate \"workspace.filters.all\""
+    }
+  },
+  "sections": {
+    "metrics": {
+      "title": "TODO: Translate \"sections.metrics.title\"",
+      "description": "TODO: Translate \"sections.metrics.description\"",
+      "review_threads": "TODO: Translate \"sections.metrics.review_threads\"",
+      "persona_impact": "TODO: Translate \"sections.metrics.persona_impact\""
+    },
+    "alignment": {
+      "title": "TODO: Translate \"sections.alignment.title\"",
+      "description": "TODO: Translate \"sections.alignment.description\"",
+      "alignment_label": "TODO: Translate \"sections.alignment.alignment_label\"",
+      "needs_attention": "TODO: Translate \"sections.alignment.needs_attention\"",
+      "confidence_suffix": "TODO: Translate \"sections.alignment.confidence_suffix\"",
+      "key_signals": "TODO: Translate \"sections.alignment.key_signals\"",
+      "open_questions": "TODO: Translate \"sections.alignment.open_questions\"",
+      "signals_description": "TODO: Translate \"sections.alignment.signals_description\""
+    },
+    "rhythms": {
+      "title": "TODO: Translate \"sections.rhythms.title\"",
+      "description": "TODO: Translate \"sections.rhythms.description\"",
+      "next_touchpoint": "TODO: Translate \"sections.rhythms.next_touchpoint\"",
+      "status": "TODO: Translate \"sections.rhythms.status\"",
+      "linked_threads": "TODO: Translate \"sections.rhythms.linked_threads\""
+    },
+    "feedback": {
+      "title": "TODO: Translate \"sections.feedback.title\"",
+      "description": "TODO: Translate \"sections.feedback.description\"",
+      "participation": "TODO: Translate \"sections.feedback.participation\"",
+      "backlog_status": "TODO: Translate \"sections.feedback.backlog_status\"",
+      "updated": "TODO: Translate \"sections.feedback.updated\"",
+      "highlights": "TODO: Translate \"sections.feedback.highlights\"",
+      "quick_reactions": "TODO: Translate \"sections.feedback.quick_reactions\"",
+      "reaction_saved": "TODO: Translate \"sections.feedback.reaction_saved\"",
+      "create_account": "TODO: Translate \"sections.feedback.create_account\""
+    }
+  },
+  "personas": {
+    "player": "TODO: Translate \"personas.player\"",
+    "ops": "TODO: Translate \"personas.ops\"",
+    "gm": "TODO: Translate \"personas.gm\"",
+    "admin": "TODO: Translate \"personas.admin\""
+  },
+  "status": {
+    "triaged": "TODO: Translate \"status.triaged\"",
+    "in_progress": "TODO: Translate \"status.in_progress\"",
+    "shipped": "TODO: Translate \"status.shipped\"",
+    "on_track": "TODO: Translate \"status.on_track\"",
+    "at_risk": "TODO: Translate \"status.at_risk\"",
+    "off_track": "TODO: Translate \"status.off_track\""
+  },
+  "sentiment": {
+    "positive": "TODO: Translate \"sentiment.positive\"",
+    "neutral": "TODO: Translate \"sentiment.neutral\"",
+    "concerned": "TODO: Translate \"sentiment.concerned\""
+  },
+  "errors": {
+    "load_snapshot_failed": "TODO: Translate \"errors.load_snapshot_failed\""
+  }
+}

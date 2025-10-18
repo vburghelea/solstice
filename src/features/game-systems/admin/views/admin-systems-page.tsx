@@ -32,6 +32,7 @@ import {
   DEFAULT_SYSTEM_DETAIL_ROUTE,
   type SystemDetailRoute,
 } from "~/features/game-systems/admin/lib/system-routes";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 export const adminSystemsSearchSchema = z.object({
@@ -51,20 +52,6 @@ export const ADMIN_SYSTEMS_DEFAULT_SORT: AdminSystemSortOption = "updated-desc";
 export const ADMIN_SYSTEMS_DEFAULT_PAGE = 1;
 export const ADMIN_SYSTEMS_DEFAULT_PER_PAGE = 20;
 
-const STATUS_OPTIONS: Array<{ value: AdminSystemStatusFilter; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "needs_curation", label: "Needs curation" },
-  { value: "errors", label: "Errors" },
-  { value: "published", label: "Published" },
-  { value: "unpublished", label: "Unpublished" },
-];
-
-const SORT_OPTIONS: Array<{ value: AdminSystemSortOption; label: string }> = [
-  { value: "updated-desc", label: "Recently updated" },
-  { value: "name-asc", label: "Name" },
-  { value: "crawl-status", label: "Crawl status" },
-];
-
 const PER_PAGE_OPTIONS = [10, 20, 50] as const;
 
 interface AdminSystemsPageProps {
@@ -80,9 +67,6 @@ interface AdminSystemsPageProps {
 }
 
 const DEFAULT_CONTAINER_CLASS = "space-y-6 p-4 sm:p-6 lg:p-8";
-const DEFAULT_HEADER_TITLE = "Game systems";
-const DEFAULT_HEADER_DESCRIPTION =
-  "Monitor crawler status, editorial readiness, and media moderation for each ruleset.";
 
 interface AdminSystemsFormState {
   q: string;
@@ -96,10 +80,16 @@ export function AdminSystemsPage({
   navigate,
   detailRoute = DEFAULT_SYSTEM_DETAIL_ROUTE,
   className,
-  headerTitle = DEFAULT_HEADER_TITLE,
-  headerDescription = DEFAULT_HEADER_DESCRIPTION,
+  headerTitle,
+  headerDescription,
 }: AdminSystemsPageProps) {
+  const { t } = useGameSystemsTranslation();
   const { q, status, sort, page: searchPage, perPage: searchPerPage } = search;
+
+  // Set default header values from translations if not provided
+  const resolvedHeaderTitle = headerTitle ?? t("admin.page.default_title");
+  const resolvedHeaderDescription =
+    headerDescription ?? t("admin.page.default_description");
 
   const listInput = useMemo(() => {
     const params: AdminSystemsSearchParams = {
@@ -204,12 +194,27 @@ export function AdminSystemsPage({
   const pageCount = data?.pageCount ?? 0;
 
   const filteredTotal = total;
-  const summaryStats = buildSummaryStats(stats, filteredTotal);
+  const summaryStats = buildSummaryStats(stats, filteredTotal, t);
   const isPristine =
     formState.q.trim() === "" &&
     formState.status === ADMIN_SYSTEMS_DEFAULT_STATUS &&
     formState.sort === ADMIN_SYSTEMS_DEFAULT_SORT &&
     formState.perPage === ADMIN_SYSTEMS_DEFAULT_PER_PAGE;
+
+  // Dynamic status and sort options from translations
+  const statusOptions: Array<{ value: AdminSystemStatusFilter; label: string }> = [
+    { value: "all", label: t("admin.status_options.all") },
+    { value: "needs_curation", label: t("admin.status_options.needs_curation") },
+    { value: "errors", label: t("admin.status_options.errors") },
+    { value: "published", label: t("admin.status_options.published") },
+    { value: "unpublished", label: t("admin.status_options.unpublished") },
+  ];
+
+  const sortOptions: Array<{ value: AdminSystemSortOption; label: string }> = [
+    { value: "updated-desc", label: t("admin.sort_options.updated_desc") },
+    { value: "name-asc", label: t("admin.sort_options.name_asc") },
+    { value: "crawl-status", label: t("admin.sort_options.crawl_status") },
+  ];
 
   return (
     <div className={cn(DEFAULT_CONTAINER_CLASS, className)}>
@@ -217,23 +222,25 @@ export function AdminSystemsPage({
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-2">
-              <CardTitle className="text-2xl font-semibold">{headerTitle}</CardTitle>
-              <CardDescription className="text-sm">{headerDescription}</CardDescription>
+              <CardTitle className="text-2xl font-semibold">
+                {resolvedHeaderTitle}
+              </CardTitle>
+              <CardDescription className="text-sm">
+                {resolvedHeaderDescription}
+              </CardDescription>
             </div>
             <ManualSystemCreateDialog detailRoute={detailRoute} />
           </div>
         </CardHeader>
         <CardContent className="gap-4 space-y-4">
-          <SummaryBadges summaryStats={summaryStats} total={filteredTotal} />
+          <SummaryBadges summaryStats={summaryStats} total={filteredTotal} t={t} />
         </CardContent>
       </Card>
 
       <Card className="shadow-sm">
         <CardHeader className="pb-4">
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>
-            Search by name, filter by status, and adjust sorting.
-          </CardDescription>
+          <CardTitle>{t("admin.page.filters_title")}</CardTitle>
+          <CardDescription>{t("admin.page.filters_description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -245,12 +252,12 @@ export function AdminSystemsPage({
                 className="text-foreground text-xs font-medium"
                 htmlFor="systems-search"
               >
-                Keyword
+                {t("admin.page.search_label")}
               </label>
               <Input
                 id="systems-search"
                 type="search"
-                placeholder="Search systems"
+                placeholder={t("admin.page.search_placeholder")}
                 value={formState.q}
                 onChange={(event) =>
                   setFormState((previous) => ({ ...previous, q: event.target.value }))
@@ -259,7 +266,9 @@ export function AdminSystemsPage({
             </div>
 
             <div className="flex flex-col gap-2 sm:w-48">
-              <label className="text-foreground text-xs font-medium">Status</label>
+              <label className="text-foreground text-xs font-medium">
+                {t("admin.page.status_label")}
+              </label>
               <Select
                 value={formState.status}
                 onValueChange={(value) =>
@@ -270,10 +279,10 @@ export function AdminSystemsPage({
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder={t("admin.page.status_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {STATUS_OPTIONS.map((option) => (
+                  {statusOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -283,7 +292,9 @@ export function AdminSystemsPage({
             </div>
 
             <div className="flex flex-col gap-2 sm:w-48">
-              <label className="text-foreground text-xs font-medium">Sort</label>
+              <label className="text-foreground text-xs font-medium">
+                {t("admin.page.sort_label")}
+              </label>
               <Select
                 value={formState.sort}
                 onValueChange={(value) =>
@@ -294,10 +305,10 @@ export function AdminSystemsPage({
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sort" />
+                  <SelectValue placeholder={t("admin.page.sort_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {SORT_OPTIONS.map((option) => (
+                  {sortOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -307,7 +318,9 @@ export function AdminSystemsPage({
             </div>
 
             <div className="flex flex-col gap-2 sm:w-40">
-              <label className="text-foreground text-xs font-medium">Per page</label>
+              <label className="text-foreground text-xs font-medium">
+                {t("admin.page.per_page_label")}
+              </label>
               <Select
                 value={String(formState.perPage)}
                 onValueChange={(value) =>
@@ -318,7 +331,7 @@ export function AdminSystemsPage({
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Results per page" />
+                  <SelectValue placeholder={t("admin.page.per_page_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {PER_PAGE_OPTIONS.map((option) => (
@@ -332,7 +345,7 @@ export function AdminSystemsPage({
 
             <div className="flex gap-2 pt-2 sm:pt-0">
               <Button type="submit" disabled={systemsQuery.isFetching}>
-                Apply
+                {t("admin.page.apply_button")}
               </Button>
               <Button
                 type="button"
@@ -340,7 +353,7 @@ export function AdminSystemsPage({
                 onClick={handleReset}
                 disabled={systemsQuery.isFetching || isPristine}
               >
-                Clear
+                {t("admin.page.clear_button")}
               </Button>
             </div>
           </form>
@@ -350,7 +363,7 @@ export function AdminSystemsPage({
       {systemsQuery.isLoading ? (
         <Card className="border-dashed">
           <CardContent className="text-muted-foreground py-10 text-center text-sm">
-            Loading systems…
+            {t("admin.page.loading")}
           </CardContent>
         </Card>
       ) : systems.length > 0 ? (
@@ -367,10 +380,8 @@ export function AdminSystemsPage({
       ) : (
         <Card className="border-dashed">
           <CardHeader>
-            <CardTitle>No systems found</CardTitle>
-            <CardDescription>
-              Adjust filters or clear the search to view the full catalog.
-            </CardDescription>
+            <CardTitle>{t("admin.page.no_systems_title")}</CardTitle>
+            <CardDescription>{t("admin.page.no_systems_description")}</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -381,9 +392,11 @@ export function AdminSystemsPage({
 function SummaryBadges({
   summaryStats,
   total,
+  t,
 }: {
   summaryStats: ReturnType<typeof buildSummaryStats>;
   total: number;
+  t: (key: string) => string;
 }) {
   return (
     <div className="space-y-3">
@@ -404,7 +417,16 @@ function SummaryBadges({
         ))}
       </div>
       <p className="text-muted-foreground text-xs">
-        Showing {total} {total === 1 ? "system" : "systems"} matching the current filter.
+        {(t as (key: string, options?: Record<string, unknown>) => string)(
+          "admin.page.showing_results",
+          {
+            total,
+            itemType:
+              total === 1
+                ? t("admin.page.system_singular")
+                : t("admin.page.system_plural"),
+          },
+        )}
       </p>
     </div>
   );
@@ -471,6 +493,7 @@ function buildSearchFromForm(form: AdminSystemsFormState): AdminSystemsSearchPar
 function buildSummaryStats(
   stats: AdminGameSystemListResponse["stats"] | undefined,
   filteredTotal: number,
+  t: (key: string) => string,
 ) {
   const total = stats?.total ?? filteredTotal;
   const needsCuration = stats?.needsCuration ?? 0;
@@ -478,20 +501,28 @@ function buildSummaryStats(
   const published = stats?.published ?? 0;
 
   const summary = [
-    { label: "Total", value: total, variant: "secondary" as const },
     {
-      label: "Needs curation",
+      label: t("admin.summary_badges.total"),
+      value: total,
+      variant: "secondary" as const,
+    },
+    {
+      label: t("admin.summary_badges.needs_curation"),
       value: needsCuration,
       variant: needsCuration > 0 ? ("destructive" as const) : ("secondary" as const),
     },
     {
-      label: "Errors",
+      label: t("admin.summary_badges.errors"),
       value: errors,
       variant: errors > 0 ? ("destructive" as const) : ("secondary" as const),
     },
-    { label: "Published", value: published, variant: "outline" as const },
     {
-      label: "Visible now",
+      label: t("admin.summary_badges.published"),
+      value: published,
+      variant: "outline" as const,
+    },
+    {
+      label: t("admin.summary_badges.visible_now"),
       value: filteredTotal,
       variant: "outline" as const,
     },

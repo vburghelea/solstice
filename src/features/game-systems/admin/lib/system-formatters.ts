@@ -12,16 +12,24 @@ type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 export function formatSystemRelativeTime(
   isoString: string | null | undefined,
-  { fallback = DEFAULT_RELATIVE_FALLBACK }: { fallback?: string } = {},
+  {
+    fallback = DEFAULT_RELATIVE_FALLBACK,
+    t,
+  }: {
+    fallback?: string;
+    t?: (key: string, params?: Record<string, unknown>) => string;
+  } = {},
 ) {
   if (!isoString) return fallback;
 
   const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return "invalid date";
+  if (Number.isNaN(date.getTime()))
+    return t ? t("formatters.relative_time.invalid_date") : "invalid date";
 
   const deltaMs = Date.now() - date.getTime();
   const deltaSeconds = Math.round(deltaMs / 1000);
-  if (Math.abs(deltaSeconds) < 60) return "just now";
+  if (Math.abs(deltaSeconds) < 60)
+    return t ? t("formatters.relative_time.just_now") : "just now";
 
   const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
   let duration = deltaSeconds;
@@ -52,25 +60,28 @@ export function getSystemCrawlBadgeVariant(
   return CRAWL_VARIANT_MAP[status.toLowerCase()] ?? "outline";
 }
 
-export function formatSystemCrawlStatus(status: string | null | undefined) {
-  if (!status) return "Unknown";
+export function formatSystemCrawlStatus(
+  status: string | null | undefined,
+  t?: (key: string, params?: Record<string, unknown>) => string,
+) {
+  if (!status) return t ? t("formatters.crawl_status.unknown") : "Unknown";
 
   const normalized = status.toLowerCase();
   switch (normalized) {
     case "success":
-      return "Success";
+      return t ? t("formatters.crawl_status.success") : "Success";
     case "partial":
-      return "Partial";
+      return t ? t("formatters.crawl_status.partial") : "Partial";
     case "error":
-      return "Error";
+      return t ? t("formatters.crawl_status.error") : "Error";
     case "queued":
-      return "Queued";
+      return t ? t("formatters.crawl_status.queued") : "Queued";
     case "processing":
-      return "Processing";
+      return t ? t("formatters.crawl_status.processing") : "Processing";
     case "inactive":
-      return "Inactive";
+      return t ? t("formatters.crawl_status.inactive") : "Inactive";
     case "unknown":
-      return "Unknown";
+      return t ? t("formatters.crawl_status.unknown") : "Unknown";
     default:
       return status.charAt(0).toUpperCase() + status.slice(1);
   }

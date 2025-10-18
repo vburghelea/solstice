@@ -8,6 +8,10 @@ import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { DataTable } from "~/components/ui/data-table";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import {
+  useCommonTranslation,
+  useGameSystemsTranslation,
+} from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { bulkUpdateAdminSystems } from "../game-systems-admin.mutations";
 import type { BulkAdminAction } from "../game-systems-admin.schemas";
@@ -29,11 +33,13 @@ import {
   selectionReducer,
 } from "./systems-dashboard-selection";
 
-const selectionColumn: ColumnDef<AdminGameSystemListItem> = {
+const createSelectionColumn = (
+  t: (key: string, params?: Record<string, unknown>) => string,
+): ColumnDef<AdminGameSystemListItem> => ({
   id: "select",
   header: ({ table }) => (
     <Checkbox
-      aria-label="Select all systems on this page"
+      aria-label={t("accessibility.select_all_page")}
       checked={
         table.getIsAllPageRowsSelected()
           ? true
@@ -46,7 +52,7 @@ const selectionColumn: ColumnDef<AdminGameSystemListItem> = {
   ),
   cell: ({ row }) => (
     <Checkbox
-      aria-label={`Select ${row.original.name}`}
+      aria-label={t("accessibility.select_item", { name: row.original.name })}
       checked={row.getIsSelected()}
       disabled={!row.getCanSelect()}
       onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -55,9 +61,13 @@ const selectionColumn: ColumnDef<AdminGameSystemListItem> = {
   enableSorting: false,
   enableHiding: false,
   size: 32,
-};
+});
 
-function createColumns(detailRoute: SystemDetailRoute) {
+function createColumns(
+  detailRoute: SystemDetailRoute,
+  t: (key: string, params?: Record<string, unknown>) => string,
+  tGameSystems: (key: string, params?: Record<string, unknown>) => string,
+) {
   const detailColumns: ColumnDef<AdminGameSystemListItem>[] = [
     {
       accessorKey: "name",
@@ -81,7 +91,9 @@ function createColumns(detailRoute: SystemDetailRoute) {
                 {item.cmsApproved ? "Approved" : "Needs approval"}
               </Badge>
             </div>
-            <p className="text-muted-foreground text-xs">Slug: {item.slug}</p>
+            <p className="text-muted-foreground text-xs">
+              {tGameSystems("admin.table.slug_prefix")} {item.slug}
+            </p>
           </div>
         );
       },
@@ -92,7 +104,9 @@ function createColumns(detailRoute: SystemDetailRoute) {
       cell: ({ row }) => {
         const item = row.original;
         if (item.statusFlags.length === 0) {
-          return <Badge variant="secondary">Ready</Badge>;
+          return (
+            <Badge variant="secondary">{tGameSystems("admin.table.ready_status")}</Badge>
+          );
         }
         return (
           <div className="flex flex-wrap gap-1">
@@ -111,13 +125,15 @@ function createColumns(detailRoute: SystemDetailRoute) {
         const crawlStatus = item.crawlStatus ?? "unknown";
         const crawlVariant = getSystemCrawlBadgeVariant(crawlStatus);
         const lastLabel = item.lastCrawledAt
-          ? `${formatDateAndTime(item.lastCrawledAt)} (${formatSystemRelativeTime(item.lastCrawledAt)})`
+          ? `${formatDateAndTime(item.lastCrawledAt)} (${formatSystemRelativeTime(item.lastCrawledAt, { t })})`
           : "Never crawled";
         const errorMessage = item.errorMessage?.trim();
 
         return (
           <div className="space-y-1">
-            <Badge variant={crawlVariant}>{formatSystemCrawlStatus(crawlStatus)}</Badge>
+            <Badge variant={crawlVariant}>
+              {formatSystemCrawlStatus(crawlStatus, t)}
+            </Badge>
             <p className="text-muted-foreground text-xs">{lastLabel}</p>
             {errorMessage ? (
               <p className="text-destructive line-clamp-2 text-xs">{errorMessage}</p>
@@ -136,7 +152,7 @@ function createColumns(detailRoute: SystemDetailRoute) {
             {item.heroModerated ? "Hero approved" : "Hero needs review"}
           </Badge>
         ) : (
-          <Badge variant="destructive">No hero</Badge>
+          <Badge variant="destructive">{tGameSystems("admin.table.no_hero_badge")}</Badge>
         );
 
         return (
@@ -156,7 +172,7 @@ function createColumns(detailRoute: SystemDetailRoute) {
       header: "Updated",
       cell: ({ row }) => {
         const item = row.original;
-        const updatedLabel = `${formatDateAndTime(item.updatedAt)} (${formatSystemRelativeTime(item.updatedAt)})`;
+        const updatedLabel = `${formatDateAndTime(item.updatedAt)} (${formatSystemRelativeTime(item.updatedAt, { t })})`;
         return <p className="text-muted-foreground text-xs">{updatedLabel}</p>;
       },
     },
@@ -168,7 +184,7 @@ function createColumns(detailRoute: SystemDetailRoute) {
         return (
           <Button asChild size="sm" variant="secondary" className="gap-1">
             <Link to={detailRoute} params={{ systemId: String(item.id) }}>
-              <span>Edit</span>
+              <span>{tGameSystems("admin.table.edit_action")}</span>
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </Button>
@@ -178,7 +194,7 @@ function createColumns(detailRoute: SystemDetailRoute) {
   ];
 
   return [
-    selectionColumn,
+    createSelectionColumn(t),
     ...detailColumns,
   ] satisfies ColumnDef<AdminGameSystemListItem>[];
 }
@@ -204,7 +220,12 @@ export function SystemsDashboardTable({
   onPageChange,
   systemDetailRoute = DEFAULT_SYSTEM_DETAIL_ROUTE,
 }: SystemsDashboardTableProps) {
-  const columns = useMemo(() => createColumns(systemDetailRoute), [systemDetailRoute]);
+  const { t } = useCommonTranslation();
+  const { t: tGameSystems } = useGameSystemsTranslation();
+  const columns = useMemo(
+    () => createColumns(systemDetailRoute, t, tGameSystems),
+    [systemDetailRoute, t, tGameSystems],
+  );
   const queryClient = useQueryClient();
 
   const datasetSignature = useMemo(
@@ -244,6 +265,11 @@ export function SystemsDashboardTable({
 
   const selectedCount = selectedIds.length;
 
+  const bulkActionLabels = useMemo(
+    () => getBulkActionLabels(tGameSystems),
+    [tGameSystems],
+  );
+
   const bulkMutation = useMutation({
     mutationFn: async (action: BulkAction) => {
       if (selectedIds.length === 0) return;
@@ -273,14 +299,14 @@ export function SystemsDashboardTable({
 
     if (action === "delete") {
       const confirmed = window.confirm(
-        "This will permanently remove the selected systems and all related data. Continue?",
+        tGameSystems("admin.table.confirmations.delete_systems"),
       );
       if (!confirmed) return;
     }
 
     if (action === "deactivate") {
       const confirmed = window.confirm(
-        "Deactivate selected systems and mark them as inactive? They will be hidden from public listings.",
+        tGameSystems("admin.table.confirmations.deactivate_systems"),
       );
       if (!confirmed) return;
     }
@@ -299,6 +325,7 @@ export function SystemsDashboardTable({
         selectedCount={selectedCount}
         isBusy={bulkMutation.isPending}
         onAction={handleBulkAction}
+        t={tGameSystems}
       />
     ) : null;
 
@@ -346,47 +373,46 @@ type BulkAction =
   | "deactivate"
   | "delete";
 
-const bulkActionLabels: Record<
-  BulkAction,
-  { successMessage: string; errorPrefix: string }
-> = {
+const getBulkActionLabels = (
+  t: (key: string, params?: Record<string, unknown>) => string,
+): Record<BulkAction, { successMessage: string; errorPrefix: string }> => ({
   publish: {
-    successMessage: "Selected systems published",
-    errorPrefix: "Could not publish selected systems",
+    successMessage: t("admin.table.bulk_actions.messages.publish_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.publish_error"),
   },
   unpublish: {
-    successMessage: "Selected systems reverted to draft",
-    errorPrefix: "Could not revert publish status",
+    successMessage: t("admin.table.bulk_actions.messages.unpublish_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.unpublish_error"),
   },
   approve: {
-    successMessage: "Selected systems approved",
-    errorPrefix: "Could not approve selected systems",
+    successMessage: t("admin.table.bulk_actions.messages.approve_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.approve_error"),
   },
   "revoke-approval": {
-    successMessage: "Selected systems marked for review",
-    errorPrefix: "Could not update approval status",
+    successMessage: t("admin.table.bulk_actions.messages.revoke_approval_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.revoke_approval_error"),
   },
   "hero-approved": {
-    successMessage: "Hero images marked as reviewed",
-    errorPrefix: "Could not update hero moderation",
+    successMessage: t("admin.table.bulk_actions.messages.hero_approved_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.hero_approved_error"),
   },
   "hero-needs-review": {
-    successMessage: "Hero images flagged for review",
-    errorPrefix: "Could not update hero moderation",
+    successMessage: t("admin.table.bulk_actions.messages.hero_needs_review_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.hero_needs_review_error"),
   },
   "queue-recrawl": {
-    successMessage: "Selected systems queued for recrawl",
-    errorPrefix: "Could not queue recrawl",
+    successMessage: t("admin.table.bulk_actions.messages.queue_recrawl_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.queue_recrawl_error"),
   },
   deactivate: {
-    successMessage: "Selected systems deactivated",
-    errorPrefix: "Could not deactivate systems",
+    successMessage: t("admin.table.bulk_actions.messages.deactivate_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.deactivate_error"),
   },
   delete: {
-    successMessage: "Selected systems deleted",
-    errorPrefix: "Could not delete systems",
+    successMessage: t("admin.table.bulk_actions.messages.delete_success"),
+    errorPrefix: t("admin.table.bulk_actions.messages.delete_error"),
   },
-};
+});
 
 function buildBulkUpdatePayload(action: BulkAction): BulkAdminAction {
   switch (action) {
@@ -419,15 +445,17 @@ function BulkActionsToolbar({
   selectedCount,
   isBusy,
   onAction,
+  t,
 }: {
   selectedCount: number;
   isBusy: boolean;
   onAction: (action: BulkAction) => void;
+  t: (key: string, params?: Record<string, unknown>) => string;
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-semibold">
-        {selectedCount} selected
+        {t("admin.table.bulk_actions.selected_count", { count: selectedCount })}
       </Badge>
       <div className="flex flex-wrap items-center gap-2">
         <Button
@@ -436,7 +464,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="secondary"
         >
-          Publish
+          {t("admin.table.bulk_actions.buttons.publish")}
         </Button>
         <Button
           size="sm"
@@ -444,7 +472,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="outline"
         >
-          Revert to draft
+          {t("admin.table.bulk_actions.buttons.revert_to_draft")}
         </Button>
         <Button
           size="sm"
@@ -452,7 +480,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="default"
         >
-          Approve
+          {t("admin.table.bulk_actions.buttons.approve")}
         </Button>
         <Button
           size="sm"
@@ -460,7 +488,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="ghost"
         >
-          Mark for review
+          {t("admin.table.bulk_actions.buttons.mark_for_review")}
         </Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -470,7 +498,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="default"
         >
-          Hero reviewed
+          {t("admin.table.bulk_actions.buttons.hero_reviewed")}
         </Button>
         <Button
           size="sm"
@@ -478,7 +506,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="outline"
         >
-          Hero needs review
+          {t("admin.table.bulk_actions.buttons.hero_needs_review")}
         </Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -488,7 +516,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="secondary"
         >
-          Queue recrawl
+          {t("admin.table.bulk_actions.buttons.queue_recrawl")}
         </Button>
         <Button
           size="sm"
@@ -496,7 +524,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="outline"
         >
-          Deactivate
+          {t("admin.table.bulk_actions.buttons.deactivate")}
         </Button>
         <Button
           size="sm"
@@ -504,7 +532,7 @@ function BulkActionsToolbar({
           disabled={isBusy}
           variant="destructive"
         >
-          Delete
+          {t("admin.table.bulk_actions.buttons.delete")}
         </Button>
       </div>
     </div>

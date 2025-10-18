@@ -10,6 +10,7 @@ import {
   updateGameParticipant,
 } from "~/features/games/games.mutations";
 import { GameApplication, GameParticipant } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import type { User } from "~/lib/auth/types";
 import { OperationResult } from "~/shared/types/common";
 
@@ -31,6 +32,7 @@ export function GameParticipantsList({
   participants,
 }: GameParticipantsListProps) {
   const queryClient = useQueryClient();
+  const { t } = useGamesTranslation();
 
   const removeParticipantMutation = useMutation<
     OperationResult<GameParticipant>,
@@ -39,12 +41,14 @@ export function GameParticipantsList({
   >({
     mutationFn: updateGameParticipant,
     onSuccess: () => {
-      toast.success("Participant removed successfully!");
+      toast.success(t("participants_list.success_messages.participant_removed"));
       queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] });
       queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
     },
     onError: (error) => {
-      toast.error(`Failed to remove participant: ${error.message}`);
+      toast.error(
+        t("participants_list.error_messages.failed_to_remove", { error: error.message }),
+      );
     },
   });
 
@@ -63,24 +67,32 @@ export function GameParticipantsList({
   >({
     mutationFn: removeGameParticipantBan,
     onSuccess: () => {
-      toast.success("Participant ban removed successfully!");
+      toast.success(t("participants_list.success_messages.ban_removed"));
       queryClient.invalidateQueries({ queryKey: ["gameParticipants", gameId] });
       queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
     },
     onError: (error) => {
-      toast.error(`Failed to remove participant ban: ${error.message}`);
+      toast.error(
+        t("participants_list.error_messages.failed_to_remove_ban", {
+          error: error.message,
+        }),
+      );
     },
   });
 
   const respondToGameApplicationMutation = useMutation({
     mutationFn: respondToGameApplication,
     onSuccess: () => {
-      toast.success("Application status updated successfully!");
+      toast.success(t("participants_list.success_messages.application_updated"));
       queryClient.invalidateQueries({ queryKey: ["gameApplications", gameId] });
       queryClient.invalidateQueries({ queryKey: ["gameDetails", gameId] });
     },
     onError: (error) => {
-      toast.error(`Failed to update application status: ${error.message}`);
+      toast.error(
+        t("participants_list.error_messages.failed_to_update_application", {
+          error: error.message,
+        }),
+      );
     },
   });
 
@@ -116,11 +128,15 @@ export function GameParticipantsList({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Participants ({approvedParticipants.length})</CardTitle>
+          <CardTitle>
+            {t("participants_list.participants_title", {
+              count: approvedParticipants.length,
+            })}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {approvedParticipants.length === 0 ? (
-            <p>No participants yet.</p>
+            <p>{t("participants_list.no_participants")}</p>
           ) : (
             <ul className="space-y-2">
               {approvedParticipants.map((p) => (
@@ -139,7 +155,12 @@ export function GameParticipantsList({
                         userId={p.userId}
                         username={p.user.name || p.user.email}
                       />{" "}
-                      {p.userId === gameOwnerId ? "(owner)" : `(${p.role} - ${p.status})`}
+                      {p.userId === gameOwnerId
+                        ? t("participants_list.owner_label")
+                        : t("participants_list.role_status", {
+                            role: p.role,
+                            status: p.status,
+                          })}
                     </span>
                   </div>
                   {isOwner &&
@@ -157,8 +178,8 @@ export function GameParticipantsList({
                       >
                         {removeParticipantMutation.isPending &&
                         removeParticipantMutation.variables?.data.id === p.id
-                          ? "Removing..."
-                          : "Remove"}
+                          ? t("participants_list.buttons.removing")
+                          : t("participants_list.buttons.remove")}
                       </Button>
                     )}
                 </li>
@@ -171,7 +192,11 @@ export function GameParticipantsList({
       {isOwner && pendingApplications.length > 0 && (
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle>Pending Applications ({pendingApplications.length})</CardTitle>
+            <CardTitle>
+              {t("participants_list.pending_applications_title", {
+                count: pendingApplications.length,
+              })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -202,8 +227,8 @@ export function GameParticipantsList({
                       disabled={respondToGameApplicationMutation.isPending}
                     >
                       {respondToGameApplicationMutation.isPending
-                        ? "Approving..."
-                        : "Approve"}
+                        ? t("participants_list.buttons.approving")
+                        : t("participants_list.buttons.approve")}
                     </Button>
                     <Button
                       variant="destructive"
@@ -212,8 +237,8 @@ export function GameParticipantsList({
                       disabled={respondToGameApplicationMutation.isPending}
                     >
                       {respondToGameApplicationMutation.isPending
-                        ? "Rejecting..."
-                        : "Reject"}
+                        ? t("participants_list.buttons.rejecting")
+                        : t("participants_list.buttons.reject")}
                     </Button>
                   </div>
                 </li>
@@ -226,7 +251,11 @@ export function GameParticipantsList({
       {isOwner && rejectedParticipants.length > 0 && (
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle>Banned from the Game ({rejectedParticipants.length})</CardTitle>
+            <CardTitle>
+              {t("participants_list.banned_title", {
+                count: rejectedParticipants.length,
+              })}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -260,8 +289,8 @@ export function GameParticipantsList({
                   >
                     {removeRejectedParticipantMutation.isPending &&
                     removeRejectedParticipantMutation.variables?.data.id === p.id
-                      ? "Allowing..."
-                      : "Allow"}
+                      ? t("participants_list.buttons.allowing")
+                      : t("participants_list.buttons.allow")}
                   </Button>
                 </li>
               ))}

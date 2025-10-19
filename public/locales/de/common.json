@@ -329,6 +329,15 @@
       "momentum_check": "Momentum-Check"
     }
   },
+  "not_found": {
+    "title": "404 — Seite nicht gefunden",
+    "headline": "Dieser Spielzug ist außerhalb des Spielfelds",
+    "description": "Die Seite, die Du suchst, wurde möglicherweise umbenannt, archiviert oder hat es nie in die Aufstellung geschafft. Nutze die unten stehenden Optionen, um wieder ins Spiel zu kommen oder gib uns Bescheid, damit wir Dir helfen können, sie zu finden.",
+    "go_back": "Zurück",
+    "visit_homepage": "Homepage besuchen",
+    "browse_events": "Events durchsuchen",
+    "need_support": "Benötigst Du Unterstützung? E-Mail an"
+  },
   "roles": {
     "definitions": {
       "visitor": {

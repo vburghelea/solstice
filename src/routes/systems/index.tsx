@@ -21,7 +21,7 @@ import type {
   AvailableGameSystemFilters,
   GameSystemListItem,
 } from "~/features/game-systems/game-systems.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 
 const SYSTEMS_PER_PAGE = 20;
@@ -94,7 +94,7 @@ function SystemsBrowsePage() {
   };
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <section className="bg-secondary text-secondary-foreground py-16 dark:bg-gray-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-semibold sm:text-4xl">{t("browse.title")}</h1>
@@ -142,7 +142,7 @@ function SystemsBrowsePage() {
           ) : null}
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 

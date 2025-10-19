@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, CreditCard, ScrollText, UsersIcon } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
@@ -62,7 +62,7 @@ function CommunityStarterToolkitPage() {
   ];
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
         eyebrow={t("toolkit.hero.eyebrow")}
         title={t("toolkit.hero.title")}
@@ -275,6 +275,6 @@ function CommunityStarterToolkitPage() {
           </p>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

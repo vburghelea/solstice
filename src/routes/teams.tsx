@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { MapPinIcon, Trophy, UsersIcon } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useTeamsTranslation } from "~/hooks/useTypedTranslation";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
@@ -62,7 +62,7 @@ function TeamsPage() {
   ];
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
         eyebrow={t("hero.eyebrow")}
         title={t("hero.title")}
@@ -176,6 +176,6 @@ function TeamsPage() {
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

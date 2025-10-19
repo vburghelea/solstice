@@ -1,7 +1,8 @@
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
 import { ArrowLeftIcon, SearchIcon } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
+import { useCommonTranslation } from "~/hooks/useTypedTranslation";
 import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
 
 const NOT_FOUND_BACKGROUND = getCloudinaryAssetUrl("heroNotFound", {
@@ -12,8 +13,10 @@ const NOT_FOUND_BACKGROUND = getCloudinaryAssetUrl("heroNotFound", {
 });
 
 export function NotFound() {
+  const { t } = useCommonTranslation();
+
   return (
-    <PublicLayout>
+    <VisitorShell>
       <section className="bg-background relative overflow-hidden py-24 sm:py-28 lg:py-32">
         <div
           className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10"
@@ -21,15 +24,13 @@ export function NotFound() {
         />
         <div className="relative z-10 container mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-6 text-center sm:px-8 lg:px-12">
           <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
-            404 — page not found
+            {t("not_found.title")}
           </p>
           <h1 className="text-foreground mt-4 text-4xl font-bold sm:text-5xl">
-            Looks like this play is out of bounds
+            {t("not_found.headline")}
           </h1>
           <p className="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">
-            The page you’re after may have been renamed, archived, or never made the
-            roster. Use the options below to jump back into the action or drop us a note
-            so we can help you track it down.
+            {t("not_found.description")}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button
@@ -38,26 +39,26 @@ export function NotFound() {
               className="btn-brand-primary"
             >
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Go back
+              {t("not_found.go_back")}
             </Button>
             <Button asChild variant="secondary">
               <Link to="/">
                 <SearchIcon className="mr-2 h-4 w-4" />
-                Visit the homepage
+                {t("not_found.visit_homepage")}
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/events">Browse events</Link>
+              <Link to="/events">{t("not_found.browse_events")}</Link>
             </Button>
           </div>
           <p className="text-muted-foreground mt-8 text-xs tracking-[0.3em] uppercase">
-            Need support? Email{" "}
+            {t("not_found.need_support")}{" "}
             <a className="underline" href="mailto:info@roundup.games">
               info@roundup.games
             </a>
           </p>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

@@ -329,6 +329,15 @@
       "momentum_check": "Momentum check"
     }
   },
+  "not_found": {
+    "title": "404 — page not found",
+    "headline": "Looks like this play is out of bounds",
+    "description": "The page you're after may have been renamed, archived, or never made the roster. Use the options below to jump back into the action or drop us a note so we can help you track it down.",
+    "go_back": "Go back",
+    "visit_homepage": "Visit the homepage",
+    "browse_events": "Browse events",
+    "need_support": "Need support? Email"
+  },
   "roles": {
     "definitions": {
       "visitor": {

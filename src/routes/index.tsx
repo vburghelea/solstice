@@ -14,7 +14,7 @@ import {
 } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import {
   buildFallbackSelection,
   CITY_PREFERENCE_STORAGE_KEY,
@@ -259,7 +259,7 @@ function VisitorExperience() {
   }, [flattenedSuggestions, selectedCity]);
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="token-stack-3xl space-y-4">
         <HeroSection
           eyebrow={ht("hero.eyebrow")}
@@ -652,6 +652,6 @@ function VisitorExperience() {
           </div>
         </section>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

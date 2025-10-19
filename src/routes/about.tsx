@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, ScrollText, Swords, UsersIcon } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useAboutTranslation } from "~/hooks/useTypedTranslation";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
@@ -90,7 +90,7 @@ function AboutPage() {
   ];
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
         eyebrow={t("hero.eyebrow")}
         title={t("hero.title")}
@@ -255,6 +255,6 @@ function AboutPage() {
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

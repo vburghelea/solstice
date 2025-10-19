@@ -8,7 +8,7 @@ import {
 } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
 import { useCommonTranslation, useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
@@ -210,7 +210,7 @@ function SearchPage() {
   const hasFilteredGames = filteredGames.length > 0;
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="bg-secondary text-foreground dark:bg-gray-950">
         <section className="border-border/60 bg-secondary border-b dark:border-gray-800 dark:bg-gray-950">
           <div className="container mx-auto px-4 py-12 sm:py-16">
@@ -329,6 +329,6 @@ function SearchPage() {
           </div>
         </section>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

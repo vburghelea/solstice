@@ -349,5 +349,41 @@
     "select_a_team": "Please select a team",
     "registration_open": "Registration open",
     "registration_closed": "Registration closed"
+  },
+  "not_found": {
+    "title": "Event Not Found",
+    "description": "The event you're looking for doesn't exist or is not publicly available.",
+    "back_to_events": "Back to Events"
+  },
+  "schedule": "Event Schedule",
+  "rules_format": "Rules & Format",
+  "requirements": "Requirements",
+  "amenities": "Amenities",
+  "organizer": "Event Organizer",
+  "share": {
+    "title": "Share Event",
+    "copy_link": "Copy Link"
+  },
+  "listing": {
+    "title": "Events",
+    "subtitle": "Tournaments, training camps, and community festivals",
+    "description": "Roundup Games sanctions competitions year-round so athletes at every level can compete, learn, and connect.",
+    "register_team": "Register your team",
+    "submit_event": "Submit an event",
+    "filter": "Filter upcoming events",
+    "calendar_title": "Upcoming events calendar",
+    "clear_filters": "Clear filters",
+    "country": "Country",
+    "city": "City",
+    "type": "Type",
+    "status": "Status",
+    "registration_type": "Registration type",
+    "all_countries": "All countries",
+    "all_cities": "All cities",
+    "all_types": "All types",
+    "all_statuses": "All statuses",
+    "all_registration_types": "All registration types",
+    "load_failed": "Events failed to load",
+    "no_results": "No events match this filter right now. Contact us at {{email}} and we'll add your event to the calendar."
   }
 }

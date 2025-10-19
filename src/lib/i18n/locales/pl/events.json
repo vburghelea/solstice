@@ -349,5 +349,41 @@
     "select_a_team": "Proszę wybrać drużynę",
     "registration_open": "Rejestracja otwarta",
     "registration_closed": "Rejestracja zamknięta"
+  },
+  "not_found": {
+    "title": "Wydarzenie nie znalezione",
+    "description": "Wydarzenie, którego szukasz, nie istnieje lub nie jest publicznie dostępne.",
+    "back_to_events": "Wróć do wydarzeń"
+  },
+  "schedule": "Harmonogram wydarzenia",
+  "rules_format": "Zasady i format",
+  "requirements": "Wymagania",
+  "amenities": "Udogodnienia",
+  "organizer": "Organizator wydarzenia",
+  "share": {
+    "title": "Udostępnij wydarzenie",
+    "copy_link": "Kopiuj link"
+  },
+  "listing": {
+    "title": "Wydarzenia",
+    "subtitle": "Turnieje, obozy treningowe i festiwale społecznościowe",
+    "description": "Roundup Games sankcjonuje zawody przez cały rok, aby sportowcy na każdym poziomie mogli rywalizować, uczyć się i nawiązywać kontakty.",
+    "register_team": "Zarejestruj swoją drużynę",
+    "submit_event": "Zgłoś wydarzenie",
+    "filter": "Filtruj nadchodzące wydarzenia",
+    "calendar_title": "Kalendarz nadchodzących wydarzeń",
+    "clear_filters": "Wyczyść filtry",
+    "country": "Kraj",
+    "city": "Miasto",
+    "type": "Typ",
+    "status": "Status",
+    "registration_type": "Typ rejestracji",
+    "all_countries": "Wszystkie kraje",
+    "all_cities": "Wszystkie miasta",
+    "all_types": "Wszystkie typy",
+    "all_statuses": "Wszystkie statusy",
+    "all_registration_types": "Wszystkie typy rejestracji",
+    "load_failed": "Ładowanie wydarzeń nie powiodło się",
+    "no_results": "Żadne wydarzenia nie pasują do tego filtra. Skontaktuj się z nami pod adresem {{email}}, a dodamy Twoje wydarzenie do kalendarza."
   }
 }

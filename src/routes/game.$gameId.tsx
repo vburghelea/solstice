@@ -13,7 +13,7 @@ import type { GameSystemDetail } from "~/features/game-systems/game-systems.type
 import { applyToGame } from "~/features/games/games.mutations";
 import { getGame } from "~/features/games/games.queries";
 import type { GameApplication, GameWithDetails } from "~/features/games/games.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
@@ -93,7 +93,7 @@ function VisitGameDetailPage() {
 
   if (!gameDetails) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <div
           className={cn(
             SURFACE_CLASSNAME,
@@ -124,7 +124,7 @@ function VisitGameDetailPage() {
             </Link>
           </div>
         </div>
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
@@ -211,7 +211,7 @@ function VisitGameDetailPage() {
     : "";
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="token-stack-2xl space-y-4">
         <section
           className={cn(
@@ -823,7 +823,7 @@ function VisitGameDetailPage() {
           </aside>
         </div>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 

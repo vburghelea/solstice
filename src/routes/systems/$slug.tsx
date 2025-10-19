@@ -22,7 +22,7 @@ import { SystemHero } from "~/features/game-systems/components/system-hero";
 import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
 import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { useCloudinaryImage } from "~/shared/hooks/useCloudinaryImage";
@@ -55,7 +55,7 @@ function SystemDetailPage() {
   });
 
   return (
-    <PublicLayout className="max-w-none px-0">
+    <VisitorShell>
       <div className="relative isolate overflow-hidden">
         {heroBackground.src ? (
           <>
@@ -350,7 +350,7 @@ function SystemDetailPage() {
           </section>
         </section>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 

@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, ScrollText, Swords } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
@@ -68,7 +68,7 @@ function SessionPlansPage() {
     },
   ];
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
         eyebrow={t("session_plans.hero.eyebrow")}
         title={t("session_plans.hero.title")}
@@ -223,6 +223,6 @@ function SessionPlansPage() {
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, Info, PenSquareIcon, UsersIcon } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
@@ -73,7 +73,7 @@ function SafetyPoliciesPage() {
   ];
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
         eyebrow={t("safety_policies.hero.eyebrow")}
         title={t("safety_policies.hero.title")}
@@ -313,6 +313,6 @@ function SafetyPoliciesPage() {
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

@@ -349,5 +349,41 @@
     "select_a_team": "Bitte wähle ein Team",
     "registration_open": "Anmeldung geöffnet",
     "registration_closed": "Anmeldung geschlossen"
+  },
+  "not_found": {
+    "title": "Event nicht gefunden",
+    "description": "Das Event, das Du suchst, existiert nicht oder ist nicht öffentlich verfügbar.",
+    "back_to_events": "Zurück zu Events"
+  },
+  "schedule": "Event-Zeitplan",
+  "rules_format": "Regeln & Format",
+  "requirements": "Voraussetzungen",
+  "amenities": "Annehmlichkeiten",
+  "organizer": "Event-Organisator",
+  "share": {
+    "title": "Event teilen",
+    "copy_link": "Link kopieren"
+  },
+  "listing": {
+    "title": "Events",
+    "subtitle": "Turniere, Trainingscamps und Community-Festivals",
+    "description": "Roundup Games sanktioniert das ganze Jahr über Wettbewerbe, damit Athleten auf jedem Level konkurrieren, lernen und sich verbinden können.",
+    "register_team": "Dein Team registrieren",
+    "submit_event": "Event einreichen",
+    "filter": "Bevorstehende Events filtern",
+    "calendar_title": "Kalender der bevorstehenden Events",
+    "clear_filters": "Filter löschen",
+    "country": "Land",
+    "city": "Stadt",
+    "type": "Typ",
+    "status": "Status",
+    "registration_type": "Registrierungsart",
+    "all_countries": "Alle Länder",
+    "all_cities": "Alle Städte",
+    "all_types": "Alle Typen",
+    "all_statuses": "Alle Status",
+    "all_registration_types": "Alle Registrierungsarten",
+    "load_failed": "Laden der Events fehlgeschlagen",
+    "no_results": "Keine Events entsprechen diesem Filter. Kontaktiere uns unter {{email}} und wir fügen Dein Event zum Kalender hinzu."
   }
 }

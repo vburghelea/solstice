@@ -33,8 +33,9 @@ import type {
   EventWithDetails,
   RegistrationType,
 } from "~/features/events/events.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { useCountries } from "~/shared/hooks/useCountries";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
@@ -115,6 +116,7 @@ export const Route = createFileRoute("/events/")({
 });
 
 function EventsIndex() {
+  const { t } = useEventsTranslation();
   const { playerFilters } = Route.useLoaderData() as EventsLoaderData;
   const [filters, setFilters] = useState<EventFiltersState>(DEFAULT_EVENT_FILTERS);
   const { getCountryName } = useCountries();
@@ -230,16 +232,16 @@ function EventsIndex() {
   );
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
-        eyebrow="Events"
-        title="Tournaments, training camps, and community festivals"
-        subtitle="Roundup Games sanctions competitions year-round so athletes at every level can compete, learn, and connect."
+        eyebrow={t("events.listing.title")}
+        title={t("events.listing.subtitle")}
+        subtitle={t("events.listing.description")}
         backgroundImageSet={EVENTS_HERO_IMAGE}
-        ctaText="Register your team"
+        ctaText={t("events.listing.register_team")}
         ctaLink="/auth/signup"
         secondaryCta={{
-          text: "Submit an event",
+          text: t("events.listing.submit_event"),
           link: "mailto:events@roundup.games",
         }}
       />
@@ -250,10 +252,10 @@ function EventsIndex() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
-                  Filter upcoming events
+                  {t("events.listing.filter")}
                 </p>
                 <h2 className="text-foreground mt-2 text-2xl font-bold sm:text-3xl dark:text-gray-50">
-                  Upcoming events calendar
+                  {t("events.listing.calendar_title")}
                 </h2>
               </div>
               {!hasQuickFilters && hasActiveFilters ? (
@@ -262,7 +264,7 @@ function EventsIndex() {
                   onClick={resetFilters}
                   className="text-primary text-sm font-medium hover:underline"
                 >
-                  Clear filters
+                  {t("events.listing.clear_filters")}
                 </button>
               ) : null}
             </div>
@@ -277,7 +279,7 @@ function EventsIndex() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  Country
+                  {t("events.listing.country")}
                 </p>
                 <Select
                   value={filters.country}
@@ -286,10 +288,12 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="All countries" />
+                    <SelectValue placeholder={t("events.listing.all_countries")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All countries</SelectItem>
+                    <SelectItem value="all">
+                      {t("events.listing.all_countries")}
+                    </SelectItem>
                     {countryOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -301,7 +305,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  City
+                  {t("events.listing.city")}
                 </p>
                 <Select
                   value={filters.city}
@@ -310,10 +314,10 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="All cities" />
+                    <SelectValue placeholder={t("events.listing.all_cities")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All cities</SelectItem>
+                    <SelectItem value="all">{t("events.listing.all_cities")}</SelectItem>
                     {cityOptions.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}
@@ -325,7 +329,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  Type
+                  {t("events.listing.type")}
                 </p>
                 <Select
                   value={filters.type}
@@ -337,10 +341,10 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="All types" />
+                    <SelectValue placeholder={t("events.listing.all_types")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All types</SelectItem>
+                    <SelectItem value="all">{t("events.listing.all_types")}</SelectItem>
                     {EVENT_TYPE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -352,7 +356,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  Status
+                  {t("events.listing.status")}
                 </p>
                 <Select
                   value={filters.status}
@@ -364,10 +368,12 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="All statuses" />
+                    <SelectValue placeholder={t("events.listing.all_statuses")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="all">
+                      {t("events.listing.all_statuses")}
+                    </SelectItem>
                     {EVENT_STATUS_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -379,7 +385,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  Registration type
+                  {t("events.listing.registration_type")}
                 </p>
                 <Select
                   value={filters.registrationType}
@@ -391,10 +397,14 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="All registration types" />
+                    <SelectValue
+                      placeholder={t("events.listing.all_registration_types")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All registration types</SelectItem>
+                    <SelectItem value="all">
+                      {t("events.listing.all_registration_types")}
+                    </SelectItem>
                     {REGISTRATION_TYPE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -411,7 +421,7 @@ function EventsIndex() {
             {!isLoading && isError && filteredEvents.length === 0 && (
               <div className="sm:col-span-2 lg:col-span-3">
                 <DataErrorState
-                  title="Events failed to load"
+                  title={t("events.listing.load_failed")}
                   description={error instanceof Error ? error.message : undefined}
                   onRetry={() => refetch()}
                 />
@@ -419,9 +429,7 @@ function EventsIndex() {
             )}
             {!isLoading && !isError && filteredEvents.length === 0 && (
               <div className="border-border bg-muted text-muted-foreground rounded-2xl border border-dashed p-8 text-center text-sm sm:col-span-2 lg:col-span-3">
-                No events match this filter right now. Contact us at{" "}
-                <a href="mailto:events@roundup.games">events@roundup.games</a>
-                and we’ll add your event to the calendar.
+                {t("events.listing.no_results", { email: "events@roundup.games" })}
               </div>
             )}
             {!isLoading &&
@@ -429,6 +437,6 @@ function EventsIndex() {
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

@@ -329,6 +329,15 @@
       "momentum_check": "Sprawdzenie pędu"
     }
   },
+  "not_found": {
+    "title": "404 — strona nie znaleziona",
+    "headline": "Ten ruch jest poza boiskiem",
+    "description": "Strona, której szukasz, mogła zostać zmieniona, zarchiwizowana lub nigdy nie trafiła do składu. Skorzystaj z poniższych opcji, aby wrócić do akcji lub daj nam znać, a pomożemy Ci ją znaleźć.",
+    "go_back": "Wróć",
+    "visit_homepage": "Odwiedź stronę główną",
+    "browse_events": "Przeglądaj wydarzenia",
+    "need_support": "Potrzebujesz wsparcia? E-mail"
+  },
   "roles": {
     "definitions": {
       "visitor": {

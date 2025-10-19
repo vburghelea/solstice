@@ -48,7 +48,7 @@ import type {
   EventRegistrationResultPayload,
   EventWithDetails,
 } from "~/features/events/events.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import type { User } from "~/lib/auth/types";
@@ -220,15 +220,15 @@ function EventRegistrationPage() {
 
   if (eventLoading || registrationLoading) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <RegistrationSkeleton />
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
   if (!eventData || !isPublicEvent) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <div className="container mx-auto px-4 py-16">
           <Alert variant="destructive">
             <AlertTitle>{t("registration.event_not_found")}</AlertTitle>
@@ -241,7 +241,7 @@ function EventRegistrationPage() {
             </Link>
           </Button>
         </div>
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
@@ -292,7 +292,7 @@ function EventRegistrationPage() {
 
   if (registrationStatus?.isRegistered) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <div className="container mx-auto px-4 py-16">
           <Alert>
             <CheckCircleIcon className="h-4 w-4" />
@@ -312,12 +312,12 @@ function EventRegistrationPage() {
             </Button>
           </div>
         </div>
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="container mx-auto space-y-6 px-4 py-16">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm">
@@ -730,7 +730,7 @@ function EventRegistrationPage() {
           </aside>
         </div>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 

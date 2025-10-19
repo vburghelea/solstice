@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, Trophy, UsersIcon } from "~/components/ui/icons";
 import { SafeLink } from "~/components/ui/SafeLink";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
 
@@ -104,7 +104,7 @@ function ResourcesIndexPage() {
   ];
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
         eyebrow={t("hero.eyebrow")}
         title={t("hero.title")}
@@ -250,6 +250,6 @@ function ResourcesIndexPage() {
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

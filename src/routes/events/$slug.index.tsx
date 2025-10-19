@@ -87,13 +87,13 @@ function EventDetailPage() {
       <VisitorShell>
         <div className="container mx-auto px-4 py-16">
           <Alert variant="destructive">
-            <AlertTitle>{t("events.not_found.title")}</AlertTitle>
-            <AlertDescription>{t("events.not_found.description")}</AlertDescription>
+            <AlertTitle>{t("not_found.title")}</AlertTitle>
+            <AlertDescription>{t("not_found.description")}</AlertDescription>
           </Alert>
           <Button asChild className="mt-6">
             <Link to="/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("events.not_found.back_to_events")}
+              {t("not_found.back_to_events")}
             </Link>
           </Button>
         </div>
@@ -137,7 +137,7 @@ function EventDetailPage() {
           <Button asChild variant="ghost" size="sm">
             <Link to="/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("events.not_found.back_to_events")}
+              {t("not_found.back_to_events")}
             </Link>
           </Button>
         </div>
@@ -244,7 +244,7 @@ function EventDetailPage() {
             {event.schedule && Object.keys(event.schedule).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>{t("events.schedule")}</CardTitle>
+                  <CardTitle>{t("schedule")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -268,7 +268,7 @@ function EventDetailPage() {
             {event.rules && Object.keys(event.rules).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>{t("events.rules_format")}</CardTitle>
+                  <CardTitle>{t("rules_format")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -289,7 +289,7 @@ function EventDetailPage() {
             {event.requirements && Object.keys(event.requirements).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>{t("events.requirements")}</CardTitle>
+                  <CardTitle>{t("requirements")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -312,7 +312,7 @@ function EventDetailPage() {
             {event.amenities && Object.keys(event.amenities).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>{t("events.amenities")}</CardTitle>
+                  <CardTitle>{t("amenities")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-2">
@@ -339,13 +339,13 @@ function EventDetailPage() {
             {/* Registration Card */}
             <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
-                <CardTitle>{t("events.registration.title")}</CardTitle>
+                <CardTitle>{t("detail_registration.title")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("events.registration.status")}
+                      {t("detail_registration.status")}
                     </span>
                     <Badge
                       variant={registrationBadge.variant}
@@ -358,7 +358,7 @@ function EventDetailPage() {
                   {registrationClosesAtDate && (
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">
-                        {t("events.registration.closes")}
+                        {t("detail_registration.closes")}
                       </span>
                       <span className="text-muted-foreground text-sm">
                         {format(registrationClosesAtDate, "MMM d, yyyy")}
@@ -368,7 +368,7 @@ function EventDetailPage() {
 
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">
-                      {t("events.registration.registered")}
+                      {t("detail_registration.registered")}
                     </span>
                     <span className="text-sm">
                       {event.registrationCount}
@@ -379,7 +379,7 @@ function EventDetailPage() {
                   {event.availableSpots !== undefined && (
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">
-                        {t("events.registration.available_spots")}
+                        {t("detail_registration.available_spots")}
                       </span>
                       <span
                         className={`text-sm font-bold ${
@@ -396,13 +396,13 @@ function EventDetailPage() {
 
                 {/* Pricing */}
                 <div className="space-y-2">
-                  <h4 className="font-medium">{t("events.registration.fees")}</h4>
+                  <h4 className="font-medium">{t("detail_registration.fees")}</h4>
 
                   {event.registrationType === "team" ||
                   event.registrationType === "both" ? (
                     <div className="flex items-center justify-between">
                       <span className="text-sm">
-                        {t("events.registration.team_registration")}
+                        {t("detail_registration.team_registration")}
                       </span>
                       <span className="font-medium">
                         ${((event.teamRegistrationFee || 0) / 100).toFixed(2)}
@@ -414,7 +414,7 @@ function EventDetailPage() {
                   event.registrationType === "both" ? (
                     <div className="flex items-center justify-between">
                       <span className="text-sm">
-                        {t("events.registration.individual_registration")}
+                        {t("detail_registration.individual_registration")}
                       </span>
                       <span className="font-medium">
                         ${((event.individualRegistrationFee || 0) / 100).toFixed(2)}
@@ -427,7 +427,7 @@ function EventDetailPage() {
                       <InfoIcon className="h-4 w-4" />
                       <AlertDescription>
                         {event.earlyBirdDiscount}%{" "}
-                        {t("events.registration.early_bird_discount")}{" "}
+                        {t("detail_registration.early_bird_discount")}{" "}
                         {format(earlyBirdDeadlineDate, "MMM d")}
                       </AlertDescription>
                     </Alert>
@@ -445,10 +445,10 @@ function EventDetailPage() {
                   <Alert>
                     <CheckCircleIcon className="h-4 w-4" />
                     <AlertTitle>
-                      {t("events.registration.already_registered.title")}
+                      {t("detail_registration.already_registered.title")}
                     </AlertTitle>
                     <AlertDescription>
-                      {t("events.registration.already_registered.description")}
+                      {t("detail_registration.already_registered.description")}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -457,7 +457,7 @@ function EventDetailPage() {
                       <Alert>
                         <InfoIcon className="h-4 w-4" />
                         <AlertDescription>
-                          {t("events.registration.sign_in_required", {
+                          {t("detail_registration.sign_in_required", {
                             link: (
                               <Link to="/auth/login" className="underline">
                                 sign in
@@ -469,16 +469,16 @@ function EventDetailPage() {
                     ) : isRegistrationOpen && hasSpots ? (
                       <Button asChild className="w-full">
                         <Link to="/events/$slug/register" params={{ slug: event.slug }}>
-                          {t("events.registration.register_now")}
+                          {t("detail_registration.register_now")}
                         </Link>
                       </Button>
                     ) : !isRegistrationOpen ? (
                       <Button disabled className="w-full">
-                        {t("events.registration.registration_closed")}
+                        {t("detail_registration.registration_closed")}
                       </Button>
                     ) : (
                       <Button disabled className="w-full">
-                        {t("events.registration.event_full")}
+                        {t("detail_registration.event_full")}
                       </Button>
                     )}
                   </>
@@ -489,7 +489,7 @@ function EventDetailPage() {
             {/* Organizer Card */}
             <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
-                <CardTitle>{t("events.organizer")}</CardTitle>
+                <CardTitle>{t("organizer")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -517,7 +517,7 @@ function EventDetailPage() {
             {/* Share Card */}
             <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
-                <CardTitle>{t("events.share.title")}</CardTitle>
+                <CardTitle>{t("share.title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Button
@@ -528,7 +528,7 @@ function EventDetailPage() {
                     // You could add a toast notification here
                   }}
                 >
-                  {t("events.share.copy_link")}
+                  {t("share.copy_link")}
                 </Button>
               </CardContent>
             </Card>

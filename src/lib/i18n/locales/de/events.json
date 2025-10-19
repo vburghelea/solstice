@@ -192,56 +192,6 @@
     "creation_error": "Ein Fehler ist beim Erstellen des Events aufgetreten",
     "load_failed": "Fehler beim Laden der Events: {{message}}"
   },
-  "list": {
-    "filter_title": "Events filtern",
-    "labels": {
-      "event_type": "Event-Typ",
-      "status": "Status",
-      "city": "Stadt",
-      "country": "Land",
-      "sort_by": "Sortieren nach",
-      "sort_order": "Sortierreihenfolge"
-    },
-    "placeholders": {
-      "all_types": "Alle Typen",
-      "all_statuses": "Alle Status",
-      "filter_by_city": "Nach Stadt filtern",
-      "all_countries": "Alle Länder"
-    },
-    "options": {
-      "tournament": "Turnier",
-      "league": "Liga",
-      "camp": "Camp",
-      "clinic": "Klinik",
-      "social": "Gesellschaftlich",
-      "other": "Andere",
-      "published": "Veröffentlicht",
-      "registration_open": "Anmeldung geöffnet",
-      "registration_closed": "Anmeldung geschlossen",
-      "in_progress": "In Bearbeitung",
-      "completed": "Abgeschlossen",
-      "start_date": "Startdatum",
-      "name": "Name",
-      "recently_added": "Kürzlich hinzugefügt",
-      "ascending": "Aufsteigend",
-      "descending": "Absteigend"
-    },
-    "empty_state": "Keine Events gefunden, die deinen Kriterien entsprechen.",
-    "registration": {
-      "open": "Anmeldung geöffnet",
-      "spots_left": "({{count}} Plätze frei)",
-      "registered": "{{count}} angemeldet",
-      "type_label": "{{type}} Anmeldung"
-    },
-    "pagination": {
-      "showing": "Zeige {{start}}-{{end}} von {{total}} Events",
-      "previous": "Zurück",
-      "next": "Weiter"
-    },
-    "actions": {
-      "view_details": "Details ansehen"
-    }
-  },
   "list_item": {
     "free": "Kostenlos",
     "capacity_tbd": "Kapazität steht fest",
@@ -350,6 +300,25 @@
     "registration_open": "Anmeldung geöffnet",
     "registration_closed": "Anmeldung geschlossen"
   },
+  "detail_registration": {
+    "title": "Registrierung",
+    "status": "Status",
+    "closes": "Schließt",
+    "registered": "Registriert",
+    "available_spots": "Verfügbare Plätze",
+    "fees": "Registrierungsgebühren",
+    "team_registration": "Team-Registrierung",
+    "individual_registration": "Einzel-Registrierung",
+    "early_bird_discount": "Frühbucherrabatt verfügbar bis",
+    "already_registered": {
+      "title": "Du bist registriert!",
+      "description": "Du bist bereits für dieses Event registriert."
+    },
+    "sign_in_required": "Bitte {{link}} um Dich für dieses Event zu registrieren.",
+    "register_now": "Jetzt registrieren",
+    "registration_closed": "Registrierung geschlossen",
+    "event_full": "Event ausgebucht"
+  },
   "not_found": {
     "title": "Event nicht gefunden",
     "description": "Das Event, das Du suchst, existiert nicht oder ist nicht öffentlich verfügbar.",
@@ -384,6 +353,17 @@
     "all_statuses": "Alle Status",
     "all_registration_types": "Alle Registrierungsarten",
     "load_failed": "Laden der Events fehlgeschlagen",
-    "no_results": "Keine Events entsprechen diesem Filter. Kontaktiere uns unter {{email}} und wir fügen Dein Event zum Kalender hinzu."
+    "no_results": "Keine Events entsprechen diesem Filter. Kontaktiere uns unter {{email}} und wir fügen Dein Event zum Kalender hinzu.",
+    "options": {
+      "tournament": "Turnier",
+      "league": "Liga",
+      "camp": "Camp",
+      "social": "Social",
+      "other": "Andere",
+      "published": "Veröffentlicht",
+      "registration_open": "Registrierung geöffnet",
+      "registration_closed": "Registrierung geschlossen",
+      "in_progress": "In Bearbeitung"
+    }
   }
 }

@@ -192,56 +192,6 @@
     "creation_error": "Wystąpił błąd podczas tworzenia wydarzenia",
     "load_failed": "Błąd ładowania wydarzeń: {{message}}"
   },
-  "list": {
-    "filter_title": "Filtruj wydarzenia",
-    "labels": {
-      "event_type": "Typ wydarzenia",
-      "status": "Status",
-      "city": "Miasto",
-      "country": "Kraj",
-      "sort_by": "Sortuj według",
-      "sort_order": "Kolejność sortowania"
-    },
-    "placeholders": {
-      "all_types": "Wszystkie typy",
-      "all_statuses": "Wszystkie statusy",
-      "filter_by_city": "Filtruj według miasta",
-      "all_countries": "Wszystkie kraje"
-    },
-    "options": {
-      "tournament": "Turniej",
-      "league": "Liga",
-      "camp": "Obóz",
-      "clinic": "Klinika",
-      "social": "Społeczny",
-      "other": "Inne",
-      "published": "Opublikowany",
-      "registration_open": "Rejestracja otwarta",
-      "registration_closed": "Rejestracja zamknięta",
-      "in_progress": "W trakcie",
-      "completed": "Ukończony",
-      "start_date": "Data rozpoczęcia",
-      "name": "Nazwa",
-      "recently_added": "Ostatnio dodane",
-      "ascending": "Rosnąco",
-      "descending": "Malejąco"
-    },
-    "empty_state": "Nie znaleziono wydarzeń pasujących do Twoich kryteriów.",
-    "registration": {
-      "open": "Rejestracja otwarta",
-      "spots_left": "(pozostało {{count}} miejsc)",
-      "registered": "zarejestrowano {{count}}",
-      "type_label": "Rejestracja {{type}}"
-    },
-    "pagination": {
-      "showing": "Pokazywanie {{start}}-{{end}} z {{total}} wydarzeń",
-      "previous": "Wstecz",
-      "next": "Dalej"
-    },
-    "actions": {
-      "view_details": "Zobacz szczegóły"
-    }
-  },
   "list_item": {
     "free": "Bezpłatne",
     "capacity_tbd": "Pojemność do ustalenia",
@@ -350,6 +300,25 @@
     "registration_open": "Rejestracja otwarta",
     "registration_closed": "Rejestracja zamknięta"
   },
+  "detail_registration": {
+    "title": "Rejestracja",
+    "status": "Status",
+    "closes": "Zamyka",
+    "registered": "Zarejestrowani",
+    "available_spots": "Dostępne miejsca",
+    "fees": "Opłaty rejestracyjne",
+    "team_registration": "Rejestracja drużyny",
+    "individual_registration": "Rejestracja indywidualna",
+    "early_bird_discount": "zniżka early bird dostępna do",
+    "already_registered": {
+      "title": "Jesteś zarejestrowany!",
+      "description": "Jesteś już zarejestrowany na to wydarzenie."
+    },
+    "sign_in_required": "Proszę {{link}}, aby zarejestrować się na to wydarzenie.",
+    "register_now": "Zarejestruj się teraz",
+    "registration_closed": "Rejestracja zamknięta",
+    "event_full": "Wydarzenie pełne"
+  },
   "not_found": {
     "title": "Wydarzenie nie znalezione",
     "description": "Wydarzenie, którego szukasz, nie istnieje lub nie jest publicznie dostępne.",
@@ -384,6 +353,17 @@
     "all_statuses": "Wszystkie statusy",
     "all_registration_types": "Wszystkie typy rejestracji",
     "load_failed": "Ładowanie wydarzeń nie powiodło się",
-    "no_results": "Żadne wydarzenia nie pasują do tego filtra. Skontaktuj się z nami pod adresem {{email}}, a dodamy Twoje wydarzenie do kalendarza."
+    "no_results": "Żadne wydarzenia nie pasują do tego filtra. Skontaktuj się z nami pod adresem {{email}}, a dodamy Twoje wydarzenie do kalendarza.",
+    "options": {
+      "tournament": "Turniej",
+      "league": "Liga",
+      "camp": "Obóz",
+      "social": "Społeczność",
+      "other": "Inne",
+      "published": "Opublikowano",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta",
+      "in_progress": "W trakcie"
+    }
   }
 }

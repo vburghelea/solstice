@@ -192,56 +192,6 @@
     "creation_error": "An error occurred while creating the event",
     "load_failed": "Error loading events: {{message}}"
   },
-  "list": {
-    "filter_title": "Filter Events",
-    "labels": {
-      "event_type": "Event Type",
-      "status": "Status",
-      "city": "City",
-      "country": "Country",
-      "sort_by": "Sort By",
-      "sort_order": "Sort Order"
-    },
-    "placeholders": {
-      "all_types": "All types",
-      "all_statuses": "All statuses",
-      "filter_by_city": "Filter by city",
-      "all_countries": "All countries"
-    },
-    "options": {
-      "tournament": "Tournament",
-      "league": "League",
-      "camp": "Camp",
-      "clinic": "Clinic",
-      "social": "Social",
-      "other": "Other",
-      "published": "Published",
-      "registration_open": "Registration Open",
-      "registration_closed": "Registration Closed",
-      "in_progress": "In Progress",
-      "completed": "Completed",
-      "start_date": "Start Date",
-      "name": "Name",
-      "recently_added": "Recently Added",
-      "ascending": "Ascending",
-      "descending": "Descending"
-    },
-    "empty_state": "No events found matching your criteria.",
-    "registration": {
-      "open": "Registration Open",
-      "spots_left": "({{count}} spots left)",
-      "registered": "{{count}} registered",
-      "type_label": "{{type}} registration"
-    },
-    "pagination": {
-      "showing": "Showing {{start}}-{{end}} of {{total}} events",
-      "previous": "Previous",
-      "next": "Next"
-    },
-    "actions": {
-      "view_details": "View Details"
-    }
-  },
   "list_item": {
     "free": "Free",
     "capacity_tbd": "Capacity TBD",
@@ -350,6 +300,25 @@
     "registration_open": "Registration open",
     "registration_closed": "Registration closed"
   },
+  "detail_registration": {
+    "title": "Registration",
+    "status": "Status",
+    "closes": "Closes",
+    "registered": "Registered",
+    "available_spots": "Available Spots",
+    "fees": "Registration Fees",
+    "team_registration": "Team Registration",
+    "individual_registration": "Individual Registration",
+    "early_bird_discount": "early bird discount available until",
+    "already_registered": {
+      "title": "You're Registered!",
+      "description": "You are already registered for this event."
+    },
+    "sign_in_required": "Please {{link}} to register for this event.",
+    "register_now": "Register Now",
+    "registration_closed": "Registration Closed",
+    "event_full": "Event Full"
+  },
   "not_found": {
     "title": "Event Not Found",
     "description": "The event you're looking for doesn't exist or is not publicly available.",
@@ -384,6 +353,17 @@
     "all_statuses": "All statuses",
     "all_registration_types": "All registration types",
     "load_failed": "Events failed to load",
-    "no_results": "No events match this filter right now. Contact us at {{email}} and we'll add your event to the calendar."
+    "no_results": "No events match this filter right now. Contact us at {{email}} and we'll add your event to the calendar.",
+    "options": {
+      "tournament": "Tournament",
+      "league": "League",
+      "camp": "Camp",
+      "social": "Social",
+      "other": "Other",
+      "published": "Published",
+      "registration_open": "Registration Open",
+      "registration_closed": "Registration Closed",
+      "in_progress": "In Progress"
+    }
   }
 }

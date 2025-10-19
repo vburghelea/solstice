@@ -40,19 +40,19 @@ import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
 import { useCountries } from "~/shared/hooks/useCountries";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
-const EVENT_TYPE_OPTIONS: Array<{ value: EventType; label: string }> = [
-  { value: "tournament", label: "Tournament" },
-  { value: "league", label: "League" },
-  { value: "camp", label: "Camp" },
-  { value: "social", label: "Social" },
-  { value: "other", label: "Other" },
+const EVENT_TYPE_OPTIONS: Array<{ value: EventType; labelKey: string }> = [
+  { value: "tournament", labelKey: "listing.options.tournament" },
+  { value: "league", labelKey: "listing.options.league" },
+  { value: "camp", labelKey: "listing.options.camp" },
+  { value: "social", labelKey: "listing.options.social" },
+  { value: "other", labelKey: "listing.options.other" },
 ];
 
-const EVENT_STATUS_OPTIONS: Array<{ value: EventStatus; label: string }> = [
-  { value: "published", label: "Published" },
-  { value: "registration_open", label: "Registration Open" },
-  { value: "registration_closed", label: "Registration Closed" },
-  { value: "in_progress", label: "In Progress" },
+const EVENT_STATUS_OPTIONS: Array<{ value: EventStatus; labelKey: string }> = [
+  { value: "published", labelKey: "listing.options.published" },
+  { value: "registration_open", labelKey: "listing.registration_open" },
+  { value: "registration_closed", labelKey: "listing.registration_closed" },
+  { value: "in_progress", labelKey: "listing.in_progress" },
 ];
 
 const EVENTS_HERO_IMAGE = createResponsiveCloudinaryImage("heroTournament", {
@@ -68,11 +68,11 @@ const EVENTS_HERO_IMAGE = createResponsiveCloudinaryImage("heroTournament", {
 
 const REGISTRATION_TYPE_OPTIONS: Array<{
   value: RegistrationType;
-  label: string;
+  labelKey: string;
 }> = [
-  { value: "team", label: "Team" },
-  { value: "individual", label: "Individual" },
-  { value: "both", label: "Team & Individual" },
+  { value: "team", labelKey: "events.registration_types.team" },
+  { value: "individual", labelKey: "events.registration_types.individual" },
+  { value: "both", labelKey: "events.registration_types.both" },
 ];
 
 type PlayerLocationFilters = {
@@ -118,6 +118,10 @@ export const Route = createFileRoute("/events/")({
 function EventsIndex() {
   const { t } = useEventsTranslation();
   const { playerFilters } = Route.useLoaderData() as EventsLoaderData;
+
+  // Debug: Check if translation is working
+  console.log("EventsIndex t() result for title:", t("listing.title"));
+  console.log("EventsIndex i18n language:", t("currentLanguage"));
   const [filters, setFilters] = useState<EventFiltersState>(DEFAULT_EVENT_FILTERS);
   const { getCountryName } = useCountries();
 
@@ -234,14 +238,14 @@ function EventsIndex() {
   return (
     <VisitorShell>
       <HeroSection
-        eyebrow={t("events.listing.title")}
-        title={t("events.listing.subtitle")}
-        subtitle={t("events.listing.description")}
+        eyebrow={t("listing.title")}
+        title={t("listing.subtitle")}
+        subtitle={t("listing.description")}
         backgroundImageSet={EVENTS_HERO_IMAGE}
-        ctaText={t("events.listing.register_team")}
+        ctaText={t("listing.register_team")}
         ctaLink="/auth/signup"
         secondaryCta={{
-          text: t("events.listing.submit_event"),
+          text: t("listing.submit_event"),
           link: "mailto:events@roundup.games",
         }}
       />
@@ -252,10 +256,10 @@ function EventsIndex() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-brand-red text-sm font-semibold tracking-[0.3em] uppercase">
-                  {t("events.listing.filter")}
+                  {t("listing.filter")}
                 </p>
                 <h2 className="text-foreground mt-2 text-2xl font-bold sm:text-3xl dark:text-gray-50">
-                  {t("events.listing.calendar_title")}
+                  {t("listing.calendar_title")}
                 </h2>
               </div>
               {!hasQuickFilters && hasActiveFilters ? (
@@ -264,7 +268,7 @@ function EventsIndex() {
                   onClick={resetFilters}
                   className="text-primary text-sm font-medium hover:underline"
                 >
-                  {t("events.listing.clear_filters")}
+                  {t("listing.clear_filters")}
                 </button>
               ) : null}
             </div>
@@ -279,7 +283,7 @@ function EventsIndex() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  {t("events.listing.country")}
+                  {t("listing.country")}
                 </p>
                 <Select
                   value={filters.country}
@@ -288,12 +292,10 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("events.listing.all_countries")} />
+                    <SelectValue placeholder={t("listing.all_countries")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">
-                      {t("events.listing.all_countries")}
-                    </SelectItem>
+                    <SelectItem value="all">{t("listing.all_countries")}</SelectItem>
                     {countryOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -305,7 +307,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  {t("events.listing.city")}
+                  {t("listing.city")}
                 </p>
                 <Select
                   value={filters.city}
@@ -314,10 +316,10 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("events.listing.all_cities")} />
+                    <SelectValue placeholder={t("listing.all_cities")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t("events.listing.all_cities")}</SelectItem>
+                    <SelectItem value="all">{t("listing.all_cities")}</SelectItem>
                     {cityOptions.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}
@@ -329,7 +331,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  {t("events.listing.type")}
+                  {t("listing.type")}
                 </p>
                 <Select
                   value={filters.type}
@@ -341,13 +343,13 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("events.listing.all_types")} />
+                    <SelectValue placeholder={t("listing.all_types")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t("events.listing.all_types")}</SelectItem>
+                    <SelectItem value="all">{t("listing.all_types")}</SelectItem>
                     {EVENT_TYPE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -356,7 +358,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  {t("events.listing.status")}
+                  {t("listing.status")}
                 </p>
                 <Select
                   value={filters.status}
@@ -368,15 +370,13 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("events.listing.all_statuses")} />
+                    <SelectValue placeholder={t("listing.all_statuses")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">
-                      {t("events.listing.all_statuses")}
-                    </SelectItem>
+                    <SelectItem value="all">{t("listing.all_statuses")}</SelectItem>
                     {EVENT_STATUS_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -385,7 +385,7 @@ function EventsIndex() {
 
               <div className="space-y-1">
                 <p className="text-muted-foreground text-xs font-semibold tracking-[0.2em] uppercase dark:text-gray-300">
-                  {t("events.listing.registration_type")}
+                  {t("listing.registration_type")}
                 </p>
                 <Select
                   value={filters.registrationType}
@@ -397,17 +397,15 @@ function EventsIndex() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue
-                      placeholder={t("events.listing.all_registration_types")}
-                    />
+                    <SelectValue placeholder={t("listing.all_registration_types")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">
-                      {t("events.listing.all_registration_types")}
+                      {t("listing.all_registration_types")}
                     </SelectItem>
                     {REGISTRATION_TYPE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -421,7 +419,7 @@ function EventsIndex() {
             {!isLoading && isError && filteredEvents.length === 0 && (
               <div className="sm:col-span-2 lg:col-span-3">
                 <DataErrorState
-                  title={t("events.listing.load_failed")}
+                  title={t("listing.load_failed")}
                   description={error instanceof Error ? error.message : undefined}
                   onRetry={() => refetch()}
                 />
@@ -429,7 +427,7 @@ function EventsIndex() {
             )}
             {!isLoading && !isError && filteredEvents.length === 0 && (
               <div className="border-border bg-muted text-muted-foreground rounded-2xl border border-dashed p-8 text-center text-sm sm:col-span-2 lg:col-span-3">
-                {t("events.listing.no_results", { email: "events@roundup.games" })}
+                {t("listing.no_results", { email: "events@roundup.games" })}
               </div>
             )}
             {!isLoading &&

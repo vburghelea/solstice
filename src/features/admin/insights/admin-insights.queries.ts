@@ -3,11 +3,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 
+import { SupportedLanguage } from "~/lib/i18n/config";
+import { getServerTranslationFunction } from "~/lib/i18n/server-translations";
 import type { OperationResult } from "~/shared/types/common";
 
 const adminInsightsInputSchema = z
   .object({
     windowDays: z.number().int().min(7).max(180).optional(),
+    language: z.enum(["en", "de", "pl"]).optional(),
   })
   .optional();
 
@@ -172,6 +175,8 @@ export const getAdminInsights = createServerFn({ method: "GET" })
 
       const db = await getDb();
       const windowDays = data?.windowDays ?? 30;
+      const language = (data?.language as SupportedLanguage) ?? "en";
+      const t = getServerTranslationFunction("admin", language);
       const now = new Date();
       const today = new Date(now);
       today.setHours(0, 0, 0, 0);
@@ -410,35 +415,42 @@ export const getAdminInsights = createServerFn({ method: "GET" })
       const kpis: AdminInsightKpiWire[] = [
         {
           id: "active-memberships",
-          label: "Active memberships",
+          label: t("insights.kpis.active_memberships.label"),
           value: activeMemberships,
           change: membershipTrend.change,
           direction: membershipTrend.direction,
-          supportingCopy: `${expiringMemberships} expiring within 30 days`,
+          supportingCopy: t("insights.kpis.active_memberships.supporting_copy", {
+            count: expiringMemberships,
+          }),
         },
         {
           id: "governance-uptime",
-          label: "Platform availability",
+          label: t("insights.kpis.platform_availability.label"),
           value: Number(availability.toFixed(2)),
           change: -Math.abs(downtimeRatio * 100),
           direction: availability >= 99 ? "up" : "down",
-          supportingCopy: `${incidentRows.length} incidents reviewed this window`,
+          supportingCopy: t("insights.kpis.platform_availability.supporting_copy", {
+            count: incidentRows.length,
+          }),
         },
         {
           id: "role-assignments",
-          label: "Role assignments",
+          label: t("insights.kpis.role_assignments.label"),
           value: assignmentsCurrent,
           change: roleTrend.change,
           direction: roleTrend.direction,
-          supportingCopy: `${totalUsers} users across ${assignmentsCurrent} scoped grants`,
+          supportingCopy: t("insights.kpis.role_assignments.supporting_copy", {
+            users: totalUsers,
+            grants: assignmentsCurrent,
+          }),
         },
         {
           id: "gm-pipeline",
-          label: "Campaign activations",
+          label: t("insights.kpis.campaign_activations.label"),
           value: campaignsCurrent,
           change: gmTrend.change,
           direction: gmTrend.direction,
-          supportingCopy: "Studio collaborations escalated to admins",
+          supportingCopy: t("insights.kpis.campaign_activations.supporting_copy"),
         },
       ];
 
@@ -464,9 +476,11 @@ export const getAdminInsights = createServerFn({ method: "GET" })
       const alerts: AdminAlertWire[] = [
         {
           id: "membership-expiry",
-          name: "Membership expiry watch",
-          channel: "Slack + Email",
-          threshold: `${expiringMemberships} expiring in 30 days`,
+          name: t("insights.alerts.membership_expiry_watch"),
+          channel: t("insights.alerts.channels.slack_email"),
+          threshold: t("insights.alerts.thresholds.expiring_in_30_days", {
+            count: expiringMemberships,
+          }),
           enabled: true,
           lastTriggeredAt: membershipExpiringTouchRow?.value ?? null,
           status:
@@ -478,9 +492,12 @@ export const getAdminInsights = createServerFn({ method: "GET" })
         },
         {
           id: "incident-response",
-          name: "System incident response",
-          channel: "Pager + Email",
-          threshold: `${incidentRows.length} incidents in ${windowDays}d`,
+          name: t("insights.alerts.system_incident_response"),
+          channel: t("insights.alerts.channels.pager_email"),
+          threshold: t("insights.alerts.thresholds.incidents_in_window", {
+            count: incidentRows.length,
+            days: windowDays,
+          }),
           enabled: true,
           lastTriggeredAt: incidentLatestRow?.value ?? null,
           status: incidentRows.some((incident) => incident.severity === "error")
@@ -491,9 +508,11 @@ export const getAdminInsights = createServerFn({ method: "GET" })
         },
         {
           id: "persona-alignment",
-          name: "Persona alignment digest",
-          channel: "Weekly Email",
-          threshold: `${eventsCurrent} live visitor touchpoints`,
+          name: t("insights.alerts.persona_alignment_digest"),
+          channel: t("insights.alerts.channels.weekly_email"),
+          threshold: t("insights.alerts.thresholds.live_visitor_touchpoints", {
+            count: eventsCurrent,
+          }),
           enabled: true,
           lastTriggeredAt: now.toISOString(),
           status: visitorTrend.direction === "down" ? "degraded" : "stable",
@@ -503,36 +522,44 @@ export const getAdminInsights = createServerFn({ method: "GET" })
       const personaImpacts: PersonaImpactWire[] = [
         {
           personaId: "visitor",
-          personaLabel: "Visitor",
-          headline: `${eventsCurrent} public experiences live`,
+          personaLabel: t("insights.persona_impacts.visitor.label"),
+          headline: t("insights.persona_impacts.visitor.headline", {
+            count: eventsCurrent,
+          }),
           change: visitorTrend.change,
           direction: visitorTrend.direction,
         },
         {
           personaId: "player",
-          personaLabel: "Player",
-          headline: `${playersCurrent} confirmed seats this window`,
+          personaLabel: t("insights.persona_impacts.player.label"),
+          headline: t("insights.persona_impacts.player.headline", {
+            count: playersCurrent,
+          }),
           change: playerTrend.change,
           direction: playerTrend.direction,
         },
         {
           personaId: "ops",
-          personaLabel: "Operations",
-          headline: `${eventsCurrent} events under active coordination`,
+          personaLabel: t("insights.persona_impacts.ops.label"),
+          headline: t("insights.persona_impacts.ops.headline", { count: eventsCurrent }),
           change: visitorTrend.change,
           direction: visitorTrend.direction,
         },
         {
           personaId: "gm",
-          personaLabel: "Game Master",
-          headline: `${campaignsCurrent} campaigns in motion`,
+          personaLabel: t("insights.persona_impacts.gm.label"),
+          headline: t("insights.persona_impacts.gm.headline", {
+            count: campaignsCurrent,
+          }),
           change: gmTrend.change,
           direction: gmTrend.direction,
         },
         {
           personaId: "admin",
-          personaLabel: "Platform Admin",
-          headline: `${assignmentsCurrent} governance updates logged`,
+          personaLabel: t("insights.persona_impacts.admin.label"),
+          headline: t("insights.persona_impacts.admin.headline", {
+            count: assignmentsCurrent,
+          }),
           change: roleTrend.change,
           direction: roleTrend.direction,
         },
@@ -586,17 +613,22 @@ export interface UseAdminInsightsOptions
     "queryKey" | "queryFn"
   > {
   windowDays?: number;
+  language?: SupportedLanguage;
 }
 
 export function useAdminInsights({
   windowDays,
+  language,
   ...options
 }: UseAdminInsightsOptions = {}) {
   return useQuery<AdminInsightsSnapshot, Error>({
-    queryKey: ["admin", "insights", windowDays ?? 30],
+    queryKey: ["admin", "insights", windowDays ?? 30, language],
     queryFn: async () => {
       const result = await getAdminInsights({
-        data: windowDays ? { windowDays } : undefined,
+        data: {
+          windowDays: windowDays ?? 30,
+          language,
+        },
       });
       if (!result.success) {
         throw new Error(result.errors?.[0]?.message ?? "Failed to load admin insights");

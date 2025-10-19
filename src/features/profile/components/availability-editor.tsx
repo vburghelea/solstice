@@ -1,3 +1,4 @@
+import { format, setDay } from "date-fns";
 import type { ReactNode } from "react";
 import {
   useCallback,
@@ -7,6 +8,8 @@ import {
 } from "react";
 import type { AvailabilityData, DayAvailability } from "~/db/schema/auth.schema";
 import { useProfileTranslation } from "~/hooks/useTypedTranslation";
+import type { SupportedLanguage } from "~/lib/i18n/config";
+import { getDateLocale } from "~/lib/i18n/utils";
 import { cn } from "~/shared/lib/utils";
 import { AVAILABILITY_CONFIG } from "~/shared/types/common";
 import {
@@ -151,7 +154,7 @@ interface AvailabilityEditorGridProps {
     index: number,
     labelIndexes: number[],
   ) => ReactNode;
-  dayLabelFormatter?: (day: (typeof DAYS)[number]) => string;
+  dayLabelFormatter?: (day: (typeof DAYS)[number], currentLanguage?: string) => string;
   testId?: string;
 }
 
@@ -166,7 +169,25 @@ const defaultHeaderRenderer = (
   </>
 );
 
-const defaultDayLabelFormatter = (day: (typeof DAYS)[number]) => day.slice(0, 3);
+const createLocalizedDayLabelFormatter = (currentLanguage?: string) => {
+  const locale = getDateLocale(currentLanguage as SupportedLanguage);
+  return (day: (typeof DAYS)[number]) => {
+    // Map day names to date-fns day indices (0 = Sunday, 1 = Monday, etc.)
+    const dayToIndex: Record<string, number> = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+
+    // Create a date for that weekday (any week will do)
+    const date = setDay(new Date(), dayToIndex[day]);
+    return format(date, "EEE", locale ? { locale } : {});
+  };
+};
 
 function AvailabilityEditorGrid({
   value,
@@ -181,10 +202,13 @@ function AvailabilityEditorGrid({
   headerLabelIndexes,
   containerClassName,
   renderHeaderLabel = defaultHeaderRenderer,
-  dayLabelFormatter = defaultDayLabelFormatter,
+  dayLabelFormatter,
   testId = "availability-editor",
 }: AvailabilityEditorGridProps) {
-  const { t } = useProfileTranslation();
+  const { t, currentLanguage } = useProfileTranslation();
+
+  // Create localized day label formatter using current language
+  const localizedDayLabelFormatter = createLocalizedDayLabelFormatter(currentLanguage);
   const [dragState, setDragState] = useState<DragState>({ ...DEFAULT_DRAG_STATE });
 
   const handlePointerUp = useCallback(() => {
@@ -328,7 +352,8 @@ function AvailabilityEditorGrid({
             cellMinWidthRem={cellMinWidthRem}
             rowHeightClassName={rowHeightClassName}
             dayGridClassName={dayGridClassName}
-            dayLabelFormatter={dayLabelFormatter}
+            dayLabelFormatter={dayLabelFormatter || localizedDayLabelFormatter}
+            currentLanguage={currentLanguage}
           />
         ))}
       </div>
@@ -388,7 +413,20 @@ export function MobileAvailabilityEditor({
       renderHeaderLabel={(interval, index, indexes) => (
         <span>{indexes.includes(index) ? interval.time : ""}</span>
       )}
-      dayLabelFormatter={(day) => day.slice(0, 2).toUpperCase()}
+      dayLabelFormatter={(day, currentLanguage) => {
+        const locale = getDateLocale(currentLanguage as SupportedLanguage);
+        const dayToIndex: Record<string, number> = {
+          sunday: 0,
+          monday: 1,
+          tuesday: 2,
+          wednesday: 3,
+          thursday: 4,
+          friday: 5,
+          saturday: 6,
+        };
+        const date = setDay(new Date(), dayToIndex[day]);
+        return format(date, "EEEEEE", locale ? { locale } : {}); // Very short day name format
+      }}
       testId="availability-editor-mobile"
     />
   );
@@ -412,7 +450,8 @@ interface DayRowProps {
   cellMinWidthRem: number;
   rowHeightClassName: string;
   dayGridClassName: string;
-  dayLabelFormatter: (day: (typeof DAYS)[number]) => string;
+  dayLabelFormatter: (day: (typeof DAYS)[number], currentLanguage?: string) => string;
+  currentLanguage?: string;
 }
 
 function DayRow({
@@ -426,6 +465,7 @@ function DayRow({
   rowHeightClassName,
   dayGridClassName,
   dayLabelFormatter,
+  currentLanguage,
 }: DayRowProps) {
   const dayAvailability = value[day];
 
@@ -448,7 +488,7 @@ function DayRow({
   return (
     <div className={cn("grid", dayGridClassName)}>
       <div className="text-muted-foreground text-xs font-semibold tracking-wide uppercase sm:text-sm sm:font-medium sm:capitalize">
-        {dayLabelFormatter(day)}
+        {dayLabelFormatter(day, currentLanguage)}
       </div>
       <div
         className="grid w-full"

@@ -650,27 +650,27 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               />
               <div>
                 <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                  {playerT("ui.headquarters.title")}
+                  {playerT("dashboard.ui.headquarters.title")}
                 </p>
                 <h1 className="text-foreground text-2xl font-semibold sm:text-3xl">
-                  {playerT("ui.welcome_back")}
+                  {playerT("dashboard.ui.welcome_back")}
                   {user?.name?.trim() ? `, ${user.name.trim()}` : ""}
                 </h1>
               </div>
             </div>
             <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
-              {playerT("ui.subtitle")}
+              {playerT("dashboard.ui.subtitle")}
             </p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <Badge variant="outline" className="border-primary/40 text-primary">
                 <CheckCircle2 className="mr-2 h-3.5 w-3.5" />{" "}
-                {playerT("ui.badges.privacy_ready")}
+                {playerT("dashboard.ui.badges.privacy_ready")}
               </Badge>
               <Badge
                 variant="secondary"
                 className="bg-secondary/60 text-secondary-foreground"
               >
-                {playerT("ui.teams_synced", {
+                {playerT("dashboard.ui.teams_synced", {
                   count: teamCount,
                   plural: teamCount === 1 ? "" : "s",
                 })}
@@ -681,7 +681,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             <CardContent className="bg-background/70 relative z-10 border-t border-white/10 p-4 sm:p-6">
               <div className="text-primary flex items-center gap-2 text-xs font-semibold tracking-widest uppercase sm:text-sm">
                 <ScrollText className="h-4 w-4" />
-                {playerT("ui.review_reminders.title")}
+                {playerT("dashboard.ui.review_reminders.title")}
               </div>
               <div className="mt-3 space-y-2">
                 {pendingReviews.map((review) => (
@@ -695,14 +695,14 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                         {review.gameName}
                       </span>
                       <span className="text-muted-foreground mt-1 text-xs">
-                        {playerT("ui.review_gm", {
+                        {playerT("dashboard.ui.review_gm", {
                           gmName: review.gm.name ?? "your GM",
                           date: formatDateAndTime(review.dateTime),
                         })}
                       </span>
                     </div>
                     <span className="text-primary group-hover:text-primary/80 text-xs font-semibold tracking-widest uppercase transition">
-                      {playerT("ui.start_review")}
+                      {playerT("dashboard.ui.start_review")}
                     </span>
                   </Link>
                 ))}
@@ -713,17 +713,22 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader className="space-y-3">
             <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
-              <Trophy className="h-4 w-4" /> {playerT("ui.control_center.title")}
+              <Trophy className="h-4 w-4" />{" "}
+              {playerT("dashboard.ui.control_center.title")}
             </CardTitle>
-            <CardDescription>{playerT("ui.control_center.subtitle")}</CardDescription>
-            <Badge
-              variant={profileComplete ? "secondary" : "outline"}
-              className="border-primary/30 w-fit text-xs font-semibold tracking-widest uppercase"
-            >
-              {profileComplete
-                ? playerT("ui.badges.profile_complete")
-                : playerT("ui.badges.profile_steps_remaining")}
-            </Badge>
+            <CardDescription>
+              {playerT("dashboard.ui.control_center.subtitle")}
+            </CardDescription>
+            {isHydrated && (
+              <Badge
+                variant={profileComplete ? "secondary" : "outline"}
+                className="border-primary/30 w-fit text-xs font-semibold tracking-widest uppercase"
+              >
+                {profileComplete
+                  ? playerT("dashboard.ui.badges.profile_complete")
+                  : playerT("dashboard.ui.badges.profile_steps_remaining")}
+              </Badge>
+            )}
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
@@ -842,7 +847,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                {playerT("ui.upcoming.title")}
+                {playerT("dashboard.ui.upcoming.title")}
               </p>
               <CardTitle className="text-foreground text-xl font-semibold">
                 {nextGame ? nextGame.name : playerT("dashboard.upcoming_games.no_games")}
@@ -869,16 +874,14 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             ) : (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-muted-foreground text-sm">
-                  {playerT("ui.flexible_calendar")}
+                  {playerT("dashboard.ui.flexible_calendar")}
                 </p>
                 <Button
                   asChild
                   variant="outline"
                   className="border-muted/40 bg-muted/20 text-foreground hover:bg-muted/30"
                 >
-                  <Link to="/search">
-                    {playerT("dashboard.actions.discover_sessions")}
-                  </Link>
+                  <Link to="/search">{playerT("dashboard.ui.discover_sessions")}</Link>
                 </Button>
               </div>
             )}
@@ -887,16 +890,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader>
             <CardTitle className="text-foreground text-base font-semibold">
-              {playerT("ui.relationship_health.title")}
+              {playerT("dashboard.ui.relationship_health.title")}
             </CardTitle>
             <CardDescription>
-              {playerT("ui.relationship_health.subtitle")}
+              {playerT("dashboard.ui.relationship_health.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                {playerT("ui.membership_label")}
+                {playerT("dashboard.ui.membership_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">
                 {membershipLabel}
@@ -905,7 +908,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             </div>
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                {playerT("ui.pending_reviews_label")}
+                {playerT("dashboard.ui.pending_reviews_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">
                 {pendingReviewsCount}
@@ -918,7 +921,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             </div>
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                {playerT("ui.teams_label")}
+                {playerT("dashboard.ui.teams_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">{teamCount}</p>
               <p className="text-muted-foreground text-sm">
@@ -929,7 +932,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             </div>
             <div>
               <p className="text-muted-foreground text-xs tracking-widest uppercase">
-                {playerT("ui.upcoming_events_label")}
+                {playerT("dashboard.ui.upcoming_events_label")}
               </p>
               <p className="text-foreground mt-1 text-lg font-semibold">
                 {upcomingEvents.length}
@@ -948,10 +951,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader>
             <CardTitle className="text-foreground text-base font-semibold">
-              {playerT("ui.campaign_commitments.title")}
+              {playerT("dashboard.ui.campaign_commitments.title")}
             </CardTitle>
             <CardDescription>
-              {playerT("ui.campaign_commitments.subtitle")}
+              {playerT("dashboard.ui.campaign_commitments.subtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
@@ -975,9 +978,11 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
         <Card className="border-muted-foreground/20">
           <CardHeader>
             <CardTitle className="text-foreground text-base font-semibold">
-              {playerT("ui.game_roster.title")}
+              {playerT("dashboard.ui.game_roster.title")}
             </CardTitle>
-            <CardDescription>{playerT("ui.game_roster.subtitle")}</CardDescription>
+            <CardDescription>
+              {playerT("dashboard.ui.game_roster.subtitle")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             <StatPill
@@ -1004,9 +1009,11 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <CardTitle className="text-foreground text-base font-semibold">
-                {playerT("ui.events_exploring.title")}
+                {playerT("dashboard.ui.events_exploring.title")}
               </CardTitle>
-              <CardDescription>{playerT("ui.events_exploring.subtitle")}</CardDescription>
+              <CardDescription>
+                {playerT("dashboard.ui.events_exploring.subtitle")}
+              </CardDescription>
             </div>
             <Button asChild variant="ghost" className="text-primary hover:text-primary">
               <Link
@@ -1017,7 +1024,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                   });
                 }}
               >
-                {playerT("dashboard.actions.see_all_events")}
+                {playerT("dashboard.ui.see_all_events")}
               </Link>
             </Button>
           </CardHeader>
@@ -1050,10 +1057,10 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <Card className="border-muted-foreground/20">
             <CardHeader>
               <CardTitle className="text-foreground text-base font-semibold">
-                {playerT("ui.connections_radar.title")}
+                {playerT("dashboard.ui.connections_radar.title")}
               </CardTitle>
               <CardDescription>
-                {playerT("ui.connections_radar.subtitle")}
+                {playerT("dashboard.ui.connections_radar.subtitle")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1076,7 +1083,9 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                         </p>
                       </div>
                       <Badge variant="outline" className="text-xs font-semibold">
-                        {playerT("ui.members_count", { count: team.memberCount })}
+                        {playerT("dashboard.ui.members_count", {
+                          count: team.memberCount,
+                        })}
                       </Badge>
                     </Link>
                   ))}
@@ -1095,16 +1104,16 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     });
                   }}
                 >
-                  {playerT("dashboard.actions.manage_teams")}
+                  {playerT("dashboard.ui.manage_teams")}
                 </Link>
               </Button>
               {showSpotlight ? (
                 <div className="border-primary/40 bg-primary/5 rounded-lg border px-3 py-3 text-sm">
                   <p className="text-primary font-medium">
-                    {playerT("ui.beta_preview.title")}
+                    {playerT("dashboard.ui.beta_preview.title")}
                   </p>
                   <p className="text-muted-foreground">
-                    {playerT("ui.beta_preview.description")}
+                    {playerT("dashboard.ui.beta_preview.description")}
                   </p>
                 </div>
               ) : null}
@@ -1113,21 +1122,23 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
           <Card className="border-muted-foreground/20">
             <CardHeader>
               <CardTitle className="text-foreground text-base font-semibold">
-                {playerT("ui.focus_spotlight.title")}
+                {playerT("dashboard.ui.focus_spotlight.title")}
               </CardTitle>
-              <CardDescription>{playerT("ui.focus_spotlight.subtitle")}</CardDescription>
+              <CardDescription>
+                {playerT("dashboard.ui.focus_spotlight.subtitle")}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {showSpotlight ? (
                 <div className="space-y-3">
                   <p className="text-foreground text-sm font-medium">
-                    {playerT("ui.calendar_sync.title")}
+                    {playerT("dashboard.ui.calendar_sync.title")}
                   </p>
                   <p className="text-muted-foreground text-sm">
-                    {playerT("ui.calendar_sync.description")}
+                    {playerT("dashboard.ui.calendar_sync.description")}
                   </p>
                   <Button className="w-full">
-                    {playerT("ui.calendar_sync.join_pilot")}
+                    {playerT("dashboard.ui.calendar_sync.join_pilot")}
                   </Button>
                 </div>
               ) : (

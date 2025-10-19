@@ -433,7 +433,6 @@
     "not_found_description": "Das Event, das Du verwalten möchtest, existiert nicht.",
     "registrations": "Anmeldungen",
     "overview": "Übersicht",
-    "settings": "Einstellungen",
     "stats": {
       "total_registrations": "Gesamte Anmeldungen",
       "total_revenue": "Gesamteinnahmen",

@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { LanguageSwitcher } from "~/components/LanguageSwitcher";
 import { Avatar } from "~/components/ui/avatar";
@@ -36,9 +37,50 @@ interface VisitorShellProps {
 export function VisitorShell({ children, contentClassName }: VisitorShellProps) {
   const { t } = useCommonTranslation();
   const { t: navT } = useNavigationTranslation();
+  const { ready: commonReady } = useTranslation("common");
+  const { ready: navigationReady } = useTranslation("navigation");
   const { location } = useRouterState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
+
+  // Wait for translations to be ready to prevent hydration mismatch
+  if (!commonReady || !navigationReady) {
+    return (
+      <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
+        <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+            <div className="bg-muted h-9 w-32 animate-pulse rounded" />
+            <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
+              <div className="bg-muted h-8 w-20 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-24 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-28 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+            </nav>
+            <div className="hidden items-center gap-3 md:flex">
+              <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-20 animate-pulse rounded-full" />
+            </div>
+          </div>
+          <div className="border-border/40 from-primary-soft/30 to-primary-soft/10 border-t bg-gradient-to-r via-transparent">
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
+              <div className="bg-muted h-4 w-96 animate-pulse rounded" />
+              <div className="text-muted-strong flex flex-wrap items-center gap-2 text-xs">
+                <div className="bg-muted h-6 w-24 animate-pulse rounded-full" />
+                <div className="bg-muted h-6 w-32 animate-pulse rounded-full" />
+                <div className="bg-muted h-6 w-20 animate-pulse rounded-full" />
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1">
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8 lg:max-w-7xl">
+            <div className="bg-muted h-96 animate-pulse rounded" />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const dynamicNavigation = VISITOR_NAVIGATION.map((item) => ({
     ...item,

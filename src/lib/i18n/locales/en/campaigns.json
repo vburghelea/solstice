@@ -65,7 +65,7 @@
     "searching": "Searching...",
     "no_users_found": "No users found.",
     "weekly": "Weekly",
-    "biweekly": "Biweekly",
+    "bi-weekly": "Biweekly",
     "monthly": "Monthly",
     "one_shot": "One Shot",
     "ongoing": "Ongoing"
@@ -244,13 +244,14 @@
       "active": "Active",
       "completed": "Completed",
       "on_hold": "On Hold",
-      "cancelled": "Cancelled"
+      "canceled": "Canceled"
     },
     "role_labels": {
       "owner": "Organizer",
       "player": "Participant",
       "invited": "Invitee",
-      "requested": "Requested"
+      "requested": "Requested",
+      "applicant": "Applicant"
     },
     "errors": {
       "load_failed": "Failed to load campaigns."
@@ -307,5 +308,26 @@
   "validation": {
     "campaign_name_required": "Campaign name is required",
     "description_required": "Description is required"
+  },
+  "create": {
+    "title": "Create a New Campaign",
+    "subtitle": "Set up your campaign and start inviting players",
+    "error_title": "Error creating campaign",
+    "tips": {
+      "title": "Campaign tips",
+      "subtitle": "Quick reminders to help your table feel prepared from day one.",
+      "clarify_experience": {
+        "title": "Clarify the experience",
+        "description": "Use your description to outline tone, cadence, and expectations so players know if the campaign fits their style."
+      },
+      "set_limits_early": {
+        "title": "Set table limits early",
+        "description": "Minimums and maximums help players self-select. Share what safety tools you are using and call out any recurring logistics."
+      },
+      "plan_onboarding": {
+        "title": "Plan for onboarding",
+        "description": "If you run a session zero, mention what you cover and any prep work. It keeps everyone aligned before the first roll."
+      }
+    }
   }
 }

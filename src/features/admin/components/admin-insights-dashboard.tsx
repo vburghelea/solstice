@@ -314,6 +314,7 @@ export function AdminInsightsDashboard() {
   const { t, currentLanguage } = useAdminTranslation();
   const { data, isLoading, isError, error, refetch, isRefetching } = useAdminInsights({
     refetchOnWindowFocus: false,
+    language: currentLanguage,
   });
 
   if (isLoading || !data) {

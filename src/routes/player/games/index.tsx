@@ -20,7 +20,7 @@ import { GameCard } from "~/features/games/components/GameCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGamesWithCount } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
-import { useGamesTranslation } from "~/hooks/useTypedTranslation";
+import { useCommonTranslation, useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
@@ -66,6 +66,7 @@ export const Route = createFileRoute("/player/games/")({
 
 function GamesPage() {
   const { t } = useGamesTranslation();
+  const { t: ct } = useCommonTranslation();
   const {
     status = "scheduled",
     userRole = "player",
@@ -329,7 +330,7 @@ function GamesPage() {
                         </div>
                         <Button asChild variant="outline" size="sm" className="shrink-0">
                           <Link to="/player/games/$gameId" params={{ gameId: g.id }}>
-                            {t("games.buttons.view_game")}
+                            {t("buttons.view_game")}
                             <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
                           </Link>
                         </Button>
@@ -353,7 +354,7 @@ function GamesPage() {
                   to: "/player/games/$gameId",
                   params: { gameId: game.id },
                   from: "/player/games",
-                  label: t("games.buttons.view_game"),
+                  label: t("buttons.view_game"),
                 }}
               />
             ))}
@@ -379,7 +380,7 @@ function GamesPage() {
             }
             disabled={page <= 1}
           >
-            {t("common.buttons.previous")}
+            {ct("buttons.previous")}
           </Button>
           <Button
             variant="outline"
@@ -396,7 +397,7 @@ function GamesPage() {
             }
             disabled={page >= totalPages}
           >
-            {t("common.buttons.next")}
+            {ct("buttons.next")}
           </Button>
         </div>
       </div>

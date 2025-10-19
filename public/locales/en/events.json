@@ -433,7 +433,6 @@
     "not_found_description": "The event you're trying to manage doesn't exist.",
     "registrations": "Registrations",
     "overview": "Overview",
-    "settings": "Settings",
     "stats": {
       "total_registrations": "Total Registrations",
       "total_revenue": "Total Revenue",

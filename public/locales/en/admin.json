@@ -30,6 +30,61 @@
   "insights": {
     "title": "Governance performance (last {{days}} days)",
     "subtitle": "Updated {{time}}",
+    "kpis": {
+      "active_memberships": {
+        "label": "Active memberships",
+        "supporting_copy": "{{count}} expiring within 30 days"
+      },
+      "platform_availability": {
+        "label": "Platform availability",
+        "supporting_copy": "{{count}} incidents reviewed this window"
+      },
+      "role_assignments": {
+        "label": "Role assignments",
+        "supporting_copy": "{{users}} users across {{grants}} scoped grants"
+      },
+      "campaign_activations": {
+        "label": "Campaign activations",
+        "supporting_copy": "Studio collaborations escalated to admins"
+      }
+    },
+    "persona_impacts": {
+      "visitor": {
+        "label": "Visitor",
+        "headline": "{{count}} public experiences live"
+      },
+      "player": {
+        "label": "Player",
+        "headline": "{{count}} confirmed seats this window"
+      },
+      "ops": {
+        "label": "Operations",
+        "headline": "{{count}} events under active coordination"
+      },
+      "gm": {
+        "label": "Game Master",
+        "headline": "{{count}} campaigns in motion"
+      },
+      "admin": {
+        "label": "Platform Admin",
+        "headline": "{{count}} governance updates logged"
+      }
+    },
+    "alerts": {
+      "membership_expiry_watch": "Membership expiry watch",
+      "system_incident_response": "System incident response",
+      "persona_alignment_digest": "Persona alignment digest",
+      "channels": {
+        "slack_email": "Slack + Email",
+        "pager_email": "Pager + Email",
+        "weekly_email": "Weekly Email"
+      },
+      "thresholds": {
+        "expiring_in_30_days": "{{count}} expiring in 30 days",
+        "incidents_in_window": "{{count}} incidents in {{days}}d",
+        "live_visitor_touchpoints": "{{count}} live visitor touchpoints"
+      }
+    },
     "buttons": {
       "refresh": "Refresh data",
       "refreshing": "Refreshing…",
@@ -427,6 +482,10 @@
       "security": {
         "label": "Security",
         "description": "Safeguards, incidents, and audit logs"
+      },
+      "events": {
+        "label": "Event Review",
+        "description": "Event management and auditing"
       },
       "feature_flags": {
         "label": "Feature flags",

@@ -334,7 +334,8 @@
       "owner": "Organisator",
       "player": "Teilnehmer",
       "invited": "Eingeladener",
-      "requested": "Anfragender"
+      "requested": "Anfragender",
+      "applicant": "Bewerber"
     },
     "errors": {
       "load_failed": "Fehler beim Laden der Spiele.",
@@ -345,6 +346,32 @@
     "list": {
       "participants_count": "{{count}} Teilnehmer{{count, plural, =1 {} other {n}}}",
       "view_button": "Ansehen"
+    },
+    "create": {
+      "title": "Neues Spiel erstellen",
+      "subtitle": "Richten Sie Ihre Spielsitzung ein und beginnen Sie, Spieler einzuladen",
+      "back_to_games": "Zurück zu Spielen",
+      "loading_campaign_data": "Kampagnendaten werden geladen...",
+      "campaign": "Kampagne",
+      "context_synced": "Kontext synchronisiert",
+      "select_a_campaign": "Kampagne auswählen",
+      "failed_to_create_game": "Fehler beim Erstellen des Spiels",
+      "tips": {
+        "title": "Sitzungs-Checkliste",
+        "subtitle": "Behalten Sie diese Hinweise im Hinterkopf, während Sie die Sitzungsbetreffung finalisieren.",
+        "logistics_first": {
+          "title": "Zuerst die Logistik",
+          "description": "Bestätigen Sie die Zeit, Dauer und Spielerzahl, damit die Plattform die Sitzung den richtigen Spielern präsentieren kann."
+        },
+        "safety_tooling": {
+          "title": "Sicherheitswerkzeuge",
+          "description": "Nutzen Sie den Sicherheitsbereich, um den Einwilligungs-Workflow zu dokumentieren, den Sie am Tisch verwenden, und alle bereits mit der Gruppe besprochenen Grenzen."
+        },
+        "campaign_context": {
+          "title": "Kampagnenkontext",
+          "description": "Wenn Sie eine Sitzung aus einer bestehenden Kampagne ableiten, verwenden wir die Systemstandards, um das Onboarding schnell zu halten. Passen Sie alles an, was für diesen Lauf speziell ist."
+        }
+      }
     }
   }
 }

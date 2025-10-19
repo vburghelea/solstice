@@ -221,4 +221,163 @@ DATE_FORMATS.DATETIME_SHORT; // "01/01/2023 15:45"
 
 The date formatting utilities automatically use the correct locale based on the current language setting, providing consistent localized date/time displays across the entire platform.
 
-This comprehensive structure ensures that all user-facing strings and date/time formatting are properly organized, translatable, and type-safe across the entire Roundup Games platform.
+## Hydration Safety Patterns
+
+### Server-Side Rendering (SSR) Considerations
+
+When working with internationalization in a React SSR environment (TanStack Start), hydration mismatches can occur when server-rendered HTML differs from client-rendered HTML. This commonly happens with:
+
+- **Translation readiness states** - `ready` flag from `useTranslation()`
+- **Dynamic content states** - Loading/fetching states that change on mount
+- **Client-only data** - User preferences, localStorage values
+- **Dynamic class names** - Conditional styling based on client state
+
+### ✅ Proven Hydration-Safe Patterns
+
+#### 1. Translation Readiness Guard
+
+**Use this pattern for all components with translations:**
+
+```typescript
+import { useTranslation } from "react-i18next";
+import { useFeatureTranslation } from "~/hooks/useTypedTranslation";
+
+function MyComponent() {
+  const { t } = useFeatureTranslation();
+  const { ready } = useTranslation("feature");
+
+  // Always wait for translations to be ready
+  if (!ready) {
+    return (
+      <div className="container mx-auto p-6">
+        {/* Loading skeleton that matches final structure */}
+        <div className="h-8 w-32 bg-muted animate-pulse rounded" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-6">
+      <h1>{t("title")}</h1>
+      {/* Component content */}
+    </div>
+  );
+}
+```
+
+#### 2. Client-Only State with `useEffect`
+
+**Use this pattern for dynamic states that change on mount:**
+
+```typescript
+import React, { useState, useEffect } from "react";
+
+function MyComponent() {
+  // ❌ PROBLEMATIC - Causes hydration mismatch
+  const isRefreshingBad = isFetchingData || isProcessingData;
+
+  // ✅ CORRECT - Use client-only state
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Update state after mount to prevent hydration mismatch
+  useEffect(() => {
+    setIsRefreshing(isFetchingData || isProcessingData);
+  }, [isFetchingData, isProcessingData]);
+
+  if (isRefreshing) {
+    return <LoadingBanner />;
+  }
+
+  return <MainContent />;
+}
+```
+
+#### 3. Memoized Static Data
+
+**Use this pattern for data that should be consistent between server/client:**
+
+```typescript
+import { useMemo } from "react";
+
+function MyComponent() {
+  // ✅ CORRECT - Static data memoized for consistency
+  const staticData = useMemo(() => {
+    return {
+      countries: COUNTRIES,
+      getCountryName: (code: string) => COUNTRY_MAP.get(code) ?? code,
+    };
+  }, []); // Empty dependency array = static
+
+  // ❌ AVOID - Dynamic computations that change
+  const dynamicData = computeExpensiveValue(props.data); // May differ server/client
+
+  return <Component data={staticData} />;
+}
+```
+
+#### 4. Consistent Initial States
+
+**Use this pattern for loading/fetching states:**
+
+```typescript
+function MyComponent() {
+  const { data, isFetching } = useQuery({
+    queryKey: ["myData"],
+    queryFn: fetchData,
+    // ✅ Provide initial data to ensure consistent initial state
+    initialData: [],
+  });
+
+  // ✅ Use isFetching safely with translation guard
+  const { ready } = useTranslation("myFeature");
+  if (!ready || isFetching) {
+    return <LoadingSkeleton />;
+  }
+
+  return <DataDisplay data={data} />;
+}
+```
+
+### Common Hydration Mistakes to Avoid
+
+#### ❌ Direct Computation from Fetching States
+
+```typescript
+// BAD - Causes hydration mismatch
+const isRefreshing = isFetchingTeams || isFetchingInvites;
+```
+
+#### ❌ Conditional Rendering Based on Client-Only Values
+
+```typescript
+// BAD - Different HTML on server vs client
+{typeof window !== "undefined" && <ClientOnlyComponent />}
+```
+
+#### ❌ Dynamic Class Names Based on Loading States
+
+```typescript
+// BAD - Different CSS classes server vs client
+<div className={isRefreshing ? "bg-red-50" : "bg-white"}>
+```
+
+### Debugging Hydration Issues
+
+When you encounter hydration errors:
+
+1. **Check the error details** - Look for className mismatches
+2. **Identify dynamic states** - Find computed values that change on mount
+3. **Add translation guards** - Ensure `ready` check is present
+4. **Use client-only state** - Apply `useState` + `useEffect` pattern
+5. **Test with skeleton loading** - Match final component structure
+
+### Files with Proven Patterns
+
+Reference these files for working examples:
+
+- `src/routes/player/teams/index.tsx` - Client-only state pattern
+- `src/routes/player/events/index.tsx` - Translation readiness guard
+- `src/shared/hooks/useCountries.ts` - Memoized static data
+- `src/shared/hooks/useTheme.tsx` - Client-only theme detection
+
+This comprehensive structure ensures that all user-facing strings, date/time formatting, and SSR hydration patterns are properly organized, translatable, and type-safe across the entire Roundup Games platform.

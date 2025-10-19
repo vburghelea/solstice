@@ -1,4 +1,100 @@
 {
+  "my_teams": {
+    "title": "My Teams",
+    "subtitle": "Manage your teams and memberships",
+    "create_team": "Create Team",
+    "pending_invite": "pending invite",
+    "pending_invites": "pending invites",
+    "refreshing": "Refreshing team data…",
+    "no_teams_title": "No teams yet",
+    "no_teams_subtitle": "Join an existing team or create your own to get started",
+    "browse_teams": "Browse Teams",
+    "browse_all_teams": "Browse All Teams",
+    "back_to_teams": "Back to Teams"
+  },
+  "team_card": {
+    "role": "Role",
+    "members": "Members",
+    "jersey_number": "Jersey #",
+    "position": "Position",
+    "view_team": "View Team",
+    "manage": "Manage"
+  },
+  "create": {
+    "title": "Create a New Team",
+    "subtitle": "Set up your team profile and start inviting members",
+    "back_to_teams": "Back to Teams",
+    "error_title": "Error creating team",
+    "fields": {
+      "team_name": "Team Name",
+      "url_slug": "URL Slug",
+      "description": "Description",
+      "city": "City",
+      "country": "Country",
+      "primary_color": "Primary Color",
+      "secondary_color": "Secondary Color",
+      "founded_year": "Founded Year",
+      "website": "Website"
+    },
+    "placeholders": {
+      "team_name": "UVic Valkyries",
+      "url_slug": "uvic-valkyries",
+      "description": "Tell us about your team...",
+      "city": "Berlin",
+      "country": "Search for a country",
+      "primary_color": "#000000",
+      "secondary_color": "#ffffff",
+      "founded_year": "2010",
+      "website": "https://uvicvalkyries.com"
+    },
+    "descriptions": {
+      "primary_color": "Used for jerseys, branding, and team identity",
+      "secondary_color": "Accent color for team materials and website"
+    },
+    "buttons": {
+      "create": "Create Team",
+      "creating": "Creating team...",
+      "cancel": "Cancel"
+    },
+    "validation": {
+      "team_name_required": "Team name is required",
+      "slug_format": "Slug can only contain lowercase letters, numbers, and hyphens",
+      "color_format": "Color must be in hex format (e.g., #FF0000)",
+      "valid_year": "Enter a valid year",
+      "website_format": "Website must start with http:// or https://",
+      "valid_country": "Please select a valid country"
+    }
+  },
+  "details": {
+    "about": "About",
+    "no_description": "No description provided",
+    "founded_in": "Founded in {{year}}",
+    "members": "Members",
+    "team_stats": "Team Stats",
+    "total_members": "Total Members",
+    "status": "Status",
+    "created": "Created",
+    "quick_actions": "Quick Actions",
+    "manage_members": "Manage Members",
+    "pending_invitation": "You have a pending invitation for this team. Visit the Teams dashboard to accept or decline.",
+    "pending_request": "Your join request is awaiting approval from the team captains.",
+    "request_again": "Request Again",
+    "ask_to_join": "Ask to Join",
+    "sending_request": "Sending request...",
+    "join_request_sent": "Join request sent to the team captains.",
+    "request_failed": "Unable to send join request right now.",
+    "previous_request_declined": "Your previous join request was declined{{date}}. You can submit another request.",
+    "no_permissions": "You do not currently have permissions to manage or request changes for this team.",
+    "sign_in_to_request": "Sign in to request a spot on this team.",
+    "sign_in": "Sign In",
+    "browse_teams": "Browse Teams"
+  },
+  "member_info": {
+    "invited": "Invited {{date}}",
+    "requested": "Requested {{date}}",
+    "pending": "Pending",
+    "joined": "Joined {{date}}"
+  },
   "hero": {
     "eyebrow": "Teams & Clubs",
     "title": "Find your squad or build one from the ground up",

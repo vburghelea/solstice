@@ -65,7 +65,7 @@
     "searching": "Wird gesucht...",
     "no_users_found": "Keine Benutzer gefunden.",
     "weekly": "Wöchentlich",
-    "biweekly": "Zweiwöchentlich",
+    "bi-weekly": "Zweiwöchentlich",
     "monthly": "Monatlich",
     "one_shot": "Einmalig",
     "ongoing": "Laufend"
@@ -244,13 +244,14 @@
       "active": "Aktiv",
       "completed": "Abgeschlossen",
       "on_hold": "Pausiert",
-      "cancelled": "Abgesagt"
+      "canceled": "Abgesagt"
     },
     "role_labels": {
       "owner": "Organisator",
       "player": "Teilnehmer",
       "invited": "Eingeladener",
-      "requested": "Bewerber"
+      "requested": "Bewerber",
+      "applicant": "Bewerber"
     },
     "errors": {
       "load_failed": "Kampagnen konnten nicht geladen werden."
@@ -307,5 +308,26 @@
   "validation": {
     "campaign_name_required": "Kampagnenname ist erforderlich",
     "description_required": "Beschreibung ist erforderlich"
+  },
+  "create": {
+    "title": "Neue Kampagne erstellen",
+    "subtitle": "Richten Sie Ihre Kampagne ein und beginnen Sie, Spieler einzuladen",
+    "error_title": "Fehler beim Erstellen der Kampagne",
+    "tips": {
+      "title": "Kampagnen-Tipps",
+      "subtitle": "Schnelle Hinweise, um Ihrem Tisch von Anfang an ein Gefühl der Vorbereitung zu geben.",
+      "clarify_experience": {
+        "title": "Erlebnis klären",
+        "description": "Nutzen Sie Ihre Beschreibung, um Ton, Kadenz und Erwartungen zu skizzieren, damit Spieler wissen, ob die Kampagne zu ihrem Stil passt."
+      },
+      "set_limits_early": {
+        "title": "Grenzen früh festlegen",
+        "description": "Mindest- und Höchstzahlen helfen Spielern bei der Selbstauswahl. Teilen Sie mit, welche Sicherheitswerkzeuge Sie verwenden, und weisen Sie auf wiederkehrende Logistik hin."
+      },
+      "plan_onboarding": {
+        "title": "Onboarding planen",
+        "description": "Wenn Sie eine Session Zero durchführen, erwähnen Sie, was Sie abdecken und welche Vorbereitungsarbeit Sie leisten. Es hält alle vor der ersten Würfelprobe auf dem gleichen Stand."
+      }
+    }
   }
 }

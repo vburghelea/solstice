@@ -88,11 +88,11 @@ function AdminNamespaceShell() {
         description: t("workspaces.admin.nav.overview.description"),
       },
       {
-        label: t("workspaces.admin.nav.audit_logs.label"),
+        label: t("workspaces.admin.nav.events.label"),
         to: "/admin/events-review",
         icon: AlertCircle,
         inMobileNav: false,
-        description: t("workspaces.admin.nav.audit_logs.description"),
+        description: t("workspaces.admin.nav.events.description"),
       },
     ],
     [t],

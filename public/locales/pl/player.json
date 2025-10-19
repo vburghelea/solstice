@@ -2,6 +2,16 @@
   "dashboard": {
     "title": "Panel gracza",
     "welcome": "Witaj ponownie, {{name}}",
+    "actions": {
+      "edit_profile": "Edytuj profil",
+      "manage_plan": "Zarządzaj planem",
+      "start_membership": "Rozpocznij członkostwo",
+      "find_games": "Znajdź gry",
+      "discover_sessions": "Odkryj sesje",
+      "see_all_events": "Zobacz wszystkie wydarzenia",
+      "manage_teams": "Zarządzaj zespołami",
+      "open_session_briefing": "Otwórz brief sesji"
+    },
     "errors": {
       "failed_to_parse_payload": "Nie udało się przetworzyć zapisanych danych panelu",
       "failed_to_persist_payload": "Nie udało się zapisać danych panelu",
@@ -144,7 +154,11 @@
       "edit_profile": "Edytuj profil",
       "manage_plan": "Zarządzaj planem",
       "start_membership": "Rozpocznij członkostwo",
-      "find_games": "Znajdź gry"
+      "find_games": "Znajdź gry",
+      "discover_sessions": "Odkryj sesje",
+      "see_all_events": "Zobacz wszystkie wydarzenia",
+      "manage_teams": "Zarządzaj zespołami",
+      "open_session_briefing": "Otwórz brief sesji"
     }
   }
 }

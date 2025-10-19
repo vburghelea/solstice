@@ -334,7 +334,8 @@
       "owner": "Organizator",
       "player": "Uczestnik",
       "invited": "Zaproszony",
-      "requested": "Proszący"
+      "requested": "Proszący",
+      "applicant": "Aplikant"
     },
     "errors": {
       "load_failed": "Nie udało się załadować gier.",
@@ -345,6 +346,32 @@
     "list": {
       "participants_count": "{{count}} uczestnik{{count, plural, =1 {} ów {ów}}}",
       "view_button": "Zobacz"
+    },
+    "create": {
+      "title": "Utwórz nową grę",
+      "subtitle": "Skonfiguruj swoją sesję gry i zacznij zapraszać graczy",
+      "back_to_games": "Powrót do gier",
+      "loading_campaign_data": "Ładowanie danych kampanii...",
+      "campaign": "Kampania",
+      "context_synced": "Kontext zsynchronizowany",
+      "select_a_campaign": "Wybierz kampanię",
+      "failed_to_create_game": "Nie udało się utworzyć gry",
+      "tips": {
+        "title": "Checklista sesji",
+        "subtitle": "Miej te wskazówki na uwadze podczas finalizowania briefingu sesji.",
+        "logistics_first": {
+          "title": "Najpierw logistyka",
+          "description": "Potwierdź czas, trwanie i liczbę graczy, aby platforma mogła przedstawić sesję odpowiednim graczom."
+        },
+        "safety_tooling": {
+          "title": "Narzędzia bezpieczeństwa",
+          "description": "Użyj sekcji bezpieczeństwa, aby udokumentować przepływ pracy dotyczący zgody, którego używasz przy stole, oraz wszelkie granze już omówione z grupą."
+        },
+        "campaign_context": {
+          "title": "Kontekst kampanii",
+          "description": "Tworząc sesję z istniejącej kampanii, ponownie używamy ustawień domyślnych systemu, aby przyspieszyć wprowadzanie. Dostosuj wszystko, co jest specjalne dla tego przebiegu."
+        }
+      }
     }
   }
 }

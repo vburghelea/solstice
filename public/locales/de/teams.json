@@ -1,4 +1,100 @@
 {
+  "my_teams": {
+    "title": "Meine Teams",
+    "subtitle": "Verwalte deine Teams und Mitgliedschaften",
+    "create_team": "Team erstellen",
+    "pending_invite": "ausstehende Einladung",
+    "pending_invites": "ausstehende Einladungen",
+    "refreshing": "Team-Daten werden aktualisiert…",
+    "no_teams_title": "Noch keine Teams",
+    "no_teams_subtitle": "Tritt einem bestehenden Team bei oder erstelle dein eigenes, um loszulegen",
+    "browse_teams": "Teams durchsuchen",
+    "browse_all_teams": "Alle Teams durchsuchen",
+    "back_to_teams": "Zurück zu Teams"
+  },
+  "team_card": {
+    "role": "Rolle",
+    "members": "Mitglieder",
+    "jersey_number": "Trikot-Nr.",
+    "position": "Position",
+    "view_team": "Team ansehen",
+    "manage": "Verwalten"
+  },
+  "create": {
+    "title": "Neues Team erstellen",
+    "subtitle": "Richte dein Team-Profil ein und beginne, Mitglieder einzuladen",
+    "back_to_teams": "Zurück zu Teams",
+    "error_title": "Fehler beim Erstellen des Teams",
+    "fields": {
+      "team_name": "Team-Name",
+      "url_slug": "URL-Slug",
+      "description": "Beschreibung",
+      "city": "Stadt",
+      "country": "Land",
+      "primary_color": "Primärfarbe",
+      "secondary_color": "Sekundärfarbe",
+      "founded_year": "Gründungsjahr",
+      "website": "Website"
+    },
+    "placeholders": {
+      "team_name": "UVic Valkyries",
+      "url_slug": "uvic-valkyries",
+      "description": "Erzähl uns von deinem Team...",
+      "city": "Berlin",
+      "country": "Land suchen",
+      "primary_color": "#000000",
+      "secondary_color": "#ffffff",
+      "founded_year": "2010",
+      "website": "https://uvicvalkyries.com"
+    },
+    "descriptions": {
+      "primary_color": "Verwendet für Trikots, Branding und Team-Identität",
+      "secondary_color": "Akzentfarbe für Team-Materialien und Website"
+    },
+    "buttons": {
+      "create": "Team erstellen",
+      "creating": "Team wird erstellt...",
+      "cancel": "Abbrechen"
+    },
+    "validation": {
+      "team_name_required": "Team-Name ist erforderlich",
+      "slug_format": "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
+      "color_format": "Farbe muss im Hex-Format sein (z.B. #FF0000)",
+      "valid_year": "Gib ein gültiges Jahr ein",
+      "website_format": "Website muss mit http:// oder https:// beginnen",
+      "valid_country": "Bitte wähle ein gültiges Land"
+    }
+  },
+  "details": {
+    "about": "Über",
+    "no_description": "Keine Beschreibung angegeben",
+    "founded_in": "Gegründet {{year}}",
+    "members": "Mitglieder",
+    "team_stats": "Team-Statistiken",
+    "total_members": "Gesamte Mitglieder",
+    "status": "Status",
+    "created": "Erstellt",
+    "quick_actions": "Schnellaktionen",
+    "manage_members": "Mitglieder verwalten",
+    "pending_invitation": "Du hast eine ausstehende Einladung für dieses Team. Besuche das Teams-Dashboard, um sie anzunehmen oder abzulehnen.",
+    "pending_request": "Deine Beitrittsanfrage wartet auf Genehmigung durch die Team-Kapitäne.",
+    "request_again": "Erneut anfragen",
+    "ask_to_join": "Beitreten anfragen",
+    "sending_request": "Anfrage wird gesendet...",
+    "join_request_sent": "Beitrittsanfrage an die Team-Kapitäne gesendet.",
+    "request_failed": "Anfrage kann derzeit nicht gesendet werden.",
+    "previous_request_declined": "Deine vorherige Beitrittsanfrage wurde abgelehnt{{date}}. Du kannst eine weitere Anfrage senden.",
+    "no_permissions": "Du hast derzeit keine Berechtigungen, um Änderungen für dieses Team zu verwalten oder anzufordern.",
+    "sign_in_to_request": "Melde dich an, um einen Platz in diesem Team anzufordern.",
+    "sign_in": "Anmelden",
+    "browse_teams": "Teams durchsuchen"
+  },
+  "member_info": {
+    "invited": "Eingeladen {{date}}",
+    "requested": "Angefragt {{date}}",
+    "pending": "Ausstehend",
+    "joined": "Beigetreten {{date}}"
+  },
   "hero": {
     "eyebrow": "Teams & Vereine",
     "title": "Finde dein Team oder gründe dein eigenes von Grund auf",

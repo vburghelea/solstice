@@ -334,7 +334,8 @@
       "owner": "Organizer",
       "player": "Participant",
       "invited": "Invitee",
-      "requested": "Requested"
+      "requested": "Requested",
+      "applicant": "Applicant"
     },
     "errors": {
       "load_failed": "Failed to load games.",
@@ -345,6 +346,32 @@
     "list": {
       "participants_count": "{{count}} participant{{count, plural, =1 {} other {s}}}",
       "view_button": "View"
+    },
+    "create": {
+      "title": "Create a New Game",
+      "subtitle": "Set up your game session and start inviting players",
+      "back_to_games": "Back to Games",
+      "loading_campaign_data": "Loading campaign data...",
+      "campaign": "Campaign",
+      "context_synced": "Context synced",
+      "select_a_campaign": "Select a campaign",
+      "failed_to_create_game": "Failed to create game",
+      "tips": {
+        "title": "Session checklist",
+        "subtitle": "Keep these cues in mind while finalizing the session briefing.",
+        "logistics_first": {
+          "title": "Logistics first",
+          "description": "Confirm the time, duration, and player count so the platform can surface the session to the right players."
+        },
+        "safety_tooling": {
+          "title": "Safety tooling",
+          "description": "Use the safety section to document the consent workflow you use at the table and any boundaries already discussed with the group."
+        },
+        "campaign_context": {
+          "title": "Campaign context",
+          "description": "When spinning a session out of an existing campaign, we reuse the system defaults to keep onboarding fast. Adjust anything that's special for this run."
+        }
+      }
     }
   }
 }

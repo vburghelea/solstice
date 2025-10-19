@@ -5,7 +5,7 @@ import { CalendarIcon, Trophy, UsersIcon } from "~/components/ui/icons";
 import { SafeLink } from "~/components/ui/SafeLink";
 import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
-import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
+import { RESOURCES_HERO_IMAGE } from "~/shared/lib/cloudinary-assets";
 
 // Note: These constants will be populated with translation keys in the component
 // They remain empty here as they need access to the translation function

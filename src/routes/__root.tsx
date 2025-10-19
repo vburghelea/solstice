@@ -42,25 +42,30 @@ export const Route = createRootRouteWithContext<{
   user: AuthUser | null;
   language: SupportedLanguage;
 }>()({
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: async ({ location }) => {
     const detectedLanguage =
       detectLanguageFromPath(location.pathname) ?? i18nConfig.defaultLanguage;
 
     try {
-      if (typeof window === "undefined") {
-        await i18n.changeLanguage(detectedLanguage);
-        const user = await getCurrentUser();
-        return { user, language: detectedLanguage };
-      } else {
-        if (i18n.language !== detectedLanguage) {
-          void i18n.changeLanguage(detectedLanguage);
-        }
-        const user = await context.queryClient.fetchQuery({
-          queryKey: ["user"],
-          queryFn: getCurrentUser,
+      // Ensure i18n is properly initialized and language is set before proceeding
+      if (!i18n.isInitialized) {
+        // i18n should already be initialized from providers.tsx, but wait just in case
+        await new Promise<void>((resolve) => {
+          if (i18n.isInitialized) {
+            resolve();
+          } else {
+            i18n.on("initialized", resolve);
+          }
         });
-        return { user, language: detectedLanguage };
       }
+
+      // Force language change and wait for it to complete
+      if (i18n.language !== detectedLanguage) {
+        await i18n.changeLanguage(detectedLanguage);
+      }
+
+      const user = await getCurrentUser();
+      return { user, language: detectedLanguage };
     } catch (error) {
       console.error("Error loading user:", error);
       return { user: null, language: detectedLanguage };
@@ -95,6 +100,7 @@ function RootComponent() {
     let cancelled = false;
 
     const syncLanguage = async () => {
+      // Only change language if there's a mismatch to prevent unnecessary re-renders
       if (i18n.language !== language) {
         await i18n.changeLanguage(language);
       }
@@ -120,7 +126,9 @@ function RootComponent() {
         ),
       };
 
-      console.debug("[i18n] hydration snapshot", snapshot);
+      if (i18nConfig.debug) {
+        console.info("[RootComponent] Language sync complete", snapshot);
+      }
     };
 
     void syncLanguage();

@@ -65,7 +65,7 @@
     "searching": "Wyszukiwanie...",
     "no_users_found": "Nie znaleziono użytkowników.",
     "weekly": "Co tydzień",
-    "biweekly": "Co dwa tygodnie",
+    "bi-weekly": "Co dwa tygodnie",
     "monthly": "Co miesiąc",
     "one_shot": "Jednorazowa",
     "ongoing": "Ciągła"
@@ -244,13 +244,14 @@
       "active": "Aktywna",
       "completed": "Ukończona",
       "on_hold": "Wstrzymana",
-      "cancelled": "Anulowana"
+      "canceled": "Anulowana"
     },
     "role_labels": {
       "owner": "Organizator",
       "player": "Uczestnik",
       "invited": "Zaproszony",
-      "requested": "Aplikujący"
+      "requested": "Aplikujący",
+      "applicant": "Aplikujący"
     },
     "errors": {
       "load_failed": "Nie udało się załadować kampanii."
@@ -307,5 +308,26 @@
   "validation": {
     "campaign_name_required": "Nazwa kampanii jest wymagana",
     "description_required": "Opis jest wymagany"
+  },
+  "create": {
+    "title": "Utwórz nową kampanię",
+    "subtitle": "Skonfiguruj swoją kampanię i zacznij zapraszać graczy",
+    "error_title": "Błąd tworzenia kampanii",
+    "tips": {
+      "title": "Wskazówki do kampanii",
+      "subtitle": "Szybkie przypomnienia, aby pomóc waszemu stołu poczuć się przygotowanym od pierwszego dnia.",
+      "clarify_experience": {
+        "title": "Uściślij doświadczenie",
+        "description": "Użyj swojego opisu, aby zarysować ton, kadencję i oczekiwania, dzięki czemu gracze będą wiedzieć, czy kampania pasuje do ich stylu."
+      },
+      "set_limits_early": {
+        "title": "Ustaw limity stołu wcześniej",
+        "description": "Minimum i maksimum pomagają graczom w samoselekcji. Podziel się, jakich narzędzi bezpieczeństwa używasz i zwróć uwagę na powtarzające się kwestie logistyczne."
+      },
+      "plan_onboarding": {
+        "title": "Zaplanuj wprowadzenie",
+        "description": "Jeśli organizujesz sesję zero, wspomnij, co obejmuje i jakie prace przygotowawcze. To utrzymuje wszystkich na tej samej stronie przed pierwszym rzutem kostką."
+      }
+    }
   }
 }

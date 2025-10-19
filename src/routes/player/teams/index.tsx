@@ -1,5 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { TypedLink as Link } from "~/components/ui/TypedLink";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -14,6 +16,7 @@ import { LoaderIcon, PlusIcon, UsersIcon } from "~/components/ui/icons";
 import { TeamInvitationsSection } from "~/features/teams/components/team-invitations";
 import type { PendingTeamInvite, UserTeam } from "~/features/teams/teams.queries";
 import { getPendingTeamInvites, getUserTeams } from "~/features/teams/teams.queries";
+import { useTeamsTranslation } from "~/hooks/useTypedTranslation";
 import { useCountries } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/player/teams/")({
@@ -26,6 +29,10 @@ export const Route = createFileRoute("/player/teams/")({
 });
 
 function TeamsIndexPage() {
+  const { t } = useTeamsTranslation();
+  const teamsTranslation = useTranslation("teams");
+  const { ready } = teamsTranslation;
+
   const loaderData = Route.useLoaderData() as {
     userTeams: UserTeam[];
     pendingInvites: PendingTeamInvite[];
@@ -48,26 +55,76 @@ function TeamsIndexPage() {
   });
 
   const pendingCount = pendingInvites.length;
-  const isRefreshing = isFetchingTeams || isFetchingInvites;
+
+  // Use state to prevent hydration mismatch with refreshing indicator
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  // Update refreshing state after mount to prevent hydration mismatch
+  React.useEffect(() => {
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setIsRefreshing(isFetchingTeams || isFetchingInvites);
+  }, [isFetchingTeams, isFetchingInvites]);
+
+  // Prevent hydration mismatch by waiting for translations to be ready
+  if (!ready) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="bg-muted h-8 w-32 animate-pulse rounded" />
+              <div className="bg-muted h-6 w-20 animate-pulse rounded" />
+            </div>
+            <div className="bg-muted mt-2 h-4 w-48 animate-pulse rounded" />
+          </div>
+          <div className="bg-muted h-10 w-28 animate-pulse rounded" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }, (_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="space-y-3">
+                  <div className="bg-muted h-5 w-2/3 animate-pulse rounded" />
+                  <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
+                <div className="bg-muted h-4 w-2/3 animate-pulse rounded" />
+                <div className="bg-muted h-4 w-1/3 animate-pulse rounded" />
+                <div className="mt-6 flex gap-2">
+                  <div className="bg-muted h-9 flex-1 animate-pulse rounded" />
+                  <div className="bg-muted h-9 flex-1 animate-pulse rounded" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">My Teams</h1>
+            <h1 className="text-3xl font-bold">{t("my_teams.title")}</h1>
             {pendingCount > 0 && (
               <Badge variant="secondary" className="text-xs uppercase">
-                {pendingCount} pending invite{pendingCount > 1 ? "s" : ""}
+                {pendingCount}{" "}
+                {pendingCount > 1
+                  ? t("my_teams.pending_invites")
+                  : t("my_teams.pending_invite")}
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground">Manage your teams and memberships</p>
+          <p className="text-muted-foreground">{t("my_teams.subtitle")}</p>
         </div>
         <Button asChild>
           <Link to="/player/teams/create">
             <PlusIcon className="mr-2 h-4 w-4" />
-            Create Team
+            {t("my_teams.create_team")}
           </Link>
         </Button>
       </div>
@@ -75,7 +132,7 @@ function TeamsIndexPage() {
       <div className="space-y-6">
         {isRefreshing && (
           <div className="bg-brand-red/5 text-brand-red flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold tracking-wider uppercase">
-            <LoaderIcon className="h-4 w-4 animate-spin" /> Refreshing team data…
+            <LoaderIcon className="h-4 w-4 animate-spin" /> {t("my_teams.refreshing")}
           </div>
         )}
 
@@ -85,18 +142,20 @@ function TeamsIndexPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
-              <h3 className="mb-2 text-lg font-semibold">No teams yet</h3>
+              <h3 className="mb-2 text-lg font-semibold">
+                {t("my_teams.no_teams_title")}
+              </h3>
               <p className="text-muted-foreground mb-4 text-center">
-                Join an existing team or create your own to get started
+                {t("my_teams.no_teams_subtitle")}
               </p>
               <div className="flex gap-4">
                 <Button asChild variant="outline">
-                  <Link to="/player/teams/browse">Browse Teams</Link>
+                  <Link to="/player/teams/browse">{t("my_teams.browse_teams")}</Link>
                 </Button>
                 <Button asChild>
                   <Link to="/player/teams/create">
                     <PlusIcon className="mr-2 h-4 w-4" />
-                    Create Team
+                    {t("my_teams.create_team")}
                   </Link>
                 </Button>
               </div>
@@ -106,7 +165,7 @@ function TeamsIndexPage() {
           <>
             <div className="mb-4 flex justify-end">
               <Button asChild variant="outline">
-                <Link to="/player/teams/browse">Browse All Teams</Link>
+                <Link to="/player/teams/browse">{t("my_teams.browse_all_teams")}</Link>
               </Button>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -124,6 +183,7 @@ function TeamsIndexPage() {
 function TeamCard({ userTeam }: { userTeam: UserTeam }) {
   const { team, membership, memberCount } = userTeam;
   const { getCountryName } = useCountries();
+  const { t } = useTeamsTranslation();
 
   return (
     <Card className="transition-shadow hover:shadow-lg">
@@ -149,22 +209,24 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
       <CardContent>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Role</span>
+            <span className="text-muted-foreground">{t("team_card.role")}</span>
             <span className="font-medium capitalize">{membership.role}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Members</span>
+            <span className="text-muted-foreground">{t("team_card.members")}</span>
             <span className="font-medium">{memberCount}</span>
           </div>
           {membership.jerseyNumber && (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Jersey #</span>
+              <span className="text-muted-foreground">
+                {t("team_card.jersey_number")}
+              </span>
               <span className="font-medium">{membership.jerseyNumber}</span>
             </div>
           )}
           {membership.position && (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Position</span>
+              <span className="text-muted-foreground">{t("team_card.position")}</span>
               <span className="font-medium">{membership.position}</span>
             </div>
           )}
@@ -172,13 +234,13 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
         <div className="mt-4 flex gap-2">
           <Button asChild variant="outline" size="sm" className="flex-1">
             <Link to="/player/teams/$teamId" params={{ teamId: team.id }}>
-              View Team
+              {t("team_card.view_team")}
             </Link>
           </Button>
           {["captain", "coach"].includes(membership.role) && (
             <Button asChild variant="outline" size="sm" className="flex-1">
               <Link to="/player/teams/$teamId/manage" params={{ teamId: team.id }}>
-                Manage
+                {t("team_card.manage")}
               </Link>
             </Button>
           )}

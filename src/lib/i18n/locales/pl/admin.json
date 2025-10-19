@@ -30,6 +30,61 @@
   "insights": {
     "title": "Wydajność zarządzania (ostatnie {{days}} dni)",
     "subtitle": "Zaktualizowano {{time}}",
+    "kpis": {
+      "active_memberships": {
+        "label": "Aktywne członkostwa",
+        "supporting_copy": "{{count}} wygasa w ciągu 30 dni"
+      },
+      "platform_availability": {
+        "label": "Dostępność platformy",
+        "supporting_copy": "{{count}} incydentów sprawdzonych w tym okresie"
+      },
+      "role_assignments": {
+        "label": "Przypisania ról",
+        "supporting_copy": "{{users}} użytkowników w {{grants}} przyznanych uprawnieniach"
+      },
+      "campaign_activations": {
+        "label": "Aktywacje kampanii",
+        "supporting_copy": "Współpraca studia eskalowana do administratorów"
+      }
+    },
+    "persona_impacts": {
+      "visitor": {
+        "label": "Odwiedzający",
+        "headline": "{{count}} publicznych doświadczeń na żywo"
+      },
+      "player": {
+        "label": "Gracz",
+        "headline": "{{count}} potwierdzonych miejsc w tym okresie"
+      },
+      "ops": {
+        "label": "Operacje",
+        "headline": "{{count}} wydarzeń pod aktywną koordynacją"
+      },
+      "gm": {
+        "label": "Mistrz Gry",
+        "headline": "{{count}} kampanii w ruchu"
+      },
+      "admin": {
+        "label": "Administrator Platformy",
+        "headline": "{{count}} aktualizacji zarządzania zalogowanych"
+      }
+    },
+    "alerts": {
+      "membership_expiry_watch": "Monitorowanie wygasania członkostwa",
+      "system_incident_response": "Reakcja na incydenty systemowe",
+      "persona_alignment_digest": "Podsumowanie dopasowania person",
+      "channels": {
+        "slack_email": "Slack + E-mail",
+        "pager_email": "Pager + E-mail",
+        "weekly_email": "Tygodniowy E-mail"
+      },
+      "thresholds": {
+        "expiring_in_30_days": "{{count}} wygasa w ciągu 30 dni",
+        "incidents_in_window": "{{count}} incydentów w {{days}}d",
+        "live_visitor_touchpoints": "{{count}} na żywo punktów kontaktowych odwiedzających"
+      }
+    },
     "buttons": {
       "refresh": "Odśwież dane",
       "refreshing": "Odświeżam…",
@@ -427,6 +482,10 @@
       "security": {
         "label": "Bezpieczeństwo",
         "description": "Zabezpieczenia, incydenty i logi audytu"
+      },
+      "events": {
+        "label": "Przegląd wydarzeń",
+        "description": "Zarządzanie wydarzeniami i audytowanie"
       },
       "feature_flags": {
         "label": "Flagi funkcji",

@@ -324,58 +324,75 @@ function buildGameListQuery(
     sql,
   } = context;
 
-  return db
-    .select<GameQueryResultRow>({
-      id: games.id,
-      ownerId: games.ownerId,
-      campaignId: games.campaignId,
-      gameSystemId: games.gameSystemId,
-      name: games.name,
-      dateTime: games.dateTime,
-      description: games.description,
-      expectedDuration: games.expectedDuration,
-      price: games.price,
-      language: games.language,
-      location: sql<z.infer<typeof locationSchema>>`${games.location}`,
-      status: games.status,
-      minimumRequirements: sql<z.infer<typeof minimumRequirementsSchema>>`
-        ${games.minimumRequirements}
-      `,
-      visibility: games.visibility,
-      safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
-      createdAt: games.createdAt,
-      updatedAt: games.updatedAt,
-      owner: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        image: user.image,
-        uploadedAvatarPath: user.uploadedAvatarPath,
-        gmRating: user.gmRating,
-      },
-      gameSystemName: gameSystems.name,
-      gameSystemSlug: gameSystems.slug,
-      gameSystemAveragePlayTime: gameSystems.averagePlayTime,
-      gameSystemMinPlayers: gameSystems.minPlayers,
-      gameSystemMaxPlayers: gameSystems.maxPlayers,
-      systemHeroUrl: heroImage.secureUrl,
-      systemCategories: sql<string[]>`
-        array_remove(array_agg(distinct ${category.name}), NULL)
-      `,
-      participantCount: sql<number>`count(distinct ${allParticipants.userId})::int`,
-      userRole: sql`
+  // Build base selection fields
+  const baseFields = {
+    id: games.id,
+    ownerId: games.ownerId,
+    campaignId: games.campaignId,
+    gameSystemId: games.gameSystemId,
+    name: games.name,
+    dateTime: games.dateTime,
+    description: games.description,
+    expectedDuration: games.expectedDuration,
+    price: games.price,
+    language: games.language,
+    location: sql<z.infer<typeof locationSchema>>`${games.location}`,
+    status: games.status,
+    minimumRequirements: sql<z.infer<typeof minimumRequirementsSchema>>`
+      ${games.minimumRequirements}
+    `,
+    visibility: games.visibility,
+    safetyRules: sql<z.infer<typeof safetyRulesSchema>>`${games.safetyRules}`,
+    createdAt: games.createdAt,
+    updatedAt: games.updatedAt,
+    owner: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      uploadedAvatarPath: user.uploadedAvatarPath,
+      gmRating: user.gmRating,
+    },
+    gameSystemName: gameSystems.name,
+    gameSystemSlug: gameSystems.slug,
+    gameSystemAveragePlayTime: gameSystems.averagePlayTime,
+    gameSystemMinPlayers: gameSystems.minPlayers,
+    gameSystemMaxPlayers: gameSystems.maxPlayers,
+    systemHeroUrl: heroImage.secureUrl,
+    systemCategories: sql<string[]>`
+      array_remove(array_agg(distinct ${category.name}), NULL)
+    `,
+    participantCount: sql<number>`count(distinct ${allParticipants.userId})::int`,
+  };
+
+  // Add user-specific fields only if we have a current user
+  let selectFields: GameQueryResultRow;
+  if (context.currentUserId) {
+    selectFields = {
+      ...baseFields,
+      userRole: sql<typeof participantsTable.$inferSelect.role | null>`
         CASE
           WHEN ${games.ownerId} = ${context.currentUserId} THEN 'owner'
           ELSE ${currentUserParticipant.role}
         END
       `,
-      userStatus: sql`
+      userStatus: sql<typeof participantsTable.$inferSelect.status | null>`
         CASE
           WHEN ${games.ownerId} = ${context.currentUserId} THEN 'approved'
           ELSE ${currentUserParticipant.status}
         END
       `,
-    })
+    } as unknown as GameQueryResultRow;
+  } else {
+    selectFields = {
+      ...baseFields,
+      userRole: sql<typeof participantsTable.$inferSelect.role | null>`null`,
+      userStatus: sql<typeof participantsTable.$inferSelect.status | null>`null`,
+    } as unknown as GameQueryResultRow;
+  }
+
+  return db
+    .select<GameQueryResultRow>(selectFields)
     .from(games)
     .innerJoin(user, eq(games.ownerId, user.id))
     .innerJoin(gameSystems, eq(games.gameSystemId, gameSystems.id))

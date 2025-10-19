@@ -30,6 +30,61 @@
   "insights": {
     "title": "Verwaltungsleistung (letzten {{days}} Tage)",
     "subtitle": "Aktualisiert {{time}}",
+    "kpis": {
+      "active_memberships": {
+        "label": "Aktive Mitgliedschaften",
+        "supporting_copy": "{{count}} laufen in 30 Tagen ab"
+      },
+      "platform_availability": {
+        "label": "Plattform-Verfügbarkeit",
+        "supporting_copy": "{{count}} Vorfälle in diesem Zeitraum geprüft"
+      },
+      "role_assignments": {
+        "label": "Rollenzuweisungen",
+        "supporting_copy": "{{users}} Benutzer über {{grants}} zugewiesene Berechtigungen"
+      },
+      "campaign_activations": {
+        "label": "Kampagnenaktivierungen",
+        "supporting_copy": "Studio-Kooperationen an Admins eskaliert"
+      }
+    },
+    "persona_impacts": {
+      "visitor": {
+        "label": "Besucher",
+        "headline": "{{count}} öffentliche Erlebnisse live"
+      },
+      "player": {
+        "label": "Spieler",
+        "headline": "{{count}} bestätigte Plätze in diesem Zeitraum"
+      },
+      "ops": {
+        "label": "Operationen",
+        "headline": "{{count}} Events unter aktiver Koordination"
+      },
+      "gm": {
+        "label": "Spielleiter",
+        "headline": "{{count}} Kampagnen in Bewegung"
+      },
+      "admin": {
+        "label": "Plattform-Admin",
+        "headline": "{{count}} Verwaltungsaktualisierungen protokolliert"
+      }
+    },
+    "alerts": {
+      "membership_expiry_watch": "Mitgliedschaftsablauf-Überwachung",
+      "system_incident_response": "Systemvorfall-Reaktion",
+      "persona_alignment_digest": "Persona-Abstimmungs-Übersicht",
+      "channels": {
+        "slack_email": "Slack + E-Mail",
+        "pager_email": "Pager + E-Mail",
+        "weekly_email": "Wöchentliche E-Mail"
+      },
+      "thresholds": {
+        "expiring_in_30_days": "{{count}} laufen in 30 Tagen ab",
+        "incidents_in_window": "{{count}} Vorfälle in {{days}}d",
+        "live_visitor_touchpoints": "{{count}} live Besucher-Kontaktpunkte"
+      }
+    },
     "buttons": {
       "refresh": "Daten aktualisieren",
       "refreshing": "Aktualisiere…",
@@ -427,6 +482,10 @@
       "security": {
         "label": "Sicherheit",
         "description": "Schutzmaßnahmen, Vorfälle und Audit-Logs"
+      },
+      "events": {
+        "label": "Event-Überprüfung",
+        "description": "Event-Management und Auditing"
       },
       "feature_flags": {
         "label": "Feature-Flags",

@@ -5,7 +5,7 @@ import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, CreditCard, ScrollText, UsersIcon } from "~/components/ui/icons";
 import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
-import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
+import { RESOURCES_HERO_IMAGE } from "~/shared/lib/cloudinary-assets";
 
 // Translation-aware constants will be populated in the component
 

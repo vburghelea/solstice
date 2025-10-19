@@ -601,6 +601,7 @@ function GameDetailsPage() {
             image={heroBackgroundImage}
             alt={heroBackgroundAlt}
             loading="eager"
+            className="opacity-25"
           />
         ) : (
           <div

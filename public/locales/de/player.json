@@ -2,6 +2,16 @@
   "dashboard": {
     "title": "Spieler-Dashboard",
     "welcome": "Willkommen zurück, {{name}}",
+    "actions": {
+      "edit_profile": "Profil bearbeiten",
+      "manage_plan": "Plan verwalten",
+      "start_membership": "Mitgliedschaft starten",
+      "find_games": "Spiele finden",
+      "discover_sessions": "Sitzungen entdecken",
+      "see_all_events": "Alle Ereignisse anzeigen",
+      "manage_teams": "Teams verwalten",
+      "open_session_briefing": "Sitzungs-Briefing öffnen"
+    },
     "errors": {
       "failed_to_parse_payload": "Konnte die gespeicherten Dashboard-Daten nicht verarbeiten",
       "failed_to_persist_payload": "Konnte die Dashboard-Daten nicht speichern",
@@ -144,7 +154,11 @@
       "edit_profile": "Profil bearbeiten",
       "manage_plan": "Plan verwalten",
       "start_membership": "Mitgliedschaft starten",
-      "find_games": "Spiele finden"
+      "find_games": "Spiele finden",
+      "discover_sessions": "Sitzungen entdecken",
+      "see_all_events": "Alle Ereignisse anzeigen",
+      "manage_teams": "Teams verwalten",
+      "open_session_briefing": "Sitzungs-Briefing öffnen"
     }
   }
 }

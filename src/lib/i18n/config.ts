@@ -18,7 +18,6 @@ export const i18nConfig = {
     "games", // Game listings, details, reviews
     "gm", // Game master tools and features
     "inbox", // Messaging and notifications
-    "layouts", // Layout components and structure
     "membership", // Membership plans and billing
     "ops", // Operations and system management
     "player", // Player dashboard and profile

@@ -434,9 +434,7 @@ function SignOutButton({
       disabled={isSigningOut}
     >
       <LogOut className="h-4 w-4" aria-hidden />
-      <span>
-        {isSigningOut ? t("common.buttons.signing_out") : t("common.buttons.sign_out")}
-      </span>
+      <span>{isSigningOut ? t("buttons.signing_out") : t("buttons.sign_out")}</span>
     </button>
   );
 }
@@ -596,7 +594,7 @@ function UserSummary({
       />
       <div className="flex flex-col text-left">
         <span className="text-foreground text-sm font-medium">
-          {user.name ?? t("common.default_values.player_name")}
+          {user.name ?? t("default_values.player_name")}
         </span>
         {showEmail || condensed ? (
           <span className="text-muted-foreground text-xs">{user.email}</span>

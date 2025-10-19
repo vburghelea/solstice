@@ -2,6 +2,16 @@
   "dashboard": {
     "title": "Player Dashboard",
     "welcome": "Welcome back, {{name}}",
+    "actions": {
+      "edit_profile": "Edit profile",
+      "manage_plan": "Manage plan",
+      "start_membership": "Start membership",
+      "find_games": "Find games",
+      "discover_sessions": "Discover sessions",
+      "see_all_events": "See all events",
+      "manage_teams": "Manage teams",
+      "open_session_briefing": "Open session briefing"
+    },
     "errors": {
       "failed_to_parse_payload": "Failed to parse stored dashboard payload",
       "failed_to_persist_payload": "Failed to persist dashboard payload",
@@ -139,12 +149,6 @@
         "description": "Enable calendar sharing so trusted friends can nudge you when they're planning a session that fits your vibe.",
         "join_pilot": "Join the pilot"
       }
-    },
-    "actions": {
-      "edit_profile": "Edit profile",
-      "manage_plan": "Manage plan",
-      "start_membership": "Start membership",
-      "find_games": "Find games"
     }
   }
 }

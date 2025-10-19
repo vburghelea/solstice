@@ -6,7 +6,7 @@ import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, CreditCard, UsersIcon } from "~/components/ui/icons";
 import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
-import { RESOURCES_HERO_IMAGE } from "./resource-hero-image";
+import { RESOURCES_HERO_IMAGE } from "~/shared/lib/cloudinary-assets";
 
 const cardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70";

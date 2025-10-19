@@ -346,7 +346,8 @@
         "system_health": "Zdrowie systemu",
         "user_metrics": "Metryki użytkowników",
         "platform_stats": "Statystyki platformy",
-        "recent_activity": "Najnowsza aktywność"
+        "recent_activity": "Najnowsza aktywność",
+        "analytics": "Wyświetl analitykę"
       }
     },
     "ops": {

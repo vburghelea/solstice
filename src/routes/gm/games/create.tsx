@@ -33,6 +33,7 @@ import {
   updateGameInputSchema,
 } from "~/features/games/games.schemas";
 import type { GameWithDetails } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import type { OperationResult } from "~/shared/types/common";
 
 export const createGameSearchSchema = z.object({
@@ -58,6 +59,7 @@ export function GameCreateView({
   campaignId,
 }: GameCreateViewProps) {
   const navigate = useNavigate();
+  const { t } = useGamesTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -146,12 +148,12 @@ export function GameCreateView({
         if (data.errors && data.errors.length > 0) {
           setServerError(JSON.stringify(data.errors));
         } else {
-          setServerError("Failed to create game");
+          setServerError(t("create.failed_to_create_game"));
         }
       }
     },
     onError: (error) => {
-      setServerError(error.message || "Failed to create game");
+      setServerError(error.message || t("create.failed_to_create_game"));
     },
   });
 
@@ -162,7 +164,7 @@ export function GameCreateView({
           <Button variant="ghost" size="sm" asChild>
             <Link to={backLinkTo}>
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Games
+              {t("create.back_to_games")}
             </Link>
           </Button>
         </div>
@@ -171,15 +173,13 @@ export function GameCreateView({
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] xl:grid-cols-[minmax(0,2fr)_minmax(0,20rem)]">
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle className="text-foreground">Create a New Game</CardTitle>
-            <CardDescription>
-              Set up your game session and start inviting players
-            </CardDescription>
+            <CardTitle className="text-foreground">{t("create.title")}</CardTitle>
+            <CardDescription>{t("create.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {campaignId && isCampaignDataPending ? (
               <div className="text-muted-foreground text-center">
-                Loading campaign data...
+                {t("create.loading_campaign_data")}
               </div>
             ) : (
               <>
@@ -187,15 +187,15 @@ export function GameCreateView({
                   <div className="border-border/60 bg-muted/30 grid gap-2 rounded-xl border p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-foreground text-sm font-medium">
-                        Campaign
+                        {t("create.campaign")}
                       </span>
                       <span className="text-muted-foreground text-xs tracking-wide uppercase">
-                        Context synced
+                        {t("create.context_synced")}
                       </span>
                     </div>
                     <Select value={campaignId} disabled>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a campaign" />
+                        <SelectValue placeholder={t("create.select_a_campaign")} />
                       </SelectTrigger>
                       <SelectContent>
                         {campaignData.data && (
@@ -229,7 +229,7 @@ export function GameCreateView({
                         setServerError(
                           error instanceof Error
                             ? error.message
-                            : "Failed to create game",
+                            : t("create.failed_to_create_game"),
                         );
                       }
                     }}
@@ -259,35 +259,32 @@ export function GameCreateView({
 }
 
 export function GameSessionTipsCard() {
+  const { t } = useGamesTranslation();
+
   return (
     <Card className="md:col-span-1">
       <CardHeader>
-        <CardTitle>Session checklist</CardTitle>
-        <CardDescription>
-          Keep these cues in mind while finalizing the session briefing.
-        </CardDescription>
+        <CardTitle>{t("create.tips.title")}</CardTitle>
+        <CardDescription>{t("create.tips.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="text-muted-foreground space-y-4 text-sm">
         <div>
-          <p className="text-foreground font-medium">Logistics first</p>
-          <p className="mt-1">
-            Confirm the time, duration, and player count so the platform can surface the
-            session to the right players.
+          <p className="text-foreground font-medium">
+            {t("create.tips.logistics_first.title")}
           </p>
+          <p className="mt-1">{t("create.tips.logistics_first.description")}</p>
         </div>
         <div>
-          <p className="text-foreground font-medium">Safety tooling</p>
-          <p className="mt-1">
-            Use the safety section to document the consent workflow you use at the table
-            and any boundaries already discussed with the group.
+          <p className="text-foreground font-medium">
+            {t("create.tips.safety_tooling.title")}
           </p>
+          <p className="mt-1">{t("create.tips.safety_tooling.description")}</p>
         </div>
         <div>
-          <p className="text-foreground font-medium">Campaign context</p>
-          <p className="mt-1">
-            When spinning a session out of an existing campaign, we reuse the system
-            defaults to keep onboarding fast. Adjust anything that’s special for this run.
+          <p className="text-foreground font-medium">
+            {t("create.tips.campaign_context.title")}
           </p>
+          <p className="mt-1">{t("create.tips.campaign_context.description")}</p>
         </div>
       </CardContent>
     </Card>

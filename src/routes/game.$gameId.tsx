@@ -170,9 +170,9 @@ function VisitGameDetailPage() {
   const gallery = systemDetails?.gallery ?? [];
 
   const metaItems = [
-    { icon: Calendar, label: formatDateAndTime(gameDetails.dateTime) },
-    { icon: MapPin, label: gameDetails.location.address },
-    { icon: Users, label: playersRange },
+    { icon: Calendar, label: formatDateAndTime(gameDetails.dateTime), key: "datetime" },
+    { icon: MapPin, label: gameDetails.location.address, key: "location" },
+    { icon: Users, label: playersRange, key: "players" },
     {
       icon: Clock,
       label:
@@ -182,10 +182,12 @@ function VisitGameDetailPage() {
               count: systemDetails.averagePlayTime,
             })
           : gt("game_detail.sections.session_logistics.gm_will_confirm")),
+      key: "duration",
     },
     {
       icon: Globe2,
       label: <LanguageTag language={gameDetails.language} className="text-[0.65rem]" />,
+      key: "language",
     },
   ] as const;
 
@@ -336,7 +338,7 @@ function VisitGameDetailPage() {
                 {metaItems.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <div key={Icon.name} className="flex items-start gap-3">
+                    <div key={item.key} className="flex items-start gap-3">
                       <Icon className="text-primary mt-1 size-5" />
                       <span className="text-body-sm text-muted-strong leading-snug">
                         {item.label}

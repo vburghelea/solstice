@@ -118,6 +118,29 @@ const mockTranslations: Record<string, string> = {
   "player.ui.subtitle": playerTranslations.dashboard.ui.subtitle,
   "player.ui.badges.privacy_ready": playerTranslations.dashboard.ui.badges.privacy_ready,
   "player.ui.teams_synced": playerTranslations.dashboard.ui.teams_synced,
+  // Games create form translations
+  "create.title": gamesTranslations.my_games.create.title,
+  "create.subtitle": gamesTranslations.my_games.create.subtitle,
+  "create.back_to_games": gamesTranslations.my_games.create.back_to_games,
+  "create.failed_to_create_game": gamesTranslations.my_games.create.failed_to_create_game,
+  "create.loading_campaign_data": gamesTranslations.my_games.create.loading_campaign_data,
+  "create.campaign": gamesTranslations.my_games.create.campaign,
+  "create.context_synced": gamesTranslations.my_games.create.context_synced,
+  "create.select_a_campaign": gamesTranslations.my_games.create.select_a_campaign,
+  "create.tips.title": gamesTranslations.my_games.create.tips.title,
+  "create.tips.subtitle": gamesTranslations.my_games.create.tips.subtitle,
+  "create.tips.logistics_first.title":
+    gamesTranslations.my_games.create.tips.logistics_first.title,
+  "create.tips.logistics_first.description":
+    gamesTranslations.my_games.create.tips.logistics_first.description,
+  "create.tips.safety_tooling.title":
+    gamesTranslations.my_games.create.tips.safety_tooling.title,
+  "create.tips.safety_tooling.description":
+    gamesTranslations.my_games.create.tips.safety_tooling.description,
+  "create.tips.campaign_context.title":
+    gamesTranslations.my_games.create.tips.campaign_context.title,
+  "create.tips.campaign_context.description":
+    gamesTranslations.my_games.create.tips.campaign_context.description,
 };
 
 // Mock i18next instance for tests

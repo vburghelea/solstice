@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
 import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
@@ -19,8 +20,8 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { createTeam } from "~/features/teams/teams.mutations";
 import type { CreateTeamInput } from "~/features/teams/teams.schemas";
+import { useTeamsTranslation } from "~/hooks/useTypedTranslation";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
-
 import { COUNTRIES } from "~/shared/hooks/useCountries";
 
 export const Route = createFileRoute("/player/teams/create")({
@@ -28,6 +29,9 @@ export const Route = createFileRoute("/player/teams/create")({
 });
 
 function CreateTeamPage() {
+  const { t } = useTeamsTranslation();
+  const teamsTranslation = useTranslation("teams");
+  const { ready } = teamsTranslation;
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -38,7 +42,7 @@ function CreateTeamPage() {
       navigate({ to: "/player/teams/$teamId", params: { teamId: team.id } });
     },
     onError: (error) => {
-      setServerError(error.message || "Failed to create team");
+      setServerError(error.message || t("create.error_title"));
     },
   });
 
@@ -59,7 +63,7 @@ function CreateTeamPage() {
 
       // Validate required fields
       if (!value.name) {
-        setServerError("Team name is required");
+        setServerError(t("create.validation.team_name_required"));
         return;
       }
 
@@ -80,10 +84,43 @@ function CreateTeamPage() {
         });
       } catch (error) {
         console.error("Form submission error:", error);
-        setServerError(error instanceof Error ? error.message : "Failed to create team");
+        setServerError(error instanceof Error ? error.message : t("create.error_title"));
       }
     },
   });
+
+  // Prevent hydration mismatch by waiting for translations to be ready
+  if (!ready) {
+    return (
+      <div className="container mx-auto max-w-2xl p-6">
+        <div className="mb-6">
+          <div className="bg-muted h-8 w-24 animate-pulse rounded" />
+        </div>
+        <Card>
+          <CardHeader>
+            <div className="space-y-3">
+              <div className="bg-muted h-6 w-48 animate-pulse rounded" />
+              <div className="bg-muted h-4 w-80 animate-pulse rounded" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="bg-muted h-4 w-20 animate-pulse rounded" />
+                  <div className="bg-muted h-10 w-full animate-pulse rounded" />
+                </div>
+              ))}
+              <div className="flex justify-end gap-4">
+                <div className="bg-muted h-10 w-20 animate-pulse rounded" />
+                <div className="bg-muted h-10 w-28 animate-pulse rounded" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -91,17 +128,15 @@ function CreateTeamPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link to="/player/teams">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Teams
+            {t("create.back_to_teams")}
           </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-foreground">Create a New Team</CardTitle>
-          <CardDescription>
-            Set up your team profile and start inviting members
-          </CardDescription>
+          <CardTitle className="text-foreground">{t("create.title")}</CardTitle>
+          <CardDescription>{t("create.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -116,7 +151,7 @@ function CreateTeamPage() {
               <div className="bg-destructive/10 text-destructive border-destructive/20 flex items-start gap-3 rounded-lg border p-4">
                 <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="font-medium">Error creating team</p>
+                  <p className="font-medium">{t("create.error_title")}</p>
                   <p className="mt-1 text-sm">{serverError}</p>
                 </div>
               </div>
@@ -126,14 +161,15 @@ function CreateTeamPage() {
               <form.Field
                 name="name"
                 validators={{
-                  onChange: ({ value }) => (!value ? "Team name is required" : undefined),
+                  onChange: ({ value }) =>
+                    !value ? t("create.validation.team_name_required") : undefined,
                 }}
               >
                 {(field) => (
                   <ValidatedInput
                     field={field}
-                    label="Team Name"
-                    placeholder="UVic Valkyries"
+                    label={t("create.fields.team_name")}
+                    placeholder={t("create.placeholders.team_name")}
                   />
                 )}
               </form.Field>
@@ -144,7 +180,7 @@ function CreateTeamPage() {
                   onChange: ({ value }) => {
                     if (!value) return undefined;
                     if (!/^[a-z0-9-]+$/.test(value)) {
-                      return "Slug can only contain lowercase letters, numbers, and hyphens";
+                      return t("create.validation.slug_format");
                     }
                     return undefined;
                   },
@@ -153,8 +189,8 @@ function CreateTeamPage() {
                 {(field) => (
                   <ValidatedInput
                     field={field}
-                    label="URL Slug"
-                    placeholder="uvic-valkyries"
+                    label={t("create.fields.url_slug")}
+                    placeholder={t("create.placeholders.url_slug")}
                   />
                 )}
               </form.Field>
@@ -162,14 +198,14 @@ function CreateTeamPage() {
               <form.Field name="description">
                 {(field) => (
                   <div className="space-y-2">
-                    <Label htmlFor={field.name}>Description</Label>
+                    <Label htmlFor={field.name}>{t("create.fields.description")}</Label>
                     <Textarea
                       id={field.name}
                       name={field.name}
                       value={field.state.value ?? ""}
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
-                      placeholder="Tell us about your team..."
+                      placeholder={t("create.placeholders.description")}
                       rows={4}
                     />
                   </div>
@@ -179,7 +215,11 @@ function CreateTeamPage() {
               <div className="grid grid-cols-2 gap-4">
                 <form.Field name="city">
                   {(field) => (
-                    <ValidatedInput field={field} label="City" placeholder="Berlin" />
+                    <ValidatedInput
+                      field={field}
+                      label={t("create.fields.city")}
+                      placeholder={t("create.placeholders.city")}
+                    />
                   )}
                 </form.Field>
 
@@ -188,7 +228,7 @@ function CreateTeamPage() {
                   validators={{
                     onChange: ({ value }) => {
                       if (value && !COUNTRIES.some((p) => p.value === value)) {
-                        return "Please select a valid country";
+                        return t("create.validation.valid_country");
                       }
                       return undefined;
                     },
@@ -197,8 +237,8 @@ function CreateTeamPage() {
                   {(field) => (
                     <ValidatedCountryCombobox
                       field={field}
-                      label="Country"
-                      placeholder="Search for a country"
+                      label={t("create.fields.country")}
+                      placeholder={t("create.placeholders.country")}
                     />
                   )}
                 </form.Field>
@@ -210,7 +250,7 @@ function CreateTeamPage() {
                   validators={{
                     onChange: ({ value }) => {
                       if (value && !/^#[0-9A-F]{6}$/i.test(value)) {
-                        return "Color must be in hex format (e.g., #FF0000)";
+                        return t("create.validation.color_format");
                       }
                       return undefined;
                     },
@@ -219,8 +259,8 @@ function CreateTeamPage() {
                   {(field) => (
                     <ValidatedColorPicker
                       field={field}
-                      label="Primary Color"
-                      description="Used for jerseys, branding, and team identity"
+                      label={t("create.fields.primary_color")}
+                      description={t("create.descriptions.primary_color")}
                     />
                   )}
                 </form.Field>
@@ -230,7 +270,7 @@ function CreateTeamPage() {
                   validators={{
                     onChange: ({ value }) => {
                       if (value && !/^#[0-9A-F]{6}$/i.test(value)) {
-                        return "Color must be in hex format (e.g., #0000FF)";
+                        return t("create.validation.color_format");
                       }
                       return undefined;
                     },
@@ -239,8 +279,8 @@ function CreateTeamPage() {
                   {(field) => (
                     <ValidatedColorPicker
                       field={field}
-                      label="Secondary Color"
-                      description="Accent color for team materials and website"
+                      label={t("create.fields.secondary_color")}
+                      description={t("create.descriptions.secondary_color")}
                     />
                   )}
                 </form.Field>
@@ -256,7 +296,7 @@ function CreateTeamPage() {
                         (!/^\d{4}$/.test(value) ||
                           parseInt(value) > new Date().getFullYear())
                       ) {
-                        return "Enter a valid year";
+                        return t("create.validation.valid_year");
                       }
                       return undefined;
                     },
@@ -265,8 +305,8 @@ function CreateTeamPage() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Founded Year"
-                      placeholder="2010"
+                      label={t("create.fields.founded_year")}
+                      placeholder={t("create.placeholders.founded_year")}
                       maxLength={4}
                     />
                   )}
@@ -277,7 +317,7 @@ function CreateTeamPage() {
                   validators={{
                     onChange: ({ value }) => {
                       if (value && !value.startsWith("http")) {
-                        return "Website must start with http:// or https://";
+                        return t("create.validation.website_format");
                       }
                       return undefined;
                     },
@@ -286,8 +326,8 @@ function CreateTeamPage() {
                   {(field) => (
                     <ValidatedInput
                       field={field}
-                      label="Website"
-                      placeholder="https://uvicvalkyries.com"
+                      label={t("create.fields.website")}
+                      placeholder={t("create.placeholders.website")}
                       type="url"
                     />
                   )}
@@ -297,13 +337,13 @@ function CreateTeamPage() {
 
             <div className="flex justify-end gap-4">
               <Button variant="outline" asChild>
-                <Link to="/player/teams">Cancel</Link>
+                <Link to="/player/teams">{t("create.buttons.cancel")}</Link>
               </Button>
               <FormSubmitButton
                 isSubmitting={form.state.isSubmitting}
-                loadingText="Creating team..."
+                loadingText={t("create.buttons.creating")}
               >
-                Create Team
+                {t("create.buttons.create")}
               </FormSubmitButton>
             </div>
           </form>

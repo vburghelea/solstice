@@ -23,7 +23,12 @@ export function createRouter() {
 
   const router = createTanStackRouter({
     routeTree: localizedRouteTree,
-    context: { queryClient, user: null, language: i18nConfig.defaultLanguage },
+    context: {
+      queryClient,
+      user: null,
+      language: i18nConfig.defaultLanguage,
+      i18nRequestKey: null,
+    },
     defaultPreload: "intent",
     // react-query will handle data fetching & caching
     // https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#passing-all-loader-events-to-an-external-cache

@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import { lazy, Suspense, useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { ConsentProvider } from "~/features/consent";
 import type { AuthUser } from "~/lib/auth/types";
@@ -20,6 +21,7 @@ import appCss from "~/styles.css?url";
 type RootRouteContext = {
   readonly user: AuthUser | null;
   readonly language: SupportedLanguage;
+  readonly i18nRequestKey: string | null;
 };
 
 // Lazy load devtools to avoid hydration issues
@@ -41,6 +43,7 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   user: AuthUser | null;
   language: SupportedLanguage;
+  i18nRequestKey: string | null;
 }>()({
   beforeLoad: async ({ location }) => {
     const detectedLanguage =
@@ -59,16 +62,24 @@ export const Route = createRootRouteWithContext<{
         });
       }
 
-      // Force language change and wait for it to complete
-      if (i18n.language !== detectedLanguage) {
+      let i18nRequestKey: string | null = null;
+
+      if (typeof window === "undefined") {
+        const { createRequestScopedI18n } = await import(
+          "~/lib/i18n/request-instance.server"
+        );
+        const { key } = await createRequestScopedI18n(detectedLanguage);
+        i18nRequestKey = key;
+      } else if (i18n.language !== detectedLanguage) {
+        // On the client we can safely reuse the singleton instance
         await i18n.changeLanguage(detectedLanguage);
       }
 
       const user = await getCurrentUser();
-      return { user, language: detectedLanguage };
+      return { user, language: detectedLanguage, i18nRequestKey };
     } catch (error) {
       console.error("Error loading user:", error);
-      return { user: null, language: detectedLanguage };
+      return { user: null, language: detectedLanguage, i18nRequestKey: null };
     }
   },
   head: () => ({
@@ -94,15 +105,22 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
-  const { user, language } = Route.useRouteContext() as RootRouteContext;
+  const { user, language, i18nRequestKey } = Route.useRouteContext() as RootRouteContext;
+
+  const serverI18n =
+    typeof window === "undefined" && i18nRequestKey
+      ? consumeRequestScopedI18n(i18nRequestKey)
+      : null;
+
+  const activeI18n = serverI18n ?? i18n;
 
   useEffect(() => {
     let cancelled = false;
 
     const syncLanguage = async () => {
       // Only change language if there's a mismatch to prevent unnecessary re-renders
-      if (i18n.language !== language) {
-        await i18n.changeLanguage(language);
+      if (activeI18n.language !== language) {
+        await activeI18n.changeLanguage(language);
       }
 
       if (typeof window === "undefined" || cancelled) {
@@ -111,15 +129,15 @@ function RootComponent() {
 
       const snapshot = {
         routeLanguage: language,
-        i18nLanguage: i18n.language,
-        availableLanguages: i18n.languages,
+        i18nLanguage: activeI18n.language,
+        availableLanguages: activeI18n.languages,
         resourceStatus: i18nConfig.supportedLanguages.reduce(
           (acc, lng) => ({
             ...acc,
             [lng]: {
-              navigation: i18n.hasResourceBundle(lng, "navigation"),
-              common: i18n.hasResourceBundle(lng, "common"),
-              about: i18n.hasResourceBundle(lng, "about"),
+              navigation: activeI18n.hasResourceBundle(lng, "navigation"),
+              common: activeI18n.hasResourceBundle(lng, "common"),
+              about: activeI18n.hasResourceBundle(lng, "about"),
             },
           }),
           {} as Record<SupportedLanguage, Record<string, boolean>>,
@@ -140,11 +158,35 @@ function RootComponent() {
 
   return (
     <RootDocument language={language}>
-      <ConsentProvider user={user}>
-        <Outlet />
-      </ConsentProvider>
+      <I18nextProvider i18n={activeI18n}>
+        <ConsentProvider user={user}>
+          <Outlet />
+        </ConsentProvider>
+      </I18nextProvider>
     </RootDocument>
   );
+}
+
+function consumeRequestScopedI18n(key: string) {
+  if (typeof window !== "undefined") {
+    return null;
+  }
+
+  const registry = globalThis.__solsticeRequestI18nRegistry;
+  if (!registry) {
+    return null;
+  }
+
+  const instance = registry.get(key) ?? null;
+  if (instance) {
+    registry.delete(key);
+  }
+
+  return instance;
+}
+
+declare global {
+  var __solsticeRequestI18nRegistry: Map<string, import("i18next").i18n> | undefined;
 }
 
 function RootDocument({

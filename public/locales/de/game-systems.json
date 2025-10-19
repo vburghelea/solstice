@@ -1,7 +1,7 @@
 {
   "browse": {
     "title": "Spielsysteme entdecken",
-    "subtitle": "Stöbere durch Tischspiel-Regelwerke mit kuratierten Hero-Bildern, Taxonomie und wichtigen Details. Nutze das Suchfeld oder wähle eine Kategorie, um den Katalog zu verfeinern.",
+    "subtitle": "Stöbere durch Spielsysteme mit kuratierten Hero-Bildern, Taxonomie und wichtigen Details. Nutze das Suchfeld oder wähle eine Kategorie, um den Katalog zu verfeinern.",
     "no_systems": {
       "title": "Keine Systeme gefunden",
       "subtitle": "Lösche deine Filter oder versuche einen anderen Namen, um den vollen Katalog zu durchsuchen."
@@ -156,7 +156,7 @@
   "admin": {
     "page": {
       "default_title": "Spielsysteme",
-      "default_description": "Überwache Crawler-Status, redaktionelle Bereitschaft und Medien-Moderation für jedes Regelwerk.",
+      "default_description": "Überwache Crawler-Status, redaktionelle Bereitschaft und Medien-Moderation für jedes Spielsystem.",
       "filters_title": "Filter",
       "filters_description": "Suche nach Namen, filtere nach Status und passe die Sortierung an.",
       "search_label": "Stichwort",
@@ -582,7 +582,7 @@
     },
     "admin_catalog": {
       "title": "Systemkatalog",
-      "description": "Überprüfe Crawler-Gesundheit, redaktionelle Bereitschaft und Medien-Moderation für jedes veröffentlichte Regelwerk."
+      "description": "Überprüfe Crawler-Gesundheit, redaktionelle Bereitschaft und Medien-Moderation für jedes veröffentlichte Spielsystem."
     }
   }
 }

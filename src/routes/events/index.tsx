@@ -119,8 +119,6 @@ function EventsIndex() {
   const { playerFilters } = Route.useLoaderData() as EventsLoaderData;
 
   // Debug: Check if translation is working
-  console.log("EventsIndex t() result for title:", t("listing.title"));
-  console.log("EventsIndex i18n language:", t("currentLanguage"));
   const [filters, setFilters] = useState<EventFiltersState>(DEFAULT_EVENT_FILTERS);
   const { getCountryName } = useCountries();
 

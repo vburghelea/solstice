@@ -1,0 +1,219 @@
+{
+  "title": "Ustawienia",
+  "subtitle": "Zarządzaj swoimi ustawieniami konta i preferencjami",
+  "sections": {
+    "account": {
+      "title": "Ustawienia konta",
+      "subtitle": "Zarządzaj bezpieczeństwem konta, preferencjami email, sesjami i połączonymi usługami",
+      "status": {
+        "title": "Status konta",
+        "subtitle": "Przegląd głównych szczegółów Twojego konta"
+      },
+      "connected_accounts": {
+        "title": "Połączone konta",
+        "subtitle": "Zarządzaj logowaniami społecznościowymi i połączonymi usługami"
+      },
+      "buttons": {
+        "save_changes": "Zapisz zmiany",
+        "cancel": "Anuluj",
+        "update_password": "Zaktualizuj hasło",
+        "connect": "Połącz",
+        "disconnect": "Rozłącz"
+      },
+      "messages": {
+        "saved": "Ustawienia konta zostały pomyślnie zapisane",
+        "error": "Nie udało się zapisać ustawień konta"
+      },
+      "fields": {
+        "name": "Imię",
+        "email": "Email",
+        "password": "Hasło"
+      },
+      "status_labels": {
+        "verified": "Zweryfikowany",
+        "not_verified": "Niezweryfikowany",
+        "set": "Ustawione",
+        "not_configured": "Nieskonfigurowane",
+        "required": "Wymagane",
+        "connected": "Połączone",
+        "not_connected": "Niepołączone"
+      },
+      "providers": {
+        "email_password": "Email i hasło",
+        "signin_text": "Możesz zalogować się za pomocą swojego emaila i hasła.",
+        "setup_text": "Ustaw hasło, aby umożliwić logowanie przez email.",
+        "connected": {
+          "signin_text": "Możesz zalogować się za pomocą tego dostawcy.",
+          "setup_text": "Połącz tego dostawcę, aby logować się bez hasła."
+        }
+      }
+    },
+    "security": {
+      "title": "Ustawienia bezpieczeństwa",
+      "subtitle": "Zarządzaj swoim hasłem i preferencjami bezpieczeństwa",
+      "password": {
+        "title": "Zmień hasło",
+        "subtitle": "Zaktualizuj swoje hasło, aby chronić swoje konto.",
+        "current_password": "Obecne hasło",
+        "new_password": "Nowe hasło",
+        "confirm_new_password": "Potwierdź nowe hasło",
+        "button": "Zaktualizuj hasło",
+        "button_loading": "Aktualizuję...",
+        "strength_label": "Siła hasła:",
+        "sign_out_devices": "Wyloguj z innych urządzeń",
+        "sign_out_devices_description": "Zakończ aktywne sesje na innych przeglądarkach i urządzeniach",
+        "placeholders": {
+          "current_password": "Wpisz swoje obecne hasło",
+          "new_password": "Stwórz silne hasło",
+          "confirm_password": "Wpisz ponownie swoje nowe hasło"
+        },
+        "success": "Hasło zaktualizowane",
+        "error": "Nie udało się zaktualizować hasła",
+        "validation": {
+          "mismatch": "Nowe hasło i potwierdzenie nie zgadzają się",
+          "requirements_not_met": "Hasło nie spełnia wymagań"
+        }
+      },
+      "two_factor": {
+        "title": "Uwierzytelnianie dwuskładnikowe",
+        "enabled": "Włączone",
+        "disabled": "Wyłączone",
+        "enable": "Włącz 2FA",
+        "disable": "Wyłącz 2FA"
+      }
+    },
+    "notifications": {
+      "title": "Preferencje email",
+      "subtitle": "Wybierz, które niekrytyczne aktualizacje chcesz otrzymywać w swojej skrzynce odbiorczej.",
+      "email_notifications": "Powiadomienia email",
+      "push_notifications": "Powiadomienia push",
+      "preferences": {
+        "game_reminders": {
+          "label": "Przypomnienia o grach",
+          "description": "Przypomnienia 24h i 2h przed grami, w których bierzesz udział."
+        },
+        "game_updates": {
+          "label": "Aktualizacje gier",
+          "description": "Emaile, gdy gra, w której bierzesz udział, jest zaplanowana, zaktualizowana lub odwołana."
+        },
+        "campaign_digests": {
+          "label": "Tygodniowe podsumowanie kampanii",
+          "description": "Tygodniowe podsumowanie nadchodzących sesji kampanii."
+        },
+        "campaign_updates": {
+          "label": "Aktualizacje sesji kampanii",
+          "description": "Emaile, gdy sesje kampanii są zaplanowane, zaktualizowane lub odwołane."
+        },
+        "review_reminders": {
+          "label": "Przypomnienia o recenzjach",
+          "description": "Przypomnienia, aby ocenić swojego Mistrza Gry po rozgrywkach."
+        },
+        "social_notifications": {
+          "label": "Powiadomienia społecznościowe",
+          "description": "Emaile dotyczące obserwowania, próśb i innych aktywności społecznościowych."
+        }
+      },
+      "buttons": {
+        "save": "Zapisz preferencje",
+        "saving": "Zapisuję...",
+        "reset": "Przywróć domyślne"
+      },
+      "errors": {
+        "load_failed": "Nie udało się załadować preferencji email",
+        "save_failed": "Nie udało się zapisać preferencji",
+        "refresh_page": "Odśwież stronę i spróbuj ponownie."
+      }
+    },
+    "sessions": {
+      "title": "Aktywne sesje",
+      "subtitle": "Przejrzyj przeglądarki i urządzenia, które są obecnie zalogowane.",
+      "current_session": "Bieżąca sesja",
+      "device_info": "Informacje o urządzeniu",
+      "last_active": "Ostatnio aktywny",
+      "table_headers": {
+        "device": "Urządzenie",
+        "location": "Lokalizacja",
+        "last_active": "Ostatnio aktywny",
+        "actions": "Akcje"
+      },
+      "session_id": "ID sesji:",
+      "unknown_device": "Nieznane urządzenie",
+      "unknown_location": "Nieznane",
+      "this_device": "To urządzenie",
+      "current": "Bieżące",
+      "only_current_session": "Tylko Twoja bieżąca sesja jest aktywna.",
+      "actions": {
+        "revoke": "Unieważnij",
+        "revoke_all": "Wyloguj ze wszystkich innych sesji"
+      },
+      "device_types": {
+        "mobile_device": "Urządzenie mobilne",
+        "desktop": "Komputer stacjonarny",
+        "tablet": "Tablet"
+      },
+      "platforms": {
+        "macos": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "status": {
+        "refreshing": "Odświeżam dane sesji...",
+        "refreshing_preferences": "Odświeżam preferencje...",
+        "refreshing_account": "Odświeżam informacje o koncie..."
+      },
+      "errors": {
+        "load_failed": "Nie udało się załadować sesji",
+        "refresh_page": "Odśwież stronę i spróbuj ponownie."
+      },
+      "confirmation": {
+        "revoke_title": "Unieważnij sesję",
+        "revoke_message": "Czy na pewno chcesz unieważnić tę sesję?",
+        "revoke_all_title": "Unieważnij wszystkie sesje",
+        "revoke_all_message": "Czy na pewno chcesz unieważnić wszystkie inne sesje?"
+      }
+    },
+    "privacy": {
+      "title": "Ustawienia prywatności",
+      "subtitle": "Kontroluj swoje preferencje prywatności i udostępniania danych",
+      "profile_visibility": "Widoczność profilu",
+      "data_sharing": "Udostępnianie danych",
+      "preferences": {
+        "public_profile": "Profil publiczny",
+        "show_email": "Pokaż adres email",
+        "show_activity": "Pokaż status aktywności",
+        "analytics": "Udostępniaj dane analityczne",
+        "personalization": "Spersonalizowane rekomendacje"
+      }
+    }
+  },
+  "errors": {
+    "load_failed": "Nie udało się załadować przeglądu konta",
+    "save_failed": "Nie udało się zapisać ustawień",
+    "invalid_password": "Obecne hasło jest nieprawidłowe",
+    "password_mismatch": "Nowe hasła nie zgadzają się",
+    "session_revoke_failed": "Nie udało się unieważnić sesji",
+    "load_account": "Nie udało się załadować konta",
+    "load_sessions": "Nie udało się załadować sesji",
+    "load_preferences": "Nie udało się załadować preferencji email",
+    "save_preferences": "Nie udało się zapisać preferencji",
+    "unlink_account": "Nie udało się odłączyć konta",
+    "connect_account": "Nie udało się połączyć konta",
+    "update_password": "Nie udało się zaktualizować hasła. Spróbuj ponownie.",
+    "refresh_page": "Odśwież stronę i spróbuj ponownie.",
+    "unable_to_update_password": "Nie można zaktualizować hasła"
+  },
+  "success": {
+    "settings_saved": "Ustawienia zostały pomyślnie zapisane",
+    "password_changed": "Hasło zostało pomyślnie zmienione",
+    "password_updated": "Hasło zaktualizowane",
+    "session_revoked": "Sesja unieważniona",
+    "all_sessions_revoked": "Inne sesje unieważnione",
+    "account_disconnected": "Konto odłączone",
+    "email_preferences_updated": "Preferencje email zaktualizowane"
+  },
+  "alerts": {
+    "redirecting_to_provider": "Przekierowuję do dostawcy..."
+  }
+}

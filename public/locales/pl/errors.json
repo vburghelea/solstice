@@ -1,0 +1,294 @@
+{
+  "http": {
+    "400": {
+      "title": "Nieprawidłowe żądanie",
+      "message": "Serwer nie zrozumiał Twojego żądania."
+    },
+    "401": {
+      "title": "Nieautoryzowany",
+      "message": "Musisz być zalogowany, aby uzyskać dostęp do tego zasobu."
+    },
+    "403": {
+      "title": "Zabroniony",
+      "message": "Nie masz uprawnień do dostępu do tego zasobu."
+    },
+    "404": {
+      "title": "Nie znaleziono",
+      "message": "Strona, której szukasz, nie istnieje."
+    },
+    "408": {
+      "title": "Przekroczenie czasu żądania",
+      "message": "Serwer odpowiedział zbyt długo."
+    },
+    "429": {
+      "title": "Zbyt wiele żądań",
+      "message": "Wysłałeś zbyt wiele żądań. Spróbuj ponownie później."
+    },
+    "500": {
+      "title": "Wewnętrzny błąd serwera",
+      "message": "Coś poszło nie tak po naszej stronie. Spróbuj ponownie później."
+    },
+    "502": {
+      "title": "Błędna brama",
+      "message": "Serwer jest tymczasowo niedostępny."
+    },
+    "503": {
+      "title": "Usługa niedostępna",
+      "message": "Usługa jest tymczasowo wyłączona z powodu konserwacji."
+    },
+    "504": {
+      "title": "Przekroczenie czasu bramy",
+      "message": "Serwer odpowiada zbyt długo."
+    }
+  },
+  "network": {
+    "offline": {
+      "title": "Offline",
+      "message": "Wygląda na to, że jesteś offline. Sprawdź swoje połączenie internetowe."
+    },
+    "connection_failed": {
+      "title": "Połączenie nieudane",
+      "message": "Nie udało się połączyć z serwerem. Sprawdź swoje połączenie internetowe."
+    },
+    "timeout": {
+      "title": "Przekroczenie czasu żądania",
+      "message": "Przekroczono czas oczekiwania na żądanie. Spróbuj ponownie."
+    },
+    "slow_connection": {
+      "title": "Wolne połączenie",
+      "message": "Twoje połączenie wydaje się wolne. Niektóre funkcje mogą nie działać poprawnie."
+    }
+  },
+  "validation": {
+    "required_field": {
+      "title": "Pole wymagane",
+      "message": "To pole jest wymagane."
+    },
+    "invalid_format": {
+      "title": "Nieprawidłowy format",
+      "message": "Wprowadź poprawny format."
+    },
+    "invalid_email": {
+      "title": "Nieprawidłowy e-mail",
+      "message": "Wprowadź poprawny adres e-mail."
+    },
+    "invalid_phone": {
+      "title": "Nieprawidłowy numer telefonu",
+      "message": "Wprowadź poprawny numer telefonu."
+    },
+    "password_mismatch": {
+      "title": "Hasła nie pasują",
+      "message": "Hasła nie są identyczne."
+    },
+    "weak_password": {
+      "title": "Słabe hasło",
+      "message": "Hasło jest zbyt słabe. Wybierz silniejsze hasło."
+    },
+    "file_too_large": {
+      "title": "Plik zbyt duży",
+      "message": "Plik jest zbyt duży. Wybierz mniejszy plik."
+    },
+    "invalid_file_type": {
+      "title": "Nieprawidłowy typ pliku",
+      "message": "Ten typ pliku nie jest dozwolony."
+    }
+  },
+  "authentication": {
+    "invalid_credentials": {
+      "title": "Nieprawidłowe dane logowania",
+      "message": "Wprowadzony e-mail lub hasło jest nieprawidłowy."
+    },
+    "account_locked": {
+      "title": "Konto zablokowane",
+      "message": "Twoje konto zostało zablokowane. Skontaktuj się z obsługą."
+    },
+    "unverified_email": {
+      "title": "Niezweryfikowany e-mail",
+      "message": "Zweryfikuj swój adres e-mail, aby kontynuować."
+    },
+    "session_expired": {
+      "title": "Sesja wygasła",
+      "message": "Twoja sesja wygasła. Zaloguj się ponownie."
+    },
+    "access_denied": {
+      "title": "Odmowa dostępu",
+      "message": "Nie masz uprawnień do dostępu do tego zasobu."
+    },
+    "oauth_failed": {
+      "title": "OAuth nieudany",
+      "message": "Nie udało się uwierzytelnić przy użyciu wybranego dostawcy."
+    },
+    "not_authenticated": {
+      "title": "Nie uwierzytelniono",
+      "message": "Musisz być zalogowany, aby uzyskać dostęp do tego zasobu."
+    },
+    "user_not_authenticated": {
+      "title": "Użytkownik nie uwierzytelniony",
+      "message": "Zaloguj się, aby kontynuować."
+    },
+    "admin_access_required": {
+      "title": "Wymagany dostęp administratora",
+      "message": "Potrzebujesz uprawnień administratora, aby uzyskać dostęp do tego zasobu."
+    },
+    "not_authorized": {
+      "title": "Nieautoryzowany",
+      "message": "Nie masz uprawnień do wykonania tej akcji."
+    }
+  },
+  "database": {
+    "connection_failed": {
+      "title": "Połączenie z bazą danych nieudane",
+      "message": "Nie udało się połączyć z bazą danych. Spróbuj ponownie później."
+    },
+    "query_failed": {
+      "title": "Zapytanie nieudane",
+      "message": "Nie udało się wykonać zapytania do bazy danych."
+    },
+    "constraint_violation": {
+      "title": "Naruszenie ograniczeń",
+      "message": "Dane naruszają zasady bazy danych."
+    },
+    "duplicate_entry": {
+      "title": "Duplikat wpisu",
+      "message": "Ten wpis już istnieje."
+    },
+    "database_error": {
+      "title": "Błąd bazy danych",
+      "message": "Wystąpił błąd bazy danych. Spróbuj ponownie później."
+    },
+    "failed_to_fetch_members": {
+      "title": "Nie udało się pobrać członków",
+      "message": "Nie udało się pobrać członków"
+    },
+    "failed_to_list_pending_reviews": {
+      "title": "Nie udało się pobrać oczekujących recenzji",
+      "message": "Nie udało się pobrać oczekujących recenzji"
+    },
+    "no_data_provided": {
+      "title": "Nie podano danych",
+      "message": "Nie podano danych"
+    },
+    "failed_to_update_profile": {
+      "title": "Nie udało się zaktualizować profilu",
+      "message": "Nie udało się zaktualizować profilu"
+    },
+    "failed_to_complete_profile": {
+      "title": "Nie udało się ukończyć profilu",
+      "message": "Nie udało się ukończyć profilu"
+    },
+    "invalid_image_data_format": {
+      "title": "Nieprawidłowe dane obrazu",
+      "message": "Nieprawidłowy format danych obrazu"
+    },
+    "invalid_image_payload": {
+      "title": "Nieprawidłowe dane obrazu",
+      "message": "Nieprawidłowe dane obrazu"
+    },
+    "image_too_large": {
+      "title": "Obraz zbyt duży",
+      "message": "Obraz zbyt duży (maks 1MB)"
+    },
+    "failed_to_upload_avatar": {
+      "title": "Nie udało się przesłać awatara",
+      "message": "Nie udało się przesłać awatara"
+    },
+    "failed_to_remove_avatar": {
+      "title": "Nie udało się usunąć awatara",
+      "message": "Nie udało się usunąć awatara"
+    },
+    "failed_to_update_privacy_settings": {
+      "title": "Nie udało się zaktualizować ustawień prywatności",
+      "message": "Nie udało się zaktualizować ustawień prywatności"
+    },
+    "server_error": {
+      "title": "Błąd serwera",
+      "message": "Wystąpił wewnętrzny błąd serwera. Spróbuj ponownie później."
+    },
+    "fetch_failed": {
+      "title": "Pobieranie nieudane",
+      "message": "Nie udało się pobrać {{resource}}. Spróbuj ponownie później."
+    },
+    "create_failed": {
+      "title": "Tworzenie nieudane",
+      "message": "Nie udało się utworzyć {{resource}}. Spróbuj ponownie."
+    },
+    "update_failed": {
+      "title": "Aktualizacja nieudana",
+      "message": "Nie udało się zaktualizować {{resource}}. Spróbuj ponownie."
+    },
+    "delete_failed": {
+      "title": "Usunięcie nieudane",
+      "message": "Nie udało się usunąć {{resource}}. Spróbuj ponownie."
+    }
+  },
+  "file": {
+    "not_found": {
+      "title": "Plik nie znaleziony",
+      "message": "Nie można znaleźć żądanego pliku."
+    },
+    "upload_failed": {
+      "title": "Przesyłanie nieudane",
+      "message": "Nie udało się przesłać pliku. Spróbuj ponownie."
+    },
+    "download_failed": {
+      "title": "Pobieranie nieudane",
+      "message": "Nie udało się pobrać pliku. Spróbuj ponownie."
+    },
+    "corrupted": {
+      "title": "Uszkodzony plik",
+      "message": "Plik wydaje się być uszkodzony."
+    }
+  },
+  "payment": {
+    "payment_failed": {
+      "title": "Płatność nieudana",
+      "message": "Nie udało się przetworzyć Twojej płatności. Spróbuj ponownie."
+    },
+    "card_declined": {
+      "title": "Karta odrzucona",
+      "message": "Twoja karta została odrzucona. Spróbuj inną metodę płatności."
+    },
+    "insufficient_funds": {
+      "title": "Niewystarczające środki",
+      "message": "Nie masz wystarczających środków na tę transakcję."
+    },
+    "invalid_card": {
+      "title": "Nieprawidłowa karta",
+      "message": "Wprowadzone informacje o karcie są nieprawidłowe."
+    }
+  },
+  "general": {
+    "invalid_request": {
+      "title": "Nieprawidłowe żądanie",
+      "message": "Żądanie było nieprawidłowe lub źle sformatowane."
+    },
+    "permission_denied": {
+      "title": "Odmowa uprawnień",
+      "message": "Nie masz uprawnień do wykonania tej akcji."
+    },
+    "resource_not_found": {
+      "title": "Zasób nie znaleziony",
+      "message": "Nie można znaleźć żądanego zasobu."
+    },
+    "rate_limit_exceeded": {
+      "title": "Przekroczono limit żądań",
+      "message": "Wysłałeś zbyt wiele żądań. Spróbuj ponownie później."
+    },
+    "maintenance_mode": {
+      "title": "Tryb konserwacji",
+      "message": "Strona jest obecnie w trybie konserwacji. Spróbuj ponownie później."
+    }
+  },
+  "actions": {
+    "retry": "Spróbuj ponownie",
+    "refresh": "Odśwież",
+    "go_back": "Wróć",
+    "go_home": "Strona główna",
+    "contact_support": "Kontakt z obsługą",
+    "report_issue": "Zgłoś problem",
+    "try_again": "Spróbuj ponownie",
+    "reload_page": "Przeładuj stronę",
+    "check_connection": "Sprawdź połączenie",
+    "clear_cache": "Wyczyść pamięć podręczną"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "title": "Einstellungen",
+  "subtitle": "Verwalte deine Account-Einstellungen und Präferenzen",
+  "sections": {
+    "account": {
+      "title": "Account-Einstellungen",
+      "subtitle": "Verwalte deine Account-Sicherheit, E-Mail-Präferenzen, Sitzungen und verbundenen Dienste",
+      "status": {
+        "title": "Account-Status",
+        "subtitle": "Übersicht deiner wichtigsten Account-Details"
+      },
+      "connected_accounts": {
+        "title": "Verbundene Accounts",
+        "subtitle": "Verwalte deine Social-Logins und verknüpften Dienste"
+      },
+      "buttons": {
+        "save_changes": "Änderungen speichern",
+        "cancel": "Abbrechen",
+        "update_password": "Passwort aktualisieren",
+        "connect": "Verbinden",
+        "disconnect": "Trennen"
+      },
+      "messages": {
+        "saved": "Account-Einstellungen erfolgreich gespeichert",
+        "error": "Account-Einstellungen konnten nicht gespeichert werden"
+      },
+      "fields": {
+        "name": "Name",
+        "email": "E-Mail",
+        "password": "Passwort"
+      },
+      "status_labels": {
+        "verified": "Verifiziert",
+        "not_verified": "Nicht verifiziert",
+        "set": "Festgelegt",
+        "not_configured": "Nicht konfiguriert",
+        "required": "Erforderlich",
+        "connected": "Verbunden",
+        "not_connected": "Nicht verbunden"
+      },
+      "providers": {
+        "email_password": "E-Mail & Passwort",
+        "signin_text": "Du kannst dich mit deiner E-Mail und deinem Passwort anmelden.",
+        "setup_text": "Lege ein Passwort fest, um die Anmeldung per E-Mail zu ermöglichen.",
+        "connected": {
+          "signin_text": "Du kannst dich mit diesem Anbieter anmelden.",
+          "setup_text": "Verbinde diesen Anbieter, um dich ohne Passwort anzumelden."
+        }
+      }
+    },
+    "security": {
+      "title": "Sicherheitseinstellungen",
+      "subtitle": "Verwalte dein Passwort und deine Sicherheitseinstellungen",
+      "password": {
+        "title": "Passwort ändern",
+        "subtitle": "Aktualisiere dein Passwort, um deinen Account sicher zu halten.",
+        "current_password": "Aktuelles Passwort",
+        "new_password": "Neues Passwort",
+        "confirm_new_password": "Neues Passwort bestätigen",
+        "button": "Passwort aktualisieren",
+        "button_loading": "Aktualisiere...",
+        "strength_label": "Passwortstärke:",
+        "sign_out_devices": "Von anderen Geräten abmelden",
+        "sign_out_devices_description": "Aktive Sitzungen auf anderen Browsern und Geräten beenden",
+        "placeholders": {
+          "current_password": "Gib dein aktuelles Passwort ein",
+          "new_password": "Erstelle ein starkes Passwort",
+          "confirm_password": "Gib dein neues Passwort erneut ein"
+        },
+        "success": "Passwort aktualisiert",
+        "error": "Passwort konnte nicht aktualisiert werden",
+        "validation": {
+          "mismatch": "Neues Passwort und Bestätigung stimmen nicht überein",
+          "requirements_not_met": "Passwort erfüllt nicht die Anforderungen"
+        }
+      },
+      "two_factor": {
+        "title": "Zwei-Faktor-Authentifizierung",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "enable": "2FA aktivieren",
+        "disable": "2FA deaktivieren"
+      }
+    },
+    "notifications": {
+      "title": "E-Mail-Präferenzen",
+      "subtitle": "Wähle aus, welche nicht-kritischen Updates du in deinem Postfach erhalten möchtest.",
+      "email_notifications": "E-Mail-Benachrichtigungen",
+      "push_notifications": "Push-Benachrichtigungen",
+      "preferences": {
+        "game_reminders": {
+          "label": "Spielerinnerungen",
+          "description": "Erinnerungen 24h und 2h vor Spielen, an denen du teilnimmst."
+        },
+        "game_updates": {
+          "label": "Spiel-Updates",
+          "description": "E-Mails, wenn ein Spiel, an dem du teilnimmst, geplant, aktualisiert oder abgesagt wird."
+        },
+        "campaign_digests": {
+          "label": "Kampagnen-Wochenübersicht",
+          "description": "Wöchentliche Zusammenfassung deiner kommenden Kampagnensitzungen."
+        },
+        "campaign_updates": {
+          "label": "Kampagnen-Sitzungs-Updates",
+          "description": "E-Mails, wenn Kampagnensitzungen geplant, aktualisiert oder abgesagt werden."
+        },
+        "review_reminders": {
+          "label": "Bewertungserinnerungen",
+          "description": "Erinnerungen, deinen Game-Master nach Spielen zu bewerten."
+        },
+        "social_notifications": {
+          "label": "Social-Benachrichtigungen",
+          "description": "E-Mails für Folgen, Anfragen und andere Social-Aktivitäten."
+        }
+      },
+      "buttons": {
+        "save": "Präferenzen speichern",
+        "saving": "Speichere...",
+        "reset": "Auf Standard zurücksetzen"
+      },
+      "errors": {
+        "load_failed": "E-Mail-Präferenzen konnten nicht geladen werden",
+        "save_failed": "Präferenzen konnten nicht gespeichert werden",
+        "refresh_page": "Bitte lade die Seite neu und versuche es erneut."
+      }
+    },
+    "sessions": {
+      "title": "Aktive Sitzungen",
+      "subtitle": "Überprüfe Browser und Geräte, die derzeit angemeldet sind.",
+      "current_session": "Aktuelle Sitzung",
+      "device_info": "Geräteinformationen",
+      "last_active": "Zuletzt aktiv",
+      "table_headers": {
+        "device": "Gerät",
+        "location": "Standort",
+        "last_active": "Zuletzt aktiv",
+        "actions": "Aktionen"
+      },
+      "session_id": "Sitzungs-ID:",
+      "unknown_device": "Unbekanntes Gerät",
+      "unknown_location": "Unbekannt",
+      "this_device": "Dieses Gerät",
+      "current": "Aktuell",
+      "only_current_session": "Nur deine aktuelle Sitzung ist aktiv.",
+      "actions": {
+        "revoke": "Widerrufen",
+        "revoke_all": "Von allen anderen Sitzungen abmelden"
+      },
+      "device_types": {
+        "mobile_device": "Mobiles Gerät",
+        "desktop": "Desktop",
+        "tablet": "Tablet"
+      },
+      "platforms": {
+        "macos": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "ios": "iOS",
+        "android": "Android"
+      },
+      "status": {
+        "refreshing": "Sitzungsdaten werden aktualisiert...",
+        "refreshing_preferences": "Präferenzen werden aktualisiert...",
+        "refreshing_account": "Account-Informationen werden aktualisiert..."
+      },
+      "errors": {
+        "load_failed": "Sitzungen konnten nicht geladen werden",
+        "refresh_page": "Bitte lade die Seite neu und versuche es erneut."
+      },
+      "confirmation": {
+        "revoke_title": "Sitzung widerrufen",
+        "revoke_message": "Bist du sicher, dass du diese Sitzung widerrufen möchtest?",
+        "revoke_all_title": "Alle Sitzungen widerrufen",
+        "revoke_all_message": "Bist du sicher, dass du alle anderen Sitzungen widerrufen möchtest?"
+      }
+    },
+    "privacy": {
+      "title": "Datenschutzeinstellungen",
+      "subtitle": "Kontrolliere deine Datenschutz- und Datenfreigabe-Präferenzen",
+      "profile_visibility": "Profil-Sichtbarkeit",
+      "data_sharing": "Datenfreigabe",
+      "preferences": {
+        "public_profile": "Öffentliches Profil",
+        "show_email": "E-Mail-Adresse anzeigen",
+        "show_activity": "Aktivitätsstatus anzeigen",
+        "analytics": "Nutzungsdaten teilen",
+        "personalization": "Personalisierte Empfehlungen"
+      }
+    }
+  },
+  "errors": {
+    "load_failed": "Account-Übersicht konnte nicht geladen werden",
+    "save_failed": "Einstellungen konnten nicht gespeichert werden",
+    "invalid_password": "Aktuelles Passwort ist falsch",
+    "password_mismatch": "Neue Passwörter stimmen nicht überein",
+    "session_revoke_failed": "Sitzung konnte nicht widerrufen werden",
+    "load_account": "Account konnte nicht geladen werden",
+    "load_sessions": "Sitzungen konnten nicht geladen werden",
+    "load_preferences": "E-Mail-Präferenzen konnten nicht geladen werden",
+    "save_preferences": "Präferenzen konnten nicht gespeichert werden",
+    "unlink_account": "Account konnte nicht getrennt werden",
+    "connect_account": "Account konnte nicht verbunden werden",
+    "update_password": "Passwort konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+    "refresh_page": "Bitte lade die Seite neu und versuche es erneut.",
+    "unable_to_update_password": "Passwort konnte nicht aktualisiert werden"
+  },
+  "success": {
+    "settings_saved": "Einstellungen erfolgreich gespeichert",
+    "password_changed": "Passwort erfolgreich geändert",
+    "password_updated": "Passwort aktualisiert",
+    "session_revoked": "Sitzung widerrufen",
+    "all_sessions_revoked": "Andere Sitzungen widerrufen",
+    "account_disconnected": "Account getrennt",
+    "email_preferences_updated": "E-Mail-Präferenzen aktualisiert"
+  },
+  "alerts": {
+    "redirecting_to_provider": "Leite zum Anbieter weiter..."
+  }
+}

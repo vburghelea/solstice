@@ -1,0 +1,47 @@
+{
+  "personas": {
+    "visitor": {
+      "label": "Odwiedzający",
+      "short_label": "Odwiedź",
+      "description": "Odkryj publiczne historie, wydarzenia i najciekawsze momenty przygotowane dla nowych graczy."
+    },
+    "player": {
+      "label": "Gracz",
+      "short_label": "Graj",
+      "description": "Zarządzaj sesjami, zaproszeniami i aktualnościami społeczności dopasowanymi do ciebie."
+    },
+    "ops": {
+      "label": "Organizacja wydarzeń",
+      "short_label": "Organizacja",
+      "description": "Koordynuj zapisy, obsadę i przebieg wydarzeń na żywo w jednym miejscu."
+    },
+    "gm": {
+      "label": "Mistrz gry",
+      "short_label": "MG",
+      "description": "Planuj kampanie, zarządzaj zasobami i zbieraj opinie od swoich graczy."
+    },
+    "admin": {
+      "label": "Administrator platformy",
+      "short_label": "Admin",
+      "description": "Zarządzaj rolami, zgodnością i kondycją systemu na całej platformie Roundup."
+    }
+  },
+  "switcher": {
+    "title": "Zmień rolę",
+    "description": "Wybierz obszar pracy, aby zobaczyć nawigację i narzędzia dla każdej roli.",
+    "loading": "Ładowanie...",
+    "badge": "Rola",
+    "buttons": {
+      "switching": "Zmieniam rolę..."
+    },
+    "status": {
+      "active": "Aktywna",
+      "available": "Dostępna"
+    }
+  },
+  "errors": {
+    "persona_not_found": "Nie znaleziono roli",
+    "persona_locked": "Ta rola jest zablokowana",
+    "unable_to_switch_persona": "Nie udało się zmienić roli"
+  }
+}

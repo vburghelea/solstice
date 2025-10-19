@@ -1,0 +1,659 @@
+{
+  "overview": {
+    "title": "Plattform-Verwaltungscockpit",
+    "subtitle": "Der Admin-Workspace zeigt Live-Insights, Rollenabdeckung und Rollout-Steuerungen, die auf Deine Verwaltungsaufgaben zugeschnitten sind.",
+    "cards": {
+      "user_governance": {
+        "title": "Benutzerverwaltung",
+        "description": "Überprüfe Mitgliedschaften, erzwinge MFA und prüfe hochsensible Rollen in einer zentralen Übersicht.",
+        "description_detail": "Öffne das Verzeichnis für detaillierte Steuerelemente.",
+        "link_text": "Benutzerverwaltung öffnen"
+      },
+      "feature_rollouts": {
+        "title": "Feature-Rollouts",
+        "description": "Schalte Persona-Vorschauen und Beta-Wege um, um schrittweise Releases mit Vertrauen zu koordinieren.",
+        "description_detail": "Sichere Experimente ohne erneutes Deployment.",
+        "link_text": "Feature-Flags verwalten"
+      },
+      "security_posture": {
+        "title": "Sicherheitsstatus",
+        "description": "Überprüfe Vorfälle, Schutzmaßnahmen und Audit-Logs, die auf Deine Verwaltungsaufgaben zugeschnitten sind.",
+        "description_detail": "Bestätige Schutzmaßnahmen, bevor Du privilegierten Zugriff anpasst.",
+        "link_text": "Sicherheitszentrum öffnen"
+      },
+      "live_insights_preview": {
+        "title": "Live-Insights-Vorschau",
+        "description": "Optimierte Metriken helfen Admins, sich zu orientieren, bevor sie in die vollständige Konsole eintauchen."
+      }
+    }
+  },
+  "insights": {
+    "title": "Verwaltungsleistung (letzten {{days}} Tage)",
+    "subtitle": "Aktualisiert {{time}}",
+    "kpis": {
+      "active_memberships": {
+        "label": "Aktive Mitgliedschaften",
+        "supporting_copy": "{{count}} laufen in 30 Tagen ab"
+      },
+      "platform_availability": {
+        "label": "Plattform-Verfügbarkeit",
+        "supporting_copy": "{{count}} Vorfälle in diesem Zeitraum geprüft"
+      },
+      "role_assignments": {
+        "label": "Rollenzuweisungen",
+        "supporting_copy": "{{users}} Benutzer über {{grants}} zugewiesene Berechtigungen"
+      },
+      "campaign_activations": {
+        "label": "Kampagnenaktivierungen",
+        "supporting_copy": "Studio-Kooperationen an Admins eskaliert"
+      }
+    },
+    "persona_impacts": {
+      "visitor": {
+        "label": "Besucher",
+        "headline": "{{count}} öffentliche Erlebnisse live"
+      },
+      "player": {
+        "label": "Spieler",
+        "headline": "{{count}} bestätigte Plätze in diesem Zeitraum"
+      },
+      "ops": {
+        "label": "Operationen",
+        "headline": "{{count}} Events unter aktiver Koordination"
+      },
+      "gm": {
+        "label": "Spielleiter",
+        "headline": "{{count}} Kampagnen in Bewegung"
+      },
+      "admin": {
+        "label": "Plattform-Admin",
+        "headline": "{{count}} Verwaltungsaktualisierungen protokolliert"
+      }
+    },
+    "alerts": {
+      "membership_expiry_watch": "Mitgliedschaftsablauf-Überwachung",
+      "system_incident_response": "Systemvorfall-Reaktion",
+      "persona_alignment_digest": "Persona-Abstimmungs-Übersicht",
+      "channels": {
+        "slack_email": "Slack + E-Mail",
+        "pager_email": "Pager + E-Mail",
+        "weekly_email": "Wöchentliche E-Mail"
+      },
+      "thresholds": {
+        "expiring_in_30_days": "{{count}} laufen in 30 Tagen ab",
+        "incidents_in_window": "{{count}} Vorfälle in {{days}}d",
+        "live_visitor_touchpoints": "{{count}} live Besucher-Kontaktpunkte"
+      }
+    },
+    "buttons": {
+      "refresh": "Daten aktualisieren",
+      "refreshing": "Aktualisiere…",
+      "retry": "Erneut versuchen"
+    },
+    "errors": {
+      "unable_to_load": "Insights konnten nicht geladen werden",
+      "error_message": "Wir konnten den Verwaltungsanalysedienst nicht erreichen."
+    },
+    "sections": {
+      "incident_timeline": {
+        "title": "Vorfall-Zeitleiste",
+        "description": "Automatisierte Crawler und manuelle Eskalationen haben diese Ereignisse zur Überprüfung aufgedeckt.",
+        "no_incidents": "Keine Vorfälle in diesem Zeitraum",
+        "no_incidents_description": "Die Betriebszeit war stabil. Halte proaktive Warnungen als Schutzmaßnahmen bereit."
+      },
+      "live_alerting": {
+        "title": "Live-Warnungen",
+        "description": "Kanal-Routing und Schwellenwerte, die für die Admin-Verwaltungs-Schutzmaßnahmen entwickelt wurden."
+      },
+      "persona_impact": {
+        "title": "Persona-Impuls-Messung",
+        "description": "Rollenübergreifende Momentaufnahmen zeigen, wie Verwaltungsentscheidungen durch die Plattform wirken."
+      }
+    },
+    "status": {
+      "steady": "Stabil",
+      "trending_up": "Aufsteigend",
+      "needs_attention": "Benötigt Aufmerksamkeit",
+      "momentum_building": "Schwung aufbauend",
+      "requires_intervention": "Eingriff erforderlich",
+      "holding_steady": "Stabil haltend"
+    },
+    "alerts": {
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pausiert"
+      },
+      "triggered": "Ausgelöst {{time}}",
+      "awaiting_first_trigger": "Erste Auslösung erwartet"
+    },
+    "incidents": {
+      "duration": {
+        "minutes": "{{minutes}} Min",
+        "less_than_minute": "< 1 Min",
+        "in_progress": "In Bearbeitung"
+      },
+      "resolved": "Gelöst {{time}}",
+      "http_status": "HTTP {{status}}"
+    }
+  },
+  "events_review": {
+    "title": "Event-Überprüfung",
+    "subtitle": "Überprüfe und genehmige Events, die von Mitgliedern eingereicht wurden",
+    "buttons": {
+      "view_all_events": "Alle Events anzeigen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "view": "Anzeigen",
+      "manage": "Verwalten"
+    },
+    "tabs": {
+      "pending_approval": "Genehmigung ausstehend",
+      "recently_reviewed": "Kürzlich überprüft"
+    },
+    "sections": {
+      "awaiting_approval": {
+        "title": "Events, die auf Genehmigung warten",
+        "description": "Überprüfe diese Events und genehmige sie, um sie öffentlich sichtbar zu machen"
+      },
+      "recently_reviewed": {
+        "title": "Kürzlich überprüfte Events",
+        "description": "Events, die kürzlich genehmigt oder veröffentlicht wurden"
+      }
+    },
+    "tables": {
+      "headers": {
+        "event_name": "Event-Name",
+        "organizer": "Organisator",
+        "type": "Typ",
+        "date": "Datum",
+        "location": "Ort",
+        "created": "Erstellt",
+        "actions": "Aktionen",
+        "status": "Status",
+        "visibility": "Sichtbarkeit"
+      }
+    },
+    "status": {
+      "public": "Öffentlich",
+      "private": "Privat"
+    },
+    "empty_states": {
+      "no_pending_approval": "Keine Events, die auf Genehmigung warten",
+      "no_recently_reviewed": "Keine kürzlich überprüften Events"
+    },
+    "alerts": {
+      "all_caught_up": {
+        "title": "Alles erledigt!",
+        "description": "Aktuell gibt es keine Events, die auf Genehmigung warten."
+      }
+    },
+    "dialog": {
+      "approve_title": "Event genehmigen",
+      "reject_title": "Event ablehnen",
+      "approve_description": "Bist Du sicher, dass Du \"{{eventName}}\" genehmigen möchtest? Dies macht das Event öffentlich sichtbar.",
+      "reject_description": "Bist Du sicher, dass Du \"{{eventName}}\" ablehnen möchtest? Der Organisator muss Änderungen vornehmen und erneut einreichen.",
+      "buttons": {
+        "cancel": "Abbrechen"
+      }
+    },
+    "organizer": {
+      "unknown": "Unbekannt",
+      "not_provided": "Nicht angegeben"
+    },
+    "hardcoded_strings": {
+      "approve_and_made_public": " und öffentlich gemacht!",
+      "failed_to_update_event": "Event konnte nicht aktualisiert werden",
+      "error_updating_event": "Beim Aktualisieren des Events ist ein Fehler aufgetreten"
+    }
+  },
+  "user_directory": {
+    "title": "Benutzerverwaltung",
+    "subtitle": "Verfolge Mitgliedschaftsabdeckung, Rollenzuweisungen und MFA-Durchsetzung für Deine Compliance-Sicht.",
+    "buttons": {
+      "assign_role": "Rolle zuweisen",
+      "retry": "Erneut versuchen",
+      "refresh": "Aktualisieren",
+      "delete": "Löschen",
+      "export_csv": "CSV exportieren",
+      "require_mfa": "MFA erforderlich",
+      "mfa_enforced": "MFA durchgesetzt"
+    },
+    "sections": {
+      "role_summary": {
+        "title": "Rollen-Zusammenfassung",
+        "description": "Übersicht aller Systemrollen und ihrer Zuweisungszahlen"
+      },
+      "current_assignments": {
+        "title": "Aktuelle Rollenzuweisungen",
+        "description": "Audit-Protokoll, wer Zugriff hat, wann er gewährt wurde und von wem."
+      }
+    },
+    "tables": {
+      "headers": {
+        "user": "Benutzer",
+        "membership": "Mitgliedschaft",
+        "roles": "Rollen",
+        "role_assigned": "Rolle zugewiesen",
+        "mfa": "MFA",
+        "last_active": "Zuletzt aktiv",
+        "risk": "Risiko",
+        "latest_activity": "Letzte Aktivität",
+        "actions": "Aktionen",
+        "role": "Rolle",
+        "scope": "Geltungsbereich",
+        "assigned_by": "Zugewiesen von",
+        "assigned_at": "Zugewiesen am",
+        "expires": "Läuft ab",
+        "notes": "Notizen"
+      }
+    },
+    "membership": {
+      "status": {
+        "active": "Aktiv",
+        "expired": "Abgelaufen",
+        "canceled": "Storniert",
+        "none": "Keine Mitgliedschaft"
+      },
+      "expires": "Läuft ab {{time}}"
+    },
+    "mfa": {
+      "enforced": "Durchgesetzt",
+      "missing": "Fehlend"
+    },
+    "risk": {
+      "clear": "Klar"
+    },
+    "activity": {
+      "no_activity": "Keine Aktivität",
+      "no_recent_events": "Keine aktuellen Ereignisse"
+    },
+    "roles": {
+      "no_assignments": "Keine Zuweisungen",
+      "assigned": "{{count}} zugewiesen"
+    },
+    "role_summary": {
+      "assigned_count": "{{count}} zugewiesen"
+    },
+    "form": {
+      "assign_role": {
+        "title": "Eine Rolle zuweisen",
+        "description": "Suche nach einem Benutzer und gewähre ihm eine Rolle. Geltungsbereichsbezogene Rollen erfordern entweder einen Team- oder Event-Kontext.",
+        "fields": {
+          "user": "Benutzer",
+          "role": "Rolle",
+          "team_scope": "Team-Geltungsbereich",
+          "event_scope": "Event-Geltungsbereich",
+          "expiration": "Ablauf",
+          "notes": "Notizen"
+        },
+        "placeholders": {
+          "search_users": "Benutzer suchen...",
+          "team_id": "Team-ID",
+          "event_id": "Event-ID",
+          "add_context": "Kontext für diese Zuweisung hinzufügen (optional)"
+        },
+        "hints": {
+          "team_scope": "Verwende für die Zuweisung von <strong>Team Admin</strong>. Für globale Rollen leer lassen.",
+          "event_scope": "Verwende für die Zuweisung von <strong>Event Admin</strong>. Für globale Rollen leer lassen.",
+          "expiration": "Optional — leer lassen für kein Ablaufdatum."
+        },
+        "validation": {
+          "select_user": "Wähle einen Benutzer",
+          "select_role": "Wähle eine Rolle"
+        },
+        "buttons": {
+          "assign_role": "Rolle zuweisen"
+        }
+      },
+      "filters": {
+        "membership": "Mitgliedschaft",
+        "all_memberships": "Alle Mitgliedschaften",
+        "filter_by_role": "Nach Rolle filtern",
+        "all_roles": "Alle Rollen"
+      },
+      "select_role_placeholder": "Rolle auswählen",
+      "buttons": {
+        "retry": "Erneut versuchen"
+      }
+    },
+    "search": {
+      "placeholder": "Nach Name oder E-Mail suchen",
+      "no_users_found": "Keine Benutzer gefunden.",
+      "searching_users": "Suche Benutzer..."
+    },
+    "export": {
+      "filename": "plattform-compliance-{{date}}.csv",
+      "success": "Compliance-Bericht exportiert",
+      "pending": "Exportiere…"
+    },
+    "loading": {
+      "refreshing": "Aktualisiere…"
+    },
+    "errors": {
+      "unable_to_load": "Benutzerverwaltung konnte nicht geladen werden",
+      "service_unavailable": "Der Benutzerverzeichnisdienst ist vorübergehend nicht verfügbar.",
+      "assign_role_failed": "Rolle konnte nicht zugewiesen werden",
+      "remove_role_assignment_failed": "Rollenzuweisung konnte nicht entfernt werden",
+      "delete_user_failed": "Benutzer konnte nicht gelöscht werden",
+      "export_compliance_report_failed": "Compliance-Bericht konnte nicht exportiert werden",
+      "search_users_failed": "Benutzersuche fehlgeschlagen",
+      "load_role_management_data_failed": "Rollenverwaltungsdaten konnten nicht geladen werden",
+      "load_failed": "Benutzerverwaltung konnte nicht geladen werden"
+    },
+    "messages": {
+      "role_assigned_success": "Rolle erfolgreich zugewiesen",
+      "role_assignment_removed": "Rollenzuweisung entfernt",
+      "user_permanently_deleted": "Benutzer dauerhaft gelöscht",
+      "compliance_report_exported": "Compliance-Bericht exportiert"
+    },
+    "dialogs": {
+      "remove_assignment": {
+        "title": "Rollenzuweisung entfernen",
+        "description": "Dies entzieht {{userName}} die Rolle \"{{roleName}}\". Diese Aktion kann nicht rückgängig gemacht werden.",
+        "buttons": {
+          "remove_access": "Zugriff entfernen"
+        }
+      },
+      "delete_user": {
+        "title": "Benutzer dauerhaft löschen",
+        "warning": "Diese Aktion ist <strong>dauerhaft, unumkehrbar und potenziell katastrophal</strong>.",
+        "warning_text": "<strong>WARNUNG:</strong> Das Löschen von <strong>{{userName}}</strong> ({{userEmail}}) wird kaskadierend alle zugehörigen Daten einschließlich Spiele, Events, Kampagnen, Mitgliedschaften und potenziell andere Spieler löschen, die Teil dieser Aktivitäten sind.",
+        "warning_description": "Das Löschen von <strong>{{name}}</strong> ({{email}}) wird kaskadierend alle zugehörigen Daten einschließlich Spiele, Events, Kampagnen, Mitgliedschaften und potenziell andere Spieler löschen, die Teil dieser Aktivitäten sind.",
+        "sections": {
+          "data_to_delete_title": "Daten, die dauerhaft gelöscht werden:",
+          "data_to_delete": {
+            "profile": "Benutzerkonto und Profilinformationen",
+            "memberships": "Alle Mitgliedschaften und Abonnementdaten",
+            "games": "Game-Master-Status und erstellte Spiele",
+            "events": "Event-Organisation und erstellte Events",
+            "campaigns": "Kampagnen-Führung und erstellte Kampagnen",
+            "teams": "Team-Mitgliedschaften und -Zuordnungen",
+            "notifications": "Benachrichtigungen und Kommunikationsverlauf",
+            "roles": "Rollenzuweisungen und Berechtigungen"
+          },
+          "impact_title": "Auswirkungen auf andere Benutzer:",
+          "impact_description": "Wenn dieser Benutzer ein Game-Master ist, könnten seine Spiele betroffen sein und Spieler könnten den Zugang zu laufenden Kampagnen verlieren. Wenn dieser Benutzer ein Event-Organisator ist, könnten registrierte Teilnehmer ihren Event-Zugang verlieren.",
+          "confirmation_title": "Bestätigung erforderlich:"
+        },
+        "data_to_delete": {
+          "title": "Daten, die dauerhaft gelöscht werden:",
+          "items": [
+            "Benutzerkonto und Profilinformationen",
+            "Alle Mitgliedschaften und Abonnementdaten",
+            "Game-Master-Status und erstellte Spiele",
+            "Event-Organisation und erstellte Events",
+            "Kampagnen-Führung und erstellte Kampagnen",
+            "Team-Mitgliedschaften und -Zuordnungen",
+            "Benachrichtigungen und Kommunikationsverlauf",
+            "Rollenzuweisungen und Berechtigungen"
+          ]
+        },
+        "impact_on_others": {
+          "title": "Auswirkungen auf andere Benutzer:",
+          "description": "Wenn dieser Benutzer ein Game-Master ist, könnten seine Spiele betroffen sein und Spieler könnten den Zugang zu laufenden Kampagnen verlieren. Wenn dieser Benutzer ein Event-Organisator ist, könnten registrierte Teilnehmer ihren Event-Zugang verlieren."
+        },
+        "confirmation": {
+          "title": "Bestätigung erforderlich:",
+          "instruction": "Um fortzufahren, gib bitte <code>{{email}}</code> unten ein:",
+          "placeholder": "Benutzer-E-Mail zur Bestätigung eingeben"
+        },
+        "buttons": {
+          "delete_permanently": "Dauerhaft löschen"
+        }
+      }
+    },
+    "scope": {
+      "global": "Global",
+      "team": "Team: {{teamId}}",
+      "event": "Event: {{eventId}}"
+    },
+    "assigned_by": {
+      "system": "System"
+    },
+    "permissions": {
+      "none_configured": "Keine konfiguriert"
+    },
+    "descriptions": {
+      "no_description": "Keine Beschreibung angegeben."
+    },
+    "misc": {
+      "permissions": "Berechtigungen",
+      "no_expiration": "Kein Ablauf",
+      "remove_access": "Entfernen"
+    },
+    "risk_flags": {
+      "email_not_verified": "E-Mail nicht verifiziert",
+      "mfa_not_enrolled": "MFA nicht registriert",
+      "membership_not_active": "Mitgliedschaft nicht aktiv"
+    },
+    "audit_trail": {
+      "role_granted": "{{roleName}} erteilt",
+      "membership_status": "Mitgliedschaft {{status}}",
+      "last_active": "Zuletzt aktiv"
+    }
+  },
+  "social_audits": {
+    "title": "Soziale Audits",
+    "description": "Admin-nur Ansicht von Folge-/Blockier-Aktionen für Moderation.",
+    "filters": {
+      "action": "Aktion",
+      "actor_user_id": "Akteur-Benutzer-ID",
+      "target_user_id": "Ziel-Benutzer-ID",
+      "any": "Beliebig",
+      "apply_filters": "Filter anwenden",
+      "user_id_placeholder": "Benutzer-ID"
+    },
+    "table_headers": {
+      "date": "Datum",
+      "action": "Aktion",
+      "actor": "Akteur",
+      "target": "Ziel",
+      "ui_surface": "UI-Oberfläche",
+      "reason": "Grund"
+    },
+    "pagination": {
+      "page_info": "Seite {{current}} von {{total}} • {{count}} gesamt",
+      "previous": "Vorherige",
+      "next": "Nächste"
+    },
+    "loading": "Lade…",
+    "no_data": {
+      "no_audit_rows": "Keine Audit-Zeilen"
+    },
+    "actions": {
+      "follow": "folgen",
+      "unfollow": "entfolgen",
+      "block": "blockieren",
+      "unblock": "entblockieren"
+    },
+    "no_user_data": "—"
+  },
+  "navigation": {
+    "aria_label": "Admin-Navigation",
+    "items": {
+      "insights": {
+        "label": "Insights",
+        "description": "System-KPIs, Vorfälle und Warnungen"
+      },
+      "users": {
+        "label": "Benutzer",
+        "description": "Rollen, Mitgliedschaften und MFA-Abdeckung"
+      },
+      "security": {
+        "label": "Sicherheit",
+        "description": "Schutzmaßnahmen, Vorfälle und Audit-Logs"
+      },
+      "events": {
+        "label": "Event-Überprüfung",
+        "description": "Event-Management und Auditing"
+      },
+      "feature_flags": {
+        "label": "Feature-Flags",
+        "description": "Persona-Rollouts und Experimente"
+      }
+    }
+  },
+  "security_center": {
+    "title": "Sicherheitsstatus",
+    "subtitle": "Schutzmaßnahmen für das Verwaltungskonsolen verwalten",
+    "description": "Verfolge Plattform-Verteidigungen, leite Vorfall-Überprüfungen und bestätige, dass privilegierte Steuerelemente den Admin-Bedarf an auditierbaren Schutzmaßnahmen respektieren.",
+    "actions": {
+      "refresh_snapshot": "Snapshot aktualisieren",
+      "refreshing": "Aktualisiere…",
+      "enable_safeguard": "Schutzmaßnahme aktivieren",
+      "disable_safeguard": "Schutzmaßnahme deaktivieren",
+      "confirm": "Bestätigen",
+      "cancel": "Abbrechen"
+    },
+    "status": {
+      "stable_governance_posture": "Stabile Verwaltungshaltung",
+      "heightened_monitoring": "Verstärkte Überwachung",
+      "improving": "Verbessernd",
+      "declining": "Abnehmend",
+      "flat": "Flach",
+      "enforced": "Durchgesetzt",
+      "disabled": "Deaktiviert"
+    },
+    "sections": {
+      "critical_safeguards": {
+        "title": "Kritische Schutzmaßnahmen",
+        "description": "Bestätige plattformweite Steuerelemente, bevor Du den Zugriff für privilegierte Personas aktivierst oder deaktivierst."
+      },
+      "active_incidents": {
+        "title": "Aktive Vorfälle",
+        "description": "Priorisiere Abhilfemaßnahmen, die das Vertrauen von Besuchern, Spielern und Betriebsleuten schützen, während Admins die Konsole überwachen."
+      },
+      "compliance_checklist": {
+        "title": "Compliance-Checkliste",
+        "description": "Sequenziere die nächsten besten Aktionen, damit Audits schnell und verteidigbar für Admins bleiben."
+      },
+      "privileged_action_log": {
+        "title": "Protokoll privilegierter Aktionen",
+        "description": "Überprüfe die letzten manuellen und automatisierten Änderungen, um die Audit-Bereitschaft zu bestätigen."
+      }
+    },
+    "labels": {
+      "score_calculated_across_pillars": "Punktzahl berechnet über Identität, Infrastruktur und Audit-Säulen.",
+      "last_reviewed": "Zuletzt überprüft",
+      "over_the_last_days": "in den letzten {{count}} Tagen",
+      "impact": "Auswirkung",
+      "persona_impact": "Persona-Auswirkung",
+      "effort": "Aufwand",
+      "actor": "Akteur",
+      "risk_level": "RISIKO"
+    },
+    "status_indicators": {
+      "all_clear": "Alles klar",
+      "no_unresolved_incidents": "Keine ungelösten Vorfälle erfordern derzeit Aufmerksamkeit.",
+      "investigating": "Untersuchend",
+      "mitigated": "Abgemildert",
+      "resolved": "Gelöst"
+    },
+    "messages": {
+      "unable_to_load_security_posture": "Sicherheitsstatus konnte nicht geladen werden",
+      "could_not_retrieve_governance_safeguards": "Wir konnten Verwaltungsschutzmaßnahmen nicht abrufen. Aktualisiere die Seite oder kontaktiere das Plattform-Engineering-Team.",
+      "enabled_or_disabled_control": "{{action}} {{control}}",
+      "no_recent_privileged_changes": "Keine aktuellen privilegierten Änderungen wurden in diesem Zeitraum aufgezeichnet.",
+      "unable_to_update_control": "Steuerung konnte nicht aktualisiert werden"
+    },
+    "controls": {
+      "enforced": "Durchgesetzt",
+      "disabled": "Deaktiviert",
+      "enable_control": "Steuerung aktivieren",
+      "disable_control": "Steuerung deaktivieren",
+      "last_reviewed_by": "Zuletzt überprüft {{timeAgo}} von {{user}}. Nächste Überprüfung in {{days}} Tagen."
+    },
+    "dialog": {
+      "confirmation_title": "{{action}} Schutzmaßnahme",
+      "enable_description": "Bestätige, dass die Schutzmaßnahme bereit ist, bevor Du sie für alle privilegierten Personas aktivierst.",
+      "disable_description": "Das Deaktivieren dieses Steuerelements entfernt Echtzeit-Schutzmaßnahmen. Erfasse die Begründung für das Audit-Protokoll.",
+      "provide_context": "Biete Kontext für das Audit-Protokoll, damit wir Verwaltungsentscheidungen nachverfolgen können.",
+      "document_why_change_necessary": "Dokumentiere, warum diese Änderung notwendig ist, die erwarteten Auswirkungen und Abhilfeschritte.",
+      "confirm_enable_safeguard": "Bestätige, dass die Schutzmaßnahme bereit ist, bevor Du sie für alle privilegierten Personas aktivierst.",
+      "confirm_disable_control": "Das Deaktivieren dieses Steuerelements entfernt Echtzeit-Schutzmaßnahmen. Erfasse die Begründung für das Audit-Protokoll.",
+      "validation": {
+        "min_12_characters": "Bitte gib mindestens 12 Zeichen ein, damit die Begründung audit-fähig ist."
+      }
+    },
+    "taxonomy": {
+      "category": "Kategorie",
+      "mechanic": "Mechanik"
+    },
+    "hardcoded_strings": {
+      "unable_to_load_security_posture": "Sicherheitsstatus konnte nicht geladen werden",
+      "could_not_retrieve_governance_safeguards": "Wir konnten Verwaltungsschutzmaßnahmen nicht abrufen. Aktualisiere die Seite oder kontaktiere das Plattform-Engineering-Team.",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "critical": "KRITISCH",
+      "high": "HOCH",
+      "medium": "MITTEL",
+      "enforced": "Durchgesetzt",
+      "last_reviewed_by_next_review": "Zuletzt überprüft {{timeAgo}} von {{user}}. Nächste Überprüfung in {{days}} Tagen.",
+      "disable_control": "Steuerung deaktivieren",
+      "enable_control": "Steuerung aktivieren",
+      "investigating": "Untersuchend",
+      "mitigated": "Abgemildert",
+      "resolved": "Gelöst",
+      "all_clear": "Alles klar",
+      "no_unresolved_incidents_require_attention": "Keine ungelösten Vorfälle erfordern derzeit Aufmerksamkeit.",
+      "detected_resolved": "Erkannt {{detectedAt}}{{resolvedAt}}",
+      "effort": "Aufwand: {{effort}}",
+      "persona_impact": "Persona-Auswirkung: {{personaImpact}}",
+      "no_recent_privileged_changes_recorded": "Keine aktuellen privilegierten Änderungen wurden in diesem Zeitraum aufgezeichnet.",
+      "confirm_safeguard_ready_before_enabling": "Bestätige, dass die Schutzmaßnahme bereit ist, bevor Du sie für alle privilegierten Personas aktivierst.",
+      "disabling_control_removes_guardrails": "Das Deaktivieren dieses Steuerelements entfernt Echtzeit-Schutzmaßnahmen. Erfasse die Begründung für das Audit-Protokoll.",
+      "provide_context_for_audit_log": "Biete Kontext für das Audit-Protokoll, damit wir Verwaltungsentscheidungen nachverfolgen können.",
+      "document_why_change_necessary": "Dokumentiere, warum diese Änderung notwendig ist, die erwarteten Auswirkungen und Abhilfeschritte.",
+      "please_include_at_least_12_characters": "Bitte gib mindestens 12 Zeichen ein, damit die Begründung audit-fähig ist.",
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen"
+    }
+  },
+  "feature_flags": {
+    "console": {
+      "title": "Feature-Rollout-Konsole",
+      "description": "Verwalte lokale Overrides für Experimente und Persona-Vorschauen, ohne Produktionsumgebungsvariablen zu berühren.",
+      "curated_flags": {
+        "shared_inbox": {
+          "label": "Workspace Shared Inbox",
+          "description": "Schaltet die Shared-Inbox-Erfahrung für Player-, Ops-, GM- und Admin-Workspaces um."
+        },
+        "collaboration": {
+          "label": "Cross-Persona Collaboration Workspace",
+          "description": "Steuert den Zugriff auf den Collaboration-Workspace für rollenbasierte Dashboards."
+        }
+      },
+      "status": {
+        "not_set": "Nicht festgelegt",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "effective_state": "Effektiver Status:"
+      },
+      "override": {
+        "none": "Keine",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "clear_override": "Override entfernen"
+      },
+      "buttons": {
+        "enable": "Aktivieren",
+        "disable": "Deaktivieren",
+        "refresh": "Aktualisieren",
+        "add": "Hinzufügen",
+        "retry": "Erneut versuchen"
+      },
+      "placeholders": {
+        "add_flag_key": "Flag-Schlüssel hinzufügen"
+      },
+      "empty_state": {
+        "title": "Keine Feature-Flags gefunden",
+        "description": "Füge einen Flag-Schlüssel hinzu, um Overrides zu verwalten oder definiere Umgebungsvariablen mit VITE_FLAG_ Präfix."
+      },
+      "error": {
+        "title": "Feature-Flags nicht verfügbar",
+        "description": "Wir konnten das Plattform-Flag-Register nicht lesen.",
+        "custom_flag_description": "Benutzerdefinierter Flag-Override"
+      }
+    }
+  }
+}

@@ -213,6 +213,79 @@ Consider using GitHub Discussions or a project board to track planned components
 3. **Follow naming conventions** - PascalCase for components
 4. **Include TypeScript types** - Full type safety required
 5. **Test accessibility** - Use screen reader and keyboard
+6. **Use Real Strings**: Extract actual UI strings, not placeholders
+
+### Component File Structure
+
+```
+src/
+├── components/ui/      # Base shadcn/ui components
+│   ├── button.tsx
+│   ├── card.tsx
+│   ├── input.tsx
+│   └── README.md       # Component list
+└── components/         # Project-specific components
+│   ├── form-fields/
+│   └── ThemeToggle.tsx
+```
+
+### Translation Requirements
+
+When creating new components that display user-facing text:
+
+1. **Extract Real Strings**: Never use placeholder text
+2. **Use Translation Keys**: Wrap user-facing text in translation keys
+3. **Use Typed Hooks**: Import appropriate translation hook (e.g., `useSettingsTranslation`)
+4. **Test Multiple Languages**: Ensure translations work in all supported languages
+
+### Component with Translations Example
+
+```typescript
+import { useSettingsTranslation } from '~/hooks/useTypedTranslation';
+
+export const EventForm = () => {
+  const { t } = useSettingsTranslation();
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="space-y-4">
+        <ValidatedInput
+          label={t('settings.email.label')}
+          error={errors.email}
+          required
+        />
+        <ValidatedInput
+          label={t('profile.display_name.label')}
+          placeholder={t('profile.display_name.placeholder')}
+        />
+        <FormSubmitButton isLoading={isSubmitting}>
+          {t('settings.save')}
+        </FormSubmitButton>
+      </div>
+    </form>
+  );
+};
+```
+
+### Before Committing New Components
+
+1. **Check Translation Keys**: Ensure all user-facing text has translation keys
+2. **Check Types**: Run `pnpm check-types` to ensure type safety
+3. **Test Accessibility**: Verify screen reader compatibility
+4. **Update Documentation**: Include translation patterns in component documentation
+5. **Test Multiple Languages**: Verify translations work in en, de, pl
+
+This approach ensures all components maintain accessibility and internationalization standards.
+
+## Development Guidelines
+
+### Creating New Components
+
+1. **Check existing components** first - don't recreate what exists
+2. **Start with shadcn/ui** - Use as foundation when possible
+3. **Follow naming conventions** - PascalCase for components
+4. **Include TypeScript types** - Full type safety required
+5. **Test accessibility** - Use screen reader and keyboard
 
 ### Component File Structure
 

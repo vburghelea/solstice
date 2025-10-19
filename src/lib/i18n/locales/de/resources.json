@@ -1,0 +1,974 @@
+{
+  "hero": {
+    "eyebrow": "Ressourcen",
+    "title": "Leite unvergessliche Tischspiel-Programme",
+    "subtitle": "Toolkits, Trainingspläne und Zertifizierungspfade, kuratiert vom Roundup Games Entwicklungsteam.",
+    "cta_text": "Nach Kategorie browsen",
+    "secondary_cta": "Maßgeschneiderte Unterstützung anfordern"
+  },
+  "sections": {
+    "club_toolkit": {
+      "title": "Community-Starter-Toolkit",
+      "description": "Satzungen, Budgetplaner, Sponsoren-Präsentationen und Onboarding-E-Mails, zugeschnitten auf Tischspielvereine und Brettspiel-Cafés.",
+      "actions": {
+        "download_toolkit": "Toolkit herunterladen",
+        "view_charter": "Satzungsvorlage ansehen"
+      }
+    },
+    "training": {
+      "title": "Sitzungs-Gestaltungsbibliothek",
+      "description": "Abenteuer-Ideen, Kampagnen-Handbücher und Brettspiel-Rotationspläne, kuratiert von erfahrenen Game Mastern und Event-Veranstaltern.",
+      "actions": {
+        "browse_plans": "Sitzungspläne durchsuchen",
+        "watch_clinics": "Moderationskliniken ansehen"
+      }
+    },
+    "safe_sport": {
+      "title": "Sicherheits- & Barrierefreiheits-Ressourcen",
+      "description": "Richtlinien, Sicherheitseinweisungen und Inklusionsleitfäden, abgestimmt auf die Community-Standards von Roundup Games.",
+      "actions": {
+        "download_policies": "Richtlinien herunterladen",
+        "report_concern": "Ein Bedenken melden"
+      }
+    }
+  },
+  "certification": {
+    "title": "Zertifizierung & Bildungswege",
+    "subtitle": "Unser Learning-Management-System hält Deine Qualifikationen aktuell. Schließe die Online-Module ab und buche praktische Bewertungen bei provincialen Partnern.",
+    "tracks": {
+      "gm_pathway": {
+        "title": "Game Master Weg",
+        "description": "Selbstgesteuerte Module zu Best Practices für Session Zero, Sicherheitstools und Kampagnen-Pacing – perfekt für Storyteller, die langfristige Spiele leiten.",
+        "cta": "GM-Training starten"
+      },
+      "host_pathway": {
+        "title": "Community-Veranstalter Weg",
+        "description": "Workshops zu Event-Abläufen, Tisch-Zuweisungen und der Begrüßung neuer Spieler – ideal für Café-Manager und Meetup-Organisatoren, die offene Spielabende veranstalten.",
+        "cta": "Für Veranstalter-Labs anmelden"
+      },
+      "operations_pathway": {
+        "title": "Event-Operations Weg",
+        "description": "Schritt-für-Schritt-Anleitungen für Turnierplanung, Koordination von Freiwilligen und Implementierung optimierter Check-in-Systeme.",
+        "cta": "Operations-Kit herunterladen"
+      }
+    }
+  },
+  "consultation": {
+    "eyebrow": "Brauchst Du etwas Maßgeschneidertes?",
+    "title": "Entwickler-Stunden für Vereine",
+    "description": "Buche eine Beratung mit unserem Team, um Förderanträge, Event-Bewerbungen oder langfristige Athleten-Entwicklungspläne zu überprüfen. Wir arbeiten mit Dir zusammen, um Ressourcen und Verbindungen für Deine Region anzupassen.",
+    "actions": {
+      "schedule_meeting": "Ein Treffen vereinbaren",
+      "connect_hubs": "Mit regionalen Hub verbinden"
+    },
+    "office_hours": {
+      "title": "Sprechstunden-Menü",
+      "services": {
+        "funding_strategy": "Förderstrategie-Optimierung",
+        "operations_audit": "Event-Operations-Audit",
+        "volunteer_mapping": "Freiwilligen-Journey-Mapping",
+        "conduct_review": "Community-Verhaltenskodex-Überprüfung"
+      }
+    }
+  },
+  "charter_template": {
+    "hero": {
+      "eyebrow": "Vereins-Satzungsvorlage",
+      "title": "Anpassbare Governance für Tischspiel-Communitys",
+      "subtitle": "Nutze unsere lebendige Satzung, um Erwartungen zu formalisieren, Deine gemeinsame Identität zu feiern und Neuzugänge mit Klarheit zu begrüßen.",
+      "cta_text": "Vorlage kopieren",
+      "secondary_cta": "Moderationsunterstützung anfordern"
+    },
+    "why_works": {
+      "eyebrow": "Warum diese Satzung funktioniert",
+      "title": "Transparente, inklusive Richtlinien für Vereine jeder Größe",
+      "description": "Entwickelt zusammen mit Administratoren, Bibliothekaren und Café-Besitzern, hält diese Satzung die Struktur zugänglich. Jeder Klausel kommen Moderationshinweise bei, um Dir bei der Einführung bei Mitgliedern zu helfen, plus optionale Änderungen für Schulen und Jugendorganisationen."
+    },
+    "sections": {
+      "mission_values": {
+        "title": "Mission & Werte",
+        "description": "Verankere Deinen Storytelling-Fokus und Deine Community-Versprechen, damit jeder weiß, warum dieser Raum existiert.",
+        "highlights": [
+          "Zweckerklärung zugeschnitten auf Tisch- und Brettspiele",
+          "Verpflichtung zu Sicherheit, Barrierefreiheit und Anti-Belästigung",
+          "Inklusionssatzung mit Sprache für geschlechtsbejahende und neurodivergente Spieler"
+        ]
+      },
+      "membership_governance": {
+        "title": "Mitgliedschaft & Governance",
+        "description": "Kläre, wer beitreten kann, wie Entscheidungen getroffen werden und die Wege zu Führungsrollen.",
+        "highlights": [
+          "Mitgliedsstufen mit Vorteilen und Erwartungen",
+          "Abstimmungsstruktur und Jahres-Generalversammlungs-Checkliste",
+          "Konfliktlösungsleiter und Eskalationszeitpläne"
+        ]
+      },
+      "programming_safety": {
+        "title": "Programmierung & Sicherheit",
+        "description": "Skizziere, wie Events vorgeschlagen, genehmigt und bewertet werden, wobei das Wohlbefinden der Spieler im Vordergrund steht.",
+        "highlights": [
+          "Sitzungs-Pitch-Formular und Auswahlrubrik",
+          "Tisch-Moderatorrollen, Verantwortlichkeiten und Trainingsmodule",
+          "Vorfall-Meldungs-Workflow mit Antwort-Benchmarks"
+        ]
+      }
+    },
+    "facilitation": {
+      "eyebrow": "Moderationshinweise",
+      "title": "Veranstalte eine Satzung-Review-Workshop",
+      "description": "Bringe Mitarbeiter, Freiwillige und Community-Mitglieder in den Entwurfsprozess ein. Unser Moderationsleitfaden führt Dich durch einen 90-minütigen Workshop zu Werten, Mitgliedsabläufen und Verantwortlichkeit. Nutze die enthaltene Folienvorlage und Breakout-Prompts, um gemeinsam Sprache zu schaffen, die Deinen Campus oder Deine Region widerspiegelt.",
+      "workshop_outline": {
+        "title": "Workshop-Abriß",
+        "items": [
+          "Eisbrecher: \"Unvergessliche Momente am Tisch\" Runde",
+          "Satzungsdurchgang mit Annotationsaktivität",
+          "Kleingruppen-Bearbeitung mit Szenariokarten",
+          "Zustimmungsbasierte Ratifizierung und nächste Schritte"
+        ]
+      },
+      "toolkit": {
+        "title": "Moderations-Toolkit",
+        "description": "Enthält annotiertes Skript, editierbare Folien und Evaluationsformular, um Feedback von Teilnehmern zu sammeln.",
+        "button": "Workshop-Kit herunterladen"
+      },
+      "scenario_cards": {
+        "title": "Szenariokarten",
+        "description": "Dreißig echte Tischspiel-Dilemmata, um Deine Satzungssprache und Eskalationsverfahren zu stresstesten.",
+        "button": "PDF-Kartenstapel herunterladen"
+      }
+    },
+    "downloads": {
+      "title": "Wähle Dein Format",
+      "formats": {
+        "docx": {
+          "title": "Editierbares Dokument (DOCX)",
+          "description": "Am besten für Ausschüsse, die in Word oder Google Docs entwerfen.",
+          "button": "DOCX herunterladen"
+        },
+        "pdf": {
+          "title": "Druckbare Version (PDF)",
+          "description": "Bereit zum Teilen Dokument mit ausfüllbaren Feldern zur Abnahme.",
+          "button": "PDF herunterladen"
+        },
+        "markdown": {
+          "title": "Leichtgewichtige Verfassung (Markdown)",
+          "description": "Nutzen mit statischen Sites, Git-basierten Communitys oder Notion-Arbeitsbereichen.",
+          "button": "Markdown kopieren"
+        }
+      },
+      "custom_clause": {
+        "title": "Brauchst Du eine maßgeschneiderte Klausel?",
+        "description": "Unsere Politik-Spezialisten können helfen, Sprache für Jugendprogramme, öffentliche Einrichtungen oder mehrsprachige Kapitel anzupassen.",
+        "button": "Mit Policy-Team verbinden"
+      }
+    }
+  },
+  "toolkit": {
+    "hero": {
+      "eyebrow": "Community-Starter-Toolkit",
+      "title": "Starte Deinen Tischspielverein mit Zuversicht",
+      "subtitle": "Unser Toolkit destilliert die Best Practices aus florierenden Roundup Games Kapiteln, damit Du in Wochen, nicht Monaten, Schwung aufbauen kannst.",
+      "cta_text": "Auf das Toolkit zugreifen",
+      "secondary_cta": "Mit einem Community-Coach sprechen"
+    },
+    "whats_inside": {
+      "eyebrow": "Was ist drin",
+      "title": "Alles, was Du von Tag Null an bis zu Deinem ersten großen Event brauchst",
+      "description": "Ob Du einen Campusverein, ein Bibliotheks-nach-hours-Programm oder eine Brettspiel-Café-Liga startest, dieses Toolkit hält die Planung bodenständig und kollaborativ. Arbeite dich durch die Playbooks in Reihenfolge oder springe direkt zu den Vorlagen, die zu Deinem nächsten Meilenstein passen."
+    },
+    "core_documents": {
+      "title": "Kern-Dokumente",
+      "items": [
+        "Editierbare Verfassung und Betriebssatzung",
+        "Verhaltenskodex mit Vorfall-Reaktionsworkflow",
+        "Freiwilligen- und Game Master-Vereinbarungen",
+        "Barrierefreie Mitgliedsantrag und Verzichtformulare"
+      ]
+    },
+    "planning_tools": {
+      "title": "Planungs-Tools",
+      "items": [
+        "Budget- und Förderprognose-Tabellenkalkulation mit Cashflow-Szenarien",
+        "Sponsor-Outreach-Sequenzen und Pitch-Deck-Folien",
+        "Event-kritischer-Pfad-Vorlage mit Rollenzuweisungen",
+        "Risikobewertung und Sicherheits-Checkliste zugeschnitten auf Tischspiele"
+      ]
+    },
+    "readiness_blocks": {
+      "founding_documents": {
+        "title": "Gründungsdokumente",
+        "description": "Passe eine Satzung, einen Verhaltenskodex und eine Freiwilligenvereinbarung an, die die Werte und den Ton Deiner Community widerspiegeln."
+      },
+      "financial_runway": {
+        "title": "Finanzielle Startbahn",
+        "description": "Budgetvorlagen, Cashflow-Tracker und Muster-Sponsor-Decks helfen Dir, Saisonen mit Zuversicht zu prognostizieren."
+      },
+      "people_operations": {
+        "title": "Personal-Operationen",
+        "description": "Rollenbeschreibungen, Onboarding-Checklisten und Besprechungsagenden halten Mitarbeiter, GMs und Freiwillige auf Kurs."
+      },
+      "quality_standards": {
+        "title": "Qualitätsstandards",
+        "description": "Sitzungs-Rubriken und Feedback-Schleifen stellen sicher, dass jedes Programm das Roundup Games Siegel der Fürsorge erfüllt."
+      }
+    },
+    "how_to_use": {
+      "eyebrow": "Wie man das Toolkit verwendet",
+      "title": "Ein geführter Sprint, um Community-Infrastruktur aufzubauen",
+      "description": "Folge unserem 6-wöchigen Launch-Roadmap oder passe die Module an Deinen Zeitplan an. Jedes Kapitel endet mit Reflexions-Prompts, damit Dein Kernteam Fortschritt bewerten und Blocker frühzeitig aufdecken kann."
+    },
+    "phases": {
+      "weeks_1_2": {
+        "title": "Wochen 1-2",
+        "items": [
+          "Community-Werte und inklusive Spielrichtlinien definieren",
+          "Einen Meeting-Rhythmus und Entscheidungsmodell festlegen",
+          "Gründungsrollen und Kommunikationskanäle bestätigen"
+        ]
+      },
+      "weeks_3_4": {
+        "title": "Wochen 3-4",
+        "items": [
+          "Förderquellen und Sponsoren-Prospekte kartieren",
+          "Deine erste Flaggschiff-Event-Agenda prototypisieren",
+          "Onboarding-Reisen für Spieler und Freiwillige einrichten"
+        ]
+      },
+      "weeks_5_6": {
+        "title": "Wochen 5-6",
+        "items": [
+          "Sicherheitsübungen und Debriefing-Rituale testen",
+          "Dein nächstes Quartal an Programmierung planen",
+          "Pilot-Feedback sammeln und die Satzung iterieren"
+        ]
+      }
+    },
+    "downloads": {
+      "title": "Formate herunterladen",
+      "description": "Bevorzugst Du Offline-Arbeit? Holen Dir das editierbare Bundle oder einzelne Vorlagen unten. Jede Datei bleibt synchron mit den neuesten Governance-, Barrierefreiheits- und Sicherheitsanforderungen vom Roundup Games Entwicklungsteam.",
+      "formats": {
+        "zip": {
+          "title": "Komplettes Toolkit (ZIP)",
+          "description": "Alle Satzungen, Tabellenkalkulationen und Politik-Vorlagen in einem Archiv.",
+          "button": "ZIP herunterladen"
+        },
+        "docx": {
+          "title": "Satzung & Governance (DOCX)",
+          "description": "Editierbare Verfassung, Verhaltenskodex und Freiwilligenvereinbarung.",
+          "button": "DOCX herunterladen"
+        },
+        "sheets": {
+          "title": "Budgets & Sponsoren (Sheets)",
+          "description": "Live-Tabellenkalkulation für Cashflow, Förderungen und wiederkehrende Ausgaben.",
+          "button": "Tabellenkalkulation kopieren"
+        }
+      },
+      "support": {
+        "description": "Brauchst Du Hilfe bei der Anpassung der Materialien? E-Mail {{email}}, um eine Kollaborationssitzung mit unserem Community-Erfolgsteam anzufordern.",
+        "email": "development@roundup.games"
+      }
+    }
+  },
+  "safety_policies": {
+    "hero": {
+      "eyebrow": "Sicherheits- & Barrierefreiheits-Richtlinien",
+      "title": "Fühle Dich bei jeder Roundup-Veranstaltung geschützt",
+      "subtitle": "Wir gestalten Richtlinien mit Community-Mitgliedern, Sicherheits-Experten und Rechtsberatern, damit Deine Geschichten in sicheren Räumen blühen können.",
+      "cta_text": "Richtlinien herunterladen",
+      "secondary_cta": "Ein dringendes Bedenken melden"
+    },
+    "approach": {
+      "eyebrow": "Unser Ansatz",
+      "title": "Richtlinien, die mit Überlebenden, Anwälten und Storytellern entwickelt wurden",
+      "description": "Wir schaffen Sicherheitsstandards gemeinsam mit traumasensiblen Praktikern und marginalisierten Community-Mitgliedern. Das Ergebnis ist ein lebendiger Rahmen, der Schaden reduziert, Zustimmung priorisiert und Daten über jedes Kapitel hinweg schützt."
+    },
+    "pillars": {
+      "people_first": {
+        "title": "Menschenorientierte Schutzmaßnahmen",
+        "description": "Geschulte Community-Verwalter, geprüfte Freiwillige und klare Eskalationsleiter halten jeden Tisch unterstützt."
+      },
+      "consent_driven": {
+        "title": "Zustimmungsbasiertes Spiel",
+        "description": "Sitzungssicherheitstools, Vor-Event-Briefings und Debriefing-Rituale helfen Teilnehmern, ihre Bedürfnisse in Echtzeit zu vertreten."
+      },
+      "data_stewardship": {
+        "title": "Daten-Verwaltung",
+        "description": "Wir minimieren Datensammlung, verschlüsseln sensible Aufzeichnungen und halten transparente Aufbewahrungspläne für alle Programme."
+      }
+    },
+    "policy_library": {
+      "eyebrow": "Richtlinien-Bibliothek",
+      "title": "Jede Phase der Teilnehmer-Reise abdecken",
+      "description": "Die Bibliothek ist nach Lebenszyklus organisiert – vor, während und nach Events – damit Du schnell die Anleitung finden kannst, die Du brauchst. Jede Richtlinie enthält Trainings-Checklisten, Implementierungstipps und Metriken zur Überprüfung der Wirksamkeit.",
+      "lifecycle": {
+        "before": {
+          "title": "Vor dem Event",
+          "items": [
+            "Veranstaltungsrisiko-Bewertungen und Barrierefreiheits-Audits",
+            "Freiwilligen-Screening und Referenzprüfungen",
+            "Registrierungsdaten-Minimierungsrichtlinien"
+          ]
+        },
+        "during": {
+          "title": "Während des Events",
+          "items": [
+            "Sicherheits-Briefing-Skripte und Rot/Gelb-Eskalationsmatrix",
+            "Vorfall-Reaktionsrollen mit Rufbereitschaftsabdeckung",
+            "Echtzeit-Barrierefreiheits-Anpassungs-Checkliste"
+          ]
+        },
+        "after": {
+          "title": "Nach dem Event",
+          "items": [
+            "Nachfass-Protokolle und Betreuungsverweise",
+            "Daten-Aufbewahrungspläne abgestimmt auf Datenschutzrecht",
+            "Ursachenanalyse-Vorlage für Vorfall-Reviews"
+          ]
+        },
+        "digital": {
+          "title": "Digitales Portal",
+          "items": [
+            "Plattform-Sicherheits-Haltung und Verschlüsselungsstandards",
+            "Daten-Betreff-Anfrage-Workflow",
+            "Lieferanten-Due-Diligence-Fragebogen"
+          ]
+        }
+      },
+      "timeline": {
+        "title": "Jährlicher Überprüfungszeitplan",
+        "description": "Richtlinien durchlaufen dreijährliche Überprüfungen mit externen Beratern, die auf Schutzmaßnahmen, Cybersicherheit und Disability Justice spezialisiert sind. Wir veröffentlichen ein Änderungsprotokoll und laden zur öffentlichen Kommentierung vor der Ratifizierung ein.",
+        "schedule": [
+          "Januar: Legal- und Compliance-Audit",
+          "Mai: Community-Townhall & Umfrage",
+          "September: Barrierefreiheit und Datensicherheit-Refresh"
+        ]
+      },
+      "transparency": {
+        "title": "Transparenzberichte",
+        "description": "Halbjährliche Berichte fassen Vorfall-Metriken, Auflösungs-Zeitpläne und Verbesserungsprojekte zusammen. Abonniere, um Updates zu erhalten, sobald sie veröffentlicht werden.",
+        "button": "Der Sicherheits-Briefing-Liste beitreten"
+      }
+    },
+    "downloads": {
+      "title": "Richtlinien-Pakete herunterladen",
+      "formats": {
+        "handbook": {
+          "title": "Community-Sicherheits-Handbuch",
+          "description": "Vollständige Richtlinien für persönliche Programme, einschließlich Moderatorskripte.",
+          "button": "PDF herunterladen"
+        },
+        "data_protection": {
+          "title": "Datenschutz-Nachtrag",
+          "description": "Datenschutzrichtlinie, Aufbewahrungspläne und Vorfall-Benachrichtigungsvorlagen.",
+          "button": "PDF herunterladen"
+        },
+        "accessibility": {
+          "title": "Barrierefreiheits-Playbook",
+          "description": "Richtlinien für sensorenfreundliche, mobilitätsbewusste und mehrsprachige Events.",
+          "button": "PDF herunterladen"
+        }
+      },
+      "custom_policies": {
+        "title": "Brauchst Du eine unterzeichnete Richtlinie für Deine Veranstaltung?",
+        "description": "Unser Rechtsteam kann venue-spezifische Vereinbarungen oder Compliance-Bestätigungen gemeinsam erstellen.",
+        "button": "Mit Legal koordinieren"
+      }
+    },
+    "questions": {
+      "title": "Fragen oder Feedback?",
+      "description": "Wende Dich an safety@roundup.games mit Richtlinien-Updates, Barrierefreiheits-Anfragen oder klärenden Fragen. Wir antworten innerhalb von 48 Stunden und können Folgegespräche bei Bedarf planen.",
+      "emergency": {
+        "title": "Notfallkontakte",
+        "description": "Für dringende Vorfälle während eines Events rufe die 24/7-Hotline an, die mit registrierten Koordinatoren geteilt wird. Für digitale Sicherheitsbedenken E-Mail security@roundup.games, um unser Rufbereitschafts-Response-Team zu erreichen."
+      }
+    }
+  },
+  "report_concern": {
+    "hero": {
+      "eyebrow": "Ein Bedenken melden",
+      "title": "Wir sind da, um zu helfen – Tag und Nacht",
+      "subtitle": "Roundup Games nimmt jede Meldung ernst. Wende Dich an uns, damit wir unsere Community sicher, unterstützt und informiert halten können.",
+      "cta_text": "Meldeschritte ansehen",
+      "secondary_cta": "Sicherheitsrichtlinien besuchen"
+    },
+    "reporting_steps": {
+      "eyebrow": "Wie man meldet",
+      "title": "Wir reagieren schnell und halten Dich informiert",
+      "description": "Folge diesen Schritten, damit wir Teilnehmer schützen und Vorfälle mit Fürsorge lösen können. Unser Team wird Deine Meldung bestätigen, nächste Schritte skizzieren und Updates teilen, bis die Angelegenheit geklärt ist.",
+      "steps": [
+        {
+          "title": "Sorge dafür, dass jeder sicher ist",
+          "description": "Wenn jemand in unmittelbarer Gefahr ist, kontaktiere zuerst lokale Notdienste. Unser Response-Team wird Folge-Support koordinieren, sobald die Situation stabil ist."
+        },
+        {
+          "title": "Sammle wichtige Details",
+          "description": "Schreibe auf, was passiert ist, wann es geschah, wer beteiligt war und welche sofortigen Maßnahmen ergriffen wurden. Füge Links, Screenshots oder Fotos bei, falls relevant."
+        },
+        {
+          "title": "Erreiche das richtige Team",
+          "description": "Wähle unten den Meldekanal, der zum Bedenken passt. Wenn Du unsicher bist, kontaktiere die Hotline und wir werden die Anfrage weiterleiten."
+        }
+      ]
+    },
+    "channels": {
+      "eyebrow": "Wähle einen Kanal",
+      "title": "Spezialisierte Teams bereit zum Reagieren",
+      "description": "Nutze die Option, die am besten zur Situation passt, damit wir die richtigen Responder aktivieren können. Wenn Du anonyme Meldung bevorzugst, wähle \"Conduct Response Team\" und gib diesen Wunsch im Formular an.",
+      "contact_label": "Kontakt",
+      "urgent_safety": {
+        "title": "Dringendes Sicherheitsbedenken",
+        "description": "Körperlicher Schaden, Belästigung oder schwere emotionale Belastung, die gerade jetzt bei einem Event stattfindet.",
+        "contact": "24/7 Sicherheits-Hotline",
+        "action_label": "Rufe 1-855-ROUNDUP an",
+        "notes": "Verfügbar für registrierte Koordinatoren und Veranstaltungsmanager. Dolmetscher und Echtzeit-Untertitelung auf Anfrage verfügbar."
+      },
+      "conduct_violation": {
+        "title": "Verhaltenskodex-Verletzung",
+        "description": "Meldungen, die Belästigung, Diskriminierung, Mobbing oder wiederholtes störendes Verhalten betreffen.",
+        "contact": "Conduct Response Team",
+        "action_label": "E-Mail conduct@roundup.games",
+        "notes": "Erwarte eine Bestätigung innerhalb von 12 Stunden und einen vollständigen Folgeplan innerhalb von 48 Stunden."
+      },
+      "data_issue": {
+        "title": "Daten- oder Plattform-Problem",
+        "description": "Verdächtige Kompromittierung des Kontos, Datenschutzbedenken oder Fehler, die sensible Informationen aussetzen.",
+        "contact": "Sicherheits- & Plattform-Team",
+        "action_label": "E-Mail security@roundup.games",
+        "notes": "Kritische Schwachstellen werden innerhalb von zwei Stunden priorisiert. Wir koordinieren verantwortungsvolle Offenlegung und Status-Updates."
+      },
+      "accessibility_request": {
+        "title": "Barrierefreiheits-Anfrage",
+        "description": "Unterstützungen, Interpretationsdienste oder Barrierenentfernung für bevorstehende Programme.",
+        "contact": "Barrierefreiheits-Schalter",
+        "action_label": "E-Mail accessibility@roundup.games",
+        "notes": "Wir werden innerhalb eines Werktages mit nächsten Schritten oder Planungsoptionen antworten."
+      }
+    },
+    "what_to_expect": {
+      "eyebrow": "Nach Deiner Meldung",
+      "title": "Was Du von unserem Response-Team erwarten kannst",
+      "expectations": [
+        "Bestätigungs-Empfang mit zugewiesenem Responder innerhalb von 12 Stunden",
+        "Maßgeschneiderter Sicherheitsplan und Zeitplan für nächste Updates",
+        "Optionen für wiederherstellende Gespräche oder formelle Untersuchungen",
+        "Abschluss-Zusammenfassung mit Folge-Ressourcen und zukünftigen Präventionsschritten"
+      ],
+      "live_support": {
+        "title": "Bevorzugst Du Live-Gespräche?",
+        "description": "Plane einen Anruf mit einem Mitglied des Community-Care-Teams. Wir können zusätzliche Spezialisten je nach Art Deines Bedenkkens hinzuziehen.",
+        "action_label": "Ein Pflege-Gespräch buchen"
+      },
+      "anonymous_note": "Anonyme Meldungen werden mit gleicher Dringlichkeit untersucht. Wir teilen, welche Maßnahmen ergriffen wurden, über ein öffentliches Update, wenn wir nicht direkt folgen können."
+    },
+    "support_resources": {
+      "title": "Unterstützungs-Ressourcen",
+      "description": "Wir arbeiten mit lokalen Organisationen zusammen, die auf psychische Gesundheit, Opferdienste und wiederherstellende Prozesse spezialisiert sind. Wenn Du zusätzliche Betreuung brauchst, lass es uns wissen und wir stellen Dir Verbindungen her.",
+      "resources": [
+        {
+          "title": "Psychische Gesundheit Warmline",
+          "description": "Peer-Support für Stress, Burnout und Verarbeitung schwieriger Sitzungen.",
+          "action_label": "Rufe 1-888-555-2222 an"
+        },
+        {
+          "title": "Wiederherstellende Kreis-Moderatoren",
+          "description": "Unabhängige Praktiker, die in traumasensiblen, community-geführten Heilung geschult sind.",
+          "action_label": "Überweisung anfordern"
+        },
+        {
+          "title": "Digitale Sicherheits-Klinik",
+          "description": "Sicherheits-Freiwillige, die helfen, Geräte und Konten nach Vorfällen zu sichern.",
+          "action_label": "Einen Termin vereinbaren"
+        }
+      ]
+    }
+  },
+  "community_host_pathway": {
+    "hero": {
+      "eyebrow": "Community-Veranstalter Weg",
+      "title": "Lasse Treffs wachsen, die sich wie zu Hause fühlen",
+      "subtitle": "Training für Event-Leads, Café-Teams und Freiwillige, die Räume in unvergessliche Tischspiel-Ziele verwandeln.",
+      "cta_text": "Für die nächste Kohorte bewerben",
+      "secondary_cta": "Einen zertifizierten Veranstalter einstellen"
+    },
+    "curriculum": {
+      "eyebrow": "Lehrplan-Tracks",
+      "title": "Baue Gastfreundschaft, Logistik und Wachstums-Superkräfte auf",
+      "description": "Mische Live-Workshops mit Schicht-Schatten-Einsätzen bei Flaggschiff-Roundup-Veranstaltungen. Veranstalter verlassen sich mit wiederholbaren Systemen, Feedback-Frameworks und einem Netzwerk von Gleichgesinnten, um Playbooks zu tauschen.",
+      "tracks": [
+        {
+          "title": "Gastfreundschaft & Inklusion",
+          "focus": "Gestaltung von Ankünften, Orientierungen und Tisch-Zuweisungen, die jeden Besucher vom ersten Hallo an willkommen heißen.",
+          "highlights": [
+            "Front-of-House-Rituale und sensorenfreundliche Beschilderung",
+            "Pronomen-Best Practices und kulturelle Kompetenz-Drills",
+            "Deeskalations-Playbook für gängige Veranstaltungs-Szenarien"
+          ]
+        },
+        {
+          "title": "Operationale Exzellenz",
+          "focus": "Meistere Event-Logistik – von Ausrüstungsvorbereitung und Freiwilligen-Management bis zu Live-Fehlerbehebung und Schließprozeduren.",
+          "highlights": [
+            "Run-of-Show-Vorlagen mit Kontingenz-Auslösern",
+            "Inventur und Tisch-Layout-Kartierung",
+            "Vorfall-Meldung und Übergabe-Protokolle"
+          ]
+        },
+        {
+          "title": "Community-Wachstum",
+          "focus": "Kultiviere Mitglieds-Momentum mit Outreach, Partnerschaften und Post-Event-Storytelling.",
+          "highlights": [
+            "Social-Media- und Newsletter-Inhaltskalender",
+            "Feedback-Schleifen-Design und Retention-Benchmarks",
+            "Partnerschafts-Toolkit für Cafés, Bibliotheken und Schulen"
+          ]
+        }
+      ]
+    },
+    "practicum": {
+      "eyebrow": "Lerne durch Handeln",
+      "title": "Schatten-Schichten und Practicum-Unterstützung",
+      "description": "Jeder Teilnehmer absolviert zwei betreute Schichten bei vielbesuchten Events. Du übst Einlass, Tisch-Übergänge und Schließungen mit Feedback von Senior-Veranstaltern und Community-Managern.",
+      "checklist_title": "Practicum-Checkliste",
+      "checklist_items": [
+        "Barrierefreiheits-Rundgang und Sensorik-Kalibrierung",
+        "Tisch-Wechsel-Management und Wartelisten-Triage",
+        "Spieler-Konflikt-Mediation mit wiederherstellenden Optionen"
+      ],
+      "toolkit_title": "Toolkit-Downloads",
+      "toolkit_description": "Enthält Grundriss-Vorlagen, Checklisten-Poster-Sets und Post-Event-Umfrage-Automatisierungen.",
+      "toolkit_button": "ZIP herunterladen",
+      "certifications_title": "Optionale Zertifizierungen",
+      "certifications_description": "Add-on-Workshops decken Lebensmittelhandhabung, Erste Hilfe und inklusive Programmierung für Jugendliche oder Senioren ab."
+    },
+    "playbooks": {
+      "title": "Playbooks & Vorlagen",
+      "opening_night": {
+        "title": "Eröffnungsabend-Checkliste",
+        "description": "Schritt-für-Schritt Run-of-Show für Erstteilnehmer.",
+        "button": "PDF herunterladen"
+      },
+      "volunteer_matrix": {
+        "title": "Freiwilligen-Zeitplan-Matrix",
+        "description": "Dynamische Tabellenkalkulation für Schichtzuweisungen und Erinnerungs-Automatisierungen.",
+        "button": "XLSX herunterladen"
+      },
+      "retention_kit": {
+        "title": "Retention-Kampagnen-Kit",
+        "description": "E-Mail-Drips, Social-Captions und Highlight-Reels, um Spieler zurückzuholen.",
+        "button": "ZIP herunterladen"
+      }
+    },
+    "application": {
+      "eyebrow": "Bewerbungsprozess",
+      "title": "Rollende Aufnahmen mit vierteljährlichen Startterminen",
+      "description": "Reiche Deine Bewerbung ein, um der nächsten Kohorte beizutreten. Wir priorisieren Teams, die marginale Spieler bedienen, ländliche Regionen und neue Venue-Launches.",
+      "process_items": [
+        "Virtuelle Info-Sitzungen am ersten Dienstag jedes Monats",
+        "Bewerbungs-Überprüfung innerhalb von fünf Werktagen",
+        "Gruppeninterviews konzentriert auf Szenarien-Planung",
+        "Stipendien und gleitende Skalierungspreise verfügbar"
+      ],
+      "action_button": "Bewerbungsanruf starten",
+      "maintenance_title": "Zertifizierungs-Instandhaltung",
+      "maintenance_items": [
+        "CPR/Erste Hilfe alle zwei Jahre erneuern",
+        "Zwei Micro-Kurse aus der Moderations-Klinik-Bibliothek absolvieren",
+        "Vierteljährliche Event-Metriken und Community-Geschichten einreichen"
+      ],
+      "contact_prompt": "Programmfragen? E-Mail",
+      "contact_email": "events@roundup.games",
+      "graduate_benefits": "Absolventen erhalten ein digitales Abzeichen und Platzierungs-Unterstützung mit verbundenen Cafés, Bibliotheken und Convention-Partnern in ganz Kanada."
+    }
+  },
+  "event_operations_kit": {
+    "hero": {
+      "eyebrow": "Event-Operations-Kit",
+      "title": "Leite nahtlose Tischspiel-Events, Turniere und Festivals",
+      "subtitle": "Operationale Blaupausen, die vom Roundup Games Events-Team getestet wurden, um Dir zu helfen, sichere, unvergessliche und profitable Treffs zu liefern.",
+      "cta_text": "Das Kit herunterladen",
+      "secondary_cta": "Eine Ops-Beratung buchen"
+    },
+    "operating_system": {
+      "eyebrow": "Betriebssystem",
+      "title": "Vorlagen, die von Pop-ups zu mehrtägigen Conventions skalieren",
+      "description": "Wähle die Module, die Du brauchst, oder setze das gesamte Kit ein. Wir fügen editierbare Tabellenkalkulationen, LiveOps-Dashboards und Moderations-Checklisten ein, damit Dein Team in Echtzeit zusammenarbeiten kann.",
+      "phases": [
+        {
+          "title": "Planung & Budgetierung",
+          "description": "Kapazitätsmodelle, Personalplanungs-Raster und Cashflow-Vorlagen halten Dich in Kontrolle, bevor überhaupt Tickets veröffentlicht werden.",
+          "bullets": [
+            "Umsatz-Szenarien mit Sponsor- und Merch-Add-ons",
+            "Freiwilligen- und Auftragnehmer-Personalkalkulatoren",
+            "Venue-Vergleichs-Arbeitsblatt und Risikobewertung"
+          ]
+        },
+        {
+          "title": "Event-Durchführung",
+          "description": "Minuten-für-Minuten Run-of-Show, Kommunikations-Bäume und Krisenreaktionskarten sorgen für reibungslose Lieferung am Event-Tag",
+          "bullets": [
+            "Check-in-Ablauf mit QR-Codes und Backup-Listen",
+            "Funk- und Nachrichtenprotokolle für Floor-Leads",
+            "Vorfall-Eskalationsmatrix und Dokumentations-Kit"
+          ]
+        },
+        {
+          "title": "Post-Event-Verpackung",
+          "description": "Debrief-Vorlagen, Metrik-Dashboards und Outreach-Skripte helfen Dir, Momentum in zukünftiges Wachstum umzuwandeln.",
+          "bullets": [
+            "Stakeholder-Bericht-Abriß mit Finanz-Zusammenfassung",
+            "Freiwilligen-Dank-Automatisierungs-Sequenzen",
+            "Spieler-Umfrage-Analyse und Retention-Planer"
+          ]
+        }
+      ]
+    },
+    "liveops": {
+      "eyebrow": "LiveOps-Dashboard",
+      "title": "Echtzeitdaten halten Operationen ruhig und proaktiv",
+      "description": "Richte unser verbundenes Tabellenkalkulations-Dashboard ein, um Teilnahme, Tisch-Belegung, Freiwilligen-Zuweisungen und Vorfall-Protokolle zu überwachen. Integriere mit unseren Formularen oder schließe Deine eigenen Datenquellen an.",
+      "widgets_title": "Dashboard-Widgets",
+      "widgets": [
+        "Check-in-Zähler mit Kapazitätsalarmen",
+        "Tisch-Nutzungs-Heatmap und Warteschlangen-Tracker",
+        "Freiwilligen-Personal-Tafel mit Pausen-Erinnerungen"
+      ],
+      "automations_title": "Enthaltene Automatisierungen",
+      "automations_description": "Zapier-fertige Rezepte senden SMS-Alarme an Schicht-Leads, lösen Inventar-Nachbestell-Benachrichtigungen aus und aktualisieren Deine Post-Event-Berichte.",
+      "automations_button": "Automatisierungs-Pack herunterladen",
+      "vendor_title": "Lieferanten-Management-Kit",
+      "vendor_description": "Vertragsvorlagen, Versicherungs-Checklisten und Kommunikations-Kadenzen halten Partner synchron.",
+      "vendor_button": "Lieferanten-Kit herunterladen"
+    },
+    "downloads": {
+      "title": "Das volle Kit herunterladen",
+      "operations_bundle": {
+        "title": "Operations-Bundle (ZIP)",
+        "description": "Alle Vorlagen, Dashboards und Politik-Referenzen in einem Archiv.",
+        "button": "ZIP herunterladen"
+      },
+      "run_of_show": {
+        "title": "Run-of-Show-Vorlage",
+        "description": "Google Sheets + Excel-Formate mit eingebauten automatisierten Erinnerungen.",
+        "button": "XLSX herunterladen"
+      },
+      "compliance_binder": {
+        "title": "Risiko- & Compliance-Binder",
+        "description": "Versicherungs-Zertifikate, Verzichtformulare und Notfall-Reaktionskarten.",
+        "button": "PDF herunterladen"
+      },
+      "support_title": "Brauchst Du maßgeschneiderte Automatisierung oder Personal-Unterstützung?",
+      "support_description": "Unsere Event-Operations-Berater können Dashboards gemeinsam bauen, Freiwillige rekrutieren und Lieferanten-Briefings für Dein nächstes Flaggschiff-Programm verwalten.",
+      "support_button": "Mit dem Operations-Team sprechen"
+    }
+  },
+  "session_plans": {
+    "hero": {
+      "eyebrow": "Sitzungs-Gestaltungsbibliothek",
+      "title": "Moderator-getestete Sitzungen für jeden Tisch",
+      "subtitle": "Lade einsatzbereite Abenteuer, Rotationspläne und Debriefing-Leitfäden herunter, die von Roundup Games Storytellern entwickelt wurden.",
+      "cta_text": "Sammlungen durchsuchen",
+      "secondary_cta": "Eine Gestaltungsberatung buchen"
+    },
+    "collections": {
+      "eyebrow": "Kuratierte Playlists",
+      "title": "Mische und passe Abenteuer an Deine Ziele an",
+      "description": "Filtere nach Genre, Sitzungsdauer, Spielerfahrung oder Barrierefreiheitsbedürfnissen. Jeder Plan listet erforderliche Materialien, Moderationstipps und Spotlight-Momente, um neue Storyteller zu coachen.",
+      "story_driven": {
+        "title": "Story-getriebene Kampagnen",
+        "description": "Episodische Bögen für narrative-fokussierte Gruppen mit Session Zero-Prompts und Sicherheitstool-Erinnerungen.",
+        "examples": [
+          "Whispers Below: Urban Fantasy-Mysterium in vier Akten",
+          "Voyagers of the Verdant Sea: Hopepunk-Exploration Mini-Serie",
+          "The Iron Concordat: Politische Intrige mit rotierenden Spotlight-Szenen"
+        ]
+      },
+      "quickstart": {
+        "title": "Quickstart-Ein-Shots",
+        "description": "Wenig Vorbereitungsabenteuer, die in 90-Minuten bis 2-Stunden-Fenster passen – ideal für Cafés, Vereine und Convention-Demos.",
+        "examples": [
+          "Aurora Chase: Kooperatives Puzzle-Crawl mit verzweigten Enden",
+          "Signal Lost: Sci-Fi-Rettung featuring fail-forward-Mechaniken",
+          "Hearth & Hollow: Gemütliches Mysterium mit zugänglichen Regeln-Referenzen"
+        ]
+      },
+      "board_games": {
+        "title": "Brettspiel-Spotlights",
+        "description": "Kuratierte Rotationspläne für moderne Brettspiele, betonend Barrierefreiheit, Thema und Wiederspiel-Vielfalt.",
+        "examples": [
+          "Gateway-Abend: Cascadia, Azul und Flamecraft mit Moderatorskripten",
+          "Strategie-Leiter: Dune Imperium in John Company mit Prep-Briefings",
+          "Kollab-Ecke: Spirit Island und The Crew mit Teamwork-Debrief-Prompts"
+        ]
+      }
+    },
+    "logistics": {
+      "eyebrow": "Was jeder Plan enthält",
+      "title": "Steck-and-Play-Logistik für reibungslose Sitzungen",
+      "description": "Jeder Download bietet Moderators-Briefings, optionale Sicherheits-Kalibrierungen und Pacing-Rufe, damit Du Dich an ein breites Spektrum von Spielerenergie anpassen kannst. Wir fügen auch Wrap-up-Prompts und digitale Folge-Vorlagen hinzu, um die Verbindung nach dem Spielabend am Laufen zu halten.",
+      "files_title": "Dateien in jedem Paket",
+      "files": [
+        "Sitzungs-Überblick mit Ton, Thema und Inhaltswarnungen",
+        "Moderationsskript mit Timing-Cues und Spotlight-Rotationen",
+        "Spieler-Handouts, Karten-Packs und Token falls zutreffend",
+        "Debrief-Fragen und Umfrage-Link für Post-Event-Einblicke"
+      ],
+      "update_cadence": {
+        "title": "Update-Takt",
+        "description": "Neue Bundles erscheinen monatlich mit saisonalen Events, Convention-Paketen und Community-Einreichungen, kuratiert vom Roundup Games Design-Rat."
+      },
+      "accessibility": {
+        "title": "Barrierefreiheits-Hinweise",
+        "description": "Wir markieren Sensorik-Last, Leseebene und physische Anforderungen für jeden Plan. Alternativen werden für Sehbehinderte, würfellose und leise Umgebungen bereitgestellt."
+      }
+    },
+    "downloads": {
+      "title": "Sitzungs-Bundles herunterladen",
+      "story_driven_pack": {
+        "title": "Story-getriebene Kampagnen-Pakete",
+        "description": "Enthält Whispers Below, Verdant Sea und Iron Concordat-Bögen.",
+        "button": "ZIP herunterladen"
+      },
+      "quickstart_bundle": {
+        "title": "Quickstart-Ein-Shot-Bundle",
+        "description": "Enthält Aurora Chase, Signal Lost und Hearth & Hollow Abenteuer.",
+        "button": "ZIP herunterladen"
+      },
+      "board_game_kit": {
+        "title": "Brettspiel-Spotlight-Kit",
+        "description": "Rotationspläne, Moderators-Briefings und Spieler-Scorekarten.",
+        "button": "ZIP herunterladen"
+      }
+    },
+    "submission": {
+      "title": "Reiche Deinen eigenen Sitzungsplan ein",
+      "description": "Hast Du ein getestetes Abenteuer oder ein Brettspiel-Abend-Format? Teile es mit dem Design-Rat für Feedback und mögliche Aufnahme in die Bibliothek.",
+      "button": "Den Design-Rat e-Mailen"
+    }
+  },
+  "facilitation_clinics": {
+    "hero": {
+      "eyebrow": "Moderations-Kliniken",
+      "title": "On-Demand-Coaching für Storyteller und Veranstalter",
+      "subtitle": "Schau Dir Master-Moderatoren an, wie sie Live-Sitzungen leiten, dann wende die gleichen Techniken an Deinen Tischen mit geführten Übungsmaterialien an.",
+      "cta_text": "Die Kliniken streamen",
+      "secondary_cta": "Live-Coaching buchen"
+    },
+    "format": {
+      "eyebrow": "Klinik-Format",
+      "title": "Lerne durch das Ansehen echter Tische in Aktion",
+      "description": "Jede Klinik paart eine Live-aufgezeichnete Sitzung mit Kommentaren von Roundup Games Moderatoren. Pausiere bei Reflexionsmarkern, um mit Deinem eigenen Personal zu üben, oder nutze die enthaltenen Diskussions-Prompts, um das Video in ein Team-Workshop zu verwandeln."
+    },
+    "modules": [
+      {
+        "title": "Den Tisch vorbereiten",
+        "duration": "28 Minuten",
+        "focus": "Gastfreundschafts-Rituale, Onboarding-Skripte und Barrierefreiheits-Rundgänge, die erste Sitzungs-Nerven beruhigen.",
+        "resources": [
+          "Moderator-Eröffnungsskript",
+          "Raum-Layout-Checkliste",
+          "Sensorik-Überlegungen-Arbeitsblatt"
+        ]
+      },
+      {
+        "title": "Sicherheitstools in Bewegung",
+        "duration": "34 Minuten",
+        "focus": "Demonstrationen von zustimmungsbasierten Sicherheitstools mit Live-Debriefing und Coaching-Tipps für knifflige Momente.",
+        "resources": [
+          "X-Karte und Open Door-Spielset",
+          "Lines & Veils Muster-Prompts",
+          "Eskalations-Entscheidungsbaum"
+        ]
+      },
+      {
+        "title": "Pacing & Spotlight-Management",
+        "duration": "31 Minuten",
+        "focus": "Ausgewogene Aktion und Reflexion, Unterstützung leiserer Spieler und das Lesen der Tisch-Energie in Echtzeit.",
+        "resources": [
+          "Beat-Struktur-Arbeitsblatt",
+          "Publikums-Engagement-Tracker",
+          "Post-Sitzung-Reflexionsformular"
+        ]
+      }
+    ],
+    "runtime_label": "Laufzeit:",
+    "loading_clinics": "Moderations-Kliniken werden geladen...",
+    "streaming_access": {
+      "eyebrow": "Streaming-Zugang",
+      "title": "Schau Dir Kliniken jederzeit, überall an",
+      "description": "Videos werden auf unserem privaten Lernportal gehostet. Fordere einen Zugangscode an und Du erhältst Streaming-Links, Foliendecks und Notizen-Pakete für jede Klinik. Kapitel sind zeitgestempelt, damit Du direkt zu den Momenten springen kannst, die Du überprüfen möchtest.",
+      "request_access": {
+        "title": "Zugang anfordern",
+        "description": "E-Mail training@roundup.games mit Deinem Organisationsnamen, bevorzugter Klinik und Moderators-Roster. Wir genehmigen Anfragen innerhalb von zwei Werktagen.",
+        "button": "Dem Trainingsteam e-Mailen"
+      }
+    },
+    "discussion_guide": {
+      "title": "Diskussions-Leitfaden",
+      "description": "Verwandle die Kliniken in ein Team-Lern-Sitzung mit Reflexions-Prompts und Fähigkeits-Drills für neue und erfahrene Moderatoren gleichermaßen.",
+      "button": "PDF-Leitfaden herunterladen"
+    },
+    "certification_credits": {
+      "title": "Zertifizierungs-Credits",
+      "description": "Schließe alle drei Kliniken ab und reiche Reflexions-Aufgaben ein, um Weiterbildungsstunden zu verdienen, die von Roundup Games und Partner-Ligen anerkannt werden.",
+      "credits": {
+        "hours_per_clinic": "2 CE Stunden pro Klinik",
+        "digital_badge": "Digital-Abzeichen innerhalb von 7 Tagen ausgestellt",
+        "counts_toward": "Zählt zur GM- und Veranstalter-Weg-Erneuerungen"
+      }
+    },
+    "downloads": {
+      "title": "Klinik-Ressourcen herunterladen",
+      "opening_rituals": {
+        "title": "Eröffnungsritualen-Paket",
+        "description": "Skripte, Tischschilder und Willkommenskarten, die in den Kliniken vorgestellt werden.",
+        "button": "ZIP herunterladen"
+      },
+      "safety_tools": {
+        "title": "Sicherheitstool-Kit",
+        "description": "Druckbare Karten, Moderators-Cheat-Sheets und Vorfall-Log-Vorlagen.",
+        "button": "ZIP herunterladen"
+      },
+      "spotlight_scheduler": {
+        "title": "Spotlight-Planer",
+        "description": "Editierbarer Pacing-Tracker kompatibel mit Google Sheets und Excel.",
+        "button": "XLSX herunterladen"
+      }
+    },
+    "accessibility": {
+      "title": "Brauchst Du Dolmetscherdienste?",
+      "description": "Wir können Live-Untertitelung, ASL-Interpretation oder Übersetzung für Dein Team-Training arrangieren. Lass es uns mindestens zwei Wochen im Voraus wissen.",
+      "button": "Barrierefreiheits-Unterstützung koordinieren"
+    },
+    "access": {
+      "title": "Auf die Klinik-Bibliothek zugreifen",
+      "description": "Alle Kliniken enthalten herunterladbare Moderatoren-Leitfäden, Reflexions-Prompts und Übungs-Arbeitsblätter. Perfekt für individuelles Lernen oder Team-Trainingssitzungen.",
+      "cta_button": "Alle Kliniken durchsuchen",
+      "coaching_cta": "1:1 Coaching-Sitzung buchen"
+    },
+    "technical": {
+      "title": "Technische Anforderungen",
+      "description": "Kliniken streamen in HD mit Untertiteln und herunterladbaren Transkripten. Alle Materialien werden in barrierefreien Formaten für Screenreader und Sehbehinderungen bereitgestellt."
+    }
+  },
+  "game_master_pathway": {
+    "hero": {
+      "eyebrow": "Game Master Weg",
+      "title": "Level up Deine Storytelling-Praxis",
+      "subtitle": "Ein strukturierter Lehrplan, der narrative Handwerkskunst, Sicherheits-Führung und Produktionsfähigkeiten verbindet, damit Du unvergessliche Kampagnen liefern kannst.",
+      "cta_text": "Jetzt einschreiben",
+      "secondary_cta": "Sitzungsbibliothek durchsuchen"
+    },
+    "curriculum": {
+      "eyebrow": "Lehrplan-Überblick",
+      "title": "Baue Fähigkeiten in Stufen mit Experten-Mentorschaft auf",
+      "description": "Live-Kliniken, asynchrone Workshops und reflektierendes Coaching helfen Dir sicher zu experimentieren und neue Techniken an Deinen Heimat-Tischen anzuwenden. Erwarte wöchentliche Übungs-Prompts, Peer-Feedback-Runden und 1:1-Sitzungen mit Senior-GMs.",
+      "recommended_pace": "Empfohlenes Tempo: {{duration}}",
+      "milestones": [
+        {
+          "title": "Foundation-Abzeichen",
+          "duration": "4 Wochen",
+          "outcomes": [
+            "Session Zero-Meisterschaft mit zustimmungsvorwärts Moderation",
+            "Improvisations-Drills für Charakter-Spotlighting",
+            "Sicherheitstool-Zertifizierung und Tisch-Bund-Gestaltung"
+          ]
+        },
+        {
+          "title": "Campaign Architect-Abzeichen",
+          "duration": "6 Wochen",
+          "outcomes": [
+            "Langform-narrative Pacing mit Bögen und Cliffhangern",
+            "Dynamische Begegnungs-Gestaltung verwurzelt in Spieler-Autonomie",
+            "Community-Management für hybride Online/Präsenz-Spiele"
+          ]
+        },
+        {
+          "title": "Master Storyteller-Abzeichen",
+          "duration": "8 Wochen",
+          "outcomes": [
+            "Fortschrittliche emotionale Sicherheits-Moderation und Konflikt-Reparatur",
+            "Mentorats-Practicum mit aufstrebenden Game Mastern",
+            "Performance-Coaching für Live-Shows und gestreamte Events"
+          ]
+        }
+      ]
+    },
+    "learning": {
+      "eyebrow": "Lernerfahrung",
+      "title": "Praxis-reiche, feedback-schwere Coaching-Reise",
+      "description": "Jede Kohorte ist auf 16 Teilnehmer begrenzt, um intime, hochvertrauensvolle Lernumgebungen zu erhalten. Du erhältst detaillierte Notizen zu aufgenommenen Sitzungen und schattest Senior-Moderatoren während live Community-Programmen.",
+      "weekly_rhythm": {
+        "title": "Wöchentlicher Rhythmus",
+        "schedule": [
+          "Montag: Live-Klinik mit Q&A",
+          "Mittwoch: Peer-Übungs-Pods und Kritik-Austausch",
+          "Freitag: Sprechstunden mit Lehrplan-Designern"
+        ]
+      },
+      "portfolio": {
+        "title": "Portfolio & Bewertung",
+        "description": "Schließe ab mit dokumentiertem Kampagnen-Buch, Sitzungsaufzeichnungen und Spieler-Feedback-Berichten, die Du mit Venues, Produktionspartnern oder zukünftigen Mitarbeitern teilen kannst."
+      },
+      "alumni": {
+        "title": "Alumni-Netzwerk",
+        "description": "Zugang zu exklusiven Casting-Aufrufen, bezahlten Storytelling-Möglichkeiten und kollaborativen Worldbuilding-Jams mit anderen Roundup-zertifizierten Game Mastern."
+      }
+    },
+    "resources": {
+      "title": "Lehrplan-Module & Ressourcen",
+      "narrative_workbook": {
+        "title": "Narrative Handwerkskunst-Arbeitsbuch",
+        "description": "Übungen für Motiv-Entwicklung, Charakter-Bögen und kollaborative Szenen-Gestaltung.",
+        "button": "PDF herunterladen"
+      },
+      "safety_toolkit": {
+        "title": "Sicherheits-Führungs-Toolkit",
+        "description": "Vorfall-Protokolle, Zustimmungsskripte und wiederherstellende Reparatur-Playbooks, die im Weg verwendet werden.",
+        "button": "ZIP herunterladen"
+      },
+      "performance_guide": {
+        "title": "Performance-Coaching-Leitfaden",
+        "description": "Stimme, Haltung und Kamera-Präsenz-Übungen für Live- und gestreamte Erlebnisse.",
+        "button": "PDF herunterladen"
+      }
+    },
+    "enrollment": {
+      "eyebrow": "Einschreibungsdetails",
+      "title": "Bevorstehende Kohorten und Studiengebühren-Optionen",
+      "cohorts": [
+        "Frühlingskohorte (8. April Start) – hybride Online & Toronto-Studio",
+        "Sommerkohorte (15. Juli Start) – vollständig virtuell mit regionalen Meetups",
+        "Stipendien verfügbar für marginale Storyteller und Jugend-Mentoren"
+      ],
+      "tuition": "Studiengebühren beginnen bei 480 CAD mit flexiblen Ratenplänen. Partner-Venues können Plätze für ihre Moderatoren über den Roundup Development Fund sponsen.",
+      "cta_button": "Ein Aufnahmegespräch planen",
+      "requirements": {
+        "title": "Zertifizierungs-Anforderungen",
+        "items": [
+          "Alle Meilenstein-Projekte und Reflexions-Journale abschließen",
+          "Zwei betreute Community-Sitzungen moderieren",
+          "Aktive Sicherheits-Zertifizierung und Hintergrundüberprüfungen beibehalten",
+          "Zur Sitzungs-Gestaltungsbibliothek oder Mentorats-Pool beitragen"
+        ]
+      },
+      "contact": {
+        "questions": "Fragen? E-Mail {{email}} für persönliche Anleitung.",
+        "email": "training@roundup.games"
+      },
+      "graduate_benefits": "Absolventen erhalten ein digitales Abzeichen und Platzierungs-Unterstützung mit verbundenen Cafés, Bibliotheken und Convention-Partnern in ganz Kanada."
+    }
+  },
+  "community": {
+    "title": "Der Community der Veranstalter beitreten",
+    "description": "Tausche Fehlerbehebungs-Tipps, teile Lieferanten-Empfehlungen und arbeite an mehrregionalen Events im Roundup Games Operations Collective auf Discord zusammen.",
+    "action_button": "Eine Einladung anfordern"
+  },
+  "loading": {
+    "phases": "Phasen werden geladen...",
+    "curriculum_tracks": "Lehrplan-Tracks werden geladen...",
+    "widgets": "Widgets werden geladen...",
+    "reporting_steps": "Melde-Schritte werden geladen...",
+    "support_resources": "Unterstützungs-Ressourcen werden geladen...",
+    "toolkit_phases": "Toolkit-Phasen werden geladen..."
+  }
+}

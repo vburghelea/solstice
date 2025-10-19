@@ -1,0 +1,629 @@
+{
+  "create": {
+    "title": "Create New Event",
+    "subtitle": "Fill in the details to create a new Roundup Games event. You can save as draft and publish later.",
+    "steps": {
+      "basic_info": {
+        "title": "Basic Info",
+        "description": "Event name and description"
+      },
+      "location_dates": {
+        "title": "Location & Dates",
+        "description": "Where and when"
+      },
+      "registration": {
+        "title": "Registration",
+        "description": "Registration settings and pricing"
+      },
+      "details": {
+        "title": "Additional Details",
+        "description": "Contact info and settings"
+      }
+    }
+  },
+  "form": {
+    "fields": {
+      "name": "Event Name",
+      "slug": "Slug",
+      "short_description": "Short Description",
+      "description": "Description",
+      "type": "Type",
+      "status": "Initial Status",
+      "logo": "Event Logo",
+      "logo_url": "Logo URL (optional)",
+      "banner": "Hero Banner",
+      "banner_url": "Banner URL (optional)",
+      "venue_name": "Venue Name",
+      "venue_address": "Venue Address",
+      "city": "City",
+      "province": "Province/State",
+      "country": "Country",
+      "postal_code": "Postal Code",
+      "location_notes": "Location Notes",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "registration_opens": "Registration Opens",
+      "registration_closes": "Registration Closes",
+      "registration_type": "Registration Type",
+      "max_teams": "Max Teams",
+      "max_participants": "Max Participants",
+      "min_players_per_team": "Minimum Players per Team",
+      "max_players_per_team": "Maximum Players per Team",
+      "team_fee": "Team Fee (USD)",
+      "individual_fee": "Individual Fee (USD)",
+      "early_bird_discount": "Discount Percentage",
+      "early_bird_deadline": "Early Bird Deadline",
+      "allow_etransfer": "Allow Interac e-Transfer",
+      "etransfer_recipient": "E-transfer Recipient Email",
+      "etransfer_instructions": "E-transfer Instructions",
+      "allow_waitlist": "Allow Waitlist",
+      "require_membership": "Require Active Membership",
+      "contact_email": "Contact Email",
+      "contact_phone": "Contact Phone",
+      "website": "Event Website",
+      "public_event": "Public Event",
+      "featured_event": "Featured Event"
+    },
+    "placeholders": {
+      "name": "Awesome Summer Tournament",
+      "slug": "awesome-summer-tournament",
+      "short_description": "Brief description for event cards and previews",
+      "description": "Detailed event description...",
+      "logo_url": "https://cdn.example.com/event-logo.png",
+      "banner_url": "https://cdn.example.com/event-banner.jpg",
+      "venue_name": "Community Sports Complex",
+      "venue_address": "Karl-Marx-Straße 1",
+      "city": "Berlin",
+      "country": "Search for a country",
+      "postal_code": "10115",
+      "location_notes": "Parking information, directions, accessibility notes...",
+      "contact_email": "event@beispiel.de",
+      "contact_phone": "+49 1512 3456789",
+      "website": "https://beispiel.de/event",
+      "etransfer_instructions": "Include the security question, expected password, or any other notes for e-transfer payments.",
+      "short_description_card": "One-line summary for cards and previews",
+      "description_details": "Share key details, schedule, and what to expect"
+    },
+    "descriptions": {
+      "slug": "This will be used in the event URL",
+      "short_description": "Max 500 characters",
+      "logo": "Displayed on compact cards and featured sections.",
+      "banner": "Shown on the public event page and featured listings.",
+      "logo_helper": "Ideal size is a square PNG or JPG up to 5MB.",
+      "banner_helper": "Use a wide image (16:9) up to 8MB for the event hero.",
+      "early_bird_discount": "Percentage discount for early registration",
+      "etransfer_recipient": "Where e-transfer payments should be sent",
+      "public_event_admin": "Make this event visible to everyone",
+      "public_event_user": "Request public visibility (requires admin approval)",
+      "featured_event": "Highlight this event on the homepage and in search results",
+      "allow_waitlist": "Allow registrations to join a waitlist when the event is full",
+      "require_membership": "Only allow users with active Roundup Games memberships to register"
+    },
+    "sections": {
+      "branding": {
+        "title": "Branding",
+        "description": "Add visuals to personalize your event. Upload images or paste URLs for assets you already host."
+      },
+      "pricing": {
+        "title": "Pricing"
+      },
+      "early_bird": {
+        "title": "Early Bird Discount"
+      },
+      "alternate_payment": {
+        "title": "Alternate Payment Options"
+      },
+      "contact_info": {
+        "title": "Contact Information"
+      },
+      "visibility": {
+        "title": "Visibility Settings"
+      }
+    }
+  },
+  "buttons": {
+    "previous": "Previous",
+    "next": "Next",
+    "create": "Create Event",
+    "creating": "Creating..."
+  },
+  "select": {
+    "select_type": "Select type",
+    "select_registration_type": "Select registration type"
+  },
+  "types": {
+    "tournament": "Tournament",
+    "league": "League",
+    "camp": "Training Camp",
+    "clinic": "Skills Clinic",
+    "social": "Social Event",
+    "other": "Other"
+  },
+  "status": {
+    "draft": "Draft (Not visible)",
+    "published": "Published (Visible)",
+    "in_progress": "In Progress",
+    "registration_open": "Registration Open",
+    "registration_closed": "Registration Open"
+  },
+  "registration_types": {
+    "team": "Team",
+    "individual": "Individual",
+    "both": "Team & Individual"
+  },
+  "alerts": {
+    "admin_approval": {
+      "title": "Admin Approval Required",
+      "description": "Your event will be created as a draft and will require admin approval before it becomes publicly visible. You can still manage and edit your event while it's pending approval."
+    },
+    "approval_process": {
+      "description": "After creating your event, an administrator will review it and approve it for public visibility. You'll be notified once your event is approved."
+    }
+  },
+  "validation": {
+    "name_required": "Event name is required",
+    "slug_required": "URL slug is required",
+    "slug_format": "Slug must be lowercase letters, numbers, and hyphens only",
+    "short_description_max": "Short description must be under 500 characters",
+    "start_date_required": "Start date is required",
+    "end_date_required": "End date is required",
+    "etransfer_recipient_required": "E-transfer recipient email is required when e-transfer is enabled",
+    "early_bird_deadline_required": "Early bird deadline is required when a discount is provided",
+    "early_bird_discount_required": "Set a discount percentage or remove the deadline",
+    "valid_etransfer_email": "Enter a valid e-transfer email",
+    "invalid_value": "Invalid value"
+  },
+  "upload": {
+    "logo_uploading": "Uploading logo...",
+    "banner_uploading": "Uploading banner...",
+    "logo_success": "Logo uploaded successfully",
+    "banner_success": "Banner uploaded successfully",
+    "logo_failed": "Failed to upload logo",
+    "banner_failed": "Failed to upload banner",
+    "wait_for_upload": "Please wait for image uploads to complete before submitting.",
+    "file_read_failed": "Failed to read file"
+  },
+  "success": {
+    "created": "Event created successfully!",
+    "created_pending_approval": "Event created! It will be reviewed by an admin before becoming public."
+  },
+  "errors": {
+    "create_failed": "Failed to create event",
+    "upload_failed": "Failed to upload image",
+    "validation_error": "Please fix the highlighted fields.",
+    "creation_error": "An error occurred while creating the event",
+    "load_failed": "Error loading events: {{message}}"
+  },
+  "list_item": {
+    "free": "Free",
+    "capacity_tbd": "Capacity TBD",
+    "date_tbd": "TBD",
+    "spots_left": "{{count}} spots left"
+  },
+  "minimal_form": {
+    "title": "Create New Event (Test)",
+    "description": "This is a minimal test form to isolate the rendering issue.",
+    "test_button": "Test Button"
+  },
+  "detail": {
+    "event_not_found": "Event not found",
+    "dates": "Dates",
+    "type": "Type",
+    "status": "Status",
+    "registration": "Registration",
+    "open": "Open",
+    "closed": "Closed",
+    "spots_left": "{{count}} spots left",
+    "registrations": "Registrations",
+    "no_registrations": "No registrations yet.",
+    "confirm": "Confirm",
+    "waitlist": "Waitlist",
+    "cancel": "Cancel",
+    "actions": {
+      "publish": "Publish",
+      "open_registration": "Open Registration",
+      "close_registration": "Close Registration",
+      "start": "Start",
+      "complete": "Complete",
+      "cancel": "Cancel"
+    },
+    "success": {
+      "event_updated": "Event updated",
+      "registration_updated": "Registration updated"
+    },
+    "errors": {
+      "update_failed": "Failed to update event",
+      "registration_update_failed": "Failed to update registration"
+    }
+  },
+  "registration": {
+    "event_not_found": "Event Not Found",
+    "event_not_available": "The event you're trying to register for doesn't exist or is not publicly available.",
+    "back_to_events": "Back to Events",
+    "already_registered": "Already Registered",
+    "already_registered_description": "You are already registered for this event.",
+    "back_to_event_details": "Back to Event Details",
+    "view_event_details": "View Event Details",
+    "register_for_event": "Register for {{eventName}}",
+    "register_description": "Complete the form below to register for this event",
+    "registration_type": "Registration Type",
+    "individual_registration": "Individual Registration",
+    "team_registration": "Team Registration",
+    "register_as_individual": "Register as an individual player",
+    "register_entire_team": "Register your entire team",
+    "select_team": "Select Team",
+    "select_team_placeholder": "Select a team",
+    "join_create_team": "Join or create a team",
+    "need_team_to_register": "You need to be part of a team to register as a team.",
+    "additional_info": "Additional Information (optional)",
+    "additional_info_placeholder": "Any dietary restrictions, accessibility needs, or other information...",
+    "payment_method": "Payment Method",
+    "square_checkout": "Square Checkout",
+    "etransfer": "Interac e-Transfer",
+    "pay_securely_online": "Pay securely online with credit or debit card.",
+    "submit_send_payment_manually": "Submit now and send payment manually after this form.",
+    "etransfer_instructions": "E-transfer Instructions",
+    "send_payment_to": "Send payment to {{recipient}}. Include your name and the event in the message.",
+    "no_payment_required": "No Payment Required",
+    "no_payment_description": "This registration does not require payment. Submit the form to finish.",
+    "terms_and_conditions": "Terms and Conditions",
+    "agree_terms": "I agree to the event terms and code of conduct",
+    "agree_terms_description": "You must agree to these terms to participate in the event.",
+    "accept_liability_waiver": "I have read and accepted the liability waiver",
+    "accept_waiver_description": "Every participant must accept the waiver before registering.",
+    "submitting": "Submitting...",
+    "awaiting_etransfer": "Awaiting E-Transfer",
+    "complete_registration": "Complete Registration",
+    "finish_etransfer": "Finish Your E-transfer",
+    "send_payment_finalize": "Send your payment to finalize the registration.",
+    "recipient_email": "Recipient Email",
+    "instructions": "Instructions",
+    "see_event_instructions": "See event instructions",
+    "payment_received_confirmation": "Once the payment is received, an administrator will mark your registration as paid.",
+    "return_to_dashboard": "Return to Dashboard",
+    "event_overview": "Event Overview",
+    "status": "Status",
+    "registered": "Registered",
+    "spots_remaining": "Spots remaining",
+    "registration_fees": "Registration Fees",
+    "current_fee": "Current Fee",
+    "early_bird_applied": "Early bird discount applied ({{percentage}}% off)",
+    "participant_information": "Participant Information",
+    "unknown_participant": "Unknown participant",
+    "no_email_available": "No email available",
+    "registration_failed": "Registration failed",
+    "redirecting_to_square": "Redirecting to Square checkout...",
+    "registration_submitted": "Registration submitted! Follow the e-transfer instructions below.",
+    "registration_completed": "Registration completed!",
+    "error_during_registration": "An error occurred during registration",
+    "already_submitted": "You've already submitted this registration.",
+    "accept_all_terms": "Please accept all terms and conditions",
+    "select_a_team": "Please select a team",
+    "registration_open": "Registration open",
+    "registration_closed": "Registration closed"
+  },
+  "detail_registration": {
+    "title": "Registration",
+    "status": "Status",
+    "closes": "Closes",
+    "registered": "Registered",
+    "available_spots": "Available Spots",
+    "fees": "Registration Fees",
+    "team_registration": "Team Registration",
+    "individual_registration": "Individual Registration",
+    "early_bird_discount": "early bird discount available until",
+    "already_registered": {
+      "title": "You're Registered!",
+      "description": "You are already registered for this event."
+    },
+    "sign_in_required": "Please {{link}} to register for this event.",
+    "register_now": "Register Now",
+    "registration_closed": "Registration Closed",
+    "event_full": "Event Full"
+  },
+  "not_found": {
+    "title": "Event Not Found",
+    "description": "The event you're looking for doesn't exist or is not publicly available.",
+    "back_to_events": "Back to Events"
+  },
+  "schedule": "Event Schedule",
+  "rules_format": "Rules & Format",
+  "requirements": "Requirements",
+  "amenities": "Amenities",
+  "organizer": "Event Organizer",
+  "share": {
+    "title": "Share Event",
+    "copy_link": "Copy Link"
+  },
+  "listing": {
+    "title": "Events",
+    "subtitle": "Tournaments, training camps, and community festivals",
+    "description": "Roundup Games sanctions competitions year-round so athletes at every level can compete, learn, and connect.",
+    "register_team": "Register your team",
+    "submit_event": "Submit an event",
+    "filter": "Filter upcoming events",
+    "calendar_title": "Upcoming events calendar",
+    "clear_filters": "Clear filters",
+    "country": "Country",
+    "city": "City",
+    "type": "Type",
+    "status": "Status",
+    "registration_type": "Registration type",
+    "all_countries": "All countries",
+    "all_cities": "All cities",
+    "all_types": "All types",
+    "all_statuses": "All statuses",
+    "all_registration_types": "All registration types",
+    "load_failed": "Events failed to load",
+    "no_results": "No events match this filter right now. Contact us at {{email}} and we'll add your event to the calendar.",
+    "loading": "Loading...",
+    "loading_description": "Please wait while we load the events.",
+    "options": {
+      "tournament": "Tournament",
+      "league": "League",
+      "camp": "Camp",
+      "social": "Social",
+      "other": "Other",
+      "published": "Published",
+      "registration_open": "Registration Open",
+      "registration_closed": "Registration Closed",
+      "in_progress": "In Progress",
+      "view_details": "View Details"
+    }
+  },
+  "list": {
+    "filter_title": "Filter Events",
+    "labels": {
+      "event_type": "Event Type",
+      "status": "Status",
+      "city": "City",
+      "country": "Country",
+      "sort_by": "Sort By",
+      "sort_order": "Sort Order"
+    },
+    "placeholders": {
+      "all_types": "All Types",
+      "all_statuses": "All Statuses",
+      "all_countries": "All Countries",
+      "filter_by_city": "Filter by city"
+    },
+    "options": {
+      "tournament": "Tournament",
+      "league": "League",
+      "camp": "Camp",
+      "clinic": "Clinic",
+      "social": "Social",
+      "other": "Other",
+      "published": "Published",
+      "registration_open": "Registration Open",
+      "registration_closed": "Registration Closed",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "start_date": "Start Date",
+      "name": "Name",
+      "recently_added": "Recently Added",
+      "ascending": "Ascending",
+      "descending": "Descending"
+    },
+    "empty_state": "No events found matching your criteria.",
+    "pagination": {
+      "showing": "Showing {{start}}-{{end}} of {{total}} events",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "actions": {
+      "view_details": "View Details"
+    },
+    "registration": {
+      "open": "Registration Open",
+      "spots_left": "{{count}} spots left",
+      "registered": "{{count}} registered",
+      "type_label": "{{type}}"
+    }
+  },
+  "admin": {
+    "title": "Events",
+    "subtitle": "Browse and register for upcoming events",
+    "create_event": "Create Event",
+    "view_event": "View Event",
+    "back_to_events": "Back to Events",
+    "manage_event": "Manage Event",
+    "view_public_page": "View Public Page",
+    "not_found": "Event not found",
+    "not_found_description": "The event you're trying to manage doesn't exist.",
+    "registrations": "Registrations",
+    "overview": "Overview",
+    "stats": {
+      "total_registrations": "Total Registrations",
+      "total_revenue": "Total Revenue",
+      "outstanding_etransfers": "Outstanding E-Transfers",
+      "available_spots": "Available Spots",
+      "event_status": "Event Status",
+      "pending": "pending",
+      "from_registrations": "From {{count}} registrations",
+      "awaiting_confirmation": "Awaiting manual confirmation",
+      "unlimited": "Unlimited"
+    },
+    "actions": {
+      "publish": "Publish",
+      "open_registration": "Open Registration",
+      "close_registration": "Close Registration",
+      "start": "Start",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "waitlist": "Waitlist",
+      "mark_paid": "Mark Paid",
+      "send_reminder": "Send Reminder",
+      "view": "View",
+      "event_updated": "Event updated",
+      "update_failed": "Failed to update event",
+      "registration_updated": "Registration updated",
+      "registration_update_failed": "Failed to update registration"
+    },
+    "tables": {
+      "headers": {
+        "name": "Name",
+        "email": "Email",
+        "type": "Type",
+        "team": "Team",
+        "status": "Status",
+        "payment_status": "Payment Status",
+        "payment_method": "Payment Method",
+        "amount": "Amount",
+        "amount_due": "Amount Due",
+        "amount_paid": "Amount Paid",
+        "registered": "Registered",
+        "actions": "Actions"
+      },
+      "no_registrations": "No registrations yet",
+      "unknown": "Unknown",
+      "na": "N/A"
+    },
+    "recent_registrations": {
+      "title": "Recent Registrations",
+      "description": "Latest registrations for your event"
+    },
+    "all_registrations": {
+      "title": "All Registrations",
+      "description": "Manage event registrations and participants"
+    },
+    "quick_actions": {
+      "title": "Quick Actions",
+      "export_registrations": "Export Registrations",
+      "email_participants": "Email Participants",
+      "export_csv": "Export CSV"
+    },
+    "settings": {
+      "title": "Event Settings",
+      "description": "Manage event configuration and status",
+      "event_status": "Event Status",
+      "visibility": "Visibility",
+      "public_event": "Public Event",
+      "make_private": "Make Private",
+      "make_public": "Make Public",
+      "featured_event": "Featured Event",
+      "feature_event": "Feature Event",
+      "remove_feature": "Remove Feature",
+      "danger_zone": "Danger Zone",
+      "danger_description": "These actions are permanent and cannot be undone.",
+      "delete_event": "Delete Event"
+    },
+    "export": {
+      "no_registrations": "No registrations to export",
+      "success": "Registrations exported successfully"
+    },
+    "confirmations": {
+      "are_you_sure": "Are you sure?",
+      "cancel_event_description": "This will cancel the event and notify all registered participants. This action cannot be undone.",
+      "delete_event_description": "This will permanently delete the event and all associated data. This action cannot be undone.",
+      "no_keep_event": "No, keep event",
+      "yes_cancel_event": "Yes, cancel event",
+      "delete_event": "Delete Event"
+    },
+    "payment": {
+      "marking": "Marking...",
+      "sending": "Sending...",
+      "reminder_logged": "Reminder logged"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "registration_open": "Registration Open",
+      "registration_closed": "Registration Closed"
+    },
+    "labels": {
+      "dates": "Dates",
+      "type": "Type",
+      "status": "Status",
+      "registration": "Registration",
+      "spots_left": "spots left",
+      "of_teams": "of {{count}} teams",
+      "of_participants": "of {{count}} participants"
+    },
+    "management": {
+      "title": "Manage Event",
+      "overview": "Overview",
+      "registrations": "Registrations",
+      "settings": "Settings",
+      "view_public_page": "View Public Page",
+      "recent_registrations": "Recent Registrations",
+      "recent_registrations_description": "Latest registrations for your event",
+      "tabs": {
+        "overview": "Overview",
+        "registrations": "Registrations",
+        "settings": "Settings"
+      },
+      "stats": {
+        "total_registrations": "Total Registrations",
+        "pending": "pending",
+        "total_revenue": "Total Revenue",
+        "outstanding_etransfers": "Outstanding E-Transfers",
+        "awaiting_confirmation": "Awaiting manual confirmation",
+        "available_spots": "Available Spots",
+        "event_status": "Event Status",
+        "unlimited": "Unlimited",
+        "from_registrations": "From {{count}} registrations"
+      },
+      "actions": {
+        "export_registrations": "Export Registrations",
+        "email_participants": "Email Participants",
+        "open_registration": "Open Registration",
+        "close_registration": "Close Registration",
+        "cancel_event": "Cancel Event",
+        "mark_paid": "Mark Paid",
+        "send_reminder": "Send Reminder",
+        "view": "View",
+        "export_csv": "Export CSV",
+        "make_public": "Make Public",
+        "make_private": "Make Private",
+        "feature_event": "Feature Event",
+        "remove_feature": "Remove Feature",
+        "delete_event": "Delete Event"
+      },
+      "tables": {
+        "headers": {
+          "name": "Name",
+          "email": "Email",
+          "type": "Type",
+          "team": "Team",
+          "status": "Status",
+          "payment_status": "Payment Status",
+          "payment_method": "Payment Method",
+          "amount": "Amount",
+          "amount_due": "Amount Due",
+          "amount_paid": "Amount Paid",
+          "registered": "Registered",
+          "date": "Date",
+          "actions": "Actions"
+        },
+        "no_registrations": "No registrations yet",
+        "unknown": "Unknown",
+        "na": "N/A"
+      },
+      "confirmations": {
+        "are_you_sure": "Are you sure?",
+        "cancel_event_description": "This will cancel the event and notify all registered participants. This action cannot be undone.",
+        "delete_event_description": "This will permanently delete the event and all associated data. This action cannot be undone.",
+        "no_keep_event": "No, keep event",
+        "yes_cancel_event": "Yes, cancel event",
+        "delete_event": "Delete Event"
+      },
+      "status_badges": {
+        "draft": "Draft",
+        "published": "Published",
+        "registration_open": "Registration Open",
+        "registration_closed": "Registration Closed",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "canceled": "Canceled"
+      },
+      "payment": {
+        "marking": "Marking...",
+        "sending": "Sending...",
+        "reminder_logged": "Reminder logged",
+        "canadian_dollars": "CAD"
+      }
+    }
+  }
+}

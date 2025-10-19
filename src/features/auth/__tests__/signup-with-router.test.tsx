@@ -47,7 +47,7 @@ describe("SignupForm with Router", () => {
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByLabelText("Confirm Password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sign up" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create account" })).toBeInTheDocument();
   });
 
   it("validates password confirmation", async () => {
@@ -61,7 +61,7 @@ describe("SignupForm with Router", () => {
     await user.type(screen.getByLabelText("Password"), "password123");
     await user.type(screen.getByLabelText("Confirm Password"), "password456");
 
-    await user.click(screen.getByRole("button", { name: "Sign up" }));
+    await user.click(screen.getByRole("button", { name: "Create account" }));
 
     // Should show password mismatch error
     await waitFor(() => {
@@ -90,7 +90,7 @@ describe("SignupForm with Router", () => {
     await user.type(screen.getByLabelText("Password"), "securepassword123");
     await user.type(screen.getByLabelText("Confirm Password"), "securepassword123");
 
-    await user.click(screen.getByRole("button", { name: "Sign up" }));
+    await user.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => {
       expect(auth.signUp.email).toHaveBeenCalledWith(

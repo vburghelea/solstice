@@ -1,0 +1,100 @@
+{
+  "page": {
+    "title": "Mitgliedschaft",
+    "subtitle": "Werde Mitglied bei Roundup Games und erhalte exklusive Vorteile"
+  },
+  "current_status": {
+    "title": "Dein aktueller Status",
+    "active_membership": "Aktive Mitgliedschaft",
+    "no_active_membership": "Keine aktive Mitgliedschaft",
+    "join_today_message": "Werde noch heute Mitglied und nimm an Events teil",
+    "type": "Typ: {{type}}",
+    "expires": "Läuft ab: {{date}}",
+    "days_remaining": "Verbleibende Tage: {{count}}"
+  },
+  "available_plans": {
+    "title": "Verfügbare Mitgliedschaften",
+    "price": "{{price}} €",
+    "current_plan": "Dein aktueller Plan",
+    "purchase": "Kaufen",
+    "renew": "Verlängern",
+    "not_available": "Nicht verfügbar"
+  },
+  "buttons": {
+    "purchase": "Kaufen",
+    "renew": "Verlängern",
+    "current_plan": "Dein Plan",
+    "not_available": "Nicht verfügbar",
+    "view_options": "Optionen ansehen"
+  },
+  "mobile_cta": {
+    "choose_membership": "Wähle eine Mitgliedschaft zum Weitermachen",
+    "view_options": "Optionen ansehen"
+  },
+  "status": {
+    "processing_payment": "Deine Zahlung wird bearbeitet..."
+  },
+  "errors": {
+    "failed_to_fetch_membership_status": "Wir konnten deinen Mitgliedschaftsstatus nicht abrufen",
+    "failed_to_fetch_membership_type": "Wir konnten den Mitgliedschaftstyp nicht laden",
+    "failed_to_fetch_membership_types": "Wir konnten die verfügbaren Mitgliedschaften nicht laden",
+    "failed_to_create_checkout_session": "Wir konnten die Bezahlung nicht vorbereiten",
+    "missing_membership_type_for_checkout": "Es fehlt ein Mitgliedschaftstyp für die Bezahlung",
+    "missing_checkout_information": "Es fehlen wichtige Informationen für die Bezahlung. Bitte kontaktiere unseren Support.",
+    "failed_to_confirm_membership": "Wir konnten deine Mitgliedschaft nicht bestätigen",
+    "failed_to_confirm_membership_purchase": "Wir konnten deinen Kauf nicht abschließen",
+    "error": "Fehler",
+    "payment": {
+      "canceled": "Die Zahlung wurde abgebrochen",
+      "verification_failed": "Die Zahlung konnte nicht überprüft werden",
+      "processing_error": "Bei der Bearbeitung deiner Zahlung ist ein Fehler aufgetreten",
+      "failed": "Die Zahlung ist fehlgeschlagen"
+    }
+  },
+  "success": {
+    "membership_purchased_successfully": "Herzlichen Glückwunsch! Deine Mitgliedschaft ist jetzt aktiv."
+  },
+  "loading": {
+    "title": "Wird geladen..."
+  },
+  "plan_features": {
+    "title": "Verfügbare Mitgliedschaften",
+    "price_display": "{{price}} €"
+  },
+  "admin": {
+    "report": {
+      "title": "Mitgliedschaftsbericht",
+      "description": "Alle Mitgliedschaften auf der Plattform einsehen und exportieren",
+      "columns": {
+        "user": "Mitglied",
+        "email": "E-Mail",
+        "membership_type": "Mitgliedschaft",
+        "start_date": "Beginn",
+        "end_date": "Ende",
+        "status": "Status",
+        "price": "Preis",
+        "payment_id": "Zahlungs-ID",
+        "created_at": "Erstellt am"
+      },
+      "filter": {
+        "label": "Status",
+        "options": {
+          "all": "Alle",
+          "active": "Aktiv",
+          "expired": "Abgelaufen",
+          "canceled": "Gekündigt"
+        }
+      },
+      "actions": {
+        "export_csv": "CSV exportieren"
+      },
+      "loading": "Mitgliedschaften werden geladen...",
+      "errors": {
+        "failed_to_load": "Wir konnten die Mitgliedschaften nicht laden",
+        "access_denied": "Kein Zugriff",
+        "access_denied_description": "Du hast keine Berechtigung, diesen Bericht einzusehen. Admin-Rechte erforderlich.",
+        "error_loading_report": "Fehler beim Laden des Berichts"
+      }
+    }
+  }
+}

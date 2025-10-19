@@ -29,7 +29,8 @@ import type {
   EventOperationResult,
   EventWithDetails,
 } from "~/features/events/events.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 export const Route = createFileRoute("/events/$slug/")({
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/events/$slug/")({
 });
 
 function EventDetailPage() {
+  const { t } = useEventsTranslation();
   const { slug } = Route.useParams();
   const { user } = useRouteContext({ from: "/events/$slug" });
 
@@ -68,9 +70,9 @@ function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <EventDetailSkeleton />
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
@@ -82,22 +84,20 @@ function EventDetailPage() {
 
   if (error || !eventData || !isPublicEvent) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <div className="container mx-auto px-4 py-16">
           <Alert variant="destructive">
-            <AlertTitle>Event Not Found</AlertTitle>
-            <AlertDescription>
-              The event you're looking for doesn't exist or is not publicly available.
-            </AlertDescription>
+            <AlertTitle>{t("not_found.title")}</AlertTitle>
+            <AlertDescription>{t("not_found.description")}</AlertDescription>
           </Alert>
           <Button asChild className="mt-6">
             <Link to="/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Events
+              {t("not_found.back_to_events")}
             </Link>
           </Button>
         </div>
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
@@ -131,13 +131,13 @@ function EventDetailPage() {
     : "";
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="container mx-auto space-y-6 px-4 py-16">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="sm">
             <Link to="/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Events
+              {t("not_found.back_to_events")}
             </Link>
           </Button>
         </div>
@@ -244,7 +244,7 @@ function EventDetailPage() {
             {event.schedule && Object.keys(event.schedule).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>Event Schedule</CardTitle>
+                  <CardTitle>{t("schedule")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -268,7 +268,7 @@ function EventDetailPage() {
             {event.rules && Object.keys(event.rules).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>Rules & Format</CardTitle>
+                  <CardTitle>{t("rules_format")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -289,7 +289,7 @@ function EventDetailPage() {
             {event.requirements && Object.keys(event.requirements).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>Requirements</CardTitle>
+                  <CardTitle>{t("requirements")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -312,7 +312,7 @@ function EventDetailPage() {
             {event.amenities && Object.keys(event.amenities).length > 0 && (
               <Card className="bg-secondary dark:bg-gray-900/70">
                 <CardHeader>
-                  <CardTitle>Amenities</CardTitle>
+                  <CardTitle>{t("amenities")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-2">
@@ -339,12 +339,14 @@ function EventDetailPage() {
             {/* Registration Card */}
             <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
-                <CardTitle>Registration</CardTitle>
+                <CardTitle>{t("detail_registration.title")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Status</span>
+                    <span className="text-sm font-medium">
+                      {t("detail_registration.status")}
+                    </span>
                     <Badge
                       variant={registrationBadge.variant}
                       className={cn("capitalize", registrationBadge.className)}
@@ -355,7 +357,9 @@ function EventDetailPage() {
 
                   {registrationClosesAtDate && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Closes</span>
+                      <span className="text-sm font-medium">
+                        {t("detail_registration.closes")}
+                      </span>
                       <span className="text-muted-foreground text-sm">
                         {format(registrationClosesAtDate, "MMM d, yyyy")}
                       </span>
@@ -363,7 +367,9 @@ function EventDetailPage() {
                   )}
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Registered</span>
+                    <span className="text-sm font-medium">
+                      {t("detail_registration.registered")}
+                    </span>
                     <span className="text-sm">
                       {event.registrationCount}
                       {registrationCapacitySuffix}
@@ -372,7 +378,9 @@ function EventDetailPage() {
 
                   {event.availableSpots !== undefined && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Available Spots</span>
+                      <span className="text-sm font-medium">
+                        {t("detail_registration.available_spots")}
+                      </span>
                       <span
                         className={`text-sm font-bold ${
                           event.availableSpots > 0 ? "text-green-600" : "text-red-600"
@@ -388,12 +396,14 @@ function EventDetailPage() {
 
                 {/* Pricing */}
                 <div className="space-y-2">
-                  <h4 className="font-medium">Registration Fees</h4>
+                  <h4 className="font-medium">{t("detail_registration.fees")}</h4>
 
                   {event.registrationType === "team" ||
                   event.registrationType === "both" ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Team Registration</span>
+                      <span className="text-sm">
+                        {t("detail_registration.team_registration")}
+                      </span>
                       <span className="font-medium">
                         ${((event.teamRegistrationFee || 0) / 100).toFixed(2)}
                       </span>
@@ -403,7 +413,9 @@ function EventDetailPage() {
                   {event.registrationType === "individual" ||
                   event.registrationType === "both" ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Individual Registration</span>
+                      <span className="text-sm">
+                        {t("detail_registration.individual_registration")}
+                      </span>
                       <span className="font-medium">
                         ${((event.individualRegistrationFee || 0) / 100).toFixed(2)}
                       </span>
@@ -414,7 +426,8 @@ function EventDetailPage() {
                     <Alert>
                       <InfoIcon className="h-4 w-4" />
                       <AlertDescription>
-                        {event.earlyBirdDiscount}% early bird discount available until{" "}
+                        {event.earlyBirdDiscount}%{" "}
+                        {t("detail_registration.early_bird_discount")}{" "}
                         {format(earlyBirdDeadlineDate, "MMM d")}
                       </AlertDescription>
                     </Alert>
@@ -431,9 +444,11 @@ function EventDetailPage() {
                 ) : registrationStatus?.isRegistered ? (
                   <Alert>
                     <CheckCircleIcon className="h-4 w-4" />
-                    <AlertTitle>You're Registered!</AlertTitle>
+                    <AlertTitle>
+                      {t("detail_registration.already_registered.title")}
+                    </AlertTitle>
                     <AlertDescription>
-                      You are already registered for this event.
+                      {t("detail_registration.already_registered.description")}
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -442,26 +457,28 @@ function EventDetailPage() {
                       <Alert>
                         <InfoIcon className="h-4 w-4" />
                         <AlertDescription>
-                          Please{" "}
-                          <Link to="/auth/login" className="underline">
-                            sign in
-                          </Link>{" "}
-                          to register for this event.
+                          {t("detail_registration.sign_in_required", {
+                            link: (
+                              <Link to="/auth/login" className="underline">
+                                sign in
+                              </Link>
+                            ),
+                          })}
                         </AlertDescription>
                       </Alert>
                     ) : isRegistrationOpen && hasSpots ? (
                       <Button asChild className="w-full">
                         <Link to="/events/$slug/register" params={{ slug: event.slug }}>
-                          Register Now
+                          {t("detail_registration.register_now")}
                         </Link>
                       </Button>
                     ) : !isRegistrationOpen ? (
                       <Button disabled className="w-full">
-                        Registration Closed
+                        {t("detail_registration.registration_closed")}
                       </Button>
                     ) : (
                       <Button disabled className="w-full">
-                        Event Full
+                        {t("detail_registration.event_full")}
                       </Button>
                     )}
                   </>
@@ -472,7 +489,7 @@ function EventDetailPage() {
             {/* Organizer Card */}
             <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
-                <CardTitle>Event Organizer</CardTitle>
+                <CardTitle>{t("organizer")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -500,7 +517,7 @@ function EventDetailPage() {
             {/* Share Card */}
             <Card className="bg-secondary dark:bg-gray-900/70">
               <CardHeader>
-                <CardTitle>Share Event</CardTitle>
+                <CardTitle>{t("share.title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Button
@@ -511,14 +528,14 @@ function EventDetailPage() {
                     // You could add a toast notification here
                   }}
                 >
-                  Copy Link
+                  {t("share.copy_link")}
                 </Button>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 

@@ -1,0 +1,294 @@
+{
+  "http": {
+    "400": {
+      "title": "Ungültige Anfrage",
+      "message": "Der Server konnte Deine Anfrage nicht verstehen."
+    },
+    "401": {
+      "title": "Nicht autorisiert",
+      "message": "Du musst angemeldet sein, um auf diese Ressource zuzugreifen."
+    },
+    "403": {
+      "title": "Verboten",
+      "message": "Du hast keine Berechtigung, auf diese Ressource zuzugreifen."
+    },
+    "404": {
+      "title": "Nicht gefunden",
+      "message": "Die Seite, die Du suchst, existiert nicht."
+    },
+    "408": {
+      "title": "Anfrage-Timeout",
+      "message": "Der Server hat zu lange gebraucht, um zu antworten."
+    },
+    "429": {
+      "title": "Zu viele Anfragen",
+      "message": "Du hast zu viele Anfragen gesendet. Bitte versuche es später erneut."
+    },
+    "500": {
+      "title": "Interner Serverfehler",
+      "message": "Etwas ist auf unserer Seite schiefgelaufen. Bitte versuche es später erneut."
+    },
+    "502": {
+      "title": "Fehlerhaftes Gateway",
+      "message": "Der Server ist vorübergehend nicht verfügbar."
+    },
+    "503": {
+      "title": "Dienst nicht verfügbar",
+      "message": "Der Dienst ist vorübergehend wegen Wartungsarbeiten nicht verfügbar."
+    },
+    "504": {
+      "title": "Gateway-Timeout",
+      "message": "Der Server braucht zu lange zum Antworten."
+    }
+  },
+  "network": {
+    "offline": {
+      "title": "Offline",
+      "message": "Du scheinst offline zu sein. Bitte überprüfe Deine Internetverbindung."
+    },
+    "connection_failed": {
+      "title": "Verbindung fehlgeschlagen",
+      "message": "Verbindung zum Server konnte nicht hergestellt werden. Bitte überprüfe Deine Internetverbindung."
+    },
+    "timeout": {
+      "title": "Anfrage-Timeout",
+      "message": "Die Anfrage hat das Zeitlimit überschritten. Bitte versuche es erneut."
+    },
+    "slow_connection": {
+      "title": "Langsame Verbindung",
+      "message": "Deine Verbindung scheint langsam zu sein. Einige Funktionen funktionieren möglicherweise nicht richtig."
+    }
+  },
+  "validation": {
+    "required_field": {
+      "title": "Pflichtfeld",
+      "message": "Dieses Feld ist erforderlich."
+    },
+    "invalid_format": {
+      "title": "Ungültiges Format",
+      "message": "Bitte gib ein gültiges Format ein."
+    },
+    "invalid_email": {
+      "title": "Ungültige E-Mail",
+      "message": "Bitte gib eine gültige E-Mail-Adresse ein."
+    },
+    "invalid_phone": {
+      "title": "Ungültige Telefonnummer",
+      "message": "Bitte gib eine gültige Telefonnummer ein."
+    },
+    "password_mismatch": {
+      "title": "Passwort stimmt nicht überein",
+      "message": "Die Passwörter stimmen nicht überein."
+    },
+    "weak_password": {
+      "title": "Schwaches Passwort",
+      "message": "Das Passwort ist zu schwach. Bitte wähle ein stärkeres Passwort."
+    },
+    "file_too_large": {
+      "title": "Datei zu groß",
+      "message": "Die Datei ist zu groß. Bitte wähle eine kleinere Datei."
+    },
+    "invalid_file_type": {
+      "title": "Ungültiger Dateityp",
+      "message": "Dieser Dateityp ist nicht erlaubt."
+    }
+  },
+  "authentication": {
+    "invalid_credentials": {
+      "title": "Ungültige Anmeldedaten",
+      "message": "Die eingegebene E-Mail oder das Passwort ist falsch."
+    },
+    "account_locked": {
+      "title": "Konto gesperrt",
+      "message": "Dein Konto wurde gesperrt. Bitte kontaktiere den Support."
+    },
+    "unverified_email": {
+      "title": "Nicht verifizierte E-Mail",
+      "message": "Bitte verifiziere Deine E-Mail-Adresse, um fortzufahren."
+    },
+    "session_expired": {
+      "title": "Sitzung abgelaufen",
+      "message": "Deine Sitzung ist abgelaufen. Bitte melde Dich erneut an."
+    },
+    "access_denied": {
+      "title": "Zugriff verweigert",
+      "message": "Du hast keine Berechtigung, auf diese Ressource zuzugreifen."
+    },
+    "oauth_failed": {
+      "title": "OAuth fehlgeschlagen",
+      "message": "Authentifizierung mit dem ausgewählten Anbieter fehlgeschlagen."
+    },
+    "not_authenticated": {
+      "title": "Nicht authentifiziert",
+      "message": "Du musst angemeldet sein, um auf diese Ressource zuzugreifen."
+    },
+    "user_not_authenticated": {
+      "title": "Benutzer nicht authentifiziert",
+      "message": "Bitte anmelden, um fortzufahren."
+    },
+    "admin_access_required": {
+      "title": "Admin-Zugriff erforderlich",
+      "message": "Du benötigst Administratorrechte, um auf diese Ressource zuzugreifen."
+    },
+    "not_authorized": {
+      "title": "Nicht autorisiert",
+      "message": "Du hast keine Berechtigung, diese Aktion durchzuführen."
+    }
+  },
+  "database": {
+    "connection_failed": {
+      "title": "Datenbankverbindung fehlgeschlagen",
+      "message": "Verbindung zur Datenbank konnte nicht hergestellt werden. Bitte versuche es später erneut."
+    },
+    "query_failed": {
+      "title": "Abfrage fehlgeschlagen",
+      "message": "Die Datenbankabfrage konnte nicht ausgeführt werden."
+    },
+    "constraint_violation": {
+      "title": "Constraint-Verletzung",
+      "message": "Die Daten verstoßen gegen Datenbank-Constraints."
+    },
+    "duplicate_entry": {
+      "title": "Doppelter Eintrag",
+      "message": "Dieser Eintrag existiert bereits."
+    },
+    "database_error": {
+      "title": "Datenbankfehler",
+      "message": "Ein Datenbankfehler ist aufgetreten. Bitte versuche es später erneut."
+    },
+    "failed_to_fetch_members": {
+      "title": "Mitglieder konnten nicht geladen werden",
+      "message": "Mitglieder konnten nicht geladen werden"
+    },
+    "failed_to_list_pending_reviews": {
+      "title": "Ausstehende Reviews konnten nicht gelistet werden",
+      "message": "Ausstehende Reviews konnten nicht gelistet werden"
+    },
+    "no_data_provided": {
+      "title": "Keine Daten bereitgestellt",
+      "message": "Keine Daten bereitgestellt"
+    },
+    "failed_to_update_profile": {
+      "title": "Profil konnte nicht aktualisiert werden",
+      "message": "Profil konnte nicht aktualisiert werden"
+    },
+    "failed_to_complete_profile": {
+      "title": "Profil konnte nicht vervollständigt werden",
+      "message": "Profil konnte nicht vervollständigt werden"
+    },
+    "invalid_image_data_format": {
+      "title": "Ungültige Bilddaten",
+      "message": "Ungültiges Bilddatenformat"
+    },
+    "invalid_image_payload": {
+      "title": "Ungültige Bild-Payload",
+      "message": "Ungültige Bild-Payload"
+    },
+    "image_too_large": {
+      "title": "Bild zu groß",
+      "message": "Bild zu groß (max 1MB)"
+    },
+    "failed_to_upload_avatar": {
+      "title": "Avatar konnte nicht hochgeladen werden",
+      "message": "Avatar konnte nicht hochgeladen werden"
+    },
+    "failed_to_remove_avatar": {
+      "title": "Avatar konnte nicht entfernt werden",
+      "message": "Avatar konnte nicht entfernt werden"
+    },
+    "failed_to_update_privacy_settings": {
+      "title": "Privatsphäre-Einstellungen konnten nicht aktualisiert werden",
+      "message": "Privatsphäre-Einstellungen konnten nicht aktualisiert werden"
+    },
+    "server_error": {
+      "title": "Serverfehler",
+      "message": "Ein interner Serverfehler ist aufgetreten. Bitte versuche es später erneut."
+    },
+    "fetch_failed": {
+      "title": "Abruf fehlgeschlagen",
+      "message": "{{resource}} konnte nicht geladen werden. Bitte versuche es später erneut."
+    },
+    "create_failed": {
+      "title": "Erstellung fehlgeschlagen",
+      "message": "{{resource}} konnte nicht erstellt werden. Bitte versuche es erneut."
+    },
+    "update_failed": {
+      "title": "Aktualisierung fehlgeschlagen",
+      "message": "{{resource}} konnte nicht aktualisiert werden. Bitte versuche es erneut."
+    },
+    "delete_failed": {
+      "title": "Löschung fehlgeschlagen",
+      "message": "{{resource}} konnte nicht gelöscht werden. Bitte versuche es erneut."
+    }
+  },
+  "file": {
+    "not_found": {
+      "title": "Datei nicht gefunden",
+      "message": "Die angeforderte Datei konnte nicht gefunden werden."
+    },
+    "upload_failed": {
+      "title": "Upload fehlgeschlagen",
+      "message": "Die Datei konnte nicht hochgeladen werden. Bitte versuche es erneut."
+    },
+    "download_failed": {
+      "title": "Download fehlgeschlagen",
+      "message": "Die Datei konnte nicht heruntergeladen werden. Bitte versuche es erneut."
+    },
+    "corrupted": {
+      "title": "Beschädigte Datei",
+      "message": "Die Datei scheint beschädigt zu sein."
+    }
+  },
+  "payment": {
+    "payment_failed": {
+      "title": "Zahlung fehlgeschlagen",
+      "message": "Deine Zahlung konnte nicht verarbeitet werden. Bitte versuche es erneut."
+    },
+    "card_declined": {
+      "title": "Karte abgelehnt",
+      "message": "Deine Karte wurde abgelehnt. Bitte versuche eine andere Zahlungsmethode."
+    },
+    "insufficient_funds": {
+      "title": "Unzureichende Mittel",
+      "message": "Du hast nicht genügend Mittel für diese Transaktion."
+    },
+    "invalid_card": {
+      "title": "Ungültige Karte",
+      "message": "Die eingegebenen Karteninformationen sind ungültig."
+    }
+  },
+  "general": {
+    "invalid_request": {
+      "title": "Ungültige Anfrage",
+      "message": "Die Anfrage war ungültig oder fehlerhaft formatiert."
+    },
+    "permission_denied": {
+      "title": "Berechtigung verweigert",
+      "message": "Du hast keine Berechtigung, diese Aktion durchzuführen."
+    },
+    "resource_not_found": {
+      "title": "Ressource nicht gefunden",
+      "message": "Die angeforderte Ressource konnte nicht gefunden werden."
+    },
+    "rate_limit_exceeded": {
+      "title": "Rate-Limit überschritten",
+      "message": "Du hast zu viele Anfragen gesendet. Bitte versuche es später erneut."
+    },
+    "maintenance_mode": {
+      "title": "Wartungsmodus",
+      "message": "Die Seite befindet sich derzeit im Wartungsmodus. Bitte versuche es später erneut."
+    }
+  },
+  "actions": {
+    "retry": "Erneut versuchen",
+    "refresh": "Aktualisieren",
+    "go_back": "Zurück",
+    "go_home": "Zur Startseite",
+    "contact_support": "Support kontaktieren",
+    "report_issue": "Problem melden",
+    "try_again": "Erneut versuchen",
+    "reload_page": "Seite neu laden",
+    "check_connection": "Verbindung prüfen",
+    "clear_cache": "Cache leeren"
+  }
+}

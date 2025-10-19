@@ -1,0 +1,83 @@
+{
+  "hero": {
+    "eyebrow": "O Roundup Games",
+    "title": "Platforma dla lokalnych spotkań wokół gier planszowych i fabularnych.",
+    "subtitle": "Istniejemy, aby ułatwić każdemu odwiedzającemu wejście do tętniącej życiem przestrzeni, rzucenie kośćmi i wyjście z wiedzą o więcej osobach, które dbają o ich historie.",
+    "cta_text": "Poznaj nasze programy",
+    "secondary_cta": "Poznaj nasze zespoły"
+  },
+  "mission": {
+    "eyebrow": "Nasza misja",
+    "title": "Walka z samotnością przez radosną, prawdziwą zabawę",
+    "description_1": "Roundup Games zostało stworzone dla osób takich jak Ty, które tęsknią za połączeniem tak samo jak za sprytnymi mechanikami i wspólnym opowiadaniem historii. Pielęgnujemy lokalne doświadczenia, które są ciepłe, bezstresowe i przemyślanie prowadzone, abyś mógł przyjść taki, jaki jesteś i od razu poczuć się zauważonym.",
+    "description_2": "Organizując sesje dzielenia się umiejętnościami, kręgi mentorskie i zmieniające się kampanie, dajemy opowiadaczom historii przestrzeń, której potrzebują do doskonalenia swojego rzemiosła, jednocześnie wprowadzając publiczność w odważne nowe światy. Każda inicjatywa, którą wprowadzamy, jest prowadzona przez przekonanie, że zabawa to podstawowa potrzeba ludzka – i jeden z najpotężniejszych antidotum na nudę i izolację.",
+    "highlights": {
+      "belonging": {
+        "title": "Przynależność przy każdym stole",
+        "description": "Łączymy nowicjuszy, weteranów i ciekawych odwiedzających z przyjaznymi gospodarzami, aby nikt nie musiał znów spędzać cichego wieczoru w samotności."
+      },
+      "storytellers": {
+        "title": "Sceny dla opowiadaczy historii",
+        "description": "Roundup Games tworzy przestrzenie gotowe do prób, w których Mistrzowie Gry mogą ćwiczyć swoje rzemiosło, otrzymywać coaching i prezentować swoje historie zaangażowanej publiczności."
+      },
+      "purpose": {
+        "title": "Zabawa z celem",
+        "description": "Każde spotkanie jest zaprojektowane, aby rozpalić śmiech, ciekawość i długotrwałe przyjaźnie przez przemyślane doświadczenia z grami planszowymi i fabularnymi."
+      }
+    }
+  },
+  "vision": {
+    "eyebrow": "Nasza wizja",
+    "title": "Bezpieczeństwo przede wszystkim w projektowaniu spotkań i danych",
+    "description_1": "Zaufanie jest fundamentem każdego doświadczenia Roundup. Tworzymy bezpieczne przestrzenie, w których uczestnicy mogą zanurzyć się w historii bez martwienia się o fizyczne, emocjonalne czy cyfrowe zagrożenia. To zaangażowanie zaczyna się od wyszkolonego personelu na miejscu i rozciąga się na to, jak przechowujemy, zezwalamy i działamy na Twoje informacje za kulisami.",
+    "description_2": "Nasza platforma nieustannie się rozwija, aby sprostać oczekiwaniom naszej społeczności i partnerów. Inwestujemy w transparentne raportowanie, odpowiedzialne narzędzia AI i współpracę przy przeglądach polityk z ekspertami w dziedzinie ochrony, dostępności i cyberbezpieczeństwa.",
+    "commitments": [
+      "Dedykowani opiekunowie społeczności i wyszkoleni moderatorzy na każdym oficjalnym wydarzeniu.",
+      "Narzędzia bezpieczeństwa – od sprawdzania zgody po kręgi podsumowujące – wplecione w projekt sesji.",
+      "Prywatność przede wszystkim w praktykach danych z szyfrowanym przechowywaniem, minimalnym retencją i transparentnym zarządzaniem.",
+      "Ciągłe audyty z partnerami specjalizującymi się w ochronie wrażliwych społeczności."
+    ]
+  },
+  "stories_insights": {
+    "eyebrow": "Historie i spostrzeżenia",
+    "title": "Artykuły wkrótce",
+    "subtitle": "Tworzymy bibliotekę esejów, wywiadów i aktualizacji postępów, abyś mógł śledzić, jak wizja Roundup Games staje się rzeczywistością w różnych regionach.",
+    "articles": {
+      "mission_practice": {
+        "title": "Misja w praktyce",
+        "description": "Historie z lokalnych oddziałów, które zamieniają puste środy wieczorem w tętniące życiem, międzygeneracyjne spotkania."
+      },
+      "vision_safety": {
+        "title": "Wizja i standardy bezpieczeństwa",
+        "description": "Głębokie analizy polityk, partnerów i narzędzi, które sprawiają, że nasza społeczność czuje się bezpieczna i szanowana."
+      },
+      "roadmap_impact": {
+        "title": "Mapa drogowa i raporty wpływu",
+        "description": "Kwartalne aktualizacje nowych funkcji platformy, regionalnych startów i wskaźników, które kierują naszymi decyzjami."
+      }
+    },
+    "publishing_soon": "Publikacja wkrótce"
+  },
+  "feedback": {
+    "eyebrow": "Podziel się swoim głosem",
+    "title": "Kanały opinii wkrótce otwarte",
+    "description": "Projektujemy portal opinii, w którym możesz wspierać nowe pomysły, zgłaszać obawy i pomagać nam doskonalić każde doświadczenie. Do startu możesz wysłać e-mail na",
+    "email": "hello@roundup.games",
+    "email_description": "nasz zespół społeczności przekaże Twoją wiadomość do odpowiednich osób.",
+    "topics": {
+      "suggest_system": {
+        "title": "Zaproponuj nowy system gry",
+        "description": "Pomóż nam prezentować zasady i uniwersa, które ekscytują Twoje grupy i rozszerzają naszą bibliotekę przygód."
+      },
+      "nominate_venue": {
+        "title": "Zaproponuj miejsce",
+        "description": "Opowiedz nam o kawiarniach, bibliotekach i centrach społecznych, które byłyby wspaniałymi miejscami spotkań."
+      },
+      "report_issue": {
+        "title": "Zgłoś problem z platformą",
+        "description": "Udostępnij błędy, obawy dotyczące dostępności lub prośby o treści, abyśmy mogli ciągle poprawiać doświadczenie cyfrowe."
+      }
+    },
+    "feedback_form_soon": "Formularz opinii startuje wkrótce"
+  }
+}

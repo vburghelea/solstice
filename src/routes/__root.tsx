@@ -8,11 +8,21 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { ConsentProvider } from "~/features/consent";
 import type { AuthUser } from "~/lib/auth/types";
+import { i18nConfig, type SupportedLanguage } from "~/lib/i18n/config";
+import { detectLanguageFromPath } from "~/lib/i18n/detector";
+import i18n from "~/lib/i18n/i18n";
 import appCss from "~/styles.css?url";
+
+type RootRouteContext = {
+  readonly user: AuthUser | null;
+  readonly language: SupportedLanguage;
+  readonly i18nRequestKey: string | null;
+};
 
 // Lazy load devtools to avoid hydration issues
 const ReactQueryDevtools = lazy(() =>
@@ -31,26 +41,45 @@ const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaste
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  user: AuthUser;
+  user: AuthUser | null;
+  language: SupportedLanguage;
+  i18nRequestKey: string | null;
 }>()({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ location }) => {
+    const detectedLanguage =
+      detectLanguageFromPath(location.pathname) ?? i18nConfig.defaultLanguage;
+
     try {
-      // Check if we're on the server or client
-      if (typeof window === "undefined") {
-        // Server: use the server function
-        const user = await getCurrentUser();
-        return { user };
-      } else {
-        // Client: fetch the full user data
-        const user = await context.queryClient.fetchQuery({
-          queryKey: ["user"],
-          queryFn: getCurrentUser,
+      // Ensure i18n is properly initialized and language is set before proceeding
+      if (!i18n.isInitialized) {
+        // i18n should already be initialized from providers.tsx, but wait just in case
+        await new Promise<void>((resolve) => {
+          if (i18n.isInitialized) {
+            resolve();
+          } else {
+            i18n.on("initialized", resolve);
+          }
         });
-        return { user };
       }
+
+      let i18nRequestKey: string | null = null;
+
+      if (typeof window === "undefined") {
+        const { createRequestScopedI18n } = await import(
+          "~/lib/i18n/request-instance.server"
+        );
+        const { key } = await createRequestScopedI18n(detectedLanguage);
+        i18nRequestKey = key;
+      } else if (i18n.language !== detectedLanguage) {
+        // On the client we can safely reuse the singleton instance
+        await i18n.changeLanguage(detectedLanguage);
+      }
+
+      const user = await getCurrentUser();
+      return { user, language: detectedLanguage, i18nRequestKey };
     } catch (error) {
       console.error("Error loading user:", error);
-      return { user: null };
+      return { user: null, language: detectedLanguage, i18nRequestKey: null };
     }
   },
   head: () => ({
@@ -76,20 +105,100 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
-  const { user } = Route.useRouteContext();
+  const { user, language, i18nRequestKey } = Route.useRouteContext() as RootRouteContext;
+
+  const serverI18n =
+    typeof window === "undefined" && i18nRequestKey
+      ? consumeRequestScopedI18n(i18nRequestKey)
+      : null;
+
+  const activeI18n = serverI18n ?? i18n;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const syncLanguage = async () => {
+      // Only change language if there's a mismatch to prevent unnecessary re-renders
+      if (activeI18n.language !== language) {
+        await activeI18n.changeLanguage(language);
+      }
+
+      if (typeof window === "undefined" || cancelled) {
+        return;
+      }
+
+      const snapshot = {
+        routeLanguage: language,
+        i18nLanguage: activeI18n.language,
+        availableLanguages: activeI18n.languages,
+        resourceStatus: i18nConfig.supportedLanguages.reduce(
+          (acc, lng) => ({
+            ...acc,
+            [lng]: {
+              navigation: activeI18n.hasResourceBundle(lng, "navigation"),
+              common: activeI18n.hasResourceBundle(lng, "common"),
+              about: activeI18n.hasResourceBundle(lng, "about"),
+            },
+          }),
+          {} as Record<SupportedLanguage, Record<string, boolean>>,
+        ),
+      };
+
+      if (i18nConfig.debug) {
+        console.info("[RootComponent] Language sync complete", snapshot);
+      }
+    };
+
+    void syncLanguage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeI18n, language]);
+
   return (
-    <RootDocument>
-      <ConsentProvider user={user}>
-        <Outlet />
-      </ConsentProvider>
+    <RootDocument language={language}>
+      <I18nextProvider i18n={activeI18n}>
+        <ConsentProvider user={user}>
+          <Outlet />
+        </ConsentProvider>
+      </I18nextProvider>
     </RootDocument>
   );
 }
 
-function RootDocument({ children }: { readonly children: React.ReactNode }) {
+function consumeRequestScopedI18n(key: string) {
+  if (typeof window !== "undefined") {
+    return null;
+  }
+
+  const registry = globalThis.__solsticeRequestI18nRegistry;
+  if (!registry) {
+    return null;
+  }
+
+  const instance = registry.get(key) ?? null;
+  if (instance) {
+    registry.delete(key);
+  }
+
+  return instance;
+}
+
+declare global {
+  var __solsticeRequestI18nRegistry: Map<string, import("i18next").i18n> | undefined;
+}
+
+function RootDocument({
+  children,
+  language,
+}: {
+  readonly children: React.ReactNode;
+  readonly language: SupportedLanguage;
+}) {
   return (
     // suppress since we're updating the "dark" class in a custom script below
-    <html lang="en" suppressHydrationWarning>
+    <html lang={language} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

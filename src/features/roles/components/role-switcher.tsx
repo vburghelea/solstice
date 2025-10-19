@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { useRolesTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 import {
@@ -19,6 +20,7 @@ import {
 } from "~/features/roles/role-switcher-context";
 
 export function RoleSwitcher() {
+  const { t } = useRolesTranslation();
   const { resolution, status, error, switchPersona, clearError } = useRoleSwitcher();
   const activePersona = useActivePersona();
   const [isHydrated, setIsHydrated] = useState(false);
@@ -74,17 +76,17 @@ export function RoleSwitcher() {
             <Loader2Icon className="mr-2 size-4 animate-spin" aria-hidden="true" />
           ) : null}
           <span className="mr-2 font-medium">
-            {isHydrated ? activePersona.shortLabel : "Loading..."}
+            {isHydrated
+              ? t(`personas.${activePersona.id}.short_label`)
+              : t("switcher.loading")}
           </span>
-          <Badge variant="secondary">Persona</Badge>
+          <Badge variant="secondary">{t("switcher.badge")}</Badge>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg" showCloseButton>
         <DialogHeader>
-          <DialogTitle>Switch persona</DialogTitle>
-          <DialogDescription>
-            Choose a workspace to preview persona-specific navigation and tooling.
-          </DialogDescription>
+          <DialogTitle>{t("switcher.title")}</DialogTitle>
+          <DialogDescription>{t("switcher.description")}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           {resolution.personas
@@ -111,13 +113,17 @@ export function RoleSwitcher() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col">
-                      <span className="text-base font-semibold">{persona.label}</span>
+                      <span className="text-base font-semibold">
+                        {t(`personas.${persona.id}.label`)}
+                      </span>
                       <span className="text-muted-foreground text-sm">
-                        {persona.description}
+                        {t(`personas.${persona.id}.description`)}
                       </span>
                     </div>
                     <Badge variant={isActive ? "default" : "outline"}>
-                      {isActive ? "Active" : "Available"}
+                      {isActive
+                        ? t("switcher.status.active")
+                        : t("switcher.status.available")}
                     </Badge>
                   </div>
                 </button>

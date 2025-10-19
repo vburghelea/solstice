@@ -1,29 +1,30 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { tCommon } from "~/lib/i18n/server-translations";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { RoleAssignmentRow, RoleOperationResult } from "./roles.types";
 
 const assignRoleSchema = z
   .object({
-    userId: z.string().min(1, "User is required"),
-    roleId: z.string().min(1, "Role is required"),
+    userId: z.string().min(1, tCommon("validation.user_required")),
+    roleId: z.string().min(1, tCommon("validation.role_required")),
     teamId: z.string().min(1).optional().nullable(),
     eventId: z.string().min(1).optional().nullable(),
-    notes: z.string().trim().max(500, "Notes must be 500 characters or fewer").optional(),
+    notes: z.string().trim().max(500, tCommon("validation.notes_too_long")).optional(),
     expiresAt: z.string().datetime().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.teamId && data.eventId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Choose either a team scope or an event scope—not both.",
+        message: tCommon("validation.choose_either_team_or_event"),
         path: ["teamId"],
       });
     }
   });
 
 const removeRoleSchema = z.object({
-  assignmentId: z.string().min(1, "Assignment id is required"),
+  assignmentId: z.string().min(1, tCommon("validation.assignment_id_required")),
 });
 
 function normalizeNotes(notes?: string) {

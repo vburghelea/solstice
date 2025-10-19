@@ -51,6 +51,7 @@ import type {
   EventOperationResult,
   EventWithDetails,
 } from "~/features/events/events.types";
+import { useCommonTranslation, useOpsTranslation } from "~/hooks/useTypedTranslation";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
@@ -72,6 +73,8 @@ interface FocusTarget {
 }
 
 export function OpsOverviewDashboard() {
+  const { t } = useOpsTranslation();
+  const { t: commonT } = useCommonTranslation();
   const queryClient = useQueryClient();
   const [approvalDialog, setApprovalDialog] = useState<{
     isOpen: boolean;
@@ -113,8 +116,8 @@ export function OpsOverviewDashboard() {
       if (result.success) {
         toast.success(
           approve
-            ? "Event approved and moved to the operations pipeline"
-            : "Event returned for revisions",
+            ? t("approval_dialog.success_approved")
+            : t("approval_dialog.success_rejected"),
         );
         void queryClient.invalidateQueries({ queryKey: ["ops", "events"] });
         void queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -125,7 +128,7 @@ export function OpsOverviewDashboard() {
           action: "approve",
         });
       } else {
-        const message = result.errors?.[0]?.message || "Failed to update event";
+        const message = result.errors?.[0]?.message || t("approval_dialog.error_update");
         toast.error(message);
         queryClient.setQueryData(
           ["ops", "events", "pending"],
@@ -134,7 +137,7 @@ export function OpsOverviewDashboard() {
       }
     },
     onError: () => {
-      toast.error("An error occurred while updating the event");
+      toast.error(t("approval_dialog.error_occurred"));
     },
   });
 
@@ -156,11 +159,11 @@ export function OpsOverviewDashboard() {
       const event = pendingList[0];
       return {
         tone: "critical",
-        title: "Approve the next submission",
+        title: t("pipeline.next_submission"),
         description: `${event.name} is queued to go live once you give the green light. Double-check organizer details and publish when ready.`,
-        meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? "Location TBD"}`,
+        meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? t("pipeline.location_tbd")}`,
         ctaHref: "/admin/events-review",
-        ctaLabel: "Review submission",
+        ctaLabel: t("pipeline.review_submission"),
       };
     }
 
@@ -170,12 +173,12 @@ export function OpsOverviewDashboard() {
         tone: item.severity === "critical" ? "critical" : "warning",
         title:
           item.severity === "critical"
-            ? "Urgent logistics check"
-            : "Monitor marketing pulse",
+            ? t("pipeline.urgent_logistics")
+            : t("pipeline.monitor_marketing"),
         description: item.message,
-        meta: `${format(item.startDate, "MMM d")} · ${item.city ?? "Location TBD"}`,
+        meta: `${format(item.startDate, "MMM d")} · ${item.city ?? t("pipeline.location_tbd")}`,
         ctaHref: "/ops/events",
-        ctaLabel: "Open event roster",
+        ctaLabel: t("pipeline.open_roster"),
       };
     }
 
@@ -183,16 +186,16 @@ export function OpsOverviewDashboard() {
       const event = pipelineList[0];
       return {
         tone: "default",
-        title: "Stay ahead of the pipeline",
+        title: t("pipeline.stay_ahead"),
         description: `${event.name} is the next confirmed experience. Review staffing notes and marketing pushes to keep momentum strong.`,
-        meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? "Location TBD"}`,
+        meta: `${format(new Date(event.startDate), "MMM d")} · ${event.city ?? t("pipeline.location_tbd")}`,
         ctaHref: `/ops/events/${event.id}`,
-        ctaLabel: "Open ops view",
+        ctaLabel: t("pipeline.open_ops_view"),
       };
     }
 
     return null;
-  }, [attentionItems, pendingList, pipelineList]);
+  }, [attentionItems, pendingList, pipelineList, t]);
 
   if (isLoading) {
     return <OpsOverviewSkeleton />;
@@ -204,20 +207,15 @@ export function OpsOverviewDashboard() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            Event operations mission control
-          </h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Keep approvals, staffing, and marketing signals aligned in one workspace so
-            you can steer live experiences without leaving the dashboard.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.title")}</h1>
+          <p className="text-muted-foreground max-w-2xl">{t("dashboard.subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="secondary">
-            <Link to="/ops/events">View legacy dashboard</Link>
+            <Link to="/ops/events">{t("dashboard.legacy_dashboard_link")}</Link>
           </Button>
           <Button asChild>
-            <Link to="/ops/events/create">Launch new event</Link>
+            <Link to="/ops/events/create">{t("dashboard.launch_event")}</Link>
           </Button>
         </div>
       </div>
@@ -227,27 +225,27 @@ export function OpsOverviewDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <SnapshotCard
           icon={<ClockIcon className="h-5 w-5" />}
-          label="Awaiting review"
+          label={t("snapshot_cards.awaiting_review")}
           value={snapshot.approvals}
-          description="Submissions queued for operations approval"
+          description={t("snapshot_cards.awaiting_review_description")}
         />
         <SnapshotCard
           icon={<SparklesIcon className="h-5 w-5" />}
-          label="Registration live"
+          label={t("snapshot_cards.registration_live")}
           value={snapshot.registrationOpen}
-          description="Campaigns actively collecting signups"
+          description={t("snapshot_cards.registration_live_description")}
         />
         <SnapshotCard
           icon={<Users2Icon className="h-5 w-5" />}
-          label="Confirmed events"
+          label={t("snapshot_cards.confirmed_events")}
           value={snapshot.confirmedEvents}
-          description="Published and ready for execution"
+          description={t("snapshot_cards.confirmed_events_description")}
         />
         <SnapshotCard
           icon={<ShieldAlertIcon className="h-5 w-5" />}
-          label="Capacity alerts"
+          label={t("snapshot_cards.capacity_alerts")}
           value={snapshot.capacityAlerts}
-          description="Tables approaching waitlist thresholds"
+          description={t("snapshot_cards.capacity_alerts_description")}
           tone={snapshot.capacityAlerts > 0 ? "warning" : "default"}
         />
       </div>
@@ -255,9 +253,9 @@ export function OpsOverviewDashboard() {
       {isRefreshingData ? (
         <Alert variant="default">
           <AlertCircleIcon className="h-4 w-4" />
-          <AlertTitle>Refreshing data</AlertTitle>
+          <AlertTitle>{t("status_messages.refreshing_data")}</AlertTitle>
           <AlertDescription>
-            Pulling the latest submissions, staffing counts, and campaign stats.
+            {t("status_messages.refreshing_data_description")}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -265,14 +263,14 @@ export function OpsOverviewDashboard() {
       <Tabs defaultValue={pendingList.length > 0 ? "approvals" : "pipeline"}>
         <TabsList>
           <TabsTrigger value="approvals">
-            Approvals queue
+            {t("tabs.approvals_queue")}
             {pendingList.length > 0 ? (
               <Badge variant="destructive" className="ml-2">
                 {pendingList.length}
               </Badge>
             ) : null}
           </TabsTrigger>
-          <TabsTrigger value="pipeline">Pipeline health</TabsTrigger>
+          <TabsTrigger value="pipeline">{t("tabs.pipeline_health")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="approvals" className="space-y-4">
@@ -280,29 +278,30 @@ export function OpsOverviewDashboard() {
             <Card className="p-8 text-center">
               <CheckCircle2Icon className="text-muted-foreground mx-auto h-12 w-12" />
               <p className="text-muted-foreground mt-2">
-                Every submission has been triaged — enjoy a moment to breathe.
+                {t("empty_states.all_triaged")}
               </p>
             </Card>
           ) : (
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle>Events awaiting go-live</CardTitle>
+                <CardTitle>{t("sections.events_awaiting_approval")}</CardTitle>
                 <CardDescription>
-                  Review organizer details, skim logistics, and approve or send back
-                  revisions.
+                  {t("sections.events_awaiting_description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Organizer</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Start</TableHead>
-                      <TableHead>Location</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("table_headers.event")}</TableHead>
+                      <TableHead>{t("table_headers.organizer")}</TableHead>
+                      <TableHead>{t("table_headers.type")}</TableHead>
+                      <TableHead>{t("table_headers.start")}</TableHead>
+                      <TableHead>{t("table_headers.location")}</TableHead>
+                      <TableHead>{t("table_headers.created")}</TableHead>
+                      <TableHead className="text-right">
+                        {t("table_headers.actions")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -321,10 +320,10 @@ export function OpsOverviewDashboard() {
                         <TableCell>
                           <div className="space-y-0.5">
                             <div className="text-sm font-medium">
-                              {event.organizer?.name ?? "Unknown"}
+                              {event.organizer?.name ?? t("labels.unknown")}
                             </div>
                             <div className="text-muted-foreground text-xs">
-                              {event.organizer?.email ?? "Not provided"}
+                              {event.organizer?.email ?? t("labels.not_provided")}
                             </div>
                           </div>
                         </TableCell>
@@ -349,7 +348,9 @@ export function OpsOverviewDashboard() {
                               </span>
                             </div>
                           ) : (
-                            <span className="text-muted-foreground text-sm">TBD</span>
+                            <span className="text-muted-foreground text-sm">
+                              {t("labels.tbd")}
+                            </span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -361,7 +362,7 @@ export function OpsOverviewDashboard() {
                           <div className="flex justify-end gap-2">
                             <Button asChild size="sm" variant="outline">
                               <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                Preview
+                                {t("actions.preview")}
                               </Link>
                             </Button>
                             <Button
@@ -372,7 +373,7 @@ export function OpsOverviewDashboard() {
                               }
                             >
                               <CheckCircleIcon className="mr-1 h-4 w-4" />
-                              Approve
+                              {t("actions.approve")}
                             </Button>
                             <Button
                               size="sm"
@@ -382,7 +383,7 @@ export function OpsOverviewDashboard() {
                               }
                             >
                               <XCircleIcon className="mr-1 h-4 w-4" />
-                              Reject
+                              {t("actions.reject")}
                             </Button>
                           </div>
                         </TableCell>
@@ -396,27 +397,31 @@ export function OpsOverviewDashboard() {
 
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle>Recent approvals</CardTitle>
+              <CardTitle>{t("sections.recent_approvals")}</CardTitle>
               <CardDescription>
-                Keep a pulse on which experiences moved forward and jump back into
-                operations if adjustments are needed.
+                {t("hardcoded_strings.recent_approvals_description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {recentlyReviewed.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  Once events are approved they will appear here with quick links to
-                  manage rosters and logistics.
+                  {t("hardcoded_strings.no_recent_approvals")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Visibility</TableHead>
-                      <TableHead>Updated</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.event")}</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.status")}</TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.visibility")}
+                      </TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.updated")}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("hardcoded_strings.actions.view")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -430,7 +435,9 @@ export function OpsOverviewDashboard() {
                         </TableCell>
                         <TableCell>
                           <Badge variant={event.isPublic ? "default" : "secondary"}>
-                            {event.isPublic ? "Public" : "Private"}
+                            {event.isPublic
+                              ? t("hardcoded_strings.visibility.public")
+                              : t("hardcoded_strings.visibility.private")}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -448,12 +455,12 @@ export function OpsOverviewDashboard() {
                                 to="/ops/events/$eventId"
                                 params={{ eventId: event.id }}
                               >
-                                Tasks & notes
+                                {t("hardcoded_strings.actions.tasks_notes")}
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
                               <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                View
+                                {t("hardcoded_strings.actions.view")}
                               </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline">
@@ -461,7 +468,7 @@ export function OpsOverviewDashboard() {
                                 to="/ops/events/$eventId/manage"
                                 params={{ eventId: event.id }}
                               >
-                                Manage
+                                {t("hardcoded_strings.actions.manage")}
                               </Link>
                             </Button>
                           </div>
@@ -478,28 +485,32 @@ export function OpsOverviewDashboard() {
         <TabsContent value="pipeline" className="space-y-4">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle>Pipeline health</CardTitle>
+              <CardTitle>{t("hardcoded_strings.pipeline_health.title")}</CardTitle>
               <CardDescription>
-                Monitor registrations, capacity, and readiness for the upcoming slate of
-                events.
+                {t("hardcoded_strings.pipeline_health.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {pipelineList.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  No events found in the pipeline. Keep approvals moving to populate this
-                  view.
+                  {t("hardcoded_strings.pipeline_health.no_events")}
                 </p>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Event</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Registered</TableHead>
-                      <TableHead>Capacity</TableHead>
-                      <TableHead>Start</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.event")}</TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.status")}</TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.registered")}
+                      </TableHead>
+                      <TableHead>
+                        {t("hardcoded_strings.table_headers.capacity")}
+                      </TableHead>
+                      <TableHead>{t("hardcoded_strings.table_headers.start")}</TableHead>
+                      <TableHead className="text-right">
+                        {t("hardcoded_strings.actions.view")}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -527,7 +538,7 @@ export function OpsOverviewDashboard() {
                             <p className="text-muted-foreground text-xs">
                               {event.city
                                 ? `${event.city}${event.country ? `, ${event.country}` : ""}`
-                                : "Location pending"}
+                                : t("pipeline.location_tbd")}
                             </p>
                           </TableCell>
                           <TableCell>
@@ -560,11 +571,13 @@ export function OpsOverviewDashboard() {
                                     : "text-muted-foreground",
                                 )}
                               >
-                                {availableSpots} spots left
+                                {t("hardcoded_strings.pipeline_health.spots_left", {
+                                  count: availableSpots,
+                                })}
                               </span>
                             ) : (
                               <span className="text-muted-foreground text-sm">
-                                Unlimited
+                                {t("hardcoded_strings.pipeline_health.unlimited")}
                               </span>
                             )}
                           </TableCell>
@@ -580,7 +593,7 @@ export function OpsOverviewDashboard() {
                                   to="/ops/events/$eventId"
                                   params={{ eventId: event.id }}
                                 >
-                                  Tasks & notes
+                                  {t("hardcoded_strings.actions.tasks_notes")}
                                 </Link>
                               </Button>
                               <Button asChild size="sm" variant="outline">
@@ -588,12 +601,12 @@ export function OpsOverviewDashboard() {
                                   to="/ops/events/$eventId/manage"
                                   params={{ eventId: event.id }}
                                 >
-                                  Manage
+                                  {t("hardcoded_strings.actions.manage")}
                                 </Link>
                               </Button>
                               <Button asChild size="sm" variant="ghost">
                                 <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                  View
+                                  {t("hardcoded_strings.actions.view")}
                                 </Link>
                               </Button>
                             </div>
@@ -609,15 +622,15 @@ export function OpsOverviewDashboard() {
 
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle>Logistics watchlist</CardTitle>
+              <CardTitle>{t("hardcoded_strings.logistics_watchlist.title")}</CardTitle>
               <CardDescription>
-                Upcoming events that need final staffing or marketing coordination.
+                {t("hardcoded_strings.logistics_watchlist.description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {attentionItems.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
-                  All systems are green — keep monitoring registration momentum.
+                  {t("hardcoded_strings.logistics_watchlist.no_issues")}
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -632,16 +645,15 @@ export function OpsOverviewDashboard() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle>Marketing hotspots</CardTitle>
+                <CardTitle>{t("hardcoded_strings.marketing_hotspots.title")}</CardTitle>
                 <CardDescription>
-                  Cities generating the most volume and near-term activity.
+                  {t("hardcoded_strings.marketing_hotspots.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {marketingBreakdown.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    No marketing trends available yet. Approve more events to surface
-                    hotspots.
+                    {t("hardcoded_strings.marketing_hotspots.no_data")}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -650,10 +662,16 @@ export function OpsOverviewDashboard() {
                         <div>
                           <p className="font-medium">{location}</p>
                           <p className="text-muted-foreground text-xs">
-                            {stats.upcoming} launching in the next 30 days
+                            {t("hardcoded_strings.marketing_hotspots.launching_soon", {
+                              count: stats.upcoming,
+                            })}
                           </p>
                         </div>
-                        <Badge variant="outline">{stats.total} live</Badge>
+                        <Badge variant="outline">
+                          {t("hardcoded_strings.marketing_hotspots.live", {
+                            count: stats.total,
+                          })}
+                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -663,16 +681,15 @@ export function OpsOverviewDashboard() {
 
             <Card>
               <CardHeader className="space-y-1">
-                <CardTitle>Live event command list</CardTitle>
+                <CardTitle>{t("hardcoded_strings.live_command_list.title")}</CardTitle>
                 <CardDescription>
-                  Quick links to adjust staffing or check rosters for imminent
-                  experiences.
+                  {t("hardcoded_strings.live_command_list.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {liveEvents.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    No live events yet — approvals will populate this list automatically.
+                    {t("hardcoded_strings.live_command_list.no_events")}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -682,7 +699,7 @@ export function OpsOverviewDashboard() {
                           <p className="leading-tight font-medium">{event.name}</p>
                           <p className="text-muted-foreground text-xs">
                             {format(new Date(event.startDate), "MMM d")} ·{" "}
-                            {event.city ?? "Location TBD"}
+                            {event.city ?? t("labels.tbd")}
                           </p>
                         </div>
                         <Button asChild size="sm" variant="outline">
@@ -690,7 +707,7 @@ export function OpsOverviewDashboard() {
                             to="/ops/events/$eventId/manage"
                             params={{ eventId: event.id }}
                           >
-                            Adjust
+                            {t("hardcoded_strings.actions.adjust")}
                           </Link>
                         </Button>
                       </div>
@@ -710,16 +727,18 @@ export function OpsOverviewDashboard() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {approvalDialog.action === "approve" ? "Approve Event" : "Reject Event"}
+              {approvalDialog.action === "approve"
+                ? t("approval_dialog.approve_event")
+                : t("approval_dialog.reject_event")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {approvalDialog.action === "approve"
-                ? `Are you sure you want to approve "${approvalDialog.eventName}"? This will make the event publicly visible.`
-                : `Are you sure you want to reject "${approvalDialog.eventName}"? The organizer will need to make changes and resubmit.`}
+                ? t("approval_dialog.approve_description")
+                : t("approval_dialog.reject_description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{commonT("buttons.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApprovalAction}
               className={
@@ -728,7 +747,9 @@ export function OpsOverviewDashboard() {
                   : ""
               }
             >
-              {approvalDialog.action === "approve" ? "Approve" : "Reject"}
+              {approvalDialog.action === "approve"
+                ? t("approval_dialog.confirm_approve")
+                : t("approval_dialog.confirm_reject")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -738,6 +759,7 @@ export function OpsOverviewDashboard() {
 }
 
 function FocusBanner({ target }: { target: FocusTarget }) {
+  const { t } = useOpsTranslation();
   const toneStyles: Record<FocusTone, string> = {
     default: "border-primary/30 bg-primary/5",
     warning: "border-amber-200 bg-amber-50",
@@ -764,7 +786,7 @@ function FocusBanner({ target }: { target: FocusTarget }) {
           <div className="mt-0.5">{toneIcon[target.tone]}</div>
           <div className="space-y-1">
             <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-              Mission focus
+              {t("hardcoded_strings.mission_focus")}
             </p>
             <h2 className="text-xl leading-tight font-semibold">{target.title}</h2>
             <p className="text-muted-foreground text-sm">{target.description}</p>
@@ -813,6 +835,7 @@ function SnapshotCard({
 }
 
 function WatchlistItem({ item }: { item: OpsAttentionItem }) {
+  const { t } = useOpsTranslation();
   const tone = item.severity === "critical" ? "destructive" : "secondary";
   const daysUntilStart = differenceInCalendarDays(item.startDate, new Date());
 
@@ -822,17 +845,22 @@ function WatchlistItem({ item }: { item: OpsAttentionItem }) {
         <div>
           <p className="leading-tight font-medium">{item.name}</p>
           <p className="text-muted-foreground text-xs">
-            {format(item.startDate, "MMM d")} · {item.city ?? "Location TBD"}
+            {format(item.startDate, "MMM d")} · {item.city ?? t("labels.tbd")}
           </p>
         </div>
         <Badge variant={tone} className="capitalize">
-          {item.severity === "critical" ? "Urgent" : "Monitor"}
+          {item.severity === "critical"
+            ? t("hardcoded_strings.logistics_watchlist.urgent")
+            : t("hardcoded_strings.logistics_watchlist.monitor")}
         </Badge>
       </div>
       <p className="text-muted-foreground text-sm">{item.message}</p>
       {typeof item.availableSpots === "number" ? (
         <p className="text-xs font-medium">
-          {item.availableSpots} spots remaining · {Math.max(daysUntilStart, 0)} days out
+          {t("hardcoded_strings.logistics_watchlist.spots_remaining", {
+            count: item.availableSpots,
+            days: Math.max(daysUntilStart, 0),
+          })}
         </p>
       ) : null}
     </div>

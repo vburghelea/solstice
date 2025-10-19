@@ -1,0 +1,333 @@
+{
+  "buttons": {
+    "view_campaign": "View Campaign",
+    "create_campaign": "Create Campaign",
+    "update_campaign": "Update Campaign",
+    "save": "Save",
+    "cancel": "Cancel",
+    "invite": "Invite",
+    "revoke": "Revoke",
+    "accept": "Accept",
+    "reject": "Reject",
+    "accepting": "Accepting...",
+    "rejecting": "Rejecting...",
+    "save_session_zero_details": "Save Session Zero Details"
+  },
+  "labels": {
+    "campaign_name": "Campaign Name",
+    "description": "Description",
+    "game_system": "Game System",
+    "language": "Language",
+    "visibility": "Visibility",
+    "participants": "Participants",
+    "game_master": "Game Master",
+    "time_of_day": "Time of Day",
+    "session_duration": "Session Duration",
+    "recurrence": "Recurrence",
+    "campaign_status": "Campaign Status",
+    "expected_duration": "Expected Duration",
+    "max_players": "Max Players",
+    "location": "Location",
+    "safety_tools": "Safety Tools",
+    "table_rules": "Table Rules",
+    "session_zero": "Session Zero",
+    "character_creation": "Character Creation",
+    "campaign_expectations": "Campaign Expectations",
+    "table_expectations": "Table Expectations",
+    "safety_rules": "Safety Rules",
+    "content_warnings": "Content Warnings",
+    "search_users": "Search Users",
+    "invite_by_email": "Invite by Email",
+    "pending_invitations": "Pending invitations"
+  },
+  "participants_list": {
+    "participants_title": "Participants ({{count}})",
+    "no_participants": "No participants yet.",
+    "owner_label": "(owner)",
+    "role_status": "({role} - {{status}})",
+    "removing": "Removing...",
+    "remove": "Remove",
+    "pending_applications_title": "Pending Applications ({{count}})",
+    "status_label": "({{status}})",
+    "approving": "Approving...",
+    "approve": "Approve",
+    "rejecting": "Rejecting...",
+    "reject": "Reject",
+    "banned_title": "Banned from the Campaign ({{count}})",
+    "allowing": "Allowing...",
+    "allow": "Allow"
+  },
+  "status": {
+    "connections_teammates": "Connections & Teammates",
+    "unknown_user": "Unknown User",
+    "no_pending_invitations": "No pending invitations.",
+    "no_campaigns_found": "No campaigns found. Create one!",
+    "searching": "Searching...",
+    "no_users_found": "No users found.",
+    "weekly": "Weekly",
+    "bi-weekly": "Biweekly",
+    "monthly": "Monthly",
+    "one_shot": "One Shot",
+    "ongoing": "Ongoing"
+  },
+  "messages": {
+    "invitation_rejected_success": "Invitation rejected successfully!",
+    "invitation_response_recorded": "Invitation response recorded.",
+    "participant_invited_success": "Participant invited successfully!",
+    "invitation_revoked_success": "Invitation revoked successfully!",
+    "campaign_created_success": "Campaign created successfully!",
+    "campaign_updated_success": "Campaign updated successfully!",
+    "participant_removed_success": "Participant removed successfully!",
+    "participant_ban_removed_success": "Participant ban removed successfully!",
+    "application_status_updated_success": "Application status updated successfully!"
+  },
+  "errors": {
+    "failed_to_reject_invitation": "Failed to reject invitation",
+    "failed_to_respond_invitation": "Failed to respond to invitation.",
+    "unexpected_error": "An unexpected error occurred.",
+    "failed_to_invite_participant": "Failed to invite participant",
+    "failed_to_revoke_invitation": "Failed to revoke invitation",
+    "failed_to_create_campaign": "Failed to create campaign",
+    "failed_to_update_campaign": "Failed to update campaign",
+    "participant_remove_failed": "Failed to remove participant: {{message}}",
+    "participant_ban_remove_failed": "Failed to remove participant ban: {{message}}",
+    "application_update_failed": "Failed to update application status: {{message}}"
+  },
+  "descriptions": {
+    "schedule_details": "When and how often your campaign meets.",
+    "participant_requirements": "Who can join and what's expected.",
+    "location_details": "Where your campaign takes place.",
+    "character_creation_process": "How characters will be created.",
+    "campaign_overview": "Share the essentials players need to understand your ongoing story.",
+    "location": "Let players know where your group will gather.",
+    "safety_table_culture": "Optional expectations to set the tone for how you'll play together.",
+    "visibility_options": "Visibility options: Public (visible to everyone), Connections & Teammates (visible to your followers, the people you follow, and active teammates), Private (visible only to invited players)",
+    "campaign_expectations": "What players should expect from this campaign.",
+    "table_expectations": "Rules and expectations for the game table.",
+    "manage_invitations": "Review and process pending invitations.",
+    "invite_participants": "Search for users or invite them by email.",
+    "campaign_invitation": "You have been invited to this campaign. Please accept or reject the invitation."
+  },
+  "form_sections": {
+    "campaign_overview": "Campaign overview",
+    "schedule_details": "Schedule details",
+    "participant_requirements": "Participant requirements",
+    "location": "Location",
+    "safety_table_culture": "Safety & table culture",
+    "session_zero": "Session Zero",
+    "character_creation": "Character Creation",
+    "campaign_expectations": "Campaign expectations",
+    "table_expectations": "Table expectations"
+  },
+  "visibility_options": {
+    "description": "Visibility options: Public (visible to everyone), Connections & Teammates (visible to your followers, the people you follow, and active teammates), Private (visible only to invited players)"
+  },
+  "safety_options": {
+    "no_alcohol": "No Alcohol",
+    "safe_word_required": "Safe Word Required",
+    "encourage_open_communication": "Encourage Open Communication",
+    "lines_veils": "Lines & Veils",
+    "x_card": "X-Card",
+    "script_change": "Script Change"
+  },
+  "invitation_status": {
+    "invited": "Invited"
+  },
+  "default_labels": {
+    "view_campaign": "View Campaign"
+  },
+  "titles": {
+    "campaign_invitation": "Campaign Invitation",
+    "invite_participants": "Invite Participants",
+    "manage_invitations": "Manage Invitations"
+  },
+  "campaign_fields": {
+    "campaign_name": "Campaign Name",
+    "description": "Description",
+    "game_system_used": "Game System Used",
+    "recurrence": "Recurrence",
+    "time_of_day": "Time of Day",
+    "session_duration_minutes": "Session Duration (minutes)",
+    "price_per_session_eur": "Price per session (EUR) (optional)",
+    "language": "Language",
+    "visibility": "Visibility",
+    "address": "Address",
+    "minimum_players": "Minimum Players",
+    "maximum_players": "Maximum Players",
+    "safety_tool": "Safety Tool",
+    "safety_tool_details_optional": "Safety Tool Details (optional)",
+    "player_boundaries_consent_notes_optional": "Player Boundaries / Consent Notes (optional)",
+    "no_alcohol": "No Alcohol",
+    "safe_word_required": "Safe Word Required",
+    "encourage_open_communication": "Encourage Open Communication"
+  },
+  "placeholders": {
+    "campaign_name_placeholder": "Enter a compelling name for your planned campaign",
+    "search_and_select_game_system": "Search and select the game system you want to use",
+    "select_recurrence": "Select recurrence",
+    "time_of_day_placeholder": "e.g., Evenings, Afternoons",
+    "session_duration_placeholder": "e.g., 180, 240",
+    "select_language": "Select a language",
+    "select_visibility": "Select visibility",
+    "campaign_name": "Enter campaign name",
+    "description": "Enter campaign description",
+    "search_users": "Search by name or email (4+ chars)",
+    "enter_name": "Enter name",
+    "enter_email": "Enter email address",
+    "safety_tool_placeholder": "Any specifics about the chosen safety tool",
+    "player_boundaries_consent_placeholder": "Any boundaries or consent notes players should be aware of"
+  },
+  "validation_messages": {
+    "campaign_name_required": "The campaign name is what most players see first when looking for adventure, make sure it's compelling.",
+    "description_required": "Please add a campaign description that sets the tone for what players should expect.",
+    "game_system_required": "Please select a game system for your campaign.",
+    "recurrence_required": "Choose the recurrence for your campaign.",
+    "time_of_day_required": "Specify the general time of day for your campaign sessions.",
+    "session_duration_required": "Specify the typical duration of a single session within the campaign.",
+    "language_required": "Choose the primary language for communication within the campaign.",
+    "visibility_required": "Pick a visibility value that allows you to find the right people efficiently.",
+    "address_required": "Enter the address of the location where the campaign sessions will take place.",
+    "min_players_required": "We need to know how many people are expected to participate.",
+    "max_players_required": "We need to know how many people are expected to participate.",
+    "price_optional": "If you want to add a cover charge for the campaign session, specify it here."
+  },
+  "session_zero": {
+    "campaign_expectations": {
+      "title": "Campaign Expectations",
+      "campaign_style": "Campaign Style (e.g., High Fantasy, Dark & Gritty)",
+      "game_difficulty": "Game Difficulty (e.g., Lethal, Forgiving)",
+      "house_rules": "House Rules / Homebrew Content",
+      "leveling_up_method": "Leveling Up Method (XP or Milestones)",
+      "campaign_length": "Campaign Length (e.g., One-shot, Long-running)"
+    },
+    "table_expectations": {
+      "title": "Table Expectations",
+      "food_drinks_policy": "Food and Drinks Policy",
+      "non_table_activities": "Non-Table Activities (e.g., Phone Use, Side Conversations)",
+      "unannounced_dice_rolls_policy": "Unannounced Dice Rolls Policy",
+      "pvp_contested_rolls_policy": "PVP and Contested Rolls Policy",
+      "character_secrets_policy": "Character Secrets Policy",
+      "player_absences_policy": "Player Absences Policy"
+    },
+    "safety_tools": {
+      "title": "Safety Tools",
+      "encourage_open_communication": "Encourage Open Communication",
+      "use_x_card_system": "Use X-Card System",
+      "x_card_system_details": "X-Card System Details (if applicable)",
+      "player_boundaries_consent_discussion": "Player Boundaries and Consent Discussion"
+    },
+    "character_creation": {
+      "title": "Character Creation",
+      "character_creation_questions": "Character Creation Questions (e.g., Starting Level, Equipment)",
+      "feats_allowed": "Feats Allowed",
+      "stats_determination_method": "Stats Determination Method (e.g., Rolling, Point-Buy)",
+      "character_context_integration": "Character Context and Integration"
+    },
+    "documented_character_creation_outcome": {
+      "title": "Documented Character Creation Outcome",
+      "final_character_creation_decisions": "Final Character Creation Decisions"
+    }
+  },
+  "my_campaigns": {
+    "title": "My Campaigns",
+    "subtitle": "Manage your campaign sessions",
+    "filter_by_status": "Filter by status",
+    "filter_by_role": "Filter by role",
+    "create_new_campaign": "Create New Campaign",
+    "no_campaigns_title": "No campaigns yet",
+    "no_campaigns_subtitle": "Create your first campaign to get started",
+    "participants": "participants",
+    "pagination": {
+      "page_info": "Page {{current}} of {{total}} • {{count}} total"
+    },
+    "status_labels": {
+      "active": "Active",
+      "completed": "Completed",
+      "on_hold": "On Hold",
+      "canceled": "Canceled"
+    },
+    "role_labels": {
+      "owner": "Organizer",
+      "player": "Participant",
+      "invited": "Invitee",
+      "requested": "Requested",
+      "applicant": "Applicant"
+    },
+    "errors": {
+      "load_failed": "Failed to load campaigns."
+    },
+    "list": {
+      "view_button": "View"
+    }
+  },
+  "detail": {
+    "invalid_campaign_id": "Invalid campaign ID format.",
+    "failed_to_load_campaign": "Failed to load campaign details.",
+    "failed_to_fetch_campaign": "Failed to fetch campaign",
+    "campaign_not_found": "Campaign not found",
+    "campaign_data_not_found": "Campaign data not found",
+    "game_session_status_updated": "Game session status updated successfully!",
+    "failed_to_update_game_session_status": "Failed to update game session status",
+    "unexpected_error_updating_game_session": "An unexpected error occurred while updating game session status",
+    "campaign_updated": "Campaign updated successfully",
+    "failed_to_update_campaign": "Failed to update campaign",
+    "unexpected_error_occurred": "An unexpected error occurred",
+    "failed_to_fetch_application_status": "Failed to fetch your application status.",
+    "application_submitted": "Application submitted successfully!",
+    "failed_to_submit_application": "Failed to submit application.",
+    "unexpected_error_applying": "An unexpected error occurred while applying.",
+    "mark_campaign_completed": "Mark campaign as completed",
+    "cancel_campaign": "Cancel this campaign",
+    "confirm_cancel_campaign": "Are you sure you want to cancel this campaign?",
+    "open_session_zero": "Open session zero notes",
+    "exit_edit_mode": "Exit edit mode",
+    "edit_campaign_details": "Edit campaign details",
+    "about_this_campaign": "About this campaign",
+    "about_description": "Summarize the tone, arc, and player expectations.",
+    "no_description_provided": "The organizer hasn't shared additional campaign context yet.",
+    "edit_campaign": "Edit campaign",
+    "edit_description": "Update the overarching details for your ongoing story.",
+    "game_sessions": "Game sessions",
+    "filter_by_status": "Filter by status",
+    "create_session": "Create session",
+    "no_game_sessions_found": "No game sessions found for this campaign with the selected status.",
+    "view_game": "View Game",
+    "application_pending": "Your application is pending review.",
+    "application_rejected": "Your application was rejected.",
+    "campaign_logistics": "Campaign logistics",
+    "logistics_description": "Keep everyone aligned on cadence and table shape.",
+    "location": "Location",
+    "location_shared_after_approval": "Shared after your seat is approved.",
+    "not_specified": "Not specified",
+    "safety_consent": "Safety & consent",
+    "safety_description": "Consistency for every session in the campaign.",
+    "applying": "Applying...",
+    "apply_to_join": "Apply to join",
+    "price_session": "Price/session"
+  },
+  "validation": {
+    "campaign_name_required": "Campaign name is required",
+    "description_required": "Description is required"
+  },
+  "create": {
+    "title": "Create a New Campaign",
+    "subtitle": "Set up your campaign and start inviting players",
+    "error_title": "Error creating campaign",
+    "tips": {
+      "title": "Campaign tips",
+      "subtitle": "Quick reminders to help your table feel prepared from day one.",
+      "clarify_experience": {
+        "title": "Clarify the experience",
+        "description": "Use your description to outline tone, cadence, and expectations so players know if the campaign fits their style."
+      },
+      "set_limits_early": {
+        "title": "Set table limits early",
+        "description": "Minimums and maximums help players self-select. Share what safety tools you are using and call out any recurring logistics."
+      },
+      "plan_onboarding": {
+        "title": "Plan for onboarding",
+        "description": "If you run a session zero, mention what you cover and any prep work. It keeps everyone aligned before the first roll."
+      }
+    }
+  }
+}

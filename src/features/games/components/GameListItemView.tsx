@@ -13,6 +13,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { GameListItem } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { buildPlayersRange, formatExpectedDuration } from "~/shared/lib/game-formatting";
 import { cn } from "~/shared/lib/utils";
@@ -55,8 +56,9 @@ export function GameShowcaseCard({
   className,
   link,
 }: GameShowcaseCardProps) {
+  const { t } = useGamesTranslation();
   const formattedDate = formatDateAndTime(game.dateTime);
-  const price = game.price ? `€${game.price.toFixed(2)}` : "Free";
+  const price = game.price ? `€${game.price.toFixed(2)}` : t("list_item.free");
   const heroUrl = game.heroImageUrl;
   const categories = (game.gameSystem?.categories ?? []).filter(Boolean).slice(0, 3);
 
@@ -67,7 +69,7 @@ export function GameShowcaseCard({
 
   const playersLabelParts: string[] = [];
   if (typeof game.participantCount === "number") {
-    playersLabelParts.push(`${game.participantCount} joined`);
+    playersLabelParts.push(t("list_item.joined_count", { count: game.participantCount }));
   }
   const playersRange = buildPlayersRange(minPlayers, maxPlayers, { fallback: null });
   if (playersRange) {
@@ -77,8 +79,8 @@ export function GameShowcaseCard({
 
   const expectedDuration = formatExpectedDuration(game.expectedDuration);
   const durationLabel = expectedDuration
-    ? `${expectedDuration} session`
-    : formatSystemDuration(game.gameSystem?.averagePlayTime ?? null);
+    ? t("list_item.session_duration", { duration: expectedDuration })
+    : formatSystemDuration(game.gameSystem?.averagePlayTime ?? null, t);
 
   const metaItems: Array<{ icon: MetaIcon; label: ReactNode }> = [];
 
@@ -127,7 +129,7 @@ export function GameShowcaseCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4">
           <Badge className="bg-white/20 text-xs font-semibold tracking-wide text-white uppercase">
-            {game.gameSystem?.name ?? "Original system"}
+            {game.gameSystem?.name ?? t("list_item.original_system")}
           </Badge>
           {categories.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -200,7 +202,7 @@ export function GameShowcaseCard({
             <div className="flex items-start gap-2">
               <Sparkles className="text-primary mt-0.5 size-4" />
               <span className="text-muted-foreground flex-1 leading-snug dark:text-gray-300">
-                Part of an ongoing campaign
+                {t("list_item.campaign_part")}
               </span>
             </div>
           ) : null}
@@ -208,7 +210,9 @@ export function GameShowcaseCard({
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-2">
           <span className="text-muted-foreground text-sm dark:text-gray-300">
-            Hosted by {game.owner?.name ?? game.owner?.email ?? "a community GM"}
+            {game.owner?.name || game.owner?.email
+              ? t("list_item.hosted_by", { name: game.owner?.name ?? game.owner?.email })
+              : t("list_item.hosted_by_community")}
           </span>
           <Button
             asChild
@@ -223,7 +227,7 @@ export function GameShowcaseCard({
               {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
               className="flex items-center"
             >
-              View details
+              {t("list_item.view_details")}
               <ChevronRight className="ml-1 size-4" />
             </Link>
           </Button>
@@ -233,7 +237,10 @@ export function GameShowcaseCard({
   );
 }
 
-function formatSystemDuration(minutes: number | null): string | null {
+function formatSystemDuration(
+  minutes: number | null,
+  t: (key: string, params?: Record<string, unknown>) => string,
+): string | null {
   if (!minutes || Number.isNaN(minutes)) {
     return null;
   }
@@ -242,10 +249,10 @@ function formatSystemDuration(minutes: number | null): string | null {
     const hours = Math.floor(minutes / 60);
     const remainder = minutes % 60;
     if (remainder) {
-      return `~${hours}h ${remainder}m adventure`;
+      return t("list_item.duration_formats.hours_minutes", { hours, minutes: remainder });
     }
-    return `~${hours}h adventure`;
+    return t("list_item.duration_formats.hours_only", { hours });
   }
 
-  return `~${minutes}m adventure`;
+  return t("list_item.duration_formats.minutes_only", { minutes });
 }

@@ -1,0 +1,221 @@
+{
+  "my_teams": {
+    "title": "Moje Drużyny",
+    "subtitle": "Zarządzaj swoimi drużynami i członkostwem",
+    "create_team": "Utwórz Drużynę",
+    "pending_invite": "oczekujące zaproszenie",
+    "pending_invites": "oczekujących zaproszeń",
+    "refreshing": "Odświeżanie danych drużyny…",
+    "no_teams_title": "Brak drużyn",
+    "no_teams_subtitle": "Dołącz do istniejącej drużyny lub utwórz własną, aby zacząć",
+    "browse_teams": "Przeglądaj Drużyny",
+    "browse_all_teams": "Przeglądaj Wszystkie Drużyny",
+    "back_to_teams": "Wróć do Drużyn"
+  },
+  "team_card": {
+    "role": "Rola",
+    "members": "Członkowie",
+    "jersey_number": "Nr koszulki",
+    "position": "Pozycja",
+    "view_team": "Zobacz Drużynę",
+    "manage": "Zarządzaj"
+  },
+  "create": {
+    "title": "Utwórz Nową Drużynę",
+    "subtitle": "Skonfiguruj profil drużyny i zacznij zapraszać członków",
+    "back_to_teams": "Wróć do Drużyn",
+    "error_title": "Błąd tworzenia drużyny",
+    "fields": {
+      "team_name": "Nazwa Drużyny",
+      "url_slug": "URL Slug",
+      "description": "Opis",
+      "city": "Miasto",
+      "country": "Kraj",
+      "primary_color": "Kolor Główny",
+      "secondary_color": "Kolor Dodatkowy",
+      "founded_year": "Rok Założenia",
+      "website": "Strona WWW"
+    },
+    "placeholders": {
+      "team_name": "UVic Valkyries",
+      "url_slug": "uvic-valkyries",
+      "description": "Opowiedz nam o swojej drużynie...",
+      "city": "Berlin",
+      "country": "Szukaj kraju",
+      "primary_color": "#000000",
+      "secondary_color": "#ffffff",
+      "founded_year": "2010",
+      "website": "https://uvicvalkyries.com"
+    },
+    "descriptions": {
+      "primary_color": "Używany do koszulek, brandingu i tożsamości drużyny",
+      "secondary_color": "Kolor akcentowy dla materiałów drużyny i strony internetowej"
+    },
+    "buttons": {
+      "create": "Utwórz Drużynę",
+      "creating": "Tworzenie drużyny...",
+      "cancel": "Anuluj"
+    },
+    "validation": {
+      "team_name_required": "Nazwa drużyny jest wymagana",
+      "slug_format": "Slug może zawierać tylko małe litery, cyfry i myślniki",
+      "color_format": "Kolor musi być w formacie hex (np. #FF0000)",
+      "valid_year": "Wprowadź prawidłowy rok",
+      "website_format": "Strona WWW musi zaczynać się od http:// lub https://",
+      "valid_country": "Proszę wybrać prawidłowy kraj"
+    }
+  },
+  "details": {
+    "about": "O",
+    "no_description": "Brak opisu",
+    "founded_in": "Założono {{year}}",
+    "members": "Członkowie",
+    "team_stats": "Statystyki Drużyny",
+    "total_members": "Łącznie Członków",
+    "status": "Status",
+    "created": "Utworzono",
+    "quick_actions": "Szybkie Akcje",
+    "manage_members": "Zarządzaj Członkami",
+    "pending_invitation": "Masz oczekujące zaproszenie do tej drużyny. Odwiedź panel Drużyny, aby zaakceptować lub odrzucić.",
+    "pending_request": "Twoja prośba o dołączenie oczekuje na zatwierdzenie przez kapitanów drużyny.",
+    "request_again": "Poproś Ponownie",
+    "ask_to_join": "Poproś o Dołączenie",
+    "sending_request": "Wysyłanie prośby...",
+    "join_request_sent": "Prośba o dołączenie wysłana do kapitanów drużyny.",
+    "request_failed": "Nie można teraz wysłać prośby o dołączenie.",
+    "previous_request_declined": "Twoja poprzednia prośba o dołączenie została odrzucona{{date}}. Możesz wysłać kolejną prośbę.",
+    "no_permissions": "Nie masz obecnie uprawnień do zarządzania lub proszenia o zmiany dla tej drużyny.",
+    "sign_in_to_request": "Zaloguj się, aby poprosić o miejsce w tej drużynie.",
+    "sign_in": "Zaloguj się",
+    "browse_teams": "Przeglądaj Drużyny"
+  },
+  "member_info": {
+    "invited": "Zaproszony {{date}}",
+    "requested": "Prośba {{date}}",
+    "pending": "Oczekujący",
+    "joined": "Dołączył {{date}}"
+  },
+  "hero": {
+    "eyebrow": "Drużyny & Kluby",
+    "title": "Znajdź swoją ekipę lub stwórz ją od zera",
+    "subtitle": "Od wybrzeża do wybrzeża społeczności gier planszowych szukają gospodarzy, opowiadaczy historii, ekspertów od zasad i wolontariuszy. Odkryj grupy w Twojej okolicy i skorzystaj z zasobów, które pomogą Twojemu programowi rozwinąć skrzydła.",
+    "cta_text": "Przeglądaj zasoby klubów",
+    "secondary_cta": "Załóż nowy klub"
+  },
+  "pathways": {
+    "university": {
+      "title": "Kluby uniwersyteckie & studenckie",
+      "description": "Programy akademickie w każdym regionie promują rozgrywki turniejowe, ligi wewnętrzne i rekrutację nowicjuszy. Skorzystaj z naszych szablonów planowania sezonu i wsparcia sędziowskiego."
+    },
+    "community": {
+      "title": "Ligi społecznościowe & miejskie",
+      "description": "Ligi dorosłych pozwalają wieczorom z grami planszowymi rozkwitać przez cały rok dzięki dywizjom o różnym poziomie zaawansowania, własnym stołom i podróżującym grupom meet-up. Możemy pomóc w planowaniu, ubezpieczeniu i wnioskach o dotacje."
+    },
+    "youth": {
+      "title": "Programy młodzieżowe & szkolne",
+      "description": "Wprowadź sport do klas i centrów młodzieżowych dzięki zmodyfikowanym zasadom, inkluzywnym ćwiczeniom i szkoleniom dla trenerów, które skalują się od sesji dla początkujących po regionalne turnieje."
+    }
+  },
+  "connect_locally": {
+    "eyebrow": "Połącz się lokalnie",
+    "title": "Wyszukiwarka klubów & regionalne centra",
+    "description_1": "Nasi regionalni koordynatorzy utrzymują aktywny katalog drużyn uniwersyteckich, społecznościowych i młodzieżowych. Niezależnie od tego, czy się przeprowadzasz, rekrutujesz, czy szukasz meczów towarzyskich, połączymy Cię z właściwymi osobami w kilka sekund.",
+    "description_2": "Organizujesz turniej lub chcesz zagrać mecz sparingowy? Prześlij swoje dane, a wyślemy zapytanie do sąsiednich programów i sędziów w całym kraju.",
+    "email_support": "Wsparcie regionalne przez e-mail",
+    "list_event": "Dodaj swoje wydarzenie"
+  },
+  "information_shared": {
+    "title": "Informacje, które udostępniamy",
+    "items": {
+      "contacts": "Kontakty klubowe i harmonogramy treningów",
+      "referees": "Dostępność sędziów i osób prowadzących zapisy",
+      "equipment": "Programy wypożyczania sprzętu i rozwiązania magazynowe",
+      "billeting": "Sieć noclegów dla podróżujących drużyn"
+    },
+    "updated_monthly": "Aktualizowane co miesiąc dzięki zgłoszeniom klubów"
+  },
+  "tools": {
+    "title": "Narzędzia na każdym etapie",
+    "subtitle": "Od razu zacznij budować program dzięki szablonom i materiałom szkoleniowym utrzymywanym przez nasz zespół deweloperski."
+  },
+  "resources": {
+    "club_starter": {
+      "title": "Zestaw startowy dla klubów",
+      "description": "Pobierz szablony statutów, planery budżetów i opisy ról dla wolontariuszy, aby uruchomić zrównoważony program."
+    },
+    "practice_library": {
+      "title": "Biblioteka treningów & fitness",
+      "description": "Dostęp do progresywnych planów treningowych, wideo z umiejętnościami i klinik bramkarskich przygotowanych przez kadrę reprezentacji narodowej."
+    },
+    "safe_sport": {
+      "title": "Bezpieczny sport & ochrona",
+      "description": "Zachowaj zgodność z krajowymi zasadami dotyczącymi kontroli przeszłości, zgłaszania urazów i projektowania inkluzywnych programów."
+    },
+    "open_resource": "Otwórz zasób"
+  },
+  "invitations": {
+    "title": "Oczekujące zaproszenia do drużyny",
+    "badge": "{{count}} oczekujących",
+    "accept": "Przyjmij",
+    "accepting": "Przyjmowanie...",
+    "decline": "Odrzuć",
+    "declining": "Odrzucanie...",
+    "accepted": "Zaproszenie przyjęte.",
+    "declined": "Zaproszenie odrzucone.",
+    "sent": "Zaproszenie wysłane",
+    "request_created": "Prośba utworzona",
+    "invited_by": "Zaproszony przez {{name}}"
+  },
+  "form": {
+    "fields": {
+      "team_name": "Nazwa drużyny",
+      "team_description": "Opis drużyny",
+      "role": "Rola",
+      "member_email": "E-mail członka"
+    },
+    "placeholders": {
+      "team_name": "Wpisz nazwę drużyny",
+      "team_description": "Opisz swoją drużynę",
+      "member_email": "czlonek@przyklad.pl"
+    }
+  },
+  "buttons": {
+    "create_team": "Utwórz drużynę",
+    "invite_member": "Zaproś członka",
+    "join_team": "Dołącz do drużyny",
+    "leave_team": "Opuść drużynę"
+  },
+  "roles": {
+    "owner": "Właściciel",
+    "admin": "Admin",
+    "member": "Członek",
+    "pending": "Oczekujący"
+  },
+  "errors": {
+    "accept_failed": "Nie udało się przyjąć zaproszenia.",
+    "decline_failed": "Nie udało się odrzucić zaproszenia.",
+    "create_failed": "Nie udało się utworzyć drużyny.",
+    "invite_failed": "Nie udało się zaprosić członka."
+  },
+  "status": {
+    "active": "Aktywny",
+    "inactive": "Nieaktywny",
+    "suspended": "Zawieszony"
+  },
+  "browse": {
+    "title": "Przeglądaj drużyny",
+    "subtitle": "Odkrywaj i dołączaj do drużyn w Twojej okolicy",
+    "back_to_my_teams": "Powrót do moich drużyn",
+    "search_placeholder": "Szukaj drużyn po nazwie lub mieście...",
+    "no_teams_title": "Nie znaleziono drużyn",
+    "no_teams_subtitle": "Brak dostępnych drużyn do przeglądania",
+    "try_different_search": "Spróbuj innego hasła wyszukiwania",
+    "search_error_title": "Nie znaleziono drużyn pasujących do wyszukiwania",
+    "search_error_description": "Spróbuj ponownie lub dostosuj filtry wyszukiwania.",
+    "members": "Członkowie",
+    "founded": "Założony",
+    "created_by": "Utworzone przez",
+    "view_team": "Zobacz drużynę",
+    "view": "Zobacz"
+  }
+}

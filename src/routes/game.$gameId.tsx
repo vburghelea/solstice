@@ -13,7 +13,8 @@ import type { GameSystemDetail } from "~/features/game-systems/game-systems.type
 import { applyToGame } from "~/features/games/games.mutations";
 import { getGame } from "~/features/games/games.queries";
 import type { GameApplication, GameWithDetails } from "~/features/games/games.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { HeroBackgroundImage } from "~/shared/components/hero-background-image";
@@ -80,6 +81,7 @@ function VisitGameDetailPage() {
   const { user, isAuthenticated } = useAuth();
   const { gameDetails, systemDetails } = Route.useLoaderData() as LoaderData;
   const [isSystemAboutOpen, setIsSystemAboutOpen] = useState(false);
+  const { t: gt } = useGamesTranslation();
 
   const applyMutation = useMutation<
     OperationResult<GameApplication>,
@@ -91,24 +93,25 @@ function VisitGameDetailPage() {
 
   if (!gameDetails) {
     return (
-      <PublicLayout>
+      <VisitorShell>
         <div
           className={cn(
             SURFACE_CLASSNAME,
             "token-stack-lg mx-auto max-w-3xl items-center text-center",
           )}
         >
-          <h1 className="text-heading-sm text-foreground">Session unavailable</h1>
+          <h1 className="text-heading-sm text-foreground">
+            {gt("game_detail.unavailable.title")}
+          </h1>
           <p className="text-body-sm text-muted-strong">
-            The game you were looking for is no longer accepting players or may have been
-            removed.
+            {gt("game_detail.unavailable.message")}
           </p>
           <div className="token-gap-sm flex flex-wrap items-center justify-center">
             <Link
               to="/search"
               className={cn(buttonVariants({ size: "sm" }), "rounded-full")}
             >
-              Browse all games
+              {gt("game_detail.unavailable.browse_games")}
             </Link>
             <Link
               to="/"
@@ -117,11 +120,11 @@ function VisitGameDetailPage() {
                 "rounded-full",
               )}
             >
-              Visit homepage
+              {gt("game_detail.unavailable.visit_homepage")}
             </Link>
           </div>
         </div>
-      </PublicLayout>
+      </VisitorShell>
     );
   }
 
@@ -163,24 +166,28 @@ function VisitGameDetailPage() {
     .join(" • ");
 
   const systemSummary = systemDetails?.description ?? systemDetails?.summary ?? null;
-  const systemLinks = systemDetails ? buildSystemExternalLinks(systemDetails) : [];
+  const systemLinks = systemDetails ? buildSystemExternalLinks(systemDetails, gt) : [];
   const gallery = systemDetails?.gallery ?? [];
 
   const metaItems = [
-    { icon: Calendar, label: formatDateAndTime(gameDetails.dateTime) },
-    { icon: MapPin, label: gameDetails.location.address },
-    { icon: Users, label: playersRange },
+    { icon: Calendar, label: formatDateAndTime(gameDetails.dateTime), key: "datetime" },
+    { icon: MapPin, label: gameDetails.location.address, key: "location" },
+    { icon: Users, label: playersRange, key: "players" },
     {
       icon: Clock,
       label:
         expectedDuration ??
         (systemDetails?.averagePlayTime
-          ? `${systemDetails.averagePlayTime} minutes`
-          : "GM will confirm"),
+          ? gt("game_detail.sections.session_logistics.minutes", {
+              count: systemDetails.averagePlayTime,
+            })
+          : gt("game_detail.sections.session_logistics.gm_will_confirm")),
+      key: "duration",
     },
     {
       icon: Globe2,
       label: <LanguageTag language={gameDetails.language} className="text-[0.65rem]" />,
+      key: "language",
     },
   ] as const;
 
@@ -206,7 +213,7 @@ function VisitGameDetailPage() {
     : "";
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="token-stack-2xl space-y-4">
         <section
           className={cn(
@@ -230,11 +237,11 @@ function VisitGameDetailPage() {
           <div className="relative z-10 flex min-h-[260px] flex-col justify-end gap-6 p-8 text-white sm:p-12">
             <div className="flex flex-wrap items-center gap-3">
               <Badge className="bg-white/15 text-xs font-semibold tracking-wide text-white uppercase">
-                Public session
+                {gt("game_detail.badges.public_session")}
               </Badge>
               {gameDetails.campaignId ? (
                 <Badge className="bg-white/15 text-xs font-semibold tracking-wide text-white uppercase">
-                  Ongoing campaign
+                  {gt("game_detail.badges.ongoing_campaign")}
                 </Badge>
               ) : null}
             </div>
@@ -255,17 +262,19 @@ function VisitGameDetailPage() {
                 />
                 <div className="token-stack-3xs text-left">
                   <p className="text-body-sm tracking-[0.25em] text-white/75 uppercase">
-                    Hosted by
+                    {gt("game_detail.hosted_by")}
                   </p>
                   <p className="text-body-lg font-semibold text-white">
                     {gameDetails.owner?.name ??
                       gameDetails.owner?.email ??
-                      "Community GM"}
+                      gt("game_detail.community_gm")}
                   </p>
                   <p className="text-body-xs text-white/75">
                     {gameDetails.owner?.gmRating
-                      ? `Community rating: ${gameDetails.owner.gmRating.toFixed(1)}/5`
-                      : "New to the Roundup Games community"}
+                      ? gt("game_detail.community_rating", {
+                          rating: gameDetails.owner.gmRating.toFixed(1),
+                        })
+                      : gt("game_detail.new_to_community")}
                   </p>
                 </div>
               </div>
@@ -279,7 +288,9 @@ function VisitGameDetailPage() {
                       applyMutation.mutate({ data: { gameId: gameDetails.id } })
                     }
                   >
-                    {applyMutation.isPending ? "Applying..." : "Request a seat"}
+                    {applyMutation.isPending
+                      ? gt("game_detail.applying")
+                      : gt("game_detail.request_seat")}
                   </Button>
                 ) : (
                   <Button
@@ -292,7 +303,7 @@ function VisitGameDetailPage() {
                       })
                     }
                   >
-                    Sign in to apply
+                    {gt("game_detail.sign_in_to_apply")}
                   </Button>
                 )
               ) : null}
@@ -309,21 +320,25 @@ function VisitGameDetailPage() {
               )}
             >
               <header className="token-stack-2xs">
-                <p className="text-eyebrow text-primary-soft">Table briefing</p>
-                <h2 className="text-heading-xs text-foreground">About this session</h2>
+                <p className="text-eyebrow text-primary-soft">
+                  {gt("game_detail.sections.table_briefing.eyebrow")}
+                </p>
+                <h2 className="text-heading-xs text-foreground">
+                  {gt("game_detail.sections.table_briefing.title")}
+                </h2>
                 <p className="text-body-sm text-muted-strong">
-                  Get a feel for the table vibe before you request a seat.
+                  {gt("game_detail.sections.table_briefing.subtitle")}
                 </p>
               </header>
               <div className="text-body-sm text-muted-strong whitespace-pre-wrap">
                 {gameDetails.description ??
-                  "The game organizer hasn't shared additional details yet."}
+                  gt("game_detail.sections.table_briefing.no_details")}
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 {metaItems.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <div key={Icon.name} className="flex items-start gap-3">
+                    <div key={item.key} className="flex items-start gap-3">
                       <Icon className="text-primary mt-1 size-5" />
                       <span className="text-body-sm text-muted-strong leading-snug">
                         {item.label}
@@ -335,8 +350,8 @@ function VisitGameDetailPage() {
                   <Sparkles className="text-primary mt-1 size-5" />
                   <span className="text-body-sm text-muted-strong leading-snug">
                     {gameDetails.campaignId
-                      ? "Part of an ongoing campaign"
-                      : "One-shot friendly for curious players"}
+                      ? gt("game_detail.sections.table_briefing.ongoing_campaign")
+                      : gt("game_detail.sections.table_briefing.one_shot")}
                   </span>
                 </div>
               </div>
@@ -349,39 +364,57 @@ function VisitGameDetailPage() {
               )}
             >
               <header className="token-stack-2xs">
-                <p className="text-eyebrow text-primary-soft">Session logistics</p>
-                <h2 className="text-heading-xs text-foreground">Arrival checklist</h2>
+                <p className="text-eyebrow text-primary-soft">
+                  {gt("game_detail.sections.session_logistics.eyebrow")}
+                </p>
+                <h2 className="text-heading-xs text-foreground">
+                  {gt("game_detail.sections.session_logistics.title")}
+                </h2>
                 <p className="text-body-sm text-muted-strong">
-                  Everything you need to know before joining the table.
+                  {gt("game_detail.sections.session_logistics.subtitle")}
                 </p>
               </header>
               <div className="grid gap-6 sm:grid-cols-2">
                 <InfoItem
-                  label="Date & time"
+                  label={gt("game_detail.sections.session_logistics.date_time")}
                   value={formatDateAndTime(gameDetails.dateTime)}
                 />
                 <InfoItem
-                  label="Language"
+                  label={gt("game_detail.sections.session_logistics.language")}
                   value={<LanguageTag language={gameDetails.language} />}
                 />
-                <InfoItem label="Price" value={priceLabel} />
-                <InfoItem label="Players" value={playersRange} />
                 <InfoItem
-                  label="Seats available"
-                  value={seatsAvailable != null ? `${seatsAvailable} open` : "Contact GM"}
+                  label={gt("game_detail.sections.session_logistics.price")}
+                  value={priceLabel}
                 />
                 <InfoItem
-                  label="Duration"
+                  label={gt("game_detail.sections.session_logistics.players")}
+                  value={playersRange}
+                />
+                <InfoItem
+                  label={gt("game_detail.sections.session_logistics.seats_available")}
+                  value={
+                    seatsAvailable != null
+                      ? gt("game_detail.sections.session_logistics.seats_open", {
+                          count: seatsAvailable,
+                        })
+                      : gt("game_detail.sections.session_logistics.contact_gm")
+                  }
+                />
+                <InfoItem
+                  label={gt("game_detail.sections.session_logistics.duration")}
                   value={
                     expectedDuration ??
                     (systemDetails?.averagePlayTime
-                      ? `${systemDetails.averagePlayTime} min`
-                      : "GM will confirm")
+                      ? gt("game_detail.sections.session_logistics.minutes", {
+                          count: systemDetails.averagePlayTime,
+                        })
+                      : gt("game_detail.sections.session_logistics.gm_will_confirm"))
                   }
                 />
               </div>
               <div className="token-stack-2xs border-primary/20 bg-primary/5 text-body-sm text-muted-strong rounded-2xl border p-4 transition-colors dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300">
-                Precise meeting details are shared once your seat is confirmed.
+                {gt("game_detail.sections.session_logistics.meeting_details_notice")}
               </div>
             </section>
 
@@ -392,10 +425,14 @@ function VisitGameDetailPage() {
               )}
             >
               <header className="token-stack-2xs">
-                <p className="text-eyebrow text-primary-soft">Where we’re meeting</p>
-                <h2 className="text-heading-xs text-foreground">Venue details</h2>
+                <p className="text-eyebrow text-primary-soft">
+                  {gt("game_detail.sections.venue_details.eyebrow")}
+                </p>
+                <h2 className="text-heading-xs text-foreground">
+                  {gt("game_detail.sections.venue_details.title")}
+                </h2>
                 <p className="text-body-sm text-muted-strong">
-                  We share exact instructions with approved players.
+                  {gt("game_detail.sections.venue_details.subtitle")}
                 </p>
               </header>
               <div className="text-body-sm text-muted-strong flex items-start gap-3">
@@ -417,10 +454,18 @@ function VisitGameDetailPage() {
                 )}
               >
                 <header className="token-stack-2xs">
-                  <p className="text-eyebrow text-primary-soft">Art & inspiration</p>
-                  <h2 className="text-heading-xs text-foreground">Visual mood board</h2>
+                  <p className="text-eyebrow text-primary-soft">
+                    {gt("game_detail.sections.art_inspiration.eyebrow")}
+                  </p>
+                  <h2 className="text-heading-xs text-foreground">
+                    {gt("game_detail.sections.art_inspiration.title")}
+                  </h2>
                   <p className="text-body-sm text-muted-strong">
-                    Approved imagery curated for {systemDetails?.name ?? "this system"}.
+                    {gt("game_detail.sections.art_inspiration.subtitle", {
+                      systemName:
+                        systemDetails?.name ??
+                        gt("game_detail.sections.art_inspiration.this_system"),
+                    })}
                   </p>
                 </header>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -432,12 +477,18 @@ function VisitGameDetailPage() {
                       <CloudinaryImage
                         imageUrl={asset.secureUrl}
                         transform={{ width: 800, height: 400 }}
-                        alt={`${systemDetails?.name ?? "Game system"} artwork`}
+                        alt={gt("game_detail.sections.art_inspiration.artwork_alt", {
+                          systemName:
+                            systemDetails?.name ??
+                            gt("game_detail.sections.art_inspiration.game_system"),
+                        })}
                         className="h-48 w-full object-cover"
                       />
                       {asset.license ? (
                         <figcaption className="text-body-2xs text-muted-strong px-4 py-2">
-                          Licensed: {asset.license}
+                          {gt("game_detail.sections.art_inspiration.licensed", {
+                            license: asset.license,
+                          })}
                           {asset.licenseUrl ? (
                             <>
                               {" "}
@@ -448,7 +499,7 @@ function VisitGameDetailPage() {
                                 rel="noreferrer"
                                 className="underline"
                               >
-                                View details
+                                {gt("game_detail.sections.art_inspiration.view_details")}
                               </a>
                             </>
                           ) : null}
@@ -467,10 +518,14 @@ function VisitGameDetailPage() {
               )}
             >
               <header className="token-stack-2xs">
-                <p className="text-eyebrow text-primary-soft">Safety tools</p>
-                <h2 className="text-heading-xs text-foreground">Table expectations</h2>
+                <p className="text-eyebrow text-primary-soft">
+                  {gt("game_detail.sections.safety_tools.eyebrow")}
+                </p>
+                <h2 className="text-heading-xs text-foreground">
+                  {gt("game_detail.sections.safety_tools.title")}
+                </h2>
                 <p className="text-body-sm text-muted-strong">
-                  Tools and boundaries shared by the game organizer.
+                  {gt("game_detail.sections.safety_tools.subtitle")}
                 </p>
               </header>
               <SafetyRulesView safetyRules={gameDetails.safetyRules} />
@@ -485,12 +540,16 @@ function VisitGameDetailPage() {
               >
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="token-stack-2xs">
-                    <p className="text-eyebrow text-primary-soft">System spotlight</p>
+                    <p className="text-eyebrow text-primary-soft">
+                      {gt("game_detail.sections.system_spotlight.eyebrow")}
+                    </p>
                     <h2 className="text-heading-xs text-foreground">
-                      About {systemDetails.name}
+                      {gt("game_detail.sections.system_spotlight.title", {
+                        systemName: systemDetails.name,
+                      })}
                     </h2>
                     <p className="text-body-sm text-muted-strong">
-                      Pulled from the Roundup Games system library.
+                      {gt("game_detail.sections.system_spotlight.subtitle")}
                     </p>
                   </div>
                   <Button
@@ -501,14 +560,16 @@ function VisitGameDetailPage() {
                     aria-controls="system-about-content"
                     className="rounded-full px-4"
                   >
-                    {isSystemAboutOpen ? "Hide details" : "Show details"}
+                    {isSystemAboutOpen
+                      ? gt("game_detail.sections.system_spotlight.hide_details")
+                      : gt("game_detail.sections.system_spotlight.show_details")}
                   </Button>
                 </header>
                 {isSystemAboutOpen ? (
                   <div id="system-about-content" className="token-stack-sm">
                     <p className="text-body-sm text-muted-strong whitespace-pre-wrap">
                       {systemSummary ??
-                        "We're still gathering lore for this system—check back soon."}
+                        gt("game_detail.sections.system_spotlight.no_summary")}
                     </p>
                     {(systemDetails.categories.length > 0 ||
                       systemDetails.mechanics.length > 0) && (
@@ -516,7 +577,7 @@ function VisitGameDetailPage() {
                         {systemDetails.categories.length > 0 ? (
                           <div className="token-stack-3xs">
                             <h3 className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
-                              Categories
+                              {gt("game_detail.sections.system_spotlight.categories")}
                             </h3>
                             <div className="flex flex-wrap gap-2">
                               {systemDetails.categories.map((category) => (
@@ -533,7 +594,7 @@ function VisitGameDetailPage() {
                         {systemDetails.mechanics.length > 0 ? (
                           <div className="token-stack-3xs">
                             <h3 className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
-                              Mechanics
+                              {gt("game_detail.sections.system_spotlight.mechanics")}
                             </h3>
                             <div className="flex flex-wrap gap-2">
                               {systemDetails.mechanics.map((mechanic) => (
@@ -549,7 +610,9 @@ function VisitGameDetailPage() {
                     {systemLinks.length > 0 ? (
                       <div className="token-stack-3xs">
                         <h3 className="text-body-xs text-muted-strong tracking-[0.3em] uppercase">
-                          External references
+                          {gt(
+                            "game_detail.sections.system_spotlight.external_references",
+                          )}
                         </h3>
                         <ul className="token-stack-3xs">
                           {systemLinks.map((link) => (
@@ -573,7 +636,7 @@ function VisitGameDetailPage() {
                         params={{ slug: systemDetails.slug }}
                         className="text-primary text-body-sm font-semibold underline-offset-4 hover:underline"
                       >
-                        Explore the full system profile &raquo;
+                        {gt("game_detail.sections.system_spotlight.explore_full_profile")}
                       </Link>
                     </div>
                   </div>
@@ -590,10 +653,14 @@ function VisitGameDetailPage() {
               )}
             >
               <header className="token-stack-3xs">
-                <p className="text-eyebrow text-primary-soft">Host snapshot</p>
-                <h2 className="text-heading-xs text-foreground">Game organizer</h2>
+                <p className="text-eyebrow text-primary-soft">
+                  {gt("game_detail.sections.host_snapshot.eyebrow")}
+                </p>
+                <h2 className="text-heading-xs text-foreground">
+                  {gt("game_detail.sections.host_snapshot.title")}
+                </h2>
                 <p className="text-body-sm text-muted-strong">
-                  Meet your storyteller before you arrive.
+                  {gt("game_detail.sections.host_snapshot.subtitle")}
                 </p>
               </header>
               {gameDetails.owner ? (
@@ -611,14 +678,16 @@ function VisitGameDetailPage() {
                     </p>
                     <p className="text-body-sm text-muted-strong">
                       {gameDetails.owner.gmRating
-                        ? `Community rating: ${gameDetails.owner.gmRating.toFixed(1)}/5`
-                        : "New to the Roundup Games community"}
+                        ? gt("game_detail.community_rating", {
+                            rating: gameDetails.owner.gmRating.toFixed(1),
+                          })
+                        : gt("game_detail.new_to_community")}
                     </p>
                   </div>
                 </div>
               ) : (
                 <p className="text-body-sm text-muted-strong">
-                  We'll share the organizer's details once the schedule is confirmed.
+                  {gt("game_detail.sections.host_snapshot.organizer_details_soon")}
                 </p>
               )}
             </section>
@@ -631,12 +700,16 @@ function VisitGameDetailPage() {
                 )}
               >
                 <header className="token-stack-3xs">
-                  <p className="text-eyebrow text-primary-soft">System quick facts</p>
-                  <h2 className="text-heading-xs text-foreground">Ruleset overview</h2>
+                  <p className="text-eyebrow text-primary-soft">
+                    {gt("game_detail.sections.system_facts.eyebrow")}
+                  </p>
+                  <h2 className="text-heading-xs text-foreground">
+                    {gt("game_detail.sections.system_facts.title")}
+                  </h2>
                 </header>
                 <div className="token-stack-3xs text-body-sm text-muted-strong">
                   <QuickFact
-                    label="Players"
+                    label={gt("game_detail.sections.system_facts.players")}
                     value={buildPlayersRange(
                       systemDetails.minPlayers,
                       systemDetails.maxPlayers,
@@ -644,25 +717,27 @@ function VisitGameDetailPage() {
                   />
                   {systemDetails.optimalPlayers ? (
                     <QuickFact
-                      label="Optimal table"
-                      value={`${systemDetails.optimalPlayers} players`}
+                      label={gt("game_detail.sections.system_facts.optimal_table")}
+                      value={gt("game_detail.sections.system_facts.players_suffix", {
+                        count: systemDetails.optimalPlayers,
+                      })}
                     />
                   ) : null}
                   {systemDetails.averagePlayTime ? (
                     <QuickFact
-                      label="Average session"
-                      value={`${systemDetails.averagePlayTime} minutes`}
+                      label={gt("game_detail.sections.system_facts.average_session")}
+                      value={`${systemDetails.averagePlayTime} ${gt("game_detail.sections.session_logistics.minutes", { count: systemDetails.averagePlayTime })}`}
                     />
                   ) : null}
                   {systemDetails.yearReleased ? (
                     <QuickFact
-                      label="First published"
+                      label={gt("game_detail.sections.system_facts.first_published")}
                       value={`${systemDetails.yearReleased}`}
                     />
                   ) : null}
                   {systemDetails.ageRating ? (
                     <QuickFact
-                      label="Age rating"
+                      label={gt("game_detail.sections.system_facts.age_rating")}
                       value={
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -672,8 +747,7 @@ function VisitGameDetailPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="max-w-[220px] text-sm">
-                              Recommended minimum age based on content themes and
-                              mechanics.
+                              {gt("game_detail.sections.system_facts.age_rating_tooltip")}
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -682,7 +756,7 @@ function VisitGameDetailPage() {
                   ) : null}
                   {systemDetails.complexityRating ? (
                     <QuickFact
-                      label="Complexity"
+                      label={gt("game_detail.sections.system_facts.complexity")}
                       value={systemDetails.complexityRating}
                     />
                   ) : null}
@@ -697,17 +771,23 @@ function VisitGameDetailPage() {
               )}
             >
               <header className="token-stack-3xs">
-                <p className="text-eyebrow text-primary-soft">Ready to join?</p>
-                <h2 className="text-heading-xs text-foreground">Reserve your seat</h2>
+                <p className="text-eyebrow text-primary-soft">
+                  {gt("game_detail.sections.reserve_seat.eyebrow")}
+                </p>
+                <h2 className="text-heading-xs text-foreground">
+                  {gt("game_detail.sections.reserve_seat.title")}
+                </h2>
               </header>
               <div className="token-stack-2xs text-body-sm text-muted-strong">
                 <p>
-                  Cost per player:{" "}
+                  {gt("game_detail.sections.reserve_seat.cost_per_player")}{" "}
                   <span className="text-foreground font-semibold">{priceLabel}</span>
                 </p>
                 <p>
                   {playersRange}
-                  {seatsAvailable != null ? ` • ${seatsAvailable} seats left` : ""}
+                  {seatsAvailable != null
+                    ? ` • ${gt("game_detail.sections.session_logistics.seats_open", { count: seatsAvailable })}`
+                    : ""}
                 </p>
               </div>
               {canApply ? (
@@ -719,7 +799,9 @@ function VisitGameDetailPage() {
                       applyMutation.mutate({ data: { gameId: gameDetails.id } })
                     }
                   >
-                    {applyMutation.isPending ? "Applying..." : "Apply to join"}
+                    {applyMutation.isPending
+                      ? gt("game_detail.applying")
+                      : gt("game_detail.sections.reserve_seat.apply_to_join")}
                   </Button>
                 ) : (
                   <Button
@@ -731,19 +813,19 @@ function VisitGameDetailPage() {
                       })
                     }
                   >
-                    Sign in to apply
+                    {gt("game_detail.sign_in_to_apply")}
                   </Button>
                 )
               ) : (
                 <p className="text-body-sm text-muted-strong">
-                  Applications for this session are currently closed.
+                  {gt("game_detail.sections.reserve_seat.applications_closed")}
                 </p>
               )}
             </section>
           </aside>
         </div>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 
@@ -763,7 +845,7 @@ function QuickFact({ label, value }: QuickFactProps) {
   );
 }
 
-function buildSystemExternalLinks(system: GameSystemDetail) {
+function buildSystemExternalLinks(system: GameSystemDetail, t: (key: string) => string) {
   const refs: Array<{ href: string; label: string }> = [];
   const externalRefs = system.externalRefs;
   if (!externalRefs) return refs;
@@ -773,7 +855,7 @@ function buildSystemExternalLinks(system: GameSystemDetail) {
     const href = value.startsWith("http")
       ? value
       : `https://startplaying.games/play/${value.replace(/^\/?(?:play|system)\//, "")}`;
-    refs.push({ href, label: "StartPlaying" });
+    refs.push({ href, label: t("external_refs.startplaying") });
   }
 
   if (externalRefs.bgg) {
@@ -784,7 +866,7 @@ function buildSystemExternalLinks(system: GameSystemDetail) {
           .replace(/^\/?boardgame\//, "")
           .replace(/^\/?rpg\//, "")
           .replace(/^\//, "")}`;
-    refs.push({ href, label: "BoardGameGeek" });
+    refs.push({ href, label: t("external_refs.boardgamegeek") });
   }
 
   if (externalRefs.wikipedia) {
@@ -792,7 +874,7 @@ function buildSystemExternalLinks(system: GameSystemDetail) {
     const href = value.startsWith("http")
       ? value
       : `https://en.wikipedia.org/wiki/${encodeURIComponent(value)}`;
-    refs.push({ href, label: "Wikipedia" });
+    refs.push({ href, label: t("external_refs.wikipedia") });
   }
 
   return refs;

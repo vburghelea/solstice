@@ -14,6 +14,7 @@ import {
 import { RoleBadge } from "~/components/ui/RoleBadge";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 
 type LinkPrimitive = string | number | boolean;
@@ -32,11 +33,12 @@ interface CampaignCardProps {
 }
 
 export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
+  const { t } = useCampaignsTranslation();
   const resolvedLink: CampaignCardLinkConfig = {
     to: viewLink?.to ?? "/player/campaigns/$campaignId",
     params: viewLink?.params ?? { campaignId: campaign.id },
     from: viewLink?.from ?? "/player/campaigns",
-    label: viewLink?.label ?? "View Campaign",
+    label: viewLink?.label ?? t("default_labels.view_campaign"),
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };
 
@@ -85,31 +87,31 @@ export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
             </div>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Game System</span>
+            <span className="text-muted-foreground">{t("labels.game_system")}</span>
             <span className="font-medium">{campaign.gameSystem.name}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Language</span>
+            <span className="text-muted-foreground">{t("labels.language")}</span>
             <LanguageTag language={campaign.language} className="text-[0.7rem]" />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Time of Day</span>
+            <span className="text-muted-foreground">{t("labels.time_of_day")}</span>
             <span className="font-medium">{campaign.timeOfDay}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Session Duration</span>
+            <span className="text-muted-foreground">{t("labels.session_duration")}</span>
             <span className="font-medium">{campaign.sessionDuration}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Visibility</span>
+            <span className="text-muted-foreground">{t("labels.visibility")}</span>
             {campaign.visibility === "protected" ? (
-              <Badge variant="secondary">Connections &amp; Teammates</Badge>
+              <Badge variant="secondary">{t("status.connections_teammates")}</Badge>
             ) : (
               <span className="font-medium capitalize">{campaign.visibility}</span>
             )}
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Participants</span>
+            <span className="text-muted-foreground">{t("labels.participants")}</span>
             <span className="font-medium">{campaign.participantCount}</span>
           </div>
         </div>
@@ -121,7 +123,7 @@ export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
               {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
               {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             >
-              {resolvedLink.label ?? "View Campaign"}
+              {resolvedLink.label ?? t("default_labels.view_campaign")}
             </Link>
           </Button>
         </div>

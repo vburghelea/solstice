@@ -1,0 +1,145 @@
+{
+  "title": "Posteingang",
+  "subtitle": "Verwalte deine Nachrichten und Benachrichtigungen",
+  "shared_inbox": {
+    "title": "Geteilter Posteingang",
+    "loading": "Lade geteilten Posteingang",
+    "loading_description": "Hole aktuelle Konversationen und Persona-Metriken für den {{persona}} Arbeitsbereich.",
+    "unable_to_load": "Geteilter Posteingang konnte nicht geladen werden",
+    "unable_to_load_description": "Bitte aktualisiere die Seite und versuche es erneut. Kontaktiere das Platform-Team, wenn das Problem weiterhin besteht.",
+    "beta_badge": "Zusammenarbeit Beta",
+    "open_reporting": "Übergreifendes Reporting öffnen",
+    "action_due_prefix": "Fällig ",
+    "sections": {
+      "metrics": {
+        "title": "Kennzahlen",
+        "description": "Wichtige Leistungskennzahlen und Nutzungsstatistiken"
+      },
+      "filters": {
+        "title": "Filter",
+        "description": "Posteingang nach Workflow oder Eskalationstyp fokussieren."
+      },
+      "tips": {
+        "title": "Zusammenarbeit-Tipps",
+        "description": "Erwartungen abgleichen, wenn mehrere Personen die Konversation teilen."
+      },
+      "threads": {
+        "title": "Konversationen",
+        "no_threads": "Noch keine Konversationen",
+        "no_threads_description": "Ändere die Filter oder lade Mitarbeiter ein, um eine geteilte Konversation zu starten.",
+        "log_note": "Interne Notiz hinzufügen",
+        "select_thread": "Konversation auswählen",
+        "select_thread_description": "Wähle eine Konversation, um kontextübergreifende Infos, Notizen und Aufgaben zu sehen."
+      }
+    },
+    "priority": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "status": {
+      "open": "Offen",
+      "waiting": "Warte auf Antwort",
+      "resolved": "Gelöst"
+    },
+    "threads_awaiting": {
+      "one": "{{count}} Konversation wartet auf deine Aufmerksamkeit.",
+      "other": "{{count}} Konversationen warten auf deine Aufmerksamkeit."
+    },
+    "thread_detail": {
+      "action_items": "Aufgaben",
+      "priority_label": "Priorität:",
+      "last_updated": "Zuletzt aktualisiert",
+      "reply_to_thread": "Auf Konversation antworten",
+      "add_follow_up": "Folgeaufgabe hinzufügen",
+      "owner_label": "Deins",
+      "status_label": "Status:"
+    }
+  },
+  "status_labels": {
+    "open": "Offen",
+    "waiting_on_response": "Warte auf Antwort",
+    "resolved": "Gelöst",
+    "closed": "Geschlossen",
+    "in_progress": "In Bearbeitung",
+    "urgent": "Dringend",
+    "low_priority": "Niedrige Priorität"
+  },
+  "filters": {
+    "title": "Nachrichten filtern",
+    "all": "Alle",
+    "unread": "Ungelesen",
+    "important": "Wichtig",
+    "recent": "Aktuell",
+    "resolved": "Gelöst",
+    "pending": "Ausstehend"
+  },
+  "messages": {
+    "loading_messages": "Lade Nachrichten...",
+    "no_messages": "Keine Nachrichten gefunden",
+    "failed_to_load": "Posteingang konnte nicht geladen werden",
+    "empty_state": {
+      "title": "Noch keine Nachrichten",
+      "subtitle": "Wenn du Nachrichten erhältst, erscheinen sie hier"
+    },
+    "compose": {
+      "title": "Nachricht verfassen",
+      "placeholder": "Schreib hier deine Nachricht...",
+      "send": "Senden",
+      "sending": "Wird gesendet...",
+      "attach_file": "Datei anhängen"
+    },
+    "reply": {
+      "title": "Auf Nachricht antworten",
+      "placeholder": "Schreib hier deine Antwort...",
+      "send": "Antwort senden",
+      "sending": "Antwort wird gesendet..."
+    }
+  },
+  "actions": {
+    "mark_as_read": "Als gelesen markieren",
+    "mark_as_unread": "Als ungelesen markieren",
+    "archive": "Archivieren",
+    "delete": "Löschen",
+    "reply": "Antworten",
+    "forward": "Weiterleiten",
+    "star": "Markieren",
+    "unstar": "Markierung entfernen",
+    "flag": "Kennzeichen",
+    "unflag": "Kennzeichen entfernen"
+  },
+  "thread": {
+    "title": "Konversation",
+    "participants": "Teilnehmer",
+    "messages": "Nachrichten",
+    "last_message": "Letzte Nachricht",
+    "started_by": "Gestartet von",
+    "reply_to_thread": "Auf Konversation antworten"
+  },
+  "notifications": {
+    "new_message": "Neue Nachricht",
+    "message_reply": "Antwort auf Nachricht",
+    "thread_updated": "Konversation aktualisiert"
+  },
+  "search": {
+    "placeholder": "Nachrichten durchsuchen...",
+    "no_results": "Keine Nachrichten gefunden, die deiner Suche entsprechen",
+    "filters": {
+      "date_range": "Zeitraum",
+      "sender": "Absender",
+      "subject": "Betreff"
+    }
+  },
+  "errors": {
+    "send_failed": "Nachricht konnte nicht gesendet werden",
+    "load_failed": "Nachrichten konnten nicht geladen werden",
+    "delete_failed": "Nachricht konnte nicht gelöscht werden",
+    "archive_failed": "Nachricht konnte nicht archiviert werden",
+    "load_snapshot_failed": "Posteingang konnte nicht geladen werden"
+  },
+  "success": {
+    "message_sent": "Nachricht erfolgreich gesendet",
+    "message_archived": "Nachricht erfolgreich archiviert",
+    "message_deleted": "Nachricht erfolgreich gelöscht"
+  }
+}

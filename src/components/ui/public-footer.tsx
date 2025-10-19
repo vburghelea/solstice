@@ -1,8 +1,22 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { CookiePreferencesTrigger } from "~/features/consent";
+import type { AuthUser } from "~/lib/auth/types";
+import type { SupportedLanguage } from "~/lib/i18n/config";
+import { getLocalizedUrl } from "~/lib/i18n/detector";
+import { Route as RootRoute } from "~/routes/__root";
 
 export function PublicFooter() {
+  const { language } = RootRoute.useRouteContext() as {
+    user: AuthUser | null;
+    language: SupportedLanguage;
+  };
+
+  const eventsHref = getLocalizedUrl("/events", language);
+  const teamsHref = getLocalizedUrl("/teams", language);
+  const resourcesHref = getLocalizedUrl("/resources", language);
+  const aboutHref = getLocalizedUrl("/about", language);
+
   return (
     <footer className="bg-brand-dark text-brand-light">
       <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -26,25 +40,25 @@ export function PublicFooter() {
             <nav className="mt-3 space-y-2 text-sm sm:mt-4">
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/events"
+                to={eventsHref}
               >
                 Events
               </Link>
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/teams"
+                to={teamsHref}
               >
                 Teams
               </Link>
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/resources"
+                to={resourcesHref}
               >
                 Resources
               </Link>
               <Link
                 className="block text-gray-400 transition hover:text-white"
-                to="/about"
+                to={aboutHref}
               >
                 About Roundup Games
               </Link>

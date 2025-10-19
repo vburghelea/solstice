@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "eyebrow": "Zacznij planować",
+    "title": "Odkryj przygody przy stole stworzone dla odkrywców",
+    "subtitle": "Poznaj spotkania społeczności, twórz kolekcje ulubionych systemów i obserwuj opowiadaczy, którzy pasują do Twojego stylu.",
+    "cta_text": "Stwórz swój profil",
+    "secondary_cta": "Zaloguj się, aby kontynuować"
+  },
+  "explorer_guide": {
+    "eyebrow": "Przewodnik odkrywcy",
+    "title": "Zaplanuj następny przystanek swojej podróży",
+    "subtitle": "Wybierz miasto domowe, aby podglądać spotkania, organizatorów i światy gier, które witają nowych graczy.",
+    "city_focus_label": "Skup się na mieście",
+    "browse_all_locations": "Przeglądaj wszystkie lokalizacje",
+    "location_data_coming_soon": "Dane o lokalizacjach wkrótce",
+    "from_your_profile": "z Twojego profilu",
+    "players_count": "{{count}} graczy",
+    "location_suggestion": "Sugerujemy miasta z Twojego profilu, zapisanych preferencji lub strefy czasowej, kiedy możemy.",
+    "popular_cities": "Popularne miasta:",
+    "how_it_flows": {
+      "title": "Jak działa ta trasa",
+      "subtitle": "Postępuj zgodnie z tymi krokami, aby zdecydować, kiedy dołączyć do społeczności lub wypatrywać nowych zaproszeń."
+    },
+    "chapters": [
+      "Odkrywaj spotkania i festiwale przygotowane dla ciekawych początkujących.",
+      "Poznawaj systemy i sesje, które priorytetowo traktują wdrożenie i narzędzia bezpieczeństwa.",
+      "Zapisz miasto domowe, aby otrzymywać aktualizacje, gdy pojawią się wolne miejsca."
+    ],
+    "themes": {
+      "curated_spotlights": {
+        "title": "Wyselekcjonowane atrakcje",
+        "description": "Ręcznie wybrane sesje i historie ułatwiają poczucie atmosfery Roundup, zanim jeszcze usiądziesz przy stole."
+      },
+      "effortless_planning": {
+        "title": "Bezproblemowe planowanie",
+        "description": "Wybierz miasto, odkrywaj wolne miejsca i oznaczaj wydarzenia, które kochasz, bez zobowiązań, dopóki nie będziesz gotów."
+      },
+      "trust_first_design": {
+        "title": "Projektowanie z zaufaniem na pierwszym miejscu",
+        "description": "Praktyki bezpieczeństwa, uwagi o dostępności i prezentacje organizatorów pojawiają się na początku, aby odkrywcy mogli podejmować pewne decyzje."
+      }
+    }
+  },
+  "confidence_signals": {
+    "eyebrow": "Sygnały zaufania",
+    "title": "Co sprawia, że Roundup jest bezpieczny",
+    "subtitle": "Podkreślamy wskazówki, które pomagają indywidualnym odkrywcom poczuć się pewnie przed wejściem w nową przestrzeń.",
+    "safety_tools": {
+      "title": "Narzędzia bezpieczeństwa na widoku",
+      "description": "Organizatorzy prezentują Linie i Zasłony, Karty X i rytuały podsumowujące, aby każdy wiedział, jak troska objawia się przy stole."
+    },
+    "meet_facilitator": {
+      "title": "Poznaj organizatora",
+      "description": "Biogramy MG podkreślają zaimki, tempo sesji i rytuały powitalne, abyś mógł wyczuć atmosferę, zanim przybędziesz."
+    },
+    "welcoming_spaces": {
+      "title": "Przestrzenie, które są przyjazne",
+      "description": "Każda informacja o miejscu obejmuje uwagi o mobilności, wskazówki transportowe i atmosferę społeczności, pomagając odwiedzającym wyobrazić sobie doświadczenie."
+    }
+  },
+  "upcoming_events": {
+    "eyebrow": "Nadchodzące spotkania",
+    "title_prefix": "Wydarzenia w pobliżu",
+    "default_area": "Twojej okolicy",
+    "subtitle": "Kuratowane przez organizatorów społeczności. Każde RSVP przybliża Cię do pierwszej pamięci o sesji gry.",
+    "no_events_title": "Jeszcze nie zaplanowano wydarzeń dla tego miasta.",
+    "no_events_subtitle": "Sprawdź później, gdy organizatorzy opublikują nowe sesje.",
+    "browse_full_calendar": "Przeglądaj pełny kalendarz"
+  },
+  "story_sessions": {
+    "eyebrow": "Historie do wypróbowania",
+    "title": "Sesje witające nowych odkrywców",
+    "subtitle": "Te stoły kładą nacisk na wdrożenie, narzędzia bezpieczeństwa i energię współpracy.",
+    "no_sessions_title": "Jeszcze nie ma sesji wyróżnionych w tym mieście.",
+    "no_sessions_subtitle": "Zapisz się na nasz newsletter lub spróbuj ponownie później dla nowych treści.",
+    "search_all_games": "Przeszukaj wszystkie gry"
+  },
+  "trending_systems": {
+    "eyebrow": "Popularne systemy",
+    "title": "Zestawy reguł z pędem",
+    "subtitle": "Odkryj, które systemy rozświetlają stoły, abyś wiedział, czego uczyć się dalej.",
+    "no_systems": "Będziemy podkreślać popularne systemy, gdy zaplanowanych będzie więcej sesji.",
+    "sessions_count": "{{count}} sesji",
+    "hero_art_pending": "Ilustracja hero czeka na moderację",
+    "description_coming_soon": "Opis wkrótce."
+  },
+  "ready_to_go_deeper": {
+    "title": "Gdy będziesz gotów, by zejść głębiej",
+    "subtitle": "Stwórz darmowe konto, aby obserwować miasta, dołączać do sesji i otrzymywać zaproszenia od zaufanych MG.",
+    "start_profile": "Rozpocznij swój profil gracza",
+    "have_account": "Mam już konto"
+  }
+}

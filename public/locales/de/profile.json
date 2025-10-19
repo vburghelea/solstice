@@ -1,0 +1,347 @@
+{
+  "onboarding": {
+    "title": "Vervollständige Dein Spielerprofil",
+    "description": "Gib diese Details ein, um das Onboarding abzuschließen und den Spielerbereich freizuschalten."
+  },
+  "basic_information": {
+    "title": "Grundlegende Informationen",
+    "description": "Deine persönlichen Daten und Kontaktdaten"
+  },
+  "additional_information": {
+    "title": "Zusätzliche Informationen",
+    "description": "Deine Spielvorlieben und Verfügbarkeit"
+  },
+  "privacy_settings": {
+    "title": "Privatsphäre-Einstellungen",
+    "description": "Kontrolliere, welche Informationen für andere sichtbar sind",
+    "choose_what_others_see": "Wähle aus, welche Informationen andere Mitglieder über Dich sehen können."
+  },
+  "game_preferences": {
+    "title": "Spielvorlieben",
+    "description": "Deine Lieblings- und unerwünschten Spielsysteme"
+  },
+  "blocklist": {
+    "title": "Sperrliste",
+    "description": "Verwalte die Benutzer, die Du gesperrt hast",
+    "explanation": "Gesperrte Benutzer können Dir nicht folgen, Dich nicht einladen oder sich nicht für Deine Spiele/Kampagnen bewerben. Du kannst die Sperre jederzeit aufheben.",
+    "open_blocklist": "Sperrliste öffnen"
+  },
+  "personal_information": {
+    "title": "Persönliche Informationen",
+    "description": "Grundlegende Informationen über Dich"
+  },
+  "labels": {
+    "profile_name": "Profilname",
+    "email_address": "E-Mail-Adresse",
+    "gender": "Geschlecht",
+    "pronouns": "Pronomen",
+    "phone_number": "Telefonnummer",
+    "city": "Stadt",
+    "country": "Land",
+    "overall_experience_level": "Gesamterfahrungslevel",
+    "games_hosted": "Veranstaltete Spiele",
+    "gm_rating": "Game-Master-Bewertung",
+    "response_rate": "Antwortrate",
+    "avg_response_time": "Ø Antwortzeit",
+    "top_strengths": "Größte Stärken",
+    "availability_calendar": "Verfügbarkeitskalender",
+    "languages": "Sprachen",
+    "identity_tags": "Identitäts-Tags",
+    "preferred_game_themes": "Bevorzugte Spielthemen",
+    "favorite_systems": "Lieblingssysteme",
+    "avoided_systems": "Gemiedene Systeme",
+    "time": "Zeit"
+  },
+  "placeholders": {
+    "profile_name": "wähle einen einzigartigen Benutzernamen",
+    "gender": "Geschlecht auswählen",
+    "pronouns": "z.B. er/ihn, sie/ihr, they/them",
+    "phone_number": "+49 1512 3456789",
+    "city": "Berlin",
+    "country": "Nach einem Land suchen",
+    "experience_level": "Erfahrungslevel auswählen",
+    "languages": "Sprachen auswählen, die Du sprichst",
+    "identity_tags": "Identitäts-Tags auswählen",
+    "game_themes": "Bevorzugte Spielthemen auswählen"
+  },
+  "descriptions": {
+    "profile_name": "Dieser Name ist öffentlich und muss einzigartig sein. Verwende Buchstaben, Zahlen, Punkte, Unterstriche oder Bindestriche.",
+    "profile_name_public": "Dieser Name ist öffentlich und für andere Spieler sichtbar.",
+    "availability": "Lege Deine wöchentliche Verfügbarkeit für Spielsitzungen fest",
+    "languages": "Sprachen, in denen Du Dich wohl fühlst beim Spielen",
+    "identity_tags": "Hilf anderen, kompatible Spielpartner zu finden",
+    "game_themes": "Spielthemen, die Dir am meisten gefallen",
+    "availability_calendar": "Klicke und ziehe, um Deine verfügbaren Zeitfenster jede Woche auszuwählen.",
+    "identity_tags_help": "Hilf anderen, kompatible Spielpartner zu finden",
+    "game_themes_help": "Spielthemen, die Dir am meisten gefallen"
+  },
+  "buttons": {
+    "edit": "Bearbeiten",
+    "cancel": "Abbrechen",
+    "save_changes": "Änderungen speichern",
+    "saving": "Speichern...",
+    "complete_profile": "Profil vervollständigen",
+    "completing_profile": "Profil wird vervollständigt...",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "form_steps": {
+    "personal": {
+      "title": "Persönliche Informationen",
+      "description": "Grundlegende Informationen über Dich"
+    },
+    "additional": {
+      "title": "Zusätzliche Informationen",
+      "description": "Mehr Details über Deine Spielvorlieben und Erfahrung"
+    },
+    "privacy": {
+      "title": "Privatsphäre-Einstellungen",
+      "description": "Kontrolliere, welche Informationen für andere sichtbar sind"
+    },
+    "game_preferences": {
+      "title": "Spielvorlieben",
+      "description": "Wähle Deine Lieblings- und unbeliebtesten Spielsysteme"
+    }
+  },
+  "privacy_options": {
+    "show_email_to_teammates": "Meine E-Mail-Adresse für Teammitglieder anzeigen",
+    "show_phone_to_teammates": "Meine Telefonnummer für Teammitglieder anzeigen",
+    "show_location_to_everyone": "Meinen Standort (Stadt und Land) für alle anzeigen",
+    "show_languages_to_everyone": "Meine Sprachen für alle anzeigen",
+    "show_game_preferences_to_everyone": "Meine Spielvorlieben für alle anzeigen",
+    "show_location_to_others": "Meinen Standort (Stadt/Land) für andere anzeigen",
+    "show_languages_to_others": "Meine Sprachen für andere anzeigen",
+    "show_game_preferences_to_others": "Meine Spielvorlieben für andere anzeigen",
+    "allow_team_invitations": "Team-Einladungen von anderen Benutzern erlauben",
+    "allow_team_captains_invitations": "Team-Kapitänen erlauben, mir Einladungen zu senden",
+    "only_allow_invites_from_connections": "Nur Einladungen von Verbindungen zulassen",
+    "allow_follows": "Anderen Benutzern erlauben, Dir zu folgen",
+    "allow_others_to_follow": "Anderen erlauben, mir zu folgen",
+    "show_email_to_team_members": "Meine E-Mail-Adresse für Teammitglieder anzeigen",
+    "show_phone_to_team_members": "Meine Telefonnummer für Teammitglieder anzeigen"
+  },
+  "status": {
+    "loading_profile": "Profil wird geladen...",
+    "loading_profile_data": "Profildaten werden geladen...",
+    "not_set": "Nicht festgelegt",
+    "not_specified": "Nicht angegeben",
+    "no_languages_specified": "Keine Sprachen angegeben",
+    "no_identity_tags_specified": "Keine Identitäts-Tags angegeben",
+    "no_game_themes_specified": "Keine Spielthemen angegeben",
+    "no_favorites_specified": "Keine Favoriten angegeben",
+    "no_avoided_systems_specified": "Keine gemiedenen Systeme angegeben",
+    "na": "N/A"
+  },
+  "privacy_display": {
+    "email_visible_to_teammates": "E-Mail für Teammitglieder sichtbar",
+    "phone_visible_to_teammates": "Telefonnummer für Teammitglieder sichtbar",
+    "location_visible_to_everyone": "Standort für alle sichtbar",
+    "languages_visible_to_everyone": "Sprachen für alle sichtbar",
+    "game_preferences_visible_to_everyone": "Spielvorlieben für alle sichtbar",
+    "allow_team_invitations": "Team-Einladungen zulassen",
+    "only_allow_invites_from_connections": "Nur Einladungen von Verbindungen zulassen",
+    "allow_follows": "Folgen zulassen"
+  },
+  "aria_labels": {
+    "edit_basic_information": "Grundlegende Informationen bearbeiten",
+    "edit_additional_information": "Zusätzliche Informationen bearbeiten",
+    "edit_privacy_settings": "Privatsphäre-Einstellungen bearbeiten",
+    "edit_game_preferences": "Spielvorlieben bearbeiten"
+  },
+  "errors": {
+    "failed_to_load_profile": "Profil konnte nicht geladen werden",
+    "please_try_logging_in_again": "Bitte versuche Dich erneut anzumelden",
+    "no_changes_made": "Es wurden keine Änderungen an Deinem Profil vorgenommen.",
+    "profile_updated_successfully": "Profil erfolgreich aktualisiert",
+    "failed_to_update_profile": "Profil konnte nicht aktualisiert werden",
+    "profile_name_already_taken": "Dieser Profilname ist bereits vergeben",
+    "unable_to_verify_profile_name": "Profilname konnte nicht überprüft werden. Bitte versuche es erneut.",
+    "failed_to_reserve_profile_name": "Profilname konnte nicht reserviert werden",
+    "failed_to_save_profile": "Profil konnte nicht gespeichert werden",
+    "unexpected_error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
+    "please_save_or_cancel_current_changes": "Bitte speichere oder brich Deine aktuellen Änderungen ab, bevor Du einen anderen Abschnitt bearbeitest."
+  },
+  "optional_fields": {
+    "gender": "Geschlecht (optional)",
+    "pronouns": "Pronomen (optional)",
+    "phone": "Telefonnummer (optional)",
+    "city": "Stadt (optional)",
+    "country": "Land (optional)",
+    "languages": "Sprachen (optional)",
+    "identity_tags": "Identitäts-Tags (optional)",
+    "game_themes": "Bevorzugte Spielthemen (optional)",
+    "experience_level": "Gesamterfahrungslevel (optional)",
+    "calendar_availability": "Kalender-Verfügbarkeit (optional)"
+  },
+  "placeholders_optional": {
+    "pronouns": "z.B., they/them, sie/ihr, er/ihn",
+    "languages": "Sprachen hinzufügen, die Du sprichst",
+    "identity_tags": "Identitäts-Tags hinzufügen, die Dich repräsentieren",
+    "game_themes": "Spielthemen hinzufügen, die Du bevorzugst",
+    "experience_level": "Wähle Dein Erfahrungslevel"
+  },
+  "hero_section": {
+    "complete_profile_prompt": "Vervollständige Dein Spielerprofil, um mit Geschichtenerzählern, Veranstaltungsorten und Zeitplänen zusammengebracht zu werden, die zu Dir passen.",
+    "save_cities": "Städte speichern",
+    "follow_storytellers": "Geschichtenerzählern folgen",
+    "book_quickly": "Schnell buchen"
+  },
+  "gender_options": {
+    "male": "Männlich",
+    "female": "Weiblich",
+    "non_binary": "Nicht-binär",
+    "other": "Andere",
+    "prefer_not_to_say": "Möchte nicht angeben"
+  },
+  "gm_stats": {
+    "response_time_minutes": "{{count}} Min",
+    "response_rate_percentage": "{{count}}%",
+    "rating_na": "N/A"
+  },
+  "form_fields": {
+    "gender": "Geschlecht",
+    "select_gender": "Geschlecht auswählen",
+    "pronouns": "Pronomen",
+    "pronouns_example": "z.B. er/ihn, sie/ihr, they/them",
+    "phone_number": "Telefonnummer",
+    "phone_example": "+49 1512 3456789",
+    "city": "Stadt",
+    "city_example": "Berlin",
+    "country": "Land",
+    "search_country": "Nach einem Land suchen",
+    "overall_experience_level": "Gesamterfahrungslevel",
+    "select_experience_level": "Erfahrungslevel auswählen"
+  },
+  "privacy_checkboxes": {
+    "show_email_to_teammates": "Meine E-Mail-Adresse für Teammitglieder anzeigen",
+    "show_phone_to_teammates": "Meine Telefonnummer für Teammitglieder anzeigen",
+    "show_location_to_everyone": "Meinen Standort (Stadt und Land) für alle anzeigen",
+    "show_languages_to_everyone": "Meine Sprachen für alle anzeigen",
+    "show_game_preferences_to_everyone": "Meine Spielvorlieben für alle anzeigen",
+    "allow_team_invitations": "Team-Einladungen von anderen Benutzern erlauben",
+    "only_allow_invites_from_connections": "Nur Einladungen von Verbindungen zulassen",
+    "allow_follows": "Anderen Benutzern erlauben, Dir zu folgen"
+  },
+  "display": {
+    "not_set": "Nicht festgelegt",
+    "not_specified": "Nicht angegeben",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "game_preferences_step": {
+    "favorite_systems_title": "Lieblingsspielsysteme",
+    "favorite_systems_placeholder": "Lieblingsspielsysteme suchen und hinzufügen...",
+    "avoid_systems_title": "Zu meidende Spielsysteme",
+    "avoid_systems_placeholder": "Zu meidende Spielsysteme suchen und hinzufügen..."
+  },
+  "complete_profile_form": {
+    "steps": {
+      "personal_information": {
+        "title": "Persönliche Informationen",
+        "description": "Grundlegende Informationen über Dich"
+      },
+      "additional_information": {
+        "title": "Zusätzliche Informationen",
+        "description": "Mehr Details über Deine Spielvorlieben und Erfahrung"
+      },
+      "privacy_settings": {
+        "title": "Privatsphäre-Einstellungen",
+        "description": "Kontrolliere, welche Informationen für andere sichtbar sind"
+      },
+      "game_preferences": {
+        "title": "Spielvorlieben",
+        "description": "Wähle Deine Lieblings- und unbeliebtesten Spielsysteme"
+      }
+    },
+    "loading_profile": "Profil wird geladen...",
+    "failed_to_load_profile": "Profil konnte nicht geladen werden. Bitte versuche es erneut.",
+    "navigation": {
+      "previous": "Zurück",
+      "next": "Weiter",
+      "complete_profile": "Profil vervollständigen",
+      "completing_profile": "Profil wird vervollständigt..."
+    },
+    "fields": {
+      "profile_name": {
+        "label": "Profilname",
+        "placeholder": "wähle einen einzigartigen Benutzernamen",
+        "description": "Dieser Name ist öffentlich und muss einzigartig sein. Verwende Buchstaben, Zahlen, Punkte, Unterstriche oder Bindestriche."
+      },
+      "gender": {
+        "label": "Geschlecht (optional)",
+        "placeholder": "Geschlecht auswählen"
+      },
+      "pronouns": {
+        "label": "Pronomen (optional)",
+        "placeholder": "z.B., they/them, sie/ihr, er/ihn"
+      },
+      "phone": {
+        "label": "Telefonnummer (optional)",
+        "placeholder": "+49 1512 3456789"
+      },
+      "city": {
+        "label": "Stadt (optional)",
+        "placeholder": "Berlin"
+      },
+      "country": {
+        "label": "Land (optional)",
+        "placeholder": "Nach einem Land suchen"
+      },
+      "languages": {
+        "label": "Sprachen (optional)",
+        "placeholder": "Sprachen hinzufügen, die Du sprichst"
+      },
+      "identity_tags": {
+        "label": "Identitäts-Tags (optional)",
+        "placeholder": "Identitäts-Tags hinzufügen, die Dich repräsentieren"
+      },
+      "preferred_game_themes": {
+        "label": "Bevorzugte Spielthemen (optional)",
+        "placeholder": "Spielthemen hinzufügen, die Du bevorzugst"
+      },
+      "experience_level": {
+        "label": "Gesamterfahrungslevel (optional)",
+        "placeholder": "Wähle Dein Erfahrungslevel"
+      },
+      "calendar_availability": {
+        "label": "Kalender-Verfügbarkeit (optional)",
+        "description": "Klicke und ziehe, um Deine verfügbaren Zeitfenster jede Woche auszuwählen."
+      }
+    },
+    "privacy_settings_intro": "Wähle aus, welche Informationen andere Mitglieder über Dich sehen können.",
+    "privacy_checkboxes": {
+      "show_email_to_team_members": "Meine E-Mail-Adresse für Teammitglieder anzeigen",
+      "show_phone_to_team_members": "Meine Telefonnummer für Teammitglieder anzeigen",
+      "show_location_to_others": "Meinen Standort (Stadt/Land) für andere anzeigen",
+      "show_languages_to_others": "Meine Sprachen für andere anzeigen",
+      "show_game_preferences_to_others": "Meine Spielvorlieben für andere anzeigen",
+      "allow_team_invitations": "Team-Kapitänen erlauben, mir Einladungen zu senden",
+      "only_allow_invites_from_connections": "Nur Einladungen von Verbindungen zulassen",
+      "allow_follows": "Anderen erlauben, mir zu folgen"
+    },
+    "errors": {
+      "failed_to_save_profile": "Profil konnte nicht gespeichert werden",
+      "unable_to_verify_profile_name": "Profilname konnte nicht überprüft werden. Bitte versuche es erneut.",
+      "profile_name_taken": "Dieser Profilname ist bereits vergeben",
+      "failed_to_reserve_profile_name": "Profilname konnte nicht reserviert werden",
+      "unexpected_error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
+    }
+  },
+  "avatar_upload": {
+    "buttons": {
+      "upload_avatar": "Avatar hochladen",
+      "use_provider_avatar": "Provider-Avatar verwenden",
+      "processing": "Verarbeitung..."
+    },
+    "messages": {
+      "avatar_updated": "Avatar aktualisiert",
+      "failed_to_upload_avatar": "Avatar konnte nicht hochgeladen werden",
+      "reverted_to_provider_avatar": "Zu Provider-Avatar zurückgekehrt",
+      "failed_to_remove_avatar": "Avatar konnte nicht entfernt werden",
+      "could_not_process_image": "Bild konnte nicht verarbeitet werden"
+    },
+    "errors": {
+      "canvas_not_supported": "Canvas nicht unterstützt"
+    }
+  }
+}

@@ -20,6 +20,7 @@ import { GameCard } from "~/features/games/components/GameCard";
 import { updateGameSessionStatus } from "~/features/games/games.mutations";
 import { listGamesWithCount } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
+import { useCommonTranslation, useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import type { OperationResult } from "~/shared/types/common";
@@ -64,6 +65,8 @@ export const Route = createFileRoute("/gm/games/")({
 });
 
 function GamesPage() {
+  const { t: tGames } = useGamesTranslation();
+  const { t: tCommon } = useCommonTranslation();
   const {
     status = "scheduled",
     userRole = "owner",
@@ -88,7 +91,7 @@ function GamesPage() {
         data: { filters: { status, userRole }, page, pageSize },
       });
       if (!result.success) {
-        toast.error("Failed to load games.");
+        toast.error(tGames("my_games.errors.load_failed"));
       }
       return result;
     },
@@ -172,13 +175,15 @@ function GamesPage() {
           },
         );
       }
-      toast.error(err.message || "An unexpected error occurred");
+      toast.error(err.message || tGames("my_games.errors.unexpected_error"));
     },
     onSuccess: (result) => {
       if (result.success) {
-        toast.success("Game status updated");
+        toast.success(tGames("my_games.errors.status_updated"));
       } else {
-        toast.error(result.errors?.[0]?.message || "Failed to update status");
+        toast.error(
+          result.errors?.[0]?.message || tGames("my_games.errors.update_failed"),
+        );
       }
     },
     onSettled: async () => {
@@ -191,8 +196,10 @@ function GamesPage() {
     <div className="container mx-auto p-4 sm:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Games</h1>
-          <p className="text-muted-foreground">Manage your game sessions</p>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">
+            {tGames("my_games.title")}
+          </h1>
+          <p className="text-muted-foreground">{tGames("my_games.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Select
@@ -207,7 +214,7 @@ function GamesPage() {
             }}
           >
             <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={tGames("my_games.filter_by_status")} />
             </SelectTrigger>
             <SelectContent>
               {gameStatusEnum.enumValues.map((status) => (
@@ -229,18 +236,18 @@ function GamesPage() {
             }}
           >
             <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
-              <SelectValue placeholder="Filter by role" />
+              <SelectValue placeholder={tGames("my_games.filter_by_role")} />
             </SelectTrigger>
             <SelectContent>
               {participantRoleEnum.enumValues.map((role) => (
                 <SelectItem key={role} value={role}>
                   {role === "owner"
-                    ? "Organizer"
+                    ? tGames("my_games.role_labels.owner")
                     : role === "player"
-                      ? "Participant"
+                      ? tGames("my_games.role_labels.player")
                       : role === "invited"
-                        ? "Invitee"
-                        : "Requested"}
+                        ? tGames("my_games.role_labels.invited")
+                        : tGames("my_games.role_labels.requested")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -248,7 +255,7 @@ function GamesPage() {
           <Button asChild>
             <Link to="/gm/games/create">
               <PlusIcon className="mr-2 h-4 w-4" />
-              Create New Game
+              {tGames("my_games.create_new_game")}
             </Link>
           </Button>
         </div>
@@ -258,14 +265,16 @@ function GamesPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Gamepad2 className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">No games yet</h3>
+            <h3 className="mb-2 text-lg font-semibold">
+              {tGames("my_games.no_games_title")}
+            </h3>
             <p className="text-muted-foreground mb-4 text-center">
-              Create your first game session to get started
+              {tGames("my_games.no_games_subtitle")}
             </p>
             <Button asChild>
               <Link to="/gm/games/create">
                 <PlusIcon className="mr-2 h-4 w-4" />
-                Create New Game
+                {tGames("my_games.create_new_game")}
               </Link>
             </Button>
           </CardContent>
@@ -317,21 +326,22 @@ function GamesPage() {
                             </span>
                             <span className="inline-flex min-w-0 items-center gap-1">
                               <span className="truncate">
-                                {g.gameSystem?.name || "N/A"}
+                                {g.gameSystem?.name || tCommon("status.not_available")}
                               </span>
                             </span>
                           </div>
                           <div className="text-muted-foreground flex items-center gap-1 text-xs">
                             <Users className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
                             <span>
-                              {g.participantCount} participant
-                              {g.participantCount === 1 ? "" : "s"}
+                              {tGames("list.participants_count", {
+                                count: g.participantCount,
+                              })}
                             </span>
                           </div>
                         </div>
                         <Button asChild variant="outline" size="sm" className="shrink-0">
                           <Link to="/gm/games/$gameId" params={{ gameId: g.id }}>
-                            View
+                            {tGames("list.view_button")}
                             <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
                           </Link>
                         </Button>
@@ -364,7 +374,11 @@ function GamesPage() {
       )}
       <div className="mt-6 flex items-center justify-between">
         <div className="text-muted-foreground text-sm">
-          Page {page} of {totalPages} • {totalCount} total
+          {tGames("my_games.pagination.page_info", {
+            current: page,
+            total: totalPages,
+            count: totalCount,
+          })}
         </div>
         <div className="flex gap-2">
           <Button
@@ -377,7 +391,7 @@ function GamesPage() {
             }
             disabled={page <= 1}
           >
-            Previous
+            {tCommon("buttons.previous")}
           </Button>
           <Button
             variant="outline"
@@ -394,7 +408,7 @@ function GamesPage() {
             }
             disabled={page >= totalPages}
           >
-            Next
+            {tCommon("buttons.next")}
           </Button>
         </div>
       </div>

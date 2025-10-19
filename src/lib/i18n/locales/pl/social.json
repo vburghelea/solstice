@@ -1,0 +1,36 @@
+{
+  "blocklist": {
+    "title": "Zablokowani użytkownicy",
+    "description": "Użytkownicy, których zablokowałeś i którzy nie mogą już z Tobą wchodzić w interakcje",
+    "loading": "Ładowanie zablokowanych użytkowników...",
+    "no_blocked_users": "Brak zablokowanych użytkowników",
+    "no_blocked_users_description": "Jeszcze nikogo nie zablokowałeś.",
+    "user_count": {
+      "one": "{{count}} zablokowany użytkownik",
+      "other": "{{count}} zablokowanych użytkowników"
+    },
+    "buttons": {
+      "unblock": "Odblokuj",
+      "unblocking": "Odblokowywanie...",
+      "cancel": "Anuluj",
+      "confirm_unblock": "Tak, odblokuj"
+    },
+    "dialog": {
+      "title": "Odblokuj użytkownika",
+      "description": "Czy na pewno chcesz odblokować {{name}}? Ta osoba będzie mogła znów Cię obserwować, zapraszać do gier i wchodzić z Tobą w interakcje."
+    },
+    "status": {
+      "blocked": "Zablokowany"
+    },
+    "reason": "Powód",
+    "blocked_date": "Zablokowany {{date}}",
+    "toast": {
+      "unblock_success": "Użytkownik został pomyślnie odblokowany",
+      "unblock_error": "Nie udało się odblokować użytkownika",
+      "load_error": "Nie udało się załadować listy zablokowanych"
+    }
+  },
+  "errors": {
+    "unexpected_error": "Wystąpił nieoczekiwany błąd"
+  }
+}

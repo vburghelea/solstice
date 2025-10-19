@@ -1,8 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { useTranslation } from "react-i18next";
 
+import { LanguageSwitcher } from "~/components/LanguageSwitcher";
 import { Avatar } from "~/components/ui/avatar";
+import {
+  useCommonTranslation,
+  useNavigationTranslation,
+} from "~/hooks/useTypedTranslation";
 import type { AuthUser } from "~/lib/auth/types";
 import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
@@ -29,9 +35,59 @@ interface VisitorShellProps {
 }
 
 export function VisitorShell({ children, contentClassName }: VisitorShellProps) {
+  const { t } = useCommonTranslation();
+  const { t: navT } = useNavigationTranslation();
+  const { ready: commonReady } = useTranslation("common");
+  const { ready: navigationReady } = useTranslation("navigation");
   const { location } = useRouterState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
+
+  // Wait for translations to be ready to prevent hydration mismatch
+  if (!commonReady || !navigationReady) {
+    return (
+      <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
+        <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
+          <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+            <div className="bg-muted h-9 w-32 animate-pulse rounded" />
+            <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
+              <div className="bg-muted h-8 w-20 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-24 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-28 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+            </nav>
+            <div className="hidden items-center gap-3 md:flex">
+              <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+              <div className="bg-muted h-8 w-20 animate-pulse rounded-full" />
+            </div>
+          </div>
+          <div className="border-border/40 from-primary-soft/30 to-primary-soft/10 border-t bg-gradient-to-r via-transparent">
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
+              <div className="bg-muted h-4 w-96 animate-pulse rounded" />
+              <div className="text-muted-strong flex flex-wrap items-center gap-2 text-xs">
+                <div className="bg-muted h-6 w-24 animate-pulse rounded-full" />
+                <div className="bg-muted h-6 w-32 animate-pulse rounded-full" />
+                <div className="bg-muted h-6 w-20 animate-pulse rounded-full" />
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1">
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8 lg:max-w-7xl">
+            <div className="bg-muted h-96 animate-pulse rounded" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const dynamicNavigation = VISITOR_NAVIGATION.map((item) => ({
+    ...item,
+    label: navT(
+      `main.${item.to === "/" ? "home" : item.to === "/search" ? "find_games" : item.to === "/systems" ? "game_systems" : item.to.replace("/", "")}`,
+    ),
+  }));
 
   const isActive = (path: string) =>
     path === "/"
@@ -46,13 +102,13 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
             <span className="roundup-star-logo h-9 w-9" aria-hidden="true" />
             <span className="flex flex-col leading-tight">
               <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
-                Roundup Games
+                {t("brand.name")}
               </span>
-              <span className="text-base md:text-lg">At a table near you!</span>
+              <span className="text-base md:text-lg">{t("brand.slogan")}</span>
             </span>
           </Link>
           <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
-            {VISITOR_NAVIGATION.map((item) => (
+            {dynamicNavigation.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -68,7 +124,8 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
               </Link>
             ))}
           </nav>
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-3 md:flex">
+            <LanguageSwitcher variant="compact" showLabel={false} />
             {user ? (
               <Link
                 to="/player"
@@ -90,13 +147,13 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                   to="/auth/login"
                   className="text-muted-foreground hover:text-foreground text-sm font-semibold transition"
                 >
-                  Sign in
+                  {navT("user.login")}
                 </Link>
                 <Link
                   to="/auth/signup"
                   className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition"
                 >
-                  Create profile
+                  {navT("user.signup")}
                 </Link>
               </>
             )}
@@ -105,26 +162,27 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
             type="button"
             className="text-muted-foreground md:hidden"
             onClick={() => setIsMenuOpen((open) => !open)}
-            aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
+            aria-label={
+              isMenuOpen
+                ? t("workspace.navigation.close")
+                : t("workspace.navigation.open")
+            }
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
         <div className="border-border/40 from-primary-soft/30 to-primary-soft/10 border-t bg-gradient-to-r via-transparent">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
-            <p className="text-foreground font-medium">
-              Complete your player profile to match with storytellers, venues, and
-              schedules tailored to you.
-            </p>
+            <p className="text-foreground font-medium">{t("hero.complete_profile")}</p>
             <div className="text-muted-strong flex flex-wrap items-center gap-2 text-xs">
               <span className="bg-primary/15 text-primary rounded-full px-3 py-1 font-semibold">
-                Save cities
+                {t("hero.save_cities")}
               </span>
               <span className="bg-primary/15 text-primary rounded-full px-3 py-1 font-semibold">
-                Follow storytellers
+                {t("hero.follow_storytellers")}
               </span>
               <span className="bg-primary/15 text-primary rounded-full px-3 py-1 font-semibold">
-                Book quickly
+                {t("hero.book_quickly")}
               </span>
             </div>
           </div>
@@ -132,7 +190,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
         {isMenuOpen ? (
           <div className="border-border/40 border-t bg-[color:color-mix(in_oklab,var(--surface-default)_94%,transparent)] px-4 pt-4 pb-6 supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur md:hidden">
             <nav className="flex flex-col gap-2">
-              {VISITOR_NAVIGATION.map((item) => (
+              {dynamicNavigation.map((item) => (
                 <Link
                   key={`mobile-${item.to}`}
                   to={item.to}
@@ -149,6 +207,9 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                 </Link>
               ))}
               <div className="mt-3 flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <LanguageSwitcher variant="flags" />
+                </div>
                 {user ? (
                   <Link
                     to="/player"
@@ -172,14 +233,14 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                       className="text-muted-foreground hover:text-foreground rounded-full px-4 py-2 text-sm font-semibold transition"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Sign in
+                      {navT("user.login")}
                     </Link>
                     <Link
                       to="/auth/signup"
                       className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Create profile
+                      {navT("user.signup")}
                     </Link>
                   </>
                 )}
@@ -204,42 +265,42 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 md:grid-cols-[1.5fr,1fr,1fr] md:px-8">
           <div className="space-y-3">
             <p className="text-muted-strong text-sm font-semibold tracking-[0.3em] uppercase">
-              Roundup Games
+              {t("brand.name")}
             </p>
-            <p className="text-muted-strong text-sm">
-              Stories, campaigns, and community events curated for curious explorers.
-              Start with a city, save your preferences, and we'll connect you when the
-              right table opens up.
-            </p>
+            <p className="text-muted-strong text-sm">{t("footer.description")}</p>
           </div>
           <div className="space-y-2">
-            <p className="text-foreground text-sm font-semibold">Plan your visit</p>
+            <p className="text-foreground text-sm font-semibold">
+              {t("footer.plan_visit")}
+            </p>
             <div className="text-muted-strong flex flex-col gap-1 text-sm">
               <Link to="/events" className="hover:text-foreground transition">
-                Event calendar
+                {t("footer.event_calendar")}
               </Link>
               <Link to="/search" className="hover:text-foreground transition">
-                Find a game night
+                {t("footer.find_game_night")}
               </Link>
               <Link to="/systems" className="hover:text-foreground transition">
-                Browse systems
+                {t("footer.browse_systems")}
               </Link>
             </div>
           </div>
           <div className="space-y-2">
-            <p className="text-foreground text-sm font-semibold">Stay in touch</p>
+            <p className="text-foreground text-sm font-semibold">
+              {t("footer.stay_in_touch")}
+            </p>
             <div className="text-muted-strong flex flex-col gap-1 text-sm">
               <Link to="/resources" className="hover:text-foreground transition">
-                Resources
+                {t("footer.resources")}
               </Link>
               <Link to="/about" className="hover:text-foreground transition">
-                About Roundup
+                {t("footer.about_roundup")}
               </Link>
               <a
                 href="mailto:hello@roundup.games"
                 className="hover:text-foreground transition"
               >
-                hello@roundup.games
+                {t("footer.contact_email")}
               </a>
             </div>
           </div>

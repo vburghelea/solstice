@@ -20,7 +20,7 @@ export function HeroBackgroundImage({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute inset-0 z-0 overflow-hidden",
+        "pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden",
         className,
       )}
     >

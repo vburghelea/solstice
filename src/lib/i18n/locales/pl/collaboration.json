@@ -1,0 +1,75 @@
+{
+  "title": "Współpraca",
+  "subtitle": "Współpraca i raportowanie między obszarami",
+  "workspace": {
+    "loading": "Ładowanie informacji o współpracy",
+    "loading_description": "Gromadzenie aktualnych metryk z obszarów graczy, operacji, GM i administratorów.",
+    "unable_to_load": "Nie udało się załadować danych współpracy",
+    "unable_to_load_description": "Odśwież stronę, aby spróbować ponownie. Jeśli problem nadal występuje, skontaktuj się z zespołem platformy.",
+    "beta_badge": "Hub współpracy",
+    "title": "Raportowanie i feedback między obszarami",
+    "description": "Dopasuj się do różnych ról, nie opuszczając swojego obszaru.",
+    "updated_label": "Zaktualizowano",
+    "filters": {
+      "all": "Wszystkie role"
+    }
+  },
+  "sections": {
+    "metrics": {
+      "title": "Wspólne metryki raportowania",
+      "description": "Śledź, jak eksperymenty w jednym obszarze wpływają na wyniki w innych.",
+      "review_threads": "Przejrzyj wspólne wątki",
+      "persona_impact": "Wpływ ról"
+    },
+    "alignment": {
+      "title": "Skupienie na dopasowaniu ról",
+      "description": "Pokaż, na co zwracają uwagę poszczególne role i gdzie współpraca wymaga wzmocnienia.",
+      "alignment_label": "Dopasowanie",
+      "needs_attention": "Wymaga uwagi",
+      "confidence_suffix": "pewności",
+      "key_signals": "Kluczowe sygnały",
+      "open_questions": "Otwarte pytania",
+      "signals_description": "Sygnały i otwarte pytania pomagają zespołowi planować kolejne eksperymenty."
+    },
+    "rhythms": {
+      "title": "Rytmy współpracy",
+      "description": "Rytuały, które utrzymują role w zgodzie, połączone z wspólnymi wątkami skrzynki odbiorczej, które kierują decyzjami.",
+      "next_touchpoint": "Następny punkt kontaktowy",
+      "status": "Status",
+      "linked_threads": "Powiązane wątki"
+    },
+    "feedback": {
+      "title": "Pętle zbierania feedbacku",
+      "description": "Ankiety pulsacyjne i szybkie reakcje trafiają bezpośrednio do backlogu, aby opiekunowie platformy mogli szybko reagować.",
+      "participation": "Udział",
+      "backlog_status": "Status backlogu:",
+      "updated": "Zaktualizowano",
+      "highlights": "Najważniejsze momenty",
+      "quick_reactions": "Szybkie reakcje",
+      "reaction_saved": "Twoja reakcja została zapisana w dzienniku eksperymentów backlogu – Jordan i Priya zobaczą ją podczas następnej synchronizacji zarządzania.",
+      "create_account": "Utwórz konto, aby rejestrować reakcje, które dotrą do zespołu platformy."
+    }
+  },
+  "personas": {
+    "player": "Gracz",
+    "ops": "Operacje",
+    "gm": "Mistrz Gry",
+    "admin": "Administrator platformy"
+  },
+  "status": {
+    "triaged": "Skategoryzowane",
+    "in_progress": "W toku",
+    "shipped": "Opublikowane",
+    "on_track": "Na dobrej drodze",
+    "at_risk": "Ryzykowne",
+    "off_track": "Zboczone z drogi"
+  },
+  "sentiment": {
+    "positive": "Pozytywna dynamika",
+    "neutral": "Neutralna ocena",
+    "concerned": "Wymaga dalszych działań"
+  },
+  "errors": {
+    "load_snapshot_failed": "Nie udało się załadować migawki"
+  }
+}

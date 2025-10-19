@@ -1,0 +1,377 @@
+{
+  "buttons": {
+    "view_game": "Zobacz grę",
+    "mark_completed": "Oznacz jako ukończone",
+    "cancel_session": "Odwołaj sesję",
+    "revoke": "Cofnij",
+    "accept": "Akceptuj",
+    "reject": "Odrzuć",
+    "accepting": "Akceptuję...",
+    "rejecting": "Odrzucam...",
+    "invite": "Zaproś",
+    "cancel": "Anuluj",
+    "create_game": "Stwórz grę",
+    "update_game": "Zaktualizuj grę",
+    "submit_review": "Prześlij recenzję"
+  },
+  "external_refs": {
+    "startplaying": "StartPlaying",
+    "boardgamegeek": "BoardGameGeek",
+    "wikipedia": "Wikipedia"
+  },
+  "labels": {
+    "game_system": "System gry",
+    "language": "Język",
+    "players": "Gracze",
+    "visibility": "Widoczność",
+    "participants": "Uczestnicy",
+    "pending_participant": "Oczekujący uczestnik",
+    "date_time": "Data i godzina",
+    "expected_duration": "Oczekiwany czas trwania (minuty)",
+    "price": "Cena (PLN) (opcjonalnie)",
+    "game_session_name": "Nazwa sesji gry",
+    "description": "Opis",
+    "game_system_used": "Używany system gry",
+    "address": "Adres",
+    "minimum_players": "Minimalna liczba graczy",
+    "maximum_players": "Maksymalna liczba graczy",
+    "search_users": "Szukaj użytkowników",
+    "invite_by_email": "Zaproś przez e-mail",
+    "pending_invitations": "Oczekujące zaproszenia",
+    "safety_tool": "Narzędzie bezpieczeństwa",
+    "safety_tool_details": "Szczegóły narzędzia bezpieczeństwa (opcjonalnie)",
+    "player_boundaries_consent": "Granice graczy / Notatki o zgodzie (opcjonalnie)"
+  },
+  "placeholders": {
+    "game_session_name": "Wpisz chwytliwą nazwę dla swojej planowanej sesji gry",
+    "search_and_select_game_system": "Wyszukaj i wybierz system gry, którego chcesz użyć",
+    "select_language": "Wybierz język",
+    "select_visibility": "Wybierz widoczność",
+    "select_safety_tool": "Wybierz narzędzie bezpieczeństwa",
+    "safety_tool_details": "Jakieś szczegóły dotyczące wybranego narzędzia bezpieczeństwa",
+    "player_boundaries_consent": "Jakieś granice lub uwagi o zgodzie, o których gracze powinni wiedzieć",
+    "search_users": "Szukaj po nazwie lub e-mailu (4+ znaki)",
+    "enter_name": "Wpisz imię",
+    "enter_email": "Wpisz adres e-mail"
+  },
+  "status": {
+    "connections_teammates": "Połączenia i współgracze",
+    "unknown_user": "Nieznany użytkownik",
+    "no_pending_invitations": "Brak oczekujących zaproszeń.",
+    "no_games_found": "Nie znaleziono gier. Stwórz jedną!",
+    "searching": "Szukanie...",
+    "no_users_found": "Nie znaleziono użytkowników."
+  },
+  "messages": {
+    "invitation_rejected_success": "Zaproszenie zostało odrzucone!",
+    "invitation_response_recorded": "Odpowiedź na zaproszenie została zapisana.",
+    "participant_invited_success": "Uczestnik został zaproszony!",
+    "invitation_revoked_success": "Zaproszenie zostało cofnięte!",
+    "review_submitted_success": "Dzięki za Twoją recenzję!"
+  },
+  "errors": {
+    "failed_to_reject_invitation": "Nie udało się odrzucić zaproszenia",
+    "failed_to_respond_invitation": "Nie udało się odpowiedzieć na zaproszenie.",
+    "unexpected_error": "Wystąpił nieoczekiwany błąd.",
+    "failed_to_invite_participant": "Nie udało się zaprosić uczestnika",
+    "failed_to_revoke_invitation": "Nie udało się cofnąć zaproszenia",
+    "failed_to_submit_review": "Nie udało się przesłać recenzji",
+    "search_failed": "Nie udało się wyszukać systemów gier"
+  },
+  "descriptions": {
+    "session_overview": "Podziel się podstawami, których gracze potrzebują przed potwierdzeniem udziału.",
+    "participant_requirements": "Opcjonalne wytyczne, które pomagają graczom wybrać odpowiednie stoły.",
+    "location": "Poinformuj graczy, gdzie odbędzie się sesja.",
+    "safety_table_culture": "Opcjonalne oczekiwania, które ustalają nastrój wspólnej gry.",
+    "manage_invitations": "Przejrzyj i przetwarzaj oczekujące zaproszenia.",
+    "invite_participants": "Wyszukaj użytkowników lub zaproś ich przez e-mail.",
+    "game_invitation": "Zostałeś zaproszony do tej gry. Proszę zaakceptuj lub odrzuć zaproszenie."
+  },
+  "form_sections": {
+    "session_overview": "Przegląd sesji",
+    "participant_requirements": "Wymagania dla uczestników",
+    "location": "Lokalizacja",
+    "safety_table_culture": "Bezpieczeństwo i kultura stołu"
+  },
+  "visibility_options": {
+    "description": "Opcje widoczności: Publiczne (widoczne dla wszystkich), Połączenia i współgracze (widoczne dla Twoich obserwujących, osoby które śledzisz i aktywnych współgraczy), Prywatne (widoczne tylko dla zaproszonych graczy)"
+  },
+  "safety_options": {
+    "no_alcohol": "Bez alkoholu",
+    "safe_word_required": "Wymagane safeword",
+    "encourage_open_communication": "Zachęcaj do otwartej komunikacji"
+  },
+  "confirmation": {
+    "cancel_session": "Czy na pewno chcesz odwołać tę sesję?"
+  },
+  "invitation_status": {
+    "invited": "Zaproszony"
+  },
+  "languages": {
+    "english": "Angielski",
+    "chinese": "Chiński",
+    "hindi": "Hindi",
+    "spanish": "Hiszpański",
+    "french": "Francuski",
+    "arabic": "Arabski",
+    "bengali": "Bengalski",
+    "russian": "Rosyjski"
+  },
+  "validation_errors": {
+    "game_session_name_required": "Nazwa sesji gry jest tym, co większość graczy widzi jako pierwsze szukając przygód, upewnij się, że jest chwytliwa.",
+    "description_required": "Dodaj opis sesji gry, który ustala ton tego, czego gracze mogą się spodziewać.",
+    "game_system_required": "Wybierz system gry dla swojej sesji.",
+    "duration_required": "Wpisz czas trwania gry w minutach, aby inni wiedzieli, ile czasu muszą zarezerwować.",
+    "price_optional": "Jeśli chcesz dodać opłatę za grę, określ ją tutaj.",
+    "language_required": "Wybierz język, w którym będzie grany wybrany przez Ciebie system gry.",
+    "visibility_required": "Wybierz wartość widoczności, która pozwoli Ci efektywnie znaleźć odpowiednich ludzi.",
+    "min_players_required": "Musimy wiedzieć, ile osób ma wziąć udział.",
+    "max_players_required": "Musimy wiedzieć, ile osób ma wziąć udział.",
+    "address_required": "Wpisz adres lokalizacji, gdzie odbędzie się sesja gry."
+  },
+  "titles": {
+    "invite_participants": "Zaproś uczestników",
+    "manage_invitations": "Zarządzaj zaproszeniami",
+    "game_invitation": "Zaproszenie do gry",
+    "review_gm": "Oceń tego MG"
+  },
+  "combobox": {
+    "empty_message": "Zacznij wpisywać nazwę systemu gry, aby szukać.",
+    "no_results_message": "Nie znaleziono systemu gry."
+  },
+  "review_labels": {
+    "rate_gm": "Oceń MG",
+    "select_strengths": "Wybierz do 3 mocnych stron",
+    "comments_optional": "Komentarze (opcjonalnie)",
+    "choose_max_three": "Wybierz do 3 z 10",
+    "submitting": "Wysyłanie...",
+    "placeholder_comment": "Co wyróżniło się w tej sesji?"
+  },
+  "participants_list": {
+    "participants_title": "Uczestnicy ({{count}})",
+    "pending_applications_title": "Oczekujące aplikacje ({{count}})",
+    "banned_title": "Zbanowani z gry ({{count}})",
+    "no_participants": "Jeszcze nie ma uczestników.",
+    "owner_label": "(właściciel)",
+    "role_status": "({{role}} - {{status}})",
+    "buttons": {
+      "remove": "Usuń",
+      "removing": "Usuwanie...",
+      "approve": "Zatwierdź",
+      "approving": "Zatwierdzanie...",
+      "reject": "Odrzuć",
+      "rejecting": "Odrzucanie...",
+      "allow": "Pozwól",
+      "allowing": "Pozwalanie..."
+    },
+    "success_messages": {
+      "participant_removed": "Uczestnik został usunięty!",
+      "ban_removed": "Ban na uczestnictwo został zdjęty!",
+      "application_updated": "Status aplikacji został zaktualizowany!"
+    },
+    "error_messages": {
+      "failed_to_remove": "Nie udało się usunąć uczestnika: {{error}}",
+      "failed_to_remove_ban": "Nie udało się zdjąć banu: {{error}}",
+      "failed_to_update_application": "Nie udało się zaktualizować statusu aplikacji: {{error}}"
+    }
+  },
+  "list_item": {
+    "free": "Darmowe",
+    "original_system": "Oryginalny system",
+    "campaign_part": "Część trwającej kampanii",
+    "hosted_by": "Organizowane przez {{name}}",
+    "hosted_by_community": "Organizowane przez MG społeczności",
+    "view_details": "Zobacz szczegóły",
+    "joined_count": "{{count}} dołączyło",
+    "session_duration": "sesja {{duration}}",
+    "duration_formats": {
+      "hours_minutes": "~{{hours}}h {{minutes}}m przygoda",
+      "hours_only": "~{{hours}}h przygoda",
+      "minutes_only": "~{{minutes}}m przygoda"
+    }
+  },
+  "quick_filters": {
+    "in_city": "W {{city}}",
+    "my_favorite_systems": "Moje ulubione systemy",
+    "in_my_language": "W moim języku",
+    "my_themes": "Moje tematy"
+  },
+  "search": {
+    "title": "Wszystkie sesje gier",
+    "subtitle": "Zaplanuj swoją następną przygodę planszową z publicznymi grami w Twojej okolicy.",
+    "session": "sesja",
+    "sessions": "sesje",
+    "with_quick_filters": "z Twoimi szybkimi filtrami",
+    "no_games": {
+      "title": "Obecnie nie znaleziono publicznych gier.",
+      "subtitle": "Sprawdź później lub stwórz konto, aby zorganizować pierwszą sesję w swojej okolicy.",
+      "become_host": "Zostań organizatorem"
+    },
+    "no_filtered_sessions": {
+      "title": "Żadne sesje nie pasują do Twoich szybkich filtrów.",
+      "subtitle": "Spróbuj dostosować lub wyczyścić filtry, aby przeglądać pełny katalog."
+    }
+  },
+  "game_detail": {
+    "unavailable": {
+      "title": "Sesja niedostępna",
+      "message": "Gra, której szukasz, nie przyjmuje już graczy lub mogła zostać usunięta.",
+      "browse_games": "Przeglądaj wszystkie gry",
+      "visit_homepage": "Odwiedź stronę główną"
+    },
+    "badges": {
+      "public_session": "Sesja publiczna",
+      "ongoing_campaign": "Trwająca kampania"
+    },
+    "hosted_by": "Organizowane przez",
+    "community_gm": "MG społeczności",
+    "community_rating": "Ocena społeczności: {{rating}}/5",
+    "new_to_community": "Nowy w społeczności Roundup Games",
+    "request_seat": "Poproś o miejsce",
+    "applying": "Aplikuję...",
+    "sign_in_to_apply": "Zaloguj się, aby aplikować",
+    "sections": {
+      "table_briefing": {
+        "eyebrow": "Briefing stołu",
+        "title": "O tej sesji",
+        "subtitle": "Zapoznaj się z atmosferą stołu przed prośbą o miejsce.",
+        "no_details": "Organizator gry nie udostępnił jeszcze dodatkowych szczegółów.",
+        "ongoing_campaign": "Część trwającej kampanii",
+        "one_shot": "One-shot przyjazny dla ciekawskich graczy"
+      },
+      "session_logistics": {
+        "eyebrow": "Logistyka sesji",
+        "title": "Checklist dojazdu",
+        "subtitle": "Wszystko, co musisz wiedzieć przed dołączeniem do stołu.",
+        "date_time": "Data i godzina",
+        "language": "Język",
+        "price": "Cena",
+        "players": "Gracze",
+        "seats_available": "Dostępne miejsca",
+        "seats_open": "{{count}} wolnych",
+        "contact_gm": "Kontakt z MG",
+        "duration": "Czas trwania",
+        "minutes": "{{count}} min",
+        "gm_will_confirm": "MG potwierdzi",
+        "meeting_details_notice": "Dokładne szczegóły spotkania są udostępniane po potwierdzeniu Twojego miejsca."
+      },
+      "venue_details": {
+        "eyebrow": "Gdzie się spotykamy",
+        "title": "Szczegóły miejsca",
+        "subtitle": "Udostępniamy precyzyjne instrukcje zatwierdzonym graczom."
+      },
+      "art_inspiration": {
+        "eyebrow": "Sztuka i inspiracja",
+        "title": "Wizualna mood board",
+        "subtitle": "Zatwierdzone obrazy wybrane dla {{systemName}}.",
+        "this_system": "tego systemu",
+        "game_system": "System gry",
+        "artwork_alt": "Grafika {{systemName}}",
+        "licensed": "Licencja: {{license}}",
+        "view_details": "Zobacz szczegóły"
+      },
+      "safety_tools": {
+        "eyebrow": "Narzędzia bezpieczeństwa",
+        "title": "Oczekiwania przy stole",
+        "subtitle": "Narzędzia i granice udostępnione przez organizatora gry."
+      },
+      "system_spotlight": {
+        "eyebrow": "Reflektor na system",
+        "title": "O {{systemName}}",
+        "subtitle": "Z biblioteki systemów Roundup Games.",
+        "show_details": "Pokaż szczegóły",
+        "hide_details": "Ukryj szczegóły",
+        "categories": "Kategorie",
+        "mechanics": "Mechaniki",
+        "external_references": "Referencje zewnętrzne",
+        "no_summary": "Wciąż zbieramy informacje o tym systemie – sprawdź niedługo ponownie.",
+        "explore_full_profile": "Odkryj pełen profil systemu »"
+      },
+      "host_snapshot": {
+        "eyebrow": "Zdjęcie organizatora",
+        "title": "Organizator gry",
+        "subtitle": "Poznaj swojego opowiadacza historii przed przybyciem.",
+        "organizer_details_soon": "Udostępnimy szczegóły organizatora, gdy harmonogram zostanie potwierdzony."
+      },
+      "system_facts": {
+        "eyebrow": "Szybkie fakty o systemie",
+        "title": "Przegląd zasad",
+        "players": "Gracze",
+        "optimal_table": "Optymalny stół",
+        "average_session": "Średnia sesja",
+        "first_published": "Pierwsze wydanie",
+        "age_rating": "Ocena wiekowa",
+        "age_rating_tooltip": "Zalecany minimalny wiek na podstawie tematów i mechanik.",
+        "complexity": "Złożoność",
+        "players_suffix": "{{count}} graczy"
+      },
+      "reserve_seat": {
+        "eyebrow": "Gotowy do dołączenia?",
+        "title": "Zarezerwuj swoje miejsce",
+        "cost_per_player": "Koszt na gracza:",
+        "applications_closed": "Aplikacje do tej sesji są obecnie zamknięte.",
+        "apply_to_join": "Aplikuj o dołączenie"
+      }
+    }
+  },
+  "my_games": {
+    "title": "Moje gry",
+    "subtitle": "Zarządzaj swoimi sesjami gier",
+    "filter_by_status": "Filtruj po statusie",
+    "filter_by_role": "Filtruj po roli",
+    "create_new_game": "Stwórz nową grę",
+    "no_games_title": "Jeszcze nie ma gier",
+    "no_games_subtitle": "Stwórz swoją pierwszą sesję gry, aby zacząć",
+    "pagination": {
+      "page_info": "Strona {{current}} z {{total}} • {{count}} łącznie"
+    },
+    "status_labels": {
+      "scheduled": "Zaplanowane",
+      "completed": "Ukończone",
+      "canceled": "Odwołane"
+    },
+    "role_labels": {
+      "owner": "Organizator",
+      "player": "Uczestnik",
+      "invited": "Zaproszony",
+      "requested": "Proszący",
+      "applicant": "Aplikant"
+    },
+    "errors": {
+      "load_failed": "Nie udało się załadować gier.",
+      "update_failed": "Nie udało się zaktualizować statusu",
+      "unexpected_error": "Wystąpił nieoczekiwany błąd",
+      "status_updated": "Status gry zaktualizowany"
+    },
+    "list": {
+      "participants_count": "{{count}} uczestnik{{count, plural, =1 {} ów {ów}}}",
+      "view_button": "Zobacz"
+    },
+    "create": {
+      "title": "Utwórz nową grę",
+      "subtitle": "Skonfiguruj swoją sesję gry i zacznij zapraszać graczy",
+      "back_to_games": "Powrót do gier",
+      "loading_campaign_data": "Ładowanie danych kampanii...",
+      "campaign": "Kampania",
+      "context_synced": "Kontext zsynchronizowany",
+      "select_a_campaign": "Wybierz kampanię",
+      "failed_to_create_game": "Nie udało się utworzyć gry",
+      "tips": {
+        "title": "Checklista sesji",
+        "subtitle": "Miej te wskazówki na uwadze podczas finalizowania briefingu sesji.",
+        "logistics_first": {
+          "title": "Najpierw logistyka",
+          "description": "Potwierdź czas, trwanie i liczbę graczy, aby platforma mogła przedstawić sesję odpowiednim graczom."
+        },
+        "safety_tooling": {
+          "title": "Narzędzia bezpieczeństwa",
+          "description": "Użyj sekcji bezpieczeństwa, aby udokumentować przepływ pracy dotyczący zgody, którego używasz przy stole, oraz wszelkie granze już omówione z grupą."
+        },
+        "campaign_context": {
+          "title": "Kontekst kampanii",
+          "description": "Tworząc sesję z istniejącej kampanii, ponownie używamy ustawień domyślnych systemu, aby przyspieszyć wprowadzanie. Dostosuj wszystko, co jest specjalne dla tego przebiegu."
+        }
+      }
+    }
+  }
+}

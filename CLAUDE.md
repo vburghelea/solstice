@@ -45,6 +45,131 @@ export const myServerFn = createServerFn({ method: "POST" })
 - Production verification (2025‑09‑19): checkout `LUJO45SIIB655EEP`, payment `Hd3J4zVKfMdLXNXalzSO94b6upOZY`.
   Use this as a baseline when debugging future regressions.
 
+## Internationalization (i18n) Guidelines
+
+### Core Principles
+
+- **Real Strings Only**: Always extract actual user-facing strings from the codebase, never create generic placeholder strings
+- **Feature-Based Organization**: Structure translations to match `src/features/` directory structure
+- **Type Safety**: Use TypeScript with Zod validation for all form inputs and server functions
+- **User-Friendly Language**: Write clear, concise, action-oriented text that users understand
+
+### String Extraction Process
+
+1. **Audit Feature Files**: Read through actual component files in `src/features/[feature]/`
+2. **Extract Real Strings**: Focus on UI text that users will see (buttons, labels, messages, errors, status)
+3. **Organize by Component**: Group strings by component (e.g., `form.fields`, `card.actions`, `validation.errors`)
+4. **Categorize by Type**: Separate into buttons, labels, messages, errors, status, descriptions
+5. **Use Extracted Placeholders**: Keep original placeholder text from actual forms
+
+### Implementation Pattern
+
+```typescript
+// ✅ CORRECT - Extract from actual code
+const extractedStrings = {
+  create_event: "Create New Event",
+  email_placeholder: "Enter your email address",
+  validation_required: "This field is required",
+};
+
+// ❌ AVOID - Generic placeholders
+const genericStrings = {
+  create_event: "Create Event",
+  email_placeholder: "Email",
+  validation_required: "Required",
+};
+```
+
+### Required Namespaces
+
+- **admin** - Admin dashboard, user management, insights, feature flags
+- **campaigns** - Campaign creation, management, participation
+- **events** - Event creation, management, attendance
+- **games** - Game listings, details, reviews, applications, invitations
+- **membership** - Membership plans, billing, subscriptions
+- **settings** - User settings, preferences, account management
+- **profile** - User profile management and preferences
+- **teams** - Team creation and management
+- **forms** - Form validation and input labels
+- **errors** - Error messages and error pages
+- **common** - Shared UI elements, buttons, status messages
+- **navigation** - Navigation menus, breadcrumbs, links
+
+### String Extraction Example
+
+```typescript
+// From src/features/events/components/event-create-form.tsx
+export const extractedEventStrings = {
+  create_title: "Create New Event",
+  subtitle: "Fill in the details to create a new Roundup Games event",
+  fields: {
+    event_name: "Event Name",
+    description: "Description",
+    start_date: "Start Date",
+    price: "Price ($)",
+  },
+  buttons: {
+    create: "Create Event",
+    saving: "Creating...",
+  },
+};
+```
+
+### Translation Usage
+
+```typescript
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
+
+const { t } = useEventsTranslation();
+const title = t("create_form.title"); // "Create New Event"
+const error = t("validation.required"); // "This field is required"
+```
+
+### Testing Requirements
+
+- **E2E Tests**: Include i18n testing in your E2E test suite
+- **Locale Testing**: Test all supported languages
+- **String Coverage**: Ensure all extracted strings have corresponding translations
+
+### Documentation Updates
+
+- Update `docs/i18n-feature-structure.md` with new namespaces
+- Include extraction patterns and examples in `CLAUDE.md`
+- Document any new string extraction processes
+
+### Dynamic Type Generation
+
+The project uses automatic type generation for translation keys to ensure type safety without manual maintenance:
+
+```bash
+# Generate TypeScript types from JSON translation files
+pnpm i18n:generate-types
+```
+
+This command:
+
+- Reads all JSON translation files from `src/lib/i18n/locales/en/`
+- Generates TypeScript types in `src/lib/i18n/generated-types.ts`
+- Creates 1,599+ type-safe translation keys automatically
+- Updates `AllTranslationKeys` and namespace-specific types
+
+**Type Generation Workflow:**
+
+1. Add new translation keys to appropriate JSON files
+2. Run `pnpm i18n:generate-types` to update types
+3. Use auto-generated types in components with full IDE support
+4. No manual type maintenance required
+
+### Before Committing
+
+1. **Generate Types**: Run `pnpm i18n:generate-types` after adding translation keys
+2. **Check Types**: Run `pnpm check-types` to ensure type safety
+3. **Test Translations**: Verify translation keys work correctly
+4. **Update Documentation**: Keep docs synchronized with codebase changes
+5. **Bulk Copy**: Run `cp -rf src/lib/i18n/locales/* public/locales/` to copy all locale files
+
+This approach ensures authentic, meaningful translations that reflect the actual user experience across all languages with zero maintenance overhead for type definitions.
+
 ## Using Repomix for AI Context Management
 
 Repomix helps create focused context bundles for AI assistants like Claude. The goal is to pack relevant files while staying under the 60,000 token limit.
@@ -157,6 +282,7 @@ npx repomix@latest \
   This ensures all browser tests pass before merging. Use `--workers 1` for consistent execution.
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
+- `pnpm i18n:generate-types` - Generate TypeScript types from translation JSON files
 - `pnpm docs:reference` - Generate TypeDoc API documentation
 - `pnpm docs:erd` - Generate database ERD diagrams from schema
 - `pnpm docs:all` - Run all documentation generation

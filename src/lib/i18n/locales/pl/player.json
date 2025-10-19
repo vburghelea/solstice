@@ -1,0 +1,164 @@
+{
+  "dashboard": {
+    "title": "Panel gracza",
+    "welcome": "Witaj ponownie, {{name}}",
+    "actions": {
+      "edit_profile": "Edytuj profil",
+      "manage_plan": "Zarządzaj planem",
+      "start_membership": "Rozpocznij członkostwo",
+      "find_games": "Znajdź gry",
+      "discover_sessions": "Odkryj sesje",
+      "see_all_events": "Zobacz wszystkie wydarzenia",
+      "manage_teams": "Zarządzaj zespołami",
+      "open_session_briefing": "Otwórz brief sesji"
+    },
+    "errors": {
+      "failed_to_parse_payload": "Nie udało się przetworzyć zapisanych danych panelu",
+      "failed_to_persist_payload": "Nie udało się zapisać danych panelu",
+      "failed_to_load_profile": "Nie udało się załadować profilu gracza",
+      "failed_to_fetch_workspace_stats": "Nie udało się pobrać statystyk obszaru gry",
+      "failed_to_fetch_next_scheduled_game": "Nie udało się pobrać następnej zaplanowanej gry",
+      "failed_to_fetch_membership_status": "Nie udało się pobrać statusu członkostwa",
+      "failed_to_update_privacy_settings": "Nie udało się zaktualizować ustawień prywatności",
+      "failed_to_update_notification_preferences": "Nie udało się zaktualizować preferencji powiadomień"
+    },
+    "privacy": {
+      "invites_from_connections": {
+        "label": "Pozwól na zaproszenia tylko od znajomych",
+        "description": "Ogranicz nowe zaproszenia do kontaktów, którym ufasz."
+      },
+      "follow_requests": {
+        "label": "Pozwól na prośby o obserwowanie",
+        "description": "Pozwól członkom społeczności śledzić Twoje aktualizacje."
+      }
+    },
+    "notifications": {
+      "game_reminders": {
+        "label": "Przypomnienia o grach",
+        "description": "Otrzymuj przypomnienia przed rozpoczęciem sesji."
+      },
+      "review_reminders": {
+        "label": "Przypomnienia o recenzjach",
+        "description": "Bądź na bieżąco z organizatorami gier."
+      }
+    },
+    "membership": {
+      "status_active": "Aktywne",
+      "status_inactive": "Nieaktywne",
+      "active": "Członkostwo aktywne",
+      "no_active_membership": "Brak aktywnego członkostwa",
+      "manage_plan": "Zarządzaj planem",
+      "start_membership": "Rozpocznij członkostwo"
+    },
+    "upcoming_games": {
+      "no_games": "Brak nadchodzących gier",
+      "stay_available": "Bądź dostępny"
+    },
+    "pending_reviews": {
+      "all_caught_up": "Jesteś na bieżąco",
+      "share_stories": "Podziel się historiami ze stołu"
+    },
+    "teams": {
+      "join_crew": "Dołącz do ekipy",
+      "active_teams": "Aktywne zespoły, w których jesteś",
+      "watch_calendar": "Obserwuj kalendarz",
+      "opportunities_waiting": "Czekające okazje"
+    },
+    "stats": {
+      "organizer": "Organizator",
+      "player": "Gracz",
+      "invites": "Zaproszenia"
+    },
+    "empty_states": {
+      "no_events": "Obecnie brak wyróżnionych wydarzeń.",
+      "no_teams": "Jeszcze nie zsynchronizowano zespołów. Dołącz do ekipy, aby zacząć.",
+      "experiment_loading": "Cierpliwości. Nowy eksperyment się ładuje."
+    },
+    "profile": {
+      "complete": "Profil dopracowany",
+      "steps_remaining": "Pozostałe kroki w profilu"
+    },
+    "teams_section": {
+      "you_lead": "Prowadzisz ten zespół"
+    },
+    "persona_initial": "G",
+    "ui": {
+      "welcome_back": "Witaj ponownie",
+      "subtitle": "Bądź na bieżąco z sesjami, zaproszeniami i wydarzeniami społeczności. Wszystko, czego potrzebujesz, aby czuć się połączony, jest zorganizowane tutaj.",
+      "badges": {
+        "privacy_ready": "Ustawienia prywatności gotowe",
+        "profile_complete": "Profil dopracowany",
+        "profile_steps_remaining": "Pozostałe kroki w profilu"
+      },
+      "headquarters": {
+        "title": "Baza gracza"
+      },
+      "control_center": {
+        "title": "Twój centrum sterowania",
+        "subtitle": "Dostosuj widoczność, otrzymuj powiadomienia i przeskakuj do działań bez opuszczania bazy."
+      },
+      "teams_synced": "{{count}} zespo{{plural}} zsynchronizowano",
+      "review_reminders": {
+        "title": "Przypomnienia o recenzjach"
+      },
+      "relationship_health": {
+        "title": "Zdrowie relacji",
+        "subtitle": "Szybki przegląd tego, jak pozostajesz połączony ze społecznością."
+      },
+      "upcoming": {
+        "title": "Następne"
+      },
+      "membership_label": "Członkostwo",
+      "pending_reviews_label": "Oczekujące recenzje",
+      "teams_label": "Zespoły",
+      "upcoming_events_label": "Nadchodzące wydarzenia",
+      "campaign_commitments": {
+        "title": "Zaangażowanie w kampanie",
+        "subtitle": "Śledź, jak prowadzisz i uczestniczysz, aby nic nie umknęło."
+      },
+      "game_roster": {
+        "title": "Harmonogram gier",
+        "subtitle": "Wiedz, gdzie prowadzisz, grasz i gdzie jesteś w kolejce do dołączenia."
+      },
+      "events_exploring": {
+        "title": "Wydarzenia do odkrycia",
+        "subtitle": "Rekomendacje odświeżają się automatycznie, gdy nowe sesje stają się dostępne."
+      },
+      "connections_radar": {
+        "title": "Radar połączeń",
+        "subtitle": "Spojrzenie na zespoły, które w tym tygodniu polegają na Tobie pod względem pędu."
+      },
+      "focus_spotlight": {
+        "title": "Reflektor uwagi",
+        "subtitle": "Highlety odblokowują się stopniowo, gdy testujemy eksperymenty zorientowane na gracza."
+      },
+      "flexible_calendar": "Zachowaj elastyczność kalendarza i zarezerwuj miejsce w następnej przygodzie.",
+      "open_session_briefing": "Otwórz informacje o sesji",
+      "discover_sessions": "Odkrywaj sesje",
+      "manage_teams": "Zarządzaj zespołami",
+      "see_all_events": "Zobacz wszystkie wydarzenia",
+      "review_gm": "Oceń {{gmName}} • {{date}}",
+      "start_review": "Rozpocznij",
+      "members_count": "{{count}} członków",
+      "beta_preview": {
+        "title": "Podgląd beta",
+        "description": "Zaawansowane rekomendacje kolegów z zespołu są w przygotowaniu. Spodziewaj się wkrótce wyselekcjonowanych ulepszeń."
+      },
+      "calendar_sync": {
+        "title": "Wczesny dostęp: synchronizacja kalendarza",
+        "description": "Włącz udostępnianie kalendarza, aby zaufani znajomi mogli Cię przypominać, gdy planują sesję pasującą do Twojego stylu.",
+        "join_pilot": "Dołącz do programu pilotażowego"
+      }
+    },
+    "actions": {
+      "edit_profile": "Edytuj profil",
+      "manage_plan": "Zarządzaj planem",
+      "start_membership": "Rozpocznij członkostwo",
+      "find_games": "Znajdź gry",
+      "discover_sessions": "Odkryj sesje",
+      "see_all_events": "Zobacz wszystkie wydarzenia",
+      "manage_teams": "Zarządzaj zespołami",
+      "open_session_briefing": "Otwórz brief sesji"
+    }
+  }
+}

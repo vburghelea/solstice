@@ -1,0 +1,47 @@
+{
+  "personas": {
+    "visitor": {
+      "label": "Besucher",
+      "short_label": "Besuchen",
+      "description": "Entdecke öffentliche Geschichten, Events und Highlights, die für Neueingezogene zusammengestellt wurden."
+    },
+    "player": {
+      "label": "Spieler",
+      "short_label": "Spielen",
+      "description": "Verwalte deine Sitzungen, Einladungen und Community-Updates, die genau auf dich zugeschnitten sind."
+    },
+    "ops": {
+      "label": "Event-Management",
+      "short_label": "Management",
+      "description": "Koordiniere Anmeldungen, Personal und Live-Event-Workflows an einem Ort."
+    },
+    "gm": {
+      "label": "Game-Master",
+      "short_label": "GM",
+      "description": "Plane Kampagnen, kuratiere Inhalte und sammle Feedback von deinen Spielrunden."
+    },
+    "admin": {
+      "label": "Plattform-Admin",
+      "short_label": "Admin",
+      "description": "Verwalte Rollen, Compliance und Systemgesundheit auf der gesamten Roundup-Plattform."
+    }
+  },
+  "switcher": {
+    "title": "Persona wechseln",
+    "description": "Wähle einen Arbeitsbereich, um die spezifische Navigation und Tools für jede Persona zu sehen.",
+    "loading": "Lädt...",
+    "badge": "Persona",
+    "buttons": {
+      "switching": "Persona wird gewechselt..."
+    },
+    "status": {
+      "active": "Aktiv",
+      "available": "Verfügbar"
+    }
+  },
+  "errors": {
+    "persona_not_found": "Persona nicht gefunden",
+    "persona_locked": "Diese Persona ist gesperrt",
+    "unable_to_switch_persona": "Persona konnte nicht gewechselt werden"
+  }
+}

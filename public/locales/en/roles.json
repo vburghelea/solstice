@@ -1,0 +1,47 @@
+{
+  "personas": {
+    "visitor": {
+      "label": "Visitor",
+      "short_label": "Visit",
+      "description": "Preview public stories, events, and highlights curated for newcomers."
+    },
+    "player": {
+      "label": "Player",
+      "short_label": "Play",
+      "description": "Manage sessions, invitations, and community updates tailored to you."
+    },
+    "ops": {
+      "label": "Event Operations",
+      "short_label": "Ops",
+      "description": "Coordinate registrations, staffing, and live event workflows in one view."
+    },
+    "gm": {
+      "label": "Game Master",
+      "short_label": "GM",
+      "description": "Plan campaigns, curate assets, and gather feedback from your tables."
+    },
+    "admin": {
+      "label": "Platform Admin",
+      "short_label": "Admin",
+      "description": "Govern roles, compliance, and system health across the Roundup platform."
+    }
+  },
+  "switcher": {
+    "title": "Switch persona",
+    "description": "Choose a workspace to preview persona-specific navigation and tooling.",
+    "loading": "Loading...",
+    "badge": "Persona",
+    "buttons": {
+      "switching": "Switching persona..."
+    },
+    "status": {
+      "active": "Active",
+      "available": "Available"
+    }
+  },
+  "errors": {
+    "persona_not_found": "Persona not found",
+    "persona_locked": "This persona is locked",
+    "unable_to_switch_persona": "Unable to switch persona"
+  }
+}

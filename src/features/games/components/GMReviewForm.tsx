@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { gmStrengthLabels, gmStrengthOptions } from "~/shared/types/common";
 
 type Props = {
@@ -25,6 +26,7 @@ const THUMBS: Array<{ value: number; label: string }> = [
 ];
 
 export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
+  const { t } = useGamesTranslation();
   const queryClient = useQueryClient();
   const [rating, setRating] = useState<number | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -45,18 +47,18 @@ export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
     },
     onSuccess: async (res) => {
       if (res.success) {
-        toast.success("Thanks for your review!");
+        toast.success(t("messages.review_submitted_success"));
         await queryClient.invalidateQueries({ queryKey: ["gmReviews", gmId] });
         onSubmitted?.();
         setRating(null);
         setSelected([]);
         setComment("");
       } else {
-        toast.error(res.message || "Failed to submit review");
+        toast.error(res.message || t("errors.failed_to_submit_review"));
       }
     },
     onError: (err) => {
-      toast.error(err.message || "Failed to submit review");
+      toast.error(err.message || t("errors.failed_to_submit_review"));
     },
   });
 
@@ -75,11 +77,11 @@ export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Review this GM</CardTitle>
+        <CardTitle>{t("titles.review_gm")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
-          <Label className="mb-2 block">Rate the GM</Label>
+          <Label className="mb-2 block">{t("review_labels.rate_gm")}</Label>
           <div className="flex flex-wrap gap-2">
             {THUMBS.map((t) => (
               <Button
@@ -96,7 +98,7 @@ export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
         </div>
 
         <div className="mb-4">
-          <Label className="mb-2 block">Select up to 3 strengths</Label>
+          <Label className="mb-2 block">{t("review_labels.select_strengths")}</Label>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
             {gmStrengthOptions.map((key) => (
               <label key={key} className="flex cursor-pointer items-center gap-2">
@@ -108,17 +110,19 @@ export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
               </label>
             ))}
           </div>
-          <div className="text-muted-foreground mt-2 text-xs">Choose up to 3 of 10</div>
+          <div className="text-muted-foreground mt-2 text-xs">
+            {t("review_labels.choose_max_three")}
+          </div>
         </div>
 
         <div className="mb-4">
-          <Label className="mb-2 block">Comments (optional)</Label>
+          <Label className="mb-2 block">{t("review_labels.comments_optional")}</Label>
           <Textarea
             value={comment}
             onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
               setComment(event.target.value)
             }
-            placeholder="What stood out in this session?"
+            placeholder={t("review_labels.placeholder_comment")}
           />
         </div>
 
@@ -141,7 +145,9 @@ export function GMReviewForm({ gameId, gmId, onSubmitted }: Props) {
             mutation.mutate({ data: payload });
           }}
         >
-          {mutation.isPending ? "Submitting..." : "Submit Review"}
+          {mutation.isPending
+            ? t("review_labels.submitting")
+            : t("buttons.submit_review")}
         </Button>
       </CardContent>
     </Card>

@@ -6,17 +6,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { changePassword } from "~/features/auth/auth.queries";
+import { useAuthTranslation } from "~/hooks/useTypedTranslation";
 import { useAppForm } from "~/lib/form";
 
-const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(8, "New password must be at least 8 characters"),
-});
-
 export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
+  const { t } = useAuthTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Dynamic schema with translation
+  const passwordChangeSchema = z.object({
+    currentPassword: z.string().refine((val) => val.length > 0, {
+      message: t(
+        "security_settings.password_change.validation.current_password_required",
+      ),
+    }),
+    newPassword: z.string().refine((val) => val.length >= 8, {
+      message: t("security_settings.password_change.validation.new_password_min_length"),
+    }),
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -34,9 +43,9 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
         if (result.error) {
           throw new Error(result.error);
         }
-        setSuccess("Password updated successfully!");
+        setSuccess(t("security_settings.password_change.success"));
       } catch {
-        setError("Failed to update password. Please check your current password.");
+        setError(t("security_settings.password_change.error"));
       } finally {
         setIsSubmitting(false);
       }
@@ -59,7 +68,9 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
         }}
         children={(field) => (
           <div className="space-y-2">
-            <Label htmlFor={field.name}>Current Password</Label>
+            <Label htmlFor={field.name}>
+              {t("security_settings.password_change.current_password")}
+            </Label>
             <Input
               id={field.name}
               name={field.name}
@@ -85,7 +96,9 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
         }}
         children={(field) => (
           <div className="space-y-2">
-            <Label htmlFor={field.name}>New Password</Label>
+            <Label htmlFor={field.name}>
+              {t("security_settings.password_change.new_password")}
+            </Label>
             <Input
               id={field.name}
               name={field.name}
@@ -110,10 +123,10 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
         {isSubmitting ? (
           <>
             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-            Changing Password...
+            {t("security_settings.password_change.changing_password")}
           </>
         ) : (
-          "Change Password"
+          t("security_settings.password_change.button")
         )}
       </Button>
     </form>
@@ -122,7 +135,7 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
   if (embedded) {
     return (
       <section className="space-y-4">
-        <h3 className="text-base font-medium">Security Settings</h3>
+        <h3 className="text-base font-medium">{t("security_settings.title")}</h3>
         {content}
       </section>
     );
@@ -131,7 +144,7 @@ export function SecuritySettings({ embedded = false }: { embedded?: boolean }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Security Settings</CardTitle>
+        <CardTitle>{t("security_settings.title")}</CardTitle>
       </CardHeader>
       <CardContent>{content}</CardContent>
     </Card>

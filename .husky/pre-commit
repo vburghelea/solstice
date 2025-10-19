@@ -2,6 +2,11 @@
 # Run lint-staged for formatting
 npx lint-staged
 
+# Copy i18n files to public directory
+echo "Syncing and copying i18n files to public directory..."
+pnpm i18n:sync
+pnpm i18n:copy
+
 # Run the same checks as GitHub Actions
 echo "Running pre-commit checks..."
 

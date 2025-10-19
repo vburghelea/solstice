@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "eyebrow": "Starte deine Planung",
+    "title": "Entdecke Tischabenteuer, die für Entdecker gemacht sind",
+    "subtitle": "Erkunde Community-Treffen, kuratiere deine Lieblingssysteme und folge den Geschichtenerzählern, die zu deinem Stil passen.",
+    "cta_text": "Erstelle dein Profil",
+    "secondary_cta": "Melde dich an, um weiterzumachen"
+  },
+  "explorer_guide": {
+    "eyebrow": "Entdeckerführer",
+    "title": "Plane die nächste Station deiner Reise",
+    "subtitle": "Wähle eine Heimatstadt, um Treffen, Veranstalter und Geschichtenwelten zu sehen, die neue Spieler willkommen heißen.",
+    "city_focus_label": "Auf eine Stadt konzentrieren",
+    "browse_all_locations": "Alle Orte durchsuchen",
+    "location_data_coming_soon": "Standortdaten kommen bald",
+    "from_your_profile": "aus deinem Profil",
+    "players_count": "{{count}} Spieler",
+    "location_suggestion": "Wir schlagen Städte aus deinem Profil, gespeicherten Vorlieben oder Zeitzone vor, wenn wir können.",
+    "popular_cities": "Beliebte Städte:",
+    "how_it_flows": {
+      "title": "Wie diese Tour abläuft",
+      "subtitle": "Folge diesen Schritten, um zu entscheiden, wann du der Community beitrittst oder nach neuen Einladungen ausschau hältst."
+    },
+    "chapters": [
+      "Erkunde Treffen und Festivals, die für neugierige Anfänger kuratiert wurden.",
+      "Entdecke Systeme und Sitzungen, die Onboarding und Sicherheitswerkzeuge priorisieren.",
+      "Speichere eine Heimatstadt, um Updates zu erhalten, wenn Plätze frei werden."
+    ],
+    "themes": {
+      "curated_spotlights": {
+        "title": "Kuratierte Highlights",
+        "description": "Handverlesene Sitzungen und Geschichten machen es einfach, das Roundup-Flair zu spüren, bevor du je am Tisch sitzt."
+      },
+      "effortless_planning": {
+        "title": "Mühelose Planung",
+        "description": "Wähle eine Stadt, erkunde freie Plätze und markiere Events, die du liebst, ohne dich festzulegen, bevor du bereit bist."
+      },
+      "trust_first_design": {
+        "title": "Vertrauen-zuerst-Design",
+        "description": "Sicherheitspraktiken, Barrierefreiheitshinweise und GM-Vorstellungen kommen von Anfang an, damit Entdecker selbstbewusste Entscheidungen treffen können."
+      }
+    }
+  },
+  "confidence_signals": {
+    "eyebrow": "Vertrauenssignale",
+    "title": "Was Roundup sicher macht",
+    "subtitle": "Wir betonen die Hinweise, die einzelnen Entdeckern helfen, sich sicher zu fühlen, bevor sie einen neuen Raum betreten.",
+    "safety_tools": {
+      "title": "Sicherheitswerkzeuge sichtbar",
+      "description": "Veranstalter zeigen Linien & Schleier, X-Karten und Debriefing-Rituale, damit jeder weiß, wie Fürsorge am Tisch gezeigt wird."
+    },
+    "meet_facilitator": {
+      "title": "Lerne den Veranstalter kennen",
+      "description": "GM-Bios heben Pronomen, Sitzungstempo und Willkommensrituale hervor, damit du den Raum lesen kannst, bevor du ankommst."
+    },
+    "welcoming_spaces": {
+      "title": "Räume, die sich einladend anfühlen",
+      "description": "Jeder Veranstaltungshinweis umfasst Mobilitätsnotizen, Transittipps und Community-Vibes, die Besuchern helfen, sich das Erlebnis vorzustellen."
+    }
+  },
+  "upcoming_events": {
+    "eyebrow": "Bevorstehende Treffen",
+    "title_prefix": "Events in der Nähe von",
+    "default_area": "deiner Umgebung",
+    "subtitle": "Kuratiert von Community-Veranstaltern. Jede RSVP bringt dich näher an deine erste Spielsitzungserinnerung.",
+    "no_events_title": "Noch keine Events für diese Stadt geplant.",
+    "no_events_subtitle": "Schau später wieder vorbei, wenn Veranstalter neue Sitzungen veröffentlichen.",
+    "browse_full_calendar": "Vollen Kalender durchsuchen"
+  },
+  "story_sessions": {
+    "eyebrow": "Geschichten zum Probieren",
+    "title": "Sitzungen, die neue Entdecker willkommen heißen",
+    "subtitle": "Diese Tische legen Wert auf Onboarding, Sicherheitswerkzeuge und kollaborative Energie.",
+    "no_sessions_title": "Noch keine Highlight-Sitzungen in dieser Stadt.",
+    "no_sessions_subtitle": "Abonniere unseren Newsletter oder versuche es später für neue Inhalte.",
+    "search_all_games": "Alle Spiele durchsuchen"
+  },
+  "trending_systems": {
+    "eyebrow": "Trending Systeme",
+    "title": "Spielsysteme mit Momentum",
+    "subtitle": "Entdecke, welche Systeme Tische zum Leuchten bringen, damit du weißt, was du als Nächstes lernen sollst.",
+    "no_systems": "Wir werden beliebte Systeme hervorheben, sobald mehr Sitzungen geplant sind.",
+    "sessions_count": "{{count}} Sitzungen",
+    "hero_art_pending": "Hero-Art wartet auf Moderation",
+    "description_coming_soon": "Beschreibung folgt in Kürze."
+  },
+  "ready_to_go_deeper": {
+    "title": "Wenn du bereit bist, tiefer einzutauchen",
+    "subtitle": "Erstelle ein kostenloses Konto, um Städten zu folgen, an Sitzungen teilzunehmen und Einladungen von vertrauenswürdigen GMs zu erhalten.",
+    "start_profile": "Starte dein Spielerprofil",
+    "have_account": "Ich habe bereits ein Konto"
+  }
+}

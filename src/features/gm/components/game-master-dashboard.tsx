@@ -15,6 +15,7 @@ import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";
 import { GameMasterB2bPipeline } from "~/features/gm/components/game-master-b2b-pipeline";
 import type { GmPipelineOpportunity, GmPipelineStage } from "~/features/gm/gm.types";
+import { useGmTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
@@ -49,6 +50,8 @@ export function GameMasterDashboard({
   pipelineStages,
   pipelineOpportunities,
 }: GameMasterDashboardProps) {
+  const { t } = useGmTranslation();
+
   const engagedPlayers = scheduledGames.reduce(
     (total, game) => total + (game.participantCount ?? 0),
     0,
@@ -64,19 +67,23 @@ export function GameMasterDashboard({
     .slice(0, 6)
     .map((game) => {
       const campaignName = game.campaignId
-        ? (campaignLookup.get(game.campaignId) ?? "Standalone session")
-        : "Standalone session";
+        ? (campaignLookup.get(game.campaignId) ?? t("session_types.standalone"))
+        : t("session_types.standalone");
       const sessionLabel = formatDateAndTime(game.dateTime);
       const isCampaignSession = Boolean(game.campaignId);
 
       return {
         id: game.id,
-        title: isCampaignSession ? `${campaignName} debrief` : `${game.name} recap`,
+        title: isCampaignSession
+          ? t("labels.debrief", { name: campaignName })
+          : t("labels.recap", { name: game.name }),
         description: isCampaignSession
-          ? `Collect safety check-ins and narrative beats from ${game.participantCount} players.`
-          : `Capture highlights and player energy while the story is fresh.`,
+          ? t("labels.collect_safety", { count: game.participantCount })
+          : t("labels.capture_highlights"),
         scheduledFor: sessionLabel,
-        actionLabel: isCampaignSession ? "Open campaign studio" : "Session notes",
+        actionLabel: isCampaignSession
+          ? t("actions.open_studio")
+          : t("actions.session_notes"),
         action: game.campaignId
           ? {
               to: "/gm/campaigns/$campaignId",
@@ -97,11 +104,10 @@ export function GameMasterDashboard({
             <div className="space-y-2">
               <Badge className="bg-white/20 text-white">GM Studio Beta</Badge>
               <h1 className="text-3xl font-semibold text-balance text-white sm:text-4xl">
-                Orchestrate campaigns with cinematic clarity
+                {t("dashboard.title")}
               </h1>
               <p className="max-w-2xl text-base text-white/80 sm:text-lg">
-                The studio brings campaign prep, session pacing, and follow-up rituals
-                into a single flow. Prioritize the stories that need attention next.
+                {t("dashboard.subtitle")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -110,14 +116,14 @@ export function GameMasterDashboard({
                 variant="secondary"
                 className="bg-white/10 text-white hover:bg-white/20"
               >
-                <Link to="/gm/campaigns/create">Plan new campaign</Link>
+                <Link to="/gm/campaigns/create">{t("actions.start_campaign")}</Link>
               </Button>
               <Button
                 asChild
                 variant="secondary"
                 className="bg-white/10 text-white hover:bg-white/25"
               >
-                <Link to="/gm/feedback">Feedback triage board</Link>
+                <Link to="/gm/feedback">{t("actions.open_triage_board")}</Link>
               </Button>
             </div>
           </div>
@@ -125,27 +131,27 @@ export function GameMasterDashboard({
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <MetricTile
               icon={<CalendarCheck2Icon className="size-5" />}
-              label="Upcoming sessions"
+              label={t("stats.upcoming_sessions")}
               value={scheduledGamesTotal}
-              assistive="Next 30 days"
+              assistive={t("stats.upcoming_sessions_assistive")}
             />
             <MetricTile
               icon={<SparklesIcon className="size-5" />}
-              label="Active campaigns"
+              label={t("stats.active_campaigns")}
               value={campaignsTotal}
-              assistive="Ready for spotlight"
+              assistive={t("stats.active_campaigns_assistive")}
             />
             <MetricTile
               icon={<Users2Icon className="size-5" />}
-              label="Players engaged"
+              label={t("stats.players_engaged")}
               value={engagedPlayers}
-              assistive="Across scheduled sessions"
+              assistive={t("stats.players_engaged_assistive")}
             />
             <MetricTile
               icon={<PenSquareIcon className="size-5" />}
-              label="Campaign-linked sessions"
+              label={t("stats.campaign_linked_sessions")}
               value={campaignAnchoredSessions}
-              assistive="Anchored to story arcs"
+              assistive={t("stats.campaign_linked_sessions_assistive")}
             />
           </div>
         </div>
@@ -156,23 +162,24 @@ export function GameMasterDashboard({
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle className="text-2xl">Session runway</CardTitle>
+              <CardTitle className="text-2xl">
+                {t("sections.session_runway.title")}
+              </CardTitle>
               <p className="text-muted-foreground text-sm">
-                Keep your next gatherings sharp with staging cues, visibility, and player
-                load.
+                {t("sections.session_runway.description")}
               </p>
             </div>
             <Button asChild variant="outline" size="sm">
-              <Link to="/gm/games">Open session manager</Link>
+              <Link to="/gm/games">{t("actions.open_session_manager")}</Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-6">
             {scheduledGames.length === 0 ? (
               <EmptyState
                 icon={<CalendarCheck2Icon className="size-10" />}
-                title="No sessions on deck"
-                description="Schedule a new gathering or convert a campaign beat into a live session to keep momentum."
-                actionLabel="Schedule session"
+                title={t("empty_states.no_sessions.title")}
+                description={t("empty_states.no_sessions.description")}
+                actionLabel={t("empty_states.no_sessions.action_label")}
                 actionHref="/gm/games/create"
               />
             ) : (
@@ -192,18 +199,20 @@ export function GameMasterDashboard({
 
         <Card className="lg:col-span-1">
           <CardHeader className="flex flex-col gap-2">
-            <CardTitle className="text-2xl">Campaign pulse</CardTitle>
+            <CardTitle className="text-2xl">
+              {t("sections.campaign_pulse.title")}
+            </CardTitle>
             <p className="text-muted-foreground text-sm">
-              Spot arcs that need outreach, recruitment, or spotlight moments.
+              {t("sections.campaign_pulse.description")}
             </p>
           </CardHeader>
           <CardContent className="space-y-5">
             {campaigns.length === 0 ? (
               <EmptyState
                 icon={<SparklesIcon className="size-10" />}
-                title="No active campaigns yet"
-                description="Draft your next narrative arc or revive a past favorite to keep your tables engaged."
-                actionLabel="Start a campaign"
+                title={t("empty_states.no_campaigns.title")}
+                description={t("empty_states.no_campaigns.description")}
+                actionLabel={t("empty_states.no_campaigns.action_label")}
                 actionHref="/gm/campaigns/create"
               />
             ) : (
@@ -228,8 +237,11 @@ export function GameMasterDashboard({
                           {campaign.gameSystem.name} • {campaign.recurrence}
                         </p>
                         <p className="text-muted-foreground text-xs">
-                          {campaign.participantCount} participants • Updated{" "}
-                          {formatDateAndTime(campaign.updatedAt)}
+                          {t("labels.participants", { count: campaign.participantCount })}{" "}
+                          •{" "}
+                          {t("labels.updated", {
+                            date: formatDateAndTime(campaign.updatedAt),
+                          })}
                         </p>
                       </div>
                       <Button asChild variant="ghost" size="sm" className="shrink-0">
@@ -237,7 +249,7 @@ export function GameMasterDashboard({
                           to="/gm/campaigns/$campaignId"
                           params={{ campaignId: campaign.id }}
                         >
-                          Open studio
+                          {t("actions.open_studio")}
                         </Link>
                       </Button>
                     </div>
@@ -252,17 +264,19 @@ export function GameMasterDashboard({
       <Card>
         <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-2xl">Feedback follow-up queue</CardTitle>
+            <CardTitle className="text-2xl">
+              {t("dashboard.feedback_queue_title")}
+            </CardTitle>
             <p className="text-muted-foreground text-sm">
-              Keep safety tools and post-session reflections flowing for every table.
+              {t("dashboard.feedback_queue_description")}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
-              {feedbackFollowUps.length} upcoming touchpoints
+              {t("badges.upcoming_touchpoints", { count: feedbackFollowUps.length })}
             </Badge>
             <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-              <Link to="/gm/feedback">Open triage board</Link>
+              <Link to="/gm/feedback">{t("actions.open_triage_board")}</Link>
             </Button>
           </div>
         </CardHeader>
@@ -270,9 +284,9 @@ export function GameMasterDashboard({
           {feedbackFollowUps.length === 0 ? (
             <EmptyState
               icon={<ListChecksIcon className="size-10" />}
-              title="No follow-ups queued"
-              description="Once you host a session, we’ll surface the debrief, survey, and escalation tasks here."
-              actionLabel="Browse session archive"
+              title={t("empty_states.no_followups.title")}
+              description={t("empty_states.no_followups.description")}
+              actionLabel={t("empty_states.no_followups.action_label")}
               actionHref="/gm/games"
             />
           ) : (
@@ -291,7 +305,7 @@ export function GameMasterDashboard({
                       {followUp.description}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Session: {followUp.scheduledFor}
+                      {t("labels.session")} {followUp.scheduledFor}
                     </p>
                   </div>
                   <Button

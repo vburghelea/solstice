@@ -1,8 +1,7 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatDistanceToNow } from "date-fns";
+
 import {
   AlertTriangleIcon,
   DownloadIcon,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Avatar } from "~/components/ui/avatar";
@@ -81,6 +81,8 @@ import {
   type RoleUserSearchResult,
 } from "~/features/roles";
 import { canDeleteUsers } from "~/features/roles/permission.service";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
+import type { SupportedLanguage } from "~/lib/i18n/config";
 import {
   useAdminUserDirectory,
   useExportComplianceReport,
@@ -89,19 +91,21 @@ import {
   type AdminUserRecord,
 } from "../users/admin-user-directory.queries";
 
-const membershipLabels: Record<AdminMembershipStatus, string> = {
-  active: "Active",
-  expired: "Expired",
-  canceled: "Canceled",
-  none: "No membership",
-};
-
 const membershipTone: Record<AdminMembershipStatus, string> = {
   active: "bg-emerald-500/10 text-emerald-600",
   expired: "bg-amber-500/10 text-amber-600",
   canceled: "bg-destructive/10 text-destructive",
   none: "bg-muted text-muted-foreground",
 };
+
+const getMembershipLabels = (
+  t: (key: string) => string,
+): Record<AdminMembershipStatus, string> => ({
+  active: t("user_directory.membership.status.active"),
+  expired: t("user_directory.membership.status.expired"),
+  canceled: t("user_directory.membership.status.canceled"),
+  none: t("user_directory.membership.status.none"),
+});
 
 function DirectorySkeleton() {
   return (
@@ -125,6 +129,7 @@ function DirectorySkeleton() {
 function useRoleAssignmentForm(
   roles: RoleSummary[],
   onSuccess: (assignment: RoleAssignmentRow) => void,
+  adminT: (key: string) => string,
 ) {
   const form = useForm({
     defaultValues: {
@@ -151,14 +156,20 @@ function useRoleAssignmentForm(
         });
 
         if (!result.success || !result.data) {
-          throw new Error(result.errors?.[0]?.message || "Failed to assign role");
+          throw new Error(
+            result.errors?.[0]?.message ||
+              adminT("user_directory.errors.assign_role_failed"),
+          );
         }
 
         onSuccess(result.data);
         form.reset();
-        toast.success("Role assigned successfully");
+        toast.success(adminT("user_directory.messages.role_assigned_success"));
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to assign role";
+        const message =
+          error instanceof Error
+            ? error.message
+            : adminT("user_directory.errors.assign_role_failed");
         toast.error(message);
       }
     },
@@ -180,29 +191,54 @@ function useRoleAssignmentForm(
 function RiskBadge({
   message,
   type,
+  adminT,
 }: {
   message: string;
   type: "security" | "compliance";
+  adminT: (key: string) => string;
 }) {
   const tone =
     type === "security"
       ? "bg-amber-500/10 text-amber-600"
       : "bg-destructive/10 text-destructive";
+
+  const translatedMessage = adminT(`user_directory.risk_flags.${message}`);
+
   return (
     <Badge variant="outline" className={cn("border-transparent", tone)}>
-      {message}
+      {translatedMessage}
     </Badge>
   );
+}
+
+function translateAuditTrailLabel(
+  label: string,
+  adminT: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  if (label.startsWith("role_granted:")) {
+    const roleName = label.replace("role_granted:", "");
+    return adminT("user_directory.audit_trail.role_granted", { roleName });
+  }
+  if (label.startsWith("membership_status:")) {
+    const status = label.replace("membership_status:", "");
+    return adminT("user_directory.audit_trail.membership_status", { status });
+  }
+  if (label === "last_active") {
+    return adminT("user_directory.audit_trail.last_active");
+  }
+  return label; // fallback for any unexpected labels
 }
 
 function buildColumns(
   canDeleteUser: boolean,
   setUserToDelete: (user: AdminUserRecord) => void,
+  adminT: (key: string, options?: Record<string, unknown>) => string,
+  currentLanguage: string,
 ): ColumnDef<AdminUserRecord>[] {
   return [
     {
       accessorKey: "name",
-      header: "User",
+      header: adminT("user_directory.tables.headers.user"),
       cell: ({ row }) => {
         const record = row.original;
         return (
@@ -232,10 +268,11 @@ function buildColumns(
     },
     {
       accessorKey: "membershipStatus",
-      header: "Membership",
+      header: adminT("user_directory.tables.headers.membership"),
       cell: ({ row }) => {
         const record = row.original;
         const tone = membershipTone[record.membershipStatus];
+        const membershipLabels = getMembershipLabels(adminT);
         return (
           <div className="token-stack-xs">
             <Badge variant="outline" className={cn("border-transparent", tone)}>
@@ -243,8 +280,13 @@ function buildColumns(
             </Badge>
             {record.membershipExpiresAt ? (
               <span className="text-body-xs text-muted-foreground">
-                Expires{" "}
-                {formatDistanceToNow(record.membershipExpiresAt, { addSuffix: true })}
+                {adminT("user_directory.membership.expires").replace(
+                  "{{time}}",
+                  formatDistanceToNowLocalized(
+                    record.membershipExpiresAt,
+                    currentLanguage as SupportedLanguage,
+                  ),
+                )}
               </span>
             ) : null}
           </div>
@@ -253,12 +295,14 @@ function buildColumns(
     },
     {
       accessorKey: "roles",
-      header: "Roles",
+      header: adminT("user_directory.tables.headers.roles"),
       cell: ({ row }) => {
         const record = row.original;
         if (record.roles.length === 0) {
           return (
-            <span className="text-body-xs text-muted-foreground">No assignments</span>
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.roles.no_assignments")}
+            </span>
           );
         }
         return (
@@ -281,11 +325,15 @@ function buildColumns(
     },
     {
       accessorKey: "roleAssignedAt",
-      header: "Role Assigned",
+      header: adminT("user_directory.tables.headers.role_assigned"),
       cell: ({ row }) => {
         const record = row.original;
         if (record.roles.length === 0) {
-          return <span className="text-body-xs text-muted-foreground">Never</span>;
+          return (
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.activity.no_activity")}
+            </span>
+          );
         }
         // Get the most recent role assignment
         const mostRecentRole = record.roles.reduce((latest, current) =>
@@ -293,16 +341,17 @@ function buildColumns(
         );
         return (
           <span className="text-body-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(mostRecentRole.assignedAt), {
-              addSuffix: true,
-            })}
+            {formatDistanceToNowLocalized(
+              new Date(mostRecentRole.assignedAt),
+              currentLanguage as SupportedLanguage,
+            )}
           </span>
         );
       },
     },
     {
       accessorKey: "mfaEnrolled",
-      header: "MFA",
+      header: adminT("user_directory.tables.headers.mfa"),
       cell: ({ row }) => {
         const { mfaEnrolled } = row.original;
         return (
@@ -312,32 +361,41 @@ function buildColumns(
             ) : (
               <ShieldOffIcon aria-hidden className="text-destructive size-4" />
             )}
-            {mfaEnrolled ? "Enforced" : "Missing"}
+            {mfaEnrolled
+              ? adminT("user_directory.mfa.enforced")
+              : adminT("user_directory.mfa.missing")}
           </span>
         );
       },
     },
     {
       accessorKey: "lastActiveAt",
-      header: "Last active",
+      header: adminT("user_directory.tables.headers.last_active"),
       cell: ({ row }) => {
         const { lastActiveAt } = row.original;
         return (
           <span className="text-body-sm text-muted-foreground">
             {lastActiveAt
-              ? formatDistanceToNow(lastActiveAt, { addSuffix: true })
-              : "No activity"}
+              ? formatDistanceToNowLocalized(
+                  lastActiveAt,
+                  currentLanguage as SupportedLanguage,
+                )
+              : adminT("user_directory.activity.no_activity")}
           </span>
         );
       },
     },
     {
       accessorKey: "riskFlags",
-      header: "Risk",
+      header: adminT("user_directory.tables.headers.risk"),
       cell: ({ row }) => {
         const { riskFlags } = row.original;
         if (riskFlags.length === 0) {
-          return <span className="text-body-xs text-muted-foreground">Clear</span>;
+          return (
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.risk.clear")}
+            </span>
+          );
         }
         return (
           <div className="flex flex-wrap gap-1">
@@ -346,6 +404,7 @@ function buildColumns(
                 key={`${flag.type}-${flag.message}`}
                 type={flag.type}
                 message={flag.message}
+                adminT={adminT}
               />
             ))}
           </div>
@@ -354,20 +413,26 @@ function buildColumns(
     },
     {
       accessorKey: "auditTrail",
-      header: "Latest activity",
+      header: adminT("user_directory.tables.headers.latest_activity"),
       cell: ({ row }) => {
         const { auditTrail } = row.original;
         if (auditTrail.length === 0) {
           return (
-            <span className="text-body-xs text-muted-foreground">No recent events</span>
+            <span className="text-body-xs text-muted-foreground">
+              {adminT("user_directory.activity.no_recent_events")}
+            </span>
           );
         }
         const [latest] = auditTrail;
+        const translatedLabel = translateAuditTrailLabel(latest.label, adminT);
         return (
           <div className="token-stack-xs">
-            <span className="text-body-sm text-foreground">{latest.label}</span>
+            <span className="text-body-sm text-foreground">{translatedLabel}</span>
             <span className="text-body-xs text-muted-foreground px-2">
-              {formatDistanceToNow(latest.timestamp, { addSuffix: true })}
+              {formatDistanceToNowLocalized(
+                latest.timestamp,
+                currentLanguage as SupportedLanguage,
+              )}
             </span>
           </div>
         );
@@ -377,7 +442,7 @@ function buildColumns(
       ? [
           {
             id: "actions",
-            header: "Actions",
+            header: adminT("user_directory.tables.headers.actions"),
             cell: ({ row }: { row: { original: AdminUserRecord } }) => {
               const record = row.original;
               return (
@@ -388,7 +453,7 @@ function buildColumns(
                   className="flex items-center gap-1"
                 >
                   <UserX className="h-4 w-4" />
-                  Delete
+                  {adminT("user_directory.buttons.delete")}
                 </Button>
               );
             },
@@ -398,11 +463,12 @@ function buildColumns(
   ];
 }
 
-export function AdminUserDirectory() {
-  // Get current user from route context
-  const { user: currentUser } = useRouteContext({ from: "/admin/users" }) as {
-    user: { id: string } | null;
-  };
+interface AdminUserDirectoryProps {
+  currentUser: { id: string } | null;
+}
+
+export function AdminUserDirectory({ currentUser }: AdminUserDirectoryProps) {
+  const { t: adminT, currentLanguage } = useAdminTranslation();
 
   const [pageIndex, setPageIndex] = useState(0);
   const [search, setSearch] = useState("");
@@ -425,7 +491,8 @@ export function AdminUserDirectory() {
       const result = await getRoleManagementData();
       if (!result.success || !result.data) {
         throw new Error(
-          result.errors?.[0]?.message || "Failed to load role management data",
+          result.errors?.[0]?.message ||
+            adminT("user_directory.errors.load_role_management_data_failed"),
         );
       }
 
@@ -484,11 +551,14 @@ export function AdminUserDirectory() {
     mutationFn: removeRoleAssignment,
     onSuccess: (result) => {
       if (!result.success || !result.data) {
-        toast.error(result.errors?.[0]?.message || "Failed to remove role assignment");
+        toast.error(
+          result.errors?.[0]?.message ||
+            adminT("user_directory.errors.remove_role_assignment_failed"),
+        );
         return;
       }
 
-      toast.success("Role assignment removed");
+      toast.success(adminT("user_directory.messages.role_assignment_removed"));
       queryClient.invalidateQueries({ queryKey: ["role-management"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
@@ -496,7 +566,7 @@ export function AdminUserDirectory() {
       const message =
         mutationError instanceof Error
           ? mutationError.message
-          : "Failed to remove role assignment";
+          : adminT("user_directory.errors.remove_role_assignment_failed");
       toast.error(message);
     },
     onSettled: () => {
@@ -517,13 +587,16 @@ export function AdminUserDirectory() {
       return result;
     },
     onSuccess: () => {
-      toast.success("User permanently deleted");
+      toast.success(adminT("user_directory.messages.user_permanently_deleted"));
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       setUserToDelete(null);
       setDeleteConfirmationInput("");
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to delete user";
+      const message =
+        error instanceof Error
+          ? error.message
+          : adminT("user_directory.errors.delete_user_failed");
       toast.error(message);
     },
     onSettled: () => {
@@ -532,14 +605,18 @@ export function AdminUserDirectory() {
     },
   });
 
-  const { form, scopeType } = useRoleAssignmentForm(roleData?.roles ?? [], () => {
-    queryClient.invalidateQueries({ queryKey: ["role-management"] });
-    queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
-    setAssignDialogOpen(false);
-    setUserSearchTerm("");
-    setUserResults([]);
-    setUserSearchOpen(false);
-  });
+  const { form, scopeType } = useRoleAssignmentForm(
+    roleData?.roles ?? [],
+    () => {
+      queryClient.invalidateQueries({ queryKey: ["role-management"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      setAssignDialogOpen(false);
+      setUserSearchTerm("");
+      setUserResults([]);
+      setUserSearchOpen(false);
+    },
+    adminT,
+  );
 
   const handleExport = async () => {
     try {
@@ -554,12 +631,12 @@ export function AdminUserDirectory() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast.success("Compliance report exported");
+      toast.success(adminT("user_directory.messages.compliance_report_exported"));
     } catch (mutationError) {
       const message =
         mutationError instanceof Error
           ? mutationError.message
-          : "Failed to export compliance report";
+          : adminT("user_directory.errors.export_compliance_report_failed");
       toast.error(message);
     }
   };
@@ -584,8 +661,8 @@ export function AdminUserDirectory() {
   }, [isClient, roleData, currentUser]);
 
   const columns = useMemo(
-    () => buildColumns(canDeleteUser, setUserToDelete),
-    [canDeleteUser, setUserToDelete],
+    () => buildColumns(canDeleteUser, setUserToDelete, adminT, currentLanguage),
+    [canDeleteUser, setUserToDelete, adminT, currentLanguage],
   );
 
   const handleDialogOpenChange = (open: boolean) => {
@@ -627,11 +704,16 @@ export function AdminUserDirectory() {
       if (result.success && result.data) {
         setUserResults(result.data);
       } else {
-        toast.error(result.errors?.[0]?.message || "Failed to search users");
+        toast.error(
+          result.errors?.[0]?.message ||
+            adminT("user_directory.errors.search_users_failed"),
+        );
       }
     } catch (searchError) {
       const message =
-        searchError instanceof Error ? searchError.message : "Failed to search users";
+        searchError instanceof Error
+          ? searchError.message
+          : adminT("user_directory.errors.search_users_failed");
       toast.error(message);
     } finally {
       setIsSearchingUsers(false);
@@ -658,16 +740,16 @@ export function AdminUserDirectory() {
           <div className="token-gap-xs flex items-center gap-2">
             <AlertTriangleIcon className="text-destructive size-5" aria-hidden />
             <CardTitle className="text-heading-sm">
-              Unable to load user governance
+              {adminT("user_directory.errors.load_failed")}
             </CardTitle>
           </div>
           <CardDescription className="text-body-sm text-destructive">
-            {error?.message ?? "The user directory service is temporarily unavailable."}
+            {error?.message ?? adminT("user_directory.errors.service_unavailable")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={() => refetch()} variant="outline">
-            Retry
+            {adminT("user_directory.form.buttons.retry")}
           </Button>
         </CardContent>
       </Card>
@@ -684,10 +766,11 @@ export function AdminUserDirectory() {
         <CardHeader className="token-stack-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="token-stack-xs">
-              <CardTitle className="text-heading-sm">User governance</CardTitle>
+              <CardTitle className="text-heading-sm">
+                {adminT("user_directory.title")}
+              </CardTitle>
               <CardDescription className="text-body-sm text-muted-strong">
-                Track membership coverage, role assignments, and MFA enforcement for your
-                compliance lens.
+                {adminT("user_directory.subtitle")}
               </CardDescription>
             </div>
             {isClient && (
@@ -695,15 +778,16 @@ export function AdminUserDirectory() {
                 <DialogTrigger asChild>
                   <Button className="w-full sm:w-auto">
                     <PlusIcon className="mr-2 h-4 w-4" />
-                    Assign Role
+                    {adminT("user_directory.buttons.assign_role")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg">
                   <DialogHeader>
-                    <DialogTitle>Assign a Role</DialogTitle>
+                    <DialogTitle>
+                      {adminT("user_directory.dialogs.assign_role.title")}
+                    </DialogTitle>
                     <DialogDescription>
-                      Search for a user and grant them a role. Scoped roles require either
-                      a team or event context.
+                      {adminT("user_directory.dialogs.assign_role.description")}
                     </DialogDescription>
                   </DialogHeader>
 
@@ -718,7 +802,12 @@ export function AdminUserDirectory() {
                     <form.Field
                       name="userId"
                       validators={{
-                        onChange: ({ value }) => (!value ? "Select a user" : undefined),
+                        onChange: ({ value }) =>
+                          !value
+                            ? adminT(
+                                "user_directory.form.assign_role.validation.select_user",
+                              )
+                            : undefined,
                       }}
                     >
                       {(field) => {
@@ -728,7 +817,9 @@ export function AdminUserDirectory() {
 
                         return (
                           <div className="space-y-2">
-                            <Label>User</Label>
+                            <Label>
+                              {adminT("user_directory.form.assign_role.fields.user")}
+                            </Label>
                             <Popover
                               open={userSearchOpen}
                               onOpenChange={(open) => setUserSearchOpen(open)}
@@ -751,7 +842,7 @@ export function AdminUserDirectory() {
                                     </span>
                                   ) : (
                                     <span className="text-muted-foreground">
-                                      Search by name or email
+                                      {adminT("user_directory.search.placeholder")}
                                     </span>
                                   )}
                                   <Search className="ml-2 h-4 w-4 shrink-0 opacity-60" />
@@ -763,7 +854,9 @@ export function AdminUserDirectory() {
                               >
                                 <Command shouldFilter={false}>
                                   <CommandInput
-                                    placeholder="Search users..."
+                                    placeholder={adminT(
+                                      "user_directory.form.assign_role.placeholders.search_users",
+                                    )}
                                     value={userSearchTerm}
                                     onValueChange={handleUserSearchChange}
                                   />
@@ -780,6 +873,7 @@ export function AdminUserDirectory() {
                                       ]);
                                       setUserSearchOpen(false);
                                     }}
+                                    adminT={adminT}
                                   />
                                 </Command>
                               </PopoverContent>
@@ -798,12 +892,19 @@ export function AdminUserDirectory() {
                     <form.Field
                       name="roleId"
                       validators={{
-                        onChange: ({ value }) => (!value ? "Select a role" : undefined),
+                        onChange: ({ value }) =>
+                          !value
+                            ? adminT(
+                                "user_directory.form.assign_role.validation.select_role",
+                              )
+                            : undefined,
                       }}
                     >
                       {(field) => (
                         <div className="space-y-2">
-                          <Label htmlFor="role-select">Role</Label>
+                          <Label htmlFor="role-select">
+                            {adminT("user_directory.form.assign_role.fields.role")}
+                          </Label>
                           <select
                             id="role-select"
                             className="border-input focus-visible:border-ring focus-visible:ring-ring/50 flex h-10 w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50"
@@ -812,7 +913,7 @@ export function AdminUserDirectory() {
                             disabled={form.state.isSubmitting}
                           >
                             <option value="" disabled>
-                              Select a role
+                              {adminT("user_directory.form.select_role_placeholder")}
                             </option>
                             {roleOptions.map((role) => (
                               <option key={role.value} value={role.value}>
@@ -834,17 +935,22 @@ export function AdminUserDirectory() {
                       <form.Field name="teamId">
                         {(field) => (
                           <div className="space-y-2">
-                            <Label htmlFor="role-team">Team Scope</Label>
+                            <Label htmlFor="role-team">
+                              {adminT(
+                                "user_directory.form.assign_role.fields.team_scope",
+                              )}
+                            </Label>
                             <Input
                               id="role-team"
-                              placeholder="Team ID"
+                              placeholder={adminT(
+                                "user_directory.form.assign_role.placeholders.team_id",
+                              )}
                               value={field.state.value}
                               onChange={(event) => field.handleChange(event.target.value)}
                               disabled={form.state.isSubmitting || scopeType !== "team"}
                             />
                             <FieldHint>
-                              Use for assigning <strong>Team Admin</strong>. Leave blank
-                              for global roles.
+                              {adminT("user_directory.form.assign_role.hints.team_scope")}
                             </FieldHint>
                           </div>
                         )}
@@ -853,17 +959,24 @@ export function AdminUserDirectory() {
                       <form.Field name="eventId">
                         {(field) => (
                           <div className="space-y-2">
-                            <Label htmlFor="role-event">Event Scope</Label>
+                            <Label htmlFor="role-event">
+                              {adminT(
+                                "user_directory.form.assign_role.fields.event_scope",
+                              )}
+                            </Label>
                             <Input
                               id="role-event"
-                              placeholder="Event ID"
+                              placeholder={adminT(
+                                "user_directory.form.assign_role.placeholders.event_id",
+                              )}
                               value={field.state.value}
                               onChange={(event) => field.handleChange(event.target.value)}
                               disabled={form.state.isSubmitting || scopeType !== "event"}
                             />
                             <FieldHint>
-                              Use for assigning <strong>Event Admin</strong>. Leave blank
-                              for global roles.
+                              {adminT(
+                                "user_directory.form.assign_role.hints.event_scope",
+                              )}
                             </FieldHint>
                           </div>
                         )}
@@ -873,7 +986,9 @@ export function AdminUserDirectory() {
                     <form.Field name="expiresAt">
                       {(field) => (
                         <div className="space-y-2">
-                          <Label htmlFor="role-expiration">Expiration</Label>
+                          <Label htmlFor="role-expiration">
+                            {adminT("user_directory.form.assign_role.fields.expiration")}
+                          </Label>
                           <Input
                             id="role-expiration"
                             type="datetime-local"
@@ -881,7 +996,9 @@ export function AdminUserDirectory() {
                             onChange={(event) => field.handleChange(event.target.value)}
                             disabled={form.state.isSubmitting}
                           />
-                          <FieldHint>Optional — leave blank for no expiration.</FieldHint>
+                          <FieldHint>
+                            {adminT("user_directory.form.assign_role.hints.expiration")}
+                          </FieldHint>
                         </div>
                       )}
                     </form.Field>
@@ -889,10 +1006,14 @@ export function AdminUserDirectory() {
                     <form.Field name="notes">
                       {(field) => (
                         <div className="space-y-2">
-                          <Label htmlFor="role-notes">Notes</Label>
+                          <Label htmlFor="role-notes">
+                            {adminT("user_directory.form.assign_role.fields.notes")}
+                          </Label>
                           <Textarea
                             id="role-notes"
-                            placeholder="Add context for this assignment (optional)"
+                            placeholder={adminT(
+                              "user_directory.form.assign_role.placeholders.add_context",
+                            )}
                             value={field.state.value}
                             onChange={(event) => field.handleChange(event.target.value)}
                             disabled={form.state.isSubmitting}
@@ -906,7 +1027,7 @@ export function AdminUserDirectory() {
                         {form.state.isSubmitting && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        Assign Role
+                        {adminT("user_directory.form.assign_role.buttons.assign_role")}
                       </Button>
                     </DialogFooter>
                   </form>
@@ -922,7 +1043,7 @@ export function AdminUserDirectory() {
                   setPageIndex(0);
                   setSearch(event.target.value);
                 }}
-                placeholder="Search by name or email"
+                placeholder={adminT("user_directory.search.placeholder")}
                 className="pl-9"
               />
               <FilterIcon
@@ -938,14 +1059,26 @@ export function AdminUserDirectory() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Membership" />
+                <SelectValue
+                  placeholder={adminT("user_directory.form.filters.membership")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All memberships</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-                <SelectItem value="canceled">Canceled</SelectItem>
-                <SelectItem value="none">No membership</SelectItem>
+                <SelectItem value="all">
+                  {adminT("user_directory.form.filters.all_memberships")}
+                </SelectItem>
+                <SelectItem value="active">
+                  {adminT("user_directory.membership.status.active")}
+                </SelectItem>
+                <SelectItem value="expired">
+                  {adminT("user_directory.membership.status.expired")}
+                </SelectItem>
+                <SelectItem value="canceled">
+                  {adminT("user_directory.membership.status.canceled")}
+                </SelectItem>
+                <SelectItem value="none">
+                  {adminT("user_directory.membership.status.none")}
+                </SelectItem>
               </SelectContent>
             </Select>
             {isClient && (
@@ -957,10 +1090,14 @@ export function AdminUserDirectory() {
                 }}
               >
                 <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Filter by role" />
+                  <SelectValue
+                    placeholder={adminT("user_directory.form.filters.filter_by_role")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All roles</SelectItem>
+                  <SelectItem value="all">
+                    {adminT("user_directory.form.filters.all_roles")}
+                  </SelectItem>
                   {roleOptions.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
@@ -979,7 +1116,9 @@ export function AdminUserDirectory() {
               className="flex items-center gap-2"
             >
               <KeyRoundIcon className="size-4" aria-hidden />
-              {requireMfa ? "MFA enforced" : "Require MFA"}
+              {requireMfa
+                ? adminT("user_directory.buttons.mfa_enforced")
+                : adminT("user_directory.buttons.require_mfa")}
             </Button>
             <Button
               type="button"
@@ -989,7 +1128,9 @@ export function AdminUserDirectory() {
               disabled={exportMutation.isPending}
             >
               <DownloadIcon className="size-4" aria-hidden />
-              {exportMutation.isPending ? "Exporting…" : "Export CSV"}
+              {exportMutation.isPending
+                ? adminT("user_directory.export.pending")
+                : adminT("user_directory.buttons.export_csv")}
             </Button>
             <Button
               type="button"
@@ -997,7 +1138,9 @@ export function AdminUserDirectory() {
               onClick={() => refetch()}
               disabled={isRefetching}
             >
-              {isRefetching ? "Refreshing…" : "Refresh"}
+              {isRefetching
+                ? adminT("user_directory.loading.refreshing")
+                : adminT("user_directory.buttons.refresh")}
             </Button>
           </div>
         </CardHeader>
@@ -1023,12 +1166,14 @@ export function AdminUserDirectory() {
       {isClient && roleData && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight">Role Summary</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {adminT("user_directory.sections.role_summary.title")}
+            </h2>
             <p className="text-muted-foreground text-sm">
-              Overview of all system roles and their assignment counts
+              {adminT("user_directory.sections.role_summary.description")}
             </p>
           </div>
-          <RoleSummaryGrid roles={roleData.roles} />
+          <RoleSummaryGrid roles={roleData.roles} adminT={adminT} />
         </div>
       )}
 
@@ -1036,23 +1181,31 @@ export function AdminUserDirectory() {
       {isClient && roleData && roleData.assignments.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Current Role Assignments</CardTitle>
+            <CardTitle>
+              {adminT("user_directory.sections.current_assignments.title")}
+            </CardTitle>
             <CardDescription>
-              Audit log of who has access, when it was granted, and by whom.
+              {adminT("user_directory.sections.current_assignments.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Scope</TableHead>
-                  <TableHead>Assigned By</TableHead>
-                  <TableHead>Assigned At</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Notes</TableHead>
-                  <TableHead className="w-[120px] text-right">Actions</TableHead>
+                  <TableHead>{adminT("user_directory.tables.headers.user")}</TableHead>
+                  <TableHead>{adminT("user_directory.tables.headers.role")}</TableHead>
+                  <TableHead>{adminT("user_directory.tables.headers.scope")}</TableHead>
+                  <TableHead>
+                    {adminT("user_directory.tables.headers.assigned_by")}
+                  </TableHead>
+                  <TableHead>
+                    {adminT("user_directory.tables.headers.assigned_at")}
+                  </TableHead>
+                  <TableHead>{adminT("user_directory.tables.headers.expires")}</TableHead>
+                  <TableHead>{adminT("user_directory.tables.headers.notes")}</TableHead>
+                  <TableHead className="w-[120px] text-right">
+                    {adminT("user_directory.tables.headers.actions")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1076,11 +1229,21 @@ export function AdminUserDirectory() {
                     </TableCell>
                     <TableCell>
                       {assignment.teamId ? (
-                        <Badge variant="outline">Team: {assignment.teamId}</Badge>
+                        <Badge variant="outline">
+                          {adminT("user_directory.scope.team", {
+                            teamId: assignment.teamId,
+                          })}
+                        </Badge>
                       ) : assignment.eventId ? (
-                        <Badge variant="outline">Event: {assignment.eventId}</Badge>
+                        <Badge variant="outline">
+                          {adminT("user_directory.scope.event", {
+                            eventId: assignment.eventId,
+                          })}
+                        </Badge>
                       ) : (
-                        <span className="text-muted-foreground text-xs">Global</span>
+                        <span className="text-muted-foreground text-xs">
+                          {adminT("user_directory.scope.global")}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -1092,7 +1255,9 @@ export function AdminUserDirectory() {
                           </span>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground text-xs">System</span>
+                        <span className="text-muted-foreground text-xs">
+                          {adminT("user_directory.assigned_by.system")}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -1107,7 +1272,7 @@ export function AdminUserDirectory() {
                         </time>
                       ) : (
                         <span className="text-muted-foreground text-xs">
-                          No expiration
+                          {adminT("user_directory.misc.no_expiration")}
                         </span>
                       )}
                     </TableCell>
@@ -1128,15 +1293,22 @@ export function AdminUserDirectory() {
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm">
                             <Trash2Icon className="mr-2 h-4 w-4" />
-                            Remove
+                            {adminT("user_directory.misc.remove_access")}
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Remove role assignment</DialogTitle>
+                            <DialogTitle>
+                              {adminT("user_directory.dialogs.remove_assignment.title")}
+                            </DialogTitle>
                             <DialogDescription>
-                              This will revoke "{assignment.roleName}" from{" "}
-                              {assignment.userName}. This action cannot be undone.
+                              {adminT(
+                                "user_directory.dialogs.remove_assignment.description",
+                                {
+                                  roleName: assignment.roleName,
+                                  userName: assignment.userName,
+                                },
+                              )}
                             </DialogDescription>
                           </DialogHeader>
                           <DialogFooter className="flex items-center justify-end gap-2">
@@ -1144,7 +1316,7 @@ export function AdminUserDirectory() {
                               variant="outline"
                               onClick={() => setAssignmentToRemove(null)}
                             >
-                              Cancel
+                              {adminT("common.buttons.cancel")}
                             </Button>
                             <Button
                               variant="destructive"
@@ -1159,7 +1331,9 @@ export function AdminUserDirectory() {
                               {removeMutation.isPending && (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               )}
-                              Remove access
+                              {adminT(
+                                "user_directory.dialogs.remove_assignment.buttons.remove_access",
+                              )}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
@@ -1187,11 +1361,10 @@ export function AdminUserDirectory() {
           <DialogHeader>
             <DialogTitle className="text-destructive flex items-center gap-2">
               <AlertTriangleIcon className="h-5 w-5" />
-              Permanently Delete User
+              {adminT("user_directory.dialogs.delete_user.title")}
             </DialogTitle>
             <DialogDescription>
-              This action is{" "}
-              <strong>permanent, irreversible, and potentially catastrophic</strong>.
+              {adminT("user_directory.dialogs.delete_user.warning")}
             </DialogDescription>
           </DialogHeader>
 
@@ -1200,47 +1373,89 @@ export function AdminUserDirectory() {
               <Alert className="border-destructive bg-destructive/5">
                 <AlertTriangleIcon className="h-4 w-4" />
                 <AlertDescription className="text-destructive">
-                  <strong>WARNING:</strong> Deleting <strong>{userToDelete.name}</strong>{" "}
-                  ({userToDelete.email}) will cascade delete all associated data including
-                  games, events, campaigns, memberships, and potentially impact other
-                  players who are part of these activities.
+                  {adminT("user_directory.dialogs.delete_user.warning_text", {
+                    userName: userToDelete.name,
+                    userEmail: userToDelete.email,
+                  })}
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
-                <h4 className="font-medium">Data that will be permanently deleted:</h4>
+                <h4 className="font-medium">
+                  {adminT(
+                    "user_directory.dialogs.delete_user.sections.data_to_delete_title",
+                  )}
+                </h4>
                 <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
-                  <li>User account and profile information</li>
-                  <li>All memberships and subscription data</li>
-                  <li>Game master status and games created</li>
-                  <li>Event organization and created events</li>
-                  <li>Campaign leadership and created campaigns</li>
-                  <li>Team memberships and associations</li>
-                  <li>Notifications and communication history</li>
-                  <li>Role assignments and permissions</li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.profile",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.memberships",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.games",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.events",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.campaigns",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.teams",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.notifications",
+                    )}
+                  </li>
+                  <li>
+                    {adminT(
+                      "user_directory.dialogs.delete_user.sections.data_to_delete.roles",
+                    )}
+                  </li>
                 </ul>
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-destructive font-medium">Impact on other users:</h4>
+                <h4 className="text-destructive font-medium">
+                  {adminT("user_directory.dialogs.delete_user.sections.impact_title")}
+                </h4>
                 <p className="text-muted-foreground text-sm">
-                  If this user is a Game Master, their games may be affected and players
-                  could lose access to ongoing campaigns. If this user is an event
-                  organizer, registered participants may lose their event access.
+                  {adminT(
+                    "user_directory.dialogs.delete_user.sections.impact_description",
+                  )}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-medium">Confirmation required:</h4>
+                <h4 className="font-medium">
+                  {adminT(
+                    "user_directory.dialogs.delete_user.sections.confirmation_title",
+                  )}
+                </h4>
                 <p className="text-sm">
-                  To proceed, please type{" "}
-                  <code className="bg-muted rounded px-1 text-xs">
-                    {userToDelete.email}
-                  </code>{" "}
-                  below:
+                  {adminT("user_directory.dialogs.delete_user.confirmation.instruction", {
+                    email: `<code className="bg-muted rounded px-1 text-xs">${userToDelete.email}</code>`,
+                  })}
                 </p>
                 <Input
-                  placeholder="Enter user email to confirm"
+                  placeholder={adminT(
+                    "user_directory.dialogs.delete_user.confirmation.placeholder",
+                  )}
                   value={deleteConfirmationInput}
                   onChange={(e) => setDeleteConfirmationInput(e.target.value)}
                 />
@@ -1256,7 +1471,7 @@ export function AdminUserDirectory() {
                 setDeleteConfirmationInput("");
               }}
             >
-              Cancel
+              {adminT("common.buttons.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -1273,7 +1488,7 @@ export function AdminUserDirectory() {
               {deleteUserMutation.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Delete Permanently
+              {adminT("user_directory.dialogs.delete_user.buttons.delete_permanently")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1282,7 +1497,13 @@ export function AdminUserDirectory() {
   );
 }
 
-function RoleSummaryGrid({ roles }: { roles: RoleSummary[] }) {
+function RoleSummaryGrid({
+  roles,
+  adminT,
+}: {
+  roles: RoleSummary[];
+  adminT: (key: string) => string;
+}) {
   if (!roles.length) return null;
 
   return (
@@ -1291,17 +1512,21 @@ function RoleSummaryGrid({ roles }: { roles: RoleSummary[] }) {
         <Card key={role.id}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{role.name}</CardTitle>
-            <Badge variant="outline">{role.assignmentCount} assigned</Badge>
+            <Badge variant="outline">{`${role.assignmentCount} ${adminT("user_directory.roles.assigned")}`}</Badge>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <p className="text-muted-foreground text-sm">
-              {role.description || "No description provided."}
+              {role.description || adminT("user_directory.descriptions.no_description")}
             </p>
             <div>
-              <p className="text-muted-foreground mb-1 text-xs uppercase">Permissions</p>
+              <p className="text-muted-foreground mb-1 text-xs uppercase">
+                {adminT("user_directory.misc.permissions")}
+              </p>
               <div className="flex flex-wrap gap-2">
                 {Object.keys(role.permissions).length === 0 ? (
-                  <Badge variant="secondary">None configured</Badge>
+                  <Badge variant="secondary">
+                    {adminT("user_directory.permissions.none_configured")}
+                  </Badge>
                 ) : (
                   Object.keys(role.permissions)
                     .filter((key) => role.permissions[key])
@@ -1328,20 +1553,23 @@ function CommandListWithResults({
   isSearching,
   results,
   onSelect,
+  adminT,
 }: {
   isSearching: boolean;
   results: RoleUserSearchResult[];
   onSelect: (result: RoleUserSearchResult) => void;
+  adminT: (key: string) => string;
 }) {
   return (
     <CommandList className="relative">
       <CommandEmpty>
         {isSearching ? (
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
-            <Loader2 className="h-4 w-4 animate-spin" /> Searching users...
+            <Loader2 className="h-4 w-4 animate-spin" />{" "}
+            {adminT("user_directory.search.searching_users")}
           </div>
         ) : (
-          "No users found."
+          adminT("user_directory.search.no_users_found")
         )}
       </CommandEmpty>
       <CommandGroup>

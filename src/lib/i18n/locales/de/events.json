@@ -1,0 +1,629 @@
+{
+  "create": {
+    "title": "Neues Event erstellen",
+    "subtitle": "Fülle die Details aus, um ein neues Roundup Games Event zu erstellen. Du kannst es als Entwurf speichern und später veröffentlichen.",
+    "steps": {
+      "basic_info": {
+        "title": "Grundinformationen",
+        "description": "Event-Name und Beschreibung"
+      },
+      "location_dates": {
+        "title": "Ort & Daten",
+        "description": "Wo und wann"
+      },
+      "registration": {
+        "title": "Anmeldung",
+        "description": "Anmeldungseinstellungen und Preise"
+      },
+      "details": {
+        "title": "Zusätzliche Details",
+        "description": "Kontaktinformationen und Einstellungen"
+      }
+    }
+  },
+  "form": {
+    "fields": {
+      "name": "Event-Name",
+      "slug": "Slug",
+      "short_description": "Kurzbeschreibung",
+      "description": "Beschreibung",
+      "type": "Typ",
+      "status": "Anfangsstatus",
+      "logo": "Event-Logo",
+      "logo_url": "Logo-URL (optional)",
+      "banner": "Hero-Banner",
+      "banner_url": "Banner-URL (optional)",
+      "venue_name": "Veranstaltungsort",
+      "venue_address": "Adresse des Veranstaltungsortes",
+      "city": "Stadt",
+      "province": "Bundesland/Bundesstaat",
+      "country": "Land",
+      "postal_code": "Postleitzahl",
+      "location_notes": "Hinweise zum Ort",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "registration_opens": "Anmeldung öffnet",
+      "registration_closes": "Anmeldung schließt",
+      "registration_type": "Anmeldetyp",
+      "max_teams": "Max. Teams",
+      "max_participants": "Max. Teilnehmer",
+      "min_players_per_team": "Mindestspieler pro Team",
+      "max_players_per_team": "Maximalspieler pro Team",
+      "team_fee": "Teamgebühr (USD)",
+      "individual_fee": "Einzelgebühr (USD)",
+      "early_bird_discount": "Rabattprozentsatz",
+      "early_bird_deadline": "Frühbucher-Frist",
+      "allow_etransfer": "Interac e-Transfer erlauben",
+      "etransfer_recipient": "E-Transfer-Empfänger-E-Mail",
+      "etransfer_instructions": "E-Transfer-Anweisungen",
+      "allow_waitlist": "Warteliste erlauben",
+      "require_membership": "Aktive Mitgliedschaft erforderlich",
+      "contact_email": "Kontakt-E-Mail",
+      "contact_phone": "Kontakt-Telefon",
+      "website": "Event-Website",
+      "public_event": "Öffentliches Event",
+      "featured_event": "Empfohlenes Event"
+    },
+    "placeholders": {
+      "name": "Tolles Sommerturnier",
+      "slug": "tolles-sommerturnier",
+      "short_description": "Kurze Beschreibung für Event-Karten und Vorschauen",
+      "description": "Detaillierte Event-Beschreibung...",
+      "logo_url": "https://cdn.example.com/event-logo.png",
+      "banner_url": "https://cdn.example.com/event-banner.jpg",
+      "venue_name": "Sportanlage der Gemeinde",
+      "venue_address": "Karl-Marx-Straße 1",
+      "city": "Berlin",
+      "country": "Land suchen",
+      "postal_code": "10115",
+      "location_notes": "Parkinformationen, Wegbeschreibung, Barrierefreiheitshinweise...",
+      "contact_email": "event@beispiel.de",
+      "contact_phone": "+49 1512 3456789",
+      "website": "https://beispiel.de/event",
+      "etransfer_instructions": "Gib die Sicherheitsfrage, das erwartete Passwort oder andere Hinweise für E-Transfer-Zahlungen an.",
+      "short_description_card": "Einzeilige Zusammenfassung für Karten und Vorschauen",
+      "description_details": "Teile wichtige Details, Zeitplan und was du erwarten kannst"
+    },
+    "descriptions": {
+      "slug": "Dies wird in der Event-URL verwendet",
+      "short_description": "Max. 500 Zeichen",
+      "logo": "Wird auf kompakten Karten und empfohlenen Bereichen angezeigt.",
+      "banner": "Wird auf der öffentlichen Event-Seite und in empfohlenen Listings angezeigt.",
+      "logo_helper": "Ideale Größe ist ein quadratisches PNG oder JPG bis zu 5MB.",
+      "banner_helper": "Verwende ein breites Bild (16:9) bis zu 8MB für den Event-Helden.",
+      "early_bird_discount": "Prozentualer Rabatt für frühe Anmeldung",
+      "etransfer_recipient": "Wohin E-Transfer-Zahlungen gesendet werden sollen",
+      "public_event_admin": "Mach dieses Event für alle sichtbar",
+      "public_event_user": "Öffentliche Sichtbarkeit anfordern (erfordert Admin-Genehmigung)",
+      "featured_event": "Hebe dieses Event auf der Startseite und in Suchergebnissen hervor",
+      "allow_waitlist": "Erlaube Anmeldungen einer Warteliste beizutreten, wenn das Event voll ist",
+      "require_membership": "Erlaube nur Benutzern mit aktiven Roundup Games Mitgliedschaften sich anzumelden"
+    },
+    "sections": {
+      "branding": {
+        "title": "Branding",
+        "description": "Füge visuelle Elemente hinzu, um dein Event zu personalisieren. Lade Bilder hoch oder füge URLs für Assets ein, die du bereits hostest."
+      },
+      "pricing": {
+        "title": "Preise"
+      },
+      "early_bird": {
+        "title": "Frühbucher-Rabatt"
+      },
+      "alternate_payment": {
+        "title": "Alternative Zahlungsoptionen"
+      },
+      "contact_info": {
+        "title": "Kontaktinformationen"
+      },
+      "visibility": {
+        "title": "Sichtbarkeitseinstellungen"
+      }
+    }
+  },
+  "buttons": {
+    "previous": "Zurück",
+    "next": "Weiter",
+    "create": "Event erstellen",
+    "creating": "Erstellen..."
+  },
+  "select": {
+    "select_type": "Typ auswählen",
+    "select_registration_type": "Anmeldetyp auswählen"
+  },
+  "types": {
+    "tournament": "Turnier",
+    "league": "Liga",
+    "camp": "Trainingscamp",
+    "clinic": "Skills-Klinik",
+    "social": "Gesellschaftliches Event",
+    "other": "Andere"
+  },
+  "status": {
+    "draft": "Entwurf (Nicht sichtbar)",
+    "published": "Veröffentlicht (Sichtbar)",
+    "in_progress": "In Bearbeitung",
+    "registration_open": "Anmeldung geöffnet",
+    "registration_closed": "Anmeldung geschlossen"
+  },
+  "registration_types": {
+    "team": "Team",
+    "individual": "Einzel",
+    "both": "Team & Einzel"
+  },
+  "alerts": {
+    "admin_approval": {
+      "title": "Admin-Genehmigung erforderlich",
+      "description": "Dein Event wird als Entwurf erstellt und benötigt eine Admin-Genehmigung, bevor es öffentlich sichtbar wird. Du kannst dein Event weiterhin verwalten und bearbeiten, während es auf Genehmigung wartet."
+    },
+    "approval_process": {
+      "description": "Nachdem du dein Event erstellt hast, wird ein Administrator es überprüfen und für öffentliche Sichtbarkeit genehmigen. Du wirst benachrichtigt, sobald dein Event genehmigt wurde."
+    }
+  },
+  "validation": {
+    "name_required": "Event-Name ist erforderlich",
+    "slug_required": "URL-Slug ist erforderlich",
+    "slug_format": "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten",
+    "short_description_max": "Kurzbeschreibung muss unter 500 Zeichen sein",
+    "start_date_required": "Startdatum ist erforderlich",
+    "end_date_required": "Enddatum ist erforderlich",
+    "etransfer_recipient_required": "E-Transfer-Empfänger-E-Mail ist erforderlich, wenn E-Transfer aktiviert ist",
+    "early_bird_deadline_required": "Frühbucher-Frist ist erforderlich, wenn ein Rabatt angeboten wird",
+    "early_bird_discount_required": "Lege einen Rabattprozentsatz fest oder entferne die Frist",
+    "valid_etransfer_email": "Gib eine gültige E-Transfer-E-Mail ein",
+    "invalid_value": "Ungültiger Wert"
+  },
+  "upload": {
+    "logo_uploading": "Lade Logo hoch...",
+    "banner_uploading": "Lade Banner hoch...",
+    "logo_success": "Logo erfolgreich hochgeladen",
+    "banner_success": "Banner erfolgreich hochgeladen",
+    "logo_failed": "Logo-Upload fehlgeschlagen",
+    "banner_failed": "Banner-Upload fehlgeschlagen",
+    "wait_for_upload": "Bitte warte, bis die Bild-Uploads abgeschlossen sind, bevor du abschickst.",
+    "file_read_failed": "Dateilesen fehlgeschlagen"
+  },
+  "success": {
+    "created": "Event erfolgreich erstellt!",
+    "created_pending_approval": "Event erstellt! Es wird von einem Administrator überprüft, bevor es öffentlich wird."
+  },
+  "errors": {
+    "create_failed": "Event-Erstellung fehlgeschlagen",
+    "upload_failed": "Bild-Upload fehlgeschlagen",
+    "validation_error": "Bitte behebe die markierten Felder.",
+    "creation_error": "Ein Fehler ist beim Erstellen des Events aufgetreten",
+    "load_failed": "Fehler beim Laden der Events: {{message}}"
+  },
+  "list_item": {
+    "free": "Kostenlos",
+    "capacity_tbd": "Kapazität steht fest",
+    "date_tbd": "Steht fest",
+    "spots_left": "{{count}} Plätze frei"
+  },
+  "minimal_form": {
+    "title": "Neues Event erstellen (Test)",
+    "description": "Dies ist ein minimales Testformular, um das Rendering-Problem zu isolieren.",
+    "test_button": "Test-Button"
+  },
+  "detail": {
+    "event_not_found": "Event nicht gefunden",
+    "dates": "Daten",
+    "type": "Typ",
+    "status": "Status",
+    "registration": "Anmeldung",
+    "open": "Geöffnet",
+    "closed": "Geschlossen",
+    "spots_left": "{{count}} Plätze frei",
+    "registrations": "Anmeldungen",
+    "no_registrations": "Noch keine Anmeldungen.",
+    "confirm": "Bestätigen",
+    "waitlist": "Warteliste",
+    "cancel": "Abbrechen",
+    "actions": {
+      "publish": "Veröffentlichen",
+      "open_registration": "Anmeldung öffnen",
+      "close_registration": "Anmeldung schließen",
+      "start": "Starten",
+      "complete": "Abschließen",
+      "cancel": "Abbrechen"
+    },
+    "success": {
+      "event_updated": "Event aktualisiert",
+      "registration_updated": "Anmeldung aktualisiert"
+    },
+    "errors": {
+      "update_failed": "Event-Aktualisierung fehlgeschlagen",
+      "registration_update_failed": "Anmeldeaktualisierung fehlgeschlagen"
+    }
+  },
+  "registration": {
+    "event_not_found": "Event nicht gefunden",
+    "event_not_available": "Das Event, für das du dich anmelden möchtest, existiert nicht oder ist nicht öffentlich verfügbar.",
+    "back_to_events": "Zurück zu Events",
+    "already_registered": "Bereits angemeldet",
+    "already_registered_description": "Du bist bereits für dieses Event angemeldet.",
+    "back_to_event_details": "Zurück zu Event-Details",
+    "view_event_details": "Event-Details ansehen",
+    "register_for_event": "Für {{eventName}} anmelden",
+    "register_description": "Fülle das Formular unten aus, um dich für dieses Event anzumelden",
+    "registration_type": "Anmeldetyp",
+    "individual_registration": "Einzelanmeldung",
+    "team_registration": "Teamanmeldung",
+    "register_as_individual": "Als einzelner Spieler anmelden",
+    "register_entire_team": "Dein gesamtes Team anmelden",
+    "select_team": "Team auswählen",
+    "select_team_placeholder": "Wähle ein Team",
+    "join_create_team": "Team beitreten oder erstellen",
+    "need_team_to_register": "Du musst Teil eines Teams sein, um dich als Team anzumelden.",
+    "additional_info": "Zusätzliche Informationen (optional)",
+    "additional_info_placeholder": "Diätetische Einschränkungen, Barrierefreiheitsbedürfnisse oder andere Informationen...",
+    "payment_method": "Zahlungsmethode",
+    "square_checkout": "Square-Checkout",
+    "etransfer": "Interac e-Transfer",
+    "pay_securely_online": "Bezahle sicher online mit Kredit- oder Debitkarte.",
+    "submit_send_payment_manually": "Jetzt abschicken und Zahlung manuell nach diesem Formular senden.",
+    "etransfer_instructions": "E-Transfer-Anweisungen",
+    "send_payment_to": "Sende Zahlung an {{recipient}}. Gib deinen Namen und das Event in der Nachricht an.",
+    "no_payment_required": "Keine Zahlung erforderlich",
+    "no_payment_description": "Diese Anmeldung erfordert keine Zahlung. Schicke das Formular ab, um abzuschließen.",
+    "terms_and_conditions": "Teilnahmebedingungen",
+    "agree_terms": "Ich stimme den Event-Bedingungen und dem Verhaltenskodex zu",
+    "agree_terms_description": "Du musst diesen Bedingungen zustimmen, um am Event teilzunehmen.",
+    "accept_liability_waiver": "Ich habe den Haftungsausschluss gelesen und akzeptiert",
+    "accept_waiver_description": "Jeder Teilnehmer muss den Haftungsausschluss vor der Anmeldung akzeptieren.",
+    "submitting": "Absenden...",
+    "awaiting_etransfer": "Warte auf E-Transfer",
+    "complete_registration": "Anmeldung abschließen",
+    "finish_etransfer": "Schließ deinen E-Transfer ab",
+    "send_payment_finalize": "Sende deine Zahlung, um die Anmeldung abzuschließen.",
+    "recipient_email": "Empfänger-E-Mail",
+    "instructions": "Anweisungen",
+    "see_event_instructions": "Event-Anweisungen ansehen",
+    "payment_received_confirmation": "Sobald die Zahlung eingeht, wird ein Administrator deine Anmeldung als bezahlt markieren.",
+    "return_to_dashboard": "Zurück zum Dashboard",
+    "event_overview": "Event-Übersicht",
+    "status": "Status",
+    "registered": "Angemeldet",
+    "spots_remaining": "Verbleibende Plätze",
+    "registration_fees": "Anmeldegebühren",
+    "current_fee": "Aktuelle Gebühr",
+    "early_bird_applied": "Frühbucher-Rabatt angewendet ({{percentage}}% Rabatt)",
+    "participant_information": "Teilnehmerinformationen",
+    "unknown_participant": "Unbekannter Teilnehmer",
+    "no_email_available": "Keine E-Mail verfügbar",
+    "registration_failed": "Anmeldung fehlgeschlagen",
+    "redirecting_to_square": "Leite zum Square-Checkout weiter...",
+    "registration_submitted": "Anmeldung abgeschickt! Folge den E-Transfer-Anweisungen unten.",
+    "registration_completed": "Anmeldung abgeschlossen!",
+    "error_during_registration": "Ein Fehler ist während der Anmeldung aufgetreten",
+    "already_submitted": "Du hast diese Anmeldung bereits abgeschickt.",
+    "accept_all_terms": "Bitte stimme allen Teilnahmebedingungen zu",
+    "select_a_team": "Bitte wähle ein Team",
+    "registration_open": "Anmeldung geöffnet",
+    "registration_closed": "Anmeldung geschlossen"
+  },
+  "detail_registration": {
+    "title": "Registrierung",
+    "status": "Status",
+    "closes": "Schließt",
+    "registered": "Registriert",
+    "available_spots": "Verfügbare Plätze",
+    "fees": "Registrierungsgebühren",
+    "team_registration": "Team-Registrierung",
+    "individual_registration": "Einzel-Registrierung",
+    "early_bird_discount": "Frühbucherrabatt verfügbar bis",
+    "already_registered": {
+      "title": "Du bist registriert!",
+      "description": "Du bist bereits für dieses Event registriert."
+    },
+    "sign_in_required": "Bitte {{link}} um Dich für dieses Event zu registrieren.",
+    "register_now": "Jetzt registrieren",
+    "registration_closed": "Registrierung geschlossen",
+    "event_full": "Event ausgebucht"
+  },
+  "not_found": {
+    "title": "Event nicht gefunden",
+    "description": "Das Event, das Du suchst, existiert nicht oder ist nicht öffentlich verfügbar.",
+    "back_to_events": "Zurück zu Events"
+  },
+  "schedule": "Event-Zeitplan",
+  "rules_format": "Regeln & Format",
+  "requirements": "Voraussetzungen",
+  "amenities": "Annehmlichkeiten",
+  "organizer": "Event-Organisator",
+  "share": {
+    "title": "Event teilen",
+    "copy_link": "Link kopieren"
+  },
+  "listing": {
+    "title": "Events",
+    "subtitle": "Turniere, Trainingscamps und Community-Festivals",
+    "description": "Roundup Games sanktioniert das ganze Jahr über Wettbewerbe, damit Athleten auf jedem Level konkurrieren, lernen und sich verbinden können.",
+    "register_team": "Dein Team registrieren",
+    "submit_event": "Event einreichen",
+    "filter": "Bevorstehende Events filtern",
+    "calendar_title": "Kalender der bevorstehenden Events",
+    "clear_filters": "Filter löschen",
+    "country": "Land",
+    "city": "Stadt",
+    "type": "Typ",
+    "status": "Status",
+    "registration_type": "Registrierungsart",
+    "all_countries": "Alle Länder",
+    "all_cities": "Alle Städte",
+    "all_types": "Alle Typen",
+    "all_statuses": "Alle Status",
+    "all_registration_types": "Alle Registrierungsarten",
+    "load_failed": "Laden der Events fehlgeschlagen",
+    "no_results": "Keine Events entsprechen diesem Filter. Kontaktiere uns unter {{email}} und wir fügen Dein Event zum Kalender hinzu.",
+    "loading": "Laden...",
+    "loading_description": "Bitte warten, während wir die Events laden.",
+    "options": {
+      "tournament": "Turnier",
+      "league": "Liga",
+      "camp": "Camp",
+      "social": "Social",
+      "other": "Andere",
+      "published": "Veröffentlicht",
+      "registration_open": "Registrierung geöffnet",
+      "registration_closed": "Registrierung geschlossen",
+      "in_progress": "In Bearbeitung",
+      "view_details": "Details anzeigen"
+    }
+  },
+  "list": {
+    "filter_title": "Events filtern",
+    "labels": {
+      "event_type": "Event-Typ",
+      "status": "Status",
+      "city": "Stadt",
+      "country": "Land",
+      "sort_by": "Sortieren nach",
+      "sort_order": "Sortierreihenfolge"
+    },
+    "placeholders": {
+      "all_types": "Alle Typen",
+      "all_statuses": "Alle Status",
+      "all_countries": "Alle Länder",
+      "filter_by_city": "Nach Stadt filtern"
+    },
+    "options": {
+      "tournament": "Turnier",
+      "league": "Liga",
+      "camp": "Camp",
+      "clinic": "Klinik",
+      "social": "Social",
+      "other": "Andere",
+      "published": "Veröffentlicht",
+      "registration_open": "Anmeldung offen",
+      "registration_closed": "Anmeldung geschlossen",
+      "in_progress": "In Bearbeitung",
+      "completed": "Abgeschlossen",
+      "start_date": "Startdatum",
+      "name": "Name",
+      "recently_added": "Kürzlich hinzugefügt",
+      "ascending": "Aufsteigend",
+      "descending": "Absteigend"
+    },
+    "empty_state": "Keine Events gefunden, die Ihren Kriterien entsprechen.",
+    "pagination": {
+      "showing": "Zeige {{start}}-{{end}} von {{total}} Events",
+      "previous": "Vorherige",
+      "next": "Nächste"
+    },
+    "actions": {
+      "view_details": "Details ansehen"
+    },
+    "registration": {
+      "open": "Anmeldung offen",
+      "spots_left": "{{count}} Plätze frei",
+      "registered": "{{count}} angemeldet",
+      "type_label": "{{type}}"
+    }
+  },
+  "admin": {
+    "title": "Events",
+    "subtitle": "Aktuelle und kommende Events durchsuchen",
+    "create_event": "Event erstellen",
+    "view_event": "Event ansehen",
+    "back_to_events": "Zurück zu Events",
+    "manage_event": "Event verwalten",
+    "view_public_page": "Öffentliche Seite ansehen",
+    "not_found": "Event nicht gefunden",
+    "not_found_description": "Das Event, das Du verwalten möchtest, existiert nicht.",
+    "registrations": "Anmeldungen",
+    "overview": "Übersicht",
+    "stats": {
+      "total_registrations": "Gesamte Anmeldungen",
+      "total_revenue": "Gesamteinnahmen",
+      "outstanding_etransfers": "Ausstehende E-Transfers",
+      "available_spots": "Verfügbare Plätze",
+      "event_status": "Event-Status",
+      "pending": "ausstehend",
+      "from_registrations": "Von {{count}} Anmeldungen",
+      "awaiting_confirmation": "Warte auf manuelle Bestätigung",
+      "unlimited": "Unbegrenzt"
+    },
+    "actions": {
+      "publish": "Veröffentlichen",
+      "open_registration": "Registrierung öffnen",
+      "close_registration": "Registrierung schließen",
+      "start": "Starten",
+      "complete": "Abschließen",
+      "cancel": "Stornieren",
+      "confirm": "Bestätigen",
+      "waitlist": "Warteliste",
+      "mark_paid": "Als bezahlt markieren",
+      "send_reminder": "Erinnerung senden",
+      "view": "Ansehen",
+      "event_updated": "Event aktualisiert",
+      "update_failed": "Event-Aktualisierung fehlgeschlagen",
+      "registration_updated": "Anmeldung aktualisiert",
+      "registration_update_failed": "Anmeldeaktualisierung fehlgeschlagen"
+    },
+    "tables": {
+      "headers": {
+        "name": "Name",
+        "email": "E-Mail",
+        "type": "Typ",
+        "team": "Team",
+        "status": "Status",
+        "payment_status": "Zahlungsstatus",
+        "payment_method": "Zahlungsmethode",
+        "amount": "Betrag",
+        "amount_due": "Fälliger Betrag",
+        "amount_paid": "Gezahlter Betrag",
+        "registered": "Angemeldet",
+        "actions": "Aktionen"
+      },
+      "no_registrations": "Noch keine Anmeldungen",
+      "unknown": "Unbekannt",
+      "na": "N/A"
+    },
+    "recent_registrations": {
+      "title": "Neueste Anmeldungen",
+      "description": "Neueste Anmeldungen für Dein Event"
+    },
+    "all_registrations": {
+      "title": "Alle Anmeldungen",
+      "description": "Event-Anmeldungen und Teilnehmer verwalten"
+    },
+    "quick_actions": {
+      "title": "Schnellaktionen",
+      "export_registrations": "Anmeldungen exportieren",
+      "email_participants": "Teilnehmer e-mailen",
+      "export_csv": "CSV exportieren"
+    },
+    "settings": {
+      "title": "Event-Einstellungen",
+      "description": "Event-Konfiguration und Status verwalten",
+      "event_status": "Event-Status",
+      "visibility": "Sichtbarkeit",
+      "public_event": "Öffentliches Event",
+      "make_private": "Privat machen",
+      "make_public": "Öffentlich machen",
+      "featured_event": "Vorgestelltes Event",
+      "feature_event": "Event hervorheben",
+      "remove_feature": "Hervorhebung entfernen",
+      "danger_zone": "Gefahrenzone",
+      "danger_description": "Diese Aktionen sind permanent und können nicht rückgängig gemacht werden.",
+      "delete_event": "Event löschen"
+    },
+    "export": {
+      "no_registrations": "Keine Anmeldungen zum Exportieren",
+      "success": "Anmeldungen erfolgreich exportiert"
+    },
+    "confirmations": {
+      "are_you_sure": "Bist Du sicher?",
+      "cancel_event_description": "Dies wird das Event stornieren und alle angemeldeten Teilnehmer benachrichtigen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "delete_event_description": "Dies wird das Event und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "no_keep_event": "Nein, Event behalten",
+      "yes_cancel_event": "Ja, Event stornieren",
+      "delete_event": "Event löschen"
+    },
+    "payment": {
+      "marking": "Markiere...",
+      "sending": "Sende...",
+      "reminder_logged": "Erinnerung protokolliert"
+    },
+    "statuses": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "registration_open": "Registrierung geöffnet",
+      "registration_closed": "Registrierung geschlossen"
+    },
+    "labels": {
+      "dates": "Daten",
+      "type": "Typ",
+      "status": "Status",
+      "registration": "Registrierung",
+      "spots_left": "Plätze übrig",
+      "of_teams": "von {{count}} Teams",
+      "of_participants": "von {{count}} Teilnehmern"
+    },
+    "management": {
+      "title": "Event verwalten",
+      "overview": "Übersicht",
+      "registrations": "Anmeldungen",
+      "settings": "Einstellungen",
+      "view_public_page": "Öffentliche Seite ansehen",
+      "recent_registrations": "Neueste Anmeldungen",
+      "recent_registrations_description": "Neueste Anmeldungen für dein Event",
+      "tabs": {
+        "overview": "Übersicht",
+        "registrations": "Anmeldungen",
+        "settings": "Einstellungen"
+      },
+      "stats": {
+        "total_registrations": "Gesamte Anmeldungen",
+        "pending": "ausstehend",
+        "total_revenue": "Gesamteinnahmen",
+        "outstanding_etransfers": "Ausstehende E-Transfers",
+        "awaiting_confirmation": "Warte auf manuelle Bestätigung",
+        "available_spots": "Verfügbare Plätze",
+        "event_status": "Event-Status",
+        "unlimited": "Unbegrenzt",
+        "from_registrations": "Von {{count}} Anmeldungen"
+      },
+      "actions": {
+        "export_registrations": "Anmeldungen exportieren",
+        "email_participants": "Teilnehmer benachrichtigen",
+        "open_registration": "Registrierung öffnen",
+        "close_registration": "Registrierung schließen",
+        "cancel_event": "Event absagen",
+        "mark_paid": "Als bezahlt markieren",
+        "send_reminder": "Erinnerung senden",
+        "view": "Ansehen",
+        "export_csv": "CSV exportieren",
+        "make_public": "Öffentlich machen",
+        "make_private": "Privat machen",
+        "feature_event": "Event hervorheben",
+        "remove_feature": "Hervorhebung entfernen",
+        "delete_event": "Event löschen"
+      },
+      "tables": {
+        "headers": {
+          "name": "Name",
+          "email": "E-Mail",
+          "type": "Typ",
+          "team": "Team",
+          "status": "Status",
+          "payment_status": "Zahlungsstatus",
+          "payment_method": "Zahlungsmethode",
+          "amount": "Betrag",
+          "amount_due": "Fälliger Betrag",
+          "amount_paid": "Gezahlter Betrag",
+          "registered": "Registriert",
+          "date": "Datum",
+          "actions": "Aktionen"
+        },
+        "no_registrations": "Noch keine Anmeldungen",
+        "unknown": "Unbekannt",
+        "na": "N/V"
+      },
+      "confirmations": {
+        "are_you_sure": "Bist du sicher?",
+        "cancel_event_description": "Dies wird das Event absagen und alle registrierten Teilnehmer benachrichtigen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "delete_event_description": "Dies wird das Event und alle zugehörigen Daten permanent löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "no_keep_event": "Nein, Event behalten",
+        "yes_cancel_event": "Ja, Event absagen",
+        "delete_event": "Event löschen"
+      },
+      "status_badges": {
+        "draft": "Entwurf",
+        "published": "Veröffentlicht",
+        "registration_open": "Registrierung geöffnet",
+        "registration_closed": "Registrierung geschlossen",
+        "in_progress": "In Bearbeitung",
+        "completed": "Abgeschlossen",
+        "canceled": "Abgesagt"
+      },
+      "payment": {
+        "marking": "Markiere...",
+        "sending": "Sende...",
+        "reminder_logged": "Erinnerung protokolliert",
+        "canadian_dollars": "CAD"
+      }
+    }
+  }
+}

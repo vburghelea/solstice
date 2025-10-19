@@ -1,0 +1,246 @@
+{
+  "dashboard": {
+    "title": "Event-Operations-Missionskontrolle",
+    "subtitle": "Halte Genehmigungen, Personalplanung und Marketing-Signale in einem Arbeitsbereich zusammen, damit du Live-Erlebnisse steuern kannst, ohne das Dashboard zu verlassen.",
+    "legacy_dashboard_link": "Altes Dashboard ansehen",
+    "launch_event": "Neues Event starten"
+  },
+  "snapshot_cards": {
+    "awaiting_review": "Wartet auf Überprüfung",
+    "awaiting_review_description": "Einreichungen in der Warteschlange für die Operationsgenehmigung",
+    "registration_live": "Anmeldung live",
+    "registration_live_description": "Kampagnen, die aktiv Anmeldungen sammeln",
+    "confirmed_events": "Bestätigte Events",
+    "confirmed_events_description": "Veröffentlicht und bereit für die Durchführung",
+    "capacity_alerts": "Kapazitätsbenachrichtigungen",
+    "capacity_alerts_description": "Tische nähern sich den Wartelistenschwellen"
+  },
+  "status_messages": {
+    "refreshing_data": "Daten werden aktualisiert",
+    "refreshing_data_description": "Laden der neuesten Einreichungen, Personalzahlen und Kampagnenstatistiken."
+  },
+  "tabs": {
+    "approvals_queue": "Genehmigungswarteschlange",
+    "pipeline_health": "Pipeline-Gesundheit"
+  },
+  "empty_states": {
+    "all_triaged": "Jede Einreichung wurde triagiert — nimm dir einen Moment zum Durchatmen."
+  },
+  "sections": {
+    "events_awaiting_approval": "Events, die auf Go-Live warten",
+    "events_awaiting_description": "Überprüfe Organisatordetails, wirf einen Blick auf die Logistik und genehmige oder sende Überarbeitungen zurück.",
+    "recent_approvals": "Kürzliche Genehmigungen"
+  },
+  "table_headers": {
+    "event": "Event",
+    "organizer": "Organisator",
+    "type": "Typ",
+    "start": "Beginn",
+    "location": "Standort",
+    "created": "Erstellt",
+    "actions": "Aktionen"
+  },
+  "actions": {
+    "preview": "Vorschau",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen"
+  },
+  "approval_dialog": {
+    "approve_event": "Event genehmigen",
+    "reject_event": "Event ablehnen",
+    "approve_description": "Verschiebe dieses Event in die Operations-Pipeline für Personalplanung und Marketing.",
+    "reject_description": "Sende dieses Event mit Feedback an den Organisator zurück.",
+    "confirm_approve": "Event genehmigen",
+    "confirm_reject": "Event ablehnen",
+    "approving": "Genehmigung wird erteilt...",
+    "rejecting": "Ablehnung erfolgt...",
+    "success_approved": "Event genehmigt und in die Operations-Pipeline verschoben",
+    "success_rejected": "Event für Überarbeitungen zurückgegeben",
+    "error_update": "Event konnte nicht aktualisiert werden",
+    "error_occurred": "Beim Aktualisieren des Events ist ein Fehler aufgetreten"
+  },
+  "pipeline": {
+    "next_submission": "Nächste Einreichung genehmigen",
+    "urgent_logistics": "Dringende Logistikprüfung",
+    "monitor_marketing": "Marketing-Puls überwachen",
+    "review_submission": "Einreichung überprüfen",
+    "open_roster": "Event-Roster öffnen",
+    "stay_ahead": "Bleib der Pipeline voraus",
+    "open_ops_view": "Operations-Ansicht öffnen",
+    "location_tbd": "Standort TBD"
+  },
+  "labels": {
+    "unknown": "Unbekannt",
+    "not_provided": "Nicht angegeben",
+    "tbd": "TBD"
+  },
+  "task_status": {
+    "todo": "Zu erledigen",
+    "in_progress": "In Bearbeitung",
+    "blocked": "Benötigt Aufmerksamkeit",
+    "done": "Abgeschlossen"
+  },
+  "event_detail": {
+    "error_fetching": "Beim Abrufen des Events ist etwas schiefgelaufen.",
+    "review_tasks": "Überprüfe und annotiere Operations-Aufgaben nach Arbeitsströmen.",
+    "filter_aria_label": "Aufgaben nach Status filtern",
+    "capacity_remaining": "Verbleibende Kapazität",
+    "registration_status": "Anmeldestatus",
+    "accepting_signups": "Anmeldungen werden angenommen",
+    "closed_gated": "Geschlossen oder eingeschränkt",
+    "next_milestone": "Nächster Meilenstein",
+    "no_tasks_filter": "Keine Aufgaben entsprechen diesem Filter. Passe den Statusfilter an oder setze ihn zurück, um die vollständige Checkliste anzuzeigen.",
+    "generate_checklist": "Sobald dieses Event erfolgreich geladen ist, generieren wir eine vorgeschlagene Operations-Checkliste.",
+    "update_placeholder": "Erfasse Updates, Blocker oder Kontext für Teamkollegen.",
+    "final_approval": "Finale Genehmigung & Veröffentlichung",
+    "final_approval_description": "Überprüfe die Unterlagen des Organisators, dann schalte das Event für Marketing frei."
+  },
+  "hardcoded_strings": {
+    "mission_focus": "Missionsfokus",
+    "recent_approvals_description": "Behalte den Überblick darüber, welche Erfahrungen weitergekommen sind und springe bei Bedarf wieder in die Operations ein.",
+    "no_recent_approvals": "Sobald Events genehmigt sind, erscheinen sie hier mit schnellen Links zum Verwalten von Rostern und Logistik.",
+    "table_headers": {
+      "event": "Event",
+      "status": "Status",
+      "visibility": "Sichtbarkeit",
+      "updated": "Aktualisiert",
+      "registered": "Angemeldet",
+      "capacity": "Kapazität",
+      "start": "Beginn"
+    },
+    "actions": {
+      "tasks_notes": "Aufgaben & Notizen",
+      "view": "Ansehen",
+      "manage": "Verwalten",
+      "adjust": "Anpassen"
+    },
+    "visibility": {
+      "public": "Öffentlich",
+      "private": "Privat"
+    },
+    "pipeline_health": {
+      "title": "Pipeline-Gesundheit",
+      "description": "Überwache Anmeldungen, Kapazitäten und Bereitschaft für die kommenden Events.",
+      "no_events": "Keine Events in der Pipeline gefunden. Halte die Genehmigungen in Bewegung, um diese Ansicht zu füllen.",
+      "spots_left": "{{count}} Plätze frei",
+      "unlimited": "Unbegrenzt"
+    },
+    "logistics_watchlist": {
+      "title": "Logistik-Beobachtungsliste",
+      "description": "Bevorstehende Events, die finale Personalplanung oder Marketing-Koordination benötigen.",
+      "no_issues": "Alle Systeme sind grün — halte das Anmelde-Momentum im Auge.",
+      "urgent": "Dringend",
+      "monitor": "Überwachen",
+      "spots_remaining": "{{count}} Plätze verbleibend · {{days}} Tage bis zum Start"
+    },
+    "marketing_hotspots": {
+      "title": "Marketing-Hotspots",
+      "description": "Städte, die das meiste Volumen und kurzfristige Aktivitäten generieren.",
+      "no_data": "Noch keine Marketing-Trends verfügbar. Genehmige mehr Events, um Hotspots zu identifizieren.",
+      "launching_soon": "{{count}} starten in den nächsten 30 Tagen",
+      "live": "{{count}} live"
+    },
+    "live_command_list": {
+      "title": "Live-Event-Befehlsliste",
+      "description": "Schnelle Links zur Anpassung der Personalplanung oder zum Überprüfen von Rostern für bevorstehende Erfahrungen.",
+      "no_events": "Noch keine Live-Events — Genehmigungen füllen diese Liste automatisch."
+    }
+  },
+  "event_detail_hardcoded": {
+    "ops_mission_control": "Ops-Missionskontrolle",
+    "event_not_found": "Event nicht gefunden",
+    "event_not_found_description": "Dieses Event existiert entweder nicht mehr oder du hast keinen Zugriff mehr darauf.",
+    "open_legacy_playbook": "Altes Playbook öffnen",
+    "review_submission_history": "Einreichungshistorie überprüfen",
+    "registered": "angemeldet",
+    "operational_outlook": "Operations-Ausblick",
+    "operational_outlook_description": "Tägliche Bereitschaft, Kapazitätssignale und abhängige Arbeitsabläufe für dein Team.",
+    "tasks_complete_count": "{{completed}} von {{total}} Aufgaben abgeschlossen",
+    "task_board": "Aufgabenboard",
+    "logistics_timeline": "Logistik-Zeitachse",
+    "showing_tasks_count": "Zeige {{filtered}} von {{total}} Aufgaben.",
+    "reset_to_suggested_plan": "Auf vorgeschlagenen Plan zurücksetzen",
+    "refreshing_event_data": "Event-Daten werden aktualisiert…",
+    "attention_signals": "Aufmerksamkeitssignale",
+    "attention_signals_description": "Hebt Arbeitsströme hervor, die den Start oder die Durchführung vor Ort blockieren könnten.",
+    "all_systems_nominal": "Alle Systeme nominal",
+    "all_systems_nominal_description": "Keine dringenden Aufgaben erkannt. Behalte Anmeldungen und Lieferanten-Check-ins im Auge.",
+    "operations_snapshot": "Operations-Schnappschuss",
+    "operations_snapshot_description": "Schnellreferenz für Personalplanung, Marketing und Anmelde-Gesundheit.",
+    "schedule_with_organizer": "Mit Organisator terminieren",
+    "default_owner": "Standard-Verantwortlicher: {{owner}}",
+    "set_status_for_task": "Status festlegen für {{title}}",
+    "assign_owner_for_task": "Verantwortlichen zuweisen für {{title}}",
+    "edit_note_for_task": "Notiz bearbeiten für {{title}}",
+    "add_note_for_task": "Notiz hinzufügen für {{title}}",
+    "clear_note": "Notiz löschen",
+    "done": "Fertig",
+    "waitlist_only": "Nur Warteliste",
+    "spots_remaining": "{{count}} Plätze verbleibend",
+    "team_cap_not_set": "Team-Limit nicht festgelegt",
+    "participant_cap_not_set": "Teilnehmer-Limit nicht festgelegt",
+    "capacity_tbd": "Kapazität TBD",
+    "event_in_progress_or_complete": "Event in Bearbeitung oder abgeschlossen",
+    "event_starts_today": "Event beginnt heute",
+    "days_until_doors_open": "{{count}} Tag{{plural}} bis zum Start",
+    "task_templates": {
+      "marketing_kickoff": "Marketing-Kampagne starten",
+      "marketing_kickoff_description": "Koordiniere Social-Media-Rollout, E-Mail-Einbindung und bezahlte Boosts, falls zugewiesen.",
+      "monitor_registration_health": "Anmelde-Gesundheit überwachen",
+      "monitor_registration_health_description": "Überprüfe täglich Anmeldungen, Kapazitätsprognosen und Wartelistenzufluss.",
+      "lock_staffing": "Personalplanung & Freiwillige fixieren",
+      "lock_staffing_description": "Bestätige Moderator-Roster, Reisetermine und Notfall-Besetzung.",
+      "confirm_vendor_logistics": "Venue & Lieferanten-Logistik bestätigen",
+      "confirm_vendor_logistics_description": "Stelle sicher, dass Ladezeitenfenster, AV-Unterstützung und Versicherungsnachweise vorliegen.",
+      "run_show_brief": "Run-of-Show & Vor-Ort-Briefing",
+      "run_show_brief_description": "Teile den endgültigen Zeitplan und die Zuweisungen 48 Stunden vor Start mit dem Personal mit.",
+      "post_event_debrief": "Post-Event-Debriefing & Zusammenfassung",
+      "post_event_debrief_description": "Sammle Feedback, aktualisiere Erfolgsmetriken und teile die Zusammenfassung mit Stakeholdern."
+    },
+    "timeline": {
+      "marketing_launch": "Marketing-Start",
+      "marketing_launch_description": "Kampagne live über bezahlte und eigene Kanäle.",
+      "staffing_locked": "Personalplanung fixiert",
+      "staffing_locked_description": "Roster bestätigt, Reisen gebucht, Notfälle zugewiesen.",
+      "onsite_briefing": "Vor-Ort-Briefing",
+      "onsite_briefing_description": "Finale Zuweisungen geteilt; Ausrüstungscheck abgeschlossen.",
+      "event_day": "Event-Tag",
+      "event_day_description": "Türen öffnen sich und die Durchführung vor Ort beginnt.",
+      "post_event_debrief": "Post-Event-Debriefing",
+      "post_event_debrief_description": "Überprüfe KPIs, Feedback und Folgeaufgaben."
+    },
+    "owner_roles": {
+      "operations": "Operations",
+      "marketing_ops": "Marketing Ops",
+      "field_ops": "Field Ops",
+      "vendor_relations": "Lieferantenbeziehungen",
+      "insights": "Insights",
+      "volunteer_lead": "Freiwilligenleitung",
+      "finance_ops": "Finance Ops",
+      "partnerships": "Partnerschaften"
+    },
+    "task_categories": {
+      "launch_readiness": "Startbereitschaft",
+      "logistics": "Logistik",
+      "marketing": "Marketing",
+      "post_event": "Post-Event",
+      "staffing": "Personalplanung"
+    },
+    "ui": {
+      "ops_mission_control": "Ops-Missionskontrolle",
+      "showing_tasks_count": "Zeige {{filtered}} von {{total}} Aufgaben.",
+      "tasks_count": "{{filtered}} von {{total}}",
+      "reset_to_suggested_plan": "Auf vorgeschlagenen Plan zurücksetzen",
+      "refreshing_event_data": "Event-Daten werden aktualisiert…",
+      "clear_note": "Notiz löschen",
+      "done": "Fertig"
+    },
+    "capacity": {
+      "waitlist_only": "Nur Warteliste",
+      "spots_remaining": "{{count}} Plätze verbleibend",
+      "team_cap_not_set": "Team-Limit nicht festgelegt",
+      "participant_cap_not_set": "Teilnehmer-Limit nicht festgelegt",
+      "capacity_tbd": "Kapazität TBD"
+    }
+  }
+}

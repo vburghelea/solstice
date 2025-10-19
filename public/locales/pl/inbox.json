@@ -1,0 +1,145 @@
+{
+  "title": "Skrzynka odbiorcza",
+  "subtitle": "Zarządzaj swoimi wiadomościami i powiadomieniami",
+  "shared_inbox": {
+    "title": "Wspólna skrzynka",
+    "loading": "Ładuję wspólną skrzynkę",
+    "loading_description": "Pobieram aktywne wątki i metryki dla przestrzeni roboczej {{persona}}.",
+    "unable_to_load": "Nie udało się załadować wspólnej skrzynki",
+    "unable_to_load_description": "Odśwież stronę i spróbuj ponownie. Skontaktuj się z zespołem platformy, jeśli problem będzie się powtarzał.",
+    "beta_badge": "Współpraca beta",
+    "open_reporting": "Otwórz raportowanie międzyprzestrzenne",
+    "action_due_prefix": "Termin ",
+    "sections": {
+      "metrics": {
+        "title": "Metryki",
+        "description": "Kluczowe wskaźniki wydajności i statystyki użytkowania"
+      },
+      "filters": {
+        "title": "Filtry",
+        "description": "Skup skrzynkę na przepływie pracy lub typie eskalacji."
+      },
+      "tips": {
+        "title": "Wskazówki współpracy",
+        "description": "Dopasuj oczekiwania, gdy wiele osób dzieli wątek."
+      },
+      "threads": {
+        "title": "Wątki",
+        "no_threads": "Brak wątków",
+        "no_threads_description": "Zmień filtry lub zaproś współpracowników, aby rozpocząć wspólną rozmowę.",
+        "log_note": "Dodaj wewnętrzną notatkę",
+        "select_thread": "Wybierz wątek",
+        "select_thread_description": "Wybierz rozmowę, aby zobaczyć kontekst międzyosobowy, notatki i zadania."
+      }
+    },
+    "priority": {
+      "high": "Wysoki",
+      "medium": "Średni",
+      "low": "Niski"
+    },
+    "status": {
+      "open": "Otwarty",
+      "waiting": "Oczekuję na odpowiedź",
+      "resolved": "Rozwiązany"
+    },
+    "threads_awaiting": {
+      "one": "{{count}} wątek czeka na twoją uwagę.",
+      "other": "{{count}} wątków czeka na twoją uwagę."
+    },
+    "thread_detail": {
+      "action_items": "Zadania",
+      "priority_label": "Priorytet:",
+      "last_updated": "Ostatnio aktualizowano",
+      "reply_to_thread": "Odpowiedz na wątek",
+      "add_follow_up": "Dodaj zadanie follow-up",
+      "owner_label": "Twoje",
+      "status_label": "Status:"
+    }
+  },
+  "status_labels": {
+    "open": "Otwarty",
+    "waiting_on_response": "Oczekuję na odpowiedź",
+    "resolved": "Rozwiązany",
+    "closed": "Zamknięty",
+    "in_progress": "W realizacji",
+    "urgent": "Pilny",
+    "low_priority": "Niski priorytet"
+  },
+  "filters": {
+    "title": "Filtruj wiadomości",
+    "all": "Wszystkie",
+    "unread": "Nieprzeczytane",
+    "important": "Ważne",
+    "recent": "Ostatnie",
+    "resolved": "Rozwiązane",
+    "pending": "Oczekujące"
+  },
+  "messages": {
+    "loading_messages": "Ładuję wiadomości...",
+    "no_messages": "Nie znaleziono wiadomości",
+    "failed_to_load": "Nie udało się załadować skrzynki",
+    "empty_state": {
+      "title": "Brak wiadomości",
+      "subtitle": "Gdy otrzymasz wiadomości, pojawią się tutaj"
+    },
+    "compose": {
+      "title": "Napisz wiadomość",
+      "placeholder": "Napisz tutaj swoją wiadomość...",
+      "send": "Wyślij",
+      "sending": "Wysyłanie...",
+      "attach_file": "Załącz plik"
+    },
+    "reply": {
+      "title": "Odpowiedz na wiadomość",
+      "placeholder": "Napisz tutaj swoją odpowiedź...",
+      "send": "Wyślij odpowiedź",
+      "sending": "Wysyłanie odpowiedzi..."
+    }
+  },
+  "actions": {
+    "mark_as_read": "Oznacz jako przeczytane",
+    "mark_as_unread": "Oznacz jako nieprzeczytane",
+    "archive": "Archiwizuj",
+    "delete": "Usuń",
+    "reply": "Odpowiedz",
+    "forward": "Przekaż dalej",
+    "star": "Oznacz gwiazdką",
+    "unstar": "Usuń gwiazdkę",
+    "flag": "Oznacz flagą",
+    "unflag": "Usuń flagę"
+  },
+  "thread": {
+    "title": "Wątek",
+    "participants": "Uczestnicy",
+    "messages": "Wiadomości",
+    "last_message": "Ostatnia wiadomość",
+    "started_by": "Rozpoczął",
+    "reply_to_thread": "Odpowiedz na wątek"
+  },
+  "notifications": {
+    "new_message": "Nowa wiadomość",
+    "message_reply": "Odpowiedź na wiadomość",
+    "thread_updated": "Wątek zaktualizowany"
+  },
+  "search": {
+    "placeholder": "Szukaj wiadomości...",
+    "no_results": "Nie znaleziono wiadomości pasujących do wyszukiwania",
+    "filters": {
+      "date_range": "Zakres dat",
+      "sender": "Nadawca",
+      "subject": "Temat"
+    }
+  },
+  "errors": {
+    "send_failed": "Nie udało się wysłać wiadomości",
+    "load_failed": "Nie udało się załadować wiadomości",
+    "delete_failed": "Nie udało się usunąć wiadomości",
+    "archive_failed": "Nie udało się zarchiwizować wiadomości",
+    "load_snapshot_failed": "Nie udało się załadować skrzynki"
+  },
+  "success": {
+    "message_sent": "Wiadomość wysłana pomyślnie",
+    "message_archived": "Wiadomość zarchiwizowana pomyślnie",
+    "message_deleted": "Wiadomość usunięta pomyślnie"
+  }
+}

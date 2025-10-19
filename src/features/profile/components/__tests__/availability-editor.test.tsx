@@ -19,7 +19,9 @@ import { AvailabilityEditor } from "../availability-editor";
 
 // Helper to get a slot element.
 const getSlot = (day: string, intervalIndex: number) => {
-  const dayRow = screen.getByText(day.slice(0, 3)).parentElement;
+  // Convert day name to proper format (capitalize first letter)
+  const formattedDay = day.charAt(0).toUpperCase() + day.slice(1, 3);
+  const dayRow = screen.getByText(formattedDay).parentElement;
   if (!dayRow) throw new Error(`Day row for ${day} not found`);
   const grid = dayRow.querySelector("[style*='grid-template-columns']");
   if (!grid) throw new Error(`Grid for ${day} not found`);
@@ -30,7 +32,7 @@ const getSlot = (day: string, intervalIndex: number) => {
 describe("AvailabilityEditor", () => {
   it("renders all days and time labels", () => {
     render(<AvailabilityEditor value={defaultAvailabilityData} onChange={() => {}} />);
-    expect(screen.getByText("sun")).toBeInTheDocument();
+    expect(screen.getByText("Sun")).toBeInTheDocument();
   });
 
   it("selects a single slot on click", () => {

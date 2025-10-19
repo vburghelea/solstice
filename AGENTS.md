@@ -118,6 +118,7 @@ export const myServerFn = createServerFn({ method: "POST" })
 - `pnpm test:coverage` - Generate test coverage report
 - `pnpm db` - Run Drizzle Kit database commands
 - `pnpm auth:generate` - Generate auth schema from config
+- `pnpm i18n:generate-types` - Generate TypeScript types from translation JSON files
 - `pnpm docs:reference` - Generate TypeDoc API documentation
 - `pnpm docs:erd` - Generate database ERD diagrams from schema
 - `pnpm docs:all` - Run all documentation generation
@@ -411,6 +412,46 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    });
    ```
 
+8. **Internationalization (i18n) Considerations**:
+   - **Error Messages**: Server functions should return translation keys for user-facing errors
+   - **Validation Messages**: Use structured error responses that can be translated
+   - **Language Context**: Access user's language preference via request context when needed
+   - **Date/Number Formatting**: Server should return raw data; client handles localization
+
+   **Example - i18n-aware server function:**
+
+   ```typescript
+   export const createEvent = createServerFn({ method: "POST" })
+     .validator(createEventSchema.parse)
+     .handler(async ({ data }) => {
+       try {
+         // Server logic here
+         return { success: true, eventId: newEvent.id };
+       } catch (error) {
+         // Return translation keys for client-side translation
+         return {
+           success: false,
+           error: {
+             key: "events.create.failed",
+             defaultMessage: "Failed to create event",
+           },
+         };
+       }
+     });
+   ```
+
+   **Example - Client-side translation handling:**
+
+   ```typescript
+   const { t } = useTypedTranslation();
+   const result = await createEvent({ data: eventData });
+
+   if (!result.success) {
+     // Use translation key with fallback
+     toast.error(t(result.error.key, result.error.defaultMessage));
+   }
+   ```
+
 ### Best Practices for Type Safety
 
 1. **Avoid @ts-expect-error**:
@@ -433,6 +474,189 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    - Use validation at runtime boundaries
    - Test error cases to ensure validation works
 
+## Internationalization (i18n) Development Guidelines
+
+### Core Principles
+
+- **Real Strings Only**: Always extract actual user-facing strings from the codebase, never create generic placeholder strings
+- **Feature-Based Organization**: Structure translations to match `src/features/` directory structure
+- **Type Safety**: Use TypeScript with Zod validation for all form inputs and server functions
+- **User-Friendly Language**: Write clear, concise, action-oriented text that users understand
+
+### String Extraction Process
+
+1. **Audit Feature Files**: Read through actual component files in `src/features/[feature]/`
+2. **Extract Real Strings**: Focus on UI text that users will see (buttons, labels, messages, errors, status)
+3. **Organize by Component**: Group strings by component (e.g., `form.fields`, `card.actions`, `validation.errors`)
+4. **Categorize by Type**: Separate into buttons, labels, messages, errors, status, descriptions
+5. **Use Extracted Placeholders**: Keep original placeholder text from actual forms
+
+### Required Namespaces
+
+- **admin** - Admin dashboard, user management, insights, feature flags
+- **campaigns** - Campaign creation, management, participation
+- **events** - Event creation, management, attendance
+- **games** - Game listings, details, reviews, applications, invitations
+- **membership** - Membership plans, billing, subscriptions
+- **settings** - User settings, preferences, account management
+- **profile** - User profile management and preferences
+- **teams** - Team creation and management
+- **forms** - Form validation and input labels
+- **errors** - Error messages and error pages
+- **common** - Shared UI elements, buttons, status messages
+- **navigation** - Navigation menus, breadcrumbs, links
+
+### Dynamic Type Generation
+
+The project uses automatic type generation for translation keys to ensure type safety without manual maintenance:
+
+```bash
+# Generate TypeScript types from JSON translation files
+pnpm i18n:generate-types
+```
+
+This command:
+
+- Reads all JSON translation files from `src/lib/i18n/locales/en/`
+- Generates TypeScript types in `src/lib/i18n/generated-types.ts`
+- Creates 1,599+ type-safe translation keys automatically
+- Updates `AllTranslationKeys` and namespace-specific types
+
+**Benefits:**
+
+- Zero maintenance overhead for type definitions
+- Full IDE autocomplete and error checking
+- Compile-time validation of translation keys
+- Automatic detection of missing or unused keys
+
+### i18n-Specific Type Safety Guidelines
+
+1. **Translation Keys**: Use auto-generated types for translation keys in your components:
+
+   ```typescript
+   // Import auto-generated types
+   import { AllTranslationKeys, EventsTranslationKeys } from "~/lib/i18n/types";
+
+   // Use typed translation hook
+   const { t } = useTypedTranslation<"events">();
+   const title = t("create.title"); // Fully typed with autocomplete
+   ```
+
+2. **Server Function Error Handling**: Return structured error responses with translation keys:
+
+   ```typescript
+   export const updateEvent = createServerFn({ method: "POST" })
+     .validator(updateEventSchema.parse)
+     .handler(async ({ data }) => {
+       try {
+         // Update logic
+         return { success: true, event: updatedEvent };
+       } catch (error) {
+         return {
+           success: false,
+           error: {
+             key: "events.update.failed",
+             context: { eventId: data.id },
+           },
+         };
+       }
+     });
+   ```
+
+3. **Form Validation with i18n**: Use translation-aware validation:
+
+   ```typescript
+   const eventSchema = z.object({
+     name: z.string().min(1, {
+       message: "validation.events.name_required",
+     }),
+     date: z.string().refine(isValidDate, {
+       message: "validation.events.date_invalid",
+     }),
+   });
+   ```
+
+4. **Component Implementation Pattern**:
+
+   ```typescript
+   // Import typed translation hook
+   import { useTypedTranslation } from '~/hooks/useTypedTranslation';
+
+   const CreateEventForm = () => {
+     const { t } = useTypedTranslation('events');
+
+     return (
+       <form>
+         <h2>{t('create.title')}</h2>
+         <ValidatedInput
+           label={t('fields.name')}
+           placeholder={t('fields.name_placeholder')}
+         />
+         <Button type="submit">
+           {t('buttons.create_event')}
+         </Button>
+       </form>
+     );
+   };
+   ```
+
+### Implementation Checklist
+
+When adding i18n to new features:
+
+- ✅ Extract all user-facing strings from components
+- ✅ Organize translations into appropriate namespaces
+- ✅ Use translation keys instead of hardcoded strings
+- ✅ Implement typed translation hooks
+- ✅ Return translation keys from server functions for errors
+- ✅ Test with different languages
+- ✅ Update documentation with new namespaces
+- ✅ Run `pnpm check-types` to ensure type safety
+- ✅ Copy locale files to public: `cp -rf src/lib/i18n/locales/* public/locales/`
+
+### File Organization
+
+**Locale Files Structure:**
+
+```
+src/lib/i18n/locales/
+├── en/                          # English (default)
+│   ├── admin.json              # Admin dashboard translations
+│   ├── auth.json               # Authentication translations
+│   ├── campaigns.json          # Campaign translations
+│   ├── common.json             # Common UI elements
+│   ├── errors.json             # Error messages
+│   ├── events.json             # Event translations
+│   ├── forms.json              # Form validation and labels
+│   ├── games.json              # Game-related translations
+│   ├── membership.json         # Membership translations
+│   ├── navigation.json         # Navigation elements
+│   ├── player.json             # Player profile translations
+│   ├── profile.json            # User profile translations
+│   ├── settings.json           # Settings translations
+│   └── teams.json              # Team translations
+├── de/                          # German translations
+│   ├── admin.json
+│   ├── auth.json
+│   └── ... (same structure as en/)
+└── pl/                          # Polish translations
+    ├── admin.json
+    ├── auth.json
+    └── ... (same structure as en/)
+```
+
+**Feature Organization:**
+
+```
+src/features/[feature]/
+├── components/
+│   ├── [component].tsx          # Uses translation keys
+│   └── [component].test.tsx     # Tests with different locales
+├── [feature].schemas.ts         # Zod schemas with translation error messages
+├── [feature].queries.ts         # Server functions returning translation keys
+└── [feature].mutations.ts       # Server functions returning translation keys
+```
+
 ### Common Tasks
 
 - **Add a new page**: Create file in `src/routes/`
@@ -448,6 +672,16 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
   2. Use `.validator(schema.parse)` in the server function
   3. Define proper return types
   4. Handle errors with typed error responses
+- **Add internationalization to a feature**:
+  1. Extract all user-facing strings from components
+  2. Add translation keys to appropriate namespace files in `src/lib/i18n/locales/en/[namespace].json`
+  3. Create corresponding translations in `src/lib/i18n/locales/de/[namespace].json` and `src/lib/i18n/locales/pl/[namespace].json`
+  4. Generate TypeScript types: `pnpm i18n:generate-types`
+  5. Use `useTypedTranslation()` hook for typed translations
+  6. Update server functions to return translation keys for errors
+  7. Update Zod schemas with translation error messages
+  8. Test with different languages
+  9. Copy locale files to public: `cp -rf src/lib/i18n/locales/* public/locales/`
 
 ### User added context:
 

@@ -17,6 +17,7 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 import { AdminInsightsDashboard } from "~/features/admin/components/admin-insights-dashboard";
 import { useAdminInsights } from "~/features/admin/insights/admin-insights.queries";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminOverviewRoute,
@@ -52,6 +53,7 @@ function OverviewSkeleton() {
 }
 
 function AdminOverview() {
+  const { t } = useAdminTranslation();
   const { data, isLoading } = useAdminInsights({ windowDays: 14 });
 
   if (isLoading && !data) {
@@ -64,12 +66,9 @@ function AdminOverview() {
     <div className="token-stack-xl">
       <div className="token-stack-xs">
         <h2 className="text-heading-sm text-foreground font-semibold">
-          Platform governance cockpit
+          {t("overview.title")}
         </h2>
-        <p className="text-body-sm text-muted-strong">
-          The Admin workspace surfaces live insights, role coverage, and rollout controls
-          tailored to the stewardship remit.
-        </p>
+        <p className="text-body-sm text-muted-strong">{t("overview.subtitle")}</p>
       </div>
       <div className="token-gap-md grid gap-4 md:grid-cols-2">
         {kpis.map((kpi) => (
@@ -98,66 +97,69 @@ function AdminOverview() {
         ))}
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-xs">
-            <CardTitle className="text-heading-xs">User governance</CardTitle>
+            <CardTitle className="text-heading-xs">
+              {t("overview.cards.user_governance.title")}
+            </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Review memberships, enforce MFA, and audit high-sensitivity roles in one
-              pane of glass.
+              {t("overview.cards.user_governance.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-xs">
             <div className="text-body-sm text-muted-foreground flex items-center gap-2">
               <UsersIcon className="size-4" aria-hidden />
-              <span>Launch the directory for detailed controls.</span>
+              <span>{t("overview.cards.user_governance.description_detail")}</span>
             </div>
             <Link
               to="/admin/users"
               className="text-body-sm text-primary inline-flex items-center gap-2"
             >
-              Open user governance
+              {t("overview.cards.user_governance.link_text")}
               <ArrowRightIcon className="size-4" aria-hidden />
             </Link>
           </CardContent>
         </Card>
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-xs">
-            <CardTitle className="text-heading-xs">Feature rollouts</CardTitle>
+            <CardTitle className="text-heading-xs">
+              {t("overview.cards.feature_rollouts.title")}
+            </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Toggle persona previews and beta pathways to coordinate phased releases with
-              confidence.
+              {t("overview.cards.feature_rollouts.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-xs">
             <div className="text-body-sm text-muted-foreground flex items-center gap-2">
               <ShieldCheckIcon className="size-4" aria-hidden />
-              <span>Drive safe experimentation without redeploying.</span>
+              <span>{t("overview.cards.feature_rollouts.description_detail")}</span>
             </div>
             <Link
               to="/admin/feature-flags"
               className="text-body-sm text-primary inline-flex items-center gap-2"
             >
-              Manage feature flags
+              {t("overview.cards.feature_rollouts.link_text")}
               <ArrowRightIcon className="size-4" aria-hidden />
             </Link>
           </CardContent>
         </Card>
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-xs">
-            <CardTitle className="text-heading-xs">Security posture</CardTitle>
+            <CardTitle className="text-heading-xs">
+              {t("overview.cards.security_posture.title")}
+            </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Review incidents, guardrails, and audit logs tailored for the admins'
-              stewardship remit.
+              {t("overview.cards.security_posture.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-xs">
             <div className="text-body-sm text-muted-foreground flex items-center gap-2">
               <ShieldAlertIcon className="size-4" aria-hidden />
-              <span>Confirm safeguards before adjusting privileged access.</span>
+              <span>{t("overview.cards.security_posture.description_detail")}</span>
             </div>
             <Link
               to="/admin/security"
               className="text-body-sm text-primary inline-flex items-center gap-2"
             >
-              Open security center
+              {t("overview.cards.security_posture.link_text")}
               <ArrowRightIcon className="size-4" aria-hidden />
             </Link>
           </CardContent>
@@ -166,10 +168,11 @@ function AdminOverview() {
       <div className="token-stack-sm">
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-xs">
-            <CardTitle className="text-heading-xs">Live insights preview</CardTitle>
+            <CardTitle className="text-heading-xs">
+              {t("overview.cards.live_insights_preview.title")}
+            </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Streamlined metrics keep admins oriented before diving into the full
-              console.
+              {t("overview.cards.live_insights_preview.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>

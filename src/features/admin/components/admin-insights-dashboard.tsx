@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import {
   ActivitySquareIcon,
   AlertTriangleIcon,
@@ -8,6 +8,8 @@ import {
   ShieldAlertIcon,
 } from "lucide-react";
 import { useMemo } from "react";
+import { SupportedLanguage } from "~/lib/i18n/config";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -19,6 +21,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 import {
@@ -139,7 +142,13 @@ function InsightTile({ kpi }: { kpi: AdminInsightKpi }) {
   );
 }
 
-function PersonaImpactRow({ impact }: { impact: PersonaImpact }) {
+function PersonaImpactRow({
+  impact,
+  t,
+}: {
+  impact: PersonaImpact;
+  t: (key: string, params?: Record<string, string | number>) => string;
+}) {
   const iconMap: Record<PersonaImpact["personaId"], string> = {
     visitor: "🧭",
     player: "🎮",
@@ -175,22 +184,30 @@ function PersonaImpactRow({ impact }: { impact: PersonaImpact }) {
         </Badge>
         <span className="text-body-xs text-muted-foreground">
           {impact.direction === "flat"
-            ? "Steady"
+            ? t("insights.status.steady")
             : impact.direction === "up"
-              ? "Trending up"
-              : "Needs attention"}
+              ? t("insights.status.trending_up")
+              : t("insights.status.needs_attention")}
         </span>
       </div>
     </div>
   );
 }
 
-function IncidentRow({ incident }: { incident: AdminIncident }) {
+function IncidentRow({
+  incident,
+  t,
+  currentLanguage,
+}: {
+  incident: AdminIncident;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  currentLanguage: SupportedLanguage;
+}) {
   const duration = incident.durationMinutes
-    ? `${incident.durationMinutes} min`
+    ? t("insights.incidents.duration.minutes", { minutes: incident.durationMinutes })
     : incident.finishedAt
-      ? "< 1 min"
-      : "In progress";
+      ? t("insights.incidents.duration.less_than_minute")
+      : t("insights.incidents.duration.in_progress");
   return (
     <div className="border-border token-gap-sm rounded-lg border p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -216,15 +233,24 @@ function IncidentRow({ incident }: { incident: AdminIncident }) {
         {incident.httpStatus ? (
           <>
             <span aria-hidden>•</span>
-            <span>HTTP {incident.httpStatus}</span>
+            <span>
+              {t("insights.incidents.http_status", { status: incident.httpStatus })}
+            </span>
           </>
         ) : null}
         {incident.finishedAt ? (
           <>
             <span aria-hidden>•</span>
             <span>
-              Resolved{" "}
-              {formatDistanceToNow(new Date(incident.finishedAt), { addSuffix: true })}
+              {t("insights.incidents.resolved", {
+                time: formatDistanceToNowLocalized(
+                  new Date(incident.finishedAt),
+                  currentLanguage,
+                  {
+                    addSuffix: true,
+                  },
+                ),
+              })}
             </span>
           </>
         ) : null}
@@ -233,13 +259,23 @@ function IncidentRow({ incident }: { incident: AdminIncident }) {
   );
 }
 
-function AlertRow({ alert }: { alert: AdminAlert }) {
+function AlertRow({
+  alert,
+  t,
+  currentLanguage,
+}: {
+  alert: AdminAlert;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  currentLanguage: SupportedLanguage;
+}) {
   return (
     <div className={cn("token-stack-xs rounded-lg border p-3", alertTone[alert.status])}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-body-sm font-semibold">{alert.name}</p>
         <Badge variant="outline" className="bg-background/20 border-transparent">
-          {alert.enabled ? "Active" : "Paused"}
+          {alert.enabled
+            ? t("insights.alerts.status.active")
+            : t("insights.alerts.status.paused")}
         </Badge>
       </div>
       <p className="text-body-xs opacity-80">{alert.threshold}</p>
@@ -252,14 +288,21 @@ function AlertRow({ alert }: { alert: AdminAlert }) {
           <>
             <span aria-hidden>•</span>
             <span>
-              Triggered{" "}
-              {formatDistanceToNow(new Date(alert.lastTriggeredAt), { addSuffix: true })}
+              {t("insights.alerts.triggered", {
+                time: formatDistanceToNowLocalized(
+                  new Date(alert.lastTriggeredAt),
+                  currentLanguage,
+                  {
+                    addSuffix: true,
+                  },
+                ),
+              })}
             </span>
           </>
         ) : (
           <>
             <span aria-hidden>•</span>
-            <span>Awaiting first trigger</span>
+            <span>{t("insights.alerts.awaiting_first_trigger")}</span>
           </>
         )}
       </div>
@@ -268,8 +311,10 @@ function AlertRow({ alert }: { alert: AdminAlert }) {
 }
 
 export function AdminInsightsDashboard() {
+  const { t, currentLanguage } = useAdminTranslation();
   const { data, isLoading, isError, error, refetch, isRefetching } = useAdminInsights({
     refetchOnWindowFocus: false,
+    language: currentLanguage,
   });
 
   if (isLoading || !data) {
@@ -282,15 +327,17 @@ export function AdminInsightsDashboard() {
         <CardHeader className="token-stack-sm">
           <div className="token-gap-xs flex items-center gap-2">
             <AlertTriangleIcon className="text-destructive size-5" aria-hidden />
-            <CardTitle className="text-heading-sm">Unable to load insights</CardTitle>
+            <CardTitle className="text-heading-sm">
+              {t("insights.errors.unable_to_load")}
+            </CardTitle>
           </div>
           <CardDescription className="text-body-sm text-destructive">
-            {error?.message ?? "We couldn't reach the governance analytics service."}
+            {error?.message ?? t("insights.errors.error_message")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={() => refetch()} variant="secondary">
-            Retry
+            {t("insights.buttons.retry")}
           </Button>
         </CardContent>
       </Card>
@@ -304,14 +351,20 @@ export function AdminInsightsDashboard() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="token-stack-xs">
           <p className="text-body-xs text-muted-foreground">
-            Updated {formatDistanceToNow(data.generatedAt, { addSuffix: true })}
+            {t("insights.subtitle", {
+              time: formatDistanceToNowLocalized(data.generatedAt, currentLanguage, {
+                addSuffix: true,
+              }),
+            })}
           </p>
           <h2 className="text-heading-sm text-foreground font-semibold">
-            Governance performance (last {data.windowDays} days)
+            {t("insights.title", { days: data.windowDays })}
           </h2>
         </div>
         <Button onClick={() => refetch()} variant="outline" disabled={isRefetching}>
-          {isRefetching ? "Refreshing…" : "Refresh data"}
+          {isRefetching
+            ? t("insights.buttons.refreshing")
+            : t("insights.buttons.refresh")}
         </Button>
       </div>
       <div className="token-gap-md grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -322,9 +375,11 @@ export function AdminInsightsDashboard() {
       <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-sm">
-            <CardTitle className="text-heading-sm">Incident timeline</CardTitle>
+            <CardTitle className="text-heading-sm">
+              {t("insights.sections.incident_timeline.title")}
+            </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Automated crawlers and manual escalations surfaced these events for review.
+              {t("insights.sections.incident_timeline.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">
@@ -335,16 +390,21 @@ export function AdminInsightsDashboard() {
                   aria-hidden
                 />
                 <p className="text-body-sm text-foreground font-semibold">
-                  No incidents in this window
+                  {t("insights.sections.incident_timeline.no_incidents")}
                 </p>
                 <p className="text-body-sm text-muted-strong">
-                  Uptime has held steady. Keep proactive alerts armed as safeguards.
+                  {t("insights.sections.incident_timeline.no_incidents_description")}
                 </p>
               </div>
             ) : (
               <div className="token-stack-sm">
                 {data.incidents.map((incident) => (
-                  <IncidentRow key={incident.id} incident={incident} />
+                  <IncidentRow
+                    key={incident.id}
+                    incident={incident}
+                    t={t}
+                    currentLanguage={currentLanguage}
+                  />
                 ))}
               </div>
             )}
@@ -352,24 +412,32 @@ export function AdminInsightsDashboard() {
         </Card>
         <Card className="bg-surface-elevated border-subtle">
           <CardHeader className="token-stack-sm">
-            <CardTitle className="text-heading-sm">Live alerting</CardTitle>
+            <CardTitle className="text-heading-sm">
+              {t("insights.sections.live_alerting.title")}
+            </CardTitle>
             <CardDescription className="text-body-sm text-muted-strong">
-              Channel routing and thresholds designed for the admin governance guardrails.
+              {t("insights.sections.live_alerting.description")}
             </CardDescription>
           </CardHeader>
           <CardContent className="token-stack-sm">
             {data.alerts.map((alert) => (
-              <AlertRow key={alert.id} alert={alert} />
+              <AlertRow
+                key={alert.id}
+                alert={alert}
+                t={t}
+                currentLanguage={currentLanguage}
+              />
             ))}
           </CardContent>
         </Card>
       </div>
       <Card className="bg-surface-elevated border-subtle">
         <CardHeader className="token-stack-sm">
-          <CardTitle className="text-heading-sm">Persona impact pulse</CardTitle>
+          <CardTitle className="text-heading-sm">
+            {t("insights.sections.persona_impact.title")}
+          </CardTitle>
           <CardDescription className="text-body-sm text-muted-strong">
-            Cross-role snapshots highlight how governance decisions ripple through the
-            platform.
+            {t("insights.sections.persona_impact.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="token-gap-md">
@@ -385,17 +453,17 @@ export function AdminInsightsDashboard() {
                 </Badge>
                 <span className="text-body-xs text-muted-foreground">
                   {firstPersona.direction === "up"
-                    ? "Momentum building"
+                    ? t("insights.status.momentum_building")
                     : firstPersona.direction === "down"
-                      ? "Requires intervention"
-                      : "Holding steady"}
+                      ? t("insights.status.requires_intervention")
+                      : t("insights.status.holding_steady")}
                 </span>
               </div>
             </div>
           ) : null}
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {otherPersonas.map((impact) => (
-              <PersonaImpactRow key={impact.personaId} impact={impact} />
+              <PersonaImpactRow key={impact.personaId} impact={impact} t={t} />
             ))}
           </div>
         </CardContent>

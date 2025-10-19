@@ -21,6 +21,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 
 interface InviteParticipantsProps {
   campaignId: string;
@@ -31,6 +32,7 @@ export function InviteParticipants({
   campaignId,
   currentParticipants,
 }: InviteParticipantsProps) {
+  const { t } = useCampaignsTranslation();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [emailInvite, setEmailInvite] = useState("");
@@ -50,7 +52,7 @@ export function InviteParticipants({
   const inviteMutation = useMutation({
     mutationFn: rlInviteToCampaign,
     onSuccess: () => {
-      toast.success("Participant invited successfully!");
+      toast.success(t("messages.participant_invited_success"));
       setSearchTerm("");
       setEmailInvite("");
       setInviteeName("");
@@ -58,7 +60,7 @@ export function InviteParticipants({
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
     },
     onError: (error) => {
-      toast.error(`Failed to invite participant: ${error.message}`);
+      toast.error(`${t("errors.failed_to_invite_participant")}: ${error.message}`);
     },
   });
 
@@ -77,15 +79,15 @@ export function InviteParticipants({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Invite Participants</CardTitle>
-        <CardDescription>Search for users or invite them by email.</CardDescription>
+        <CardTitle>{t("titles.invite_participants")}</CardTitle>
+        <CardDescription>{t("descriptions.invite_participants")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="user-search">Search Users</Label>
+          <Label htmlFor="user-search">{t("labels.search_users")}</Label>
           <Input
             id="user-search"
-            placeholder="Search by name or email (4+ chars)"
+            placeholder={t("placeholders.search_users")}
             value={searchTerm}
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               setSearchTerm(event.target.value)
@@ -93,7 +95,7 @@ export function InviteParticipants({
           />
           {isSearchingUsers && debouncedSearchTerm.length >= 4 && (
             <p className="text-muted-foreground flex items-center text-sm">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Searching...
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("status.searching")}
             </p>
           )}
           {searchResults?.success && searchResults.data.length > 0 && (
@@ -140,16 +142,18 @@ export function InviteParticipants({
             searchResults.data.length === 0 &&
             debouncedSearchTerm.length >= 4 &&
             !isSearchingUsers && (
-              <p className="text-muted-foreground mt-2 text-sm">No users found.</p>
+              <p className="text-muted-foreground mt-2 text-sm">
+                {t("status.no_users_found")}
+              </p>
             )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email-invite">Invite by Email</Label>
+          <Label htmlFor="email-invite">{t("labels.invite_by_email")}</Label>
           <div className="space-y-2">
             <Input
               id="invitee-name"
-              placeholder="Enter name"
+              placeholder={t("placeholders.enter_name")}
               value={inviteeName}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setInviteeName(event.target.value)
@@ -158,7 +162,7 @@ export function InviteParticipants({
             <Input
               id="email-invite"
               type="email"
-              placeholder="Enter email address"
+              placeholder={t("placeholders.enter_email")}
               value={emailInvite}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setEmailInvite(event.target.value)
@@ -175,7 +179,7 @@ export function InviteParticipants({
               {inviteMutation.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                "Invite"
+                t("buttons.invite")
               )}
             </Button>
           </div>

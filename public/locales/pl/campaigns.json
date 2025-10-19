@@ -1,0 +1,333 @@
+{
+  "buttons": {
+    "view_campaign": "Zobacz kampanię",
+    "create_campaign": "Utwórz kampanię",
+    "update_campaign": "Zaktualizuj kampanię",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "invite": "Zaproś",
+    "revoke": "Wycofaj",
+    "accept": "Przyjmij",
+    "reject": "Odrzuć",
+    "accepting": "Przyjmowanie...",
+    "rejecting": "Odrzucanie...",
+    "save_session_zero_details": "Zapisz szczegóły Sesji Zero"
+  },
+  "labels": {
+    "campaign_name": "Nazwa kampanii",
+    "description": "Opis",
+    "game_system": "System gry",
+    "language": "Język",
+    "visibility": "Widoczność",
+    "participants": "Uczestnicy",
+    "game_master": "Mistrz Gry",
+    "time_of_day": "Pora dnia",
+    "session_duration": "Czas trwania sesji",
+    "recurrence": "Częstotliwość",
+    "campaign_status": "Status kampanii",
+    "expected_duration": "Przewidywany czas trwania",
+    "max_players": "Maks. graczy",
+    "location": "Miejsce spotkań",
+    "safety_tools": "Narzędzia bezpieczeństwa",
+    "table_rules": "Zasady przy stole",
+    "session_zero": "Sesja Zero",
+    "character_creation": "Tworzenie postaci",
+    "campaign_expectations": "Oczekiwania względem kampanii",
+    "table_expectations": "Oczekiwania przy stole",
+    "safety_rules": "Zasady bezpieczeństwa",
+    "content_warnings": "Ostrzeżenia o treści",
+    "search_users": "Szukaj użytkowników",
+    "invite_by_email": "Zaproś przez e-mail",
+    "pending_invitations": "Oczekujące zaproszenia"
+  },
+  "participants_list": {
+    "participants_title": "Uczestnicy ({{count}})",
+    "no_participants": "Brak uczestników.",
+    "owner_label": "(organizator)",
+    "role_status": "({{role}} - {{status}})",
+    "removing": "Usuwanie...",
+    "remove": "Usuń",
+    "pending_applications_title": "Oczekujące zgłoszenia ({{count}})",
+    "status_label": "({{status}})",
+    "approving": "Zatwierdzanie...",
+    "approve": "Zatwierdź",
+    "rejecting": "Odrzucanie...",
+    "reject": "Odrzuć",
+    "banned_title": "Zablokowani w kampanii ({{count}})",
+    "allowing": "Zezwalanie...",
+    "allow": "Zezwól"
+  },
+  "status": {
+    "connections_teammates": "Znajomi & Drużyna",
+    "unknown_user": "Nieznany użytkownik",
+    "no_pending_invitations": "Brak oczekujących zaproszeń.",
+    "no_campaigns_found": "Nie znaleziono kampanii. Stwórz jakąś!",
+    "searching": "Wyszukiwanie...",
+    "no_users_found": "Nie znaleziono użytkowników.",
+    "weekly": "Co tydzień",
+    "bi-weekly": "Co dwa tygodnie",
+    "monthly": "Co miesiąc",
+    "one_shot": "Jednorazowa",
+    "ongoing": "Ciągła"
+  },
+  "messages": {
+    "invitation_rejected_success": "Zaproszenie zostało pomyślnie odrzucone!",
+    "invitation_response_recorded": "Odpowiedź na zaproszenie została zapisana.",
+    "participant_invited_success": "Uczestnik został pomyślnie zaproszony!",
+    "invitation_revoked_success": "Zaproszenie zostało pomyślnie cofnięte!",
+    "campaign_created_success": "Kampania została pomyślnie utworzona!",
+    "campaign_updated_success": "Kampania została pomyślnie zaktualizowana!",
+    "participant_removed_success": "Uczestnik został pomyślnie usunięty!",
+    "participant_ban_removed_success": "Blokada uczestnika została pomyślnie zdjęta!",
+    "application_status_updated_success": "Status zgłoszenia został pomyślnie zaktualizowany!"
+  },
+  "errors": {
+    "failed_to_reject_invitation": "Nie udało się odrzucić zaproszenia",
+    "failed_to_respond_invitation": "Nie udało się odpowiedzieć na zaproszenie.",
+    "unexpected_error": "Wystąpił nieoczekiwany błąd.",
+    "failed_to_invite_participant": "Nie udało się zaprosić uczestnika",
+    "failed_to_revoke_invitation": "Nie udało się cofnąć zaproszenia",
+    "failed_to_create_campaign": "Nie udało się utworzyć kampanii",
+    "failed_to_update_campaign": "Nie udało się zaktualizować kampanii",
+    "participant_remove_failed": "Nie udało się usunąć uczestnika: {{message}}",
+    "participant_ban_remove_failed": "Nie udało się zdjąć blokady uczestnika: {{message}}",
+    "application_update_failed": "Nie udało się zaktualizować statusu zgłoszenia: {{message}}"
+  },
+  "descriptions": {
+    "schedule_details": "Kiedy i jak często spotyka się twoja kampania.",
+    "location_details": "Gdzie odbywa się twoja kampania.",
+    "character_creation_process": "Jak będą tworzone postacie.",
+    "campaign_expectations": "Czego gracze mogą oczekiwać od tej kampanii.",
+    "table_expectations": "Zasady i oczekiwania dla stołu gry.",
+    "campaign_overview": "Podstawy, których gracze potrzebują, aby zrozumieć twoją trwającą historię.",
+    "location": "Poinformuj graczy, gdzie będzie spotykać się twoja grupa.",
+    "participant_requirements": "Opcjonalne wytyczne, które pomogą graczom ocenić, czy kampania jest dla nich odpowiednia.",
+    "safety_table_culture": "Opcjonalne oczekiwania, które ustalą ton dla waszej wspólnej gry.",
+    "visibility_options": "Opcje widoczności: Publiczne (widoczne dla wszystkich), Połączenia & Zespoły (widoczne dla twoich obserwujących, osób które obserwujesz i aktywnych członków zespołu), Prywatne (widoczne tylko dla zaproszonych graczy)",
+    "manage_invitations": "Przejrzyj i przetwarzaj oczekujące zaproszenia.",
+    "invite_participants": "Wyszukaj użytkowników lub zaproś ich przez e-mail.",
+    "campaign_invitation": "Zostałeś zaproszony do tej kampanii. Przyjmij lub odrzuć zaproszenie."
+  },
+  "form_sections": {
+    "campaign_overview": "Przegląd kampanii",
+    "schedule_details": "Szczegóły harmonogramu",
+    "participant_requirements": "Wymagania dla uczestników",
+    "location": "Lokalizacja",
+    "safety_table_culture": "Bezpieczeństwo & kultura przy stole",
+    "session_zero": "Sesja Zero",
+    "character_creation": "Tworzenie postaci",
+    "campaign_expectations": "Oczekiwania względem kampanii",
+    "table_expectations": "Oczekiwania przy stole"
+  },
+  "visibility_options": {
+    "description": "Opcje widoczności: Publiczne (widoczne dla wszystkich), Połączenia & Zespoły (widoczne dla twoich obserwujących, osób które obserwujesz i aktywnych członków zespołu), Prywatne (widoczne tylko dla zaproszonych graczy)"
+  },
+  "safety_options": {
+    "no_alcohol": "Bez alkoholu",
+    "safe_word_required": "Wymagane safeword",
+    "encourage_open_communication": "Zachęcaj do otwartej komunikacji",
+    "lines_veils": "Linie & Woale",
+    "x_card": "Karta X",
+    "script_change": "Zmiana scenariusza"
+  },
+  "invitation_status": {
+    "invited": "Zaproszony"
+  },
+  "default_labels": {
+    "view_campaign": "Zobacz kampanię"
+  },
+  "titles": {
+    "campaign_invitation": "Zaproszenie do kampanii",
+    "invite_participants": "Zaproś uczestników",
+    "manage_invitations": "Zarządzaj zaproszeniami"
+  },
+  "campaign_fields": {
+    "campaign_name": "Nazwa kampanii",
+    "description": "Opis",
+    "game_system_used": "Używany system gry",
+    "recurrence": "Częstotliwość",
+    "time_of_day": "Pora dnia",
+    "session_duration_minutes": "Czas trwania sesji (minuty)",
+    "price_per_session_eur": "Cena za sesję (EUR) (opcjonalnie)",
+    "language": "Język",
+    "visibility": "Widoczność",
+    "address": "Adres",
+    "minimum_players": "Minimum graczy",
+    "maximum_players": "Maksimum graczy",
+    "safety_tool": "Narzędzie bezpieczeństwa",
+    "safety_tool_details_optional": "Szczegóły narzędzia bezpieczeństwa (opcjonalnie)",
+    "player_boundaries_consent_notes_optional": "Granice graczy / Notatki o zgodzie (opcjonalnie)",
+    "no_alcohol": "Bez alkoholu",
+    "safe_word_required": "Wymagane safeword",
+    "encourage_open_communication": "Zachęcaj do otwartej komunikacji"
+  },
+  "placeholders": {
+    "campaign_name_placeholder": "Wprowadź wciągającą nazwę dla twojej planowanej kampanii",
+    "search_and_select_game_system": "Wyszukaj i wybierz system gry, którego chcesz użyć",
+    "select_recurrence": "Wybierz częstotliwość",
+    "time_of_day_placeholder": "np. Wieczorami, Popołudniami",
+    "session_duration_placeholder": "np. 180, 240",
+    "select_language": "Wybierz język",
+    "select_visibility": "Wybierz widoczność",
+    "safety_tool_placeholder": "Jakieś szczegóły dotyczące wybranego narzędzia bezpieczeństwa",
+    "player_boundaries_consent_placeholder": "Jakieś granice lub notatki o zgodzie, o których gracze powinni wiedzieć",
+    "campaign_name": "Wprowadź nazwę kampanii",
+    "description": "Wprowadź opis kampanii",
+    "search_users": "Szukaj po nazwie lub e-mailu (4+ znaki)",
+    "enter_name": "Wprowadź nazwę",
+    "enter_email": "Wprowadź adres e-mail"
+  },
+  "validation_messages": {
+    "campaign_name_required": "Nazwa kampanii to pierwsze, co gracze zobaczą szukając przygody. Spraw, żeby była intrygująca!",
+    "description_required": "Dodaj opis kampanii, który ustali klimat i pokaże graczom, czego mogą się spodziewać.",
+    "game_system_required": "Wybierz system gry dla swojej kampanii.",
+    "recurrence_required": "Wybierz częstotliwość spotkań dla swojej kampanii.",
+    "time_of_day_required": "Określ porę dnia dla sesji twojej kampanii.",
+    "session_duration_required": "Określ typowy czas trwania jednej sesji kampanii.",
+    "language_required": "Wybierz główny język komunikacji w kampanii.",
+    "visibility_required": "Wybierz widoczność, która pomoże ci znaleźć odpowiednie osoby.",
+    "address_required": "Wprowadź adres miejsca, gdzie odbędą się sesje kampanii.",
+    "min_players_required": "Potrzebujemy wiedzieć, ile osób będzie uczestniczyć.",
+    "max_players_required": "Potrzebujemy wiedzieć, ile osób będzie uczestniczyć.",
+    "price_optional": "Jeśli chcesz dodać opłatę za sesję kampanii, określ ją tutaj."
+  },
+  "session_zero": {
+    "campaign_expectations": {
+      "title": "Oczekiwania względem kampanii",
+      "campaign_style": "Styl kampanii (np. High Fantasy, Dark & Gritty)",
+      "game_difficulty": "Trudność gry (np. Zabójcza, Przebaczająca)",
+      "house_rules": "Zasady domowe / Treści homebrew",
+      "leveling_up_method": "Metoda awansowania (PD czy Kamienie milowe)",
+      "campaign_length": "Długość kampanii (np. Jednorazowa, Długoterminowa)"
+    },
+    "table_expectations": {
+      "title": "Oczekiwania przy stole",
+      "food_drinks_policy": "Polityka dotycząca jedzenia i picia",
+      "non_table_activities": "Aktywności niezwiązane ze stołem (np. Używanie telefonu, Rozmowy boczne)",
+      "unannounced_dice_rolls_policy": "Polityka niezapowiedzianych rzutów kośćmi",
+      "pvp_contested_rolls_policy": "Polityka PvP i spornych rzutów",
+      "character_secrets_policy": "Polityka dotycząca sekretów postaci",
+      "player_absences_policy": "Polityka dotycząca nieobecności graczy"
+    },
+    "safety_tools": {
+      "title": "Narzędzia bezpieczeństwa",
+      "encourage_open_communication": "Zachęcaj do otwartej komunikacji",
+      "use_x_card_system": "Używaj systemu Kart X",
+      "x_card_system_details": "Szczegóły systemu Kart X (jeśli dotyczy)",
+      "player_boundaries_consent_discussion": "Dyskusja o granicach graczy i zgodzie"
+    },
+    "character_creation": {
+      "title": "Tworzenie postaci",
+      "character_creation_questions": "Pytania dotyczące tworzenia postaci (np. Poziom startowy, Ekwipunek)",
+      "feats_allowed": "Dozwolone atuty",
+      "stats_determination_method": "Metoda określania statystyk (np. Rzuty, Kupno punktowe)",
+      "character_context_integration": "Kontekst i integracja postaci"
+    },
+    "documented_character_creation_outcome": {
+      "title": "Udokumentowany wynik tworzenia postaci",
+      "final_character_creation_decisions": "Ostateczne decyzje dotyczące tworzenia postaci"
+    }
+  },
+  "my_campaigns": {
+    "title": "Moje kampanie",
+    "subtitle": "Zarządzaj sesjami swoich kampanii",
+    "filter_by_status": "Filtruj po statusie",
+    "filter_by_role": "Filtruj po roli",
+    "create_new_campaign": "Utwórz nową kampanię",
+    "no_campaigns_title": "Brak kampanii",
+    "no_campaigns_subtitle": "Stwórz swoją pierwszą kampanię, by zacząć przygodę!",
+    "participants": "uczestników",
+    "pagination": {
+      "page_info": "Strona {{current}} z {{total}} • {{count}} razem"
+    },
+    "status_labels": {
+      "active": "Aktywna",
+      "completed": "Ukończona",
+      "on_hold": "Wstrzymana",
+      "canceled": "Anulowana"
+    },
+    "role_labels": {
+      "owner": "Organizator",
+      "player": "Uczestnik",
+      "invited": "Zaproszony",
+      "requested": "Aplikujący",
+      "applicant": "Aplikujący"
+    },
+    "errors": {
+      "load_failed": "Nie udało się załadować kampanii."
+    },
+    "list": {
+      "view_button": "Zobacz"
+    }
+  },
+  "detail": {
+    "invalid_campaign_id": "Nieprawidłowy format ID kampanii.",
+    "failed_to_load_campaign": "Nie udało się załadować szczegółów kampanii.",
+    "failed_to_fetch_campaign": "Nie udało się pobrać kampanii",
+    "campaign_not_found": "Nie znaleziono kampanii",
+    "campaign_data_not_found": "Nie znaleziono danych kampanii",
+    "game_session_status_updated": "Status sesji gry został pomyślnie zaktualizowany!",
+    "failed_to_update_game_session_status": "Nie udało się zaktualizować statusu sesji gry",
+    "unexpected_error_updating_game_session": "Wystąpił nieoczekiwany błąd podczas aktualizacji statusu sesji gry",
+    "campaign_updated": "Kampania została pomyślnie zaktualizowana",
+    "failed_to_update_campaign": "Nie udało się zaktualizować kampanii",
+    "unexpected_error_occurred": "Wystąpił nieoczekiwany błąd",
+    "failed_to_fetch_application_status": "Nie udało się pobrać statusu twojego zgłoszenia.",
+    "application_submitted": "Zgłoszenie zostało pomyślnie złożone!",
+    "failed_to_submit_application": "Nie udało się złożyć zgłoszenia.",
+    "unexpected_error_applying": "Wystąpił nieoczekiwany błąd podczas składania zgłoszenia.",
+    "mark_campaign_completed": "Oznacz kampanię jako ukończoną",
+    "cancel_campaign": "Anuluj tę kampanię",
+    "confirm_cancel_campaign": "Czy na pewno chcesz anulować tę kampanię?",
+    "open_session_zero": "Otwórz notatki Sesji Zero",
+    "exit_edit_mode": "Wyjdź z trybu edycji",
+    "edit_campaign_details": "Edytuj szczegóły kampanii",
+    "about_this_campaign": "O tej kampanii",
+    "about_description": "Podsumuj ton, ramy i oczekiwania graczy.",
+    "no_description_provided": "Organizator nie udostępnił jeszcze dodatkowego kontekstu kampanii.",
+    "edit_campaign": "Edytuj kampanię",
+    "edit_description": "Zaktualizuj ogólne szczegóły dla swojej trwającej historii.",
+    "game_sessions": "Sesje gry",
+    "filter_by_status": "Filtruj po statusie",
+    "create_session": "Utwórz sesję",
+    "no_game_sessions_found": "Nie znaleziono sesji gry dla tej kampanii z wybranym statusem.",
+    "view_game": "Zobacz grę",
+    "application_pending": "Twoje zgłoszenie oczekuje na rozpatrzenie.",
+    "application_rejected": "Twoje zgłoszenie zostało odrzucone.",
+    "campaign_logistics": "Logistyka kampanii",
+    "logistics_description": "Utrzymuj wszystkich zgodnych co do rytmu i formy stołu.",
+    "location": "Lokalizacja",
+    "location_shared_after_approval": "Zostanie udostępniona po zatwierdzeniu twojego miejsca.",
+    "not_specified": "Nie określono",
+    "safety_consent": "Bezpieczeństwo & zgoda",
+    "safety_description": "Spójność dla każdej sesji w kampanii.",
+    "applying": "Aplikowanie...",
+    "apply_to_join": "Aplikuj o dołączenie",
+    "price_session": "Cena/sesja"
+  },
+  "validation": {
+    "campaign_name_required": "Nazwa kampanii jest wymagana",
+    "description_required": "Opis jest wymagany"
+  },
+  "create": {
+    "title": "Utwórz nową kampanię",
+    "subtitle": "Skonfiguruj swoją kampanię i zacznij zapraszać graczy",
+    "error_title": "Błąd tworzenia kampanii",
+    "tips": {
+      "title": "Wskazówki do kampanii",
+      "subtitle": "Szybkie przypomnienia, aby pomóc waszemu stołu poczuć się przygotowanym od pierwszego dnia.",
+      "clarify_experience": {
+        "title": "Uściślij doświadczenie",
+        "description": "Użyj swojego opisu, aby zarysować ton, kadencję i oczekiwania, dzięki czemu gracze będą wiedzieć, czy kampania pasuje do ich stylu."
+      },
+      "set_limits_early": {
+        "title": "Ustaw limity stołu wcześniej",
+        "description": "Minimum i maksimum pomagają graczom w samoselekcji. Podziel się, jakich narzędzi bezpieczeństwa używasz i zwróć uwagę na powtarzające się kwestie logistyczne."
+      },
+      "plan_onboarding": {
+        "title": "Zaplanuj wprowadzenie",
+        "description": "Jeśli organizujesz sesję zero, wspomnij, co obejmuje i jakie prace przygotowawcze. To utrzymuje wszystkich na tej samej stronie przed pierwszym rzutem kostką."
+      }
+    }
+  }
+}

@@ -1,7 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ProfileLink } from "~/components/ProfileLink";
@@ -56,6 +55,8 @@ import type {
   RespondToTeamRequestInput,
   UpdateTeamMemberInput,
 } from "~/features/teams/teams.schemas";
+import { usePlayerTranslation } from "~/hooks/useTypedTranslation";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export const Route = createFileRoute("/player/teams/$teamId/members")({
@@ -78,8 +79,9 @@ function TeamMembersPage() {
   const [showAddMember, setShowAddMember] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const { user: currentUser } = useAuth();
+  const { currentLanguage } = usePlayerTranslation();
 
-  const { data: members } = useSuspenseQuery({
+  const { data: members } = useSuspenseQuery<TeamMemberDetails[]>({
     queryKey: ["teamMembers", teamId],
     queryFn: async () => getTeamMembers({ data: { teamId } }),
     initialData: initialMembers,
@@ -460,13 +462,15 @@ function TeamMembersPage() {
                       {member.status === "pending" && (
                         <p className="text-muted-foreground mt-2 text-sm">
                           {member.requestedAt
-                            ? `Join request received ${formatDistanceToNow(
+                            ? `Join request received ${formatDistanceToNowLocalized(
                                 new Date(member.requestedAt),
+                                currentLanguage,
                                 { addSuffix: true },
                               )}.`
                             : member.invitedAt
-                              ? `Invitation sent ${formatDistanceToNow(
+                              ? `Invitation sent ${formatDistanceToNowLocalized(
                                   new Date(member.invitedAt),
+                                  currentLanguage,
                                   { addSuffix: true },
                                 )}${invitedBy?.name ? ` by ${invitedBy.name}` : ""}.`
                               : "Pending response."}

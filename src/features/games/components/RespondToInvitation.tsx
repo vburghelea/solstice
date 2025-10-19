@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/card";
 import { respondToGameInvitation } from "~/features/games/games.mutations";
 import type { GameParticipant } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { OperationResult } from "~/shared/types/common";
 
 interface RespondToInvitationProps {
@@ -17,6 +18,7 @@ interface RespondToInvitationProps {
 }
 
 export function RespondToInvitation({ participant }: RespondToInvitationProps) {
+  const { t } = useGamesTranslation();
   const queryClient = useQueryClient();
 
   const respondMutation = useMutation<
@@ -27,18 +29,20 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
     mutationFn: respondToGameInvitation,
     onSuccess: async (data) => {
       if (data.success) {
-        toast.success("Invitation response recorded.");
+        toast.success(t("messages.invitation_response_recorded"));
         await queryClient.invalidateQueries({ queryKey: ["game", participant.gameId] });
         await queryClient.invalidateQueries({
           queryKey: ["gameApplications", participant.gameId],
         });
         await queryClient.invalidateQueries({ queryKey: ["currentUser"] }); // Invalidate currentUser query
       } else {
-        toast.error(data.errors?.[0]?.message || "Failed to respond to invitation.");
+        toast.error(
+          data.errors?.[0]?.message || t("errors.failed_to_respond_invitation"),
+        );
       }
     },
     onError: (error) => {
-      toast.error(error.message || "An unexpected error occurred.");
+      toast.error(error.message || t("errors.unexpected_error"));
     },
   });
 
@@ -53,10 +57,8 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Game Invitation</CardTitle>
-        <CardDescription>
-          You have been invited to this game. Please accept or reject the invitation.
-        </CardDescription>
+        <CardTitle>{t("titles.game_invitation")}</CardTitle>
+        <CardDescription>{t("descriptions.game_invitation")}</CardDescription>
       </CardHeader>
       <CardContent className="flex gap-4">
         <Button
@@ -66,8 +68,8 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
         >
           {respondMutation.isPending &&
           respondMutation.variables?.data.action === "accept"
-            ? "Accepting..."
-            : "Accept"}
+            ? t("buttons.accepting")
+            : t("buttons.accept")}
         </Button>
         <Button
           onClick={handleReject}
@@ -77,8 +79,8 @@ export function RespondToInvitation({ participant }: RespondToInvitationProps) {
         >
           {respondMutation.isPending &&
           respondMutation.variables?.data.action === "reject"
-            ? "Rejecting..."
-            : "Reject"}
+            ? t("buttons.rejecting")
+            : t("buttons.reject")}
         </Button>
       </CardContent>
     </Card>

@@ -4,9 +4,10 @@ import { z } from "zod";
 
 import { PermissionService } from "~/features/roles/permission.service";
 import { requireAdmin } from "~/lib/auth/utils/admin-check";
+import { tCommon } from "~/lib/i18n/server-translations";
 
 const deleteUserSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
+  userId: z.string().min(1, tCommon("validation.user_id_required")),
 });
 
 export const deleteUser = createServerFn({ method: "POST" })

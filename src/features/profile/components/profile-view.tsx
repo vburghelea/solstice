@@ -24,6 +24,7 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Separator } from "~/components/ui/separator";
 import type { AvailabilityData } from "~/db/schema/auth.schema";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
+import { useProfileTranslation } from "~/hooks/useTypedTranslation";
 import { useCountries } from "~/shared/hooks/useCountries";
 import {
   experienceLevelOptions,
@@ -47,6 +48,7 @@ import { GamePreferencesStep } from "./game-preferences-step";
 const noopAvailabilityChange = () => {};
 
 export function ProfileView() {
+  const { t } = useProfileTranslation();
   const queryClient = useQueryClient();
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const { getCountryName } = useCountries();
@@ -258,20 +260,21 @@ export function ProfileView() {
         // If no changes, just close the form
         if (!hasChanges || Object.keys(dataToSubmit).length === 0) {
           setEditingSection(null);
-          toast.info("No changes were made to your profile.");
+          toast.info(t("errors.no_changes_made"));
           return;
         }
 
         const result = await updateUserProfile({ data: dataToSubmit });
 
         if (result.success) {
-          toast.success("Profile updated successfully");
+          toast.success(t("errors.profile_updated_successfully"));
           await invalidateProfileCaches(queryClient, result.data?.id ?? profile?.id);
           // Only exit edit mode on success
           setEditingSection(null);
         } else {
           // Show error but don't exit edit mode
-          const error = result.errors?.[0]?.message || "Failed to update profile";
+          const error =
+            result.errors?.[0]?.message || t("errors.failed_to_update_profile");
 
           toast.error(error);
           // Don't throw - let form remain interactive
@@ -279,7 +282,7 @@ export function ProfileView() {
       } catch (error) {
         // Network/unexpected errors
         const errorMessage =
-          error instanceof Error ? error.message : "An unexpected error occurred";
+          error instanceof Error ? error.message : t("errors.unexpected_error");
 
         toast.error(errorMessage);
         console.error("Profile update error:", error);
@@ -379,9 +382,7 @@ export function ProfileView() {
     if (!profile) return;
 
     if (form.state.isDirty && editingSection !== null) {
-      toast.info(
-        "Please save or cancel your current changes before editing another section.",
-      );
+      toast.info(t("errors.please_save_or_cancel_current_changes"));
       return;
     }
     if (profile.city) {
@@ -481,7 +482,7 @@ export function ProfileView() {
     return (
       <div className="flex items-center justify-center p-8">
         <LoaderCircle className="h-8 w-8 animate-spin" />
-        <span className="text-muted-foreground ml-2">Loading profile...</span>
+        <span className="text-muted-foreground ml-2">{t("status.loading_profile")}</span>
       </div>
     );
   }
@@ -489,13 +490,15 @@ export function ProfileView() {
   // Handle error state - only show error if we have an error and no successful data
   if (error && !isSuccess && !profile) {
     const errorMessage =
-      profileResult?.errors?.[0]?.message || error?.message || "Failed to load profile";
+      profileResult?.errors?.[0]?.message ||
+      error?.message ||
+      t("errors.failed_to_load_profile");
     return (
       <div className="p-8 text-center">
         <p className="text-muted-foreground">{errorMessage}</p>
         {profileResult?.errors?.[0].code === "VALIDATION_ERROR" && (
           <p className="text-muted-foreground mt-2 text-sm">
-            Please try logging in again
+            {t("errors.please_try_logging_in_again")}
           </p>
         )}
       </div>
@@ -507,7 +510,9 @@ export function ProfileView() {
     return (
       <div className="flex items-center justify-center p-8">
         <LoaderCircle className="h-8 w-8 animate-spin" />
-        <span className="text-muted-foreground ml-2">Loading profile data...</span>
+        <span className="text-muted-foreground ml-2">
+          {t("status.loading_profile_data")}
+        </span>
       </div>
     );
   }
@@ -531,9 +536,9 @@ export function ProfileView() {
                     />
                   ) : null}
                   <div>
-                    <CardTitle>Basic Information</CardTitle>
+                    <CardTitle>{t("basic_information.title")}</CardTitle>
                     <CardDescription>
-                      Your personal details and contact information
+                      {t("basic_information.description")}
                     </CardDescription>
                   </div>
                 </div>
@@ -545,10 +550,10 @@ export function ProfileView() {
                       onClick={() => startEditingSection("basic")}
                       variant="outline"
                       size="sm"
-                      aria-label="Edit Basic Information"
+                      aria-label={t("aria_labels.edit_basic_information")}
                     >
                       <Edit2 className="mr-2 h-4 w-4" />
-                      Edit
+                      {t("buttons.edit")}
                     </Button>
                   )}
                   {editingSection === "basic" && (
@@ -561,7 +566,7 @@ export function ProfileView() {
                         disabled={form.state.isSubmitting}
                       >
                         <X className="mr-2 h-4 w-4" />
-                        Cancel
+                        {t("buttons.cancel")}
                       </Button>
                       <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -577,12 +582,12 @@ export function ProfileView() {
                             {isSubmitting ? (
                               <>
                                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
+                                {t("buttons.saving")}
                               </>
                             ) : (
                               <>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Changes
+                                {t("buttons.save_changes")}
                               </>
                             )}
                           </Button>
@@ -610,9 +615,9 @@ export function ProfileView() {
                       {(field) => (
                         <ValidatedInput
                           field={field}
-                          label="Profile Name"
-                          placeholder="choose a unique username"
-                          description="This name is public and must be unique. Use letters, numbers, periods, underscores, or hyphens."
+                          label={t("labels.profile_name")}
+                          placeholder={t("placeholders.profile_name")}
+                          description={t("descriptions.profile_name")}
                           autoComplete="username"
                           maxLength={30}
                           disableWhileSubmitting={false}
@@ -625,19 +630,19 @@ export function ProfileView() {
                     </form.Field>
                   ) : (
                     <>
-                      <Label>Profile Name</Label>
+                      <Label>{t("labels.profile_name")}</Label>
                       <p className="mt-1 text-sm font-medium">
-                        {profile?.name ?? "Not set"}
+                        {profile?.name ?? t("display.not_set")}
                       </p>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        This name is public and visible to other players.
+                        {t("descriptions.profile_name_public")}
                       </p>
                     </>
                   )}
                 </div>
 
                 <div>
-                  <Label>Email Address</Label>
+                  <Label>{t("labels.email_address")}</Label>
                   <p className="text-muted-foreground mt-1 text-sm">{profile?.email}</p>
                 </div>
 
@@ -647,17 +652,17 @@ export function ProfileView() {
                       {(field) => (
                         <ValidatedSelect
                           field={field}
-                          label="Gender"
-                          placeholder="Select gender"
+                          label={t("form_fields.gender")}
+                          placeholder={t("placeholders.gender")}
                           options={genderOptions}
                         />
                       )}
                     </form.Field>
                   ) : (
                     <>
-                      <Label>Gender</Label>
+                      <Label>{t("labels.gender")}</Label>
                       <p className="text-muted-foreground mt-1 text-sm">
-                        {profile?.gender || "Not specified"}
+                        {profile?.gender || t("display.not_specified")}
                       </p>
                     </>
                   )}
@@ -669,16 +674,16 @@ export function ProfileView() {
                       {(field) => (
                         <ValidatedInput
                           field={field}
-                          label="Pronouns"
-                          placeholder="e.g. he/him, she/her, they/them"
+                          label={t("form_fields.pronouns")}
+                          placeholder={t("placeholders.pronouns")}
                         />
                       )}
                     </form.Field>
                   ) : (
                     <>
-                      <Label>Pronouns</Label>
+                      <Label>{t("labels.pronouns")}</Label>
                       <p className="text-muted-foreground mt-1 text-sm">
-                        {profile?.pronouns || "Not specified"}
+                        {profile?.pronouns || t("display.not_specified")}
                       </p>
                     </>
                   )}
@@ -690,16 +695,16 @@ export function ProfileView() {
                       {(field) => (
                         <ValidatedPhoneInput
                           field={field}
-                          label="Phone Number"
-                          placeholder="+49 1512 3456789"
+                          label={t("form_fields.phone_number")}
+                          placeholder={t("placeholders.phone_number")}
                         />
                       )}
                     </form.Field>
                   ) : (
                     <>
-                      <Label>Phone Number</Label>
+                      <Label>{t("labels.phone_number")}</Label>
                       <p className="text-muted-foreground mt-1 text-sm">
-                        {formatPhoneNumber(profile?.phone) || "Not specified"}
+                        {formatPhoneNumber(profile?.phone) || t("display.not_specified")}
                       </p>
                     </>
                   )}
@@ -709,14 +714,18 @@ export function ProfileView() {
                   {editingSection === "basic" ? (
                     <form.Field name="city">
                       {(field) => (
-                        <ValidatedInput field={field} label="City" placeholder="Berlin" />
+                        <ValidatedInput
+                          field={field}
+                          label={t("form_fields.city")}
+                          placeholder={t("placeholders.city")}
+                        />
                       )}
                     </form.Field>
                   ) : (
                     <>
-                      <Label>City</Label>
+                      <Label>{t("labels.city")}</Label>
                       <p className="text-muted-foreground mt-1 text-sm">
-                        {profile?.city || "Not specified"}
+                        {profile?.city || t("display.not_specified")}
                       </p>
                     </>
                   )}
@@ -728,19 +737,19 @@ export function ProfileView() {
                       {(field) => (
                         <ValidatedCountryCombobox
                           field={field}
-                          label="Country"
-                          placeholder="Search for a country"
+                          label={t("form_fields.country")}
+                          placeholder={t("placeholders.country")}
                           valueFormat="label"
                         />
                       )}
                     </form.Field>
                   ) : (
                     <>
-                      <Label>Country</Label>
+                      <Label>{t("labels.country")}</Label>
                       <p className="text-muted-foreground mt-1 text-sm">
                         {profile?.country
                           ? getCountryName(profile.country) || profile.country
-                          : "Not specified"}
+                          : t("display.not_specified")}
                       </p>
                     </>
                   )}
@@ -752,20 +761,20 @@ export function ProfileView() {
                       {(field) => (
                         <ValidatedSelect
                           field={field}
-                          label="Overall Experience Level"
-                          placeholder="Select experience level"
+                          label={t("form_fields.overall_experience_level")}
+                          placeholder={t("placeholders.experience_level")}
                           options={mappedExperienceLevelOptions}
                         />
                       )}
                     </form.Field>
                   ) : (
                     <>
-                      <Label>Overall Experience Level</Label>
+                      <Label>{t("labels.overall_experience_level")}</Label>
                       <p className="text-muted-foreground mt-1 text-sm">
                         {profile?.overallExperienceLevel
                           ? profile.overallExperienceLevel.charAt(0).toUpperCase() +
                             profile.overallExperienceLevel.slice(1)
-                          : "Not specified"}
+                          : t("display.not_specified")}
                       </p>
                     </>
                   )}
@@ -775,34 +784,34 @@ export function ProfileView() {
                   <div className="md:col-span-2 xl:col-span-3">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <Label>Games Hosted</Label>
+                        <Label>{t("labels.games_hosted")}</Label>
                         <p className="mt-1 text-sm font-medium">{profile.gamesHosted}</p>
                       </div>
                       <div>
-                        <Label>GM Rating</Label>
+                        <Label>{t("labels.gm_rating")}</Label>
                         <p className="mt-1 text-sm font-medium">
                           <ThumbsScore value={profile.gmRating ?? null} />
                         </p>
                       </div>
                       <div>
-                        <Label>Response Rate</Label>
+                        <Label>{t("labels.response_rate")}</Label>
                         <p className="mt-1 text-sm font-medium">
                           {typeof profile.responseRate === "number"
                             ? `${profile.responseRate}%`
-                            : "N/A"}
+                            : t("status.na")}
                         </p>
                       </div>
                       <div>
-                        <Label>Avg Response Time</Label>
+                        <Label>{t("labels.avg_response_time")}</Label>
                         <p className="mt-1 text-sm font-medium">
                           {typeof profile.averageResponseTime === "number"
                             ? `${profile.averageResponseTime} min`
-                            : "N/A"}
+                            : t("status.na")}
                         </p>
                       </div>
                       {profile.gmTopStrengths && profile.gmTopStrengths.length > 0 ? (
                         <div className="sm:col-span-2">
-                          <Label>Top Strengths</Label>
+                          <Label>{t("labels.top_strengths")}</Label>
                           <div className="mt-2 flex flex-wrap gap-2">
                             {profile.gmTopStrengths.map((s) => (
                               <span
@@ -830,9 +839,9 @@ export function ProfileView() {
             <CardHeader className="gap-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
                 <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-                  <CardTitle>Additional Information</CardTitle>
+                  <CardTitle>{t("additional_information.title")}</CardTitle>
                   <CardDescription>
-                    Your gaming preferences and availability
+                    {t("additional_information.description")}
                   </CardDescription>
                 </div>
 
@@ -843,10 +852,10 @@ export function ProfileView() {
                       onClick={() => startEditingSection("additional")}
                       variant="outline"
                       size="sm"
-                      aria-label="Edit Additional Information"
+                      aria-label={t("aria_labels.edit_additional_information")}
                     >
                       <Edit2 className="mr-2 h-4 w-4" />
-                      Edit
+                      {t("buttons.edit")}
                     </Button>
                   )}
                   {editingSection === "additional" && (
@@ -859,7 +868,7 @@ export function ProfileView() {
                         disabled={form.state.isSubmitting}
                       >
                         <X className="mr-2 h-4 w-4" />
-                        Cancel
+                        {t("buttons.cancel")}
                       </Button>
                       <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -875,12 +884,12 @@ export function ProfileView() {
                             {isSubmitting ? (
                               <>
                                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
+                                {t("buttons.saving")}
                               </>
                             ) : (
                               <>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Changes
+                                {t("buttons.save_changes")}
                               </>
                             )}
                           </Button>
@@ -894,9 +903,11 @@ export function ProfileView() {
             <CardContent className="space-y-6">
               {/* Calendar Availability */}
               <div>
-                <Label className="text-base font-medium">Availability Calendar</Label>
+                <Label className="text-base font-medium">
+                  {t("labels.availability_calendar")}
+                </Label>
                 <p className="text-muted-foreground mb-4 text-sm">
-                  Set your weekly availability for gaming sessions
+                  {t("descriptions.availability")}
                 </p>
                 {editingSection === "additional" ? (
                   <form.Field name="calendarAvailability">
@@ -923,9 +934,9 @@ export function ProfileView() {
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                 <div>
-                  <Label className="text-base font-medium">Languages</Label>
+                  <Label className="text-base font-medium">{t("labels.languages")}</Label>
                   <p className="text-muted-foreground mb-4 text-sm">
-                    Languages you feel comfortable using to play
+                    {t("descriptions.languages")}
                   </p>
                   {editingSection === "additional" ? (
                     <form.Field name="languages">
@@ -954,7 +965,7 @@ export function ProfileView() {
                               );
                             }}
                             availableSuggestions={mappedLanguageOptions}
-                            placeholder="Select languages you speak"
+                            placeholder={t("placeholders.languages")}
                           />
                         );
                       }}
@@ -966,7 +977,7 @@ export function ProfileView() {
                       ))}
                       {(!profile?.languages || profile.languages.length === 0) && (
                         <span className="text-muted-foreground text-sm">
-                          No languages specified
+                          {t("status.no_languages_specified")}
                         </span>
                       )}
                     </div>
@@ -974,9 +985,11 @@ export function ProfileView() {
                 </div>
 
                 <div>
-                  <Label className="text-base font-medium">Identity Tags</Label>
+                  <Label className="text-base font-medium">
+                    {t("labels.identity_tags")}
+                  </Label>
                   <p className="text-muted-foreground mb-4 text-sm">
-                    Help others find compatible gaming partners
+                    {t("descriptions.identity_tags")}
                   </p>
                   {editingSection === "additional" ? (
                     <form.Field name="identityTags">
@@ -1005,7 +1018,7 @@ export function ProfileView() {
                               );
                             }}
                             availableSuggestions={mappedIdentityTagOptions}
-                            placeholder="Select identity tags"
+                            placeholder={t("placeholders.identity_tags")}
                           />
                         );
                       }}
@@ -1023,7 +1036,7 @@ export function ProfileView() {
                       ))}
                       {(!profile?.identityTags || profile.identityTags.length === 0) && (
                         <span className="text-muted-foreground text-sm">
-                          No identity tags specified
+                          {t("status.no_identity_tags_specified")}
                         </span>
                       )}
                     </div>
@@ -1031,9 +1044,11 @@ export function ProfileView() {
                 </div>
 
                 <div>
-                  <Label className="text-base font-medium">Preferred Game Themes</Label>
+                  <Label className="text-base font-medium">
+                    {t("labels.preferred_game_themes")}
+                  </Label>
                   <p className="text-muted-foreground mb-4 text-sm">
-                    Game themes you enjoy most
+                    {t("descriptions.game_themes")}
                   </p>
                   {editingSection === "additional" ? (
                     <form.Field name="preferredGameThemes">
@@ -1062,7 +1077,7 @@ export function ProfileView() {
                               );
                             }}
                             availableSuggestions={mappedGameThemeOptions}
-                            placeholder="Select preferred game themes"
+                            placeholder={t("placeholders.game_themes")}
                           />
                         );
                       }}
@@ -1081,7 +1096,7 @@ export function ProfileView() {
                       {(!profile?.preferredGameThemes ||
                         profile.preferredGameThemes.length === 0) && (
                         <span className="text-muted-foreground text-sm">
-                          No game themes specified
+                          {t("status.no_game_themes_specified")}
                         </span>
                       )}
                     </div>
@@ -1096,8 +1111,8 @@ export function ProfileView() {
             <CardHeader className="gap-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
                 <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-                  <CardTitle>Blocklist</CardTitle>
-                  <CardDescription>Manage users you’ve blocked</CardDescription>
+                  <CardTitle>{t("blocklist.title")}</CardTitle>
+                  <CardDescription>{t("blocklist.description")}</CardDescription>
                 </div>
                 <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:justify-end">
                   <Button
@@ -1106,15 +1121,16 @@ export function ProfileView() {
                     variant="outline"
                     size="sm"
                   >
-                    <Link to="/player/profile/blocklist">Open Blocklist</Link>
+                    <Link to="/player/profile/blocklist">
+                      {t("blocklist.open_blocklist")}
+                    </Link>
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm">
-                Blocked users cannot follow you, invite you, or apply to your
-                games/campaigns. You can unblock them at any time.
+                {t("blocklist.explanation")}
               </p>
             </CardContent>
           </Card>
@@ -1126,10 +1142,8 @@ export function ProfileView() {
             <CardHeader className="gap-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
                 <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-                  <CardTitle>Privacy Settings</CardTitle>
-                  <CardDescription>
-                    Control what information is visible to others
-                  </CardDescription>
+                  <CardTitle>{t("privacy_settings.title")}</CardTitle>
+                  <CardDescription>{t("privacy_settings.description")}</CardDescription>
                 </div>
 
                 <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
@@ -1139,10 +1153,10 @@ export function ProfileView() {
                       onClick={() => startEditingSection("privacy")}
                       variant="outline"
                       size="sm"
-                      aria-label="Edit Privacy Settings"
+                      aria-label={t("aria_labels.edit_privacy_settings")}
                     >
                       <Edit2 className="mr-2 h-4 w-4" />
-                      Edit
+                      {t("buttons.edit")}
                     </Button>
                   )}
                   {editingSection === "privacy" && (
@@ -1155,7 +1169,7 @@ export function ProfileView() {
                         disabled={form.state.isSubmitting}
                       >
                         <X className="mr-2 h-4 w-4" />
-                        Cancel
+                        {t("buttons.cancel")}
                       </Button>
                       <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -1171,12 +1185,12 @@ export function ProfileView() {
                             {isSubmitting ? (
                               <>
                                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
+                                {t("buttons.saving")}
                               </>
                             ) : (
                               <>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Changes
+                                {t("buttons.save_changes")}
                               </>
                             )}
                           </Button>
@@ -1194,7 +1208,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my email address to teammates"
+                        label={t("privacy_checkboxes.show_email_to_teammates")}
                       />
                     )}
                   </form.Field>
@@ -1203,7 +1217,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my phone number to teammates"
+                        label={t("privacy_checkboxes.show_phone_to_teammates")}
                       />
                     )}
                   </form.Field>
@@ -1212,7 +1226,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my location (city and country) to everyone"
+                        label={t("privacy_checkboxes.show_location_to_everyone")}
                       />
                     )}
                   </form.Field>
@@ -1221,7 +1235,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my languages to everyone"
+                        label={t("privacy_checkboxes.show_languages_to_everyone")}
                       />
                     )}
                   </form.Field>
@@ -1230,37 +1244,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Show my game preferences to everyone"
-                      />
-                    )}
-                  </form.Field>
-
-                  <form.Field name="privacySettings.showLocation">
-                    {(field) => (
-                      <ValidatedCheckbox
-                        field={field}
-                        label="Show my location (city/country) to others"
-                        disabled={false}
-                      />
-                    )}
-                  </form.Field>
-
-                  <form.Field name="privacySettings.showLanguages">
-                    {(field) => (
-                      <ValidatedCheckbox
-                        field={field}
-                        label="Show my languages to others"
-                        disabled={false}
-                      />
-                    )}
-                  </form.Field>
-
-                  <form.Field name="privacySettings.showGamePreferences">
-                    {(field) => (
-                      <ValidatedCheckbox
-                        field={field}
-                        label="Show my game preferences to others"
-                        disabled={false}
+                        label={t("privacy_checkboxes.show_game_preferences_to_everyone")}
                       />
                     )}
                   </form.Field>
@@ -1269,7 +1253,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Allow team invitations from other users"
+                        label={t("privacy_checkboxes.allow_team_invitations")}
                       />
                     )}
                   </form.Field>
@@ -1278,7 +1262,9 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Only allow invites from connections"
+                        label={t(
+                          "privacy_checkboxes.only_allow_invites_from_connections",
+                        )}
                       />
                     )}
                   </form.Field>
@@ -1287,7 +1273,7 @@ export function ProfileView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Allow other users to follow you"
+                        label={t("privacy_checkboxes.allow_follows")}
                       />
                     )}
                   </form.Field>
@@ -1295,60 +1281,88 @@ export function ProfileView() {
               ) : (
                 <>
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Email visible to teammates</span>
+                    <span className="text-sm">
+                      {t("privacy_display.email_visible_to_teammates")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.showEmail ? "Yes" : "No"}
+                      {profile?.privacySettings?.showEmail
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Phone number visible to teammates</span>
+                    <span className="text-sm">
+                      {t("privacy_display.phone_visible_to_teammates")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.showPhone ? "Yes" : "No"}
+                      {profile?.privacySettings?.showPhone
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Location visible to everyone</span>
+                    <span className="text-sm">
+                      {t("privacy_display.location_visible_to_everyone")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.showLocation ? "Yes" : "No"}
+                      {profile?.privacySettings?.showLocation
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Languages visible to everyone</span>
+                    <span className="text-sm">
+                      {t("privacy_display.languages_visible_to_everyone")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.showLanguages ? "Yes" : "No"}
+                      {profile?.privacySettings?.showLanguages
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Game preferences visible to everyone</span>
+                    <span className="text-sm">
+                      {t("privacy_display.game_preferences_visible_to_everyone")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.showGamePreferences ? "Yes" : "No"}
+                      {profile?.privacySettings?.showGamePreferences
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Allow team invitations</span>
+                    <span className="text-sm">
+                      {t("privacy_display.allow_team_invitations")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.allowTeamInvitations ? "Yes" : "No"}
+                      {profile?.privacySettings?.allowTeamInvitations
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Only allow invites from connections</span>
+                    <span className="text-sm">
+                      {t("privacy_display.only_allow_invites_from_connections")}
+                    </span>
                     <span className="text-muted-foreground text-sm">
                       {profile?.privacySettings?.allowInvitesOnlyFromConnections
-                        ? "Yes"
-                        : "No"}
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
 
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-sm">Allow follows</span>
+                    <span className="text-sm">{t("privacy_display.allow_follows")}</span>
                     <span className="text-muted-foreground text-sm">
-                      {profile?.privacySettings?.allowFollows ? "Yes" : "No"}
+                      {profile?.privacySettings?.allowFollows
+                        ? t("display.yes")
+                        : t("display.no")}
                     </span>
                   </div>
                 </>
@@ -1361,10 +1375,8 @@ export function ProfileView() {
             <CardHeader className="gap-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:gap-6">
                 <div className="flex flex-1 flex-col gap-2 sm:min-w-[220px]">
-                  <CardTitle>Game Preferences</CardTitle>
-                  <CardDescription>
-                    Your favorite and avoided game systems
-                  </CardDescription>
+                  <CardTitle>{t("game_preferences.title")}</CardTitle>
+                  <CardDescription>{t("game_preferences.description")}</CardDescription>
                 </div>
 
                 <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
@@ -1374,10 +1386,10 @@ export function ProfileView() {
                       onClick={() => startEditingSection("game-preferences")}
                       variant="outline"
                       size="sm"
-                      aria-label="Edit Game Preferences"
+                      aria-label={t("aria_labels.edit_game_preferences")}
                     >
                       <Edit2 className="mr-2 h-4 w-4" />
-                      Edit
+                      {t("buttons.edit")}
                     </Button>
                   )}
                   {editingSection === "game-preferences" && (
@@ -1390,7 +1402,7 @@ export function ProfileView() {
                         disabled={form.state.isSubmitting}
                       >
                         <X className="mr-2 h-4 w-4" />
-                        Cancel
+                        {t("buttons.cancel")}
                       </Button>
                       <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -1406,12 +1418,12 @@ export function ProfileView() {
                             {isSubmitting ? (
                               <>
                                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
+                                {t("buttons.saving")}
                               </>
                             ) : (
                               <>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Changes
+                                {t("buttons.save_changes")}
                               </>
                             )}
                           </Button>
@@ -1438,7 +1450,9 @@ export function ProfileView() {
               ) : (
                 <>
                   <div>
-                    <Label className="text-base font-medium">Favorite Systems</Label>
+                    <Label className="text-base font-medium">
+                      {t("labels.favorite_systems")}
+                    </Label>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {profile?.gameSystemPreferences?.favorite?.map((system) => (
                         <span
@@ -1451,14 +1465,16 @@ export function ProfileView() {
                       {(!profile?.gameSystemPreferences?.favorite ||
                         profile.gameSystemPreferences.favorite.length === 0) && (
                         <span className="text-muted-foreground text-sm">
-                          No favorites specified
+                          {t("status.no_favorites_specified")}
                         </span>
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium">Avoided Systems</Label>
+                    <Label className="text-base font-medium">
+                      {t("labels.avoided_systems")}
+                    </Label>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {profile?.gameSystemPreferences?.avoid?.map((system) => (
                         <span
@@ -1471,7 +1487,7 @@ export function ProfileView() {
                       {(!profile?.gameSystemPreferences?.avoid ||
                         profile.gameSystemPreferences.avoid.length === 0) && (
                         <span className="text-muted-foreground text-sm">
-                          No avoided systems specified
+                          {t("status.no_avoided_systems_specified")}
                         </span>
                       )}
                     </div>

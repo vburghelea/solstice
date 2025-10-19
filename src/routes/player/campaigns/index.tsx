@@ -19,6 +19,7 @@ import { participantRoleEnum } from "~/db/schema/shared.schema";
 import { listCampaignsWithCount } from "~/features/campaigns/campaigns.queries";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { CampaignCard } from "~/features/campaigns/components/CampaignCard";
+import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { List } from "~/shared/ui/list";
 
 export const Route = createFileRoute("/player/campaigns/")({
@@ -42,6 +43,7 @@ export const Route = createFileRoute("/player/campaigns/")({
 });
 
 function CampaignsPage() {
+  const { t } = useCampaignsTranslation();
   const {
     status = "active",
     userRole = "player",
@@ -59,10 +61,12 @@ function CampaignsPage() {
         data: { filters: { status, userRole }, page, pageSize },
       });
       if (!result.success) {
-        toast.error("Failed to load campaigns.");
+        toast.error(t("my_campaigns.errors.load_failed"));
         return {
           success: false,
-          errors: [{ code: "FETCH_ERROR", message: "Failed to load campaigns" }],
+          errors: [
+            { code: "FETCH_ERROR", message: t("my_campaigns.errors.load_failed") },
+          ],
           data: { items: [], totalCount: 0 },
         } as const;
       }
@@ -78,8 +82,10 @@ function CampaignsPage() {
     <div className="container mx-auto p-4 sm:p-6">
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">My Campaigns</h1>
-          <p className="text-muted-foreground">Manage your campaign sessions</p>
+          <h1 className="text-foreground text-2xl font-bold sm:text-3xl">
+            {t("my_campaigns.title")}
+          </h1>
+          <p className="text-muted-foreground">{t("my_campaigns.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Select
@@ -94,12 +100,12 @@ function CampaignsPage() {
             }}
           >
             <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={t("my_campaigns.filter_by_status")} />
             </SelectTrigger>
             <SelectContent>
               {campaignStatusEnum.enumValues.map((status) => (
                 <SelectItem key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {t(`my_campaigns.status_labels.${status}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -116,18 +122,12 @@ function CampaignsPage() {
             }}
           >
             <SelectTrigger className="border-border bg-card text-foreground w-[160px] border sm:w-[180px]">
-              <SelectValue placeholder="Filter by role" />
+              <SelectValue placeholder={t("my_campaigns.filter_by_role")} />
             </SelectTrigger>
             <SelectContent>
               {participantRoleEnum.enumValues.map((role) => (
                 <SelectItem key={role} value={role}>
-                  {role === "owner"
-                    ? "Organizer"
-                    : role === "player"
-                      ? "Participant"
-                      : role === "invited"
-                        ? "Invitee"
-                        : "Requested"}
+                  {t(`my_campaigns.role_labels.${role}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -135,7 +135,7 @@ function CampaignsPage() {
           <Button asChild>
             <Link to="/player/campaigns/create">
               <PlusIcon className="mr-2 h-4 w-4" />
-              Create New Campaign
+              {t("my_campaigns.create_new_campaign")}
             </Link>
           </Button>
         </div>
@@ -145,14 +145,16 @@ function CampaignsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Gamepad2 className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">No campaigns yet</h3>
+            <h3 className="mb-2 text-lg font-semibold">
+              {t("my_campaigns.no_campaigns_title")}
+            </h3>
             <p className="text-muted-foreground mb-4 text-center">
-              Create your first campaign to get started
+              {t("my_campaigns.no_campaigns_subtitle")}
             </p>
             <Button asChild>
               <Link to="/player/campaigns/create">
                 <PlusIcon className="mr-2 h-4 w-4" />
-                Create New Campaign
+                {t("my_campaigns.create_new_campaign")}
               </Link>
             </Button>
           </CardContent>
@@ -186,7 +188,7 @@ function CampaignsPage() {
                       </div>
                       <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
                         <Users className="h-3.5 w-3.5" /> {c.participantCount}{" "}
-                        participants
+                        {t("my_campaigns.participants")}
                       </div>
                     </div>
                     <Link
@@ -194,7 +196,7 @@ function CampaignsPage() {
                       params={{ campaignId: c.id }}
                       className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
                     >
-                      View
+                      {t("campaigns.buttons.view_campaign")}
                       <ChevronRight className="h-4 w-4" />
                     </Link>
                   </div>
@@ -213,7 +215,7 @@ function CampaignsPage() {
                   to: "/player/campaigns/$campaignId",
                   params: { campaignId: campaign.id },
                   from: "/player/campaigns",
-                  label: "View Campaign",
+                  label: t("campaigns.buttons.view_campaign"),
                 }}
               />
             ))}
@@ -222,7 +224,11 @@ function CampaignsPage() {
       )}
       <div className="mt-6 flex items-center justify-between">
         <div className="text-muted-foreground text-sm">
-          Page {page} of {totalPages} • {totalCount} total
+          {t("my_campaigns.pagination.page_info", {
+            current: page,
+            total: totalPages,
+            count: totalCount,
+          })}
         </div>
         <div className="flex gap-2">
           <Button
@@ -235,7 +241,7 @@ function CampaignsPage() {
             }
             disabled={page <= 1}
           >
-            Previous
+            {t("common.buttons.previous")}
           </Button>
           <Button
             variant="outline"
@@ -252,7 +258,7 @@ function CampaignsPage() {
             }
             disabled={page >= totalPages}
           >
-            Next
+            {t("common.buttons.next")}
           </Button>
         </div>
       </div>

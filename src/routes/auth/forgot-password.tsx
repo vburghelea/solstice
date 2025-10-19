@@ -5,6 +5,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { LogoIcon } from "~/components/ui/icons";
 import { requestPasswordReset } from "~/features/auth/auth.mutations";
+import { useAuthTranslation } from "~/hooks/useTypedTranslation";
 import { useAppForm } from "~/lib/hooks/useAppForm";
 
 export const Route = createFileRoute("/auth/forgot-password")({
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/auth/forgot-password")({
 });
 
 function ForgotPasswordForm() {
+  const { t } = useAuthTranslation();
   const [isSuccess, setIsSuccess] = useState(false);
 
   const form = useAppForm({
@@ -22,7 +24,7 @@ function ForgotPasswordForm() {
       try {
         const result = await requestPasswordReset({ data: value });
         if (result.success) {
-          toast.success("Password reset link sent! Please check your email.");
+          toast.success(t("forgot_password.success.toast"));
           setIsSuccess(true);
         } else {
           throw new Error(result.errors?.[0]?.message || "Failed to send reset link.");
@@ -36,12 +38,10 @@ function ForgotPasswordForm() {
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center gap-6 text-center">
-        <h1 className="text-xl font-bold">Check your inbox</h1>
-        <p className="text-muted-foreground">
-          We&apos;ve sent a password reset link to the email address you provided.
-        </p>
+        <h1 className="text-xl font-bold">{t("forgot_password.success.title")}</h1>
+        <p className="text-muted-foreground">{t("forgot_password.success.message")}</p>
         <Link to="/auth/login" className="text-sm underline underline-offset-4">
-          Back to login
+          {t("forgot_password.actions.back_to_login")}
         </Link>
       </div>
     );
@@ -64,10 +64,9 @@ function ForgotPasswordForm() {
               </div>
               <span className="sr-only">Roundup Games</span>
             </a>
-            <h1 className="text-xl font-bold">Forgot your password?</h1>
+            <h1 className="text-xl font-bold">{t("forgot_password.title")}</h1>
             <p className="text-muted-foreground text-center text-sm">
-              No problem. Enter your email address and we&apos;ll send you a link to reset
-              it.
+              {t("forgot_password.no_problem")}
             </p>
           </div>
           <div className="flex flex-col gap-5">
@@ -75,9 +74,9 @@ function ForgotPasswordForm() {
               {(field) => (
                 <ValidatedInput
                   field={field}
-                  label="Email"
+                  label={t("forgot_password.fields.email")}
                   type="email"
-                  placeholder="hello@example.com"
+                  placeholder={t("forgot_password.fields.placeholder")}
                   autoFocus
                 />
               )}
@@ -86,17 +85,17 @@ function ForgotPasswordForm() {
               isSubmitting={form.state.isSubmitting}
               className="w-full"
               size="lg"
-              loadingText="Sending..."
+              loadingText={t("forgot_password.loading")}
             >
-              Send Reset Link
+              {t("forgot_password.button")}
             </FormSubmitButton>
           </div>
         </div>
       </form>
       <div className="text-center text-sm">
-        Remembered your password?{" "}
+        {t("forgot_password.actions.remembered_password")}{" "}
         <Link to="/auth/login" className="underline underline-offset-4">
-          Back to login
+          {t("forgot_password.actions.back_to_login")}
         </Link>
       </div>
     </div>

@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { tCommon } from "~/lib/i18n/server-translations";
 import { gmStrengthOptions } from "~/shared/types/common";
 
 // Validation schemas
 const followInputSchema = (input: unknown) => {
   return z
     .object({
-      followingId: z.string().min(1, "Following ID is required"),
+      followingId: z.string().min(1, tCommon("validation.following_id_required")),
     })
     .parse(input);
 };
@@ -16,17 +17,17 @@ const gmReviewInputSchema = (input: unknown) => {
   // Enforce valid strength values from shared options
   return z
     .object({
-      gmId: z.string().min(1, "GM ID is required"),
-      gameId: z.string().min(1, "Game ID is required"),
+      gmId: z.string().min(1, tCommon("validation.gm_id_required")),
+      gameId: z.string().min(1, tCommon("validation.game_id_required")),
       rating: z
         .number()
         .int()
-        .gte(-2, "Rating must be between -2 and 2")
-        .lte(2, "Rating must be between -2 and 2"),
+        .gte(-2, tCommon("validation.rating_between_range"))
+        .lte(2, tCommon("validation.rating_between_range")),
       selectedStrengths: z
         .array(z.enum(gmStrengthOptions as unknown as [string, ...string[]]))
-        .max(3, "Select up to 3 strengths"),
-      comment: z.string().max(2000).optional(),
+        .max(3, tCommon("validation.max_strengths")),
+      comment: z.string().max(2000, tCommon("validation.comment_too_long")).optional(),
     })
     .parse(input);
 };

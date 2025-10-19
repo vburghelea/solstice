@@ -1,0 +1,36 @@
+{
+  "blocklist": {
+    "title": "Blockierte Nutzer",
+    "description": "Nutzer, die du blockiert hast und nicht mehr mit dir interagieren können",
+    "loading": "Lade blockierte Nutzer...",
+    "no_blocked_users": "Keine blockierten Nutzer",
+    "no_blocked_users_description": "Du hast noch keine Nutzer blockiert.",
+    "user_count": {
+      "one": "{{count}} blockierter Nutzer",
+      "other": "{{count}} blockierte Nutzer"
+    },
+    "buttons": {
+      "unblock": "Entblocken",
+      "unblocking": "Entblocken...",
+      "cancel": "Abbrechen",
+      "confirm_unblock": "Ja, entblocken"
+    },
+    "dialog": {
+      "title": "Nutzer entblocken",
+      "description": "Bist du sicher, dass du {{name}} entblocken möchtest? Die Person kann dir dann wieder folgen, dich zu Spielen einladen und mit dir interagieren."
+    },
+    "status": {
+      "blocked": "Blockiert"
+    },
+    "reason": "Grund",
+    "blocked_date": "Blockiert am {{date}}",
+    "toast": {
+      "unblock_success": "Nutzer erfolgreich entblockt",
+      "unblock_error": "Entblocken des Nutzers fehlgeschlagen",
+      "load_error": "Laden der blockierten Nutzer fehlgeschlagen"
+    }
+  },
+  "errors": {
+    "unexpected_error": "Es ist ein unerwarteter Fehler aufgetreten"
+  }
+}

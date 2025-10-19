@@ -1,0 +1,629 @@
+{
+  "create": {
+    "title": "Utwórz nowe wydarzenie",
+    "subtitle": "Wypełnij szczegóły, aby utworzyć nowe wydarzenie Roundup Games. Możesz zapisać jako szkic i opublikować później.",
+    "steps": {
+      "basic_info": {
+        "title": "Podstawowe informacje",
+        "description": "Nazwa i opis wydarzenia"
+      },
+      "location_dates": {
+        "title": "Lokalizacja i daty",
+        "description": "Gdzie i kiedy"
+      },
+      "registration": {
+        "title": "Rejestracja",
+        "description": "Ustawienia rejestracji i ceny"
+      },
+      "details": {
+        "title": "Dodatkowe szczegóły",
+        "description": "Informacje kontaktowe i ustawienia"
+      }
+    }
+  },
+  "form": {
+    "fields": {
+      "name": "Nazwa wydarzenia",
+      "slug": "Slug",
+      "short_description": "Krótki opis",
+      "description": "Opis",
+      "type": "Typ",
+      "status": "Status początkowy",
+      "logo": "Logo wydarzenia",
+      "logo_url": "URL logo (opcjonalnie)",
+      "banner": "Baner główny",
+      "banner_url": "URL banera (opcjonalnie)",
+      "venue_name": "Nazwa miejsca",
+      "venue_address": "Adres miejsca",
+      "city": "Miasto",
+      "province": "Województwo/Stan",
+      "country": "Kraj",
+      "postal_code": "Kod pocztowy",
+      "location_notes": "Uwagi o lokalizacji",
+      "start_date": "Data rozpoczęcia",
+      "end_date": "Data zakończenia",
+      "registration_opens": "Otwarcie rejestracji",
+      "registration_closes": "Zamknięcie rejestracji",
+      "registration_type": "Typ rejestracji",
+      "max_teams": "Maks. drużyn",
+      "max_participants": "Maks. uczestników",
+      "min_players_per_team": "Min. graczy w drużynie",
+      "max_players_per_team": "Maks. graczy w drużynie",
+      "team_fee": "Opłata za drużynę (USD)",
+      "individual_fee": "Opłata indywidualna (USD)",
+      "early_bird_discount": "Procent zniżki",
+      "early_bird_deadline": "Termin wczesnej rejestracji",
+      "allow_etransfer": "Zezwalaj na Interac e-Transfer",
+      "etransfer_recipient": "E-mail odbiorcy e-transferu",
+      "etransfer_instructions": "Instrukcje e-transferu",
+      "allow_waitlist": "Zezwalaj na listę oczekujących",
+      "require_membership": "Wymagana aktywna członkostwo",
+      "contact_email": "E-mail kontaktowy",
+      "contact_phone": "Telefon kontaktowy",
+      "website": "Strona wydarzenia",
+      "public_event": "Wydarzenie publiczne",
+      "featured_event": "Wyróżnione wydarzenie"
+    },
+    "placeholders": {
+      "name": "Super letni turniej",
+      "slug": "super-letni-turniej",
+      "short_description": "Krótki opis dla kart wydarzeń i podglądów",
+      "description": "Szczegółowy opis wydarzenia...",
+      "logo_url": "https://cdn.example.com/event-logo.png",
+      "banner_url": "https://cdn.example.com/event-banner.jpg",
+      "venue_name": "Kompleks sportowy gminy",
+      "venue_address": "ul. Warszawska 1",
+      "city": "Warszawa",
+      "country": "Wyszukaj kraj",
+      "postal_code": "00-001",
+      "location_notes": "Informacje o parkowaniu, dojazd, ułatwienia dostępu...",
+      "contact_email": "wydarzenie@przyklad.pl",
+      "contact_phone": "+48 123 456 789",
+      "website": "https://przyklad.pl/wydarzenie",
+      "etransfer_instructions": "Podaj pytanie bezpieczeństwa, oczekiwane hasło lub inne uwagi dla płatności e-transferem.",
+      "short_description_card": "Jednolinijkowe podsumowanie dla kart i podglądów",
+      "description_details": "Podziel się kluczowymi szczegółami, harmonogramem i tym, czego można się spodziewać"
+    },
+    "descriptions": {
+      "slug": "Będzie używane w URL wydarzenia",
+      "short_description": "Maks. 500 znaków",
+      "logo": "Wyświetlane na kompaktowych kartach i sekcjach wyróżnionych.",
+      "banner": "Pokazywane na publicznej stronie wydarzenia i w listach wyróżnionych.",
+      "logo_helper": "Idealny rozmiar to kwadratowy PNG lub JPG do 5MB.",
+      "banner_helper": "Użyj szerokiego obrazu (16:9) do 8MB dla głównego banera wydarzenia.",
+      "early_bird_discount": "Procent zniżki dla wczesnej rejestracji",
+      "etransfer_recipient": "Dokąd powinny być wysyłane płatności e-transferem",
+      "public_event_admin": "Uczyń to wydarzenie widocznym dla wszystkich",
+      "public_event_user": "Poproś o widoczność publiczną (wymaga zatwierdzenia przez admina)",
+      "featured_event": "Wyróżnij to wydarzenie na stronie głównej i w wynikach wyszukiwania",
+      "allow_waitlist": "Zezwalaj rejestracjom na dołączenie do listy oczekujących, gdy wydarzenie jest pełne",
+      "require_membership": "Zezwalaj tylko użytkownikom z aktywnymi członkostwami Roundup Games na rejestrację"
+    },
+    "sections": {
+      "branding": {
+        "title": "Branding",
+        "description": "Dodaj elementy wizualne, aby spersonalizować swoje wydarzenie. Prześlij obrazy lub wklej URL-e dla zasobów, które już hostujesz."
+      },
+      "pricing": {
+        "title": "Ceny"
+      },
+      "early_bird": {
+        "title": "Zniżka dla wczesnej rejestracji"
+      },
+      "alternate_payment": {
+        "title": "Alternatywne opcje płatności"
+      },
+      "contact_info": {
+        "title": "Informacje kontaktowe"
+      },
+      "visibility": {
+        "title": "Ustawienia widoczności"
+      }
+    }
+  },
+  "buttons": {
+    "previous": "Wstecz",
+    "next": "Dalej",
+    "create": "Utwórz wydarzenie",
+    "creating": "Tworzenie..."
+  },
+  "select": {
+    "select_type": "Wybierz typ",
+    "select_registration_type": "Wybierz typ rejestracji"
+  },
+  "types": {
+    "tournament": "Turniej",
+    "league": "Liga",
+    "camp": "Obóz treningowy",
+    "clinic": "Klinika umiejętności",
+    "social": "Wydarzenie społeczne",
+    "other": "Inne"
+  },
+  "status": {
+    "draft": "Szkic (Niewidoczny)",
+    "published": "Opublikowany (Widoczny)",
+    "in_progress": "W trakcie",
+    "registration_open": "Rejestracja otwarta",
+    "registration_closed": "Rejestracja zamknięta"
+  },
+  "registration_types": {
+    "team": "Drużyna",
+    "individual": "Indywidualny",
+    "both": "Drużyna i indywidualny"
+  },
+  "alerts": {
+    "admin_approval": {
+      "title": "Wymagane zatwierdzenie admina",
+      "description": "Twoje wydarzenie zostanie utworzone jako szkic i będzie wymagać zatwierdzenia przez administratora, zanim stanie się publicznie widoczne. Możesz nadal zarządzać i edytować swoje wydarzenie, gdy czeka na zatwierdzenie."
+    },
+    "approval_process": {
+      "description": "Po utworzeniu wydarzenia, administrator przejrzyje je i zatwierdzi do publicznej widoczności. Zostaniesz powiadomiony, gdy Twoje wydarzenie zostanie zatwierdzone."
+    }
+  },
+  "validation": {
+    "name_required": "Nazwa wydarzenia jest wymagana",
+    "slug_required": "URL slug jest wymagany",
+    "slug_format": "Slug może zawierać tylko małe litery, cyfry i myślniki",
+    "short_description_max": "Krótki opis musi mieć poniżej 500 znaków",
+    "start_date_required": "Data rozpoczęcia jest wymagana",
+    "end_date_required": "Data zakończenia jest wymagana",
+    "etransfer_recipient_required": "E-mail odbiorcy e-transferu jest wymagany, gdy e-transfer jest włączony",
+    "early_bird_deadline_required": "Termin wczesnej rejestracji jest wymagany, gdy oferowana jest zniżka",
+    "early_bird_discount_required": "Ustaw procent zniżki lub usuń termin",
+    "valid_etransfer_email": "Wprowadź poprawny e-mail dla e-transferu",
+    "invalid_value": "Nieprawidłowa wartość"
+  },
+  "upload": {
+    "logo_uploading": "Przesyłanie logo...",
+    "banner_uploading": "Przesyłanie banera...",
+    "logo_success": "Logo pomyślnie przesłane",
+    "banner_success": "Baner pomyślnie przesłany",
+    "logo_failed": "Przesyłanie logo nie powiodło się",
+    "banner_failed": "Przesyłanie banera nie powiodło się",
+    "wait_for_upload": "Poczekaj, aż przesłania obrazów zostaną zakończone przed wysłaniem.",
+    "file_read_failed": "Odczyt pliku nie powiódł się"
+  },
+  "success": {
+    "created": "Wydarzenie pomyślnie utworzone!",
+    "created_pending_approval": "Wydarzenie utworzone! Zostanie sprawdzone przez administratora, zanim stanie się publiczne."
+  },
+  "errors": {
+    "create_failed": "Tworzenie wydarzenia nie powiodło się",
+    "upload_failed": "Przesyłanie obrazu nie powiodło się",
+    "validation_error": "Popraw oznaczone pola.",
+    "creation_error": "Wystąpił błąd podczas tworzenia wydarzenia",
+    "load_failed": "Błąd ładowania wydarzeń: {{message}}"
+  },
+  "list_item": {
+    "free": "Bezpłatne",
+    "capacity_tbd": "Pojemność do ustalenia",
+    "date_tbd": "Do ustalenia",
+    "spots_left": "pozostało {{count}} miejsc"
+  },
+  "minimal_form": {
+    "title": "Utwórz nowe wydarzenie (Test)",
+    "description": "To jest minimalny formularz testowy do izolacji problemu renderowania.",
+    "test_button": "Przycisk testowy"
+  },
+  "detail": {
+    "event_not_found": "Nie znaleziono wydarzenia",
+    "dates": "Daty",
+    "type": "Typ",
+    "status": "Status",
+    "registration": "Rejestracja",
+    "open": "Otwarta",
+    "closed": "Zamknięta",
+    "spots_left": "pozostało {{count}} miejsc",
+    "registrations": "Rejestracje",
+    "no_registrations": "Brak rejestracji.",
+    "confirm": "Potwierdź",
+    "waitlist": "Lista oczekujących",
+    "cancel": "Anuluj",
+    "actions": {
+      "publish": "Opublikuj",
+      "open_registration": "Otwórz rejestrację",
+      "close_registration": "Zamknij rejestrację",
+      "start": "Rozpocznij",
+      "complete": "Ukończ",
+      "cancel": "Anuluj"
+    },
+    "success": {
+      "event_updated": "Wydarzenie zaktualizowane",
+      "registration_updated": "Rejestracja zaktualizowana"
+    },
+    "errors": {
+      "update_failed": "Aktualizacja wydarzenia nie powiodła się",
+      "registration_update_failed": "Aktualizacja rejestracji nie powiodła się"
+    }
+  },
+  "registration": {
+    "event_not_found": "Nie znaleziono wydarzenia",
+    "event_not_available": "Wydarzenie, na które próbujesz się zarejestrować, nie istnieje lub nie jest publicznie dostępne.",
+    "back_to_events": "Wróć do wydarzeń",
+    "already_registered": "Już zarejestrowany",
+    "already_registered_description": "Jesteś już zarejestrowany na to wydarzenie.",
+    "back_to_event_details": "Wróć do szczegółów wydarzenia",
+    "view_event_details": "Zobacz szczegóły wydarzenia",
+    "register_for_event": "Zarejestruj się na {{eventName}}",
+    "register_description": "Wypełnij poniższy formularz, aby zarejestrować się na to wydarzenie",
+    "registration_type": "Typ rejestracji",
+    "individual_registration": "Rejestracja indywidualna",
+    "team_registration": "Rejestracja drużynowa",
+    "register_as_individual": "Zarejestruj się jako indywidualny gracz",
+    "register_entire_team": "Zarejestruj całą swoją drużynę",
+    "select_team": "Wybierz drużynę",
+    "select_team_placeholder": "Wybierz drużynę",
+    "join_create_team": "Dołącz lub utwórz drużynę",
+    "need_team_to_register": "Musisz być częścią drużyny, aby zarejestrować się jako drużyna.",
+    "additional_info": "Dodatkowe informacje (opcjonalnie)",
+    "additional_info_placeholder": "Ograniczenia dietetyczne, potrzeby dostępności lub inne informacje...",
+    "payment_method": "Sposób płatności",
+    "square_checkout": "Square Checkout",
+    "etransfer": "Interac e-Transfer",
+    "pay_securely_online": "Płać bezpiecznie online kartą kredytową lub debetową.",
+    "submit_send_payment_manually": "Prześlij teraz i wyślij płatność ręcznie po tym formularzu.",
+    "etransfer_instructions": "Instrukcje e-transferu",
+    "send_payment_to": "Wyślij płatność do {{recipient}}. Podaj swoje imię i nazwisko oraz wydarzenie w wiadomości.",
+    "no_payment_required": "Bez płatności",
+    "no_payment_description": "Ta rejestracja nie wymaga płatności. Prześlij formularz, aby zakończyć.",
+    "terms_and_conditions": "Warunki i zasady",
+    "agree_terms": "Zgadzam się z warunkami wydarzenia i kodeksem postępowania",
+    "agree_terms_description": "Musisz zgodzić się na te warunki, aby uczestniczyć w wydarzeniu.",
+    "accept_liability_waiver": "Przeczytałem i akceptuję zrzeczenie odpowiedzialności",
+    "accept_waiver_description": "Każdy uczestnik musi zaakceptować zrzeczenie przed rejestracją.",
+    "submitting": "Przesyłanie...",
+    "awaiting_etransfer": "Oczekiwanie na e-transfer",
+    "complete_registration": "Ukończ rejestrację",
+    "finish_etransfer": "Ukończ swój e-transfer",
+    "send_payment_finalize": "Wyślij swoją płatność, aby sfinalizować rejestrację.",
+    "recipient_email": "E-mail odbiorcy",
+    "instructions": "Instrukcje",
+    "see_event_instructions": "Zobacz instrukcje wydarzenia",
+    "payment_received_confirmation": "Gdy płatność zostanie otrzymana, administrator oznaczy Twoją rejestrację jako opłaconą.",
+    "return_to_dashboard": "Wróć do panelu",
+    "event_overview": "Przegląd wydarzenia",
+    "status": "Status",
+    "registered": "Zarejestrowany",
+    "spots_remaining": "Pozostałe miejsca",
+    "registration_fees": "Opłaty rejestracyjne",
+    "current_fee": "Aktualna opłata",
+    "early_bird_applied": "Zastosowano zniżkę dla wczesnej rejestracji ({{percentage}}% zniżki)",
+    "participant_information": "Informacje o uczestniku",
+    "unknown_participant": "Nieznany uczestnik",
+    "no_email_available": "Brak dostępnego e-maila",
+    "registration_failed": "Rejestracja nie powiodła się",
+    "redirecting_to_square": "Przekierowywanie do Square Checkout...",
+    "registration_submitted": "Rejestracja przesłana! Postępuj zgodnie z instrukcjami e-transferu poniżej.",
+    "registration_completed": "Rejestracja ukończona!",
+    "error_during_registration": "Wystąpił błąd podczas rejestracji",
+    "already_submitted": "Już przesłałeś tę rejestrację.",
+    "accept_all_terms": "Proszę zaakceptować wszystkie warunki i zasady",
+    "select_a_team": "Proszę wybrać drużynę",
+    "registration_open": "Rejestracja otwarta",
+    "registration_closed": "Rejestracja zamknięta"
+  },
+  "detail_registration": {
+    "title": "Rejestracja",
+    "status": "Status",
+    "closes": "Zamyka",
+    "registered": "Zarejestrowani",
+    "available_spots": "Dostępne miejsca",
+    "fees": "Opłaty rejestracyjne",
+    "team_registration": "Rejestracja drużyny",
+    "individual_registration": "Rejestracja indywidualna",
+    "early_bird_discount": "zniżka early bird dostępna do",
+    "already_registered": {
+      "title": "Jesteś zarejestrowany!",
+      "description": "Jesteś już zarejestrowany na to wydarzenie."
+    },
+    "sign_in_required": "Proszę {{link}}, aby zarejestrować się na to wydarzenie.",
+    "register_now": "Zarejestruj się teraz",
+    "registration_closed": "Rejestracja zamknięta",
+    "event_full": "Wydarzenie pełne"
+  },
+  "not_found": {
+    "title": "Wydarzenie nie znalezione",
+    "description": "Wydarzenie, którego szukasz, nie istnieje lub nie jest publicznie dostępne.",
+    "back_to_events": "Wróć do wydarzeń"
+  },
+  "schedule": "Harmonogram wydarzenia",
+  "rules_format": "Zasady i format",
+  "requirements": "Wymagania",
+  "amenities": "Udogodnienia",
+  "organizer": "Organizator wydarzenia",
+  "share": {
+    "title": "Udostępnij wydarzenie",
+    "copy_link": "Kopiuj link"
+  },
+  "listing": {
+    "title": "Wydarzenia",
+    "subtitle": "Turnieje, obozy treningowe i festiwale społecznościowe",
+    "description": "Roundup Games sankcjonuje zawody przez cały rok, aby sportowcy na każdym poziomie mogli rywalizować, uczyć się i nawiązywać kontakty.",
+    "register_team": "Zarejestruj swoją drużynę",
+    "submit_event": "Zgłoś wydarzenie",
+    "filter": "Filtruj nadchodzące wydarzenia",
+    "calendar_title": "Kalendarz nadchodzących wydarzeń",
+    "clear_filters": "Wyczyść filtry",
+    "country": "Kraj",
+    "city": "Miasto",
+    "type": "Typ",
+    "status": "Status",
+    "registration_type": "Typ rejestracji",
+    "all_countries": "Wszystkie kraje",
+    "all_cities": "Wszystkie miasta",
+    "all_types": "Wszystkie typy",
+    "all_statuses": "Wszystkie statusy",
+    "all_registration_types": "Wszystkie typy rejestracji",
+    "load_failed": "Ładowanie wydarzeń nie powiodło się",
+    "no_results": "Żadne wydarzenia nie pasują do tego filtra. Skontaktuj się z nami pod adresem {{email}}, a dodamy Twoje wydarzenie do kalendarza.",
+    "loading": "Ładowanie...",
+    "loading_description": "Proszę czekać, ładujemy wydarzenia.",
+    "options": {
+      "tournament": "Turniej",
+      "league": "Liga",
+      "camp": "Obóz",
+      "social": "Społeczność",
+      "other": "Inne",
+      "published": "Opublikowano",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta",
+      "in_progress": "W trakcie",
+      "view_details": "Pokaż szczegóły"
+    }
+  },
+  "list": {
+    "filter_title": "Filtruj wydarzenia",
+    "labels": {
+      "event_type": "Typ wydarzenia",
+      "status": "Status",
+      "city": "Miasto",
+      "country": "Kraj",
+      "sort_by": "Sortuj według",
+      "sort_order": "Kolejność sortowania"
+    },
+    "placeholders": {
+      "all_types": "Wszystkie typy",
+      "all_statuses": "Wszystkie statusy",
+      "all_countries": "Wszystkie kraje",
+      "filter_by_city": "Filtruj według miasta"
+    },
+    "options": {
+      "tournament": "Turniej",
+      "league": "Liga",
+      "camp": "Obóz",
+      "clinic": "Klinika",
+      "social": "Społeczne",
+      "other": "Inne",
+      "published": "Opublikowane",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta",
+      "in_progress": "W trakcie",
+      "completed": "Zakończone",
+      "start_date": "Data rozpoczęcia",
+      "name": "Nazwa",
+      "recently_added": "Ostatnio dodane",
+      "ascending": "Rosnąco",
+      "descending": "Malejąco"
+    },
+    "empty_state": "Nie znaleziono wydarzeń pasujących do kryteriów.",
+    "pagination": {
+      "showing": "Wyświetlanie {{start}}-{{end}} z {{total}} wydarzeń",
+      "previous": "Poprzednia",
+      "next": "Następna"
+    },
+    "actions": {
+      "view_details": "Zobacz szczegóły"
+    },
+    "registration": {
+      "open": "Rejestracja otwarta",
+      "spots_left": "{{count}} miejsc wolnych",
+      "registered": "{{count}} zapisanych",
+      "type_label": "{{type}}"
+    }
+  },
+  "admin": {
+    "title": "Wydarzenia",
+    "subtitle": "Przeglądaj i zapisuj się na nadchodzące wydarzenia",
+    "create_event": "Utwórz wydarzenie",
+    "view_event": "Zobacz wydarzenie",
+    "back_to_events": "Powrót do wydarzeń",
+    "manage_event": "Zarządzaj wydarzeniem",
+    "view_public_page": "Zobacz stronę publiczną",
+    "not_found": "Nie znaleziono wydarzenia",
+    "not_found_description": "Wydarzenie, które próbujesz zarządzać, nie istnieje.",
+    "registrations": "Rejestracje",
+    "overview": "Przegląd",
+    "stats": {
+      "total_registrations": "Całkowita liczba rejestracji",
+      "total_revenue": "Całkowite przychody",
+      "outstanding_etransfers": "Oczekujące przelewy",
+      "available_spots": "Dostępne miejsca",
+      "event_status": "Status wydarzenia",
+      "pending": "oczekujące",
+      "from_registrations": "Z {{count}} rejestracji",
+      "awaiting_confirmation": "Oczekujące na ręczne potwierdzenie",
+      "unlimited": "Nieograniczone"
+    },
+    "actions": {
+      "publish": "Opublikuj",
+      "open_registration": "Otwórz rejestrację",
+      "close_registration": "Zamknij rejestrację",
+      "start": "Rozpocznij",
+      "complete": "Zakończ",
+      "cancel": "Anuluj",
+      "confirm": "Potwierdź",
+      "waitlist": "Lista rezerwowa",
+      "mark_paid": "Oznacz jako opłacone",
+      "send_reminder": "Wyślij przypomnienie",
+      "view": "Zobacz",
+      "event_updated": "Wydarzenie zaktualizowane",
+      "update_failed": "Aktualizacja wydarzenia nie powiodła się",
+      "registration_updated": "Rejestracja zaktualizowana",
+      "registration_update_failed": "Aktualizacja rejestracji nie powiodła się"
+    },
+    "tables": {
+      "headers": {
+        "name": "Nazwa",
+        "email": "Email",
+        "type": "Typ",
+        "team": "Drużyna",
+        "status": "Status",
+        "payment_status": "Status płatności",
+        "payment_method": "Metoda płatności",
+        "amount": "Kwota",
+        "amount_due": "Kwota do zapłaty",
+        "amount_paid": "Zapłacona kwota",
+        "registered": "Zarejestrowano",
+        "actions": "Akcje"
+      },
+      "no_registrations": "Brak rejestracji",
+      "unknown": "Nieznany",
+      "na": "N/D"
+    },
+    "recent_registrations": {
+      "title": "Ostatnie rejestracje",
+      "description": "Najnowsze rejestracje na Twoje wydarzenie"
+    },
+    "all_registrations": {
+      "title": "Wszystkie rejestracje",
+      "description": "Zarządzaj rejestracjami i uczestnikami wydarzenia"
+    },
+    "quick_actions": {
+      "title": "Szybkie akcje",
+      "export_registrations": "Eksportuj rejestracje",
+      "email_participants": "Wyślij email do uczestników",
+      "export_csv": "Eksportuj CSV"
+    },
+    "settings": {
+      "title": "Ustawienia wydarzenia",
+      "description": "Zarządzaj konfiguracją i statusem wydarzenia",
+      "event_status": "Status wydarzenia",
+      "visibility": "Widoczność",
+      "public_event": "Wydarzenie publiczne",
+      "make_private": "Ustaw jako prywatne",
+      "make_public": "Ustaw jako publiczne",
+      "featured_event": "Wyróżnione wydarzenie",
+      "feature_event": "Wyróżnij wydarzenie",
+      "remove_feature": "Usuń wyróżnienie",
+      "danger_zone": "Strefa zagrożenia",
+      "danger_description": "Te akcje są trwałe i nie mogą być cofnięte.",
+      "delete_event": "Usuń wydarzenie"
+    },
+    "export": {
+      "no_registrations": "Brak rejestracji do eksportu",
+      "success": "Rejestracje wyeksportowane pomyślnie"
+    },
+    "confirmations": {
+      "are_you_sure": "Jesteś pewien?",
+      "cancel_event_description": "To anuluje wydarzenie i powiadomi wszystkich zarejestrowanych uczestników. Ta akcja nie może być cofnięta.",
+      "delete_event_description": "To trwale usunie wydarzenie i wszystkie powiązane dane. Ta akcja nie może być cofnięta.",
+      "no_keep_event": "Nie, zachowaj wydarzenie",
+      "yes_cancel_event": "Tak, anuluj wydarzenie",
+      "delete_event": "Usuń wydarzenie"
+    },
+    "payment": {
+      "marking": "Oznaczanie...",
+      "sending": "Wysyłanie...",
+      "reminder_logged": "Przypomnienie zapisane"
+    },
+    "statuses": {
+      "draft": "Szkic",
+      "published": "Opublikowano",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta"
+    },
+    "labels": {
+      "dates": "Daty",
+      "type": "Typ",
+      "status": "Status",
+      "registration": "Rejestracja",
+      "spots_left": "pozostałych miejsc",
+      "of_teams": "z {{count}} drużyn",
+      "of_participants": "z {{count}} uczestników"
+    },
+    "management": {
+      "title": "Zarządzaj wydarzeniem",
+      "overview": "Przegląd",
+      "registrations": "Rejestracje",
+      "settings": "Ustawienia",
+      "view_public_page": "Zobacz stronę publiczną",
+      "recent_registrations": "Najnowsze rejestracje",
+      "recent_registrations_description": "Najnowsze rejestracje dla Twojego wydarzenia",
+      "tabs": {
+        "overview": "Przegląd",
+        "registrations": "Rejestracje",
+        "settings": "Ustawienia"
+      },
+      "stats": {
+        "total_registrations": "Całkowita liczba rejestracji",
+        "pending": "oczekujące",
+        "total_revenue": "Całkowite przychody",
+        "outstanding_etransfers": "Oczekujące przelewy",
+        "awaiting_confirmation": "Oczekujące na ręczne potwierdzenie",
+        "available_spots": "Dostępne miejsca",
+        "event_status": "Status wydarzenia",
+        "unlimited": "Nieograniczone",
+        "from_registrations": "Z {{count}} rejestracji"
+      },
+      "actions": {
+        "export_registrations": "Eksportuj rejestracje",
+        "email_participants": "Wyślij e-mail do uczestników",
+        "open_registration": "Otwórz rejestrację",
+        "close_registration": "Zamknij rejestrację",
+        "cancel_event": "Anuluj wydarzenie",
+        "mark_paid": "Oznacz jako opłacone",
+        "send_reminder": "Wyślij przypomnienie",
+        "view": "Zobacz",
+        "export_csv": "Eksportuj CSV",
+        "make_public": "Upublicznij",
+        "make_private": "Ustaw jako prywatne",
+        "feature_event": "Wyróżnij wydarzenie",
+        "remove_feature": "Usuń wyróżnienie",
+        "delete_event": "Usuń wydarzenie"
+      },
+      "tables": {
+        "headers": {
+          "name": "Nazwa",
+          "email": "E-mail",
+          "type": "Typ",
+          "team": "Drużyna",
+          "status": "Status",
+          "payment_status": "Status płatności",
+          "payment_method": "Metoda płatności",
+          "amount": "Kwota",
+          "amount_due": "Kwota do zapłaty",
+          "amount_paid": "Zapłacona kwota",
+          "registered": "Zarejestrowany",
+          "date": "Data",
+          "actions": "Akcje"
+        },
+        "no_registrations": "Brak rejestracji",
+        "unknown": "Nieznany",
+        "na": "Nd"
+      },
+      "confirmations": {
+        "are_you_sure": "Czy jesteś pewien?",
+        "cancel_event_description": "Spowoduje to anulowanie wydarzenia i powiadomienie wszystkich zarejestrowanych uczestników. Ta czynność nie może być cofnięta.",
+        "delete_event_description": "Spowoduje to trwałe usunięcie wydarzenia i wszystkich powiązanych danych. Ta czynność nie może być cofnięta.",
+        "no_keep_event": "Nie, zachowaj wydarzenie",
+        "yes_cancel_event": "Tak, anuluj wydarzenie",
+        "delete_event": "Usuń wydarzenie"
+      },
+      "status_badges": {
+        "draft": "Szkic",
+        "published": "Opublikowano",
+        "registration_open": "Rejestracja otwarta",
+        "registration_closed": "Rejestracja zamknięta",
+        "in_progress": "W trakcie",
+        "completed": "Zakończone",
+        "canceled": "Anulowane"
+      },
+      "payment": {
+        "marking": "Oznaczanie...",
+        "sending": "Wysyłanie...",
+        "reminder_logged": "Przypomnienie zapisane",
+        "canadian_dollars": "CAD"
+      }
+    }
+  }
+}

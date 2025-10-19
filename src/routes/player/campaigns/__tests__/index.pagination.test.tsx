@@ -1,11 +1,14 @@
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { renderWithRouter, screen } from "~/tests/utils/router";
 
 vi.mock("~/features/campaigns/campaigns.queries", () => ({
   listCampaignsWithCount: vi.fn(),
 }));
+
+// The i18n mock is already set up in src/tests/mocks/i18n.ts
+// This will load the actual locale data from the JSON files
 
 describe("PlayerCampaignsPage pagination", () => {
   it("shows total count and navigates to next page", async () => {

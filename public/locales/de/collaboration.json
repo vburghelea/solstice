@@ -1,0 +1,75 @@
+{
+  "title": "Zusammenarbeit",
+  "subtitle": "Übergreifende Zusammenarbeit und Berichterstattung",
+  "workspace": {
+    "loading": "Lade Zusammenarbeitseinblicke",
+    "loading_description": "Sammle aktuelle Metriken aus Spieler-, Ops-, GM- und Admin-Bereichen.",
+    "unable_to_load": "Zusammenarbeitsdaten konnten nicht geladen werden",
+    "unable_to_load_description": "Bitte aktualisiere die Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, wende dich an das Platform-Team.",
+    "beta_badge": "Zusammenarbeitshub",
+    "title": "Übergreifende Berichterstattung & Feedback",
+    "description": "Passe dich an verschiedene Rollen an, ohne deinen Bereich zu verlassen.",
+    "updated_label": "Aktualisiert",
+    "filters": {
+      "all": "Alle Rollen"
+    }
+  },
+  "sections": {
+    "metrics": {
+      "title": "Gemeinsame Berichtsmetriken",
+      "description": "Verfolge, wie Experimente in einem Bereich die Ergebnisse in anderen beeinflussen.",
+      "review_threads": "Gemeinsame Threads ansehen",
+      "persona_impact": "Rollenauswirkung"
+    },
+    "alignment": {
+      "title": "Fokus auf Rollenabstimmung",
+      "description": "Zeige, worauf jede Rolle achtet und wo die Zusammenarbeit verstärkt werden muss.",
+      "alignment_label": "Abstimmung",
+      "needs_attention": "Benötigt Aufmerksamkeit",
+      "confidence_suffix": "Vertrauen",
+      "key_signals": "Wichtige Signale",
+      "open_questions": "Offene Fragen",
+      "signals_description": "Signale und offene Fragen helfen dem Team bei der Planung des nächsten Experiments."
+    },
+    "rhythms": {
+      "title": "Zusammenarbeitssrhythmen",
+      "description": "Rituale, die Rollen aufeinander abstimmen, verknüpft mit den gemeinsamen Inbox-Threads, die Entscheidungen steuern.",
+      "next_touchpoint": "Nächster Kontaktpunkt",
+      "status": "Status",
+      "linked_threads": "Verknüpfte Threads"
+    },
+    "feedback": {
+      "title": "Feedback-Erfassungsschleifen",
+      "description": "Pulse-Umfragen und schnelle Reaktionen fließen direkt in den Backlog, damit Platform-Verwalter schnell reagieren können.",
+      "participation": "Teilnahme",
+      "backlog_status": "Backlog-Status:",
+      "updated": "Aktualisiert",
+      "highlights": "Highlights",
+      "quick_reactions": "Schnelle Reaktionen",
+      "reaction_saved": "Deine Reaktion wurde im Backlog-Experimentprotokoll gespeichert – Jordan und Priya sehen sie beim nächsten Governance-Sync.",
+      "create_account": "Erstelle ein Konto, um Reaktionen aufzuzeichnen, die das Platform-Team erreichen."
+    }
+  },
+  "personas": {
+    "player": "Spieler",
+    "ops": "Operations",
+    "gm": "Game-Master",
+    "admin": "Platform-Admin"
+  },
+  "status": {
+    "triaged": "Kategorisiert",
+    "in_progress": "In Bearbeitung",
+    "shipped": "Veröffentlicht",
+    "on_track": "Auf Kurs",
+    "at_risk": "Riskant",
+    "off_track": "Vom Kurs abgekommen"
+  },
+  "sentiment": {
+    "positive": "Positive Dynamik",
+    "neutral": "Neutrale Einschätzung",
+    "concerned": "Benötigt Nachverfolgung"
+  },
+  "errors": {
+    "load_snapshot_failed": "Snapshot konnte nicht geladen werden"
+  }
+}

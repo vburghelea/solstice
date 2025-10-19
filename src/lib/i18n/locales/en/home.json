@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "eyebrow": "Start planning",
+    "title": "Discover tabletop adventures tailored to explorers",
+    "subtitle": "Tour community gatherings, curate your favourite systems, and follow the storytellers who match your style.",
+    "cta_text": "Create your profile",
+    "secondary_cta": "Log in to continue"
+  },
+  "explorer_guide": {
+    "eyebrow": "Explorer guide",
+    "title": "Chart the next stop on your journey",
+    "subtitle": "Set a home base city to preview gatherings, facilitators, and story worlds that welcome new players.",
+    "city_focus_label": "Focus on a city",
+    "browse_all_locations": "Browse all locations",
+    "location_data_coming_soon": "Location data coming soon",
+    "from_your_profile": "from your profile",
+    "players_count": "{{count}} players",
+    "location_suggestion": "We suggest cities from your profile, saved preferences, or timezone when we can.",
+    "popular_cities": "Popular cities:",
+    "how_it_flows": {
+      "title": "How this tour flows",
+      "subtitle": "Follow these beats to decide when to join the community or watch for new invitations."
+    },
+    "chapters": [
+      "Preview gatherings and festivals curated for curious first-timers.",
+      "Explore systems and sessions that prioritize onboarding and safety tools.",
+      "Save a home base city to receive updates when seats open up."
+    ],
+    "themes": {
+      "curated_spotlights": {
+        "title": "Curated spotlights",
+        "description": "Hand-picked sessions and stories make it easy to feel the Roundup vibe before you ever sit down at the table."
+      },
+      "effortless_planning": {
+        "title": "Effortless planning",
+        "description": "Choose a city, explore open seats, and mark events you love without committing before you're ready."
+      },
+      "trust_first_design": {
+        "title": "Trust-first design",
+        "description": "Safety practices, accessibility callouts, and facilitator intros appear upfront so explorers can make confident choices."
+      }
+    }
+  },
+  "confidence_signals": {
+    "eyebrow": "Confidence signals",
+    "title": "What makes Roundup feel safe",
+    "subtitle": "We foreground the cues that help solo explorers feel confident before stepping into a new space.",
+    "safety_tools": {
+      "title": "Safety tools on display",
+      "description": "Hosts showcase Lines & Veils, X-Cards, and debrief rituals so everyone knows how care shows up at the table."
+    },
+    "meet_facilitator": {
+      "title": "Meet the facilitator",
+      "description": "GM bios highlight pronouns, session pacing, and welcome rituals to help you read the room before you arrive."
+    },
+    "welcoming_spaces": {
+      "title": "Spaces that feel welcoming",
+      "description": "Each venue callout includes mobility notes, transit tips, and community vibes, helping visitors picture the experience."
+    }
+  },
+  "upcoming_events": {
+    "eyebrow": "Upcoming gatherings",
+    "title_prefix": "Events near",
+    "default_area": "your area",
+    "subtitle": "Curated by community hosts. Each RSVP takes you closer to your first game session memory.",
+    "no_events_title": "No events scheduled for this city yet.",
+    "no_events_subtitle": "Check back later as hosts publish new sessions.",
+    "browse_full_calendar": "Browse full calendar"
+  },
+  "story_sessions": {
+    "eyebrow": "Stories to sample",
+    "title": "Sessions welcoming new explorers",
+    "subtitle": "These tables lean into onboarding, safety tools, and collaborative energy.",
+    "no_sessions_title": "No spotlight sessions in this city yet.",
+    "no_sessions_subtitle": "Subscribe to our newsletter or try again later for new content.",
+    "search_all_games": "Search all games"
+  },
+  "trending_systems": {
+    "eyebrow": "Trending systems",
+    "title": "Rulesets with momentum",
+    "subtitle": "Discover which systems are lighting up tables so you know what to learn next.",
+    "no_systems": "We'll highlight popular systems once more sessions are scheduled.",
+    "sessions_count": "{{count}} sessions",
+    "hero_art_pending": "Hero art pending moderation",
+    "description_coming_soon": "Description coming soon."
+  },
+  "ready_to_go_deeper": {
+    "title": "When you're ready to go deeper",
+    "subtitle": "Create a free account to follow cities, join sessions, and receive invites from trusted GMs.",
+    "start_profile": "Start your player profile",
+    "have_account": "I already have an account"
+  }
+}

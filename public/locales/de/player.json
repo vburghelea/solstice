@@ -1,0 +1,164 @@
+{
+  "dashboard": {
+    "title": "Spieler-Dashboard",
+    "welcome": "Willkommen zurück, {{name}}",
+    "actions": {
+      "edit_profile": "Profil bearbeiten",
+      "manage_plan": "Plan verwalten",
+      "start_membership": "Mitgliedschaft starten",
+      "find_games": "Spiele finden",
+      "discover_sessions": "Sitzungen entdecken",
+      "see_all_events": "Alle Ereignisse anzeigen",
+      "manage_teams": "Teams verwalten",
+      "open_session_briefing": "Sitzungs-Briefing öffnen"
+    },
+    "errors": {
+      "failed_to_parse_payload": "Konnte die gespeicherten Dashboard-Daten nicht verarbeiten",
+      "failed_to_persist_payload": "Konnte die Dashboard-Daten nicht speichern",
+      "failed_to_load_profile": "Konnte dein Spielerprofil nicht laden",
+      "failed_to_fetch_workspace_stats": "Konnte deine Spielbereich-Statistiken nicht abrufen",
+      "failed_to_fetch_next_scheduled_game": "Konnte das nächste geplante Spiel nicht abrufen",
+      "failed_to_fetch_membership_status": "Konnte deinen Mitgliedschaftsstatus nicht abrufen",
+      "failed_to_update_privacy_settings": "Konnte deine Privatsphäre-Einstellungen nicht aktualisieren",
+      "failed_to_update_notification_preferences": "Konnte deine Benachrichtigungseinstellungen nicht aktualisieren"
+    },
+    "privacy": {
+      "invites_from_connections": {
+        "label": "Nur Einladungen von Freunden erlauben",
+        "description": "Beschränke neue Einladungen auf Kontakte, denen du vertraust."
+      },
+      "follow_requests": {
+        "label": "Folgen-Anfragen erlauben",
+        "description": "Lass Community-Mitglieder deinen Updates folgen."
+      }
+    },
+    "notifications": {
+      "game_reminders": {
+        "label": "Spiel-Erinnerungen",
+        "description": "Erhalte eine Erinnerung, bevor die Sitzungen beginnen."
+      },
+      "review_reminders": {
+        "label": "Bewertungs-Erinnerungen",
+        "description": "Bleib bei deinen Spielorganisatoren auf dem Laufenden."
+      }
+    },
+    "membership": {
+      "status_active": "Aktiv",
+      "status_inactive": "Inaktiv",
+      "active": "Mitgliedschaft aktiv",
+      "no_active_membership": "Keine aktive Mitgliedschaft",
+      "manage_plan": "Plan verwalten",
+      "start_membership": "Mitgliedschaft starten"
+    },
+    "upcoming_games": {
+      "no_games": "Keine kommenden Spiele",
+      "stay_available": "Bleib verfügbar"
+    },
+    "pending_reviews": {
+      "all_caught_up": "Du bist auf dem Laufenden",
+      "share_stories": "Erzähl deine Geschichten vom Spieltisch"
+    },
+    "teams": {
+      "join_crew": "Einem Team beitreten",
+      "active_teams": "Aktive Teams, in denen du bist",
+      "watch_calendar": "Kalender beobachten",
+      "opportunities_waiting": "Möglichkeiten warten"
+    },
+    "stats": {
+      "organizer": "Organisator",
+      "player": "Spieler",
+      "invites": "Einladungen"
+    },
+    "empty_states": {
+      "no_events": "Derzeit keine empfohlenen Events.",
+      "no_teams": "Noch keine Teams synchronisiert. Tritt einem Team bei, um loszulegen.",
+      "experiment_loading": "Bleib dran. Ein neues Experiment wird geladen."
+    },
+    "profile": {
+      "complete": "Profil optimiert",
+      "steps_remaining": "Noch zu erledigende Profilschritte"
+    },
+    "teams_section": {
+      "you_lead": "Du leitest dieses Team"
+    },
+    "persona_initial": "S",
+    "ui": {
+      "welcome_back": "Willkommen zurück",
+      "subtitle": "Behalte den Überblick über Sitzungen, Einladungen und Community-Highlights. Alles, was du brauchst, um verbunden zu bleiben, ist hier organisiert.",
+      "badges": {
+        "privacy_ready": "Datenschutz-Einstellungen bereit",
+        "profile_complete": "Profil optimiert",
+        "profile_steps_remaining": "Noch zu erledigende Profilschritte"
+      },
+      "headquarters": {
+        "title": "Spieler-Zentrale"
+      },
+      "control_center": {
+        "title": "Dein Kontrollzentrum",
+        "subtitle": "Passe deine Sichtbarkeit an, bleib informiert und springe direkt in Aktionen, ohne die Zentrale zu verlassen."
+      },
+      "teams_synced": "{{count}} Team{{plural}} synchronisiert",
+      "review_reminders": {
+        "title": "Bewertungs-Erinnerungen"
+      },
+      "relationship_health": {
+        "title": "Beziehungs-Gesundheit",
+        "subtitle": "Ein schneller Überblick, wie du in der Community verbunden bleibst."
+      },
+      "upcoming": {
+        "title": "Als Nächstes"
+      },
+      "membership_label": "Mitgliedschaft",
+      "pending_reviews_label": "Ausstehende Bewertungen",
+      "teams_label": "Teams",
+      "upcoming_events_label": "Kommende Events",
+      "campaign_commitments": {
+        "title": "Kampagnen-Verpflichtungen",
+        "subtitle": "Verfolge, wie du leitest und teilnimmst, damit nichts durchrutscht."
+      },
+      "game_roster": {
+        "title": "Spiel-Planer",
+        "subtitle": "Wisse, wo du leitest, spielst und als Nächstes auf der Warteliste stehst."
+      },
+      "events_exploring": {
+        "title": "Events zum Entdecken",
+        "subtitle": "Empfehlungen aktualisieren sich automatisch, wenn neue Sitzungen live gehen."
+      },
+      "connections_radar": {
+        "title": "Verbindungs-Radar",
+        "subtitle": "Fokus auf Teams, die diese Woche auf dich für Schwung angewiesen sind."
+      },
+      "focus_spotlight": {
+        "title": "Fokus-Scheinwerfer",
+        "subtitle": "Highlights werden freigeschaltet, während wir spielerzentrierte Experimente testen."
+      },
+      "flexible_calendar": "Behalte deinen Kalender flexibel und sichere dir einen Platz im nächsten Abenteuer.",
+      "open_session_briefing": "Sitzungs-Info öffnen",
+      "discover_sessions": "Sitzungen entdecken",
+      "manage_teams": "Teams verwalten",
+      "see_all_events": "Alle Events ansehen",
+      "review_gm": "{{gmName}} bewerten • {{date}}",
+      "start_review": "Starten",
+      "members_count": "{{count}} Mitglieder",
+      "beta_preview": {
+        "title": "Beta-Vorschau",
+        "description": "Erweiterte Teamkollegen-Empfehlungen sind in Vorbereitung. Erwarte bald kuratierte Boosts."
+      },
+      "calendar_sync": {
+        "title": "Früher Zugang: gemeinsamer Kalender-Abgleich",
+        "description": "Aktiviere Kalender-Freigabe, damit vertraute Freunde dich antippen können, wenn sie eine Sitzung planen, die zu deinem Stil passt.",
+        "join_pilot": "Am Pilotprogramm teilnehmen"
+      }
+    },
+    "actions": {
+      "edit_profile": "Profil bearbeiten",
+      "manage_plan": "Plan verwalten",
+      "start_membership": "Mitgliedschaft starten",
+      "find_games": "Spiele finden",
+      "discover_sessions": "Sitzungen entdecken",
+      "see_all_events": "Alle Ereignisse anzeigen",
+      "manage_teams": "Teams verwalten",
+      "open_session_briefing": "Sitzungs-Briefing öffnen"
+    }
+  }
+}

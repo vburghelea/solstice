@@ -12,6 +12,7 @@ import {
 import { SafeLink as Link } from "~/components/ui/SafeLink"; // Added Link import
 import { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
+import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
 import type { GameCardLinkConfig } from "./GameCard";
@@ -34,6 +35,7 @@ export function CampaignGameSessionCard({
   onUpdateStatus,
   viewLink,
 }: CampaignGameSessionCardProps) {
+  const { t } = useGamesTranslation();
   const handleUpdateStatus = (status: (typeof gameStatusEnum.enumValues)[number]) => {
     onUpdateStatus({ data: { gameId: game.id, status } });
   };
@@ -47,7 +49,7 @@ export function CampaignGameSessionCard({
     to: viewLink?.to ?? "/player/games/$gameId",
     params: viewLink?.params ?? { gameId: game.id },
     from: viewLink?.from ?? "/player/campaigns/$campaignId",
-    label: viewLink?.label ?? "View Game",
+    label: viewLink?.label ?? t("buttons.view_game"),
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };
 
@@ -87,18 +89,18 @@ export function CampaignGameSessionCard({
             </div>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Players</span>
+            <span className="text-muted-foreground">{t("labels.players")}</span>
             <span className="font-medium">
               {game.minimumRequirements?.minPlayers || "?"} -{" "}
               {game.minimumRequirements?.maxPlayers || "?"}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Visibility</span>
+            <span className="text-muted-foreground">{t("labels.visibility")}</span>
             <span className="font-medium capitalize">{game.visibility}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Participants</span>
+            <span className="text-muted-foreground">{t("labels.participants")}</span>
             <span className="font-medium">{game.participantCount}</span>
           </div>
         </div>
@@ -110,7 +112,7 @@ export function CampaignGameSessionCard({
               {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
               {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             >
-              {resolvedLink.label ?? "View Game"}
+              {resolvedLink.label ?? t("buttons.view_game")}
             </Link>
           </Button>
         </div>
@@ -126,7 +128,7 @@ export function CampaignGameSessionCard({
                 onClick={() => handleUpdateStatus("completed")}
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Mark Completed
+                {t("buttons.mark_completed")}
               </Button>
             )}
             {canCancel && (
@@ -135,13 +137,13 @@ export function CampaignGameSessionCard({
                 size="sm"
                 className="flex-2"
                 onClick={() => {
-                  if (window.confirm("Are you sure you want to cancel this session?")) {
+                  if (window.confirm(t("confirmation.cancel_session"))) {
                     handleUpdateStatus("canceled");
                   }
                 }}
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Cancel Session
+                {t("buttons.cancel_session")}
               </Button>
             )}
           </div>

@@ -22,7 +22,8 @@ import { SystemHero } from "~/features/game-systems/components/system-hero";
 import { getSystemBySlug } from "~/features/game-systems/game-systems.queries";
 import type { GameSystemDetail } from "~/features/game-systems/game-systems.types";
 import { formatPlayerCountLabel } from "~/features/game-systems/lib/player-count";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
+import { useGameSystemsTranslation } from "~/hooks/useTypedTranslation";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { useCloudinaryImage } from "~/shared/hooks/useCloudinaryImage";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/shared/ui/tooltip";
@@ -42,18 +43,19 @@ export const Route = createFileRoute("/systems/$slug")({
 });
 
 function SystemDetailPage() {
+  const { t } = useGameSystemsTranslation();
   const { system } = Route.useLoaderData() as { system: GameSystemDetail };
   const playersLabel = formatPlayerCountLabel(system);
-  const description = system.description ?? "We're compiling details for this system.";
+  const description = system.description ?? t("detail.description_missing");
   const taxonomyMissing = system.categories.length === 0 && system.mechanics.length === 0;
-  const externalLinks = buildExternalLinks(system);
+  const externalLinks = buildExternalLinks(system, t);
   const heroBackground = useCloudinaryImage(system.heroUrl, {
     width: 1920,
     height: 1080,
   });
 
   return (
-    <PublicLayout className="max-w-none px-0">
+    <VisitorShell>
       <div className="relative isolate overflow-hidden">
         {heroBackground.src ? (
           <>
@@ -75,7 +77,7 @@ function SystemDetailPage() {
         <div className="relative">
           <SystemHero
             name={system.name}
-            subtitle={system.publisher?.name ?? "Community curated"}
+            subtitle={system.publisher?.name ?? t("status.community_curated")}
             heroUrl={system.heroUrl}
             renderBackground={false}
           />
@@ -85,7 +87,7 @@ function SystemDetailPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Button asChild variant="outline" size="sm">
               <Link to="/systems">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" /> Back to browse
+                <ArrowLeftIcon className="mr-2 h-4 w-4" /> {t("detail.back_to_browse")}
               </Link>
             </Button>
             <div className="flex flex-wrap gap-2">
@@ -93,12 +95,14 @@ function SystemDetailPage() {
                 <UsersIcon className="mr-1 h-3.5 w-3.5" /> {playersLabel}
               </Badge>
               {system.averagePlayTime ? (
-                <Badge variant="outline">Avg. session {system.averagePlayTime} min</Badge>
+                <Badge variant="outline">
+                  {t("detail.avg_session", { min: system.averagePlayTime })}
+                </Badge>
               ) : null}
               {system.yearReleased ? (
                 <Badge variant="outline">
-                  <CalendarIcon className="mr-1 h-3.5 w-3.5" /> Released{" "}
-                  {system.yearReleased}
+                  <CalendarIcon className="mr-1 h-3.5 w-3.5" />{" "}
+                  {t("detail.released", { year: system.yearReleased })}
                 </Badge>
               ) : null}
             </div>
@@ -107,21 +111,20 @@ function SystemDetailPage() {
           <div className="grid gap-10 lg:grid-cols-[2fr_1fr]">
             <article className="space-y-8">
               <section className={`${detailSurfaceClass} space-y-3`}>
-                <h2 className="text-2xl font-semibold">Overview</h2>
+                <h2 className="text-2xl font-semibold">{t("detail.overview")}</h2>
                 <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-wrap">
                   {description}
                 </p>
               </section>
 
               <section className={`${detailSurfaceClass} space-y-4`}>
-                <h3 className="text-xl font-semibold">Taxonomy</h3>
+                <h3 className="text-xl font-semibold">{t("detail.taxonomy")}</h3>
                 {taxonomyMissing ? (
                   <Card className="border-dashed">
                     <CardHeader>
-                      <CardTitle>Taxonomy coming soon</CardTitle>
+                      <CardTitle>{t("detail.taxonomy_coming_soon")}</CardTitle>
                       <CardDescription>
-                        We're still mapping categories and mechanics for this system.
-                        Check back after the next crawler run.
+                        {t("detail.taxonomy_description")}
                       </CardDescription>
                     </CardHeader>
                   </Card>
@@ -130,7 +133,7 @@ function SystemDetailPage() {
                     {system.categories.length > 0 ? (
                       <div className="space-y-2">
                         <h4 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-                          Categories
+                          {t("detail.categories")}
                         </h4>
                         <div className="flex flex-wrap gap-2">
                           {system.categories.map((category) => (
@@ -145,7 +148,7 @@ function SystemDetailPage() {
                     {system.mechanics.length > 0 ? (
                       <div className="space-y-2">
                         <h4 className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-                          Mechanics
+                          {t("detail.mechanics")}
                         </h4>
                         <div className="flex flex-wrap gap-2">
                           {system.mechanics.map((mechanic) => (
@@ -161,7 +164,7 @@ function SystemDetailPage() {
               </section>
 
               <section className={`${detailSurfaceClass} space-y-4`}>
-                <h3 className="text-xl font-semibold">Gallery</h3>
+                <h3 className="text-xl font-semibold">{t("detail.gallery")}</h3>
                 {system.gallery.length > 0 ? (
                   <div className="grid gap-4 sm:grid-cols-2">
                     {system.gallery.map((asset) => (
@@ -172,12 +175,15 @@ function SystemDetailPage() {
                         <CloudinaryImage
                           imageUrl={asset.secureUrl}
                           transform={{ width: 900, height: 600 }}
-                          alt={`${system.name} gallery asset ${asset.id}`}
+                          alt={t("detail.gallery_alt", {
+                            systemName: system.name,
+                            id: asset.id,
+                          })}
                           className="h-56 w-full object-cover"
                         />
                         {asset.license ? (
                           <figcaption className="text-muted-foreground px-3 py-2 text-xs">
-                            Licensed: {asset.license}
+                            {t("detail.licensed", { license: asset.license })}
                             {asset.licenseUrl ? (
                               <>
                                 {" "}
@@ -188,7 +194,7 @@ function SystemDetailPage() {
                                   target="_blank"
                                   rel="noreferrer"
                                 >
-                                  View details
+                                  {t("detail.view_details")}
                                 </a>
                               </>
                             ) : null}
@@ -200,11 +206,8 @@ function SystemDetailPage() {
                 ) : (
                   <Card className="border-dashed">
                     <CardHeader>
-                      <CardTitle>Gallery pending moderation</CardTitle>
-                      <CardDescription>
-                        Crawlers captured imagery for this system, but it has not been
-                        approved yet. Approved assets appear here automatically.
-                      </CardDescription>
+                      <CardTitle>{t("detail.gallery_pending")}</CardTitle>
+                      <CardDescription>{t("detail.gallery_description")}</CardDescription>
                     </CardHeader>
                   </Card>
                 )}
@@ -214,28 +217,33 @@ function SystemDetailPage() {
             <aside className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Quick stats</CardTitle>
+                  <CardTitle>{t("detail.quick_stats")}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-muted-foreground space-y-3 text-sm">
-                  <QuickFact label="Players" value={playersLabel} />
+                  <QuickFact label={t("detail.players")} value={playersLabel} />
                   {system.optimalPlayers ? (
                     <QuickFact
-                      label="Optimal table"
-                      value={`${system.optimalPlayers} players`}
+                      label={t("detail.optimal_table")}
+                      value={t("detail.optimal_players", {
+                        count: system.optimalPlayers,
+                      })}
                     />
                   ) : null}
                   {system.averagePlayTime ? (
                     <QuickFact
-                      label="Average session"
-                      value={`${system.averagePlayTime} minutes`}
+                      label={t("detail.average_session")}
+                      value={`${system.averagePlayTime} ${t("detail.minutes")}`}
                     />
                   ) : null}
                   {system.yearReleased ? (
-                    <QuickFact label="First published" value={`${system.yearReleased}`} />
+                    <QuickFact
+                      label={t("detail.first_published")}
+                      value={`${system.yearReleased}`}
+                    />
                   ) : null}
                   {system.ageRating ? (
                     <QuickFact
-                      label="Age rating"
+                      label={t("detail.age_rating")}
                       value={
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -245,10 +253,7 @@ function SystemDetailPage() {
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              Recommended minimum age for players based on content themes
-                              and mechanics.
-                            </p>
+                            <p>{t("detail.age_tooltip")}</p>
                           </TooltipContent>
                         </Tooltip>
                       }
@@ -257,7 +262,7 @@ function SystemDetailPage() {
 
                   {system.complexityRating ? (
                     <QuickFact
-                      label="Complexity"
+                      label={t("detail.complexity")}
                       value={
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -267,10 +272,7 @@ function SystemDetailPage() {
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>
-                              1-5 scale where 1 is simple/beginner-friendly and 5 is
-                              complex/expert-level.
-                            </p>
+                            <p>{t("detail.complexity_tooltip")}</p>
                           </TooltipContent>
                         </Tooltip>
                       }
@@ -278,17 +280,21 @@ function SystemDetailPage() {
                   ) : null}
                   <Separator />
                   <div>
-                    <div className="text-foreground font-medium">Publisher</div>
+                    <div className="text-foreground font-medium">
+                      {t("detail.publisher")}
+                    </div>
                     <div>
                       {system.publisher ? (
                         <span>{system.publisher.name}</span>
                       ) : (
-                        <span>Pending confirmation</span>
+                        <span>{t("detail.pending_confirmation")}</span>
                       )}
                     </div>
                   </div>
                   <div>
-                    <div className="text-foreground font-medium">First published</div>
+                    <div className="text-foreground font-medium">
+                      {t("detail.first_published")}
+                    </div>
                     <div>{system.yearReleased ?? "—"}</div>
                   </div>
                 </CardContent>
@@ -297,10 +303,8 @@ function SystemDetailPage() {
               {externalLinks.length > 0 ? (
                 <Card>
                   <CardHeader>
-                    <CardTitle>External references</CardTitle>
-                    <CardDescription>
-                      Links collected by our crawlers for fact-checking and enrichment.
-                    </CardDescription>
+                    <CardTitle>{t("detail.external_references")}</CardTitle>
+                    <CardDescription>{t("detail.external_description")}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {externalLinks.map((link) => (
@@ -321,7 +325,7 @@ function SystemDetailPage() {
           </div>
 
           <section className={`${detailSurfaceClass} space-y-4`}>
-            <h3 className="text-xl font-semibold">FAQ</h3>
+            <h3 className="text-xl font-semibold">{t("detail.faq")}</h3>
             {system.faqs.length > 0 ? (
               <div className="space-y-4">
                 {system.faqs.map((faq) => (
@@ -338,18 +342,15 @@ function SystemDetailPage() {
             ) : (
               <Card className="border-dashed">
                 <CardHeader>
-                  <CardTitle>FAQ coming soon</CardTitle>
-                  <CardDescription>
-                    Content editors are drafting the most helpful questions. Have a
-                    suggestion? Reach out via the community Discord.
-                  </CardDescription>
+                  <CardTitle>{t("detail.faq_coming_soon")}</CardTitle>
+                  <CardDescription>{t("detail.faq_description")}</CardDescription>
                 </CardHeader>
               </Card>
             )}
           </section>
         </section>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }
 
@@ -367,7 +368,7 @@ function QuickFact({ label, value }: QuickFactProps) {
   );
 }
 
-function buildExternalLinks(system: GameSystemDetail) {
+function buildExternalLinks(system: GameSystemDetail, t: (key: string) => string) {
   if (!system.externalRefs) return [] as Array<{ href: string; label: string }>;
   const refs: Array<{ href: string; label: string }> = [];
   if (system.externalRefs.startplaying) {
@@ -375,7 +376,7 @@ function buildExternalLinks(system: GameSystemDetail) {
     const href = value.startsWith("http")
       ? value
       : `https://startplaying.games/play/${value.replace(/^\/?(?:play|system)\//, "")}`;
-    refs.push({ href, label: "StartPlaying" });
+    refs.push({ href, label: t("references.startplaying") });
   }
   if (system.externalRefs.bgg) {
     const value = system.externalRefs.bgg;
@@ -385,14 +386,14 @@ function buildExternalLinks(system: GameSystemDetail) {
           .replace(/^\/?boardgame\//, "")
           .replace(/^\/?rpg\//, "")
           .replace(/^\//, "")}`;
-    refs.push({ href, label: "BoardGameGeek" });
+    refs.push({ href, label: t("references.boardgamegeek") });
   }
   if (system.externalRefs.wikipedia) {
     const value = system.externalRefs.wikipedia;
     const href = value.startsWith("http")
       ? value
       : `https://en.wikipedia.org/wiki/${encodeURIComponent(value)}`;
-    refs.push({ href, label: "Wikipedia" });
+    refs.push({ href, label: t("references.wikipedia") });
   }
   return refs;
 }

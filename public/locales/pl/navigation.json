@@ -1,0 +1,389 @@
+{
+  "main": {
+    "home": "Strona główna",
+    "dashboard": "Panel",
+    "games": "Gry",
+    "events": "Wydarzenia",
+    "teams": "Drużyny",
+    "campaigns": "Kampanie",
+    "inbox": "Skrzynka odbiorcza",
+    "profile": "Profil",
+    "settings": "Ustawienia",
+    "find_games": "Znajdź gry",
+    "game_systems": "Systemy gier"
+  },
+  "user": {
+    "account": "Moje konto",
+    "profile": "Mój profil",
+    "settings": "Ustawienia",
+    "billing": "Płatności",
+    "notifications": "Powiadomienia",
+    "security": "Bezpieczeństwo",
+    "logout": "Wyloguj się",
+    "login": "Zaloguj się",
+    "signup": "Zarejestruj się"
+  },
+  "actions": {
+    "create": "Utwórz",
+    "new": "Nowy",
+    "add": "Dodaj",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "submit": "Wyślij",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "sort": "Sortuj",
+    "export": "Eksportuj",
+    "import": "Importuj",
+    "share": "Udostępnij",
+    "print": "Drukuj",
+    "download": "Pobierz",
+    "upload": "Prześlij",
+    "refresh": "Odśwież",
+    "reload": "Załaduj ponownie"
+  },
+  "states": {
+    "loading": "Ładowanie...",
+    "saving": "Zapisywanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "warning": "Ostrzeżenie",
+    "info": "Informacja"
+  },
+  "breadcrumbs": {
+    "home": "Strona główna",
+    "dashboard": "Panel",
+    "games": "Gry",
+    "events": "Wydarzenia",
+    "teams": "Drużyny",
+    "campaigns": "Kampanie",
+    "inbox": "Skrzynka odbiorcza",
+    "profile": "Profil",
+    "settings": "Ustawienia",
+    "admin": "Admin"
+  },
+  "sidebar": {
+    "toggle": "Przełącz panel boczny",
+    "close": "Zamknij panel boczny",
+    "open": "Otwórz panel boczny",
+    "sections": {
+      "main": "Główne",
+      "games": "Gry",
+      "social": "Społeczność",
+      "account": "Konto",
+      "admin": "Administracja"
+    }
+  },
+  "header": {
+    "navigation": "Nawigacja",
+    "menu": "Menu",
+    "user_menu": "Menu użytkownika",
+    "notifications": "Powiadomienia",
+    "search_placeholder": "Szukaj...",
+    "language_switcher": "Język",
+    "theme_switcher": "Motyw"
+  },
+  "footer": {
+    "home": "Strona główna",
+    "about": "O nas",
+    "features": "Funkcje",
+    "pricing": "Ceny",
+    "contact": "Kontakt",
+    "blog": "Blog",
+    "help": "Pomoc",
+    "support": "Wsparcie",
+    "docs": "Dokumentacja",
+    "terms": "Regulamin",
+    "privacy": "Polityka prywatności",
+    "cookies": "Polityka cookies",
+    "copyright": "© {{year}} Roundup Games. Wszelkie prawa zastrzeżone.",
+    "plan_your_visit": "Zaplanuj wizytę",
+    "event_calendar": "Kalendarz wydarzeń",
+    "find_game_night": "Znajdź wieczór gier",
+    "browse_systems": "Przeglądaj systemy",
+    "stay_in_touch": "Zostań w kontakcie",
+    "resources": "Zasoby",
+    "about_roundup": "O Roundup",
+    "contact_email": "hello@roundup.games"
+  },
+  "tabs": {
+    "overview": "Przegląd",
+    "details": "Szczegóły",
+    "settings": "Ustawienia",
+    "activity": "Aktywność",
+    "history": "Historia",
+    "analytics": "Analityka",
+    "reports": "Raporty",
+    "members": "Członkowie",
+    "schedule": "Harmonogram",
+    "gallery": "Galeria",
+    "files": "Pliki",
+    "discussion": "Dyskusja",
+    "tasks": "Zadania",
+    "notes": "Notatki"
+  },
+  "pagination": {
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "first": "Pierwsza",
+    "last": "Ostatnia",
+    "page": "Strona",
+    "of": "z",
+    "showing": "Wyświetlanie",
+    "to": "do",
+    "results": "wyników",
+    "per_page": "na stronę",
+    "all": "Wszystko"
+  },
+  "table": {
+    "actions": "Akcje",
+    "select": "Wybierz",
+    "selected": "Wybrane",
+    "all_selected": "Wszystkie wybrane",
+    "none_selected": "Brak wybranych",
+    "sort_by": "Sortuj według",
+    "filter_by": "Filtruj według",
+    "search_placeholder": "Szukaj w tabeli...",
+    "no_data": "Brak dostępnych danych",
+    "loading_data": "Ładowanie danych...",
+    "error_loading": "Błąd ładowania danych",
+    "retry": "Spróbuj ponownie",
+    "columns": {
+      "name": "Nazwa",
+      "email": "E-mail",
+      "status": "Status",
+      "created": "Utworzono",
+      "updated": "Zaktualizowano",
+      "actions": "Akcje"
+    }
+  },
+  "modals": {
+    "close": "Zamknij",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "save": "Zapisz",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "create": "Utwórz",
+    "submit": "Wyślij",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "finish": "Zakończ"
+  },
+  "tooltips": {
+    "edit": "Edytuj element",
+    "delete": "Usuń element",
+    "view": "Pokaż szczegóły",
+    "copy": "Kopiuj do schowka",
+    "download": "Pobierz plik",
+    "share": "Udostępnij element",
+    "print": "Drukuj element",
+    "refresh": "Odśwież dane",
+    "settings": "Ustawienia",
+    "help": "Pomoc",
+    "info": "Informacja"
+  },
+  "empty_states": {
+    "no_data": "Brak dostępnych danych",
+    "no_results": "Brak wyników",
+    "no_items": "Brak elementów do wyświetlenia",
+    "nothing_here": "Nie ma tu jeszcze nic",
+    "start_by_creating": "Zacznij od utworzenia pierwszego elementu",
+    "no_search_results": "Brak wyników dla Twojego wyszukiwania",
+    "try_different_filters": "Spróbuj innych filtrów lub haseł wyszukiwania"
+  },
+  "workspaces": {
+    "player": {
+      "title": "Obszar roboczy gracza",
+      "description": "Zarządzaj sesjami, zaproszeniami i społecznością z jednego responsywnego centrum.",
+      "fallback_label": "Gracz",
+      "welcome_back": "Witaj ponownie, {{name}}",
+      "welcome_back_generic": "Witaj ponownie",
+      "nav": {
+        "overview": {
+          "label": "Przegląd",
+          "description": "Śledź członkostwo, zaproszenia i następną sesję na pierwszy rzut oka."
+        },
+        "campaigns": {
+          "label": "Kampanie",
+          "description": "Przejrzyj aktywne wątki fabularne i planuj nadchodzące sceny."
+        },
+        "games": {
+          "label": "Gry",
+          "description": "Zarządzaj zaplanowanymi sesjami i aktualizuj uczestnictwo."
+        },
+        "events": {
+          "label": "Wydarzenia",
+          "description": "Przeglądaj nadchodzące spotkania i potwierdzaj obecność."
+        },
+        "teams": {
+          "label": "Drużyny",
+          "description": "Koordynuj z zespołami i zarządzaj zaproszeniami."
+        },
+        "inbox": {
+          "label": "Skrzynka odbiorcza",
+          "description": "Sprawdź nowe ogłoszenia i udostępnione wątki."
+        },
+        "collaboration": {
+          "label": "Współpraca",
+          "description": "Koordynuj z współgraczami i prowadzącymi bez opuszczania centrum."
+        },
+        "profile": {
+          "label": "Profil",
+          "description": "Przeglądaj i edytuj swoje dane osobowe i preferencje."
+        },
+        "settings": {
+          "label": "Ustawienia",
+          "description": "Zarządzaj prywatnością, powiadomieniami i połączonymi kontami."
+        },
+        "systems": {
+          "label": "Zarządzanie systemami gier",
+          "description": "Zarządzaj systemami gier, kolejką crawlowania i zarządzaniem treściami."
+        }
+      },
+      "summary": {
+        "membership": "Członkostwo",
+        "active": "Aktywne",
+        "inactive": "Nieaktywne",
+        "membership_active": "Członkostwo aktywne",
+        "no_active_membership": "Brak aktywnego członkostwa",
+        "days_remaining": "{{days}} dni pozostało",
+        "manage_membership": "Zarządzaj członkostwem",
+        "next_session": "Następna sesja",
+        "no_upcoming_games": "Brak zaplanowanych gier",
+        "view_game_details": "Pokaż szczegóły gry",
+        "community": "Społeczność",
+        "not_on_a_team": "Nie jesteś jeszcze w drużynie",
+        "teams_connected": "{{count}} połączonych drużyn{{plural}}",
+        "join_a_team": "Dołącz do drużyny, aby koordynować sesje",
+        "pending_invites": "{{count}} oczekujących zaproszeń{{plural}}",
+        "no_pending_invitations": "Brak oczekujących zaproszeń",
+        "browse_teams": "Przeglądaj drużyny"
+      }
+    },
+    "gm": {
+      "title": "Obszar roboczy Mistrza Gry",
+      "description": "Koordynuj kampanie, sesje i niestandardowe wątki dopasowane do Twoich stołów.",
+      "fallback_label": "Mistrz Gry",
+      "welcome_back": "Witaj ponownie, {{name}}",
+      "welcome_back_generic": "Witaj ponownie",
+      "nav": {
+        "overview": {
+          "label": "Przegląd",
+          "description": "Przejrzyj wskazówki do przygotowań, informacje zwrotne na żywo i przepływ B2B z jednego centrum dowodzenia."
+        },
+        "campaigns": {
+          "label": "Kampanie",
+          "description": "Zarządzaj wątkami fabularnymi, dossierami i zdrowiem kampanii w jednym miejscu."
+        },
+        "games": {
+          "label": "Gry",
+          "description": "Planuj, aktualizuj i analizuj sesje na swojej liście."
+        },
+        "feedback_triage": {
+          "label": "Triaż opinii",
+          "description": "Pracuj przez analizy, rytuały bezpieczeństwa i nadchodzące listy kontrolne przygotowań."
+        },
+        "shared_inbox": {
+          "label": "Wspólna skrzynka odbiorcza",
+          "description": "Koordynuj aktualizacje narracyjne i ogłoszenia z działem operacji."
+        },
+        "collaboration": {
+          "label": "Współpraca",
+          "description": "Współpracuj z zespołami operacyjnymi i platformowymi nad niestandardowymi możliwościami."
+        }
+      },
+      "summary": {
+        "upcoming_sessions": "Nadchodzące sesje",
+        "no_sessions_scheduled": "Brak zaplanowanych sesji",
+        "next_session_detail": "Następna: {{name}} • {{datetime}}",
+        "manage_sessions": "Zarządzaj sesjami",
+        "active_campaigns": "Aktywne kampanie",
+        "campaign_detail": "{{name}} • {{system}}",
+        "draft_next_arc": "Szkicuj następny wątek, aby uzupełnić listę",
+        "view_workspace": "Pokaż obszar roboczy",
+        "pipeline_attention": "Uwaga w przepływie",
+        "pipeline_detail": "{{escalations}} eskalacji{{plural}} na żywo • {{total}} wszystkich wątków",
+        "log_corporate_opportunity": "Zaloguj szansę korporacyjną, aby rozpocząć śledzenie",
+        "review_pipeline": "Przejrzyj przepływ"
+      }
+    },
+    "admin": {
+      "title": "Obszar roboczy administratora",
+      "description": "Zarządzanie, zgodność i nadzór platformą z jednego centralnego centrum.",
+      "fallback_label": "Administrator",
+      "welcome_back": "Witaj ponownie, {{name}}",
+      "welcome_back_generic": "Witaj ponownie",
+      "nav": {
+        "overview": {
+          "label": "Przegląd",
+          "description": "Zdrowie systemu, metryki użytkowników i wgląd operacyjny na pierwszy rzut oka."
+        },
+        "users": {
+          "label": "Użytkownicy",
+          "description": "Zarządzanie użytkownikami, role i kontrola dostępu."
+        },
+        "analytics": {
+          "label": "Analityka",
+          "description": "Metryki platformy, wzorce użycia i dane wydajności."
+        },
+        "settings": {
+          "label": "Ustawienia",
+          "description": "Konfiguracja systemu, flagi funkcji i ustawienia platformy."
+        },
+        "systems": {
+          "label": "Zarządzanie systemami gier",
+          "description": "Zarządzaj systemami gier, kolejką crawlowania i zarządzaniem treściami."
+        },
+        "audit_logs": {
+          "label": "Logi audytowe",
+          "description": "Zdarzenia systemowe, akcje użytkowników i rekordy zgodności."
+        }
+      },
+      "summary": {
+        "system_health": "Zdrowie systemu",
+        "user_metrics": "Metryki użytkowników",
+        "platform_stats": "Statystyki platformy",
+        "recent_activity": "Najnowsza aktywność",
+        "analytics": "Wyświetl analitykę"
+      }
+    },
+    "ops": {
+      "title": "Obszar roboczy operacji",
+      "description": "Koordynacja wydarzeń, logistyka i wsparcie społeczności z jednego centralnego centrum.",
+      "fallback_label": "Operacje",
+      "welcome_back": "Witaj ponownie, {{name}}",
+      "welcome_back_generic": "Witaj ponownie",
+      "nav": {
+        "overview": {
+          "label": "Przegląd",
+          "description": "Panel kontroli misji z nadchodzącymi wydarzeniami i kolejkami zadań."
+        },
+        "events": {
+          "label": "Wydarzenia",
+          "description": "Tworzenie wydarzeń, zarządzanie i koordynacja logistyczna."
+        },
+        "venues": {
+          "label": "Miejsca",
+          "description": "Zarządzanie miejscami, harmonogram i planowanie pojemności."
+        },
+        "staff": {
+          "label": "Personel",
+          "description": "Harmonogram personelu, zadania i śledzenie wydajności."
+        },
+        "reports": {
+          "label": "Raporty",
+          "description": "Raporty operacyjne, analityka i inteligencja biznesowa."
+        }
+      },
+      "summary": {
+        "upcoming_events": "Nadchodzące wydarzenia",
+        "pending_tasks": "Oczekujące zadania",
+        "staff_on_duty": "Personel w służbie",
+        "venue_utilization": "Wykorzystanie miejsc"
+      }
+    }
+  }
+}

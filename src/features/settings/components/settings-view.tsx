@@ -1,6 +1,5 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
 import {
   AlertCircle,
   CheckCircle2,
@@ -50,7 +49,9 @@ import {
   unlinkAccount,
   updateNotificationPreferences,
 } from "~/features/settings";
+import { useSettingsTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 import {
   getPasswordStrength,
   getPasswordStrengthLabel,
@@ -67,13 +68,16 @@ type ChangePasswordFormValues = ChangePasswordInput & {
   confirmPassword: string;
 };
 
-function formatUserAgent(agent: string | null | undefined) {
-  if (!agent) return "Unknown device";
-  if (agent.toLowerCase().includes("mobile")) return "Mobile device";
-  if (agent.toLowerCase().includes("mac")) return "macOS";
-  if (agent.toLowerCase().includes("windows")) return "Windows";
-  if (agent.toLowerCase().includes("linux")) return "Linux";
-  return agent.split(" ")[0] ?? "Unknown";
+function formatUserAgent(agent: string | null | undefined, t: (key: string) => string) {
+  if (!agent) return t("sections.sessions.unknown_device");
+  if (agent.toLowerCase().includes("mobile"))
+    return t("sections.sessions.device_types.mobile_device");
+  if (agent.toLowerCase().includes("mac")) return t("sections.sessions.platforms.macos");
+  if (agent.toLowerCase().includes("windows"))
+    return t("sections.sessions.platforms.windows");
+  if (agent.toLowerCase().includes("linux"))
+    return t("sections.sessions.platforms.linux");
+  return agent.split(" ")[0] ?? t("sections.sessions.unknown_device");
 }
 
 function maskToken(token: string) {
@@ -82,6 +86,7 @@ function maskToken(token: string) {
 }
 
 export function SettingsView() {
+  const { t, currentLanguage } = useSettingsTranslation();
   const queryClient = useQueryClient();
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [notificationError, setNotificationError] = useState<string | null>(null);
@@ -96,7 +101,7 @@ export function SettingsView() {
     queryFn: async (): Promise<AccountOverviewResult> => {
       const result = await getAccountOverview();
       if (!result.success || !result.data) {
-        throw new Error(result.errors?.[0]?.message || "Failed to load account overview");
+        throw new Error(result.errors?.[0]?.message || t("errors.load_failed"));
       }
       return result.data;
     },
@@ -113,7 +118,7 @@ export function SettingsView() {
     queryFn: async (): Promise<SessionsOverview> => {
       const result = await getSessionsOverview();
       if (!result.success || !result.data) {
-        throw new Error(result.errors?.[0]?.message || "Failed to load sessions");
+        throw new Error(result.errors?.[0]?.message || t("errors.load_sessions"));
       }
       return result.data;
     },
@@ -130,9 +135,7 @@ export function SettingsView() {
     queryFn: async (): Promise<NotificationPreferences> => {
       const result = await getNotificationPreferences();
       if (!result.success || !result.data) {
-        throw new Error(
-          result.errors?.[0]?.message || "Failed to load email preferences",
-        );
+        throw new Error(result.errors?.[0]?.message || t("errors.load_preferences"));
       }
       return result.data;
     },
@@ -143,17 +146,17 @@ export function SettingsView() {
     mutationFn: async (input: ChangePasswordInput) => changePassword({ data: input }),
     onSuccess: (result) => {
       if (result.success) {
-        toast.success("Password updated");
+        toast.success(t("success.password_updated"));
         queryClient.invalidateQueries({ queryKey: ["account-overview"] });
       } else {
-        const message = result.errors?.[0]?.message || "Failed to update password";
+        const message = result.errors?.[0]?.message || t("errors.update_password");
         toast.error(message);
         throw new Error(message);
       }
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to update password";
+        error instanceof Error ? error.message : t("errors.update_password");
       toast.error(message);
     },
   });
@@ -162,15 +165,16 @@ export function SettingsView() {
     mutationFn: async (token: string) => revokeSession({ data: { token } }),
     onSuccess: async (result) => {
       if (!result.success) {
-        const message = result.errors?.[0]?.message || "Failed to revoke session";
+        const message = result.errors?.[0]?.message || t("errors.session_revoke_failed");
         toast.error(message);
         throw new Error(message);
       }
-      toast.success("Session revoked");
+      toast.success(t("success.session_revoked"));
       await queryClient.invalidateQueries({ queryKey: ["sessions-overview"] });
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Failed to revoke session";
+      const message =
+        error instanceof Error ? error.message : t("errors.session_revoke_failed");
       toast.error(message);
     },
   });
@@ -179,16 +183,16 @@ export function SettingsView() {
     mutationFn: async () => revokeOtherSessions(),
     onSuccess: async (result) => {
       if (!result.success) {
-        const message = result.errors?.[0]?.message || "Failed to revoke other sessions";
+        const message = result.errors?.[0]?.message || t("errors.session_revoke_failed");
         toast.error(message);
         throw new Error(message);
       }
-      toast.success("Other sessions revoked");
+      toast.success(t("success.all_sessions_revoked"));
       await queryClient.invalidateQueries({ queryKey: ["sessions-overview"] });
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to revoke other sessions";
+        error instanceof Error ? error.message : t("errors.session_revoke_failed");
       toast.error(message);
     },
   });
@@ -198,15 +202,15 @@ export function SettingsView() {
       unlinkAccount({ data: variables }),
     onSuccess: async (result) => {
       if (!result.success) {
-        const message = result.errors?.[0]?.message || "Failed to unlink account";
+        const message = result.errors?.[0]?.message || t("errors.unlink_account");
         toast.error(message);
         throw new Error(message);
       }
-      toast.success("Account disconnected");
+      toast.success(t("success.account_disconnected"));
       await queryClient.invalidateQueries({ queryKey: ["account-overview"] });
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Failed to unlink account";
+      const message = error instanceof Error ? error.message : t("errors.unlink_account");
       toast.error(message);
     },
   });
@@ -216,17 +220,16 @@ export function SettingsView() {
       updateNotificationPreferences({ data: input }),
     onSuccess: async (result) => {
       if (!result.success || !result.data) {
-        const message =
-          result.errors?.[0]?.message || "Failed to update email preferences";
+        const message = result.errors?.[0]?.message || t("errors.save_preferences");
         toast.error(message);
         throw new Error(message);
       }
-      toast.success("Email preferences updated");
+      toast.success(t("success.email_preferences_updated"));
       await queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
     },
     onError: (error: unknown) => {
       const message =
-        error instanceof Error ? error.message : "Failed to update email preferences";
+        error instanceof Error ? error.message : t("errors.save_preferences");
       toast.error(message);
     },
   });
@@ -243,13 +246,16 @@ export function SettingsView() {
       setPasswordError(null);
 
       if (formValues.newPassword !== formValues.confirmPassword) {
-        setPasswordError("New password and confirmation do not match");
+        setPasswordError(t("sections.security.password.validation.mismatch"));
         return;
       }
 
       const validation = validatePassword(formValues.newPassword);
       if (!validation.isValid) {
-        setPasswordError(validation.errors[0] ?? "Password does not meet requirements");
+        setPasswordError(
+          validation.errors[0] ??
+            t("sections.security.password.validation.requirements_not_met"),
+        );
         return;
       }
 
@@ -263,9 +269,7 @@ export function SettingsView() {
         formApi.reset();
       } catch (error) {
         const message =
-          error instanceof Error
-            ? error.message
-            : "Failed to update password. Please try again.";
+          error instanceof Error ? error.message : t("errors.update_password");
         setPasswordError(message);
       }
     },
@@ -286,7 +290,7 @@ export function SettingsView() {
         }
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "Failed to update email preferences";
+          error instanceof Error ? error.message : t("errors.save_preferences");
         setNotificationError(message);
       }
     },
@@ -327,20 +331,19 @@ export function SettingsView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your account security, email preferences, sessions, and connected
-          services
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t("sections.account.title")}
+        </h1>
+        <p className="text-muted-foreground mt-2">{t("sections.account.subtitle")}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr,1fr]">
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>{t("sections.security.password.title")}</CardTitle>
               <CardDescription>
-                Update your password to keep your account secure.
+                {t("sections.security.password.subtitle")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -363,9 +366,11 @@ export function SettingsView() {
                       <ValidatedInput
                         field={field}
                         type="password"
-                        label="Current password"
+                        label={t("sections.security.password.current_password")}
                         autoComplete="current-password"
-                        placeholder="Enter your current password"
+                        placeholder={t(
+                          "sections.security.password.placeholders.current_password",
+                        )}
                       />
                     )}
                   </changePasswordForm.Field>
@@ -375,16 +380,18 @@ export function SettingsView() {
                       <ValidatedInput
                         field={field}
                         type="password"
-                        label="New password"
+                        label={t("sections.security.password.new_password")}
                         autoComplete="new-password"
-                        placeholder="Create a strong password"
+                        placeholder={t(
+                          "sections.security.password.placeholders.new_password",
+                        )}
                       />
                     )}
                   </changePasswordForm.Field>
 
                   {passwordStrength ? (
                     <div className="text-muted-foreground text-sm">
-                      Password strength:{" "}
+                      {t("sections.security.password.strength_label")}{" "}
                       <span className="font-medium">{passwordStrength.label}</span>
                     </div>
                   ) : null}
@@ -394,9 +401,11 @@ export function SettingsView() {
                       <ValidatedInput
                         field={field}
                         type="password"
-                        label="Confirm new password"
+                        label={t("sections.security.password.confirm_new_password")}
                         autoComplete="new-password"
-                        placeholder="Re-enter your new password"
+                        placeholder={t(
+                          "sections.security.password.placeholders.confirm_password",
+                        )}
                       />
                     )}
                   </changePasswordForm.Field>
@@ -405,8 +414,10 @@ export function SettingsView() {
                     {(field) => (
                       <ValidatedCheckbox
                         field={field}
-                        label="Sign out of other devices"
-                        description="End active sessions on other browsers and devices"
+                        label={t("sections.security.password.sign_out_devices")}
+                        description={t(
+                          "sections.security.password.sign_out_devices_description",
+                        )}
                       />
                     )}
                   </changePasswordForm.Field>
@@ -414,7 +425,7 @@ export function SettingsView() {
                   {passwordError ? (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Unable to update password</AlertTitle>
+                      <AlertTitle>{t("errors.unable_to_update_password")}</AlertTitle>
                       <AlertDescription>{passwordError}</AlertDescription>
                     </Alert>
                   ) : null}
@@ -428,10 +439,10 @@ export function SettingsView() {
                       {pendingChangePassword ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Updating...
+                          {t("sections.security.password.button_loading")}
                         </>
                       ) : (
-                        "Update password"
+                        t("sections.security.password.button")
                       )}
                     </Button>
                   </div>
@@ -442,10 +453,8 @@ export function SettingsView() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Email Preferences</CardTitle>
-              <CardDescription>
-                Choose which non-critical updates you receive in your inbox.
-              </CardDescription>
+              <CardTitle>{t("sections.notifications.title")}</CardTitle>
+              <CardDescription>{t("sections.notifications.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent>
               {notificationLoading ? (
@@ -458,10 +467,12 @@ export function SettingsView() {
               ) : notificationQueryError ? (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Unable to load email preferences</AlertTitle>
+                  <AlertTitle>
+                    {t("sections.notifications.errors.load_failed")}
+                  </AlertTitle>
                   <AlertDescription>
                     {(notificationQueryError as Error).message ||
-                      "Please refresh the page and try again."}
+                      t("sections.notifications.errors.refresh_page")}
                   </AlertDescription>
                 </Alert>
               ) : (
@@ -477,8 +488,12 @@ export function SettingsView() {
                       {(field) => (
                         <ValidatedCheckbox
                           field={field}
-                          label="Game reminders"
-                          description="Reminders 24h and 2h before games you’re attending."
+                          label={t(
+                            "sections.notifications.preferences.game_reminders.label",
+                          )}
+                          description={t(
+                            "sections.notifications.preferences.game_reminders.description",
+                          )}
                           disabled={updateNotificationPreferencesMutation.isPending}
                         />
                       )}
@@ -487,8 +502,12 @@ export function SettingsView() {
                       {(field) => (
                         <ValidatedCheckbox
                           field={field}
-                          label="Game updates"
-                          description="Emails when a game you’re attending is scheduled, updated, or canceled."
+                          label={t(
+                            "sections.notifications.preferences.game_updates.label",
+                          )}
+                          description={t(
+                            "sections.notifications.preferences.game_updates.description",
+                          )}
                           disabled={updateNotificationPreferencesMutation.isPending}
                         />
                       )}
@@ -497,8 +516,12 @@ export function SettingsView() {
                       {(field) => (
                         <ValidatedCheckbox
                           field={field}
-                          label="Campaign weekly digest"
-                          description="Weekly summary of your upcoming campaign sessions."
+                          label={t(
+                            "sections.notifications.preferences.campaign_digests.label",
+                          )}
+                          description={t(
+                            "sections.notifications.preferences.campaign_digests.description",
+                          )}
                           disabled={updateNotificationPreferencesMutation.isPending}
                         />
                       )}
@@ -507,8 +530,12 @@ export function SettingsView() {
                       {(field) => (
                         <ValidatedCheckbox
                           field={field}
-                          label="Campaign session updates"
-                          description="Emails when campaign sessions are scheduled, updated, or canceled."
+                          label={t(
+                            "sections.notifications.preferences.campaign_updates.label",
+                          )}
+                          description={t(
+                            "sections.notifications.preferences.campaign_updates.description",
+                          )}
                           disabled={updateNotificationPreferencesMutation.isPending}
                         />
                       )}
@@ -517,8 +544,12 @@ export function SettingsView() {
                       {(field) => (
                         <ValidatedCheckbox
                           field={field}
-                          label="Review reminders"
-                          description="Reminders to review your GM after games."
+                          label={t(
+                            "sections.notifications.preferences.review_reminders.label",
+                          )}
+                          description={t(
+                            "sections.notifications.preferences.review_reminders.description",
+                          )}
                           disabled={updateNotificationPreferencesMutation.isPending}
                         />
                       )}
@@ -527,8 +558,12 @@ export function SettingsView() {
                       {(field) => (
                         <ValidatedCheckbox
                           field={field}
-                          label="Social notifications"
-                          description="Emails for follows, requests, and other social activity."
+                          label={t(
+                            "sections.notifications.preferences.social_notifications.label",
+                          )}
+                          description={t(
+                            "sections.notifications.preferences.social_notifications.description",
+                          )}
                           disabled={updateNotificationPreferencesMutation.isPending}
                         />
                       )}
@@ -538,7 +573,9 @@ export function SettingsView() {
                   {notificationError ? (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Unable to save preferences</AlertTitle>
+                      <AlertTitle>
+                        {t("sections.notifications.errors.save_failed")}
+                      </AlertTitle>
                       <AlertDescription>{notificationError}</AlertDescription>
                     </Alert>
                   ) : null}
@@ -552,10 +589,10 @@ export function SettingsView() {
                       {updateNotificationPreferencesMutation.isPending ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
+                          {t("sections.notifications.buttons.saving")}
                         </>
                       ) : (
-                        "Save preferences"
+                        t("sections.notifications.buttons.save")
                       )}
                     </Button>
                   </div>
@@ -563,7 +600,7 @@ export function SettingsView() {
                   {notificationFetching ? (
                     <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Refreshing preferences...
+                      {t("sections.sessions.status.refreshing_preferences")}
                     </div>
                   ) : null}
                 </form>
@@ -573,10 +610,8 @@ export function SettingsView() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Active Sessions</CardTitle>
-              <CardDescription>
-                Review browsers and devices that are currently signed in.
-              </CardDescription>
+              <CardTitle>{t("sections.sessions.title")}</CardTitle>
+              <CardDescription>{t("sections.sessions.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent>
               {sessionsLoading ? (
@@ -588,10 +623,10 @@ export function SettingsView() {
               ) : sessionsError ? (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Unable to load sessions</AlertTitle>
+                  <AlertTitle>{t("sections.sessions.errors.load_failed")}</AlertTitle>
                   <AlertDescription>
                     {(sessionsError as Error).message ||
-                      "Please refresh the page and try again."}
+                      t("sections.sessions.errors.refresh_page")}
                   </AlertDescription>
                 </Alert>
               ) : sessionsData ? (
@@ -599,10 +634,18 @@ export function SettingsView() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Device</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Last active</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>
+                          {t("sections.sessions.table_headers.device")}
+                        </TableHead>
+                        <TableHead>
+                          {t("sections.sessions.table_headers.location")}
+                        </TableHead>
+                        <TableHead>
+                          {t("sections.sessions.table_headers.last_active")}
+                        </TableHead>
+                        <TableHead className="text-right">
+                          {t("sections.sessions.table_headers.actions")}
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -615,19 +658,26 @@ export function SettingsView() {
                             <div className="flex flex-col">
                               <span className="font-medium">
                                 {session.isCurrent
-                                  ? "This device"
-                                  : formatUserAgent(session.userAgent)}
+                                  ? t("sections.sessions.this_device")
+                                  : formatUserAgent(session.userAgent, t)}
                               </span>
                               <span className="text-muted-foreground text-xs">
-                                Session ID: {maskToken(session.token)}
+                                {t("sections.sessions.session_id")}{" "}
+                                {maskToken(session.token)}
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell>{session.ipAddress ?? "Unknown"}</TableCell>
                           <TableCell>
-                            {formatDistanceToNow(new Date(session.updatedAt), {
-                              addSuffix: true,
-                            })}
+                            {session.ipAddress ?? t("sections.sessions.unknown_location")}
+                          </TableCell>
+                          <TableCell>
+                            {formatDistanceToNowLocalized(
+                              new Date(session.updatedAt),
+                              currentLanguage,
+                              {
+                                addSuffix: true,
+                              },
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             {session.isCurrent ? (
@@ -635,7 +685,7 @@ export function SettingsView() {
                                 variant="secondary"
                                 className="bg-green-100 text-green-800"
                               >
-                                Current
+                                {t("sections.sessions.current")}
                               </Badge>
                             ) : (
                               <Button
@@ -651,7 +701,7 @@ export function SettingsView() {
                                 ) : (
                                   <LogOut className="mr-2 h-4 w-4" />
                                 )}
-                                Revoke
+                                {t("sections.sessions.actions.revoke")}
                               </Button>
                             )}
                           </TableCell>
@@ -671,18 +721,18 @@ export function SettingsView() {
                       ) : (
                         <Shield className="mr-2 h-4 w-4" />
                       )}
-                      Sign out of all other sessions
+                      {t("sections.sessions.actions.revoke_all")}
                     </Button>
                   ) : (
                     <div className="text-muted-foreground text-sm">
-                      Only your current session is active.
+                      {t("sections.sessions.only_current_session")}
                     </div>
                   )}
 
                   {sessionsFetching ? (
                     <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Refreshing session data...
+                      {t("sections.sessions.status.refreshing")}
                     </div>
                   ) : null}
                 </div>
@@ -694,8 +744,8 @@ export function SettingsView() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Account status</CardTitle>
-              <CardDescription>Overview of your primary account details.</CardDescription>
+              <CardTitle>{t("sections.account.status.title")}</CardTitle>
+              <CardDescription>{t("sections.account.status.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {accountLoading ? (
@@ -707,20 +757,23 @@ export function SettingsView() {
               ) : accountError ? (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Unable to load account</AlertTitle>
+                  <AlertTitle>{t("errors.load_account")}</AlertTitle>
                   <AlertDescription>
-                    {(accountError as Error).message ||
-                      "Please refresh the page and try again."}
+                    {(accountError as Error).message || t("errors.refresh_page")}
                   </AlertDescription>
                 </Alert>
               ) : accountOverview ? (
                 <div className="space-y-3">
                   <div>
-                    <div className="text-muted-foreground text-sm font-medium">Name</div>
+                    <div className="text-muted-foreground text-sm font-medium">
+                      {t("sections.account.fields.name")}
+                    </div>
                     <div className="text-sm">{accountOverview.user.name}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground text-sm font-medium">Email</div>
+                    <div className="text-muted-foreground text-sm font-medium">
+                      {t("sections.account.fields.email")}
+                    </div>
                     <div className="flex items-center gap-2 text-sm">
                       <span>{accountOverview.user.email}</span>
                       {accountOverview.user.emailVerified ? (
@@ -728,29 +781,33 @@ export function SettingsView() {
                           variant="secondary"
                           className="bg-green-100 text-green-800"
                         >
-                          <CheckCircle2 className="mr-1 h-3 w-3" /> Verified
+                          <CheckCircle2 className="mr-1 h-3 w-3" />{" "}
+                          {t("sections.account.status_labels.verified")}
                         </Badge>
                       ) : (
                         <Badge
                           variant="outline"
                           className="border-amber-400 text-amber-700"
                         >
-                          <AlertCircle className="mr-1 h-3 w-3" /> Not verified
+                          <AlertCircle className="mr-1 h-3 w-3" />{" "}
+                          {t("sections.account.status_labels.not_verified")}
                         </Badge>
                       )}
                     </div>
                   </div>
                   <div>
                     <div className="text-muted-foreground text-sm font-medium">
-                      Password
+                      {t("sections.account.fields.password")}
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <span>
-                        {accountOverview.hasPassword ? "Set" : "Not configured"}
+                        {accountOverview.hasPassword
+                          ? t("sections.account.status_labels.set")
+                          : t("sections.account.status_labels.not_configured")}
                       </span>
                       {!accountOverview.hasPassword ? (
                         <Badge variant="outline" className="border-red-400 text-red-700">
-                          Required
+                          {t("sections.account.status_labels.required")}
                         </Badge>
                       ) : null}
                     </div>
@@ -759,7 +816,7 @@ export function SettingsView() {
                   {accountFetching ? (
                     <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Refreshing account info...
+                      {t("sections.sessions.status.refreshing_account")}
                     </div>
                   ) : null}
                 </div>
@@ -769,8 +826,10 @@ export function SettingsView() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Connected accounts</CardTitle>
-              <CardDescription>Manage social logins and linked services.</CardDescription>
+              <CardTitle>{t("sections.account.connected_accounts.title")}</CardTitle>
+              <CardDescription>
+                {t("sections.account.connected_accounts.subtitle")}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {accountLoading ? (
@@ -788,11 +847,13 @@ export function SettingsView() {
                           className="border-border flex items-center justify-between rounded-lg border p-3"
                         >
                           <div className="space-y-1">
-                            <div className="font-medium">Email &amp; password</div>
+                            <div className="font-medium">
+                              {t("sections.account.providers.email_password")}
+                            </div>
                             <p className="text-muted-foreground text-sm">
                               {accountOverview.hasPassword
-                                ? "You can sign in with your email and password."
-                                : "Set a password to allow email-based sign in."}
+                                ? t("sections.account.providers.signin_text")
+                                : t("sections.account.providers.setup_text")}
                             </p>
                           </div>
                           <Button
@@ -804,7 +865,7 @@ export function SettingsView() {
                               focusElement?.focus();
                             }}
                           >
-                            Update password
+                            {t("sections.account.buttons.update_password")}
                           </Button>
                         </div>
                       );
@@ -829,16 +890,18 @@ export function SettingsView() {
                                 variant="secondary"
                                 className="bg-green-100 text-green-800"
                               >
-                                Connected
+                                {t("sections.account.status_labels.connected")}
                               </Badge>
                             ) : (
-                              <Badge variant="outline">Not connected</Badge>
+                              <Badge variant="outline">
+                                {t("sections.account.status_labels.not_connected")}
+                              </Badge>
                             )}
                           </div>
                           <p className="text-muted-foreground text-sm">
                             {isLinked
-                              ? "You can sign in using this provider."
-                              : "Connect this provider to sign in without a password."}
+                              ? t("sections.account.providers.connected.signin_text")
+                              : t("sections.account.providers.connected.setup_text")}
                           </p>
                         </div>
                         {isLinked ? (
@@ -861,7 +924,7 @@ export function SettingsView() {
                             ) : (
                               <Trash2 className="mr-2 h-4 w-4" />
                             )}
-                            Disconnect
+                            {t("sections.account.buttons.disconnect")}
                           </Button>
                         ) : (
                           <Button
@@ -874,7 +937,7 @@ export function SettingsView() {
                                 },
                                 {
                                   onRequest: () => {
-                                    toast.message("Redirecting to provider...");
+                                    toast.message(t("alerts.redirecting_to_provider"));
                                   },
                                   onError: (ctx: unknown) => {
                                     const errorContext =
@@ -883,7 +946,7 @@ export function SettingsView() {
                                         : undefined;
                                     const errorMessage =
                                       errorContext?.error?.message ||
-                                      "Failed to connect account";
+                                      t("errors.connect_account");
                                     toast.error(errorMessage);
                                   },
                                 },
@@ -891,7 +954,7 @@ export function SettingsView() {
                             }
                           >
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            Connect
+                            {t("sections.account.buttons.connect")}
                           </Button>
                         )}
                       </div>

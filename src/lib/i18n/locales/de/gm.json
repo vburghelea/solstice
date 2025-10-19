@@ -1,0 +1,315 @@
+{
+  "dashboard": {
+    "title": "Leite deine Kampagnen mit filmreifer Klarheit",
+    "subtitle": "Das Studio vereint Kampagnenvorbereitung, Session-Pacing und Nachbereitung-Rituale in einem einzigen Fluss. Priorisiere die Geschichten, die als Nächstes deine Aufmerksamkeit brauchen.",
+    "loading_error": {
+      "title": "Beim Laden des Studios gab es ein kleines Problem",
+      "description": "Einige Kampagnen- oder Session-Daten konnten nicht geladen werden. Aktualisiere die Seite oder öffne die klassische Dashboard-Ansicht."
+    },
+    "feedback_queue_title": "Feedback-Nachverfolgung",
+    "feedback_queue_description": "Halte Sicherheitswerkzeuge und Nach-Session-Reflexionen für jeden Tisch am Laufen."
+  },
+  "stats": {
+    "upcoming_sessions": "Bevorstehende Sessions",
+    "upcoming_sessions_assistive": "Nächste 30 Tage",
+    "active_campaigns": "Aktive Kampagnen",
+    "active_campaigns_assistive": "Bereit für den Spotlight",
+    "players_engaged": "Spieler involviert",
+    "players_engaged_assistive": "Über alle geplanten Sessions",
+    "campaign_linked_sessions": "Kampagnen-gebundene Sessions",
+    "campaign_linked_sessions_assistive": "Verankert in Handlungsbögen"
+  },
+  "empty_states": {
+    "no_sessions": {
+      "title": "Keine Sessions in Vorbereitung",
+      "description": "Plane ein neues Treffen oder wandele ein Kampagnen-Element in eine Live-Session um, um den Schwung zu halten.",
+      "action_label": "Session planen"
+    },
+    "no_campaigns": {
+      "title": "Noch keine aktiven Kampagnen",
+      "description": "Entwerfe deinen nächsten Handlungsbogen oder belebe einen alten Favoriten, um deine Tische bei der Stange zu halten.",
+      "action_label": "Kampagne starten"
+    },
+    "no_followups": {
+      "title": "Keine Nachverfolgungen in der Warteschlange",
+      "description": "Sobald du eine Session leitest, zeigen wir dir hier die Debrief-, Umfrage- und Eskalationsaufgaben.",
+      "action_label": "Session-Archiv durchsuchen"
+    }
+  },
+  "actions": {
+    "open_studio": "Studio öffnen",
+    "open_triage_board": "Triage-Board öffnen",
+    "schedule_session": "Session planen",
+    "start_campaign": "Kampagne starten",
+    "browse_archive": "Archiv durchsuchen",
+    "session_notes": "Session-Notizen",
+    "open_session_manager": "Session-Manager öffnen",
+    "open_legacy_view": "Legacy-Ansicht öffnen",
+    "edit_details": "Details bearbeiten"
+  },
+  "sections": {
+    "session_runway": {
+      "title": "Session-Vorbereitung",
+      "description": "Halte deine nächsten Treffen scharf mit Inszenierungs-Hinweisen, Übersicht und Spieler-Load."
+    },
+    "campaign_pulse": {
+      "title": "Kampagnen-Puls",
+      "description": "Erkenne Handlungsbögen, die Reach-out, Rekrutierung oder Spotlight-Momente brauchen."
+    }
+  },
+  "session_types": {
+    "standalone": "Einzel-Session"
+  },
+  "badges": {
+    "upcoming_touchpoints": "{{count}} anstehende Kontakte"
+  },
+  "labels": {
+    "participants": "{{count}} Teilnehmer",
+    "updated": "Aktualisiert {{date}}",
+    "session": "Session:",
+    "debrief": "{{name}} Debrief",
+    "recap": "{{name}} Zusammenfassung",
+    "collect_safety": "Sicherheits-Check-ins und Narrative Beats von {{count}} Spielern sammeln.",
+    "capture_highlights": "Highlights und Spieler-Energie festhalten, während die Geschichte noch frisch ist."
+  },
+  "feedback_triage": {
+    "title": "Sorge dafür, dass sich jeder Tisch gehört und sicher fühlt",
+    "subtitle": "Bündele Nach-Session-Umfragen, Sicherheits-Eskalationen und Feier-Hinweise auf einem Board, das auf die Rituale des Story Guides abgestimmt ist.",
+    "badge": "Feedback-Triage",
+    "back_to_studio": "Zurück zur Studio-Übersicht",
+    "stats": {
+      "debriefs_queued": "Debriefs in Warteschlange",
+      "safety_checkpoints": "Sicherheits-Kontrollpunkte",
+      "upcoming_nudges": "Anstehende Erinnerungen"
+    },
+    "actions": {
+      "create_feedback_task": "Feedback-Aufgabe erstellen",
+      "open_recap": "Zusammenfassung öffnen",
+      "open_campaign": "Kampagne öffnen",
+      "session_details": "Session-Details"
+    },
+    "columns": {
+      "debriefs": {
+        "title": "Nach-Session-Nachverfolgungen",
+        "description": "Debriefs, Umfragen und Dankeschön, die nach deinen letzten Treffen in der Warteschlange stehen.",
+        "empty": {
+          "title": "Keine Nachverfolgungen ausstehend",
+          "description": "Leite eine Session und wir zeigen dir dir sofort die Debrief-Aufgaben an."
+        }
+      },
+      "safety_checkin": {
+        "title": "Sicherheit & Wohlbefinden",
+        "description": "Check-ins, Grenzen und Eskalations-Notizen, die Aufmerksamkeit verdienen.",
+        "empty": {
+          "title": "Sicherheitswerkzeuge alle eingestellt",
+          "description": "Tolle Arbeit! Halte Grenzen und Werkzeuge fest, während sich deine Tische weiterentwickeln."
+        }
+      },
+      "upcoming_nudges": {
+        "title": "Anstehende Kontakte",
+        "description": "Vor-Session-Erinnerungen und Rituale, die dein Storytelling für filmische Umsetzung vorbereiten.",
+        "empty": {
+          "title": "Keine anstehenden Sessions in Warteschlange",
+          "description": "Plane dein nächstes Treffen, um Vorbereitungs-Checklisten und Erinnerungen freizuschalten."
+        }
+      }
+    },
+    "severity": {
+      "overdue": "Überfällig",
+      "attention": "Aufmerksamkeit erforderlich",
+      "on_track": "Auf Kurs"
+    },
+    "tasks": {
+      "collect_surveys": "Umfragen und Sicherheits-Notizen von {{count}} Spielern sammeln, um den Kreis zu schließen.",
+      "completed_prefix": "Abgeschlossen {{time}}",
+      "starts_prefix": "Beginnt {{time}}",
+      "started_prefix": "Begonnen {{time}}",
+      "capture_boundaries": "Zustimmungsgrenzen für den Tisch festhalten.",
+      "boundaries_documented": "Grenzen dokumentiert – auf Abweichungen prüfen.",
+      "confirm_safety_tool": "Bestätige das Sicherheitswerkzeug, das du leiten wirst.",
+      "safety_tooling_confirmed": "Sicherheitswerkzeuge bestätigt – Erinnerungen vor der Session teilen.",
+      "safety_sweep_suffix": "Sicherheits-Check",
+      "prep_checklist_suffix": "Vorbereitungs-Checkliste",
+      "prep_checklist_detail": "Spotlights, Requisiten und Vor-Session-Umfragen vor {{time}} doppelt prüfen.",
+      "updated_prefix": "Aktualisiert {{time}}"
+    }
+  },
+  "campaign_workspace": {
+    "badge": {
+      "campaign_studio": "Kampagnen-Studio"
+    },
+    "narrative_brief": {
+      "title": "Narratives Briefing",
+      "campaign_pitch": "Kampagnen-Pitch",
+      "session_zero_checkpoints": "Session-Null-Kontrollpunkte"
+    },
+    "session_pipeline": {
+      "title": "Session-Pipeline",
+      "upcoming": "Bevorstehend",
+      "recent_wraps": "Kürzliche Abschlüsse"
+    },
+    "player_dossiers": {
+      "title": "Spieler-Akten"
+    },
+    "location": {
+      "remote_tbd": "Remote / Noch offen"
+    },
+    "recurrence": {
+      "custom_cadence": "Benutzerdefiniertes Tempo"
+    },
+    "sessions": {
+      "next_session": "Nächste Session",
+      "not_scheduled": "Nicht geplant",
+      "add_gathering": "Treffen hinzufügen",
+      "last_debrief": "Letztes Debrief",
+      "awaiting_first_session": "Warte auf erste Session",
+      "run_session": "Session leiten"
+    },
+    "details": {
+      "active_roster": "Aktives Line-up",
+      "system": "System",
+      "custom": "Benutzerdefiniert",
+      "story_engine_focus": "Story-Engine im Fokus"
+    },
+    "expectations": {
+      "tone_difficulty": "Ton & Schwierigkeit",
+      "challenge_scope_placeholder": "Leg den Herausforderungs-Rahmen fest.",
+      "session_cadence": "Session-Tempo",
+      "arc_length_placeholder": "Handlungsbogen-Länge oder Staffeln dokumentieren.",
+      "character_creation": "Charaktererstellung",
+      "character_creation_placeholder": "Festhalten, wie Charaktere in die Welt eingebunden sind.",
+      "house_rules": "Hausregeln",
+      "house_rules_placeholder": "Sicherheits-, Würfel- oder Hausregeln-Hinweise auflisten."
+    },
+    "safety": {
+      "player_boundaries_captured": "Spieler-Grenzen erfasst",
+      "document_boundaries": "Spieler-Grenzen und X-Karten-Vereinbarungen dokumentieren",
+      "attendance_policy_shared": "Anwesenheitsrichtlinie geteilt",
+      "clarify_absences": "Kläre, wie mit Abwesenheiten und Verspätungen umgegangen wird"
+    },
+    "empty_states": {
+      "no_sessions_scheduled": {
+        "title": "Keine Sessions geplant",
+        "description": "Stelle das nächste Kapitel in die Warteschlange, um deine Spieler bei der Stange zu halten.",
+        "action_label": "Session planen"
+      },
+      "no_completed_sessions": {
+        "title": "Keine abgeschlossenen Sessions",
+        "description": "Sobald du ein Treffen abschließt, heben wir hier die Debrief-Aufgaben hervor.",
+        "action_label": "Archiv ansehen"
+      }
+    },
+    "participants": {
+      "ready": "Bereit",
+      "unnamed_player": "Unbenannter Spieler"
+    },
+    "description": "Leite diesen Handlungsbogen, Vorbereitungs-Rituale und Spieler-Energie aus einem einzigen, auf den Story Guide zugeschnittenen Arbeitsbereich.",
+    "active_players": "{{count}} aktive Spieler",
+    "sections": {
+      "narrative_brief": {
+        "subtitle": "Halte den Kampagnen-Rückenstrang, Tisch-Rituale und Vorbereitungs-Hinweise griffbereit."
+      },
+      "safety_consent": {
+        "title": "Sicherheit & Zustimmung",
+        "subtitle": "Stimme auf Werkzeuge, Grenzen und Erinnerungen vor und nach jeder Session ab."
+      },
+      "session_pipeline": {
+        "subtitle": "Verfolge, was als Nächstes kommt, und feiere die Story-Beats, die du bereits geliefert hast."
+      },
+      "player_dossiers": {
+        "subtitle": "Behalte den Überblick darüber, wer am Tisch sitzt, ihr Status und die Einladungen in Bewegung."
+      }
+    },
+    "pending_invites": {
+      "count": "{{count}} ausstehende Einladung{{count, plural, =1 {} other {en}}}",
+      "reminder": "Sende eine persönliche Notiz oder Erinnerung, um das Line-up vor der nächsten Session final zu machen."
+    },
+    "session_card": {
+      "attendees": "{{count}} Teilnehmer",
+      "last_updated": "Zuletzt aktualisiert {{time}}",
+      "review_recap": "Zusammenfassung ansehen"
+    }
+  },
+  "b2b_pipeline": {
+    "title": "B2B-Kollaborations-Pipeline",
+    "subtitle": "Verfolge jede Unternehmens-Gelegenheit mit klaren Übergaben, Story-Guide-Hinweisen und Eskalations-Hooks, die mit der Plattform-Aufsicht verbunden sind.",
+    "active_opportunities": "{{count}} aktive Gelegenheiten",
+    "focus_cues": {
+      "title": "Fokus-Hinweise auf dich zugeschnitten",
+      "description": "Hebe dringende Narrative-Fäden, live Eskalationen und gefährdete Verlängerungen hervor, ohne die breitere Pipeline aus den Augen zu verlieren."
+    },
+    "focus_summary": {
+      "active_opportunities": "Aktive Gelegenheiten",
+      "active_opportunities_assistive": "Über alle Phasen",
+      "my_focus": "Mein Fokus",
+      "my_focus_assistive": "Dringend & dir zugewiesen",
+      "renewals_at_risk": "Verlängerungen gefährdet",
+      "renewals_at_risk_assistive": "Benötigen Rettungspläne",
+      "escalations_live": "Eskalationen live",
+      "escalations_live_assistive": "Überwacht oder ausgelöst",
+      "follow_ups_due": "Nachverfolgungen fällig",
+      "follow_ups_due_assistive": "Innerhalb 48 Stunden"
+    },
+    "empty_state": {
+      "title": "Noch keine aktiven B2B-Fäden",
+      "description": "Sobald eine Gelegenheit erfasst wird, erscheinen hier Phasen, Zuweisungen und Eskalations-Hooks.",
+      "action_label": "Unternehmens-Pilot planen"
+    },
+    "focus_toggle": {
+      "my_focus_description": "Dringende, eskalierte oder gefährdete Fäden, die dir zugewiesen sind.",
+      "entire_pipeline_description": "Jede laufende Gelegenheit über Teams hinweg ansehen.",
+      "view_label": "Ansehen"
+    },
+    "stage": {
+      "respond_within": "Innerhalb {{hours}} Stunden antworten",
+      "exit_criteria_label": "Austrittskriterien:",
+      "clear_stage": "Phase ist klar. Bereit für den nächsten narrativen Handschlag.",
+      "no_focus_threads": "Keine dringenden Fokus-Fäden in dieser Phase."
+    },
+    "opportunity": {
+      "location_tbd": "Ort noch offen",
+      "point_of_contact": "Ansprechpartner:",
+      "entered_stage_ago": "Vor {{duration}} in Phase eingetreten",
+      "last_touch": "Letzter Kontakt {{duration}}",
+      "next_step": "Nächster Schritt",
+      "follow_up_due": "Nachverfolgung überfällig",
+      "follow_up_due_soon": "Nachverfolgung bald fällig",
+      "follow_up_scheduled": "Nachverfolgung fällig",
+      "follow_up_status": {
+        "overdue": "Überfällig — jetzt wieder verbinden",
+        "due_soon": "Fällig innerhalb 48 Stunden",
+        "scheduled": "Im Takt"
+      },
+      "services_in_scope": "Leistungen im Umfang",
+      "assigned_partners": "Zugewiesene Partner",
+      "escalation_hooks": "Eskalations-Hooks",
+      "no_escalation_hooks": "Noch keine Eskalations-Hooks konfiguriert.",
+      "studio_note": "Studio-Notiz",
+      "studio_note_placeholder": "Entscheidungs-Hinweise, Sicherheitskontext oder Produktions-Blocker festhalten.",
+      "linked_to": "Verknüpft mit {{name}}",
+      "loop_specialists": "Zusätzliche Spezialisten über Plattform-Admin einbeziehen"
+    },
+    "assignment_roles": {
+      "story_guide_you": "Story Guide (du)"
+    },
+    "escalation": {
+      "escalate_via": "Eskalieren über {{role}}",
+      "resolve_by": "Lösen bis {{date}}",
+      "triggered": "Ausgelöst",
+      "monitoring": "Überwachung"
+    },
+    "note_sync": {
+      "synced": "Synchronisiert",
+      "pending_sync": "Synchronisierung ausstehend",
+      "syncing": "Synchronisierung…",
+      "offline": "Offline — lokal gespeichert",
+      "ready_to_sync": "Bereit zur Synchronisierung",
+      "sync_failed": "Synchronisierung fehlgeschlagen",
+      "conflict_detected": "Konflikt erkannt",
+      "last_updated_by": "Zuletzt aktualisiert von {{name}} am {{date}}",
+      "accept_platform_update": "Plattform-Update akzeptieren",
+      "overwrite_with_note": "Mit meiner Notiz überschreiben",
+      "retry_sync": "Synchronisierung wiederholen"
+    }
+  }
+}

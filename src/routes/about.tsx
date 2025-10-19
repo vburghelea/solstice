@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CheckCircle2, ScrollText, Swords, UsersIcon } from "~/components/ui/icons";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
+import { useAboutTranslation } from "~/hooks/useTypedTranslation";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 
 const cardSurfaceClass =
@@ -11,69 +12,8 @@ const cardSurfaceClass =
 const mutedCardSurfaceClass =
   "rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/60";
 
-const missionHighlights = [
-  {
-    title: "Belonging at every table",
-    description:
-      "We connect newcomers, veterans, and curious visitors with welcoming hosts so no one has to face another quiet evening alone.",
-    icon: UsersIcon,
-  },
-  {
-    title: "Stages for storytellers",
-    description:
-      "Roundup Games creates rehearsal-ready spaces where Game Masters can practice their craft, receive coaching, and showcase their narratives to engaged audiences.",
-    icon: ScrollText,
-  },
-  {
-    title: "Play with purpose",
-    description:
-      "Every gathering is designed to spark laughter, curiosity, and long-term friendships through thoughtfully curated tabletop and board game experiences.",
-    icon: Swords,
-  },
-];
-
-const safetyCommitments = [
-  "Dedicated community stewards and trained facilitators at every sanctioned event.",
-  "Safety tools—from consent check-ins to debrief circles—woven into session design.",
-  "Privacy-first data practices with encrypted storage, minimal retention, and transparent governance.",
-  "Continuous audits with partners who specialize in safeguarding vulnerable communities.",
-];
-
-const articlePlaceholders = [
-  {
-    title: "Mission in practice",
-    description:
-      "Stories from local chapters turning empty Wednesday nights into vibrant, cross-generational meetups.",
-  },
-  {
-    title: "Vision and safety standards",
-    description:
-      "Deep dives into the policies, partners, and tools that keep our community feeling brave and respected.",
-  },
-  {
-    title: "Roadmap & impact reports",
-    description:
-      "Quarterly updates on new platform features, regional launches, and the metrics guiding our decisions.",
-  },
-];
-
-const feedbackTopics = [
-  {
-    title: "Suggest a new game system",
-    description:
-      "Help us feature rulesets and universes that excite your tables and broaden our library of adventures.",
-  },
-  {
-    title: "Nominate a venue",
-    description:
-      "Tell us about cafés, libraries, and community halls that would make incredible gathering points.",
-  },
-  {
-    title: "Report a platform issue",
-    description:
-      "Share bugs, accessibility concerns, or content requests so we can keep improving the digital experience.",
-  },
-];
+// Note: These constants will be populated with translation keys in the component
+// They remain empty here as they need access to the translation function
 
 const ABOUT_HERO_IMAGE = createResponsiveCloudinaryImage("heroAbout", {
   transformation: {
@@ -91,17 +31,75 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
+  const { t } = useAboutTranslation();
+
+  // Translation-aware constants
+  const missionHighlights = [
+    {
+      title: t("mission.highlights.belonging.title"),
+      description: t("mission.highlights.belonging.description"),
+      icon: UsersIcon,
+    },
+    {
+      title: t("mission.highlights.storytellers.title"),
+      description: t("mission.highlights.storytellers.description"),
+      icon: ScrollText,
+    },
+    {
+      title: t("mission.highlights.purpose.title"),
+      description: t("mission.highlights.purpose.description"),
+      icon: Swords,
+    },
+  ];
+
+  const safetyCommitments = [
+    t("vision.commitments.0"),
+    t("vision.commitments.1"),
+    t("vision.commitments.2"),
+    t("vision.commitments.3"),
+  ];
+
+  const articlePlaceholders = [
+    {
+      title: t("stories_insights.articles.mission_practice.title"),
+      description: t("stories_insights.articles.mission_practice.description"),
+    },
+    {
+      title: t("stories_insights.articles.vision_safety.title"),
+      description: t("stories_insights.articles.vision_safety.description"),
+    },
+    {
+      title: t("stories_insights.articles.roadmap_impact.title"),
+      description: t("stories_insights.articles.roadmap_impact.description"),
+    },
+  ];
+
+  const feedbackTopics = [
+    {
+      title: t("feedback.topics.suggest_system.title"),
+      description: t("feedback.topics.suggest_system.description"),
+    },
+    {
+      title: t("feedback.topics.nominate_venue.title"),
+      description: t("feedback.topics.nominate_venue.description"),
+    },
+    {
+      title: t("feedback.topics.report_issue.title"),
+      description: t("feedback.topics.report_issue.description"),
+    },
+  ];
+
   return (
-    <PublicLayout>
+    <VisitorShell>
       <HeroSection
-        eyebrow="About Roundup Games"
-        title="A platform for local-first gatherings around tabletop and board games."
-        subtitle="We exist to make it easier for every visitor to step into a lively room, roll some dice, and leave knowing more people who care about their stories."
+        eyebrow={t("hero.eyebrow")}
+        title={t("hero.title")}
+        subtitle={t("hero.subtitle")}
         backgroundImageSet={ABOUT_HERO_IMAGE}
-        ctaText="Explore our programs"
+        ctaText={t("hero.cta_text")}
         ctaLink="/resources"
         secondaryCta={{
-          text: "Meet our teams",
+          text: t("hero.secondary_cta"),
           link: "/teams",
         }}
       />
@@ -110,23 +108,16 @@ function AboutPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Our mission
+              {t("mission.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Combat loneliness with joyful, real-life play
+              {t("mission.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Roundup Games was built for people who crave connection as much as they
-              crave clever mechanics and collaborative storytelling. We nurture
-              local-first experiences that are warm, low-pressure, and thoughtfully
-              facilitated so you can arrive as you are and immediately feel seen.
+              {t("mission.description_1")}
             </p>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              By hosting skill-sharing sessions, mentorship circles, and rotating
-              campaigns, we give storytellers the room they need to hone their craft while
-              introducing audiences to bold new worlds. Every initiative we ship is guided
-              by the belief that play is a basic human need—and one of the most powerful
-              antidotes to boredom and isolation.
+              {t("mission.description_2")}
             </p>
           </div>
           <ul className="space-y-4">
@@ -156,23 +147,16 @@ function AboutPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Our vision
+              {t("vision.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Safety-first design for gatherings and data
+              {t("vision.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Trust is the foundation of every Roundup experience. We create brave spaces
-              where participants can immerse themselves in narrative without worrying
-              about physical, emotional, or digital harm. That commitment starts with
-              trained staff on the floor and extends to how we store, permission, and act
-              on your information behind the scenes.
+              {t("vision.description_1")}
             </p>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              Our platform is continually evolving to meet the expectations of our
-              community and partners. We invest in transparent reporting, responsible AI
-              tooling, and collaborative policy reviews with experts in safeguarding,
-              accessibility, and cyber security.
+              {t("vision.description_2")}
             </p>
           </div>
           <ul className="space-y-4">
@@ -197,15 +181,13 @@ function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Stories & insights
+              {t("stories_insights.eyebrow")}
             </p>
             <h2 className="mt-3 text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Articles coming soon
+              {t("stories_insights.title")}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              We’re assembling a library of essays, interviews, and progress updates so
-              you can follow how the Roundup Games vision becomes reality across different
-              regions.
+              {t("stories_insights.subtitle")}
             </p>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -223,7 +205,7 @@ function AboutPage() {
                   disabled
                   aria-disabled="true"
                 >
-                  Publishing soon
+                  {t("stories_insights.publishing_soon")}
                 </Button>
               </article>
             ))}
@@ -235,22 +217,20 @@ function AboutPage() {
         <div className="container mx-auto grid gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-10">
           <div className="space-y-5">
             <p className="text-brand-red text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
-              Share your voice
+              {t("feedback.eyebrow")}
             </p>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl dark:text-gray-50">
-              Feedback channels opening soon
+              {t("feedback.title")}
             </h2>
             <p className="text-sm leading-relaxed text-gray-700 sm:text-base dark:text-gray-300">
-              We’re designing a feedback portal where you can champion new ideas, flag
-              concerns, and help us refine every experience. Until it launches, you can
-              email
+              {t("feedback.description")}
               <a
                 className="text-brand-red font-semibold hover:underline"
                 href="mailto:hello@roundup.games"
               >
-                hello@roundup.games
+                {t("feedback.email")}
               </a>{" "}
-              and our community team will route your note to the right people.
+              {t("feedback.email_description")}
             </p>
           </div>
           <div className="space-y-4">
@@ -268,13 +248,13 @@ function AboutPage() {
                   disabled
                   aria-disabled="true"
                 >
-                  Feedback form launching soon
+                  {t("feedback.feedback_form_soon")}
                 </Button>
               </div>
             ))}
           </div>
         </div>
       </section>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

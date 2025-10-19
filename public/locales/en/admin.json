@@ -1,0 +1,659 @@
+{
+  "overview": {
+    "title": "Platform governance cockpit",
+    "subtitle": "The Admin workspace surfaces live insights, role coverage, and rollout controls tailored to the stewardship remit.",
+    "cards": {
+      "user_governance": {
+        "title": "User governance",
+        "description": "Review memberships, enforce MFA, and audit high-sensitivity roles in one pane of glass.",
+        "description_detail": "Launch the directory for detailed controls.",
+        "link_text": "Open user governance"
+      },
+      "feature_rollouts": {
+        "title": "Feature rollouts",
+        "description": "Toggle persona previews and beta pathways to coordinate phased releases with confidence.",
+        "description_detail": "Drive safe experimentation without redeploying.",
+        "link_text": "Manage feature flags"
+      },
+      "security_posture": {
+        "title": "Security posture",
+        "description": "Review incidents, guardrails, and audit logs tailored for the admins' stewardship remit.",
+        "description_detail": "Confirm safeguards before adjusting privileged access.",
+        "link_text": "Open security center"
+      },
+      "live_insights_preview": {
+        "title": "Live insights preview",
+        "description": "Streamlined metrics keep admins oriented before diving into the full console."
+      }
+    }
+  },
+  "insights": {
+    "title": "Governance performance (last {{days}} days)",
+    "subtitle": "Updated {{time}}",
+    "kpis": {
+      "active_memberships": {
+        "label": "Active memberships",
+        "supporting_copy": "{{count}} expiring within 30 days"
+      },
+      "platform_availability": {
+        "label": "Platform availability",
+        "supporting_copy": "{{count}} incidents reviewed this window"
+      },
+      "role_assignments": {
+        "label": "Role assignments",
+        "supporting_copy": "{{users}} users across {{grants}} scoped grants"
+      },
+      "campaign_activations": {
+        "label": "Campaign activations",
+        "supporting_copy": "Studio collaborations escalated to admins"
+      }
+    },
+    "persona_impacts": {
+      "visitor": {
+        "label": "Visitor",
+        "headline": "{{count}} public experiences live"
+      },
+      "player": {
+        "label": "Player",
+        "headline": "{{count}} confirmed seats this window"
+      },
+      "ops": {
+        "label": "Operations",
+        "headline": "{{count}} events under active coordination"
+      },
+      "gm": {
+        "label": "Game Master",
+        "headline": "{{count}} campaigns in motion"
+      },
+      "admin": {
+        "label": "Platform Admin",
+        "headline": "{{count}} governance updates logged"
+      }
+    },
+    "alerts": {
+      "membership_expiry_watch": "Membership expiry watch",
+      "system_incident_response": "System incident response",
+      "persona_alignment_digest": "Persona alignment digest",
+      "channels": {
+        "slack_email": "Slack + Email",
+        "pager_email": "Pager + Email",
+        "weekly_email": "Weekly Email"
+      },
+      "thresholds": {
+        "expiring_in_30_days": "{{count}} expiring in 30 days",
+        "incidents_in_window": "{{count}} incidents in {{days}}d",
+        "live_visitor_touchpoints": "{{count}} live visitor touchpoints"
+      }
+    },
+    "buttons": {
+      "refresh": "Refresh data",
+      "refreshing": "Refreshing…",
+      "retry": "Retry"
+    },
+    "errors": {
+      "unable_to_load": "Unable to load insights",
+      "error_message": "We couldn't reach the governance analytics service."
+    },
+    "sections": {
+      "incident_timeline": {
+        "title": "Incident timeline",
+        "description": "Automated crawlers and manual escalations surfaced these events for review.",
+        "no_incidents": "No incidents in this window",
+        "no_incidents_description": "Uptime has held steady. Keep proactive alerts armed as safeguards."
+      },
+      "live_alerting": {
+        "title": "Live alerting",
+        "description": "Channel routing and thresholds designed for the admin governance guardrails."
+      },
+      "persona_impact": {
+        "title": "Persona impact pulse",
+        "description": "Cross-role snapshots highlight how governance decisions ripple through the platform."
+      }
+    },
+    "status": {
+      "steady": "Steady",
+      "trending_up": "Trending up",
+      "needs_attention": "Needs attention",
+      "momentum_building": "Momentum building",
+      "requires_intervention": "Requires intervention",
+      "holding_steady": "Holding steady"
+    },
+    "alerts": {
+      "status": {
+        "active": "Active",
+        "paused": "Paused"
+      },
+      "triggered": "Triggered {{time}}",
+      "awaiting_first_trigger": "Awaiting first trigger"
+    },
+    "incidents": {
+      "duration": {
+        "minutes": "{{minutes}} min",
+        "less_than_minute": "< 1 min",
+        "in_progress": "In progress"
+      },
+      "resolved": "Resolved {{time}}",
+      "http_status": "HTTP {{status}}"
+    }
+  },
+  "events_review": {
+    "title": "Event Review",
+    "subtitle": "Review and approve events submitted by members",
+    "buttons": {
+      "view_all_events": "View All Events",
+      "approve": "Approve",
+      "reject": "Reject",
+      "view": "View",
+      "manage": "Manage"
+    },
+    "tabs": {
+      "pending_approval": "Pending Approval",
+      "recently_reviewed": "Recently Reviewed"
+    },
+    "sections": {
+      "awaiting_approval": {
+        "title": "Events Awaiting Approval",
+        "description": "Review these events and approve them to make them public"
+      },
+      "recently_reviewed": {
+        "title": "Recently Reviewed Events",
+        "description": "Events that have been recently approved or published"
+      }
+    },
+    "tables": {
+      "headers": {
+        "event_name": "Event Name",
+        "organizer": "Organizer",
+        "type": "Type",
+        "date": "Date",
+        "location": "Location",
+        "created": "Created",
+        "actions": "Actions",
+        "status": "Status",
+        "visibility": "Visibility"
+      }
+    },
+    "status": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "empty_states": {
+      "no_pending_approval": "No events pending approval",
+      "no_recently_reviewed": "No recently reviewed events"
+    },
+    "alerts": {
+      "all_caught_up": {
+        "title": "All caught up!",
+        "description": "There are no events pending approval at this time."
+      }
+    },
+    "dialog": {
+      "approve_title": "Approve Event",
+      "reject_title": "Reject Event",
+      "approve_description": "Are you sure you want to approve \"{{eventName}}\"? This will make the event publicly visible.",
+      "reject_description": "Are you sure you want to reject \"{{eventName}}\"? The organizer will need to make changes and resubmit.",
+      "buttons": {
+        "cancel": "Cancel"
+      }
+    },
+    "organizer": {
+      "unknown": "Unknown",
+      "not_provided": "Not provided"
+    },
+    "hardcoded_strings": {
+      "approve_and_made_public": " and made public!",
+      "failed_to_update_event": "Failed to update event",
+      "error_updating_event": "An error occurred while updating the event"
+    }
+  },
+  "user_directory": {
+    "title": "User governance",
+    "subtitle": "Track membership coverage, role assignments, and MFA enforcement for your compliance lens.",
+    "buttons": {
+      "assign_role": "Assign Role",
+      "retry": "Retry",
+      "refresh": "Refresh",
+      "delete": "Delete",
+      "export_csv": "Export CSV",
+      "require_mfa": "Require MFA",
+      "mfa_enforced": "MFA enforced"
+    },
+    "sections": {
+      "role_summary": {
+        "title": "Role Summary",
+        "description": "Overview of all system roles and their assignment counts"
+      },
+      "current_assignments": {
+        "title": "Current Role Assignments",
+        "description": "Audit log of who has access, when it was granted, and by whom."
+      }
+    },
+    "tables": {
+      "headers": {
+        "user": "User",
+        "membership": "Membership",
+        "roles": "Roles",
+        "role_assigned": "Role Assigned",
+        "mfa": "MFA",
+        "last_active": "Last active",
+        "risk": "Risk",
+        "latest_activity": "Latest activity",
+        "actions": "Actions",
+        "role": "Role",
+        "scope": "Scope",
+        "assigned_by": "Assigned By",
+        "assigned_at": "Assigned At",
+        "expires": "Expires",
+        "notes": "Notes"
+      }
+    },
+    "membership": {
+      "status": {
+        "active": "Active",
+        "expired": "Expired",
+        "canceled": "Canceled",
+        "none": "No membership"
+      },
+      "expires": "Expires {{time}}"
+    },
+    "mfa": {
+      "enforced": "Enforced",
+      "missing": "Missing"
+    },
+    "risk": {
+      "clear": "Clear"
+    },
+    "activity": {
+      "no_activity": "No activity",
+      "no_recent_events": "No recent events"
+    },
+    "roles": {
+      "no_assignments": "No assignments",
+      "assigned": "{{count}} assigned"
+    },
+    "role_summary": {
+      "assigned_count": "{{count}} assigned"
+    },
+    "form": {
+      "assign_role": {
+        "title": "Assign a Role",
+        "description": "Search for a user and grant them a role. Scoped roles require either a team or event context.",
+        "fields": {
+          "user": "User",
+          "role": "Role",
+          "team_scope": "Team Scope",
+          "event_scope": "Event Scope",
+          "expiration": "Expiration",
+          "notes": "Notes"
+        },
+        "placeholders": {
+          "search_users": "Search users...",
+          "team_id": "Team ID",
+          "event_id": "Event ID",
+          "add_context": "Add context for this assignment (optional)"
+        },
+        "hints": {
+          "team_scope": "Use for assigning <strong>Team Admin</strong>. Leave blank for global roles.",
+          "event_scope": "Use for assigning <strong>Event Admin</strong>. Leave blank for global roles.",
+          "expiration": "Optional — leave blank for no expiration."
+        },
+        "validation": {
+          "select_user": "Select a user",
+          "select_role": "Select a role"
+        },
+        "buttons": {
+          "assign_role": "Assign Role"
+        }
+      },
+      "filters": {
+        "membership": "Membership",
+        "all_memberships": "All memberships",
+        "filter_by_role": "Filter by role",
+        "all_roles": "All roles"
+      },
+      "select_role_placeholder": "Select a role",
+      "buttons": {
+        "retry": "Retry"
+      }
+    },
+    "search": {
+      "placeholder": "Search by name or email",
+      "no_users_found": "No users found.",
+      "searching_users": "Searching users..."
+    },
+    "export": {
+      "filename": "platform-compliance-{{date}}.csv",
+      "success": "Compliance report exported",
+      "pending": "Exporting…"
+    },
+    "loading": {
+      "refreshing": "Refreshing…"
+    },
+    "errors": {
+      "unable_to_load": "Unable to load user governance",
+      "service_unavailable": "The user directory service is temporarily unavailable.",
+      "assign_role_failed": "Failed to assign role",
+      "remove_role_assignment_failed": "Failed to remove role assignment",
+      "delete_user_failed": "Failed to delete user",
+      "export_compliance_report_failed": "Failed to export compliance report",
+      "search_users_failed": "Failed to search users",
+      "load_role_management_data_failed": "Failed to load role management data",
+      "load_failed": "Unable to load user governance"
+    },
+    "messages": {
+      "role_assigned_success": "Role assigned successfully",
+      "role_assignment_removed": "Role assignment removed",
+      "user_permanently_deleted": "User permanently deleted",
+      "compliance_report_exported": "Compliance report exported"
+    },
+    "dialogs": {
+      "remove_assignment": {
+        "title": "Remove role assignment",
+        "description": "This will revoke \"{{roleName}}\" from {{userName}}. This action cannot be undone.",
+        "buttons": {
+          "remove_access": "Remove access"
+        }
+      },
+      "delete_user": {
+        "title": "Permanently Delete User",
+        "warning": "This action is <strong>permanent, irreversible, and potentially catastrophic</strong>.",
+        "warning_text": "<strong>WARNING:</strong> Deleting <strong>{{userName}}</strong> ({{userEmail}}) will cascade delete all associated data including games, events, campaigns, memberships, and potentially impact other players who are part of these activities.",
+        "warning_description": "Deleting <strong>{{name}}</strong> ({{email}}) will cascade delete all associated data including games, events, campaigns, memberships, and potentially impact other players who are part of these activities.",
+        "sections": {
+          "data_to_delete_title": "Data that will be permanently deleted:",
+          "data_to_delete": {
+            "profile": "User account and profile information",
+            "memberships": "All memberships and subscription data",
+            "games": "Game master status and games created",
+            "events": "Event organization and created events",
+            "campaigns": "Campaign leadership and created campaigns",
+            "teams": "Team memberships and associations",
+            "notifications": "Notifications and communication history",
+            "roles": "Role assignments and permissions"
+          },
+          "impact_title": "Impact on other users:",
+          "impact_description": "If this user is a Game Master, their games may be affected and players could lose access to ongoing campaigns. If this user is an event organizer, registered participants may lose their event access.",
+          "confirmation_title": "Confirmation required:"
+        },
+        "data_to_delete": {
+          "title": "Data that will be permanently deleted:",
+          "items": [
+            "User account and profile information",
+            "All memberships and subscription data",
+            "Game master status and games created",
+            "Event organization and created events",
+            "Campaign leadership and created campaigns",
+            "Team memberships and associations",
+            "Notifications and communication history",
+            "Role assignments and permissions"
+          ]
+        },
+        "impact_on_others": {
+          "title": "Impact on other users:",
+          "description": "If this user is a Game Master, their games may be affected and players could lose access to ongoing campaigns. If this user is an event organizer, registered participants may lose their event access."
+        },
+        "confirmation": {
+          "title": "Confirmation required:",
+          "instruction": "To proceed, please type <code>{{email}}</code> below:",
+          "placeholder": "Enter user email to confirm"
+        },
+        "buttons": {
+          "delete_permanently": "Delete Permanently"
+        }
+      }
+    },
+    "scope": {
+      "global": "Global",
+      "team": "Team: {{teamId}}",
+      "event": "Event: {{eventId}}"
+    },
+    "assigned_by": {
+      "system": "System"
+    },
+    "permissions": {
+      "none_configured": "None configured"
+    },
+    "descriptions": {
+      "no_description": "No description provided."
+    },
+    "misc": {
+      "permissions": "Permissions",
+      "no_expiration": "No expiration",
+      "remove_access": "Remove"
+    },
+    "risk_flags": {
+      "email_not_verified": "Email not verified",
+      "mfa_not_enrolled": "MFA not enrolled",
+      "membership_not_active": "Membership not active"
+    },
+    "audit_trail": {
+      "role_granted": "{{roleName}} granted",
+      "membership_status": "Membership {{status}}",
+      "last_active": "Last active"
+    }
+  },
+  "social_audits": {
+    "title": "Social Audits",
+    "description": "Admin-only view of follow/block actions for moderation.",
+    "filters": {
+      "action": "Action",
+      "actor_user_id": "Actor User ID",
+      "target_user_id": "Target User ID",
+      "any": "Any",
+      "apply_filters": "Apply Filters",
+      "user_id_placeholder": "user id"
+    },
+    "table_headers": {
+      "date": "Date",
+      "action": "Action",
+      "actor": "Actor",
+      "target": "Target",
+      "ui_surface": "UI Surface",
+      "reason": "Reason"
+    },
+    "pagination": {
+      "page_info": "Page {{current}} of {{total}} • {{count}} total",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "loading": "Loading…",
+    "no_data": {
+      "no_audit_rows": "No audit rows"
+    },
+    "actions": {
+      "follow": "follow",
+      "unfollow": "unfollow",
+      "block": "block",
+      "unblock": "unblock"
+    },
+    "no_user_data": "—"
+  },
+  "navigation": {
+    "aria_label": "Admin navigation",
+    "items": {
+      "insights": {
+        "label": "Insights",
+        "description": "System KPIs, incidents, and alerting"
+      },
+      "users": {
+        "label": "Users",
+        "description": "Roles, membership, and MFA coverage"
+      },
+      "security": {
+        "label": "Security",
+        "description": "Safeguards, incidents, and audit logs"
+      },
+      "events": {
+        "label": "Event Review",
+        "description": "Event management and auditing"
+      },
+      "feature_flags": {
+        "label": "Feature flags",
+        "description": "Persona rollouts and experiments"
+      }
+    }
+  },
+  "security_center": {
+    "title": "Security posture",
+    "subtitle": "Steward safeguards for the governance console",
+    "description": "Track platform defenses, guide incident review, and confirm that privileged controls respect admins' need for auditable guardrails.",
+    "actions": {
+      "refresh_snapshot": "Refresh snapshot",
+      "refreshing": "Refreshing…",
+      "enable_safeguard": "Enable safeguard",
+      "disable_safeguard": "Disable safeguard",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "status": {
+      "stable_governance_posture": "Stable governance posture",
+      "heightened_monitoring": "Heightened monitoring",
+      "improving": "Improving",
+      "declining": "Declining",
+      "flat": "Flat",
+      "enforced": "Enforced",
+      "disabled": "Disabled"
+    },
+    "sections": {
+      "critical_safeguards": {
+        "title": "Critical safeguards",
+        "description": "Confirm platform-wide controls before enabling or disabling access for privileged personas."
+      },
+      "active_incidents": {
+        "title": "Active incidents",
+        "description": "Prioritize mitigations that shield visitor, player, and operations trust while admins monitor the console."
+      },
+      "compliance_checklist": {
+        "title": "Compliance checklist",
+        "description": "Sequence the next best actions so audits stay fast and defensible for admins."
+      },
+      "privileged_action_log": {
+        "title": "Privileged action log",
+        "description": "Review the latest manual and automated changes to confirm audit readiness."
+      }
+    },
+    "labels": {
+      "score_calculated_across_pillars": "Score calculated across identity, infrastructure, and audit pillars.",
+      "last_reviewed": "Last reviewed",
+      "over_the_last_days": "over the last {{count}} days",
+      "impact": "Impact",
+      "persona_impact": "Persona impact",
+      "effort": "Effort",
+      "actor": "Actor",
+      "risk_level": "RISK"
+    },
+    "status_indicators": {
+      "all_clear": "All clear",
+      "no_unresolved_incidents": "No unresolved incidents require attention right now.",
+      "investigating": "Investigating",
+      "mitigated": "Mitigated",
+      "resolved": "Resolved"
+    },
+    "messages": {
+      "unable_to_load_security_posture": "Unable to load security posture",
+      "could_not_retrieve_governance_safeguards": "We could not retrieve governance safeguards. Refresh the page or contact the platform engineering team.",
+      "enabled_or_disabled_control": "{{action}} {{control}}",
+      "no_recent_privileged_changes": "No recent privileged changes have been recorded in this window.",
+      "unable_to_update_control": "Unable to update control"
+    },
+    "controls": {
+      "enforced": "Enforced",
+      "disabled": "Disabled",
+      "enable_control": "Enable control",
+      "disable_control": "Disable control",
+      "last_reviewed_by": "Last reviewed {{timeAgo}} by {{user}}. Next review in {{days}} days."
+    },
+    "dialog": {
+      "confirmation_title": "{{action}} safeguard",
+      "enable_description": "Confirm the safeguard is ready before enabling it for all privileged personas.",
+      "disable_description": "Disabling this control removes real-time guardrails. Capture justification for the audit trail.",
+      "provide_context": "Provide context for the audit log so we can trace stewardship decisions.",
+      "confirm_enable_safeguard": "Confirm the safeguard is ready before enabling it for all privileged personas.",
+      "confirm_disable_control": "Disabling this control removes real-time guardrails. Capture justification for the audit trail.",
+      "document_why_change_necessary": "Document why this change is necessary, the expected impact, and mitigation steps.",
+      "validation": {
+        "min_12_characters": "Please include at least 12 characters so the rationale is audit-ready."
+      }
+    },
+    "taxonomy": {
+      "category": "Category",
+      "mechanic": "Mechanic"
+    },
+    "hardcoded_strings": {
+      "unable_to_load_security_posture": "Unable to load security posture",
+      "could_not_retrieve_governance_safeguards": "We could not retrieve governance safeguards. Refresh the page or contact the platform engineering team.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "critical": "CRITICAL",
+      "high": "HIGH",
+      "medium": "MEDIUM",
+      "enforced": "Enforced",
+      "last_reviewed_by_next_review": "Last reviewed {{timeAgo}} by {{user}}. Next review in {{days}} days.",
+      "disable_control": "Disable control",
+      "enable_control": "Enable control",
+      "investigating": "Investigating",
+      "mitigated": "Mitigated",
+      "resolved": "Resolved",
+      "all_clear": "All clear",
+      "no_unresolved_incidents_require_attention": "No unresolved incidents require attention right now.",
+      "detected_resolved": "Detected {{detectedAt}}{{resolvedAt}}",
+      "effort": "Effort: {{effort}}",
+      "persona_impact": "Persona impact: {{personaImpact}}",
+      "no_recent_privileged_changes_recorded": "No recent privileged changes have been recorded in this window.",
+      "confirm_safeguard_ready_before_enabling": "Confirm the safeguard is ready before enabling it for all privileged personas.",
+      "disabling_control_removes_guardrails": "Disabling this control removes real-time guardrails. Capture justification for the audit trail.",
+      "provide_context_for_audit_log": "Provide context for the audit log so we can trace stewardship decisions.",
+      "document_why_change_necessary": "Document why this change is necessary, the expected impact, and mitigation steps.",
+      "please_include_at_least_12_characters": "Please include at least 12 characters so the rationale is audit-ready.",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
+  },
+  "feature_flags": {
+    "console": {
+      "title": "Feature rollout console",
+      "description": "Manage local overrides for experiments and persona previews without touching production environment variables.",
+      "curated_flags": {
+        "shared_inbox": {
+          "label": "Workspace shared inbox",
+          "description": "Toggles the shared inbox experience across player, ops, GM, and admin workspaces."
+        },
+        "collaboration": {
+          "label": "Cross-persona collaboration workspace",
+          "description": "Controls access to the collaboration workspace for role-based dashboards."
+        }
+      },
+      "status": {
+        "not_set": "Not set",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "effective_state": "Effective state:"
+      },
+      "override": {
+        "none": "None",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "clear_override": "Clear override"
+      },
+      "buttons": {
+        "enable": "Enable",
+        "disable": "Disable",
+        "refresh": "Refresh",
+        "add": "Add",
+        "retry": "Retry"
+      },
+      "placeholders": {
+        "add_flag_key": "Add flag key"
+      },
+      "empty_state": {
+        "title": "No feature flags discovered",
+        "description": "Add a flag key to manage overrides or define environment variables prefixed with VITE_FLAG_."
+      },
+      "error": {
+        "title": "Feature flags unavailable",
+        "description": "We couldn't read the platform flag registry.",
+        "custom_flag_description": "Custom flag override"
+      }
+    }
+  }
+}

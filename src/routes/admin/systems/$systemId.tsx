@@ -58,7 +58,7 @@ function AdminSystemEditorRoute() {
 
   const handleTabChange = (nextTab: AdminSystemEditorTab) => {
     navigate({
-      search: (prev) => {
+      search: (prev: SystemEditorSearchParams) => {
         const next: SystemEditorSearchParams = { ...prev, tab: nextTab };
         if (nextTab === DEFAULT_SYSTEM_EDITOR_TAB) {
           next.tab = undefined;

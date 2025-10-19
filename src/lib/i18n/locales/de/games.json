@@ -1,0 +1,377 @@
+{
+  "buttons": {
+    "view_game": "Spiel ansehen",
+    "mark_completed": "Abschließen",
+    "cancel_session": "Sitzung absagen",
+    "revoke": "Zurückziehen",
+    "accept": "Annehmen",
+    "reject": "Ablehnen",
+    "accepting": "Nehme an...",
+    "rejecting": "Lehne ab...",
+    "invite": "Einladen",
+    "cancel": "Abbrechen",
+    "create_game": "Spiel erstellen",
+    "update_game": "Spiel aktualisieren",
+    "submit_review": "Bewertung abgeben"
+  },
+  "external_refs": {
+    "startplaying": "StartPlaying",
+    "boardgamegeek": "BoardGameGeek",
+    "wikipedia": "Wikipedia"
+  },
+  "labels": {
+    "game_system": "Spiel-System",
+    "language": "Sprache",
+    "players": "Spieler",
+    "visibility": "Sichtbarkeit",
+    "participants": "Teilnehmer",
+    "pending_participant": "Anstehender Teilnehmer",
+    "date_time": "Datum und Uhrzeit",
+    "expected_duration": "Erwartete Dauer (Minuten)",
+    "price": "Preis (EUR) (optional)",
+    "game_session_name": "Name der Spielsitzung",
+    "description": "Beschreibung",
+    "game_system_used": "Verwendetes Spiel-System",
+    "address": "Adresse",
+    "minimum_players": "Mindestens Spieler",
+    "maximum_players": "Höchstens Spieler",
+    "search_users": "Benutzer suchen",
+    "invite_by_email": "Per E-Mail einladen",
+    "pending_invitations": "Anstehende Einladungen",
+    "safety_tool": "Sicherheits-Tool",
+    "safety_tool_details": "Details zum Sicherheits-Tool (optional)",
+    "player_boundaries_consent": "Grenzen der Spieler / Zustimmungsnotizen (optional)"
+  },
+  "placeholders": {
+    "game_session_name": "Gib einen ansprechenden Namen für deine geplante Spielsitzung ein",
+    "search_and_select_game_system": "Suche und wähle das Spiel-System aus, das du verwenden möchtest",
+    "select_language": "Wähle eine Sprache",
+    "select_visibility": "Wähle die Sichtbarkeit",
+    "select_safety_tool": "Wähle ein Sicherheits-Tool",
+    "safety_tool_details": "Besonderheiten zum gewählten Sicherheits-Tool",
+    "player_boundaries_consent": "Grenzen oder Zustimmungshinweise, über die sich Spieler im Klaren sein sollten",
+    "search_users": "Nach Name oder E-Mail suchen (4+ Zeichen)",
+    "enter_name": "Name eingeben",
+    "enter_email": "E-Mail-Adresse eingeben"
+  },
+  "status": {
+    "connections_teammates": "Verbindungen & Mitspieler",
+    "unknown_user": "Unbekannter Benutzer",
+    "no_pending_invitations": "Keine anstehenden Einladungen.",
+    "no_games_found": "Keine Spiele gefunden. Erstelle eines!",
+    "searching": "Suche...",
+    "no_users_found": "Keine Benutzer gefunden."
+  },
+  "messages": {
+    "invitation_rejected_success": "Einladung erfolgreich abgelehnt!",
+    "invitation_response_recorded": "Einladungsantwort recorded.",
+    "participant_invited_success": "Teilnehmer erfolgreich eingeladen!",
+    "invitation_revoked_success": "Einladung erfolgreich zurückgezogen!",
+    "review_submitted_success": "Vielen Dank für deine Bewertung!"
+  },
+  "errors": {
+    "failed_to_reject_invitation": "Fehler beim Ablehnen der Einladung",
+    "failed_to_respond_invitation": "Fehler beim Antworten auf die Einladung.",
+    "unexpected_error": "Ein unerwarteter Fehler ist aufgetreten.",
+    "failed_to_invite_participant": "Fehler beim Einladen des Teilnehmers",
+    "failed_to_revoke_invitation": "Fehler beim Zurückziehen der Einladung",
+    "failed_to_submit_review": "Fehler beim Absenden der Bewertung",
+    "search_failed": "Fehler beim Suchen nach Spiel-Systemen"
+  },
+  "descriptions": {
+    "session_overview": "Teile die wichtigsten Informationen, die Spieler benötigen, bevor sie zusagen.",
+    "participant_requirements": "Optionale Richtlinien, die Spielern helfen, die richtigen Tische auszuwählen.",
+    "location": "Lass die Spieler wissen, wo die Sitzung stattfinden wird.",
+    "safety_table_culture": "Optionale Erwartungen, die den Ton für euer gemeinsames Spiel vorgeben.",
+    "manage_invitations": "Überprüfe und bearbeite anstehende Einladungen.",
+    "invite_participants": "Suche nach Benutzern oder lade sie per E-Mail ein.",
+    "game_invitation": "Du wurdest zu diesem Spiel eingeladen. Bitte nimm die Einladung an oder lehne sie ab."
+  },
+  "form_sections": {
+    "session_overview": "Sitzungsüberblick",
+    "participant_requirements": "Teilnehmeranforderungen",
+    "location": "Ort",
+    "safety_table_culture": "Sicherheit & Tischkultur"
+  },
+  "visibility_options": {
+    "description": "Sichtbarkeitsoptionen: Öffentlich (sichtbar für alle), Verbindungen & Mitspieler (sichtbar für deine Follower, die Personen, denen du folgst, und aktive Mitspieler), Privat (sichtbar nur für eingeladene Spieler)"
+  },
+  "safety_options": {
+    "no_alcohol": "Kein Alkohol",
+    "safe_word_required": "Safeword erforderlich",
+    "encourage_open_communication": "Offene Kommunikation fördern"
+  },
+  "confirmation": {
+    "cancel_session": "Bist du sicher, dass du diese Sitzung absagen möchtest?"
+  },
+  "invitation_status": {
+    "invited": "Eingeladen"
+  },
+  "languages": {
+    "english": "Englisch",
+    "chinese": "Chinesisch",
+    "hindi": "Hindi",
+    "spanish": "Spanisch",
+    "french": "Französisch",
+    "arabic": "Arabisch",
+    "bengali": "Bengalisch",
+    "russian": "Russisch"
+  },
+  "validation_errors": {
+    "game_session_name_required": "Der Name der Spielsitzung ist das, was die meisten Spieler zuerst sehen, wenn sie nach Abenteuern suchen. Achte darauf, dass er ansprechend ist.",
+    "description_required": "Bitte füge eine Beschreibung der Spielsitzung hinzu, die den Ton für das angibt, was Spieler erwarten können.",
+    "game_system_required": "Bitte wähle ein Spiel-System für deine Sitzung aus.",
+    "duration_required": "Gib eine Spieldauer in Minuten ein, damit andere wissen, wie viel Zeit sie dafür einplanen müssen.",
+    "price_optional": "Wenn du eine Teilnahmegebühr für das Spiel erheben möchtest, gib sie hier an.",
+    "language_required": "Wähle die Sprache, in der das von dir gewählte Spiel-System gespielt wird.",
+    "visibility_required": "Wähle einen Sichtbarkeitswert, der es dir ermöglicht, effizient die richtigen Leute zu finden.",
+    "min_players_required": "Wir müssen wissen, wie viele Leute teilnehmen sollen.",
+    "max_players_required": "Wir müssen wissen, wie viele Leute teilnehmen sollen.",
+    "address_required": "Gib die Adresse des Ortes ein, an dem die Spielsitzung stattfinden wird."
+  },
+  "titles": {
+    "invite_participants": "Teilnehmer einladen",
+    "manage_invitations": "Einladungen verwalten",
+    "game_invitation": "Spieleinladung",
+    "review_gm": "Diesen GM bewerten"
+  },
+  "combobox": {
+    "empty_message": "Beginne damit, den Namen des Spiel-Systems einzugeben, um zu suchen.",
+    "no_results_message": "Kein Spiel-System gefunden."
+  },
+  "review_labels": {
+    "rate_gm": "Bewerte den GM",
+    "select_strengths": "Wähle bis zu 3 Stärken",
+    "comments_optional": "Kommentare (optional)",
+    "choose_max_three": "Wähle bis zu 3 von 10",
+    "submitting": "Wird gesendet...",
+    "placeholder_comment": "Was ist dir in dieser Sitzung besonders aufgefallen?"
+  },
+  "participants_list": {
+    "participants_title": "Teilnehmer ({{count}})",
+    "pending_applications_title": "Anstehende Bewerbungen ({{count}})",
+    "banned_title": "Vom Spiel gesperrt ({{count}})",
+    "no_participants": "Noch keine Teilnehmer.",
+    "owner_label": "(Organisator)",
+    "role_status": "({{role}} - {{status}})",
+    "buttons": {
+      "remove": "Entfernen",
+      "removing": "Wird entfernt...",
+      "approve": "Genehmigen",
+      "approving": "Wird genehmigt...",
+      "reject": "Ablehnen",
+      "rejecting": "Wird abgelehnt...",
+      "allow": "Erlauben",
+      "allowing": "Wird erlaubt..."
+    },
+    "success_messages": {
+      "participant_removed": "Teilnehmer erfolgreich entfernt!",
+      "ban_removed": "Spielsperre erfolgreich aufgehoben!",
+      "application_updated": "Bewerbungsstatus erfolgreich aktualisiert!"
+    },
+    "error_messages": {
+      "failed_to_remove": "Fehler beim Entfernen des Teilnehmers: {{error}}",
+      "failed_to_remove_ban": "Fehler beim Aufheben der Spielsperre: {{error}}",
+      "failed_to_update_application": "Fehler beim Aktualisieren des Bewerbungsstatus: {{error}}"
+    }
+  },
+  "list_item": {
+    "free": "Kostenlos",
+    "original_system": "Original-System",
+    "campaign_part": "Teil einer laufenden Kampagne",
+    "hosted_by": "Veranstaltet von {{name}}",
+    "hosted_by_community": "Veranstaltet von einem Community-GM",
+    "view_details": "Details ansehen",
+    "joined_count": "{{count}} beigetreten",
+    "session_duration": "{{duration}} Sitzung",
+    "duration_formats": {
+      "hours_minutes": "~{{hours}}h {{minutes}}m Abenteuer",
+      "hours_only": "~{{hours}}h Abenteuer",
+      "minutes_only": "~{{minutes}}m Abenteuer"
+    }
+  },
+  "quick_filters": {
+    "in_city": "In {{city}}",
+    "my_favorite_systems": "Meine Lieblings-Systeme",
+    "in_my_language": "In meiner Sprache",
+    "my_themes": "Meine Themen"
+  },
+  "search": {
+    "title": "Alle Spielsitzungen",
+    "subtitle": "Plane dein nächstes Tabletop-Abenteuer mit öffentlichen Spielen in deiner Nähe.",
+    "session": "Sitzung",
+    "sessions": "Sitzungen",
+    "with_quick_filters": "mit deinen Schnellfiltern",
+    "no_games": {
+      "title": "Derzeit keine öffentlichen Spiele gefunden.",
+      "subtitle": "Schau später vorbei oder erstelle ein Konto, um die erste Sitzung in deiner Gegend zu veranstalten.",
+      "become_host": "Werde zum Gastgeber"
+    },
+    "no_filtered_sessions": {
+      "title": "Keine Sitzungen entsprechen deinen Schnellfiltern.",
+      "subtitle": "Versuche, Filter anzupassen oder zu löschen, um das vollständige Angebot zu durchsuchen."
+    }
+  },
+  "game_detail": {
+    "unavailable": {
+      "title": "Sitzung nicht verfügbar",
+      "message": "Das Spiel, nach dem du gesucht hast, nimmt keine Spieler mehr auf oder wurde entfernt.",
+      "browse_games": "Alle Spiele durchsuchen",
+      "visit_homepage": "Homepage besuchen"
+    },
+    "badges": {
+      "public_session": "Öffentliche Sitzung",
+      "ongoing_campaign": "Laufende Kampagne"
+    },
+    "hosted_by": "Veranstaltet von",
+    "community_gm": "Community-GM",
+    "community_rating": "Community-Bewertung: {{rating}}/5",
+    "new_to_community": "Neu in der Roundup Games Community",
+    "request_seat": "Platz anfordern",
+    "applying": "Bewerbe mich...",
+    "sign_in_to_apply": "Anmelden zum Bewerben",
+    "sections": {
+      "table_briefing": {
+        "eyebrow": "Tisch-Briefing",
+        "title": "Über diese Sitzung",
+        "subtitle": "Verschaffe dir einen Eindruck von der Tisch-Atmosphäre, bevor du einen Platz anforderst.",
+        "no_details": "Der Spielorganisator hat noch keine zusätzlichen Details geteilt.",
+        "ongoing_campaign": "Teil einer laufenden Kampagne",
+        "one_shot": "One-Shot, freundlich für neugierige Spieler"
+      },
+      "session_logistics": {
+        "eyebrow": "Sitzungslogistik",
+        "title": "Anreise-Checkliste",
+        "subtitle": "Alles, was du wissen musst, bevor du zum Tisch kommst.",
+        "date_time": "Datum & Uhrzeit",
+        "language": "Sprache",
+        "price": "Preis",
+        "players": "Spieler",
+        "seats_available": "Verfügbare Plätze",
+        "seats_open": "{{count}} offen",
+        "contact_gm": "GM kontaktieren",
+        "duration": "Dauer",
+        "minutes": "{{count}} min",
+        "gm_will_confirm": "GM wird bestätigen",
+        "meeting_details_notice": "Genaue Treffpunktdetails werden geteilt, sobald dein Platz bestätigt ist."
+      },
+      "venue_details": {
+        "eyebrow": "Wo wir uns treffen",
+        "title": "Veranstaltungsort-Details",
+        "subtitle": "Wir teilen genaue Anweisungen mit genehmigten Spielern."
+      },
+      "art_inspiration": {
+        "eyebrow": "Kunst & Inspiration",
+        "title": "Visuelle Mood Board",
+        "subtitle": "Genehmigte Bilder, kuratiert für {{systemName}}.",
+        "this_system": "dieses System",
+        "game_system": "Spiel-System",
+        "artwork_alt": "{{systemName}} Kunstwerk",
+        "licensed": "Lizenziert: {{license}}",
+        "view_details": "Details ansehen"
+      },
+      "safety_tools": {
+        "eyebrow": "Sicherheits-Tools",
+        "title": "Tisch-Erwartungen",
+        "subtitle": "Tools und Grenzen, die vom Spielorganisator geteilt wurden."
+      },
+      "system_spotlight": {
+        "eyebrow": "System-Spotlight",
+        "title": "Über {{systemName}}",
+        "subtitle": "Aus der Roundup Games System-Bibliothek.",
+        "show_details": "Details anzeigen",
+        "hide_details": "Details ausblenden",
+        "categories": "Kategorien",
+        "mechanics": "Mechaniken",
+        "external_references": "Externe Referenzen",
+        "no_summary": "Wir sammeln noch Informationen für dieses System – schau bald wieder vorbei.",
+        "explore_full_profile": "Vollständiges System-Profil erkunden »"
+      },
+      "host_snapshot": {
+        "eyebrow": "Gastgeber-Snapshot",
+        "title": "Spielorganisator",
+        "subtitle": "Lerne deinen Geschichtenerzähler kennen, bevor du ankommst.",
+        "organizer_details_soon": "Wir teilen die Details des Organisators, sobald der Zeitplan bestätigt ist."
+      },
+      "system_facts": {
+        "eyebrow": "System-Quick-Facts",
+        "title": "Spielsystem-Überblick",
+        "players": "Spieler",
+        "optimal_table": "Optimaler Tisch",
+        "average_session": "Durchschnittliche Sitzung",
+        "first_published": "Erstveröffentlicht",
+        "age_rating": "Altersfreigabe",
+        "age_rating_tooltip": "Empfohlenes Mindestalter basierend auf Inhaltsthemen und Mechaniken.",
+        "complexity": "Komplexität",
+        "players_suffix": "{{count}} Spieler"
+      },
+      "reserve_seat": {
+        "eyebrow": "Bereit zum Mitmachen?",
+        "title": "Sichere dir deinen Platz",
+        "cost_per_player": "Kosten pro Spieler:",
+        "applications_closed": "Bewerbungen für diese Sitzung sind derzeit geschlossen.",
+        "apply_to_join": "Bewerbe dich zur Teilnahme"
+      }
+    }
+  },
+  "my_games": {
+    "title": "Meine Spiele",
+    "subtitle": "Verwalte deine Spielsitzungen",
+    "filter_by_status": "Nach Status filtern",
+    "filter_by_role": "Nach Rolle filtern",
+    "create_new_game": "Neues Spiel erstellen",
+    "no_games_title": "Noch keine Spiele",
+    "no_games_subtitle": "Erstelle deine erste Spielsitzung, um loszulegen",
+    "pagination": {
+      "page_info": "Seite {{current}} von {{total}} • {{count}} insgesamt"
+    },
+    "status_labels": {
+      "scheduled": "Geplant",
+      "completed": "Abgeschlossen",
+      "canceled": "Abgesagt"
+    },
+    "role_labels": {
+      "owner": "Organisator",
+      "player": "Teilnehmer",
+      "invited": "Eingeladener",
+      "requested": "Anfragender",
+      "applicant": "Bewerber"
+    },
+    "errors": {
+      "load_failed": "Fehler beim Laden der Spiele.",
+      "update_failed": "Fehler beim Aktualisieren des Status",
+      "unexpected_error": "Ein unerwarteter Fehler ist aufgetreten",
+      "status_updated": "Spielstatus aktualisiert"
+    },
+    "list": {
+      "participants_count": "{{count}} Teilnehmer{{count, plural, =1 {} other {n}}}",
+      "view_button": "Ansehen"
+    },
+    "create": {
+      "title": "Neues Spiel erstellen",
+      "subtitle": "Richten Sie Ihre Spielsitzung ein und beginnen Sie, Spieler einzuladen",
+      "back_to_games": "Zurück zu Spielen",
+      "loading_campaign_data": "Kampagnendaten werden geladen...",
+      "campaign": "Kampagne",
+      "context_synced": "Kontext synchronisiert",
+      "select_a_campaign": "Kampagne auswählen",
+      "failed_to_create_game": "Fehler beim Erstellen des Spiels",
+      "tips": {
+        "title": "Sitzungs-Checkliste",
+        "subtitle": "Behalten Sie diese Hinweise im Hinterkopf, während Sie die Sitzungsbetreffung finalisieren.",
+        "logistics_first": {
+          "title": "Zuerst die Logistik",
+          "description": "Bestätigen Sie die Zeit, Dauer und Spielerzahl, damit die Plattform die Sitzung den richtigen Spielern präsentieren kann."
+        },
+        "safety_tooling": {
+          "title": "Sicherheitswerkzeuge",
+          "description": "Nutzen Sie den Sicherheitsbereich, um den Einwilligungs-Workflow zu dokumentieren, den Sie am Tisch verwenden, und alle bereits mit der Gruppe besprochenen Grenzen."
+        },
+        "campaign_context": {
+          "title": "Kampagnenkontext",
+          "description": "Wenn Sie eine Sitzung aus einer bestehenden Kampagne ableiten, verwenden wir die Systemstandards, um das Onboarding schnell zu halten. Passen Sie alles an, was für diesen Lauf speziell ist."
+        }
+      }
+    }
+  }
+}

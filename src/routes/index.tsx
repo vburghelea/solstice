@@ -14,7 +14,7 @@ import {
 } from "~/features/games/components/GameListItemView";
 import { listGames } from "~/features/games/games.queries";
 import type { GameListItem } from "~/features/games/games.types";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { VisitorShell } from "~/features/layouts/visitor-shell";
 import {
   buildFallbackSelection,
   CITY_PREFERENCE_STORAGE_KEY,
@@ -30,6 +30,7 @@ import {
 } from "~/features/profile/location-preferences";
 import { listUserLocations } from "~/features/profile/profile.queries";
 import type { CountryLocationGroup } from "~/features/profile/profile.types";
+import { useCommonTranslation, useHomeTranslation } from "~/hooks/useTypedTranslation";
 import type { AuthUser } from "~/lib/auth/types";
 import { createResponsiveCloudinaryImage } from "~/shared/lib/cloudinary-assets";
 import { cn } from "~/shared/lib/utils";
@@ -78,47 +79,8 @@ export const Route = createFileRoute("/")({
   },
   component: VisitorExperience,
 });
-const DISCOVERY_THEMES = [
-  {
-    title: "Curated spotlights",
-    description:
-      "Hand-picked sessions and stories make it easy to feel the Roundup vibe before you ever sit down at the table.",
-  },
-  {
-    title: "Effortless planning",
-    description:
-      "Choose a city, explore open seats, and mark events you love without committing before you're ready.",
-  },
-  {
-    title: "Trust-first design",
-    description:
-      "Safety practices, accessibility callouts, and facilitator intros appear upfront so explorers can make confident choices.",
-  },
-];
-
-const STORY_CHAPTERS = [
-  "Preview gatherings and festivals curated for curious first-timers.",
-  "Explore systems and sessions that prioritize onboarding and safety tools.",
-  "Save a home base city to receive updates when seats open up.",
-];
-
-const TRUST_PROMISES = [
-  {
-    title: "Safety tools on display",
-    description:
-      "Hosts showcase Lines & Veils, X-Cards, and debrief rituals so everyone knows how care shows up at the table.",
-  },
-  {
-    title: "Meet the facilitator",
-    description:
-      "GM bios highlight pronouns, session pacing, and welcome rituals to help you read the room before you arrive.",
-  },
-  {
-    title: "Spaces that feel welcoming",
-    description:
-      "Each venue callout includes mobility notes, transit tips, and community vibes, helping visitors picture the experience.",
-  },
-];
+// Note: These constants will be populated with translation keys in the component
+// They remain empty here as they need access to the translation function
 
 const VISITOR_HERO_IMAGE = createResponsiveCloudinaryImage("heroTournamentCards", {
   transformation: {
@@ -141,6 +103,46 @@ function VisitorExperience() {
   const { featuredGames, popularSystems, upcomingEvents, locationGroups } =
     Route.useLoaderData() as VisitorLoaderData;
   const { user } = Route.useRouteContext() as { user: AuthUser };
+
+  const { t: ht } = useHomeTranslation();
+  const { t: ct } = useCommonTranslation();
+
+  // Translation-aware constants
+  const DISCOVERY_THEMES = [
+    {
+      title: ht("explorer_guide.themes.curated_spotlights.title"),
+      description: ht("explorer_guide.themes.curated_spotlights.description"),
+    },
+    {
+      title: ht("explorer_guide.themes.effortless_planning.title"),
+      description: ht("explorer_guide.themes.effortless_planning.description"),
+    },
+    {
+      title: ht("explorer_guide.themes.trust_first_design.title"),
+      description: ht("explorer_guide.themes.trust_first_design.description"),
+    },
+  ];
+
+  const STORY_CHAPTERS = [
+    ht("explorer_guide.chapters.0"),
+    ht("explorer_guide.chapters.1"),
+    ht("explorer_guide.chapters.2"),
+  ];
+
+  const TRUST_PROMISES = [
+    {
+      title: ht("confidence_signals.safety_tools.title"),
+      description: ht("confidence_signals.safety_tools.description"),
+    },
+    {
+      title: ht("confidence_signals.meet_facilitator.title"),
+      description: ht("confidence_signals.meet_facilitator.description"),
+    },
+    {
+      title: ht("confidence_signals.welcoming_spaces.title"),
+      description: ht("confidence_signals.welcoming_spaces.description"),
+    },
+  ];
 
   const fallbackSelection = useMemo(
     () => buildFallbackSelection(locationGroups),
@@ -213,7 +215,7 @@ function VisitorExperience() {
   const activeSelection = selectedCity ?? fallbackSelection ?? null;
   const activeSelectionLabel = activeSelection
     ? `${activeSelection.city}, ${activeSelection.country}`
-    : "your area";
+    : ht("upcoming_events.default_area");
 
   const localEvents = useMemo(
     () => filterEventsBySelection(upcomingEvents, activeSelection),
@@ -257,16 +259,16 @@ function VisitorExperience() {
   }, [flattenedSuggestions, selectedCity]);
 
   return (
-    <PublicLayout>
+    <VisitorShell>
       <div className="token-stack-3xl space-y-4">
         <HeroSection
-          eyebrow="Start planning"
-          title="Discover tabletop adventures tailored to explorers"
-          subtitle="Tour community gatherings, curate your favourite systems, and follow the storytellers who match your style."
+          eyebrow={ht("hero.eyebrow")}
+          title={ht("hero.title")}
+          subtitle={ht("hero.subtitle")}
           backgroundImageSet={VISITOR_HERO_IMAGE}
-          ctaText="Create your profile"
+          ctaText={ht("hero.cta_text")}
           ctaLink="/auth/signup"
-          secondaryCta={{ text: "Log in to continue", link: "/auth/login" }}
+          secondaryCta={{ text: ht("hero.secondary_cta"), link: "/auth/login" }}
         />
 
         <section className={cn("token-stack-2xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
@@ -279,14 +281,15 @@ function VisitorExperience() {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,227,208,0.75),_rgba(255,255,255,0.95))] opacity-95 dark:hidden" />
             <div className="token-gap-xl relative flex flex-col lg:flex-row lg:items-start lg:justify-between">
               <div className="token-stack-md max-w-2xl">
-                <p className="text-eyebrow text-primary-soft">Explorer guide</p>
+                <p className="text-eyebrow text-primary-soft">
+                  {ht("explorer_guide.eyebrow")}
+                </p>
                 <div className="token-stack-sm">
                   <h2 className="text-heading-md text-foreground">
-                    Chart the next stop on your journey
+                    {ht("explorer_guide.title")}
                   </h2>
                   <p className="text-body-md text-muted-strong">
-                    Set a home base city to preview gatherings, facilitators, and story
-                    worlds that welcome new players.
+                    {ht("explorer_guide.subtitle")}
                   </p>
                 </div>
                 <List className="token-stack-sm">
@@ -315,7 +318,7 @@ function VisitorExperience() {
               </div>
               <div className="token-stack-sm w-full max-w-sm">
                 <label className="text-body-sm text-muted-strong" htmlFor="visitor-city">
-                  Focus on a city
+                  {ht("explorer_guide.city_focus_label")}
                 </label>
                 <div className="relative">
                   <select
@@ -329,18 +332,22 @@ function VisitorExperience() {
                   >
                     <option value="">
                       {hasLocationOptions
-                        ? "Browse all locations"
-                        : "Location data coming soon"}
+                        ? ht("explorer_guide.browse_all_locations")
+                        : ht("explorer_guide.location_data_coming_soon")}
                     </option>
                     {selectedCity && !selectionInOptions ? (
                       <option value={locationSelectValue}>
-                        {selectedCity.city}, {selectedCity.country} (from your profile)
+                        {selectedCity.city}, {selectedCity.country} (
+                        {ht("explorer_guide.from_your_profile")})
                       </option>
                     ) : null}
                     {locationGroups.map((group) => (
                       <optgroup
                         key={group.country}
-                        label={`${group.country} • ${group.totalUsers} players`}
+                        label={ct("location.country_players", {
+                          country: group.country,
+                          count: group.totalUsers,
+                        })}
                       >
                         {group.cities.map((city) => {
                           const value = encodeSelection({
@@ -349,7 +356,8 @@ function VisitorExperience() {
                           });
                           return (
                             <option key={value} value={value}>
-                              {city.city} ({city.userCount} players)
+                              {city.city} (
+                              {ct("location.players_count", { count: city.userCount })})
                             </option>
                           );
                         })}
@@ -368,13 +376,12 @@ function VisitorExperience() {
                   </div>
                 </div>
                 <p className="text-body-xs text-muted-strong">
-                  We suggest cities from your profile, saved preferences, or timezone when
-                  we can.
+                  {ht("explorer_guide.location_suggestion")}
                 </p>
                 {suggestionChips.length > 0 ? (
                   <div className="token-gap-xs flex flex-wrap items-center">
                     <span className="text-body-xs text-muted-strong">
-                      Popular cities:
+                      {ht("explorer_guide.popular_cities")}
                     </span>
                     {suggestionChips.map((suggestion) => (
                       <button
@@ -399,10 +406,11 @@ function VisitorExperience() {
 
           <div className={cn("token-gap-lg space-y-4", explorerPanelSurface)}>
             <div className="token-stack-sm max-w-xl">
-              <h3 className="text-heading-sm text-foreground">How this tour flows</h3>
+              <h3 className="text-heading-sm text-foreground">
+                {ht("explorer_guide.how_it_flows.title")}
+              </h3>
               <p className="text-body-sm text-muted-strong">
-                Follow these beats to decide when to join the community or watch for new
-                invitations.
+                {ht("explorer_guide.how_it_flows.subtitle")}
               </p>
             </div>
             <ol className="token-gap-md grid gap-5 md:grid-cols-3">
@@ -425,13 +433,14 @@ function VisitorExperience() {
 
         <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
           <div className="token-stack-xs">
-            <p className="text-eyebrow text-primary-soft">Confidence signals</p>
+            <p className="text-eyebrow text-primary-soft">
+              {ht("confidence_signals.eyebrow")}
+            </p>
             <h2 className="text-heading-sm text-foreground">
-              What makes Roundup feel safe
+              {ht("confidence_signals.title")}
             </h2>
             <p className="text-body-sm text-muted-strong">
-              We foreground the cues that help solo explorers feel confident before
-              stepping into a new space.
+              {ht("confidence_signals.subtitle")}
             </p>
           </div>
           <div className="token-gap-md grid gap-5 md:grid-cols-3">
@@ -452,13 +461,14 @@ function VisitorExperience() {
         <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
           <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="token-stack-xs">
-              <p className="text-eyebrow text-primary-soft">Upcoming gatherings</p>
+              <p className="text-eyebrow text-primary-soft">
+                {ht("upcoming_events.eyebrow")}
+              </p>
               <h2 className="text-heading-sm text-foreground">
-                Events near {activeSelectionLabel}
+                {ht("upcoming_events.title_prefix")} {activeSelectionLabel}
               </h2>
               <p className="text-body-sm text-muted-strong">
-                Curated by community hosts. Each RSVP takes you closer to your first game
-                session memory.
+                {ht("upcoming_events.subtitle")}
               </p>
             </div>
             <Link
@@ -468,17 +478,17 @@ function VisitorExperience() {
                 "rounded-full",
               )}
             >
-              Browse full calendar
+              {ht("upcoming_events.browse_full_calendar")}
             </Link>
           </div>
 
           {localEvents.length === 0 ? (
             <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
               <p className="text-body-md text-muted-strong">
-                No events scheduled for this city yet.
+                {ht("upcoming_events.no_events_title")}
               </p>
               <p className="text-body-sm text-muted-strong">
-                Check back later as hosts publish new sessions.
+                {ht("upcoming_events.no_events_subtitle")}
               </p>
             </div>
           ) : (
@@ -493,12 +503,14 @@ function VisitorExperience() {
         <section className={cn("token-stack-xl space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
           <div className="token-gap-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="token-stack-xs">
-              <p className="text-eyebrow text-primary-soft">Stories to sample</p>
+              <p className="text-eyebrow text-primary-soft">
+                {ht("story_sessions.eyebrow")}
+              </p>
               <h2 className="text-heading-sm text-foreground">
-                Sessions welcoming new explorers
+                {ht("story_sessions.title")}
               </h2>
               <p className="text-body-sm text-muted-strong">
-                These tables lean into onboarding, safety tools, and collaborative energy.
+                {ht("story_sessions.subtitle")}
               </p>
             </div>
             <Link
@@ -508,17 +520,17 @@ function VisitorExperience() {
                 "rounded-full",
               )}
             >
-              Search all games
+              {ht("story_sessions.search_all_games")}
             </Link>
           </div>
 
           {localGames.length === 0 ? (
             <div className="token-stack-sm items-center rounded-xl border border-[color:color-mix(in_oklab,var(--primary-soft)_28%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_10%,white)]/85 p-8 text-center">
               <p className="text-body-md text-muted-strong">
-                No spotlight sessions in this city yet.
+                {ht("story_sessions.no_sessions_title")}
               </p>
               <p className="text-body-sm text-muted-strong">
-                Subscribe to our newsletter or try again later for new content.
+                {ht("story_sessions.no_sessions_subtitle")}
               </p>
             </div>
           ) : (
@@ -544,16 +556,19 @@ function VisitorExperience() {
 
         <section className={cn("token-stack-lg space-y-4 p-6 md:p-10", SECTION_SURFACE)}>
           <div className="token-stack-xs">
-            <p className="text-eyebrow text-primary-soft">Trending systems</p>
-            <h2 className="text-heading-sm text-foreground">Rulesets with momentum</h2>
+            <p className="text-eyebrow text-primary-soft">
+              {ht("trending_systems.eyebrow")}
+            </p>
+            <h2 className="text-heading-sm text-foreground">
+              {ht("trending_systems.title")}
+            </h2>
             <p className="text-body-sm text-muted-strong">
-              Discover which systems are lighting up tables so you know what to learn
-              next.
+              {ht("trending_systems.subtitle")}
             </p>
           </div>
           {systemHighlights.length === 0 ? (
             <p className="text-body-sm text-muted-strong">
-              We’ll highlight popular systems once more sessions are scheduled.
+              {ht("trending_systems.no_systems")}
             </p>
           ) : (
             <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
@@ -572,13 +587,13 @@ function VisitorExperience() {
                       {system.heroUrl ? (
                         <img
                           src={system.heroUrl}
-                          alt={`${system.name} cover art`}
+                          alt={ct("image.cover_art_alt", { name: system.name })}
                           className="h-full w-full object-cover"
                           loading="lazy"
                         />
                       ) : (
                         <div className="bg-muted text-muted-strong text-body-xs flex h-full w-full items-center justify-center">
-                          Hero art pending moderation
+                          {ht("trending_systems.hero_art_pending")}
                         </div>
                       )}
                     </div>
@@ -588,11 +603,13 @@ function VisitorExperience() {
                           {system.name}
                         </p>
                         <span className="text-body-2xs text-muted-strong tracking-wide uppercase">
-                          {system.gameCount} sessions
+                          {ht("trending_systems.sessions_count", {
+                            count: system.gameCount,
+                          })}
                         </span>
                       </div>
                       <p className="text-body-xs text-muted-strong line-clamp-3">
-                        {system.summary ?? "Description coming soon."}
+                        {system.summary ?? ht("trending_systems.description_coming_soon")}
                       </p>
                     </div>
                   </div>
@@ -610,11 +627,10 @@ function VisitorExperience() {
         >
           <div className="token-stack-sm">
             <h2 className="text-heading-sm text-foreground">
-              When you’re ready to go deeper
+              {ht("ready_to_go_deeper.title")}
             </h2>
             <p className="text-body-md text-muted-strong">
-              Create a free account to follow cities, join sessions, and receive invites
-              from trusted GMs.
+              {ht("ready_to_go_deeper.subtitle")}
             </p>
           </div>
           <div className="token-gap-sm flex flex-wrap items-center justify-center">
@@ -622,7 +638,7 @@ function VisitorExperience() {
               to="/auth/signup"
               className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
             >
-              Start your player profile
+              {ht("ready_to_go_deeper.start_profile")}
             </Link>
             <Link
               to="/auth/login"
@@ -631,11 +647,11 @@ function VisitorExperience() {
                 "rounded-full px-8",
               )}
             >
-              I already have an account
+              {ht("ready_to_go_deeper.have_account")}
             </Link>
           </div>
         </section>
       </div>
-    </PublicLayout>
+    </VisitorShell>
   );
 }

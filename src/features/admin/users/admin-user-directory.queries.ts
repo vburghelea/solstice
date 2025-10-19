@@ -378,20 +378,23 @@ async function fetchAdminDirectory({ filters, page, pageSize }: QueryContext) {
 
     const riskFlags: AdminUserRecordWire["riskFlags"] = [];
     if (!row.emailVerified) {
-      riskFlags.push({ type: "security", message: "Email not verified" });
+      riskFlags.push({ type: "security", message: "email_not_verified" });
     }
     if (!mfaEnrolled) {
-      riskFlags.push({ type: "security", message: "MFA not enrolled" });
+      riskFlags.push({ type: "security", message: "mfa_not_enrolled" });
     }
     if (membershipStatus !== "active") {
-      riskFlags.push({ type: "compliance", message: "Membership not active" });
+      riskFlags.push({ type: "compliance", message: "membership_not_active" });
     }
 
     const latestRole = assignments.reduce<{ label: string; timestamp: Date } | null>(
       (acc, assignment) => {
         const timestamp = assignment.assignedAt ?? null;
         if (!timestamp) return acc;
-        const current = { label: `${assignment.name} granted`, timestamp };
+        const current = {
+          label: `role_granted:${assignment.name}`,
+          timestamp,
+        };
         if (!acc || current.timestamp > acc.timestamp) {
           return current;
         }
@@ -409,12 +412,15 @@ async function fetchAdminDirectory({ filters, page, pageSize }: QueryContext) {
     }
     if (membership?.updatedAt) {
       auditTrail.push({
-        label: `Membership ${membershipStatus}`,
+        label: `membership_status:${membershipStatus}`,
         timestamp: membership.updatedAt.toISOString(),
       });
     }
     if (lastActiveAt) {
-      auditTrail.push({ label: "Last active", timestamp: lastActiveAt.toISOString() });
+      auditTrail.push({
+        label: "last_active",
+        timestamp: lastActiveAt.toISOString(),
+      });
     }
     auditTrail.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
 

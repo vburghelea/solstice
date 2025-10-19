@@ -15,11 +15,13 @@ import {
 } from "react";
 
 import { toast } from "sonner";
+import { LanguageSwitcher } from "~/components/LanguageSwitcher";
 import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { useActivePersona } from "~/features/roles/role-switcher-context";
+import { useCommonTranslation, useRolesTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
 import type { AuthUser } from "~/lib/auth/types";
 import { Route as RootRoute } from "~/routes/__root";
@@ -67,6 +69,8 @@ export function RoleWorkspaceLayout({
   fallbackLabel,
   workspaceLabel,
 }: RoleWorkspaceLayoutProps) {
+  const { t } = useCommonTranslation();
+  const { t: rolesT } = useRolesTranslation();
   const queryClient = useQueryClient();
   const routerInstance = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -101,7 +105,7 @@ export function RoleWorkspaceLayout({
       }
     } catch (error) {
       console.error("Failed to sign out:", error);
-      toast.error("We couldn't sign you out. Please try again.");
+      toast.error(t("errors.sign_out_failed"));
       setIsSigningOut(false);
       return;
     }
@@ -112,10 +116,13 @@ export function RoleWorkspaceLayout({
     } finally {
       window.location.href = "/auth/login";
     }
-  }, [isSigningOut, queryClient, routerInstance]);
+  }, [isSigningOut, queryClient, routerInstance, t]);
 
   const resolvedWorkspaceLabel =
-    workspaceLabel ?? persona?.label ?? fallbackLabel ?? "Workspace";
+    workspaceLabel ??
+    rolesT(`personas.${persona.id}.label`) ??
+    fallbackLabel ??
+    t("workspace.label");
   const headerSubtitle =
     subtitle ??
     (user?.name ? `${user.name}'s workspace` : `${resolvedWorkspaceLabel} workspace`);
@@ -175,24 +182,25 @@ export function RoleWorkspaceLayout({
                 <span className="text-muted-foreground text-xs font-medium uppercase">
                   {resolvedWorkspaceLabel}
                 </span>
-                <span className="text-base font-semibold">Workspace</span>
+                <span className="text-base font-semibold">{t("workspace.label")}</span>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => dispatchNavOpen("close")}
-                aria-label="Close workspace navigation"
+                aria-label={t("workspace.navigation.close_workspace")}
               >
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <UserSummary user={user} showEmail />
-            <div className="flex items-center justify-end">
+            <UserSummary user={user} showEmail t={t} />
+            <div className="flex items-center justify-end gap-3">
+              <LanguageSwitcher variant="compact" showLabel={false} />
               <RoleSwitcher />
             </div>
             <WorkspaceNavSection
               workspaceLabel={resolvedWorkspaceLabel}
-              heading="Workspace tools"
+              heading={t("workspace.tools")}
               items={workspaceNavItems}
               activePath={location}
               onNavigate={() => dispatchNavOpen("close")}
@@ -200,7 +208,7 @@ export function RoleWorkspaceLayout({
             {accountNavItems.length ? (
               <WorkspaceNavSection
                 workspaceLabel={resolvedWorkspaceLabel}
-                heading="Account"
+                heading={t("account.label")}
                 items={accountNavItems}
                 activePath={location}
                 onNavigate={() => dispatchNavOpen("close")}
@@ -212,6 +220,7 @@ export function RoleWorkspaceLayout({
                   onSignOut={handleSignOut}
                   isSigningOut={isSigningOut}
                   className="w-full justify-center"
+                  t={t}
                 />
               </div>
             ) : null}
@@ -224,6 +233,7 @@ export function RoleWorkspaceLayout({
           title={title}
           subtitle={headerSubtitle}
           onMenuClick={() => dispatchNavOpen("open")}
+          t={t}
         />
         <main className="flex-1 px-4 pt-4 pb-[var(--workspace-mobile-main-padding)] sm:px-6 sm:pt-6 lg:px-10 lg:pb-12">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:max-w-[90%]">
@@ -233,6 +243,7 @@ export function RoleWorkspaceLayout({
                   <WorkspaceBrandHeader
                     subtitle={headerSubtitle}
                     title={title}
+                    t={t}
                     {...(description ? { description } : {})}
                   />
                 </div>
@@ -241,8 +252,8 @@ export function RoleWorkspaceLayout({
                   <Suspense
                     fallback={
                       <div className="bg-surface-subtle border-subtle text-subtle token-gap-xs flex flex-col rounded-xl border border-dashed p-6">
-                        <span className="text-eyebrow">Loading workspace</span>
-                        <p className="text-body-sm">Preparing workspace experience...</p>
+                        <span className="text-eyebrow">{t("workspace.loading")}</span>
+                        <p className="text-body-sm">{t("workspace.preparing")}</p>
                       </div>
                     }
                   >
@@ -259,12 +270,13 @@ export function RoleWorkspaceLayout({
                 activePath={location}
                 onSignOut={handleSignOut}
                 isSigningOut={isSigningOut}
+                t={t}
               />
             </div>
             {headerSlot ? <div className="hidden lg:block">{headerSlot}</div> : null}
           </div>
         </main>
-        <WorkspaceMobileNav items={mobileNavItems} activePath={location} />
+        <WorkspaceMobileNav items={mobileNavItems} activePath={location} t={t} />
       </div>
     </div>
   );
@@ -278,6 +290,7 @@ function WorkspaceSummaryPanel({
   activePath,
   onSignOut,
   isSigningOut,
+  t,
 }: {
   workspaceLabel: string;
   user: AuthUser | null;
@@ -286,6 +299,7 @@ function WorkspaceSummaryPanel({
   activePath: string;
   onSignOut: () => Promise<void> | void;
   isSigningOut: boolean;
+  t: (key: string) => string;
 }) {
   return (
     <aside
@@ -295,21 +309,22 @@ function WorkspaceSummaryPanel({
       )}
     >
       <div className="flex flex-col gap-4">
-        <UserSummary user={user} showEmail />
-        <div className="flex w-full items-center justify-end">
+        <UserSummary user={user} showEmail t={t} />
+        <div className="flex w-full items-center justify-end gap-3">
+          <LanguageSwitcher variant="compact" showLabel={false} />
           <RoleSwitcher />
         </div>
       </div>
       <WorkspaceNavSection
         workspaceLabel={workspaceLabel}
-        heading="Workspace tools"
+        heading={t("workspace.tools")}
         items={workspaceNavItems}
         activePath={activePath}
       />
       {accountNavItems.length ? (
         <WorkspaceNavSection
           workspaceLabel={workspaceLabel}
-          heading="Account"
+          heading={t("account.label")}
           items={accountNavItems}
           activePath={activePath}
         />
@@ -320,6 +335,7 @@ function WorkspaceSummaryPanel({
             onSignOut={onSignOut}
             isSigningOut={isSigningOut}
             className="w-full"
+            t={t}
           />
         </div>
       ) : null}
@@ -396,10 +412,12 @@ function SignOutButton({
   onSignOut,
   isSigningOut,
   className,
+  t,
 }: {
   onSignOut: () => Promise<void> | void;
   isSigningOut: boolean;
   className?: string;
+  t: (key: string) => string;
 }) {
   const handleClick = () => {
     void onSignOut();
@@ -416,7 +434,7 @@ function SignOutButton({
       disabled={isSigningOut}
     >
       <LogOut className="h-4 w-4" aria-hidden />
-      <span>{isSigningOut ? "Signing out..." : "Sign out"}</span>
+      <span>{isSigningOut ? t("buttons.signing_out") : t("buttons.sign_out")}</span>
     </button>
   );
 }
@@ -425,10 +443,12 @@ function WorkspaceMobileHeader({
   title,
   subtitle,
   onMenuClick,
+  t,
 }: {
   title: string;
   subtitle: string;
   onMenuClick: () => void;
+  t: (key: string) => string;
 }) {
   return (
     <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-40 border-b backdrop-blur lg:hidden">
@@ -438,7 +458,7 @@ function WorkspaceMobileHeader({
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
-            aria-label="Open workspace navigation"
+            aria-label={t("workspace.navigation.open_workspace")}
           >
             <Menu className="h-6 w-6" />
           </Button>
@@ -446,9 +466,9 @@ function WorkspaceMobileHeader({
             <span className="roundup-star-logo h-8 w-8" aria-hidden="true" />
             <span className="flex flex-col leading-tight">
               <span className="text-primary text-[0.65rem] font-semibold tracking-[0.3em] uppercase">
-                Roundup Games
+                {t("brand.name")}
               </span>
-              <span className="text-sm font-semibold">At a table near you!</span>
+              <span className="text-sm font-semibold">{t("brand.slogan")}</span>
             </span>
           </Link>
         </div>
@@ -466,9 +486,11 @@ function WorkspaceMobileHeader({
 function WorkspaceMobileNav({
   items,
   activePath,
+  t,
 }: {
   items: RoleWorkspaceNavItem[];
   activePath: string;
+  t: (key: string) => string;
 }) {
   if (items.length === 0) {
     return null;
@@ -477,7 +499,7 @@ function WorkspaceMobileNav({
     <nav
       className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky bottom-0 z-40 border-t backdrop-blur lg:hidden"
       style={{ paddingBottom: "calc(var(--workspace-mobile-safe-area))" }}
-      aria-label="Workspace"
+      aria-label={t("workspace.label")}
     >
       <ul className="flex items-stretch justify-between">
         {items.map((item) => {
@@ -511,10 +533,12 @@ function WorkspaceBrandHeader({
   subtitle,
   title,
   description,
+  t,
 }: {
   subtitle: string;
   title: string;
   description?: string;
+  t: (key: string) => string;
 }) {
   return (
     <section className="border-border/60 bg-muted/30 dark:bg-card/70 flex flex-col gap-6 rounded-2xl border px-5 py-6 shadow-sm sm:px-6">
@@ -523,9 +547,9 @@ function WorkspaceBrandHeader({
           <span className="roundup-star-logo h-12 w-12" aria-hidden="true" />
           <span className="flex flex-col leading-tight">
             <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
-              Roundup Games
+              {t("brand.name")}
             </span>
-            <span className="text-lg font-semibold md:text-xl">At a table near you!</span>
+            <span className="text-lg font-semibold md:text-xl">{t("brand.slogan")}</span>
           </span>
         </Link>
         <div className="flex max-w-xl flex-col gap-2 text-left sm:items-end sm:text-right">
@@ -548,10 +572,12 @@ function UserSummary({
   user,
   showEmail = false,
   condensed = false,
+  t,
 }: {
   user: AuthUser | null;
   showEmail?: boolean;
   condensed?: boolean;
+  t: (key: string) => string;
 }) {
   if (!user) {
     return null;
@@ -568,7 +594,7 @@ function UserSummary({
       />
       <div className="flex flex-col text-left">
         <span className="text-foreground text-sm font-medium">
-          {user.name ?? "Member"}
+          {user.name ?? t("default_values.player_name")}
         </span>
         {showEmail || condensed ? (
           <span className="text-muted-foreground text-xs">{user.email}</span>

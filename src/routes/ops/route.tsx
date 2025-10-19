@@ -5,47 +5,16 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
-import {
-  RoleWorkspaceLayout,
-  type RoleWorkspaceNavItem,
-} from "~/features/layouts/role-workspace-layout";
+import { RoleWorkspaceLayout } from "~/features/layouts/role-workspace-layout";
 import { useOpsEventsData } from "~/features/ops/components/use-ops-events-data";
 import { resolvePersonaResolution } from "~/features/roles/persona.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { RoleSwitcherProvider } from "~/features/roles/role-switcher-context";
+import { useNavigationTranslation } from "~/hooks/useTypedTranslation";
 import { requireAuthAndProfile } from "~/lib/auth/guards/route-guards";
 import { WORKSPACE_FEATURE_FLAGS } from "~/lib/feature-flag-keys";
 import { useFeatureFlag } from "~/lib/feature-flags";
 import { formatDateAndTime } from "~/shared/lib/datetime";
-
-const BASE_OPS_NAVIGATION: RoleWorkspaceNavItem[] = [
-  {
-    label: "Overview",
-    to: "/ops",
-    icon: Home,
-    exact: true,
-    description:
-      "Watch approvals, staffing, and logistics rollups in one mission control.",
-  },
-  {
-    label: "Events",
-    to: "/ops/events",
-    icon: CalendarDays,
-    description: "Review approvals, logistics, and marketing health for each event.",
-  },
-  {
-    label: "Shared inbox",
-    to: "/ops/inbox",
-    icon: Inbox,
-    description: "Respond to event updates and venue coordination threads together.",
-  },
-  {
-    label: "Collaboration",
-    to: "/ops/collaboration",
-    icon: KanbanSquare,
-    description: "Track assignments and workflow handoffs across the ops team.",
-  },
-];
 
 export const Route = createFileRoute("/ops")({
   beforeLoad: async ({ context, location }) => {
@@ -59,14 +28,46 @@ export const Route = createFileRoute("/ops")({
 });
 
 function OpsNamespaceShell() {
+  const { t } = useNavigationTranslation();
   const { resolution } = Route.useLoaderData() as { resolution: PersonaResolution };
   const loadResolution = useServerFn(resolvePersonaResolution);
   const { user } = Route.useRouteContext();
   const showSharedInbox = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.sharedInbox);
   const showCollaboration = useFeatureFlag(WORKSPACE_FEATURE_FLAGS.collaboration);
 
+  const baseOpsNavigation = useMemo(
+    () => [
+      {
+        label: t("workspaces.ops.nav.overview.label"),
+        to: "/ops",
+        icon: Home,
+        exact: true,
+        description: t("workspaces.ops.nav.overview.description"),
+      },
+      {
+        label: t("workspaces.ops.nav.events.label"),
+        to: "/ops/events",
+        icon: CalendarDays,
+        description: t("workspaces.ops.nav.events.description"),
+      },
+      {
+        label: t("workspaces.ops.nav.reports.label"),
+        to: "/ops/inbox",
+        icon: Inbox,
+        description: t("workspaces.ops.nav.reports.description"),
+      },
+      {
+        label: t("workspaces.ops.nav.reports.label"),
+        to: "/ops/collaboration",
+        icon: KanbanSquare,
+        description: t("workspaces.ops.nav.reports.description"),
+      },
+    ],
+    [t],
+  );
+
   const navigationItems = useMemo(() => {
-    return BASE_OPS_NAVIGATION.filter((item) => {
+    return baseOpsNavigation.filter((item) => {
       if (item.to === "/ops/inbox") {
         return showSharedInbox;
       }
@@ -77,10 +78,12 @@ function OpsNamespaceShell() {
 
       return true;
     });
-  }, [showCollaboration, showSharedInbox]);
+  }, [baseOpsNavigation, showCollaboration, showSharedInbox]);
 
-  const workspaceSubtitle = user?.name ? `Welcome back, ${user.name}` : "Welcome back";
-  const workspaceLabel = user?.name ? `${user.name}` : "Operations";
+  const workspaceSubtitle = user?.name
+    ? t("workspaces.ops.welcome_back", { name: user.name })
+    : t("workspaces.ops.welcome_back_generic");
+  const workspaceLabel = user?.name ? user.name : t("workspaces.ops.fallback_label");
 
   return (
     <RoleSwitcherProvider
@@ -90,10 +93,10 @@ function OpsNamespaceShell() {
       }
     >
       <RoleWorkspaceLayout
-        title="Operations workspace"
-        description="Monitor approvals, logistics, and staffing signals in real time so every event stays on track."
+        title={t("workspaces.ops.title")}
+        description={t("workspaces.ops.description")}
         navItems={navigationItems}
-        fallbackLabel="Operations"
+        fallbackLabel={t("workspaces.ops.fallback_label")}
         subtitle={workspaceSubtitle}
         workspaceLabel={workspaceLabel}
         headerSlot={<OpsWorkspaceSummary />}
@@ -103,6 +106,7 @@ function OpsNamespaceShell() {
 }
 
 function OpsWorkspaceSummary() {
+  const { t } = useNavigationTranslation();
   const { pendingList, pipelineList, attentionItems, liveEvents, isLoading } =
     useOpsEventsData();
   const [isHydrated, setIsHydrated] = useState(false);
@@ -127,7 +131,9 @@ function OpsWorkspaceSummary() {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Approvals queue</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("workspaces.ops.summary.pending_tasks")}
+          </CardTitle>
           <span className="text-muted-foreground text-xs font-semibold">
             {pendingList.length}
           </span>
@@ -143,18 +149,20 @@ function OpsWorkspaceSummary() {
                 to="/admin/events-review"
                 className="text-primary text-xs font-medium"
               >
-                Review submissions
+                {t("workspaces.ops.summary.upcoming_events")}
               </Link>
             </>
           ) : (
-            <span>All submissions are reviewed</span>
+            <span>{t("workspaces.ops.summary.staff_on_duty")}</span>
           )}
         </CardContent>
       </Card>
 
       <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Pipeline focus</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("workspaces.ops.summary.venue_utilization")}
+          </CardTitle>
           <span className="text-muted-foreground text-xs font-semibold">
             {pipelineList.length}
           </span>
@@ -178,11 +186,11 @@ function OpsWorkspaceSummary() {
                   params={{ eventId: nextPipelineEvent.id }}
                   className="text-primary text-xs font-medium"
                 >
-                  Open ops detail
+                  {t("workspaces.ops.summary.staff_on_duty")}
                 </Link>
               </span>
             ) : (
-              <span>No confirmed events in the pipeline</span>
+              <span>{t("workspaces.ops.summary.venue_utilization")}</span>
             )}
           </span>
         </CardContent>
@@ -190,7 +198,9 @@ function OpsWorkspaceSummary() {
 
       <Card className="h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">Attention signals</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("workspaces.ops.summary.staff_on_duty")}
+          </CardTitle>
           <AlertTriangle className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent className="text-muted-foreground flex flex-col gap-2 text-sm">
@@ -209,9 +219,9 @@ function OpsWorkspaceSummary() {
               <span>{formatDateAndTime(criticalAttention.startDate)}</span>
             </>
           ) : liveEvents.length > 0 ? (
-            <span>All live events are trending green</span>
+            <span>{t("workspaces.ops.summary.venue_utilization")}</span>
           ) : (
-            <span>No active alerts</span>
+            <span>{t("workspaces.ops.summary.pending_tasks")}</span>
           )}
         </CardContent>
       </Card>

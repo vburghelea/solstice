@@ -17,6 +17,7 @@ import {
 } from "~/components/ui/select";
 import { Skeleton } from "~/components/ui/skeleton";
 import { applyEventFilterChange } from "~/features/events/utils";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import { COUNTRIES } from "~/shared/hooks/useCountries";
 import { cn } from "~/shared/lib/utils";
 import { listEvents } from "../events.queries";
@@ -54,14 +55,14 @@ const SKELETON_CARD_KEYS = [
 ];
 
 const SORT_OPTIONS: { label: string; value: SortBy }[] = [
-  { label: "Start Date", value: "startDate" },
-  { label: "Name", value: "name" },
-  { label: "Recently Added", value: "createdAt" },
+  { label: "start_date", value: "startDate" },
+  { label: "name", value: "name" },
+  { label: "recently_added", value: "createdAt" },
 ];
 
 const SORT_ORDER_OPTIONS: { label: string; value: SortOrder }[] = [
-  { label: "Ascending", value: "asc" },
-  { label: "Descending", value: "desc" },
+  { label: "ascending", value: "asc" },
+  { label: "descending", value: "desc" },
 ];
 
 export function EventList({
@@ -71,6 +72,7 @@ export function EventList({
   buildEventLink,
   actionLabel,
 }: EventListProps) {
+  const { t } = useEventsTranslation();
   const [filters, setFilters] = useState<EventFilters>(() => ({ ...initialFilters }));
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<SortBy>("startDate");
@@ -115,12 +117,12 @@ export function EventList({
   const filterSection = showFilters ? (
     <Card>
       <CardHeader>
-        <CardTitle>Filter Events</CardTitle>
+        <CardTitle>{t("list.filter_title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
-            <Label htmlFor="type">Event Type</Label>
+            <Label htmlFor="type">{t("list.labels.event_type")}</Label>
             <Select
               value={typeFilterValue}
               onValueChange={(value) =>
@@ -131,22 +133,22 @@ export function EventList({
               }
             >
               <SelectTrigger id="type">
-                <SelectValue placeholder="All types" />
+                <SelectValue placeholder={t("list.placeholders.all_types")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All types</SelectItem>
-                <SelectItem value="tournament">Tournament</SelectItem>
-                <SelectItem value="league">League</SelectItem>
-                <SelectItem value="camp">Camp</SelectItem>
-                <SelectItem value="clinic">Clinic</SelectItem>
-                <SelectItem value="social">Social</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="all">{t("list.placeholders.all_types")}</SelectItem>
+                <SelectItem value="tournament">{t("list.options.tournament")}</SelectItem>
+                <SelectItem value="league">{t("list.options.league")}</SelectItem>
+                <SelectItem value="camp">{t("list.options.camp")}</SelectItem>
+                <SelectItem value="clinic">{t("list.options.clinic")}</SelectItem>
+                <SelectItem value="social">{t("list.options.social")}</SelectItem>
+                <SelectItem value="other">{t("list.options.other")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t("list.labels.status")}</Label>
             <Select
               value={statusFilterValue}
               onValueChange={(value) =>
@@ -157,24 +159,30 @@ export function EventList({
               }
             >
               <SelectTrigger id="status">
-                <SelectValue placeholder="All statuses" />
+                <SelectValue placeholder={t("list.placeholders.all_statuses")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-                <SelectItem value="registration_open">Registration Open</SelectItem>
-                <SelectItem value="registration_closed">Registration Closed</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="all">{t("list.placeholders.all_statuses")}</SelectItem>
+                <SelectItem value="published">{t("list.options.published")}</SelectItem>
+                <SelectItem value="registration_open">
+                  {t("list.options.registration_open")}
+                </SelectItem>
+                <SelectItem value="registration_closed">
+                  {t("list.options.registration_closed")}
+                </SelectItem>
+                <SelectItem value="in_progress">
+                  {t("list.options.in_progress")}
+                </SelectItem>
+                <SelectItem value="completed">{t("list.options.completed")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
+            <Label htmlFor="city">{t("list.labels.city")}</Label>
             <Input
               id="city"
-              placeholder="Filter by city"
+              placeholder={t("list.placeholders.filter_by_city")}
               value={filters.city ?? ""}
               onChange={(event) =>
                 handleFilterChange("city", event.target.value || undefined)
@@ -183,7 +191,7 @@ export function EventList({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
+            <Label htmlFor="country">{t("list.labels.country")}</Label>
             <Select
               value={countryFilterValue}
               onValueChange={(value) =>
@@ -194,10 +202,12 @@ export function EventList({
               }
             >
               <SelectTrigger id="country">
-                <SelectValue placeholder="All countries" />
+                <SelectValue placeholder={t("list.placeholders.all_countries")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All countries</SelectItem>
+                <SelectItem value="all">
+                  {t("list.placeholders.all_countries")}
+                </SelectItem>
                 {COUNTRIES.map((country) => (
                   <SelectItem key={country.value} value={country.value}>
                     {country.label}
@@ -208,7 +218,7 @@ export function EventList({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sortBy">Sort By</Label>
+            <Label htmlFor="sortBy">{t("list.labels.sort_by")}</Label>
             <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortBy)}>
               <SelectTrigger id="sortBy">
                 <SelectValue />
@@ -216,7 +226,7 @@ export function EventList({
               <SelectContent>
                 {SORT_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                    {t(`list.options.${option.label}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -224,7 +234,7 @@ export function EventList({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="sortOrder">Sort Order</Label>
+            <Label htmlFor="sortOrder">{t("list.labels.sort_order")}</Label>
             <Select
               value={sortOrder}
               onValueChange={(value) => setSortOrder(value as SortOrder)}
@@ -235,7 +245,7 @@ export function EventList({
               <SelectContent>
                 {SORT_ORDER_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                    {t(`list.options.${option.label}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -249,7 +259,7 @@ export function EventList({
   if (error) {
     return (
       <div className="text-destructive text-center">
-        Error loading events: {error.message}
+        {t("errors.load_failed", { message: error.message })}
       </div>
     );
   }
@@ -278,7 +288,7 @@ export function EventList({
         </div>
       ) : hasNoEvents ? (
         <Card className="p-8 text-center">
-          <p className="text-muted-foreground">No events found matching your criteria.</p>
+          <p className="text-muted-foreground">{t("list.empty_state")}</p>
         </Card>
       ) : (
         <>
@@ -289,6 +299,7 @@ export function EventList({
                 event={event}
                 buildEventLink={buildEventLink}
                 fallbackActionLabel={actionLabel}
+                t={t}
               />
             ))}
           </div>
@@ -296,8 +307,11 @@ export function EventList({
           {data && data.pageInfo.totalPages > 1 && (
             <div className="flex items-center justify-between">
               <div className="text-muted-foreground text-sm">
-                Showing {(page - 1) * pageSize + 1}-
-                {Math.min(page * pageSize, data.totalCount)} of {data.totalCount} events
+                {t("list.pagination.showing", {
+                  start: (page - 1) * pageSize + 1,
+                  end: Math.min(page * pageSize, data.totalCount),
+                  total: data.totalCount,
+                })}
               </div>
               <div className="flex gap-2">
                 <Button
@@ -306,7 +320,7 @@ export function EventList({
                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                   disabled={!data.pageInfo.hasPreviousPage}
                 >
-                  Previous
+                  {t("list.pagination.previous")}
                 </Button>
                 <div className="flex items-center gap-1">
                   {Array.from(
@@ -335,7 +349,7 @@ export function EventList({
                   onClick={() => setPage((prev) => prev + 1)}
                   disabled={!data.pageInfo.hasNextPage}
                 >
-                  Next
+                  {t("list.pagination.next")}
                 </Button>
               </div>
             </div>
@@ -350,15 +364,18 @@ function EventCard({
   event,
   buildEventLink,
   fallbackActionLabel,
+  t,
 }: {
   readonly event: EventWithDetails;
   readonly buildEventLink?: EventListProps["buildEventLink"];
   readonly fallbackActionLabel?: EventListProps["actionLabel"];
+  readonly t: (key: string, params?: Record<string, string | number>) => string;
 }) {
   const typeIcon = getTypeIcon(event.type);
   const badgeAppearance = getStatusBadgeAppearance(event.status);
   const builderLink = buildEventLink?.(event);
-  const linkLabel = builderLink?.label ?? fallbackActionLabel ?? "View Details";
+  const linkLabel =
+    builderLink?.label ?? fallbackActionLabel ?? t("list.actions.view_details");
   const resolvedLink: LinkConfig = {
     to: builderLink?.to ?? "/events/$slug",
     params: builderLink?.params ?? { slug: event.slug },
@@ -421,10 +438,12 @@ function EventCard({
           {event.isRegistrationOpen ? (
             <div className="flex items-center gap-2">
               <ClockIcon className="h-4 w-4 text-emerald-600" />
-              <span className="font-medium text-emerald-600">Registration Open</span>
+              <span className="font-medium text-emerald-600">
+                {t("list.registration.open")}
+              </span>
               {event.availableSpots !== undefined ? (
                 <span className="text-muted-foreground">
-                  ({event.availableSpots} spots left)
+                  {t("list.registration.spots_left", { count: event.availableSpots })}
                 </span>
               ) : null}
             </div>
@@ -432,12 +451,16 @@ function EventCard({
 
           <div className="flex items-center gap-2">
             <UsersIcon className="text-muted-foreground h-4 w-4" />
-            <span>{event.registrationCount} registered</span>
+            <span>
+              {t("list.registration.registered", { count: event.registrationCount })}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
             <TagIcon className="text-muted-foreground h-4 w-4" />
-            <span className="capitalize">{event.registrationType} registration</span>
+            <span className="capitalize">
+              {t("list.registration.type_label", { type: event.registrationType })}
+            </span>
           </div>
         </div>
 

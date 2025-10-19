@@ -1,4 +1,4 @@
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -43,15 +43,13 @@ const updateUserLanguagePreferences = createServerFn()
     return { success: true };
   });
 
-// Query client for invalidating queries
-const queryClient = new QueryClient();
-
 /**
  * Hook to detect and set the current language
  */
 export const useLanguageDetection = (path?: string) => {
   const currentPath =
     path ?? (typeof window !== "undefined" ? window.location.pathname : "/");
+  const queryClient = useQueryClient();
 
   // Query user preferences
   const {
@@ -82,6 +80,11 @@ export const useLanguageDetection = (path?: string) => {
   // Detect current language based on path and preferences
   const detectedLanguage = getCurrentLanguage(currentPath, userPreferences);
 
+  const buildLocalizedUrl = (
+    originalUrl: string,
+    targetLanguage: SupportedLanguage = detectedLanguage,
+  ) => getLocalizedUrl(originalUrl, targetLanguage, detectedLanguage);
+
   // Change language function
   const changeLanguage = async (language: SupportedLanguage) => {
     // Change i18n language first
@@ -99,7 +102,7 @@ export const useLanguageDetection = (path?: string) => {
     }
 
     // Return the localized URL
-    const localizedUrl = getLocalizedUrl(currentPath, language, detectedLanguage);
+    const localizedUrl = buildLocalizedUrl(currentPath, language);
     return localizedUrl;
   };
 
@@ -122,35 +125,10 @@ export const useLanguageDetection = (path?: string) => {
     error: preferencesError,
     changeLanguage,
     autoDetectLanguage,
+    getLocalizedUrl: buildLocalizedUrl,
     isUpdating: updatePreferencesMutation.isPending,
     updateError: updatePreferencesMutation.error,
   };
-};
-
-/**
- * Hook to get localized URL
- */
-export const useLocalizedUrl = () => {
-  const { currentLanguage } = useLanguageDetection();
-
-  const getLocalizedUrl = (originalUrl: string, targetLanguage?: SupportedLanguage) => {
-    const lang = targetLanguage ?? currentLanguage;
-    const segments = originalUrl.split("/").filter(Boolean);
-
-    // Remove current language prefix if it exists
-    if (segments[0] && ["en", "de", "pl"].includes(segments[0])) {
-      segments.shift();
-    }
-
-    // Add target language prefix if it's not the default language
-    if (lang !== i18nConfig.defaultLanguage) {
-      segments.unshift(lang);
-    }
-
-    return `/${segments.join("/")}`;
-  };
-
-  return { getLocalizedUrl };
 };
 
 /**
@@ -158,8 +136,8 @@ export const useLocalizedUrl = () => {
  */
 export const useLanguageSwitcher = (path?: string) => {
   const router = useRouter();
-  const { currentLanguage, changeLanguage, isUpdating } = useLanguageDetection(path);
-  const { getLocalizedUrl } = useLocalizedUrl();
+  const { currentLanguage, changeLanguage, getLocalizedUrl, isUpdating } =
+    useLanguageDetection(path);
 
   const switchLanguage = async (language: SupportedLanguage) => {
     if (language === currentLanguage) return;

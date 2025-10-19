@@ -1,3 +1,4 @@
+import { useRouterState } from "@tanstack/react-router";
 import { Check, ChevronDown, Globe } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -23,7 +24,10 @@ export function LanguageSwitcher({
   showLabel = true,
   className = "",
 }: LanguageSwitcherProps) {
-  const { currentLanguage, switchLanguage, isUpdating } = useLanguageSwitcher();
+  const { location } = useRouterState();
+  const { currentLanguage, switchLanguage, isUpdating } = useLanguageSwitcher(
+    location.pathname,
+  );
   const [isOpen, setIsOpen] = useState(false);
   const supportedLanguages = getSupportedLanguages();
 

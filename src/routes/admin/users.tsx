@@ -7,5 +7,8 @@ export const Route = createFileRoute("/admin/users")({
 });
 
 function AdminUsersRoute() {
-  return <AdminUserDirectory />;
+  const { user } = Route.useRouteContext() as {
+    user: { id: string } | null;
+  };
+  return <AdminUserDirectory currentUser={user} />;
 }

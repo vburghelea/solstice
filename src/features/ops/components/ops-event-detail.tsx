@@ -1,12 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  addDays,
-  format,
-  formatDistanceToNow,
-  isAfter,
-  isBefore,
-  subDays,
-} from "date-fns";
+import { addDays, format, isAfter, isBefore, subDays } from "date-fns";
 import {
   AlertCircleIcon,
   CalendarIcon,
@@ -22,6 +15,8 @@ import {
 } from "lucide-react";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { SupportedLanguage } from "~/lib/i18n/config";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
@@ -137,7 +132,7 @@ interface OpsEventDetailProps {
 }
 
 export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
-  const { t } = useOpsTranslation();
+  const { t, currentLanguage } = useOpsTranslation();
   const { t: commonT } = useCommonTranslation();
 
   const {
@@ -414,6 +409,7 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                   t={t}
                   commonT={commonT}
                   taskStatusLabels={taskStatusLabels}
+                  currentLanguage={currentLanguage}
                 />
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -433,7 +429,12 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
                 </div>
               </TabsContent>
               <TabsContent value="timeline">
-                <Timeline event={event} tasks={tasks} t={t} />
+                <Timeline
+                  event={event}
+                  tasks={tasks}
+                  t={t}
+                  currentLanguage={currentLanguage}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -522,6 +523,7 @@ function TaskTable({
   t,
   commonT,
   taskStatusLabels,
+  currentLanguage,
 }: {
   tasks: OpsTask[];
   onStatusChange: (taskId: string, status: OpsTaskStatus) => void;
@@ -531,6 +533,7 @@ function TaskTable({
   t: (key: string) => string;
   commonT: (key: string) => string;
   taskStatusLabels: Record<string, string>;
+  currentLanguage: SupportedLanguage;
 }) {
   if (tasks.length === 0) {
     return (
@@ -618,7 +621,9 @@ function TaskTable({
                   <div className="space-y-1 text-xs">
                     <p>{format(task.dueDate, "PPP")}</p>
                     <p className="text-muted-foreground">
-                      {formatDistanceToNow(task.dueDate, { addSuffix: true })}
+                      {formatDistanceToNowLocalized(task.dueDate, currentLanguage, {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                 ) : (
@@ -725,10 +730,12 @@ function Timeline({
   event,
   tasks,
   t,
+  currentLanguage,
 }: {
   event: EventWithDetails;
   tasks: OpsTask[];
   t: (key: string) => string;
+  currentLanguage: SupportedLanguage;
 }) {
   const timeline = buildTimeline(event, tasks, t);
 
@@ -753,7 +760,9 @@ function Timeline({
             </div>
             <span className="text-muted-foreground text-xs">
               {format(milestone.date, "PPP")} ·{" "}
-              {formatDistanceToNow(milestone.date, { addSuffix: true })}
+              {formatDistanceToNowLocalized(milestone.date, currentLanguage, {
+                addSuffix: true,
+              })}
             </span>
           </div>
           <p className="text-muted-foreground mt-2 text-sm">{milestone.description}</p>

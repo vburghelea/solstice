@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { useMemo, useState } from "react";
+import { SupportedLanguage } from "~/lib/i18n/config";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -38,7 +40,7 @@ type SharedInboxViewProps = {
 
 export function SharedInboxView(props: SharedInboxViewProps) {
   const { persona, userName, userId, mode = "interactive", previewMessage } = props;
-  const { t } = useInboxTranslation();
+  const { t, currentLanguage } = useInboxTranslation();
 
   const {
     data: snapshot,
@@ -310,6 +312,7 @@ export function SharedInboxView(props: SharedInboxViewProps) {
                   isActive={thread.id === activeThreadId}
                   onSelect={() => setSelectedThreadId(thread.id)}
                   t={t}
+                  currentLanguage={currentLanguage}
                 />
               ))
             )}
@@ -323,6 +326,7 @@ export function SharedInboxView(props: SharedInboxViewProps) {
               thread={selectedThread}
               isPreview={isPreview}
               t={t}
+              currentLanguage={currentLanguage}
             />
           ) : (
             <Card className="items-center justify-center gap-2 px-6 py-10 text-center">
@@ -346,13 +350,18 @@ type ThreadListItemProps = {
   isActive: boolean;
   onSelect: () => void;
   t: (key: string, params?: Record<string, unknown>) => string;
+  currentLanguage: SupportedLanguage;
 };
 
 function ThreadListItem(props: ThreadListItemProps) {
-  const { persona, thread, isActive, onSelect, t } = props;
-  const latestUpdate = formatDistanceToNow(new Date(thread.updatedAt), {
-    addSuffix: true,
-  });
+  const { persona, thread, isActive, onSelect, t, currentLanguage } = props;
+  const latestUpdate = formatDistanceToNowLocalized(
+    new Date(thread.updatedAt),
+    currentLanguage,
+    {
+      addSuffix: true,
+    },
+  );
   const isUnread = thread.unreadFor.includes(persona);
 
   return (
@@ -403,10 +412,11 @@ type ThreadDetailProps = {
   thread: SharedInboxThread;
   isPreview: boolean;
   t: (key: string, params?: Record<string, unknown>) => string;
+  currentLanguage: SupportedLanguage;
 };
 
 function ThreadDetail(props: ThreadDetailProps) {
-  const { persona, thread, isPreview, t } = props;
+  const { persona, thread, isPreview, t, currentLanguage } = props;
   const participantsById = useMemo(() => {
     return thread.participants.reduce<
       Record<string, (typeof thread.participants)[number]>
@@ -489,9 +499,13 @@ function ThreadDetail(props: ThreadDetailProps) {
         <div className="space-y-5">
           {thread.messages.map((message) => {
             const author = participantsById[message.authorId];
-            const timestamp = formatDistanceToNow(new Date(message.timestamp), {
-              addSuffix: true,
-            });
+            const timestamp = formatDistanceToNowLocalized(
+              new Date(message.timestamp),
+              currentLanguage,
+              {
+                addSuffix: true,
+              },
+            );
             return (
               <div key={message.id} className="rounded-xl border px-4 py-4 shadow-xs">
                 <div className="flex items-start justify-between gap-3">
@@ -549,7 +563,7 @@ function ThreadDetail(props: ThreadDetailProps) {
       <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
         <p className="text-muted-foreground text-xs">
           {t("shared_inbox.thread_detail.last_updated")}{" "}
-          {formatDistanceToNow(new Date(thread.updatedAt), {
+          {formatDistanceToNowLocalized(new Date(thread.updatedAt), currentLanguage, {
             addSuffix: true,
           })}
         </p>

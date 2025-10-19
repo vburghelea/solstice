@@ -1,347 +1,347 @@
 {
   "onboarding": {
-    "title": "TODO: Translate \"onboarding.title\"",
-    "description": "TODO: Translate \"onboarding.description\""
+    "title": "Uzupełnij swój profil gracza",
+    "description": "Podaj te dane, aby ukończyć wdrożenie i odblokować przestrzeń gracza."
   },
   "basic_information": {
-    "title": "TODO: Translate \"basic_information.title\"",
-    "description": "TODO: Translate \"basic_information.description\""
+    "title": "Podstawowe informacje",
+    "description": "Twoje dane osobowe i kontaktowe"
   },
   "additional_information": {
-    "title": "TODO: Translate \"additional_information.title\"",
-    "description": "TODO: Translate \"additional_information.description\""
+    "title": "Dodatkowe informacje",
+    "description": "Twoje preferencje dotyczące gier i dostępności"
   },
   "privacy_settings": {
-    "title": "TODO: Translate \"privacy_settings.title\"",
-    "description": "TODO: Translate \"privacy_settings.description\"",
-    "choose_what_others_see": "TODO: Translate \"privacy_settings.choose_what_others_see\""
+    "title": "Ustawienia prywatności",
+    "description": "Kontroluj, jakie informacje są widoczne dla innych",
+    "choose_what_others_see": "Wybierz, jakie informacje inni członkowie mogą o Tobie zobaczyć."
   },
   "game_preferences": {
-    "title": "TODO: Translate \"game_preferences.title\"",
-    "description": "TODO: Translate \"game_preferences.description\""
+    "title": "Preferencje gier",
+    "description": "Twoje ulubione i nielubiane systemy gier"
   },
   "blocklist": {
-    "title": "TODO: Translate \"blocklist.title\"",
-    "description": "TODO: Translate \"blocklist.description\"",
-    "explanation": "TODO: Translate \"blocklist.explanation\"",
-    "open_blocklist": "TODO: Translate \"blocklist.open_blocklist\""
+    "title": "Lista zablokowanych",
+    "description": "Zarządzaj użytkownikami, których zablokowałeś",
+    "explanation": "Zablokowani użytkownicy nie mogą Cię obserwować, zapraszać ani ubiegać się o Twoje gry/kampanie. Możesz odblokować ich w każdej chwili.",
+    "open_blocklist": "Otwórz listę zablokowanych"
   },
   "personal_information": {
-    "title": "TODO: Translate \"personal_information.title\"",
-    "description": "TODO: Translate \"personal_information.description\""
+    "title": "Informacje osobiste",
+    "description": "Podstawowe informacje o Tobie"
   },
   "labels": {
-    "profile_name": "TODO: Translate \"labels.profile_name\"",
-    "email_address": "TODO: Translate \"labels.email_address\"",
-    "gender": "TODO: Translate \"labels.gender\"",
-    "pronouns": "TODO: Translate \"labels.pronouns\"",
-    "phone_number": "TODO: Translate \"labels.phone_number\"",
-    "city": "TODO: Translate \"labels.city\"",
-    "country": "TODO: Translate \"labels.country\"",
-    "overall_experience_level": "TODO: Translate \"labels.overall_experience_level\"",
-    "games_hosted": "TODO: Translate \"labels.games_hosted\"",
-    "gm_rating": "TODO: Translate \"labels.gm_rating\"",
-    "response_rate": "TODO: Translate \"labels.response_rate\"",
-    "avg_response_time": "TODO: Translate \"labels.avg_response_time\"",
-    "top_strengths": "TODO: Translate \"labels.top_strengths\"",
-    "availability_calendar": "TODO: Translate \"labels.availability_calendar\"",
-    "languages": "TODO: Translate \"labels.languages\"",
-    "identity_tags": "TODO: Translate \"labels.identity_tags\"",
-    "preferred_game_themes": "TODO: Translate \"labels.preferred_game_themes\"",
-    "favorite_systems": "TODO: Translate \"labels.favorite_systems\"",
-    "avoided_systems": "TODO: Translate \"labels.avoided_systems\"",
-    "time": "TODO: Translate \"labels.time\""
+    "profile_name": "Nazwa profilu",
+    "email_address": "Adres e-mail",
+    "gender": "Płeć",
+    "pronouns": "Zaimki",
+    "phone_number": "Numer telefonu",
+    "city": "Miasto",
+    "country": "Kraj",
+    "overall_experience_level": "Ogólny poziom doświadczenia",
+    "games_hosted": "Zorganizowane gry",
+    "gm_rating": "Ocena MG",
+    "response_rate": "Wskaźnik odpowiedzi",
+    "avg_response_time": "Śr. czas odpowiedzi",
+    "top_strengths": "Największe zalety",
+    "availability_calendar": "Kalendarz dostępności",
+    "languages": "Języki",
+    "identity_tags": "Tagi tożsamości",
+    "preferred_game_themes": "Preferowane motywy gier",
+    "favorite_systems": "Ulubione systemy",
+    "avoided_systems": "Unikane systemy",
+    "time": "Czas"
   },
   "placeholders": {
-    "profile_name": "TODO: Translate \"placeholders.profile_name\"",
-    "gender": "TODO: Translate \"placeholders.gender\"",
-    "pronouns": "TODO: Translate \"placeholders.pronouns\"",
-    "phone_number": "TODO: Translate \"placeholders.phone_number\"",
-    "city": "TODO: Translate \"placeholders.city\"",
-    "country": "TODO: Translate \"placeholders.country\"",
-    "experience_level": "TODO: Translate \"placeholders.experience_level\"",
-    "languages": "TODO: Translate \"placeholders.languages\"",
-    "identity_tags": "TODO: Translate \"placeholders.identity_tags\"",
-    "game_themes": "TODO: Translate \"placeholders.game_themes\""
+    "profile_name": "wybierz unikalną nazwę użytkownika",
+    "gender": "Wybierz płeć",
+    "pronouns": "np. on/jego, ona/jej, they/them",
+    "phone_number": "+48 123 456 789",
+    "city": "Warszawa",
+    "country": "Wyszukaj kraj",
+    "experience_level": "Wybierz poziom doświadczenia",
+    "languages": "Wybierz języki, którymi mówisz",
+    "identity_tags": "Wybierz tagi tożsamości",
+    "game_themes": "Wybierz preferowane motywy gier"
   },
   "descriptions": {
-    "profile_name": "TODO: Translate \"descriptions.profile_name\"",
-    "profile_name_public": "TODO: Translate \"descriptions.profile_name_public\"",
-    "availability": "TODO: Translate \"descriptions.availability\"",
-    "languages": "TODO: Translate \"descriptions.languages\"",
-    "identity_tags": "TODO: Translate \"descriptions.identity_tags\"",
-    "game_themes": "TODO: Translate \"descriptions.game_themes\"",
-    "availability_calendar": "TODO: Translate \"descriptions.availability_calendar\"",
-    "identity_tags_help": "TODO: Translate \"descriptions.identity_tags_help\"",
-    "game_themes_help": "TODO: Translate \"descriptions.game_themes_help\""
+    "profile_name": "Ta nazwa jest publiczna i musi być unikalna. Używaj liter, cyfr, kropek, podkreśleń lub myślników.",
+    "profile_name_public": "Ta nazwa jest publiczna i widoczna dla innych graczy.",
+    "availability": "Ustaw swoją cotygodniową dostępność na sesje gier",
+    "languages": "Języki, w których czujesz się komfortowo grając",
+    "identity_tags": "Pomóż innym znaleźć kompatybilnych partnerów do gry",
+    "game_themes": "Motywy gier, które najbardziej lubisz",
+    "availability_calendar": "Kliknij i przeciągnij, aby wybrać dostępne godziny w każdym tygodniu.",
+    "identity_tags_help": "Pomóż innym znaleźć kompatybilnych partnerów do gry",
+    "game_themes_help": "Motywy gier, które najbardziej lubisz"
   },
   "buttons": {
-    "edit": "TODO: Translate \"buttons.edit\"",
-    "cancel": "TODO: Translate \"buttons.cancel\"",
-    "save_changes": "TODO: Translate \"buttons.save_changes\"",
-    "saving": "TODO: Translate \"buttons.saving\"",
-    "complete_profile": "TODO: Translate \"buttons.complete_profile\"",
-    "completing_profile": "TODO: Translate \"buttons.completing_profile\"",
-    "previous": "TODO: Translate \"buttons.previous\"",
-    "next": "TODO: Translate \"buttons.next\""
+    "edit": "Edytuj",
+    "cancel": "Anuluj",
+    "save_changes": "Zapisz zmiany",
+    "saving": "Zapisywanie...",
+    "complete_profile": "Uzupełnij profil",
+    "completing_profile": "Uzupełnianie profilu...",
+    "previous": "Wstecz",
+    "next": "Dalej"
   },
   "form_steps": {
     "personal": {
-      "title": "TODO: Translate \"form_steps.personal.title\"",
-      "description": "TODO: Translate \"form_steps.personal.description\""
+      "title": "Informacje osobiste",
+      "description": "Podstawowe informacje o Tobie"
     },
     "additional": {
-      "title": "TODO: Translate \"form_steps.additional.title\"",
-      "description": "TODO: Translate \"form_steps.additional.description\""
+      "title": "Dodatkowe informacje",
+      "description": "Więcej szczegółów o Twoich preferencjach i doświadczeniu w grach"
     },
     "privacy": {
-      "title": "TODO: Translate \"form_steps.privacy.title\"",
-      "description": "TODO: Translate \"form_steps.privacy.description\""
+      "title": "Ustawienia prywatności",
+      "description": "Kontroluj, jakie informacje są widoczne dla innych"
     },
     "game_preferences": {
-      "title": "TODO: Translate \"form_steps.game_preferences.title\"",
-      "description": "TODO: Translate \"form_steps.game_preferences.description\""
+      "title": "Preferencje gier",
+      "description": "Wybierz swoje ulubione i najmniej lubiane systemy gier"
     }
   },
   "privacy_options": {
-    "show_email_to_teammates": "TODO: Translate \"privacy_options.show_email_to_teammates\"",
-    "show_phone_to_teammates": "TODO: Translate \"privacy_options.show_phone_to_teammates\"",
-    "show_location_to_everyone": "TODO: Translate \"privacy_options.show_location_to_everyone\"",
-    "show_languages_to_everyone": "TODO: Translate \"privacy_options.show_languages_to_everyone\"",
-    "show_game_preferences_to_everyone": "TODO: Translate \"privacy_options.show_game_preferences_to_everyone\"",
-    "show_location_to_others": "TODO: Translate \"privacy_options.show_location_to_others\"",
-    "show_languages_to_others": "TODO: Translate \"privacy_options.show_languages_to_others\"",
-    "show_game_preferences_to_others": "TODO: Translate \"privacy_options.show_game_preferences_to_others\"",
-    "allow_team_invitations": "TODO: Translate \"privacy_options.allow_team_invitations\"",
-    "allow_team_captains_invitations": "TODO: Translate \"privacy_options.allow_team_captains_invitations\"",
-    "only_allow_invites_from_connections": "TODO: Translate \"privacy_options.only_allow_invites_from_connections\"",
-    "allow_follows": "TODO: Translate \"privacy_options.allow_follows\"",
-    "allow_others_to_follow": "TODO: Translate \"privacy_options.allow_others_to_follow\"",
-    "show_email_to_team_members": "TODO: Translate \"privacy_options.show_email_to_team_members\"",
-    "show_phone_to_team_members": "TODO: Translate \"privacy_options.show_phone_to_team_members\""
+    "show_email_to_teammates": "Pokaż mój adres e-mail członkom zespołu",
+    "show_phone_to_teammates": "Pokaż mój numer telefonu członkom zespołu",
+    "show_location_to_everyone": "Pokaż moją lokalizację (miasto i kraj) wszystkim",
+    "show_languages_to_everyone": "Pokaż moje języki wszystkim",
+    "show_game_preferences_to_everyone": "Pokaż moje preferencje gier wszystkim",
+    "show_location_to_others": "Pokaż moją lokalizację (miasto/kraj) innym",
+    "show_languages_to_others": "Pokaż moje języki innym",
+    "show_game_preferences_to_others": "Pokaż moje preferencje gier innym",
+    "allow_team_invitations": "Pozwól na zaproszenia do zespołów od innych użytkowników",
+    "allow_team_captains_invitations": "Pozwól kapitanom zespołów wysyłać Ci zaproszenia",
+    "only_allow_invites_from_connections": "Pozwól tylko na zaproszenia od połączeń",
+    "allow_follows": "Pozwól innym użytkownikom Cię obserwować",
+    "allow_others_to_follow": "Pozwól innym Cię obserwować",
+    "show_email_to_team_members": "Pokaż mój adres e-mail członkom zespołu",
+    "show_phone_to_team_members": "Pokaż mój numer telefonu członkom zespołu"
   },
   "status": {
-    "loading_profile": "TODO: Translate \"status.loading_profile\"",
-    "loading_profile_data": "TODO: Translate \"status.loading_profile_data\"",
-    "not_set": "TODO: Translate \"status.not_set\"",
-    "not_specified": "TODO: Translate \"status.not_specified\"",
-    "no_languages_specified": "TODO: Translate \"status.no_languages_specified\"",
-    "no_identity_tags_specified": "TODO: Translate \"status.no_identity_tags_specified\"",
-    "no_game_themes_specified": "TODO: Translate \"status.no_game_themes_specified\"",
-    "no_favorites_specified": "TODO: Translate \"status.no_favorites_specified\"",
-    "no_avoided_systems_specified": "TODO: Translate \"status.no_avoided_systems_specified\"",
-    "na": "TODO: Translate \"status.na\""
+    "loading_profile": "Ładowanie profilu...",
+    "loading_profile_data": "Ładowanie danych profilu...",
+    "not_set": "Nie ustawiono",
+    "not_specified": "Nie określono",
+    "no_languages_specified": "Nie określono języków",
+    "no_identity_tags_specified": "Nie określono tagów tożsamości",
+    "no_game_themes_specified": "Nie określono motywów gier",
+    "no_favorites_specified": "Nie określono ulubionych",
+    "no_avoided_systems_specified": "Nie określono unikanych systemów",
+    "na": "N/A"
   },
   "privacy_display": {
-    "email_visible_to_teammates": "TODO: Translate \"privacy_display.email_visible_to_teammates\"",
-    "phone_visible_to_teammates": "TODO: Translate \"privacy_display.phone_visible_to_teammates\"",
-    "location_visible_to_everyone": "TODO: Translate \"privacy_display.location_visible_to_everyone\"",
-    "languages_visible_to_everyone": "TODO: Translate \"privacy_display.languages_visible_to_everyone\"",
-    "game_preferences_visible_to_everyone": "TODO: Translate \"privacy_display.game_preferences_visible_to_everyone\"",
-    "allow_team_invitations": "TODO: Translate \"privacy_display.allow_team_invitations\"",
-    "only_allow_invites_from_connections": "TODO: Translate \"privacy_display.only_allow_invites_from_connections\"",
-    "allow_follows": "TODO: Translate \"privacy_display.allow_follows\""
+    "email_visible_to_teammates": "E-mail widoczny dla członków zespołu",
+    "phone_visible_to_teammates": "Telefon widoczny dla członków zespołu",
+    "location_visible_to_everyone": "Lokalizacja widoczna dla wszystkich",
+    "languages_visible_to_everyone": "Języki widoczne dla wszystkich",
+    "game_preferences_visible_to_everyone": "Preferencje gier widoczne dla wszystkich",
+    "allow_team_invitations": "Pozwól na zaproszenia do zespołów",
+    "only_allow_invites_from_connections": "Tylko zaproszenia od połączeń",
+    "allow_follows": "Pozwól na obserwowanie"
   },
   "aria_labels": {
-    "edit_basic_information": "TODO: Translate \"aria_labels.edit_basic_information\"",
-    "edit_additional_information": "TODO: Translate \"aria_labels.edit_additional_information\"",
-    "edit_privacy_settings": "TODO: Translate \"aria_labels.edit_privacy_settings\"",
-    "edit_game_preferences": "TODO: Translate \"aria_labels.edit_game_preferences\""
+    "edit_basic_information": "Edytuj podstawowe informacje",
+    "edit_additional_information": "Edytuj dodatkowe informacje",
+    "edit_privacy_settings": "Edytuj ustawienia prywatności",
+    "edit_game_preferences": "Edytuj preferencje gier"
   },
   "errors": {
-    "failed_to_load_profile": "TODO: Translate \"errors.failed_to_load_profile\"",
-    "please_try_logging_in_again": "TODO: Translate \"errors.please_try_logging_in_again\"",
-    "no_changes_made": "TODO: Translate \"errors.no_changes_made\"",
-    "profile_updated_successfully": "TODO: Translate \"errors.profile_updated_successfully\"",
-    "failed_to_update_profile": "TODO: Translate \"errors.failed_to_update_profile\"",
-    "profile_name_already_taken": "TODO: Translate \"errors.profile_name_already_taken\"",
-    "unable_to_verify_profile_name": "TODO: Translate \"errors.unable_to_verify_profile_name\"",
-    "failed_to_reserve_profile_name": "TODO: Translate \"errors.failed_to_reserve_profile_name\"",
-    "failed_to_save_profile": "TODO: Translate \"errors.failed_to_save_profile\"",
-    "unexpected_error": "TODO: Translate \"errors.unexpected_error\"",
-    "please_save_or_cancel_current_changes": "TODO: Translate \"errors.please_save_or_cancel_current_changes\""
+    "failed_to_load_profile": "Nie udało się załadować profilu",
+    "please_try_logging_in_again": "Spróbuj zalogować się ponownie",
+    "no_changes_made": "Nie wprowadzono żadnych zmian w Twoim profilu.",
+    "profile_updated_successfully": "Profil zaktualizowano pomyślnie",
+    "failed_to_update_profile": "Nie udało się zaktualizować profilu",
+    "profile_name_already_taken": "Ta nazwa profilu jest już zajęta",
+    "unable_to_verify_profile_name": "Nie udało się zweryfikować nazwy profilu. Spróbuj ponownie.",
+    "failed_to_reserve_profile_name": "Nie udało się zarezerwować nazwy profilu",
+    "failed_to_save_profile": "Nie udało się zapisać profilu",
+    "unexpected_error": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+    "please_save_or_cancel_current_changes": "Proszę zapisz lub anuluj bieżące zmiany przed edycją innej sekcji."
   },
   "optional_fields": {
-    "gender": "TODO: Translate \"optional_fields.gender\"",
-    "pronouns": "TODO: Translate \"optional_fields.pronouns\"",
-    "phone": "TODO: Translate \"optional_fields.phone\"",
-    "city": "TODO: Translate \"optional_fields.city\"",
-    "country": "TODO: Translate \"optional_fields.country\"",
-    "languages": "TODO: Translate \"optional_fields.languages\"",
-    "identity_tags": "TODO: Translate \"optional_fields.identity_tags\"",
-    "game_themes": "TODO: Translate \"optional_fields.game_themes\"",
-    "experience_level": "TODO: Translate \"optional_fields.experience_level\"",
-    "calendar_availability": "TODO: Translate \"optional_fields.calendar_availability\""
+    "gender": "Płeć (opcjonalne)",
+    "pronouns": "Zaimki (opcjonalne)",
+    "phone": "Numer telefonu (opcjonalne)",
+    "city": "Miasto (opcjonalne)",
+    "country": "Kraj (opcjonalne)",
+    "languages": "Języki (opcjonalne)",
+    "identity_tags": "Tagi tożsamości (opcjonalne)",
+    "game_themes": "Preferowane motywy gier (opcjonalne)",
+    "experience_level": "Ogólny poziom doświadczenia (opcjonalne)",
+    "calendar_availability": "Dostępność w kalendarzu (opcjonalne)"
   },
   "placeholders_optional": {
-    "pronouns": "TODO: Translate \"placeholders_optional.pronouns\"",
-    "languages": "TODO: Translate \"placeholders_optional.languages\"",
-    "identity_tags": "TODO: Translate \"placeholders_optional.identity_tags\"",
-    "game_themes": "TODO: Translate \"placeholders_optional.game_themes\"",
-    "experience_level": "TODO: Translate \"placeholders_optional.experience_level\""
+    "pronouns": "np., they/them, ona/jej, on/jego",
+    "languages": "Dodaj języki, którymi mówisz",
+    "identity_tags": "Dodaj tagi tożsamości, które Cię reprezentują",
+    "game_themes": "Dodaj motywy gier, które preferujesz",
+    "experience_level": "Wybierz swój poziom doświadczenia"
   },
   "hero_section": {
-    "complete_profile_prompt": "TODO: Translate \"hero_section.complete_profile_prompt\"",
-    "save_cities": "TODO: Translate \"hero_section.save_cities\"",
-    "follow_storytellers": "TODO: Translate \"hero_section.follow_storytellers\"",
-    "book_quickly": "TODO: Translate \"hero_section.book_quickly\""
+    "complete_profile_prompt": "Uzupełnij swój profil gracza, aby dopasować Cię z opowiadamaczami, miejscami i harmonogramami dostosowanymi do Ciebie.",
+    "save_cities": "Zapisuj miasta",
+    "follow_storytellers": "Obserwuj opowiadamaczy",
+    "book_quickly": "Rezerwuj szybko"
   },
   "gender_options": {
-    "male": "TODO: Translate \"gender_options.male\"",
-    "female": "TODO: Translate \"gender_options.female\"",
-    "non_binary": "TODO: Translate \"gender_options.non_binary\"",
-    "other": "TODO: Translate \"gender_options.other\"",
-    "prefer_not_to_say": "TODO: Translate \"gender_options.prefer_not_to_say\""
+    "male": "Mężczyzna",
+    "female": "Kobieta",
+    "non_binary": "Niebinarny",
+    "other": "Inne",
+    "prefer_not_to_say": "Wolę nie mówić"
   },
   "gm_stats": {
-    "response_time_minutes": "TODO: Translate \"gm_stats.response_time_minutes\"",
-    "response_rate_percentage": "TODO: Translate \"gm_stats.response_rate_percentage\"",
-    "rating_na": "TODO: Translate \"gm_stats.rating_na\""
+    "response_time_minutes": "{{count}} min",
+    "response_rate_percentage": "{{count}}%",
+    "rating_na": "N/A"
   },
   "form_fields": {
-    "gender": "TODO: Translate \"form_fields.gender\"",
-    "select_gender": "TODO: Translate \"form_fields.select_gender\"",
-    "pronouns": "TODO: Translate \"form_fields.pronouns\"",
-    "pronouns_example": "TODO: Translate \"form_fields.pronouns_example\"",
-    "phone_number": "TODO: Translate \"form_fields.phone_number\"",
-    "phone_example": "TODO: Translate \"form_fields.phone_example\"",
-    "city": "TODO: Translate \"form_fields.city\"",
-    "city_example": "TODO: Translate \"form_fields.city_example\"",
-    "country": "TODO: Translate \"form_fields.country\"",
-    "search_country": "TODO: Translate \"form_fields.search_country\"",
-    "overall_experience_level": "TODO: Translate \"form_fields.overall_experience_level\"",
-    "select_experience_level": "TODO: Translate \"form_fields.select_experience_level\""
+    "gender": "Płeć",
+    "select_gender": "Wybierz płeć",
+    "pronouns": "Zaimki",
+    "pronouns_example": "np. on/jego, ona/jej, they/them",
+    "phone_number": "Numer telefonu",
+    "phone_example": "+48 123 456 789",
+    "city": "Miasto",
+    "city_example": "Warszawa",
+    "country": "Kraj",
+    "search_country": "Wyszukaj kraj",
+    "overall_experience_level": "Ogólny poziom doświadczenia",
+    "select_experience_level": "Wybierz poziom doświadczenia"
   },
   "privacy_checkboxes": {
-    "show_email_to_teammates": "TODO: Translate \"privacy_checkboxes.show_email_to_teammates\"",
-    "show_phone_to_teammates": "TODO: Translate \"privacy_checkboxes.show_phone_to_teammates\"",
-    "show_location_to_everyone": "TODO: Translate \"privacy_checkboxes.show_location_to_everyone\"",
-    "show_languages_to_everyone": "TODO: Translate \"privacy_checkboxes.show_languages_to_everyone\"",
-    "show_game_preferences_to_everyone": "TODO: Translate \"privacy_checkboxes.show_game_preferences_to_everyone\"",
-    "allow_team_invitations": "TODO: Translate \"privacy_checkboxes.allow_team_invitations\"",
-    "only_allow_invites_from_connections": "TODO: Translate \"privacy_checkboxes.only_allow_invites_from_connections\"",
-    "allow_follows": "TODO: Translate \"privacy_checkboxes.allow_follows\""
+    "show_email_to_teammates": "Pokaż mój adres e-mail członkom zespołu",
+    "show_phone_to_teammates": "Pokaż mój numer telefonu członkom zespołu",
+    "show_location_to_everyone": "Pokaż moją lokalizację (miasto i kraj) wszystkim",
+    "show_languages_to_everyone": "Pokaż moje języki wszystkim",
+    "show_game_preferences_to_everyone": "Pokaż moje preferencje gier wszystkim",
+    "allow_team_invitations": "Pozwól na zaproszenia do zespołów od innych użytkowników",
+    "only_allow_invites_from_connections": "Pozwól tylko na zaproszenia od połączeń",
+    "allow_follows": "Pozwól innym użytkownikom Cię obserwować"
   },
   "display": {
-    "not_set": "TODO: Translate \"display.not_set\"",
-    "not_specified": "TODO: Translate \"display.not_specified\"",
-    "yes": "TODO: Translate \"display.yes\"",
-    "no": "TODO: Translate \"display.no\""
+    "not_set": "Nie ustawiono",
+    "not_specified": "Nie określono",
+    "yes": "Tak",
+    "no": "Nie"
   },
   "game_preferences_step": {
-    "favorite_systems_title": "TODO: Translate \"game_preferences_step.favorite_systems_title\"",
-    "favorite_systems_placeholder": "TODO: Translate \"game_preferences_step.favorite_systems_placeholder\"",
-    "avoid_systems_title": "TODO: Translate \"game_preferences_step.avoid_systems_title\"",
-    "avoid_systems_placeholder": "TODO: Translate \"game_preferences_step.avoid_systems_placeholder\""
+    "favorite_systems_title": "Ulubione systemy gier",
+    "favorite_systems_placeholder": "Wyszukaj i dodaj ulubione systemy gier...",
+    "avoid_systems_title": "Systemy gier do unikania",
+    "avoid_systems_placeholder": "Wyszukaj i dodaj systemy gier do unikania..."
   },
   "complete_profile_form": {
     "steps": {
       "personal_information": {
-        "title": "TODO: Translate \"complete_profile_form.steps.personal_information.title\"",
-        "description": "TODO: Translate \"complete_profile_form.steps.personal_information.description\""
+        "title": "Informacje osobiste",
+        "description": "Podstawowe informacje o Tobie"
       },
       "additional_information": {
-        "title": "TODO: Translate \"complete_profile_form.steps.additional_information.title\"",
-        "description": "TODO: Translate \"complete_profile_form.steps.additional_information.description\""
+        "title": "Dodatkowe informacje",
+        "description": "Więcej szczegółów o Twoich preferencjach i doświadczeniu w grach"
       },
       "privacy_settings": {
-        "title": "TODO: Translate \"complete_profile_form.steps.privacy_settings.title\"",
-        "description": "TODO: Translate \"complete_profile_form.steps.privacy_settings.description\""
+        "title": "Ustawienia prywatności",
+        "description": "Kontroluj, jakie informacje są widoczne dla innych"
       },
       "game_preferences": {
-        "title": "TODO: Translate \"complete_profile_form.steps.game_preferences.title\"",
-        "description": "TODO: Translate \"complete_profile_form.steps.game_preferences.description\""
+        "title": "Preferencje gier",
+        "description": "Wybierz swoje ulubione i najmniej lubiane systemy gier"
       }
     },
-    "loading_profile": "TODO: Translate \"complete_profile_form.loading_profile\"",
-    "failed_to_load_profile": "TODO: Translate \"complete_profile_form.failed_to_load_profile\"",
+    "loading_profile": "Ładowanie profilu...",
+    "failed_to_load_profile": "Nie udało się załadować profilu. Spróbuj ponownie.",
     "navigation": {
-      "previous": "TODO: Translate \"complete_profile_form.navigation.previous\"",
-      "next": "TODO: Translate \"complete_profile_form.navigation.next\"",
-      "complete_profile": "TODO: Translate \"complete_profile_form.navigation.complete_profile\"",
-      "completing_profile": "TODO: Translate \"complete_profile_form.navigation.completing_profile\""
+      "previous": "Wstecz",
+      "next": "Dalej",
+      "complete_profile": "Uzupełnij profil",
+      "completing_profile": "Uzupełnianie profilu..."
     },
     "fields": {
       "profile_name": {
-        "label": "TODO: Translate \"complete_profile_form.fields.profile_name.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.profile_name.placeholder\"",
-        "description": "TODO: Translate \"complete_profile_form.fields.profile_name.description\""
+        "label": "Nazwa profilu",
+        "placeholder": "wybierz unikalną nazwę użytkownika",
+        "description": "Ta nazwa jest publiczna i musi być unikalna. Używaj liter, cyfr, kropek, podkreśleń lub myślników."
       },
       "gender": {
-        "label": "TODO: Translate \"complete_profile_form.fields.gender.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.gender.placeholder\""
+        "label": "Płeć (opcjonalne)",
+        "placeholder": "Wybierz płeć"
       },
       "pronouns": {
-        "label": "TODO: Translate \"complete_profile_form.fields.pronouns.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.pronouns.placeholder\""
+        "label": "Zaimki (opcjonalne)",
+        "placeholder": "np., they/them, ona/jej, on/jego"
       },
       "phone": {
-        "label": "TODO: Translate \"complete_profile_form.fields.phone.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.phone.placeholder\""
+        "label": "Numer telefonu (opcjonalne)",
+        "placeholder": "+48 123 456 789"
       },
       "city": {
-        "label": "TODO: Translate \"complete_profile_form.fields.city.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.city.placeholder\""
+        "label": "Miasto (opcjonalne)",
+        "placeholder": "Warszawa"
       },
       "country": {
-        "label": "TODO: Translate \"complete_profile_form.fields.country.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.country.placeholder\""
+        "label": "Kraj (opcjonalne)",
+        "placeholder": "Wyszukaj kraj"
       },
       "languages": {
-        "label": "TODO: Translate \"complete_profile_form.fields.languages.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.languages.placeholder\""
+        "label": "Języki (opcjonalne)",
+        "placeholder": "Dodaj języki, którymi mówisz"
       },
       "identity_tags": {
-        "label": "TODO: Translate \"complete_profile_form.fields.identity_tags.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.identity_tags.placeholder\""
+        "label": "Tagi tożsamości (opcjonalne)",
+        "placeholder": "Dodaj tagi tożsamości, które Cię reprezentują"
       },
       "preferred_game_themes": {
-        "label": "TODO: Translate \"complete_profile_form.fields.preferred_game_themes.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.preferred_game_themes.placeholder\""
+        "label": "Preferowane motywy gier (opcjonalne)",
+        "placeholder": "Dodaj motywy gier, które preferujesz"
       },
       "experience_level": {
-        "label": "TODO: Translate \"complete_profile_form.fields.experience_level.label\"",
-        "placeholder": "TODO: Translate \"complete_profile_form.fields.experience_level.placeholder\""
+        "label": "Ogólny poziom doświadczenia (opcjonalne)",
+        "placeholder": "Wybierz swój poziom doświadczenia"
       },
       "calendar_availability": {
-        "label": "TODO: Translate \"complete_profile_form.fields.calendar_availability.label\"",
-        "description": "TODO: Translate \"complete_profile_form.fields.calendar_availability.description\""
+        "label": "Dostępność w kalendarzu (opcjonalne)",
+        "description": "Kliknij i przeciągnij, aby wybrać dostępne godziny w każdym tygodniu."
       }
     },
-    "privacy_settings_intro": "TODO: Translate \"complete_profile_form.privacy_settings_intro\"",
+    "privacy_settings_intro": "Wybierz, jakie informacje inni członkowie mogą o Tobie zobaczyć.",
     "privacy_checkboxes": {
-      "show_email_to_team_members": "TODO: Translate \"complete_profile_form.privacy_checkboxes.show_email_to_team_members\"",
-      "show_phone_to_team_members": "TODO: Translate \"complete_profile_form.privacy_checkboxes.show_phone_to_team_members\"",
-      "show_location_to_others": "TODO: Translate \"complete_profile_form.privacy_checkboxes.show_location_to_others\"",
-      "show_languages_to_others": "TODO: Translate \"complete_profile_form.privacy_checkboxes.show_languages_to_others\"",
-      "show_game_preferences_to_others": "TODO: Translate \"complete_profile_form.privacy_checkboxes.show_game_preferences_to_others\"",
-      "allow_team_invitations": "TODO: Translate \"complete_profile_form.privacy_checkboxes.allow_team_invitations\"",
-      "only_allow_invites_from_connections": "TODO: Translate \"complete_profile_form.privacy_checkboxes.only_allow_invites_from_connections\"",
-      "allow_follows": "TODO: Translate \"complete_profile_form.privacy_checkboxes.allow_follows\""
+      "show_email_to_team_members": "Pokaż mój adres e-mail członkom zespołu",
+      "show_phone_to_team_members": "Pokaż mój numer telefonu członkom zespołu",
+      "show_location_to_others": "Pokaż moją lokalizację (miasto/kraj) innym",
+      "show_languages_to_others": "Pokaż moje języki innym",
+      "show_game_preferences_to_others": "Pokaż moje preferencje gier innym",
+      "allow_team_invitations": "Pozwól kapitanom zespołów wysyłać Ci zaproszenia",
+      "only_allow_invites_from_connections": "Pozwól tylko na zaproszenia od połączeń",
+      "allow_follows": "Pozwól innym Cię obserwować"
     },
     "errors": {
-      "failed_to_save_profile": "TODO: Translate \"complete_profile_form.errors.failed_to_save_profile\"",
-      "unable_to_verify_profile_name": "TODO: Translate \"complete_profile_form.errors.unable_to_verify_profile_name\"",
-      "profile_name_taken": "TODO: Translate \"complete_profile_form.errors.profile_name_taken\"",
-      "failed_to_reserve_profile_name": "TODO: Translate \"complete_profile_form.errors.failed_to_reserve_profile_name\"",
-      "unexpected_error": "TODO: Translate \"complete_profile_form.errors.unexpected_error\""
+      "failed_to_save_profile": "Nie udało się zapisać profilu",
+      "unable_to_verify_profile_name": "Nie udało się zweryfikować nazwy profilu. Spróbuj ponownie.",
+      "profile_name_taken": "Ta nazwa profilu jest już zajęta",
+      "failed_to_reserve_profile_name": "Nie udało się zarezerwować nazwy profilu",
+      "unexpected_error": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie."
     }
   },
   "avatar_upload": {
     "buttons": {
-      "upload_avatar": "TODO: Translate \"avatar_upload.buttons.upload_avatar\"",
-      "use_provider_avatar": "TODO: Translate \"avatar_upload.buttons.use_provider_avatar\"",
-      "processing": "TODO: Translate \"avatar_upload.buttons.processing\""
+      "upload_avatar": "Prześlij awatar",
+      "use_provider_avatar": "Użyj awatara dostawcy",
+      "processing": "Przetwarzanie..."
     },
     "messages": {
-      "avatar_updated": "TODO: Translate \"avatar_upload.messages.avatar_updated\"",
-      "failed_to_upload_avatar": "TODO: Translate \"avatar_upload.messages.failed_to_upload_avatar\"",
-      "reverted_to_provider_avatar": "TODO: Translate \"avatar_upload.messages.reverted_to_provider_avatar\"",
-      "failed_to_remove_avatar": "TODO: Translate \"avatar_upload.messages.failed_to_remove_avatar\"",
-      "could_not_process_image": "TODO: Translate \"avatar_upload.messages.could_not_process_image\""
+      "avatar_updated": "Awatar zaktualizowany",
+      "failed_to_upload_avatar": "Nie udało się przesłać awatara",
+      "reverted_to_provider_avatar": "Powrócono do awatara dostawcy",
+      "failed_to_remove_avatar": "Nie udało się usunąć awatara",
+      "could_not_process_image": "Nie udało się przetworzyć obrazu"
     },
     "errors": {
-      "canvas_not_supported": "TODO: Translate \"avatar_upload.errors.canvas_not_supported\""
+      "canvas_not_supported": "Canvas nie jest wspierany"
     }
   }
 }

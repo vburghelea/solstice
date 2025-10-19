@@ -7,28 +7,34 @@ import { i18nConfig } from "./config";
 
 // Import all available translation files (explicit imports for reliability)
 // These are the files that actually exist in the project
+import enAdmin from "~/lib/i18n/locales/en/admin.json";
 import enAuth from "~/lib/i18n/locales/en/auth.json";
 import enCampaigns from "~/lib/i18n/locales/en/campaigns.json";
 import enCommon from "~/lib/i18n/locales/en/common.json";
 import enEvents from "~/lib/i18n/locales/en/events.json";
 import enGames from "~/lib/i18n/locales/en/games.json";
 import enProfile from "~/lib/i18n/locales/en/profile.json";
+import enRoles from "~/lib/i18n/locales/en/roles.json";
 import enSettings from "~/lib/i18n/locales/en/settings.json";
 
+import deAdmin from "~/lib/i18n/locales/de/admin.json";
 import deAuth from "~/lib/i18n/locales/de/auth.json";
 import deCampaigns from "~/lib/i18n/locales/de/campaigns.json";
 import deCommon from "~/lib/i18n/locales/de/common.json";
 import deEvents from "~/lib/i18n/locales/de/events.json";
 import deGames from "~/lib/i18n/locales/de/games.json";
 import deProfile from "~/lib/i18n/locales/de/profile.json";
+import deRoles from "~/lib/i18n/locales/de/roles.json";
 import deSettings from "~/lib/i18n/locales/de/settings.json";
 
+import plAdmin from "~/lib/i18n/locales/pl/admin.json";
 import plAuth from "~/lib/i18n/locales/pl/auth.json";
 import plCampaigns from "~/lib/i18n/locales/pl/campaigns.json";
 import plCommon from "~/lib/i18n/locales/pl/common.json";
 import plEvents from "~/lib/i18n/locales/pl/events.json";
 import plGames from "~/lib/i18n/locales/pl/games.json";
 import plProfile from "~/lib/i18n/locales/pl/profile.json";
+import plRoles from "~/lib/i18n/locales/pl/roles.json";
 import plSettings from "~/lib/i18n/locales/pl/settings.json";
 
 /**
@@ -39,6 +45,7 @@ const createDynamicTranslationMap = () => {
   // All available translation files (this is the only hardcoded part)
   const availableTranslations = {
     en: {
+      admin: enAdmin,
       common: enCommon,
       auth: enAuth,
       games: enGames,
@@ -46,8 +53,10 @@ const createDynamicTranslationMap = () => {
       settings: enSettings,
       profile: enProfile,
       campaigns: enCampaigns,
+      roles: enRoles,
     },
     de: {
+      admin: deAdmin,
       common: deCommon,
       auth: deAuth,
       games: deGames,
@@ -55,8 +64,10 @@ const createDynamicTranslationMap = () => {
       settings: deSettings,
       profile: deProfile,
       campaigns: deCampaigns,
+      roles: deRoles,
     },
     pl: {
+      admin: plAdmin,
       common: plCommon,
       auth: plAuth,
       games: plGames,
@@ -64,6 +75,7 @@ const createDynamicTranslationMap = () => {
       settings: plSettings,
       profile: plProfile,
       campaigns: plCampaigns,
+      roles: plRoles,
     },
   };
 
@@ -208,6 +220,7 @@ export const t = (key: string, options?: Record<string, string | number>) =>
 
 // Dynamically export namespace translation functions based on config
 // This ensures we only export functions for namespaces that actually exist in the config
+export const tAdmin = translationFunctions["tAdmin"];
 export const tCommon = translationFunctions["tCommon"];
 export const tAuth = translationFunctions["tAuth"];
 export const tGames = translationFunctions["tGames"];
@@ -215,6 +228,7 @@ export const tEvents = translationFunctions["tEvents"];
 export const tSettings = translationFunctions["tSettings"];
 export const tProfile = translationFunctions["tProfile"];
 export const tCampaigns = translationFunctions["tCampaigns"];
+export const tRoles = translationFunctions["tRoles"];
 
 // For any additional namespaces that might be added to config in the future,
 // we can create a dynamic export object

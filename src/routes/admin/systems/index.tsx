@@ -29,8 +29,8 @@ function AdminSystemsRoute() {
       search={search}
       navigate={navigate}
       detailRoute="/admin/systems/$systemId"
-      headerTitle={t("admin_catalog.title")}
-      headerDescription={t("admin_catalog.description")}
+      headerTitle={t("admin.admin_catalog.title")}
+      headerDescription={t("admin.admin_catalog.description")}
       className="space-y-6 p-6 lg:p-8"
     />
   );

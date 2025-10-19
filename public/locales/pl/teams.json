@@ -1,125 +1,125 @@
 {
   "hero": {
-    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
-    "title": "TODO: Translate \"hero.title\"",
-    "subtitle": "TODO: Translate \"hero.subtitle\"",
-    "cta_text": "TODO: Translate \"hero.cta_text\"",
-    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+    "eyebrow": "Drużyny & Kluby",
+    "title": "Znajdź swoją ekipę lub stwórz ją od zera",
+    "subtitle": "Od wybrzeża do wybrzeża społeczności gier planszowych szukają gospodarzy, opowiadaczy historii, ekspertów od zasad i wolontariuszy. Odkryj grupy w Twojej okolicy i skorzystaj z zasobów, które pomogą Twojemu programowi rozwinąć skrzydła.",
+    "cta_text": "Przeglądaj zasoby klubów",
+    "secondary_cta": "Załóż nowy klub"
   },
   "pathways": {
     "university": {
-      "title": "TODO: Translate \"pathways.university.title\"",
-      "description": "TODO: Translate \"pathways.university.description\""
+      "title": "Kluby uniwersyteckie & studenckie",
+      "description": "Programy akademickie w każdym regionie promują rozgrywki turniejowe, ligi wewnętrzne i rekrutację nowicjuszy. Skorzystaj z naszych szablonów planowania sezonu i wsparcia sędziowskiego."
     },
     "community": {
-      "title": "TODO: Translate \"pathways.community.title\"",
-      "description": "TODO: Translate \"pathways.community.description\""
+      "title": "Ligi społecznościowe & miejskie",
+      "description": "Ligi dorosłych pozwalają wieczorom z grami planszowymi rozkwitać przez cały rok dzięki dywizjom o różnym poziomie zaawansowania, własnym stołom i podróżującym grupom meet-up. Możemy pomóc w planowaniu, ubezpieczeniu i wnioskach o dotacje."
     },
     "youth": {
-      "title": "TODO: Translate \"pathways.youth.title\"",
-      "description": "TODO: Translate \"pathways.youth.description\""
+      "title": "Programy młodzieżowe & szkolne",
+      "description": "Wprowadź sport do klas i centrów młodzieżowych dzięki zmodyfikowanym zasadom, inkluzywnym ćwiczeniom i szkoleniom dla trenerów, które skalują się od sesji dla początkujących po regionalne turnieje."
     }
   },
   "connect_locally": {
-    "eyebrow": "TODO: Translate \"connect_locally.eyebrow\"",
-    "title": "TODO: Translate \"connect_locally.title\"",
-    "description_1": "TODO: Translate \"connect_locally.description_1\"",
-    "description_2": "TODO: Translate \"connect_locally.description_2\"",
-    "email_support": "TODO: Translate \"connect_locally.email_support\"",
-    "list_event": "TODO: Translate \"connect_locally.list_event\""
+    "eyebrow": "Połącz się lokalnie",
+    "title": "Wyszukiwarka klubów & regionalne centra",
+    "description_1": "Nasi regionalni koordynatorzy utrzymują aktywny katalog drużyn uniwersyteckich, społecznościowych i młodzieżowych. Niezależnie od tego, czy się przeprowadzasz, rekrutujesz, czy szukasz meczów towarzyskich, połączymy Cię z właściwymi osobami w kilka sekund.",
+    "description_2": "Organizujesz turniej lub chcesz zagrać mecz sparingowy? Prześlij swoje dane, a wyślemy zapytanie do sąsiednich programów i sędziów w całym kraju.",
+    "email_support": "Wsparcie regionalne przez e-mail",
+    "list_event": "Dodaj swoje wydarzenie"
   },
   "information_shared": {
-    "title": "TODO: Translate \"information_shared.title\"",
+    "title": "Informacje, które udostępniamy",
     "items": {
-      "contacts": "TODO: Translate \"information_shared.items.contacts\"",
-      "referees": "TODO: Translate \"information_shared.items.referees\"",
-      "equipment": "TODO: Translate \"information_shared.items.equipment\"",
-      "billeting": "TODO: Translate \"information_shared.items.billeting\""
+      "contacts": "Kontakty klubowe i harmonogramy treningów",
+      "referees": "Dostępność sędziów i osób prowadzących zapisy",
+      "equipment": "Programy wypożyczania sprzętu i rozwiązania magazynowe",
+      "billeting": "Sieć noclegów dla podróżujących drużyn"
     },
-    "updated_monthly": "TODO: Translate \"information_shared.updated_monthly\""
+    "updated_monthly": "Aktualizowane co miesiąc dzięki zgłoszeniom klubów"
   },
   "tools": {
-    "title": "TODO: Translate \"tools.title\"",
-    "subtitle": "TODO: Translate \"tools.subtitle\""
+    "title": "Narzędzia na każdym etapie",
+    "subtitle": "Od razu zacznij budować program dzięki szablonom i materiałom szkoleniowym utrzymywanym przez nasz zespół deweloperski."
   },
   "resources": {
     "club_starter": {
-      "title": "TODO: Translate \"resources.club_starter.title\"",
-      "description": "TODO: Translate \"resources.club_starter.description\""
+      "title": "Zestaw startowy dla klubów",
+      "description": "Pobierz szablony statutów, planery budżetów i opisy ról dla wolontariuszy, aby uruchomić zrównoważony program."
     },
     "practice_library": {
-      "title": "TODO: Translate \"resources.practice_library.title\"",
-      "description": "TODO: Translate \"resources.practice_library.description\""
+      "title": "Biblioteka treningów & fitness",
+      "description": "Dostęp do progresywnych planów treningowych, wideo z umiejętnościami i klinik bramkarskich przygotowanych przez kadrę reprezentacji narodowej."
     },
     "safe_sport": {
-      "title": "TODO: Translate \"resources.safe_sport.title\"",
-      "description": "TODO: Translate \"resources.safe_sport.description\""
+      "title": "Bezpieczny sport & ochrona",
+      "description": "Zachowaj zgodność z krajowymi zasadami dotyczącymi kontroli przeszłości, zgłaszania urazów i projektowania inkluzywnych programów."
     },
-    "open_resource": "TODO: Translate \"resources.open_resource\""
+    "open_resource": "Otwórz zasób"
   },
   "invitations": {
-    "title": "TODO: Translate \"invitations.title\"",
-    "badge": "TODO: Translate \"invitations.badge\"",
-    "accept": "TODO: Translate \"invitations.accept\"",
-    "accepting": "TODO: Translate \"invitations.accepting\"",
-    "decline": "TODO: Translate \"invitations.decline\"",
-    "declining": "TODO: Translate \"invitations.declining\"",
-    "accepted": "TODO: Translate \"invitations.accepted\"",
-    "declined": "TODO: Translate \"invitations.declined\"",
-    "sent": "TODO: Translate \"invitations.sent\"",
-    "request_created": "TODO: Translate \"invitations.request_created\"",
-    "invited_by": "TODO: Translate \"invitations.invited_by\""
+    "title": "Oczekujące zaproszenia do drużyny",
+    "badge": "{{count}} oczekujących",
+    "accept": "Przyjmij",
+    "accepting": "Przyjmowanie...",
+    "decline": "Odrzuć",
+    "declining": "Odrzucanie...",
+    "accepted": "Zaproszenie przyjęte.",
+    "declined": "Zaproszenie odrzucone.",
+    "sent": "Zaproszenie wysłane",
+    "request_created": "Prośba utworzona",
+    "invited_by": "Zaproszony przez {{name}}"
   },
   "form": {
     "fields": {
-      "team_name": "TODO: Translate \"form.fields.team_name\"",
-      "team_description": "TODO: Translate \"form.fields.team_description\"",
-      "role": "TODO: Translate \"form.fields.role\"",
-      "member_email": "TODO: Translate \"form.fields.member_email\""
+      "team_name": "Nazwa drużyny",
+      "team_description": "Opis drużyny",
+      "role": "Rola",
+      "member_email": "E-mail członka"
     },
     "placeholders": {
-      "team_name": "TODO: Translate \"form.placeholders.team_name\"",
-      "team_description": "TODO: Translate \"form.placeholders.team_description\"",
-      "member_email": "TODO: Translate \"form.placeholders.member_email\""
+      "team_name": "Wpisz nazwę drużyny",
+      "team_description": "Opisz swoją drużynę",
+      "member_email": "czlonek@przyklad.pl"
     }
   },
   "buttons": {
-    "create_team": "TODO: Translate \"buttons.create_team\"",
-    "invite_member": "TODO: Translate \"buttons.invite_member\"",
-    "join_team": "TODO: Translate \"buttons.join_team\"",
-    "leave_team": "TODO: Translate \"buttons.leave_team\""
+    "create_team": "Utwórz drużynę",
+    "invite_member": "Zaproś członka",
+    "join_team": "Dołącz do drużyny",
+    "leave_team": "Opuść drużynę"
   },
   "roles": {
-    "owner": "TODO: Translate \"roles.owner\"",
-    "admin": "TODO: Translate \"roles.admin\"",
-    "member": "TODO: Translate \"roles.member\"",
-    "pending": "TODO: Translate \"roles.pending\""
+    "owner": "Właściciel",
+    "admin": "Admin",
+    "member": "Członek",
+    "pending": "Oczekujący"
   },
   "errors": {
-    "accept_failed": "TODO: Translate \"errors.accept_failed\"",
-    "decline_failed": "TODO: Translate \"errors.decline_failed\"",
-    "create_failed": "TODO: Translate \"errors.create_failed\"",
-    "invite_failed": "TODO: Translate \"errors.invite_failed\""
+    "accept_failed": "Nie udało się przyjąć zaproszenia.",
+    "decline_failed": "Nie udało się odrzucić zaproszenia.",
+    "create_failed": "Nie udało się utworzyć drużyny.",
+    "invite_failed": "Nie udało się zaprosić członka."
   },
   "status": {
-    "active": "TODO: Translate \"status.active\"",
-    "inactive": "TODO: Translate \"status.inactive\"",
-    "suspended": "TODO: Translate \"status.suspended\""
+    "active": "Aktywny",
+    "inactive": "Nieaktywny",
+    "suspended": "Zawieszony"
   },
   "browse": {
-    "title": "TODO: Translate \"browse.title\"",
-    "subtitle": "TODO: Translate \"browse.subtitle\"",
-    "back_to_my_teams": "TODO: Translate \"browse.back_to_my_teams\"",
-    "search_placeholder": "TODO: Translate \"browse.search_placeholder\"",
-    "no_teams_title": "TODO: Translate \"browse.no_teams_title\"",
-    "no_teams_subtitle": "TODO: Translate \"browse.no_teams_subtitle\"",
-    "try_different_search": "TODO: Translate \"browse.try_different_search\"",
-    "search_error_title": "TODO: Translate \"browse.search_error_title\"",
-    "search_error_description": "TODO: Translate \"browse.search_error_description\"",
-    "members": "TODO: Translate \"browse.members\"",
-    "founded": "TODO: Translate \"browse.founded\"",
-    "created_by": "TODO: Translate \"browse.created_by\"",
-    "view_team": "TODO: Translate \"browse.view_team\"",
-    "view": "TODO: Translate \"browse.view\""
+    "title": "Przeglądaj drużyny",
+    "subtitle": "Odkrywaj i dołączaj do drużyn w Twojej okolicy",
+    "back_to_my_teams": "Powrót do moich drużyn",
+    "search_placeholder": "Szukaj drużyn po nazwie lub mieście...",
+    "no_teams_title": "Nie znaleziono drużyn",
+    "no_teams_subtitle": "Brak dostępnych drużyn do przeglądania",
+    "try_different_search": "Spróbuj innego hasła wyszukiwania",
+    "search_error_title": "Nie znaleziono drużyn pasujących do wyszukiwania",
+    "search_error_description": "Spróbuj ponownie lub dostosuj filtry wyszukiwania.",
+    "members": "Członkowie",
+    "founded": "Założony",
+    "created_by": "Utworzone przez",
+    "view_team": "Zobacz drużynę",
+    "view": "Zobacz"
   }
 }

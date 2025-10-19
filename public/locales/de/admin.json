@@ -1,578 +1,599 @@
 {
   "overview": {
-    "title": "TODO: Translate \"overview.title\"",
-    "subtitle": "TODO: Translate \"overview.subtitle\"",
+    "title": "Plattform-Verwaltungscockpit",
+    "subtitle": "Der Admin-Workspace zeigt Live-Insights, Rollenabdeckung und Rollout-Steuerungen, die auf Deine Verwaltungsaufgaben zugeschnitten sind.",
     "cards": {
       "user_governance": {
-        "title": "TODO: Translate \"overview.cards.user_governance.title\"",
-        "description": "TODO: Translate \"overview.cards.user_governance.description\"",
-        "description_detail": "TODO: Translate \"overview.cards.user_governance.description_detail\"",
-        "link_text": "TODO: Translate \"overview.cards.user_governance.link_text\""
+        "title": "Benutzerverwaltung",
+        "description": "Überprüfe Mitgliedschaften, erzwinge MFA und prüfe hochsensible Rollen in einer zentralen Übersicht.",
+        "description_detail": "Öffne das Verzeichnis für detaillierte Steuerelemente.",
+        "link_text": "Benutzerverwaltung öffnen"
       },
       "feature_rollouts": {
-        "title": "TODO: Translate \"overview.cards.feature_rollouts.title\"",
-        "description": "TODO: Translate \"overview.cards.feature_rollouts.description\"",
-        "description_detail": "TODO: Translate \"overview.cards.feature_rollouts.description_detail\"",
-        "link_text": "TODO: Translate \"overview.cards.feature_rollouts.link_text\""
+        "title": "Feature-Rollouts",
+        "description": "Schalte Persona-Vorschauen und Beta-Wege um, um schrittweise Releases mit Vertrauen zu koordinieren.",
+        "description_detail": "Sichere Experimente ohne erneutes Deployment.",
+        "link_text": "Feature-Flags verwalten"
       },
       "security_posture": {
-        "title": "TODO: Translate \"overview.cards.security_posture.title\"",
-        "description": "TODO: Translate \"overview.cards.security_posture.description\"",
-        "description_detail": "TODO: Translate \"overview.cards.security_posture.description_detail\"",
-        "link_text": "TODO: Translate \"overview.cards.security_posture.link_text\""
+        "title": "Sicherheitsstatus",
+        "description": "Überprüfe Vorfälle, Schutzmaßnahmen und Audit-Logs, die auf Deine Verwaltungsaufgaben zugeschnitten sind.",
+        "description_detail": "Bestätige Schutzmaßnahmen, bevor Du privilegierten Zugriff anpasst.",
+        "link_text": "Sicherheitszentrum öffnen"
       },
       "live_insights_preview": {
-        "title": "TODO: Translate \"overview.cards.live_insights_preview.title\"",
-        "description": "TODO: Translate \"overview.cards.live_insights_preview.description\""
+        "title": "Live-Insights-Vorschau",
+        "description": "Optimierte Metriken helfen Admins, sich zu orientieren, bevor sie in die vollständige Konsole eintauchen."
       }
     }
   },
   "insights": {
-    "title": "TODO: Translate \"insights.title\"",
-    "subtitle": "TODO: Translate \"insights.subtitle\"",
+    "title": "Verwaltungsleistung (letzten {{days}} Tage)",
+    "subtitle": "Aktualisiert {{time}}",
     "buttons": {
-      "refresh": "TODO: Translate \"insights.buttons.refresh\"",
-      "refreshing": "TODO: Translate \"insights.buttons.refreshing\"",
-      "retry": "TODO: Translate \"insights.buttons.retry\""
+      "refresh": "Daten aktualisieren",
+      "refreshing": "Aktualisiere…",
+      "retry": "Erneut versuchen"
     },
     "errors": {
-      "unable_to_load": "TODO: Translate \"insights.errors.unable_to_load\"",
-      "error_message": "TODO: Translate \"insights.errors.error_message\""
+      "unable_to_load": "Insights konnten nicht geladen werden",
+      "error_message": "Wir konnten den Verwaltungsanalysedienst nicht erreichen."
     },
     "sections": {
       "incident_timeline": {
-        "title": "TODO: Translate \"insights.sections.incident_timeline.title\"",
-        "description": "TODO: Translate \"insights.sections.incident_timeline.description\"",
-        "no_incidents": "TODO: Translate \"insights.sections.incident_timeline.no_incidents\"",
-        "no_incidents_description": "TODO: Translate \"insights.sections.incident_timeline.no_incidents_description\""
+        "title": "Vorfall-Zeitleiste",
+        "description": "Automatisierte Crawler und manuelle Eskalationen haben diese Ereignisse zur Überprüfung aufgedeckt.",
+        "no_incidents": "Keine Vorfälle in diesem Zeitraum",
+        "no_incidents_description": "Die Betriebszeit war stabil. Halte proaktive Warnungen als Schutzmaßnahmen bereit."
       },
       "live_alerting": {
-        "title": "TODO: Translate \"insights.sections.live_alerting.title\"",
-        "description": "TODO: Translate \"insights.sections.live_alerting.description\""
+        "title": "Live-Warnungen",
+        "description": "Kanal-Routing und Schwellenwerte, die für die Admin-Verwaltungs-Schutzmaßnahmen entwickelt wurden."
       },
       "persona_impact": {
-        "title": "TODO: Translate \"insights.sections.persona_impact.title\"",
-        "description": "TODO: Translate \"insights.sections.persona_impact.description\""
+        "title": "Persona-Impuls-Messung",
+        "description": "Rollenübergreifende Momentaufnahmen zeigen, wie Verwaltungsentscheidungen durch die Plattform wirken."
       }
     },
     "status": {
-      "steady": "TODO: Translate \"insights.status.steady\"",
-      "trending_up": "TODO: Translate \"insights.status.trending_up\"",
-      "needs_attention": "TODO: Translate \"insights.status.needs_attention\"",
-      "momentum_building": "TODO: Translate \"insights.status.momentum_building\"",
-      "requires_intervention": "TODO: Translate \"insights.status.requires_intervention\"",
-      "holding_steady": "TODO: Translate \"insights.status.holding_steady\""
+      "steady": "Stabil",
+      "trending_up": "Aufsteigend",
+      "needs_attention": "Benötigt Aufmerksamkeit",
+      "momentum_building": "Schwung aufbauend",
+      "requires_intervention": "Eingriff erforderlich",
+      "holding_steady": "Stabil haltend"
     },
     "alerts": {
       "status": {
-        "active": "TODO: Translate \"insights.alerts.status.active\"",
-        "paused": "TODO: Translate \"insights.alerts.status.paused\""
+        "active": "Aktiv",
+        "paused": "Pausiert"
       },
-      "triggered": "TODO: Translate \"insights.alerts.triggered\"",
-      "awaiting_first_trigger": "TODO: Translate \"insights.alerts.awaiting_first_trigger\""
+      "triggered": "Ausgelöst {{time}}",
+      "awaiting_first_trigger": "Erste Auslösung erwartet"
     },
     "incidents": {
       "duration": {
-        "minutes": "TODO: Translate \"insights.incidents.duration.minutes\"",
-        "less_than_minute": "TODO: Translate \"insights.incidents.duration.less_than_minute\"",
-        "in_progress": "TODO: Translate \"insights.incidents.duration.in_progress\""
+        "minutes": "{{minutes}} Min",
+        "less_than_minute": "< 1 Min",
+        "in_progress": "In Bearbeitung"
       },
-      "resolved": "TODO: Translate \"insights.incidents.resolved\"",
-      "http_status": "TODO: Translate \"insights.incidents.http_status\""
+      "resolved": "Gelöst {{time}}",
+      "http_status": "HTTP {{status}}"
     }
   },
   "events_review": {
-    "title": "TODO: Translate \"events_review.title\"",
-    "subtitle": "TODO: Translate \"events_review.subtitle\"",
+    "title": "Event-Überprüfung",
+    "subtitle": "Überprüfe und genehmige Events, die von Mitgliedern eingereicht wurden",
     "buttons": {
-      "view_all_events": "TODO: Translate \"events_review.buttons.view_all_events\"",
-      "approve": "TODO: Translate \"events_review.buttons.approve\"",
-      "reject": "TODO: Translate \"events_review.buttons.reject\"",
-      "view": "TODO: Translate \"events_review.buttons.view\"",
-      "manage": "TODO: Translate \"events_review.buttons.manage\""
+      "view_all_events": "Alle Events anzeigen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "view": "Anzeigen",
+      "manage": "Verwalten"
     },
     "tabs": {
-      "pending_approval": "TODO: Translate \"events_review.tabs.pending_approval\"",
-      "recently_reviewed": "TODO: Translate \"events_review.tabs.recently_reviewed\""
+      "pending_approval": "Genehmigung ausstehend",
+      "recently_reviewed": "Kürzlich überprüft"
     },
     "sections": {
       "awaiting_approval": {
-        "title": "TODO: Translate \"events_review.sections.awaiting_approval.title\"",
-        "description": "TODO: Translate \"events_review.sections.awaiting_approval.description\""
+        "title": "Events, die auf Genehmigung warten",
+        "description": "Überprüfe diese Events und genehmige sie, um sie öffentlich sichtbar zu machen"
       },
       "recently_reviewed": {
-        "title": "TODO: Translate \"events_review.sections.recently_reviewed.title\"",
-        "description": "TODO: Translate \"events_review.sections.recently_reviewed.description\""
+        "title": "Kürzlich überprüfte Events",
+        "description": "Events, die kürzlich genehmigt oder veröffentlicht wurden"
       }
     },
     "tables": {
       "headers": {
-        "event_name": "TODO: Translate \"events_review.tables.headers.event_name\"",
-        "organizer": "TODO: Translate \"events_review.tables.headers.organizer\"",
-        "type": "TODO: Translate \"events_review.tables.headers.type\"",
-        "date": "TODO: Translate \"events_review.tables.headers.date\"",
-        "location": "TODO: Translate \"events_review.tables.headers.location\"",
-        "created": "TODO: Translate \"events_review.tables.headers.created\"",
-        "actions": "TODO: Translate \"events_review.tables.headers.actions\"",
-        "status": "TODO: Translate \"events_review.tables.headers.status\"",
-        "visibility": "TODO: Translate \"events_review.tables.headers.visibility\""
+        "event_name": "Event-Name",
+        "organizer": "Organisator",
+        "type": "Typ",
+        "date": "Datum",
+        "location": "Ort",
+        "created": "Erstellt",
+        "actions": "Aktionen",
+        "status": "Status",
+        "visibility": "Sichtbarkeit"
       }
     },
     "status": {
-      "public": "TODO: Translate \"events_review.status.public\"",
-      "private": "TODO: Translate \"events_review.status.private\""
+      "public": "Öffentlich",
+      "private": "Privat"
     },
     "empty_states": {
-      "no_pending_approval": "TODO: Translate \"events_review.empty_states.no_pending_approval\"",
-      "no_recently_reviewed": "TODO: Translate \"events_review.empty_states.no_recently_reviewed\""
+      "no_pending_approval": "Keine Events, die auf Genehmigung warten",
+      "no_recently_reviewed": "Keine kürzlich überprüften Events"
     },
     "alerts": {
       "all_caught_up": {
-        "title": "TODO: Translate \"events_review.alerts.all_caught_up.title\"",
-        "description": "TODO: Translate \"events_review.alerts.all_caught_up.description\""
+        "title": "Alles erledigt!",
+        "description": "Aktuell gibt es keine Events, die auf Genehmigung warten."
       }
     },
     "dialog": {
-      "approve_title": "TODO: Translate \"events_review.dialog.approve_title\"",
-      "reject_title": "TODO: Translate \"events_review.dialog.reject_title\"",
-      "approve_description": "TODO: Translate \"events_review.dialog.approve_description\"",
-      "reject_description": "TODO: Translate \"events_review.dialog.reject_description\"",
+      "approve_title": "Event genehmigen",
+      "reject_title": "Event ablehnen",
+      "approve_description": "Bist Du sicher, dass Du \"{{eventName}}\" genehmigen möchtest? Dies macht das Event öffentlich sichtbar.",
+      "reject_description": "Bist Du sicher, dass Du \"{{eventName}}\" ablehnen möchtest? Der Organisator muss Änderungen vornehmen und erneut einreichen.",
       "buttons": {
-        "cancel": "TODO: Translate \"events_review.dialog.buttons.cancel\""
+        "cancel": "Abbrechen"
       }
     },
     "organizer": {
-      "unknown": "TODO: Translate \"events_review.organizer.unknown\"",
-      "not_provided": "TODO: Translate \"events_review.organizer.not_provided\""
+      "unknown": "Unbekannt",
+      "not_provided": "Nicht angegeben"
     },
     "hardcoded_strings": {
-      "approve_and_made_public": "TODO: Translate \"events_review.hardcoded_strings.approve_and_made_public\"",
-      "failed_to_update_event": "TODO: Translate \"events_review.hardcoded_strings.failed_to_update_event\"",
-      "error_updating_event": "TODO: Translate \"events_review.hardcoded_strings.error_updating_event\""
+      "approve_and_made_public": " und öffentlich gemacht!",
+      "failed_to_update_event": "Event konnte nicht aktualisiert werden",
+      "error_updating_event": "Beim Aktualisieren des Events ist ein Fehler aufgetreten"
     }
   },
   "user_directory": {
-    "title": "TODO: Translate \"user_directory.title\"",
-    "subtitle": "TODO: Translate \"user_directory.subtitle\"",
+    "title": "Benutzerverwaltung",
+    "subtitle": "Verfolge Mitgliedschaftsabdeckung, Rollenzuweisungen und MFA-Durchsetzung für Deine Compliance-Sicht.",
     "buttons": {
-      "assign_role": "TODO: Translate \"user_directory.buttons.assign_role\"",
-      "retry": "TODO: Translate \"user_directory.buttons.retry\"",
-      "refresh": "TODO: Translate \"user_directory.buttons.refresh\"",
-      "delete": "TODO: Translate \"user_directory.buttons.delete\"",
-      "export_csv": "TODO: Translate \"user_directory.buttons.export_csv\"",
-      "require_mfa": "TODO: Translate \"user_directory.buttons.require_mfa\"",
-      "mfa_enforced": "TODO: Translate \"user_directory.buttons.mfa_enforced\""
+      "assign_role": "Rolle zuweisen",
+      "retry": "Erneut versuchen",
+      "refresh": "Aktualisieren",
+      "delete": "Löschen",
+      "export_csv": "CSV exportieren",
+      "require_mfa": "MFA erforderlich",
+      "mfa_enforced": "MFA durchgesetzt"
     },
     "sections": {
       "role_summary": {
-        "title": "TODO: Translate \"user_directory.sections.role_summary.title\"",
-        "description": "TODO: Translate \"user_directory.sections.role_summary.description\""
+        "title": "Rollen-Zusammenfassung",
+        "description": "Übersicht aller Systemrollen und ihrer Zuweisungszahlen"
       },
       "current_assignments": {
-        "title": "TODO: Translate \"user_directory.sections.current_assignments.title\"",
-        "description": "TODO: Translate \"user_directory.sections.current_assignments.description\""
+        "title": "Aktuelle Rollenzuweisungen",
+        "description": "Audit-Protokoll, wer Zugriff hat, wann er gewährt wurde und von wem."
       }
     },
     "tables": {
       "headers": {
-        "user": "TODO: Translate \"user_directory.tables.headers.user\"",
-        "membership": "TODO: Translate \"user_directory.tables.headers.membership\"",
-        "roles": "TODO: Translate \"user_directory.tables.headers.roles\"",
-        "role_assigned": "TODO: Translate \"user_directory.tables.headers.role_assigned\"",
-        "mfa": "TODO: Translate \"user_directory.tables.headers.mfa\"",
-        "last_active": "TODO: Translate \"user_directory.tables.headers.last_active\"",
-        "risk": "TODO: Translate \"user_directory.tables.headers.risk\"",
-        "latest_activity": "TODO: Translate \"user_directory.tables.headers.latest_activity\"",
-        "actions": "TODO: Translate \"user_directory.tables.headers.actions\"",
-        "role": "TODO: Translate \"user_directory.tables.headers.role\"",
-        "scope": "TODO: Translate \"user_directory.tables.headers.scope\"",
-        "assigned_by": "TODO: Translate \"user_directory.tables.headers.assigned_by\"",
-        "assigned_at": "TODO: Translate \"user_directory.tables.headers.assigned_at\"",
-        "expires": "TODO: Translate \"user_directory.tables.headers.expires\"",
-        "notes": "TODO: Translate \"user_directory.tables.headers.notes\""
+        "user": "Benutzer",
+        "membership": "Mitgliedschaft",
+        "roles": "Rollen",
+        "role_assigned": "Rolle zugewiesen",
+        "mfa": "MFA",
+        "last_active": "Zuletzt aktiv",
+        "risk": "Risiko",
+        "latest_activity": "Letzte Aktivität",
+        "actions": "Aktionen",
+        "role": "Rolle",
+        "scope": "Geltungsbereich",
+        "assigned_by": "Zugewiesen von",
+        "assigned_at": "Zugewiesen am",
+        "expires": "Läuft ab",
+        "notes": "Notizen"
       }
     },
     "membership": {
       "status": {
-        "active": "TODO: Translate \"user_directory.membership.status.active\"",
-        "expired": "TODO: Translate \"user_directory.membership.status.expired\"",
-        "canceled": "TODO: Translate \"user_directory.membership.status.canceled\"",
-        "none": "TODO: Translate \"user_directory.membership.status.none\""
+        "active": "Aktiv",
+        "expired": "Abgelaufen",
+        "canceled": "Storniert",
+        "none": "Keine Mitgliedschaft"
       },
-      "expires": "TODO: Translate \"user_directory.membership.expires\""
+      "expires": "Läuft ab {{time}}"
     },
     "mfa": {
-      "enforced": "TODO: Translate \"user_directory.mfa.enforced\"",
-      "missing": "TODO: Translate \"user_directory.mfa.missing\""
+      "enforced": "Durchgesetzt",
+      "missing": "Fehlend"
     },
     "risk": {
-      "clear": "TODO: Translate \"user_directory.risk.clear\""
+      "clear": "Klar"
     },
     "activity": {
-      "no_activity": "TODO: Translate \"user_directory.activity.no_activity\"",
-      "no_recent_events": "TODO: Translate \"user_directory.activity.no_recent_events\""
+      "no_activity": "Keine Aktivität",
+      "no_recent_events": "Keine aktuellen Ereignisse"
     },
     "roles": {
-      "no_assignments": "TODO: Translate \"user_directory.roles.no_assignments\"",
-      "assigned": "TODO: Translate \"user_directory.roles.assigned\""
+      "no_assignments": "Keine Zuweisungen",
+      "assigned": "{{count}} zugewiesen"
     },
     "role_summary": {
-      "assigned_count": "TODO: Translate \"user_directory.role_summary.assigned_count\""
+      "assigned_count": "{{count}} zugewiesen"
     },
     "form": {
       "assign_role": {
-        "title": "TODO: Translate \"user_directory.form.assign_role.title\"",
-        "description": "TODO: Translate \"user_directory.form.assign_role.description\"",
+        "title": "Eine Rolle zuweisen",
+        "description": "Suche nach einem Benutzer und gewähre ihm eine Rolle. Geltungsbereichsbezogene Rollen erfordern entweder einen Team- oder Event-Kontext.",
         "fields": {
-          "user": "TODO: Translate \"user_directory.form.assign_role.fields.user\"",
-          "role": "TODO: Translate \"user_directory.form.assign_role.fields.role\"",
-          "team_scope": "TODO: Translate \"user_directory.form.assign_role.fields.team_scope\"",
-          "event_scope": "TODO: Translate \"user_directory.form.assign_role.fields.event_scope\"",
-          "expiration": "TODO: Translate \"user_directory.form.assign_role.fields.expiration\"",
-          "notes": "TODO: Translate \"user_directory.form.assign_role.fields.notes\""
+          "user": "Benutzer",
+          "role": "Rolle",
+          "team_scope": "Team-Geltungsbereich",
+          "event_scope": "Event-Geltungsbereich",
+          "expiration": "Ablauf",
+          "notes": "Notizen"
         },
         "placeholders": {
-          "search_users": "TODO: Translate \"user_directory.form.assign_role.placeholders.search_users\"",
-          "team_id": "TODO: Translate \"user_directory.form.assign_role.placeholders.team_id\"",
-          "event_id": "TODO: Translate \"user_directory.form.assign_role.placeholders.event_id\"",
-          "add_context": "TODO: Translate \"user_directory.form.assign_role.placeholders.add_context\""
+          "search_users": "Benutzer suchen...",
+          "team_id": "Team-ID",
+          "event_id": "Event-ID",
+          "add_context": "Kontext für diese Zuweisung hinzufügen (optional)"
         },
         "hints": {
-          "team_scope": "TODO: Translate \"user_directory.form.assign_role.hints.team_scope\"",
-          "event_scope": "TODO: Translate \"user_directory.form.assign_role.hints.event_scope\"",
-          "expiration": "TODO: Translate \"user_directory.form.assign_role.hints.expiration\""
+          "team_scope": "Verwende für die Zuweisung von <strong>Team Admin</strong>. Für globale Rollen leer lassen.",
+          "event_scope": "Verwende für die Zuweisung von <strong>Event Admin</strong>. Für globale Rollen leer lassen.",
+          "expiration": "Optional — leer lassen für kein Ablaufdatum."
         },
         "validation": {
-          "select_user": "TODO: Translate \"user_directory.form.assign_role.validation.select_user\"",
-          "select_role": "TODO: Translate \"user_directory.form.assign_role.validation.select_role\""
+          "select_user": "Wähle einen Benutzer",
+          "select_role": "Wähle eine Rolle"
         },
         "buttons": {
-          "assign_role": "TODO: Translate \"user_directory.form.assign_role.buttons.assign_role\""
+          "assign_role": "Rolle zuweisen"
         }
       },
       "filters": {
-        "membership": "TODO: Translate \"user_directory.form.filters.membership\"",
-        "all_memberships": "TODO: Translate \"user_directory.form.filters.all_memberships\"",
-        "filter_by_role": "TODO: Translate \"user_directory.form.filters.filter_by_role\"",
-        "all_roles": "TODO: Translate \"user_directory.form.filters.all_roles\""
+        "membership": "Mitgliedschaft",
+        "all_memberships": "Alle Mitgliedschaften",
+        "filter_by_role": "Nach Rolle filtern",
+        "all_roles": "Alle Rollen"
       },
-      "select_role_placeholder": "TODO: Translate \"user_directory.form.select_role_placeholder\"",
+      "select_role_placeholder": "Rolle auswählen",
       "buttons": {
-        "retry": "TODO: Translate \"user_directory.form.buttons.retry\""
+        "retry": "Erneut versuchen"
       }
     },
     "search": {
-      "placeholder": "TODO: Translate \"user_directory.search.placeholder\"",
-      "no_users_found": "TODO: Translate \"user_directory.search.no_users_found\"",
-      "searching_users": "TODO: Translate \"user_directory.search.searching_users\""
+      "placeholder": "Nach Name oder E-Mail suchen",
+      "no_users_found": "Keine Benutzer gefunden.",
+      "searching_users": "Suche Benutzer..."
     },
     "export": {
-      "filename": "TODO: Translate \"user_directory.export.filename\"",
-      "success": "TODO: Translate \"user_directory.export.success\"",
-      "pending": "TODO: Translate \"user_directory.export.pending\""
+      "filename": "plattform-compliance-{{date}}.csv",
+      "success": "Compliance-Bericht exportiert",
+      "pending": "Exportiere…"
     },
     "loading": {
-      "refreshing": "TODO: Translate \"user_directory.loading.refreshing\""
+      "refreshing": "Aktualisiere…"
     },
     "errors": {
-      "unable_to_load": "TODO: Translate \"user_directory.errors.unable_to_load\"",
-      "service_unavailable": "TODO: Translate \"user_directory.errors.service_unavailable\"",
-      "assign_role_failed": "TODO: Translate \"user_directory.errors.assign_role_failed\"",
-      "remove_role_assignment_failed": "TODO: Translate \"user_directory.errors.remove_role_assignment_failed\"",
-      "delete_user_failed": "TODO: Translate \"user_directory.errors.delete_user_failed\"",
-      "export_compliance_report_failed": "TODO: Translate \"user_directory.errors.export_compliance_report_failed\"",
-      "search_users_failed": "TODO: Translate \"user_directory.errors.search_users_failed\"",
-      "load_role_management_data_failed": "TODO: Translate \"user_directory.errors.load_role_management_data_failed\"",
-      "load_failed": "TODO: Translate \"user_directory.errors.load_failed\""
+      "unable_to_load": "Benutzerverwaltung konnte nicht geladen werden",
+      "service_unavailable": "Der Benutzerverzeichnisdienst ist vorübergehend nicht verfügbar.",
+      "assign_role_failed": "Rolle konnte nicht zugewiesen werden",
+      "remove_role_assignment_failed": "Rollenzuweisung konnte nicht entfernt werden",
+      "delete_user_failed": "Benutzer konnte nicht gelöscht werden",
+      "export_compliance_report_failed": "Compliance-Bericht konnte nicht exportiert werden",
+      "search_users_failed": "Benutzersuche fehlgeschlagen",
+      "load_role_management_data_failed": "Rollenverwaltungsdaten konnten nicht geladen werden",
+      "load_failed": "Benutzerverwaltung konnte nicht geladen werden"
     },
     "messages": {
-      "role_assigned_success": "TODO: Translate \"user_directory.messages.role_assigned_success\"",
-      "role_assignment_removed": "TODO: Translate \"user_directory.messages.role_assignment_removed\"",
-      "user_permanently_deleted": "TODO: Translate \"user_directory.messages.user_permanently_deleted\"",
-      "compliance_report_exported": "TODO: Translate \"user_directory.messages.compliance_report_exported\""
+      "role_assigned_success": "Rolle erfolgreich zugewiesen",
+      "role_assignment_removed": "Rollenzuweisung entfernt",
+      "user_permanently_deleted": "Benutzer dauerhaft gelöscht",
+      "compliance_report_exported": "Compliance-Bericht exportiert"
     },
     "dialogs": {
       "remove_assignment": {
-        "title": "TODO: Translate \"user_directory.dialogs.remove_assignment.title\"",
-        "description": "TODO: Translate \"user_directory.dialogs.remove_assignment.description\"",
+        "title": "Rollenzuweisung entfernen",
+        "description": "Dies entzieht {{userName}} die Rolle \"{{roleName}}\". Diese Aktion kann nicht rückgängig gemacht werden.",
         "buttons": {
-          "remove_access": "TODO: Translate \"user_directory.dialogs.remove_assignment.buttons.remove_access\""
+          "remove_access": "Zugriff entfernen"
         }
       },
       "delete_user": {
-        "title": "TODO: Translate \"user_directory.dialogs.delete_user.title\"",
-        "warning": "TODO: Translate \"user_directory.dialogs.delete_user.warning\"",
-        "warning_text": "TODO: Translate \"user_directory.dialogs.delete_user.warning_text\"",
-        "warning_description": "TODO: Translate \"user_directory.dialogs.delete_user.warning_description\"",
+        "title": "Benutzer dauerhaft löschen",
+        "warning": "Diese Aktion ist <strong>dauerhaft, unumkehrbar und potenziell katastrophal</strong>.",
+        "warning_text": "<strong>WARNUNG:</strong> Das Löschen von <strong>{{userName}}</strong> ({{userEmail}}) wird kaskadierend alle zugehörigen Daten einschließlich Spiele, Events, Kampagnen, Mitgliedschaften und potenziell andere Spieler löschen, die Teil dieser Aktivitäten sind.",
+        "warning_description": "Das Löschen von <strong>{{name}}</strong> ({{email}}) wird kaskadierend alle zugehörigen Daten einschließlich Spiele, Events, Kampagnen, Mitgliedschaften und potenziell andere Spieler löschen, die Teil dieser Aktivitäten sind.",
         "sections": {
-          "data_to_delete_title": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete_title\"",
+          "data_to_delete_title": "Daten, die dauerhaft gelöscht werden:",
           "data_to_delete": {
-            "profile": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.profile\"",
-            "memberships": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.memberships\"",
-            "games": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.games\"",
-            "events": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.events\"",
-            "campaigns": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.campaigns\"",
-            "teams": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.teams\"",
-            "notifications": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.notifications\"",
-            "roles": "TODO: Translate \"user_directory.dialogs.delete_user.sections.data_to_delete.roles\""
+            "profile": "Benutzerkonto und Profilinformationen",
+            "memberships": "Alle Mitgliedschaften und Abonnementdaten",
+            "games": "Game-Master-Status und erstellte Spiele",
+            "events": "Event-Organisation und erstellte Events",
+            "campaigns": "Kampagnen-Führung und erstellte Kampagnen",
+            "teams": "Team-Mitgliedschaften und -Zuordnungen",
+            "notifications": "Benachrichtigungen und Kommunikationsverlauf",
+            "roles": "Rollenzuweisungen und Berechtigungen"
           },
-          "impact_title": "TODO: Translate \"user_directory.dialogs.delete_user.sections.impact_title\"",
-          "impact_description": "TODO: Translate \"user_directory.dialogs.delete_user.sections.impact_description\"",
-          "confirmation_title": "TODO: Translate \"user_directory.dialogs.delete_user.sections.confirmation_title\""
+          "impact_title": "Auswirkungen auf andere Benutzer:",
+          "impact_description": "Wenn dieser Benutzer ein Game-Master ist, könnten seine Spiele betroffen sein und Spieler könnten den Zugang zu laufenden Kampagnen verlieren. Wenn dieser Benutzer ein Event-Organisator ist, könnten registrierte Teilnehmer ihren Event-Zugang verlieren.",
+          "confirmation_title": "Bestätigung erforderlich:"
         },
         "data_to_delete": {
-          "title": "TODO: Translate \"user_directory.dialogs.delete_user.data_to_delete.title\"",
-          "items": "TODO: Translate \"user_directory.dialogs.delete_user.data_to_delete.items\""
+          "title": "Daten, die dauerhaft gelöscht werden:",
+          "items": [
+            "Benutzerkonto und Profilinformationen",
+            "Alle Mitgliedschaften und Abonnementdaten",
+            "Game-Master-Status und erstellte Spiele",
+            "Event-Organisation und erstellte Events",
+            "Kampagnen-Führung und erstellte Kampagnen",
+            "Team-Mitgliedschaften und -Zuordnungen",
+            "Benachrichtigungen und Kommunikationsverlauf",
+            "Rollenzuweisungen und Berechtigungen"
+          ]
         },
         "impact_on_others": {
-          "title": "TODO: Translate \"user_directory.dialogs.delete_user.impact_on_others.title\"",
-          "description": "TODO: Translate \"user_directory.dialogs.delete_user.impact_on_others.description\""
+          "title": "Auswirkungen auf andere Benutzer:",
+          "description": "Wenn dieser Benutzer ein Game-Master ist, könnten seine Spiele betroffen sein und Spieler könnten den Zugang zu laufenden Kampagnen verlieren. Wenn dieser Benutzer ein Event-Organisator ist, könnten registrierte Teilnehmer ihren Event-Zugang verlieren."
         },
         "confirmation": {
-          "title": "TODO: Translate \"user_directory.dialogs.delete_user.confirmation.title\"",
-          "instruction": "TODO: Translate \"user_directory.dialogs.delete_user.confirmation.instruction\"",
-          "placeholder": "TODO: Translate \"user_directory.dialogs.delete_user.confirmation.placeholder\""
+          "title": "Bestätigung erforderlich:",
+          "instruction": "Um fortzufahren, gib bitte <code>{{email}}</code> unten ein:",
+          "placeholder": "Benutzer-E-Mail zur Bestätigung eingeben"
         },
         "buttons": {
-          "delete_permanently": "TODO: Translate \"user_directory.dialogs.delete_user.buttons.delete_permanently\""
+          "delete_permanently": "Dauerhaft löschen"
         }
       }
     },
     "scope": {
-      "global": "TODO: Translate \"user_directory.scope.global\"",
-      "team": "TODO: Translate \"user_directory.scope.team\"",
-      "event": "TODO: Translate \"user_directory.scope.event\""
+      "global": "Global",
+      "team": "Team: {{teamId}}",
+      "event": "Event: {{eventId}}"
     },
     "assigned_by": {
-      "system": "TODO: Translate \"user_directory.assigned_by.system\""
+      "system": "System"
     },
     "permissions": {
-      "none_configured": "TODO: Translate \"user_directory.permissions.none_configured\""
+      "none_configured": "Keine konfiguriert"
     },
     "descriptions": {
-      "no_description": "TODO: Translate \"user_directory.descriptions.no_description\""
+      "no_description": "Keine Beschreibung angegeben."
     },
     "misc": {
-      "permissions": "TODO: Translate \"user_directory.misc.permissions\"",
-      "no_expiration": "TODO: Translate \"user_directory.misc.no_expiration\"",
-      "remove_access": "TODO: Translate \"user_directory.misc.remove_access\""
+      "permissions": "Berechtigungen",
+      "no_expiration": "Kein Ablauf",
+      "remove_access": "Entfernen"
+    },
+    "risk_flags": {
+      "email_not_verified": "E-Mail nicht verifiziert",
+      "mfa_not_enrolled": "MFA nicht registriert",
+      "membership_not_active": "Mitgliedschaft nicht aktiv"
+    },
+    "audit_trail": {
+      "role_granted": "{{roleName}} erteilt",
+      "membership_status": "Mitgliedschaft {{status}}",
+      "last_active": "Zuletzt aktiv"
     }
   },
   "social_audits": {
-    "title": "TODO: Translate \"social_audits.title\"",
-    "description": "TODO: Translate \"social_audits.description\"",
+    "title": "Soziale Audits",
+    "description": "Admin-nur Ansicht von Folge-/Blockier-Aktionen für Moderation.",
     "filters": {
-      "action": "TODO: Translate \"social_audits.filters.action\"",
-      "actor_user_id": "TODO: Translate \"social_audits.filters.actor_user_id\"",
-      "target_user_id": "TODO: Translate \"social_audits.filters.target_user_id\"",
-      "any": "TODO: Translate \"social_audits.filters.any\"",
-      "apply_filters": "TODO: Translate \"social_audits.filters.apply_filters\"",
-      "user_id_placeholder": "TODO: Translate \"social_audits.filters.user_id_placeholder\""
+      "action": "Aktion",
+      "actor_user_id": "Akteur-Benutzer-ID",
+      "target_user_id": "Ziel-Benutzer-ID",
+      "any": "Beliebig",
+      "apply_filters": "Filter anwenden",
+      "user_id_placeholder": "Benutzer-ID"
     },
     "table_headers": {
-      "date": "TODO: Translate \"social_audits.table_headers.date\"",
-      "action": "TODO: Translate \"social_audits.table_headers.action\"",
-      "actor": "TODO: Translate \"social_audits.table_headers.actor\"",
-      "target": "TODO: Translate \"social_audits.table_headers.target\"",
-      "ui_surface": "TODO: Translate \"social_audits.table_headers.ui_surface\"",
-      "reason": "TODO: Translate \"social_audits.table_headers.reason\""
+      "date": "Datum",
+      "action": "Aktion",
+      "actor": "Akteur",
+      "target": "Ziel",
+      "ui_surface": "UI-Oberfläche",
+      "reason": "Grund"
     },
     "pagination": {
-      "page_info": "TODO: Translate \"social_audits.pagination.page_info\"",
-      "previous": "TODO: Translate \"social_audits.pagination.previous\"",
-      "next": "TODO: Translate \"social_audits.pagination.next\""
+      "page_info": "Seite {{current}} von {{total}} • {{count}} gesamt",
+      "previous": "Vorherige",
+      "next": "Nächste"
     },
-    "loading": "TODO: Translate \"social_audits.loading\"",
+    "loading": "Lade…",
     "no_data": {
-      "no_audit_rows": "TODO: Translate \"social_audits.no_data.no_audit_rows\""
+      "no_audit_rows": "Keine Audit-Zeilen"
     },
     "actions": {
-      "follow": "TODO: Translate \"social_audits.actions.follow\"",
-      "unfollow": "TODO: Translate \"social_audits.actions.unfollow\"",
-      "block": "TODO: Translate \"social_audits.actions.block\"",
-      "unblock": "TODO: Translate \"social_audits.actions.unblock\""
+      "follow": "folgen",
+      "unfollow": "entfolgen",
+      "block": "blockieren",
+      "unblock": "entblockieren"
     },
-    "no_user_data": "TODO: Translate \"social_audits.no_user_data\""
+    "no_user_data": "—"
   },
   "navigation": {
-    "aria_label": "TODO: Translate \"navigation.aria_label\"",
+    "aria_label": "Admin-Navigation",
     "items": {
       "insights": {
-        "label": "TODO: Translate \"navigation.items.insights.label\"",
-        "description": "TODO: Translate \"navigation.items.insights.description\""
+        "label": "Insights",
+        "description": "System-KPIs, Vorfälle und Warnungen"
       },
       "users": {
-        "label": "TODO: Translate \"navigation.items.users.label\"",
-        "description": "TODO: Translate \"navigation.items.users.description\""
+        "label": "Benutzer",
+        "description": "Rollen, Mitgliedschaften und MFA-Abdeckung"
       },
       "security": {
-        "label": "TODO: Translate \"navigation.items.security.label\"",
-        "description": "TODO: Translate \"navigation.items.security.description\""
+        "label": "Sicherheit",
+        "description": "Schutzmaßnahmen, Vorfälle und Audit-Logs"
       },
       "feature_flags": {
-        "label": "TODO: Translate \"navigation.items.feature_flags.label\"",
-        "description": "TODO: Translate \"navigation.items.feature_flags.description\""
+        "label": "Feature-Flags",
+        "description": "Persona-Rollouts und Experimente"
       }
     }
   },
   "security_center": {
-    "title": "TODO: Translate \"security_center.title\"",
-    "subtitle": "TODO: Translate \"security_center.subtitle\"",
-    "description": "TODO: Translate \"security_center.description\"",
+    "title": "Sicherheitsstatus",
+    "subtitle": "Schutzmaßnahmen für das Verwaltungskonsolen verwalten",
+    "description": "Verfolge Plattform-Verteidigungen, leite Vorfall-Überprüfungen und bestätige, dass privilegierte Steuerelemente den Admin-Bedarf an auditierbaren Schutzmaßnahmen respektieren.",
     "actions": {
-      "refresh_snapshot": "TODO: Translate \"security_center.actions.refresh_snapshot\"",
-      "refreshing": "TODO: Translate \"security_center.actions.refreshing\"",
-      "enable_safeguard": "TODO: Translate \"security_center.actions.enable_safeguard\"",
-      "disable_safeguard": "TODO: Translate \"security_center.actions.disable_safeguard\"",
-      "confirm": "TODO: Translate \"security_center.actions.confirm\"",
-      "cancel": "TODO: Translate \"security_center.actions.cancel\""
-    },
-    "dialog": {
-      "confirmation_title": "TODO: Translate \"security_center.dialog.confirmation_title\"",
-      "enable_description": "TODO: Translate \"security_center.dialog.enable_description\"",
-      "disable_description": "TODO: Translate \"security_center.dialog.disable_description\"",
-      "provide_context": "TODO: Translate \"security_center.dialog.provide_context\"",
-      "document_why_change_necessary": "TODO: Translate \"security_center.dialog.document_why_change_necessary\"",
-      "validation": {
-        "min_12_characters": "TODO: Translate \"security_center.dialog.validation.min_12_characters\""
-      }
+      "refresh_snapshot": "Snapshot aktualisieren",
+      "refreshing": "Aktualisiere…",
+      "enable_safeguard": "Schutzmaßnahme aktivieren",
+      "disable_safeguard": "Schutzmaßnahme deaktivieren",
+      "confirm": "Bestätigen",
+      "cancel": "Abbrechen"
     },
     "status": {
-      "stable_governance_posture": "TODO: Translate \"security_center.status.stable_governance_posture\"",
-      "heightened_monitoring": "TODO: Translate \"security_center.status.heightened_monitoring\"",
-      "improving": "TODO: Translate \"security_center.status.improving\"",
-      "declining": "TODO: Translate \"security_center.status.declining\"",
-      "flat": "TODO: Translate \"security_center.status.flat\"",
-      "enforced": "TODO: Translate \"security_center.status.enforced\"",
-      "disabled": "TODO: Translate \"security_center.status.disabled\""
+      "stable_governance_posture": "Stabile Verwaltungshaltung",
+      "heightened_monitoring": "Verstärkte Überwachung",
+      "improving": "Verbessernd",
+      "declining": "Abnehmend",
+      "flat": "Flach",
+      "enforced": "Durchgesetzt",
+      "disabled": "Deaktiviert"
     },
     "sections": {
       "critical_safeguards": {
-        "title": "TODO: Translate \"security_center.sections.critical_safeguards.title\"",
-        "description": "TODO: Translate \"security_center.sections.critical_safeguards.description\""
+        "title": "Kritische Schutzmaßnahmen",
+        "description": "Bestätige plattformweite Steuerelemente, bevor Du den Zugriff für privilegierte Personas aktivierst oder deaktivierst."
       },
       "active_incidents": {
-        "title": "TODO: Translate \"security_center.sections.active_incidents.title\"",
-        "description": "TODO: Translate \"security_center.sections.active_incidents.description\""
+        "title": "Aktive Vorfälle",
+        "description": "Priorisiere Abhilfemaßnahmen, die das Vertrauen von Besuchern, Spielern und Betriebsleuten schützen, während Admins die Konsole überwachen."
       },
       "compliance_checklist": {
-        "title": "TODO: Translate \"security_center.sections.compliance_checklist.title\"",
-        "description": "TODO: Translate \"security_center.sections.compliance_checklist.description\""
+        "title": "Compliance-Checkliste",
+        "description": "Sequenziere die nächsten besten Aktionen, damit Audits schnell und verteidigbar für Admins bleiben."
       },
       "privileged_action_log": {
-        "title": "TODO: Translate \"security_center.sections.privileged_action_log.title\"",
-        "description": "TODO: Translate \"security_center.sections.privileged_action_log.description\""
+        "title": "Protokoll privilegierter Aktionen",
+        "description": "Überprüfe die letzten manuellen und automatisierten Änderungen, um die Audit-Bereitschaft zu bestätigen."
       }
     },
     "labels": {
-      "score_calculated_across_pillars": "TODO: Translate \"security_center.labels.score_calculated_across_pillars\"",
-      "last_reviewed": "TODO: Translate \"security_center.labels.last_reviewed\"",
-      "over_the_last_days": "TODO: Translate \"security_center.labels.over_the_last_days\"",
-      "impact": "TODO: Translate \"security_center.labels.impact\"",
-      "persona_impact": "TODO: Translate \"security_center.labels.persona_impact\"",
-      "effort": "TODO: Translate \"security_center.labels.effort\"",
-      "actor": "TODO: Translate \"security_center.labels.actor\"",
-      "risk_level": "TODO: Translate \"security_center.labels.risk_level\""
+      "score_calculated_across_pillars": "Punktzahl berechnet über Identität, Infrastruktur und Audit-Säulen.",
+      "last_reviewed": "Zuletzt überprüft",
+      "over_the_last_days": "in den letzten {{count}} Tagen",
+      "impact": "Auswirkung",
+      "persona_impact": "Persona-Auswirkung",
+      "effort": "Aufwand",
+      "actor": "Akteur",
+      "risk_level": "RISIKO"
     },
     "status_indicators": {
-      "all_clear": "TODO: Translate \"security_center.status_indicators.all_clear\"",
-      "no_unresolved_incidents": "TODO: Translate \"security_center.status_indicators.no_unresolved_incidents\"",
-      "investigating": "TODO: Translate \"security_center.status_indicators.investigating\"",
-      "mitigated": "TODO: Translate \"security_center.status_indicators.mitigated\"",
-      "resolved": "TODO: Translate \"security_center.status_indicators.resolved\""
+      "all_clear": "Alles klar",
+      "no_unresolved_incidents": "Keine ungelösten Vorfälle erfordern derzeit Aufmerksamkeit.",
+      "investigating": "Untersuchend",
+      "mitigated": "Abgemildert",
+      "resolved": "Gelöst"
     },
     "messages": {
-      "unable_to_load_security_posture": "TODO: Translate \"security_center.messages.unable_to_load_security_posture\"",
-      "could_not_retrieve_governance_safeguards": "TODO: Translate \"security_center.messages.could_not_retrieve_governance_safeguards\"",
-      "enabled_or_disabled_control": "TODO: Translate \"security_center.messages.enabled_or_disabled_control\"",
-      "no_recent_privileged_changes": "TODO: Translate \"security_center.messages.no_recent_privileged_changes\"",
-      "unable_to_update_control": "TODO: Translate \"security_center.messages.unable_to_update_control\""
+      "unable_to_load_security_posture": "Sicherheitsstatus konnte nicht geladen werden",
+      "could_not_retrieve_governance_safeguards": "Wir konnten Verwaltungsschutzmaßnahmen nicht abrufen. Aktualisiere die Seite oder kontaktiere das Plattform-Engineering-Team.",
+      "enabled_or_disabled_control": "{{action}} {{control}}",
+      "no_recent_privileged_changes": "Keine aktuellen privilegierten Änderungen wurden in diesem Zeitraum aufgezeichnet.",
+      "unable_to_update_control": "Steuerung konnte nicht aktualisiert werden"
     },
     "controls": {
-      "enforced": "TODO: Translate \"security_center.controls.enforced\"",
-      "disabled": "TODO: Translate \"security_center.controls.disabled\"",
-      "enable_control": "TODO: Translate \"security_center.controls.enable_control\"",
-      "disable_control": "TODO: Translate \"security_center.controls.disable_control\"",
-      "last_reviewed_by": "TODO: Translate \"security_center.controls.last_reviewed_by\""
+      "enforced": "Durchgesetzt",
+      "disabled": "Deaktiviert",
+      "enable_control": "Steuerung aktivieren",
+      "disable_control": "Steuerung deaktivieren",
+      "last_reviewed_by": "Zuletzt überprüft {{timeAgo}} von {{user}}. Nächste Überprüfung in {{days}} Tagen."
+    },
+    "dialog": {
+      "confirmation_title": "{{action}} Schutzmaßnahme",
+      "enable_description": "Bestätige, dass die Schutzmaßnahme bereit ist, bevor Du sie für alle privilegierten Personas aktivierst.",
+      "disable_description": "Das Deaktivieren dieses Steuerelements entfernt Echtzeit-Schutzmaßnahmen. Erfasse die Begründung für das Audit-Protokoll.",
+      "provide_context": "Biete Kontext für das Audit-Protokoll, damit wir Verwaltungsentscheidungen nachverfolgen können.",
+      "document_why_change_necessary": "Dokumentiere, warum diese Änderung notwendig ist, die erwarteten Auswirkungen und Abhilfeschritte.",
+      "confirm_enable_safeguard": "Bestätige, dass die Schutzmaßnahme bereit ist, bevor Du sie für alle privilegierten Personas aktivierst.",
+      "confirm_disable_control": "Das Deaktivieren dieses Steuerelements entfernt Echtzeit-Schutzmaßnahmen. Erfasse die Begründung für das Audit-Protokoll.",
+      "validation": {
+        "min_12_characters": "Bitte gib mindestens 12 Zeichen ein, damit die Begründung audit-fähig ist."
+      }
     },
     "taxonomy": {
-      "category": "TODO: Translate \"security_center.taxonomy.category\"",
-      "mechanic": "TODO: Translate \"security_center.taxonomy.mechanic\""
+      "category": "Kategorie",
+      "mechanic": "Mechanik"
     },
     "hardcoded_strings": {
-      "unable_to_load_security_posture": "TODO: Translate \"security_center.hardcoded_strings.unable_to_load_security_posture\"",
-      "could_not_retrieve_governance_safeguards": "TODO: Translate \"security_center.hardcoded_strings.could_not_retrieve_governance_safeguards\"",
-      "enabled": "TODO: Translate \"security_center.hardcoded_strings.enabled\"",
-      "disabled": "TODO: Translate \"security_center.hardcoded_strings.disabled\"",
-      "critical": "TODO: Translate \"security_center.hardcoded_strings.critical\"",
-      "high": "TODO: Translate \"security_center.hardcoded_strings.high\"",
-      "medium": "TODO: Translate \"security_center.hardcoded_strings.medium\"",
-      "enforced": "TODO: Translate \"security_center.hardcoded_strings.enforced\"",
-      "last_reviewed_by_next_review": "TODO: Translate \"security_center.hardcoded_strings.last_reviewed_by_next_review\"",
-      "disable_control": "TODO: Translate \"security_center.hardcoded_strings.disable_control\"",
-      "enable_control": "TODO: Translate \"security_center.hardcoded_strings.enable_control\"",
-      "investigating": "TODO: Translate \"security_center.hardcoded_strings.investigating\"",
-      "mitigated": "TODO: Translate \"security_center.hardcoded_strings.mitigated\"",
-      "resolved": "TODO: Translate \"security_center.hardcoded_strings.resolved\"",
-      "all_clear": "TODO: Translate \"security_center.hardcoded_strings.all_clear\"",
-      "no_unresolved_incidents_require_attention": "TODO: Translate \"security_center.hardcoded_strings.no_unresolved_incidents_require_attention\"",
-      "detected_resolved": "TODO: Translate \"security_center.hardcoded_strings.detected_resolved\"",
-      "effort": "TODO: Translate \"security_center.hardcoded_strings.effort\"",
-      "persona_impact": "TODO: Translate \"security_center.hardcoded_strings.persona_impact\"",
-      "no_recent_privileged_changes_recorded": "TODO: Translate \"security_center.hardcoded_strings.no_recent_privileged_changes_recorded\"",
-      "confirm_safeguard_ready_before_enabling": "TODO: Translate \"security_center.hardcoded_strings.confirm_safeguard_ready_before_enabling\"",
-      "disabling_control_removes_guardrails": "TODO: Translate \"security_center.hardcoded_strings.disabling_control_removes_guardrails\"",
-      "provide_context_for_audit_log": "TODO: Translate \"security_center.hardcoded_strings.provide_context_for_audit_log\"",
-      "document_why_change_necessary": "TODO: Translate \"security_center.hardcoded_strings.document_why_change_necessary\"",
-      "please_include_at_least_12_characters": "TODO: Translate \"security_center.hardcoded_strings.please_include_at_least_12_characters\"",
-      "cancel": "TODO: Translate \"security_center.hardcoded_strings.cancel\"",
-      "confirm": "TODO: Translate \"security_center.hardcoded_strings.confirm\""
+      "unable_to_load_security_posture": "Sicherheitsstatus konnte nicht geladen werden",
+      "could_not_retrieve_governance_safeguards": "Wir konnten Verwaltungsschutzmaßnahmen nicht abrufen. Aktualisiere die Seite oder kontaktiere das Plattform-Engineering-Team.",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "critical": "KRITISCH",
+      "high": "HOCH",
+      "medium": "MITTEL",
+      "enforced": "Durchgesetzt",
+      "last_reviewed_by_next_review": "Zuletzt überprüft {{timeAgo}} von {{user}}. Nächste Überprüfung in {{days}} Tagen.",
+      "disable_control": "Steuerung deaktivieren",
+      "enable_control": "Steuerung aktivieren",
+      "investigating": "Untersuchend",
+      "mitigated": "Abgemildert",
+      "resolved": "Gelöst",
+      "all_clear": "Alles klar",
+      "no_unresolved_incidents_require_attention": "Keine ungelösten Vorfälle erfordern derzeit Aufmerksamkeit.",
+      "detected_resolved": "Erkannt {{detectedAt}}{{resolvedAt}}",
+      "effort": "Aufwand: {{effort}}",
+      "persona_impact": "Persona-Auswirkung: {{personaImpact}}",
+      "no_recent_privileged_changes_recorded": "Keine aktuellen privilegierten Änderungen wurden in diesem Zeitraum aufgezeichnet.",
+      "confirm_safeguard_ready_before_enabling": "Bestätige, dass die Schutzmaßnahme bereit ist, bevor Du sie für alle privilegierten Personas aktivierst.",
+      "disabling_control_removes_guardrails": "Das Deaktivieren dieses Steuerelements entfernt Echtzeit-Schutzmaßnahmen. Erfasse die Begründung für das Audit-Protokoll.",
+      "provide_context_for_audit_log": "Biete Kontext für das Audit-Protokoll, damit wir Verwaltungsentscheidungen nachverfolgen können.",
+      "document_why_change_necessary": "Dokumentiere, warum diese Änderung notwendig ist, die erwarteten Auswirkungen und Abhilfeschritte.",
+      "please_include_at_least_12_characters": "Bitte gib mindestens 12 Zeichen ein, damit die Begründung audit-fähig ist.",
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen"
     }
   },
   "feature_flags": {
     "console": {
-      "title": "TODO: Translate \"feature_flags.console.title\"",
-      "description": "TODO: Translate \"feature_flags.console.description\"",
+      "title": "Feature-Rollout-Konsole",
+      "description": "Verwalte lokale Overrides für Experimente und Persona-Vorschauen, ohne Produktionsumgebungsvariablen zu berühren.",
       "curated_flags": {
         "shared_inbox": {
-          "label": "TODO: Translate \"feature_flags.console.curated_flags.shared_inbox.label\"",
-          "description": "TODO: Translate \"feature_flags.console.curated_flags.shared_inbox.description\""
+          "label": "Workspace Shared Inbox",
+          "description": "Schaltet die Shared-Inbox-Erfahrung für Player-, Ops-, GM- und Admin-Workspaces um."
         },
         "collaboration": {
-          "label": "TODO: Translate \"feature_flags.console.curated_flags.collaboration.label\"",
-          "description": "TODO: Translate \"feature_flags.console.curated_flags.collaboration.description\""
+          "label": "Cross-Persona Collaboration Workspace",
+          "description": "Steuert den Zugriff auf den Collaboration-Workspace für rollenbasierte Dashboards."
         }
       },
       "status": {
-        "not_set": "TODO: Translate \"feature_flags.console.status.not_set\"",
-        "enabled": "TODO: Translate \"feature_flags.console.status.enabled\"",
-        "disabled": "TODO: Translate \"feature_flags.console.status.disabled\"",
-        "effective_state": "TODO: Translate \"feature_flags.console.status.effective_state\""
+        "not_set": "Nicht festgelegt",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "effective_state": "Effektiver Status:"
       },
       "override": {
-        "none": "TODO: Translate \"feature_flags.console.override.none\"",
-        "enabled": "TODO: Translate \"feature_flags.console.override.enabled\"",
-        "disabled": "TODO: Translate \"feature_flags.console.override.disabled\"",
-        "clear_override": "TODO: Translate \"feature_flags.console.override.clear_override\""
+        "none": "Keine",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "clear_override": "Override entfernen"
       },
       "buttons": {
-        "enable": "TODO: Translate \"feature_flags.console.buttons.enable\"",
-        "disable": "TODO: Translate \"feature_flags.console.buttons.disable\"",
-        "refresh": "TODO: Translate \"feature_flags.console.buttons.refresh\"",
-        "add": "TODO: Translate \"feature_flags.console.buttons.add\"",
-        "retry": "TODO: Translate \"feature_flags.console.buttons.retry\""
+        "enable": "Aktivieren",
+        "disable": "Deaktivieren",
+        "refresh": "Aktualisieren",
+        "add": "Hinzufügen",
+        "retry": "Erneut versuchen"
       },
       "placeholders": {
-        "add_flag_key": "TODO: Translate \"feature_flags.console.placeholders.add_flag_key\""
+        "add_flag_key": "Flag-Schlüssel hinzufügen"
       },
       "empty_state": {
-        "title": "TODO: Translate \"feature_flags.console.empty_state.title\"",
-        "description": "TODO: Translate \"feature_flags.console.empty_state.description\""
+        "title": "Keine Feature-Flags gefunden",
+        "description": "Füge einen Flag-Schlüssel hinzu, um Overrides zu verwalten oder definiere Umgebungsvariablen mit VITE_FLAG_ Präfix."
       },
       "error": {
-        "title": "TODO: Translate \"feature_flags.console.error.title\"",
-        "description": "TODO: Translate \"feature_flags.console.error.description\"",
-        "custom_flag_description": "TODO: Translate \"feature_flags.console.error.custom_flag_description\""
+        "title": "Feature-Flags nicht verfügbar",
+        "description": "Wir konnten das Plattform-Flag-Register nicht lesen.",
+        "custom_flag_description": "Benutzerdefinierter Flag-Override"
       }
     }
   }

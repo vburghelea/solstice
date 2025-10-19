@@ -518,6 +518,29 @@
       "ready_status": "Ready",
       "no_hero_badge": "No hero",
       "edit_action": "Edit",
+      "headers": {
+        "system": "System",
+        "completeness": "Completeness",
+        "crawl": "Crawl",
+        "media": "Media",
+        "updated": "Updated",
+        "actions": "Actions"
+      },
+      "status": {
+        "published": "Published",
+        "draft": "Draft",
+        "approved": "Approved",
+        "needs_approval": "Needs approval",
+        "hero_approved": "Hero approved",
+        "hero_needs_review": "Hero needs review",
+        "gallery_clean": "Gallery clean",
+        "pending": "pending",
+        "never_crawled": "Never crawled"
+      },
+      "showing_results": "Showing {{start}}–{{end}} of {{total}} {{itemType}}.",
+      "system_singular": "system",
+      "system_plural": "systems",
+      "page_info": "Page {{current}} of {{total}}",
       "confirmations": {
         "delete_systems": "This will permanently remove the selected systems and all related data. Continue?",
         "deactivate_systems": "Deactivate selected systems and mark them as inactive? They will be hidden from public listings."

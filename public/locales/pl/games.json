@@ -1,350 +1,350 @@
 {
   "buttons": {
-    "view_game": "TODO: Translate \"buttons.view_game\"",
-    "mark_completed": "TODO: Translate \"buttons.mark_completed\"",
-    "cancel_session": "TODO: Translate \"buttons.cancel_session\"",
-    "revoke": "TODO: Translate \"buttons.revoke\"",
-    "accept": "TODO: Translate \"buttons.accept\"",
-    "reject": "TODO: Translate \"buttons.reject\"",
-    "accepting": "TODO: Translate \"buttons.accepting\"",
-    "rejecting": "TODO: Translate \"buttons.rejecting\"",
-    "invite": "TODO: Translate \"buttons.invite\"",
-    "cancel": "TODO: Translate \"buttons.cancel\"",
-    "create_game": "TODO: Translate \"buttons.create_game\"",
-    "update_game": "TODO: Translate \"buttons.update_game\"",
-    "submit_review": "TODO: Translate \"buttons.submit_review\""
+    "view_game": "Zobacz grę",
+    "mark_completed": "Oznacz jako ukończone",
+    "cancel_session": "Odwołaj sesję",
+    "revoke": "Cofnij",
+    "accept": "Akceptuj",
+    "reject": "Odrzuć",
+    "accepting": "Akceptuję...",
+    "rejecting": "Odrzucam...",
+    "invite": "Zaproś",
+    "cancel": "Anuluj",
+    "create_game": "Stwórz grę",
+    "update_game": "Zaktualizuj grę",
+    "submit_review": "Prześlij recenzję"
   },
   "external_refs": {
-    "startplaying": "TODO: Translate \"external_refs.startplaying\"",
-    "boardgamegeek": "TODO: Translate \"external_refs.boardgamegeek\"",
-    "wikipedia": "TODO: Translate \"external_refs.wikipedia\""
+    "startplaying": "StartPlaying",
+    "boardgamegeek": "BoardGameGeek",
+    "wikipedia": "Wikipedia"
   },
   "labels": {
-    "game_system": "TODO: Translate \"labels.game_system\"",
-    "language": "TODO: Translate \"labels.language\"",
-    "players": "TODO: Translate \"labels.players\"",
-    "visibility": "TODO: Translate \"labels.visibility\"",
-    "participants": "TODO: Translate \"labels.participants\"",
-    "pending_participant": "TODO: Translate \"labels.pending_participant\"",
-    "date_time": "TODO: Translate \"labels.date_time\"",
-    "expected_duration": "TODO: Translate \"labels.expected_duration\"",
-    "price": "TODO: Translate \"labels.price\"",
-    "game_session_name": "TODO: Translate \"labels.game_session_name\"",
-    "description": "TODO: Translate \"labels.description\"",
-    "game_system_used": "TODO: Translate \"labels.game_system_used\"",
-    "address": "TODO: Translate \"labels.address\"",
-    "minimum_players": "TODO: Translate \"labels.minimum_players\"",
-    "maximum_players": "TODO: Translate \"labels.maximum_players\"",
-    "search_users": "TODO: Translate \"labels.search_users\"",
-    "invite_by_email": "TODO: Translate \"labels.invite_by_email\"",
-    "pending_invitations": "TODO: Translate \"labels.pending_invitations\"",
-    "safety_tool": "TODO: Translate \"labels.safety_tool\"",
-    "safety_tool_details": "TODO: Translate \"labels.safety_tool_details\"",
-    "player_boundaries_consent": "TODO: Translate \"labels.player_boundaries_consent\""
+    "game_system": "System gry",
+    "language": "Język",
+    "players": "Gracze",
+    "visibility": "Widoczność",
+    "participants": "Uczestnicy",
+    "pending_participant": "Oczekujący uczestnik",
+    "date_time": "Data i godzina",
+    "expected_duration": "Oczekiwany czas trwania (minuty)",
+    "price": "Cena (PLN) (opcjonalnie)",
+    "game_session_name": "Nazwa sesji gry",
+    "description": "Opis",
+    "game_system_used": "Używany system gry",
+    "address": "Adres",
+    "minimum_players": "Minimalna liczba graczy",
+    "maximum_players": "Maksymalna liczba graczy",
+    "search_users": "Szukaj użytkowników",
+    "invite_by_email": "Zaproś przez e-mail",
+    "pending_invitations": "Oczekujące zaproszenia",
+    "safety_tool": "Narzędzie bezpieczeństwa",
+    "safety_tool_details": "Szczegóły narzędzia bezpieczeństwa (opcjonalnie)",
+    "player_boundaries_consent": "Granice graczy / Notatki o zgodzie (opcjonalnie)"
   },
   "placeholders": {
-    "game_session_name": "TODO: Translate \"placeholders.game_session_name\"",
-    "search_and_select_game_system": "TODO: Translate \"placeholders.search_and_select_game_system\"",
-    "select_language": "TODO: Translate \"placeholders.select_language\"",
-    "select_visibility": "TODO: Translate \"placeholders.select_visibility\"",
-    "select_safety_tool": "TODO: Translate \"placeholders.select_safety_tool\"",
-    "safety_tool_details": "TODO: Translate \"placeholders.safety_tool_details\"",
-    "player_boundaries_consent": "TODO: Translate \"placeholders.player_boundaries_consent\"",
-    "search_users": "TODO: Translate \"placeholders.search_users\"",
-    "enter_name": "TODO: Translate \"placeholders.enter_name\"",
-    "enter_email": "TODO: Translate \"placeholders.enter_email\""
+    "game_session_name": "Wpisz chwytliwą nazwę dla swojej planowanej sesji gry",
+    "search_and_select_game_system": "Wyszukaj i wybierz system gry, którego chcesz użyć",
+    "select_language": "Wybierz język",
+    "select_visibility": "Wybierz widoczność",
+    "select_safety_tool": "Wybierz narzędzie bezpieczeństwa",
+    "safety_tool_details": "Jakieś szczegóły dotyczące wybranego narzędzia bezpieczeństwa",
+    "player_boundaries_consent": "Jakieś granice lub uwagi o zgodzie, o których gracze powinni wiedzieć",
+    "search_users": "Szukaj po nazwie lub e-mailu (4+ znaki)",
+    "enter_name": "Wpisz imię",
+    "enter_email": "Wpisz adres e-mail"
   },
   "status": {
-    "connections_teammates": "TODO: Translate \"status.connections_teammates\"",
-    "unknown_user": "TODO: Translate \"status.unknown_user\"",
-    "no_pending_invitations": "TODO: Translate \"status.no_pending_invitations\"",
-    "no_games_found": "TODO: Translate \"status.no_games_found\"",
-    "searching": "TODO: Translate \"status.searching\"",
-    "no_users_found": "TODO: Translate \"status.no_users_found\""
+    "connections_teammates": "Połączenia i współgracze",
+    "unknown_user": "Nieznany użytkownik",
+    "no_pending_invitations": "Brak oczekujących zaproszeń.",
+    "no_games_found": "Nie znaleziono gier. Stwórz jedną!",
+    "searching": "Szukanie...",
+    "no_users_found": "Nie znaleziono użytkowników."
   },
   "messages": {
-    "invitation_rejected_success": "TODO: Translate \"messages.invitation_rejected_success\"",
-    "invitation_response_recorded": "TODO: Translate \"messages.invitation_response_recorded\"",
-    "participant_invited_success": "TODO: Translate \"messages.participant_invited_success\"",
-    "invitation_revoked_success": "TODO: Translate \"messages.invitation_revoked_success\"",
-    "review_submitted_success": "TODO: Translate \"messages.review_submitted_success\""
+    "invitation_rejected_success": "Zaproszenie zostało odrzucone!",
+    "invitation_response_recorded": "Odpowiedź na zaproszenie została zapisana.",
+    "participant_invited_success": "Uczestnik został zaproszony!",
+    "invitation_revoked_success": "Zaproszenie zostało cofnięte!",
+    "review_submitted_success": "Dzięki za Twoją recenzję!"
   },
   "errors": {
-    "failed_to_reject_invitation": "TODO: Translate \"errors.failed_to_reject_invitation\"",
-    "failed_to_respond_invitation": "TODO: Translate \"errors.failed_to_respond_invitation\"",
-    "unexpected_error": "TODO: Translate \"errors.unexpected_error\"",
-    "failed_to_invite_participant": "TODO: Translate \"errors.failed_to_invite_participant\"",
-    "failed_to_revoke_invitation": "TODO: Translate \"errors.failed_to_revoke_invitation\"",
-    "failed_to_submit_review": "TODO: Translate \"errors.failed_to_submit_review\"",
-    "search_failed": "TODO: Translate \"errors.search_failed\""
+    "failed_to_reject_invitation": "Nie udało się odrzucić zaproszenia",
+    "failed_to_respond_invitation": "Nie udało się odpowiedzieć na zaproszenie.",
+    "unexpected_error": "Wystąpił nieoczekiwany błąd.",
+    "failed_to_invite_participant": "Nie udało się zaprosić uczestnika",
+    "failed_to_revoke_invitation": "Nie udało się cofnąć zaproszenia",
+    "failed_to_submit_review": "Nie udało się przesłać recenzji",
+    "search_failed": "Nie udało się wyszukać systemów gier"
   },
   "descriptions": {
-    "session_overview": "TODO: Translate \"descriptions.session_overview\"",
-    "participant_requirements": "TODO: Translate \"descriptions.participant_requirements\"",
-    "location": "TODO: Translate \"descriptions.location\"",
-    "safety_table_culture": "TODO: Translate \"descriptions.safety_table_culture\"",
-    "manage_invitations": "TODO: Translate \"descriptions.manage_invitations\"",
-    "invite_participants": "TODO: Translate \"descriptions.invite_participants\"",
-    "game_invitation": "TODO: Translate \"descriptions.game_invitation\""
+    "session_overview": "Podziel się podstawami, których gracze potrzebują przed potwierdzeniem udziału.",
+    "participant_requirements": "Opcjonalne wytyczne, które pomagają graczom wybrać odpowiednie stoły.",
+    "location": "Poinformuj graczy, gdzie odbędzie się sesja.",
+    "safety_table_culture": "Opcjonalne oczekiwania, które ustalają nastrój wspólnej gry.",
+    "manage_invitations": "Przejrzyj i przetwarzaj oczekujące zaproszenia.",
+    "invite_participants": "Wyszukaj użytkowników lub zaproś ich przez e-mail.",
+    "game_invitation": "Zostałeś zaproszony do tej gry. Proszę zaakceptuj lub odrzuć zaproszenie."
   },
   "form_sections": {
-    "session_overview": "TODO: Translate \"form_sections.session_overview\"",
-    "participant_requirements": "TODO: Translate \"form_sections.participant_requirements\"",
-    "location": "TODO: Translate \"form_sections.location\"",
-    "safety_table_culture": "TODO: Translate \"form_sections.safety_table_culture\""
+    "session_overview": "Przegląd sesji",
+    "participant_requirements": "Wymagania dla uczestników",
+    "location": "Lokalizacja",
+    "safety_table_culture": "Bezpieczeństwo i kultura stołu"
   },
   "visibility_options": {
-    "description": "TODO: Translate \"visibility_options.description\""
+    "description": "Opcje widoczności: Publiczne (widoczne dla wszystkich), Połączenia i współgracze (widoczne dla Twoich obserwujących, osoby które śledzisz i aktywnych współgraczy), Prywatne (widoczne tylko dla zaproszonych graczy)"
   },
   "safety_options": {
-    "no_alcohol": "TODO: Translate \"safety_options.no_alcohol\"",
-    "safe_word_required": "TODO: Translate \"safety_options.safe_word_required\"",
-    "encourage_open_communication": "TODO: Translate \"safety_options.encourage_open_communication\""
+    "no_alcohol": "Bez alkoholu",
+    "safe_word_required": "Wymagane safeword",
+    "encourage_open_communication": "Zachęcaj do otwartej komunikacji"
   },
   "confirmation": {
-    "cancel_session": "TODO: Translate \"confirmation.cancel_session\""
+    "cancel_session": "Czy na pewno chcesz odwołać tę sesję?"
   },
   "invitation_status": {
-    "invited": "TODO: Translate \"invitation_status.invited\""
+    "invited": "Zaproszony"
   },
   "languages": {
-    "english": "TODO: Translate \"languages.english\"",
-    "chinese": "TODO: Translate \"languages.chinese\"",
-    "hindi": "TODO: Translate \"languages.hindi\"",
-    "spanish": "TODO: Translate \"languages.spanish\"",
-    "french": "TODO: Translate \"languages.french\"",
-    "arabic": "TODO: Translate \"languages.arabic\"",
-    "bengali": "TODO: Translate \"languages.bengali\"",
-    "russian": "TODO: Translate \"languages.russian\""
+    "english": "Angielski",
+    "chinese": "Chiński",
+    "hindi": "Hindi",
+    "spanish": "Hiszpański",
+    "french": "Francuski",
+    "arabic": "Arabski",
+    "bengali": "Bengalski",
+    "russian": "Rosyjski"
   },
   "validation_errors": {
-    "game_session_name_required": "TODO: Translate \"validation_errors.game_session_name_required\"",
-    "description_required": "TODO: Translate \"validation_errors.description_required\"",
-    "game_system_required": "TODO: Translate \"validation_errors.game_system_required\"",
-    "duration_required": "TODO: Translate \"validation_errors.duration_required\"",
-    "price_optional": "TODO: Translate \"validation_errors.price_optional\"",
-    "language_required": "TODO: Translate \"validation_errors.language_required\"",
-    "visibility_required": "TODO: Translate \"validation_errors.visibility_required\"",
-    "min_players_required": "TODO: Translate \"validation_errors.min_players_required\"",
-    "max_players_required": "TODO: Translate \"validation_errors.max_players_required\"",
-    "address_required": "TODO: Translate \"validation_errors.address_required\""
+    "game_session_name_required": "Nazwa sesji gry jest tym, co większość graczy widzi jako pierwsze szukając przygód, upewnij się, że jest chwytliwa.",
+    "description_required": "Dodaj opis sesji gry, który ustala ton tego, czego gracze mogą się spodziewać.",
+    "game_system_required": "Wybierz system gry dla swojej sesji.",
+    "duration_required": "Wpisz czas trwania gry w minutach, aby inni wiedzieli, ile czasu muszą zarezerwować.",
+    "price_optional": "Jeśli chcesz dodać opłatę za grę, określ ją tutaj.",
+    "language_required": "Wybierz język, w którym będzie grany wybrany przez Ciebie system gry.",
+    "visibility_required": "Wybierz wartość widoczności, która pozwoli Ci efektywnie znaleźć odpowiednich ludzi.",
+    "min_players_required": "Musimy wiedzieć, ile osób ma wziąć udział.",
+    "max_players_required": "Musimy wiedzieć, ile osób ma wziąć udział.",
+    "address_required": "Wpisz adres lokalizacji, gdzie odbędzie się sesja gry."
   },
   "titles": {
-    "invite_participants": "TODO: Translate \"titles.invite_participants\"",
-    "manage_invitations": "TODO: Translate \"titles.manage_invitations\"",
-    "game_invitation": "TODO: Translate \"titles.game_invitation\"",
-    "review_gm": "TODO: Translate \"titles.review_gm\""
+    "invite_participants": "Zaproś uczestników",
+    "manage_invitations": "Zarządzaj zaproszeniami",
+    "game_invitation": "Zaproszenie do gry",
+    "review_gm": "Oceń tego MG"
   },
   "combobox": {
-    "empty_message": "TODO: Translate \"combobox.empty_message\"",
-    "no_results_message": "TODO: Translate \"combobox.no_results_message\""
+    "empty_message": "Zacznij wpisywać nazwę systemu gry, aby szukać.",
+    "no_results_message": "Nie znaleziono systemu gry."
   },
   "review_labels": {
-    "rate_gm": "TODO: Translate \"review_labels.rate_gm\"",
-    "select_strengths": "TODO: Translate \"review_labels.select_strengths\"",
-    "comments_optional": "TODO: Translate \"review_labels.comments_optional\"",
-    "choose_max_three": "TODO: Translate \"review_labels.choose_max_three\"",
-    "submitting": "TODO: Translate \"review_labels.submitting\"",
-    "placeholder_comment": "TODO: Translate \"review_labels.placeholder_comment\""
+    "rate_gm": "Oceń MG",
+    "select_strengths": "Wybierz do 3 mocnych stron",
+    "comments_optional": "Komentarze (opcjonalnie)",
+    "choose_max_three": "Wybierz do 3 z 10",
+    "submitting": "Wysyłanie...",
+    "placeholder_comment": "Co wyróżniło się w tej sesji?"
   },
   "participants_list": {
-    "participants_title": "TODO: Translate \"participants_list.participants_title\"",
-    "pending_applications_title": "TODO: Translate \"participants_list.pending_applications_title\"",
-    "banned_title": "TODO: Translate \"participants_list.banned_title\"",
-    "no_participants": "TODO: Translate \"participants_list.no_participants\"",
-    "owner_label": "TODO: Translate \"participants_list.owner_label\"",
-    "role_status": "TODO: Translate \"participants_list.role_status\"",
+    "participants_title": "Uczestnicy ({{count}})",
+    "pending_applications_title": "Oczekujące aplikacje ({{count}})",
+    "banned_title": "Zbanowani z gry ({{count}})",
+    "no_participants": "Jeszcze nie ma uczestników.",
+    "owner_label": "(właściciel)",
+    "role_status": "({{role}} - {{status}})",
     "buttons": {
-      "remove": "TODO: Translate \"participants_list.buttons.remove\"",
-      "removing": "TODO: Translate \"participants_list.buttons.removing\"",
-      "approve": "TODO: Translate \"participants_list.buttons.approve\"",
-      "approving": "TODO: Translate \"participants_list.buttons.approving\"",
-      "reject": "TODO: Translate \"participants_list.buttons.reject\"",
-      "rejecting": "TODO: Translate \"participants_list.buttons.rejecting\"",
-      "allow": "TODO: Translate \"participants_list.buttons.allow\"",
-      "allowing": "TODO: Translate \"participants_list.buttons.allowing\""
+      "remove": "Usuń",
+      "removing": "Usuwanie...",
+      "approve": "Zatwierdź",
+      "approving": "Zatwierdzanie...",
+      "reject": "Odrzuć",
+      "rejecting": "Odrzucanie...",
+      "allow": "Pozwól",
+      "allowing": "Pozwalanie..."
     },
     "success_messages": {
-      "participant_removed": "TODO: Translate \"participants_list.success_messages.participant_removed\"",
-      "ban_removed": "TODO: Translate \"participants_list.success_messages.ban_removed\"",
-      "application_updated": "TODO: Translate \"participants_list.success_messages.application_updated\""
+      "participant_removed": "Uczestnik został usunięty!",
+      "ban_removed": "Ban na uczestnictwo został zdjęty!",
+      "application_updated": "Status aplikacji został zaktualizowany!"
     },
     "error_messages": {
-      "failed_to_remove": "TODO: Translate \"participants_list.error_messages.failed_to_remove\"",
-      "failed_to_remove_ban": "TODO: Translate \"participants_list.error_messages.failed_to_remove_ban\"",
-      "failed_to_update_application": "TODO: Translate \"participants_list.error_messages.failed_to_update_application\""
+      "failed_to_remove": "Nie udało się usunąć uczestnika: {{error}}",
+      "failed_to_remove_ban": "Nie udało się zdjąć banu: {{error}}",
+      "failed_to_update_application": "Nie udało się zaktualizować statusu aplikacji: {{error}}"
     }
   },
   "list_item": {
-    "free": "TODO: Translate \"list_item.free\"",
-    "original_system": "TODO: Translate \"list_item.original_system\"",
-    "campaign_part": "TODO: Translate \"list_item.campaign_part\"",
-    "hosted_by": "TODO: Translate \"list_item.hosted_by\"",
-    "hosted_by_community": "TODO: Translate \"list_item.hosted_by_community\"",
-    "view_details": "TODO: Translate \"list_item.view_details\"",
-    "joined_count": "TODO: Translate \"list_item.joined_count\"",
-    "session_duration": "TODO: Translate \"list_item.session_duration\"",
+    "free": "Darmowe",
+    "original_system": "Oryginalny system",
+    "campaign_part": "Część trwającej kampanii",
+    "hosted_by": "Organizowane przez {{name}}",
+    "hosted_by_community": "Organizowane przez MG społeczności",
+    "view_details": "Zobacz szczegóły",
+    "joined_count": "{{count}} dołączyło",
+    "session_duration": "sesja {{duration}}",
     "duration_formats": {
-      "hours_minutes": "TODO: Translate \"list_item.duration_formats.hours_minutes\"",
-      "hours_only": "TODO: Translate \"list_item.duration_formats.hours_only\"",
-      "minutes_only": "TODO: Translate \"list_item.duration_formats.minutes_only\""
+      "hours_minutes": "~{{hours}}h {{minutes}}m przygoda",
+      "hours_only": "~{{hours}}h przygoda",
+      "minutes_only": "~{{minutes}}m przygoda"
     }
   },
   "quick_filters": {
-    "in_city": "TODO: Translate \"quick_filters.in_city\"",
-    "my_favorite_systems": "TODO: Translate \"quick_filters.my_favorite_systems\"",
-    "in_my_language": "TODO: Translate \"quick_filters.in_my_language\"",
-    "my_themes": "TODO: Translate \"quick_filters.my_themes\""
+    "in_city": "W {{city}}",
+    "my_favorite_systems": "Moje ulubione systemy",
+    "in_my_language": "W moim języku",
+    "my_themes": "Moje tematy"
   },
   "search": {
-    "title": "TODO: Translate \"search.title\"",
-    "subtitle": "TODO: Translate \"search.subtitle\"",
-    "session": "TODO: Translate \"search.session\"",
-    "sessions": "TODO: Translate \"search.sessions\"",
-    "with_quick_filters": "TODO: Translate \"search.with_quick_filters\"",
+    "title": "Wszystkie sesje gier",
+    "subtitle": "Zaplanuj swoją następną przygodę planszową z publicznymi grami w Twojej okolicy.",
+    "session": "sesja",
+    "sessions": "sesje",
+    "with_quick_filters": "z Twoimi szybkimi filtrami",
     "no_games": {
-      "title": "TODO: Translate \"search.no_games.title\"",
-      "subtitle": "TODO: Translate \"search.no_games.subtitle\"",
-      "become_host": "TODO: Translate \"search.no_games.become_host\""
+      "title": "Obecnie nie znaleziono publicznych gier.",
+      "subtitle": "Sprawdź później lub stwórz konto, aby zorganizować pierwszą sesję w swojej okolicy.",
+      "become_host": "Zostań organizatorem"
     },
     "no_filtered_sessions": {
-      "title": "TODO: Translate \"search.no_filtered_sessions.title\"",
-      "subtitle": "TODO: Translate \"search.no_filtered_sessions.subtitle\""
+      "title": "Żadne sesje nie pasują do Twoich szybkich filtrów.",
+      "subtitle": "Spróbuj dostosować lub wyczyścić filtry, aby przeglądać pełny katalog."
     }
   },
   "game_detail": {
     "unavailable": {
-      "title": "TODO: Translate \"game_detail.unavailable.title\"",
-      "message": "TODO: Translate \"game_detail.unavailable.message\"",
-      "browse_games": "TODO: Translate \"game_detail.unavailable.browse_games\"",
-      "visit_homepage": "TODO: Translate \"game_detail.unavailable.visit_homepage\""
+      "title": "Sesja niedostępna",
+      "message": "Gra, której szukasz, nie przyjmuje już graczy lub mogła zostać usunięta.",
+      "browse_games": "Przeglądaj wszystkie gry",
+      "visit_homepage": "Odwiedź stronę główną"
     },
     "badges": {
-      "public_session": "TODO: Translate \"game_detail.badges.public_session\"",
-      "ongoing_campaign": "TODO: Translate \"game_detail.badges.ongoing_campaign\""
+      "public_session": "Sesja publiczna",
+      "ongoing_campaign": "Trwająca kampania"
     },
-    "hosted_by": "TODO: Translate \"game_detail.hosted_by\"",
-    "community_gm": "TODO: Translate \"game_detail.community_gm\"",
-    "community_rating": "TODO: Translate \"game_detail.community_rating\"",
-    "new_to_community": "TODO: Translate \"game_detail.new_to_community\"",
-    "request_seat": "TODO: Translate \"game_detail.request_seat\"",
-    "applying": "TODO: Translate \"game_detail.applying\"",
-    "sign_in_to_apply": "TODO: Translate \"game_detail.sign_in_to_apply\"",
+    "hosted_by": "Organizowane przez",
+    "community_gm": "MG społeczności",
+    "community_rating": "Ocena społeczności: {{rating}}/5",
+    "new_to_community": "Nowy w społeczności Roundup Games",
+    "request_seat": "Poproś o miejsce",
+    "applying": "Aplikuję...",
+    "sign_in_to_apply": "Zaloguj się, aby aplikować",
     "sections": {
       "table_briefing": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.table_briefing.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.table_briefing.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.table_briefing.subtitle\"",
-        "no_details": "TODO: Translate \"game_detail.sections.table_briefing.no_details\"",
-        "ongoing_campaign": "TODO: Translate \"game_detail.sections.table_briefing.ongoing_campaign\"",
-        "one_shot": "TODO: Translate \"game_detail.sections.table_briefing.one_shot\""
+        "eyebrow": "Briefing stołu",
+        "title": "O tej sesji",
+        "subtitle": "Zapoznaj się z atmosferą stołu przed prośbą o miejsce.",
+        "no_details": "Organizator gry nie udostępnił jeszcze dodatkowych szczegółów.",
+        "ongoing_campaign": "Część trwającej kampanii",
+        "one_shot": "One-shot przyjazny dla ciekawskich graczy"
       },
       "session_logistics": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.session_logistics.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.session_logistics.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.session_logistics.subtitle\"",
-        "date_time": "TODO: Translate \"game_detail.sections.session_logistics.date_time\"",
-        "language": "TODO: Translate \"game_detail.sections.session_logistics.language\"",
-        "price": "TODO: Translate \"game_detail.sections.session_logistics.price\"",
-        "players": "TODO: Translate \"game_detail.sections.session_logistics.players\"",
-        "seats_available": "TODO: Translate \"game_detail.sections.session_logistics.seats_available\"",
-        "seats_open": "TODO: Translate \"game_detail.sections.session_logistics.seats_open\"",
-        "contact_gm": "TODO: Translate \"game_detail.sections.session_logistics.contact_gm\"",
-        "duration": "TODO: Translate \"game_detail.sections.session_logistics.duration\"",
-        "minutes": "TODO: Translate \"game_detail.sections.session_logistics.minutes\"",
-        "gm_will_confirm": "TODO: Translate \"game_detail.sections.session_logistics.gm_will_confirm\"",
-        "meeting_details_notice": "TODO: Translate \"game_detail.sections.session_logistics.meeting_details_notice\""
+        "eyebrow": "Logistyka sesji",
+        "title": "Checklist dojazdu",
+        "subtitle": "Wszystko, co musisz wiedzieć przed dołączeniem do stołu.",
+        "date_time": "Data i godzina",
+        "language": "Język",
+        "price": "Cena",
+        "players": "Gracze",
+        "seats_available": "Dostępne miejsca",
+        "seats_open": "{{count}} wolnych",
+        "contact_gm": "Kontakt z MG",
+        "duration": "Czas trwania",
+        "minutes": "{{count}} min",
+        "gm_will_confirm": "MG potwierdzi",
+        "meeting_details_notice": "Dokładne szczegóły spotkania są udostępniane po potwierdzeniu Twojego miejsca."
       },
       "venue_details": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.venue_details.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.venue_details.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.venue_details.subtitle\""
+        "eyebrow": "Gdzie się spotykamy",
+        "title": "Szczegóły miejsca",
+        "subtitle": "Udostępniamy precyzyjne instrukcje zatwierdzonym graczom."
       },
       "art_inspiration": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.art_inspiration.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.art_inspiration.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.art_inspiration.subtitle\"",
-        "this_system": "TODO: Translate \"game_detail.sections.art_inspiration.this_system\"",
-        "game_system": "TODO: Translate \"game_detail.sections.art_inspiration.game_system\"",
-        "artwork_alt": "TODO: Translate \"game_detail.sections.art_inspiration.artwork_alt\"",
-        "licensed": "TODO: Translate \"game_detail.sections.art_inspiration.licensed\"",
-        "view_details": "TODO: Translate \"game_detail.sections.art_inspiration.view_details\""
+        "eyebrow": "Sztuka i inspiracja",
+        "title": "Wizualna mood board",
+        "subtitle": "Zatwierdzone obrazy wybrane dla {{systemName}}.",
+        "this_system": "tego systemu",
+        "game_system": "System gry",
+        "artwork_alt": "Grafika {{systemName}}",
+        "licensed": "Licencja: {{license}}",
+        "view_details": "Zobacz szczegóły"
       },
       "safety_tools": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.safety_tools.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.safety_tools.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.safety_tools.subtitle\""
+        "eyebrow": "Narzędzia bezpieczeństwa",
+        "title": "Oczekiwania przy stole",
+        "subtitle": "Narzędzia i granice udostępnione przez organizatora gry."
       },
       "system_spotlight": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.system_spotlight.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.system_spotlight.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.system_spotlight.subtitle\"",
-        "show_details": "TODO: Translate \"game_detail.sections.system_spotlight.show_details\"",
-        "hide_details": "TODO: Translate \"game_detail.sections.system_spotlight.hide_details\"",
-        "categories": "TODO: Translate \"game_detail.sections.system_spotlight.categories\"",
-        "mechanics": "TODO: Translate \"game_detail.sections.system_spotlight.mechanics\"",
-        "external_references": "TODO: Translate \"game_detail.sections.system_spotlight.external_references\"",
-        "no_summary": "TODO: Translate \"game_detail.sections.system_spotlight.no_summary\"",
-        "explore_full_profile": "TODO: Translate \"game_detail.sections.system_spotlight.explore_full_profile\""
+        "eyebrow": "Reflektor na system",
+        "title": "O {{systemName}}",
+        "subtitle": "Z biblioteki systemów Roundup Games.",
+        "show_details": "Pokaż szczegóły",
+        "hide_details": "Ukryj szczegóły",
+        "categories": "Kategorie",
+        "mechanics": "Mechaniki",
+        "external_references": "Referencje zewnętrzne",
+        "no_summary": "Wciąż zbieramy informacje o tym systemie – sprawdź niedługo ponownie.",
+        "explore_full_profile": "Odkryj pełen profil systemu »"
       },
       "host_snapshot": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.host_snapshot.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.host_snapshot.title\"",
-        "subtitle": "TODO: Translate \"game_detail.sections.host_snapshot.subtitle\"",
-        "organizer_details_soon": "TODO: Translate \"game_detail.sections.host_snapshot.organizer_details_soon\""
+        "eyebrow": "Zdjęcie organizatora",
+        "title": "Organizator gry",
+        "subtitle": "Poznaj swojego opowiadacza historii przed przybyciem.",
+        "organizer_details_soon": "Udostępnimy szczegóły organizatora, gdy harmonogram zostanie potwierdzony."
       },
       "system_facts": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.system_facts.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.system_facts.title\"",
-        "players": "TODO: Translate \"game_detail.sections.system_facts.players\"",
-        "optimal_table": "TODO: Translate \"game_detail.sections.system_facts.optimal_table\"",
-        "average_session": "TODO: Translate \"game_detail.sections.system_facts.average_session\"",
-        "first_published": "TODO: Translate \"game_detail.sections.system_facts.first_published\"",
-        "age_rating": "TODO: Translate \"game_detail.sections.system_facts.age_rating\"",
-        "age_rating_tooltip": "TODO: Translate \"game_detail.sections.system_facts.age_rating_tooltip\"",
-        "complexity": "TODO: Translate \"game_detail.sections.system_facts.complexity\"",
-        "players_suffix": "TODO: Translate \"game_detail.sections.system_facts.players_suffix\""
+        "eyebrow": "Szybkie fakty o systemie",
+        "title": "Przegląd zasad",
+        "players": "Gracze",
+        "optimal_table": "Optymalny stół",
+        "average_session": "Średnia sesja",
+        "first_published": "Pierwsze wydanie",
+        "age_rating": "Ocena wiekowa",
+        "age_rating_tooltip": "Zalecany minimalny wiek na podstawie tematów i mechanik.",
+        "complexity": "Złożoność",
+        "players_suffix": "{{count}} graczy"
       },
       "reserve_seat": {
-        "eyebrow": "TODO: Translate \"game_detail.sections.reserve_seat.eyebrow\"",
-        "title": "TODO: Translate \"game_detail.sections.reserve_seat.title\"",
-        "cost_per_player": "TODO: Translate \"game_detail.sections.reserve_seat.cost_per_player\"",
-        "applications_closed": "TODO: Translate \"game_detail.sections.reserve_seat.applications_closed\"",
-        "apply_to_join": "TODO: Translate \"game_detail.sections.reserve_seat.apply_to_join\""
+        "eyebrow": "Gotowy do dołączenia?",
+        "title": "Zarezerwuj swoje miejsce",
+        "cost_per_player": "Koszt na gracza:",
+        "applications_closed": "Aplikacje do tej sesji są obecnie zamknięte.",
+        "apply_to_join": "Aplikuj o dołączenie"
       }
     }
   },
   "my_games": {
-    "title": "TODO: Translate \"my_games.title\"",
-    "subtitle": "TODO: Translate \"my_games.subtitle\"",
-    "filter_by_status": "TODO: Translate \"my_games.filter_by_status\"",
-    "filter_by_role": "TODO: Translate \"my_games.filter_by_role\"",
-    "create_new_game": "TODO: Translate \"my_games.create_new_game\"",
-    "no_games_title": "TODO: Translate \"my_games.no_games_title\"",
-    "no_games_subtitle": "TODO: Translate \"my_games.no_games_subtitle\"",
+    "title": "Moje gry",
+    "subtitle": "Zarządzaj swoimi sesjami gier",
+    "filter_by_status": "Filtruj po statusie",
+    "filter_by_role": "Filtruj po roli",
+    "create_new_game": "Stwórz nową grę",
+    "no_games_title": "Jeszcze nie ma gier",
+    "no_games_subtitle": "Stwórz swoją pierwszą sesję gry, aby zacząć",
     "pagination": {
-      "page_info": "TODO: Translate \"my_games.pagination.page_info\""
+      "page_info": "Strona {{current}} z {{total}} • {{count}} łącznie"
     },
     "status_labels": {
-      "scheduled": "TODO: Translate \"my_games.status_labels.scheduled\"",
-      "completed": "TODO: Translate \"my_games.status_labels.completed\"",
-      "canceled": "TODO: Translate \"my_games.status_labels.canceled\""
+      "scheduled": "Zaplanowane",
+      "completed": "Ukończone",
+      "canceled": "Odwołane"
     },
     "role_labels": {
-      "owner": "TODO: Translate \"my_games.role_labels.owner\"",
-      "player": "TODO: Translate \"my_games.role_labels.player\"",
-      "invited": "TODO: Translate \"my_games.role_labels.invited\"",
-      "requested": "TODO: Translate \"my_games.role_labels.requested\""
+      "owner": "Organizator",
+      "player": "Uczestnik",
+      "invited": "Zaproszony",
+      "requested": "Proszący"
     },
     "errors": {
-      "load_failed": "TODO: Translate \"my_games.errors.load_failed\"",
-      "update_failed": "TODO: Translate \"my_games.errors.update_failed\"",
-      "unexpected_error": "TODO: Translate \"my_games.errors.unexpected_error\"",
-      "status_updated": "TODO: Translate \"my_games.errors.status_updated\""
+      "load_failed": "Nie udało się załadować gier.",
+      "update_failed": "Nie udało się zaktualizować statusu",
+      "unexpected_error": "Wystąpił nieoczekiwany błąd",
+      "status_updated": "Status gry zaktualizowany"
     },
     "list": {
-      "participants_count": "TODO: Translate \"my_games.list.participants_count\"",
-      "view_button": "TODO: Translate \"my_games.list.view_button\""
+      "participants_count": "{{count}} uczestnik{{count, plural, =1 {} ów {ów}}}",
+      "view_button": "Zobacz"
     }
   }
 }

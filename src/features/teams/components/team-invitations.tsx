@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -7,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { acceptTeamInvite, declineTeamInvite } from "~/features/teams/teams.mutations";
 import type { PendingTeamInvite } from "~/features/teams/teams.queries";
 import { useTeamsTranslation } from "~/hooks/useTypedTranslation";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 import { cn } from "~/shared/lib/utils";
 
 export interface TeamInvitationsSectionProps {
@@ -14,7 +14,7 @@ export interface TeamInvitationsSectionProps {
 }
 
 export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps) {
-  const { t } = useTeamsTranslation();
+  const { t, currentLanguage } = useTeamsTranslation();
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -146,7 +146,9 @@ export function TeamInvitationsSection({ invites }: TeamInvitationsSectionProps)
                   {activityTimestamp && activityLabel && (
                     <p className="text-muted-foreground mt-1 text-sm">
                       {activityLabel}{" "}
-                      {formatDistanceToNow(activityTimestamp, { addSuffix: true })}
+                      {formatDistanceToNowLocalized(activityTimestamp, currentLanguage, {
+                        addSuffix: true,
+                      })}
                     </p>
                   )}
                   {invite.inviter?.name && (

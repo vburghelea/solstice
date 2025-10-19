@@ -1,78 +1,83 @@
 {
   "hero": {
-    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
-    "title": "TODO: Translate \"hero.title\"",
-    "subtitle": "TODO: Translate \"hero.subtitle\"",
-    "cta_text": "TODO: Translate \"hero.cta_text\"",
-    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+    "eyebrow": "Über Roundup Games",
+    "title": "Eine Plattform für lokale Treffpunkte rund um Brettspiele und Gesellschaftsspiele.",
+    "subtitle": "Wir existieren, um es für jeden Besucher einfacher zu machen, einen lebendigen Raum zu betreten, Würfel zu werfen und mit mehr Menschen in Kontakt zu treten, die sich für ihre Geschichten interessieren.",
+    "cta_text": "Entdecke unsere Programme",
+    "secondary_cta": "Lerne unsere Teams kennen"
   },
   "mission": {
-    "eyebrow": "TODO: Translate \"mission.eyebrow\"",
-    "title": "TODO: Translate \"mission.title\"",
-    "description_1": "TODO: Translate \"mission.description_1\"",
-    "description_2": "TODO: Translate \"mission.description_2\"",
+    "eyebrow": "Unsere Mission",
+    "title": "Einsamkeit mit fröhlichem, echtem Spiel bekämpfen",
+    "description_1": "Roundup Games wurde für Menschen wie Dich geschaffen, die sich nach Verbindung sehnen, so sehr wie sie nach cleveren Mechanismen und kollaborativem Geschichtenerzählen streben. Wir pflegen lokale Erlebnisse, die warmherzig, entspannt und durchdacht moderiert sind, damit Du ankommen kannst wie Du bist und Dich sofort gesehen fühlst.",
+    "description_2": "Indem wir Skill-Sharing-Sessions, Mentorship-Kreise und wechselnde Kampagnen veranstalten, geben wir Geschichtenerzählern den Raum, den sie benötigen, um ihr Handwerk zu perfektionieren und gleichzeitig das Publikum in kühne neue Welten einzuführen. Jede Initiative, die wir starten, wird von dem Glauben geleitet, dass Spielen ein grundlegendes menschliches Bedürfnis ist – und eines der stärksten Mittel gegen Langeweile und Einsamkeit.",
     "highlights": {
       "belonging": {
-        "title": "TODO: Translate \"mission.highlights.belonging.title\"",
-        "description": "TODO: Translate \"mission.highlights.belonging.description\""
+        "title": "Zugehörigkeit an jedem Tisch",
+        "description": "Wir verbinden Neulinge, Veteranen und neugierige Besucher mit einladenden Gastgebern, damit niemand wieder einen stillen Abend allein verbringen muss."
       },
       "storytellers": {
-        "title": "TODO: Translate \"mission.highlights.storytellers.title\"",
-        "description": "TODO: Translate \"mission.highlights.storytellers.description\""
+        "title": "Bühnen für Geschichtenerzähler",
+        "description": "Roundup Games schafft probebereite Räume, in denen Game-Master ihr Handwerk üben, Coaching erhalten und ihre Narrative einem engagierten Publikum präsentieren können."
       },
       "purpose": {
-        "title": "TODO: Translate \"mission.highlights.purpose.title\"",
-        "description": "TODO: Translate \"mission.highlights.purpose.description\""
+        "title": "Mit Absicht spielen",
+        "description": "Jedes Treffen ist darauf ausgelegt, Lachen, Neugier und langanhaltende Freundschaften durch durchdachte Brett- und Gesellschaftsspielerlebnisse zu entfachen."
       }
     }
   },
   "vision": {
-    "eyebrow": "TODO: Translate \"vision.eyebrow\"",
-    "title": "TODO: Translate \"vision.title\"",
-    "description_1": "TODO: Translate \"vision.description_1\"",
-    "description_2": "TODO: Translate \"vision.description_2\"",
-    "commitments": "TODO: Translate \"vision.commitments\""
+    "eyebrow": "Unsere Vision",
+    "title": "Sicherheitsfirst-Design für Treffpunkte und Daten",
+    "description_1": "Vertrauen ist das Fundament jeder Roundup-Erfahrung. Wir schaffen mutige Räume, in denen Teilnehmer sich ohne Sorgen um physischen, emotionalen oder digitalen Schaden in die Geschichte vertiefen können. Dieses Engagement beginnt mit geschultem Personal vor Ort und erstreckt sich darauf, wie wir Deine Informationen im Hintergrund speichern, berechtigen und nutzen.",
+    "description_2": "Unsere Plattform entwickelt sich kontinuierlich weiter, um den Erwartungen unserer Community und Partner gerecht zu werden. Wir investieren in transparente Berichterstattung, verantwortungsvolle KI-Tools und kollaborative Richtlinienüberprüfungen mit Experten in den Bereichen Schutz, Barrierefreiheit und Cybersicherheit.",
+    "commitments": [
+      "Dedizierte Community-Betreuer und geschulte Moderatoren bei jedem sanktionierten Event.",
+      "Sicherheitstools – von Zustimmungs-Check-ins bis hin zu Debriefing-Kreisen – in das Session-Design integriert.",
+      "Privatsphäre-first Datenpraktiken mit verschlüsselter Speicherung, minimaler Aufbewahrung und transparenter Verwaltung.",
+      "Kontinuierliche Audits mit Partnern, die sich auf den Schutz schutzbedürftiger Gemeinschaften spezialisieren."
+    ]
   },
   "stories_insights": {
-    "eyebrow": "TODO: Translate \"stories_insights.eyebrow\"",
-    "title": "TODO: Translate \"stories_insights.title\"",
-    "subtitle": "TODO: Translate \"stories_insights.subtitle\"",
+    "eyebrow": "Geschichten & Einblicke",
+    "title": "Artikel kommen bald",
+    "subtitle": "Wir stellen eine Bibliothek mit Essays, Interviews und Fortschritts-Updates zusammen, damit Du verfolgen kannst, wie die Roundup Games Vision in verschiedenen Regionen Realität wird.",
     "articles": {
       "mission_practice": {
-        "title": "TODO: Translate \"stories_insights.articles.mission_practice.title\"",
-        "description": "TODO: Translate \"stories_insights.articles.mission_practice.description\""
+        "title": "Mission in der Praxis",
+        "description": "Geschichten von lokalen Chapters, die leere Mittwochabende in lebendige, generationsübergreifende Treffpunkte verwandeln."
       },
       "vision_safety": {
-        "title": "TODO: Translate \"stories_insights.articles.vision_safety.title\"",
-        "description": "TODO: Translate \"stories_insights.articles.vision_safety.description\""
+        "title": "Vision und Sicherheitsstandards",
+        "description": "Tiefgehende Einblicke in die Richtlinien, Partner und Tools, die unsere Community mutig und respektiert fühlen lassen."
       },
       "roadmap_impact": {
-        "title": "TODO: Translate \"stories_insights.articles.roadmap_impact.title\"",
-        "description": "TODO: Translate \"stories_insights.articles.roadmap_impact.description\""
+        "title": "Roadmap & Wirkungsberichte",
+        "description": "Quartalsweise Updates zu neuen Plattform-Features, regionalen Starts und den Kennzahlen, die unsere Entscheidungen leiten."
       }
     },
-    "publishing_soon": "TODO: Translate \"stories_insights.publishing_soon\""
+    "publishing_soon": "Veröffentlichung beginnt bald"
   },
   "feedback": {
-    "eyebrow": "TODO: Translate \"feedback.eyebrow\"",
-    "title": "TODO: Translate \"feedback.title\"",
-    "description": "TODO: Translate \"feedback.description\"",
-    "email": "TODO: Translate \"feedback.email\"",
-    "email_description": "TODO: Translate \"feedback.email_description\"",
+    "eyebrow": "Teile Deine Stimme",
+    "title": "Feedback-Kanäle öffnen bald",
+    "description": "Wir entwerfen ein Feedback-Portal, in dem Du neue Ideen befürworten, Bedenken melden und uns helfen kannst, jede Erfahrung zu verfeinern. Bis zum Start kannst Du eine E-Mail senden an",
+    "email": "hello@roundup.games",
+    "email_description": "unser Community-Team wird Deine Nachricht an die richtigen Personen weiterleiten.",
     "topics": {
       "suggest_system": {
-        "title": "TODO: Translate \"feedback.topics.suggest_system.title\"",
-        "description": "TODO: Translate \"feedback.topics.suggest_system.description\""
+        "title": "Ein neues Spielsystem vorschlagen",
+        "description": "Hilf uns, Regelwerke und Universen zu präsentieren, die Deine Tische begeistern und unsere Bibliothek an Abenteuern erweitern."
       },
       "nominate_venue": {
-        "title": "TODO: Translate \"feedback.topics.nominate_venue.title\"",
-        "description": "TODO: Translate \"feedback.topics.nominate_venue.description\""
+        "title": "Einen Ort vorschlagen",
+        "description": "Erzähl uns von Cafés, Bibliotheken und Gemeinschaftsräumen, die unglaubliche Treffpunkte wären."
       },
       "report_issue": {
-        "title": "TODO: Translate \"feedback.topics.report_issue.title\"",
-        "description": "TODO: Translate \"feedback.topics.report_issue.description\""
+        "title": "Ein Plattformproblem melden",
+        "description": "Teile Bugs, Bedenken zur Barrierefreiheit oder Inhaltsanfragen mit, damit wir das digitale Erlebnis kontinuierlich verbessern können."
       }
     },
-    "feedback_form_soon": "TODO: Translate \"feedback.feedback_form_soon\""
+    "feedback_form_soon": "Feedback-Formular startet bald"
   }
 }

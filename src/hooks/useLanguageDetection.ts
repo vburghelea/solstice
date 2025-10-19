@@ -1,4 +1,5 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { SupportedLanguage, i18nConfig } from "~/lib/i18n/config";
@@ -7,6 +8,7 @@ import {
   getCurrentLanguage,
   storeLanguagePreference,
 } from "~/lib/i18n/detector";
+import i18n from "~/lib/i18n/i18n";
 import { UserLanguagePreferences } from "~/lib/i18n/types";
 
 /**
@@ -82,6 +84,9 @@ export const useLanguageDetection = (path?: string) => {
 
   // Change language function
   const changeLanguage = async (language: SupportedLanguage) => {
+    // Change i18n language first
+    await i18n.changeLanguage(language);
+
     // Store in localStorage and cookie
     storeLanguagePreference(language);
 
@@ -151,8 +156,9 @@ export const useLocalizedUrl = () => {
 /**
  * Hook for language switching with URL updates
  */
-export const useLanguageSwitcher = () => {
-  const { currentLanguage, changeLanguage, isUpdating } = useLanguageDetection();
+export const useLanguageSwitcher = (path?: string) => {
+  const router = useRouter();
+  const { currentLanguage, changeLanguage, isUpdating } = useLanguageDetection(path);
   const { getLocalizedUrl } = useLocalizedUrl();
 
   const switchLanguage = async (language: SupportedLanguage) => {
@@ -162,8 +168,7 @@ export const useLanguageSwitcher = () => {
 
     // Update URL without page reload
     if (typeof window !== "undefined") {
-      window.history.pushState({}, "", localizedUrl);
-      // Trigger a custom event for components that need to react to URL changes
+      router.history.push(localizedUrl);
       window.dispatchEvent(
         new CustomEvent("languageChanged", {
           detail: { language, url: localizedUrl },

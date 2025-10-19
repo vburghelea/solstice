@@ -166,7 +166,7 @@ This command:
 2. **Check Types**: Run `pnpm check-types` to ensure type safety
 3. **Test Translations**: Verify translation keys work correctly
 4. **Update Documentation**: Keep docs synchronized with codebase changes
-5. **Bulk Copy**: Run `cp -rf src/lib/i18n/locales/ public/` to copy all locale files
+5. **Bulk Copy**: Run `cp -rf src/lib/i18n/locales/* public/locales/` to copy all locale files
 
 This approach ensures authentic, meaningful translations that reflect the actual user experience across all languages with zero maintenance overhead for type definitions.
 

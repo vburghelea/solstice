@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import {
   AlertTriangleIcon,
   CheckIcon,
@@ -9,6 +8,7 @@ import {
   ToggleRightIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -189,7 +189,7 @@ function FeatureFlagSkeleton() {
 }
 
 export function AdminFeatureFlagConsole() {
-  const { t } = useAdminTranslation();
+  const { t, currentLanguage } = useAdminTranslation();
   const [customKey, setCustomKey] = useState("");
   const [customFlags, setCustomFlags] = useState<string[]>([]);
   const { data, isLoading, isError, error, refetch, isRefetching } =
@@ -327,7 +327,9 @@ export function AdminFeatureFlagConsole() {
         {data?.flags.length ? (
           <p className="text-body-xs text-muted-foreground border-border/60 border-t pt-2">
             Environment snapshot refreshed{" "}
-            {formatDistanceToNow(new Date(), { addSuffix: true })}
+            {formatDistanceToNowLocalized(new Date(), currentLanguage, {
+              addSuffix: true,
+            })}
           </p>
         ) : null}
       </CardContent>

@@ -2,8 +2,12 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { ReactNode, useState } from "react";
 
+import { LanguageSwitcher } from "~/components/LanguageSwitcher";
 import { Avatar } from "~/components/ui/avatar";
-import { useCommonTranslation } from "~/hooks/useTypedTranslation";
+import {
+  useCommonTranslation,
+  useNavigationTranslation,
+} from "~/hooks/useTypedTranslation";
 import type { AuthUser } from "~/lib/auth/types";
 import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
@@ -31,14 +35,15 @@ interface VisitorShellProps {
 
 export function VisitorShell({ children, contentClassName }: VisitorShellProps) {
   const { t } = useCommonTranslation();
+  const { t: navT } = useNavigationTranslation();
   const { location } = useRouterState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
 
   const dynamicNavigation = VISITOR_NAVIGATION.map((item) => ({
     ...item,
-    label: t(
-      `navigation.${item.to === "/" ? "home" : item.to === "/search" ? "find_games" : item.to === "/systems" ? "game_systems" : item.to.replace("/", "")}`,
+    label: navT(
+      `main.${item.to === "/" ? "home" : item.to === "/search" ? "find_games" : item.to === "/systems" ? "game_systems" : item.to.replace("/", "")}`,
     ),
   }));
 
@@ -77,7 +82,8 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
               </Link>
             ))}
           </nav>
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-3 md:flex">
+            <LanguageSwitcher variant="compact" showLabel={false} />
             {user ? (
               <Link
                 to="/player"
@@ -99,13 +105,13 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                   to="/auth/login"
                   className="text-muted-foreground hover:text-foreground text-sm font-semibold transition"
                 >
-                  {t("buttons.sign_in")}
+                  {navT("user.login")}
                 </Link>
                 <Link
                   to="/auth/signup"
                   className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition"
                 >
-                  {t("buttons.create_profile")}
+                  {navT("user.signup")}
                 </Link>
               </>
             )}
@@ -159,6 +165,9 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                 </Link>
               ))}
               <div className="mt-3 flex flex-col gap-2">
+                <div className="flex justify-center">
+                  <LanguageSwitcher variant="flags" />
+                </div>
                 {user ? (
                   <Link
                     to="/player"
@@ -182,14 +191,14 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                       className="text-muted-foreground hover:text-foreground rounded-full px-4 py-2 text-sm font-semibold transition"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      {t("buttons.sign_in")}
+                      {navT("user.login")}
                     </Link>
                     <Link
                       to="/auth/signup"
                       className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      {t("buttons.create_profile")}
+                      {navT("user.signup")}
                     </Link>
                   </>
                 )}

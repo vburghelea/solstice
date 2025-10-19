@@ -1,75 +1,75 @@
 {
-  "title": "TODO: Translate \"title\"",
-  "subtitle": "TODO: Translate \"subtitle\"",
+  "title": "Współpraca",
+  "subtitle": "Współpraca i raportowanie między obszarami",
   "workspace": {
-    "loading": "TODO: Translate \"workspace.loading\"",
-    "loading_description": "TODO: Translate \"workspace.loading_description\"",
-    "unable_to_load": "TODO: Translate \"workspace.unable_to_load\"",
-    "unable_to_load_description": "TODO: Translate \"workspace.unable_to_load_description\"",
-    "beta_badge": "TODO: Translate \"workspace.beta_badge\"",
-    "title": "TODO: Translate \"workspace.title\"",
-    "description": "TODO: Translate \"workspace.description\"",
-    "updated_label": "TODO: Translate \"workspace.updated_label\"",
+    "loading": "Ładowanie informacji o współpracy",
+    "loading_description": "Gromadzenie aktualnych metryk z obszarów graczy, operacji, GM i administratorów.",
+    "unable_to_load": "Nie udało się załadować danych współpracy",
+    "unable_to_load_description": "Odśwież stronę, aby spróbować ponownie. Jeśli problem nadal występuje, skontaktuj się z zespołem platformy.",
+    "beta_badge": "Hub współpracy",
+    "title": "Raportowanie i feedback między obszarami",
+    "description": "Dopasuj się do różnych ról, nie opuszczając swojego obszaru.",
+    "updated_label": "Zaktualizowano",
     "filters": {
-      "all": "TODO: Translate \"workspace.filters.all\""
+      "all": "Wszystkie role"
     }
   },
   "sections": {
     "metrics": {
-      "title": "TODO: Translate \"sections.metrics.title\"",
-      "description": "TODO: Translate \"sections.metrics.description\"",
-      "review_threads": "TODO: Translate \"sections.metrics.review_threads\"",
-      "persona_impact": "TODO: Translate \"sections.metrics.persona_impact\""
+      "title": "Wspólne metryki raportowania",
+      "description": "Śledź, jak eksperymenty w jednym obszarze wpływają na wyniki w innych.",
+      "review_threads": "Przejrzyj wspólne wątki",
+      "persona_impact": "Wpływ ról"
     },
     "alignment": {
-      "title": "TODO: Translate \"sections.alignment.title\"",
-      "description": "TODO: Translate \"sections.alignment.description\"",
-      "alignment_label": "TODO: Translate \"sections.alignment.alignment_label\"",
-      "needs_attention": "TODO: Translate \"sections.alignment.needs_attention\"",
-      "confidence_suffix": "TODO: Translate \"sections.alignment.confidence_suffix\"",
-      "key_signals": "TODO: Translate \"sections.alignment.key_signals\"",
-      "open_questions": "TODO: Translate \"sections.alignment.open_questions\"",
-      "signals_description": "TODO: Translate \"sections.alignment.signals_description\""
+      "title": "Skupienie na dopasowaniu ról",
+      "description": "Pokaż, na co zwracają uwagę poszczególne role i gdzie współpraca wymaga wzmocnienia.",
+      "alignment_label": "Dopasowanie",
+      "needs_attention": "Wymaga uwagi",
+      "confidence_suffix": "pewności",
+      "key_signals": "Kluczowe sygnały",
+      "open_questions": "Otwarte pytania",
+      "signals_description": "Sygnały i otwarte pytania pomagają zespołowi planować kolejne eksperymenty."
     },
     "rhythms": {
-      "title": "TODO: Translate \"sections.rhythms.title\"",
-      "description": "TODO: Translate \"sections.rhythms.description\"",
-      "next_touchpoint": "TODO: Translate \"sections.rhythms.next_touchpoint\"",
-      "status": "TODO: Translate \"sections.rhythms.status\"",
-      "linked_threads": "TODO: Translate \"sections.rhythms.linked_threads\""
+      "title": "Rytmy współpracy",
+      "description": "Rytuały, które utrzymują role w zgodzie, połączone z wspólnymi wątkami skrzynki odbiorczej, które kierują decyzjami.",
+      "next_touchpoint": "Następny punkt kontaktowy",
+      "status": "Status",
+      "linked_threads": "Powiązane wątki"
     },
     "feedback": {
-      "title": "TODO: Translate \"sections.feedback.title\"",
-      "description": "TODO: Translate \"sections.feedback.description\"",
-      "participation": "TODO: Translate \"sections.feedback.participation\"",
-      "backlog_status": "TODO: Translate \"sections.feedback.backlog_status\"",
-      "updated": "TODO: Translate \"sections.feedback.updated\"",
-      "highlights": "TODO: Translate \"sections.feedback.highlights\"",
-      "quick_reactions": "TODO: Translate \"sections.feedback.quick_reactions\"",
-      "reaction_saved": "TODO: Translate \"sections.feedback.reaction_saved\"",
-      "create_account": "TODO: Translate \"sections.feedback.create_account\""
+      "title": "Pętle zbierania feedbacku",
+      "description": "Ankiety pulsacyjne i szybkie reakcje trafiają bezpośrednio do backlogu, aby opiekunowie platformy mogli szybko reagować.",
+      "participation": "Udział",
+      "backlog_status": "Status backlogu:",
+      "updated": "Zaktualizowano",
+      "highlights": "Najważniejsze momenty",
+      "quick_reactions": "Szybkie reakcje",
+      "reaction_saved": "Twoja reakcja została zapisana w dzienniku eksperymentów backlogu – Jordan i Priya zobaczą ją podczas następnej synchronizacji zarządzania.",
+      "create_account": "Utwórz konto, aby rejestrować reakcje, które dotrą do zespołu platformy."
     }
   },
   "personas": {
-    "player": "TODO: Translate \"personas.player\"",
-    "ops": "TODO: Translate \"personas.ops\"",
-    "gm": "TODO: Translate \"personas.gm\"",
-    "admin": "TODO: Translate \"personas.admin\""
+    "player": "Gracz",
+    "ops": "Operacje",
+    "gm": "Mistrz Gry",
+    "admin": "Administrator platformy"
   },
   "status": {
-    "triaged": "TODO: Translate \"status.triaged\"",
-    "in_progress": "TODO: Translate \"status.in_progress\"",
-    "shipped": "TODO: Translate \"status.shipped\"",
-    "on_track": "TODO: Translate \"status.on_track\"",
-    "at_risk": "TODO: Translate \"status.at_risk\"",
-    "off_track": "TODO: Translate \"status.off_track\""
+    "triaged": "Skategoryzowane",
+    "in_progress": "W toku",
+    "shipped": "Opublikowane",
+    "on_track": "Na dobrej drodze",
+    "at_risk": "Ryzykowne",
+    "off_track": "Zboczone z drogi"
   },
   "sentiment": {
-    "positive": "TODO: Translate \"sentiment.positive\"",
-    "neutral": "TODO: Translate \"sentiment.neutral\"",
-    "concerned": "TODO: Translate \"sentiment.concerned\""
+    "positive": "Pozytywna dynamika",
+    "neutral": "Neutralna ocena",
+    "concerned": "Wymaga dalszych działań"
   },
   "errors": {
-    "load_snapshot_failed": "TODO: Translate \"errors.load_snapshot_failed\""
+    "load_snapshot_failed": "Nie udało się załadować migawki"
   }
 }

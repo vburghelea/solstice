@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupportedLanguage } from "../config";
 import {
+  createDateFormatter,
+  DATE_FORMATS,
+  formatDateLocalized,
+  formatDateWithPattern,
+  formatDistanceToNowLocalized,
+  getDateLocale,
   getLanguageInfo,
   getSupportedLanguages,
   isLanguageRTL,
@@ -140,6 +146,146 @@ describe("i18n Utils", () => {
       ]);
       expect(result.valid).toBe(false);
       expect(result.missing).toContain("buttons.cancel");
+    });
+  });
+
+  describe("Date Formatting Utilities", () => {
+    const testDate = new Date(2023, 0, 1, 12, 0, 0); // January 1, 2023, 12:00 PM
+
+    describe("getDateLocale", () => {
+      it("should return undefined for English (default)", () => {
+        const locale = getDateLocale("en");
+        expect(locale).toBeUndefined();
+      });
+
+      it("should return German locale for German", () => {
+        const locale = getDateLocale("de");
+        expect(locale).toBeDefined();
+        expect(locale?.code).toBe("de");
+      });
+
+      it("should return Polish locale for Polish", () => {
+        const locale = getDateLocale("pl");
+        expect(locale).toBeDefined();
+        expect(locale?.code).toBe("pl");
+      });
+
+      it("should return undefined for unsupported language", () => {
+        const locale = getDateLocale("fr" as SupportedLanguage);
+        expect(locale).toBeUndefined();
+      });
+    });
+
+    describe("formatDistanceToNowLocalized", () => {
+      // Mock the current date for consistent testing
+      const mockNow = new Date(2023, 0, 1, 15, 0, 0); // 3:00 PM
+
+      beforeEach(() => {
+        // Mock Date.now() to return a consistent timestamp
+        vi.useFakeTimers();
+        vi.setSystemTime(mockNow);
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      it("should format time in English by default", () => {
+        const pastDate = new Date(2023, 0, 1, 13, 0, 0); // 1:00 PM (2 hours ago)
+        const result = formatDistanceToNowLocalized(pastDate);
+        expect(result).toBe("about 2 hours ago");
+      });
+
+      it("should format time in German when language is de", () => {
+        const pastDate = new Date(2023, 0, 1, 13, 0, 0); // 1:00 PM (2 hours ago)
+        const result = formatDistanceToNowLocalized(pastDate, "de");
+        expect(result).toMatch(/vor/); // German relative time contains "vor"
+      });
+
+      it("should format time in Polish when language is pl", () => {
+        const pastDate = new Date(2023, 0, 1, 13, 0, 0); // 1:00 PM (2 hours ago)
+        const result = formatDistanceToNowLocalized(pastDate, "pl");
+        expect(result).toMatch(/temu/); // Polish relative time contains "temu"
+      });
+
+      it("should support custom options", () => {
+        const pastDate = new Date(2023, 0, 1, 13, 0, 0); // 1:00 PM (2 hours ago)
+        const result = formatDistanceToNowLocalized(pastDate, "en", { addSuffix: false });
+        expect(result).toBe("about 2 hours");
+      });
+    });
+
+    describe("formatDateLocalized", () => {
+      it("should format date in English by default", () => {
+        const result = formatDateLocalized(testDate, "MMMM d, yyyy");
+        expect(result).toBe("January 1, 2023");
+      });
+
+      it("should format date in German when language is de", () => {
+        const result = formatDateLocalized(testDate, "MMMM d, yyyy", "de");
+        expect(result).toBe("Januar 1, 2023");
+      });
+
+      it("should format date in Polish when language is pl", () => {
+        const result = formatDateLocalized(testDate, "MMMM d, yyyy", "pl");
+        expect(result).toBe("stycznia 1, 2023");
+      });
+    });
+
+    describe("formatDateWithPattern", () => {
+      it("should format date using SHORT pattern", () => {
+        const result = formatDateWithPattern(testDate, "SHORT");
+        expect(result).toBe("Jan 1, 2023");
+      });
+
+      it("should format date using MEDIUM pattern in German", () => {
+        const result = formatDateWithPattern(testDate, "MEDIUM", "de");
+        expect(result).toBe("Januar 1, 2023");
+      });
+
+      it("should format date using LONG pattern in Polish", () => {
+        const result = formatDateWithPattern(testDate, "LONG", "pl");
+        expect(result).toMatch(/stycznia/); // Contains month name in Polish
+      });
+    });
+
+    describe("createDateFormatter", () => {
+      it("should create a formatter for English", () => {
+        const formatter = createDateFormatter("en");
+        expect(formatter.format(testDate, "MMMM d, yyyy")).toBe("January 1, 2023");
+        expect(formatter.formatWithPattern(testDate, "SHORT")).toBe("Jan 1, 2023");
+      });
+
+      it("should create a formatter for German", () => {
+        const formatter = createDateFormatter("de");
+        expect(formatter.format(testDate, "MMMM d, yyyy")).toBe("Januar 1, 2023");
+        expect(formatter.formatWithPattern(testDate, "SHORT")).toBe("Jan. 1, 2023");
+      });
+
+      it("should create a formatter for Polish", () => {
+        const formatter = createDateFormatter("pl");
+        expect(formatter.format(testDate, "MMMM d, yyyy")).toBe("stycznia 1, 2023");
+        expect(formatter.formatWithPattern(testDate, "SHORT")).toBe("sty 1, 2023");
+      });
+    });
+
+    describe("DATE_FORMATS constants", () => {
+      it("should have all expected format patterns", () => {
+        expect(DATE_FORMATS).toHaveProperty("SHORT");
+        expect(DATE_FORMATS).toHaveProperty("MEDIUM");
+        expect(DATE_FORMATS).toHaveProperty("LONG");
+        expect(DATE_FORMATS).toHaveProperty("FULL");
+        expect(DATE_FORMATS).toHaveProperty("TIME_ONLY");
+        expect(DATE_FORMATS).toHaveProperty("DATE_ONLY");
+        expect(DATE_FORMATS).toHaveProperty("DATETIME_SHORT");
+      });
+
+      it("should have valid date format strings", () => {
+        Object.values(DATE_FORMATS).forEach((format) => {
+          expect(typeof format).toBe("string");
+          expect(format.length).toBeGreaterThan(0);
+        });
+      });
     });
   });
 });

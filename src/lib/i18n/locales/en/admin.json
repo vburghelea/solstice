@@ -365,6 +365,16 @@
       "permissions": "Permissions",
       "no_expiration": "No expiration",
       "remove_access": "Remove"
+    },
+    "risk_flags": {
+      "email_not_verified": "Email not verified",
+      "mfa_not_enrolled": "MFA not enrolled",
+      "membership_not_active": "Membership not active"
+    },
+    "audit_trail": {
+      "role_granted": "{{roleName}} granted",
+      "membership_status": "Membership {{status}}",
+      "last_active": "Last active"
     }
   },
   "social_audits": {
@@ -436,10 +446,6 @@
       "confirm": "Confirm",
       "cancel": "Cancel"
     },
-    "dialog": {
-      "confirm_enable_safeguard": "Confirm the safeguard is ready before enabling it for all privileged personas.",
-      "confirm_disable_control": "Disabling this control removes real-time guardrails. Capture justification for the audit trail."
-    },
     "status": {
       "stable_governance_posture": "Stable governance posture",
       "heightened_monitoring": "Heightened monitoring",
@@ -503,6 +509,8 @@
       "enable_description": "Confirm the safeguard is ready before enabling it for all privileged personas.",
       "disable_description": "Disabling this control removes real-time guardrails. Capture justification for the audit trail.",
       "provide_context": "Provide context for the audit log so we can trace stewardship decisions.",
+      "confirm_enable_safeguard": "Confirm the safeguard is ready before enabling it for all privileged personas.",
+      "confirm_disable_control": "Disabling this control removes real-time guardrails. Capture justification for the audit trail.",
       "document_why_change_necessary": "Document why this change is necessary, the expected impact, and mitigation steps.",
       "validation": {
         "min_12_characters": "Please include at least 12 characters so the rationale is audit-ready."

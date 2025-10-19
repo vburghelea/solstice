@@ -1,315 +1,315 @@
 {
   "dashboard": {
-    "title": "TODO: Translate \"dashboard.title\"",
-    "subtitle": "TODO: Translate \"dashboard.subtitle\"",
+    "title": "Leite deine Kampagnen mit filmreifer Klarheit",
+    "subtitle": "Das Studio vereint Kampagnenvorbereitung, Session-Pacing und Nachbereitung-Rituale in einem einzigen Fluss. Priorisiere die Geschichten, die als Nächstes deine Aufmerksamkeit brauchen.",
     "loading_error": {
-      "title": "TODO: Translate \"dashboard.loading_error.title\"",
-      "description": "TODO: Translate \"dashboard.loading_error.description\""
+      "title": "Beim Laden des Studios gab es ein kleines Problem",
+      "description": "Einige Kampagnen- oder Session-Daten konnten nicht geladen werden. Aktualisiere die Seite oder öffne die klassische Dashboard-Ansicht."
     },
-    "feedback_queue_title": "TODO: Translate \"dashboard.feedback_queue_title\"",
-    "feedback_queue_description": "TODO: Translate \"dashboard.feedback_queue_description\""
+    "feedback_queue_title": "Feedback-Nachverfolgung",
+    "feedback_queue_description": "Halte Sicherheitswerkzeuge und Nach-Session-Reflexionen für jeden Tisch am Laufen."
   },
   "stats": {
-    "upcoming_sessions": "TODO: Translate \"stats.upcoming_sessions\"",
-    "upcoming_sessions_assistive": "TODO: Translate \"stats.upcoming_sessions_assistive\"",
-    "active_campaigns": "TODO: Translate \"stats.active_campaigns\"",
-    "active_campaigns_assistive": "TODO: Translate \"stats.active_campaigns_assistive\"",
-    "players_engaged": "TODO: Translate \"stats.players_engaged\"",
-    "players_engaged_assistive": "TODO: Translate \"stats.players_engaged_assistive\"",
-    "campaign_linked_sessions": "TODO: Translate \"stats.campaign_linked_sessions\"",
-    "campaign_linked_sessions_assistive": "TODO: Translate \"stats.campaign_linked_sessions_assistive\""
+    "upcoming_sessions": "Bevorstehende Sessions",
+    "upcoming_sessions_assistive": "Nächste 30 Tage",
+    "active_campaigns": "Aktive Kampagnen",
+    "active_campaigns_assistive": "Bereit für den Spotlight",
+    "players_engaged": "Spieler involviert",
+    "players_engaged_assistive": "Über alle geplanten Sessions",
+    "campaign_linked_sessions": "Kampagnen-gebundene Sessions",
+    "campaign_linked_sessions_assistive": "Verankert in Handlungsbögen"
   },
   "empty_states": {
     "no_sessions": {
-      "title": "TODO: Translate \"empty_states.no_sessions.title\"",
-      "description": "TODO: Translate \"empty_states.no_sessions.description\"",
-      "action_label": "TODO: Translate \"empty_states.no_sessions.action_label\""
+      "title": "Keine Sessions in Vorbereitung",
+      "description": "Plane ein neues Treffen oder wandele ein Kampagnen-Element in eine Live-Session um, um den Schwung zu halten.",
+      "action_label": "Session planen"
     },
     "no_campaigns": {
-      "title": "TODO: Translate \"empty_states.no_campaigns.title\"",
-      "description": "TODO: Translate \"empty_states.no_campaigns.description\"",
-      "action_label": "TODO: Translate \"empty_states.no_campaigns.action_label\""
+      "title": "Noch keine aktiven Kampagnen",
+      "description": "Entwerfe deinen nächsten Handlungsbogen oder belebe einen alten Favoriten, um deine Tische bei der Stange zu halten.",
+      "action_label": "Kampagne starten"
     },
     "no_followups": {
-      "title": "TODO: Translate \"empty_states.no_followups.title\"",
-      "description": "TODO: Translate \"empty_states.no_followups.description\"",
-      "action_label": "TODO: Translate \"empty_states.no_followups.action_label\""
+      "title": "Keine Nachverfolgungen in der Warteschlange",
+      "description": "Sobald du eine Session leitest, zeigen wir dir hier die Debrief-, Umfrage- und Eskalationsaufgaben.",
+      "action_label": "Session-Archiv durchsuchen"
     }
   },
   "actions": {
-    "open_studio": "TODO: Translate \"actions.open_studio\"",
-    "open_triage_board": "TODO: Translate \"actions.open_triage_board\"",
-    "schedule_session": "TODO: Translate \"actions.schedule_session\"",
-    "start_campaign": "TODO: Translate \"actions.start_campaign\"",
-    "browse_archive": "TODO: Translate \"actions.browse_archive\"",
-    "session_notes": "TODO: Translate \"actions.session_notes\"",
-    "open_session_manager": "TODO: Translate \"actions.open_session_manager\"",
-    "open_legacy_view": "TODO: Translate \"actions.open_legacy_view\"",
-    "edit_details": "TODO: Translate \"actions.edit_details\""
+    "open_studio": "Studio öffnen",
+    "open_triage_board": "Triage-Board öffnen",
+    "schedule_session": "Session planen",
+    "start_campaign": "Kampagne starten",
+    "browse_archive": "Archiv durchsuchen",
+    "session_notes": "Session-Notizen",
+    "open_session_manager": "Session-Manager öffnen",
+    "open_legacy_view": "Legacy-Ansicht öffnen",
+    "edit_details": "Details bearbeiten"
   },
   "sections": {
     "session_runway": {
-      "title": "TODO: Translate \"sections.session_runway.title\"",
-      "description": "TODO: Translate \"sections.session_runway.description\""
+      "title": "Session-Vorbereitung",
+      "description": "Halte deine nächsten Treffen scharf mit Inszenierungs-Hinweisen, Übersicht und Spieler-Load."
     },
     "campaign_pulse": {
-      "title": "TODO: Translate \"sections.campaign_pulse.title\"",
-      "description": "TODO: Translate \"sections.campaign_pulse.description\""
+      "title": "Kampagnen-Puls",
+      "description": "Erkenne Handlungsbögen, die Reach-out, Rekrutierung oder Spotlight-Momente brauchen."
     }
   },
   "session_types": {
-    "standalone": "TODO: Translate \"session_types.standalone\""
+    "standalone": "Einzel-Session"
   },
   "badges": {
-    "upcoming_touchpoints": "TODO: Translate \"badges.upcoming_touchpoints\""
+    "upcoming_touchpoints": "{{count}} anstehende Kontakte"
   },
   "labels": {
-    "participants": "TODO: Translate \"labels.participants\"",
-    "updated": "TODO: Translate \"labels.updated\"",
-    "session": "TODO: Translate \"labels.session\"",
-    "debrief": "TODO: Translate \"labels.debrief\"",
-    "recap": "TODO: Translate \"labels.recap\"",
-    "collect_safety": "TODO: Translate \"labels.collect_safety\"",
-    "capture_highlights": "TODO: Translate \"labels.capture_highlights\""
+    "participants": "{{count}} Teilnehmer",
+    "updated": "Aktualisiert {{date}}",
+    "session": "Session:",
+    "debrief": "{{name}} Debrief",
+    "recap": "{{name}} Zusammenfassung",
+    "collect_safety": "Sicherheits-Check-ins und Narrative Beats von {{count}} Spielern sammeln.",
+    "capture_highlights": "Highlights und Spieler-Energie festhalten, während die Geschichte noch frisch ist."
   },
   "feedback_triage": {
-    "title": "TODO: Translate \"feedback_triage.title\"",
-    "subtitle": "TODO: Translate \"feedback_triage.subtitle\"",
-    "badge": "TODO: Translate \"feedback_triage.badge\"",
-    "back_to_studio": "TODO: Translate \"feedback_triage.back_to_studio\"",
+    "title": "Sorge dafür, dass sich jeder Tisch gehört und sicher fühlt",
+    "subtitle": "Bündele Nach-Session-Umfragen, Sicherheits-Eskalationen und Feier-Hinweise auf einem Board, das auf die Rituale des Story Guides abgestimmt ist.",
+    "badge": "Feedback-Triage",
+    "back_to_studio": "Zurück zur Studio-Übersicht",
     "stats": {
-      "debriefs_queued": "TODO: Translate \"feedback_triage.stats.debriefs_queued\"",
-      "safety_checkpoints": "TODO: Translate \"feedback_triage.stats.safety_checkpoints\"",
-      "upcoming_nudges": "TODO: Translate \"feedback_triage.stats.upcoming_nudges\""
+      "debriefs_queued": "Debriefs in Warteschlange",
+      "safety_checkpoints": "Sicherheits-Kontrollpunkte",
+      "upcoming_nudges": "Anstehende Erinnerungen"
     },
     "actions": {
-      "create_feedback_task": "TODO: Translate \"feedback_triage.actions.create_feedback_task\"",
-      "open_recap": "TODO: Translate \"feedback_triage.actions.open_recap\"",
-      "open_campaign": "TODO: Translate \"feedback_triage.actions.open_campaign\"",
-      "session_details": "TODO: Translate \"feedback_triage.actions.session_details\""
+      "create_feedback_task": "Feedback-Aufgabe erstellen",
+      "open_recap": "Zusammenfassung öffnen",
+      "open_campaign": "Kampagne öffnen",
+      "session_details": "Session-Details"
     },
     "columns": {
       "debriefs": {
-        "title": "TODO: Translate \"feedback_triage.columns.debriefs.title\"",
-        "description": "TODO: Translate \"feedback_triage.columns.debriefs.description\"",
+        "title": "Nach-Session-Nachverfolgungen",
+        "description": "Debriefs, Umfragen und Dankeschön, die nach deinen letzten Treffen in der Warteschlange stehen.",
         "empty": {
-          "title": "TODO: Translate \"feedback_triage.columns.debriefs.empty.title\"",
-          "description": "TODO: Translate \"feedback_triage.columns.debriefs.empty.description\""
+          "title": "Keine Nachverfolgungen ausstehend",
+          "description": "Leite eine Session und wir zeigen dir dir sofort die Debrief-Aufgaben an."
         }
       },
       "safety_checkin": {
-        "title": "TODO: Translate \"feedback_triage.columns.safety_checkin.title\"",
-        "description": "TODO: Translate \"feedback_triage.columns.safety_checkin.description\"",
+        "title": "Sicherheit & Wohlbefinden",
+        "description": "Check-ins, Grenzen und Eskalations-Notizen, die Aufmerksamkeit verdienen.",
         "empty": {
-          "title": "TODO: Translate \"feedback_triage.columns.safety_checkin.empty.title\"",
-          "description": "TODO: Translate \"feedback_triage.columns.safety_checkin.empty.description\""
+          "title": "Sicherheitswerkzeuge alle eingestellt",
+          "description": "Tolle Arbeit! Halte Grenzen und Werkzeuge fest, während sich deine Tische weiterentwickeln."
         }
       },
       "upcoming_nudges": {
-        "title": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.title\"",
-        "description": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.description\"",
+        "title": "Anstehende Kontakte",
+        "description": "Vor-Session-Erinnerungen und Rituale, die dein Storytelling für filmische Umsetzung vorbereiten.",
         "empty": {
-          "title": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.empty.title\"",
-          "description": "TODO: Translate \"feedback_triage.columns.upcoming_nudges.empty.description\""
+          "title": "Keine anstehenden Sessions in Warteschlange",
+          "description": "Plane dein nächstes Treffen, um Vorbereitungs-Checklisten und Erinnerungen freizuschalten."
         }
       }
     },
     "severity": {
-      "overdue": "TODO: Translate \"feedback_triage.severity.overdue\"",
-      "attention": "TODO: Translate \"feedback_triage.severity.attention\"",
-      "on_track": "TODO: Translate \"feedback_triage.severity.on_track\""
+      "overdue": "Überfällig",
+      "attention": "Aufmerksamkeit erforderlich",
+      "on_track": "Auf Kurs"
     },
     "tasks": {
-      "collect_surveys": "TODO: Translate \"feedback_triage.tasks.collect_surveys\"",
-      "completed_prefix": "TODO: Translate \"feedback_triage.tasks.completed_prefix\"",
-      "starts_prefix": "TODO: Translate \"feedback_triage.tasks.starts_prefix\"",
-      "started_prefix": "TODO: Translate \"feedback_triage.tasks.started_prefix\"",
-      "capture_boundaries": "TODO: Translate \"feedback_triage.tasks.capture_boundaries\"",
-      "boundaries_documented": "TODO: Translate \"feedback_triage.tasks.boundaries_documented\"",
-      "confirm_safety_tool": "TODO: Translate \"feedback_triage.tasks.confirm_safety_tool\"",
-      "safety_tooling_confirmed": "TODO: Translate \"feedback_triage.tasks.safety_tooling_confirmed\"",
-      "safety_sweep_suffix": "TODO: Translate \"feedback_triage.tasks.safety_sweep_suffix\"",
-      "prep_checklist_suffix": "TODO: Translate \"feedback_triage.tasks.prep_checklist_suffix\"",
-      "prep_checklist_detail": "TODO: Translate \"feedback_triage.tasks.prep_checklist_detail\"",
-      "updated_prefix": "TODO: Translate \"feedback_triage.tasks.updated_prefix\""
+      "collect_surveys": "Umfragen und Sicherheits-Notizen von {{count}} Spielern sammeln, um den Kreis zu schließen.",
+      "completed_prefix": "Abgeschlossen {{time}}",
+      "starts_prefix": "Beginnt {{time}}",
+      "started_prefix": "Begonnen {{time}}",
+      "capture_boundaries": "Zustimmungsgrenzen für den Tisch festhalten.",
+      "boundaries_documented": "Grenzen dokumentiert – auf Abweichungen prüfen.",
+      "confirm_safety_tool": "Bestätige das Sicherheitswerkzeug, das du leiten wirst.",
+      "safety_tooling_confirmed": "Sicherheitswerkzeuge bestätigt – Erinnerungen vor der Session teilen.",
+      "safety_sweep_suffix": "Sicherheits-Check",
+      "prep_checklist_suffix": "Vorbereitungs-Checkliste",
+      "prep_checklist_detail": "Spotlights, Requisiten und Vor-Session-Umfragen vor {{time}} doppelt prüfen.",
+      "updated_prefix": "Aktualisiert {{time}}"
     }
   },
   "campaign_workspace": {
     "badge": {
-      "campaign_studio": "TODO: Translate \"campaign_workspace.badge.campaign_studio\""
+      "campaign_studio": "Kampagnen-Studio"
     },
     "narrative_brief": {
-      "title": "TODO: Translate \"campaign_workspace.narrative_brief.title\"",
-      "campaign_pitch": "TODO: Translate \"campaign_workspace.narrative_brief.campaign_pitch\"",
-      "session_zero_checkpoints": "TODO: Translate \"campaign_workspace.narrative_brief.session_zero_checkpoints\""
+      "title": "Narratives Briefing",
+      "campaign_pitch": "Kampagnen-Pitch",
+      "session_zero_checkpoints": "Session-Null-Kontrollpunkte"
     },
     "session_pipeline": {
-      "title": "TODO: Translate \"campaign_workspace.session_pipeline.title\"",
-      "upcoming": "TODO: Translate \"campaign_workspace.session_pipeline.upcoming\"",
-      "recent_wraps": "TODO: Translate \"campaign_workspace.session_pipeline.recent_wraps\""
+      "title": "Session-Pipeline",
+      "upcoming": "Bevorstehend",
+      "recent_wraps": "Kürzliche Abschlüsse"
     },
     "player_dossiers": {
-      "title": "TODO: Translate \"campaign_workspace.player_dossiers.title\""
+      "title": "Spieler-Akten"
     },
     "location": {
-      "remote_tbd": "TODO: Translate \"campaign_workspace.location.remote_tbd\""
+      "remote_tbd": "Remote / Noch offen"
     },
     "recurrence": {
-      "custom_cadence": "TODO: Translate \"campaign_workspace.recurrence.custom_cadence\""
+      "custom_cadence": "Benutzerdefiniertes Tempo"
     },
     "sessions": {
-      "next_session": "TODO: Translate \"campaign_workspace.sessions.next_session\"",
-      "not_scheduled": "TODO: Translate \"campaign_workspace.sessions.not_scheduled\"",
-      "add_gathering": "TODO: Translate \"campaign_workspace.sessions.add_gathering\"",
-      "last_debrief": "TODO: Translate \"campaign_workspace.sessions.last_debrief\"",
-      "awaiting_first_session": "TODO: Translate \"campaign_workspace.sessions.awaiting_first_session\"",
-      "run_session": "TODO: Translate \"campaign_workspace.sessions.run_session\""
+      "next_session": "Nächste Session",
+      "not_scheduled": "Nicht geplant",
+      "add_gathering": "Treffen hinzufügen",
+      "last_debrief": "Letztes Debrief",
+      "awaiting_first_session": "Warte auf erste Session",
+      "run_session": "Session leiten"
     },
     "details": {
-      "active_roster": "TODO: Translate \"campaign_workspace.details.active_roster\"",
-      "system": "TODO: Translate \"campaign_workspace.details.system\"",
-      "custom": "TODO: Translate \"campaign_workspace.details.custom\"",
-      "story_engine_focus": "TODO: Translate \"campaign_workspace.details.story_engine_focus\""
+      "active_roster": "Aktives Line-up",
+      "system": "System",
+      "custom": "Benutzerdefiniert",
+      "story_engine_focus": "Story-Engine im Fokus"
     },
     "expectations": {
-      "tone_difficulty": "TODO: Translate \"campaign_workspace.expectations.tone_difficulty\"",
-      "challenge_scope_placeholder": "TODO: Translate \"campaign_workspace.expectations.challenge_scope_placeholder\"",
-      "session_cadence": "TODO: Translate \"campaign_workspace.expectations.session_cadence\"",
-      "arc_length_placeholder": "TODO: Translate \"campaign_workspace.expectations.arc_length_placeholder\"",
-      "character_creation": "TODO: Translate \"campaign_workspace.expectations.character_creation\"",
-      "character_creation_placeholder": "TODO: Translate \"campaign_workspace.expectations.character_creation_placeholder\"",
-      "house_rules": "TODO: Translate \"campaign_workspace.expectations.house_rules\"",
-      "house_rules_placeholder": "TODO: Translate \"campaign_workspace.expectations.house_rules_placeholder\""
+      "tone_difficulty": "Ton & Schwierigkeit",
+      "challenge_scope_placeholder": "Leg den Herausforderungs-Rahmen fest.",
+      "session_cadence": "Session-Tempo",
+      "arc_length_placeholder": "Handlungsbogen-Länge oder Staffeln dokumentieren.",
+      "character_creation": "Charaktererstellung",
+      "character_creation_placeholder": "Festhalten, wie Charaktere in die Welt eingebunden sind.",
+      "house_rules": "Hausregeln",
+      "house_rules_placeholder": "Sicherheits-, Würfel- oder Hausregeln-Hinweise auflisten."
     },
     "safety": {
-      "player_boundaries_captured": "TODO: Translate \"campaign_workspace.safety.player_boundaries_captured\"",
-      "document_boundaries": "TODO: Translate \"campaign_workspace.safety.document_boundaries\"",
-      "attendance_policy_shared": "TODO: Translate \"campaign_workspace.safety.attendance_policy_shared\"",
-      "clarify_absences": "TODO: Translate \"campaign_workspace.safety.clarify_absences\""
+      "player_boundaries_captured": "Spieler-Grenzen erfasst",
+      "document_boundaries": "Spieler-Grenzen und X-Karten-Vereinbarungen dokumentieren",
+      "attendance_policy_shared": "Anwesenheitsrichtlinie geteilt",
+      "clarify_absences": "Kläre, wie mit Abwesenheiten und Verspätungen umgegangen wird"
     },
     "empty_states": {
       "no_sessions_scheduled": {
-        "title": "TODO: Translate \"campaign_workspace.empty_states.no_sessions_scheduled.title\"",
-        "description": "TODO: Translate \"campaign_workspace.empty_states.no_sessions_scheduled.description\"",
-        "action_label": "TODO: Translate \"campaign_workspace.empty_states.no_sessions_scheduled.action_label\""
+        "title": "Keine Sessions geplant",
+        "description": "Stelle das nächste Kapitel in die Warteschlange, um deine Spieler bei der Stange zu halten.",
+        "action_label": "Session planen"
       },
       "no_completed_sessions": {
-        "title": "TODO: Translate \"campaign_workspace.empty_states.no_completed_sessions.title\"",
-        "description": "TODO: Translate \"campaign_workspace.empty_states.no_completed_sessions.description\"",
-        "action_label": "TODO: Translate \"campaign_workspace.empty_states.no_completed_sessions.action_label\""
+        "title": "Keine abgeschlossenen Sessions",
+        "description": "Sobald du ein Treffen abschließt, heben wir hier die Debrief-Aufgaben hervor.",
+        "action_label": "Archiv ansehen"
       }
     },
     "participants": {
-      "ready": "TODO: Translate \"campaign_workspace.participants.ready\"",
-      "unnamed_player": "TODO: Translate \"campaign_workspace.participants.unnamed_player\""
+      "ready": "Bereit",
+      "unnamed_player": "Unbenannter Spieler"
     },
-    "description": "TODO: Translate \"campaign_workspace.description\"",
-    "active_players": "TODO: Translate \"campaign_workspace.active_players\"",
+    "description": "Leite diesen Handlungsbogen, Vorbereitungs-Rituale und Spieler-Energie aus einem einzigen, auf den Story Guide zugeschnittenen Arbeitsbereich.",
+    "active_players": "{{count}} aktive Spieler",
     "sections": {
       "narrative_brief": {
-        "subtitle": "TODO: Translate \"campaign_workspace.sections.narrative_brief.subtitle\""
+        "subtitle": "Halte den Kampagnen-Rückenstrang, Tisch-Rituale und Vorbereitungs-Hinweise griffbereit."
       },
       "safety_consent": {
-        "title": "TODO: Translate \"campaign_workspace.sections.safety_consent.title\"",
-        "subtitle": "TODO: Translate \"campaign_workspace.sections.safety_consent.subtitle\""
+        "title": "Sicherheit & Zustimmung",
+        "subtitle": "Stimme auf Werkzeuge, Grenzen und Erinnerungen vor und nach jeder Session ab."
       },
       "session_pipeline": {
-        "subtitle": "TODO: Translate \"campaign_workspace.sections.session_pipeline.subtitle\""
+        "subtitle": "Verfolge, was als Nächstes kommt, und feiere die Story-Beats, die du bereits geliefert hast."
       },
       "player_dossiers": {
-        "subtitle": "TODO: Translate \"campaign_workspace.sections.player_dossiers.subtitle\""
+        "subtitle": "Behalte den Überblick darüber, wer am Tisch sitzt, ihr Status und die Einladungen in Bewegung."
       }
     },
     "pending_invites": {
-      "count": "TODO: Translate \"campaign_workspace.pending_invites.count\"",
-      "reminder": "TODO: Translate \"campaign_workspace.pending_invites.reminder\""
+      "count": "{{count}} ausstehende Einladung{{count, plural, =1 {} other {en}}}",
+      "reminder": "Sende eine persönliche Notiz oder Erinnerung, um das Line-up vor der nächsten Session final zu machen."
     },
     "session_card": {
-      "attendees": "TODO: Translate \"campaign_workspace.session_card.attendees\"",
-      "last_updated": "TODO: Translate \"campaign_workspace.session_card.last_updated\"",
-      "review_recap": "TODO: Translate \"campaign_workspace.session_card.review_recap\""
+      "attendees": "{{count}} Teilnehmer",
+      "last_updated": "Zuletzt aktualisiert {{time}}",
+      "review_recap": "Zusammenfassung ansehen"
     }
   },
   "b2b_pipeline": {
-    "title": "TODO: Translate \"b2b_pipeline.title\"",
-    "subtitle": "TODO: Translate \"b2b_pipeline.subtitle\"",
-    "active_opportunities": "TODO: Translate \"b2b_pipeline.active_opportunities\"",
+    "title": "B2B-Kollaborations-Pipeline",
+    "subtitle": "Verfolge jede Unternehmens-Gelegenheit mit klaren Übergaben, Story-Guide-Hinweisen und Eskalations-Hooks, die mit der Plattform-Aufsicht verbunden sind.",
+    "active_opportunities": "{{count}} aktive Gelegenheiten",
     "focus_cues": {
-      "title": "TODO: Translate \"b2b_pipeline.focus_cues.title\"",
-      "description": "TODO: Translate \"b2b_pipeline.focus_cues.description\""
+      "title": "Fokus-Hinweise auf dich zugeschnitten",
+      "description": "Hebe dringende Narrative-Fäden, live Eskalationen und gefährdete Verlängerungen hervor, ohne die breitere Pipeline aus den Augen zu verlieren."
     },
     "focus_summary": {
-      "active_opportunities": "TODO: Translate \"b2b_pipeline.focus_summary.active_opportunities\"",
-      "active_opportunities_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.active_opportunities_assistive\"",
-      "my_focus": "TODO: Translate \"b2b_pipeline.focus_summary.my_focus\"",
-      "my_focus_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.my_focus_assistive\"",
-      "renewals_at_risk": "TODO: Translate \"b2b_pipeline.focus_summary.renewals_at_risk\"",
-      "renewals_at_risk_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.renewals_at_risk_assistive\"",
-      "escalations_live": "TODO: Translate \"b2b_pipeline.focus_summary.escalations_live\"",
-      "escalations_live_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.escalations_live_assistive\"",
-      "follow_ups_due": "TODO: Translate \"b2b_pipeline.focus_summary.follow_ups_due\"",
-      "follow_ups_due_assistive": "TODO: Translate \"b2b_pipeline.focus_summary.follow_ups_due_assistive\""
+      "active_opportunities": "Aktive Gelegenheiten",
+      "active_opportunities_assistive": "Über alle Phasen",
+      "my_focus": "Mein Fokus",
+      "my_focus_assistive": "Dringend & dir zugewiesen",
+      "renewals_at_risk": "Verlängerungen gefährdet",
+      "renewals_at_risk_assistive": "Benötigen Rettungspläne",
+      "escalations_live": "Eskalationen live",
+      "escalations_live_assistive": "Überwacht oder ausgelöst",
+      "follow_ups_due": "Nachverfolgungen fällig",
+      "follow_ups_due_assistive": "Innerhalb 48 Stunden"
     },
     "empty_state": {
-      "title": "TODO: Translate \"b2b_pipeline.empty_state.title\"",
-      "description": "TODO: Translate \"b2b_pipeline.empty_state.description\"",
-      "action_label": "TODO: Translate \"b2b_pipeline.empty_state.action_label\""
+      "title": "Noch keine aktiven B2B-Fäden",
+      "description": "Sobald eine Gelegenheit erfasst wird, erscheinen hier Phasen, Zuweisungen und Eskalations-Hooks.",
+      "action_label": "Unternehmens-Pilot planen"
     },
     "focus_toggle": {
-      "my_focus_description": "TODO: Translate \"b2b_pipeline.focus_toggle.my_focus_description\"",
-      "entire_pipeline_description": "TODO: Translate \"b2b_pipeline.focus_toggle.entire_pipeline_description\"",
-      "view_label": "TODO: Translate \"b2b_pipeline.focus_toggle.view_label\""
+      "my_focus_description": "Dringende, eskalierte oder gefährdete Fäden, die dir zugewiesen sind.",
+      "entire_pipeline_description": "Jede laufende Gelegenheit über Teams hinweg ansehen.",
+      "view_label": "Ansehen"
     },
     "stage": {
-      "respond_within": "TODO: Translate \"b2b_pipeline.stage.respond_within\"",
-      "exit_criteria_label": "TODO: Translate \"b2b_pipeline.stage.exit_criteria_label\"",
-      "clear_stage": "TODO: Translate \"b2b_pipeline.stage.clear_stage\"",
-      "no_focus_threads": "TODO: Translate \"b2b_pipeline.stage.no_focus_threads\""
+      "respond_within": "Innerhalb {{hours}} Stunden antworten",
+      "exit_criteria_label": "Austrittskriterien:",
+      "clear_stage": "Phase ist klar. Bereit für den nächsten narrativen Handschlag.",
+      "no_focus_threads": "Keine dringenden Fokus-Fäden in dieser Phase."
     },
     "opportunity": {
-      "location_tbd": "TODO: Translate \"b2b_pipeline.opportunity.location_tbd\"",
-      "point_of_contact": "TODO: Translate \"b2b_pipeline.opportunity.point_of_contact\"",
-      "entered_stage_ago": "TODO: Translate \"b2b_pipeline.opportunity.entered_stage_ago\"",
-      "last_touch": "TODO: Translate \"b2b_pipeline.opportunity.last_touch\"",
-      "next_step": "TODO: Translate \"b2b_pipeline.opportunity.next_step\"",
-      "follow_up_due": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_due\"",
-      "follow_up_due_soon": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_due_soon\"",
-      "follow_up_scheduled": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_scheduled\"",
+      "location_tbd": "Ort noch offen",
+      "point_of_contact": "Ansprechpartner:",
+      "entered_stage_ago": "Vor {{duration}} in Phase eingetreten",
+      "last_touch": "Letzter Kontakt {{duration}}",
+      "next_step": "Nächster Schritt",
+      "follow_up_due": "Nachverfolgung überfällig",
+      "follow_up_due_soon": "Nachverfolgung bald fällig",
+      "follow_up_scheduled": "Nachverfolgung fällig",
       "follow_up_status": {
-        "overdue": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_status.overdue\"",
-        "due_soon": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_status.due_soon\"",
-        "scheduled": "TODO: Translate \"b2b_pipeline.opportunity.follow_up_status.scheduled\""
+        "overdue": "Überfällig — jetzt wieder verbinden",
+        "due_soon": "Fällig innerhalb 48 Stunden",
+        "scheduled": "Im Takt"
       },
-      "services_in_scope": "TODO: Translate \"b2b_pipeline.opportunity.services_in_scope\"",
-      "assigned_partners": "TODO: Translate \"b2b_pipeline.opportunity.assigned_partners\"",
-      "escalation_hooks": "TODO: Translate \"b2b_pipeline.opportunity.escalation_hooks\"",
-      "no_escalation_hooks": "TODO: Translate \"b2b_pipeline.opportunity.no_escalation_hooks\"",
-      "studio_note": "TODO: Translate \"b2b_pipeline.opportunity.studio_note\"",
-      "studio_note_placeholder": "TODO: Translate \"b2b_pipeline.opportunity.studio_note_placeholder\"",
-      "linked_to": "TODO: Translate \"b2b_pipeline.opportunity.linked_to\"",
-      "loop_specialists": "TODO: Translate \"b2b_pipeline.opportunity.loop_specialists\""
+      "services_in_scope": "Leistungen im Umfang",
+      "assigned_partners": "Zugewiesene Partner",
+      "escalation_hooks": "Eskalations-Hooks",
+      "no_escalation_hooks": "Noch keine Eskalations-Hooks konfiguriert.",
+      "studio_note": "Studio-Notiz",
+      "studio_note_placeholder": "Entscheidungs-Hinweise, Sicherheitskontext oder Produktions-Blocker festhalten.",
+      "linked_to": "Verknüpft mit {{name}}",
+      "loop_specialists": "Zusätzliche Spezialisten über Plattform-Admin einbeziehen"
     },
     "assignment_roles": {
-      "story_guide_you": "TODO: Translate \"b2b_pipeline.assignment_roles.story_guide_you\""
+      "story_guide_you": "Story Guide (du)"
     },
     "escalation": {
-      "escalate_via": "TODO: Translate \"b2b_pipeline.escalation.escalate_via\"",
-      "resolve_by": "TODO: Translate \"b2b_pipeline.escalation.resolve_by\"",
-      "triggered": "TODO: Translate \"b2b_pipeline.escalation.triggered\"",
-      "monitoring": "TODO: Translate \"b2b_pipeline.escalation.monitoring\""
+      "escalate_via": "Eskalieren über {{role}}",
+      "resolve_by": "Lösen bis {{date}}",
+      "triggered": "Ausgelöst",
+      "monitoring": "Überwachung"
     },
     "note_sync": {
-      "synced": "TODO: Translate \"b2b_pipeline.note_sync.synced\"",
-      "pending_sync": "TODO: Translate \"b2b_pipeline.note_sync.pending_sync\"",
-      "syncing": "TODO: Translate \"b2b_pipeline.note_sync.syncing\"",
-      "offline": "TODO: Translate \"b2b_pipeline.note_sync.offline\"",
-      "ready_to_sync": "TODO: Translate \"b2b_pipeline.note_sync.ready_to_sync\"",
-      "sync_failed": "TODO: Translate \"b2b_pipeline.note_sync.sync_failed\"",
-      "conflict_detected": "TODO: Translate \"b2b_pipeline.note_sync.conflict_detected\"",
-      "last_updated_by": "TODO: Translate \"b2b_pipeline.note_sync.last_updated_by\"",
-      "accept_platform_update": "TODO: Translate \"b2b_pipeline.note_sync.accept_platform_update\"",
-      "overwrite_with_note": "TODO: Translate \"b2b_pipeline.note_sync.overwrite_with_note\"",
-      "retry_sync": "TODO: Translate \"b2b_pipeline.note_sync.retry_sync\""
+      "synced": "Synchronisiert",
+      "pending_sync": "Synchronisierung ausstehend",
+      "syncing": "Synchronisierung…",
+      "offline": "Offline — lokal gespeichert",
+      "ready_to_sync": "Bereit zur Synchronisierung",
+      "sync_failed": "Synchronisierung fehlgeschlagen",
+      "conflict_detected": "Konflikt erkannt",
+      "last_updated_by": "Zuletzt aktualisiert von {{name}} am {{date}}",
+      "accept_platform_update": "Plattform-Update akzeptieren",
+      "overwrite_with_note": "Mit meiner Notiz überschreiben",
+      "retry_sync": "Synchronisierung wiederholen"
     }
   }
 }

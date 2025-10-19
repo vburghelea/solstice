@@ -1,8 +1,7 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatDistanceToNow } from "date-fns";
+
 import {
   AlertTriangleIcon,
   DownloadIcon,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Avatar } from "~/components/ui/avatar";
@@ -82,6 +82,7 @@ import {
 } from "~/features/roles";
 import { canDeleteUsers } from "~/features/roles/permission.service";
 import { useAdminTranslation } from "~/hooks/useTypedTranslation";
+import type { SupportedLanguage } from "~/lib/i18n/config";
 import {
   useAdminUserDirectory,
   useExportComplianceReport,
@@ -100,10 +101,10 @@ const membershipTone: Record<AdminMembershipStatus, string> = {
 const getMembershipLabels = (
   t: (key: string) => string,
 ): Record<AdminMembershipStatus, string> => ({
-  active: t("admin.user_directory.membership.status.active"),
-  expired: t("admin.user_directory.membership.status.expired"),
-  canceled: t("admin.user_directory.membership.status.canceled"),
-  none: t("admin.user_directory.membership.status.none"),
+  active: t("user_directory.membership.status.active"),
+  expired: t("user_directory.membership.status.expired"),
+  canceled: t("user_directory.membership.status.canceled"),
+  none: t("user_directory.membership.status.none"),
 });
 
 function DirectorySkeleton() {
@@ -190,25 +191,49 @@ function useRoleAssignmentForm(
 function RiskBadge({
   message,
   type,
+  adminT,
 }: {
   message: string;
   type: "security" | "compliance";
+  adminT: (key: string) => string;
 }) {
   const tone =
     type === "security"
       ? "bg-amber-500/10 text-amber-600"
       : "bg-destructive/10 text-destructive";
+
+  const translatedMessage = adminT(`user_directory.risk_flags.${message}`);
+
   return (
     <Badge variant="outline" className={cn("border-transparent", tone)}>
-      {message}
+      {translatedMessage}
     </Badge>
   );
+}
+
+function translateAuditTrailLabel(
+  label: string,
+  adminT: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  if (label.startsWith("role_granted:")) {
+    const roleName = label.replace("role_granted:", "");
+    return adminT("user_directory.audit_trail.role_granted", { roleName });
+  }
+  if (label.startsWith("membership_status:")) {
+    const status = label.replace("membership_status:", "");
+    return adminT("user_directory.audit_trail.membership_status", { status });
+  }
+  if (label === "last_active") {
+    return adminT("user_directory.audit_trail.last_active");
+  }
+  return label; // fallback for any unexpected labels
 }
 
 function buildColumns(
   canDeleteUser: boolean,
   setUserToDelete: (user: AdminUserRecord) => void,
-  adminT: (key: string) => string,
+  adminT: (key: string, options?: Record<string, unknown>) => string,
+  currentLanguage: string,
 ): ColumnDef<AdminUserRecord>[] {
   return [
     {
@@ -257,7 +282,10 @@ function buildColumns(
               <span className="text-body-xs text-muted-foreground">
                 {adminT("user_directory.membership.expires").replace(
                   "{{time}}",
-                  formatDistanceToNow(record.membershipExpiresAt, { addSuffix: true }),
+                  formatDistanceToNowLocalized(
+                    record.membershipExpiresAt,
+                    currentLanguage as SupportedLanguage,
+                  ),
                 )}
               </span>
             ) : null}
@@ -313,9 +341,10 @@ function buildColumns(
         );
         return (
           <span className="text-body-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(mostRecentRole.assignedAt), {
-              addSuffix: true,
-            })}
+            {formatDistanceToNowLocalized(
+              new Date(mostRecentRole.assignedAt),
+              currentLanguage as SupportedLanguage,
+            )}
           </span>
         );
       },
@@ -347,7 +376,10 @@ function buildColumns(
         return (
           <span className="text-body-sm text-muted-foreground">
             {lastActiveAt
-              ? formatDistanceToNow(lastActiveAt, { addSuffix: true })
+              ? formatDistanceToNowLocalized(
+                  lastActiveAt,
+                  currentLanguage as SupportedLanguage,
+                )
               : adminT("user_directory.activity.no_activity")}
           </span>
         );
@@ -372,6 +404,7 @@ function buildColumns(
                 key={`${flag.type}-${flag.message}`}
                 type={flag.type}
                 message={flag.message}
+                adminT={adminT}
               />
             ))}
           </div>
@@ -391,11 +424,15 @@ function buildColumns(
           );
         }
         const [latest] = auditTrail;
+        const translatedLabel = translateAuditTrailLabel(latest.label, adminT);
         return (
           <div className="token-stack-xs">
-            <span className="text-body-sm text-foreground">{latest.label}</span>
+            <span className="text-body-sm text-foreground">{translatedLabel}</span>
             <span className="text-body-xs text-muted-foreground px-2">
-              {formatDistanceToNow(latest.timestamp, { addSuffix: true })}
+              {formatDistanceToNowLocalized(
+                latest.timestamp,
+                currentLanguage as SupportedLanguage,
+              )}
             </span>
           </div>
         );
@@ -426,13 +463,12 @@ function buildColumns(
   ];
 }
 
-export function AdminUserDirectory() {
-  const { t: adminT } = useAdminTranslation();
+interface AdminUserDirectoryProps {
+  currentUser: { id: string } | null;
+}
 
-  // Get current user from route context
-  const { user: currentUser } = useRouteContext({ from: "/admin/users" }) as {
-    user: { id: string } | null;
-  };
+export function AdminUserDirectory({ currentUser }: AdminUserDirectoryProps) {
+  const { t: adminT, currentLanguage } = useAdminTranslation();
 
   const [pageIndex, setPageIndex] = useState(0);
   const [search, setSearch] = useState("");
@@ -625,8 +661,8 @@ export function AdminUserDirectory() {
   }, [isClient, roleData, currentUser]);
 
   const columns = useMemo(
-    () => buildColumns(canDeleteUser, setUserToDelete, adminT),
-    [canDeleteUser, setUserToDelete, adminT],
+    () => buildColumns(canDeleteUser, setUserToDelete, adminT, currentLanguage),
+    [canDeleteUser, setUserToDelete, adminT, currentLanguage],
   );
 
   const handleDialogOpenChange = (open: boolean) => {

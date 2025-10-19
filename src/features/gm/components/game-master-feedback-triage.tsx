@@ -1,4 +1,3 @@
-import { differenceInHours, formatDistanceToNow } from "date-fns";
 import { CalendarClockIcon, ClipboardListIcon, HeartPulseIcon } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -7,6 +6,8 @@ import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGmTranslation } from "~/hooks/useTypedTranslation";
+import type { SupportedLanguage } from "~/lib/i18n/config";
+import { differenceInHours, formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
 
@@ -21,8 +22,14 @@ export function GameMasterFeedbackTriageBoard({
   upcomingSessions,
   activeCampaigns,
 }: GameMasterFeedbackTriageBoardProps) {
-  const { t } = useGmTranslation();
-  const columns = buildColumns(completedSessions, upcomingSessions, activeCampaigns, t);
+  const { t, currentLanguage } = useGmTranslation();
+  const columns = buildColumns(
+    completedSessions,
+    upcomingSessions,
+    activeCampaigns,
+    t,
+    currentLanguage,
+  );
 
   return (
     <div className="space-y-10">
@@ -113,6 +120,7 @@ function buildColumns(
   upcomingSessions: GameListItem[],
   activeCampaigns: CampaignListItem[],
   t: ReturnType<typeof useGmTranslation>["t"],
+  currentLanguage: SupportedLanguage,
 ): TriageColumn[] {
   const now = new Date();
 
@@ -128,7 +136,9 @@ function buildColumns(
         count: session.participantCount,
       }),
       dueLabel: t("feedback_triage.tasks.completed_prefix", {
-        time: formatDistanceToNow(completedAt, { addSuffix: true }),
+        time: formatDistanceToNowLocalized(completedAt, currentLanguage, {
+          addSuffix: true,
+        }),
       }),
       severity,
       actionLabel: t("feedback_triage.actions.open_recap"),
@@ -160,7 +170,9 @@ function buildColumns(
       title: `${campaign.name} ${t("feedback_triage.tasks.safety_sweep_suffix")}`,
       detail: detailParts.join(" "),
       dueLabel: t("feedback_triage.tasks.updated_prefix", {
-        time: formatDistanceToNow(updatedAt, { addSuffix: true }),
+        time: formatDistanceToNowLocalized(updatedAt, currentLanguage, {
+          addSuffix: true,
+        }),
       }),
       severity,
       actionLabel: t("feedback_triage.actions.open_campaign"),
@@ -175,7 +187,9 @@ function buildColumns(
     const sessionStart = new Date(session.dateTime);
     const hoursUntil = differenceInHours(sessionStart, now);
     const severity = hoursUntil < 6 ? "critical" : hoursUntil < 24 ? "caution" : "info";
-    const distanceLabel = formatDistanceToNow(sessionStart, { addSuffix: true });
+    const distanceLabel = formatDistanceToNowLocalized(sessionStart, currentLanguage, {
+      addSuffix: true,
+    });
     const dueLabel =
       hoursUntil <= 0
         ? t("feedback_triage.tasks.started_prefix", { time: distanceLabel })

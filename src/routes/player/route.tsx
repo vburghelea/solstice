@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { formatDistanceToNow } from "date-fns";
 import {
   CalendarDays,
   Gamepad2,
@@ -14,6 +13,7 @@ import {
   Users2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -169,7 +169,7 @@ function PlayerNamespaceShell() {
 }
 
 function PlayerWorkspaceSummary() {
-  const { t } = useNavigationTranslation();
+  const { t, currentLanguage } = useNavigationTranslation();
   const { user } = Route.useRouteContext();
   const isAuthenticated = Boolean(user?.id);
 
@@ -308,7 +308,11 @@ function PlayerWorkspaceSummary() {
               <span className="text-foreground font-medium">{nextGame.name}</span>
               <span>{formatDateAndTime(nextGame.dateTime)}</span>
               <span className="text-muted-foreground text-xs tracking-wide uppercase">
-                {formatDistanceToNow(new Date(nextGame.dateTime), { addSuffix: true })}
+                {formatDistanceToNowLocalized(
+                  new Date(nextGame.dateTime),
+                  currentLanguage,
+                  { addSuffix: true },
+                )}
               </span>
               <Link
                 from="/player"

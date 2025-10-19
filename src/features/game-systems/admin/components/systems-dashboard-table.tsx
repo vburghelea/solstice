@@ -71,7 +71,7 @@ function createColumns(
   const detailColumns: ColumnDef<AdminGameSystemListItem>[] = [
     {
       accessorKey: "name",
-      header: "System",
+      header: tGameSystems("admin.table.headers.system"),
       cell: ({ row }) => {
         const item = row.original;
         return (
@@ -85,10 +85,14 @@ function createColumns(
                 {item.name}
               </Link>
               <Badge variant={item.isPublished ? "default" : "outline"}>
-                {item.isPublished ? "Published" : "Draft"}
+                {item.isPublished
+                  ? tGameSystems("admin.table.status.published")
+                  : tGameSystems("admin.table.status.draft")}
               </Badge>
               <Badge variant={item.cmsApproved ? "secondary" : "outline"}>
-                {item.cmsApproved ? "Approved" : "Needs approval"}
+                {item.cmsApproved
+                  ? tGameSystems("admin.table.status.approved")
+                  : tGameSystems("admin.table.status.needs_approval")}
               </Badge>
             </div>
             <p className="text-muted-foreground text-xs">
@@ -100,7 +104,7 @@ function createColumns(
     },
     {
       accessorKey: "statusFlags",
-      header: "Completeness",
+      header: tGameSystems("admin.table.headers.completeness"),
       cell: ({ row }) => {
         const item = row.original;
         if (item.statusFlags.length === 0) {
@@ -119,20 +123,20 @@ function createColumns(
     },
     {
       accessorKey: "crawlStatus",
-      header: "Crawl",
+      header: tGameSystems("admin.table.headers.crawl"),
       cell: ({ row }) => {
         const item = row.original;
         const crawlStatus = item.crawlStatus ?? "unknown";
         const crawlVariant = getSystemCrawlBadgeVariant(crawlStatus);
         const lastLabel = item.lastCrawledAt
           ? `${formatDateAndTime(item.lastCrawledAt)} (${formatSystemRelativeTime(item.lastCrawledAt, { t })})`
-          : "Never crawled";
+          : tGameSystems("admin.table.status.never_crawled");
         const errorMessage = item.errorMessage?.trim();
 
         return (
           <div className="space-y-1">
             <Badge variant={crawlVariant}>
-              {formatSystemCrawlStatus(crawlStatus, t)}
+              {formatSystemCrawlStatus(crawlStatus, tGameSystems)}
             </Badge>
             <p className="text-muted-foreground text-xs">{lastLabel}</p>
             {errorMessage ? (
@@ -144,12 +148,14 @@ function createColumns(
     },
     {
       accessorKey: "media",
-      header: "Media",
+      header: tGameSystems("admin.table.headers.media"),
       cell: ({ row }) => {
         const item = row.original;
         const heroBadge = item.heroSelected ? (
           <Badge variant={item.heroModerated ? "secondary" : "outline"}>
-            {item.heroModerated ? "Hero approved" : "Hero needs review"}
+            {item.heroModerated
+              ? tGameSystems("admin.table.status.hero_approved")
+              : tGameSystems("admin.table.status.hero_needs_review")}
           </Badge>
         ) : (
           <Badge variant="destructive">{tGameSystems("admin.table.no_hero_badge")}</Badge>
@@ -160,8 +166,8 @@ function createColumns(
             {heroBadge}
             <Badge variant={item.unmoderatedMediaCount > 0 ? "outline" : "secondary"}>
               {item.unmoderatedMediaCount > 0
-                ? `${item.unmoderatedMediaCount} pending`
-                : "Gallery clean"}
+                ? `${item.unmoderatedMediaCount} ${tGameSystems("admin.table.status.pending")}`
+                : tGameSystems("admin.table.status.gallery_clean")}
             </Badge>
           </div>
         );
@@ -169,7 +175,7 @@ function createColumns(
     },
     {
       accessorKey: "updatedAt",
-      header: "Updated",
+      header: tGameSystems("admin.table.headers.updated"),
       cell: ({ row }) => {
         const item = row.original;
         const updatedLabel = `${formatDateAndTime(item.updatedAt)} (${formatSystemRelativeTime(item.updatedAt, { t })})`;
@@ -178,7 +184,7 @@ function createColumns(
     },
     {
       id: "actions",
-      header: "Actions",
+      header: tGameSystems("admin.table.headers.actions"),
       cell: ({ row }) => {
         const item = row.original;
         return (
@@ -333,12 +339,29 @@ export function SystemsDashboardTable({
     <div className="space-y-3">
       <div className="text-muted-foreground flex items-center justify-between gap-3 text-xs">
         <span>
-          Showing {hasResults ? `${startLabel}–${endLabel}` : 0} of {total}
-          {total === 1 ? " system" : " systems"}
+          {hasResults
+            ? tGameSystems("admin.table.showing_results", {
+                start: startLabel,
+                end: endLabel,
+                total,
+                itemType:
+                  total === 1
+                    ? tGameSystems("admin.table.system_singular")
+                    : tGameSystems("admin.table.system_plural"),
+              })
+            : tGameSystems("admin.table.showing_results", {
+                start: 0,
+                end: 0,
+                total: 0,
+                itemType: tGameSystems("admin.table.system_singular"),
+              })}
         </span>
         {pageCount > 0 ? (
           <span>
-            Page {hasResults ? page : 1} of {Math.max(pageCount, 1)}
+            {tGameSystems("admin.table.page_info", {
+              current: hasResults ? page : 1,
+              total: Math.max(pageCount, 1),
+            })}
           </span>
         ) : null}
       </div>

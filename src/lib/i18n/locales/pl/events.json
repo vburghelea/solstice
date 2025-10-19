@@ -1,353 +1,353 @@
 {
   "create": {
-    "title": "TODO: Translate \"create.title\"",
-    "subtitle": "TODO: Translate \"create.subtitle\"",
+    "title": "Utwórz nowe wydarzenie",
+    "subtitle": "Wypełnij szczegóły, aby utworzyć nowe wydarzenie Roundup Games. Możesz zapisać jako szkic i opublikować później.",
     "steps": {
       "basic_info": {
-        "title": "TODO: Translate \"create.steps.basic_info.title\"",
-        "description": "TODO: Translate \"create.steps.basic_info.description\""
+        "title": "Podstawowe informacje",
+        "description": "Nazwa i opis wydarzenia"
       },
       "location_dates": {
-        "title": "TODO: Translate \"create.steps.location_dates.title\"",
-        "description": "TODO: Translate \"create.steps.location_dates.description\""
+        "title": "Lokalizacja i daty",
+        "description": "Gdzie i kiedy"
       },
       "registration": {
-        "title": "TODO: Translate \"create.steps.registration.title\"",
-        "description": "TODO: Translate \"create.steps.registration.description\""
+        "title": "Rejestracja",
+        "description": "Ustawienia rejestracji i ceny"
       },
       "details": {
-        "title": "TODO: Translate \"create.steps.details.title\"",
-        "description": "TODO: Translate \"create.steps.details.description\""
+        "title": "Dodatkowe szczegóły",
+        "description": "Informacje kontaktowe i ustawienia"
       }
     }
   },
   "form": {
     "fields": {
-      "name": "TODO: Translate \"form.fields.name\"",
-      "slug": "TODO: Translate \"form.fields.slug\"",
-      "short_description": "TODO: Translate \"form.fields.short_description\"",
-      "description": "TODO: Translate \"form.fields.description\"",
-      "type": "TODO: Translate \"form.fields.type\"",
-      "status": "TODO: Translate \"form.fields.status\"",
-      "logo": "TODO: Translate \"form.fields.logo\"",
-      "logo_url": "TODO: Translate \"form.fields.logo_url\"",
-      "banner": "TODO: Translate \"form.fields.banner\"",
-      "banner_url": "TODO: Translate \"form.fields.banner_url\"",
-      "venue_name": "TODO: Translate \"form.fields.venue_name\"",
-      "venue_address": "TODO: Translate \"form.fields.venue_address\"",
-      "city": "TODO: Translate \"form.fields.city\"",
-      "province": "TODO: Translate \"form.fields.province\"",
-      "country": "TODO: Translate \"form.fields.country\"",
-      "postal_code": "TODO: Translate \"form.fields.postal_code\"",
-      "location_notes": "TODO: Translate \"form.fields.location_notes\"",
-      "start_date": "TODO: Translate \"form.fields.start_date\"",
-      "end_date": "TODO: Translate \"form.fields.end_date\"",
-      "registration_opens": "TODO: Translate \"form.fields.registration_opens\"",
-      "registration_closes": "TODO: Translate \"form.fields.registration_closes\"",
-      "registration_type": "TODO: Translate \"form.fields.registration_type\"",
-      "max_teams": "TODO: Translate \"form.fields.max_teams\"",
-      "max_participants": "TODO: Translate \"form.fields.max_participants\"",
-      "min_players_per_team": "TODO: Translate \"form.fields.min_players_per_team\"",
-      "max_players_per_team": "TODO: Translate \"form.fields.max_players_per_team\"",
-      "team_fee": "TODO: Translate \"form.fields.team_fee\"",
-      "individual_fee": "TODO: Translate \"form.fields.individual_fee\"",
-      "early_bird_discount": "TODO: Translate \"form.fields.early_bird_discount\"",
-      "early_bird_deadline": "TODO: Translate \"form.fields.early_bird_deadline\"",
-      "allow_etransfer": "TODO: Translate \"form.fields.allow_etransfer\"",
-      "etransfer_recipient": "TODO: Translate \"form.fields.etransfer_recipient\"",
-      "etransfer_instructions": "TODO: Translate \"form.fields.etransfer_instructions\"",
-      "allow_waitlist": "TODO: Translate \"form.fields.allow_waitlist\"",
-      "require_membership": "TODO: Translate \"form.fields.require_membership\"",
-      "contact_email": "TODO: Translate \"form.fields.contact_email\"",
-      "contact_phone": "TODO: Translate \"form.fields.contact_phone\"",
-      "website": "TODO: Translate \"form.fields.website\"",
-      "public_event": "TODO: Translate \"form.fields.public_event\"",
-      "featured_event": "TODO: Translate \"form.fields.featured_event\""
+      "name": "Nazwa wydarzenia",
+      "slug": "Slug",
+      "short_description": "Krótki opis",
+      "description": "Opis",
+      "type": "Typ",
+      "status": "Status początkowy",
+      "logo": "Logo wydarzenia",
+      "logo_url": "URL logo (opcjonalnie)",
+      "banner": "Baner główny",
+      "banner_url": "URL banera (opcjonalnie)",
+      "venue_name": "Nazwa miejsca",
+      "venue_address": "Adres miejsca",
+      "city": "Miasto",
+      "province": "Województwo/Stan",
+      "country": "Kraj",
+      "postal_code": "Kod pocztowy",
+      "location_notes": "Uwagi o lokalizacji",
+      "start_date": "Data rozpoczęcia",
+      "end_date": "Data zakończenia",
+      "registration_opens": "Otwarcie rejestracji",
+      "registration_closes": "Zamknięcie rejestracji",
+      "registration_type": "Typ rejestracji",
+      "max_teams": "Maks. drużyn",
+      "max_participants": "Maks. uczestników",
+      "min_players_per_team": "Min. graczy w drużynie",
+      "max_players_per_team": "Maks. graczy w drużynie",
+      "team_fee": "Opłata za drużynę (USD)",
+      "individual_fee": "Opłata indywidualna (USD)",
+      "early_bird_discount": "Procent zniżki",
+      "early_bird_deadline": "Termin wczesnej rejestracji",
+      "allow_etransfer": "Zezwalaj na Interac e-Transfer",
+      "etransfer_recipient": "E-mail odbiorcy e-transferu",
+      "etransfer_instructions": "Instrukcje e-transferu",
+      "allow_waitlist": "Zezwalaj na listę oczekujących",
+      "require_membership": "Wymagana aktywna członkostwo",
+      "contact_email": "E-mail kontaktowy",
+      "contact_phone": "Telefon kontaktowy",
+      "website": "Strona wydarzenia",
+      "public_event": "Wydarzenie publiczne",
+      "featured_event": "Wyróżnione wydarzenie"
     },
     "placeholders": {
-      "name": "TODO: Translate \"form.placeholders.name\"",
-      "slug": "TODO: Translate \"form.placeholders.slug\"",
-      "short_description": "TODO: Translate \"form.placeholders.short_description\"",
-      "description": "TODO: Translate \"form.placeholders.description\"",
-      "logo_url": "TODO: Translate \"form.placeholders.logo_url\"",
-      "banner_url": "TODO: Translate \"form.placeholders.banner_url\"",
-      "venue_name": "TODO: Translate \"form.placeholders.venue_name\"",
-      "venue_address": "TODO: Translate \"form.placeholders.venue_address\"",
-      "city": "TODO: Translate \"form.placeholders.city\"",
-      "country": "TODO: Translate \"form.placeholders.country\"",
-      "postal_code": "TODO: Translate \"form.placeholders.postal_code\"",
-      "location_notes": "TODO: Translate \"form.placeholders.location_notes\"",
-      "contact_email": "TODO: Translate \"form.placeholders.contact_email\"",
-      "contact_phone": "TODO: Translate \"form.placeholders.contact_phone\"",
-      "website": "TODO: Translate \"form.placeholders.website\"",
-      "etransfer_instructions": "TODO: Translate \"form.placeholders.etransfer_instructions\"",
-      "short_description_card": "TODO: Translate \"form.placeholders.short_description_card\"",
-      "description_details": "TODO: Translate \"form.placeholders.description_details\""
+      "name": "Super letni turniej",
+      "slug": "super-letni-turniej",
+      "short_description": "Krótki opis dla kart wydarzeń i podglądów",
+      "description": "Szczegółowy opis wydarzenia...",
+      "logo_url": "https://cdn.example.com/event-logo.png",
+      "banner_url": "https://cdn.example.com/event-banner.jpg",
+      "venue_name": "Kompleks sportowy gminy",
+      "venue_address": "ul. Warszawska 1",
+      "city": "Warszawa",
+      "country": "Wyszukaj kraj",
+      "postal_code": "00-001",
+      "location_notes": "Informacje o parkowaniu, dojazd, ułatwienia dostępu...",
+      "contact_email": "wydarzenie@przyklad.pl",
+      "contact_phone": "+48 123 456 789",
+      "website": "https://przyklad.pl/wydarzenie",
+      "etransfer_instructions": "Podaj pytanie bezpieczeństwa, oczekiwane hasło lub inne uwagi dla płatności e-transferem.",
+      "short_description_card": "Jednolinijkowe podsumowanie dla kart i podglądów",
+      "description_details": "Podziel się kluczowymi szczegółami, harmonogramem i tym, czego można się spodziewać"
     },
     "descriptions": {
-      "slug": "TODO: Translate \"form.descriptions.slug\"",
-      "short_description": "TODO: Translate \"form.descriptions.short_description\"",
-      "logo": "TODO: Translate \"form.descriptions.logo\"",
-      "banner": "TODO: Translate \"form.descriptions.banner\"",
-      "logo_helper": "TODO: Translate \"form.descriptions.logo_helper\"",
-      "banner_helper": "TODO: Translate \"form.descriptions.banner_helper\"",
-      "early_bird_discount": "TODO: Translate \"form.descriptions.early_bird_discount\"",
-      "etransfer_recipient": "TODO: Translate \"form.descriptions.etransfer_recipient\"",
-      "public_event_admin": "TODO: Translate \"form.descriptions.public_event_admin\"",
-      "public_event_user": "TODO: Translate \"form.descriptions.public_event_user\"",
-      "featured_event": "TODO: Translate \"form.descriptions.featured_event\"",
-      "allow_waitlist": "TODO: Translate \"form.descriptions.allow_waitlist\"",
-      "require_membership": "TODO: Translate \"form.descriptions.require_membership\""
+      "slug": "Będzie używane w URL wydarzenia",
+      "short_description": "Maks. 500 znaków",
+      "logo": "Wyświetlane na kompaktowych kartach i sekcjach wyróżnionych.",
+      "banner": "Pokazywane na publicznej stronie wydarzenia i w listach wyróżnionych.",
+      "logo_helper": "Idealny rozmiar to kwadratowy PNG lub JPG do 5MB.",
+      "banner_helper": "Użyj szerokiego obrazu (16:9) do 8MB dla głównego banera wydarzenia.",
+      "early_bird_discount": "Procent zniżki dla wczesnej rejestracji",
+      "etransfer_recipient": "Dokąd powinny być wysyłane płatności e-transferem",
+      "public_event_admin": "Uczyń to wydarzenie widocznym dla wszystkich",
+      "public_event_user": "Poproś o widoczność publiczną (wymaga zatwierdzenia przez admina)",
+      "featured_event": "Wyróżnij to wydarzenie na stronie głównej i w wynikach wyszukiwania",
+      "allow_waitlist": "Zezwalaj rejestracjom na dołączenie do listy oczekujących, gdy wydarzenie jest pełne",
+      "require_membership": "Zezwalaj tylko użytkownikom z aktywnymi członkostwami Roundup Games na rejestrację"
     },
     "sections": {
       "branding": {
-        "title": "TODO: Translate \"form.sections.branding.title\"",
-        "description": "TODO: Translate \"form.sections.branding.description\""
+        "title": "Branding",
+        "description": "Dodaj elementy wizualne, aby spersonalizować swoje wydarzenie. Prześlij obrazy lub wklej URL-e dla zasobów, które już hostujesz."
       },
       "pricing": {
-        "title": "TODO: Translate \"form.sections.pricing.title\""
+        "title": "Ceny"
       },
       "early_bird": {
-        "title": "TODO: Translate \"form.sections.early_bird.title\""
+        "title": "Zniżka dla wczesnej rejestracji"
       },
       "alternate_payment": {
-        "title": "TODO: Translate \"form.sections.alternate_payment.title\""
+        "title": "Alternatywne opcje płatności"
       },
       "contact_info": {
-        "title": "TODO: Translate \"form.sections.contact_info.title\""
+        "title": "Informacje kontaktowe"
       },
       "visibility": {
-        "title": "TODO: Translate \"form.sections.visibility.title\""
+        "title": "Ustawienia widoczności"
       }
     }
   },
   "buttons": {
-    "previous": "TODO: Translate \"buttons.previous\"",
-    "next": "TODO: Translate \"buttons.next\"",
-    "create": "TODO: Translate \"buttons.create\"",
-    "creating": "TODO: Translate \"buttons.creating\""
+    "previous": "Wstecz",
+    "next": "Dalej",
+    "create": "Utwórz wydarzenie",
+    "creating": "Tworzenie..."
   },
   "select": {
-    "select_type": "TODO: Translate \"select.select_type\"",
-    "select_registration_type": "TODO: Translate \"select.select_registration_type\""
+    "select_type": "Wybierz typ",
+    "select_registration_type": "Wybierz typ rejestracji"
   },
   "types": {
-    "tournament": "TODO: Translate \"types.tournament\"",
-    "league": "TODO: Translate \"types.league\"",
-    "camp": "TODO: Translate \"types.camp\"",
-    "clinic": "TODO: Translate \"types.clinic\"",
-    "social": "TODO: Translate \"types.social\"",
-    "other": "TODO: Translate \"types.other\""
+    "tournament": "Turniej",
+    "league": "Liga",
+    "camp": "Obóz treningowy",
+    "clinic": "Klinika umiejętności",
+    "social": "Wydarzenie społeczne",
+    "other": "Inne"
   },
   "status": {
-    "draft": "TODO: Translate \"status.draft\"",
-    "published": "TODO: Translate \"status.published\"",
-    "registration_open": "TODO: Translate \"status.registration_open\""
+    "draft": "Szkic (Niewidoczny)",
+    "published": "Opublikowany (Widoczny)",
+    "registration_open": "Rejestracja otwarta"
   },
   "registration_types": {
-    "team": "TODO: Translate \"registration_types.team\"",
-    "individual": "TODO: Translate \"registration_types.individual\"",
-    "both": "TODO: Translate \"registration_types.both\""
+    "team": "Drużyna",
+    "individual": "Indywidualny",
+    "both": "Drużyna i indywidualny"
   },
   "alerts": {
     "admin_approval": {
-      "title": "TODO: Translate \"alerts.admin_approval.title\"",
-      "description": "TODO: Translate \"alerts.admin_approval.description\""
+      "title": "Wymagane zatwierdzenie admina",
+      "description": "Twoje wydarzenie zostanie utworzone jako szkic i będzie wymagać zatwierdzenia przez administratora, zanim stanie się publicznie widoczne. Możesz nadal zarządzać i edytować swoje wydarzenie, gdy czeka na zatwierdzenie."
     },
     "approval_process": {
-      "description": "TODO: Translate \"alerts.approval_process.description\""
+      "description": "Po utworzeniu wydarzenia, administrator przejrzyje je i zatwierdzi do publicznej widoczności. Zostaniesz powiadomiony, gdy Twoje wydarzenie zostanie zatwierdzone."
     }
   },
   "validation": {
-    "name_required": "TODO: Translate \"validation.name_required\"",
-    "slug_required": "TODO: Translate \"validation.slug_required\"",
-    "slug_format": "TODO: Translate \"validation.slug_format\"",
-    "short_description_max": "TODO: Translate \"validation.short_description_max\"",
-    "start_date_required": "TODO: Translate \"validation.start_date_required\"",
-    "end_date_required": "TODO: Translate \"validation.end_date_required\"",
-    "etransfer_recipient_required": "TODO: Translate \"validation.etransfer_recipient_required\"",
-    "early_bird_deadline_required": "TODO: Translate \"validation.early_bird_deadline_required\"",
-    "early_bird_discount_required": "TODO: Translate \"validation.early_bird_discount_required\"",
-    "valid_etransfer_email": "TODO: Translate \"validation.valid_etransfer_email\"",
-    "invalid_value": "TODO: Translate \"validation.invalid_value\""
+    "name_required": "Nazwa wydarzenia jest wymagana",
+    "slug_required": "URL slug jest wymagany",
+    "slug_format": "Slug może zawierać tylko małe litery, cyfry i myślniki",
+    "short_description_max": "Krótki opis musi mieć poniżej 500 znaków",
+    "start_date_required": "Data rozpoczęcia jest wymagana",
+    "end_date_required": "Data zakończenia jest wymagana",
+    "etransfer_recipient_required": "E-mail odbiorcy e-transferu jest wymagany, gdy e-transfer jest włączony",
+    "early_bird_deadline_required": "Termin wczesnej rejestracji jest wymagany, gdy oferowana jest zniżka",
+    "early_bird_discount_required": "Ustaw procent zniżki lub usuń termin",
+    "valid_etransfer_email": "Wprowadź poprawny e-mail dla e-transferu",
+    "invalid_value": "Nieprawidłowa wartość"
   },
   "upload": {
-    "logo_uploading": "TODO: Translate \"upload.logo_uploading\"",
-    "banner_uploading": "TODO: Translate \"upload.banner_uploading\"",
-    "logo_success": "TODO: Translate \"upload.logo_success\"",
-    "banner_success": "TODO: Translate \"upload.banner_success\"",
-    "logo_failed": "TODO: Translate \"upload.logo_failed\"",
-    "banner_failed": "TODO: Translate \"upload.banner_failed\"",
-    "wait_for_upload": "TODO: Translate \"upload.wait_for_upload\"",
-    "file_read_failed": "TODO: Translate \"upload.file_read_failed\""
+    "logo_uploading": "Przesyłanie logo...",
+    "banner_uploading": "Przesyłanie banera...",
+    "logo_success": "Logo pomyślnie przesłane",
+    "banner_success": "Baner pomyślnie przesłany",
+    "logo_failed": "Przesyłanie logo nie powiodło się",
+    "banner_failed": "Przesyłanie banera nie powiodło się",
+    "wait_for_upload": "Poczekaj, aż przesłania obrazów zostaną zakończone przed wysłaniem.",
+    "file_read_failed": "Odczyt pliku nie powiódł się"
   },
   "success": {
-    "created": "TODO: Translate \"success.created\"",
-    "created_pending_approval": "TODO: Translate \"success.created_pending_approval\""
+    "created": "Wydarzenie pomyślnie utworzone!",
+    "created_pending_approval": "Wydarzenie utworzone! Zostanie sprawdzone przez administratora, zanim stanie się publiczne."
   },
   "errors": {
-    "create_failed": "TODO: Translate \"errors.create_failed\"",
-    "upload_failed": "TODO: Translate \"errors.upload_failed\"",
-    "validation_error": "TODO: Translate \"errors.validation_error\"",
-    "creation_error": "TODO: Translate \"errors.creation_error\"",
-    "load_failed": "TODO: Translate \"errors.load_failed\""
+    "create_failed": "Tworzenie wydarzenia nie powiodło się",
+    "upload_failed": "Przesyłanie obrazu nie powiodło się",
+    "validation_error": "Popraw oznaczone pola.",
+    "creation_error": "Wystąpił błąd podczas tworzenia wydarzenia",
+    "load_failed": "Błąd ładowania wydarzeń: {{message}}"
   },
   "list": {
-    "filter_title": "TODO: Translate \"list.filter_title\"",
+    "filter_title": "Filtruj wydarzenia",
     "labels": {
-      "event_type": "TODO: Translate \"list.labels.event_type\"",
-      "status": "TODO: Translate \"list.labels.status\"",
-      "city": "TODO: Translate \"list.labels.city\"",
-      "country": "TODO: Translate \"list.labels.country\"",
-      "sort_by": "TODO: Translate \"list.labels.sort_by\"",
-      "sort_order": "TODO: Translate \"list.labels.sort_order\""
+      "event_type": "Typ wydarzenia",
+      "status": "Status",
+      "city": "Miasto",
+      "country": "Kraj",
+      "sort_by": "Sortuj według",
+      "sort_order": "Kolejność sortowania"
     },
     "placeholders": {
-      "all_types": "TODO: Translate \"list.placeholders.all_types\"",
-      "all_statuses": "TODO: Translate \"list.placeholders.all_statuses\"",
-      "filter_by_city": "TODO: Translate \"list.placeholders.filter_by_city\"",
-      "all_countries": "TODO: Translate \"list.placeholders.all_countries\""
+      "all_types": "Wszystkie typy",
+      "all_statuses": "Wszystkie statusy",
+      "filter_by_city": "Filtruj według miasta",
+      "all_countries": "Wszystkie kraje"
     },
     "options": {
-      "tournament": "TODO: Translate \"list.options.tournament\"",
-      "league": "TODO: Translate \"list.options.league\"",
-      "camp": "TODO: Translate \"list.options.camp\"",
-      "clinic": "TODO: Translate \"list.options.clinic\"",
-      "social": "TODO: Translate \"list.options.social\"",
-      "other": "TODO: Translate \"list.options.other\"",
-      "published": "TODO: Translate \"list.options.published\"",
-      "registration_open": "TODO: Translate \"list.options.registration_open\"",
-      "registration_closed": "TODO: Translate \"list.options.registration_closed\"",
-      "in_progress": "TODO: Translate \"list.options.in_progress\"",
-      "completed": "TODO: Translate \"list.options.completed\"",
-      "start_date": "TODO: Translate \"list.options.start_date\"",
-      "name": "TODO: Translate \"list.options.name\"",
-      "recently_added": "TODO: Translate \"list.options.recently_added\"",
-      "ascending": "TODO: Translate \"list.options.ascending\"",
-      "descending": "TODO: Translate \"list.options.descending\""
+      "tournament": "Turniej",
+      "league": "Liga",
+      "camp": "Obóz",
+      "clinic": "Klinika",
+      "social": "Społeczny",
+      "other": "Inne",
+      "published": "Opublikowany",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta",
+      "in_progress": "W trakcie",
+      "completed": "Ukończony",
+      "start_date": "Data rozpoczęcia",
+      "name": "Nazwa",
+      "recently_added": "Ostatnio dodane",
+      "ascending": "Rosnąco",
+      "descending": "Malejąco"
     },
-    "empty_state": "TODO: Translate \"list.empty_state\"",
+    "empty_state": "Nie znaleziono wydarzeń pasujących do Twoich kryteriów.",
     "registration": {
-      "open": "TODO: Translate \"list.registration.open\"",
-      "spots_left": "TODO: Translate \"list.registration.spots_left\"",
-      "registered": "TODO: Translate \"list.registration.registered\"",
-      "type_label": "TODO: Translate \"list.registration.type_label\""
+      "open": "Rejestracja otwarta",
+      "spots_left": "(pozostało {{count}} miejsc)",
+      "registered": "zarejestrowano {{count}}",
+      "type_label": "Rejestracja {{type}}"
     },
     "pagination": {
-      "showing": "TODO: Translate \"list.pagination.showing\"",
-      "previous": "TODO: Translate \"list.pagination.previous\"",
-      "next": "TODO: Translate \"list.pagination.next\""
+      "showing": "Pokazywanie {{start}}-{{end}} z {{total}} wydarzeń",
+      "previous": "Wstecz",
+      "next": "Dalej"
     },
     "actions": {
-      "view_details": "TODO: Translate \"list.actions.view_details\""
+      "view_details": "Zobacz szczegóły"
     }
   },
   "list_item": {
-    "free": "TODO: Translate \"list_item.free\"",
-    "capacity_tbd": "TODO: Translate \"list_item.capacity_tbd\"",
-    "date_tbd": "TODO: Translate \"list_item.date_tbd\"",
-    "spots_left": "TODO: Translate \"list_item.spots_left\""
+    "free": "Bezpłatne",
+    "capacity_tbd": "Pojemność do ustalenia",
+    "date_tbd": "Do ustalenia",
+    "spots_left": "pozostało {{count}} miejsc"
   },
   "minimal_form": {
-    "title": "TODO: Translate \"minimal_form.title\"",
-    "description": "TODO: Translate \"minimal_form.description\"",
-    "test_button": "TODO: Translate \"minimal_form.test_button\""
+    "title": "Utwórz nowe wydarzenie (Test)",
+    "description": "To jest minimalny formularz testowy do izolacji problemu renderowania.",
+    "test_button": "Przycisk testowy"
   },
   "detail": {
-    "event_not_found": "TODO: Translate \"detail.event_not_found\"",
-    "dates": "TODO: Translate \"detail.dates\"",
-    "type": "TODO: Translate \"detail.type\"",
-    "status": "TODO: Translate \"detail.status\"",
-    "registration": "TODO: Translate \"detail.registration\"",
-    "open": "TODO: Translate \"detail.open\"",
-    "closed": "TODO: Translate \"detail.closed\"",
-    "spots_left": "TODO: Translate \"detail.spots_left\"",
-    "registrations": "TODO: Translate \"detail.registrations\"",
-    "no_registrations": "TODO: Translate \"detail.no_registrations\"",
-    "confirm": "TODO: Translate \"detail.confirm\"",
-    "waitlist": "TODO: Translate \"detail.waitlist\"",
-    "cancel": "TODO: Translate \"detail.cancel\"",
+    "event_not_found": "Nie znaleziono wydarzenia",
+    "dates": "Daty",
+    "type": "Typ",
+    "status": "Status",
+    "registration": "Rejestracja",
+    "open": "Otwarta",
+    "closed": "Zamknięta",
+    "spots_left": "pozostało {{count}} miejsc",
+    "registrations": "Rejestracje",
+    "no_registrations": "Brak rejestracji.",
+    "confirm": "Potwierdź",
+    "waitlist": "Lista oczekujących",
+    "cancel": "Anuluj",
     "actions": {
-      "publish": "TODO: Translate \"detail.actions.publish\"",
-      "open_registration": "TODO: Translate \"detail.actions.open_registration\"",
-      "close_registration": "TODO: Translate \"detail.actions.close_registration\"",
-      "start": "TODO: Translate \"detail.actions.start\"",
-      "complete": "TODO: Translate \"detail.actions.complete\"",
-      "cancel": "TODO: Translate \"detail.actions.cancel\""
+      "publish": "Opublikuj",
+      "open_registration": "Otwórz rejestrację",
+      "close_registration": "Zamknij rejestrację",
+      "start": "Rozpocznij",
+      "complete": "Ukończ",
+      "cancel": "Anuluj"
     },
     "success": {
-      "event_updated": "TODO: Translate \"detail.success.event_updated\"",
-      "registration_updated": "TODO: Translate \"detail.success.registration_updated\""
+      "event_updated": "Wydarzenie zaktualizowane",
+      "registration_updated": "Rejestracja zaktualizowana"
     },
     "errors": {
-      "update_failed": "TODO: Translate \"detail.errors.update_failed\"",
-      "registration_update_failed": "TODO: Translate \"detail.errors.registration_update_failed\""
+      "update_failed": "Aktualizacja wydarzenia nie powiodła się",
+      "registration_update_failed": "Aktualizacja rejestracji nie powiodła się"
     }
   },
   "registration": {
-    "event_not_found": "TODO: Translate \"registration.event_not_found\"",
-    "event_not_available": "TODO: Translate \"registration.event_not_available\"",
-    "back_to_events": "TODO: Translate \"registration.back_to_events\"",
-    "already_registered": "TODO: Translate \"registration.already_registered\"",
-    "already_registered_description": "TODO: Translate \"registration.already_registered_description\"",
-    "back_to_event_details": "TODO: Translate \"registration.back_to_event_details\"",
-    "view_event_details": "TODO: Translate \"registration.view_event_details\"",
-    "register_for_event": "TODO: Translate \"registration.register_for_event\"",
-    "register_description": "TODO: Translate \"registration.register_description\"",
-    "registration_type": "TODO: Translate \"registration.registration_type\"",
-    "individual_registration": "TODO: Translate \"registration.individual_registration\"",
-    "team_registration": "TODO: Translate \"registration.team_registration\"",
-    "register_as_individual": "TODO: Translate \"registration.register_as_individual\"",
-    "register_entire_team": "TODO: Translate \"registration.register_entire_team\"",
-    "select_team": "TODO: Translate \"registration.select_team\"",
-    "select_team_placeholder": "TODO: Translate \"registration.select_team_placeholder\"",
-    "join_create_team": "TODO: Translate \"registration.join_create_team\"",
-    "need_team_to_register": "TODO: Translate \"registration.need_team_to_register\"",
-    "additional_info": "TODO: Translate \"registration.additional_info\"",
-    "additional_info_placeholder": "TODO: Translate \"registration.additional_info_placeholder\"",
-    "payment_method": "TODO: Translate \"registration.payment_method\"",
-    "square_checkout": "TODO: Translate \"registration.square_checkout\"",
-    "etransfer": "TODO: Translate \"registration.etransfer\"",
-    "pay_securely_online": "TODO: Translate \"registration.pay_securely_online\"",
-    "submit_send_payment_manually": "TODO: Translate \"registration.submit_send_payment_manually\"",
-    "etransfer_instructions": "TODO: Translate \"registration.etransfer_instructions\"",
-    "send_payment_to": "TODO: Translate \"registration.send_payment_to\"",
-    "no_payment_required": "TODO: Translate \"registration.no_payment_required\"",
-    "no_payment_description": "TODO: Translate \"registration.no_payment_description\"",
-    "terms_and_conditions": "TODO: Translate \"registration.terms_and_conditions\"",
-    "agree_terms": "TODO: Translate \"registration.agree_terms\"",
-    "agree_terms_description": "TODO: Translate \"registration.agree_terms_description\"",
-    "accept_liability_waiver": "TODO: Translate \"registration.accept_liability_waiver\"",
-    "accept_waiver_description": "TODO: Translate \"registration.accept_waiver_description\"",
-    "submitting": "TODO: Translate \"registration.submitting\"",
-    "awaiting_etransfer": "TODO: Translate \"registration.awaiting_etransfer\"",
-    "complete_registration": "TODO: Translate \"registration.complete_registration\"",
-    "finish_etransfer": "TODO: Translate \"registration.finish_etransfer\"",
-    "send_payment_finalize": "TODO: Translate \"registration.send_payment_finalize\"",
-    "recipient_email": "TODO: Translate \"registration.recipient_email\"",
-    "instructions": "TODO: Translate \"registration.instructions\"",
-    "see_event_instructions": "TODO: Translate \"registration.see_event_instructions\"",
-    "payment_received_confirmation": "TODO: Translate \"registration.payment_received_confirmation\"",
-    "return_to_dashboard": "TODO: Translate \"registration.return_to_dashboard\"",
-    "event_overview": "TODO: Translate \"registration.event_overview\"",
-    "status": "TODO: Translate \"registration.status\"",
-    "registered": "TODO: Translate \"registration.registered\"",
-    "spots_remaining": "TODO: Translate \"registration.spots_remaining\"",
-    "registration_fees": "TODO: Translate \"registration.registration_fees\"",
-    "current_fee": "TODO: Translate \"registration.current_fee\"",
-    "early_bird_applied": "TODO: Translate \"registration.early_bird_applied\"",
-    "participant_information": "TODO: Translate \"registration.participant_information\"",
-    "unknown_participant": "TODO: Translate \"registration.unknown_participant\"",
-    "no_email_available": "TODO: Translate \"registration.no_email_available\"",
-    "registration_failed": "TODO: Translate \"registration.registration_failed\"",
-    "redirecting_to_square": "TODO: Translate \"registration.redirecting_to_square\"",
-    "registration_submitted": "TODO: Translate \"registration.registration_submitted\"",
-    "registration_completed": "TODO: Translate \"registration.registration_completed\"",
-    "error_during_registration": "TODO: Translate \"registration.error_during_registration\"",
-    "already_submitted": "TODO: Translate \"registration.already_submitted\"",
-    "accept_all_terms": "TODO: Translate \"registration.accept_all_terms\"",
-    "select_a_team": "TODO: Translate \"registration.select_a_team\"",
-    "registration_open": "TODO: Translate \"registration.registration_open\"",
-    "registration_closed": "TODO: Translate \"registration.registration_closed\""
+    "event_not_found": "Nie znaleziono wydarzenia",
+    "event_not_available": "Wydarzenie, na które próbujesz się zarejestrować, nie istnieje lub nie jest publicznie dostępne.",
+    "back_to_events": "Wróć do wydarzeń",
+    "already_registered": "Już zarejestrowany",
+    "already_registered_description": "Jesteś już zarejestrowany na to wydarzenie.",
+    "back_to_event_details": "Wróć do szczegółów wydarzenia",
+    "view_event_details": "Zobacz szczegóły wydarzenia",
+    "register_for_event": "Zarejestruj się na {{eventName}}",
+    "register_description": "Wypełnij poniższy formularz, aby zarejestrować się na to wydarzenie",
+    "registration_type": "Typ rejestracji",
+    "individual_registration": "Rejestracja indywidualna",
+    "team_registration": "Rejestracja drużynowa",
+    "register_as_individual": "Zarejestruj się jako indywidualny gracz",
+    "register_entire_team": "Zarejestruj całą swoją drużynę",
+    "select_team": "Wybierz drużynę",
+    "select_team_placeholder": "Wybierz drużynę",
+    "join_create_team": "Dołącz lub utwórz drużynę",
+    "need_team_to_register": "Musisz być częścią drużyny, aby zarejestrować się jako drużyna.",
+    "additional_info": "Dodatkowe informacje (opcjonalnie)",
+    "additional_info_placeholder": "Ograniczenia dietetyczne, potrzeby dostępności lub inne informacje...",
+    "payment_method": "Sposób płatności",
+    "square_checkout": "Square Checkout",
+    "etransfer": "Interac e-Transfer",
+    "pay_securely_online": "Płać bezpiecznie online kartą kredytową lub debetową.",
+    "submit_send_payment_manually": "Prześlij teraz i wyślij płatność ręcznie po tym formularzu.",
+    "etransfer_instructions": "Instrukcje e-transferu",
+    "send_payment_to": "Wyślij płatność do {{recipient}}. Podaj swoje imię i nazwisko oraz wydarzenie w wiadomości.",
+    "no_payment_required": "Bez płatności",
+    "no_payment_description": "Ta rejestracja nie wymaga płatności. Prześlij formularz, aby zakończyć.",
+    "terms_and_conditions": "Warunki i zasady",
+    "agree_terms": "Zgadzam się z warunkami wydarzenia i kodeksem postępowania",
+    "agree_terms_description": "Musisz zgodzić się na te warunki, aby uczestniczyć w wydarzeniu.",
+    "accept_liability_waiver": "Przeczytałem i akceptuję zrzeczenie odpowiedzialności",
+    "accept_waiver_description": "Każdy uczestnik musi zaakceptować zrzeczenie przed rejestracją.",
+    "submitting": "Przesyłanie...",
+    "awaiting_etransfer": "Oczekiwanie na e-transfer",
+    "complete_registration": "Ukończ rejestrację",
+    "finish_etransfer": "Ukończ swój e-transfer",
+    "send_payment_finalize": "Wyślij swoją płatność, aby sfinalizować rejestrację.",
+    "recipient_email": "E-mail odbiorcy",
+    "instructions": "Instrukcje",
+    "see_event_instructions": "Zobacz instrukcje wydarzenia",
+    "payment_received_confirmation": "Gdy płatność zostanie otrzymana, administrator oznaczy Twoją rejestrację jako opłaconą.",
+    "return_to_dashboard": "Wróć do panelu",
+    "event_overview": "Przegląd wydarzenia",
+    "status": "Status",
+    "registered": "Zarejestrowany",
+    "spots_remaining": "Pozostałe miejsca",
+    "registration_fees": "Opłaty rejestracyjne",
+    "current_fee": "Aktualna opłata",
+    "early_bird_applied": "Zastosowano zniżkę dla wczesnej rejestracji ({{percentage}}% zniżki)",
+    "participant_information": "Informacje o uczestniku",
+    "unknown_participant": "Nieznany uczestnik",
+    "no_email_available": "Brak dostępnego e-maila",
+    "registration_failed": "Rejestracja nie powiodła się",
+    "redirecting_to_square": "Przekierowywanie do Square Checkout...",
+    "registration_submitted": "Rejestracja przesłana! Postępuj zgodnie z instrukcjami e-transferu poniżej.",
+    "registration_completed": "Rejestracja ukończona!",
+    "error_during_registration": "Wystąpił błąd podczas rejestracji",
+    "already_submitted": "Już przesłałeś tę rejestrację.",
+    "accept_all_terms": "Proszę zaakceptować wszystkie warunki i zasady",
+    "select_a_team": "Proszę wybrać drużynę",
+    "registration_open": "Rejestracja otwarta",
+    "registration_closed": "Rejestracja zamknięta"
   }
 }

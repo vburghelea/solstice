@@ -64,7 +64,6 @@
     "created": "Created",
     "updated": "Updated",
     "expires": "Expires",
-    "status": "Status",
     "type": "Type",
     "category": "Category",
     "title": "Title",
@@ -276,9 +275,6 @@
       "privacy": "Privacy",
       "notifications": "Notifications"
     }
-  },
-  "footer": {
-    "description": "Stories, campaigns, and community events curated for curious explorers. Start with a city, save your preferences, and we'll connect you when the right table opens up."
   },
   "location": {
     "players_count": "{{count}} players",

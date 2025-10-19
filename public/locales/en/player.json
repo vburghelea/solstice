@@ -138,11 +138,7 @@
         "title": "Early access: collaborative calendar sync",
         "description": "Enable calendar sharing so trusted friends can nudge you when they're planning a session that fits your vibe.",
         "join_pilot": "Join the pilot"
-      },
-      "open_session_briefing": "Open session briefing",
-      "discover_sessions": "Discover sessions",
-      "manage_teams": "Manage teams",
-      "see_all_events": "See all events"
+      }
     },
     "actions": {
       "edit_profile": "Edit profile",

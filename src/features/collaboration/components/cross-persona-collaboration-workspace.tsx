@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { useMemo, useState } from "react";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -56,7 +57,7 @@ export function CrossPersonaCollaborationWorkspace(
     previewMessage,
     inboxPathOverride,
   } = props;
-  const { t } = useCollaborationTranslation();
+  const { t, currentLanguage } = useCollaborationTranslation();
 
   const PERSONA_META: Record<PersonaId, { label: string; accent: string }> = {
     player: {
@@ -178,7 +179,9 @@ export function CrossPersonaCollaborationWorkspace(
         <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
           <span className="text-muted-foreground">
             {t("workspace.updated_label")}{" "}
-            {formatDistanceToNow(new Date(snapshot.updatedAt), { addSuffix: true })}
+            {formatDistanceToNowLocalized(new Date(snapshot.updatedAt), currentLanguage, {
+              addSuffix: true,
+            })}
           </span>
           <Separator orientation="vertical" className="h-4" />
           <span className="text-muted-foreground">{t("workspace.description")}</span>
@@ -498,9 +501,13 @@ export function CrossPersonaCollaborationWorkspace(
                   <Separator orientation="vertical" className="hidden h-4 sm:block" />
                   <span className="text-muted-foreground">
                     {t("sections.feedback.updated")}{" "}
-                    {formatDistanceToNow(new Date(entry.lastUpdatedAt), {
-                      addSuffix: true,
-                    })}
+                    {formatDistanceToNowLocalized(
+                      new Date(entry.lastUpdatedAt),
+                      currentLanguage,
+                      {
+                        addSuffix: true,
+                      },
+                    )}
                   </span>
                 </div>
                 <div className="space-y-2">

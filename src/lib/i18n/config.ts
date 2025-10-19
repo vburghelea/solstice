@@ -1,5 +1,8 @@
+const supportedLanguages = ["en", "de", "pl"] as const;
+type SupportedLanguage = (typeof supportedLanguages)[number];
+
 export const i18nConfig = {
-  supportedLanguages: ["en", "de", "pl"] as const,
+  supportedLanguages,
   defaultLanguage: "en" as const,
   fallbackLanguage: "en" as const,
   namespaces: [
@@ -48,6 +51,12 @@ export const i18nConfig = {
     lookupCookie: "i18next",
     lookupLocalStorage: "i18nextLng",
     checkWhitelist: true,
+    convertDetectedLanguage: (lng: string) => {
+      const normalized = lng.split("-")[0]?.toLowerCase() ?? i18nConfig.fallbackLanguage;
+      return supportedLanguages.includes(normalized as SupportedLanguage)
+        ? normalized
+        : i18nConfig.fallbackLanguage;
+    },
   },
 
   // React i18next configuration
@@ -65,4 +74,4 @@ export const i18nConfig = {
 };
 
 export type Namespace = (typeof i18nConfig.namespaces)[number];
-export type SupportedLanguage = (typeof i18nConfig.supportedLanguages)[number];
+export type { SupportedLanguage };

@@ -61,6 +61,9 @@ export default {
       "home",
       "about",
       "resources",
+      "errors",
+      "forms",
+      "navigation",
     ],
     resource: {
       loadPath: "src/lib/i18n/locales/{{lng}}/{{ns}}.json",

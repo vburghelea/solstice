@@ -1,47 +1,47 @@
 {
   "personas": {
     "visitor": {
-      "label": "TODO: Translate \"personas.visitor.label\"",
-      "short_label": "TODO: Translate \"personas.visitor.short_label\"",
-      "description": "TODO: Translate \"personas.visitor.description\""
+      "label": "Odwiedzający",
+      "short_label": "Odwiedź",
+      "description": "Odkryj publiczne historie, wydarzenia i najciekawsze momenty przygotowane dla nowych graczy."
     },
     "player": {
-      "label": "TODO: Translate \"personas.player.label\"",
-      "short_label": "TODO: Translate \"personas.player.short_label\"",
-      "description": "TODO: Translate \"personas.player.description\""
+      "label": "Gracz",
+      "short_label": "Graj",
+      "description": "Zarządzaj sesjami, zaproszeniami i aktualnościami społeczności dopasowanymi do ciebie."
     },
     "ops": {
-      "label": "TODO: Translate \"personas.ops.label\"",
-      "short_label": "TODO: Translate \"personas.ops.short_label\"",
-      "description": "TODO: Translate \"personas.ops.description\""
+      "label": "Organizacja wydarzeń",
+      "short_label": "Organizacja",
+      "description": "Koordynuj zapisy, obsadę i przebieg wydarzeń na żywo w jednym miejscu."
     },
     "gm": {
-      "label": "TODO: Translate \"personas.gm.label\"",
-      "short_label": "TODO: Translate \"personas.gm.short_label\"",
-      "description": "TODO: Translate \"personas.gm.description\""
+      "label": "Mistrz gry",
+      "short_label": "MG",
+      "description": "Planuj kampanie, zarządzaj zasobami i zbieraj opinie od swoich graczy."
     },
     "admin": {
-      "label": "TODO: Translate \"personas.admin.label\"",
-      "short_label": "TODO: Translate \"personas.admin.short_label\"",
-      "description": "TODO: Translate \"personas.admin.description\""
+      "label": "Administrator platformy",
+      "short_label": "Admin",
+      "description": "Zarządzaj rolami, zgodnością i kondycją systemu na całej platformie Roundup."
     }
   },
   "switcher": {
-    "title": "TODO: Translate \"switcher.title\"",
-    "description": "TODO: Translate \"switcher.description\"",
-    "loading": "TODO: Translate \"switcher.loading\"",
-    "badge": "TODO: Translate \"switcher.badge\"",
+    "title": "Zmień rolę",
+    "description": "Wybierz obszar pracy, aby zobaczyć nawigację i narzędzia dla każdej roli.",
+    "loading": "Ładowanie...",
+    "badge": "Rola",
     "buttons": {
-      "switching": "TODO: Translate \"switcher.buttons.switching\""
+      "switching": "Zmieniam rolę..."
     },
     "status": {
-      "active": "TODO: Translate \"switcher.status.active\"",
-      "available": "TODO: Translate \"switcher.status.available\""
+      "active": "Aktywna",
+      "available": "Dostępna"
     }
   },
   "errors": {
-    "persona_not_found": "TODO: Translate \"errors.persona_not_found\"",
-    "persona_locked": "TODO: Translate \"errors.persona_locked\"",
-    "unable_to_switch_persona": "TODO: Translate \"errors.unable_to_switch_persona\""
+    "persona_not_found": "Nie znaleziono roli",
+    "persona_locked": "Ta rola jest zablokowana",
+    "unable_to_switch_persona": "Nie udało się zmienić roli"
   }
 }

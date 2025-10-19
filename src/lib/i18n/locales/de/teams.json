@@ -1,125 +1,125 @@
 {
   "hero": {
-    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
-    "title": "TODO: Translate \"hero.title\"",
-    "subtitle": "TODO: Translate \"hero.subtitle\"",
-    "cta_text": "TODO: Translate \"hero.cta_text\"",
-    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+    "eyebrow": "Teams & Vereine",
+    "title": "Finde dein Team oder gründe dein eigenes von Grund auf",
+    "subtitle": "Von Küste zu Küste suchen Brettspiel-Communitys nach Gastgebern, Geschichtenerzählern, Regel-Experten und ehrenamtlichen Helfern. Entdecke Gruppen in deiner Nähe und nutze die Ressourcen, damit dein Programm blüht und gedeiht.",
+    "cta_text": "Vereins-Ressourcen durchstöbern",
+    "secondary_cta": "Einen neuen Verein starten"
   },
   "pathways": {
     "university": {
-      "title": "TODO: Translate \"pathways.university.title\"",
-      "description": "TODO: Translate \"pathways.university.description\""
+      "title": "Uni- & Hochschul-Clubs",
+      "description": "Campus-Programme in jeder Region fördern Wettbewerbs-Spiele, Campus-Ligen und den Nachwuchs. Greife auf unsere Saisonplanungsvorlagen und Schiedsrichter-Unterstützung zurück."
     },
     "community": {
-      "title": "TODO: Translate \"pathways.community.title\"",
-      "description": "TODO: Translate \"pathways.community.description\""
+      "title": "Gemeinschafts- & Stadt-Ligen",
+      "description": "Erwachsenen-Ligen lassen Brettspiel-Abende das ganze Jahr über blühen mit gemischten Skill-Leveln, eigenen Tischen und reisenden Meetup-Gruppen. Wir helfen dir bei Terminplanung, Versicherung und Förderanträgen."
     },
     "youth": {
-      "title": "TODO: Translate \"pathways.youth.title\"",
-      "description": "TODO: Translate \"pathways.youth.description\""
+      "title": "Jugend- & Schul-Programme",
+      "description": "Führe den Sport in Klassenzimmern und Jugendzentren ein mit angepassten Regeln, inklusiven Übungen und Trainer-Ausbildungen, die von Einsteiger-Sessions bis zu regionalen Turnieren reichen."
     }
   },
   "connect_locally": {
-    "eyebrow": "TODO: Translate \"connect_locally.eyebrow\"",
-    "title": "TODO: Translate \"connect_locally.title\"",
-    "description_1": "TODO: Translate \"connect_locally.description_1\"",
-    "description_2": "TODO: Translate \"connect_locally.description_2\"",
-    "email_support": "TODO: Translate \"connect_locally.email_support\"",
-    "list_event": "TODO: Translate \"connect_locally.list_event\""
+    "eyebrow": "Lokal vernetzen",
+    "title": "Vereins-Finder & regionale Zentren",
+    "description_1": "Unsere regionalen Koordinatoren pflegen ein aktuelles Verzeichnis von Uni-, Gemeinschafts- und Jugend-Teams. Ob du umziehst, Mitglieder suchst oder Freundschaftsspiele suchst – wir verbinden dich in Sekunden mit den richtigen Kontakten.",
+    "description_2": "Du veranstaltest ein Turnier oder möchtest ein Trainingsspiel machen? Gib deine Details ein und wir senden die Anfrage an benachbarte Programme und Schiedsrichter im ganzen Land.",
+    "email_support": "Regionale Unterstützung per E-Mail",
+    "list_event": "Dein Event eintragen"
   },
   "information_shared": {
-    "title": "TODO: Translate \"information_shared.title\"",
+    "title": "Informationen, die wir teilen",
     "items": {
-      "contacts": "TODO: Translate \"information_shared.items.contacts\"",
-      "referees": "TODO: Translate \"information_shared.items.referees\"",
-      "equipment": "TODO: Translate \"information_shared.items.equipment\"",
-      "billeting": "TODO: Translate \"information_shared.items.billeting\""
+      "contacts": "Vereins-Kontakte und Trainingszeiten",
+      "referees": "Schiedsrichter- und Protokoll-Verfügbarkeit",
+      "equipment": "Ausleih-Programme für Ausrüstung und Lagerlösungen",
+      "billeting": "Gastgeber-Netzwerke für reisende Teams"
     },
-    "updated_monthly": "TODO: Translate \"information_shared.updated_monthly\""
+    "updated_monthly": "Monatlich aktualisiert mit Vereins-Einreichungen"
   },
   "tools": {
-    "title": "TODO: Translate \"tools.title\"",
-    "subtitle": "TODO: Translate \"tools.subtitle\""
+    "title": "Werkzeuge für jede Phase",
+    "subtitle": "Starte direkt mit dem Programmaufbau mit Vorlagen und Trainingsinhalten, die von unserem Entwicklungsteam gepflegt werden."
   },
   "resources": {
     "club_starter": {
-      "title": "TODO: Translate \"resources.club_starter.title\"",
-      "description": "TODO: Translate \"resources.club_starter.description\""
+      "title": "Vereins-Gründungs-Toolkit",
+      "description": "Lade Satzungsvorlagen, Budget-Planer und Rollenbeschreibungen für Ehrenamtliche herunter, um ein nachhaltiges Programm zu starten."
     },
     "practice_library": {
-      "title": "TODO: Translate \"resources.practice_library.title\"",
-      "description": "TODO: Translate \"resources.practice_library.description\""
+      "title": "Training & Fitness-Bibliothek",
+      "description": "Zugriff auf fortschreitende Trainingspläne, Skill-Videos und Torwart-Kliniken, entwickelt von den Nationalmannschafts-Trainern."
     },
     "safe_sport": {
-      "title": "TODO: Translate \"resources.safe_sport.title\"",
-      "description": "TODO: Translate \"resources.safe_sport.description\""
+      "title": "Sicherer Sport & Schutzmaßnahmen",
+      "description": "Bleibe konform mit nationalen Richtlinien für Hintergrundüberprüfungen, Verletzungsberichte und inklusive Programmgestaltung."
     },
-    "open_resource": "TODO: Translate \"resources.open_resource\""
+    "open_resource": "Ressource öffnen"
   },
   "invitations": {
-    "title": "TODO: Translate \"invitations.title\"",
-    "badge": "TODO: Translate \"invitations.badge\"",
-    "accept": "TODO: Translate \"invitations.accept\"",
-    "accepting": "TODO: Translate \"invitations.accepting\"",
-    "decline": "TODO: Translate \"invitations.decline\"",
-    "declining": "TODO: Translate \"invitations.declining\"",
-    "accepted": "TODO: Translate \"invitations.accepted\"",
-    "declined": "TODO: Translate \"invitations.declined\"",
-    "sent": "TODO: Translate \"invitations.sent\"",
-    "request_created": "TODO: Translate \"invitations.request_created\"",
-    "invited_by": "TODO: Translate \"invitations.invited_by\""
+    "title": "Ausstehende Team-Einladungen",
+    "badge": "{{count}} ausstehend",
+    "accept": "Annehmen",
+    "accepting": "Wird angenommen...",
+    "decline": "Ablehnen",
+    "declining": "Wird abgelehnt...",
+    "accepted": "Einladung angenommen.",
+    "declined": "Einladung abgelehnt.",
+    "sent": "Einladung gesendet",
+    "request_created": "Anfrage erstellt",
+    "invited_by": "Eingeladen von {{name}}"
   },
   "form": {
     "fields": {
-      "team_name": "TODO: Translate \"form.fields.team_name\"",
-      "team_description": "TODO: Translate \"form.fields.team_description\"",
-      "role": "TODO: Translate \"form.fields.role\"",
-      "member_email": "TODO: Translate \"form.fields.member_email\""
+      "team_name": "Team-Name",
+      "team_description": "Team-Beschreibung",
+      "role": "Rolle",
+      "member_email": "Mitglieder-E-Mail"
     },
     "placeholders": {
-      "team_name": "TODO: Translate \"form.placeholders.team_name\"",
-      "team_description": "TODO: Translate \"form.placeholders.team_description\"",
-      "member_email": "TODO: Translate \"form.placeholders.member_email\""
+      "team_name": "Team-Namen eingeben",
+      "team_description": "Beschreibe dein Team",
+      "member_email": "mitglied@beispiel.de"
     }
   },
   "buttons": {
-    "create_team": "TODO: Translate \"buttons.create_team\"",
-    "invite_member": "TODO: Translate \"buttons.invite_member\"",
-    "join_team": "TODO: Translate \"buttons.join_team\"",
-    "leave_team": "TODO: Translate \"buttons.leave_team\""
+    "create_team": "Team erstellen",
+    "invite_member": "Mitglied einladen",
+    "join_team": "Team beitreten",
+    "leave_team": "Team verlassen"
   },
   "roles": {
-    "owner": "TODO: Translate \"roles.owner\"",
-    "admin": "TODO: Translate \"roles.admin\"",
-    "member": "TODO: Translate \"roles.member\"",
-    "pending": "TODO: Translate \"roles.pending\""
+    "owner": "Besitzer",
+    "admin": "Admin",
+    "member": "Mitglied",
+    "pending": "Ausstehend"
   },
   "errors": {
-    "accept_failed": "TODO: Translate \"errors.accept_failed\"",
-    "decline_failed": "TODO: Translate \"errors.decline_failed\"",
-    "create_failed": "TODO: Translate \"errors.create_failed\"",
-    "invite_failed": "TODO: Translate \"errors.invite_failed\""
+    "accept_failed": "Einladung konnte nicht angenommen werden.",
+    "decline_failed": "Einladung konnte nicht abgelehnt werden.",
+    "create_failed": "Team konnte nicht erstellt werden.",
+    "invite_failed": "Mitglied konnte nicht eingeladen werden."
   },
   "status": {
-    "active": "TODO: Translate \"status.active\"",
-    "inactive": "TODO: Translate \"status.inactive\"",
-    "suspended": "TODO: Translate \"status.suspended\""
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "suspended": "Gesperrt"
   },
   "browse": {
-    "title": "TODO: Translate \"browse.title\"",
-    "subtitle": "TODO: Translate \"browse.subtitle\"",
-    "back_to_my_teams": "TODO: Translate \"browse.back_to_my_teams\"",
-    "search_placeholder": "TODO: Translate \"browse.search_placeholder\"",
-    "no_teams_title": "TODO: Translate \"browse.no_teams_title\"",
-    "no_teams_subtitle": "TODO: Translate \"browse.no_teams_subtitle\"",
-    "try_different_search": "TODO: Translate \"browse.try_different_search\"",
-    "search_error_title": "TODO: Translate \"browse.search_error_title\"",
-    "search_error_description": "TODO: Translate \"browse.search_error_description\"",
-    "members": "TODO: Translate \"browse.members\"",
-    "founded": "TODO: Translate \"browse.founded\"",
-    "created_by": "TODO: Translate \"browse.created_by\"",
-    "view_team": "TODO: Translate \"browse.view_team\"",
-    "view": "TODO: Translate \"browse.view\""
+    "title": "Teams durchsuchen",
+    "subtitle": "Entdecke und trete Teams in deiner Nähe bei",
+    "back_to_my_teams": "Zurück zu meinen Teams",
+    "search_placeholder": "Teams nach Name oder Stadt suchen...",
+    "no_teams_title": "Keine Teams gefunden",
+    "no_teams_subtitle": "Keine Teams zum Durchsuchen verfügbar",
+    "try_different_search": "Versuche einen anderen Suchbegriff",
+    "search_error_title": "Wir konnten keine passenden Teams finden",
+    "search_error_description": "Bitte versuche es erneut oder passe deine Suchfilter an.",
+    "members": "Mitglieder",
+    "founded": "Gegründet",
+    "created_by": "Erstellt von",
+    "view_team": "Team ansehen",
+    "view": "Ansehen"
   }
 }

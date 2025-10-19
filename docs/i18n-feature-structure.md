@@ -102,7 +102,7 @@ For each namespace, follow this pattern:
    - Create corresponding hook
 
 5. **Copy to public directory**
-   - `cp -rf src/lib/i18n/locales/ public/`
+   - `cp -rf src/lib/i18n/locales/* public/locales/`
 
 ## Next Steps
 
@@ -148,6 +148,8 @@ src/lib/i18n/
 
 ## Usage Example
 
+### Text Translations
+
 ```typescript
 // Import the hook
 import { useGamesTranslation } from "~/hooks/useTypedTranslation";
@@ -160,4 +162,63 @@ const label = t("form.fields.game_session_name.label");
 const validation = t("form.validation.name_required");
 ```
 
-This comprehensive structure ensures that all user-facing strings are properly organized, translatable, and type-safe across the entire Roundup Games platform.
+### Date/Time Formatting
+
+```typescript
+// Import date formatting utilities
+import { formatDistanceToNowLocalized, formatDateWithPattern, createDateFormatter } from "~/lib/i18n/utils";
+import { useAdminTranslation } from "~/hooks/useTypedTranslation";
+
+function MyComponent() {
+  const { currentLanguage } = useAdminTranslation();
+  const createdAt = new Date(2023, 0, 1);
+  const eventDate = new Date(2023, 0, 1, 14, 30);
+
+  // Basic relative time formatting
+  return (
+    <div>
+      <p>Created {formatDistanceToNowLocalized(createdAt, currentLanguage)}</p>
+      <p>Event starts {formatDateWithPattern(eventDate, "LONG", currentLanguage)}</p>
+    </div>
+  );
+}
+
+// Advanced usage - better for components with multiple dates
+function EventList() {
+  const { currentLanguage } = useAdminTranslation();
+  const formatter = createDateFormatter(currentLanguage);
+
+  return (
+    <div>
+      <p>Created: {formatter.formatWithPattern(createdAt, "MEDIUM")}</p>
+      <p>Updated: {formatter.formatDistanceToNow(updatedAt)}</p>
+      <p>Event: {formatter.format(eventDate, "EEEE, MMMM d, yyyy 'at' h:mm a")}</p>
+    </div>
+  );
+}
+```
+
+### Available Date Formatting Patterns
+
+```typescript
+import { DATE_FORMATS } from "~/lib/i18n/utils";
+
+// Predefined platform patterns:
+DATE_FORMATS.SHORT; // "Jan 1, 2023"
+DATE_FORMATS.MEDIUM; // "January 1, 2023"
+DATE_FORMATS.LONG; // "January 1, 2023 at 3:45 PM"
+DATE_FORMATS.FULL; // "Sunday, January 1, 2023 at 3:45 PM"
+DATE_FORMATS.TIME_ONLY; // "3:45 PM"
+DATE_FORMATS.DATE_ONLY; // "2023-01-01"
+DATE_FORMATS.DATETIME_SHORT; // "01/01/2023 15:45"
+```
+
+### Supported Languages for Date/Time Formatting
+
+- **English** (default): "about 2 hours ago", "January 1, 2023"
+- **German**: "vor etwa 2 Stunden", "Januar 1, 2023"
+- **Polish**: "około 2 godziny temu", "stycznia 1, 2023"
+
+The date formatting utilities automatically use the correct locale based on the current language setting, providing consistent localized date/time displays across the entire platform.
+
+This comprehensive structure ensures that all user-facing strings and date/time formatting are properly organized, translatable, and type-safe across the entire Roundup Games platform.

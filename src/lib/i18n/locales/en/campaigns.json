@@ -57,14 +57,6 @@
     "allowing": "Allowing...",
     "allow": "Allow"
   },
-  "placeholders": {
-    "campaign_name": "Enter campaign name",
-    "description": "Enter campaign description",
-    "search_and_select_game_system": "Search and select the game system you want to use",
-    "search_users": "Search by name or email (4+ chars)",
-    "enter_name": "Enter name",
-    "enter_email": "Enter email address"
-  },
   "status": {
     "connections_teammates": "Connections & Teammates",
     "unknown_user": "Unknown User",
@@ -102,12 +94,14 @@
     "application_update_failed": "Failed to update application status: {{message}}"
   },
   "descriptions": {
-    "campaign_overview": "Basic information about your campaign.",
     "schedule_details": "When and how often your campaign meets.",
     "participant_requirements": "Who can join and what's expected.",
     "location_details": "Where your campaign takes place.",
-    "safety_table_culture": "Safety expectations and table culture.",
     "character_creation_process": "How characters will be created.",
+    "campaign_overview": "Share the essentials players need to understand your ongoing story.",
+    "location": "Let players know where your group will gather.",
+    "safety_table_culture": "Optional expectations to set the tone for how you'll play together.",
+    "visibility_options": "Visibility options: Public (visible to everyone), Connections & Teammates (visible to your followers, the people you follow, and active teammates), Private (visible only to invited players)",
     "campaign_expectations": "What players should expect from this campaign.",
     "table_expectations": "Rules and expectations for the game table.",
     "manage_invitations": "Review and process pending invitations.",
@@ -175,15 +169,13 @@
     "session_duration_placeholder": "e.g., 180, 240",
     "select_language": "Select a language",
     "select_visibility": "Select visibility",
+    "campaign_name": "Enter campaign name",
+    "description": "Enter campaign description",
+    "search_users": "Search by name or email (4+ chars)",
+    "enter_name": "Enter name",
+    "enter_email": "Enter email address",
     "safety_tool_placeholder": "Any specifics about the chosen safety tool",
     "player_boundaries_consent_placeholder": "Any boundaries or consent notes players should be aware of"
-  },
-  "descriptions": {
-    "campaign_overview": "Share the essentials players need to understand your ongoing story.",
-    "location": "Let players know where your group will gather.",
-    "participant_requirements": "Optional guidelines that help players gauge whether the campaign is a fit.",
-    "safety_table_culture": "Optional expectations to set the tone for how you'll play together.",
-    "visibility_options": "Visibility options: Public (visible to everyone), Connections & Teammates (visible to your followers, the people you follow, and active teammates), Private (visible only to invited players)"
   },
   "validation_messages": {
     "campaign_name_required": "The campaign name is what most players see first when looking for adventure, make sure it's compelling.",

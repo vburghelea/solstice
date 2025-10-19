@@ -1,145 +1,145 @@
 {
-  "title": "TODO: Translate \"title\"",
-  "subtitle": "TODO: Translate \"subtitle\"",
+  "title": "Posteingang",
+  "subtitle": "Verwalte deine Nachrichten und Benachrichtigungen",
   "shared_inbox": {
-    "title": "TODO: Translate \"shared_inbox.title\"",
-    "loading": "TODO: Translate \"shared_inbox.loading\"",
-    "loading_description": "TODO: Translate \"shared_inbox.loading_description\"",
-    "unable_to_load": "TODO: Translate \"shared_inbox.unable_to_load\"",
-    "unable_to_load_description": "TODO: Translate \"shared_inbox.unable_to_load_description\"",
-    "beta_badge": "TODO: Translate \"shared_inbox.beta_badge\"",
-    "open_reporting": "TODO: Translate \"shared_inbox.open_reporting\"",
-    "action_due_prefix": "TODO: Translate \"shared_inbox.action_due_prefix\"",
+    "title": "Geteilter Posteingang",
+    "loading": "Lade geteilten Posteingang",
+    "loading_description": "Hole aktuelle Konversationen und Persona-Metriken für den {{persona}} Arbeitsbereich.",
+    "unable_to_load": "Geteilter Posteingang konnte nicht geladen werden",
+    "unable_to_load_description": "Bitte aktualisiere die Seite und versuche es erneut. Kontaktiere das Platform-Team, wenn das Problem weiterhin besteht.",
+    "beta_badge": "Zusammenarbeit Beta",
+    "open_reporting": "Übergreifendes Reporting öffnen",
+    "action_due_prefix": "Fällig ",
     "sections": {
       "metrics": {
-        "title": "TODO: Translate \"shared_inbox.sections.metrics.title\"",
-        "description": "TODO: Translate \"shared_inbox.sections.metrics.description\""
+        "title": "Kennzahlen",
+        "description": "Wichtige Leistungskennzahlen und Nutzungsstatistiken"
       },
       "filters": {
-        "title": "TODO: Translate \"shared_inbox.sections.filters.title\"",
-        "description": "TODO: Translate \"shared_inbox.sections.filters.description\""
+        "title": "Filter",
+        "description": "Posteingang nach Workflow oder Eskalationstyp fokussieren."
       },
       "tips": {
-        "title": "TODO: Translate \"shared_inbox.sections.tips.title\"",
-        "description": "TODO: Translate \"shared_inbox.sections.tips.description\""
+        "title": "Zusammenarbeit-Tipps",
+        "description": "Erwartungen abgleichen, wenn mehrere Personen die Konversation teilen."
       },
       "threads": {
-        "title": "TODO: Translate \"shared_inbox.sections.threads.title\"",
-        "no_threads": "TODO: Translate \"shared_inbox.sections.threads.no_threads\"",
-        "no_threads_description": "TODO: Translate \"shared_inbox.sections.threads.no_threads_description\"",
-        "log_note": "TODO: Translate \"shared_inbox.sections.threads.log_note\"",
-        "select_thread": "TODO: Translate \"shared_inbox.sections.threads.select_thread\"",
-        "select_thread_description": "TODO: Translate \"shared_inbox.sections.threads.select_thread_description\""
+        "title": "Konversationen",
+        "no_threads": "Noch keine Konversationen",
+        "no_threads_description": "Ändere die Filter oder lade Mitarbeiter ein, um eine geteilte Konversation zu starten.",
+        "log_note": "Interne Notiz hinzufügen",
+        "select_thread": "Konversation auswählen",
+        "select_thread_description": "Wähle eine Konversation, um kontextübergreifende Infos, Notizen und Aufgaben zu sehen."
       }
     },
     "priority": {
-      "high": "TODO: Translate \"shared_inbox.priority.high\"",
-      "medium": "TODO: Translate \"shared_inbox.priority.medium\"",
-      "low": "TODO: Translate \"shared_inbox.priority.low\""
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
     },
     "status": {
-      "open": "TODO: Translate \"shared_inbox.status.open\"",
-      "waiting": "TODO: Translate \"shared_inbox.status.waiting\"",
-      "resolved": "TODO: Translate \"shared_inbox.status.resolved\""
+      "open": "Offen",
+      "waiting": "Warte auf Antwort",
+      "resolved": "Gelöst"
     },
     "threads_awaiting": {
-      "one": "TODO: Translate \"shared_inbox.threads_awaiting.one\"",
-      "other": "TODO: Translate \"shared_inbox.threads_awaiting.other\""
+      "one": "{{count}} Konversation wartet auf deine Aufmerksamkeit.",
+      "other": "{{count}} Konversationen warten auf deine Aufmerksamkeit."
     },
     "thread_detail": {
-      "action_items": "TODO: Translate \"shared_inbox.thread_detail.action_items\"",
-      "priority_label": "TODO: Translate \"shared_inbox.thread_detail.priority_label\"",
-      "last_updated": "TODO: Translate \"shared_inbox.thread_detail.last_updated\"",
-      "reply_to_thread": "TODO: Translate \"shared_inbox.thread_detail.reply_to_thread\"",
-      "add_follow_up": "TODO: Translate \"shared_inbox.thread_detail.add_follow_up\"",
-      "owner_label": "TODO: Translate \"shared_inbox.thread_detail.owner_label\"",
-      "status_label": "TODO: Translate \"shared_inbox.thread_detail.status_label\""
+      "action_items": "Aufgaben",
+      "priority_label": "Priorität:",
+      "last_updated": "Zuletzt aktualisiert",
+      "reply_to_thread": "Auf Konversation antworten",
+      "add_follow_up": "Folgeaufgabe hinzufügen",
+      "owner_label": "Deins",
+      "status_label": "Status:"
     }
   },
   "status_labels": {
-    "open": "TODO: Translate \"status_labels.open\"",
-    "waiting_on_response": "TODO: Translate \"status_labels.waiting_on_response\"",
-    "resolved": "TODO: Translate \"status_labels.resolved\"",
-    "closed": "TODO: Translate \"status_labels.closed\"",
-    "in_progress": "TODO: Translate \"status_labels.in_progress\"",
-    "urgent": "TODO: Translate \"status_labels.urgent\"",
-    "low_priority": "TODO: Translate \"status_labels.low_priority\""
+    "open": "Offen",
+    "waiting_on_response": "Warte auf Antwort",
+    "resolved": "Gelöst",
+    "closed": "Geschlossen",
+    "in_progress": "In Bearbeitung",
+    "urgent": "Dringend",
+    "low_priority": "Niedrige Priorität"
   },
   "filters": {
-    "title": "TODO: Translate \"filters.title\"",
-    "all": "TODO: Translate \"filters.all\"",
-    "unread": "TODO: Translate \"filters.unread\"",
-    "important": "TODO: Translate \"filters.important\"",
-    "recent": "TODO: Translate \"filters.recent\"",
-    "resolved": "TODO: Translate \"filters.resolved\"",
-    "pending": "TODO: Translate \"filters.pending\""
+    "title": "Nachrichten filtern",
+    "all": "Alle",
+    "unread": "Ungelesen",
+    "important": "Wichtig",
+    "recent": "Aktuell",
+    "resolved": "Gelöst",
+    "pending": "Ausstehend"
   },
   "messages": {
-    "loading_messages": "TODO: Translate \"messages.loading_messages\"",
-    "no_messages": "TODO: Translate \"messages.no_messages\"",
-    "failed_to_load": "TODO: Translate \"messages.failed_to_load\"",
+    "loading_messages": "Lade Nachrichten...",
+    "no_messages": "Keine Nachrichten gefunden",
+    "failed_to_load": "Posteingang konnte nicht geladen werden",
     "empty_state": {
-      "title": "TODO: Translate \"messages.empty_state.title\"",
-      "subtitle": "TODO: Translate \"messages.empty_state.subtitle\""
+      "title": "Noch keine Nachrichten",
+      "subtitle": "Wenn du Nachrichten erhältst, erscheinen sie hier"
     },
     "compose": {
-      "title": "TODO: Translate \"messages.compose.title\"",
-      "placeholder": "TODO: Translate \"messages.compose.placeholder\"",
-      "send": "TODO: Translate \"messages.compose.send\"",
-      "sending": "TODO: Translate \"messages.compose.sending\"",
-      "attach_file": "TODO: Translate \"messages.compose.attach_file\""
+      "title": "Nachricht verfassen",
+      "placeholder": "Schreib hier deine Nachricht...",
+      "send": "Senden",
+      "sending": "Wird gesendet...",
+      "attach_file": "Datei anhängen"
     },
     "reply": {
-      "title": "TODO: Translate \"messages.reply.title\"",
-      "placeholder": "TODO: Translate \"messages.reply.placeholder\"",
-      "send": "TODO: Translate \"messages.reply.send\"",
-      "sending": "TODO: Translate \"messages.reply.sending\""
+      "title": "Auf Nachricht antworten",
+      "placeholder": "Schreib hier deine Antwort...",
+      "send": "Antwort senden",
+      "sending": "Antwort wird gesendet..."
     }
   },
   "actions": {
-    "mark_as_read": "TODO: Translate \"actions.mark_as_read\"",
-    "mark_as_unread": "TODO: Translate \"actions.mark_as_unread\"",
-    "archive": "TODO: Translate \"actions.archive\"",
-    "delete": "TODO: Translate \"actions.delete\"",
-    "reply": "TODO: Translate \"actions.reply\"",
-    "forward": "TODO: Translate \"actions.forward\"",
-    "star": "TODO: Translate \"actions.star\"",
-    "unstar": "TODO: Translate \"actions.unstar\"",
-    "flag": "TODO: Translate \"actions.flag\"",
-    "unflag": "TODO: Translate \"actions.unflag\""
+    "mark_as_read": "Als gelesen markieren",
+    "mark_as_unread": "Als ungelesen markieren",
+    "archive": "Archivieren",
+    "delete": "Löschen",
+    "reply": "Antworten",
+    "forward": "Weiterleiten",
+    "star": "Markieren",
+    "unstar": "Markierung entfernen",
+    "flag": "Kennzeichen",
+    "unflag": "Kennzeichen entfernen"
   },
   "thread": {
-    "title": "TODO: Translate \"thread.title\"",
-    "participants": "TODO: Translate \"thread.participants\"",
-    "messages": "TODO: Translate \"thread.messages\"",
-    "last_message": "TODO: Translate \"thread.last_message\"",
-    "started_by": "TODO: Translate \"thread.started_by\"",
-    "reply_to_thread": "TODO: Translate \"thread.reply_to_thread\""
+    "title": "Konversation",
+    "participants": "Teilnehmer",
+    "messages": "Nachrichten",
+    "last_message": "Letzte Nachricht",
+    "started_by": "Gestartet von",
+    "reply_to_thread": "Auf Konversation antworten"
   },
   "notifications": {
-    "new_message": "TODO: Translate \"notifications.new_message\"",
-    "message_reply": "TODO: Translate \"notifications.message_reply\"",
-    "thread_updated": "TODO: Translate \"notifications.thread_updated\""
+    "new_message": "Neue Nachricht",
+    "message_reply": "Antwort auf Nachricht",
+    "thread_updated": "Konversation aktualisiert"
   },
   "search": {
-    "placeholder": "TODO: Translate \"search.placeholder\"",
-    "no_results": "TODO: Translate \"search.no_results\"",
+    "placeholder": "Nachrichten durchsuchen...",
+    "no_results": "Keine Nachrichten gefunden, die deiner Suche entsprechen",
     "filters": {
-      "date_range": "TODO: Translate \"search.filters.date_range\"",
-      "sender": "TODO: Translate \"search.filters.sender\"",
-      "subject": "TODO: Translate \"search.filters.subject\""
+      "date_range": "Zeitraum",
+      "sender": "Absender",
+      "subject": "Betreff"
     }
   },
   "errors": {
-    "send_failed": "TODO: Translate \"errors.send_failed\"",
-    "load_failed": "TODO: Translate \"errors.load_failed\"",
-    "delete_failed": "TODO: Translate \"errors.delete_failed\"",
-    "archive_failed": "TODO: Translate \"errors.archive_failed\"",
-    "load_snapshot_failed": "TODO: Translate \"errors.load_snapshot_failed\""
+    "send_failed": "Nachricht konnte nicht gesendet werden",
+    "load_failed": "Nachrichten konnten nicht geladen werden",
+    "delete_failed": "Nachricht konnte nicht gelöscht werden",
+    "archive_failed": "Nachricht konnte nicht archiviert werden",
+    "load_snapshot_failed": "Posteingang konnte nicht geladen werden"
   },
   "success": {
-    "message_sent": "TODO: Translate \"success.message_sent\"",
-    "message_archived": "TODO: Translate \"success.message_archived\"",
-    "message_deleted": "TODO: Translate \"success.message_deleted\""
+    "message_sent": "Nachricht erfolgreich gesendet",
+    "message_archived": "Nachricht erfolgreich archiviert",
+    "message_deleted": "Nachricht erfolgreich gelöscht"
   }
 }

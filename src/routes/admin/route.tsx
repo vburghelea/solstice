@@ -49,10 +49,10 @@ function AdminNamespaceShell() {
         description: t("workspaces.admin.nav.analytics.description"),
       },
       {
-        label: t("workspaces.admin.nav.settings.label"),
+        label: t("workspaces.admin.nav.systems.label"),
         to: "/admin/systems",
         icon: Layers,
-        description: t("workspaces.admin.nav.settings.description"),
+        description: t("workspaces.admin.nav.systems.description"),
       },
       {
         label: t("workspaces.admin.nav.users.label"),

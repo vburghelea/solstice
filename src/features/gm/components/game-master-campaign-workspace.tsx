@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import {
   CalendarCheck2Icon,
   MapPinIcon,
@@ -14,6 +13,7 @@ import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGmTranslation } from "~/hooks/useTypedTranslation";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 import { SafetyRulesView } from "~/shared/components/SafetyRulesView";
 import { formatDateAndTime } from "~/shared/lib/datetime";
 import { cn } from "~/shared/lib/utils";
@@ -29,7 +29,7 @@ export function GameMasterCampaignWorkspace({
   upcomingSessions,
   completedSessions,
 }: GameMasterCampaignWorkspaceProps) {
-  const { t } = useGmTranslation();
+  const { t, currentLanguage } = useGmTranslation();
   const nextSession = upcomingSessions[0] ?? null;
   const lastCompleted = completedSessions[0] ?? null;
   const activePlayers = campaign.participants.filter(
@@ -118,8 +118,9 @@ export function GameMasterCampaignWorkspace({
               label={t("campaign_workspace.sessions.last_debrief")}
               value={
                 lastCompleted
-                  ? formatDistanceToNow(
+                  ? formatDistanceToNowLocalized(
                       new Date(lastCompleted.updatedAt ?? lastCompleted.dateTime),
+                      currentLanguage,
                       {
                         addSuffix: true,
                       },
@@ -415,7 +416,7 @@ interface SessionSummaryChipProps {
 }
 
 function SessionSummaryChip({ session }: SessionSummaryChipProps) {
-  const { t } = useGmTranslation();
+  const { t, currentLanguage } = useGmTranslation();
   const completedAt = session.updatedAt ?? session.dateTime;
   return (
     <div className="border-border/60 bg-muted/40 flex flex-col gap-2 rounded-2xl border p-4">
@@ -433,7 +434,9 @@ function SessionSummaryChip({ session }: SessionSummaryChipProps) {
       </p>
       <p className="text-muted-foreground text-xs">
         {t("campaign_workspace.session_card.last_updated", {
-          time: formatDistanceToNow(new Date(completedAt), { addSuffix: true }),
+          time: formatDistanceToNowLocalized(new Date(completedAt), currentLanguage, {
+            addSuffix: true,
+          }),
         })}
       </p>
       <Button asChild variant="ghost" size="sm" className="self-start px-0 text-xs">

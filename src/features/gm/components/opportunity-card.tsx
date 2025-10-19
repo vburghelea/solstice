@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, formatDistanceToNowStrict } from "date-fns";
+import { format } from "date-fns";
 import {
   AlertTriangleIcon,
   CheckIcon,
@@ -11,6 +11,8 @@ import {
   WifiOffIcon,
 } from "lucide-react";
 import { useEffect, useReducer, useRef, useState } from "react";
+import type { SupportedLanguage } from "~/lib/i18n/config";
+import { formatDistanceToNowStrictLocalized } from "~/lib/i18n/utils";
 
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -45,6 +47,7 @@ export interface OpportunityCardProps {
   healthCopy: Record<GmPipelineHealth, { label: string; className: string }>;
   tGm: (key: string, options?: Record<string, unknown>) => string;
   tCommon: (key: string, options?: Record<string, unknown>) => string;
+  currentLanguage: SupportedLanguage;
 }
 
 interface AssignmentListProps {
@@ -155,14 +158,23 @@ export function OpportunityCard({
   healthCopy,
   tGm,
   tCommon,
+  currentLanguage,
 }: OpportunityCardProps) {
-  const stageDuration = formatDistanceToNowStrict(new Date(opportunity.stageEnteredAt), {
-    addSuffix: false,
-  });
+  const stageDuration = formatDistanceToNowStrictLocalized(
+    new Date(opportunity.stageEnteredAt),
+    currentLanguage,
+    {
+      addSuffix: false,
+    },
+  );
   const lastInteractionDistance = opportunity.lastInteractionAt
-    ? formatDistanceToNowStrict(new Date(opportunity.lastInteractionAt), {
-        addSuffix: false,
-      })
+    ? formatDistanceToNowStrictLocalized(
+        new Date(opportunity.lastInteractionAt),
+        currentLanguage,
+        {
+          addSuffix: false,
+        },
+      )
     : null;
 
   return (

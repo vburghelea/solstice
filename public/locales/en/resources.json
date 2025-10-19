@@ -970,11 +970,5 @@
     "reporting_steps": "Loading reporting steps...",
     "support_resources": "Loading support resources...",
     "toolkit_phases": "Loading toolkit phases..."
-  },
-  "report_concern": {
-    "loading": {
-      "reporting_steps": "Loading reporting steps...",
-      "support_resources": "Loading support resources..."
-    }
   }
 }

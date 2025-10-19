@@ -1,0 +1,388 @@
+{
+  "main": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "games": "Spiele",
+    "events": "Events",
+    "teams": "Teams",
+    "campaigns": "Kampagnen",
+    "inbox": "Posteingang",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "find_games": "Spiele finden",
+    "game_systems": "Spielsysteme"
+  },
+  "user": {
+    "account": "Mein Konto",
+    "profile": "Mein Profil",
+    "settings": "Einstellungen",
+    "billing": "Abrechnung",
+    "notifications": "Benachrichtigungen",
+    "security": "Sicherheit",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "signup": "Registrieren"
+  },
+  "actions": {
+    "create": "Erstellen",
+    "new": "Neu",
+    "add": "Hinzufügen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "submit": "Absenden",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "share": "Teilen",
+    "print": "Drucken",
+    "download": "Herunterladen",
+    "upload": "Hochladen",
+    "refresh": "Aktualisieren",
+    "reload": "Neu laden"
+  },
+  "states": {
+    "loading": "Laden...",
+    "saving": "Speichern...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "warning": "Warnung",
+    "info": "Information"
+  },
+  "breadcrumbs": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "games": "Spiele",
+    "events": "Events",
+    "teams": "Teams",
+    "campaigns": "Kampagnen",
+    "inbox": "Posteingang",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "admin": "Admin"
+  },
+  "sidebar": {
+    "toggle": "Seitenleiste umschalten",
+    "close": "Seitenleiste schließen",
+    "open": "Seitenleiste öffnen",
+    "sections": {
+      "main": "Hauptmenü",
+      "games": "Spiele",
+      "social": "Soziales",
+      "account": "Konto",
+      "admin": "Administration"
+    }
+  },
+  "header": {
+    "navigation": "Navigation",
+    "menu": "Menü",
+    "user_menu": "Benutzermenü",
+    "notifications": "Benachrichtigungen",
+    "search_placeholder": "Suchen...",
+    "language_switcher": "Sprache",
+    "theme_switcher": "Design"
+  },
+  "footer": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "features": "Funktionen",
+    "pricing": "Preise",
+    "contact": "Kontakt",
+    "blog": "Blog",
+    "help": "Hilfe",
+    "support": "Support",
+    "docs": "Dokumentation",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzerklärung",
+    "cookies": "Cookie-Richtlinie",
+    "copyright": "© {{year}} Roundup Games. Alle Rechte vorbehalten.",
+    "plan_your_visit": "Besuch planen",
+    "event_calendar": "Event-Kalender",
+    "find_game_night": "Spielabend finden",
+    "browse_systems": "Systeme durchsuchen",
+    "stay_in_touch": "Bleiben Sie in Kontakt",
+    "resources": "Ressourcen",
+    "about_roundup": "Über Roundup",
+    "contact_email": "hello@roundup.games"
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "details": "Details",
+    "settings": "Einstellungen",
+    "activity": "Aktivität",
+    "history": "Verlauf",
+    "analytics": "Analytik",
+    "reports": "Berichte",
+    "members": "Mitglieder",
+    "schedule": "Zeitplan",
+    "gallery": "Galerie",
+    "files": "Dateien",
+    "discussion": "Diskussion",
+    "tasks": "Aufgaben",
+    "notes": "Notizen"
+  },
+  "pagination": {
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "first": "Erste",
+    "last": "Letzte",
+    "page": "Seite",
+    "of": "von",
+    "showing": "Zeige",
+    "to": "bis",
+    "results": "Ergebnisse",
+    "per_page": "pro Seite",
+    "all": "Alle"
+  },
+  "table": {
+    "actions": "Aktionen",
+    "select": "Auswählen",
+    "selected": "Ausgewählt",
+    "all_selected": "Alle ausgewählt",
+    "none_selected": "Keine ausgewählt",
+    "sort_by": "Sortieren nach",
+    "filter_by": "Filtern nach",
+    "search_placeholder": "In Tabelle suchen...",
+    "no_data": "Keine Daten verfügbar",
+    "loading_data": "Daten werden geladen...",
+    "error_loading": "Fehler beim Laden der Daten",
+    "retry": "Erneut versuchen",
+    "columns": {
+      "name": "Name",
+      "email": "E-Mail",
+      "status": "Status",
+      "created": "Erstellt",
+      "updated": "Aktualisiert",
+      "actions": "Aktionen"
+    }
+  },
+  "modals": {
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "submit": "Absenden",
+    "back": "Zurück",
+    "next": "Weiter",
+    "finish": "Abschließen"
+  },
+  "tooltips": {
+    "edit": "Element bearbeiten",
+    "delete": "Element löschen",
+    "view": "Details anzeigen",
+    "copy": "In Zwischenablage kopieren",
+    "download": "Datei herunterladen",
+    "share": "Element teilen",
+    "print": "Element drucken",
+    "refresh": "Daten aktualisieren",
+    "settings": "Einstellungen",
+    "help": "Hilfe",
+    "info": "Information"
+  },
+  "empty_states": {
+    "no_data": "Keine Daten verfügbar",
+    "no_results": "Keine Ergebnisse gefunden",
+    "no_items": "Keine Elemente zum Anzeigen",
+    "nothing_here": "Hier gibt es noch nichts",
+    "start_by_creating": "Erstellen Sie Ihr erstes Element",
+    "no_search_results": "Keine Ergebnisse für Ihre Suche gefunden",
+    "try_different_filters": "Versuchen Sie andere Filter oder Suchbegriffe"
+  },
+  "workspaces": {
+    "player": {
+      "title": "Spieler-Workspace",
+      "description": "Verwalten Sie Sitzungen, Einladungen und Community-Einblicke aus einem responsiven Hub.",
+      "fallback_label": "Spieler",
+      "welcome_back": "Willkommen zurück, {{name}}",
+      "welcome_back_generic": "Willkommen zurück",
+      "nav": {
+        "overview": {
+          "label": "Übersicht",
+          "description": "Verfolgen Sie Mitgliedschaft, Einladungen und Ihre nächste Sitzung auf einen Blick."
+        },
+        "campaigns": {
+          "label": "Kampagnen",
+          "description": "Überprüfen Sie Ihre aktiven Handlungsbögen und planen Sie kommende Beats."
+        },
+        "games": {
+          "label": "Spiele",
+          "description": "Verwalten Sie geplante Sitzungen und aktualisieren Sie die Teilnahme."
+        },
+        "events": {
+          "label": "Events",
+          "description": "Durchsuchen Sie kommende Treffen und bestätigen Sie Ihre Teilnahme."
+        },
+        "teams": {
+          "label": "Teams",
+          "description": "Koordination mit Ihren Crews und Bearbeitung von Einladungen."
+        },
+        "inbox": {
+          "label": "Posteingang",
+          "description": "Informieren Sie sich über neue Ankündigungen und geteilte Threads."
+        },
+        "collaboration": {
+          "label": "Zusammenarbeit",
+          "description": "Koordination mit Teamkollegen und Moderatoren ohne den Hub zu verlassen."
+        },
+        "profile": {
+          "label": "Profil",
+          "description": "Überprüfen und bearbeiten Sie Ihre persönlichen Daten und Präferenzen."
+        },
+        "settings": {
+          "label": "Einstellungen",
+          "description": "Verwalten Sie Datenschutz, Benachrichtigungen und verbundene Konten."
+        },
+        "systems": {
+          "label": "Spielsystem-Verwaltung",
+          "description": "Verwalte Spielsysteme, Warteschlange für das Crawling und Inhalteverwaltung."
+        }
+      },
+      "summary": {
+        "membership": "Mitgliedschaft",
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "membership_active": "Mitgliedschaft aktiv",
+        "no_active_membership": "Keine aktive Mitgliedschaft",
+        "days_remaining": "{{days}} Tage verbleibend",
+        "manage_membership": "Mitgliedschaft verwalten",
+        "next_session": "Nächste Sitzung",
+        "no_upcoming_games": "Keine kommenden Spiele geplant",
+        "view_game_details": "Spieldetails anzeigen",
+        "community": "Community",
+        "not_on_a_team": "Sie sind noch in keinem Team",
+        "teams_connected": "{{count}} Team{{plural}} verbunden",
+        "join_a_team": "Treten Sie einem Team bei, um Sitzungen zu koordinieren",
+        "pending_invites": "{{count}} ausstehende Einladung{{plural}}",
+        "no_pending_invitations": "Keine ausstehenden Einladungen",
+        "browse_teams": "Teams durchsuchen"
+      }
+    },
+    "gm": {
+      "title": "Game-Master-Workspace",
+      "description": "Koordination von Kampagnen, Sitzungen und maßgeschneiderten Threads für Ihre Tische.",
+      "fallback_label": "Game-Master",
+      "welcome_back": "Willkommen zurück, {{name}}",
+      "welcome_back_generic": "Willkommen zurück",
+      "nav": {
+        "overview": {
+          "label": "Übersicht",
+          "description": "Überprüfen Sie Vorbereitungshinweise, Live-Feedback und die B2B-Pipeline aus einem Kommandozentrum."
+        },
+        "campaigns": {
+          "label": "Kampagnen",
+          "description": "Verwalten Sie Handlungsbögen, Dossiers und Kampagnengesundheit an einem Ort."
+        },
+        "games": {
+          "label": "Spiele",
+          "description": "Planen, aktualisieren und werten Sie die Sitzungen auf Ihrer Startbahn."
+        },
+        "feedback_triage": {
+          "label": "Feedback-Triage",
+          "description": "Bearbeiten Sie Debriefings, Sicherheitsrituale und kommende Vorbereitungs-Checklisten."
+        },
+        "shared_inbox": {
+          "label": "Geteilter Posteingang",
+          "description": "Koordination von Narrative-Updates und Ankündigungen mit dem Operations-Team."
+        },
+        "collaboration": {
+          "label": "Zusammenarbeit",
+          "description": "Partnerschaft mit Ops- und Plattform-Teams bei maßgeschneiderten Möglichkeiten."
+        }
+      },
+      "summary": {
+        "upcoming_sessions": "Kommende Sitzungen",
+        "no_sessions_scheduled": "Keine Sitzungen geplant",
+        "next_session_detail": "Nächste: {{name}} • {{datetime}}",
+        "manage_sessions": "Sitzungen verwalten",
+        "active_campaigns": "Aktive Kampagnen",
+        "campaign_detail": "{{name}} • {{system}}",
+        "draft_next_arc": "Entwerfen Sie Ihren nächsten Bogen, um das Roster zu füllen",
+        "view_workspace": "Workspace anzeigen",
+        "pipeline_attention": "Pipeline-Aufmerksamkeit",
+        "pipeline_detail": "{{escalations}} Eskalation{{plural}} live • {{total}} Gesamt-Threads",
+        "log_corporate_opportunity": "Protokollieren Sie eine Unternehmensmöglichkeit, um die Verfolgung zu beginnen",
+        "review_pipeline": "Pipeline überprüfen"
+      }
+    },
+    "admin": {
+      "title": "Admin-Workspace",
+      "description": "Governance, Compliance und Plattform-Aufsicht aus einem zentralen Hub.",
+      "fallback_label": "Administrator",
+      "welcome_back": "Willkommen zurück, {{name}}",
+      "welcome_back_generic": "Willkommen zurück",
+      "nav": {
+        "overview": {
+          "label": "Übersicht",
+          "description": "Systemgesundheit, Benutzermetriken und operative Einblicke auf einen Blick."
+        },
+        "users": {
+          "label": "Benutzer",
+          "description": "Benutzerverwaltung, Rollen und Zugriffskontrolle."
+        },
+        "analytics": {
+          "label": "Analytik",
+          "description": "Plattform-Metriken, Nutzungsmuster und Leistungsdaten."
+        },
+        "settings": {
+          "label": "Einstellungen",
+          "description": "Systemkonfiguration, Feature-Flags und Plattformeinstellungen."
+        },
+        "systems": {
+          "label": "Spielsystem-Verwaltung",
+          "description": "Verwalte Spielsysteme, Warteschlange für das Crawling und Inhalteverwaltung."
+        },
+        "audit_logs": {
+          "label": "Audit-Logs",
+          "description": "Systemereignisse, Benutzeraktionen und Compliance-Datensätze."
+        }
+      },
+      "summary": {
+        "system_health": "Systemgesundheit",
+        "user_metrics": "Benutzermetriken",
+        "platform_stats": "Plattformstatistiken",
+        "recent_activity": "Letzte Aktivität"
+      }
+    },
+    "ops": {
+      "title": "Operations-Workspace",
+      "description": "Event-Koordination, Logistik und Community-Support aus einem zentralen Hub.",
+      "fallback_label": "Operations",
+      "welcome_back": "Willkommen zurück, {{name}}",
+      "welcome_back_generic": "Willkommen zurück",
+      "nav": {
+        "overview": {
+          "label": "Übersicht",
+          "description": "Mission-Control-Dashboard mit kommenden Events und Aufgaben-Warteschlangen."
+        },
+        "events": {
+          "label": "Events",
+          "description": "Event-Erstellung, -Management und Logistik-Koordination."
+        },
+        "venues": {
+          "label": "Veranstaltungsorte",
+          "description": "Veranstaltungsort-Management, Zeitplanung und Kapazitätsplanung."
+        },
+        "staff": {
+          "label": "Personal",
+          "description": "Personal-Einsatzplanung, Zuweisungen und Leistungsverfolgung."
+        },
+        "reports": {
+          "label": "Berichte",
+          "description": "Operations-Berichte, Analytik und Business Intelligence."
+        }
+      },
+      "summary": {
+        "upcoming_events": "Kommende Events",
+        "pending_tasks": "Ausstehende Aufgaben",
+        "staff_on_duty": "Personal im Dienst",
+        "venue_utilization": "Auslastung der Veranstaltungsorte"
+      }
+    }
+  }
+}

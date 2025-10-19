@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import { toast } from "sonner";
+import { LanguageSwitcher } from "~/components/LanguageSwitcher";
 import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
@@ -193,7 +194,8 @@ export function RoleWorkspaceLayout({
               </Button>
             </div>
             <UserSummary user={user} showEmail t={t} />
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-end gap-3">
+              <LanguageSwitcher variant="compact" showLabel={false} />
               <RoleSwitcher />
             </div>
             <WorkspaceNavSection
@@ -308,7 +310,8 @@ function WorkspaceSummaryPanel({
     >
       <div className="flex flex-col gap-4">
         <UserSummary user={user} showEmail t={t} />
-        <div className="flex w-full items-center justify-end">
+        <div className="flex w-full items-center justify-end gap-3">
+          <LanguageSwitcher variant="compact" showLabel={false} />
           <RoleSwitcher />
         </div>
       </div>

@@ -22,6 +22,7 @@ import type {
   GmPipelineStage,
 } from "~/features/gm/gm.types";
 import { useCommonTranslation, useGmTranslation } from "~/hooks/useTypedTranslation";
+import type { SupportedLanguage } from "~/lib/i18n/config";
 import { cn } from "~/shared/lib/utils";
 import { OpportunityCard, getOpportunityFocusMeta } from "./opportunity-card";
 
@@ -55,7 +56,7 @@ export function GameMasterB2bPipeline({
   stages,
   opportunities,
 }: GameMasterB2bPipelineProps) {
-  const { t: tGm } = useGmTranslation();
+  const { t: tGm, currentLanguage } = useGmTranslation();
   const { t: tCommon } = useCommonTranslation();
   const [focusMode, setFocusMode] = useState<FocusMode>("mine");
 
@@ -160,6 +161,7 @@ export function GameMasterB2bPipeline({
                   focusMode={focusMode}
                   tGm={tGm}
                   tCommon={tCommon}
+                  currentLanguage={currentLanguage as SupportedLanguage}
                 />
               );
             })}
@@ -177,6 +179,7 @@ interface StageColumnProps {
   focusMode: FocusMode;
   tGm: (key: string, options?: Record<string, unknown>) => string;
   tCommon: (key: string, options?: Record<string, unknown>) => string;
+  currentLanguage: SupportedLanguage;
 }
 
 interface FocusToggleProps {
@@ -321,6 +324,7 @@ function StageColumn({
   focusMode,
   tGm,
   tCommon,
+  currentLanguage,
 }: StageColumnProps) {
   const serviceLevelHours = Math.round(stage.serviceLevelMinutes / 60);
   const isFocusFiltered = focusMode !== "all";
@@ -378,6 +382,7 @@ function StageColumn({
                 healthCopy={healthCopy}
                 tGm={tGm}
                 tCommon={tCommon}
+                currentLanguage={currentLanguage as SupportedLanguage}
               />
             );
           })

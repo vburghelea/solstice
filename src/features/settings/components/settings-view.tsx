@@ -1,6 +1,5 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
 import {
   AlertCircle,
   CheckCircle2,
@@ -52,6 +51,7 @@ import {
 } from "~/features/settings";
 import { useSettingsTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 import {
   getPasswordStrength,
   getPasswordStrengthLabel,
@@ -86,7 +86,7 @@ function maskToken(token: string) {
 }
 
 export function SettingsView() {
-  const { t } = useSettingsTranslation();
+  const { t, currentLanguage } = useSettingsTranslation();
   const queryClient = useQueryClient();
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [notificationError, setNotificationError] = useState<string | null>(null);
@@ -671,9 +671,13 @@ export function SettingsView() {
                             {session.ipAddress ?? t("sections.sessions.unknown_location")}
                           </TableCell>
                           <TableCell>
-                            {formatDistanceToNow(new Date(session.updatedAt), {
-                              addSuffix: true,
-                            })}
+                            {formatDistanceToNowLocalized(
+                              new Date(session.updatedAt),
+                              currentLanguage,
+                              {
+                                addSuffix: true,
+                              },
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             {session.isCurrent ? (

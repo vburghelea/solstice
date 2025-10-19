@@ -6,6 +6,18 @@ import { SupportedLanguage } from "~/lib/i18n/config";
 import i18n from "~/lib/i18n/i18n";
 import { LanguageSwitcher } from "../LanguageSwitcher";
 
+// Mock TanStack Router hooks
+vi.mock("@tanstack/react-router", () => ({
+  useRouterState: vi.fn(() => ({
+    location: {
+      pathname: "/test",
+    },
+  })),
+  useRouter: vi.fn(() => ({
+    navigate: vi.fn(),
+  })),
+}));
+
 // Mock interface for useLanguageDetection
 interface MockLanguageDetection {
   currentLanguage: SupportedLanguage;

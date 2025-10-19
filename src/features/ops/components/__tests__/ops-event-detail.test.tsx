@@ -77,6 +77,7 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
 
       return result;
     },
+    currentLanguage: "en",
   }),
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useCommonTranslation: () => ({

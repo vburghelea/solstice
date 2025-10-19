@@ -1,75 +1,75 @@
 {
-  "title": "TODO: Translate \"title\"",
-  "subtitle": "TODO: Translate \"subtitle\"",
+  "title": "Zusammenarbeit",
+  "subtitle": "Übergreifende Zusammenarbeit und Berichterstattung",
   "workspace": {
-    "loading": "TODO: Translate \"workspace.loading\"",
-    "loading_description": "TODO: Translate \"workspace.loading_description\"",
-    "unable_to_load": "TODO: Translate \"workspace.unable_to_load\"",
-    "unable_to_load_description": "TODO: Translate \"workspace.unable_to_load_description\"",
-    "beta_badge": "TODO: Translate \"workspace.beta_badge\"",
-    "title": "TODO: Translate \"workspace.title\"",
-    "description": "TODO: Translate \"workspace.description\"",
-    "updated_label": "TODO: Translate \"workspace.updated_label\"",
+    "loading": "Lade Zusammenarbeitseinblicke",
+    "loading_description": "Sammle aktuelle Metriken aus Spieler-, Ops-, GM- und Admin-Bereichen.",
+    "unable_to_load": "Zusammenarbeitsdaten konnten nicht geladen werden",
+    "unable_to_load_description": "Bitte aktualisiere die Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, wende dich an das Platform-Team.",
+    "beta_badge": "Zusammenarbeitshub",
+    "title": "Übergreifende Berichterstattung & Feedback",
+    "description": "Passe dich an verschiedene Rollen an, ohne deinen Bereich zu verlassen.",
+    "updated_label": "Aktualisiert",
     "filters": {
-      "all": "TODO: Translate \"workspace.filters.all\""
+      "all": "Alle Rollen"
     }
   },
   "sections": {
     "metrics": {
-      "title": "TODO: Translate \"sections.metrics.title\"",
-      "description": "TODO: Translate \"sections.metrics.description\"",
-      "review_threads": "TODO: Translate \"sections.metrics.review_threads\"",
-      "persona_impact": "TODO: Translate \"sections.metrics.persona_impact\""
+      "title": "Gemeinsame Berichtsmetriken",
+      "description": "Verfolge, wie Experimente in einem Bereich die Ergebnisse in anderen beeinflussen.",
+      "review_threads": "Gemeinsame Threads ansehen",
+      "persona_impact": "Rollenauswirkung"
     },
     "alignment": {
-      "title": "TODO: Translate \"sections.alignment.title\"",
-      "description": "TODO: Translate \"sections.alignment.description\"",
-      "alignment_label": "TODO: Translate \"sections.alignment.alignment_label\"",
-      "needs_attention": "TODO: Translate \"sections.alignment.needs_attention\"",
-      "confidence_suffix": "TODO: Translate \"sections.alignment.confidence_suffix\"",
-      "key_signals": "TODO: Translate \"sections.alignment.key_signals\"",
-      "open_questions": "TODO: Translate \"sections.alignment.open_questions\"",
-      "signals_description": "TODO: Translate \"sections.alignment.signals_description\""
+      "title": "Fokus auf Rollenabstimmung",
+      "description": "Zeige, worauf jede Rolle achtet und wo die Zusammenarbeit verstärkt werden muss.",
+      "alignment_label": "Abstimmung",
+      "needs_attention": "Benötigt Aufmerksamkeit",
+      "confidence_suffix": "Vertrauen",
+      "key_signals": "Wichtige Signale",
+      "open_questions": "Offene Fragen",
+      "signals_description": "Signale und offene Fragen helfen dem Team bei der Planung des nächsten Experiments."
     },
     "rhythms": {
-      "title": "TODO: Translate \"sections.rhythms.title\"",
-      "description": "TODO: Translate \"sections.rhythms.description\"",
-      "next_touchpoint": "TODO: Translate \"sections.rhythms.next_touchpoint\"",
-      "status": "TODO: Translate \"sections.rhythms.status\"",
-      "linked_threads": "TODO: Translate \"sections.rhythms.linked_threads\""
+      "title": "Zusammenarbeitssrhythmen",
+      "description": "Rituale, die Rollen aufeinander abstimmen, verknüpft mit den gemeinsamen Inbox-Threads, die Entscheidungen steuern.",
+      "next_touchpoint": "Nächster Kontaktpunkt",
+      "status": "Status",
+      "linked_threads": "Verknüpfte Threads"
     },
     "feedback": {
-      "title": "TODO: Translate \"sections.feedback.title\"",
-      "description": "TODO: Translate \"sections.feedback.description\"",
-      "participation": "TODO: Translate \"sections.feedback.participation\"",
-      "backlog_status": "TODO: Translate \"sections.feedback.backlog_status\"",
-      "updated": "TODO: Translate \"sections.feedback.updated\"",
-      "highlights": "TODO: Translate \"sections.feedback.highlights\"",
-      "quick_reactions": "TODO: Translate \"sections.feedback.quick_reactions\"",
-      "reaction_saved": "TODO: Translate \"sections.feedback.reaction_saved\"",
-      "create_account": "TODO: Translate \"sections.feedback.create_account\""
+      "title": "Feedback-Erfassungsschleifen",
+      "description": "Pulse-Umfragen und schnelle Reaktionen fließen direkt in den Backlog, damit Platform-Verwalter schnell reagieren können.",
+      "participation": "Teilnahme",
+      "backlog_status": "Backlog-Status:",
+      "updated": "Aktualisiert",
+      "highlights": "Highlights",
+      "quick_reactions": "Schnelle Reaktionen",
+      "reaction_saved": "Deine Reaktion wurde im Backlog-Experimentprotokoll gespeichert – Jordan und Priya sehen sie beim nächsten Governance-Sync.",
+      "create_account": "Erstelle ein Konto, um Reaktionen aufzuzeichnen, die das Platform-Team erreichen."
     }
   },
   "personas": {
-    "player": "TODO: Translate \"personas.player\"",
-    "ops": "TODO: Translate \"personas.ops\"",
-    "gm": "TODO: Translate \"personas.gm\"",
-    "admin": "TODO: Translate \"personas.admin\""
+    "player": "Spieler",
+    "ops": "Operations",
+    "gm": "Game-Master",
+    "admin": "Platform-Admin"
   },
   "status": {
-    "triaged": "TODO: Translate \"status.triaged\"",
-    "in_progress": "TODO: Translate \"status.in_progress\"",
-    "shipped": "TODO: Translate \"status.shipped\"",
-    "on_track": "TODO: Translate \"status.on_track\"",
-    "at_risk": "TODO: Translate \"status.at_risk\"",
-    "off_track": "TODO: Translate \"status.off_track\""
+    "triaged": "Kategorisiert",
+    "in_progress": "In Bearbeitung",
+    "shipped": "Veröffentlicht",
+    "on_track": "Auf Kurs",
+    "at_risk": "Riskant",
+    "off_track": "Vom Kurs abgekommen"
   },
   "sentiment": {
-    "positive": "TODO: Translate \"sentiment.positive\"",
-    "neutral": "TODO: Translate \"sentiment.neutral\"",
-    "concerned": "TODO: Translate \"sentiment.concerned\""
+    "positive": "Positive Dynamik",
+    "neutral": "Neutrale Einschätzung",
+    "concerned": "Benötigt Nachverfolgung"
   },
   "errors": {
-    "load_snapshot_failed": "TODO: Translate \"errors.load_snapshot_failed\""
+    "load_snapshot_failed": "Snapshot konnte nicht geladen werden"
   }
 }

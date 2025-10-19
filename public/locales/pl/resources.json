@@ -1,660 +1,974 @@
 {
   "hero": {
-    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
-    "title": "TODO: Translate \"hero.title\"",
-    "subtitle": "TODO: Translate \"hero.subtitle\"",
-    "cta_text": "TODO: Translate \"hero.cta_text\"",
-    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+    "eyebrow": "Zasoby",
+    "title": "Prowadź niezapomniane programy gier planszowych",
+    "subtitle": "Zestawy narzędzi, plany szkoleniowe i ścieżki certyfikacji przygotowane przez zespół deweloperski Roundup Games.",
+    "cta_text": "Przeglądaj według kategorii",
+    "secondary_cta": "Poproś o wsparcie na zamówienie"
   },
   "sections": {
     "club_toolkit": {
-      "title": "TODO: Translate \"sections.club_toolkit.title\"",
-      "description": "TODO: Translate \"sections.club_toolkit.description\"",
+      "title": "Zestaw startowy dla społeczności",
+      "description": "Statuty, planery budżetów, prezentacje sponsorów i e-maily wprowadzające, dostosowane do klubów gier planszowych i kawiarni.",
       "actions": {
-        "download_toolkit": "TODO: Translate \"sections.club_toolkit.actions.download_toolkit\"",
-        "view_charter": "TODO: Translate \"sections.club_toolkit.actions.view_charter\""
+        "download_toolkit": "Pobierz zestaw narzędzi",
+        "view_charter": "Zobacz szablon statutu"
       }
     },
     "training": {
-      "title": "TODO: Translate \"sections.training.title\"",
-      "description": "TODO: Translate \"sections.training.description\"",
+      "title": "Biblioteka projektowania sesji",
+      "description": "Pomysły na przygody, podręczniki kampanii i plany rotacji gier planszowych przygotowane przez doświadczonych Mistrzów Gry i organizatorów wydarzeń.",
       "actions": {
-        "browse_plans": "TODO: Translate \"sections.training.actions.browse_plans\"",
-        "watch_clinics": "TODO: Translate \"sections.training.actions.watch_clinics\""
+        "browse_plans": "Przeglądaj plany sesji",
+        "watch_clinics": "Oglądaj kliniki prowadzenia"
       }
     },
     "safe_sport": {
-      "title": "TODO: Translate \"sections.safe_sport.title\"",
-      "description": "TODO: Translate \"sections.safe_sport.description\"",
+      "title": "Zasoby bezpieczeństwa i dostępności",
+      "description": "Polityki, instrukcje bezpieczeństwa i wytyczne inkluzyjności zgodne ze standardami społeczności Roundup Games.",
       "actions": {
-        "download_policies": "TODO: Translate \"sections.safe_sport.actions.download_policies\"",
-        "report_concern": "TODO: Translate \"sections.safe_sport.actions.report_concern\""
+        "download_policies": "Pobierz polityki",
+        "report_concern": "Zgłoś obawę"
       }
     }
   },
   "certification": {
-    "title": "TODO: Translate \"certification.title\"",
-    "subtitle": "TODO: Translate \"certification.subtitle\"",
+    "title": "Certyfikacja i ścieżki edukacyjne",
+    "subtitle": "Nasz system zarządzania nauką utrzymuje Twoje kwalifikacje aktualne. Ukończ moduły online i zarezerwuj praktyczne oceny u partnerów prowincjonalnych.",
     "tracks": {
       "gm_pathway": {
-        "title": "TODO: Translate \"certification.tracks.gm_pathway.title\"",
-        "description": "TODO: Translate \"certification.tracks.gm_pathway.description\"",
-        "cta": "TODO: Translate \"certification.tracks.gm_pathway.cta\""
+        "title": "Ścieżka Mistrza Gry",
+        "description": "Samodzielne moduły obejmujące najlepsze praktyki sesji zerowych, narzędzia bezpieczeństwa i tempo kampanii – idealne dla narratorów prowadzących długoterminowe gry.",
+        "cta": "Rozpocznij szkolenie MG"
       },
       "host_pathway": {
-        "title": "TODO: Translate \"certification.tracks.host_pathway.title\"",
-        "description": "TODO: Translate \"certification.tracks.host_pathway.description\"",
-        "cta": "TODO: Translate \"certification.tracks.host_pathway.cta\""
+        "title": "Ścieżka Organizatora Społeczności",
+        "description": "Warsztaty dotyczące przepływu wydarzeń, przydziału stolików i powitania nowych graczy – idealne dla menedżerów kawiarni i organizatorów spotkań prowadzących otwarte wieczory gier.",
+        "cta": "Zapisz się na laboratoria organizatorów"
       },
       "operations_pathway": {
-        "title": "TODO: Translate \"certification.tracks.operations_pathway.title\"",
-        "description": "TODO: Translate \"certification.tracks.operations_pathway.description\"",
-        "cta": "TODO: Translate \"certification.tracks.operations_pathway.cta\""
+        "title": "Ścieżka Operacji Wydarzeń",
+        "description": "Instrukcje krok po kroku dotyczące planowania turniejów, koordynacji wolontariuszy i wdrażania zoptymalizowanych systemów odpraw.",
+        "cta": "Pobierz zestaw operacyjny"
       }
     }
   },
   "consultation": {
-    "eyebrow": "TODO: Translate \"consultation.eyebrow\"",
-    "title": "TODO: Translate \"consultation.title\"",
-    "description": "TODO: Translate \"consultation.description\"",
+    "eyebrow": "Potrzebujesz czegoś na zamówienie?",
+    "title": "Godziny deweloperskie dla klubów",
+    "description": "Zarezerwuj konsultację z naszym zespołem, aby przejrzeć wnioski o dotacje, oferty wydarzeń lub długoterminowe plany rozwoju sportowców. Będziemy współpracować z Tobą, aby dostosować zasoby i połączenia dla Twojego regionu.",
     "actions": {
-      "schedule_meeting": "TODO: Translate \"consultation.actions.schedule_meeting\"",
-      "connect_hubs": "TODO: Translate \"consultation.actions.connect_hubs\""
+      "schedule_meeting": "Umów spotkanie",
+      "connect_hubs": "Połącz z regionalnymi hubami"
     },
     "office_hours": {
-      "title": "TODO: Translate \"consultation.office_hours.title\"",
+      "title": "Menu godzin pracy",
       "services": {
-        "funding_strategy": "TODO: Translate \"consultation.office_hours.services.funding_strategy\"",
-        "operations_audit": "TODO: Translate \"consultation.office_hours.services.operations_audit\"",
-        "volunteer_mapping": "TODO: Translate \"consultation.office_hours.services.volunteer_mapping\"",
-        "conduct_review": "TODO: Translate \"consultation.office_hours.services.conduct_review\""
+        "funding_strategy": "Optymalizacja strategii finansowania",
+        "operations_audit": "Audit operacji wydarzeń",
+        "volunteer_mapping": "Mapowanie podróży wolontariuszy",
+        "conduct_review": "Przegląd kodeksu postępowania społeczności"
       }
     }
   },
   "charter_template": {
     "hero": {
-      "eyebrow": "TODO: Translate \"charter_template.hero.eyebrow\"",
-      "title": "TODO: Translate \"charter_template.hero.title\"",
-      "subtitle": "TODO: Translate \"charter_template.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"charter_template.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"charter_template.hero.secondary_cta\""
+      "eyebrow": "Szablon statutu klubu",
+      "title": "Elastyczne zarządzanie dla społeczności gier planszowych",
+      "subtitle": "Użyj naszego żywego statutu, aby sformalizować oczekiwania, uczcić wspólną tożsamość i powitać nowych członków z klarownością.",
+      "cta_text": "Skopiuj szablon",
+      "secondary_cta": "Poproś o wsparcie prowadzenia"
     },
     "why_works": {
-      "eyebrow": "TODO: Translate \"charter_template.why_works.eyebrow\"",
-      "title": "TODO: Translate \"charter_template.why_works.title\"",
-      "description": "TODO: Translate \"charter_template.why_works.description\""
+      "eyebrow": "Dlaczego ten statut działa",
+      "title": "Przejrzyste, inkluzywne wytyczne dla klubów każdej wielkości",
+      "description": "Opracowany razem z administratorami, bibliotekarzami i właścicielami kawiarni, ten statut utrzymuje strukturę dostępną. Każdej klauzuli towarzyszą wskazówki prowadzące, aby pomóc Ci we wprowadzeniu u członków, plus opcjonalne zmiany dla szkół i organizacji młodzieżowych."
     },
     "sections": {
       "mission_values": {
-        "title": "TODO: Translate \"charter_template.sections.mission_values.title\"",
-        "description": "TODO: Translate \"charter_template.sections.mission_values.description\"",
-        "highlights": "TODO: Translate \"charter_template.sections.mission_values.highlights\""
+        "title": "Misja i wartości",
+        "description": "Zakotwicz swój focus narracyjny i obietnice społeczności, aby każdy wiedział, dlaczego ta przestrzeń istnieje.",
+        "highlights": [
+          "Oświadczenie celu dostosowane do gier planszowych i stołowych",
+          "Zobowiązanie do bezpieczeństwa, dostępności i antyharassmentu",
+          "Statut inkluzywności z językiem dla graczy afirmujących płeć i neurodivergentnych"
+        ]
       },
       "membership_governance": {
-        "title": "TODO: Translate \"charter_template.sections.membership_governance.title\"",
-        "description": "TODO: Translate \"charter_template.sections.membership_governance.description\"",
-        "highlights": "TODO: Translate \"charter_template.sections.membership_governance.highlights\""
+        "title": "Członkostwo i zarządzanie",
+        "description": "Ujasnij, kto może dołączyć, jak podejmowane są decyzje i ścieżki do ról przywódczych.",
+        "highlights": [
+          "Poziomy członkostwa z korzyściami i oczekiwaniami",
+          "Struktura głosowania i checklista corocznego zgromadzenia ogólnego",
+          "Drabina rozwiązywania konfliktów i harmonogramy eskalacji"
+        ]
       },
       "programming_safety": {
-        "title": "TODO: Translate \"charter_template.sections.programming_safety.title\"",
-        "description": "TODO: Translate \"charter_template.sections.programming_safety.description\"",
-        "highlights": "TODO: Translate \"charter_template.sections.programming_safety.highlights\""
+        "title": "Programowanie i bezpieczeństwo",
+        "description": "Szkicuj, jak wydarzenia są proponowane, zatwierdzane i oceniane z uwzględnieniem dobrostanu graczy.",
+        "highlights": [
+          "Formularz pitchu sesji i rubryka wyboru",
+          "Role prowadzących stół, odpowiedzialności i moduły szkoleniowe",
+          "Workflow zgłaszania incydentów z punktami odniesienia czasowych odpowiedzi"
+        ]
       }
     },
     "facilitation": {
-      "eyebrow": "TODO: Translate \"charter_template.facilitation.eyebrow\"",
-      "title": "TODO: Translate \"charter_template.facilitation.title\"",
-      "description": "TODO: Translate \"charter_template.facilitation.description\"",
+      "eyebrow": "Wskazówki prowadzącego",
+      "title": "Zorganizuj warsztaty przeglądu statutu",
+      "description": "Zaangażuj pracowników, wolontariuszy i członków społeczności w proces tworzenia. Nasz przewodnik prowadzący przeprowadzi Cię przez 90-minutowy warsztat dotyczący wartości, przepływów członkowskich i odpowiedzialności. Użyj zawartej prezentacji i promptów breakout, aby współtworzyć język, który odzwierciedla Twój kampus lub region.",
       "workshop_outline": {
-        "title": "TODO: Translate \"charter_template.facilitation.workshop_outline.title\"",
-        "items": "TODO: Translate \"charter_template.facilitation.workshop_outline.items\""
+        "title": "Zarys warsztatów",
+        "items": [
+          "Łamacz lodów: Koło \"Niezapomniane chwile przy stole\"",
+          "Przejście statutu z aktywnością adnotacji",
+          "Edycja w małych grupach z kartami scenariuszy",
+          "Zatwierdzenie oparte na zgodzie i następne kroki"
+        ]
       },
       "toolkit": {
-        "title": "TODO: Translate \"charter_template.facilitation.toolkit.title\"",
-        "description": "TODO: Translate \"charter_template.facilitation.toolkit.description\"",
-        "button": "TODO: Translate \"charter_template.facilitation.toolkit.button\""
+        "title": "Zestaw narzędzi prowadzącego",
+        "description": "Zawiera anotowany skrypt, edytowalne slajdy i formularz ewaluacji do zbierania opinii od uczestników.",
+        "button": "Pobierz zestaw warsztatowy"
       },
       "scenario_cards": {
-        "title": "TODO: Translate \"charter_template.facilitation.scenario_cards.title\"",
-        "description": "TODO: Translate \"charter_template.facilitation.scenario_cards.description\"",
-        "button": "TODO: Translate \"charter_template.facilitation.scenario_cards.button\""
+        "title": "Karty scenariuszy",
+        "description": "Trzydzieści prawdziwych dylematów gier stołowych, aby strestestować język statutu i procedury eskalacji.",
+        "button": "Pobierz talie PDF"
       }
     },
     "downloads": {
-      "title": "TODO: Translate \"charter_template.downloads.title\"",
+      "title": "Wybierz swój format",
       "formats": {
         "docx": {
-          "title": "TODO: Translate \"charter_template.downloads.formats.docx.title\"",
-          "description": "TODO: Translate \"charter_template.downloads.formats.docx.description\"",
-          "button": "TODO: Translate \"charter_template.downloads.formats.docx.button\""
+          "title": "Edytowalny dokument (DOCX)",
+          "description": "Najlepszy dla komitetów tworzących w Word lub Google Docs.",
+          "button": "Pobierz DOCX"
         },
         "pdf": {
-          "title": "TODO: Translate \"charter_template.downloads.formats.pdf.title\"",
-          "description": "TODO: Translate \"charter_template.downloads.formats.pdf.description\"",
-          "button": "TODO: Translate \"charter_template.downloads.formats.pdf.button\""
+          "title": "Wersja do druku (PDF)",
+          "description": "Gotowy do udostępnienia dokument z polami do wypełnienia do zatwierdzenia.",
+          "button": "Pobierz PDF"
         },
         "markdown": {
-          "title": "TODO: Translate \"charter_template.downloads.formats.markdown.title\"",
-          "description": "TODO: Translate \"charter_template.downloads.formats.markdown.description\"",
-          "button": "TODO: Translate \"charter_template.downloads.formats.markdown.button\""
+          "title": "Lekka konstytucja (Markdown)",
+          "description": "Użyj z witryn statycznych, społeczności opartych na Git lub obszarów roboczych Notion.",
+          "button": "Skopiuj Markdown"
         }
       },
       "custom_clause": {
-        "title": "TODO: Translate \"charter_template.downloads.custom_clause.title\"",
-        "description": "TODO: Translate \"charter_template.downloads.custom_clause.description\"",
-        "button": "TODO: Translate \"charter_template.downloads.custom_clause.button\""
+        "title": "Potrzebujesz niestandardowej klauzuli?",
+        "description": "Nasi specjaliści ds. polityki mogą pomóc dostosować język do programów młodzieżowych, instytucji publicznych lub wielojęzycznych rozdziałów.",
+        "button": "Połącz z zespołem polityki"
       }
     }
   },
   "toolkit": {
     "hero": {
-      "eyebrow": "TODO: Translate \"toolkit.hero.eyebrow\"",
-      "title": "TODO: Translate \"toolkit.hero.title\"",
-      "subtitle": "TODO: Translate \"toolkit.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"toolkit.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"toolkit.hero.secondary_cta\""
+      "eyebrow": "Zestaw startowy dla społeczności",
+      "title": "Rozpocznij swój klub gier stołowych z pewnością siebie",
+      "subtitle": "Nasz zestaw destyluje najlepsze praktyki z rozkwitających kapituł Roundup Games, dzięki czemu możesz budować pęd w tygodnie, nie miesiącach.",
+      "cta_text": "Uzyskaj dostęp do zestawu",
+      "secondary_cta": "Porozmawiaj z trenerem społeczności"
     },
     "whats_inside": {
-      "eyebrow": "TODO: Translate \"toolkit.whats_inside.eyebrow\"",
-      "title": "TODO: Translate \"toolkit.whats_inside.title\"",
-      "description": "TODO: Translate \"toolkit.whats_inside.description\""
+      "eyebrow": "Co jest w środku",
+      "title": "Wszystko, czego potrzebujesz od dnia zero do Twojego pierwszego wielkiego wydarzenia",
+      "description": "Czy tworzysz klub kampusowy, program po godzinach biblioteki czy ligę gier planszowych w kawiarni, ten zestaw utrzymuje planowanie realistycznym i współpracującym. Pracuj przez podręczniki w kolejności lub skocz bezpośrednio do szablonów pasujących do Twojego następnego kamienia milowego."
     },
     "core_documents": {
-      "title": "TODO: Translate \"toolkit.core_documents.title\"",
-      "items": "TODO: Translate \"toolkit.core_documents.items\""
+      "title": "Dokumenty podstawowe",
+      "items": [
+        "Edytowalna konstytucja i statut operacyjny",
+        "Kodeks postępowania z workflowem reakcji na incydenty",
+        "Umowy wolontariuszy i Mistrzów Gry",
+        "Dostępne formularze członkowskie i zrzeczenia odpowiedzialności"
+      ]
     },
     "planning_tools": {
-      "title": "TODO: Translate \"toolkit.planning_tools.title\"",
-      "items": "TODO: Translate \"toolkit.planning_tools.items\""
+      "title": "Narzędzia planowania",
+      "items": [
+        "Arkusze kalkulacyjne prognoz budżetu i finansowania ze scenariuszami przepływów pieniężnych",
+        "Sekwencje outreachu sponsorów i slajdy pitch decków",
+        "Szablon ścieżki krytycznej wydarzenia z przydziałem ról",
+        "Ocena ryzyka i lista kontrolna bezpieczeństwa dostosowana do gier stołowych"
+      ]
     },
     "readiness_blocks": {
       "founding_documents": {
-        "title": "TODO: Translate \"toolkit.readiness_blocks.founding_documents.title\"",
-        "description": "TODO: Translate \"toolkit.readiness_blocks.founding_documents.description\""
+        "title": "Dokumenty założycielskie",
+        "description": "Dostosuj statut, kodeks postępowania i umowę wolontariusza, które odzwierciedlają wartości i ton Twojej społeczności."
       },
       "financial_runway": {
-        "title": "TODO: Translate \"toolkit.readiness_blocks.financial_runway.title\"",
-        "description": "TODO: Translate \"toolkit.readiness_blocks.financial_runway.description\""
+        "title": "Finansowy start",
+        "description": "Szablony budżetów, trackery przepływów pieniężnych i przykładowe talie sponsorów pomagają Ci prognozować sezony z pewnością."
       },
       "people_operations": {
-        "title": "TODO: Translate \"toolkit.readiness_blocks.people_operations.title\"",
-        "description": "TODO: Translate \"toolkit.readiness_blocks.people_operations.description\""
+        "title": "Operacje personalne",
+        "description": "Opisy ról, listy kontrolne onboardingu i agendy spotkań utrzymują pracowników, MG i wolontariuszy na właściwej ścieżce."
       },
       "quality_standards": {
-        "title": "TODO: Translate \"toolkit.readiness_blocks.quality_standards.title\"",
-        "description": "TODO: Translate \"toolkit.readiness_blocks.quality_standards.description\""
+        "title": "Standardy jakości",
+        "description": "Rubryki sesji i pętle opinii zapewniają, że każdy program spełnia pieczęć opieki Roundup Games."
       }
     },
     "how_to_use": {
-      "eyebrow": "TODO: Translate \"toolkit.how_to_use.eyebrow\"",
-      "title": "TODO: Translate \"toolkit.how_to_use.title\"",
-      "description": "TODO: Translate \"toolkit.how_to_use.description\""
+      "eyebrow": "Jak używać zestawu",
+      "title": "Z przewodnikiem sprint, aby zbudować infrastrukturę społeczności",
+      "description": "Postępuj zgodnie z naszą 6-tygodniową mapą drogową startu lub dostosuj moduły do swojego harmonogramu. Każdy rozdział kończy się promptami refleksyjnymi, aby Twój zespół rdzeniowy mógł ocenić postępy i wcześnie wykrywać blokery."
     },
     "phases": {
       "weeks_1_2": {
-        "title": "TODO: Translate \"toolkit.phases.weeks_1_2.title\"",
-        "items": "TODO: Translate \"toolkit.phases.weeks_1_2.items\""
+        "title": "Tygodnie 1-2",
+        "items": [
+          "Zdefiniuj wartości społeczności i inkluzywne wytyczne gier",
+          "Ustal rytm spotkań i model podejmowania decyzji",
+          "Potwierdź role założycielskie i kanały komunikacji"
+        ]
       },
       "weeks_3_4": {
-        "title": "TODO: Translate \"toolkit.phases.weeks_3_4.title\"",
-        "items": "TODO: Translate \"toolkit.phases.weeks_3_4.items\""
+        "title": "Tygodnie 3-4",
+        "items": [
+          "Zmapuj źródła finansowania i prospekty sponsorów",
+          "Prototypuj agendę swojego pierwszego flagowego wydarzenia",
+          "Skonfiguruj podróże onboardingowe dla graczy i wolontariuszy"
+        ]
       },
       "weeks_5_6": {
-        "title": "TODO: Translate \"toolkit.phases.weeks_5_6.title\"",
-        "items": "TODO: Translate \"toolkit.phases.weeks_5_6.items\""
+        "title": "Tygodnie 5-6",
+        "items": [
+          "Przetestuj ćwiczenia bezpieczeństwa i rytuały debriefingu",
+          "Zaplanuj swoje następne kwartale programowania",
+          "Zbierz opinie pilotowe i iteruj statut"
+        ]
       }
     },
     "downloads": {
-      "title": "TODO: Translate \"toolkit.downloads.title\"",
-      "description": "TODO: Translate \"toolkit.downloads.description\"",
+      "title": "Pobierz formaty",
+      "description": "Wolisz pracować offline? Pobierz edytowalny pakiet lub poszczególne szablony poniżej. Każdy plik pozostaje zsynchronizowany z najnowszymi wymaganiami dotyczącymi zarządzania, dostępności i bezpieczeństwa od zespołu deweloperskiego Roundup Games.",
       "formats": {
         "zip": {
-          "title": "TODO: Translate \"toolkit.downloads.formats.zip.title\"",
-          "description": "TODO: Translate \"toolkit.downloads.formats.zip.description\"",
-          "button": "TODO: Translate \"toolkit.downloads.formats.zip.button\""
+          "title": "Kompletny zestaw (ZIP)",
+          "description": "Wszystkie statuty, arkusze kalkulacyjne i szablony polityk w jednym archiwum.",
+          "button": "Pobierz ZIP"
         },
         "docx": {
-          "title": "TODO: Translate \"toolkit.downloads.formats.docx.title\"",
-          "description": "TODO: Translate \"toolkit.downloads.formats.docx.description\"",
-          "button": "TODO: Translate \"toolkit.downloads.formats.docx.button\""
+          "title": "Statut i zarządzanie (DOCX)",
+          "description": "Edytowalna konstytucja, kodeks postępowania i umowa wolontariusza.",
+          "button": "Pobierz DOCX"
         },
         "sheets": {
-          "title": "TODO: Translate \"toolkit.downloads.formats.sheets.title\"",
-          "description": "TODO: Translate \"toolkit.downloads.formats.sheets.description\"",
-          "button": "TODO: Translate \"toolkit.downloads.formats.sheets.button\""
+          "title": "Budżety i sponsorzy (Sheets)",
+          "description": "Na żywo arkusz kalkulacyjny dla przepływów pieniężnych, dotacji i wydatków cyklicznych.",
+          "button": "Skopiuj arkusz kalkulacyjny"
         }
       },
       "support": {
-        "description": "TODO: Translate \"toolkit.downloads.support.description\"",
-        "email": "TODO: Translate \"toolkit.downloads.support.email\""
+        "description": "Potrzebujesz pomocy w dostosowaniu materiałów? E-mail {{email}}, aby poprosić o sesję współpracy z naszym zespołem sukcesu społeczności.",
+        "email": "development@roundup.games"
       }
     }
   },
   "safety_policies": {
     "hero": {
-      "eyebrow": "TODO: Translate \"safety_policies.hero.eyebrow\"",
-      "title": "TODO: Translate \"safety_policies.hero.title\"",
-      "subtitle": "TODO: Translate \"safety_policies.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"safety_policies.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"safety_policies.hero.secondary_cta\""
+      "eyebrow": "Polityki bezpieczeństwa i dostępności",
+      "title": "Czuj się chroniony na każdym wydarzeniu Roundup",
+      "subtitle": "Tworzymy polityki z członkami społeczności, ekspertami ds. bezpieczeństwa i doradcami prawnymi, aby Twoje historie mogły kwitnąć w bezpiecznych przestrzeniach.",
+      "cta_text": "Pobierz polityki",
+      "secondary_cta": "Zgłoś pilną obawę"
     },
     "approach": {
-      "eyebrow": "TODO: Translate \"safety_policies.approach.eyebrow\"",
-      "title": "TODO: Translate \"safety_policies.approach.title\"",
-      "description": "TODO: Translate \"safety_policies.approach.description\""
+      "eyebrow": "Nasze podejście",
+      "title": "Polityki opracowane z ocalonymi, obrońcami i narratorami",
+      "description": "Współtworzymy standardy bezpieczeństwa z wrażliwymi na traumę praktykami i marginalizowanymi członkami społeczności. Wynikiem jest żywa ramy, która redukuje szkodę, priorytetyzuje zgodę i chroni dane przez każdy rozdział."
     },
     "pillars": {
       "people_first": {
-        "title": "TODO: Translate \"safety_policies.pillars.people_first.title\"",
-        "description": "TODO: Translate \"safety_policies.pillars.people_first.description\""
+        "title": "Ludzko-pierwsze zabezpieczenia",
+        "description": "Wyszkoleni zarządcy społeczności, sprawdzeni wolontariusze i jasne drabiny eskalacji utrzymują każdy stół wsparty."
       },
       "consent_driven": {
-        "title": "TODO: Translate \"safety_policies.pillars.consent_driven.title\"",
-        "description": "TODO: Translate \"safety_policies.pillars.consent_driven.description\""
+        "title": "Gra oparta na zgodzie",
+        "description": "Narzędzia bezpieczeństwa sesji, instruktaże przed wydarzeniami i rytuały debriefingu pomagają uczestnikom reprezentować swoje potrzeby w czasie rzeczywistym."
       },
       "data_stewardship": {
-        "title": "TODO: Translate \"safety_policies.pillars.data_stewardship.title\"",
-        "description": "TODO: Translate \"safety_policies.pillars.data_stewardship.description\""
+        "title": "Zarządzanie danymi",
+        "description": "Minimalizujemy zbieranie danych, szyfrujemy wrażliwe zapisy i utrzymujemy transparentne harmoniki przechowywania dla wszystkich programów."
       }
     },
     "policy_library": {
-      "eyebrow": "TODO: Translate \"safety_policies.policy_library.eyebrow\"",
-      "title": "TODO: Translate \"safety_policies.policy_library.title\"",
-      "description": "TODO: Translate \"safety_policies.policy_library.description\"",
+      "eyebrow": "Biblioteka polityk",
+      "title": "Obejmij każdą fazę podróży uczestnika",
+      "description": "Biblioteka jest zorganizowana według cyklu życia – przed, podczas i po wydarzeniach – abyś mógł szybko znaleźć wskazówki, których potrzebujesz. Każda polityka zawiera listy kontrolne szkoleń, wskazówki implementacyjne i metryki do audytowania skuteczności.",
       "lifecycle": {
         "before": {
-          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.before.title\"",
-          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.before.items\""
+          "title": "Przed wydarzeniem",
+          "items": [
+            "Oceny ryzyka wydarzeń i audyty dostępności",
+            "Screening wolontariuszy i kontrole referencyjne",
+            "Wytyczne minimalizacji danych rejestracyjnych"
+          ]
         },
         "during": {
-          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.during.title\"",
-          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.during.items\""
+          "title": "Podczas wydarzenia",
+          "items": [
+            "Skrypty instruktażu bezpieczeństwa i macierz eskalacji czerwony/żółty",
+            "Role reakcji na incydenty z pokryciem dyżuru",
+            "Lista kontrolna dostosowań dostępności w czasie rzeczywistym"
+          ]
         },
         "after": {
-          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.after.title\"",
-          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.after.items\""
+          "title": "Po wydarzeniu",
+          "items": [
+            "Protokoły następcze i odniesienia do opieki",
+            "Harmoniki przechowywania danych zgodne z prawem prywatności",
+            "Szablon analizy pierwotnej przyczyny dla recenzji incydentów"
+          ]
         },
         "digital": {
-          "title": "TODO: Translate \"safety_policies.policy_library.lifecycle.digital.title\"",
-          "items": "TODO: Translate \"safety_policies.policy_library.lifecycle.digital.items\""
+          "title": "Portal cyfrowy",
+          "items": [
+            "Postawa bezpieczeństwa platformy i standardy szyfrowania",
+            "Workflow żądania podmiotu danych",
+            "Kwestionariusz due diligence dostawcy"
+          ]
         }
       },
       "timeline": {
-        "title": "TODO: Translate \"safety_policies.policy_library.timeline.title\"",
-        "description": "TODO: Translate \"safety_policies.policy_library.timeline.description\"",
-        "schedule": "TODO: Translate \"safety_policies.policy_library.timeline.schedule\""
+        "title": "Roczny harmonogram przeglądu",
+        "description": "Polityki przechodzą trzyletnie przeglądy z zewnętrznymi doradcami specjalizującymi się w zabezpieczeniach, cyberbezpieczeństwie i sprawiedliwości dla osób z niepełnosprawnościami. Publikujemy dziennik zmian i zapraszamy do publicznego komentarza przed ratyfikacją.",
+        "schedule": [
+          "Styczeń: Audit prawny i zgodności",
+          "Maj: Townhall społeczności i ankieta",
+          "Wrzesień: Odświeżenie dostępności i bezpieczeństwa danych"
+        ]
       },
       "transparency": {
-        "title": "TODO: Translate \"safety_policies.policy_library.transparency.title\"",
-        "description": "TODO: Translate \"safety_policies.policy_library.transparency.description\"",
-        "button": "TODO: Translate \"safety_policies.policy_library.transparency.button\""
+        "title": "Raporty transparentności",
+        "description": "Półroczne raporty podsumowujące metryki incydentów, harmoniki rozwiązywania i projekty ulepszeń. Zapisz się, aby otrzymywać aktualizacje, gdy tylko zostaną opublikowane.",
+        "button": "Dołącz do listy bezpieczeństwa"
       }
     },
     "downloads": {
-      "title": "TODO: Translate \"safety_policies.downloads.title\"",
+      "title": "Pobierz pakiety polityk",
       "formats": {
         "handbook": {
-          "title": "TODO: Translate \"safety_policies.downloads.formats.handbook.title\"",
-          "description": "TODO: Translate \"safety_policies.downloads.formats.handbook.description\"",
-          "button": "TODO: Translate \"safety_policies.downloads.formats.handbook.button\""
+          "title": "Podręcznik bezpieczeństwa społeczności",
+          "description": "Kompletne polityki dla programów osobistych, w tym skrypty prowadzące.",
+          "button": "Pobierz PDF"
         },
         "data_protection": {
-          "title": "TODO: Translate \"safety_policies.downloads.formats.data_protection.title\"",
-          "description": "TODO: Translate \"safety_policies.downloads.formats.data_protection.description\"",
-          "button": "TODO: Translate \"safety_policies.downloads.formats.data_protection.button\""
+          "title": "Dodatek ochrony danych",
+          "description": "Polityka prywatności, harmoniki przechowywania i szablony powiadomień o incydentach.",
+          "button": "Pobierz PDF"
         },
         "accessibility": {
-          "title": "TODO: Translate \"safety_policies.downloads.formats.accessibility.title\"",
-          "description": "TODO: Translate \"safety_policies.downloads.formats.accessibility.description\"",
-          "button": "TODO: Translate \"safety_policies.downloads.formats.accessibility.button\""
+          "title": "Podręcznik dostępności",
+          "description": "Wytyczne dla wydarzeń przyjaznych zmysłowo, świadomych mobilności i wielojęzycznych.",
+          "button": "Pobierz PDF"
         }
       },
       "custom_policies": {
-        "title": "TODO: Translate \"safety_policies.downloads.custom_policies.title\"",
-        "description": "TODO: Translate \"safety_policies.downloads.custom_policies.description\"",
-        "button": "TODO: Translate \"safety_policies.downloads.custom_policies.button\""
+        "title": "Potrzebujesz podpisanej polityki dla swojego miejsca?",
+        "description": "Nasz zespół prawny może wspólnie tworzyć umowy specyficzne dla miejsca lub atesty zgodności.",
+        "button": "Skoordynuj z zespołem prawnym"
       }
     },
     "questions": {
-      "title": "TODO: Translate \"safety_policies.questions.title\"",
-      "description": "TODO: Translate \"safety_policies.questions.description\"",
+      "title": "Pytania lub opinie?",
+      "description": "Skontaktuj się z safety@roundup.games z aktualizacjami polityk, prośbami o dostępność lub wyjaśniającymi pytaniami. Odpowiadamy w ciągu 48 godzin i możemy zaplanować rozmowy następcze w razie potrzeby.",
       "emergency": {
-        "title": "TODO: Translate \"safety_policies.questions.emergency.title\"",
-        "description": "TODO: Translate \"safety_policies.questions.emergency.description\""
+        "title": "Kontakty alarmowe",
+        "description": "W przypadku pilnych incydentów podczas wydarzenia zadzwoń na 24/7 hotlineę, która jest udostępniana zarejestrowanym koordynatorom. W przypadku obaw dotyczących bezpieczeństwa cyfrowego e-mail security@roundup.games, aby dotrzeć do naszego zespołu reakcji dyżurnej."
       }
     }
   },
   "report_concern": {
-    "loading": {
-      "reporting_steps": "TODO: Translate \"report_concern.loading.reporting_steps\"",
-      "support_resources": "TODO: Translate \"report_concern.loading.support_resources\""
+    "hero": {
+      "eyebrow": "Zgłoś obawę",
+      "title": "Jesteśmy tu, aby pomóc – dzień i noc",
+      "subtitle": "Roundup Games traktuje każdą zgłoszenie poważnie. Skontaktuj się z nami, abyśmy mogli utrzymać naszą społeczność bezpieczną, wspieraną i poinformowaną.",
+      "cta_text": "Zobacz kroki zgłoszenia",
+      "secondary_cta": "Odwiedź polityki bezpieczeństwa"
+    },
+    "reporting_steps": {
+      "eyebrow": "Jak zgłosić",
+      "title": "Reagujemy szybko i utrzymujemy Cię poinformowanego",
+      "description": "Postępuj zgodnie z tymi krokami, abyśmy mogli chronić uczestników i rozwiązywać incydenty z opieką. Nasz zespół potwierdzi Twoje zgłoszenie, zarysuje następne kroki i podzieli się aktualizacjami, dopóki sprawa nie zostanie rozwiązana.",
+      "steps": [
+        {
+          "title": "Zadbaj, aby każdy był bezpieczny",
+          "description": "Jeśli ktoś jest w bezpośrednim niebezpieczeństwie, skontaktuj się najpierw z lokalnymi służbami ratunkowymi. Nasz zespół reakcji skoordynuje wsparcie następcze, gdy sytuacja będzie stabilna."
+        },
+        {
+          "title": "Zbierz kluczowe szczegóły",
+          "description": "Zapisz, co się stało, kiedy się wydarzyło, kto był zaangażowany i jakie podjęto natychmiastowe działania. Dołącz linki, zrzuty ekranu lub zdjęcia, jeśli istotne."
+        },
+        {
+          "title": "Dotrzyj do właściwego zespołu",
+          "description": "Wybierz poniżej kanał zgłoszenia, który pasuje do obawy. Jeśli nie jesteś pewien, skontaktuj się z hotlineą, a my przekażemy zapytanie."
+        }
+      ]
+    },
+    "channels": {
+      "eyebrow": "Wybierz kanał",
+      "title": "Specjalistyczne zespoły gotowe do reagowania",
+      "description": "Użyj opcji, która najlepiej pasuje do sytuacji, abyśmy mogli aktywować właściwych responderów. Jeśli wolisz anonimowe zgłoszenie, wybierz \"Conduct Response Team\" i wskaż to życzenie w formularzu.",
+      "contact_label": "Kontakt",
+      "urgent_safety": {
+        "title": "Pilna obawa o bezpieczeństwo",
+        "description": "Szkoda fizyczna, harassment lub poważny stres emocjonalny, który dzieje się teraz na wydarzeniu.",
+        "contact": "24/7 Safety Hotline",
+        "action_label": "Zadzwoń 1-855-ROUNDUP",
+        "notes": "Dostępna dla zarejestrowanych koordynatorów i menedżerów miejsc. Tłumacze i napisy w czasie rzeczywistym dostępne na żądanie."
+      },
+      "conduct_violation": {
+        "title": "Naruszenie kodeksu postępowania",
+        "description": "Zgłoszenia dotyczące harassmentu, dyskryminacji, mobbingu lub powtarzającego się zakłócającego zachowania.",
+        "contact": "Conduct Response Team",
+        "action_label": "E-mail conduct@roundup.games",
+        "notes": "Oczekuj potwierdzenia w ciągu 12 godzin i pełnego planu następczego w ciągu 48 godzin."
+      },
+      "data_issue": {
+        "title": "Problem z danymi lub platformą",
+        "description": "Podejrzewane naruszenie konta, obawy o prywatność lub błędy ujawniające wrażliwe informacje.",
+        "contact": "Zespół bezpieczeństwa i platformy",
+        "action_label": "E-mail security@roundup.games",
+        "notes": "Krytyczne luki są priorytetowane w ciągu dwóch godzin. Koordynujemy odpowiedzialne ujawnienie i aktualizacje statusu."
+      },
+      "accessibility_request": {
+        "title": "Prośba o dostępność",
+        "description": "Udogodnienia, usługi tłumaczeniowe lub usuwanie barier dla nadchodzących programów.",
+        "contact": "Dyżur dostępności",
+        "action_label": "E-mail accessibility@roundup.games",
+        "notes": "Odpowiemy w ciągu jednego dnia roboczego z następnymi krokami lub opcjami planowania."
+      }
+    },
+    "what_to_expect": {
+      "eyebrow": "Po Twoim zgłoszeniu",
+      "title": "Czego możesz oczekiwać od naszego zespołu reakcji",
+      "expectations": [
+        "Potwierdzenie otrzymania z przypisanym responderem w ciągu 12 godzin",
+        "Dostosowany plan bezpieczeństwa i harmonogram kolejnych aktualizacji",
+        "Opcje rozmów restoracyjnych lub formalnych dochodzeń",
+        "Podsumowanie zakończenia z zasobami następczymi i przyszłymi krokami zapobiegawczymi"
+      ],
+      "live_support": {
+        "title": "Wolisz rozmowy na żywo?",
+        "description": "Zaplanuj rozmowę z członkiem zespołu opieki społeczności. Możemy dodatkowo zaangażować specjalistów w zależności od natury Twojej obawy.",
+        "action_label": "Zarezerwuj rozmowę opiekuńczą"
+      },
+      "anonymous_note": "Anonimowe zgłoszenia są badane z taką samą pilnością. Podzielimy się, jakie działania zostały podjęte, przez publiczną aktualizację, gdy nie będziemy mogli bezpośrednio nastąpić."
+    },
+    "support_resources": {
+      "title": "Zasoby wsparcia",
+      "description": "Współpracujemy z lokalnymi organizacjami specjalizującymi się w zdrowiu psychicznym, usługach dla ofiar i procesach restoracyjnych. Jeśli potrzebujesz dodatkowej opieki, daj nam znać, a my nawiążemy połączenia.",
+      "resources": [
+        {
+          "title": "Ciepła linia zdrowia psychicznego",
+          "description": "Wsparcie rówieśnicze dla stresu, wypalenia i przetwarzania trudnych sesji.",
+          "action_label": "Zadzwoń 1-888-555-2222"
+        },
+        {
+          "title": "Moderatorzy kręgów restoracyjnych",
+          "description": "Niezależni praktycy przeszkoleni w leczeniu wrażliwym na traumę, prowadzonym przez społeczność.",
+          "action_label": "Poproś o skierowanie"
+        },
+        {
+          "title": "Klinika bezpieczeństwa cyfrowego",
+          "description": "Wolontariusze bezpieczeństwa, którzy pomagają zabezpieczyć urządzenia i konta po incydentach.",
+          "action_label": "Zarezerwuj wizytę"
+        }
+      ]
     }
   },
   "community_host_pathway": {
     "hero": {
-      "eyebrow": "TODO: Translate \"community_host_pathway.hero.eyebrow\"",
-      "title": "TODO: Translate \"community_host_pathway.hero.title\"",
-      "subtitle": "TODO: Translate \"community_host_pathway.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"community_host_pathway.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"community_host_pathway.hero.secondary_cta\""
+      "eyebrow": "Ścieżka Organizatora Społeczności",
+      "title": "Pozwalaj rozrastać się spotkaniom, które czują się jak dom",
+      "subtitle": "Szkolenie dla liderów wydarzeń, zespołów kawiarni i wolontariuszy, którzy przekształcają przestrzenie w niezapomniale cele gier stołowych.",
+      "cta_text": "Aplikuj do następnej kohorty",
+      "secondary_cta": "Zatrudnij certyfikowanego organizatora"
     },
     "curriculum": {
-      "eyebrow": "TODO: Translate \"community_host_pathway.curriculum.eyebrow\"",
-      "title": "TODO: Translate \"community_host_pathway.curriculum.title\"",
-      "description": "TODO: Translate \"community_host_pathway.curriculum.description\"",
-      "tracks": "TODO: Translate \"community_host_pathway.curriculum.tracks\""
+      "eyebrow": "Ścieżki programu nauczania",
+      "title": "Zbuduj supermoce gościnności, logistyki i wzrostu",
+      "description": "Mieszaj warsztaty na żywo ze zmianami cieniowymi przy flagowych wydarzeniach Roundup. Organizatorzy opuszczają się z powtarzalnymi systemami, frameworkami opinii i siecią rówieśników do wymiany podręczników.",
+      "tracks": [
+        {
+          "title": "Gościnność i inkluzywność",
+          "focus": "Projektowanie przyjazdów, orientacji i przydziałów stolików, które sprawiają, że każdy gość czuje się mile widziany od pierwszego cześć.",
+          "highlights": [
+            "Rytuały front-of-house i przyjazna zmysłowo oznakowanie",
+            "Najlepsze praktyki dotyczące zaimion i ćwiczenia kompetencji kulturowych",
+            "Podręcznik deeskalacji dla typowych scenariuszy wydarzeń"
+          ]
+        },
+        {
+          "title": "Doskonałość operacyjna",
+          "focus": "Opanuj logistykę wydarzeń – od przygotowania sprzętu i zarządzania wolontariuszami do rozwiązywania problemów na żywo i procedur zamykania.",
+          "highlights": [
+            "Szablony run-of-show z wyzwalaczami awaryjnymi",
+            "Inwentaryzacja i mapowanie układu stolików",
+            "Zgłaszanie incydentów i protokoły przekazania"
+          ]
+        },
+        {
+          "title": "Wzrost społeczności",
+          "focus": "Kultywuj pęd członkowski z outreachem, partnerstwami i storytellingiem po wydarzeniach.",
+          "highlights": [
+            "Kalendzary treści mediów społecznościowych i biuletynów",
+            "Projektowanie pętli opinii i benchmarki retencji",
+            "Zestaw partnerstwa dla kawiarni, bibliotek i szkół"
+          ]
+        }
+      ]
     },
     "practicum": {
-      "eyebrow": "TODO: Translate \"community_host_pathway.practicum.eyebrow\"",
-      "title": "TODO: Translate \"community_host_pathway.practicum.title\"",
-      "description": "TODO: Translate \"community_host_pathway.practicum.description\"",
-      "checklist_title": "TODO: Translate \"community_host_pathway.practicum.checklist_title\"",
-      "checklist_items": "TODO: Translate \"community_host_pathway.practicum.checklist_items\"",
-      "toolkit_title": "TODO: Translate \"community_host_pathway.practicum.toolkit_title\"",
-      "toolkit_description": "TODO: Translate \"community_host_pathway.practicum.toolkit_description\"",
-      "toolkit_button": "TODO: Translate \"community_host_pathway.practicum.toolkit_button\"",
-      "certifications_title": "TODO: Translate \"community_host_pathway.practicum.certifications_title\"",
-      "certifications_description": "TODO: Translate \"community_host_pathway.practicum.certifications_description\""
+      "eyebrow": "Ucz się przez działanie",
+      "title": "Zmiany cieniowe i wsparcie practicum",
+      "description": "Każdy uczestnik kończy dwie nadzorowane zmiany przy dużych wydarzeniach. Będziesz ćwiczyć odprawę, przejścia stolików i zamykania z opiniami od seniorów organizatorów i menedżerów społeczności.",
+      "checklist_title": "Checklista practicum",
+      "checklist_items": [
+        "Przejście dostępności i kalibracja zmysłowa",
+        "Zarządzanie przejściami stolików i triaż list oczekujących",
+        "Mediacja konfliktów graczy z opcjami restoracyjnymi"
+      ],
+      "toolkit_title": "Pobrania zestawu narzędzi",
+      "toolkit_description": "Zawiera szablony układu, zestawy plakatów checklist i automatyzacje ankiet po wydarzeniach.",
+      "toolkit_button": "Pobierz ZIP",
+      "certifications_title": "Opcjonalne certyfikaty",
+      "certifications_description": "Warsztaty dodatkowe obejmują obsługę żywności, pierwszą pomocę i programowanie inkluzywne dla młodzieży lub seniorów."
     },
     "playbooks": {
-      "title": "TODO: Translate \"community_host_pathway.playbooks.title\"",
+      "title": "Podręczniki i szablony",
       "opening_night": {
-        "title": "TODO: Translate \"community_host_pathway.playbooks.opening_night.title\"",
-        "description": "TODO: Translate \"community_host_pathway.playbooks.opening_night.description\"",
-        "button": "TODO: Translate \"community_host_pathway.playbooks.opening_night.button\""
+        "title": "Checklista otwarcia wieczoru",
+        "description": "Instrukcja krok po kroku run-of-show dla pierwszych uczestników.",
+        "button": "Pobierz PDF"
       },
       "volunteer_matrix": {
-        "title": "TODO: Translate \"community_host_pathway.playbooks.volunteer_matrix.title\"",
-        "description": "TODO: Translate \"community_host_pathway.playbooks.volunteer_matrix.description\"",
-        "button": "TODO: Translate \"community_host_pathway.playbooks.volunteer_matrix.button\""
+        "title": "Macierz harmonogramu wolontariuszy",
+        "description": "Dynamiczny arkusz kalkulacyjny dla przydziałów zmian i automatyzacji przypomnień.",
+        "button": "Pobierz XLSX"
       },
       "retention_kit": {
-        "title": "TODO: Translate \"community_host_pathway.playbooks.retention_kit.title\"",
-        "description": "TODO: Translate \"community_host_pathway.playbooks.retention_kit.description\"",
-        "button": "TODO: Translate \"community_host_pathway.playbooks.retention_kit.button\""
+        "title": "Zestaw kampanii retencji",
+        "description": "Emaile drips, podpisy społecznościowe i highlighty, aby zachęcić graczy do powrotu.",
+        "button": "Pobierz ZIP"
       }
     },
     "application": {
-      "eyebrow": "TODO: Translate \"community_host_pathway.application.eyebrow\"",
-      "title": "TODO: Translate \"community_host_pathway.application.title\"",
-      "description": "TODO: Translate \"community_host_pathway.application.description\"",
-      "process_items": "TODO: Translate \"community_host_pathway.application.process_items\"",
-      "action_button": "TODO: Translate \"community_host_pathway.application.action_button\"",
-      "maintenance_title": "TODO: Translate \"community_host_pathway.application.maintenance_title\"",
-      "maintenance_items": "TODO: Translate \"community_host_pathway.application.maintenance_items\"",
-      "contact_prompt": "TODO: Translate \"community_host_pathway.application.contact_prompt\"",
-      "contact_email": "TODO: Translate \"community_host_pathway.application.contact_email\"",
-      "graduate_benefits": "TODO: Translate \"community_host_pathway.application.graduate_benefits\""
+      "eyebrow": "Proces aplikacji",
+      "title": "Przyjęcia ciągłe z kwartalnymi terminami startowymi",
+      "description": "Złóż swoją aplikację, aby dołączyć do następnej kohorty. Priorytetujemy zespoły obsługujące marginalizowanych graczy, regiony wiejskie i nowe starty miejsc.",
+      "process_items": [
+        "Wirtualne sesje informacyjne pierwszego wtorku każdego miesiąca",
+        "Przegląd aplikacji w ciągu pięciu dni roboczych",
+        "Wywiady grupowe skoncentrowane na planowaniu scenariuszy",
+        "Stypendia i ceny skali przesuwnej dostępne"
+      ],
+      "action_button": "Rozpocznij rozmowę aplikacyjną",
+      "maintenance_title": "Utrzymanie certyfikacji",
+      "maintenance_items": [
+        "Odnawiaj RPR/pierwszą pomoc co dwa lata",
+        "Ukończ dwa mikrokursy z biblioteki klinik prowadzenia",
+        "Przeglądaj kwartalne metryki wydarzeń i historie społeczności"
+      ],
+      "contact_prompt": "Pytania o program? E-mail",
+      "contact_email": "events@roundup.games",
+      "graduate_benefits": "Absolwenci otrzymują cyfrową odznakę i wsparcie w rozmieszczeniu z powiązanymi kawiarniami, bibliotekami i partnerami konwentowymi w całej Kanadzie."
     }
   },
   "event_operations_kit": {
     "hero": {
-      "eyebrow": "TODO: Translate \"event_operations_kit.hero.eyebrow\"",
-      "title": "TODO: Translate \"event_operations_kit.hero.title\"",
-      "subtitle": "TODO: Translate \"event_operations_kit.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"event_operations_kit.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"event_operations_kit.hero.secondary_cta\""
+      "eyebrow": "Zestaw operacji wydarzeń",
+      "title": "Prowadź bezproblemowe wydarzenia gier stołowych, turnieje i festiwale",
+      "subtitle": "Operacyjne plany przetestowane przez zespół wydarzeń Roundup Games, aby pomóc Ci dostarczać bezpieczne, niezapomniane i rentowne spotkania.",
+      "cta_text": "Pobierz zestaw",
+      "secondary_cta": "Zarezerwuj konsultację ops"
     },
     "operating_system": {
-      "eyebrow": "TODO: Translate \"event_operations_kit.operating_system.eyebrow\"",
-      "title": "TODO: Translate \"event_operations_kit.operating_system.title\"",
-      "description": "TODO: Translate \"event_operations_kit.operating_system.description\"",
-      "phases": "TODO: Translate \"event_operations_kit.operating_system.phases\""
+      "eyebrow": "System operacyjny",
+      "title": "Szablony, które skalują się od pop-upów do wielodniowych konwentów",
+      "description": "Wybierz moduły, których potrzebujesz, lub wdróż cały zestaw. Dołączamy edytowalne arkusze kalkulacyjne, pulpity LiveOps i checklisty prowadzenia, aby Twój zespół mógł współpracować w czasie rzeczywistym.",
+      "phases": [
+        {
+          "title": "Planowanie i budżetowanie",
+          "description": "Modele pojemności, siatki planowania personelu i szablony przepływów pieniężnych utrzymują Cię w kontroli, zanim nawet bilety zostaną wydane.",
+          "bullets": [
+            "Scenariusze przychodów z dodatkami sponsorów i merchu",
+            "Kalkulatory personelu wolontariuszy i contractorów",
+            "Arkusz porównawczy miejsc i ocena ryzyka"
+          ]
+        },
+        {
+          "title": "Wykonanie wydarzenia",
+          "description": "Minuta po minucie run-of-show, drzewa komunikacji i karty reakcji kryzysowej zapewniają płynną dostawę w dniu wydarzenia",
+          "bullets": [
+            "Przepływ odpraw z kodami QR i listami kopii zapasowych",
+            "Protokoły radiowe i wiadomości dla liderów podłogi",
+            "Macierz eskalacji incydentów i zestaw dokumentacji"
+          ]
+        },
+        {
+          "title": "Zawijanie po wydarzeniu",
+          "description": "Szablony debriefingu, pulpity metryk i skrypty outreach pomagają przekształcić pęd w przyszły wzrost.",
+          "bullets": [
+            "Streszczenie raportu interesariuszy z podsumowaniem finansowym",
+            "Sekwencje automatyzacji podziękowań wolontariuszom",
+            "Analiza ankiety graczy i planer retencji"
+          ]
+        }
+      ]
     },
     "liveops": {
-      "eyebrow": "TODO: Translate \"event_operations_kit.liveops.eyebrow\"",
-      "title": "TODO: Translate \"event_operations_kit.liveops.title\"",
-      "description": "TODO: Translate \"event_operations_kit.liveops.description\"",
-      "widgets_title": "TODO: Translate \"event_operations_kit.liveops.widgets_title\"",
-      "widgets": "TODO: Translate \"event_operations_kit.liveops.widgets\"",
-      "automations_title": "TODO: Translate \"event_operations_kit.liveops.automations_title\"",
-      "automations_description": "TODO: Translate \"event_operations_kit.liveops.automations_description\"",
-      "automations_button": "TODO: Translate \"event_operations_kit.liveops.automations_button\"",
-      "vendor_title": "TODO: Translate \"event_operations_kit.liveops.vendor_title\"",
-      "vendor_description": "TODO: Translate \"event_operations_kit.liveops.vendor_description\"",
-      "vendor_button": "TODO: Translate \"event_operations_kit.liveops.vendor_button\""
+      "eyebrow": "Pulpit LiveOps",
+      "title": "Dane w czasie rzeczywistym utrzymują operacje spokojnymi i proaktywnymi",
+      "description": "Skonfiguruj nasz połączony pulpit arkusza kalkulacyjnego, aby monitorować uczestnictwo, obłożenie stolików, przydziały wolontariuszy i logi incydentów. Zintegruj z naszymi formularzami lub podłącz swoje własne źródła danych.",
+      "widgets_title": "Widżety pulpitu",
+      "widgets": [
+        "Licznik odpraw z alertami pojemności",
+        "Mapa cieplna wykorzystania stolików i tracker kolejki",
+        "Tablica personelu wolontariuszy z przypomnieniami o przerwach"
+      ],
+      "automations_title": "Zawarte automatyzacje",
+      "automations_description": "Gotowe recepty Zapier wysyłają alerty SMS do liderów zmian, wyzwalają powiadomienia o uzupełnieniu zapasów i aktualizują Twoje raporty po wydarzeniach.",
+      "automations_button": "Pobierz pakiet automatyzacji",
+      "vendor_title": "Zestaw zarządzania dostawcami",
+      "vendor_description": "Szablony umów, listy kontrolne ubezpieczeń i kadencje komunikacji utrzymują partnerów zsynchronizowanych.",
+      "vendor_button": "Pobierz zestaw dostawców"
     },
     "downloads": {
-      "title": "TODO: Translate \"event_operations_kit.downloads.title\"",
+      "title": "Pobierz pełny zestaw",
       "operations_bundle": {
-        "title": "TODO: Translate \"event_operations_kit.downloads.operations_bundle.title\"",
-        "description": "TODO: Translate \"event_operations_kit.downloads.operations_bundle.description\"",
-        "button": "TODO: Translate \"event_operations_kit.downloads.operations_bundle.button\""
+        "title": "Pakiet operacyjny (ZIP)",
+        "description": "Wszystkie szablony, pulpity i odniesienia polityk w jednym archiwum.",
+        "button": "Pobierz ZIP"
       },
       "run_of_show": {
-        "title": "TODO: Translate \"event_operations_kit.downloads.run_of_show.title\"",
-        "description": "TODO: Translate \"event_operations_kit.downloads.run_of_show.description\"",
-        "button": "TODO: Translate \"event_operations_kit.downloads.run_of_show.button\""
+        "title": "Szablon run-of-show",
+        "description": "Formaty Google Sheets + Excel z wbudowanymi automatycznymi przypomnieniami.",
+        "button": "Pobierz XLSX"
       },
       "compliance_binder": {
-        "title": "TODO: Translate \"event_operations_kit.downloads.compliance_binder.title\"",
-        "description": "TODO: Translate \"event_operations_kit.downloads.compliance_binder.description\"",
-        "button": "TODO: Translate \"event_operations_kit.downloads.compliance_binder.button\""
+        "title": "Działka ryzyka i zgodności",
+        "description": "Certyfikaty ubezpieczeniowe, formularze zrzeczenia i karty reakcji alarmowej.",
+        "button": "Pobierz PDF"
       },
-      "support_title": "TODO: Translate \"event_operations_kit.downloads.support_title\"",
-      "support_description": "TODO: Translate \"event_operations_kit.downloads.support_description\"",
-      "support_button": "TODO: Translate \"event_operations_kit.downloads.support_button\""
+      "support_title": "Potrzebujesz niestandardowej automatyzacji lub wsparcia personelu?",
+      "support_description": "Nasi konsultanci operacji wydarzeń mogą wspólnie budować pulpity, rekrutować wolontariuszy i zarządzać briefingami dostawców dla Twojego następnego programu flagowego.",
+      "support_button": "Porozmawiaj z zespołem operacyjnym"
     }
   },
   "session_plans": {
     "hero": {
-      "eyebrow": "TODO: Translate \"session_plans.hero.eyebrow\"",
-      "title": "TODO: Translate \"session_plans.hero.title\"",
-      "subtitle": "TODO: Translate \"session_plans.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"session_plans.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"session_plans.hero.secondary_cta\""
+      "eyebrow": "Biblioteka projektowania sesji",
+      "title": "Przetestowane przez prowadzących sesje dla każdego stolika",
+      "subtitle": "Pobierz gotowe przygody, plany rotacji i przewodniki debriefingu opracowane przez narratorów Roundup Games.",
+      "cta_text": "Przeglądaj kolekcje",
+      "secondary_cta": "Zarezerwuj konsultację projektową"
     },
     "collections": {
-      "eyebrow": "TODO: Translate \"session_plans.collections.eyebrow\"",
-      "title": "TODO: Translate \"session_plans.collections.title\"",
-      "description": "TODO: Translate \"session_plans.collections.description\"",
+      "eyebrow": "Kurowane playlisty",
+      "title": "Mieszaj i dopasowuj przygody do swoich celów",
+      "description": "Filtruj według gatunku, długości sesji, doświadczenia graczy lub potrzeb dostępności. Każdy plan listuje wymagane materiały, wskazówki prowadzące i momenty spotlight, aby coachować nowych narratorów.",
       "story_driven": {
-        "title": "TODO: Translate \"session_plans.collections.story_driven.title\"",
-        "description": "TODO: Translate \"session_plans.collections.story_driven.description\"",
-        "examples": "TODO: Translate \"session_plans.collections.story_driven.examples\""
+        "title": "Kampanie napędzane historią",
+        "description": "Łuki epizodyczne dla grup skoncentrowanych na narracji z promptami sesji zerowych i przypomnieniami o narzędziach bezpieczeństwa.",
+        "examples": [
+          "Whispers Below: Tajemnica urban fantasy w czterech aktach",
+          "Voyagers of the Verdant Sea: Mini-seria eksploracji hopepunk",
+          "The Iron Concordat: Intryga polityczna z rotującymi scenami spotlight"
+        ]
       },
       "quickstart": {
-        "title": "TODO: Translate \"session_plans.collections.quickstart.title\"",
-        "description": "TODO: Translate \"session_plans.collections.quickstart.description\"",
-        "examples": "TODO: Translate \"session_plans.collections.quickstart.examples\""
+        "title": "One-shoty szybkiego startu",
+        "description": "Przygody o niskim przygotowaniu, które pasują do 90-minutowych do 2-godzinnych okien – idealne dla kawiarni, klubów i dem konwentowych.",
+        "examples": [
+          "Aurora Chase: Współpraca puzzle z rozgałęzionymi zakończeniami",
+          "Signal Lost: Ratunek sci-fi z mechanikami fail-forward",
+          "Hearth & Hollow: Przytulna tajemnica z dostępnymi odniesieniami do zasad"
+        ]
       },
       "board_games": {
-        "title": "TODO: Translate \"session_plans.collections.board_games.title\"",
-        "description": "TODO: Translate \"session_plans.collections.board_games.description\"",
-        "examples": "TODO: Translate \"session_plans.collections.board_games.examples\""
+        "title": "Spotlighty gier planszowych",
+        "description": "Kurowane plany rotacji dla nowoczesnych gier planszowych, podkreślające dostępność, temat i różnorodność rozgrywki.",
+        "examples": [
+          "Wieczór bramowy: Cascadia, Azul i Flamecraft ze skryptami prowadzącymi",
+          "Drabina strategii: Dune Imperium w John Company z briefami prep",
+          "Róg współpracy: Spirit Island i The Crew z promptami debriefingu zespołowego"
+        ]
       }
     },
     "logistics": {
-      "eyebrow": "TODO: Translate \"session_plans.logistics.eyebrow\"",
-      "title": "TODO: Translate \"session_plans.logistics.title\"",
-      "description": "TODO: Translate \"session_plans.logistics.description\"",
-      "files_title": "TODO: Translate \"session_plans.logistics.files_title\"",
-      "files": "TODO: Translate \"session_plans.logistics.files\"",
+      "eyebrow": "Co zawiera każdy plan",
+      "title": "Logistyka plug-and-play dla płynnych sesji",
+      "description": "Każde pobranie oferuje briefy prowadzących, opcjonalne kalibracje bezpieczeństwa i wezwania tempa, abyś mógł dostosować się do szerokiego spektrum energii graczy. Dodajemy również prompty wrap-up i szablony cyfrowe następcze, aby utrzymać połączenie po wieczorze gier.",
+      "files_title": "Pliki w każdym pakiecie",
+      "files": [
+        "Przegląd sesji z tonem, tematem i ostrzeżeniami o treści",
+        "Skrypt prowadzący z cue'ami czasowymi i rotacjami spotlight",
+        "Ręce graczy, pakiety map i tokeny, jeśli dotyczy",
+        "Pytania debriefingu i link ankiety dla opinii po wydarzeniach"
+      ],
       "update_cadence": {
-        "title": "TODO: Translate \"session_plans.logistics.update_cadence.title\"",
-        "description": "TODO: Translate \"session_plans.logistics.update_cadence.description\""
+        "title": "Tempo aktualizacji",
+        "description": "Nowe paczki pojawiają się miesięcznie z sezonowymi wydarzeniami, pakietami konwentowymi i zgłoszeniami społeczności, kuratowane przez radę projektową Roundup Games."
       },
       "accessibility": {
-        "title": "TODO: Translate \"session_plans.logistics.accessibility.title\"",
-        "description": "TODO: Translate \"session_plans.logistics.accessibility.description\""
+        "title": "Uwagi dotyczące dostępności",
+        "description": "Oznaczamy obciążenie zmysłowe, poziom czytania i wymagania fizyczne dla każdego planu. Alternatywy są dostarczane dla niedowidzących, bezkości i cichych środowisk."
       }
     },
     "downloads": {
-      "title": "TODO: Translate \"session_plans.downloads.title\"",
+      "title": "Pobierz pakiety sesji",
       "story_driven_pack": {
-        "title": "TODO: Translate \"session_plans.downloads.story_driven_pack.title\"",
-        "description": "TODO: Translate \"session_plans.downloads.story_driven_pack.description\"",
-        "button": "TODO: Translate \"session_plans.downloads.story_driven_pack.button\""
+        "title": "Pakiet kampanii napędzanych historią",
+        "description": "Zawiera łuki Whispers Below, Verdant Sea i Iron Concordat.",
+        "button": "Pobierz ZIP"
       },
       "quickstart_bundle": {
-        "title": "TODO: Translate \"session_plans.downloads.quickstart_bundle.title\"",
-        "description": "TODO: Translate \"session_plans.downloads.quickstart_bundle.description\"",
-        "button": "TODO: Translate \"session_plans.downloads.quickstart_bundle.button\""
+        "title": "Bundle one-shotów szybkiego startu",
+        "description": "Zawiera przygody Aurora Chase, Signal Lost i Hearth & Hollow.",
+        "button": "Pobierz ZIP"
       },
       "board_game_kit": {
-        "title": "TODO: Translate \"session_plans.downloads.board_game_kit.title\"",
-        "description": "TODO: Translate \"session_plans.downloads.board_game_kit.description\"",
-        "button": "TODO: Translate \"session_plans.downloads.board_game_kit.button\""
+        "title": "Zestaw spotlightów gier planszowych",
+        "description": "Plany rotacji, briefy prowadzące i karty punktacji graczy.",
+        "button": "Pobierz ZIP"
       }
     },
     "submission": {
-      "title": "TODO: Translate \"session_plans.submission.title\"",
-      "description": "TODO: Translate \"session_plans.submission.description\"",
-      "button": "TODO: Translate \"session_plans.submission.button\""
+      "title": "Zgłoś swój własny plan sesji",
+      "description": "Masz przetestowaną przygodę lub format wieczoru gier planszowych? Podziel się z radą projektową dla opinii i możliwego włączenia do biblioteki.",
+      "button": "E-mail do rady projektowej"
     }
   },
   "facilitation_clinics": {
     "hero": {
-      "eyebrow": "TODO: Translate \"facilitation_clinics.hero.eyebrow\"",
-      "title": "TODO: Translate \"facilitation_clinics.hero.title\"",
-      "subtitle": "TODO: Translate \"facilitation_clinics.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"facilitation_clinics.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"facilitation_clinics.hero.secondary_cta\""
+      "eyebrow": "Kliniki prowadzenia",
+      "title": "Coaching na żądanie dla narratorów i organizatorów",
+      "subtitle": "Oglądaj mistrzów prowadzących, jak prowadzą sesje na żywo, a następnie stosuj te same techniki przy swoich stolikach z materiałami ćwiczebnymi prowadzonymi.",
+      "cta_text": "Streamuj kliniki",
+      "secondary_cta": "Zarezerwuj coaching na żywo"
     },
     "format": {
-      "eyebrow": "TODO: Translate \"facilitation_clinics.format.eyebrow\"",
-      "title": "TODO: Translate \"facilitation_clinics.format.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.format.description\""
+      "eyebrow": "Format kliniki",
+      "title": "Ucz się, obserwując prawdziwe stoliki w akcji",
+      "description": "Każda klinika łączy nagraną na żywo sesję z komentarzami od prowadzących Roundup Games. Pauzuj przy znacznikach refleksyjnych, aby ćwiczyć ze swoim własnym personelem, lub użyj zawartych promptów dyskusyjnych, aby przekształcić wideo w warsztat zespołowy."
     },
-    "modules": "TODO: Translate \"facilitation_clinics.modules\"",
-    "runtime_label": "TODO: Translate \"facilitation_clinics.runtime_label\"",
-    "loading_clinics": "TODO: Translate \"facilitation_clinics.loading_clinics\"",
+    "modules": [
+      {
+        "title": "Przygotowanie stolika",
+        "duration": "28 minut",
+        "focus": "Rytuały gościnności, skrypty onboarding i przejścia dostępności, które uspokajają nerwy pierwszej sesji.",
+        "resources": [
+          "Skrypt otwarcia prowadzącego",
+          "Checklista układu pokoju",
+          "Arkusz rozważań sensorycznych"
+        ]
+      },
+      {
+        "title": "Narzędzia bezpieczeństwa w ruchu",
+        "duration": "34 minuty",
+        "focus": "Demonstracje narzędzi bezpieczeństwa opartych na zgodzie z debriefingiem na żywo i wskazówkami coachingowymi dla trudnych momentów.",
+        "resources": [
+          "Karta X i zestaw Open Door",
+          "Przykładowe prompty Lines & Veils",
+          "Drzewo decyzyjne eskalacji"
+        ]
+      },
+      {
+        "title": "Tempo i zarządzanie spotlightem",
+        "duration": "31 minut",
+        "focus": "Zrównoważona akcja i refleksja, wsparcie cichszych graczy i czytanie energii stolika w czasie rzeczywistym.",
+        "resources": [
+          "Arkusz struktury beat",
+          "Tracker zaangażowania publiczności",
+          "Formularz refleksji po sesji"
+        ]
+      }
+    ],
+    "runtime_label": "Czas trwania:",
+    "loading_clinics": "Ładowanie klinik prowadzenia...",
     "streaming_access": {
-      "eyebrow": "TODO: Translate \"facilitation_clinics.streaming_access.eyebrow\"",
-      "title": "TODO: Translate \"facilitation_clinics.streaming_access.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.streaming_access.description\"",
+      "eyebrow": "Dostęp streamingowy",
+      "title": "Oglądaj kliniki随时随地, anywhere",
+      "description": "Wideo są hostowane na naszym prywatnym portalu edukacyjnym. Poproś o kod dostępu, a otrzymasz linki streamingowe, slajdy i pakiety notatek dla każdej kliniki. Rozdziały są stemplowane czasowo, abyś mógł skakać bezpośrednio do momentów, które chcesz przejrzeć.",
       "request_access": {
-        "title": "TODO: Translate \"facilitation_clinics.streaming_access.request_access.title\"",
-        "description": "TODO: Translate \"facilitation_clinics.streaming_access.request_access.description\"",
-        "button": "TODO: Translate \"facilitation_clinics.streaming_access.request_access.button\""
+        "title": "Poproś o dostęp",
+        "description": "E-mail training@roundup.games z nazwą Twojej organizacji, preferowaną kliniką i rosterem prowadzących. Zatwierdzamy zapytania w ciągu dwóch dni roboczych.",
+        "button": "E-mail do zespołu szkoleniowego"
       }
     },
     "discussion_guide": {
-      "title": "TODO: Translate \"facilitation_clinics.discussion_guide.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.discussion_guide.description\"",
-      "button": "TODO: Translate \"facilitation_clinics.discussion_guide.button\""
+      "title": "Przewodnik dyskusyjny",
+      "description": "Przekształć kliniki w sesję edukacyjną zespołową z promptami refleksyjnymi i ćwiczeniami umiejętności dla nowych i doświadczonych prowadzących.",
+      "button": "Pobierz przewodnik PDF"
     },
     "certification_credits": {
-      "title": "TODO: Translate \"facilitation_clinics.certification_credits.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.certification_credits.description\"",
+      "title": "Kredyty certyfikacji",
+      "description": "Ukończ wszystkie trzy kliniki i złóż zadania refleksyjne, aby zarobić godziny edukacji ciągłej uznawane przez Roundup Games i partnerów lig.",
       "credits": {
-        "hours_per_clinic": "TODO: Translate \"facilitation_clinics.certification_credits.credits.hours_per_clinic\"",
-        "digital_badge": "TODO: Translate \"facilitation_clinics.certification_credits.credits.digital_badge\"",
-        "counts_toward": "TODO: Translate \"facilitation_clinics.certification_credits.credits.counts_toward\""
+        "hours_per_clinic": "2 godziny CE na klinikę",
+        "digital_badge": "Cyfrowa odznaka wydana w ciągu 7 dni",
+        "counts_toward": "Liczy się do odnowień ścieżki MG i organizatora"
       }
     },
     "downloads": {
-      "title": "TODO: Translate \"facilitation_clinics.downloads.title\"",
+      "title": "Pobierz zasoby kliniki",
       "opening_rituals": {
-        "title": "TODO: Translate \"facilitation_clinics.downloads.opening_rituals.title\"",
-        "description": "TODO: Translate \"facilitation_clinics.downloads.opening_rituals.description\"",
-        "button": "TODO: Translate \"facilitation_clinics.downloads.opening_rituals.button\""
+        "title": "Pakiet rytuałów otwarcia",
+        "description": "Skrypty, znaki stolikowe i karty powitalne prezentowane w klinikach.",
+        "button": "Pobierz ZIP"
       },
       "safety_tools": {
-        "title": "TODO: Translate \"facilitation_clinics.downloads.safety_tools.title\"",
-        "description": "TODO: Translate \"facilitation_clinics.downloads.safety_tools.description\"",
-        "button": "TODO: Translate \"facilitation_clinics.downloads.safety_tools.button\""
+        "title": "Zestaw narzędzi bezpieczeństwa",
+        "description": "Drukowalne karty, cheat sheets prowadzące i szablony logów incydentów.",
+        "button": "Pobierz ZIP"
       },
       "spotlight_scheduler": {
-        "title": "TODO: Translate \"facilitation_clinics.downloads.spotlight_scheduler.title\"",
-        "description": "TODO: Translate \"facilitation_clinics.downloads.spotlight_scheduler.description\"",
-        "button": "TODO: Translate \"facilitation_clinics.downloads.spotlight_scheduler.button\""
+        "title": "Planer spotlight",
+        "description": "Edytowalny tracker tempa kompatybilny z Google Sheets i Excel.",
+        "button": "Pobierz XLSX"
       }
     },
     "accessibility": {
-      "title": "TODO: Translate \"facilitation_clinics.accessibility.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.accessibility.description\"",
-      "button": "TODO: Translate \"facilitation_clinics.accessibility.button\""
+      "title": "Potrzebujesz usług tłumaczeniowych?",
+      "description": "Możemy zorganizować podpisy na żywo, interpretację ASL lub tłumaczenie dla Twojego szkolenia zespołowego. Daj nam znać co najmniej dwa tygodnie wcześniej.",
+      "button": "Skoordynuj wsparcie dostępności"
     },
     "access": {
-      "title": "TODO: Translate \"facilitation_clinics.access.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.access.description\"",
-      "cta_button": "TODO: Translate \"facilitation_clinics.access.cta_button\"",
-      "coaching_cta": "TODO: Translate \"facilitation_clinics.access.coaching_cta\""
+      "title": "Uzyskaj dostęp do biblioteki kliniki",
+      "description": "Wszystkie kliniki zawierają pobieralne przewodniki prowadzące, prompty refleksyjne i arkusze ćwiczebne. Idealne dla indywidualnej nauki lub sesji szkoleniowych zespołowych.",
+      "cta_button": "Przeglądaj wszystkie kliniki",
+      "coaching_cta": "Zarezerwuj sesję coachingową 1:1"
     },
     "technical": {
-      "title": "TODO: Translate \"facilitation_clinics.technical.title\"",
-      "description": "TODO: Translate \"facilitation_clinics.technical.description\""
+      "title": "Wymagania techniczne",
+      "description": "Kliniki streamują w HD z podpisami i pobieranymi transkrypcjami. Wszystkie materiały są dostarczane w formatach dostępnych dla czytników ekranu i niedowidzących."
     }
   },
   "game_master_pathway": {
     "hero": {
-      "eyebrow": "TODO: Translate \"game_master_pathway.hero.eyebrow\"",
-      "title": "TODO: Translate \"game_master_pathway.hero.title\"",
-      "subtitle": "TODO: Translate \"game_master_pathway.hero.subtitle\"",
-      "cta_text": "TODO: Translate \"game_master_pathway.hero.cta_text\"",
-      "secondary_cta": "TODO: Translate \"game_master_pathway.hero.secondary_cta\""
+      "eyebrow": "Ścieżka Mistrza Gry",
+      "title": "Podnieś poziom swojej praktyki narracji",
+      "subtitle": "Ustrukturyzowany program nauczania, który łączy rzemiosło narracyjne, przywództwo bezpieczeństwa i umiejętności produkcyjne, abyś mógł dostarczać niezapomniane kampanie.",
+      "cta_text": "Zapisz się teraz",
+      "secondary_cta": "Przeglądaj bibliotekę sesji"
     },
     "curriculum": {
-      "eyebrow": "TODO: Translate \"game_master_pathway.curriculum.eyebrow\"",
-      "title": "TODO: Translate \"game_master_pathway.curriculum.title\"",
-      "description": "TODO: Translate \"game_master_pathway.curriculum.description\"",
-      "recommended_pace": "TODO: Translate \"game_master_pathway.curriculum.recommended_pace\"",
-      "milestones": "TODO: Translate \"game_master_pathway.curriculum.milestones\""
+      "eyebrow": "Przegląd programu nauczania",
+      "title": "Buduj umiejętności etapami z mentorstwem ekspertów",
+      "description": "Kliniki na żywo, warsztaty asynchroniczne i refleksyjne coaching pomagają Ci bezpiecznie eksperymentować i stosować nowe techniki przy swoich domowych stolikach. Oczekuj cotygodniowych promptów ćwiczebnych, rund opinii rówieśniczych i sesji 1:1 z seniorami MG.",
+      "recommended_pace": "Zalecane tempo: {{duration}}",
+      "milestones": [
+        {
+          "title": "Odznaka fundacji",
+          "duration": "4 tygodnie",
+          "outcomes": [
+            "Mistrzostwo sesji zerowej z prowadzeniem zgodnym z zgodą",
+            "Ćwiczenia improwizacyjne dla podkreślania postaci",
+            "Certyfikacja narzędzi bezpieczeństwa i projektowanie więzi stolika"
+          ]
+        },
+        {
+          "title": "Odznaka architekta kampanii",
+          "duration": "6 tygodni",
+          "outcomes": [
+            "Tempo narracji długiej z łukami i cliffhangerami",
+            "Dynamiczne projektowanie spotkań zakorzenione w autonomii graczy",
+            "Zarządzanie społecznością dla hybrydowej gry online/przebiegowej"
+          ]
+        },
+        {
+          "title": "Odznaka mistrza narracji",
+          "duration": "8 tygodni",
+          "outcomes": [
+            "Zaawansowane prowadzenie bezpieczeństwa emocjonalnego i naprawa konfliktów",
+            "Practicum mentoraty prowadzących wschodzących mistrzów gry",
+            "Coaching wystąpień dla pokazów na żywo i wydarzeń streamowanych"
+          ]
+        }
+      ]
     },
     "learning": {
-      "eyebrow": "TODO: Translate \"game_master_pathway.learning.eyebrow\"",
-      "title": "TODO: Translate \"game_master_pathway.learning.title\"",
-      "description": "TODO: Translate \"game_master_pathway.learning.description\"",
+      "eyebrow": "Doświadczenie edukacyjne",
+      "title": "Podróż coachingowa bogata w praktykę i opinie",
+      "description": "Każda kohorta jest ograniczona do 16 uczestników, aby utrzymać intymne, wysokopoziomowe środowiska edukacyjne. Otrzymasz szczegółowe notatki do nagranych sesji i będziesz shadowować seniorów prowadzących podczas programów społecznościowych na żywo.",
       "weekly_rhythm": {
-        "title": "TODO: Translate \"game_master_pathway.learning.weekly_rhythm.title\"",
-        "schedule": "TODO: Translate \"game_master_pathway.learning.weekly_rhythm.schedule\""
+        "title": "Cotygodniowy rytm",
+        "schedule": [
+          "Poniedziałek: Klinika na żywo z Q&A",
+          "Środa: Pody ćwiczebne rówieśnicze i wymiana krytyk",
+          "Piątek: Godziny pracy z projektantami programu nauczania"
+        ]
       },
       "portfolio": {
-        "title": "TODO: Translate \"game_master_pathway.learning.portfolio.title\"",
-        "description": "TODO: Translate \"game_master_pathway.learning.portfolio.description\""
+        "title": "Portfolio i ocena",
+        "description": "Ukończ z udokumentowaną biblią kampanii, nagraniami sesji i raportami opinii graczy, które możesz udostępniać miejscom, partnerom produkcyjnym lub przyszłym współpracownikom."
       },
       "alumni": {
-        "title": "TODO: Translate \"game_master_pathway.learning.alumni.title\"",
-        "description": "TODO: Translate \"game_master_pathway.learning.alumni.description\""
+        "title": "Sieć absolwentów",
+        "description": "Dostęp do ekskluzywnych castingów, płatnych możliwości narracji i wspólnych sesji worldbuilding z innymi certyfikowanymi mistrzami gry Roundup."
       }
     },
     "resources": {
-      "title": "TODO: Translate \"game_master_pathway.resources.title\"",
+      "title": "Moduły i zasoby programu nauczania",
       "narrative_workbook": {
-        "title": "TODO: Translate \"game_master_pathway.resources.narrative_workbook.title\"",
-        "description": "TODO: Translate \"game_master_pathway.resources.narrative_workbook.description\"",
-        "button": "TODO: Translate \"game_master_pathway.resources.narrative_workbook.button\""
+        "title": "Podręcznik rzemiosła narracyjnego",
+        "description": "Ćwiczenia na rozwój motywów, łuki postaci i wspólne tworzenie scen.",
+        "button": "Pobierz PDF"
       },
       "safety_toolkit": {
-        "title": "TODO: Translate \"game_master_pathway.resources.safety_toolkit.title\"",
-        "description": "TODO: Translate \"game_master_pathway.resources.safety_toolkit.description\"",
-        "button": "TODO: Translate \"game_master_pathway.resources.safety_toolkit.button\""
+        "title": "Zestaw narzędzi przywództwa bezpieczeństwa",
+        "description": "Protokoły incydentów, skrypty zgody i podręczniki naprawy restoracyjnej używane w ścieżce.",
+        "button": "Pobierz ZIP"
       },
       "performance_guide": {
-        "title": "TODO: Translate \"game_master_pathway.resources.performance_guide.title\"",
-        "description": "TODO: Translate \"game_master_pathway.resources.performance_guide.description\"",
-        "button": "TODO: Translate \"game_master_pathway.resources.performance_guide.button\""
+        "title": "Przewodnik coachingu wystąpień",
+        "description": "Ćwiczenia głosu, postawy i obecności kamery dla doświadczeń na żywo i streamowanych.",
+        "button": "Pobierz PDF"
       }
     },
     "enrollment": {
-      "eyebrow": "TODO: Translate \"game_master_pathway.enrollment.eyebrow\"",
-      "title": "TODO: Translate \"game_master_pathway.enrollment.title\"",
-      "cohorts": "TODO: Translate \"game_master_pathway.enrollment.cohorts\"",
-      "tuition": "TODO: Translate \"game_master_pathway.enrollment.tuition\"",
-      "cta_button": "TODO: Translate \"game_master_pathway.enrollment.cta_button\"",
+      "eyebrow": "Szczegóły zapisów",
+      "title": "Nadchodzące kohorty i opcje czesnego",
+      "cohorts": [
+        "Kohorta wiosenna (start 8 kwietnia) – hybrydowa online i studio Toronto",
+        "Kohorta letnia (start 15 lipca) – całkowicie wirtualna z regionalnymi meetupami",
+        "Stypendia dostępne dla marginalnych narratorów i mentorów młodzieży"
+      ],
+      "tuition": "Czesne rozpoczyna się od 480 CAD z elastycznymi planami płatności. Miejsca mogą sponsorować miejsca dla swoich prowadzących przez Fundusz Rozwoju Roundup.",
+      "cta_button": "Zaplanuj rozmowę kwalifikacyjną",
       "requirements": {
-        "title": "TODO: Translate \"game_master_pathway.enrollment.requirements.title\"",
-        "items": "TODO: Translate \"game_master_pathway.enrollment.requirements.items\""
+        "title": "Wymagania certyfikacji",
+        "items": [
+          "Ukończ wszystkie projekty kamieni milowych i dzienniki refleksyjne",
+          "Prowadź dwie nadzorowane sesje społecznościowe",
+          "Utrzymuj aktywną certyfikację bezpieczeństwa i kontrole tła",
+          "Współtwórz do biblioteki projektowania sesji lub puli mentorstwa"
+        ]
       },
       "contact": {
-        "questions": "TODO: Translate \"game_master_pathway.enrollment.contact.questions\"",
-        "email": "TODO: Translate \"game_master_pathway.enrollment.contact.email\""
+        "questions": "Pytania? E-mail {{email}} dla osobistego przewodnictwa.",
+        "email": "training@roundup.games"
       },
-      "graduate_benefits": "TODO: Translate \"game_master_pathway.enrollment.graduate_benefits\""
+      "graduate_benefits": "Absolwenci otrzymują cyfrową odznakę i wsparcie w rozmieszczeniu z powiązanymi kawiarniami, bibliotekami i partnerami konwentowymi w całej Kanadzie."
     }
   },
   "community": {
-    "title": "TODO: Translate \"community.title\"",
-    "description": "TODO: Translate \"community.description\"",
-    "action_button": "TODO: Translate \"community.action_button\""
+    "title": "Dołącz do społeczności organizatorów",
+    "description": "Wymieniaj się wskazówkami rozwiązywania problemów, udostępniaj rekomendacje dostawców i współpracuj przy wydarzeniach wieloregionalnych w kolektywie operacji Roundup Games na Discord.",
+    "action_button": "Poproś o zaproszenie"
   },
   "loading": {
-    "phases": "TODO: Translate \"loading.phases\"",
-    "curriculum_tracks": "TODO: Translate \"loading.curriculum_tracks\"",
-    "widgets": "TODO: Translate \"loading.widgets\"",
-    "reporting_steps": "TODO: Translate \"loading.reporting_steps\"",
-    "support_resources": "TODO: Translate \"loading.support_resources\"",
-    "toolkit_phases": "TODO: Translate \"loading.toolkit_phases\""
+    "phases": "Ładowanie faz...",
+    "curriculum_tracks": "Ładowanie ścieżek programu...",
+    "widgets": "Ładowanie widżetów...",
+    "reporting_steps": "Ładowanie kroków zgłaszania...",
+    "support_resources": "Ładowanie zasobów wsparcia...",
+    "toolkit_phases": "Ładowanie faz zestawu..."
   }
 }

@@ -1,150 +1,150 @@
 {
   "dashboard": {
-    "title": "TODO: Translate \"dashboard.title\"",
-    "welcome": "TODO: Translate \"dashboard.welcome\"",
+    "title": "Spieler-Dashboard",
+    "welcome": "Willkommen zurück, {{name}}",
     "errors": {
-      "failed_to_parse_payload": "TODO: Translate \"dashboard.errors.failed_to_parse_payload\"",
-      "failed_to_persist_payload": "TODO: Translate \"dashboard.errors.failed_to_persist_payload\"",
-      "failed_to_load_profile": "TODO: Translate \"dashboard.errors.failed_to_load_profile\"",
-      "failed_to_fetch_workspace_stats": "TODO: Translate \"dashboard.errors.failed_to_fetch_workspace_stats\"",
-      "failed_to_fetch_next_scheduled_game": "TODO: Translate \"dashboard.errors.failed_to_fetch_next_scheduled_game\"",
-      "failed_to_fetch_membership_status": "TODO: Translate \"dashboard.errors.failed_to_fetch_membership_status\"",
-      "failed_to_update_privacy_settings": "TODO: Translate \"dashboard.errors.failed_to_update_privacy_settings\"",
-      "failed_to_update_notification_preferences": "TODO: Translate \"dashboard.errors.failed_to_update_notification_preferences\""
+      "failed_to_parse_payload": "Konnte die gespeicherten Dashboard-Daten nicht verarbeiten",
+      "failed_to_persist_payload": "Konnte die Dashboard-Daten nicht speichern",
+      "failed_to_load_profile": "Konnte dein Spielerprofil nicht laden",
+      "failed_to_fetch_workspace_stats": "Konnte deine Spielbereich-Statistiken nicht abrufen",
+      "failed_to_fetch_next_scheduled_game": "Konnte das nächste geplante Spiel nicht abrufen",
+      "failed_to_fetch_membership_status": "Konnte deinen Mitgliedschaftsstatus nicht abrufen",
+      "failed_to_update_privacy_settings": "Konnte deine Privatsphäre-Einstellungen nicht aktualisieren",
+      "failed_to_update_notification_preferences": "Konnte deine Benachrichtigungseinstellungen nicht aktualisieren"
     },
     "privacy": {
       "invites_from_connections": {
-        "label": "TODO: Translate \"dashboard.privacy.invites_from_connections.label\"",
-        "description": "TODO: Translate \"dashboard.privacy.invites_from_connections.description\""
+        "label": "Nur Einladungen von Freunden erlauben",
+        "description": "Beschränke neue Einladungen auf Kontakte, denen du vertraust."
       },
       "follow_requests": {
-        "label": "TODO: Translate \"dashboard.privacy.follow_requests.label\"",
-        "description": "TODO: Translate \"dashboard.privacy.follow_requests.description\""
+        "label": "Folgen-Anfragen erlauben",
+        "description": "Lass Community-Mitglieder deinen Updates folgen."
       }
     },
     "notifications": {
       "game_reminders": {
-        "label": "TODO: Translate \"dashboard.notifications.game_reminders.label\"",
-        "description": "TODO: Translate \"dashboard.notifications.game_reminders.description\""
+        "label": "Spiel-Erinnerungen",
+        "description": "Erhalte eine Erinnerung, bevor die Sitzungen beginnen."
       },
       "review_reminders": {
-        "label": "TODO: Translate \"dashboard.notifications.review_reminders.label\"",
-        "description": "TODO: Translate \"dashboard.notifications.review_reminders.description\""
+        "label": "Bewertungs-Erinnerungen",
+        "description": "Bleib bei deinen Spielorganisatoren auf dem Laufenden."
       }
     },
     "membership": {
-      "status_active": "TODO: Translate \"dashboard.membership.status_active\"",
-      "status_inactive": "TODO: Translate \"dashboard.membership.status_inactive\"",
-      "active": "TODO: Translate \"dashboard.membership.active\"",
-      "no_active_membership": "TODO: Translate \"dashboard.membership.no_active_membership\"",
-      "manage_plan": "TODO: Translate \"dashboard.membership.manage_plan\"",
-      "start_membership": "TODO: Translate \"dashboard.membership.start_membership\""
+      "status_active": "Aktiv",
+      "status_inactive": "Inaktiv",
+      "active": "Mitgliedschaft aktiv",
+      "no_active_membership": "Keine aktive Mitgliedschaft",
+      "manage_plan": "Plan verwalten",
+      "start_membership": "Mitgliedschaft starten"
     },
     "upcoming_games": {
-      "no_games": "TODO: Translate \"dashboard.upcoming_games.no_games\"",
-      "stay_available": "TODO: Translate \"dashboard.upcoming_games.stay_available\""
+      "no_games": "Keine kommenden Spiele",
+      "stay_available": "Bleib verfügbar"
     },
     "pending_reviews": {
-      "all_caught_up": "TODO: Translate \"dashboard.pending_reviews.all_caught_up\"",
-      "share_stories": "TODO: Translate \"dashboard.pending_reviews.share_stories\""
+      "all_caught_up": "Du bist auf dem Laufenden",
+      "share_stories": "Erzähl deine Geschichten vom Spieltisch"
     },
     "teams": {
-      "join_crew": "TODO: Translate \"dashboard.teams.join_crew\"",
-      "active_teams": "TODO: Translate \"dashboard.teams.active_teams\"",
-      "watch_calendar": "TODO: Translate \"dashboard.teams.watch_calendar\"",
-      "opportunities_waiting": "TODO: Translate \"dashboard.teams.opportunities_waiting\""
+      "join_crew": "Einem Team beitreten",
+      "active_teams": "Aktive Teams, in denen du bist",
+      "watch_calendar": "Kalender beobachten",
+      "opportunities_waiting": "Möglichkeiten warten"
     },
     "stats": {
-      "organizer": "TODO: Translate \"dashboard.stats.organizer\"",
-      "player": "TODO: Translate \"dashboard.stats.player\"",
-      "invites": "TODO: Translate \"dashboard.stats.invites\""
+      "organizer": "Organisator",
+      "player": "Spieler",
+      "invites": "Einladungen"
     },
     "empty_states": {
-      "no_events": "TODO: Translate \"dashboard.empty_states.no_events\"",
-      "no_teams": "TODO: Translate \"dashboard.empty_states.no_teams\"",
-      "experiment_loading": "TODO: Translate \"dashboard.empty_states.experiment_loading\""
+      "no_events": "Derzeit keine empfohlenen Events.",
+      "no_teams": "Noch keine Teams synchronisiert. Tritt einem Team bei, um loszulegen.",
+      "experiment_loading": "Bleib dran. Ein neues Experiment wird geladen."
     },
     "profile": {
-      "complete": "TODO: Translate \"dashboard.profile.complete\"",
-      "steps_remaining": "TODO: Translate \"dashboard.profile.steps_remaining\""
+      "complete": "Profil optimiert",
+      "steps_remaining": "Noch zu erledigende Profilschritte"
     },
     "teams_section": {
-      "you_lead": "TODO: Translate \"dashboard.teams_section.you_lead\""
+      "you_lead": "Du leitest dieses Team"
     },
-    "persona_initial": "TODO: Translate \"dashboard.persona_initial\"",
+    "persona_initial": "S",
     "ui": {
-      "welcome_back": "TODO: Translate \"dashboard.ui.welcome_back\"",
-      "subtitle": "TODO: Translate \"dashboard.ui.subtitle\"",
+      "welcome_back": "Willkommen zurück",
+      "subtitle": "Behalte den Überblick über Sitzungen, Einladungen und Community-Highlights. Alles, was du brauchst, um verbunden zu bleiben, ist hier organisiert.",
       "badges": {
-        "privacy_ready": "TODO: Translate \"dashboard.ui.badges.privacy_ready\"",
-        "profile_complete": "TODO: Translate \"dashboard.ui.badges.profile_complete\"",
-        "profile_steps_remaining": "TODO: Translate \"dashboard.ui.badges.profile_steps_remaining\""
+        "privacy_ready": "Datenschutz-Einstellungen bereit",
+        "profile_complete": "Profil optimiert",
+        "profile_steps_remaining": "Noch zu erledigende Profilschritte"
       },
       "headquarters": {
-        "title": "TODO: Translate \"dashboard.ui.headquarters.title\""
+        "title": "Spieler-Zentrale"
       },
       "control_center": {
-        "title": "TODO: Translate \"dashboard.ui.control_center.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.control_center.subtitle\""
+        "title": "Dein Kontrollzentrum",
+        "subtitle": "Passe deine Sichtbarkeit an, bleib informiert und springe direkt in Aktionen, ohne die Zentrale zu verlassen."
       },
-      "teams_synced": "TODO: Translate \"dashboard.ui.teams_synced\"",
+      "teams_synced": "{{count}} Team{{plural}} synchronisiert",
       "review_reminders": {
-        "title": "TODO: Translate \"dashboard.ui.review_reminders.title\""
+        "title": "Bewertungs-Erinnerungen"
       },
       "relationship_health": {
-        "title": "TODO: Translate \"dashboard.ui.relationship_health.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.relationship_health.subtitle\""
+        "title": "Beziehungs-Gesundheit",
+        "subtitle": "Ein schneller Überblick, wie du in der Community verbunden bleibst."
       },
       "upcoming": {
-        "title": "TODO: Translate \"dashboard.ui.upcoming.title\""
+        "title": "Als Nächstes"
       },
-      "membership_label": "TODO: Translate \"dashboard.ui.membership_label\"",
-      "pending_reviews_label": "TODO: Translate \"dashboard.ui.pending_reviews_label\"",
-      "teams_label": "TODO: Translate \"dashboard.ui.teams_label\"",
-      "upcoming_events_label": "TODO: Translate \"dashboard.ui.upcoming_events_label\"",
+      "membership_label": "Mitgliedschaft",
+      "pending_reviews_label": "Ausstehende Bewertungen",
+      "teams_label": "Teams",
+      "upcoming_events_label": "Kommende Events",
       "campaign_commitments": {
-        "title": "TODO: Translate \"dashboard.ui.campaign_commitments.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.campaign_commitments.subtitle\""
+        "title": "Kampagnen-Verpflichtungen",
+        "subtitle": "Verfolge, wie du leitest und teilnimmst, damit nichts durchrutscht."
       },
       "game_roster": {
-        "title": "TODO: Translate \"dashboard.ui.game_roster.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.game_roster.subtitle\""
+        "title": "Spiel-Planer",
+        "subtitle": "Wisse, wo du leitest, spielst und als Nächstes auf der Warteliste stehst."
       },
       "events_exploring": {
-        "title": "TODO: Translate \"dashboard.ui.events_exploring.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.events_exploring.subtitle\""
+        "title": "Events zum Entdecken",
+        "subtitle": "Empfehlungen aktualisieren sich automatisch, wenn neue Sitzungen live gehen."
       },
       "connections_radar": {
-        "title": "TODO: Translate \"dashboard.ui.connections_radar.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.connections_radar.subtitle\""
+        "title": "Verbindungs-Radar",
+        "subtitle": "Fokus auf Teams, die diese Woche auf dich für Schwung angewiesen sind."
       },
       "focus_spotlight": {
-        "title": "TODO: Translate \"dashboard.ui.focus_spotlight.title\"",
-        "subtitle": "TODO: Translate \"dashboard.ui.focus_spotlight.subtitle\""
+        "title": "Fokus-Scheinwerfer",
+        "subtitle": "Highlights werden freigeschaltet, während wir spielerzentrierte Experimente testen."
       },
-      "flexible_calendar": "TODO: Translate \"dashboard.ui.flexible_calendar\"",
-      "open_session_briefing": "TODO: Translate \"dashboard.ui.open_session_briefing\"",
-      "discover_sessions": "TODO: Translate \"dashboard.ui.discover_sessions\"",
-      "manage_teams": "TODO: Translate \"dashboard.ui.manage_teams\"",
-      "see_all_events": "TODO: Translate \"dashboard.ui.see_all_events\"",
-      "review_gm": "TODO: Translate \"dashboard.ui.review_gm\"",
-      "start_review": "TODO: Translate \"dashboard.ui.start_review\"",
-      "members_count": "TODO: Translate \"dashboard.ui.members_count\"",
+      "flexible_calendar": "Behalte deinen Kalender flexibel und sichere dir einen Platz im nächsten Abenteuer.",
+      "open_session_briefing": "Sitzungs-Info öffnen",
+      "discover_sessions": "Sitzungen entdecken",
+      "manage_teams": "Teams verwalten",
+      "see_all_events": "Alle Events ansehen",
+      "review_gm": "{{gmName}} bewerten • {{date}}",
+      "start_review": "Starten",
+      "members_count": "{{count}} Mitglieder",
       "beta_preview": {
-        "title": "TODO: Translate \"dashboard.ui.beta_preview.title\"",
-        "description": "TODO: Translate \"dashboard.ui.beta_preview.description\""
+        "title": "Beta-Vorschau",
+        "description": "Erweiterte Teamkollegen-Empfehlungen sind in Vorbereitung. Erwarte bald kuratierte Boosts."
       },
       "calendar_sync": {
-        "title": "TODO: Translate \"dashboard.ui.calendar_sync.title\"",
-        "description": "TODO: Translate \"dashboard.ui.calendar_sync.description\"",
-        "join_pilot": "TODO: Translate \"dashboard.ui.calendar_sync.join_pilot\""
+        "title": "Früher Zugang: gemeinsamer Kalender-Abgleich",
+        "description": "Aktiviere Kalender-Freigabe, damit vertraute Freunde dich antippen können, wenn sie eine Sitzung planen, die zu deinem Stil passt.",
+        "join_pilot": "Am Pilotprogramm teilnehmen"
       }
     },
     "actions": {
-      "edit_profile": "TODO: Translate \"dashboard.actions.edit_profile\"",
-      "manage_plan": "TODO: Translate \"dashboard.actions.manage_plan\"",
-      "start_membership": "TODO: Translate \"dashboard.actions.start_membership\"",
-      "find_games": "TODO: Translate \"dashboard.actions.find_games\""
+      "edit_profile": "Profil bearbeiten",
+      "manage_plan": "Plan verwalten",
+      "start_membership": "Mitgliedschaft starten",
+      "find_games": "Spiele finden"
     }
   }
 }

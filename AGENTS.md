@@ -612,7 +612,7 @@ When adding i18n to new features:
 - ✅ Test with different languages
 - ✅ Update documentation with new namespaces
 - ✅ Run `pnpm check-types` to ensure type safety
-- ✅ Copy locale files to public: `cp -rf src/lib/i18n/locales/ public/`
+- ✅ Copy locale files to public: `cp -rf src/lib/i18n/locales/* public/locales/`
 
 ### File Organization
 
@@ -681,7 +681,7 @@ src/features/[feature]/
   6. Update server functions to return translation keys for errors
   7. Update Zod schemas with translation error messages
   8. Test with different languages
-  9. Copy locale files to public: `cp -rf src/lib/i18n/locales/ public/`
+  9. Copy locale files to public: `cp -rf src/lib/i18n/locales/* public/locales/`
 
 ### User added context:
 

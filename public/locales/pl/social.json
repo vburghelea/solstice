@@ -1,36 +1,36 @@
 {
   "blocklist": {
-    "title": "TODO: Translate \"blocklist.title\"",
-    "description": "TODO: Translate \"blocklist.description\"",
-    "loading": "TODO: Translate \"blocklist.loading\"",
-    "no_blocked_users": "TODO: Translate \"blocklist.no_blocked_users\"",
-    "no_blocked_users_description": "TODO: Translate \"blocklist.no_blocked_users_description\"",
+    "title": "Zablokowani użytkownicy",
+    "description": "Użytkownicy, których zablokowałeś i którzy nie mogą już z Tobą wchodzić w interakcje",
+    "loading": "Ładowanie zablokowanych użytkowników...",
+    "no_blocked_users": "Brak zablokowanych użytkowników",
+    "no_blocked_users_description": "Jeszcze nikogo nie zablokowałeś.",
     "user_count": {
-      "one": "TODO: Translate \"blocklist.user_count.one\"",
-      "other": "TODO: Translate \"blocklist.user_count.other\""
+      "one": "{{count}} zablokowany użytkownik",
+      "other": "{{count}} zablokowanych użytkowników"
     },
     "buttons": {
-      "unblock": "TODO: Translate \"blocklist.buttons.unblock\"",
-      "unblocking": "TODO: Translate \"blocklist.buttons.unblocking\"",
-      "cancel": "TODO: Translate \"blocklist.buttons.cancel\"",
-      "confirm_unblock": "TODO: Translate \"blocklist.buttons.confirm_unblock\""
+      "unblock": "Odblokuj",
+      "unblocking": "Odblokowywanie...",
+      "cancel": "Anuluj",
+      "confirm_unblock": "Tak, odblokuj"
     },
     "dialog": {
-      "title": "TODO: Translate \"blocklist.dialog.title\"",
-      "description": "TODO: Translate \"blocklist.dialog.description\""
+      "title": "Odblokuj użytkownika",
+      "description": "Czy na pewno chcesz odblokować {{name}}? Ta osoba będzie mogła znów Cię obserwować, zapraszać do gier i wchodzić z Tobą w interakcje."
     },
     "status": {
-      "blocked": "TODO: Translate \"blocklist.status.blocked\""
+      "blocked": "Zablokowany"
     },
-    "reason": "TODO: Translate \"blocklist.reason\"",
-    "blocked_date": "TODO: Translate \"blocklist.blocked_date\"",
+    "reason": "Powód",
+    "blocked_date": "Zablokowany {{date}}",
     "toast": {
-      "unblock_success": "TODO: Translate \"blocklist.toast.unblock_success\"",
-      "unblock_error": "TODO: Translate \"blocklist.toast.unblock_error\"",
-      "load_error": "TODO: Translate \"blocklist.toast.load_error\""
+      "unblock_success": "Użytkownik został pomyślnie odblokowany",
+      "unblock_error": "Nie udało się odblokować użytkownika",
+      "load_error": "Nie udało się załadować listy zablokowanych"
     }
   },
   "errors": {
-    "unexpected_error": "TODO: Translate \"errors.unexpected_error\""
+    "unexpected_error": "Wystąpił nieoczekiwany błąd"
   }
 }

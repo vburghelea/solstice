@@ -237,6 +237,10 @@
         "settings": {
           "label": "Settings",
           "description": "Manage privacy, notifications, and connected accounts."
+        },
+        "systems": {
+          "label": "Game Systems",
+          "description": "Manage game systems, crawl queue and apply content management."
         }
       },
       "summary": {
@@ -328,6 +332,10 @@
         "settings": {
           "label": "Settings",
           "description": "System configuration, feature flags, and platform settings."
+        },
+        "systems": {
+          "label": "Game Systems",
+          "description": "Manage game systems, crawl queue and apply content management."
         },
         "audit_logs": {
           "label": "Audit logs",

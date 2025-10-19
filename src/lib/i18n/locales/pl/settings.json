@@ -1,219 +1,219 @@
 {
-  "title": "TODO: Translate \"title\"",
-  "subtitle": "TODO: Translate \"subtitle\"",
+  "title": "Ustawienia",
+  "subtitle": "Zarządzaj swoimi ustawieniami konta i preferencjami",
   "sections": {
     "account": {
-      "title": "TODO: Translate \"sections.account.title\"",
-      "subtitle": "TODO: Translate \"sections.account.subtitle\"",
+      "title": "Ustawienia konta",
+      "subtitle": "Zarządzaj bezpieczeństwem konta, preferencjami email, sesjami i połączonymi usługami",
       "status": {
-        "title": "TODO: Translate \"sections.account.status.title\"",
-        "subtitle": "TODO: Translate \"sections.account.status.subtitle\""
+        "title": "Status konta",
+        "subtitle": "Przegląd głównych szczegółów Twojego konta"
       },
       "connected_accounts": {
-        "title": "TODO: Translate \"sections.account.connected_accounts.title\"",
-        "subtitle": "TODO: Translate \"sections.account.connected_accounts.subtitle\""
+        "title": "Połączone konta",
+        "subtitle": "Zarządzaj logowaniami społecznościowymi i połączonymi usługami"
       },
       "buttons": {
-        "save_changes": "TODO: Translate \"sections.account.buttons.save_changes\"",
-        "cancel": "TODO: Translate \"sections.account.buttons.cancel\"",
-        "update_password": "TODO: Translate \"sections.account.buttons.update_password\"",
-        "connect": "TODO: Translate \"sections.account.buttons.connect\"",
-        "disconnect": "TODO: Translate \"sections.account.buttons.disconnect\""
+        "save_changes": "Zapisz zmiany",
+        "cancel": "Anuluj",
+        "update_password": "Zaktualizuj hasło",
+        "connect": "Połącz",
+        "disconnect": "Rozłącz"
       },
       "messages": {
-        "saved": "TODO: Translate \"sections.account.messages.saved\"",
-        "error": "TODO: Translate \"sections.account.messages.error\""
+        "saved": "Ustawienia konta zostały pomyślnie zapisane",
+        "error": "Nie udało się zapisać ustawień konta"
       },
       "fields": {
-        "name": "TODO: Translate \"sections.account.fields.name\"",
-        "email": "TODO: Translate \"sections.account.fields.email\"",
-        "password": "TODO: Translate \"sections.account.fields.password\""
+        "name": "Imię",
+        "email": "Email",
+        "password": "Hasło"
       },
       "status_labels": {
-        "verified": "TODO: Translate \"sections.account.status_labels.verified\"",
-        "not_verified": "TODO: Translate \"sections.account.status_labels.not_verified\"",
-        "set": "TODO: Translate \"sections.account.status_labels.set\"",
-        "not_configured": "TODO: Translate \"sections.account.status_labels.not_configured\"",
-        "required": "TODO: Translate \"sections.account.status_labels.required\"",
-        "connected": "TODO: Translate \"sections.account.status_labels.connected\"",
-        "not_connected": "TODO: Translate \"sections.account.status_labels.not_connected\""
+        "verified": "Zweryfikowany",
+        "not_verified": "Niezweryfikowany",
+        "set": "Ustawione",
+        "not_configured": "Nieskonfigurowane",
+        "required": "Wymagane",
+        "connected": "Połączone",
+        "not_connected": "Niepołączone"
       },
       "providers": {
-        "email_password": "TODO: Translate \"sections.account.providers.email_password\"",
-        "signin_text": "TODO: Translate \"sections.account.providers.signin_text\"",
-        "setup_text": "TODO: Translate \"sections.account.providers.setup_text\"",
+        "email_password": "Email i hasło",
+        "signin_text": "Możesz zalogować się za pomocą swojego emaila i hasła.",
+        "setup_text": "Ustaw hasło, aby umożliwić logowanie przez email.",
         "connected": {
-          "signin_text": "TODO: Translate \"sections.account.providers.connected.signin_text\"",
-          "setup_text": "TODO: Translate \"sections.account.providers.connected.setup_text\""
+          "signin_text": "Możesz zalogować się za pomocą tego dostawcy.",
+          "setup_text": "Połącz tego dostawcę, aby logować się bez hasła."
         }
       }
     },
     "security": {
-      "title": "TODO: Translate \"sections.security.title\"",
-      "subtitle": "TODO: Translate \"sections.security.subtitle\"",
+      "title": "Ustawienia bezpieczeństwa",
+      "subtitle": "Zarządzaj swoim hasłem i preferencjami bezpieczeństwa",
       "password": {
-        "title": "TODO: Translate \"sections.security.password.title\"",
-        "subtitle": "TODO: Translate \"sections.security.password.subtitle\"",
-        "current_password": "TODO: Translate \"sections.security.password.current_password\"",
-        "new_password": "TODO: Translate \"sections.security.password.new_password\"",
-        "confirm_new_password": "TODO: Translate \"sections.security.password.confirm_new_password\"",
-        "button": "TODO: Translate \"sections.security.password.button\"",
-        "button_loading": "TODO: Translate \"sections.security.password.button_loading\"",
-        "strength_label": "TODO: Translate \"sections.security.password.strength_label\"",
-        "sign_out_devices": "TODO: Translate \"sections.security.password.sign_out_devices\"",
-        "sign_out_devices_description": "TODO: Translate \"sections.security.password.sign_out_devices_description\"",
+        "title": "Zmień hasło",
+        "subtitle": "Zaktualizuj swoje hasło, aby chronić swoje konto.",
+        "current_password": "Obecne hasło",
+        "new_password": "Nowe hasło",
+        "confirm_new_password": "Potwierdź nowe hasło",
+        "button": "Zaktualizuj hasło",
+        "button_loading": "Aktualizuję...",
+        "strength_label": "Siła hasła:",
+        "sign_out_devices": "Wyloguj z innych urządzeń",
+        "sign_out_devices_description": "Zakończ aktywne sesje na innych przeglądarkach i urządzeniach",
         "placeholders": {
-          "current_password": "TODO: Translate \"sections.security.password.placeholders.current_password\"",
-          "new_password": "TODO: Translate \"sections.security.password.placeholders.new_password\"",
-          "confirm_password": "TODO: Translate \"sections.security.password.placeholders.confirm_password\""
+          "current_password": "Wpisz swoje obecne hasło",
+          "new_password": "Stwórz silne hasło",
+          "confirm_password": "Wpisz ponownie swoje nowe hasło"
         },
-        "success": "TODO: Translate \"sections.security.password.success\"",
-        "error": "TODO: Translate \"sections.security.password.error\"",
+        "success": "Hasło zaktualizowane",
+        "error": "Nie udało się zaktualizować hasła",
         "validation": {
-          "mismatch": "TODO: Translate \"sections.security.password.validation.mismatch\"",
-          "requirements_not_met": "TODO: Translate \"sections.security.password.validation.requirements_not_met\""
+          "mismatch": "Nowe hasło i potwierdzenie nie zgadzają się",
+          "requirements_not_met": "Hasło nie spełnia wymagań"
         }
       },
       "two_factor": {
-        "title": "TODO: Translate \"sections.security.two_factor.title\"",
-        "enabled": "TODO: Translate \"sections.security.two_factor.enabled\"",
-        "disabled": "TODO: Translate \"sections.security.two_factor.disabled\"",
-        "enable": "TODO: Translate \"sections.security.two_factor.enable\"",
-        "disable": "TODO: Translate \"sections.security.two_factor.disable\""
+        "title": "Uwierzytelnianie dwuskładnikowe",
+        "enabled": "Włączone",
+        "disabled": "Wyłączone",
+        "enable": "Włącz 2FA",
+        "disable": "Wyłącz 2FA"
       }
     },
     "notifications": {
-      "title": "TODO: Translate \"sections.notifications.title\"",
-      "subtitle": "TODO: Translate \"sections.notifications.subtitle\"",
-      "email_notifications": "TODO: Translate \"sections.notifications.email_notifications\"",
-      "push_notifications": "TODO: Translate \"sections.notifications.push_notifications\"",
+      "title": "Preferencje email",
+      "subtitle": "Wybierz, które niekrytyczne aktualizacje chcesz otrzymywać w swojej skrzynce odbiorczej.",
+      "email_notifications": "Powiadomienia email",
+      "push_notifications": "Powiadomienia push",
       "preferences": {
         "game_reminders": {
-          "label": "TODO: Translate \"sections.notifications.preferences.game_reminders.label\"",
-          "description": "TODO: Translate \"sections.notifications.preferences.game_reminders.description\""
+          "label": "Przypomnienia o grach",
+          "description": "Przypomnienia 24h i 2h przed grami, w których bierzesz udział."
         },
         "game_updates": {
-          "label": "TODO: Translate \"sections.notifications.preferences.game_updates.label\"",
-          "description": "TODO: Translate \"sections.notifications.preferences.game_updates.description\""
+          "label": "Aktualizacje gier",
+          "description": "Emaile, gdy gra, w której bierzesz udział, jest zaplanowana, zaktualizowana lub odwołana."
         },
         "campaign_digests": {
-          "label": "TODO: Translate \"sections.notifications.preferences.campaign_digests.label\"",
-          "description": "TODO: Translate \"sections.notifications.preferences.campaign_digests.description\""
+          "label": "Tygodniowe podsumowanie kampanii",
+          "description": "Tygodniowe podsumowanie nadchodzących sesji kampanii."
         },
         "campaign_updates": {
-          "label": "TODO: Translate \"sections.notifications.preferences.campaign_updates.label\"",
-          "description": "TODO: Translate \"sections.notifications.preferences.campaign_updates.description\""
+          "label": "Aktualizacje sesji kampanii",
+          "description": "Emaile, gdy sesje kampanii są zaplanowane, zaktualizowane lub odwołane."
         },
         "review_reminders": {
-          "label": "TODO: Translate \"sections.notifications.preferences.review_reminders.label\"",
-          "description": "TODO: Translate \"sections.notifications.preferences.review_reminders.description\""
+          "label": "Przypomnienia o recenzjach",
+          "description": "Przypomnienia, aby ocenić swojego Mistrza Gry po rozgrywkach."
         },
         "social_notifications": {
-          "label": "TODO: Translate \"sections.notifications.preferences.social_notifications.label\"",
-          "description": "TODO: Translate \"sections.notifications.preferences.social_notifications.description\""
+          "label": "Powiadomienia społecznościowe",
+          "description": "Emaile dotyczące obserwowania, próśb i innych aktywności społecznościowych."
         }
       },
       "buttons": {
-        "save": "TODO: Translate \"sections.notifications.buttons.save\"",
-        "saving": "TODO: Translate \"sections.notifications.buttons.saving\"",
-        "reset": "TODO: Translate \"sections.notifications.buttons.reset\""
+        "save": "Zapisz preferencje",
+        "saving": "Zapisuję...",
+        "reset": "Przywróć domyślne"
       },
       "errors": {
-        "load_failed": "TODO: Translate \"sections.notifications.errors.load_failed\"",
-        "save_failed": "TODO: Translate \"sections.notifications.errors.save_failed\"",
-        "refresh_page": "TODO: Translate \"sections.notifications.errors.refresh_page\""
+        "load_failed": "Nie udało się załadować preferencji email",
+        "save_failed": "Nie udało się zapisać preferencji",
+        "refresh_page": "Odśwież stronę i spróbuj ponownie."
       }
     },
     "sessions": {
-      "title": "TODO: Translate \"sections.sessions.title\"",
-      "subtitle": "TODO: Translate \"sections.sessions.subtitle\"",
-      "current_session": "TODO: Translate \"sections.sessions.current_session\"",
-      "device_info": "TODO: Translate \"sections.sessions.device_info\"",
-      "last_active": "TODO: Translate \"sections.sessions.last_active\"",
+      "title": "Aktywne sesje",
+      "subtitle": "Przejrzyj przeglądarki i urządzenia, które są obecnie zalogowane.",
+      "current_session": "Bieżąca sesja",
+      "device_info": "Informacje o urządzeniu",
+      "last_active": "Ostatnio aktywny",
       "table_headers": {
-        "device": "TODO: Translate \"sections.sessions.table_headers.device\"",
-        "location": "TODO: Translate \"sections.sessions.table_headers.location\"",
-        "last_active": "TODO: Translate \"sections.sessions.table_headers.last_active\"",
-        "actions": "TODO: Translate \"sections.sessions.table_headers.actions\""
+        "device": "Urządzenie",
+        "location": "Lokalizacja",
+        "last_active": "Ostatnio aktywny",
+        "actions": "Akcje"
       },
-      "session_id": "TODO: Translate \"sections.sessions.session_id\"",
-      "unknown_device": "TODO: Translate \"sections.sessions.unknown_device\"",
-      "unknown_location": "TODO: Translate \"sections.sessions.unknown_location\"",
-      "this_device": "TODO: Translate \"sections.sessions.this_device\"",
-      "current": "TODO: Translate \"sections.sessions.current\"",
-      "only_current_session": "TODO: Translate \"sections.sessions.only_current_session\"",
+      "session_id": "ID sesji:",
+      "unknown_device": "Nieznane urządzenie",
+      "unknown_location": "Nieznane",
+      "this_device": "To urządzenie",
+      "current": "Bieżące",
+      "only_current_session": "Tylko Twoja bieżąca sesja jest aktywna.",
       "actions": {
-        "revoke": "TODO: Translate \"sections.sessions.actions.revoke\"",
-        "revoke_all": "TODO: Translate \"sections.sessions.actions.revoke_all\""
+        "revoke": "Unieważnij",
+        "revoke_all": "Wyloguj ze wszystkich innych sesji"
       },
       "device_types": {
-        "mobile_device": "TODO: Translate \"sections.sessions.device_types.mobile_device\"",
-        "desktop": "TODO: Translate \"sections.sessions.device_types.desktop\"",
-        "tablet": "TODO: Translate \"sections.sessions.device_types.tablet\""
+        "mobile_device": "Urządzenie mobilne",
+        "desktop": "Komputer stacjonarny",
+        "tablet": "Tablet"
       },
       "platforms": {
-        "macos": "TODO: Translate \"sections.sessions.platforms.macos\"",
-        "windows": "TODO: Translate \"sections.sessions.platforms.windows\"",
-        "linux": "TODO: Translate \"sections.sessions.platforms.linux\"",
-        "ios": "TODO: Translate \"sections.sessions.platforms.ios\"",
-        "android": "TODO: Translate \"sections.sessions.platforms.android\""
+        "macos": "macOS",
+        "windows": "Windows",
+        "linux": "Linux",
+        "ios": "iOS",
+        "android": "Android"
       },
       "status": {
-        "refreshing": "TODO: Translate \"sections.sessions.status.refreshing\"",
-        "refreshing_preferences": "TODO: Translate \"sections.sessions.status.refreshing_preferences\"",
-        "refreshing_account": "TODO: Translate \"sections.sessions.status.refreshing_account\""
+        "refreshing": "Odświeżam dane sesji...",
+        "refreshing_preferences": "Odświeżam preferencje...",
+        "refreshing_account": "Odświeżam informacje o koncie..."
       },
       "errors": {
-        "load_failed": "TODO: Translate \"sections.sessions.errors.load_failed\"",
-        "refresh_page": "TODO: Translate \"sections.sessions.errors.refresh_page\""
+        "load_failed": "Nie udało się załadować sesji",
+        "refresh_page": "Odśwież stronę i spróbuj ponownie."
       },
       "confirmation": {
-        "revoke_title": "TODO: Translate \"sections.sessions.confirmation.revoke_title\"",
-        "revoke_message": "TODO: Translate \"sections.sessions.confirmation.revoke_message\"",
-        "revoke_all_title": "TODO: Translate \"sections.sessions.confirmation.revoke_all_title\"",
-        "revoke_all_message": "TODO: Translate \"sections.sessions.confirmation.revoke_all_message\""
+        "revoke_title": "Unieważnij sesję",
+        "revoke_message": "Czy na pewno chcesz unieważnić tę sesję?",
+        "revoke_all_title": "Unieważnij wszystkie sesje",
+        "revoke_all_message": "Czy na pewno chcesz unieważnić wszystkie inne sesje?"
       }
     },
     "privacy": {
-      "title": "TODO: Translate \"sections.privacy.title\"",
-      "subtitle": "TODO: Translate \"sections.privacy.subtitle\"",
-      "profile_visibility": "TODO: Translate \"sections.privacy.profile_visibility\"",
-      "data_sharing": "TODO: Translate \"sections.privacy.data_sharing\"",
+      "title": "Ustawienia prywatności",
+      "subtitle": "Kontroluj swoje preferencje prywatności i udostępniania danych",
+      "profile_visibility": "Widoczność profilu",
+      "data_sharing": "Udostępnianie danych",
       "preferences": {
-        "public_profile": "TODO: Translate \"sections.privacy.preferences.public_profile\"",
-        "show_email": "TODO: Translate \"sections.privacy.preferences.show_email\"",
-        "show_activity": "TODO: Translate \"sections.privacy.preferences.show_activity\"",
-        "analytics": "TODO: Translate \"sections.privacy.preferences.analytics\"",
-        "personalization": "TODO: Translate \"sections.privacy.preferences.personalization\""
+        "public_profile": "Profil publiczny",
+        "show_email": "Pokaż adres email",
+        "show_activity": "Pokaż status aktywności",
+        "analytics": "Udostępniaj dane analityczne",
+        "personalization": "Spersonalizowane rekomendacje"
       }
     }
   },
   "errors": {
-    "load_failed": "TODO: Translate \"errors.load_failed\"",
-    "save_failed": "TODO: Translate \"errors.save_failed\"",
-    "invalid_password": "TODO: Translate \"errors.invalid_password\"",
-    "password_mismatch": "TODO: Translate \"errors.password_mismatch\"",
-    "session_revoke_failed": "TODO: Translate \"errors.session_revoke_failed\"",
-    "load_account": "TODO: Translate \"errors.load_account\"",
-    "load_sessions": "TODO: Translate \"errors.load_sessions\"",
-    "load_preferences": "TODO: Translate \"errors.load_preferences\"",
-    "save_preferences": "TODO: Translate \"errors.save_preferences\"",
-    "unlink_account": "TODO: Translate \"errors.unlink_account\"",
-    "connect_account": "TODO: Translate \"errors.connect_account\"",
-    "update_password": "TODO: Translate \"errors.update_password\"",
-    "refresh_page": "TODO: Translate \"errors.refresh_page\"",
-    "unable_to_update_password": "TODO: Translate \"errors.unable_to_update_password\""
+    "load_failed": "Nie udało się załadować przeglądu konta",
+    "save_failed": "Nie udało się zapisać ustawień",
+    "invalid_password": "Obecne hasło jest nieprawidłowe",
+    "password_mismatch": "Nowe hasła nie zgadzają się",
+    "session_revoke_failed": "Nie udało się unieważnić sesji",
+    "load_account": "Nie udało się załadować konta",
+    "load_sessions": "Nie udało się załadować sesji",
+    "load_preferences": "Nie udało się załadować preferencji email",
+    "save_preferences": "Nie udało się zapisać preferencji",
+    "unlink_account": "Nie udało się odłączyć konta",
+    "connect_account": "Nie udało się połączyć konta",
+    "update_password": "Nie udało się zaktualizować hasła. Spróbuj ponownie.",
+    "refresh_page": "Odśwież stronę i spróbuj ponownie.",
+    "unable_to_update_password": "Nie można zaktualizować hasła"
   },
   "success": {
-    "settings_saved": "TODO: Translate \"success.settings_saved\"",
-    "password_changed": "TODO: Translate \"success.password_changed\"",
-    "password_updated": "TODO: Translate \"success.password_updated\"",
-    "session_revoked": "TODO: Translate \"success.session_revoked\"",
-    "all_sessions_revoked": "TODO: Translate \"success.all_sessions_revoked\"",
-    "account_disconnected": "TODO: Translate \"success.account_disconnected\"",
-    "email_preferences_updated": "TODO: Translate \"success.email_preferences_updated\""
+    "settings_saved": "Ustawienia zostały pomyślnie zapisane",
+    "password_changed": "Hasło zostało pomyślnie zmienione",
+    "password_updated": "Hasło zaktualizowane",
+    "session_revoked": "Sesja unieważniona",
+    "all_sessions_revoked": "Inne sesje unieważnione",
+    "account_disconnected": "Konto odłączone",
+    "email_preferences_updated": "Preferencje email zaktualizowane"
   },
   "alerts": {
-    "redirecting_to_provider": "TODO: Translate \"alerts.redirecting_to_provider\""
+    "redirecting_to_provider": "Przekierowuję do dostawcy..."
   }
 }

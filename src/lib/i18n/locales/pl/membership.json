@@ -1,99 +1,99 @@
 {
   "page": {
-    "title": "TODO: Translate \"page.title\"",
-    "subtitle": "TODO: Translate \"page.subtitle\""
+    "title": "Członkostwo",
+    "subtitle": "Dołącz do Roundup Games i uzyskaj ekskluzywne korzyści członkowskie"
   },
   "current_status": {
-    "title": "TODO: Translate \"current_status.title\"",
-    "active_membership": "TODO: Translate \"current_status.active_membership\"",
-    "no_active_membership": "TODO: Translate \"current_status.no_active_membership\"",
-    "join_today_message": "TODO: Translate \"current_status.join_today_message\"",
-    "type": "TODO: Translate \"current_status.type\"",
-    "expires": "TODO: Translate \"current_status.expires\"",
-    "days_remaining": "TODO: Translate \"current_status.days_remaining\""
+    "title": "Twój aktualny status",
+    "active_membership": "Aktywne członkostwo",
+    "no_active_membership": "Brak aktywnego członkostwa",
+    "join_today_message": "Dołącz już dziś, aby wziąć udział w wydarzeniach i korzystać z przywilejów",
+    "type": "Typ: {{type}}",
+    "expires": "Wygasa: {{date}}",
+    "days_remaining": "Pozostało dni: {{count}}"
   },
   "available_plans": {
-    "title": "TODO: Translate \"available_plans.title\"",
-    "price": "TODO: Translate \"available_plans.price\"",
-    "current_plan": "TODO: Translate \"available_plans.current_plan\"",
-    "purchase": "TODO: Translate \"available_plans.purchase\"",
-    "renew": "TODO: Translate \"available_plans.renew\"",
-    "not_available": "TODO: Translate \"available_plans.not_available\""
+    "title": "Dostępne członkowstwa",
+    "price": "{{price}} zł",
+    "current_plan": "Twój obecny plan",
+    "purchase": "Kup",
+    "renew": "Odnów",
+    "not_available": "Niedostępne"
   },
   "buttons": {
-    "purchase": "TODO: Translate \"buttons.purchase\"",
-    "renew": "TODO: Translate \"buttons.renew\"",
-    "current_plan": "TODO: Translate \"buttons.current_plan\"",
-    "not_available": "TODO: Translate \"buttons.not_available\"",
-    "view_options": "TODO: Translate \"buttons.view_options\""
+    "purchase": "Kup",
+    "renew": "Odnów",
+    "current_plan": "Twój plan",
+    "not_available": "Niedostępne",
+    "view_options": "Zobacz opcje"
   },
   "mobile_cta": {
-    "choose_membership": "TODO: Translate \"mobile_cta.choose_membership\"",
-    "view_options": "TODO: Translate \"mobile_cta.view_options\""
+    "choose_membership": "Wybierz członkostwo, aby kontynuować",
+    "view_options": "Zobacz opcje"
   },
   "status": {
-    "processing_payment": "TODO: Translate \"status.processing_payment\""
+    "processing_payment": "Przetwarzamy Twoją płatność..."
   },
   "errors": {
-    "failed_to_fetch_membership_status": "TODO: Translate \"errors.failed_to_fetch_membership_status\"",
-    "failed_to_fetch_membership_type": "TODO: Translate \"errors.failed_to_fetch_membership_type\"",
-    "failed_to_fetch_membership_types": "TODO: Translate \"errors.failed_to_fetch_membership_types\"",
-    "failed_to_create_checkout_session": "TODO: Translate \"errors.failed_to_create_checkout_session\"",
-    "missing_membership_type_for_checkout": "TODO: Translate \"errors.missing_membership_type_for_checkout\"",
-    "missing_checkout_information": "TODO: Translate \"errors.missing_checkout_information\"",
-    "failed_to_confirm_membership": "TODO: Translate \"errors.failed_to_confirm_membership\"",
-    "failed_to_confirm_membership_purchase": "TODO: Translate \"errors.failed_to_confirm_membership_purchase\"",
-    "error": "TODO: Translate \"errors.error\"",
+    "failed_to_fetch_membership_status": "Nie udało się pobrać statusu członkostwa",
+    "failed_to_fetch_membership_type": "Nie udało się pobrać typu członkostwa",
+    "failed_to_fetch_membership_types": "Nie udało się pobrać dostępnych typów członkostwa",
+    "failed_to_create_checkout_session": "Nie udało się utworzyć sesji płatności",
+    "missing_membership_type_for_checkout": "Brakuje typu członkostwa dla sesji płatności",
+    "missing_checkout_information": "Brakuje informacji płatniczych. Skontaktuj się z obsługą.",
+    "failed_to_confirm_membership": "Nie udało się potwierdzić członkostwa",
+    "failed_to_confirm_membership_purchase": "Nie udało się potwierdzić zakupu członkostwa",
+    "error": "Błąd",
     "payment": {
-      "canceled": "TODO: Translate \"errors.payment.canceled\"",
-      "verification_failed": "TODO: Translate \"errors.payment.verification_failed\"",
-      "processing_error": "TODO: Translate \"errors.payment.processing_error\"",
-      "failed": "TODO: Translate \"errors.payment.failed\""
+      "canceled": "Płatność została anulowana",
+      "verification_failed": "Weryfikacja płatności nie powiodła się",
+      "processing_error": "Wystąpił błąd podczas przetwarzania płatności",
+      "failed": "Płatność nie powiodła się"
     }
   },
   "success": {
-    "membership_purchased_successfully": "TODO: Translate \"success.membership_purchased_successfully\""
+    "membership_purchased_successfully": "Gratulacje! Pomyślnie zakupiłeś członkostwo."
   },
   "loading": {
-    "title": "TODO: Translate \"loading.title\""
+    "title": "Ładowanie..."
   },
   "plan_features": {
-    "title": "TODO: Translate \"plan_features.title\"",
-    "price_display": "TODO: Translate \"plan_features.price_display\""
+    "title": "Dostępne członkowstwa",
+    "price_display": "{{price}} zł"
   },
   "admin": {
     "report": {
-      "title": "TODO: Translate \"admin.report.title\"",
-      "description": "TODO: Translate \"admin.report.description\"",
+      "title": "Raport członkostw",
+      "description": "Przeglądaj i eksportuj wszystkie dane członkostw na platformie",
       "columns": {
-        "user": "TODO: Translate \"admin.report.columns.user\"",
-        "email": "TODO: Translate \"admin.report.columns.email\"",
-        "membership_type": "TODO: Translate \"admin.report.columns.membership_type\"",
-        "start_date": "TODO: Translate \"admin.report.columns.start_date\"",
-        "end_date": "TODO: Translate \"admin.report.columns.end_date\"",
-        "status": "TODO: Translate \"admin.report.columns.status\"",
-        "price": "TODO: Translate \"admin.report.columns.price\"",
-        "payment_id": "TODO: Translate \"admin.report.columns.payment_id\"",
-        "created_at": "TODO: Translate \"admin.report.columns.created_at\""
+        "user": "Użytkownik",
+        "email": "E-mail",
+        "membership_type": "Typ członkostwa",
+        "start_date": "Data rozpoczęcia",
+        "end_date": "Data zakończenia",
+        "status": "Status",
+        "price": "Cena",
+        "payment_id": "ID płatności",
+        "created_at": "Utworzono"
       },
       "filter": {
-        "label": "TODO: Translate \"admin.report.filter.label\"",
+        "label": "Status",
         "options": {
-          "all": "TODO: Translate \"admin.report.filter.options.all\"",
-          "active": "TODO: Translate \"admin.report.filter.options.active\"",
-          "expired": "TODO: Translate \"admin.report.filter.options.expired\"",
-          "canceled": "TODO: Translate \"admin.report.filter.options.canceled\""
+          "all": "Wszystkie",
+          "active": "Aktywne",
+          "expired": "Wygasłe",
+          "canceled": "Anulowane"
         }
       },
       "actions": {
-        "export_csv": "TODO: Translate \"admin.report.actions.export_csv\""
+        "export_csv": "Eksportuj CSV"
       },
-      "loading": "TODO: Translate \"admin.report.loading\"",
+      "loading": "Ładowanie członkostw...",
       "errors": {
-        "failed_to_load": "TODO: Translate \"admin.report.errors.failed_to_load\"",
-        "access_denied": "TODO: Translate \"admin.report.errors.access_denied\"",
-        "access_denied_description": "TODO: Translate \"admin.report.errors.access_denied_description\"",
-        "error_loading_report": "TODO: Translate \"admin.report.errors.error_loading_report\""
+        "failed_to_load": "Nie udało się załadować członkostw",
+        "access_denied": "Odmowa dostępu",
+        "access_denied_description": "Nie masz uprawnień do przeglądania tego raportu. Wymagane uprawnienia admina.",
+        "error_loading_report": "Błąd ładowania raportu"
       }
     }
   }

@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import {
   AlertCircleIcon,
   ArrowRightIcon,
@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SupportedLanguage } from "~/lib/i18n/config";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
@@ -140,12 +142,12 @@ function SecuritySkeleton() {
   );
 }
 
-function formatTimestamp(value: Date) {
-  return `${format(value, "PPpp")} (${formatDistanceToNow(value, { addSuffix: true })})`;
+function formatTimestamp(value: Date, currentLanguage: SupportedLanguage) {
+  return `${format(value, "PPpp")} (${formatDistanceToNowLocalized(value, currentLanguage, { addSuffix: true })})`;
 }
 
 export function AdminSecurityCenter() {
-  const { t } = useAdminTranslation();
+  const { t, currentLanguage } = useAdminTranslation();
   const [pendingControl, setPendingControl] = useState<PendingControl | null>(null);
   const [reason, setReason] = useState("");
   const windowDays = 30;
@@ -280,7 +282,9 @@ export function AdminSecurityCenter() {
             </div>
             <p className="text-body-xs text-muted-foreground">
               Last reviewed{" "}
-              {formatDistanceToNow(summary.lastUpdatedAt, { addSuffix: true })}
+              {formatDistanceToNowLocalized(summary.lastUpdatedAt, currentLanguage, {
+                addSuffix: true,
+              })}
             </p>
           </div>
         </CardContent>
@@ -320,7 +324,11 @@ export function AdminSecurityCenter() {
                     </p>
                     <p className="text-body-xs text-muted-foreground">
                       Last reviewed{" "}
-                      {formatDistanceToNow(control.lastReviewedAt, { addSuffix: true })}{" "}
+                      {formatDistanceToNowLocalized(
+                        control.lastReviewedAt,
+                        currentLanguage,
+                        { addSuffix: true },
+                      )}{" "}
                       by {control.lastUpdatedBy}. Next review in{" "}
                       {control.reviewIntervalDays} days.
                     </p>
@@ -432,9 +440,13 @@ export function AdminSecurityCenter() {
                     </p>
                     <p className="text-body-xs text-muted-foreground mt-2">
                       Detected{" "}
-                      {formatDistanceToNow(incident.detectedAt, { addSuffix: true })}
+                      {formatDistanceToNowLocalized(
+                        incident.detectedAt,
+                        currentLanguage,
+                        { addSuffix: true },
+                      )}
                       {incident.resolvedAt
-                        ? ` • Resolved ${formatDistanceToNow(incident.resolvedAt, { addSuffix: true })}`
+                        ? ` • Resolved ${formatDistanceToNowLocalized(incident.resolvedAt, currentLanguage, { addSuffix: true })}`
                         : ""}
                     </p>
                   </div>
@@ -535,7 +547,7 @@ export function AdminSecurityCenter() {
                     </div>
                     <p className="text-body-xs text-muted-strong">{event.context}</p>
                     <p className="text-body-xs text-muted-foreground">
-                      {formatTimestamp(event.timestamp)}
+                      {formatTimestamp(event.timestamp, currentLanguage)}
                     </p>
                   </div>
                   <div className="token-stack-xs items-end">

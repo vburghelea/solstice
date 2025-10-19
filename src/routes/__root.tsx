@@ -8,11 +8,19 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { getCurrentUser } from "~/features/auth/auth.queries";
 import { ConsentProvider } from "~/features/consent";
 import type { AuthUser } from "~/lib/auth/types";
+import { i18nConfig, type SupportedLanguage } from "~/lib/i18n/config";
+import { detectLanguageFromPath } from "~/lib/i18n/detector";
+import i18n from "~/lib/i18n/i18n";
 import appCss from "~/styles.css?url";
+
+type RootRouteContext = {
+  readonly user: AuthUser | null;
+  readonly language: SupportedLanguage;
+};
 
 // Lazy load devtools to avoid hydration issues
 const ReactQueryDevtools = lazy(() =>
@@ -31,26 +39,31 @@ const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaste
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  user: AuthUser;
+  user: AuthUser | null;
+  language: SupportedLanguage;
 }>()({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
+    const detectedLanguage =
+      detectLanguageFromPath(location.pathname) ?? i18nConfig.defaultLanguage;
+
     try {
-      // Check if we're on the server or client
       if (typeof window === "undefined") {
-        // Server: use the server function
+        await i18n.changeLanguage(detectedLanguage);
         const user = await getCurrentUser();
-        return { user };
+        return { user, language: detectedLanguage };
       } else {
-        // Client: fetch the full user data
+        if (i18n.language !== detectedLanguage) {
+          void i18n.changeLanguage(detectedLanguage);
+        }
         const user = await context.queryClient.fetchQuery({
           queryKey: ["user"],
           queryFn: getCurrentUser,
         });
-        return { user };
+        return { user, language: detectedLanguage };
       }
     } catch (error) {
       console.error("Error loading user:", error);
-      return { user: null };
+      return { user: null, language: detectedLanguage };
     }
   },
   head: () => ({
@@ -76,9 +89,49 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
-  const { user } = Route.useRouteContext();
+  const { user, language } = Route.useRouteContext() as RootRouteContext;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const syncLanguage = async () => {
+      if (i18n.language !== language) {
+        await i18n.changeLanguage(language);
+      }
+
+      if (typeof window === "undefined" || cancelled) {
+        return;
+      }
+
+      const snapshot = {
+        routeLanguage: language,
+        i18nLanguage: i18n.language,
+        availableLanguages: i18n.languages,
+        resourceStatus: i18nConfig.supportedLanguages.reduce(
+          (acc, lng) => ({
+            ...acc,
+            [lng]: {
+              navigation: i18n.hasResourceBundle(lng, "navigation"),
+              common: i18n.hasResourceBundle(lng, "common"),
+              about: i18n.hasResourceBundle(lng, "about"),
+            },
+          }),
+          {} as Record<SupportedLanguage, Record<string, boolean>>,
+        ),
+      };
+
+      console.debug("[i18n] hydration snapshot", snapshot);
+    };
+
+    void syncLanguage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
+
   return (
-    <RootDocument>
+    <RootDocument language={language}>
       <ConsentProvider user={user}>
         <Outlet />
       </ConsentProvider>
@@ -86,10 +139,16 @@ function RootComponent() {
   );
 }
 
-function RootDocument({ children }: { readonly children: React.ReactNode }) {
+function RootDocument({
+  children,
+  language,
+}: {
+  readonly children: React.ReactNode;
+  readonly language: SupportedLanguage;
+}) {
   return (
     // suppress since we're updating the "dark" class in a custom script below
-    <html lang="en" suppressHydrationWarning>
+    <html lang={language} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

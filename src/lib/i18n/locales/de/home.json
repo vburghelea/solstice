@@ -1,89 +1,93 @@
 {
   "hero": {
-    "eyebrow": "TODO: Translate \"hero.eyebrow\"",
-    "title": "TODO: Translate \"hero.title\"",
-    "subtitle": "TODO: Translate \"hero.subtitle\"",
-    "cta_text": "TODO: Translate \"hero.cta_text\"",
-    "secondary_cta": "TODO: Translate \"hero.secondary_cta\""
+    "eyebrow": "Starte deine Planung",
+    "title": "Entdecke Tischabenteuer, die für Entdecker gemacht sind",
+    "subtitle": "Erkunde Community-Treffen, kuratiere deine Lieblingssysteme und folge den Geschichtenerzählern, die zu deinem Stil passen.",
+    "cta_text": "Erstelle dein Profil",
+    "secondary_cta": "Melde dich an, um weiterzumachen"
   },
   "explorer_guide": {
-    "eyebrow": "TODO: Translate \"explorer_guide.eyebrow\"",
-    "title": "TODO: Translate \"explorer_guide.title\"",
-    "subtitle": "TODO: Translate \"explorer_guide.subtitle\"",
-    "city_focus_label": "TODO: Translate \"explorer_guide.city_focus_label\"",
-    "browse_all_locations": "TODO: Translate \"explorer_guide.browse_all_locations\"",
-    "location_data_coming_soon": "TODO: Translate \"explorer_guide.location_data_coming_soon\"",
-    "from_your_profile": "TODO: Translate \"explorer_guide.from_your_profile\"",
-    "players_count": "TODO: Translate \"explorer_guide.players_count\"",
-    "location_suggestion": "TODO: Translate \"explorer_guide.location_suggestion\"",
-    "popular_cities": "TODO: Translate \"explorer_guide.popular_cities\"",
+    "eyebrow": "Entdeckerführer",
+    "title": "Plane die nächste Station deiner Reise",
+    "subtitle": "Wähle eine Heimatstadt, um Treffen, Veranstalter und Geschichtenwelten zu sehen, die neue Spieler willkommen heißen.",
+    "city_focus_label": "Auf eine Stadt konzentrieren",
+    "browse_all_locations": "Alle Orte durchsuchen",
+    "location_data_coming_soon": "Standortdaten kommen bald",
+    "from_your_profile": "aus deinem Profil",
+    "players_count": "{{count}} Spieler",
+    "location_suggestion": "Wir schlagen Städte aus deinem Profil, gespeicherten Vorlieben oder Zeitzone vor, wenn wir können.",
+    "popular_cities": "Beliebte Städte:",
     "how_it_flows": {
-      "title": "TODO: Translate \"explorer_guide.how_it_flows.title\"",
-      "subtitle": "TODO: Translate \"explorer_guide.how_it_flows.subtitle\""
+      "title": "Wie diese Tour abläuft",
+      "subtitle": "Folge diesen Schritten, um zu entscheiden, wann du der Community beitrittst oder nach neuen Einladungen ausschau hältst."
     },
-    "chapters": "TODO: Translate \"explorer_guide.chapters\"",
+    "chapters": [
+      "Erkunde Treffen und Festivals, die für neugierige Anfänger kuratiert wurden.",
+      "Entdecke Systeme und Sitzungen, die Onboarding und Sicherheitswerkzeuge priorisieren.",
+      "Speichere eine Heimatstadt, um Updates zu erhalten, wenn Plätze frei werden."
+    ],
     "themes": {
       "curated_spotlights": {
-        "title": "TODO: Translate \"explorer_guide.themes.curated_spotlights.title\"",
-        "description": "TODO: Translate \"explorer_guide.themes.curated_spotlights.description\""
+        "title": "Kuratierte Highlights",
+        "description": "Handverlesene Sitzungen und Geschichten machen es einfach, das Roundup-Flair zu spüren, bevor du je am Tisch sitzt."
       },
       "effortless_planning": {
-        "title": "TODO: Translate \"explorer_guide.themes.effortless_planning.title\"",
-        "description": "TODO: Translate \"explorer_guide.themes.effortless_planning.description\""
+        "title": "Mühelose Planung",
+        "description": "Wähle eine Stadt, erkunde freie Plätze und markiere Events, die du liebst, ohne dich festzulegen, bevor du bereit bist."
       },
       "trust_first_design": {
-        "title": "TODO: Translate \"explorer_guide.themes.trust_first_design.title\"",
-        "description": "TODO: Translate \"explorer_guide.themes.trust_first_design.description\""
+        "title": "Vertrauen-zuerst-Design",
+        "description": "Sicherheitspraktiken, Barrierefreiheitshinweise und GM-Vorstellungen kommen von Anfang an, damit Entdecker selbstbewusste Entscheidungen treffen können."
       }
     }
   },
   "confidence_signals": {
-    "eyebrow": "TODO: Translate \"confidence_signals.eyebrow\"",
-    "title": "TODO: Translate \"confidence_signals.title\"",
-    "subtitle": "TODO: Translate \"confidence_signals.subtitle\"",
+    "eyebrow": "Vertrauenssignale",
+    "title": "Was Roundup sicher macht",
+    "subtitle": "Wir betonen die Hinweise, die einzelnen Entdeckern helfen, sich sicher zu fühlen, bevor sie einen neuen Raum betreten.",
     "safety_tools": {
-      "title": "TODO: Translate \"confidence_signals.safety_tools.title\"",
-      "description": "TODO: Translate \"confidence_signals.safety_tools.description\""
+      "title": "Sicherheitswerkzeuge sichtbar",
+      "description": "Veranstalter zeigen Linien & Schleier, X-Karten und Debriefing-Rituale, damit jeder weiß, wie Fürsorge am Tisch gezeigt wird."
     },
     "meet_facilitator": {
-      "title": "TODO: Translate \"confidence_signals.meet_facilitator.title\"",
-      "description": "TODO: Translate \"confidence_signals.meet_facilitator.description\""
+      "title": "Lerne den Veranstalter kennen",
+      "description": "GM-Bios heben Pronomen, Sitzungstempo und Willkommensrituale hervor, damit du den Raum lesen kannst, bevor du ankommst."
     },
     "welcoming_spaces": {
-      "title": "TODO: Translate \"confidence_signals.welcoming_spaces.title\"",
-      "description": "TODO: Translate \"confidence_signals.welcoming_spaces.description\""
+      "title": "Räume, die sich einladend anfühlen",
+      "description": "Jeder Veranstaltungshinweis umfasst Mobilitätsnotizen, Transittipps und Community-Vibes, die Besuchern helfen, sich das Erlebnis vorzustellen."
     }
   },
   "upcoming_events": {
-    "eyebrow": "TODO: Translate \"upcoming_events.eyebrow\"",
-    "title_prefix": "TODO: Translate \"upcoming_events.title_prefix\"",
-    "default_area": "TODO: Translate \"upcoming_events.default_area\"",
-    "subtitle": "TODO: Translate \"upcoming_events.subtitle\"",
-    "no_events_title": "TODO: Translate \"upcoming_events.no_events_title\"",
-    "no_events_subtitle": "TODO: Translate \"upcoming_events.no_events_subtitle\"",
-    "browse_full_calendar": "TODO: Translate \"upcoming_events.browse_full_calendar\""
+    "eyebrow": "Bevorstehende Treffen",
+    "title_prefix": "Events in der Nähe von",
+    "default_area": "deiner Umgebung",
+    "subtitle": "Kuratiert von Community-Veranstaltern. Jede RSVP bringt dich näher an deine erste Spielsitzungserinnerung.",
+    "no_events_title": "Noch keine Events für diese Stadt geplant.",
+    "no_events_subtitle": "Schau später wieder vorbei, wenn Veranstalter neue Sitzungen veröffentlichen.",
+    "browse_full_calendar": "Vollen Kalender durchsuchen"
   },
   "story_sessions": {
-    "eyebrow": "TODO: Translate \"story_sessions.eyebrow\"",
-    "title": "TODO: Translate \"story_sessions.title\"",
-    "subtitle": "TODO: Translate \"story_sessions.subtitle\"",
-    "no_sessions_title": "TODO: Translate \"story_sessions.no_sessions_title\"",
-    "no_sessions_subtitle": "TODO: Translate \"story_sessions.no_sessions_subtitle\"",
-    "search_all_games": "TODO: Translate \"story_sessions.search_all_games\""
+    "eyebrow": "Geschichten zum Probieren",
+    "title": "Sitzungen, die neue Entdecker willkommen heißen",
+    "subtitle": "Diese Tische legen Wert auf Onboarding, Sicherheitswerkzeuge und kollaborative Energie.",
+    "no_sessions_title": "Noch keine Highlight-Sitzungen in dieser Stadt.",
+    "no_sessions_subtitle": "Abonniere unseren Newsletter oder versuche es später für neue Inhalte.",
+    "search_all_games": "Alle Spiele durchsuchen"
   },
   "trending_systems": {
-    "eyebrow": "TODO: Translate \"trending_systems.eyebrow\"",
-    "title": "TODO: Translate \"trending_systems.title\"",
-    "subtitle": "TODO: Translate \"trending_systems.subtitle\"",
-    "no_systems": "TODO: Translate \"trending_systems.no_systems\"",
-    "sessions_count": "TODO: Translate \"trending_systems.sessions_count\"",
-    "hero_art_pending": "TODO: Translate \"trending_systems.hero_art_pending\"",
-    "description_coming_soon": "TODO: Translate \"trending_systems.description_coming_soon\""
+    "eyebrow": "Trending Systeme",
+    "title": "Regelwerke mit Momentum",
+    "subtitle": "Entdecke, welche Systeme Tische zum Leuchten bringen, damit du weißt, was du als Nächstes lernen sollst.",
+    "no_systems": "Wir werden beliebte Systeme hervorheben, sobald mehr Sitzungen geplant sind.",
+    "sessions_count": "{{count}} Sitzungen",
+    "hero_art_pending": "Hero-Art wartet auf Moderation",
+    "description_coming_soon": "Beschreibung folgt in Kürze."
   },
   "ready_to_go_deeper": {
-    "title": "TODO: Translate \"ready_to_go_deeper.title\"",
-    "subtitle": "TODO: Translate \"ready_to_go_deeper.subtitle\"",
-    "start_profile": "TODO: Translate \"ready_to_go_deeper.start_profile\"",
-    "have_account": "TODO: Translate \"ready_to_go_deeper.have_account\""
+    "title": "Wenn du bereit bist, tiefer einzutauchen",
+    "subtitle": "Erstelle ein kostenloses Konto, um Städten zu folgen, an Sitzungen teilzunehmen und Einladungen von vertrauenswürdigen GMs zu erhalten.",
+    "start_profile": "Starte dein Spielerprofil",
+    "have_account": "Ich habe bereits ein Konto"
   }
 }

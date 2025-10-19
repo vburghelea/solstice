@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import {
   ActivitySquareIcon,
   AlertTriangleIcon,
@@ -8,6 +8,8 @@ import {
   ShieldAlertIcon,
 } from "lucide-react";
 import { useMemo } from "react";
+import { SupportedLanguage } from "~/lib/i18n/config";
+import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -195,9 +197,11 @@ function PersonaImpactRow({
 function IncidentRow({
   incident,
   t,
+  currentLanguage,
 }: {
   incident: AdminIncident;
   t: (key: string, params?: Record<string, string | number>) => string;
+  currentLanguage: SupportedLanguage;
 }) {
   const duration = incident.durationMinutes
     ? t("insights.incidents.duration.minutes", { minutes: incident.durationMinutes })
@@ -239,9 +243,13 @@ function IncidentRow({
             <span aria-hidden>•</span>
             <span>
               {t("insights.incidents.resolved", {
-                time: formatDistanceToNow(new Date(incident.finishedAt), {
-                  addSuffix: true,
-                }),
+                time: formatDistanceToNowLocalized(
+                  new Date(incident.finishedAt),
+                  currentLanguage,
+                  {
+                    addSuffix: true,
+                  },
+                ),
               })}
             </span>
           </>
@@ -254,9 +262,11 @@ function IncidentRow({
 function AlertRow({
   alert,
   t,
+  currentLanguage,
 }: {
   alert: AdminAlert;
   t: (key: string, params?: Record<string, string | number>) => string;
+  currentLanguage: SupportedLanguage;
 }) {
   return (
     <div className={cn("token-stack-xs rounded-lg border p-3", alertTone[alert.status])}>
@@ -279,9 +289,13 @@ function AlertRow({
             <span aria-hidden>•</span>
             <span>
               {t("insights.alerts.triggered", {
-                time: formatDistanceToNow(new Date(alert.lastTriggeredAt), {
-                  addSuffix: true,
-                }),
+                time: formatDistanceToNowLocalized(
+                  new Date(alert.lastTriggeredAt),
+                  currentLanguage,
+                  {
+                    addSuffix: true,
+                  },
+                ),
               })}
             </span>
           </>
@@ -297,7 +311,7 @@ function AlertRow({
 }
 
 export function AdminInsightsDashboard() {
-  const { t } = useAdminTranslation();
+  const { t, currentLanguage } = useAdminTranslation();
   const { data, isLoading, isError, error, refetch, isRefetching } = useAdminInsights({
     refetchOnWindowFocus: false,
   });
@@ -337,7 +351,9 @@ export function AdminInsightsDashboard() {
         <div className="token-stack-xs">
           <p className="text-body-xs text-muted-foreground">
             {t("insights.subtitle", {
-              time: formatDistanceToNow(data.generatedAt, { addSuffix: true }),
+              time: formatDistanceToNowLocalized(data.generatedAt, currentLanguage, {
+                addSuffix: true,
+              }),
             })}
           </p>
           <h2 className="text-heading-sm text-foreground font-semibold">
@@ -382,7 +398,12 @@ export function AdminInsightsDashboard() {
             ) : (
               <div className="token-stack-sm">
                 {data.incidents.map((incident) => (
-                  <IncidentRow key={incident.id} incident={incident} t={t} />
+                  <IncidentRow
+                    key={incident.id}
+                    incident={incident}
+                    t={t}
+                    currentLanguage={currentLanguage}
+                  />
                 ))}
               </div>
             )}
@@ -399,7 +420,12 @@ export function AdminInsightsDashboard() {
           </CardHeader>
           <CardContent className="token-stack-sm">
             {data.alerts.map((alert) => (
-              <AlertRow key={alert.id} alert={alert} t={t} />
+              <AlertRow
+                key={alert.id}
+                alert={alert}
+                t={t}
+                currentLanguage={currentLanguage}
+              />
             ))}
           </CardContent>
         </Card>

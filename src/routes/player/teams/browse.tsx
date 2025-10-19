@@ -53,9 +53,9 @@ function BrowseTeamsPage() {
     initialData: [],
   });
 
-  const teams = searchQuery
-    ? searchResults.map((item) => ({ ...item, creator: null }))
-    : allTeams;
+  const teams = (
+    searchQuery ? searchResults.map((item) => ({ ...item, creator: null })) : allTeams
+  ) as TeamListItem[];
 
   const showSkeletons =
     (searchQuery ? isSearching : isFetchingAll) && (teams?.length ?? 0) === 0;

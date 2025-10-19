@@ -142,7 +142,9 @@
   "status": {
     "draft": "Draft (Not visible)",
     "published": "Published (Visible)",
-    "registration_open": "Registration Open"
+    "in_progress": "In Progress",
+    "registration_open": "Registration Open",
+    "registration_closed": "Registration Open"
   },
   "registration_types": {
     "team": "Team",
@@ -364,6 +366,127 @@
       "registration_open": "Registration Open",
       "registration_closed": "Registration Closed",
       "in_progress": "In Progress"
+    }
+  },
+  "admin": {
+    "title": "Events",
+    "subtitle": "Browse and register for upcoming events",
+    "create_event": "Create Event",
+    "view_event": "View Event",
+    "back_to_events": "Back to Events",
+    "manage_event": "Manage Event",
+    "view_public_page": "View Public Page",
+    "not_found": "Event not found",
+    "not_found_description": "The event you're trying to manage doesn't exist.",
+    "registrations": "Registrations",
+    "overview": "Overview",
+    "stats": {
+      "total_registrations": "Total Registrations",
+      "total_revenue": "Total Revenue",
+      "outstanding_etransfers": "Outstanding E-Transfers",
+      "available_spots": "Available Spots",
+      "event_status": "Event Status",
+      "pending": "pending",
+      "from_registrations": "From {{count}} registrations",
+      "awaiting_confirmation": "Awaiting manual confirmation",
+      "unlimited": "Unlimited"
+    },
+    "actions": {
+      "publish": "Publish",
+      "open_registration": "Open Registration",
+      "close_registration": "Close Registration",
+      "start": "Start",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "waitlist": "Waitlist",
+      "mark_paid": "Mark Paid",
+      "send_reminder": "Send Reminder",
+      "view": "View",
+      "event_updated": "Event updated",
+      "update_failed": "Failed to update event",
+      "registration_updated": "Registration updated",
+      "registration_update_failed": "Failed to update registration"
+    },
+    "tables": {
+      "headers": {
+        "name": "Name",
+        "email": "Email",
+        "type": "Type",
+        "team": "Team",
+        "status": "Status",
+        "payment_status": "Payment Status",
+        "payment_method": "Payment Method",
+        "amount": "Amount",
+        "amount_due": "Amount Due",
+        "amount_paid": "Amount Paid",
+        "registered": "Registered",
+        "actions": "Actions"
+      },
+      "no_registrations": "No registrations yet",
+      "unknown": "Unknown",
+      "na": "N/A"
+    },
+    "recent_registrations": {
+      "title": "Recent Registrations",
+      "description": "Latest registrations for your event"
+    },
+    "all_registrations": {
+      "title": "All Registrations",
+      "description": "Manage event registrations and participants"
+    },
+    "quick_actions": {
+      "title": "Quick Actions",
+      "export_registrations": "Export Registrations",
+      "email_participants": "Email Participants",
+      "export_csv": "Export CSV"
+    },
+    "settings": {
+      "title": "Event Settings",
+      "description": "Manage event configuration and status",
+      "event_status": "Event Status",
+      "visibility": "Visibility",
+      "public_event": "Public Event",
+      "make_private": "Make Private",
+      "make_public": "Make Public",
+      "featured_event": "Featured Event",
+      "feature_event": "Feature Event",
+      "remove_feature": "Remove Feature",
+      "danger_zone": "Danger Zone",
+      "danger_description": "These actions are permanent and cannot be undone.",
+      "delete_event": "Delete Event"
+    },
+    "export": {
+      "no_registrations": "No registrations to export",
+      "success": "Registrations exported successfully"
+    },
+    "confirmations": {
+      "are_you_sure": "Are you sure?",
+      "cancel_event_description": "This will cancel the event and notify all registered participants. This action cannot be undone.",
+      "delete_event_description": "This will permanently delete the event and all associated data. This action cannot be undone.",
+      "no_keep_event": "No, keep event",
+      "yes_cancel_event": "Yes, cancel event",
+      "delete_event": "Delete Event"
+    },
+    "payment": {
+      "marking": "Marking...",
+      "sending": "Sending...",
+      "reminder_logged": "Reminder logged"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "registration_open": "Registration Open",
+      "registration_closed": "Registration Closed"
+    },
+    "labels": {
+      "dates": "Dates",
+      "type": "Type",
+      "status": "Status",
+      "registration": "Registration",
+      "spots_left": "spots left",
+      "of_teams": "of {{count}} teams",
+      "of_participants": "of {{count}} participants"
     }
   }
 }

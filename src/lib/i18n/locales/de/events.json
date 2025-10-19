@@ -142,7 +142,9 @@
   "status": {
     "draft": "Entwurf (Nicht sichtbar)",
     "published": "Veröffentlicht (Sichtbar)",
-    "registration_open": "Anmeldung geöffnet"
+    "in_progress": "In Bearbeitung",
+    "registration_open": "Anmeldung geöffnet",
+    "registration_closed": "Anmeldung geschlossen"
   },
   "registration_types": {
     "team": "Team",
@@ -364,6 +366,127 @@
       "registration_open": "Registrierung geöffnet",
       "registration_closed": "Registrierung geschlossen",
       "in_progress": "In Bearbeitung"
+    }
+  },
+  "admin": {
+    "title": "Events",
+    "subtitle": "Aktuelle und kommende Events durchsuchen",
+    "create_event": "Event erstellen",
+    "view_event": "Event ansehen",
+    "back_to_events": "Zurück zu Events",
+    "manage_event": "Event verwalten",
+    "view_public_page": "Öffentliche Seite ansehen",
+    "not_found": "Event nicht gefunden",
+    "not_found_description": "Das Event, das Du verwalten möchtest, existiert nicht.",
+    "registrations": "Anmeldungen",
+    "overview": "Übersicht",
+    "stats": {
+      "total_registrations": "Gesamte Anmeldungen",
+      "total_revenue": "Gesamteinnahmen",
+      "outstanding_etransfers": "Ausstehende E-Transfers",
+      "available_spots": "Verfügbare Plätze",
+      "event_status": "Event-Status",
+      "pending": "ausstehend",
+      "from_registrations": "Von {{count}} Anmeldungen",
+      "awaiting_confirmation": "Warte auf manuelle Bestätigung",
+      "unlimited": "Unbegrenzt"
+    },
+    "actions": {
+      "publish": "Veröffentlichen",
+      "open_registration": "Registrierung öffnen",
+      "close_registration": "Registrierung schließen",
+      "start": "Starten",
+      "complete": "Abschließen",
+      "cancel": "Stornieren",
+      "confirm": "Bestätigen",
+      "waitlist": "Warteliste",
+      "mark_paid": "Als bezahlt markieren",
+      "send_reminder": "Erinnerung senden",
+      "view": "Ansehen",
+      "event_updated": "Event aktualisiert",
+      "update_failed": "Event-Aktualisierung fehlgeschlagen",
+      "registration_updated": "Anmeldung aktualisiert",
+      "registration_update_failed": "Anmeldeaktualisierung fehlgeschlagen"
+    },
+    "tables": {
+      "headers": {
+        "name": "Name",
+        "email": "E-Mail",
+        "type": "Typ",
+        "team": "Team",
+        "status": "Status",
+        "payment_status": "Zahlungsstatus",
+        "payment_method": "Zahlungsmethode",
+        "amount": "Betrag",
+        "amount_due": "Fälliger Betrag",
+        "amount_paid": "Gezahlter Betrag",
+        "registered": "Angemeldet",
+        "actions": "Aktionen"
+      },
+      "no_registrations": "Noch keine Anmeldungen",
+      "unknown": "Unbekannt",
+      "na": "N/A"
+    },
+    "recent_registrations": {
+      "title": "Neueste Anmeldungen",
+      "description": "Neueste Anmeldungen für Dein Event"
+    },
+    "all_registrations": {
+      "title": "Alle Anmeldungen",
+      "description": "Event-Anmeldungen und Teilnehmer verwalten"
+    },
+    "quick_actions": {
+      "title": "Schnellaktionen",
+      "export_registrations": "Anmeldungen exportieren",
+      "email_participants": "Teilnehmer e-mailen",
+      "export_csv": "CSV exportieren"
+    },
+    "settings": {
+      "title": "Event-Einstellungen",
+      "description": "Event-Konfiguration und Status verwalten",
+      "event_status": "Event-Status",
+      "visibility": "Sichtbarkeit",
+      "public_event": "Öffentliches Event",
+      "make_private": "Privat machen",
+      "make_public": "Öffentlich machen",
+      "featured_event": "Vorgestelltes Event",
+      "feature_event": "Event hervorheben",
+      "remove_feature": "Hervorhebung entfernen",
+      "danger_zone": "Gefahrenzone",
+      "danger_description": "Diese Aktionen sind permanent und können nicht rückgängig gemacht werden.",
+      "delete_event": "Event löschen"
+    },
+    "export": {
+      "no_registrations": "Keine Anmeldungen zum Exportieren",
+      "success": "Anmeldungen erfolgreich exportiert"
+    },
+    "confirmations": {
+      "are_you_sure": "Bist Du sicher?",
+      "cancel_event_description": "Dies wird das Event stornieren und alle angemeldeten Teilnehmer benachrichtigen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "delete_event_description": "Dies wird das Event und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "no_keep_event": "Nein, Event behalten",
+      "yes_cancel_event": "Ja, Event stornieren",
+      "delete_event": "Event löschen"
+    },
+    "payment": {
+      "marking": "Markiere...",
+      "sending": "Sende...",
+      "reminder_logged": "Erinnerung protokolliert"
+    },
+    "statuses": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "registration_open": "Registrierung geöffnet",
+      "registration_closed": "Registrierung geschlossen"
+    },
+    "labels": {
+      "dates": "Daten",
+      "type": "Typ",
+      "status": "Status",
+      "registration": "Registrierung",
+      "spots_left": "Plätze übrig",
+      "of_teams": "von {{count}} Teams",
+      "of_participants": "von {{count}} Teilnehmern"
     }
   }
 }

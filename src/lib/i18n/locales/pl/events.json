@@ -142,7 +142,9 @@
   "status": {
     "draft": "Szkic (Niewidoczny)",
     "published": "Opublikowany (Widoczny)",
-    "registration_open": "Rejestracja otwarta"
+    "in_progress": "W trakcie",
+    "registration_open": "Rejestracja otwarta",
+    "registration_closed": "Rejestracja zamknięta"
   },
   "registration_types": {
     "team": "Drużyna",
@@ -364,6 +366,127 @@
       "registration_open": "Rejestracja otwarta",
       "registration_closed": "Rejestracja zamknięta",
       "in_progress": "W trakcie"
+    }
+  },
+  "admin": {
+    "title": "Wydarzenia",
+    "subtitle": "Przeglądaj i zapisuj się na nadchodzące wydarzenia",
+    "create_event": "Utwórz wydarzenie",
+    "view_event": "Zobacz wydarzenie",
+    "back_to_events": "Powrót do wydarzeń",
+    "manage_event": "Zarządzaj wydarzeniem",
+    "view_public_page": "Zobacz stronę publiczną",
+    "not_found": "Nie znaleziono wydarzenia",
+    "not_found_description": "Wydarzenie, które próbujesz zarządzać, nie istnieje.",
+    "registrations": "Rejestracje",
+    "overview": "Przegląd",
+    "stats": {
+      "total_registrations": "Całkowita liczba rejestracji",
+      "total_revenue": "Całkowite przychody",
+      "outstanding_etransfers": "Oczekujące przelewy",
+      "available_spots": "Dostępne miejsca",
+      "event_status": "Status wydarzenia",
+      "pending": "oczekujące",
+      "from_registrations": "Z {{count}} rejestracji",
+      "awaiting_confirmation": "Oczekujące na ręczne potwierdzenie",
+      "unlimited": "Nieograniczone"
+    },
+    "actions": {
+      "publish": "Opublikuj",
+      "open_registration": "Otwórz rejestrację",
+      "close_registration": "Zamknij rejestrację",
+      "start": "Rozpocznij",
+      "complete": "Zakończ",
+      "cancel": "Anuluj",
+      "confirm": "Potwierdź",
+      "waitlist": "Lista rezerwowa",
+      "mark_paid": "Oznacz jako opłacone",
+      "send_reminder": "Wyślij przypomnienie",
+      "view": "Zobacz",
+      "event_updated": "Wydarzenie zaktualizowane",
+      "update_failed": "Aktualizacja wydarzenia nie powiodła się",
+      "registration_updated": "Rejestracja zaktualizowana",
+      "registration_update_failed": "Aktualizacja rejestracji nie powiodła się"
+    },
+    "tables": {
+      "headers": {
+        "name": "Nazwa",
+        "email": "Email",
+        "type": "Typ",
+        "team": "Drużyna",
+        "status": "Status",
+        "payment_status": "Status płatności",
+        "payment_method": "Metoda płatności",
+        "amount": "Kwota",
+        "amount_due": "Kwota do zapłaty",
+        "amount_paid": "Zapłacona kwota",
+        "registered": "Zarejestrowano",
+        "actions": "Akcje"
+      },
+      "no_registrations": "Brak rejestracji",
+      "unknown": "Nieznany",
+      "na": "N/D"
+    },
+    "recent_registrations": {
+      "title": "Ostatnie rejestracje",
+      "description": "Najnowsze rejestracje na Twoje wydarzenie"
+    },
+    "all_registrations": {
+      "title": "Wszystkie rejestracje",
+      "description": "Zarządzaj rejestracjami i uczestnikami wydarzenia"
+    },
+    "quick_actions": {
+      "title": "Szybkie akcje",
+      "export_registrations": "Eksportuj rejestracje",
+      "email_participants": "Wyślij email do uczestników",
+      "export_csv": "Eksportuj CSV"
+    },
+    "settings": {
+      "title": "Ustawienia wydarzenia",
+      "description": "Zarządzaj konfiguracją i statusem wydarzenia",
+      "event_status": "Status wydarzenia",
+      "visibility": "Widoczność",
+      "public_event": "Wydarzenie publiczne",
+      "make_private": "Ustaw jako prywatne",
+      "make_public": "Ustaw jako publiczne",
+      "featured_event": "Wyróżnione wydarzenie",
+      "feature_event": "Wyróżnij wydarzenie",
+      "remove_feature": "Usuń wyróżnienie",
+      "danger_zone": "Strefa zagrożenia",
+      "danger_description": "Te akcje są trwałe i nie mogą być cofnięte.",
+      "delete_event": "Usuń wydarzenie"
+    },
+    "export": {
+      "no_registrations": "Brak rejestracji do eksportu",
+      "success": "Rejestracje wyeksportowane pomyślnie"
+    },
+    "confirmations": {
+      "are_you_sure": "Jesteś pewien?",
+      "cancel_event_description": "To anuluje wydarzenie i powiadomi wszystkich zarejestrowanych uczestników. Ta akcja nie może być cofnięta.",
+      "delete_event_description": "To trwale usunie wydarzenie i wszystkie powiązane dane. Ta akcja nie może być cofnięta.",
+      "no_keep_event": "Nie, zachowaj wydarzenie",
+      "yes_cancel_event": "Tak, anuluj wydarzenie",
+      "delete_event": "Usuń wydarzenie"
+    },
+    "payment": {
+      "marking": "Oznaczanie...",
+      "sending": "Wysyłanie...",
+      "reminder_logged": "Przypomnienie zapisane"
+    },
+    "statuses": {
+      "draft": "Szkic",
+      "published": "Opublikowano",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta"
+    },
+    "labels": {
+      "dates": "Daty",
+      "type": "Typ",
+      "status": "Status",
+      "registration": "Rejestracja",
+      "spots_left": "pozostałych miejsc",
+      "of_teams": "z {{count}} drużyn",
+      "of_participants": "z {{count}} uczestników"
     }
   }
 }

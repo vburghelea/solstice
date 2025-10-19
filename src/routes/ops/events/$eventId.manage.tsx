@@ -62,6 +62,7 @@ import type {
   UpdateEventInput,
 } from "~/features/events/events.types";
 import type { EventRegistrationWithRoster } from "~/features/events/utils";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
@@ -103,6 +104,7 @@ export const Route = createFileRoute("/ops/events/$eventId/manage")({
 });
 
 function EventManagementPage() {
+  const { t } = useEventsTranslation();
   const { eventId } = Route.useParams();
   const { user } = useRouteContext({ from: "/ops/events/$eventId/manage" });
   const [activeTab, setActiveTab] = useState<ManagementTab>("overview");
@@ -212,15 +214,13 @@ function EventManagementPage() {
     return (
       <div className="container mx-auto p-6">
         <Alert variant="destructive">
-          <AlertTitle>Event Not Found</AlertTitle>
-          <AlertDescription>
-            The event you're trying to manage doesn't exist.
-          </AlertDescription>
+          <AlertTitle>{t("admin.not_found")}</AlertTitle>
+          <AlertDescription>{t("admin.not_found_description")}</AlertDescription>
         </Alert>
         <Button asChild className="mt-4">
           <Link to="/ops/events">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Events
+            {t("admin.back_to_events")}
           </Link>
         </Button>
       </div>
@@ -315,18 +315,18 @@ function EventManagementPage() {
           <Button asChild variant="ghost" size="sm">
             <Link to="/ops/events">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Back to Events
+              {t("admin.back_to_events")}
             </Link>
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Manage Event</h1>
+            <h1 className="text-2xl font-bold">{t("admin.manage_event")}</h1>
             <p className="text-muted-foreground">{event.name}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline">
             <Link to="/events/$slug" params={{ slug: event.slug }}>
-              View Public Page
+              {t("admin.view_public_page")}
             </Link>
           </Button>
         </div>
@@ -337,16 +337,16 @@ function EventManagementPage() {
         onValueChange={(value: string) => setActiveTab(value as ManagementTab)}
       >
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="overview">{t("admin.overview")}</TabsTrigger>
           <TabsTrigger value="registrations">
-            Registrations
+            {t("admin.registrations")}
             {registrations && registrations.length > 0 && (
               <Badge variant="secondary" className="ml-2">
                 {registrations.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="settings">{t("admin.settings")}</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -354,20 +354,24 @@ function EventManagementPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("admin.stats.total_registrations")}
+                </CardTitle>
                 <UsersIcon className="text-muted-foreground h-4 w-4" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{confirmedRegistrations.length}</div>
                 <p className="text-muted-foreground text-xs">
-                  {pendingRegistrations.length} pending
+                  {pendingRegistrations.length} {t("admin.stats.pending")}
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("admin.stats.total_revenue")}
+                </CardTitle>
                 <DollarSignIcon className="text-muted-foreground h-4 w-4" />
               </CardHeader>
               <CardContent>
@@ -376,7 +380,9 @@ function EventManagementPage() {
                   {(totalRevenueCents / 100).toFixed(2)}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  From {confirmedRegistrations.length} registrations
+                  {t("admin.stats.from_registrations", {
+                    count: confirmedRegistrations.length,
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -384,7 +390,7 @@ function EventManagementPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Outstanding E-Transfers
+                  {t("admin.stats.outstanding_etransfers")}
                 </CardTitle>
                 <MailIcon className="text-muted-foreground h-4 w-4" />
               </CardHeader>
@@ -393,24 +399,28 @@ function EventManagementPage() {
                   {outstandingEtransferRegistrations.length}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  Awaiting manual confirmation
+                  {t("admin.stats.awaiting_confirmation")}
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Available Spots</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("admin.stats.available_spots")}
+                </CardTitle>
                 <ClockIcon className="text-muted-foreground h-4 w-4" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {event.availableSpots ?? "Unlimited"}
+                  {event.availableSpots ?? t("admin.stats.unlimited")}
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  {maxTeamsValue !== undefined ? `of ${maxTeamsValue} teams` : ""}
+                  {maxTeamsValue !== undefined
+                    ? t("admin.labels.of_teams", { count: maxTeamsValue })
+                    : ""}
                   {maxParticipantsValue !== undefined
-                    ? `${maxTeamsValue !== undefined ? " / " : "of "}${maxParticipantsValue} participants`
+                    ? `${maxTeamsValue !== undefined ? " / " : ""}${t("admin.labels.of_participants", { count: maxParticipantsValue })}`
                     : ""}
                 </p>
               </CardContent>
@@ -418,7 +428,9 @@ function EventManagementPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Event Status</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("admin.stats.event_status")}
+                </CardTitle>
                 <CalendarIcon className="text-muted-foreground h-4 w-4" />
               </CardHeader>
               <CardContent>
@@ -438,8 +450,10 @@ function EventManagementPage() {
           {/* Recent Activity */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Registrations</CardTitle>
-              <CardDescription>Latest registrations for your event</CardDescription>
+              <CardTitle>{t("admin.recent_registrations.title")}</CardTitle>
+              <CardDescription>
+                {t("admin.recent_registrations.description")}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {registrations && registrations.length > 0 ? (
@@ -504,7 +518,7 @@ function EventManagementPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>{t("admin.quick_actions.title")}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               <Button
@@ -513,12 +527,12 @@ function EventManagementPage() {
                 disabled={!registrations || registrations.length === 0}
               >
                 <DownloadIcon className="mr-2 h-4 w-4" />
-                Export Registrations
+                {t("admin.quick_actions.export_registrations")}
               </Button>
 
               <Button variant="outline" disabled>
                 <MailIcon className="mr-2 h-4 w-4" />
-                Email Participants
+                {t("admin.quick_actions.email_participants")}
               </Button>
 
               {event.status === "published" && (

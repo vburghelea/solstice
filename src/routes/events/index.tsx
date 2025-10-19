@@ -49,10 +49,9 @@ const EVENT_TYPE_OPTIONS: Array<{ value: EventType; labelKey: string }> = [
 ];
 
 const EVENT_STATUS_OPTIONS: Array<{ value: EventStatus; labelKey: string }> = [
-  { value: "published", labelKey: "listing.options.published" },
-  { value: "registration_open", labelKey: "listing.registration_open" },
-  { value: "registration_closed", labelKey: "listing.registration_closed" },
-  { value: "in_progress", labelKey: "listing.in_progress" },
+  { value: "published", labelKey: "status.published" },
+  { value: "registration_open", labelKey: "status.registration_open" },
+  { value: "registration_closed", labelKey: "status.registration_closed" },
 ];
 
 const EVENTS_HERO_IMAGE = createResponsiveCloudinaryImage("heroTournament", {
@@ -70,9 +69,9 @@ const REGISTRATION_TYPE_OPTIONS: Array<{
   value: RegistrationType;
   labelKey: string;
 }> = [
-  { value: "team", labelKey: "events.registration_types.team" },
-  { value: "individual", labelKey: "events.registration_types.individual" },
-  { value: "both", labelKey: "events.registration_types.both" },
+  { value: "team", labelKey: "registration_types.team" },
+  { value: "individual", labelKey: "registration_types.individual" },
+  { value: "both", labelKey: "registration_types.both" },
 ];
 
 type PlayerLocationFilters = {

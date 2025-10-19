@@ -9,23 +9,29 @@ import {
 } from "~/features/events/events.mutations";
 import type { EventRegistrationListItem } from "~/features/events/events.queries";
 import { getEvent, listEventRegistrations } from "~/features/events/events.queries";
+import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 
 export const Route = createFileRoute("/ops/events/$eventId")({
   component: DashboardEventDetailPage,
 });
 
-const STATUS_ACTIONS = [
-  { label: "Publish", status: "published" },
-  { label: "Open Registration", status: "registration_open" },
-  { label: "Close Registration", status: "registration_closed" },
-  { label: "Start", status: "in_progress" },
-  { label: "Complete", status: "completed" },
-  { label: "Cancel", status: "canceled", variant: "destructive" as const },
-] as const;
-
 function DashboardEventDetailPage() {
+  const { t } = useEventsTranslation();
   const { eventId } = Route.useParams();
   const qc = useQueryClient();
+
+  const STATUS_ACTIONS = [
+    { label: t("admin.actions.publish"), status: "published" },
+    { label: t("admin.actions.open_registration"), status: "registration_open" },
+    { label: t("admin.actions.close_registration"), status: "registration_closed" },
+    { label: t("admin.actions.start"), status: "in_progress" },
+    { label: t("admin.actions.complete"), status: "completed" },
+    {
+      label: t("admin.actions.cancel"),
+      status: "canceled",
+      variant: "destructive" as const,
+    },
+  ] as const;
 
   const { data } = useSuspenseQuery({
     queryKey: ["event", eventId, "dashboard"],
@@ -38,13 +44,13 @@ function DashboardEventDetailPage() {
     mutationFn: updateEvent,
     onSuccess: (res) => {
       if (res.success) {
-        toast.success("Event updated");
+        toast.success(t("admin.actions.event_updated"));
       } else {
-        toast.error(res.errors?.[0]?.message || "Failed to update event");
+        toast.error(res.errors?.[0]?.message || t("admin.actions.update_failed"));
       }
     },
     onError: (err: unknown) => {
-      toast.error(err instanceof Error ? err.message : "Failed to update event");
+      toast.error(err instanceof Error ? err.message : t("admin.actions.update_failed"));
     },
   });
 
@@ -75,7 +81,7 @@ function DashboardEventDetailPage() {
   });
 
   if (!event) {
-    return <div className="p-6">Event not found</div>;
+    return <div className="p-6">{t("admin.not_found")}</div>;
   }
 
   return (
@@ -124,11 +130,13 @@ function DashboardEventDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-foreground">Registrations</CardTitle>
+          <CardTitle className="text-foreground">{t("admin.registrations")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {registrations.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No registrations yet.</p>
+            <p className="text-muted-foreground text-sm">
+              {t("admin.tables.no_registrations")}
+            </p>
           ) : (
             <div className="divide-y rounded-md border">
               {registrations.map((r) => (
@@ -159,7 +167,7 @@ function DashboardEventDetailPage() {
                       }
                       disabled={regMutation.isPending}
                     >
-                      Confirm
+                      {t("admin.actions.confirm")}
                     </Button>
                     <Button
                       size="sm"
@@ -171,7 +179,7 @@ function DashboardEventDetailPage() {
                       }
                       disabled={regMutation.isPending}
                     >
-                      Waitlist
+                      {t("admin.actions.waitlist")}
                     </Button>
                     <Button
                       size="sm"
@@ -183,7 +191,7 @@ function DashboardEventDetailPage() {
                       }
                       disabled={regMutation.isPending}
                     >
-                      Cancel
+                      {t("admin.actions.cancel")}
                     </Button>
                   </div>
                 </div>

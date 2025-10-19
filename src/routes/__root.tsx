@@ -154,7 +154,7 @@ function RootComponent() {
     return () => {
       cancelled = true;
     };
-  }, [language]);
+  }, [activeI18n, language]);
 
   return (
     <RootDocument language={language}>

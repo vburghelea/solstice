@@ -1,8 +1,10 @@
-import type { i18n as I18nInstance } from "i18next";
+import type { i18n as I18nInstance, InitOptions, Resource } from "i18next";
+import { createInstance } from "i18next";
 import { randomUUID } from "node:crypto";
+import { initReactI18next } from "react-i18next";
 
 import { i18nConfig, type SupportedLanguage } from "./config";
-import i18n from "./i18n";
+import baseI18n from "./i18n";
 
 declare global {
   var __solsticeRequestI18nRegistry: Map<string, I18nInstance> | undefined;
@@ -11,27 +13,42 @@ declare global {
 const registry: Map<string, I18nInstance> = (globalThis.__solsticeRequestI18nRegistry ??=
   new Map<string, I18nInstance>());
 
-async function cloneI18nInstance() {
-  const cloned = i18n.cloneInstance({ initImmediate: false });
+function cloneResources(): Resource {
+  const resources = baseI18n.services.resourceStore?.data ?? {};
+  return JSON.parse(JSON.stringify(resources)) as Resource;
+}
 
-  if (!cloned.isInitialized) {
-    try {
-      await cloned.init({ ...(i18n.options ?? {}) });
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
+async function createIsolatedInstance(language: SupportedLanguage) {
+  const instance = createInstance();
+  instance.use(initReactI18next);
 
-      throw new Error("Failed to initialize cloned i18n instance");
-    }
+  const sharedOptions = {
+    ...(baseI18n.options ?? {}),
+  } as InitOptions & Record<string, unknown>;
+
+  delete sharedOptions.backend;
+  delete sharedOptions.detection;
+
+  const initOptions: InitOptions = {
+    ...sharedOptions,
+    lng: language,
+    fallbackLng: i18nConfig.fallbackLanguage,
+    supportedLngs: i18nConfig.supportedLanguages,
+    resources: cloneResources(),
+    initImmediate: false,
+  };
+
+  await instance.init(initOptions);
+
+  if (instance.language !== language) {
+    await instance.changeLanguage(language);
   }
 
-  return cloned;
+  return instance;
 }
 
 export async function createRequestScopedI18n(language: SupportedLanguage) {
-  const instance = await cloneI18nInstance();
-  await instance.changeLanguage(language);
+  const instance = await createIsolatedInstance(language);
 
   if (i18nConfig.debug) {
     console.info("[i18n] created request-scoped instance", {

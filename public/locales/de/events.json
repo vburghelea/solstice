@@ -356,6 +356,8 @@
     "all_registration_types": "Alle Registrierungsarten",
     "load_failed": "Laden der Events fehlgeschlagen",
     "no_results": "Keine Events entsprechen diesem Filter. Kontaktiere uns unter {{email}} und wir fügen Dein Event zum Kalender hinzu.",
+    "loading": "Laden...",
+    "loading_description": "Bitte warten, während wir die Events laden.",
     "options": {
       "tournament": "Turnier",
       "league": "Liga",
@@ -365,7 +367,58 @@
       "published": "Veröffentlicht",
       "registration_open": "Registrierung geöffnet",
       "registration_closed": "Registrierung geschlossen",
-      "in_progress": "In Bearbeitung"
+      "in_progress": "In Bearbeitung",
+      "view_details": "Details anzeigen"
+    }
+  },
+  "list": {
+    "filter_title": "Events filtern",
+    "labels": {
+      "event_type": "Event-Typ",
+      "status": "Status",
+      "city": "Stadt",
+      "country": "Land",
+      "sort_by": "Sortieren nach",
+      "sort_order": "Sortierreihenfolge"
+    },
+    "placeholders": {
+      "all_types": "Alle Typen",
+      "all_statuses": "Alle Status",
+      "all_countries": "Alle Länder",
+      "filter_by_city": "Nach Stadt filtern"
+    },
+    "options": {
+      "tournament": "Turnier",
+      "league": "Liga",
+      "camp": "Camp",
+      "clinic": "Klinik",
+      "social": "Social",
+      "other": "Andere",
+      "published": "Veröffentlicht",
+      "registration_open": "Anmeldung offen",
+      "registration_closed": "Anmeldung geschlossen",
+      "in_progress": "In Bearbeitung",
+      "completed": "Abgeschlossen",
+      "start_date": "Startdatum",
+      "name": "Name",
+      "recently_added": "Kürzlich hinzugefügt",
+      "ascending": "Aufsteigend",
+      "descending": "Absteigend"
+    },
+    "empty_state": "Keine Events gefunden, die Ihren Kriterien entsprechen.",
+    "pagination": {
+      "showing": "Zeige {{start}}-{{end}} von {{total}} Events",
+      "previous": "Vorherige",
+      "next": "Nächste"
+    },
+    "actions": {
+      "view_details": "Details ansehen"
+    },
+    "registration": {
+      "open": "Anmeldung offen",
+      "spots_left": "{{count}} Plätze frei",
+      "registered": "{{count}} angemeldet",
+      "type_label": "{{type}}"
     }
   },
   "admin": {
@@ -380,6 +433,7 @@
     "not_found_description": "Das Event, das Du verwalten möchtest, existiert nicht.",
     "registrations": "Anmeldungen",
     "overview": "Übersicht",
+    "settings": "Einstellungen",
     "stats": {
       "total_registrations": "Gesamte Anmeldungen",
       "total_revenue": "Gesamteinnahmen",
@@ -487,6 +541,90 @@
       "spots_left": "Plätze übrig",
       "of_teams": "von {{count}} Teams",
       "of_participants": "von {{count}} Teilnehmern"
+    },
+    "management": {
+      "title": "Event verwalten",
+      "overview": "Übersicht",
+      "registrations": "Anmeldungen",
+      "settings": "Einstellungen",
+      "view_public_page": "Öffentliche Seite ansehen",
+      "recent_registrations": "Neueste Anmeldungen",
+      "recent_registrations_description": "Neueste Anmeldungen für dein Event",
+      "tabs": {
+        "overview": "Übersicht",
+        "registrations": "Anmeldungen",
+        "settings": "Einstellungen"
+      },
+      "stats": {
+        "total_registrations": "Gesamte Anmeldungen",
+        "pending": "ausstehend",
+        "total_revenue": "Gesamteinnahmen",
+        "outstanding_etransfers": "Ausstehende E-Transfers",
+        "awaiting_confirmation": "Warte auf manuelle Bestätigung",
+        "available_spots": "Verfügbare Plätze",
+        "event_status": "Event-Status",
+        "unlimited": "Unbegrenzt",
+        "from_registrations": "Von {{count}} Anmeldungen"
+      },
+      "actions": {
+        "export_registrations": "Anmeldungen exportieren",
+        "email_participants": "Teilnehmer benachrichtigen",
+        "open_registration": "Registrierung öffnen",
+        "close_registration": "Registrierung schließen",
+        "cancel_event": "Event absagen",
+        "mark_paid": "Als bezahlt markieren",
+        "send_reminder": "Erinnerung senden",
+        "view": "Ansehen",
+        "export_csv": "CSV exportieren",
+        "make_public": "Öffentlich machen",
+        "make_private": "Privat machen",
+        "feature_event": "Event hervorheben",
+        "remove_feature": "Hervorhebung entfernen",
+        "delete_event": "Event löschen"
+      },
+      "tables": {
+        "headers": {
+          "name": "Name",
+          "email": "E-Mail",
+          "type": "Typ",
+          "team": "Team",
+          "status": "Status",
+          "payment_status": "Zahlungsstatus",
+          "payment_method": "Zahlungsmethode",
+          "amount": "Betrag",
+          "amount_due": "Fälliger Betrag",
+          "amount_paid": "Gezahlter Betrag",
+          "registered": "Registriert",
+          "date": "Datum",
+          "actions": "Aktionen"
+        },
+        "no_registrations": "Noch keine Anmeldungen",
+        "unknown": "Unbekannt",
+        "na": "N/V"
+      },
+      "confirmations": {
+        "are_you_sure": "Bist du sicher?",
+        "cancel_event_description": "Dies wird das Event absagen und alle registrierten Teilnehmer benachrichtigen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "delete_event_description": "Dies wird das Event und alle zugehörigen Daten permanent löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "no_keep_event": "Nein, Event behalten",
+        "yes_cancel_event": "Ja, Event absagen",
+        "delete_event": "Event löschen"
+      },
+      "status_badges": {
+        "draft": "Entwurf",
+        "published": "Veröffentlicht",
+        "registration_open": "Registrierung geöffnet",
+        "registration_closed": "Registrierung geschlossen",
+        "in_progress": "In Bearbeitung",
+        "completed": "Abgeschlossen",
+        "canceled": "Abgesagt"
+      },
+      "payment": {
+        "marking": "Markiere...",
+        "sending": "Sende...",
+        "reminder_logged": "Erinnerung protokolliert",
+        "canadian_dollars": "CAD"
+      }
     }
   }
 }

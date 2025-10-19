@@ -356,6 +356,8 @@
     "all_registration_types": "All registration types",
     "load_failed": "Events failed to load",
     "no_results": "No events match this filter right now. Contact us at {{email}} and we'll add your event to the calendar.",
+    "loading": "Loading...",
+    "loading_description": "Please wait while we load the events.",
     "options": {
       "tournament": "Tournament",
       "league": "League",
@@ -365,7 +367,58 @@
       "published": "Published",
       "registration_open": "Registration Open",
       "registration_closed": "Registration Closed",
-      "in_progress": "In Progress"
+      "in_progress": "In Progress",
+      "view_details": "View Details"
+    }
+  },
+  "list": {
+    "filter_title": "Filter Events",
+    "labels": {
+      "event_type": "Event Type",
+      "status": "Status",
+      "city": "City",
+      "country": "Country",
+      "sort_by": "Sort By",
+      "sort_order": "Sort Order"
+    },
+    "placeholders": {
+      "all_types": "All Types",
+      "all_statuses": "All Statuses",
+      "all_countries": "All Countries",
+      "filter_by_city": "Filter by city"
+    },
+    "options": {
+      "tournament": "Tournament",
+      "league": "League",
+      "camp": "Camp",
+      "clinic": "Clinic",
+      "social": "Social",
+      "other": "Other",
+      "published": "Published",
+      "registration_open": "Registration Open",
+      "registration_closed": "Registration Closed",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "start_date": "Start Date",
+      "name": "Name",
+      "recently_added": "Recently Added",
+      "ascending": "Ascending",
+      "descending": "Descending"
+    },
+    "empty_state": "No events found matching your criteria.",
+    "pagination": {
+      "showing": "Showing {{start}}-{{end}} of {{total}} events",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "actions": {
+      "view_details": "View Details"
+    },
+    "registration": {
+      "open": "Registration Open",
+      "spots_left": "{{count}} spots left",
+      "registered": "{{count}} registered",
+      "type_label": "{{type}}"
     }
   },
   "admin": {
@@ -380,6 +433,7 @@
     "not_found_description": "The event you're trying to manage doesn't exist.",
     "registrations": "Registrations",
     "overview": "Overview",
+    "settings": "Settings",
     "stats": {
       "total_registrations": "Total Registrations",
       "total_revenue": "Total Revenue",
@@ -487,6 +541,90 @@
       "spots_left": "spots left",
       "of_teams": "of {{count}} teams",
       "of_participants": "of {{count}} participants"
+    },
+    "management": {
+      "title": "Manage Event",
+      "overview": "Overview",
+      "registrations": "Registrations",
+      "settings": "Settings",
+      "view_public_page": "View Public Page",
+      "recent_registrations": "Recent Registrations",
+      "recent_registrations_description": "Latest registrations for your event",
+      "tabs": {
+        "overview": "Overview",
+        "registrations": "Registrations",
+        "settings": "Settings"
+      },
+      "stats": {
+        "total_registrations": "Total Registrations",
+        "pending": "pending",
+        "total_revenue": "Total Revenue",
+        "outstanding_etransfers": "Outstanding E-Transfers",
+        "awaiting_confirmation": "Awaiting manual confirmation",
+        "available_spots": "Available Spots",
+        "event_status": "Event Status",
+        "unlimited": "Unlimited",
+        "from_registrations": "From {{count}} registrations"
+      },
+      "actions": {
+        "export_registrations": "Export Registrations",
+        "email_participants": "Email Participants",
+        "open_registration": "Open Registration",
+        "close_registration": "Close Registration",
+        "cancel_event": "Cancel Event",
+        "mark_paid": "Mark Paid",
+        "send_reminder": "Send Reminder",
+        "view": "View",
+        "export_csv": "Export CSV",
+        "make_public": "Make Public",
+        "make_private": "Make Private",
+        "feature_event": "Feature Event",
+        "remove_feature": "Remove Feature",
+        "delete_event": "Delete Event"
+      },
+      "tables": {
+        "headers": {
+          "name": "Name",
+          "email": "Email",
+          "type": "Type",
+          "team": "Team",
+          "status": "Status",
+          "payment_status": "Payment Status",
+          "payment_method": "Payment Method",
+          "amount": "Amount",
+          "amount_due": "Amount Due",
+          "amount_paid": "Amount Paid",
+          "registered": "Registered",
+          "date": "Date",
+          "actions": "Actions"
+        },
+        "no_registrations": "No registrations yet",
+        "unknown": "Unknown",
+        "na": "N/A"
+      },
+      "confirmations": {
+        "are_you_sure": "Are you sure?",
+        "cancel_event_description": "This will cancel the event and notify all registered participants. This action cannot be undone.",
+        "delete_event_description": "This will permanently delete the event and all associated data. This action cannot be undone.",
+        "no_keep_event": "No, keep event",
+        "yes_cancel_event": "Yes, cancel event",
+        "delete_event": "Delete Event"
+      },
+      "status_badges": {
+        "draft": "Draft",
+        "published": "Published",
+        "registration_open": "Registration Open",
+        "registration_closed": "Registration Closed",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "canceled": "Canceled"
+      },
+      "payment": {
+        "marking": "Marking...",
+        "sending": "Sending...",
+        "reminder_logged": "Reminder logged",
+        "canadian_dollars": "CAD"
+      }
     }
   }
 }

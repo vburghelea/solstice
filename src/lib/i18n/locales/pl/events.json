@@ -356,6 +356,8 @@
     "all_registration_types": "Wszystkie typy rejestracji",
     "load_failed": "Ładowanie wydarzeń nie powiodło się",
     "no_results": "Żadne wydarzenia nie pasują do tego filtra. Skontaktuj się z nami pod adresem {{email}}, a dodamy Twoje wydarzenie do kalendarza.",
+    "loading": "Ładowanie...",
+    "loading_description": "Proszę czekać, ładujemy wydarzenia.",
     "options": {
       "tournament": "Turniej",
       "league": "Liga",
@@ -365,7 +367,58 @@
       "published": "Opublikowano",
       "registration_open": "Rejestracja otwarta",
       "registration_closed": "Rejestracja zamknięta",
-      "in_progress": "W trakcie"
+      "in_progress": "W trakcie",
+      "view_details": "Pokaż szczegóły"
+    }
+  },
+  "list": {
+    "filter_title": "Filtruj wydarzenia",
+    "labels": {
+      "event_type": "Typ wydarzenia",
+      "status": "Status",
+      "city": "Miasto",
+      "country": "Kraj",
+      "sort_by": "Sortuj według",
+      "sort_order": "Kolejność sortowania"
+    },
+    "placeholders": {
+      "all_types": "Wszystkie typy",
+      "all_statuses": "Wszystkie statusy",
+      "all_countries": "Wszystkie kraje",
+      "filter_by_city": "Filtruj według miasta"
+    },
+    "options": {
+      "tournament": "Turniej",
+      "league": "Liga",
+      "camp": "Obóz",
+      "clinic": "Klinika",
+      "social": "Społeczne",
+      "other": "Inne",
+      "published": "Opublikowane",
+      "registration_open": "Rejestracja otwarta",
+      "registration_closed": "Rejestracja zamknięta",
+      "in_progress": "W trakcie",
+      "completed": "Zakończone",
+      "start_date": "Data rozpoczęcia",
+      "name": "Nazwa",
+      "recently_added": "Ostatnio dodane",
+      "ascending": "Rosnąco",
+      "descending": "Malejąco"
+    },
+    "empty_state": "Nie znaleziono wydarzeń pasujących do kryteriów.",
+    "pagination": {
+      "showing": "Wyświetlanie {{start}}-{{end}} z {{total}} wydarzeń",
+      "previous": "Poprzednia",
+      "next": "Następna"
+    },
+    "actions": {
+      "view_details": "Zobacz szczegóły"
+    },
+    "registration": {
+      "open": "Rejestracja otwarta",
+      "spots_left": "{{count}} miejsc wolnych",
+      "registered": "{{count}} zapisanych",
+      "type_label": "{{type}}"
     }
   },
   "admin": {
@@ -380,6 +433,7 @@
     "not_found_description": "Wydarzenie, które próbujesz zarządzać, nie istnieje.",
     "registrations": "Rejestracje",
     "overview": "Przegląd",
+    "settings": "Ustawienia",
     "stats": {
       "total_registrations": "Całkowita liczba rejestracji",
       "total_revenue": "Całkowite przychody",
@@ -487,6 +541,90 @@
       "spots_left": "pozostałych miejsc",
       "of_teams": "z {{count}} drużyn",
       "of_participants": "z {{count}} uczestników"
+    },
+    "management": {
+      "title": "Zarządzaj wydarzeniem",
+      "overview": "Przegląd",
+      "registrations": "Rejestracje",
+      "settings": "Ustawienia",
+      "view_public_page": "Zobacz stronę publiczną",
+      "recent_registrations": "Najnowsze rejestracje",
+      "recent_registrations_description": "Najnowsze rejestracje dla Twojego wydarzenia",
+      "tabs": {
+        "overview": "Przegląd",
+        "registrations": "Rejestracje",
+        "settings": "Ustawienia"
+      },
+      "stats": {
+        "total_registrations": "Całkowita liczba rejestracji",
+        "pending": "oczekujące",
+        "total_revenue": "Całkowite przychody",
+        "outstanding_etransfers": "Oczekujące przelewy",
+        "awaiting_confirmation": "Oczekujące na ręczne potwierdzenie",
+        "available_spots": "Dostępne miejsca",
+        "event_status": "Status wydarzenia",
+        "unlimited": "Nieograniczone",
+        "from_registrations": "Z {{count}} rejestracji"
+      },
+      "actions": {
+        "export_registrations": "Eksportuj rejestracje",
+        "email_participants": "Wyślij e-mail do uczestników",
+        "open_registration": "Otwórz rejestrację",
+        "close_registration": "Zamknij rejestrację",
+        "cancel_event": "Anuluj wydarzenie",
+        "mark_paid": "Oznacz jako opłacone",
+        "send_reminder": "Wyślij przypomnienie",
+        "view": "Zobacz",
+        "export_csv": "Eksportuj CSV",
+        "make_public": "Upublicznij",
+        "make_private": "Ustaw jako prywatne",
+        "feature_event": "Wyróżnij wydarzenie",
+        "remove_feature": "Usuń wyróżnienie",
+        "delete_event": "Usuń wydarzenie"
+      },
+      "tables": {
+        "headers": {
+          "name": "Nazwa",
+          "email": "E-mail",
+          "type": "Typ",
+          "team": "Drużyna",
+          "status": "Status",
+          "payment_status": "Status płatności",
+          "payment_method": "Metoda płatności",
+          "amount": "Kwota",
+          "amount_due": "Kwota do zapłaty",
+          "amount_paid": "Zapłacona kwota",
+          "registered": "Zarejestrowany",
+          "date": "Data",
+          "actions": "Akcje"
+        },
+        "no_registrations": "Brak rejestracji",
+        "unknown": "Nieznany",
+        "na": "Nd"
+      },
+      "confirmations": {
+        "are_you_sure": "Czy jesteś pewien?",
+        "cancel_event_description": "Spowoduje to anulowanie wydarzenia i powiadomienie wszystkich zarejestrowanych uczestników. Ta czynność nie może być cofnięta.",
+        "delete_event_description": "Spowoduje to trwałe usunięcie wydarzenia i wszystkich powiązanych danych. Ta czynność nie może być cofnięta.",
+        "no_keep_event": "Nie, zachowaj wydarzenie",
+        "yes_cancel_event": "Tak, anuluj wydarzenie",
+        "delete_event": "Usuń wydarzenie"
+      },
+      "status_badges": {
+        "draft": "Szkic",
+        "published": "Opublikowano",
+        "registration_open": "Rejestracja otwarta",
+        "registration_closed": "Rejestracja zamknięta",
+        "in_progress": "W trakcie",
+        "completed": "Zakończone",
+        "canceled": "Anulowane"
+      },
+      "payment": {
+        "marking": "Oznaczanie...",
+        "sending": "Wysyłanie...",
+        "reminder_logged": "Przypomnienie zapisane",
+        "canadian_dollars": "CAD"
+      }
     }
   }
 }

@@ -12,22 +12,18 @@ const registry: Map<string, I18nInstance> = (globalThis.__solsticeRequestI18nReg
   new Map<string, I18nInstance>());
 
 async function cloneI18nInstance() {
-  const cloned = await new Promise<I18nInstance>((resolve, reject) => {
-    i18n.cloneInstance({ initImmediate: false }, (error, instance) => {
-      if (error || !instance) {
-        reject(error ?? new Error("Failed to clone i18n instance"));
-        return;
+  const cloned = i18n.cloneInstance({ initImmediate: false });
+
+  if (!cloned.isInitialized) {
+    try {
+      await cloned.init({ ...(i18n.options ?? {}) });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
       }
 
-      resolve(instance);
-    });
-  });
-
-  if (i18nConfig.debug) {
-    console.info("[i18n] created request-scoped instance", {
-      languages: cloned.languages,
-      language: cloned.language,
-    });
+      throw new Error("Failed to initialize cloned i18n instance");
+    }
   }
 
   return cloned;
@@ -36,6 +32,13 @@ async function cloneI18nInstance() {
 export async function createRequestScopedI18n(language: SupportedLanguage) {
   const instance = await cloneI18nInstance();
   await instance.changeLanguage(language);
+
+  if (i18nConfig.debug) {
+    console.info("[i18n] created request-scoped instance", {
+      languages: instance.languages,
+      language: instance.language,
+    });
+  }
 
   const key = randomUUID();
   registry.set(key, instance);

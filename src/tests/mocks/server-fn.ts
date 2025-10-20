@@ -16,21 +16,35 @@ export const createMockServerFn = () => {
     return fn;
   };
 
-  // Add validator method for functions that use it
+  // Add inputValidator method for functions that use it
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  serverFn.validator = <T>(_fn: T) => {
-    // Return an object that has both validator and handler methods
+  serverFn.inputValidator = <T>(_fn: T) => {
+    // Return an object that has both inputValidator and handler methods
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     const validatedFn: any = vi.fn();
     validatedFn.handler = <U>(_fn: U) => serverFn.handler(_fn);
-    validatedFn.validator = <U>(_fn: U) => serverFn.validator(_fn);
+    validatedFn.inputValidator = <U>(_fn: U) => serverFn.inputValidator(_fn);
     return validatedFn;
+  };
+
+  // Keep validator for backward compatibility during migration
+  serverFn.validator = <T>(_fn: T) => {
+    return serverFn.inputValidator(_fn);
   };
 
   return serverFn;
 };
 
+// Mock createServerOnlyFn - this function is used to create server-only dependency functions
+export const createMockServerOnlyFn = () => {
+  return vi.fn().mockImplementation((fn: () => unknown) => {
+    // Return a mock function that calls the original function
+    return fn();
+  });
+};
+
 // Mock module for @tanstack/react-start
 export const mockTanStackStart = {
   createServerFn: createMockServerFn,
+  createServerOnlyFn: createMockServerOnlyFn,
 };

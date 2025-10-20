@@ -1,4 +1,4 @@
-import { createServerFileRoute } from "@tanstack/react-start/server";
+import { createFileRoute } from "@tanstack/react-router";
 
 export async function getAvatarResponse(
   fileParam: string | undefined,
@@ -28,7 +28,11 @@ export async function getAvatarResponse(
   }
 }
 
-export const ServerRoute = createServerFileRoute("/api/avatars/$file").methods({
-  GET: async ({ params }: { params: { file?: string } }) =>
-    getAvatarResponse(params.file),
+export const Route = createFileRoute("/api/avatars/$file")({
+  server: {
+    handlers: {
+      GET: async ({ params }: { params: { file?: string } }) =>
+        getAvatarResponse(params.file),
+    },
+  },
 });

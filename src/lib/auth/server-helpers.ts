@@ -241,8 +241,8 @@ const createAuth = async () => {
             await sendSignInOTP({ to: { email }, otp });
           }
         },
-      }),
-      reactStartCookies(), // MUST be the last plugin
+      }) as any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Better Auth plugin type compatibility with TanStack Start
+      reactStartCookies() as any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Better Auth plugin type compatibility with TanStack Start
     ],
   });
 };

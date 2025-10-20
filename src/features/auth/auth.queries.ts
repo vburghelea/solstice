@@ -9,9 +9,9 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
     const { getAuth } = await import("~/lib/auth/server-helpers");
+    const { getRequest } = await import("@tanstack/react-start/server");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
 
     if (!session?.user) {
@@ -84,9 +84,9 @@ export const changePassword = createServerFn({ method: "POST" }).handler(
   //@ts-expect-error:  Start type inference issue
   async ({ data }: { data: { currentPassword: string; newPassword: string } }) => {
     const { getAuth } = await import("~/lib/auth/server-helpers");
+    const { getRequest } = await import("@tanstack/react-start/server");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { headers } = getRequest();
 
     try {
       await auth.api.changePassword({

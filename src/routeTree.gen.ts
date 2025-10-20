@@ -8,8 +8,6 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createServerRootRoute } from "@tanstack/react-start/server";
-
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as TeamsRouteImport } from "./routes/teams";
 import { Route as SearchRouteImport } from "./routes/search";
@@ -61,6 +59,9 @@ import { Route as AuthSignupRouteImport } from "./routes/auth/signup";
 import { Route as AuthResetPasswordRouteImport } from "./routes/auth/reset-password";
 import { Route as AuthLoginRouteImport } from "./routes/auth/login";
 import { Route as AuthForgotPasswordRouteImport } from "./routes/auth/forgot-password";
+import { Route as ApiTestSquareRouteImport } from "./routes/api/test-square";
+import { Route as ApiHealthRouteImport } from "./routes/api/health";
+import { Route as ApiDebugSquareRouteImport } from "./routes/api/debug-square";
 import { Route as AdminUsersRouteImport } from "./routes/admin/users";
 import { Route as AdminSystemsRouteImport } from "./routes/admin/systems";
 import { Route as AdminSecurityRouteImport } from "./routes/admin/security";
@@ -100,6 +101,17 @@ import { Route as GmCampaignsCreateRouteImport } from "./routes/gm/campaigns/cre
 import { Route as GmCampaignsCampaignIdRouteImport } from "./routes/gm/campaigns.$campaignId";
 import { Route as EventsSlugRegisterRouteImport } from "./routes/events/$slug.register";
 import { Route as DevEmailTemplateRouteImport } from "./routes/dev/email/$template";
+import { Route as ApiWebhooksSquareRouteImport } from "./routes/api/webhooks/square";
+import { Route as ApiTestCleanupRouteImport } from "./routes/api/test/cleanup";
+import { Route as ApiSocialUnfollowRouteImport } from "./routes/api/social/unfollow";
+import { Route as ApiSocialUnblockRouteImport } from "./routes/api/social/unblock";
+import { Route as ApiSocialRelationshipRouteImport } from "./routes/api/social/relationship";
+import { Route as ApiSocialFollowRouteImport } from "./routes/api/social/follow";
+import { Route as ApiSocialBlocklistRouteImport } from "./routes/api/social/blocklist";
+import { Route as ApiSocialBlockRouteImport } from "./routes/api/social/block";
+import { Route as ApiC15tSplatRouteImport } from "./routes/api/c15t/$";
+import { Route as ApiAvatarsFileRouteImport } from "./routes/api/avatars/$file";
+import { Route as ApiAuthSplatRouteImport } from "./routes/api/auth/$";
 import { Route as AdminSystemsSystemIdRouteImport } from "./routes/admin/systems/$systemId";
 import { Route as PlayerTeamsTeamIdIndexRouteImport } from "./routes/player/teams/$teamId.index";
 import { Route as PlayerProfileBlocklistIndexRouteImport } from "./routes/player/profile/blocklist/index";
@@ -109,25 +121,9 @@ import { Route as PlayerTeamsTeamIdManageRouteImport } from "./routes/player/tea
 import { Route as PlayerEventsEventIdManageRouteImport } from "./routes/player/events/$eventId.manage";
 import { Route as PlayerCampaignsCampaignIdZeroRouteImport } from "./routes/player/campaigns/$campaignId/zero";
 import { Route as OpsEventsEventIdManageRouteImport } from "./routes/ops/events/$eventId.manage";
+import { Route as ApiPaymentsSquareCallbackRouteImport } from "./routes/api/payments/square/callback";
+import { Route as ApiAuthActionProviderRouteImport } from "./routes/api/auth/$action/$provider";
 import { Route as ApiAdminUsersDeleteRouteImport } from "./routes/api/admin/users/delete";
-import { ServerRoute as ApiTestSquareServerRouteImport } from "./routes/api/test-square";
-import { ServerRoute as ApiHealthServerRouteImport } from "./routes/api/health";
-import { ServerRoute as ApiDebugSquareServerRouteImport } from "./routes/api/debug-square";
-import { ServerRoute as ApiWebhooksSquareServerRouteImport } from "./routes/api/webhooks/square";
-import { ServerRoute as ApiTestCleanupServerRouteImport } from "./routes/api/test/cleanup";
-import { ServerRoute as ApiSocialUnfollowServerRouteImport } from "./routes/api/social/unfollow";
-import { ServerRoute as ApiSocialUnblockServerRouteImport } from "./routes/api/social/unblock";
-import { ServerRoute as ApiSocialRelationshipServerRouteImport } from "./routes/api/social/relationship";
-import { ServerRoute as ApiSocialFollowServerRouteImport } from "./routes/api/social/follow";
-import { ServerRoute as ApiSocialBlocklistServerRouteImport } from "./routes/api/social/blocklist";
-import { ServerRoute as ApiSocialBlockServerRouteImport } from "./routes/api/social/block";
-import { ServerRoute as ApiC15tSplatServerRouteImport } from "./routes/api/c15t/$";
-import { ServerRoute as ApiAvatarsFileServerRouteImport } from "./routes/api/avatars/$file";
-import { ServerRoute as ApiAuthSplatServerRouteImport } from "./routes/api/auth/$";
-import { ServerRoute as ApiPaymentsSquareCallbackServerRouteImport } from "./routes/api/payments/square/callback";
-import { ServerRoute as ApiAuthActionProviderServerRouteImport } from "./routes/api/auth/$action/$provider";
-
-const rootServerRouteImport = createServerRootRoute();
 
 const TeamsRoute = TeamsRouteImport.update({
   id: "/teams",
@@ -384,6 +380,21 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: "/forgot-password",
   getParentRoute: () => AuthRouteRoute,
 } as any);
+const ApiTestSquareRoute = ApiTestSquareRouteImport.update({
+  id: "/api/test-square",
+  path: "/api/test-square",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: "/api/health",
+  path: "/api/health",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiDebugSquareRoute = ApiDebugSquareRouteImport.update({
+  id: "/api/debug-square",
+  path: "/api/debug-square",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: "/users",
   path: "/users",
@@ -580,6 +591,61 @@ const DevEmailTemplateRoute = DevEmailTemplateRouteImport.update({
   path: "/dev/email/$template",
   getParentRoute: () => rootRouteImport,
 } as any);
+const ApiWebhooksSquareRoute = ApiWebhooksSquareRouteImport.update({
+  id: "/api/webhooks/square",
+  path: "/api/webhooks/square",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiTestCleanupRoute = ApiTestCleanupRouteImport.update({
+  id: "/api/test/cleanup",
+  path: "/api/test/cleanup",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiSocialUnfollowRoute = ApiSocialUnfollowRouteImport.update({
+  id: "/api/social/unfollow",
+  path: "/api/social/unfollow",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiSocialUnblockRoute = ApiSocialUnblockRouteImport.update({
+  id: "/api/social/unblock",
+  path: "/api/social/unblock",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiSocialRelationshipRoute = ApiSocialRelationshipRouteImport.update({
+  id: "/api/social/relationship",
+  path: "/api/social/relationship",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiSocialFollowRoute = ApiSocialFollowRouteImport.update({
+  id: "/api/social/follow",
+  path: "/api/social/follow",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiSocialBlocklistRoute = ApiSocialBlocklistRouteImport.update({
+  id: "/api/social/blocklist",
+  path: "/api/social/blocklist",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiSocialBlockRoute = ApiSocialBlockRouteImport.update({
+  id: "/api/social/block",
+  path: "/api/social/block",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiC15tSplatRoute = ApiC15tSplatRouteImport.update({
+  id: "/api/c15t/$",
+  path: "/api/c15t/$",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiAvatarsFileRoute = ApiAvatarsFileRouteImport.update({
+  id: "/api/avatars/$file",
+  path: "/api/avatars/$file",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: "/api/auth/$",
+  path: "/api/auth/$",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const AdminSystemsSystemIdRoute = AdminSystemsSystemIdRouteImport.update({
   id: "/$systemId",
   path: "/$systemId",
@@ -630,95 +696,22 @@ const OpsEventsEventIdManageRoute = OpsEventsEventIdManageRouteImport.update({
   path: "/manage",
   getParentRoute: () => OpsEventsEventIdRoute,
 } as any);
+const ApiPaymentsSquareCallbackRoute =
+  ApiPaymentsSquareCallbackRouteImport.update({
+    id: "/api/payments/square/callback",
+    path: "/api/payments/square/callback",
+    getParentRoute: () => rootRouteImport,
+  } as any);
+const ApiAuthActionProviderRoute = ApiAuthActionProviderRouteImport.update({
+  id: "/api/auth/$action/$provider",
+  path: "/api/auth/$action/$provider",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const ApiAdminUsersDeleteRoute = ApiAdminUsersDeleteRouteImport.update({
   id: "/api/admin/users/delete",
   path: "/api/admin/users/delete",
   getParentRoute: () => rootRouteImport,
 } as any);
-const ApiTestSquareServerRoute = ApiTestSquareServerRouteImport.update({
-  id: "/api/test-square",
-  path: "/api/test-square",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiHealthServerRoute = ApiHealthServerRouteImport.update({
-  id: "/api/health",
-  path: "/api/health",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiDebugSquareServerRoute = ApiDebugSquareServerRouteImport.update({
-  id: "/api/debug-square",
-  path: "/api/debug-square",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiWebhooksSquareServerRoute = ApiWebhooksSquareServerRouteImport.update({
-  id: "/api/webhooks/square",
-  path: "/api/webhooks/square",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiTestCleanupServerRoute = ApiTestCleanupServerRouteImport.update({
-  id: "/api/test/cleanup",
-  path: "/api/test/cleanup",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiSocialUnfollowServerRoute = ApiSocialUnfollowServerRouteImport.update({
-  id: "/api/social/unfollow",
-  path: "/api/social/unfollow",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiSocialUnblockServerRoute = ApiSocialUnblockServerRouteImport.update({
-  id: "/api/social/unblock",
-  path: "/api/social/unblock",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiSocialRelationshipServerRoute =
-  ApiSocialRelationshipServerRouteImport.update({
-    id: "/api/social/relationship",
-    path: "/api/social/relationship",
-    getParentRoute: () => rootServerRouteImport,
-  } as any);
-const ApiSocialFollowServerRoute = ApiSocialFollowServerRouteImport.update({
-  id: "/api/social/follow",
-  path: "/api/social/follow",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiSocialBlocklistServerRoute =
-  ApiSocialBlocklistServerRouteImport.update({
-    id: "/api/social/blocklist",
-    path: "/api/social/blocklist",
-    getParentRoute: () => rootServerRouteImport,
-  } as any);
-const ApiSocialBlockServerRoute = ApiSocialBlockServerRouteImport.update({
-  id: "/api/social/block",
-  path: "/api/social/block",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiC15tSplatServerRoute = ApiC15tSplatServerRouteImport.update({
-  id: "/api/c15t/$",
-  path: "/api/c15t/$",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiAvatarsFileServerRoute = ApiAvatarsFileServerRouteImport.update({
-  id: "/api/avatars/$file",
-  path: "/api/avatars/$file",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
-  id: "/api/auth/$",
-  path: "/api/auth/$",
-  getParentRoute: () => rootServerRouteImport,
-} as any);
-const ApiPaymentsSquareCallbackServerRoute =
-  ApiPaymentsSquareCallbackServerRouteImport.update({
-    id: "/api/payments/square/callback",
-    path: "/api/payments/square/callback",
-    getParentRoute: () => rootServerRouteImport,
-  } as any);
-const ApiAuthActionProviderServerRoute =
-  ApiAuthActionProviderServerRouteImport.update({
-    id: "/api/auth/$action/$provider",
-    path: "/api/auth/$action/$provider",
-    getParentRoute: () => rootServerRouteImport,
-  } as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
@@ -741,6 +734,9 @@ export interface FileRoutesByFullPath {
   "/admin/security": typeof AdminSecurityRoute;
   "/admin/systems": typeof AdminSystemsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
+  "/api/debug-square": typeof ApiDebugSquareRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/api/test-square": typeof ApiTestSquareRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
@@ -781,6 +777,17 @@ export interface FileRoutesByFullPath {
   "/resources/": typeof ResourcesIndexRoute;
   "/systems": typeof SystemsIndexRoute;
   "/admin/systems/$systemId": typeof AdminSystemsSystemIdRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/api/avatars/$file": typeof ApiAvatarsFileRoute;
+  "/api/c15t/$": typeof ApiC15tSplatRoute;
+  "/api/social/block": typeof ApiSocialBlockRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistRoute;
+  "/api/social/follow": typeof ApiSocialFollowRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/gm/campaigns/$campaignId": typeof GmCampaignsCampaignIdRoute;
@@ -812,6 +819,8 @@ export interface FileRoutesByFullPath {
   "/player/settings": typeof PlayerSettingsIndexRoute;
   "/player/teams/": typeof PlayerTeamsIndexRoute;
   "/api/admin/users/delete": typeof ApiAdminUsersDeleteRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
   "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
   "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
@@ -834,6 +843,9 @@ export interface FileRoutesByTo {
   "/admin/insights": typeof AdminInsightsRoute;
   "/admin/security": typeof AdminSecurityRoute;
   "/admin/users": typeof AdminUsersRoute;
+  "/api/debug-square": typeof ApiDebugSquareRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/api/test-square": typeof ApiTestSquareRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
@@ -866,6 +878,17 @@ export interface FileRoutesByTo {
   "/resources": typeof ResourcesIndexRoute;
   "/systems": typeof SystemsIndexRoute;
   "/admin/systems/$systemId": typeof AdminSystemsSystemIdRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/api/avatars/$file": typeof ApiAvatarsFileRoute;
+  "/api/c15t/$": typeof ApiC15tSplatRoute;
+  "/api/social/block": typeof ApiSocialBlockRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistRoute;
+  "/api/social/follow": typeof ApiSocialFollowRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/gm/campaigns/$campaignId": typeof GmCampaignsCampaignIdRoute;
@@ -895,6 +918,8 @@ export interface FileRoutesByTo {
   "/player/settings": typeof PlayerSettingsIndexRoute;
   "/player/teams": typeof PlayerTeamsIndexRoute;
   "/api/admin/users/delete": typeof ApiAdminUsersDeleteRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
   "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
   "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
@@ -926,6 +951,9 @@ export interface FileRoutesById {
   "/admin/security": typeof AdminSecurityRoute;
   "/admin/systems": typeof AdminSystemsRouteWithChildren;
   "/admin/users": typeof AdminUsersRoute;
+  "/api/debug-square": typeof ApiDebugSquareRoute;
+  "/api/health": typeof ApiHealthRoute;
+  "/api/test-square": typeof ApiTestSquareRoute;
   "/auth/forgot-password": typeof AuthForgotPasswordRoute;
   "/auth/login": typeof AuthLoginRoute;
   "/auth/reset-password": typeof AuthResetPasswordRoute;
@@ -966,6 +994,17 @@ export interface FileRoutesById {
   "/resources/": typeof ResourcesIndexRoute;
   "/systems/": typeof SystemsIndexRoute;
   "/admin/systems/$systemId": typeof AdminSystemsSystemIdRoute;
+  "/api/auth/$": typeof ApiAuthSplatRoute;
+  "/api/avatars/$file": typeof ApiAvatarsFileRoute;
+  "/api/c15t/$": typeof ApiC15tSplatRoute;
+  "/api/social/block": typeof ApiSocialBlockRoute;
+  "/api/social/blocklist": typeof ApiSocialBlocklistRoute;
+  "/api/social/follow": typeof ApiSocialFollowRoute;
+  "/api/social/relationship": typeof ApiSocialRelationshipRoute;
+  "/api/social/unblock": typeof ApiSocialUnblockRoute;
+  "/api/social/unfollow": typeof ApiSocialUnfollowRoute;
+  "/api/test/cleanup": typeof ApiTestCleanupRoute;
+  "/api/webhooks/square": typeof ApiWebhooksSquareRoute;
   "/dev/email/$template": typeof DevEmailTemplateRoute;
   "/events/$slug/register": typeof EventsSlugRegisterRoute;
   "/gm/campaigns/$campaignId": typeof GmCampaignsCampaignIdRoute;
@@ -997,6 +1036,8 @@ export interface FileRoutesById {
   "/player/settings/": typeof PlayerSettingsIndexRoute;
   "/player/teams/": typeof PlayerTeamsIndexRoute;
   "/api/admin/users/delete": typeof ApiAdminUsersDeleteRoute;
+  "/api/auth/$action/$provider": typeof ApiAuthActionProviderRoute;
+  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackRoute;
   "/ops/events/$eventId/manage": typeof OpsEventsEventIdManageRoute;
   "/player/campaigns/$campaignId/zero": typeof PlayerCampaignsCampaignIdZeroRoute;
   "/player/events/$eventId/manage": typeof PlayerEventsEventIdManageRoute;
@@ -1029,6 +1070,9 @@ export interface FileRouteTypes {
     | "/admin/security"
     | "/admin/systems"
     | "/admin/users"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
     | "/auth/forgot-password"
     | "/auth/login"
     | "/auth/reset-password"
@@ -1069,6 +1113,17 @@ export interface FileRouteTypes {
     | "/resources/"
     | "/systems"
     | "/admin/systems/$systemId"
+    | "/api/auth/$"
+    | "/api/avatars/$file"
+    | "/api/c15t/$"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
     | "/dev/email/$template"
     | "/events/$slug/register"
     | "/gm/campaigns/$campaignId"
@@ -1100,6 +1155,8 @@ export interface FileRouteTypes {
     | "/player/settings"
     | "/player/teams/"
     | "/api/admin/users/delete"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback"
     | "/ops/events/$eventId/manage"
     | "/player/campaigns/$campaignId/zero"
     | "/player/events/$eventId/manage"
@@ -1122,6 +1179,9 @@ export interface FileRouteTypes {
     | "/admin/insights"
     | "/admin/security"
     | "/admin/users"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
     | "/auth/forgot-password"
     | "/auth/login"
     | "/auth/reset-password"
@@ -1154,6 +1214,17 @@ export interface FileRouteTypes {
     | "/resources"
     | "/systems"
     | "/admin/systems/$systemId"
+    | "/api/auth/$"
+    | "/api/avatars/$file"
+    | "/api/c15t/$"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
     | "/dev/email/$template"
     | "/events/$slug/register"
     | "/gm/campaigns/$campaignId"
@@ -1183,6 +1254,8 @@ export interface FileRouteTypes {
     | "/player/settings"
     | "/player/teams"
     | "/api/admin/users/delete"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback"
     | "/ops/events/$eventId/manage"
     | "/player/campaigns/$campaignId/zero"
     | "/player/events/$eventId/manage"
@@ -1213,6 +1286,9 @@ export interface FileRouteTypes {
     | "/admin/security"
     | "/admin/systems"
     | "/admin/users"
+    | "/api/debug-square"
+    | "/api/health"
+    | "/api/test-square"
     | "/auth/forgot-password"
     | "/auth/login"
     | "/auth/reset-password"
@@ -1253,6 +1329,17 @@ export interface FileRouteTypes {
     | "/resources/"
     | "/systems/"
     | "/admin/systems/$systemId"
+    | "/api/auth/$"
+    | "/api/avatars/$file"
+    | "/api/c15t/$"
+    | "/api/social/block"
+    | "/api/social/blocklist"
+    | "/api/social/follow"
+    | "/api/social/relationship"
+    | "/api/social/unblock"
+    | "/api/social/unfollow"
+    | "/api/test/cleanup"
+    | "/api/webhooks/square"
     | "/dev/email/$template"
     | "/events/$slug/register"
     | "/gm/campaigns/$campaignId"
@@ -1284,6 +1371,8 @@ export interface FileRouteTypes {
     | "/player/settings/"
     | "/player/teams/"
     | "/api/admin/users/delete"
+    | "/api/auth/$action/$provider"
+    | "/api/payments/square/callback"
     | "/ops/events/$eventId/manage"
     | "/player/campaigns/$campaignId/zero"
     | "/player/events/$eventId/manage"
@@ -1306,143 +1395,29 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRouteWithChildren;
   SearchRoute: typeof SearchRoute;
   TeamsRoute: typeof TeamsRoute;
+  ApiDebugSquareRoute: typeof ApiDebugSquareRoute;
+  ApiHealthRoute: typeof ApiHealthRoute;
+  ApiTestSquareRoute: typeof ApiTestSquareRoute;
   GameGameIdRoute: typeof GameGameIdRoute;
   ProfileUserIdRoute: typeof ProfileUserIdRoute;
   SystemsSlugRoute: typeof SystemsSlugRoute;
   SystemsIndexRoute: typeof SystemsIndexRoute;
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute;
+  ApiAvatarsFileRoute: typeof ApiAvatarsFileRoute;
+  ApiC15tSplatRoute: typeof ApiC15tSplatRoute;
+  ApiSocialBlockRoute: typeof ApiSocialBlockRoute;
+  ApiSocialBlocklistRoute: typeof ApiSocialBlocklistRoute;
+  ApiSocialFollowRoute: typeof ApiSocialFollowRoute;
+  ApiSocialRelationshipRoute: typeof ApiSocialRelationshipRoute;
+  ApiSocialUnblockRoute: typeof ApiSocialUnblockRoute;
+  ApiSocialUnfollowRoute: typeof ApiSocialUnfollowRoute;
+  ApiTestCleanupRoute: typeof ApiTestCleanupRoute;
+  ApiWebhooksSquareRoute: typeof ApiWebhooksSquareRoute;
   DevEmailTemplateRoute: typeof DevEmailTemplateRoute;
   DevEmailIndexRoute: typeof DevEmailIndexRoute;
   ApiAdminUsersDeleteRoute: typeof ApiAdminUsersDeleteRoute;
-}
-export interface FileServerRoutesByFullPath {
-  "/api/debug-square": typeof ApiDebugSquareServerRoute;
-  "/api/health": typeof ApiHealthServerRoute;
-  "/api/test-square": typeof ApiTestSquareServerRoute;
-  "/api/auth/$": typeof ApiAuthSplatServerRoute;
-  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
-  "/api/c15t/$": typeof ApiC15tSplatServerRoute;
-  "/api/social/block": typeof ApiSocialBlockServerRoute;
-  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
-  "/api/social/follow": typeof ApiSocialFollowServerRoute;
-  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
-  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
-  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
-  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
-  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
-  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
-  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
-}
-export interface FileServerRoutesByTo {
-  "/api/debug-square": typeof ApiDebugSquareServerRoute;
-  "/api/health": typeof ApiHealthServerRoute;
-  "/api/test-square": typeof ApiTestSquareServerRoute;
-  "/api/auth/$": typeof ApiAuthSplatServerRoute;
-  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
-  "/api/c15t/$": typeof ApiC15tSplatServerRoute;
-  "/api/social/block": typeof ApiSocialBlockServerRoute;
-  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
-  "/api/social/follow": typeof ApiSocialFollowServerRoute;
-  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
-  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
-  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
-  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
-  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
-  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
-  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
-}
-export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport;
-  "/api/debug-square": typeof ApiDebugSquareServerRoute;
-  "/api/health": typeof ApiHealthServerRoute;
-  "/api/test-square": typeof ApiTestSquareServerRoute;
-  "/api/auth/$": typeof ApiAuthSplatServerRoute;
-  "/api/avatars/$file": typeof ApiAvatarsFileServerRoute;
-  "/api/c15t/$": typeof ApiC15tSplatServerRoute;
-  "/api/social/block": typeof ApiSocialBlockServerRoute;
-  "/api/social/blocklist": typeof ApiSocialBlocklistServerRoute;
-  "/api/social/follow": typeof ApiSocialFollowServerRoute;
-  "/api/social/relationship": typeof ApiSocialRelationshipServerRoute;
-  "/api/social/unblock": typeof ApiSocialUnblockServerRoute;
-  "/api/social/unfollow": typeof ApiSocialUnfollowServerRoute;
-  "/api/test/cleanup": typeof ApiTestCleanupServerRoute;
-  "/api/webhooks/square": typeof ApiWebhooksSquareServerRoute;
-  "/api/auth/$action/$provider": typeof ApiAuthActionProviderServerRoute;
-  "/api/payments/square/callback": typeof ApiPaymentsSquareCallbackServerRoute;
-}
-export interface FileServerRouteTypes {
-  fileServerRoutesByFullPath: FileServerRoutesByFullPath;
-  fullPaths:
-    | "/api/debug-square"
-    | "/api/health"
-    | "/api/test-square"
-    | "/api/auth/$"
-    | "/api/avatars/$file"
-    | "/api/c15t/$"
-    | "/api/social/block"
-    | "/api/social/blocklist"
-    | "/api/social/follow"
-    | "/api/social/relationship"
-    | "/api/social/unblock"
-    | "/api/social/unfollow"
-    | "/api/test/cleanup"
-    | "/api/webhooks/square"
-    | "/api/auth/$action/$provider"
-    | "/api/payments/square/callback";
-  fileServerRoutesByTo: FileServerRoutesByTo;
-  to:
-    | "/api/debug-square"
-    | "/api/health"
-    | "/api/test-square"
-    | "/api/auth/$"
-    | "/api/avatars/$file"
-    | "/api/c15t/$"
-    | "/api/social/block"
-    | "/api/social/blocklist"
-    | "/api/social/follow"
-    | "/api/social/relationship"
-    | "/api/social/unblock"
-    | "/api/social/unfollow"
-    | "/api/test/cleanup"
-    | "/api/webhooks/square"
-    | "/api/auth/$action/$provider"
-    | "/api/payments/square/callback";
-  id:
-    | "__root__"
-    | "/api/debug-square"
-    | "/api/health"
-    | "/api/test-square"
-    | "/api/auth/$"
-    | "/api/avatars/$file"
-    | "/api/c15t/$"
-    | "/api/social/block"
-    | "/api/social/blocklist"
-    | "/api/social/follow"
-    | "/api/social/relationship"
-    | "/api/social/unblock"
-    | "/api/social/unfollow"
-    | "/api/test/cleanup"
-    | "/api/webhooks/square"
-    | "/api/auth/$action/$provider"
-    | "/api/payments/square/callback";
-  fileServerRoutesById: FileServerRoutesById;
-}
-export interface RootServerRouteChildren {
-  ApiDebugSquareServerRoute: typeof ApiDebugSquareServerRoute;
-  ApiHealthServerRoute: typeof ApiHealthServerRoute;
-  ApiTestSquareServerRoute: typeof ApiTestSquareServerRoute;
-  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute;
-  ApiAvatarsFileServerRoute: typeof ApiAvatarsFileServerRoute;
-  ApiC15tSplatServerRoute: typeof ApiC15tSplatServerRoute;
-  ApiSocialBlockServerRoute: typeof ApiSocialBlockServerRoute;
-  ApiSocialBlocklistServerRoute: typeof ApiSocialBlocklistServerRoute;
-  ApiSocialFollowServerRoute: typeof ApiSocialFollowServerRoute;
-  ApiSocialRelationshipServerRoute: typeof ApiSocialRelationshipServerRoute;
-  ApiSocialUnblockServerRoute: typeof ApiSocialUnblockServerRoute;
-  ApiSocialUnfollowServerRoute: typeof ApiSocialUnfollowServerRoute;
-  ApiTestCleanupServerRoute: typeof ApiTestCleanupServerRoute;
-  ApiWebhooksSquareServerRoute: typeof ApiWebhooksSquareServerRoute;
-  ApiAuthActionProviderServerRoute: typeof ApiAuthActionProviderServerRoute;
-  ApiPaymentsSquareCallbackServerRoute: typeof ApiPaymentsSquareCallbackServerRoute;
+  ApiAuthActionProviderRoute: typeof ApiAuthActionProviderRoute;
+  ApiPaymentsSquareCallbackRoute: typeof ApiPaymentsSquareCallbackRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -1797,6 +1772,27 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };
+    "/api/test-square": {
+      id: "/api/test-square";
+      path: "/api/test-square";
+      fullPath: "/api/test-square";
+      preLoaderRoute: typeof ApiTestSquareRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/health": {
+      id: "/api/health";
+      path: "/api/health";
+      fullPath: "/api/health";
+      preLoaderRoute: typeof ApiHealthRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/debug-square": {
+      id: "/api/debug-square";
+      path: "/api/debug-square";
+      fullPath: "/api/debug-square";
+      preLoaderRoute: typeof ApiDebugSquareRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/admin/users": {
       id: "/admin/users";
       path: "/users";
@@ -2070,6 +2066,83 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DevEmailTemplateRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/api/webhooks/square": {
+      id: "/api/webhooks/square";
+      path: "/api/webhooks/square";
+      fullPath: "/api/webhooks/square";
+      preLoaderRoute: typeof ApiWebhooksSquareRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/test/cleanup": {
+      id: "/api/test/cleanup";
+      path: "/api/test/cleanup";
+      fullPath: "/api/test/cleanup";
+      preLoaderRoute: typeof ApiTestCleanupRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/social/unfollow": {
+      id: "/api/social/unfollow";
+      path: "/api/social/unfollow";
+      fullPath: "/api/social/unfollow";
+      preLoaderRoute: typeof ApiSocialUnfollowRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/social/unblock": {
+      id: "/api/social/unblock";
+      path: "/api/social/unblock";
+      fullPath: "/api/social/unblock";
+      preLoaderRoute: typeof ApiSocialUnblockRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/social/relationship": {
+      id: "/api/social/relationship";
+      path: "/api/social/relationship";
+      fullPath: "/api/social/relationship";
+      preLoaderRoute: typeof ApiSocialRelationshipRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/social/follow": {
+      id: "/api/social/follow";
+      path: "/api/social/follow";
+      fullPath: "/api/social/follow";
+      preLoaderRoute: typeof ApiSocialFollowRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/social/blocklist": {
+      id: "/api/social/blocklist";
+      path: "/api/social/blocklist";
+      fullPath: "/api/social/blocklist";
+      preLoaderRoute: typeof ApiSocialBlocklistRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/social/block": {
+      id: "/api/social/block";
+      path: "/api/social/block";
+      fullPath: "/api/social/block";
+      preLoaderRoute: typeof ApiSocialBlockRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/c15t/$": {
+      id: "/api/c15t/$";
+      path: "/api/c15t/$";
+      fullPath: "/api/c15t/$";
+      preLoaderRoute: typeof ApiC15tSplatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/avatars/$file": {
+      id: "/api/avatars/$file";
+      path: "/api/avatars/$file";
+      fullPath: "/api/avatars/$file";
+      preLoaderRoute: typeof ApiAvatarsFileRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/auth/$": {
+      id: "/api/auth/$";
+      path: "/api/auth/$";
+      fullPath: "/api/auth/$";
+      preLoaderRoute: typeof ApiAuthSplatRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/admin/systems/$systemId": {
       id: "/admin/systems/$systemId";
       path: "/$systemId";
@@ -2133,128 +2206,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof OpsEventsEventIdManageRouteImport;
       parentRoute: typeof OpsEventsEventIdRoute;
     };
+    "/api/payments/square/callback": {
+      id: "/api/payments/square/callback";
+      path: "/api/payments/square/callback";
+      fullPath: "/api/payments/square/callback";
+      preLoaderRoute: typeof ApiPaymentsSquareCallbackRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/api/auth/$action/$provider": {
+      id: "/api/auth/$action/$provider";
+      path: "/api/auth/$action/$provider";
+      fullPath: "/api/auth/$action/$provider";
+      preLoaderRoute: typeof ApiAuthActionProviderRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/api/admin/users/delete": {
       id: "/api/admin/users/delete";
       path: "/api/admin/users/delete";
       fullPath: "/api/admin/users/delete";
       preLoaderRoute: typeof ApiAdminUsersDeleteRouteImport;
       parentRoute: typeof rootRouteImport;
-    };
-  }
-}
-declare module "@tanstack/react-start/server" {
-  interface ServerFileRoutesByPath {
-    "/api/test-square": {
-      id: "/api/test-square";
-      path: "/api/test-square";
-      fullPath: "/api/test-square";
-      preLoaderRoute: typeof ApiTestSquareServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/health": {
-      id: "/api/health";
-      path: "/api/health";
-      fullPath: "/api/health";
-      preLoaderRoute: typeof ApiHealthServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/debug-square": {
-      id: "/api/debug-square";
-      path: "/api/debug-square";
-      fullPath: "/api/debug-square";
-      preLoaderRoute: typeof ApiDebugSquareServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/webhooks/square": {
-      id: "/api/webhooks/square";
-      path: "/api/webhooks/square";
-      fullPath: "/api/webhooks/square";
-      preLoaderRoute: typeof ApiWebhooksSquareServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/test/cleanup": {
-      id: "/api/test/cleanup";
-      path: "/api/test/cleanup";
-      fullPath: "/api/test/cleanup";
-      preLoaderRoute: typeof ApiTestCleanupServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/social/unfollow": {
-      id: "/api/social/unfollow";
-      path: "/api/social/unfollow";
-      fullPath: "/api/social/unfollow";
-      preLoaderRoute: typeof ApiSocialUnfollowServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/social/unblock": {
-      id: "/api/social/unblock";
-      path: "/api/social/unblock";
-      fullPath: "/api/social/unblock";
-      preLoaderRoute: typeof ApiSocialUnblockServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/social/relationship": {
-      id: "/api/social/relationship";
-      path: "/api/social/relationship";
-      fullPath: "/api/social/relationship";
-      preLoaderRoute: typeof ApiSocialRelationshipServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/social/follow": {
-      id: "/api/social/follow";
-      path: "/api/social/follow";
-      fullPath: "/api/social/follow";
-      preLoaderRoute: typeof ApiSocialFollowServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/social/blocklist": {
-      id: "/api/social/blocklist";
-      path: "/api/social/blocklist";
-      fullPath: "/api/social/blocklist";
-      preLoaderRoute: typeof ApiSocialBlocklistServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/social/block": {
-      id: "/api/social/block";
-      path: "/api/social/block";
-      fullPath: "/api/social/block";
-      preLoaderRoute: typeof ApiSocialBlockServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/c15t/$": {
-      id: "/api/c15t/$";
-      path: "/api/c15t/$";
-      fullPath: "/api/c15t/$";
-      preLoaderRoute: typeof ApiC15tSplatServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/avatars/$file": {
-      id: "/api/avatars/$file";
-      path: "/api/avatars/$file";
-      fullPath: "/api/avatars/$file";
-      preLoaderRoute: typeof ApiAvatarsFileServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/auth/$": {
-      id: "/api/auth/$";
-      path: "/api/auth/$";
-      fullPath: "/api/auth/$";
-      preLoaderRoute: typeof ApiAuthSplatServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/payments/square/callback": {
-      id: "/api/payments/square/callback";
-      path: "/api/payments/square/callback";
-      fullPath: "/api/payments/square/callback";
-      preLoaderRoute: typeof ApiPaymentsSquareCallbackServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
-    };
-    "/api/auth/$action/$provider": {
-      id: "/api/auth/$action/$provider";
-      path: "/api/auth/$action/$provider";
-      fullPath: "/api/auth/$action/$provider";
-      preLoaderRoute: typeof ApiAuthActionProviderServerRouteImport;
-      parentRoute: typeof rootServerRouteImport;
     };
   }
 }
@@ -2640,35 +2611,39 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRouteWithChildren,
   SearchRoute: SearchRoute,
   TeamsRoute: TeamsRoute,
+  ApiDebugSquareRoute: ApiDebugSquareRoute,
+  ApiHealthRoute: ApiHealthRoute,
+  ApiTestSquareRoute: ApiTestSquareRoute,
   GameGameIdRoute: GameGameIdRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
   SystemsSlugRoute: SystemsSlugRoute,
   SystemsIndexRoute: SystemsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAvatarsFileRoute: ApiAvatarsFileRoute,
+  ApiC15tSplatRoute: ApiC15tSplatRoute,
+  ApiSocialBlockRoute: ApiSocialBlockRoute,
+  ApiSocialBlocklistRoute: ApiSocialBlocklistRoute,
+  ApiSocialFollowRoute: ApiSocialFollowRoute,
+  ApiSocialRelationshipRoute: ApiSocialRelationshipRoute,
+  ApiSocialUnblockRoute: ApiSocialUnblockRoute,
+  ApiSocialUnfollowRoute: ApiSocialUnfollowRoute,
+  ApiTestCleanupRoute: ApiTestCleanupRoute,
+  ApiWebhooksSquareRoute: ApiWebhooksSquareRoute,
   DevEmailTemplateRoute: DevEmailTemplateRoute,
   DevEmailIndexRoute: DevEmailIndexRoute,
   ApiAdminUsersDeleteRoute: ApiAdminUsersDeleteRoute,
+  ApiAuthActionProviderRoute: ApiAuthActionProviderRoute,
+  ApiPaymentsSquareCallbackRoute: ApiPaymentsSquareCallbackRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
-const rootServerRouteChildren: RootServerRouteChildren = {
-  ApiDebugSquareServerRoute: ApiDebugSquareServerRoute,
-  ApiHealthServerRoute: ApiHealthServerRoute,
-  ApiTestSquareServerRoute: ApiTestSquareServerRoute,
-  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
-  ApiAvatarsFileServerRoute: ApiAvatarsFileServerRoute,
-  ApiC15tSplatServerRoute: ApiC15tSplatServerRoute,
-  ApiSocialBlockServerRoute: ApiSocialBlockServerRoute,
-  ApiSocialBlocklistServerRoute: ApiSocialBlocklistServerRoute,
-  ApiSocialFollowServerRoute: ApiSocialFollowServerRoute,
-  ApiSocialRelationshipServerRoute: ApiSocialRelationshipServerRoute,
-  ApiSocialUnblockServerRoute: ApiSocialUnblockServerRoute,
-  ApiSocialUnfollowServerRoute: ApiSocialUnfollowServerRoute,
-  ApiTestCleanupServerRoute: ApiTestCleanupServerRoute,
-  ApiWebhooksSquareServerRoute: ApiWebhooksSquareServerRoute,
-  ApiAuthActionProviderServerRoute: ApiAuthActionProviderServerRoute,
-  ApiPaymentsSquareCallbackServerRoute: ApiPaymentsSquareCallbackServerRoute,
-};
-export const serverRouteTree = rootServerRouteImport
-  ._addFileChildren(rootServerRouteChildren)
-  ._addFileTypes<FileServerRouteTypes>();
+
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
+  interface Register {
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
+  }
+}

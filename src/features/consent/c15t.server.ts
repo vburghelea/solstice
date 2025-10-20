@@ -1,4 +1,4 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 
 const createInstance = async () => {
   const [{ c15tInstance }, { drizzleAdapter }, { default: postgres }, { drizzle }] =
@@ -51,7 +51,7 @@ const createInstance = async () => {
 
 let instancePromise: ReturnType<typeof createInstance> | null = null;
 
-export const getConsentBackend = serverOnly(async () => {
+export const getConsentBackend = createServerOnlyFn(async () => {
   if (!instancePromise) {
     instancePromise = createInstance();
   }

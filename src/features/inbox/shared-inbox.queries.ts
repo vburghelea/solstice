@@ -1472,7 +1472,7 @@ async function buildAdminSnapshot(db: DbClient): Promise<SharedInboxSnapshot> {
 }
 
 export const getSharedInboxSnapshot = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       persona: personaSchema,
       userId: z.string().nullish(),

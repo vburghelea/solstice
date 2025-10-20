@@ -6,7 +6,7 @@
  * for better maintainability and to reduce bundle size.
  */
 
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import {
   generateTextFromHtml,
   renderCampaignDigestEmail,
@@ -203,7 +203,7 @@ class ResendEmailService {
 }
 
 // Factory function to get the appropriate email service
-const getEmailServiceInternal = serverOnly(async () => {
+const getEmailServiceInternal = createServerOnlyFn(async () => {
   const useResend = process.env["RESEND_API_KEY"] && process.env["NODE_ENV"] !== "test";
 
   if (useResend) {
@@ -214,12 +214,12 @@ const getEmailServiceInternal = serverOnly(async () => {
 });
 
 // Exported wrapper functions
-export const getEmailService = serverOnly(async () => {
+export const getEmailService = createServerOnlyFn(async () => {
   return getEmailServiceInternal();
 });
 
 // Convenience function for sending email verification
-export const sendEmailVerification = serverOnly(
+export const sendEmailVerification = createServerOnlyFn(
   async (params: {
     to: { email: string; name?: string | undefined };
     verificationUrl: string;
@@ -255,7 +255,7 @@ export const sendEmailVerification = serverOnly(
 );
 
 // Convenience function for sending membership purchase receipts (migrated from SendGrid)
-export const sendMembershipPurchaseReceipt = serverOnly(
+export const sendMembershipPurchaseReceipt = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     membershipType: string;
@@ -293,7 +293,7 @@ export const sendMembershipPurchaseReceipt = serverOnly(
   },
 );
 
-export const sendTeamInvitationEmail = serverOnly(
+export const sendTeamInvitationEmail = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     teamName: string;
@@ -341,7 +341,7 @@ export const sendTeamInvitationEmail = serverOnly(
   },
 );
 
-export const sendTeamRequestDecisionEmail = serverOnly(
+export const sendTeamRequestDecisionEmail = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     teamName: string;
@@ -387,7 +387,7 @@ export const sendTeamRequestDecisionEmail = serverOnly(
 );
 
 // Convenience function for sending game invitations
-export const sendGameInvitation = serverOnly(
+export const sendGameInvitation = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     inviterName: string;
@@ -436,7 +436,7 @@ export const sendGameInvitation = serverOnly(
 );
 
 // Game: invitation response notification (to inviter)
-export const sendGameInviteResponse = serverOnly(
+export const sendGameInviteResponse = createServerOnlyFn(
   async (params: {
     to: EmailRecipient; // inviter
     inviterName: string;
@@ -470,7 +470,7 @@ export const sendGameInviteResponse = serverOnly(
 );
 
 // Game: status update to participants
-export const sendGameStatusUpdate = serverOnly(
+export const sendGameStatusUpdate = createServerOnlyFn(
   async (params: {
     to: EmailRecipient | EmailRecipient[];
     recipientName?: string; // optional when sending to many
@@ -550,7 +550,7 @@ export const sendGameStatusUpdate = serverOnly(
 );
 
 // Game: reminder
-export const sendGameReminder = serverOnly(
+export const sendGameReminder = createServerOnlyFn(
   async (params: {
     to: EmailRecipient | EmailRecipient[];
     recipientName?: string;
@@ -580,7 +580,7 @@ export const sendGameReminder = serverOnly(
 );
 
 // Campaign: invitation (to invitee)
-export const sendCampaignInvitation = serverOnly(
+export const sendCampaignInvitation = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     inviterName: string;
@@ -621,7 +621,7 @@ export const sendCampaignInvitation = serverOnly(
 );
 
 // Campaign: invite response (to owner)
-export const sendCampaignInviteResponse = serverOnly(
+export const sendCampaignInviteResponse = createServerOnlyFn(
   async (params: {
     to: EmailRecipient; // owner
     ownerName: string;
@@ -657,7 +657,7 @@ export const sendCampaignInviteResponse = serverOnly(
 );
 
 // Campaign: session update
-export const sendCampaignSessionUpdate = serverOnly(
+export const sendCampaignSessionUpdate = createServerOnlyFn(
   async (params: {
     to: EmailRecipient | EmailRecipient[];
     recipientName?: string;
@@ -738,7 +738,7 @@ export const sendCampaignSessionUpdate = serverOnly(
 );
 
 // Campaign: weekly digest
-export const sendCampaignDigest = serverOnly(
+export const sendCampaignDigest = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     recipientName?: string;
@@ -766,7 +766,7 @@ export const sendCampaignDigest = serverOnly(
 );
 
 // Reviews: review reminder
-export const sendReviewReminder = serverOnly(
+export const sendReviewReminder = createServerOnlyFn(
   async (params: {
     to: EmailRecipient;
     recipientName?: string;
@@ -802,7 +802,7 @@ export const sendReviewReminder = serverOnly(
 );
 
 // Auth: welcome email
-export const sendWelcomeEmail = serverOnly(
+export const sendWelcomeEmail = createServerOnlyFn(
   async (params: { to: EmailRecipient; profileUrl: string }) => {
     const service = await getEmailService();
     const htmlContent = await renderWelcomeEmail({
@@ -824,7 +824,7 @@ export const sendWelcomeEmail = serverOnly(
 );
 
 // Convenience function for sending email verification OTP
-export const sendEmailVerificationOTP = serverOnly(
+export const sendEmailVerificationOTP = createServerOnlyFn(
   async (params: { to: EmailRecipient; otp: string }) => {
     const service = await getEmailService();
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
@@ -849,7 +849,7 @@ export const sendEmailVerificationOTP = serverOnly(
 );
 
 // Convenience function for sending password reset OTP
-export const sendPasswordResetOTP = serverOnly(
+export const sendPasswordResetOTP = createServerOnlyFn(
   async (params: { to: EmailRecipient; otp: string }) => {
     const service = await getEmailService();
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
@@ -874,7 +874,7 @@ export const sendPasswordResetOTP = serverOnly(
 );
 
 // Convenience function for sending password reset email
-export const sendPasswordResetEmail = serverOnly(
+export const sendPasswordResetEmail = createServerOnlyFn(
   async (params: {
     to: { email: string; name?: string | undefined };
     resetUrl: string;
@@ -910,7 +910,7 @@ export const sendPasswordResetEmail = serverOnly(
 );
 
 // Convenience function for sending sign-in OTP
-export const sendSignInOTP = serverOnly(
+export const sendSignInOTP = createServerOnlyFn(
   async (params: { to: EmailRecipient; otp: string }) => {
     const service = await getEmailService();
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";

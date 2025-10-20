@@ -47,10 +47,11 @@ vi.mock("drizzle-orm", () => ({
 // Simplify TanStack server function wrapper for unit tests
 vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => ({
-    validator: () => ({
+    inputValidator: () => ({
       handler: (h: unknown) => h,
     }),
   }),
+  createServerOnlyFn: (fn: () => unknown) => fn(),
 }));
 
 function makeDb() {

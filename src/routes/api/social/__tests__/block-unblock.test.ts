@@ -5,8 +5,12 @@ vi.mock("~/features/social", () => ({
   unblockUser: vi.fn(),
 }));
 vi.mock("@tanstack/react-start/server", () => ({
-  getWebRequest: () => ({ headers: new Headers() }),
-  createServerFileRoute: () => ({ methods: () => ({}) }),
+  createFileRoute: () => ({ methods: () => ({}) }),
+  getRequest: () => ({
+    headers: {
+      get: () => null,
+    },
+  }),
 }));
 
 describe("POST /api/social/block|unblock", () => {

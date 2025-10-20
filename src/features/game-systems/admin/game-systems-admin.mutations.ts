@@ -54,12 +54,12 @@ const bulkUpdateAdminSystemsHandler = async ({
       return { updatedIds: updated.map((row) => row.id) };
     }
     case "set-approval": {
-      const [{ getAuth }, { getWebRequest }] = await Promise.all([
+      const [{ getAuth }, { getRequest }] = await Promise.all([
         import("~/lib/auth/server-helpers"),
         import("@tanstack/react-start/server"),
       ]);
       const auth = await getAuth();
-      const { headers } = getWebRequest();
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -203,7 +203,7 @@ const bulkUpdateAdminSystemsHandler = async ({
 };
 
 export const bulkUpdateAdminSystems = createServerFn({ method: "POST" })
-  .validator(bulkUpdateAdminSystemsSchema.parse)
+  .inputValidator(bulkUpdateAdminSystemsSchema.parse)
   .handler(bulkUpdateAdminSystemsHandler);
 
 const createManualGameSystemHandler = async ({
@@ -315,7 +315,7 @@ const createManualGameSystemHandler = async ({
 };
 
 export const createManualGameSystem = createServerFn({ method: "POST" })
-  .validator(createManualGameSystemSchema.parse)
+  .inputValidator(createManualGameSystemSchema.parse)
   .handler(createManualGameSystemHandler);
 
 function slugify(value: string) {

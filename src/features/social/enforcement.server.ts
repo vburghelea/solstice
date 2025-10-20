@@ -1,6 +1,6 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 
-export const cancelPendingBetweenUsers = serverOnly(
+export const cancelPendingBetweenUsers = createServerOnlyFn(
   async (userAId: string, userBId: string): Promise<void> => {
     const { getDb } = await import("~/db/server-helpers");
     const _db = await getDb();

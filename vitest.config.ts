@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
       setupFiles: ["./src/tests/setup.tsx"],
       include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
       exclude: ["node_modules", "dist", ".next", ".cache", "build"],
+      // Remove environmentMatchGlobs since we'll handle environment detection in setup files
       coverage: {
         reporter: ["text", "json", "html"],
         exclude: [

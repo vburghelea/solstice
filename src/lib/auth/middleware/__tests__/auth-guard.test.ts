@@ -11,8 +11,12 @@ vi.mock("~/lib/auth", () => ({
 
 // Mock TanStack Start server functions
 vi.mock("@tanstack/react-start/server", () => ({
-  getWebRequest: vi.fn(() => ({ headers: new Headers() })),
   setResponseStatus: vi.fn(),
+  getRequest: () => ({
+    headers: {
+      get: () => null,
+    },
+  }),
 }));
 
 describe("authMiddleware", () => {

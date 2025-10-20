@@ -469,7 +469,7 @@ async function fetchAdminDirectory({ filters, page, pageSize }: QueryContext) {
 }
 
 export const getAdminUserDirectory = createServerFn({ method: "GET" })
-  .validator((input: unknown) => adminUserFiltersSchema.parse(input ?? {}))
+  .inputValidator((input: unknown) => adminUserFiltersSchema.parse(input ?? {}))
   .handler(async ({ data }) => {
     try {
       const filters = data ?? {};
@@ -487,9 +487,8 @@ export const getAdminUserDirectory = createServerFn({ method: "GET" })
 
 export const exportAdminComplianceReport = createServerFn({
   method: "GET",
-  response: "raw",
 })
-  .validator((input: unknown) => adminUserFiltersSchema.parse(input ?? {}))
+  .inputValidator((input: unknown) => adminUserFiltersSchema.parse(input ?? {}))
   .handler(async ({ data }) => {
     const filters = data ?? {};
     const result = await fetchAdminDirectory({ filters, page: 1, pageSize: 500 });

@@ -12,8 +12,9 @@ vi.mock("~/features/roles/permission.service", () => ({
 // Simplify server function wrapper
 vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => ({
-    validator: () => ({ handler: (h: unknown) => h }),
+    inputValidator: () => ({ handler: (h: unknown) => h }),
   }),
+  createServerOnlyFn: (fn: () => unknown) => fn(),
 }));
 
 // Fake DB layer

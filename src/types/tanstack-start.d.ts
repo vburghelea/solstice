@@ -13,7 +13,7 @@ declare module "@tanstack/start-server-core" {
 }
 
 declare module "@tanstack/react-start/server" {
-  export function createServerFileRoute(): ServerRoute<
+  export function createFileRoute(): ServerRoute<
     AnyServerRouteWithTypes,
     string,
     string,

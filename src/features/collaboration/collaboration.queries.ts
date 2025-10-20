@@ -302,7 +302,7 @@ function buildFeedbackEntry(
 }
 
 export const getCrossPersonaCollaborationSnapshot = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       activePersona: personaSchema,
       userId: z.string().nullish(),

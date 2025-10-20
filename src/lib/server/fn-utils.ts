@@ -39,7 +39,7 @@ export const callServerFn = <TData, TResult>(
   return fn({ data });
 };
 
-// Typed Zod adapter - but note: you can pass schemas directly to .validator()
+// Typed Zod adapter - but note: you can pass schemas directly to .inputValidator()
 export const zod$ =
   <T extends z.ZodTypeAny>(schema: T) =>
   (input: unknown) =>

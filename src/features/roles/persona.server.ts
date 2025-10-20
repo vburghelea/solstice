@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { PermissionService } from "~/features/roles/permission.server";
 import type { PersonaResolution } from "~/features/roles/persona.types";
 import { personaIdSchema } from "~/features/roles/persona.types";
 
@@ -12,19 +13,18 @@ const resolvePersonaInputSchema = z
   .default({});
 
 export const resolvePersonaResolution = createServerFn({ method: "POST" })
-  .validator((input) => resolvePersonaInputSchema.parse(input ?? {}))
+  .inputValidator((input) => resolvePersonaInputSchema.parse(input ?? {}))
   .handler(async ({ data }): Promise<PersonaResolution> => {
-    const [{ PermissionService }, { getAuth }, { getWebRequest }] = await Promise.all([
-      import("~/features/roles/permission.server"),
+    const [{ getAuth }, { getRequest }] = await Promise.all([
       import("~/lib/auth/server-helpers"),
       import("@tanstack/react-start/server"),
     ]);
 
     const auth = await getAuth();
-    const { headers } = getWebRequest();
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
 
-    return PermissionService.resolvePersonaResolution(session?.user?.id ?? null, {
+    return await PermissionService.resolvePersonaResolution(session?.user?.id ?? null, {
       preferredPersonaId: data.preferredPersonaId ?? null,
       forceRefresh: data.forceRefresh ?? false,
     });

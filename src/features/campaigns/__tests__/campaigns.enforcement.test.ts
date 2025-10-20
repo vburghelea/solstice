@@ -89,7 +89,8 @@ vi.mock("~/lib/auth/server-helpers", () => ({
 // Simplify server wrappers
 vi.mock("@tanstack/react-start", () => ({
   __esModule: true,
-  createServerFn: () => ({ validator: () => ({ handler: (h: unknown) => h }) }),
+  createServerFn: () => ({ inputValidator: () => ({ handler: (h: unknown) => h }) }),
+  createServerOnlyFn: (fn: () => unknown) => fn(),
 }));
 
 describe("campaigns social enforcement", () => {

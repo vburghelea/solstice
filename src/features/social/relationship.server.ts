@@ -1,4 +1,4 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 
 type Relationship = {
   follows: boolean; // viewer → target
@@ -12,7 +12,7 @@ type Relationship = {
 const REL_CACHE_TTL_MS = 60_000;
 const relCache = new Map<string, { value: Relationship; expires: number }>();
 
-const getDb = serverOnly(async () => {
+const getDb = createServerOnlyFn(async () => {
   const { db } = await import("~/db");
   return db();
 });
@@ -43,7 +43,7 @@ export function invalidateRelationshipCache(viewerId: string, targetId: string):
   relCache.delete(cacheKey(targetId, viewerId));
 }
 
-export const getRelationship = serverOnly(
+export const getRelationship = createServerOnlyFn(
   async (viewerId: string, targetId: string): Promise<Relationship> => {
     if (!viewerId || !targetId) {
       return {
@@ -127,16 +127,18 @@ export const getRelationship = serverOnly(
   },
 );
 
-export const assertNoBlock = serverOnly(async (viewerId: string, targetId: string) => {
-  const rel = await getRelationship(viewerId, targetId);
-  if (rel.blocked || rel.blockedBy) {
-    const error: Error & { code?: string } = new Error("Interaction not allowed");
-    error.code = "BLOCKED";
-    throw error;
-  }
-});
+export const assertNoBlock = createServerOnlyFn(
+  async (viewerId: string, targetId: string) => {
+    const rel = await getRelationship(viewerId, targetId);
+    if (rel.blocked || rel.blockedBy) {
+      const error: Error & { code?: string } = new Error("Interaction not allowed");
+      error.code = "BLOCKED";
+      throw error;
+    }
+  },
+);
 
-export const isConnectionsOnlyEligible = serverOnly(
+export const isConnectionsOnlyEligible = createServerOnlyFn(
   async (viewerId: string | null | undefined, ownerId: string): Promise<boolean> => {
     if (!viewerId) return false;
     const rel = await getRelationship(viewerId, ownerId);
@@ -167,7 +169,7 @@ async function getUserPrivacySettings(userId: string): Promise<PrivacySettings> 
   }
 }
 
-export const canInvite = serverOnly(
+export const canInvite = createServerOnlyFn(
   async (inviterId: string, inviteeId: string): Promise<boolean> => {
     if (!inviterId || !inviteeId) return false;
     const rel = await getRelationship(inviterId, inviteeId);

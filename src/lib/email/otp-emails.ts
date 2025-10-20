@@ -1,4 +1,4 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import {
   generateTextFromHtml,
   renderEmailVerificationOTP,
@@ -8,7 +8,7 @@ import {
 import { EmailRecipient, getEmailService } from "./resend";
 
 // Convenience function for sending email verification OTP
-export const sendEmailVerificationOTP = serverOnly(
+export const sendEmailVerificationOTP = createServerOnlyFn(
   async (params: { to: EmailRecipient; otp: string }) => {
     const service = await getEmailService();
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
@@ -33,7 +33,7 @@ export const sendEmailVerificationOTP = serverOnly(
 );
 
 // Convenience function for sending password reset OTP
-export const sendPasswordResetOTP = serverOnly(
+export const sendPasswordResetOTP = createServerOnlyFn(
   async (params: { to: EmailRecipient; otp: string }) => {
     const service = await getEmailService();
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";
@@ -58,7 +58,7 @@ export const sendPasswordResetOTP = serverOnly(
 );
 
 // Convenience function for sending sign-in OTP
-export const sendSignInOTP = serverOnly(
+export const sendSignInOTP = createServerOnlyFn(
   async (params: { to: EmailRecipient; otp: string }) => {
     const service = await getEmailService();
     const fromEmail = process.env["RESEND_FROM_EMAIL"] || "noreply@roundup.games";

@@ -14,7 +14,7 @@ import {
  * Get a team by ID with member count
  */
 export const getTeam = createServerFn({ method: "POST" })
-  .validator(zod$(getTeamSchema))
+  .inputValidator(zod$(getTeamSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -44,7 +44,7 @@ export const getTeam = createServerFn({ method: "POST" })
  * Get a team by slug
  */
 export const getTeamBySlug = createServerFn({ method: "POST" })
-  .validator(zod$(getTeamBySlugSchema))
+  .inputValidator(zod$(getTeamBySlugSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -74,7 +74,7 @@ export const getTeamBySlug = createServerFn({ method: "POST" })
  * List all active teams
  */
 export const listTeams = createServerFn({ method: "POST" })
-  .validator(zod$(listTeamsSchema))
+  .inputValidator(zod$(listTeamsSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -112,7 +112,7 @@ export const listTeams = createServerFn({ method: "POST" })
  * Get teams for the current user
  */
 export const getUserTeams = createServerFn({ method: "POST" })
-  .validator(zod$(listTeamsSchema))
+  .inputValidator(zod$(listTeamsSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const [{ getCurrentUser }, { getDb }] = await Promise.all([
@@ -169,7 +169,7 @@ export const getUserTeams = createServerFn({ method: "POST" })
  * Get team members
  */
 export const getTeamMembers = createServerFn({ method: "POST" })
-  .validator(zod$(getTeamMembersSchema))
+  .inputValidator(zod$(getTeamMembersSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -233,7 +233,7 @@ export const getTeamMembers = createServerFn({ method: "POST" })
   });
 
 export const getViewerTeamMembership = createServerFn({ method: "POST" })
-  .validator(zod$(getTeamSchema))
+  .inputValidator(zod$(getTeamSchema))
   .handler(async ({ data }) => {
     const [{ getCurrentUser }, { getDb }, { and, eq }] = await Promise.all([
       import("~/features/auth/auth.queries"),
@@ -323,7 +323,7 @@ export const getPendingTeamInvites = createServerFn({ method: "POST" }).handler(
  * Check if a user is a member of a team
  */
 export const isTeamMember = createServerFn({ method: "POST" })
-  .validator(zod$(isTeamMemberSchema))
+  .inputValidator(zod$(isTeamMemberSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -352,7 +352,7 @@ export const isTeamMember = createServerFn({ method: "POST" })
  * Determine if the current user and a target user are teammates (share the same active team)
  */
 export const areTeammatesWithCurrentUser = createServerFn({ method: "GET" })
-  .validator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const [{ getDb }, { teamMembers }, { and, eq }] = await Promise.all([
       import("~/db/server-helpers"),
@@ -363,8 +363,8 @@ export const areTeammatesWithCurrentUser = createServerFn({ method: "GET" })
     // Get current session user
     const { getAuth } = await import("~/lib/auth/server-helpers");
     const auth = await getAuth();
-    const { getWebRequest } = await import("@tanstack/react-start/server");
-    const { headers } = getWebRequest();
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const { headers } = getRequest();
     const session = await auth.api.getSession({ headers });
     const viewerId = session?.user?.id;
 
@@ -401,7 +401,7 @@ export const areTeammatesWithCurrentUser = createServerFn({ method: "GET" })
  * Search teams by name or city
  */
 export const searchTeams = createServerFn({ method: "POST" })
-  .validator(zod$(searchTeamsSchema))
+  .inputValidator(zod$(searchTeamsSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");

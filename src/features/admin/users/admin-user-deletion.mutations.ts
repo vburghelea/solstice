@@ -11,18 +11,18 @@ const deleteUserSchema = z.object({
 });
 
 export const deleteUser = createServerFn({ method: "POST" })
-  .validator(deleteUserSchema.parse)
+  .inputValidator(deleteUserSchema.parse)
   .handler(async ({ data }) => {
     console.log(`[DELETE USER] Starting deletion for userId: ${data.userId}`);
 
     // Import server-only modules inside the handler
-    const [{ getAuth }, { getWebRequest }] = await Promise.all([
+    const [{ getAuth }, { getRequest }] = await Promise.all([
       import("~/lib/auth/server-helpers"),
       import("@tanstack/react-start/server"),
     ]);
 
     const auth = await getAuth();
-    const { headers } = getWebRequest();
+    const { headers } = getRequest();
     const userSession = await auth.api.getSession({ headers });
 
     console.log(

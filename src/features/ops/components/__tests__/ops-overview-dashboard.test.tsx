@@ -1,9 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ComponentProps, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Setup mocks before imports
 import type { EventListResult, EventWithDetails } from "~/features/events/events.types";
+import { localizedLinkMock, tanStackRouterMock } from "~/tests/mocks";
 
 const queryMocks = vi.hoisted(() => ({
   useQuery: vi.fn(),
@@ -32,47 +33,13 @@ vi.mock("@tanstack/react-query", async () => {
   };
 });
 
-vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, ...rest }: ComponentProps<"a"> & { to?: string }) => (
-    <a {...rest} href={to ?? "#"}>
-      {children}
-    </a>
-  ),
-}));
+// Mock TanStack Router
+vi.mock("@tanstack/react-router", () => tanStackRouterMock);
 
-vi.mock("~/components/ui/SafeLink", () => ({
-  SafeLink: ({
-    to,
-    children,
-    ...rest
-  }: {
-    to: string;
-    children:
-      | ReactNode
-      | ((args: { isActive: boolean; isTransitioning: boolean }) => ReactNode);
-  } & Omit<ComponentProps<"a">, "href">) => (
-    <a href={to} {...rest}>
-      {typeof children === "function"
-        ? children({ isActive: false, isTransitioning: false })
-        : children}
-    </a>
-  ),
-}));
+vi.mock("~/components/ui/LocalizedLink", () => localizedLinkMock);
 
 vi.mock("sonner", () => ({
   toast: toastMocks,
-}));
-
-// Mock the translation hook to return keys instead of translated text
-vi.mock("~/hooks/useTypedTranslation", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useOpsTranslation: () => ({
-    t: (key: string) => key, // Return the key itself - tests shouldn't depend on translation content
-  }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useCommonTranslation: () => ({
-    t: (key: string) => key, // Return the key itself
-  }),
 }));
 
 vi.mock("~/features/events/events.queries", () => ({
@@ -107,9 +74,9 @@ function buildEvent(overrides: Partial<EventWithDetails> = {}): EventWithDetails
     status: "draft",
     venueName: null,
     venueAddress: null,
-    city: "Toronto",
-    province: "ON",
-    country: "Canada",
+    city: "Berlin",
+    province: "Berlin",
+    country: "Germany",
     postalCode: null,
     locationNotes: null,
     startDate: "2024-04-20",
@@ -272,7 +239,7 @@ describe("OpsOverviewDashboard", () => {
           message: "Confirm staffing, safety briefings, and arrival logistics",
           startDate: new Date("2024-04-04"),
           availableSpots: 3,
-          city: "Toronto",
+          city: "Berlin",
         },
       ],
       marketingBreakdown: [],
@@ -299,7 +266,7 @@ describe("OpsOverviewDashboard", () => {
     expect(tabs).toHaveLength(2);
 
     // Test for mission focus section and link by its href
-    const missionLink = screen.getByRole("link", { name: /review_submission/ });
+    const missionLink = screen.getByRole("link", { name: /review submission/i });
     expect(missionLink).toHaveAttribute("href", "/admin/events-review");
 
     // Test for snapshot cards by looking for the grid layout
@@ -361,7 +328,7 @@ describe("OpsOverviewDashboard", () => {
           message: "Confirm staffing, safety briefings, and arrival logistics",
           startDate: new Date("2024-04-04"),
           availableSpots: 3,
-          city: "Toronto",
+          city: "Berlin",
         },
       ],
       marketingBreakdown: [],
@@ -384,7 +351,7 @@ describe("OpsOverviewDashboard", () => {
     const buttons = within(eventRow!).getAllByRole("button");
     const approveButton = buttons.find(
       (button) =>
-        button.textContent?.includes("approve") ||
+        button.textContent?.includes("Approve") ||
         button.getAttribute("name")?.includes("approve"),
     );
     expect(approveButton).toBeInTheDocument();

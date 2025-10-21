@@ -1,7 +1,7 @@
-import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { EventList } from "~/features/events/components/event-list";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 
@@ -39,12 +39,14 @@ function EventsPage() {
           <p className="text-muted-foreground">{t("admin.subtitle")}</p>
         </div>
         {isAuthenticated ? (
-          <Button asChild>
-            <Link to="/ops/events/create">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              {t("admin.create_event")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/ops/events/create"
+            translationKey="links.event_management.create_ops_event"
+            translationNamespace="navigation"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            {t("admin.create_event")}
+          </LocalizedButtonLink>
         ) : null}
       </div>
 

@@ -3,7 +3,7 @@ import { OperationResult } from "~/shared/types/common";
 import { passwordResetRequestSchema, resetPasswordSchema } from "./auth.schemas";
 
 export const requestPasswordReset = createServerFn({ method: "POST" })
-  .validator(passwordResetRequestSchema.parse)
+  .inputValidator(passwordResetRequestSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getAuth } = await import("~/lib/auth/server-helpers");
@@ -28,7 +28,7 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
   });
 
 export const resetPassword = createServerFn({ method: "POST" })
-  .validator(resetPasswordSchema.parse)
+  .inputValidator(resetPasswordSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getAuth } = await import("~/lib/auth/server-helpers");

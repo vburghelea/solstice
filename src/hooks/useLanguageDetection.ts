@@ -15,7 +15,7 @@ import { UserLanguagePreferences } from "~/lib/i18n/types";
  * Server function to get user language preferences
  */
 const getUserLanguagePreferences = createServerFn()
-  .validator(z.object({ userId: z.string().optional() }))
+  .inputValidator(z.object({ userId: z.string().optional() }))
   .handler(async () => {
     // In a real implementation, this would fetch from the database
     // For now, return default preferences
@@ -30,7 +30,7 @@ const getUserLanguagePreferences = createServerFn()
  * Server function to update user language preferences
  */
 const updateUserLanguagePreferences = createServerFn()
-  .validator(
+  .inputValidator(
     z.object({
       userId: z.string().optional(),
       preferredLanguage: z.enum(["en", "de", "pl"]),

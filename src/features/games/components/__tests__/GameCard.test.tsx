@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { GameListItem } from "~/features/games/games.types";
 import { MOCK_GAME } from "~/tests/mocks/games";
 import { renderWithRouter, screen } from "~/tests/utils";
@@ -181,7 +182,7 @@ describe("GameCard", () => {
       },
     );
 
-    const viewButton = screen.getByRole("link", { name: /view game/i });
+    const viewButton = screen.getByRole("link", { name: "View Game Details" });
     expect(viewButton).toBeInTheDocument();
     expect(viewButton).toHaveAttribute("href", "/games/1");
   });

@@ -1,8 +1,8 @@
-# I18n Migration Quickstart Guide
+# I18n Quickstart Guide
 
 ## Overview
 
-The automated i18n migration script can dramatically accelerate the process of replacing hardcoded strings with translation keys. This guide shows you how to use it safely and effectively.
+The migration is the process of replacing hardcoded strings with translation keys. This guide shows you how to do it safely and effectively.
 
 ## Prerequisites
 
@@ -10,236 +10,310 @@ The automated i18n migration script can dramatically accelerate the process of r
 - Run `pnpm i18n:generate-types` to ensure latest types are available
 - Commit any current changes before running migration
 
-## Available Commands
+## 🌐 **Localized Navigation Implementation - Updated Guide**
 
-```bash
-# Test the migration on sample files (recommended first)
-pnpm i18n:migrate:test
+### **Rules for Implementing Localized Navigation Actions**
 
-# Preview what changes would be made to your entire codebase
-pnpm i18n:migrate:dry-run
+After completing the basic i18n migration, follow these rules for implementing localized navigation:
 
-# Actually apply the migration changes
-pnpm i18n:migrate:apply
+#### **1. Use LocalizedLink Components - MANDATORY**
 
-# Verbose output for debugging
-pnpm i18n:migrate:dry-run --verbose
+**❌ AVOID - Regular Link components:**
+
+```tsx
+import { Link } from "@tanstack/react-router";
+
+// Don't do this
+<Link to="/player/games">My Games</Link>
+<a href="/events">Events</a>
 ```
 
-## Migration Strategy
+**✅ CORRECT - Use LocalizedLink variants:**
 
-### Phase 1: Testing (5 minutes)
+```tsx
+import { LocalizedLink, LocalizedNavLink, LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 
-```bash
-# 1. Test on sample files
-pnpm i18n:migrate:test
+// Basic navigation
+<LocalizedNavLink
+  to="/player/games"
+  translationKey="links.game_management.my_games"
+  translationNamespace="navigation"
+/>
 
-# 2. Review the output and ensure it looks correct
-# 3. Check that existing translations are being reused
+// Button-style actions
+<LocalizedButtonLink
+  to="/player/games/create"
+  translationKey="links.game_management.create_game"
+  translationNamespace="navigation"
+/>
+
+// External links
+<LocalizedExternalLink
+  href="https://example.com"
+  translationKey="links.external.continue_to_site"
+  translationNamespace="navigation"
+/>
 ```
 
-### Phase 2: Preview Changes (10 minutes)
+#### **2. Programmatic Navigation Rules**
 
-```bash
-# 1. Run dry-run on full codebase
-pnpm i18n:migrate:dry-run --verbose
+**❌ AVOID - Direct router navigation:**
 
-# 2. Review the report:
-#    - Files with changes
-#    - Sample transformations
-#    - Number of strings replaced
-#    - Any errors detected
+```tsx
+import { useNavigate } from "@tanstack/react-router";
+
+const navigate = useNavigate();
+navigate("/player/games"); // Missing localization
 ```
 
-### Phase 3: Apply Changes (30-60 minutes)
+**✅ CORRECT - Use localized navigation hooks:**
+
+```tsx
+import { useLocalizedNavigation } from "~/lib/i18n/links/hooks";
+
+const { navigateLocalized, changeLanguageAndNavigate } = useLocalizedNavigation();
+
+// Navigate with localization
+await navigateLocalized({
+  to: "/player/games",
+  params: { gameId: game.id },
+});
+
+// Change language and navigate
+await changeLanguageAndNavigate("de", "/player/dashboard");
+```
+
+#### **3. Translation Key Organization**
+
+**Structure keys by feature and action type:**
+
+```json
+{
+  "links": {
+    "game_management": {
+      "my_games": "My Games",
+      "create_game": "Create New Game",
+      "view_details": "View Details"
+    },
+    "event_management": {
+      "browse_events": "Browse Events",
+      "register_for_event": "Register",
+      "event_calendar": "Event Calendar"
+    },
+    "navigation": {
+      "go_home": "Go Home",
+      "go_back": "Go Back"
+    },
+    "accessibility": {
+      "link_aria_label": {
+        "game_details": "View game details",
+        "user_profile": "View user profile"
+      }
+    }
+  }
+}
+```
+
+#### **4. Route Parameter Handling**
+
+**For dynamic routes with parameters:**
+
+```tsx
+// ✅ CORRECT - Use params prop
+<LocalizedLink
+  to="/player/games/$gameId"
+  params={{ gameId: game.id }}
+  translationKey="links.common.view_details"
+  translationNamespace="navigation"
+  ariaLabelTranslationKey="links.accessibility.link_aria_label.game_details"
+/>;
+
+// ✅ CORRECT - Programmatic with params
+await navigateLocalized({
+  to: "/player/events/$eventId",
+  params: { eventId: event.id },
+  search: { tab: "details" },
+});
+```
+
+#### **5. Search Parameters**
+
+**For links with search/query parameters:**
+
+```tsx
+<LocalizedLink
+  to="/player/games"
+  search={{ page: 2, filter: "strategy" }}
+  translationKey="links.game_management.browse_games"
+  translationNamespace="navigation"
+/>
+```
+
+#### **6. Accessibility Requirements**
+
+**Always provide proper accessibility labels:**
+
+```tsx
+<LocalizedLink
+  to="/player/games"
+  translationKey="links.game_management.my_games"
+  ariaLabelTranslationKey="links.accessibility.link_aria_label.my_games"
+  titleTranslationKey="links.accessibility.link_title.my_games"
+/>
+```
+
+### **Migration Checklist for Navigation**
+
+**For each navigation element:**
+
+- [ ] Replace `<Link>` with appropriate `LocalizedLink` variant
+- [ ] Add translation key in `navigation.json`
+- [ ] Include accessibility labels for screen readers
+- [ ] Handle route parameters correctly
+- [ ] Test language switching functionality
+- [ ] Verify proper URL generation with language prefixes
+
+### **Common Navigation Patterns**
+
+#### **Navigation Menus:**
+
+```tsx
+// Use LocalizedNavLink for menu items
+<LocalizedNavLink
+  to="/player/dashboard"
+  translationKey="navigation.main.dashboard"
+  activeProps={{ className: "active" }}
+/>
+```
+
+#### **Action Buttons:**
+
+```tsx
+// Use LocalizedButtonLink for primary actions
+<LocalizedButtonLink
+  to="/player/events/create"
+  translationKey="links.event_management.create_event"
+  translationNamespace="navigation"
+/>
+```
+
+#### **Card Links:**
+
+```tsx
+// Use LocalizedLink for card-based navigation
+<LocalizedLink
+  to="/player/games/$gameId"
+  params={{ gameId: game.id }}
+  translationKey="links.common.view_details"
+  translationNamespace="navigation"
+/>
+```
+
+## **Implementation Status**
+
+### ✅ **Completed Infrastructure:**
+
+- `LocalizedLink` component with all variants implemented
+- Core hooks: `useLocalizedNavigation`, `useLocalizedLink`, `useLocalizedBreadcrumbs`
+
+## **Development Guidelines**
+
+### **Adding New Navigation**
+
+When adding new navigation to the application:
+
+1. **Always use LocalizedLink components** - Never use plain `<Link>` or `<a href>`
+2. **Add translation keys** to `src/lib/i18n/locales/en/navigation.json`
+3. **Include accessibility labels** for screen readers
+4. **Test language switching** to verify proper URL generation
+
+### **Adding New Translation Keys**
 
 ```bash
-# 1. Commit your current state
-git add .
-git commit -m "Before i18n migration"
-
-# 2. Apply the migration
-pnpm i18n:migrate:apply
-
-# 3. Review changes
-git status
-git diff
-
-# 4. Test the application
-pnpm dev
-# Test language switching functionality
-
-# 5. Fix any issues manually
-#    - Import statement conflicts
-#    - Complex strings that need manual review
-#    - Type errors
-
-# 6. Run type checking
-pnpm check-types
-
-# 7. Generate final types
+# After adding new translation keys
 pnpm i18n:generate-types
 
-# 8. Commit the changes
-git add .
-git commit -m "feat: automated i18n migration"
+# This updates TypeScript definitions automatically
 ```
 
-## What the Script Does
+### **Common Translation Key Patterns**
 
-### ✅ Automatic Transformations
-
-1. **String Detection**: Finds hardcoded strings in:
-   - JSX text content: `<Button>Save Changes</Button>`
-   - String literals: `const title = "Welcome"`
-   - Form labels/placeholders
-   - Button text
-   - Error messages
-
-2. **Translation Key Generation**:
-   - Matches existing translations from your JSON files
-   - Generates new keys following feature-based naming
-   - Example: `"Create New Event"` → `events.create_form.title`
-
-3. **Code Transformation**:
-   - Adds appropriate translation hook imports
-   - Replaces strings with `t()` function calls
-   - Maintains existing functionality
-
-4. **Safety Features**:
-   - Creates backup files (.backup)
-   - Preserves existing translations
-   - Skips already internationalized code
-
-### ⚠️ Manual Review Required
-
-The script will flag these for manual review:
-
-- Complex template literals with variables
-- Technical strings (variable names, URLs)
-- Very short strings (< 3 characters)
-- Strings in test files
-- Already internationalized code
-
-## Expected Results
-
-Based on your project structure:
-
-- **Files processed**: 100-200 TypeScript/React files
-- **Strings replaced**: 300-500 hardcoded strings
-- **Translation keys reused**: 200+ from existing 1,599 keys
-- **New keys generated**: 100-200 new translation keys
-- **Imports added**: 50-100 hook imports
-
-## Example Transformations
-
-### Before:
-
-```typescript
-export const CreateEventButton = () => (
-  <Button>Create New Event</Button>
-);
-
-export const EventForm = () => {
-  return (
-    <form>
-      <label>Event Name</label>
-      <input placeholder="Enter your event name" />
-      <button>Submit Event</button>
-    </form>
-  );
-};
+```json
+{
+  "links": {
+    "feature_name": {
+      "action": "Action Text",
+      "view_details": "View Details",
+      "create_new": "Create New Feature",
+      "manage": "Manage",
+      "browse": "Browse Features"
+    }
+  },
+  "accessibility": {
+    "link_aria_label": {
+      "feature_page": "Visit feature page",
+      "feature_details": "View feature details"
+    }
+  }
+}
 ```
 
-### After:
-
-```typescript
-import { useEventsTranslation } from "~/hooks/useTypedTranslation";
-
-export const CreateEventButton = () => {
-  const { t } = useEventsTranslation();
-  return <Button>{t("create_form.title")}</Button>;
-};
-
-export const EventForm = () => {
-  const { t } = useEventsTranslation();
-  return (
-    <form>
-      <label>{t("form.fields.name.label")}</label>
-      <input placeholder={t("form.fields.name.placeholder")} />
-      <button>{t("form.buttons.submit")}</button>
-    </form>
-  );
-};
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Import Conflicts**:
-   - Error: Multiple imports of the same hook
-   - Fix: Manually resolve duplicate imports
-
-2. **Type Errors**:
-   - Error: `t()` function not available
-   - Fix: Ensure proper hook is imported and used
-
-3. **Missing Translation Keys**:
-   - Error: Translation key doesn't exist
-   - Fix: Run `pnpm i18n:extract` to add missing keys
-
-4. **Incorrect Replacements**:
-   - Issue: Technical strings replaced (variable names, etc.)
-   - Fix: Manually revert and add to exclude patterns
-
-### Recovery
-
-If something goes wrong:
+## **Testing Localized Navigation**
 
 ```bash
-# Restore from backups
-find src -name "*.backup" -exec sh -c 'mv "$1" "${1%.backup}"' _ {} \;
+# Test language switching in development
+pnpm dev
 
-# Or use git to reset
-git reset --hard HEAD~1
+# 1. Navigate to any page with links
+# 2. Use language switcher to change languages
+# 3. Verify all links maintain proper language prefixes
+# 4. Check that URLs update correctly: /en/player/games → /de/player/games
+
+# Test parameter resolution
+# Navigate to dynamic routes and verify parameters are correctly substituted
 ```
 
-## Post-Migration Tasks
+## **Maintenance Tasks**
 
-1. **Test Language Switching**:
-   - Verify LanguageSwitcher component works
-   - Test that all UI elements update correctly
+### **When Adding New Languages:**
 
-2. **Review Translation Quality**:
-   - Check `src/lib/i18n/locales/en/` for new keys
-   - Ensure generated keys make sense
-   - Add missing translations for German/Polish
+1. Add translation files to `src/lib/i18n/locales/[language]/`
+2. Copy `navigation.json` structure and translate all keys
+3. Run `pnpm i18n:generate-types` to update types
+4. Test language switching functionality
 
-3. **Update Documentation**:
-   - Document any new patterns established
-   - Update developer guidelines
+### **When Adding New Routes:**
 
-4. **Run Full Test Suite**:
-   ```bash
-   pnpm test
-   pnpm test:e2e
-   ```
+1. Add route translation keys to `navigation.json`
+2. Use `LocalizedLink` components for any navigation to the new route
+3. Test parameter resolution for dynamic routes
+4. Verify language switching works correctly
 
-## Best Practices
+### **Regular Maintenance:**
 
-1. **Commit Often**: Create checkpoints during the migration
-2. **Test Incrementally**: Test features as you migrate them
-3. **Review Changes**: Don't blindly accept all automated changes
-4. **Preserve Context**: Some strings need different translations based on context
+- Run `pnpm check-types` to ensure type safety
+- Test language switching before releases
+- Keep translation keys organized and consistent
+- Review accessibility labels for completeness
 
-## Next Steps
+## **Production Considerations**
 
-After migration:
+### **SEO Optimization:**
 
-1. Focus on completing missing translations
-2. Implement URL localization
-3. Add hreflang tags for SEO
-4. Set up CI/CD for translation management
+- Localized URLs automatically include language prefixes
+- Consider implementing hreflang tags for multilingual SEO
+- Ensure sitemap includes all language variants
 
-This migration will get you 80% of the way to full internationalization with minimal manual effort!
+### **Performance:**
+
+- LocalizedLink components are optimized with memoization
+- Translation types are generated at build time
+- Language detection happens server-side for optimal performance
+
+### **Monitoring:**
+
+- Monitor 404 errors for broken localized links
+- Track language switching usage analytics
+- Test all user journeys across supported languages
+
+This comprehensive approach ensures all navigation in the application is properly internationalized and maintains a consistent user experience across all supported languages.

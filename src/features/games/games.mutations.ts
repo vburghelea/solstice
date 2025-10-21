@@ -31,7 +31,7 @@ import { GameParticipant, GameWithDetails } from "./games.types";
  * Create a new game session
  */
 export const createGame = createServerFn({ method: "POST" })
-  .validator(createGameInputSchema.parse)
+  .inputValidator(createGameInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -145,7 +145,7 @@ export const createGame = createServerFn({ method: "POST" })
  * Update an existing game session
  */
 export const updateGame = createServerFn({ method: "POST" })
-  .validator(updateGameInputSchema.parse)
+  .inputValidator(updateGameInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -350,7 +350,7 @@ export const updateGame = createServerFn({ method: "POST" })
  * Delete a game session
  */
 export const deleteGame = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
+  .inputValidator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -393,7 +393,7 @@ export const deleteGame = createServerFn({ method: "POST" })
  * Cancel a game session
  */
 export const cancelGame = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
+  .inputValidator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -466,7 +466,7 @@ export const cancelGame = createServerFn({ method: "POST" })
  * Add a participant to a game (e.g., owner adding a player, or inviting)
  */
 export const addGameParticipant = createServerFn({ method: "POST" })
-  .validator(addGameParticipantInputSchema.parse)
+  .inputValidator(addGameParticipantInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -575,7 +575,7 @@ export const addGameParticipant = createServerFn({ method: "POST" })
  * Update a game participant's role or status
  */
 export const updateGameParticipant = createServerFn({ method: "POST" })
-  .validator(updateGameParticipantInputSchema.parse)
+  .inputValidator(updateGameParticipantInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -652,7 +652,7 @@ export const updateGameParticipant = createServerFn({ method: "POST" })
  * Remove a participant from a game
  */
 export const removeGameParticipant = createServerFn({ method: "POST" })
-  .validator(removeGameParticipantInputSchema.parse)
+  .inputValidator(removeGameParticipantInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -708,7 +708,7 @@ import { getRelationship } from "~/features/social/relationship.server";
  * Player applies to join a game
  */
 export const applyToGame = createServerFn({ method: "POST" })
-  .validator(applyToGameInputSchema.parse)
+  .inputValidator(applyToGameInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameApplication>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -858,7 +858,7 @@ export const applyToGame = createServerFn({ method: "POST" })
  * Owner invites a player to a game
  */
 export const inviteToGame = createServerFn({ method: "POST" })
-  .validator(inviteToGameInputSchema.parse)
+  .inputValidator(inviteToGameInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1100,7 +1100,7 @@ export const inviteToGame = createServerFn({ method: "POST" })
  * Respond to a game invitation (accept or reject)
  */
 export const respondToGameInvitation = createServerFn({ method: "POST" })
-  .validator(respondToGameInvitationSchema.parse)
+  .inputValidator(respondToGameInvitationSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant | boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1267,7 +1267,7 @@ import { getCampaign } from "~/features/campaigns/campaigns.queries"; // Import 
  * Create a new game session for a campaign
  */
 export const createGameSessionForCampaign = createServerFn({ method: "POST" })
-  .validator(createGameSessionForCampaignInputSchema.parse)
+  .inputValidator(createGameSessionForCampaignInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1412,7 +1412,7 @@ export const createGameSessionForCampaign = createServerFn({ method: "POST" })
  * Update a game session's status (e.g., cancel, complete)
  */
 export const updateGameSessionStatus = createServerFn({ method: "POST" })
-  .validator(updateGameSessionStatusInputSchema.parse)
+  .inputValidator(updateGameSessionStatusInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1555,7 +1555,7 @@ export const updateGameSessionStatus = createServerFn({ method: "POST" })
  * Respond to a game application (approve or reject)
  */
 export const respondToGameApplication = createServerFn({ method: "POST" })
-  .validator(respondToGameApplicationSchema.parse)
+  .inputValidator(respondToGameApplicationSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameApplication | boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");
@@ -1668,7 +1668,7 @@ export const respondToGameApplication = createServerFn({ method: "POST" })
  * Remove a participant's rejection ban from a game
  */
 export const removeGameParticipantBan = createServerFn({ method: "POST" })
-  .validator(removeGameParticipantBanInputSchema.parse)
+  .inputValidator(removeGameParticipantBanInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getDb } = await import("~/db/server-helpers");

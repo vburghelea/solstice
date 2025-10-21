@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
@@ -39,33 +40,18 @@ export default defineConfig(({ mode }) => {
       }) as any,
       tailwindcss(),
 
-      // IMPORTANT: TanStack Start before react(), and tell it you're supplying the React plugin
+      // TanStack Start with Nitro plugin for deployment
       tanstackStart({
-        customViteReactPlugin: true, // Tell Start we're providing React plugin
-        // https://react.dev/learn/react-compiler
-        react: {
-          babel: {
-            plugins: [
-              [
-                "babel-plugin-react-compiler",
-                {
-                  target: "19",
-                },
-              ],
-            ],
-          },
-        },
-
-        tsr: {
+        router: {
           quoteStyle: "double",
           semicolons: true,
           routeFileIgnorePrefix: "__tests__",
           // verboseFileRoutes: false,
         },
-
-        // Netlify deployment target
-        target: "netlify",
       }),
+
+      // Nitro V2 plugin for deployment behavior
+      nitroV2Plugin({}),
 
       // React plugin explicitly provided
       react(),

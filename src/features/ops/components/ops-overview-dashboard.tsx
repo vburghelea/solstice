@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
@@ -211,12 +211,19 @@ export function OpsOverviewDashboard() {
           <p className="text-muted-foreground max-w-2xl">{t("dashboard.subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary">
-            <Link to="/ops/events">{t("dashboard.legacy_dashboard_link")}</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/ops/events/create">{t("dashboard.launch_event")}</Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/ops/events"
+            translationKey="operations.legacy_dashboard"
+            translationNamespace="navigation"
+            fallbackText={t("dashboard.legacy_dashboard_link")}
+            variant="secondary"
+          />
+          <LocalizedButtonLink
+            to="/ops/events/create"
+            translationKey="operations.launch_event"
+            translationNamespace="navigation"
+            fallbackText={t("dashboard.launch_event")}
+          />
         </div>
       </div>
 
@@ -360,11 +367,15 @@ export function OpsOverviewDashboard() {
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild size="sm" variant="outline">
-                              <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                {t("actions.preview")}
-                              </Link>
-                            </Button>
+                            <LocalizedButtonLink
+                              to="/events/$slug"
+                              params={{ slug: event.slug }}
+                              translationKey="operations.preview_event"
+                              translationNamespace="navigation"
+                              fallbackText={t("actions.preview")}
+                              size="sm"
+                              variant="outline"
+                            />
                             <Button
                               size="sm"
                               variant="default"
@@ -450,27 +461,32 @@ export function OpsOverviewDashboard() {
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild size="sm">
-                              <Link
-                                to="/ops/events/$eventId"
-                                params={{ eventId: event.id }}
-                              >
-                                {t("hardcoded_strings.actions.tasks_notes")}
-                              </Link>
-                            </Button>
-                            <Button asChild size="sm" variant="outline">
-                              <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                {t("hardcoded_strings.actions.view")}
-                              </Link>
-                            </Button>
-                            <Button asChild size="sm" variant="outline">
-                              <Link
-                                to="/ops/events/$eventId/manage"
-                                params={{ eventId: event.id }}
-                              >
-                                {t("hardcoded_strings.actions.manage")}
-                              </Link>
-                            </Button>
+                            <LocalizedButtonLink
+                              to="/ops/events/$eventId"
+                              params={{ eventId: event.id }}
+                              translationKey="operations.view_tasks_notes"
+                              translationNamespace="navigation"
+                              fallbackText={t("hardcoded_strings.actions.tasks_notes")}
+                              size="sm"
+                            />
+                            <LocalizedButtonLink
+                              to="/events/$slug"
+                              params={{ slug: event.slug }}
+                              translationKey="operations.view_event"
+                              translationNamespace="navigation"
+                              fallbackText={t("hardcoded_strings.actions.view")}
+                              size="sm"
+                              variant="outline"
+                            />
+                            <LocalizedButtonLink
+                              to="/ops/events/$eventId/manage"
+                              params={{ eventId: event.id }}
+                              translationKey="operations.manage_event"
+                              translationNamespace="navigation"
+                              fallbackText={t("hardcoded_strings.actions.manage")}
+                              size="sm"
+                              variant="outline"
+                            />
                           </div>
                         </TableCell>
                       </TableRow>
@@ -588,27 +604,32 @@ export function OpsOverviewDashboard() {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end gap-2">
-                              <Button asChild size="sm">
-                                <Link
-                                  to="/ops/events/$eventId"
-                                  params={{ eventId: event.id }}
-                                >
-                                  {t("hardcoded_strings.actions.tasks_notes")}
-                                </Link>
-                              </Button>
-                              <Button asChild size="sm" variant="outline">
-                                <Link
-                                  to="/ops/events/$eventId/manage"
-                                  params={{ eventId: event.id }}
-                                >
-                                  {t("hardcoded_strings.actions.manage")}
-                                </Link>
-                              </Button>
-                              <Button asChild size="sm" variant="ghost">
-                                <Link to="/events/$slug" params={{ slug: event.slug }}>
-                                  {t("hardcoded_strings.actions.view")}
-                                </Link>
-                              </Button>
+                              <LocalizedButtonLink
+                                to="/ops/events/$eventId"
+                                params={{ eventId: event.id }}
+                                translationKey="operations.view_tasks_notes"
+                                translationNamespace="navigation"
+                                fallbackText={t("hardcoded_strings.actions.tasks_notes")}
+                                size="sm"
+                              />
+                              <LocalizedButtonLink
+                                to="/ops/events/$eventId/manage"
+                                params={{ eventId: event.id }}
+                                translationKey="operations.manage_event"
+                                translationNamespace="navigation"
+                                fallbackText={t("hardcoded_strings.actions.manage")}
+                                size="sm"
+                                variant="outline"
+                              />
+                              <LocalizedButtonLink
+                                to="/events/$slug"
+                                params={{ slug: event.slug }}
+                                translationKey="operations.view_event"
+                                translationNamespace="navigation"
+                                fallbackText={t("hardcoded_strings.actions.view")}
+                                size="sm"
+                                variant="ghost"
+                              />
                             </div>
                           </TableCell>
                         </TableRow>
@@ -702,14 +723,15 @@ export function OpsOverviewDashboard() {
                             {event.city ?? t("labels.tbd")}
                           </p>
                         </div>
-                        <Button asChild size="sm" variant="outline">
-                          <Link
-                            to="/ops/events/$eventId/manage"
-                            params={{ eventId: event.id }}
-                          >
-                            {t("hardcoded_strings.actions.adjust")}
-                          </Link>
-                        </Button>
+                        <LocalizedButtonLink
+                          to="/ops/events/$eventId/manage"
+                          params={{ eventId: event.id }}
+                          translationKey="operations.adjust_event"
+                          translationNamespace="navigation"
+                          fallbackText={t("hardcoded_strings.actions.adjust")}
+                          size="sm"
+                          variant="outline"
+                        />
                       </div>
                     ))}
                   </div>
@@ -793,9 +815,14 @@ function FocusBanner({ target }: { target: FocusTarget }) {
             <p className="text-muted-foreground text-xs font-medium">{target.meta}</p>
           </div>
         </div>
-        <Button asChild variant={buttonVariant} className="self-start">
-          <Link to={target.ctaHref}>{target.ctaLabel}</Link>
-        </Button>
+        <LocalizedButtonLink
+          to={target.ctaHref}
+          translationKey="operations.focus_action"
+          translationNamespace="navigation"
+          fallbackText={target.ctaLabel}
+          variant={buttonVariant}
+          className="self-start"
+        />
       </CardContent>
     </Card>
   );

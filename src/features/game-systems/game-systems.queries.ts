@@ -60,7 +60,7 @@ export const searchCategoriesHandler = async ({
 };
 
 export const searchCategories = createServerFn({ method: "POST" })
-  .validator(searchCategoriesSchema.parse)
+  .inputValidator(searchCategoriesSchema.parse)
   .handler(searchCategoriesHandler);
 
 const POPULAR_SYSTEM_LIMIT = 10;
@@ -375,7 +375,7 @@ export const listSystemsHandler = async ({
 };
 
 export const listSystems = createServerFn({ method: "POST" })
-  .validator(listSystemsSchema.parse)
+  .inputValidator(listSystemsSchema.parse)
   .handler(listSystemsHandler);
 
 export const getSystemBySlugHandler = async ({
@@ -511,7 +511,7 @@ export const getSystemBySlugHandler = async ({
 };
 
 export const getSystemBySlug = createServerFn({ method: "POST" })
-  .validator(getSystemBySlugSchema.parse)
+  .inputValidator(getSystemBySlugSchema.parse)
   .handler(getSystemBySlugHandler);
 
 export type ListSystemsResult = Awaited<ReturnType<typeof listSystems>>;

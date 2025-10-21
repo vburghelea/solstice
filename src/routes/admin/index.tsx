@@ -5,7 +5,7 @@ import {
   ShieldCheckIcon,
   UsersIcon,
 } from "lucide-react";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 
 import {
   Card,
@@ -85,13 +85,15 @@ function AdminOverview() {
                   ? `${kpi.value.toFixed(2)}%`
                   : kpi.value.toLocaleString()}
               </span>
-              <Link
+              <LocalizedLink
                 to="/admin/insights"
                 className="text-body-sm text-primary inline-flex items-center gap-2"
+                translationKey="admin.insights"
+                translationNamespace="navigation"
               >
                 Open insights
                 <ArrowRightIcon className="size-4" aria-hidden />
-              </Link>
+              </LocalizedLink>
             </CardContent>
           </Card>
         ))}
@@ -109,13 +111,15 @@ function AdminOverview() {
               <UsersIcon className="size-4" aria-hidden />
               <span>{t("overview.cards.user_governance.description_detail")}</span>
             </div>
-            <Link
+            <LocalizedLink
               to="/admin/users"
               className="text-body-sm text-primary inline-flex items-center gap-2"
+              translationKey="admin.user_management"
+              translationNamespace="navigation"
             >
               {t("overview.cards.user_governance.link_text")}
               <ArrowRightIcon className="size-4" aria-hidden />
-            </Link>
+            </LocalizedLink>
           </CardContent>
         </Card>
         <Card className="bg-surface-elevated border-subtle">
@@ -132,13 +136,15 @@ function AdminOverview() {
               <ShieldCheckIcon className="size-4" aria-hidden />
               <span>{t("overview.cards.feature_rollouts.description_detail")}</span>
             </div>
-            <Link
+            <LocalizedLink
               to="/admin/feature-flags"
               className="text-body-sm text-primary inline-flex items-center gap-2"
+              translationKey="admin.feature_flags"
+              translationNamespace="navigation"
             >
               {t("overview.cards.feature_rollouts.link_text")}
               <ArrowRightIcon className="size-4" aria-hidden />
-            </Link>
+            </LocalizedLink>
           </CardContent>
         </Card>
         <Card className="bg-surface-elevated border-subtle">
@@ -155,13 +161,15 @@ function AdminOverview() {
               <ShieldAlertIcon className="size-4" aria-hidden />
               <span>{t("overview.cards.security_posture.description_detail")}</span>
             </div>
-            <Link
+            <LocalizedLink
               to="/admin/security"
               className="text-body-sm text-primary inline-flex items-center gap-2"
+              translationKey="admin.security"
+              translationNamespace="navigation"
             >
               {t("overview.cards.security_posture.link_text")}
               <ArrowRightIcon className="size-4" aria-hidden />
-            </Link>
+            </LocalizedLink>
           </CardContent>
         </Card>
       </div>

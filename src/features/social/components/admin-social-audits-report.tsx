@@ -11,7 +11,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   Select,
   SelectContent,
@@ -154,9 +154,14 @@ export function AdminSocialAuditsReport() {
                       <td className="px-3 py-2 capitalize">{row.action}</td>
                       <td className="px-3 py-2">
                         {row.actor ? (
-                          <Link
+                          <LocalizedLink
                             to="/profile/$userId"
                             params={{ userId: row.actor.id }}
+                            translationKey="profile.view_profile"
+                            translationNamespace="navigation"
+                            fallbackText={
+                              row.actor.name || row.actor.email || row.actor.id
+                            }
                             className="inline-flex items-center gap-2"
                           >
                             <Avatar
@@ -169,24 +174,30 @@ export function AdminSocialAuditsReport() {
                             <span>
                               {row.actor.name || row.actor.email || row.actor.id}
                             </span>
-                          </Link>
+                          </LocalizedLink>
                         ) : row.actorUserId ? (
-                          <Link
+                          <LocalizedLink
                             to="/profile/$userId"
                             params={{ userId: row.actorUserId }}
+                            translationKey="profile.view_profile"
+                            translationNamespace="navigation"
+                            fallbackText={row.actorUserId}
                             className="underline"
-                          >
-                            {row.actorUserId}
-                          </Link>
+                          />
                         ) : (
                           "—"
                         )}
                       </td>
                       <td className="px-3 py-2">
                         {row.target ? (
-                          <Link
+                          <LocalizedLink
                             to="/profile/$userId"
                             params={{ userId: row.target.id }}
+                            translationKey="profile.view_profile"
+                            translationNamespace="navigation"
+                            fallbackText={
+                              row.target.name || row.target.email || row.target.id
+                            }
                             className="inline-flex items-center gap-2"
                           >
                             <Avatar
@@ -199,15 +210,16 @@ export function AdminSocialAuditsReport() {
                             <span>
                               {row.target.name || row.target.email || row.target.id}
                             </span>
-                          </Link>
+                          </LocalizedLink>
                         ) : row.targetUserId ? (
-                          <Link
+                          <LocalizedLink
                             to="/profile/$userId"
                             params={{ userId: row.targetUserId }}
+                            translationKey="profile.view_profile"
+                            translationNamespace="navigation"
+                            fallbackText={row.targetUserId}
                             className="underline"
-                          >
-                            {row.targetUserId}
-                          </Link>
+                          />
                         ) : (
                           "—"
                         )}

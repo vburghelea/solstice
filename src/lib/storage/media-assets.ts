@@ -1,4 +1,4 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import type { UploadApiOptions } from "cloudinary";
 import { and, eq, type SQL } from "drizzle-orm";
 import type { db } from "~/db";
@@ -33,7 +33,7 @@ export interface UploadedMediaAsset {
   originalUrl?: string;
 }
 
-const getCloudinary = serverOnly(async () => {
+const getCloudinary = createServerOnlyFn(async () => {
   const { v2 } = await import("cloudinary");
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
     process.env;

@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
 import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
@@ -26,6 +26,7 @@ import {
 } from "~/components/ui/card";
 import { AlertCircle, ArrowLeftIcon } from "~/components/ui/icons";
 import { Label } from "~/components/ui/label";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Textarea } from "~/components/ui/textarea";
 import { deactivateTeam, updateTeam } from "~/features/teams/teams.mutations";
 import { getTeam } from "~/features/teams/teams.queries";
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/player/teams/$teamId/manage")({
 });
 
 function ManageTeamPage() {
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const { teamId } = Route.useParams();
   const { teamData } = Route.useLoaderData();
@@ -110,12 +111,16 @@ function ManageTeamPage() {
   return (
     <div className="container mx-auto max-w-2xl p-6">
       <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/player/teams/$teamId" params={{ teamId }}>
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Team
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/player/teams/$teamId"
+          params={{ teamId }}
+          translationKey="links.common.view_details"
+          variant="ghost"
+          size="sm"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          Back to Team
+        </LocalizedButtonLink>
       </div>
       <Card>
         <CardHeader>
@@ -285,11 +290,14 @@ function ManageTeamPage() {
               </AlertDialog>
 
               <div className="flex gap-4">
-                <Button variant="outline" asChild>
-                  <Link to="/player/teams/$teamId" params={{ teamId }}>
-                    Cancel
-                  </Link>
-                </Button>
+                <LocalizedButtonLink
+                  to="/player/teams/$teamId"
+                  params={{ teamId }}
+                  translationKey="links.common.view_details"
+                  variant="outline"
+                >
+                  Cancel
+                </LocalizedButtonLink>
                 <Button type="submit" disabled={form.state.isSubmitting}>
                   {form.state.isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>

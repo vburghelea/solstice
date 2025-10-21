@@ -1,13 +1,13 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedColorPicker } from "~/components/form-fields/ValidatedColorPicker";
 import { ValidatedCountryCombobox } from "~/components/form-fields/ValidatedCountryCombobox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
-import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   Card,
   CardContent,
@@ -32,7 +32,7 @@ function CreateTeamPage() {
   const { t } = useTeamsTranslation();
   const teamsTranslation = useTranslation("teams");
   const { ready } = teamsTranslation;
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const createTeamMutation = useMutation({
@@ -125,12 +125,16 @@ function CreateTeamPage() {
   return (
     <div className="container mx-auto max-w-2xl p-6">
       <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/player/teams">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            {t("create.back_to_teams")}
-          </Link>
-        </Button>
+        <LocalizedLink
+          to="/player/teams"
+          translationKey="links.team_management.my_teams"
+          translationNamespace="navigation"
+          variant="ghost"
+          size="sm"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          {t("create.back_to_teams")}
+        </LocalizedLink>
       </div>
 
       <Card>
@@ -336,9 +340,14 @@ function CreateTeamPage() {
             </div>
 
             <div className="flex justify-end gap-4">
-              <Button variant="outline" asChild>
-                <Link to="/player/teams">{t("create.buttons.cancel")}</Link>
-              </Button>
+              <LocalizedButtonLink
+                to="/player/teams"
+                translationKey="links.actions.cancel"
+                translationNamespace="navigation"
+                variant="outline"
+              >
+                {t("create.buttons.cancel")}
+              </LocalizedButtonLink>
               <FormSubmitButton
                 isSubmitting={form.state.isSubmitting}
                 loadingText={t("create.buttons.creating")}

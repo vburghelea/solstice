@@ -1,9 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ProfileLink } from "~/components/ProfileLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -261,12 +262,16 @@ function TeamMembersPage() {
   return (
     <div className="container mx-auto max-w-4xl p-6">
       <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/player/teams/$teamId" params={{ teamId }}>
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Team
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/player/teams/$teamId"
+          params={{ teamId }}
+          translationKey="links.common.view_details"
+          variant="ghost"
+          size="sm"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          Back to Team
+        </LocalizedButtonLink>
       </div>
 
       <div className="mb-8 flex items-center justify-between">

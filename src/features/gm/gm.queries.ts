@@ -409,7 +409,7 @@ export const listGmB2bPipeline = createServerFn({ method: "GET" }).handler(
 );
 
 export const updateGmPipelineNote = createServerFn({ method: "POST" })
-  .validator(updateGmPipelineNoteSchema.parse)
+  .inputValidator(updateGmPipelineNoteSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GmPipelineNoteUpdateResult>> => {
     seedPipelineStore();
     const existing = pipelineStore.get(data.opportunityId);

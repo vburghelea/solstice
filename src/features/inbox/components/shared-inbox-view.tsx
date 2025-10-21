@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 
@@ -180,11 +180,14 @@ export function SharedInboxView(props: SharedInboxViewProps) {
           {personaConfig.supportingCopy}
         </p>
         <div>
-          <Button asChild size="sm" variant="outline">
-            <Link to={`/${persona}/collaboration`}>
-              {t("shared_inbox.open_reporting")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to={`/${persona}/collaboration`}
+            translationKey="collaboration.open_reporting"
+            translationNamespace="navigation"
+            fallbackText={t("shared_inbox.open_reporting")}
+            size="sm"
+            variant="outline"
+          />
         </div>
       </header>
 

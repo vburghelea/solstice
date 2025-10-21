@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { MapPinIcon, Trophy, UsersIcon } from "~/components/ui/icons";
@@ -120,14 +121,15 @@ function TeamsPage() {
                   {t("connect_locally.email_support")}
                 </Button>
               </a>
-              <Link to="/events">
-                <Button
-                  variant="outline"
-                  className="text-primary border-primary hover:bg-primary/10"
-                >
-                  {t("connect_locally.list_event")}
-                </Button>
-              </Link>
+              <LocalizedButtonLink
+                to="/events"
+                translationKey="event_management.browse_events"
+                translationNamespace="navigation"
+                variant="outline"
+                className="text-primary border-primary hover:bg-primary/10"
+              >
+                {t("connect_locally.list_event")}
+              </LocalizedButtonLink>
             </div>
           </div>
           <div className="border-border bg-card rounded-2xl border p-6 shadow-sm">

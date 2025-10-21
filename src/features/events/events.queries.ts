@@ -120,7 +120,7 @@ export type EventRegistrationSummary = {
  * List events with filters and pagination
  */
 export const listEvents = createServerFn({ method: "GET" })
-  .validator(zod$(listEventsSchema))
+  .inputValidator(zod$(listEventsSchema))
   .handler(async ({ data }): Promise<EventListResult> => {
     // Import server-only modules inside the handler
     const { getDb } = await import("~/db/server-helpers");
@@ -245,7 +245,7 @@ export const listEvents = createServerFn({ method: "GET" })
  * Get a single event by ID or slug
  */
 export const getEvent = createServerFn({ method: "GET" })
-  .validator(zod$(getEventSchema))
+  .inputValidator(zod$(getEventSchema))
   .handler(async ({ data }): Promise<EventOperationResult<EventWithDetails>> => {
     try {
       if (!data.id && !data.slug) {
@@ -322,7 +322,7 @@ export const getEvent = createServerFn({ method: "GET" })
  * List registrations for an event (organizers only)
  */
 export const listEventRegistrations = createServerFn({ method: "GET" })
-  .validator((data: unknown) => data as { eventId: string })
+  .inputValidator((data: unknown) => data as { eventId: string })
   .handler(async ({ data }) => {
     try {
       const [{ getDb }, { getAuth }, { PermissionService }] = await Promise.all([
@@ -333,8 +333,8 @@ export const listEventRegistrations = createServerFn({ method: "GET" })
 
       const db = await getDb();
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -401,7 +401,7 @@ export const listEventRegistrations = createServerFn({ method: "GET" })
  * Get upcoming events (public endpoint for homepage)
  */
 export const getUpcomingEvents = createServerFn({ method: "GET" })
-  .validator(zod$(getUpcomingEventsSchema))
+  .inputValidator(zod$(getUpcomingEventsSchema))
   .handler(async ({ data }): Promise<EventWithDetails[]> => {
     const limit = Math.min(10, data.limit || 3);
 
@@ -425,7 +425,7 @@ export const getUpcomingEvents = createServerFn({ method: "GET" })
  * Get all registrations for an event (organizer only)
  */
 export const getEventRegistrations = createServerFn({ method: "GET" })
-  .validator(z.object({ eventId: z.string().uuid() }).parse)
+  .inputValidator(z.object({ eventId: z.string().uuid() }).parse)
   .handler(async ({ data }): Promise<EventRegistrationSummary[]> => {
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
@@ -471,7 +471,7 @@ export const getEventRegistrations = createServerFn({ method: "GET" })
  * Check if a user is registered for an event
  */
 export const checkEventRegistration = createServerFn({ method: "GET" })
-  .validator(zod$(checkEventRegistrationSchema))
+  .inputValidator(zod$(checkEventRegistrationSchema))
   .handler(
     async ({
       data,

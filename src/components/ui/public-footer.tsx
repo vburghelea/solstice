@@ -1,22 +1,8 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { CookiePreferencesTrigger } from "~/features/consent";
-import type { AuthUser } from "~/lib/auth/types";
-import type { SupportedLanguage } from "~/lib/i18n/config";
-import { getLocalizedUrl } from "~/lib/i18n/detector";
-import { Route as RootRoute } from "~/routes/__root";
 
 export function PublicFooter() {
-  const { language } = RootRoute.useRouteContext() as {
-    user: AuthUser | null;
-    language: SupportedLanguage;
-  };
-
-  const eventsHref = getLocalizedUrl("/events", language);
-  const teamsHref = getLocalizedUrl("/teams", language);
-  const resourcesHref = getLocalizedUrl("/resources", language);
-  const aboutHref = getLocalizedUrl("/about", language);
-
   return (
     <footer className="bg-brand-dark text-brand-light">
       <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -38,30 +24,30 @@ export function PublicFooter() {
               Quick Links
             </h3>
             <nav className="mt-3 space-y-2 text-sm sm:mt-4">
-              <Link
+              <LocalizedLink
                 className="block text-gray-400 transition hover:text-white"
-                to={eventsHref}
-              >
-                Events
-              </Link>
-              <Link
+                to="/events"
+                translationKey="main.events"
+                translationNamespace="navigation"
+              />
+              <LocalizedLink
                 className="block text-gray-400 transition hover:text-white"
-                to={teamsHref}
-              >
-                Teams
-              </Link>
-              <Link
+                to="/teams"
+                translationKey="main.teams"
+                translationNamespace="navigation"
+              />
+              <LocalizedLink
                 className="block text-gray-400 transition hover:text-white"
-                to={resourcesHref}
-              >
-                Resources
-              </Link>
-              <Link
+                to="/resources"
+                translationKey="footer.resources"
+                translationNamespace="navigation"
+              />
+              <LocalizedLink
                 className="block text-gray-400 transition hover:text-white"
-                to={aboutHref}
-              >
-                About Roundup Games
-              </Link>
+                to="/about"
+                translationKey="footer.about"
+                translationNamespace="navigation"
+              />
               <a
                 className="block text-gray-400 transition hover:text-white"
                 href="mailto:info@roundup.games"

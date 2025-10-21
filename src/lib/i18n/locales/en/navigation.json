@@ -23,6 +23,12 @@
     "login": "Login",
     "signup": "Sign Up"
   },
+  "auth": {
+    "forgot_password": "Forgot Password",
+    "reset_password": "Reset Password",
+    "email_verification": "Verify Email",
+    "resend_verification": "Resend Verification"
+  },
   "actions": {
     "create": "Create",
     "new": "New",
@@ -98,15 +104,207 @@
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "cookies": "Cookie Policy",
-    "copyright": "© {{year}} Roundup Games. All rights reserved.",
-    "plan_your_visit": "Plan your visit",
-    "event_calendar": "Event calendar",
-    "find_game_night": "Find a game night",
-    "browse_systems": "Browse systems",
-    "stay_in_touch": "Stay in touch",
     "resources": "Resources",
-    "about_roundup": "About Roundup",
-    "contact_email": "hello@roundup.games"
+    "teams": "Teams",
+    "systems": "Game Systems"
+  },
+  "links": {
+    "common": {
+      "learn_more": "Learn More",
+      "read_more": "Read More",
+      "view_details": "View Details",
+      "show_more": "Show More",
+      "show_less": "Show Less",
+      "back_to_top": "Back to Top",
+      "continue_reading": "Continue Reading",
+      "get_started": "Get Started",
+      "view_all": "View All",
+      "see_all": "See All",
+      "explore": "Explore",
+      "discover": "Discover"
+    },
+    "actions": {
+      "join": "Join",
+      "apply": "Apply",
+      "register": "Register",
+      "sign_up": "Sign Up",
+      "signup": "Sign Up",
+      "log_in": "Log In",
+      "login": "Login",
+      "logout": "Logout",
+      "create_account": "Create Account",
+      "view_profile": "View Profile",
+      "edit_profile": "Edit Profile",
+      "manage_settings": "Manage Settings",
+      "contact_support": "Contact Support",
+      "get_help": "Get Help",
+      "feedback": "Feedback",
+      "report_issue": "Report Issue"
+    },
+    "navigation": {
+      "go_home": "Go Home",
+      "go_back": "Go Back",
+      "back_to_games": "Back to Games",
+      "back_to_events": "Back to Events",
+      "next_page": "Next Page",
+      "previous_page": "Previous Page",
+      "skip_to_content": "Skip to Content",
+      "main_navigation": "Main Navigation",
+      "breadcrumb_navigation": "Breadcrumb Navigation",
+      "view_public_page": "View Public Page"
+    },
+    "external": {
+      "opens_in_new_tab": "Opens in a new tab",
+      "external_link": "External Link",
+      "leave_site": "You are leaving our site",
+      "continue_to_site": "Continue to Site"
+    },
+    "accessibility": {
+      "link_aria_label": {
+        "user_profile": "View user profile",
+        "game_details": "View game details",
+        "event_details": "View event details",
+        "team_page": "Visit team page",
+        "campaign_page": "Visit campaign page",
+        "game_system_details": "View game system details",
+        "settings_page": "Go to settings",
+        "help_page": "Get help and support",
+        "about_page": "Learn about our platform",
+        "contact_page": "Contact us",
+        "campaign_workspace": "Visit campaign workspace",
+        "game_management": "Manage game sessions",
+        "pipeline_review": "Review business pipeline"
+      }
+    },
+    "game_management": {
+      "create_game": "Create New Game",
+      "create_gm_game": "Create Game Session",
+      "manage_games": "Manage Games",
+      "my_games": "My Games",
+      "find_games": "Find Games",
+      "browse_games": "Browse Games",
+      "game_library": "Game Library",
+      "create_session": "Create Session",
+      "join_session": "Join Session",
+      "view_game_details": "View Game Details"
+    },
+    "event_management": {
+      "create_event": "Create Event",
+      "create_ops_event": "Create Event",
+      "manage_events": "Manage Events",
+      "my_events": "My Events",
+      "find_events": "Find Events",
+      "browse_events": "Browse Events",
+      "event_calendar": "Event Calendar",
+      "register_for_event": "Register for Event",
+      "cancel_registration": "Cancel Registration",
+      "view_event_details": "View Event Details"
+    },
+    "team_management": {
+      "create_team": "Create Team",
+      "manage_teams": "Manage Teams",
+      "my_teams": "My Teams",
+      "find_teams": "Find Teams",
+      "browse_teams": "Browse Teams",
+      "team_directory": "Team Directory",
+      "join_team": "Join Team",
+      "invite_members": "Invite Members",
+      "back_to_teams": "Back to Teams",
+      "manage_members": "Manage Members"
+    },
+    "system_management": {
+      "view_system_details": "View System Details",
+      "explore_system": "Explore System",
+      "system_profile": "System Profile"
+    },
+    "membership": {
+      "manage_membership": "Manage Membership",
+      "view_membership": "View Membership",
+      "membership_status": "Membership Status",
+      "upgrade_membership": "Upgrade Membership",
+      "membership_benefits": "Membership Benefits",
+      "billing_history": "Billing History"
+    },
+    "campaign_management": {
+      "create_campaign": "Create Campaign",
+      "create_gm_campaign": "Create Campaign",
+      "manage_campaigns": "Manage Campaigns",
+      "my_campaigns": "My Campaigns",
+      "browse_campaigns": "Browse Campaigns",
+      "campaign_details": "Campaign Details",
+      "join_campaign": "Join Campaign",
+      "leave_campaign": "Leave Campaign",
+      "view_campaign_details": "View Campaign Details"
+    },
+    "workspace": {
+      "manage_sessions": "Manage Sessions",
+      "campaign_workspace": "View Campaign Workspace",
+      "review_pipeline": "Review Pipeline",
+      "manage_campaigns": "Manage Campaigns",
+      "manage_games": "Manage Games",
+      "manage_feedback": "Manage Feedback",
+      "view_analytics": "View Analytics",
+      "analytics_dashboard": "Analytics Dashboard",
+      "security_oversight": "Security Oversight",
+      "upcoming_events": "Upcoming Events",
+      "manage_event": "Manage Event",
+      "events_review": "Events Review"
+    },
+    "admin": {
+      "admin_dashboard": "Admin Dashboard",
+      "user_management": "User Management",
+      "system_management": "System Management",
+      "analytics": "Analytics",
+      "reports": "Reports",
+      "moderation": "Moderation",
+      "site_settings": "Site Settings"
+    },
+    "event_registration": {
+      "back_to_events": "Back to Events",
+      "view_event_details": "View Event Details",
+      "back_to_event_details": "Back to Event Details",
+      "return_to_dashboard": "Return to Dashboard",
+      "join_create_team": "Join or Create Team"
+    },
+    "dev": {
+      "email": {
+        "welcome-email": "Welcome Email",
+        "membership-receipt": "Membership Receipt",
+        "game-invitation": "Game Invitation",
+        "campaign-invitation": "Campaign Invitation",
+        "game-invite-response": "Game Invite Response",
+        "game-status-update": "Game Status Update",
+        "game-reminder": "Game Reminder",
+        "campaign-invite-response": "Campaign Invite Response",
+        "campaign-session-update": "Campaign Session Update",
+        "campaign-digest": "Campaign Digest",
+        "review-reminder": "Review Reminder",
+        "email-verification": "Email Verification",
+        "email-verification-otp": "Email Verification (OTP)",
+        "password-reset": "Password Reset",
+        "password-reset-otp": "Password Reset (OTP)",
+        "sign-in-otp": "Sign In OTP",
+        "team-invitation": "Team Invitation",
+        "team-request-decision": "Team Request Decision"
+      }
+    },
+    "errors": {
+      "page_not_found": "Page Not Found",
+      "access_denied": "Access Denied",
+      "server_error": "Server Error",
+      "back_to_safety": "Back to Safety",
+      "go_home": "Go Home",
+      "browse_events": "Browse Events"
+    },
+    "help": {
+      "help_center": "Help Center",
+      "documentation": "Documentation",
+      "tutorials": "Tutorials",
+      "guides": "Guides",
+      "faq": "Frequently Asked Questions",
+      "contact_support": "Contact Support",
+      "community_forum": "Community Forum"
+    }
   },
   "tabs": {
     "overview": "Overview",
@@ -384,6 +582,87 @@
         "staff_on_duty": "Staff on Duty",
         "venue_utilization": "Venue Utilization"
       }
+    }
+  },
+  "brand": {
+    "home": "Home",
+    "name": "Roundup Games",
+    "slogan": "Play Together. Anywhere."
+  },
+  "resources": {
+    "sections": {
+      "club_toolkit": {
+        "actions": {
+          "download_toolkit": "Download Toolkit",
+          "view_charter": "View Charter"
+        }
+      },
+      "training": {
+        "actions": {
+          "browse_plans": "Browse Plans",
+          "watch_clinics": "Watch Clinics"
+        }
+      },
+      "safe_sport": {
+        "actions": {
+          "download_policies": "Download Policies",
+          "report_concern": "Report Concern"
+        }
+      }
+    },
+    "certification": {
+      "tracks": {
+        "gm_pathway": {
+          "title": "Game Master Pathway",
+          "description": "Learn to run engaging games and build communities",
+          "cta": "Start Pathway"
+        },
+        "host_pathway": {
+          "title": "Community Host Pathway",
+          "description": "Organize events and grow local gaming communities",
+          "cta": "Start Pathway"
+        },
+        "operations_pathway": {
+          "title": "Event Operations Pathway",
+          "description": "Support events and ensure exceptional player experiences",
+          "cta": "Start Pathway"
+        }
+      }
+    },
+    "consultation": {
+      "actions": {
+        "connect_hubs": "Find Teams",
+        "schedule_meeting": "Schedule Consultation"
+      }
+    }
+  },
+  "operations": {
+    "mission_control": "Mission Control",
+    "open_legacy_playbook": "Open Legacy Playbook",
+    "review_submission_history": "Review Submission History",
+    "preview_event": "Preview Event",
+    "manage_event": "Manage Event",
+    "view_event": "View Event",
+    "view_tasks_notes": "View Tasks/Notes",
+    "adjust_event": "Adjust Event",
+    "legacy_dashboard": "Legacy Dashboard",
+    "launch_event": "Launch Event",
+    "focus_action": "Focus"
+  },
+  "collaboration": {
+    "review_threads": "Review Threads",
+    "open_reporting": "Open Reporting"
+  },
+  "game_systems": {
+    "edit_system": "Edit System",
+    "view_system": "View System"
+  },
+  "common": {
+    "take_action": "Take Action"
+  },
+  "admin": {
+    "dashboard_sections": {
+      "navigation": "Navigation"
     }
   }
 }

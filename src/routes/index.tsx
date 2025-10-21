@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { startTransition, useEffect, useMemo, useState } from "react";
 
-import { buttonVariants } from "~/components/ui/button";
 import { EventCard } from "~/components/ui/event-card";
 import { HeroSection } from "~/components/ui/hero-section";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { getUpcomingEvents } from "~/features/events/events.queries";
 import type { EventWithDetails } from "~/features/events/events.types";
 import { listPopularSystems } from "~/features/game-systems/game-systems.queries";
@@ -471,15 +471,16 @@ function VisitorExperience() {
                 {ht("upcoming_events.subtitle")}
               </p>
             </div>
-            <Link
+            <LocalizedButtonLink
               to="/events"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "sm" }),
-                "rounded-full",
-              )}
+              translationKey="links.event_management.browse_events"
+              translationNamespace="navigation"
+              variant="outline"
+              size="sm"
+              className="rounded-full"
             >
               {ht("upcoming_events.browse_full_calendar")}
-            </Link>
+            </LocalizedButtonLink>
           </div>
 
           {localEvents.length === 0 ? (
@@ -513,15 +514,16 @@ function VisitorExperience() {
                 {ht("story_sessions.subtitle")}
               </p>
             </div>
-            <Link
+            <LocalizedButtonLink
               to="/search"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "sm" }),
-                "rounded-full",
-              )}
+              translationKey="links.actions.search"
+              translationNamespace="navigation"
+              variant="ghost"
+              size="sm"
+              className="rounded-full"
             >
               {ht("story_sessions.search_all_games")}
-            </Link>
+            </LocalizedButtonLink>
           </div>
 
           {localGames.length === 0 ? (
@@ -573,14 +575,13 @@ function VisitorExperience() {
           ) : (
             <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
               {systemHighlights.map((system) => (
-                <Link
+                <LocalizedLink
                   key={system.id}
                   to="/systems/$slug"
                   params={{ slug: system.slug }}
-                  className={cn(
-                    "focus-visible:ring-primary focus-visible:ring-offset-background min-w-[16rem] transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_50%,transparent)] hover:shadow-md focus-visible:ring-2 focus-visible:outline-none",
-                    explorerPanelSurface,
-                  )}
+                  ariaLabelTranslationKey="links.accessibility.link_aria_label.game_system_details"
+                  translationNamespace="navigation"
+                  className={`focus-visible:ring-primary focus-visible:ring-offset-background min-w-[16rem] transition hover:border-[color:color-mix(in_oklab,var(--primary-soft)_50%,transparent)] hover:shadow-md focus-visible:ring-2 focus-visible:outline-none ${explorerPanelSurface}`}
                 >
                   <div className="token-stack-sm">
                     <div className="aspect-video overflow-hidden rounded-lg">
@@ -613,7 +614,7 @@ function VisitorExperience() {
                       </p>
                     </div>
                   </div>
-                </Link>
+                </LocalizedLink>
               ))}
             </div>
           )}
@@ -634,21 +635,25 @@ function VisitorExperience() {
             </p>
           </div>
           <div className="token-gap-sm flex flex-wrap items-center justify-center">
-            <Link
+            <LocalizedButtonLink
               to="/auth/signup"
-              className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8")}
+              translationKey="links.actions.signup"
+              translationNamespace="navigation"
+              size="lg"
+              className="rounded-full px-8"
             >
               {ht("ready_to_go_deeper.start_profile")}
-            </Link>
-            <Link
+            </LocalizedButtonLink>
+            <LocalizedButtonLink
               to="/auth/login"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "lg" }),
-                "rounded-full px-8",
-              )}
+              translationKey="links.actions.login"
+              translationNamespace="navigation"
+              variant="ghost"
+              size="lg"
+              className="rounded-full px-8"
             >
               {ht("ready_to_go_deeper.have_account")}
-            </Link>
+            </LocalizedButtonLink>
           </div>
         </section>
       </div>

@@ -1,13 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Setup mocks before imports
 import type { TeamMemberRole } from "~/db/schema";
 import type {
   TeamMemberDetails,
   ViewerTeamMembership,
 } from "~/features/teams/teams.queries";
+import { localizedLinkMock, tanStackRouterMock } from "~/tests/mocks";
 
 const mockUseAuth = vi.fn();
 const mockGetTeam = vi.fn();
@@ -49,35 +52,9 @@ vi.mock("~/components/ui/avatar", () => ({
   ),
 }));
 
-vi.mock("~/components/ui/TypedLink", () => ({
-  TypedLink: ({
-    children,
-    to,
-    params,
-    ...props
-  }: {
-    children: ReactNode;
-    to?: string;
-    params?: unknown;
-  }) => {
-    void params;
-    return (
-      <a href={typeof to === "string" ? to : undefined} {...props}>
-        {children}
-      </a>
-    );
-  },
-}));
+vi.mock("@tanstack/react-router", () => tanStackRouterMock);
 
-vi.mock("@tanstack/react-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-router")>();
-  return {
-    ...actual,
-    Link: ({ children, ...props }: { children: ReactNode }) => (
-      <a {...props}>{children}</a>
-    ),
-  };
-});
+vi.mock("~/components/ui/LocalizedLink", () => localizedLinkMock);
 
 vi.mock("sonner", () => ({
   toast: {

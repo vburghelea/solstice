@@ -1,4 +1,4 @@
-import { createServerFileRoute } from "@tanstack/react-start/server";
+import { createFileRoute } from "@tanstack/react-router";
 import { z, ZodError } from "zod";
 import { getBlocklist } from "~/features/social";
 
@@ -27,11 +27,15 @@ export async function handleBlocklist(input: unknown): Promise<Response> {
   }
 }
 
-export const ServerRoute = createServerFileRoute("/api/social/blocklist").methods({
-  GET: async ({ request }: { request: Request }) => {
-    const url = new URL(request.url);
-    const page = url.searchParams.get("page");
-    const pageSize = url.searchParams.get("pageSize");
-    return handleBlocklist({ page, pageSize });
+export const Route = createFileRoute("/api/social/blocklist")({
+  server: {
+    handlers: {
+      GET: async ({ request }: { request: Request }) => {
+        const url = new URL(request.url);
+        const page = url.searchParams.get("page");
+        const pageSize = url.searchParams.get("pageSize");
+        return handleBlocklist({ page, pageSize });
+      },
+    },
   },
 });

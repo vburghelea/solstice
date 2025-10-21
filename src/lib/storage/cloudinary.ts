@@ -1,8 +1,8 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import type { UploadApiOptions } from "cloudinary";
 import { createHash } from "crypto";
 
-export const getCloudinary = serverOnly(async () => {
+export const getCloudinary = createServerOnlyFn(async () => {
   const { v2 } = await import("cloudinary");
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
     process.env;

@@ -48,15 +48,31 @@ vi.mock("drizzle-orm", () => ({
   },
 }));
 vi.mock("@tanstack/react-start/server", () => ({
-  getWebRequest: () => ({ headers: new Headers({ "user-agent": "vitest" }) }),
+  getRequest: () => ({
+    headers: {
+      get: (name: string) => {
+        switch (name) {
+          case "x-forwarded-for":
+            return "127.0.0.1";
+          case "x-real-ip":
+            return "127.0.0.1";
+          case "cf-connecting-ip":
+            return "127.0.0.1";
+          default:
+            return null;
+        }
+      },
+    },
+  }),
 }));
 // Simplify TanStack server function wrapper for unit tests
 vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => ({
-    validator: () => ({
+    inputValidator: () => ({
       handler: (h: unknown) => h,
     }),
   }),
+  createServerOnlyFn: (fn: () => unknown) => fn(),
 }));
 
 function makeDb() {

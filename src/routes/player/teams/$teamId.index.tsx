@@ -13,7 +13,7 @@ import {
   MapPinIcon,
   UsersIcon,
 } from "~/components/ui/icons";
-import { TypedLink as Link } from "~/components/ui/TypedLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { useAuth } from "~/features/auth";
 import { requestTeamMembership } from "~/features/teams/teams.mutations";
 import {
@@ -153,12 +153,15 @@ function TeamDetailsPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/player/teams">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            Back to Teams
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/player/teams"
+          translationKey="links.team_management.back_to_teams"
+          variant="ghost"
+          size="sm"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          Back to Teams
+        </LocalizedButtonLink>
       </div>
 
       <div className="mb-8">
@@ -327,12 +330,16 @@ function TeamDetailsPage() {
               )}
 
               {canManageTeam ? (
-                <Button className="w-full" variant="outline" asChild>
-                  <Link to="/player/teams/$teamId/members" params={{ teamId }}>
-                    <UsersIcon className="mr-2 h-4 w-4" />
-                    Manage Members
-                  </Link>
-                </Button>
+                <LocalizedButtonLink
+                  to="/player/teams/$teamId/members"
+                  params={{ teamId }}
+                  translationKey="links.team_management.manage_members"
+                  className="w-full"
+                  variant="outline"
+                >
+                  <UsersIcon className="mr-2 h-4 w-4" />
+                  Manage Members
+                </LocalizedButtonLink>
               ) : pendingInviteFromTeam ? (
                 <div className="text-muted-foreground text-sm">
                   You have a pending invitation for this team. Visit the Teams dashboard
@@ -371,15 +378,21 @@ function TeamDetailsPage() {
                   <div className="text-muted-foreground text-sm">
                     Sign in to request a spot on this team.
                   </div>
-                  <Button className="w-full" variant="outline" asChild>
-                    <Link to="/auth/login">Sign In</Link>
-                  </Button>
+                  <LocalizedButtonLink
+                    to="/auth/login"
+                    translationKey="links.actions.login"
+                    className="w-full"
+                    variant="outline"
+                  />
                 </div>
               )}
 
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/player/teams/browse">Browse Teams</Link>
-              </Button>
+              <LocalizedButtonLink
+                to="/player/teams/browse"
+                translationKey="links.team_management.browse_teams"
+                variant="outline"
+                className="w-full"
+              />
             </CardContent>
           </Card>
         </div>

@@ -6,7 +6,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   Select,
   SelectContent,
@@ -1080,7 +1080,14 @@ export function CampaignForm({
           </Button>
         ) : (
           <Button variant="outline" asChild>
-            <Link to="/player/campaigns">{t("buttons.cancel")}</Link>
+            <LocalizedLink
+              to="/player/campaigns"
+              translationKey="navigation.cancel"
+              translationNamespace="common"
+              fallbackText={t("buttons.cancel")}
+            >
+              {t("buttons.cancel")}
+            </LocalizedLink>
           </Button>
         )}
         <FormSubmitButton isSubmitting={isSubmitting}>

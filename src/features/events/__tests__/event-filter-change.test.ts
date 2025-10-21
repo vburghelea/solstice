@@ -7,7 +7,7 @@ const createFilters = (filters: EventFilters = {}): EventFilters => ({ ...filter
 
 describe("applyEventFilterChange", () => {
   it("returns the original filters when removing a non-existent key", () => {
-    const filters = createFilters({ city: "Toronto" });
+    const filters = createFilters({ city: "Berlin" });
     const result = applyEventFilterChange(filters, "country", undefined);
 
     expect(result.changed).toBe(false);
@@ -15,7 +15,7 @@ describe("applyEventFilterChange", () => {
   });
 
   it("removes keys when the value is empty", () => {
-    const filters = createFilters({ city: "Toronto" });
+    const filters = createFilters({ city: "Berlin" });
     const result = applyEventFilterChange(filters, "city", " ");
 
     expect(result.changed).toBe(true);
@@ -23,8 +23,8 @@ describe("applyEventFilterChange", () => {
   });
 
   it("trims string values before comparing", () => {
-    const filters = createFilters({ city: "Toronto" });
-    const result = applyEventFilterChange(filters, "city", " Toronto  ");
+    const filters = createFilters({ city: "Berlin" });
+    const result = applyEventFilterChange(filters, "city", " Berlin  ");
 
     expect(result.changed).toBe(false);
     expect(result.nextFilters).toBe(filters);

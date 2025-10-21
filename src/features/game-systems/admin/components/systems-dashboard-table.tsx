@@ -7,7 +7,7 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { DataTable } from "~/components/ui/data-table";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   useCommonTranslation,
   useGameSystemsTranslation,
@@ -77,13 +77,16 @@ function createColumns(
         return (
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <Link
+              <LocalizedLink
                 to={detailRoute}
                 params={{ systemId: String(item.id) }}
+                translationKey="game_systems.view_system"
+                translationNamespace="navigation"
+                fallbackText={item.name}
                 className="text-foreground hover:text-primary text-sm font-semibold underline-offset-2 transition-colors hover:underline"
               >
                 {item.name}
-              </Link>
+              </LocalizedLink>
               <Badge variant={item.isPublished ? "default" : "outline"}>
                 {item.isPublished
                   ? tGameSystems("admin.table.status.published")
@@ -189,10 +192,16 @@ function createColumns(
         const item = row.original;
         return (
           <Button asChild size="sm" variant="secondary" className="gap-1">
-            <Link to={detailRoute} params={{ systemId: String(item.id) }}>
+            <LocalizedButtonLink
+              to={detailRoute}
+              params={{ systemId: String(item.id) }}
+              translationKey="game_systems.edit_system"
+              translationNamespace="navigation"
+              fallbackText={tGameSystems("admin.table.edit_action")}
+            >
               <span>{tGameSystems("admin.table.edit_action")}</span>
               <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
+            </LocalizedButtonLink>
           </Button>
         );
       },

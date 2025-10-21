@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
-import type { ComponentProps } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Setup mocks before imports
+import { localizedLinkMock, tanStackRouterMock } from "~/tests/mocks";
 import { PlayerDashboard } from "../player-dashboard";
 
 const queryMocks = vi.hoisted(() => ({
@@ -45,35 +46,10 @@ vi.mock("posthog-js", () => ({
   },
 }));
 
-vi.mock("~/components/ui/SafeLink", () => ({
-  SafeLink: ({ children, to, ...rest }: ComponentProps<"a"> & { to?: unknown }) => (
-    <a {...rest} href={typeof to === "string" ? to : "#"}>
-      {children}
-    </a>
-  ),
-}));
+// Mock TanStack Router
+vi.mock("@tanstack/react-router", () => tanStackRouterMock);
 
-vi.mock("~/hooks/useTypedTranslation", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  usePlayerTranslation: () => ({
-    t: (key: string, params?: Record<string, unknown>) => {
-      let result = key; // Return the key itself - tests shouldn't depend on translation content
-
-      // Handle parameter interpolation for test data that needs it
-      if (params) {
-        Object.entries(params).forEach(([param, value]) => {
-          result = result.replace(`{{${param}}}`, String(value));
-        });
-      }
-
-      return result;
-    },
-  }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useCommonTranslation: () => ({
-    t: (key: string) => key, // Return the key itself
-  }),
-}));
+vi.mock("~/components/ui/LocalizedLink", () => localizedLinkMock);
 
 describe("PlayerDashboard", () => {
   beforeEach(() => {
@@ -152,9 +128,9 @@ describe("PlayerDashboard", () => {
                 id: "event-1",
                 name: "Catalyst Cup",
                 startDate: now.toISOString(),
-                city: "Toronto",
-                province: "ON",
-                country: "Canada",
+                city: "Berlin",
+                province: "Berlin",
+                country: "Germany",
               },
             ],
           };
@@ -180,7 +156,7 @@ describe("PlayerDashboard", () => {
     expect(profileLink).toBeInTheDocument();
 
     // Test for membership status by looking for the status text
-    expect(screen.getByText("dashboard.membership.status_active")).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument();
 
     // Test for event content
     expect(screen.getByText(/Catalyst Cup/)).toBeInTheDocument();
@@ -197,8 +173,6 @@ describe("PlayerDashboard", () => {
     expect(checkboxes.length).toBeGreaterThan(0); // Should have some checkboxes for settings
 
     // Test for notification settings
-    expect(
-      screen.getByText("dashboard.notifications.review_reminders.label"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Review reminders")).toBeInTheDocument();
   });
 });

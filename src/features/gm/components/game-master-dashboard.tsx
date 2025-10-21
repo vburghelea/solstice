@@ -7,9 +7,8 @@ import {
 } from "lucide-react";
 import { useMemo, type ReactNode } from "react";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";
@@ -111,20 +110,26 @@ export function GameMasterDashboard({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button
-                asChild
+              <LocalizedButtonLink
+                to="/gm/campaigns/create"
+                translationKey="game_management.create_campaign"
+                translationNamespace="navigation"
+                fallbackText={t("actions.start_campaign")}
                 variant="secondary"
                 className="bg-white/10 text-white hover:bg-white/20"
               >
-                <Link to="/gm/campaigns/create">{t("actions.start_campaign")}</Link>
-              </Button>
-              <Button
-                asChild
+                {t("actions.start_campaign")}
+              </LocalizedButtonLink>
+              <LocalizedButtonLink
+                to="/gm/feedback"
+                translationKey="game_management.open_triage_board"
+                translationNamespace="navigation"
+                fallbackText={t("actions.open_triage_board")}
                 variant="secondary"
                 className="bg-white/10 text-white hover:bg-white/25"
               >
-                <Link to="/gm/feedback">{t("actions.open_triage_board")}</Link>
-              </Button>
+                {t("actions.open_triage_board")}
+              </LocalizedButtonLink>
             </div>
           </div>
 
@@ -169,9 +174,16 @@ export function GameMasterDashboard({
                 {t("sections.session_runway.description")}
               </p>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/gm/games">{t("actions.open_session_manager")}</Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/gm/games"
+              translationKey="game_management.open_session_manager"
+              translationNamespace="navigation"
+              fallbackText={t("actions.open_session_manager")}
+              variant="outline"
+              size="sm"
+            >
+              {t("actions.open_session_manager")}
+            </LocalizedButtonLink>
           </CardHeader>
           <CardContent className="space-y-6">
             {scheduledGames.length === 0 ? (
@@ -244,14 +256,18 @@ export function GameMasterDashboard({
                           })}
                         </p>
                       </div>
-                      <Button asChild variant="ghost" size="sm" className="shrink-0">
-                        <Link
-                          to="/gm/campaigns/$campaignId"
-                          params={{ campaignId: campaign.id }}
-                        >
-                          {t("actions.open_studio")}
-                        </Link>
-                      </Button>
+                      <LocalizedButtonLink
+                        to="/gm/campaigns/$campaignId"
+                        params={{ campaignId: campaign.id }}
+                        translationKey="campaigns.open_campaign_studio"
+                        translationNamespace="navigation"
+                        fallbackText={t("actions.open_studio")}
+                        variant="ghost"
+                        size="sm"
+                        className="shrink-0"
+                      >
+                        {t("actions.open_studio")}
+                      </LocalizedButtonLink>
                     </div>
                   </List.Item>
                 ))}
@@ -275,9 +291,17 @@ export function GameMasterDashboard({
             <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">
               {t("badges.upcoming_touchpoints", { count: feedbackFollowUps.length })}
             </Badge>
-            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-              <Link to="/gm/feedback">{t("actions.open_triage_board")}</Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/gm/feedback"
+              translationKey="game_management.open_triage_board"
+              translationNamespace="navigation"
+              fallbackText={t("actions.open_triage_board")}
+              variant="outline"
+              size="sm"
+              className="hidden sm:inline-flex"
+            >
+              {t("actions.open_triage_board")}
+            </LocalizedButtonLink>
           </div>
         </CardHeader>
         <CardContent>
@@ -308,14 +332,17 @@ export function GameMasterDashboard({
                       {t("labels.session")} {followUp.scheduledFor}
                     </p>
                   </div>
-                  <Button
-                    asChild
+                  <LocalizedButtonLink
+                    {...followUp.action}
+                    translationKey="navigation.view_details"
+                    translationNamespace="common"
+                    fallbackText={followUp.actionLabel}
                     variant="outline"
                     size="sm"
                     className="self-start sm:self-auto"
                   >
-                    <Link {...followUp.action}>{followUp.actionLabel}</Link>
-                  </Button>
+                    {followUp.actionLabel}
+                  </LocalizedButtonLink>
                 </List.Item>
               ))}
             </List>
@@ -380,9 +407,16 @@ function EmptyState({
         <h3 className="text-foreground text-lg font-semibold">{title}</h3>
         <p className="text-sm">{description}</p>
       </div>
-      <Button asChild variant="outline" size="sm">
-        <Link to={actionHref}>{actionLabel}</Link>
-      </Button>
+      <LocalizedButtonLink
+        to={actionHref}
+        translationKey="common.take_action"
+        translationNamespace="navigation"
+        fallbackText={actionLabel}
+        variant="outline"
+        size="sm"
+      >
+        {actionLabel}
+      </LocalizedButtonLink>
     </div>
   );
 }

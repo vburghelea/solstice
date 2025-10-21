@@ -9,7 +9,7 @@ import {
 } from "./social.schemas";
 
 export const followUser = createServerFn({ method: "POST" })
-  .validator(followInputSchema.parse)
+  .inputValidator(followInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const [
@@ -93,8 +93,8 @@ export const followUser = createServerFn({ method: "POST" })
       invalidateRelationshipCache(currentUser.id, data.followingId);
 
       // Audit
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
       const clientIp =
         (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
@@ -125,7 +125,7 @@ export const followUser = createServerFn({ method: "POST" })
   });
 
 export const unfollowUser = createServerFn({ method: "POST" })
-  .validator(unfollowInputSchema.parse)
+  .inputValidator(unfollowInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const [{ getCurrentUser }, { getDb }, { invalidateRelationshipCache }] =
@@ -164,8 +164,8 @@ export const unfollowUser = createServerFn({ method: "POST" })
       invalidateRelationshipCache(currentUser.id, data.followingId);
 
       // Audit
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
       const clientIp =
         (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
@@ -196,7 +196,7 @@ export const unfollowUser = createServerFn({ method: "POST" })
   });
 
 export const blockUser = createServerFn({ method: "POST" })
-  .validator(blockInputSchema.parse)
+  .inputValidator(blockInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const [{ getCurrentUser }, { getDb }, { invalidateRelationshipCache }] =
@@ -260,8 +260,8 @@ export const blockUser = createServerFn({ method: "POST" })
       invalidateRelationshipCache(currentUser.id, data.userId);
 
       // Audit
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
       const clientIp =
         (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;
@@ -293,7 +293,7 @@ export const blockUser = createServerFn({ method: "POST" })
   });
 
 export const unblockUser = createServerFn({ method: "POST" })
-  .validator(unblockInputSchema.parse)
+  .inputValidator(unblockInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const [{ getCurrentUser }, { getDb }, { invalidateRelationshipCache }] =
@@ -332,8 +332,8 @@ export const unblockUser = createServerFn({ method: "POST" })
       invalidateRelationshipCache(currentUser.id, data.userId);
 
       // Audit
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const xff = headers.get("x-forwarded-for") || headers.get("x-real-ip") || "";
       const clientIp =
         (headers.get("cf-connecting-ip") || xff.split(",")[0] || "").trim() || undefined;

@@ -6,7 +6,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { useAuthTranslation, useCommonTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
 import { useAppForm } from "~/lib/hooks/useAppForm";
@@ -158,9 +158,13 @@ export default function LoginForm(props?: LoginFormProps) {
               )}
             </form.Field>
             <div className="text-right text-sm">
-              <Link to="/auth/forgot-password" className="underline underline-offset-4">
-                {authT("buttons.forgot_password")}
-              </Link>
+              <LocalizedLink
+                to="/auth/forgot-password"
+                translationKey="auth.forgot_password"
+                translationNamespace="navigation"
+                fallbackText={authT("buttons.forgot_password")}
+                className="underline underline-offset-4"
+              />
             </div>
             <FormSubmitButton
               isSubmitting={form.state.isSubmitting || isLoading}
@@ -262,9 +266,13 @@ export default function LoginForm(props?: LoginFormProps) {
 
       <div className="text-center text-sm">
         {authT("login.buttons.no_account")}{" "}
-        <Link to="/auth/signup" className="underline underline-offset-4">
-          {authT("login.buttons.sign_up")}
-        </Link>
+        <LocalizedLink
+          to="/auth/signup"
+          translationKey="links.actions.signup"
+          translationNamespace="navigation"
+          fallbackText={authT("login.buttons.sign_up")}
+          className="underline underline-offset-4"
+        />
       </div>
     </div>
   );

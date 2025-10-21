@@ -1,5 +1,5 @@
 import { asyncRateLimit } from "@tanstack/pacer";
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import type { CheerioAPI } from "cheerio";
 import type { CheerioCrawlingContext } from "crawlee";
 import { eq } from "drizzle-orm";
@@ -9,7 +9,7 @@ import { CrawlSeverity, type CrawlEventLog } from "./logging";
 const START_PLAYING_BASE = "https://startplaying.games";
 const START_PLAYING_GRAPHQL = `${START_PLAYING_BASE}/api/graphql`;
 
-const getCheerioCrawler = serverOnly(async () => {
+const getCheerioCrawler = createServerOnlyFn(async () => {
   const { CheerioCrawler } = await import("crawlee");
   return CheerioCrawler;
 });
@@ -612,7 +612,7 @@ export function parseDetailPage(
   return detail;
 }
 
-const getDb = serverOnly(async () => {
+const getDb = createServerOnlyFn(async () => {
   const { db } = await import("~/db");
   const {
     gameSystems,
@@ -638,12 +638,12 @@ const getDb = serverOnly(async () => {
   };
 });
 
-const getCloudinary = serverOnly(async () => {
+const getCloudinary = createServerOnlyFn(async () => {
   const { uploadImage, computeChecksum } = await import("~/lib/storage/cloudinary");
   return { uploadImage, computeChecksum };
 });
 
-const getEnhancedUpload = serverOnly(async () => {
+const getEnhancedUpload = createServerOnlyFn(async () => {
   const { uploadGameSystemMediaFromUrl } = await import("~/lib/storage/media-assets");
   return { uploadGameSystemMediaFromUrl };
 });
@@ -895,7 +895,9 @@ export async function upsertDetail(
     .from(mediaAssets)
     .where(eq(mediaAssets.gameSystemId, systemId));
   const existingChecksums = new Set(
-    existingAssets.map((asset) => asset.checksum).filter(Boolean),
+    existingAssets
+      .map((asset: { checksum: string | null }) => asset.checksum)
+      .filter(Boolean),
   );
 
   let uploadedAssets = 0;

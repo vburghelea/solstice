@@ -150,28 +150,29 @@ export function GameShowcaseCard({
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h3 className="text-foreground text-lg font-semibold sm:text-xl dark:text-gray-50">
-                <LocalizedLink
-                  to={resolvedLink.to}
-                  {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-                  {...(resolvedLink.search
-                    ? {
-                        search: Object.fromEntries(
-                          Object.entries(resolvedLink.search)
-                            .filter(([, v]) => v !== undefined)
-                            .map(([k, v]) => [k, v as string | number | boolean]),
-                        ),
-                      }
-                    : {})}
-                  {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-                  className="flex items-center"
-                  translationKey="links.system_management.view_system_details"
-                  translationNamespace="navigation"
-                  fallbackText={game.name}
-                >
+              <LocalizedLink
+                to={resolvedLink.to}
+                {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+                {...(resolvedLink.search
+                  ? {
+                      search: Object.fromEntries(
+                        Object.entries(resolvedLink.search)
+                          .filter(([, v]) => v !== undefined)
+                          .map(([k, v]) => [k, v as string | number | boolean]),
+                      ),
+                    }
+                  : {})}
+                {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
+                className="group hover:text-primary focus-visible:ring-primary ml-0 block transform rounded pl-0 transition-all duration-300 ease-in-out hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                translationKey="links.system_management.view_system_details"
+                translationNamespace="navigation"
+                fallbackText={game.name}
+              >
+                <h3 className="text-foreground text-l ml-0 truncate pl-0 leading-tight font-bold sm:text-xl lg:text-2xl dark:text-gray-50">
                   {game.name}
-                </LocalizedLink>
-              </h3>
+                </h3>
+              </LocalizedLink>
+
               {game.description ? (
                 <p className="text-muted-foreground mt-2 line-clamp-3 text-sm dark:text-gray-300">
                   {game.description}

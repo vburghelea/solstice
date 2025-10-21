@@ -33,15 +33,12 @@ if (!i18n.isInitialized) {
   const resources = JSON.parse(JSON.stringify(bundledResources)) as Resource;
 
   if (isServer) {
-    const [{ default: FsBackend }, pathModule, fs] = await Promise.all([
+    // Server-only imports - dynamically imported to avoid client bundle inclusion
+    const [{ default: FsBackend }, { resolve, join }, { readFile }] = await Promise.all([
       import("i18next-fs-backend"),
       import("node:path"),
       import("node:fs/promises"),
     ]);
-    const { resolve, join } = pathModule as {
-      resolve: (...args: string[]) => string;
-      join: (...args: string[]) => string;
-    };
 
     i18n.use(FsBackend);
     backendConfig = {
@@ -63,7 +60,7 @@ if (!i18n.isInitialized) {
         if ((resources[language] as ResourceLanguage)[namespace]) continue;
         const filePath = join(localesRoot, language, `${namespace}.json`);
         try {
-          const content = await fs.readFile(filePath, "utf-8");
+          const content = await readFile(filePath, "utf-8");
           (resources[language] as ResourceLanguage)[namespace] = JSON.parse(content);
         } catch (error) {
           if (i18nConfig.debug) {

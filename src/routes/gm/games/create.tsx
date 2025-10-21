@@ -168,7 +168,7 @@ export function GameCreateView({
             size="sm"
           >
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            {t("create.back_to_games")}
+            {t("my_games.create.back_to_games")}
           </LocalizedButtonLink>
         </div>
       ) : null}
@@ -176,13 +176,15 @@ export function GameCreateView({
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] xl:grid-cols-[minmax(0,2fr)_minmax(0,20rem)]">
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle className="text-foreground">{t("create.title")}</CardTitle>
-            <CardDescription>{t("create.subtitle")}</CardDescription>
+            <CardTitle className="text-foreground">
+              {t("my_games.create.title")}
+            </CardTitle>
+            <CardDescription>{t("my_games.create.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {campaignId && isCampaignDataPending ? (
               <div className="text-muted-foreground text-center">
-                {t("create.loading_campaign_data")}
+                {t("my_games.create.loading_campaign_data")}
               </div>
             ) : (
               <>
@@ -190,15 +192,17 @@ export function GameCreateView({
                   <div className="border-border/60 bg-muted/30 grid gap-2 rounded-xl border p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-foreground text-sm font-medium">
-                        {t("create.campaign")}
+                        {t("my_games.create.campaign")}
                       </span>
                       <span className="text-muted-foreground text-xs tracking-wide uppercase">
-                        {t("create.context_synced")}
+                        {t("my_games.create.context_synced")}
                       </span>
                     </div>
                     <Select value={campaignId} disabled>
                       <SelectTrigger>
-                        <SelectValue placeholder={t("create.select_a_campaign")} />
+                        <SelectValue
+                          placeholder={t("my_games.create.select_a_campaign")}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {campaignData.data && (
@@ -232,7 +236,7 @@ export function GameCreateView({
                         setServerError(
                           error instanceof Error
                             ? error.message
-                            : t("create.failed_to_create_game"),
+                            : t("my_games.create.failed_to_create_game"),
                         );
                       }
                     }}
@@ -267,27 +271,27 @@ export function GameSessionTipsCard() {
   return (
     <Card className="md:col-span-1">
       <CardHeader>
-        <CardTitle>{t("create.tips.title")}</CardTitle>
-        <CardDescription>{t("create.tips.subtitle")}</CardDescription>
+        <CardTitle>{t("my_games.create.tips.title")}</CardTitle>
+        <CardDescription>{t("my_games.create.tips.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="text-muted-foreground space-y-4 text-sm">
         <div>
           <p className="text-foreground font-medium">
-            {t("create.tips.logistics_first.title")}
+            {t("my_games.create.tips.logistics_first.title")}
           </p>
-          <p className="mt-1">{t("create.tips.logistics_first.description")}</p>
+          <p className="mt-1">{t("my_games.create.tips.logistics_first.description")}</p>
         </div>
         <div>
           <p className="text-foreground font-medium">
-            {t("create.tips.safety_tooling.title")}
+            {t("my_games.create.tips.safety_tooling.title")}
           </p>
-          <p className="mt-1">{t("create.tips.safety_tooling.description")}</p>
+          <p className="mt-1">{t("my_games.create.tips.safety_tooling.description")}</p>
         </div>
         <div>
           <p className="text-foreground font-medium">
-            {t("create.tips.campaign_context.title")}
+            {t("my_games.create.tips.campaign_context.title")}
           </p>
-          <p className="mt-1">{t("create.tips.campaign_context.description")}</p>
+          <p className="mt-1">{t("my_games.create.tips.campaign_context.description")}</p>
         </div>
       </CardContent>
     </Card>

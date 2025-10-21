@@ -1,9 +1,16 @@
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { createServerOnlyFn } from "@tanstack/react-start";
 
 /**
  * Email template utilities for loading and rendering HTML email templates
+ * Server-only module - uses Node.js filesystem APIs
  */
+
+// Server-only imports
+const getServerDependencies = createServerOnlyFn(async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { resolve } = await import("node:path");
+  return { readFile, resolve };
+});
 
 export interface CampaignInvitationData {
   inviterName: string;
@@ -409,11 +416,18 @@ export async function renderReviewReminderEmail(
     reviewUrl: data.reviewUrl,
   });
 }
-const TEMPLATE_ROOT = resolve(process.cwd(), "src/shared/email-templates");
-const HEADER_PATH = resolve(TEMPLATE_ROOT, "partials/header.html");
-const FOOTER_PATH = resolve(TEMPLATE_ROOT, "partials/footer.html");
+async function getTemplatePaths() {
+  const { resolve } = await getServerDependencies();
+  const TEMPLATE_ROOT = resolve(process.cwd(), "src/shared/email-templates");
+  return {
+    TEMPLATE_ROOT,
+    HEADER_PATH: resolve(TEMPLATE_ROOT, "partials/header.html"),
+    FOOTER_PATH: resolve(TEMPLATE_ROOT, "partials/footer.html"),
+  };
+}
 
 async function loadTemplate(path: string): Promise<string> {
+  const { readFile } = await getServerDependencies();
   return readFile(path, "utf-8");
 }
 
@@ -431,6 +445,9 @@ async function renderTemplate(
   bodyFileName: string,
   replacements: Record<string, string>,
 ): Promise<string> {
+  const { resolve } = await getServerDependencies();
+  const { TEMPLATE_ROOT, HEADER_PATH, FOOTER_PATH } = await getTemplatePaths();
+
   const map = {
     currentYear: new Date().getFullYear().toString(),
     ...replacements,

@@ -675,6 +675,7 @@ function CampaignDetailsPage() {
                           to="/player/games/create"
                           search={{ campaignId }}
                           translationKey="links.game_management.create_session"
+                          translationNamespace="navigation"
                           fallbackText={t("detail.create_session")}
                           size="sm"
                         />

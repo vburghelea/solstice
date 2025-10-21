@@ -44,14 +44,12 @@ export function CampaignParticipantsList({
   >({
     mutationFn: updateCampaignParticipant,
     onSuccess: () => {
-      toast.success(t("campaigns.messages.participant_removed_success"));
+      toast.success(t("messages.participant_removed_success"));
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
     },
     onError: (error) => {
-      toast.error(
-        t("campaigns.errors.participant_remove_failed", { message: error.message }),
-      );
+      toast.error(t("errors.participant_remove_failed", { message: error.message }));
     },
   });
 
@@ -68,14 +66,12 @@ export function CampaignParticipantsList({
   >({
     mutationFn: removeCampaignParticipantBan,
     onSuccess: () => {
-      toast.success(t("campaigns.messages.participant_ban_removed_success"));
+      toast.success(t("messages.participant_ban_removed_success"));
       queryClient.invalidateQueries({ queryKey: ["campaignParticipants", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
     },
     onError: (error) => {
-      toast.error(
-        t("campaigns.errors.participant_ban_remove_failed", { message: error.message }),
-      );
+      toast.error(t("errors.participant_ban_remove_failed", { message: error.message }));
     },
   });
 
@@ -86,14 +82,12 @@ export function CampaignParticipantsList({
   const respondToCampaignApplicationMutation = useMutation({
     mutationFn: respondToCampaignApplication,
     onSuccess: () => {
-      toast.success(t("campaigns.messages.application_status_updated_success"));
+      toast.success(t("messages.application_status_updated_success"));
       queryClient.invalidateQueries({ queryKey: ["campaignApplications", campaignId] });
       queryClient.invalidateQueries({ queryKey: ["campaignDetails", campaignId] });
     },
     onError: (error) => {
-      toast.error(
-        t("campaigns.errors.application_update_failed", { message: error.message }),
-      );
+      toast.error(t("errors.application_update_failed", { message: error.message }));
     },
   });
 
@@ -130,14 +124,14 @@ export function CampaignParticipantsList({
       <Card>
         <CardHeader>
           <CardTitle>
-            {t("campaigns.participants_list.participants_title", {
+            {t("participants_list.participants_title", {
               count: approvedParticipants.length,
             })}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {approvedParticipants.length === 0 ? (
-            <p>{t("campaigns.participants_list.no_participants")}</p>
+            <p>{t("participants_list.no_participants")}</p>
           ) : (
             <ul className="space-y-2">
               {approvedParticipants.map((p) => (
@@ -157,8 +151,8 @@ export function CampaignParticipantsList({
                         username={p.user.name || p.user.email}
                       />{" "}
                       {p.userId === campaignOwnerId
-                        ? t("campaigns.participants_list.owner_label")
-                        : t("campaigns.participants_list.role_status", {
+                        ? t("participants_list.owner_label")
+                        : t("participants_list.role_status", {
                             role: p.role,
                             status: p.status,
                           })}
@@ -179,8 +173,8 @@ export function CampaignParticipantsList({
                       >
                         {removeParticipantMutation.isPending &&
                         removeParticipantMutation.variables?.data.participantId === p.id
-                          ? t("campaigns.participants_list.removing")
-                          : t("campaigns.participants_list.remove")}
+                          ? t("participants_list.removing")
+                          : t("participants_list.remove")}
                       </Button>
                     )}
                 </li>
@@ -194,7 +188,7 @@ export function CampaignParticipantsList({
         <Card className="mt-4">
           <CardHeader>
             <CardTitle>
-              {t("campaigns.participants_list.pending_applications_title", {
+              {t("participants_list.pending_applications_title", {
                 count: pendingApplications.length,
               })}
             </CardTitle>
@@ -217,7 +211,7 @@ export function CampaignParticipantsList({
                         userId={p.userId}
                         username={p.user.name || p.user.email}
                       />{" "}
-                      {t("campaigns.participants_list.status_label", {
+                      {t("participants_list.status_label", {
                         status: p.status,
                       })}
                     </span>
@@ -230,8 +224,8 @@ export function CampaignParticipantsList({
                       disabled={respondToCampaignApplicationMutation.isPending}
                     >
                       {respondToCampaignApplicationMutation.isPending
-                        ? t("campaigns.participants_list.approving")
-                        : t("campaigns.participants_list.approve")}
+                        ? t("participants_list.approving")
+                        : t("participants_list.approve")}
                     </Button>
                     <Button
                       variant="destructive"
@@ -240,8 +234,8 @@ export function CampaignParticipantsList({
                       disabled={respondToCampaignApplicationMutation.isPending}
                     >
                       {respondToCampaignApplicationMutation.isPending
-                        ? t("campaigns.participants_list.rejecting")
-                        : t("campaigns.participants_list.reject")}
+                        ? t("participants_list.rejecting")
+                        : t("participants_list.reject")}
                     </Button>
                   </div>
                 </li>
@@ -255,7 +249,7 @@ export function CampaignParticipantsList({
         <Card className="mt-4">
           <CardHeader>
             <CardTitle>
-              {t("campaigns.participants_list.banned_title", {
+              {t("participants_list.banned_title", {
                 count: rejectedParticipants.length,
               })}
             </CardTitle>
@@ -278,7 +272,7 @@ export function CampaignParticipantsList({
                         userId={p.userId}
                         username={p.user.name || p.user.email}
                       />{" "}
-                      {t("campaigns.participants_list.role_status", {
+                      {t("participants_list.role_status", {
                         role: p.role,
                         status: p.status,
                       })}
@@ -295,8 +289,8 @@ export function CampaignParticipantsList({
                   >
                     {removeRejectedParticipantMutation.isPending &&
                     removeRejectedParticipantMutation.variables?.data.id === p.id
-                      ? t("campaigns.participants_list.allowing")
-                      : t("campaigns.participants_list.allow")}
+                      ? t("participants_list.allowing")
+                      : t("participants_list.allow")}
                   </Button>
                 </li>
               ))}

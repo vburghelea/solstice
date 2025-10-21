@@ -61,7 +61,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
     return (
       <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
         <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+          <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-4 px-4 py-4 md:px-8">
             <div className="bg-muted h-9 w-32 animate-pulse rounded" />
             <nav className="hidden items-center gap-2 text-sm font-medium md:flex">
               <div className="bg-muted h-8 w-20 animate-pulse rounded" />
@@ -76,7 +76,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
             </div>
           </div>
           <div className="border-border/40 from-primary-soft/30 to-primary-soft/10 border-t bg-gradient-to-r via-transparent">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
+            <div className="mx-auto flex w-full max-w-screen-xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
               <div className="bg-muted h-4 w-96 animate-pulse rounded" />
               <div className="text-muted-strong flex flex-wrap items-center gap-2 text-xs">
                 <div className="bg-muted h-6 w-24 animate-pulse rounded-full" />
@@ -114,7 +114,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
   return (
     <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
       <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+        <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-4 px-4 py-4 md:px-8">
           <Link
             to={getLocalizedNavUrl("/")}
             search={(current) => current}
@@ -201,7 +201,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
           </button>
         </div>
         <div className="border-border/40 from-primary-soft/30 to-primary-soft/10 border-t bg-gradient-to-r via-transparent">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
+          <div className="mx-auto flex w-full max-w-screen-xl flex-col gap-2 px-4 py-3 text-sm md:flex-row md:items-center md:justify-between md:px-8">
             <p className="text-foreground font-medium">{t("hero.complete_profile")}</p>
             <div className="text-muted-strong flex flex-wrap items-center gap-2 text-xs">
               <span className="bg-primary/15 text-primary rounded-full px-3 py-1 font-semibold">
@@ -298,7 +298,7 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
       </main>
 
       <footer className="border-border/40 bg-surface-default/80 border-t py-12">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 md:grid-cols-[1.5fr,1fr,1fr] md:px-8">
+        <div className="mx-auto grid w-full max-w-screen-xl gap-8 px-4 md:grid-cols-[1.5fr,1fr,1fr] md:px-8">
           <div className="space-y-3">
             <p className="text-muted-strong text-sm font-semibold tracking-[0.3em] uppercase">
               {t("brand.name")}

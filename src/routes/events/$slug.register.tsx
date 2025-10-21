@@ -52,6 +52,7 @@ import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { getUserTeams } from "~/features/teams/teams.queries";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import type { User } from "~/lib/auth/types";
+import { resolveLocalizedPath } from "~/lib/i18n/redirects";
 import { callServerFn, unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 type UserTeamEntry = {
@@ -69,10 +70,16 @@ type UserTeamEntry = {
 export const Route = createFileRoute("/events/$slug/register")({
   beforeLoad: async ({ context, location }) => {
     if (!context.user) {
-      throw redirect({
-        to: "/auth/login",
-        search: { redirect: location.pathname },
+      const localizedLoginPath = resolveLocalizedPath({
+        targetPath: "/auth/login",
+        language: context.language,
+        currentPath: location.pathname,
       });
+
+      throw redirect({
+        to: localizedLoginPath,
+        search: { redirect: location.pathname },
+      } as never);
     }
   },
   component: EventRegistrationPage,

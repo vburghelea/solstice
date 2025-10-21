@@ -65,6 +65,7 @@ import type {
 import type { EventRegistrationWithRoster } from "~/features/events/utils";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import { resolveLocalizedPath } from "~/lib/i18n/redirects";
 import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import { cn } from "~/shared/lib/utils";
 
@@ -91,14 +92,25 @@ export const Route = createFileRoute("/ops/events/$eventId/manage")({
   beforeLoad: async ({ context, location }) => {
     const { user } = context;
     if (!user) {
-      throw redirect({
-        to: "/auth/login",
-        search: { redirect: location.pathname },
+      const localizedLoginPath = resolveLocalizedPath({
+        targetPath: "/auth/login",
+        language: context.language,
+        currentPath: location.pathname,
       });
+
+      throw redirect({
+        to: localizedLoginPath,
+        search: { redirect: location.pathname },
+      } as never);
     }
 
     if (!isAdminClient(user)) {
-      throw redirect({ to: "/ops/events" });
+      const localizedEventsPath = resolveLocalizedPath({
+        targetPath: "/ops/events",
+        language: context.language,
+        currentPath: location.pathname,
+      });
+      throw redirect({ to: localizedEventsPath } as never);
     }
   },
   component: EventManagementPage,

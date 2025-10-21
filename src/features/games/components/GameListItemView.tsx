@@ -165,7 +165,7 @@ export function GameShowcaseCard({
                     : {})}
                   {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
                   className="flex items-center"
-                  translationKey="system_management.view_system_details"
+                  translationKey="links.system_management.view_system_details"
                   translationNamespace="navigation"
                   fallbackText={game.name}
                 >
@@ -240,10 +240,10 @@ export function GameShowcaseCard({
             variant="outline"
             size="sm"
             className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 flex shrink-0 items-center gap-1.5 rounded-full"
-            translationKey="system_management.view_system_details"
+            translationKey="links.system_management.view_system_details"
             translationNamespace="navigation"
             fallbackText={t("list_item.view_details")}
-            ariaLabelTranslationKey="system_management.view_system_details"
+            ariaLabelTranslationKey="links.system_management.view_system_details"
           >
             {t("list_item.view_details")}
             <ChevronRight className="ml-1 size-4" />

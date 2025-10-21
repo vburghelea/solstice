@@ -7,7 +7,6 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
-  CardHeader,
   CardTitle,
 } from "~/components/ui/card";
 import type { GameSystemListItem } from "~/features/game-systems/game-systems.types";
@@ -27,14 +26,15 @@ export function SystemCard({ system }: SystemCardProps) {
 
   return (
     <Card className="text-foreground overflow-hidden border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-neutral-100 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/75 dark:text-gray-50">
-      <LocalizedLink
-        to="/systems/$slug"
-        params={{ slug: system.slug }}
-        className="block"
-        ariaLabelTranslationKey="system_management.view_system_details"
-        translationNamespace="navigation"
-      >
-        <div className="relative aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-700">
+      {/* Hero section with overlay */}
+      <div className="relative aspect-[16/9]">
+        <LocalizedLink
+          to="/systems/$slug"
+          params={{ slug: system.slug }}
+          className="block h-full"
+          ariaLabelTranslationKey="links.system_management.view_system_details"
+          translationNamespace="navigation"
+        >
           {system.heroUrl ? (
             <CloudinaryImage
               imageUrl={system.heroUrl}
@@ -50,21 +50,29 @@ export function SystemCard({ system }: SystemCardProps) {
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center px-4 text-center text-sm text-slate-200 dark:text-slate-100">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700 px-4 text-center text-sm text-slate-200 dark:text-slate-100">
               {t("status.pending_moderation")}
             </div>
           )}
-        </div>
-      </LocalizedLink>
-      <CardHeader className="gap-2">
-        <CardTitle className="text-xl">{system.name}</CardTitle>
-        {system.summary ? (
-          <CardDescription className="text-muted-foreground line-clamp-2 text-sm dark:text-gray-300">
-            {system.summary}
-          </CardDescription>
-        ) : null}
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
+
+          {/* Overlay text on top of hero image */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <div className="absolute right-0 bottom-0 left-0 p-6 text-white">
+              <CardTitle className="text-2xl font-bold drop-shadow-lg">
+                {system.name}
+              </CardTitle>
+              {system.summary ? (
+                <CardDescription className="mt-2 line-clamp-2 text-sm text-gray-100 drop-shadow">
+                  {system.summary}
+                </CardDescription>
+              ) : null}
+            </div>
+          </div>
+        </LocalizedLink>
+      </div>
+
+      {/* System details section */}
+      <CardContent className="flex flex-col gap-3 p-6">
         <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs font-medium tracking-wide uppercase dark:text-gray-400">
           <span>{playersLabel}</span>
           <span className="bg-border h-2 w-[1px]" aria-hidden />
@@ -114,12 +122,12 @@ export function SystemCard({ system }: SystemCardProps) {
           </div>
         ) : null}
       </CardContent>
-      <CardFooter className="justify-end">
+      <CardFooter className="justify-end p-6 pt-0">
         <LocalizedButtonLink
           to="/systems/$slug"
           params={{ slug: system.slug }}
           className={cn(buttonVariants({ size: "sm" }), "ml-auto")}
-          translationKey="system_management.view_system_details"
+          translationKey="links.system_management.view_system_details"
           translationNamespace="navigation"
           fallbackText={t("buttons.view_details")}
         />

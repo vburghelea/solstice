@@ -120,6 +120,11 @@ function RootComponent() {
         return;
       }
 
+      // After initial language sync, we can enable client-side language detection
+      // for future sessions by storing the preference
+      const { storeLanguagePreference } = await import("~/lib/i18n/detector");
+      storeLanguagePreference(language);
+
       const snapshot = {
         routeLanguage: language,
         i18nLanguage: activeI18n.language,

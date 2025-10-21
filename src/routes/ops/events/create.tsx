@@ -3,15 +3,22 @@ import { ArrowLeftIcon } from "lucide-react";
 import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { EventCreateForm } from "~/features/events/components/event-create-form";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
+import { resolveLocalizedPath } from "~/lib/i18n/redirects";
 
 export const Route = createFileRoute("/ops/events/create")({
   beforeLoad: async ({ context, location }) => {
     const { user } = context;
     if (!user) {
-      throw redirect({
-        to: "/auth/login",
-        search: { redirect: location.pathname },
+      const localizedLoginPath = resolveLocalizedPath({
+        targetPath: "/auth/login",
+        language: context.language,
+        currentPath: location.pathname,
       });
+
+      throw redirect({
+        to: localizedLoginPath,
+        search: { redirect: location.pathname },
+      } as never);
     }
   },
   component: CreateEventPage,

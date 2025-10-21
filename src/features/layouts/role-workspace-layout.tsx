@@ -95,6 +95,7 @@ export function RoleWorkspaceLayout({
   const location = useRouterState({ select: (state) => state.location.pathname });
   const navigate = useNavigate();
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
+  const currentLanguage = useMemo(() => detectLanguageFromPath(location), [location]);
 
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return;
@@ -115,9 +116,12 @@ export function RoleWorkspaceLayout({
       queryClient.clear();
       await routerInstance.invalidate();
     } finally {
-      window.location.href = "/auth/login";
+      const loginRedirectPath = currentLanguage
+        ? getLocalizedUrl("/auth/login", currentLanguage, currentLanguage)
+        : "/auth/login";
+      window.location.href = loginRedirectPath;
     }
-  }, [isSigningOut, queryClient, routerInstance, t]);
+  }, [currentLanguage, isSigningOut, queryClient, routerInstance, t]);
 
   const resolvedWorkspaceLabel =
     workspaceLabel ??
@@ -155,8 +159,6 @@ export function RoleWorkspaceLayout({
     previousPersonaIdRef.current = persona.id;
     dispatchNavOpen("close");
 
-    // Get current language from path and preserve it during navigation
-    const currentLanguage = detectLanguageFromPath(location);
     const rawTargetPath = persona.defaultRedirect ?? persona.namespacePath ?? "/";
     const targetPath = currentLanguage
       ? getLocalizedUrl(rawTargetPath, currentLanguage)
@@ -170,7 +172,7 @@ export function RoleWorkspaceLayout({
     if (!isWithinNamespace || location !== targetPath) {
       void navigate({ to: targetPath } as never);
     }
-  }, [location, navigate, persona]);
+  }, [currentLanguage, location, navigate, persona]);
 
   return (
     <div

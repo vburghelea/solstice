@@ -13,6 +13,7 @@ import {
   sendPasswordResetEmail,
   sendWelcomeEmail,
 } from "~/lib/email/resend";
+import type { SupportedLanguage } from "~/lib/i18n/config";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | null = null;
@@ -26,8 +27,17 @@ const createAuth = async () => {
   const { env, getAuthSecret, getBaseUrl, isProduction } = await import(
     "~/lib/env.server"
   );
+  const { i18nConfig } = await import("~/lib/i18n/config");
 
   const baseUrl = getBaseUrl();
+  const resolvedBaseUrl = baseUrl || env.VITE_BASE_URL || "http://localhost:5173";
+  let baseUrlForParsing: URL | null = null;
+  try {
+    baseUrlForParsing = new URL(resolvedBaseUrl);
+  } catch (error) {
+    console.warn("Invalid base URL for auth redirects", error);
+  }
+  const supportedLanguages = new Set(i18nConfig.supportedLanguages);
   const isHttpsDeployment = baseUrl?.startsWith("https://") ?? false;
   const cookieDomain = env.COOKIE_DOMAIN;
   const allowedOAuthDomains = Array.isArray(env.OAUTH_ALLOWED_DOMAINS)
@@ -228,6 +238,69 @@ const createAuth = async () => {
             }
           }
         }
+
+        if (!ctx.context.responseHeaders) {
+          return;
+        }
+
+        const isOAuthCallback =
+          ctx.path.startsWith("/callback") || ctx.path.startsWith("/oauth2/callback");
+
+        if (!isOAuthCallback) {
+          return;
+        }
+
+        const locationHeader = ctx.context.responseHeaders.get("location");
+        if (!locationHeader) {
+          return;
+        }
+
+        const cookieHeader =
+          getCookieHeader(ctx.headers as Headers | Record<string, unknown> | undefined) ??
+          getCookieHeader(
+            (ctx.request as Request | { headers?: Headers | Record<string, unknown> })
+              ?.headers,
+          );
+
+        const languageFromCookies = resolveLanguageFromCookies(
+          cookieHeader,
+          supportedLanguages,
+        );
+
+        if (!languageFromCookies) {
+          return;
+        }
+
+        const parsedLocation = safeParseLocation(
+          locationHeader,
+          baseUrlForParsing,
+          resolvedBaseUrl,
+        );
+
+        if (!parsedLocation) {
+          return;
+        }
+
+        if (baseUrlForParsing && parsedLocation.origin !== baseUrlForParsing.origin) {
+          return;
+        }
+
+        const updatedPathname = localizePathname(
+          parsedLocation.pathname,
+          languageFromCookies,
+          i18nConfig,
+        );
+
+        if (updatedPathname === parsedLocation.pathname) {
+          return;
+        }
+
+        parsedLocation.pathname = updatedPathname;
+        const updatedLocation = isAbsoluteUrl(locationHeader)
+          ? parsedLocation.toString()
+          : `${parsedLocation.pathname}${parsedLocation.search}${parsedLocation.hash}`;
+
+        ctx.context.responseHeaders.set("location", updatedLocation);
       }),
     },
 
@@ -246,6 +319,125 @@ const createAuth = async () => {
     ],
   });
 };
+
+const LANGUAGE_COOKIE_NAME = "i18next";
+
+function getCookieHeader(
+  headers: Headers | Record<string, unknown> | undefined,
+): string | null {
+  if (!headers) {
+    return null;
+  }
+
+  if (headers instanceof Headers) {
+    return headers.get("cookie");
+  }
+
+  const headerRecord = headers as Record<string, unknown>;
+  const cookieValue = headerRecord?.["cookie"];
+
+  if (typeof cookieValue === "string") {
+    return cookieValue;
+  }
+
+  if (Array.isArray(cookieValue)) {
+    return cookieValue.join("; ");
+  }
+
+  return null;
+}
+
+function resolveLanguageFromCookies(
+  cookieHeader: string | null,
+  supportedLanguages: Set<SupportedLanguage>,
+): SupportedLanguage | null {
+  if (!cookieHeader) {
+    return null;
+  }
+
+  const cookies = cookieHeader.split(";");
+
+  for (const cookie of cookies) {
+    const [name, ...rawValue] = cookie.trim().split("=");
+    if (name !== LANGUAGE_COOKIE_NAME) {
+      continue;
+    }
+
+    const joinedValue = rawValue.join("=");
+    if (!joinedValue) {
+      continue;
+    }
+
+    let decodedValue = joinedValue.replace(/^"|"$/g, "");
+    try {
+      decodedValue = decodeURIComponent(decodedValue);
+    } catch (error) {
+      console.warn("Failed to decode language cookie", error);
+    }
+
+    if (supportedLanguages.has(decodedValue as SupportedLanguage)) {
+      return decodedValue as SupportedLanguage;
+    }
+  }
+
+  return null;
+}
+
+function safeParseLocation(
+  location: string,
+  baseUrl: URL | null,
+  fallbackBase: string,
+): URL | null {
+  try {
+    if (isAbsoluteUrl(location)) {
+      return new URL(location);
+    }
+
+    if (baseUrl) {
+      return new URL(location, baseUrl);
+    }
+
+    return new URL(location, fallbackBase);
+  } catch (error) {
+    console.warn("Unable to parse auth redirect location", error);
+    return null;
+  }
+}
+
+function localizePathname(
+  pathname: string,
+  language: SupportedLanguage,
+  config: {
+    defaultLanguage: SupportedLanguage;
+    supportedLanguages: readonly SupportedLanguage[];
+  },
+): string {
+  const segments = pathname.split("/").filter(Boolean);
+  const hasTrailingSlash = pathname.endsWith("/") && pathname.length > 1;
+  const supported = new Set(config.supportedLanguages);
+
+  if (language === config.defaultLanguage) {
+    if (segments.length > 0 && supported.has(segments[0] as SupportedLanguage)) {
+      segments.shift();
+    }
+  } else if (segments.length > 0 && supported.has(segments[0] as SupportedLanguage)) {
+    segments[0] = language;
+  } else {
+    segments.unshift(language);
+  }
+
+  let nextPath = segments.length > 0 ? `/${segments.join("/")}` : "/";
+
+  if (hasTrailingSlash && nextPath !== "/") {
+    nextPath = `${nextPath}/`;
+  }
+
+  return nextPath;
+}
+
+function isAbsoluteUrl(value: string): boolean {
+  return /^https?:\/\//i.test(value);
+}
 
 // Export auth as a getter that creates instance on first use
 export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {

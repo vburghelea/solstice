@@ -19,7 +19,7 @@ import { formatDateAndTime } from "~/shared/lib/datetime";
 
 export const Route = createFileRoute("/ops")({
   beforeLoad: async ({ context, location }) => {
-    requireAuthAndProfile({ user: context.user, location });
+    requireAuthAndProfile({ user: context.user, location, language: context.language });
   },
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });

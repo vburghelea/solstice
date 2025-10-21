@@ -82,57 +82,63 @@ if (!i18n.isInitialized) {
     i18n.use(HttpBackend);
   }
 
+  const initOptions: Record<string, unknown> = {
+    initImmediate: !isServer,
+
+    // Fallback configuration
+    fallbackLng: i18nConfig.fallbackLanguage,
+
+    // Default namespace
+    defaultNS: "common",
+
+    // Available namespaces
+    ns: i18nConfig.namespaces,
+
+    // Debug in development
+    debug: i18nConfig.debug,
+
+    // Interpolation configuration
+    interpolation: i18nConfig.interpolation,
+
+    // React configuration
+    react: i18nConfig.react,
+
+    backend: backendConfig,
+
+    // Performance optimizations
+    load: "languageOnly", // Only load 'en', 'de', 'pl' (not 'en-US', 'de-DE', etc.)
+    lowerCaseLng: true, // Convert language codes to lowercase
+    supportedLngs: i18nConfig.supportedLanguages,
+
+    // Error handling
+    missingKeyHandler: (lngs: readonly string[], ns: string, key: string) => {
+      if (i18nConfig.debug) {
+        console.warn(
+          `Missing translation key: ${key} for languages: ${lngs.join(", ")}, namespace: ${ns}`,
+        );
+      }
+    },
+
+    // Save missing keys (useful for development)
+    saveMissing: i18nConfig.debug,
+
+    // Use fallback resources
+    resources,
+  };
+
+  // Server-specific configuration
+  if (isServer) {
+    initOptions["preload"] = i18nConfig.supportedLanguages;
+    initOptions["detection"] = i18nConfig.detection;
+    i18n.use(LanguageDetector);
+  } else {
+    // Client: Start with fallback language, will be updated from route context
+    initOptions["lng"] = i18nConfig.fallbackLanguage;
+  }
+
   await i18n
-    .use(LanguageDetector) // Detect user language
     .use(initReactI18next) // Pass i18n instance to react-i18next
-    .init({
-      initImmediate: !isServer,
-
-      // Fallback configuration
-      fallbackLng: i18nConfig.fallbackLanguage,
-
-      // Default namespace
-      defaultNS: "common",
-
-      // Available namespaces
-      ns: i18nConfig.namespaces,
-
-      // Debug in development
-      debug: i18nConfig.debug,
-
-      // Options for language detector
-      detection: i18nConfig.detection,
-
-      // Interpolation configuration
-      interpolation: i18nConfig.interpolation,
-
-      // React configuration
-      react: i18nConfig.react,
-
-      backend: backendConfig,
-
-      ...(isServer && { preload: i18nConfig.supportedLanguages }),
-
-      // Performance optimizations
-      load: "languageOnly", // Only load 'en', 'de', 'pl' (not 'en-US', 'de-DE', etc.)
-      lowerCaseLng: true, // Convert language codes to lowercase
-      supportedLngs: i18nConfig.supportedLanguages,
-
-      // Error handling
-      missingKeyHandler: (lngs: readonly string[], ns: string, key: string) => {
-        if (i18nConfig.debug) {
-          console.warn(
-            `Missing translation key: ${key} for languages: ${lngs.join(", ")}, namespace: ${ns}`,
-          );
-        }
-      },
-
-      // Save missing keys (useful for development)
-      saveMissing: i18nConfig.debug,
-
-      // Use fallback resources
-      resources,
-    });
+    .init(initOptions);
 
   if (isServer) {
     await i18n.loadLanguages(i18nConfig.supportedLanguages);

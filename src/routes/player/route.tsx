@@ -45,11 +45,11 @@ type UserTeamsData = Awaited<ReturnType<typeof getUserTeams>>;
 export const Route = createFileRoute("/player")({
   beforeLoad: async ({ context, location }) => {
     if (location.pathname.startsWith("/player/onboarding")) {
-      requireAuth({ user: context.user, location });
+      requireAuth({ user: context.user, location, language: context.language });
       return;
     }
 
-    requireAuthAndProfile({ user: context.user, location });
+    requireAuthAndProfile({ user: context.user, location, language: context.language });
   },
   loader: async () => {
     const resolution = await resolvePersonaResolution({ data: {} });

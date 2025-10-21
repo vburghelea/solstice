@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Calendar, Clock, Globe2, MapPin, Sparkles, Users } from "lucide-react";
 import { useState } from "react";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 
 import { LanguageTag } from "~/components/LanguageTag";
 import { Avatar } from "~/components/ui/avatar";
@@ -107,21 +108,25 @@ function VisitGameDetailPage() {
             {gt("game_detail.unavailable.message")}
           </p>
           <div className="token-gap-sm flex flex-wrap items-center justify-center">
-            <Link
+            <LocalizedLink
               to="/search"
+              translationKey="actions.search"
+              translationNamespace="navigation"
               className={cn(buttonVariants({ size: "sm" }), "rounded-full")}
             >
               {gt("game_detail.unavailable.browse_games")}
-            </Link>
-            <Link
+            </LocalizedLink>
+            <LocalizedLink
               to="/"
+              translationKey="main.home"
+              translationNamespace="navigation"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "sm" }),
                 "rounded-full",
               )}
             >
               {gt("game_detail.unavailable.visit_homepage")}
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
       </VisitorShell>
@@ -631,13 +636,15 @@ function VisitGameDetailPage() {
                       </div>
                     ) : null}
                     <div>
-                      <Link
+                      <LocalizedLink
                         to="/systems/$slug"
                         params={{ slug: systemDetails.slug }}
+                        translationKey="links.system_management.view_system_details"
+                        translationNamespace="navigation"
                         className="text-primary text-body-sm font-semibold underline-offset-4 hover:underline"
                       >
                         {gt("game_detail.sections.system_spotlight.explore_full_profile")}
-                      </Link>
+                      </LocalizedLink>
                     </div>
                   </div>
                 ) : null}

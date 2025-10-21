@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
-import { buttonVariants } from "~/components/ui/button";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import {
   GameListItemView,
   GameShowcaseCard,
@@ -12,7 +12,7 @@ import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { getCurrentUserProfileSafe } from "~/features/profile/profile.safe-queries";
 import { useCommonTranslation, useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { QuickFiltersBar } from "~/shared/components/quick-filters-bar";
-import { cn, normalizeText } from "~/shared/lib/utils";
+import { normalizeText } from "~/shared/lib/utils";
 import { List } from "~/shared/ui/list";
 
 type PlayerFilterContext = {
@@ -244,21 +244,22 @@ function SearchPage() {
                 <p className="text-muted-foreground/80 text-sm">
                   {gt("search.no_games.subtitle")}
                 </p>
-                <Link
+                <LocalizedButtonLink
                   to="/auth/signup"
-                  className={cn(
-                    buttonVariants({ size: "sm", variant: "outline" }),
-                    "mt-2 rounded-full",
-                  )}
+                  translationKey="links.actions.signup"
+                  translationNamespace="navigation"
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 rounded-full"
                 >
                   {gt("search.no_games.become_host")}
-                </Link>
+                </LocalizedButtonLink>
               </div>
             ) : (
               <>
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-muted-foreground text-sm">
-                    {ct("common.showing_results", {
+                    {ct("showing_results", {
                       count: filteredGames.length,
                       itemType:
                         filteredGames.length === 1

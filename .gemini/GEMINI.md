@@ -628,38 +628,6 @@ See /docs/development-backlog.md for prioritized feature implementation tickets
 - **Environment Variables:** `NETLIFY_DATABASE_URL`, `NETLIFY_DATABASE_URL_UNPOOLED` (Netlify auto), `DATABASE_URL`, `DATABASE_URL_UNPOOLED` (manual), `DATABASE_POOLED_URL`, `DATABASE_UNPOOLED_URL` (custom override).
 - **Best Practices:** Use default `db` for most cases, explicitly use `pooledDb` in serverless functions, `unpooledDb` for migrations.
 
-**Development Backlog (docs/development-backlog.md):**
-
-- **Completed Work:** Roundup Games Design System, Profile Schema Extension, Complete Profile Onboarding Flow.
-- **High Priority Features:** Events Feature Frontend Implementation, Integrate Roles System with Admin Access.
-- **Next Up:** UI Component Consolidation, Members Directory Feature, Team Invitations Flow.
-- **Future Roadmap:** Event Registration Payment, E-transfer, Image Uploads, Mobile PWA, Public Content Pages, Advanced Permissions, Bulk Operations, Analytics Dashboard.
-- **Cross-Cutting Notes:** All new features require E2E tests, documentation updates, Zod validation for server functions, shadcn components installed to `src/components/ui`, rate limiting with Pacer.
-
-**E2E Auth Validation Updates (docs/e2e-auth-validation-updates.md):**
-
-- **Updates:** Tests updated to match TanStack Form validation behavior (error messages) instead of HTML5 validation.
-- **Password Mismatch:** Added timeout for TanStack Form validation.
-- **Email Format:** Verifies invalid email prevents navigation.
-- **Server-Side Validation:** Separate file for tests requiring API responses.
-- **Search Functionality:** Debounced search requires ~2 seconds timeout.
-- **UI Structure:** Differences from test expectations (e.g., no `.transition-shadow` classes).
-
-**E2E Testing Issues (docs/e2e-testing-issues.md):**
-
-- **Comprehensive Patch:** Applied fixes for logout, WebKit navigation, login error handling, Firefox slowMo.
-- **All Issues Fixed:** Logout tests, Firefox NS_BINDING_ABORTED, navigation issues with SafeLink, profile/team management, login error display, WebKit navigation.
-- **Key Fixes:** Better Auth's `signOut()`, try-catch for login errors, SafeLink for WebKit, 50ms slowMo for Firefox.
-- **Root Cause Analysis:** TanStack Router + WebKit incompatibility, logout state management, browser timing differences, error state rendering.
-- **Recommended Changes:** Server-side logout, loading states, WebKit-compatible navigation component (`SafeLink`), proper error boundaries, navigation guards.
-
-**E2E Testing Workarounds (docs/e2e-testing-workarounds.md):**
-
-- **Firefox:** `slowMo: 100` to prevent `NS_BINDING_ABORTED` errors.
-- **WebKit/Safari:** `SafeLink` component (uses native `<a>` tags, handles navigation with `useNavigate()`, detects active states).
-- **Better Auth `signOut`:** Use documented method with `fetchOptions` for consistent behavior.
-- **Login Error Handling:** Try-catch wrapper around auth operations.
-
 **Project Brief (docs/project-brief.md):**
 
 - **Overview:** Comprehensive platform for tabletop/board game enthusiasts to organize sessions, events, memberships, teams.

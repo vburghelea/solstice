@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouteContext } from "@tanstack/react-router";
 import { format } from "date-fns";
 import {
   ArrowLeftIcon,
@@ -36,6 +36,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Separator } from "~/components/ui/separator";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
@@ -217,12 +218,16 @@ function EventManagementPage() {
           <AlertTitle>{t("admin.not_found")}</AlertTitle>
           <AlertDescription>{t("admin.not_found_description")}</AlertDescription>
         </Alert>
-        <Button asChild className="mt-4">
-          <Link to="/ops/events">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            {t("admin.back_to_events")}
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/ops/events"
+          variant="default"
+          className="mt-4"
+          translationKey="navigation.back_to_events"
+          translationNamespace="navigation"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          {t("admin.back_to_events")}
+        </LocalizedButtonLink>
       </div>
     );
   }
@@ -312,23 +317,31 @@ function EventManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/ops/events">
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("admin.back_to_events")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/ops/events"
+            variant="ghost"
+            size="sm"
+            translationKey="navigation.back_to_events"
+            translationNamespace="navigation"
+          >
+            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+            {t("admin.back_to_events")}
+          </LocalizedButtonLink>
           <div>
             <h1 className="text-2xl font-bold">{t("admin.manage_event")}</h1>
             <p className="text-muted-foreground">{event.name}</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link to="/events/$slug" params={{ slug: event.slug }}>
-              {t("admin.view_public_page")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/events/$slug"
+            params={{ slug: event.slug }}
+            variant="outline"
+            translationKey="navigation.view_public_page"
+            translationNamespace="navigation"
+          >
+            {t("admin.view_public_page")}
+          </LocalizedButtonLink>
         </div>
       </div>
 

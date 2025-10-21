@@ -10,6 +10,10 @@ import {
   useNavigationTranslation,
 } from "~/hooks/useTypedTranslation";
 import type { AuthUser } from "~/lib/auth/types";
+import {
+  detectLanguageFromPath,
+  getLocalizedUrl as getLocalizedUrlFromDetector,
+} from "~/lib/i18n/detector";
 import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
 
@@ -18,7 +22,7 @@ type VisitorNavPath = "/" | "/events" | "/search" | "/systems" | "/teams";
 type VisitorNavItem = {
   label: string;
   to: VisitorNavPath;
-  search?: unknown;
+  search?: Record<string, unknown>;
 };
 
 const VISITOR_NAVIGATION: readonly VisitorNavItem[] = [
@@ -42,6 +46,15 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
   const { location } = useRouterState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = RootRoute.useRouteContext() as { user: AuthUser | null };
+
+  // Get current language from path
+  const currentLanguage = detectLanguageFromPath(location.pathname);
+
+  // Helper to get localized URL
+  const getLocalizedNavUrl = (path: string) => {
+    if (!currentLanguage) return path; // No language detected, return as-is
+    return getLocalizedUrlFromDetector(path, currentLanguage, currentLanguage);
+  };
 
   // Wait for translations to be ready to prevent hydration mismatch
   if (!commonReady || !navigationReady) {
@@ -87,18 +100,27 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
     label: navT(
       `main.${item.to === "/" ? "home" : item.to === "/search" ? "find_games" : item.to === "/systems" ? "game_systems" : item.to.replace("/", "")}`,
     ),
+    to: getLocalizedNavUrl(item.to),
   }));
 
-  const isActive = (path: string) =>
-    path === "/"
-      ? location.pathname === "/"
-      : location.pathname === path || location.pathname.startsWith(`${path}/`);
+  const isActive = (path: string) => {
+    const localizedPath = getLocalizedNavUrl(path);
+    return (
+      location.pathname === localizedPath ||
+      location.pathname.startsWith(`${localizedPath}/`)
+    );
+  };
 
   return (
     <div className="via-background to-background relative flex min-h-screen flex-col bg-gradient-to-b from-[#ffece0]">
       <header className="border-border/50 text-foreground sticky top-0 z-40 border-b bg-[color:color-mix(in_oklab,var(--surface-default)_92%,transparent)] shadow-sm transition-colors supports-[backdrop-filter]:bg-[color:color-mix(in_oklab,var(--surface-default)_88%,transparent)] supports-[backdrop-filter]:backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-8">
-          <Link to="/" className="text-foreground flex items-center gap-3 font-semibold">
+          <Link
+            to={getLocalizedNavUrl("/")}
+            search={(current) => current}
+            params={(current) => current}
+            className="text-foreground flex items-center gap-3 font-semibold"
+          >
             <span className="roundup-star-logo h-9 w-9" aria-hidden="true" />
             <span className="flex flex-col leading-tight">
               <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
@@ -112,7 +134,8 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
               <Link
                 key={item.to}
                 to={item.to}
-                search={(item.search ?? undefined) as never}
+                search={() => (item.search || {}) as never}
+                params={() => ({}) as never}
                 className={cn(
                   "rounded-full px-4 py-2 transition",
                   isActive(item.to)
@@ -128,7 +151,9 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
             <LanguageSwitcher variant="compact" showLabel={false} />
             {user ? (
               <Link
-                to="/player"
+                to={getLocalizedNavUrl("/player")}
+                search={(current) => current}
+                params={() => ({}) as never}
                 className="border-border/60 hover:border-primary/60 hover:bg-primary/10 text-foreground flex items-center gap-3 rounded-full border px-3 py-2 text-sm font-semibold transition"
               >
                 <Avatar
@@ -144,13 +169,17 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
             ) : (
               <>
                 <Link
-                  to="/auth/login"
+                  to={getLocalizedNavUrl("/auth/login")}
+                  search={(current) => current}
+                  params={() => ({}) as never}
                   className="text-muted-foreground hover:text-foreground text-sm font-semibold transition"
                 >
                   {navT("user.login")}
                 </Link>
                 <Link
-                  to="/auth/signup"
+                  to={getLocalizedNavUrl("/auth/signup")}
+                  search={(current) => current}
+                  params={() => ({}) as never}
                   className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition"
                 >
                   {navT("user.signup")}
@@ -194,7 +223,8 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                 <Link
                   key={`mobile-${item.to}`}
                   to={item.to}
-                  search={(item.search ?? undefined) as never}
+                  search={() => (item.search || {}) as never}
+                  params={() => ({}) as never}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-medium transition",
                     isActive(item.to)
@@ -212,7 +242,9 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                 </div>
                 {user ? (
                   <Link
-                    to="/player"
+                    to={getLocalizedNavUrl("/player")}
+                    search={(current) => current}
+                    params={() => ({}) as never}
                     className="border-border/60 hover:border-primary/60 hover:bg-primary/10 flex items-center gap-3 rounded-full border px-4 py-2 text-sm font-semibold transition"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -229,14 +261,18 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
                 ) : (
                   <>
                     <Link
-                      to="/auth/login"
+                      to={getLocalizedNavUrl("/auth/login")}
+                      search={(current) => current}
+                      params={() => ({}) as never}
                       className="text-muted-foreground hover:text-foreground rounded-full px-4 py-2 text-sm font-semibold transition"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {navT("user.login")}
                     </Link>
                     <Link
-                      to="/auth/signup"
+                      to={getLocalizedNavUrl("/auth/signup")}
+                      search={(current) => current}
+                      params={() => ({}) as never}
                       className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition"
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -274,13 +310,28 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
               {t("footer.plan_visit")}
             </p>
             <div className="text-muted-strong flex flex-col gap-1 text-sm">
-              <Link to="/events" className="hover:text-foreground transition">
+              <Link
+                to={getLocalizedNavUrl("/events")}
+                search={(current) => current}
+                params={(current) => current}
+                className="hover:text-foreground transition"
+              >
                 {t("footer.event_calendar")}
               </Link>
-              <Link to="/search" className="hover:text-foreground transition">
+              <Link
+                to={getLocalizedNavUrl("/search")}
+                search={(current) => current}
+                params={(current) => current}
+                className="hover:text-foreground transition"
+              >
                 {t("footer.find_game_night")}
               </Link>
-              <Link to="/systems" className="hover:text-foreground transition">
+              <Link
+                to={getLocalizedNavUrl("/systems")}
+                search={(current) => current}
+                params={(current) => current}
+                className="hover:text-foreground transition"
+              >
                 {t("footer.browse_systems")}
               </Link>
             </div>
@@ -290,10 +341,20 @@ export function VisitorShell({ children, contentClassName }: VisitorShellProps) 
               {t("footer.stay_in_touch")}
             </p>
             <div className="text-muted-strong flex flex-col gap-1 text-sm">
-              <Link to="/resources" className="hover:text-foreground transition">
+              <Link
+                to={getLocalizedNavUrl("/resources")}
+                search={(current) => current}
+                params={(current) => current}
+                className="hover:text-foreground transition"
+              >
                 {t("footer.resources")}
               </Link>
-              <Link to="/about" className="hover:text-foreground transition">
+              <Link
+                to={getLocalizedNavUrl("/about")}
+                search={(current) => current}
+                params={(current) => current}
+                className="hover:text-foreground transition"
+              >
                 {t("footer.about_roundup")}
               </Link>
               <a

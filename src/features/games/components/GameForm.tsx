@@ -9,7 +9,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import {
   Select,
   SelectContent,
@@ -1131,9 +1131,16 @@ export function GameForm({
             {t("buttons.cancel")}
           </Button>
         ) : (
-          <Button variant="outline" asChild>
-            <Link to="/player/games">{t("buttons.cancel")}</Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/player/games"
+            variant="outline"
+            translationKey="buttons.cancel"
+            translationNamespace="common"
+            fallbackText={t("buttons.cancel")}
+            ariaLabelTranslationKey="buttons.cancel"
+          >
+            {t("buttons.cancel")}
+          </LocalizedButtonLink>
         )}
         <FormSubmitButton isSubmitting={isSubmitting}>
           {initialValues?.id ? t("buttons.update_game") : t("buttons.create_game")}

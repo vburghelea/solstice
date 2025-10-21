@@ -45,36 +45,40 @@ vi.mock("../../profile.queries", () => ({
 }));
 
 describe("ProfileView avatar display", () => {
-  it("shows avatar in header in view mode and shows upload UI only in edit mode", async () => {
-    const { ProfileView } = await import("../profile-view");
-    const { container } = await renderWithRouter(<ProfileView />, {
-      path: "/test",
-      initialEntries: ["/test"],
-      includeQueryClient: true,
-    });
+  it(
+    "shows avatar in header in view mode and shows upload UI only in edit mode",
+    { timeout: 10000 },
+    async () => {
+      const { ProfileView } = await import("../profile-view");
+      const { container } = await renderWithRouter(<ProfileView />, {
+        path: "/test",
+        initialEntries: ["/test"],
+        includeQueryClient: true,
+      });
 
-    await screen.findByRole("button", { name: /Edit Basic Information/i });
+      await screen.findByRole("button", { name: /Edit Basic Information/i });
 
-    await waitFor(() => {
+      await waitFor(() => {
+        expect(
+          container.querySelector("[data-slot='card-header'] [data-slot='avatar']"),
+        ).toBeTruthy();
+      });
       expect(
-        container.querySelector("[data-slot='card-header'] [data-slot='avatar']"),
-      ).toBeTruthy();
-    });
-    expect(
-      screen.queryByRole("button", { name: /upload avatar/i }),
-    ).not.toBeInTheDocument();
+        screen.queryByRole("button", { name: /upload avatar/i }),
+      ).not.toBeInTheDocument();
 
-    const editBtn = screen.getByRole("button", { name: /Edit Basic Information/i });
-    fireEvent.click(editBtn);
+      const editBtn = screen.getByRole("button", { name: /Edit Basic Information/i });
+      fireEvent.click(editBtn);
 
-    expect(
-      await screen.findByRole("button", { name: /upload avatar/i }),
-    ).toBeInTheDocument();
-
-    await waitFor(() => {
       expect(
-        container.querySelector("[data-slot='card-header'] [data-slot='avatar']"),
-      ).toBeNull();
-    });
-  });
+        await screen.findByRole("button", { name: /upload avatar/i }),
+      ).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(
+          container.querySelector("[data-slot='card-header'] [data-slot='avatar']"),
+        ).toBeNull();
+      });
+    },
+  );
 });

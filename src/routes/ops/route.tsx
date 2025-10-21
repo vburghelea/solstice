@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CalendarDays, Home, Inbox, KanbanSquare } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -145,12 +146,14 @@ function OpsWorkspaceSummary() {
             <>
               <span className="text-foreground font-medium">{pendingList[0].name}</span>
               <span>{formatDateAndTime(pendingList[0].startDate)}</span>
-              <Link
+              <LocalizedLink
                 to="/admin/events-review"
+                translationKey="links.workspace.events_review"
+                translationNamespace="navigation"
                 className="text-primary text-xs font-medium"
               >
                 {t("workspaces.ops.summary.upcoming_events")}
-              </Link>
+              </LocalizedLink>
             </>
           ) : (
             <span>{t("workspaces.ops.summary.staff_on_duty")}</span>
@@ -180,14 +183,16 @@ function OpsWorkspaceSummary() {
                   {formatDateAndTime(nextPipelineEvent.startDate)}
                 </span>
                 <span className="block">{nextPipelineEvent.city ?? "Location TBD"}</span>
-                <Link
-                  from="/ops"
+                <LocalizedLink
                   to="/ops/events/$eventId"
                   params={{ eventId: nextPipelineEvent.id }}
+                  translationKey="links.workspace.manage_event"
+                  translationNamespace="navigation"
                   className="text-primary text-xs font-medium"
+                  ariaLabelTranslationKey="links.accessibility.link_aria_label.event_details"
                 >
                   {t("workspaces.ops.summary.staff_on_duty")}
-                </Link>
+                </LocalizedLink>
               </span>
             ) : (
               <span>{t("workspaces.ops.summary.venue_utilization")}</span>

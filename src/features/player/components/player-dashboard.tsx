@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import { useEffect, useId, useMemo, useState } from "react";
 
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -17,7 +17,6 @@ import { Checkbox } from "~/components/ui/checkbox";
 import {
   Calendar,
   CheckCircle2,
-  CreditCard,
   ScrollText,
   Swords,
   Trophy,
@@ -685,10 +684,12 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               </div>
               <div className="mt-3 space-y-2">
                 {pendingReviews.map((review) => (
-                  <Link
+                  <LocalizedLink
                     key={`${review.gameId}-${review.dateTime.toISOString()}`}
                     to={`/player/games/${review.gameId}#gm-review`}
                     className="group border-primary/30 bg-primary/10 hover:border-primary/50 hover:bg-primary/15 flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition"
+                    translationKey="games.review_game"
+                    translationNamespace="navigation"
                   >
                     <div className="flex min-w-0 flex-col">
                       <span className="text-foreground truncate font-medium">
@@ -704,7 +705,7 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                     <span className="text-primary group-hover:text-primary/80 text-xs font-semibold tracking-widest uppercase transition">
                       {playerT("dashboard.ui.start_review")}
                     </span>
-                  </Link>
+                  </LocalizedLink>
                 ))}
               </div>
             </CardContent>
@@ -788,55 +789,41 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
             </div>
             <Separator />
             <div className="grid gap-2">
-              <Button
-                asChild
+              <LocalizedButtonLink
+                to="/player/profile"
+                onClick={() => {
+                  posthog.capture("player_dashboard_action_selected", {
+                    action: "profile",
+                  });
+                }}
                 variant="outline"
                 className="w-full justify-center gap-2 text-center"
-              >
-                <Link
-                  to="/player/profile"
-                  onClick={() => {
-                    posthog.capture("player_dashboard_action_selected", {
-                      action: "profile",
-                    });
-                  }}
-                >
-                  <Users className="h-4 w-4" />{" "}
-                  {playerT("dashboard.actions.edit_profile")}
-                </Link>
-              </Button>
-              <Button asChild className="w-full justify-center gap-2 text-center">
-                <Link
-                  to="/player/membership"
-                  onClick={() => {
-                    posthog.capture("player_dashboard_action_selected", {
-                      action: "membership",
-                    });
-                  }}
-                >
-                  <CreditCard className="h-4 w-4" />
-                  {membershipStatus?.hasMembership
-                    ? playerT("dashboard.actions.manage_plan")
-                    : playerT("dashboard.actions.start_membership")}
-                </Link>
-              </Button>
-              <Button
-                asChild
+                translationKey="user.profile"
+                translationNamespace="navigation"
+              />
+              <LocalizedButtonLink
+                to="/player/membership"
+                onClick={() => {
+                  posthog.capture("player_dashboard_action_selected", {
+                    action: "membership",
+                  });
+                }}
+                className="w-full justify-center gap-2 text-center"
+                translationKey="links.membership.manage_membership"
+                translationNamespace="navigation"
+              />
+              <LocalizedButtonLink
+                to="/search"
+                onClick={() => {
+                  posthog.capture("player_dashboard_action_selected", {
+                    action: "discover-games",
+                  });
+                }}
                 variant="outline"
                 className="border-muted/40 bg-muted/20 text-foreground hover:bg-muted/30 w-full justify-center gap-2 text-center"
-              >
-                <Link
-                  to="/search"
-                  onClick={() => {
-                    posthog.capture("player_dashboard_action_selected", {
-                      action: "discover-games",
-                    });
-                  }}
-                >
-                  <Calendar className="h-4 w-4" />{" "}
-                  {playerT("dashboard.actions.find_games")}
-                </Link>
-              </Button>
+                translationKey="main.find_games"
+                translationNamespace="navigation"
+              />
             </div>
           </CardContent>
         </Card>
@@ -865,24 +852,25 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 <p className="text-muted-foreground text-sm">
                   {formatDateAndTime(nextGame.dateTime)} · {nextGame.location.address}
                 </p>
-                <Button asChild>
-                  <Link to={`/player/games/${nextGame.id}`}>
-                    {playerT("dashboard.actions.open_session_briefing")}
-                  </Link>
-                </Button>
+                <LocalizedButtonLink
+                  to={`/player/games/${nextGame.id}`}
+                  className="w-full"
+                  translationKey="dashboard.actions.open_session_briefing"
+                  translationNamespace="player"
+                />
               </div>
             ) : (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-muted-foreground text-sm">
                   {playerT("dashboard.ui.flexible_calendar")}
                 </p>
-                <Button
-                  asChild
+                <LocalizedButtonLink
                   variant="outline"
+                  to="/search"
                   className="border-muted/40 bg-muted/20 text-foreground hover:bg-muted/30"
-                >
-                  <Link to="/search">{playerT("dashboard.ui.discover_sessions")}</Link>
-                </Button>
+                  translationKey="common.discover_games"
+                  translationNamespace="navigation"
+                />
               </div>
             )}
           </CardContent>
@@ -1015,18 +1003,18 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                 {playerT("dashboard.ui.events_exploring.subtitle")}
               </CardDescription>
             </div>
-            <Button asChild variant="ghost" className="text-primary hover:text-primary">
-              <Link
-                to="/search"
-                onClick={() => {
-                  posthog.capture("player_dashboard_action_selected", {
-                    action: "see-all-events",
-                  });
-                }}
-              >
-                {playerT("dashboard.ui.see_all_events")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/events"
+              onClick={() => {
+                posthog.capture("player_dashboard_action_selected", {
+                  action: "see-all-events",
+                });
+              }}
+              variant="ghost"
+              className="text-primary hover:text-primary"
+              translationKey="links.event_management.browse_events"
+              translationNamespace="navigation"
+            />
           </CardHeader>
           <CardContent className="space-y-4">
             {upcomingEvents.length === 0 ? (
@@ -1069,10 +1057,13 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
               ) : (
                 <div className="space-y-3">
                   {topTeams.map((team) => (
-                    <Link
+                    <LocalizedLink
                       key={team.id}
                       to={`/player/teams/${team.id}`}
                       className="border-muted-foreground/30 hover:border-primary/60 flex items-center justify-between rounded-lg border px-3 py-3 transition-colors"
+                      translationKey="teams.view_team_details"
+                      translationNamespace="navigation"
+                      translationValues={{ teamName: team.name }}
                     >
                       <div>
                         <p className="text-foreground text-sm font-medium">{team.name}</p>
@@ -1087,26 +1078,22 @@ export function PlayerDashboard({ user }: { readonly user: AuthUser | null }) {
                           count: team.memberCount,
                         })}
                       </Badge>
-                    </Link>
+                    </LocalizedLink>
                   ))}
                 </div>
               )}
-              <Button
-                asChild
+              <LocalizedButtonLink
+                to="/player/teams"
+                onClick={() => {
+                  posthog.capture("player_dashboard_action_selected", {
+                    action: "teams",
+                  });
+                }}
                 variant="ghost"
                 className="text-primary hover:text-primary justify-start"
-              >
-                <Link
-                  to="/player/teams"
-                  onClick={() => {
-                    posthog.capture("player_dashboard_action_selected", {
-                      action: "teams",
-                    });
-                  }}
-                >
-                  {playerT("dashboard.ui.manage_teams")}
-                </Link>
-              </Button>
+                translationKey="links.team_management.manage_teams"
+                translationNamespace="navigation"
+              />
               {showSpotlight ? (
                 <div className="border-primary/40 bg-primary/5 rounded-lg border px-3 py-3 text-sm">
                   <p className="text-primary font-medium">

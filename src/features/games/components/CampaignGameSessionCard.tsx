@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card"; // Added Card imports
-import { SafeLink as Link } from "~/components/ui/SafeLink"; // Added Link import
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink"; // Added Link import
 import { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGamesTranslation } from "~/hooks/useTypedTranslation";
@@ -50,6 +50,8 @@ export function CampaignGameSessionCard({
     params: viewLink?.params ?? { gameId: game.id },
     from: viewLink?.from ?? "/player/campaigns/$campaignId",
     label: viewLink?.label ?? t("buttons.view_game"),
+    translationKey: viewLink?.translationKey ?? "links.common.view_details",
+    translationNamespace: viewLink?.translationNamespace ?? "navigation",
     ...(viewLink?.search ? { search: viewLink.search } : {}),
   };
 
@@ -105,16 +107,17 @@ export function CampaignGameSessionCard({
           </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link
-              to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-            >
-              {resolvedLink.label ?? t("buttons.view_game")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to={resolvedLink.to}
+            params={resolvedLink.params}
+            search={resolvedLink.search}
+            translationKey={resolvedLink.translationKey}
+            translationNamespace={resolvedLink.translationNamespace}
+            fallbackText={resolvedLink.label || t("buttons.view_game")}
+            variant="outline"
+            size="sm"
+            className="flex-1"
+          />
         </div>
       </CardContent>
       {isOwner && isActionable && (

@@ -22,7 +22,7 @@ import {
   Undo2,
   XCircle,
 } from "~/components/ui/icons";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   Select,
   SelectContent,
@@ -524,13 +524,13 @@ function CampaignDetailsPage() {
                                 "text-destructive-foreground hover:bg-destructive focus-visible:ring-destructive",
                             )}
                           >
-                            <Link
+                            <LocalizedLink
                               to={action.to}
                               params={action.params ?? {}}
                               aria-label={action.label}
                             >
                               <action.icon className="h-4 w-4" />
-                            </Link>
+                            </LocalizedLink>
                           </Button>
                         ) : (
                           <Button
@@ -671,11 +671,13 @@ function CampaignDetailsPage() {
                         </SelectContent>
                       </Select>
                       {isOwner ? (
-                        <Button size="sm" asChild>
-                          <Link to="/player/games/create" search={{ campaignId }}>
-                            {t("detail.create_session")}
-                          </Link>
-                        </Button>
+                        <LocalizedButtonLink
+                          to="/player/games/create"
+                          search={{ campaignId }}
+                          translationKey="links.game_management.create_session"
+                          fallbackText={t("detail.create_session")}
+                          size="sm"
+                        />
                       ) : null}
                     </div>
                   </div>

@@ -140,6 +140,20 @@ vi.mock("sonner", async (importOriginal) => {
   };
 });
 
+// Import the mock function directly at module level
+import { LocalizedLinkMock } from "~/tests/mocks/localized-link";
+
+// Use the comprehensive LocalizedLink mock from the mocks directory
+vi.mock("~/components/ui/LocalizedLink", () => ({
+  LocalizedLink: LocalizedLinkMock,
+  LocalizedNavLink: LocalizedLinkMock,
+  LocalizedButtonLink: LocalizedLinkMock,
+  LocalizedSubtleLink: LocalizedLinkMock,
+  LocalizedExternalLink: (props: { to: string } & Record<string, unknown>) => (
+    <LocalizedLinkMock {...props} external={true} />
+  ),
+}));
+
 // Mock PostHog to avoid gzip compression issues in tests
 vi.mock("posthog-node", () => ({
   PostHog: vi.fn().mockImplementation(() => ({

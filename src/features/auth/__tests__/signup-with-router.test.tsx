@@ -1,5 +1,9 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Setup mocks before imports
+import { localizedLinkMock, tanStackRouterMock } from "~/tests/mocks";
+
 import { auth } from "~/lib/auth-client";
 import { renderWithRouter, screen, waitFor } from "~/tests/utils";
 import SignupForm from "../components/signup";
@@ -33,6 +37,11 @@ vi.mock("~/lib/auth-client", () => ({
     signInWithOAuth: vi.fn(),
   },
 }));
+
+vi.mock("@tanstack/react-router", () => tanStackRouterMock);
+
+// Mock LocalizedLink
+vi.mock("~/components/ui/LocalizedLink", () => localizedLinkMock);
 
 describe("SignupForm with Router", () => {
   beforeEach(() => {

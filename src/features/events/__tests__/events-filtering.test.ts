@@ -76,8 +76,8 @@ describe("events filtering helpers", () => {
   it("builds a context with active filters", () => {
     const filters: EventFiltersState = {
       ...DEFAULT_EVENT_FILTERS,
-      country: "ca",
-      city: "Toronto ",
+      country: "DEU",
+      city: "Berlin",
       type: "league",
       status: "registration_open",
       registrationType: "individual",
@@ -86,8 +86,8 @@ describe("events filtering helpers", () => {
     const context = buildEventFilterContext(filters);
 
     expect(context).toMatchObject({
-      country: "ca",
-      normalizedCity: "toronto",
+      country: "DEU",
+      normalizedCity: "berlin",
       type: "league",
       status: "registration_open",
       registrationType: "individual",
@@ -108,31 +108,31 @@ describe("events filtering helpers", () => {
     const events = [
       createEvent({
         id: "city-match",
-        country: "ca",
-        city: "Toronto",
+        country: "DEU",
+        city: "Berlin",
         type: "league",
         status: "registration_open",
         registrationType: "individual",
       }),
       createEvent({
         id: "country-only",
-        country: "ca",
-        city: "Ottawa",
+        country: "DEU",
+        city: "München",
         type: "tournament",
         status: "published",
         registrationType: "team",
       }),
       createEvent({
         id: "different-country",
-        country: "us",
+        country: "USA",
         city: "Buffalo",
       }),
     ];
 
     const filters: EventFiltersState = {
       ...DEFAULT_EVENT_FILTERS,
-      country: "ca",
-      city: " toronto",
+      country: "DEU",
+      city: " Berlin",
       type: "league",
       status: "registration_open",
       registrationType: "individual",
@@ -148,15 +148,15 @@ describe("events filtering helpers", () => {
   it("determines when quick filters are active", () => {
     const filters: EventFiltersState = {
       ...DEFAULT_EVENT_FILTERS,
-      country: "ca",
-      city: "Toronto",
+      country: "DEU",
+      city: "Berlin",
     };
 
     const context = buildEventFilterContext(filters);
 
-    expect(isCountryFilterActive(context, "ca")).toBe(true);
-    expect(isCountryFilterActive(context, "us")).toBe(false);
-    expect(isCityFilterActive(context, "toronto")).toBe(true);
-    expect(isCityFilterActive(context, "Ottawa")).toBe(false);
+    expect(isCountryFilterActive(context, "DEU")).toBe(true);
+    expect(isCountryFilterActive(context, "USA")).toBe(false);
+    expect(isCityFilterActive(context, "Berlin")).toBe(true);
+    expect(isCityFilterActive(context, "München")).toBe(false);
   });
 });

@@ -1,8 +1,7 @@
 import { CalendarClockIcon, ClipboardListIcon, HeartPulseIcon } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGmTranslation } from "~/hooks/useTypedTranslation";
@@ -58,13 +57,14 @@ export function GameMasterFeedbackTriageBoard({
               </span>
             </div>
           </div>
-          <Button
-            asChild
+          <LocalizedButtonLink
+            to="/gm"
+            translationKey="game_management.back_to_studio"
+            translationNamespace="navigation"
+            fallbackText={t("feedback_triage.back_to_studio")}
             variant="secondary"
             className="text-primary bg-white hover:bg-white/90"
-          >
-            <Link to="/gm">{t("feedback_triage.back_to_studio")}</Link>
-          </Button>
+          />
         </div>
         <div className="absolute inset-0 rounded-3xl border border-white/15" />
       </section>
@@ -275,9 +275,16 @@ function TriageCard({
       </div>
       <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-3 text-xs">
         <span>{task.dueLabel}</span>
-        <Button asChild variant="ghost" size="sm" className="px-0 text-xs font-medium">
-          <Link {...task.action}>{task.actionLabel}</Link>
-        </Button>
+        <LocalizedButtonLink
+          {...task.action}
+          translationKey="game_management.view_session_details"
+          translationNamespace="navigation"
+          fallbackText={task.actionLabel}
+          variant="ghost"
+          size="sm"
+          className="px-0 text-xs font-medium"
+          ariaLabelTranslationKey="game_management.view_session_details_aria"
+        />
       </div>
     </article>
   );

@@ -483,7 +483,7 @@ async function seed() {
         shortDescription: "Draft event used to exercise admin approval flows",
         type: "tournament",
         status: "draft",
-        city: "Ottawa",
+        city: "München",
         country: "DEU",
         startDate: formatDateOnly(secondEventStart),
         endDate: formatDateOnly(secondEventEnd),

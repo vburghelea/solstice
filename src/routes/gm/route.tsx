@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { differenceInHours } from "date-fns";
 import { ClipboardList, Gamepad2, Home, Inbox, ScrollText, Users2 } from "lucide-react";
 import { useMemo, type ReactNode } from "react";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -244,9 +245,15 @@ function GameMasterWorkspaceSummary() {
             : t("workspaces.gm.summary.no_sessions_scheduled")
         }
         cta={
-          <Link to="/gm/games" className="text-primary text-xs font-medium">
+          <LocalizedLink
+            to="/gm/games"
+            translationKey="links.workspace.manage_sessions"
+            translationNamespace="navigation"
+            className="text-primary text-xs font-medium"
+            ariaLabelTranslationKey="links.accessibility.link_aria_label.game_management"
+          >
             {t("workspaces.gm.summary.manage_sessions")}
-          </Link>
+          </LocalizedLink>
         }
       />
       <SummaryCard
@@ -264,13 +271,16 @@ function GameMasterWorkspaceSummary() {
         }
         cta={
           highlightedCampaign ? (
-            <Link
+            <LocalizedLink
               to="/gm/campaigns/$campaignId"
               params={{ campaignId: highlightedCampaign.id }}
+              translationKey="links.workspace.campaign_workspace"
+              translationNamespace="navigation"
               className="text-primary text-xs font-medium"
+              ariaLabelTranslationKey="links.accessibility.link_aria_label.campaign_workspace"
             >
               {t("workspaces.gm.summary.view_workspace")}
-            </Link>
+            </LocalizedLink>
           ) : undefined
         }
       />
@@ -290,9 +300,15 @@ function GameMasterWorkspaceSummary() {
         }
         cta={
           pipelineSnapshot ? (
-            <Link to="/gm" className="text-primary text-xs font-medium">
+            <LocalizedLink
+              to="/gm"
+              translationKey="links.workspace.review_pipeline"
+              translationNamespace="navigation"
+              className="text-primary text-xs font-medium"
+              ariaLabelTranslationKey="links.accessibility.link_aria_label.pipeline_review"
+            >
               {t("workspaces.gm.summary.review_pipeline")}
-            </Link>
+            </LocalizedLink>
           ) : undefined
         }
       />

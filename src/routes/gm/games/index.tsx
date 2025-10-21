@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Calendar, ChevronRight, Gamepad2, PlusIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { RoleBadge } from "~/components/ui/RoleBadge";
 import {
   Select,
@@ -252,12 +253,14 @@ function GamesPage() {
               ))}
             </SelectContent>
           </Select>
-          <Button asChild>
-            <Link to="/gm/games/create">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              {tGames("my_games.create_new_game")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/gm/games/create"
+            translationKey="links.game_management.create_gm_game"
+            translationNamespace="navigation"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            {tGames("my_games.create_new_game")}
+          </LocalizedButtonLink>
         </div>
       </div>
 
@@ -271,12 +274,14 @@ function GamesPage() {
             <p className="text-muted-foreground mb-4 text-center">
               {tGames("my_games.no_games_subtitle")}
             </p>
-            <Button asChild>
-              <Link to="/gm/games/create">
-                <PlusIcon className="mr-2 h-4 w-4" />
-                {tGames("my_games.create_new_game")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/gm/games/create"
+              translationKey="links.game_management.create_gm_game"
+              translationNamespace="navigation"
+            >
+              <PlusIcon className="mr-2 h-4 w-4" />
+              {tGames("my_games.create_new_game")}
+            </LocalizedButtonLink>
           </CardContent>
         </Card>
       ) : (
@@ -339,12 +344,19 @@ function GamesPage() {
                             </span>
                           </div>
                         </div>
-                        <Button asChild variant="outline" size="sm" className="shrink-0">
-                          <Link to="/gm/games/$gameId" params={{ gameId: g.id }}>
-                            {tGames("list.view_button")}
-                            <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
-                          </Link>
-                        </Button>
+                        <LocalizedButtonLink
+                          to="/gm/games/$gameId"
+                          params={{ gameId: g.id }}
+                          translationKey="links.game_management.view_game_details"
+                          translationNamespace="navigation"
+                          variant="outline"
+                          size="sm"
+                          className="shrink-0"
+                          ariaLabelTranslationKey="links.accessibility.link_aria_label.game_details"
+                        >
+                          {tGames("list.view_button")}
+                          <ChevronRight className="ml-1 h-4 w-4" aria-hidden />
+                        </LocalizedButtonLink>
                       </div>
                     </article>
                   </li>

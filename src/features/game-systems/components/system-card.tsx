@@ -1,4 +1,4 @@
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 
 import { Badge } from "~/components/ui/badge";
 import { buttonVariants } from "~/components/ui/button";
@@ -27,7 +27,13 @@ export function SystemCard({ system }: SystemCardProps) {
 
   return (
     <Card className="text-foreground overflow-hidden border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-neutral-100 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/75 dark:text-gray-50">
-      <Link to="/systems/$slug" params={{ slug: system.slug }} className="block">
+      <LocalizedLink
+        to="/systems/$slug"
+        params={{ slug: system.slug }}
+        className="block"
+        ariaLabelTranslationKey="system_management.view_system_details"
+        translationNamespace="navigation"
+      >
         <div className="relative aspect-[16/9] bg-gradient-to-br from-slate-900 to-slate-700">
           {system.heroUrl ? (
             <CloudinaryImage
@@ -49,7 +55,7 @@ export function SystemCard({ system }: SystemCardProps) {
             </div>
           )}
         </div>
-      </Link>
+      </LocalizedLink>
       <CardHeader className="gap-2">
         <CardTitle className="text-xl">{system.name}</CardTitle>
         {system.summary ? (
@@ -109,13 +115,14 @@ export function SystemCard({ system }: SystemCardProps) {
         ) : null}
       </CardContent>
       <CardFooter className="justify-end">
-        <Link
+        <LocalizedButtonLink
           to="/systems/$slug"
           params={{ slug: system.slug }}
           className={cn(buttonVariants({ size: "sm" }), "ml-auto")}
-        >
-          {t("buttons.view_details")}
-        </Link>
+          translationKey="system_management.view_system_details"
+          translationNamespace="navigation"
+          fallbackText={t("buttons.view_details")}
+        />
       </CardFooter>
     </Card>
   );

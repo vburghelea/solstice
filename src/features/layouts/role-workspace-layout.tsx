@@ -18,12 +18,13 @@ import { toast } from "sonner";
 import { LanguageSwitcher } from "~/components/LanguageSwitcher";
 import { Avatar } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { RoleSwitcher } from "~/features/roles/components/role-switcher";
 import { useActivePersona } from "~/features/roles/role-switcher-context";
 import { useCommonTranslation, useRolesTranslation } from "~/hooks/useTypedTranslation";
 import { auth } from "~/lib/auth-client";
 import type { AuthUser } from "~/lib/auth/types";
+import { detectLanguageFromPath, getLocalizedUrl } from "~/lib/i18n/detector";
 import { Route as RootRoute } from "~/routes/__root";
 import { cn } from "~/shared/lib/utils";
 
@@ -154,7 +155,13 @@ export function RoleWorkspaceLayout({
     previousPersonaIdRef.current = persona.id;
     dispatchNavOpen("close");
 
-    const targetPath = persona.defaultRedirect ?? persona.namespacePath ?? "/";
+    // Get current language from path and preserve it during navigation
+    const currentLanguage = detectLanguageFromPath(location);
+    const rawTargetPath = persona.defaultRedirect ?? persona.namespacePath ?? "/";
+    const targetPath = currentLanguage
+      ? getLocalizedUrl(rawTargetPath, currentLanguage)
+      : rawTargetPath;
+
     const isWithinNamespace =
       persona.namespacePath === "/"
         ? location === "/"
@@ -375,9 +382,12 @@ function WorkspaceNavSection({
             ? activePath === item.to
             : activePath === item.to || activePath.startsWith(`${item.to}/`);
           return (
-            <Link
+            <LocalizedLink
               key={item.to}
               to={item.to}
+              translationKey={`workspace.navigation.${item.label.toLowerCase().replace(/\s+/g, "_")}`}
+              translationNamespace="navigation"
+              fallbackText={item.label}
               onClick={onNavigate}
               className={cn(
                 "group flex items-start gap-3 rounded-xl border px-3 py-3 text-left transition",
@@ -400,7 +410,7 @@ function WorkspaceNavSection({
               {item.badge ? (
                 <span className="text-xs font-medium">{item.badge}</span>
               ) : null}
-            </Link>
+            </LocalizedLink>
           );
         })}
       </nav>
@@ -462,7 +472,13 @@ function WorkspaceMobileHeader({
           >
             <Menu className="h-6 w-6" />
           </Button>
-          <Link to="/" className="text-foreground flex items-center gap-3">
+          <LocalizedLink
+            to="/"
+            translationKey="brand.home"
+            translationNamespace="navigation"
+            fallbackText={t("brand.name")}
+            className="text-foreground flex items-center gap-3"
+          >
             <span className="roundup-star-logo h-8 w-8" aria-hidden="true" />
             <span className="flex flex-col leading-tight">
               <span className="text-primary text-[0.65rem] font-semibold tracking-[0.3em] uppercase">
@@ -470,7 +486,7 @@ function WorkspaceMobileHeader({
               </span>
               <span className="text-sm font-semibold">{t("brand.slogan")}</span>
             </span>
-          </Link>
+          </LocalizedLink>
         </div>
         <div className="flex flex-col items-end gap-1 text-right">
           <span className="text-muted-foreground text-[0.65rem] font-semibold uppercase">
@@ -509,8 +525,11 @@ function WorkspaceMobileNav({
             : activePath === item.to || activePath.startsWith(`${item.to}/`);
           return (
             <li key={item.to} className="flex-1">
-              <Link
+              <LocalizedLink
                 to={item.to}
+                translationKey={`workspace.navigation.${item.label.toLowerCase().replace(/\s+/g, "_")}`}
+                translationNamespace="navigation"
+                fallbackText={item.label}
                 className={cn(
                   "flex h-[var(--workspace-mobile-nav-height)] flex-col items-center justify-center gap-1 text-xs",
                   "text-muted-foreground transition",
@@ -520,7 +539,7 @@ function WorkspaceMobileNav({
               >
                 <Icon className="h-5 w-5" aria-hidden />
                 <span>{item.label}</span>
-              </Link>
+              </LocalizedLink>
             </li>
           );
         })}
@@ -543,7 +562,13 @@ function WorkspaceBrandHeader({
   return (
     <section className="border-border/60 bg-muted/30 dark:bg-card/70 flex flex-col gap-6 rounded-2xl border px-5 py-6 shadow-sm sm:px-6">
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Link to="/" className="text-foreground flex items-center gap-3">
+        <LocalizedLink
+          to="/"
+          translationKey="brand.home"
+          translationNamespace="navigation"
+          fallbackText={t("brand.name")}
+          className="text-foreground flex items-center gap-3"
+        >
           <span className="roundup-star-logo h-12 w-12" aria-hidden="true" />
           <span className="flex flex-col leading-tight">
             <span className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
@@ -551,7 +576,7 @@ function WorkspaceBrandHeader({
             </span>
             <span className="text-lg font-semibold md:text-xl">{t("brand.slogan")}</span>
           </span>
-        </Link>
+        </LocalizedLink>
         <div className="flex max-w-xl flex-col gap-2 text-left sm:items-end sm:text-right">
           <span className="text-muted-foreground text-xs font-semibold uppercase">
             {subtitle}

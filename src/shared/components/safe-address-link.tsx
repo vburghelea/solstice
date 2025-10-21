@@ -1,4 +1,8 @@
+import { useCommonTranslation } from "~/hooks/useTypedTranslation";
+
 export function SafeAddressLink({ address }: { address: string }) {
+  const { t } = useCommonTranslation();
+
   if (!address.trim()) {
     return null;
   }
@@ -12,7 +16,7 @@ export function SafeAddressLink({ address }: { address: string }) {
       rel="noreferrer noopener"
       className="text-primary text-xs font-medium underline-offset-4 hover:underline"
     >
-      Open in Google Maps
+      {t("links.open_in_google_maps")}
     </a>
   );
 }

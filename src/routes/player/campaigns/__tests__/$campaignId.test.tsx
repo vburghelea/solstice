@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { toast } from "sonner";
+
 import {
   MOCK_CAMPAIGN,
   mockApplyToCampaign,
@@ -69,7 +70,7 @@ describe("Campaign Details Page", () => {
 
     await waitFor(() => {
       expect(screen.getByText(MOCK_CAMPAIGN.name)).toBeInTheDocument();
-      expect(screen.getByText(/Game Sessions/i)).toBeInTheDocument();
+      expect(screen.getByText("Game sessions")).toBeInTheDocument();
       // Session cards can duplicate names across mobile/desktop layouts; assert at least once
       expect(screen.getAllByText(MOCK_CAMPAIGN_GAME_1.name).length).toBeGreaterThan(0);
       expect(screen.getAllByText(MOCK_CAMPAIGN_GAME_2.name).length).toBeGreaterThan(0);
@@ -112,7 +113,7 @@ describe("Campaign Details Page", () => {
     });
 
     // Since sample games share the same name, assert list size via action links
-    const viewLinks = screen.getAllByRole("link", { name: /View Game/i });
+    const viewLinks = screen.getAllByRole("link", { name: "View Game" });
     expect(viewLinks).toHaveLength(1);
   });
 
@@ -124,7 +125,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    const link = await screen.findByRole("link", { name: /Create session/i });
+    const link = await screen.findByRole("link", { name: "Create session" });
     expect(link).toHaveAttribute(
       "href",
       `/player/games/create?campaignId=${MOCK_CAMPAIGN.id}`,
@@ -139,8 +140,8 @@ describe("Campaign Details Page", () => {
     });
 
     // Card titles are not semantic headings; assert by text
-    expect(await screen.findByText(/Invite Participants/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Manage Invitations/i)).toBeInTheDocument();
+    expect(await screen.findByText("Invite Participants")).toBeInTheDocument();
+    expect(await screen.findByText("Manage Invitations")).toBeInTheDocument();
   });
 
   it("hides owner-only sections for non-owner", async () => {
@@ -150,12 +151,8 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    expect(
-      screen.queryByRole("heading", { name: /Invite Participants/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", { name: /Manage Invitations/i }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Invite Participants")).not.toBeInTheDocument();
+    expect(screen.queryByText("Manage Invitations")).not.toBeInTheDocument();
   });
 
   it("shows Apply button for eligible non-owner and calls apply mutation", async () => {
@@ -167,7 +164,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    const applyButtons = await screen.findAllByRole("button", { name: /apply to join/i });
+    const applyButtons = await screen.findAllByRole("button", { name: "Apply to join" });
     expect(applyButtons.length).toBeGreaterThan(0);
 
     await userEvent.click(applyButtons[0]);
@@ -187,16 +184,14 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    // Enter edit mode if needed (form may already be visible)
-    const maybeEditBtn = screen.queryByRole("button", {
-      name: /Edit campaign details/i,
+    // Enter edit mode by clicking the edit button (uses aria-label)
+    const editBtn = screen.getByRole("button", {
+      name: "Edit campaign details",
     });
-    if (maybeEditBtn) {
-      await userEvent.click(maybeEditBtn);
-    }
+    await userEvent.click(editBtn);
 
-    // Update form should appear
-    const updateBtn = await screen.findByRole("button", { name: /Update Campaign/i });
+    // Update form should appear - look for the submit button with correct translation
+    const updateBtn = await screen.findByRole("button", { name: "Update Campaign" });
     await userEvent.click(updateBtn);
 
     expect(mockUpdateCampaign).toHaveBeenCalled();
@@ -204,7 +199,7 @@ describe("Campaign Details Page", () => {
     // After success, edit mode should close; original Edit button visible again
     await waitFor(() => {
       expect(
-        screen.queryByRole("button", { name: /Update Campaign/i }),
+        screen.queryByRole("button", { name: "Update Campaign" }),
       ).not.toBeInTheDocument();
     });
   });
@@ -231,7 +226,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: "Apply to join" })).toHaveLength(0);
   });
 
   it("hides Apply and shows block banner when user is blocked or blocking", async () => {
@@ -250,7 +245,7 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: "Apply to join" })).toHaveLength(0);
     expect(
       screen.getByText(
         /You cannot interact with this organizer due to block settings\./i,
@@ -270,7 +265,7 @@ describe("Campaign Details Page", () => {
       path: "/player/campaigns/$campaignId",
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
-    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: "Apply to join" })).toHaveLength(0);
   });
 
   it("hides Apply when user has a pending application", async () => {
@@ -285,7 +280,7 @@ describe("Campaign Details Page", () => {
       path: "/player/campaigns/$campaignId",
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
-    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: "Apply to join" })).toHaveLength(0);
   });
 
   it("hides Apply when user has a rejected participant status", async () => {
@@ -306,7 +301,7 @@ describe("Campaign Details Page", () => {
       path: "/player/campaigns/$campaignId",
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
-    expect(screen.queryAllByRole("button", { name: /apply to join/i })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: "Apply to join" })).toHaveLength(0);
   });
 
   // Error path for update flow
@@ -327,16 +322,16 @@ describe("Campaign Details Page", () => {
       initialEntries: [`/player/campaigns/${MOCK_CAMPAIGN.id}`],
     });
 
-    const maybeEdit = screen.queryByRole("button", {
-      name: /Edit campaign details/i,
+    const editBtn = screen.getByRole("button", {
+      name: "Edit campaign details",
     });
-    if (maybeEdit) await userEvent.click(maybeEdit);
+    await userEvent.click(editBtn);
 
-    const updateBtn = await screen.findByRole("button", { name: /Update Campaign/i });
+    const updateBtn = await screen.findByRole("button", { name: "Update Campaign" });
     await userEvent.click(updateBtn);
 
     expect(toast.error).toHaveBeenCalled();
     // Still in edit mode
-    expect(screen.getByRole("button", { name: /Update Campaign/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Update Campaign" })).toBeInTheDocument();
   });
 });

@@ -2,7 +2,6 @@ import type { CheckedState } from "@radix-ui/react-checkbox";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createFileRoute,
-  Link,
   redirect,
   useNavigate,
   useRouteContext,
@@ -29,6 +28,7 @@ import {
 } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import {
   Select,
@@ -234,12 +234,14 @@ function EventRegistrationPage() {
             <AlertTitle>{t("registration.event_not_found")}</AlertTitle>
             <AlertDescription>{t("registration.event_not_available")}</AlertDescription>
           </Alert>
-          <Button asChild className="mt-6">
-            <Link to="/events">
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("registration.back_to_events")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/events"
+            translationKey="links.event_registration.back_to_events"
+            translationNamespace="navigation"
+            className="mt-6"
+          >
+            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          </LocalizedButtonLink>
         </div>
       </VisitorShell>
     );
@@ -302,14 +304,18 @@ function EventRegistrationPage() {
             </AlertDescription>
           </Alert>
           <div className="mt-6 flex gap-2">
-            <Button asChild>
-              <Link to="/events/$slug" params={{ slug }}>
-                {t("registration.view_event_details")}
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/events">{t("registration.back_to_events")}</Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/events/$slug"
+              params={{ slug }}
+              translationKey="links.event_registration.view_event_details"
+              translationNamespace="navigation"
+            />
+            <LocalizedButtonLink
+              to="/events"
+              variant="outline"
+              translationKey="links.event_registration.back_to_events"
+              translationNamespace="navigation"
+            />
           </div>
         </div>
       </VisitorShell>
@@ -320,12 +326,16 @@ function EventRegistrationPage() {
     <VisitorShell>
       <div className="container mx-auto space-y-6 px-4 py-16">
         <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/events/$slug" params={{ slug }}>
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("registration.back_to_event_details")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/events/$slug"
+            params={{ slug }}
+            variant="ghost"
+            size="sm"
+            translationKey="links.event_registration.back_to_event_details"
+            translationNamespace="navigation"
+          >
+            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          </LocalizedButtonLink>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -432,9 +442,12 @@ function EventRegistrationPage() {
                       <Alert>
                         <AlertDescription>
                           {t("registration.need_team_to_register")} {""}
-                          <Link to="/player/teams" className="underline">
-                            {t("registration.join_create_team")}
-                          </Link>
+                          <LocalizedLink
+                            to="/player/teams"
+                            translationKey="links.event_registration.join_create_team"
+                            translationNamespace="navigation"
+                            className="underline"
+                          />
                         </AlertDescription>
                       </Alert>
                     )}
@@ -625,11 +638,12 @@ function EventRegistrationPage() {
                       {t("registration.payment_received_confirmation")}
                     </AlertDescription>
                   </Alert>
-                  <Button asChild variant="outline">
-                    <Link to="/player/events">
-                      {t("registration.return_to_dashboard")}
-                    </Link>
-                  </Button>
+                  <LocalizedButtonLink
+                    to="/player/events"
+                    variant="outline"
+                    translationKey="links.event_registration.return_to_dashboard"
+                    translationNamespace="navigation"
+                  />
                 </CardContent>
               </Card>
             )}

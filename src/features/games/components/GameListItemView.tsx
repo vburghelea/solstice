@@ -10,8 +10,7 @@ import {
 import type { ComponentType, ReactNode } from "react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
@@ -152,15 +151,26 @@ export function GameShowcaseCard({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <h3 className="text-foreground text-lg font-semibold sm:text-xl dark:text-gray-50">
-                <Link
+                <LocalizedLink
                   to={resolvedLink.to}
                   {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-                  {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
+                  {...(resolvedLink.search
+                    ? {
+                        search: Object.fromEntries(
+                          Object.entries(resolvedLink.search)
+                            .filter(([, v]) => v !== undefined)
+                            .map(([k, v]) => [k, v as string | number | boolean]),
+                        ),
+                      }
+                    : {})}
                   {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
                   className="flex items-center"
+                  translationKey="system_management.view_system_details"
+                  translationNamespace="navigation"
+                  fallbackText={game.name}
                 >
                   {game.name}
-                </Link>
+                </LocalizedLink>
               </h3>
               {game.description ? (
                 <p className="text-muted-foreground mt-2 line-clamp-3 text-sm dark:text-gray-300">
@@ -214,23 +224,30 @@ export function GameShowcaseCard({
               ? t("list_item.hosted_by", { name: game.owner?.name ?? game.owner?.email })
               : t("list_item.hosted_by_community")}
           </span>
-          <Button
-            asChild
+          <LocalizedButtonLink
+            to={resolvedLink.to}
+            {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+            {...(resolvedLink.search
+              ? {
+                  search: Object.fromEntries(
+                    Object.entries(resolvedLink.search)
+                      .filter(([, v]) => v !== undefined)
+                      .map(([k, v]) => [k, v as string | number | boolean]),
+                  ),
+                }
+              : {})}
+            {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             variant="outline"
             size="sm"
-            className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 shrink-0 gap-1.5 rounded-full"
+            className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 flex shrink-0 items-center gap-1.5 rounded-full"
+            translationKey="system_management.view_system_details"
+            translationNamespace="navigation"
+            fallbackText={t("list_item.view_details")}
+            ariaLabelTranslationKey="system_management.view_system_details"
           >
-            <Link
-              to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-              className="flex items-center"
-            >
-              {t("list_item.view_details")}
-              <ChevronRight className="ml-1 size-4" />
-            </Link>
-          </Button>
+            {t("list_item.view_details")}
+            <ChevronRight className="ml-1 size-4" />
+          </LocalizedButtonLink>
         </div>
       </div>
     </article>

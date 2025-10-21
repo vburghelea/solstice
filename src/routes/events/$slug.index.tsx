@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { format } from "date-fns";
 import {
   ArrowLeftIcon,
@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { Separator } from "~/components/ui/separator";
 import { Skeleton } from "~/components/ui/skeleton";
 import { checkEventRegistration, getEvent } from "~/features/events/events.queries";
@@ -90,12 +91,15 @@ function EventDetailPage() {
             <AlertTitle>{t("not_found.title")}</AlertTitle>
             <AlertDescription>{t("not_found.description")}</AlertDescription>
           </Alert>
-          <Button asChild className="mt-6">
-            <Link to="/events">
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("not_found.back_to_events")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/events"
+            translationKey="event_management.browse_events"
+            translationNamespace="navigation"
+            className="mt-6"
+          >
+            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+            {t("not_found.back_to_events")}
+          </LocalizedButtonLink>
         </div>
       </VisitorShell>
     );
@@ -134,12 +138,16 @@ function EventDetailPage() {
     <VisitorShell>
       <div className="container mx-auto space-y-6 px-4 py-16">
         <div className="flex items-center gap-4">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/events">
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("not_found.back_to_events")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/events"
+            translationKey="event_management.browse_events"
+            translationNamespace="navigation"
+            variant="ghost"
+            size="sm"
+          >
+            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+            {t("not_found.back_to_events")}
+          </LocalizedButtonLink>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -459,19 +467,28 @@ function EventDetailPage() {
                         <AlertDescription>
                           {t("detail_registration.sign_in_required", {
                             link: (
-                              <Link to="/auth/login" className="underline">
+                              <LocalizedLink
+                                to="/auth/login"
+                                translationKey="user.login"
+                                translationNamespace="navigation"
+                                className="underline"
+                              >
                                 sign in
-                              </Link>
+                              </LocalizedLink>
                             ),
                           })}
                         </AlertDescription>
                       </Alert>
                     ) : isRegistrationOpen && hasSpots ? (
-                      <Button asChild className="w-full">
-                        <Link to="/events/$slug/register" params={{ slug: event.slug }}>
-                          {t("detail_registration.register_now")}
-                        </Link>
-                      </Button>
+                      <LocalizedButtonLink
+                        to="/events/$slug/register"
+                        params={{ slug: event.slug }}
+                        translationKey="event_management.register_for_event"
+                        translationNamespace="navigation"
+                        className="w-full"
+                      >
+                        {t("detail_registration.register_now")}
+                      </LocalizedButtonLink>
                     ) : !isRegistrationOpen ? (
                       <Button disabled className="w-full">
                         {t("detail_registration.registration_closed")}

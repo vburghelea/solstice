@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   CalendarDays,
@@ -17,6 +17,7 @@ import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { Skeleton } from "~/components/ui/skeleton";
 import { RoleWorkspaceLayout } from "~/features/layouts/role-workspace-layout";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
@@ -287,9 +288,13 @@ function PlayerWorkspaceSummary() {
               membershipDetail
             )}
           </span>
-          <Link to="/player/membership" className="text-primary text-xs font-medium">
+          <LocalizedLink
+            to="/player/membership"
+            translationKey="links.membership.manage_membership"
+            className="text-primary text-xs font-medium"
+          >
             {t("workspaces.player.summary.manage_membership")}
-          </Link>
+          </LocalizedLink>
         </CardContent>
       </Card>
 
@@ -314,14 +319,15 @@ function PlayerWorkspaceSummary() {
                   { addSuffix: true },
                 )}
               </span>
-              <Link
-                from="/player"
+              <LocalizedLink
                 to="/player/games/$gameId"
                 params={{ gameId: nextGame.id }}
+                translationKey="links.game_management.view_game_details"
+                ariaLabelTranslationKey="links.accessibility.link_aria_label.game_details"
                 className="text-primary text-xs font-medium"
               >
                 {t("workspaces.player.summary.view_game_details")}
-              </Link>
+              </LocalizedLink>
             </>
           ) : (
             <span>{t("workspaces.player.summary.no_upcoming_games")}</span>
@@ -362,9 +368,13 @@ function PlayerWorkspaceSummary() {
                     })
                   : t("workspaces.player.summary.no_pending_invitations")}
               </span>
-              <Link to="/player/teams" className="text-primary text-xs font-medium">
+              <LocalizedLink
+                to="/player/teams"
+                translationKey="links.team_management.browse_teams"
+                className="text-primary text-xs font-medium"
+              >
                 {t("workspaces.player.summary.browse_teams")}
-              </Link>
+              </LocalizedLink>
             </>
           )}
         </CardContent>

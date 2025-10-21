@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { Button } from "~/components/ui/button";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -139,12 +140,14 @@ function CampaignsPage() {
               ))}
             </SelectContent>
           </Select>
-          <Button asChild>
-            <Link to="/gm/campaigns/create">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              {tCampaigns("my_campaigns.create_new_campaign")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/gm/campaigns/create"
+            translationKey="links.campaign_management.create_gm_campaign"
+            translationNamespace="navigation"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            {tCampaigns("my_campaigns.create_new_campaign")}
+          </LocalizedButtonLink>
         </div>
       </div>
 
@@ -158,12 +161,14 @@ function CampaignsPage() {
             <p className="text-muted-foreground mb-4 text-center">
               {tCampaigns("my_campaigns.no_campaigns_subtitle")}
             </p>
-            <Button asChild>
-              <Link to="/gm/campaigns/create">
-                <PlusIcon className="mr-2 h-4 w-4" />
-                {tCampaigns("my_campaigns.create_new_campaign")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/gm/campaigns/create"
+              translationKey="links.campaign_management.create_gm_campaign"
+              translationNamespace="navigation"
+            >
+              <PlusIcon className="mr-2 h-4 w-4" />
+              {tCampaigns("my_campaigns.create_new_campaign")}
+            </LocalizedButtonLink>
           </CardContent>
         </Card>
       ) : (
@@ -189,14 +194,17 @@ function CampaignsPage() {
                         participants
                       </div>
                     </div>
-                    <Link
+                    <LocalizedLink
                       to="/gm/campaigns/$campaignId"
                       params={{ campaignId: c.id }}
+                      translationKey="links.campaign_management.view_campaign_details"
+                      translationNamespace="navigation"
                       className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                      ariaLabelTranslationKey="links.accessibility.link_aria_label.campaign_page"
                     >
                       {tCampaigns("list.view_button")}
                       <ChevronRight className="h-4 w-4" />
-                    </Link>
+                    </LocalizedLink>
                   </div>
                 </List.Item>
               ))}

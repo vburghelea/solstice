@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   AlertCircle,
@@ -14,6 +14,7 @@ import {
 import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useAdminInsights } from "~/features/admin/insights/admin-insights.queries";
 import { RoleWorkspaceLayout } from "~/features/layouts/role-workspace-layout";
@@ -184,9 +185,14 @@ function AdminWorkspaceSummary() {
               {error ? error.message : t("workspaces.admin.summary.user_metrics")}
             </span>
           )}
-          <Link to="/admin/insights" className="text-primary text-xs font-medium">
+          <LocalizedLink
+            to="/admin/insights"
+            translationKey="workspace.analytics_dashboard"
+            translationNamespace="navigation"
+            className="text-primary text-xs font-medium"
+          >
             {t("workspaces.admin.summary.analytics")}
-          </Link>
+          </LocalizedLink>
         </CardContent>
       </Card>
 
@@ -204,9 +210,14 @@ function AdminWorkspaceSummary() {
             <>
               <span className="text-foreground font-medium">{activeAlerts[0].name}</span>
               <span>{activeAlerts[0].threshold}</span>
-              <Link to="/admin/security" className="text-primary text-xs font-medium">
+              <LocalizedLink
+                to="/admin/security"
+                translationKey="workspace.security_oversight"
+                translationNamespace="navigation"
+                className="text-primary text-xs font-medium"
+              >
                 {t("workspaces.admin.summary.recent_activity")}
-              </Link>
+              </LocalizedLink>
             </>
           ) : (
             <span>{t("workspaces.admin.summary.system_health")}</span>

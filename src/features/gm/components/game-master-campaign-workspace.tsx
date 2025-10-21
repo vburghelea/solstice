@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import type { CampaignWithDetails } from "~/features/campaigns/campaigns.types";
 import { GameShowcaseCard } from "~/features/games/components/GameListItemView";
 import type { GameListItem } from "~/features/games/games.types";
@@ -73,29 +73,30 @@ export function GameMasterCampaignWorkspace({
                 {campaign.status}
               </Badge>
               <div className="flex flex-wrap gap-2 sm:justify-end">
-                <Button
-                  asChild
+                <LocalizedButtonLink
+                  to="/gm/campaigns/$campaignId"
+                  params={{ campaignId: campaign.id }}
+                  translationKey="game_management.open_legacy_view"
+                  translationNamespace="navigation"
+                  fallbackText={t("actions.open_legacy_view")}
                   variant="secondary"
                   className="bg-white/15 text-white hover:bg-white/25"
                   size="sm"
                 >
-                  <Link
-                    to="/gm/campaigns/$campaignId"
-                    params={{ campaignId: campaign.id }}
-                  >
-                    {t("actions.open_legacy_view")}
-                  </Link>
-                </Button>
-                <Button
-                  asChild
+                  {t("actions.open_legacy_view")}
+                </LocalizedButtonLink>
+                <LocalizedButtonLink
+                  to="/gm/games/create"
+                  search={{ campaignId: campaign.id }}
+                  translationKey="game_management.schedule_session"
+                  translationNamespace="navigation"
+                  fallbackText={t("actions.schedule_session")}
                   variant="secondary"
                   size="sm"
                   className="text-primary bg-white"
                 >
-                  <Link to="/gm/games/create" search={{ campaignId: campaign.id }}>
-                    {t("actions.schedule_session")}
-                  </Link>
-                </Button>
+                  {t("actions.schedule_session")}
+                </LocalizedButtonLink>
               </div>
             </div>
           </div>
@@ -159,11 +160,17 @@ export function GameMasterCampaignWorkspace({
                 {t("campaign_workspace.sections.narrative_brief.subtitle")}
               </p>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/gm/campaigns/$campaignId" params={{ campaignId: campaign.id }}>
-                {t("actions.edit_details")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/gm/campaigns/$campaignId"
+              params={{ campaignId: campaign.id }}
+              translationKey="campaigns.edit_campaign"
+              translationNamespace="navigation"
+              fallbackText={t("actions.edit_details")}
+              variant="outline"
+              size="sm"
+            >
+              {t("actions.edit_details")}
+            </LocalizedButtonLink>
           </CardHeader>
           <CardContent className="space-y-6 text-sm leading-relaxed">
             <section className="space-y-2">
@@ -404,9 +411,16 @@ function EmptyState({ title, description, actionHref, actionLabel }: EmptyStateP
     <div className="border-border/60 flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-6 text-center">
       <p className="text-foreground text-sm font-semibold">{title}</p>
       <p className="text-muted-foreground text-xs">{description}</p>
-      <Button asChild variant="outline" size="sm">
-        <Link to={actionHref}>{actionLabel}</Link>
-      </Button>
+      <LocalizedButtonLink
+        to={actionHref}
+        variant="outline"
+        size="sm"
+        translationKey="campaigns.view_session_recap"
+        translationNamespace="navigation"
+        fallbackText={actionLabel}
+      >
+        {actionLabel}
+      </LocalizedButtonLink>
     </div>
   );
 }
@@ -440,9 +454,18 @@ function SessionSummaryChip({ session }: SessionSummaryChipProps) {
         })}
       </p>
       <Button asChild variant="ghost" size="sm" className="self-start px-0 text-xs">
-        <Link to="/gm/games/$gameId" params={{ gameId: session.id }}>
+        <LocalizedButtonLink
+          to="/gm/games/$gameId"
+          params={{ gameId: session.id }}
+          translationKey="campaigns.view_session_recap"
+          translationNamespace="navigation"
+          fallbackText={t("campaign_workspace.session_card.review_recap")}
+          variant="ghost"
+          size="sm"
+          className="self-start px-0 text-xs"
+        >
           {t("campaign_workspace.session_card.review_recap")}
-        </Link>
+        </LocalizedButtonLink>
       </Button>
     </div>
   );

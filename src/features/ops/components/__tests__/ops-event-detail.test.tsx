@@ -1,13 +1,14 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ComponentProps, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Setup mocks before imports
 import type {
   EventOperationResult,
   EventWithDetails,
 } from "~/features/events/events.types";
 import { OpsEventDetail } from "~/features/ops/components/ops-event-detail";
+import { tanStackRouterMock } from "~/tests/mocks";
 
 const queryMocks = vi.hoisted(() => ({
   useQuery: vi.fn(),
@@ -22,14 +23,6 @@ vi.mock("@tanstack/react-query", async () => {
     useQuery: queryMocks.useQuery,
   };
 });
-
-vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, ...props }: { children: ReactNode; to?: string }) => (
-    <a href={to ?? "#"} {...props}>
-      {children}
-    </a>
-  ),
-}));
 
 // Import real locale data
 import commonTranslations from "~/lib/i18n/locales/en/common.json";
@@ -116,21 +109,34 @@ vi.mock("~/hooks/useTypedTranslation", () => ({
   }),
 }));
 
-vi.mock("~/components/ui/SafeLink", () => ({
-  SafeLink: ({
-    to,
+// Mock TanStack Router
+vi.mock("@tanstack/react-router", () => tanStackRouterMock);
+
+vi.mock("~/components/ui/LocalizedLink", () => ({
+  LocalizedLink: ({
     children,
-    ...rest
+    to,
+    ...props
   }: {
+    children: React.ReactNode;
     to: string;
-    children:
-      | ReactNode
-      | ((args: { isActive: boolean; isTransitioning: boolean }) => ReactNode);
-  } & Omit<ComponentProps<"a">, "href">) => (
-    <a href={to} {...rest}>
-      {typeof children === "function"
-        ? children({ isActive: false, isTransitioning: false })
-        : children}
+    [key: string]: unknown;
+  }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+  LocalizedButtonLink: ({
+    children,
+    to,
+    ...props
+  }: {
+    children: React.ReactNode;
+    to: string;
+    [key: string]: unknown;
+  }) => (
+    <a href={to} {...props}>
+      {children}
     </a>
   ),
 }));

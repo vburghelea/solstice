@@ -1,6 +1,6 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { EventCreateForm } from "~/features/events/components/event-create-form";
 import { useEventsTranslation } from "~/hooks/useTypedTranslation";
 
@@ -24,12 +24,16 @@ function CreateEventPage() {
   return (
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center gap-4">
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/ops/events">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            {t("admin.back_to_events")}
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/ops/events"
+          variant="ghost"
+          size="sm"
+          translationKey="navigation.back_to_events"
+          translationNamespace="navigation"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          {t("admin.back_to_events")}
+        </LocalizedButtonLink>
       </div>
 
       <EventCreateForm user={user} />

@@ -1,4 +1,4 @@
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Button } from "~/components/ui/button";
 import { ArrowLeftIcon, SearchIcon } from "~/components/ui/icons";
 import { VisitorShell } from "~/features/layouts/visitor-shell";
@@ -41,15 +41,21 @@ export function NotFound() {
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               {t("not_found.go_back")}
             </Button>
-            <Button asChild variant="secondary">
-              <Link to="/">
-                <SearchIcon className="mr-2 h-4 w-4" />
-                {t("not_found.visit_homepage")}
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/events">{t("not_found.browse_events")}</Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/"
+              translationKey="links.errors.go_home"
+              translationNamespace="navigation"
+              variant="secondary"
+            >
+              <SearchIcon className="mr-2 h-4 w-4" />
+              {t("not_found.visit_homepage")}
+            </LocalizedButtonLink>
+            <LocalizedButtonLink
+              to="/events"
+              translationKey="links.errors.browse_events"
+              translationNamespace="navigation"
+              variant="outline"
+            />
           </div>
           <p className="text-muted-foreground mt-8 text-xs tracking-[0.3em] uppercase">
             {t("not_found.need_support")}{" "}

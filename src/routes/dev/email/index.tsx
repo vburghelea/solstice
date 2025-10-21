@@ -1,11 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { templateNames } from "~/lib/email/templates";
 
 export const resendMembershipReceipt = createServerFn({ method: "POST" })
@@ -108,9 +109,14 @@ function EmailTemplatesIndex() {
         <ul className="list-disc pl-4">
           {templateNames.map((name) => (
             <li key={name}>
-              <Link to="/dev/email/$template" params={{ template: name }}>
+              <LocalizedLink
+                to="/dev/email/$template"
+                params={{ template: name }}
+                translationKey={`links.dev.email.${name}`}
+                translationNamespace="navigation"
+              >
                 {name}
-              </Link>
+              </LocalizedLink>
             </li>
           ))}
         </ul>

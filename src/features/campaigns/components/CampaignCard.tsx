@@ -3,7 +3,6 @@ import { LanguageTag } from "~/components/LanguageTag";
 import { ProfileLink } from "~/components/ProfileLink";
 import { Avatar } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,8 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { RoleBadge } from "~/components/ui/RoleBadge";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { CampaignListItem } from "~/features/campaigns/campaigns.types";
 import { useCampaignsTranslation } from "~/hooks/useTypedTranslation";
 import { ThumbsScore } from "~/shared/ui/thumbs-score";
@@ -116,16 +115,24 @@ export function CampaignCard({ campaign, viewLink }: CampaignCardProps) {
           </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link
-              to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-            >
-              {resolvedLink.label ?? t("default_labels.view_campaign")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            to={resolvedLink.to}
+            {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+            {...(resolvedLink.search
+              ? {
+                  search: resolvedLink.search as Record<
+                    string,
+                    string | number | boolean
+                  >,
+                }
+              : {})}
+            {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
+            translationKey="links.campaign_management.view_campaign_details"
+            translationNamespace="navigation"
+          />
         </div>
       </CardContent>
     </Card>

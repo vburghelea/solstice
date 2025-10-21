@@ -1,3 +1,4 @@
+import { useCommonTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
 export interface QuickFilterButton {
@@ -17,19 +18,23 @@ interface QuickFiltersBarProps {
 
 export function QuickFiltersBar({
   filters,
-  label = "Quick filters:",
+  label,
   onClear,
-  clearLabel = "Clear filters",
+  clearLabel,
   className,
 }: QuickFiltersBarProps) {
+  const { t } = useCommonTranslation();
+  const resolvedLabel = label ?? t("filters.quick_filters_label");
+  const resolvedClearLabel = clearLabel ?? t("filters.clear_filters");
+
   if (filters.length === 0) {
     return null;
   }
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      {label ? (
-        <span className="text-muted-foreground text-sm font-medium">{label}</span>
+      {resolvedLabel ? (
+        <span className="text-muted-foreground text-sm font-medium">{resolvedLabel}</span>
       ) : null}
       {filters.map((filter) => (
         <button
@@ -53,7 +58,7 @@ export function QuickFiltersBar({
           onClick={onClear}
           className="text-primary dark:text-primary-200 text-sm font-medium hover:underline"
         >
-          {clearLabel}
+          {resolvedClearLabel}
         </button>
       ) : null}
     </div>

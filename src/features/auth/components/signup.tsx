@@ -5,7 +5,7 @@ import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { Button } from "~/components/ui/button";
 import { GoogleIcon, LogoIcon } from "~/components/ui/icons";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { checkProfileNameAvailability } from "~/features/profile/profile.queries";
 import {
   sanitizeProfileName,
@@ -323,9 +323,12 @@ export default function SignupForm() {
 
       <div className="text-center text-sm">
         {t("signup.buttons.have_account")}{" "}
-        <Link to="/auth/login" className="underline underline-offset-4">
-          {t("signup.buttons.login")}
-        </Link>
+        <LocalizedLink
+          to="/auth/login"
+          className="underline underline-offset-4"
+          translationKey="links.actions.login"
+          translationNamespace="navigation"
+        />
       </div>
     </div>
   );

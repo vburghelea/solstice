@@ -105,6 +105,17 @@ const mockTranslations: Record<string, string> = {
   "player.dashboard.actions.edit_profile":
     playerTranslations.dashboard.actions.edit_profile,
   "player.ui.membership_label": playerTranslations.dashboard.ui.membership_label,
+  // Ops translations
+  "ops.actions.preview": opsTranslations.actions.preview,
+  "ops.actions.approve": opsTranslations.actions.approve,
+  "ops.actions.reject": opsTranslations.actions.reject,
+  // Campaign translations
+  "campaigns.detail.game_sessions": campaignsTranslations.detail.game_sessions,
+  "campaigns.titles.invite_participants":
+    campaignsTranslations.titles.invite_participants,
+  "campaigns.titles.manage_invitations": campaignsTranslations.titles.manage_invitations,
+  "campaigns.detail.apply_to_join": campaignsTranslations.detail.apply_to_join,
+  "campaigns.buttons.update_campaign": campaignsTranslations.buttons.update_campaign,
   "player.ui.focus_spotlight.title":
     playerTranslations.dashboard.ui.focus_spotlight.title,
   "player.ui.focus_spotlight.subtitle":
@@ -118,6 +129,13 @@ const mockTranslations: Record<string, string> = {
   "player.ui.subtitle": playerTranslations.dashboard.ui.subtitle,
   "player.ui.badges.privacy_ready": playerTranslations.dashboard.ui.badges.privacy_ready,
   "player.ui.teams_synced": playerTranslations.dashboard.ui.teams_synced,
+  // Navigation translations for links
+  "navigation.links.campaign_management.view_campaign_details":
+    navigationTranslations.links.campaign_management.view_campaign_details,
+  "navigation.links.campaign_management.create_campaign":
+    navigationTranslations.links.campaign_management.create_campaign,
+  "navigation.links.game_management.view_game_details":
+    navigationTranslations.links.game_management.view_game_details,
   // Games create form translations
   "create.title": gamesTranslations.my_games.create.title,
   "create.subtitle": gamesTranslations.my_games.create.subtitle,

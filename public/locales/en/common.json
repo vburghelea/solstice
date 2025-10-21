@@ -231,6 +231,7 @@
     "no_results": "No results found",
     "no_data": "No data available",
     "select_option": "Please select an option",
+    "no_safety_rules_specified": "No safety rules specified",
     "welcome_back": "Welcome back"
   },
   "links": {
@@ -240,7 +241,8 @@
     "show_more": "Show more",
     "show_less": "Show less",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "open_in_google_maps": "Open in Google Maps"
   },
   "dividers": {
     "or": "Or"
@@ -284,6 +286,10 @@
     "cover_art_alt": "{{name}} cover art"
   },
   "showing_results": "Showing {{count}} {{itemType}}",
+  "filters": {
+    "quick_filters_label": "Quick filters:",
+    "clear_filters": "Clear filters"
+  },
   "clear_all": "Clear all",
   "navigation": {
     "home": "Home",

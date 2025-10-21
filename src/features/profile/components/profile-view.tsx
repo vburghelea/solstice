@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Separator } from "~/components/ui/separator";
 import type { AvailabilityData } from "~/db/schema/auth.schema";
 import { defaultAvailabilityData } from "~/db/schema/auth.schema";
@@ -1115,16 +1115,15 @@ export function ProfileView() {
                   <CardDescription>{t("blocklist.description")}</CardDescription>
                 </div>
                 <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row sm:justify-end">
-                  <Button
-                    asChild
+                  <LocalizedButtonLink
+                    to="/player/profile/blocklist"
+                    translationKey="profile.open_blocklist"
+                    translationNamespace="navigation"
+                    fallbackText={t("blocklist.open_blocklist")}
                     className="w-full sm:w-auto"
                     variant="outline"
                     size="sm"
-                  >
-                    <Link to="/player/profile/blocklist">
-                      {t("blocklist.open_blocklist")}
-                    </Link>
-                  </Button>
+                  />
                 </div>
               </div>
             </CardHeader>

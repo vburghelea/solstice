@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { DataTable } from "~/components/ui/data-table";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { useMembershipTranslation } from "~/hooks/useTypedTranslation";
 import { exportToCSV, formatCurrency, formatDate } from "~/lib/utils/csv-export";
 import { getAllMemberships, type MembershipReportRow } from "../membership.admin-queries";
@@ -26,10 +26,12 @@ function createColumns(
         const original = row.original as MembershipReportRow;
         const display = original.userName || original.userEmail || original.userId;
         return (
-          <Link
+          <LocalizedLink
             to="/profile/$userId"
             params={{ userId: original.userId }}
             className="inline-flex items-center gap-2"
+            ariaLabelTranslationKey="profile.view_user_profile"
+            translationNamespace="navigation"
           >
             <Avatar
               name={original.userName}
@@ -39,7 +41,7 @@ function createColumns(
               className="h-6 w-6"
             />
             <span className="truncate">{display}</span>
-          </Link>
+          </LocalizedLink>
         );
       },
     },

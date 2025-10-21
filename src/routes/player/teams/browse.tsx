@@ -1,7 +1,7 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   Card,
   CardContent,
@@ -64,17 +64,20 @@ function BrowseTeamsPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/player/teams">
-            <ArrowLeftIcon className="mr-2 h-4 w-4" />
-            {t("teams.browse.back_to_my_teams")}
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/player/teams"
+          translationKey="teams.browse.back_to_my_teams"
+          variant="ghost"
+          size="sm"
+        >
+          <ArrowLeftIcon className="mr-2 h-4 w-4" />
+          {t("browse.back_to_my_teams")}
+        </LocalizedButtonLink>
       </div>
 
       <div className="mb-8">
-        <h1 className="text-foreground text-3xl font-bold">{t("teams.browse.title")}</h1>
-        <p className="text-muted-foreground">{t("teams.browse.subtitle")}</p>
+        <h1 className="text-foreground text-3xl font-bold">{t("browse.title")}</h1>
+        <p className="text-muted-foreground">{t("browse.subtitle")}</p>
       </div>
 
       <div className="mb-6">
@@ -82,7 +85,7 @@ function BrowseTeamsPage() {
           <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             type="search"
-            placeholder={t("teams.browse.search_placeholder")}
+            placeholder={t("browse.search_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="text-muted-foreground pl-10"
@@ -92,8 +95,8 @@ function BrowseTeamsPage() {
 
       {searchQuery && searchErrored ? (
         <DataErrorState
-          title={t("teams.browse.search_error_title")}
-          description={t("teams.browse.search_error_description")}
+          title={t("browse.search_error_title")}
+          description={t("browse.search_error_description")}
           onRetry={() => retrySearch()}
         />
       ) : showSkeletons ? (
@@ -106,13 +109,11 @@ function BrowseTeamsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="mb-2 text-lg font-semibold">
-              {t("teams.browse.no_teams_title")}
-            </h3>
+            <h3 className="mb-2 text-lg font-semibold">{t("browse.no_teams_title")}</h3>
             <p className="text-muted-foreground text-center">
               {searchQuery
-                ? t("teams.browse.try_different_search")
-                : t("teams.browse.no_teams_subtitle")}
+                ? t("browse.try_different_search")
+                : t("browse.no_teams_subtitle")}
             </p>
           </CardContent>
         </Card>
@@ -135,16 +136,17 @@ function BrowseTeamsPage() {
                           : ""}
                       </div>
                       <div className="text-muted-foreground mt-1 text-xs">
-                        {t("teams.browse.members")}: {teamItem.memberCount}
+                        {t("browse.members")}: {teamItem.memberCount}
                       </div>
                     </div>
-                    <Link
+                    <LocalizedLink
                       to="/player/teams/$teamId"
                       params={{ teamId: teamItem.team.id }}
+                      translationKey="links.common.view_details"
                       className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
                     >
-                      {t("teams.browse.view")}
-                    </Link>
+                      {t("browse.view")}
+                    </LocalizedLink>
                   </div>
                 </List.Item>
               ))}
@@ -203,20 +205,18 @@ function PublicTeamCard({
       <CardContent>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{t("teams.browse.members")}</span>
+            <span className="text-muted-foreground">{t("browse.members")}</span>
             <span className="font-medium">{memberCount}</span>
           </div>
           {team.foundedYear && (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t("teams.browse.founded")}</span>
+              <span className="text-muted-foreground">{t("browse.founded")}</span>
               <span className="font-medium">{team.foundedYear}</span>
             </div>
           )}
           {creator && (
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">
-                {t("teams.browse.created_by")}
-              </span>
+              <span className="text-muted-foreground">{t("browse.created_by")}</span>
               <span className="truncate font-medium">
                 {creator.name || creator.email}
               </span>
@@ -224,11 +224,16 @@ function PublicTeamCard({
           )}
         </div>
         <div className="mt-4">
-          <Button asChild variant="outline" size="sm" className="w-full">
-            <Link to="/player/teams/$teamId" params={{ teamId: team.id }}>
-              {t("teams.browse.view_team")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/player/teams/$teamId"
+            params={{ teamId: team.id }}
+            translationKey="links.common.view_details"
+            variant="outline"
+            size="sm"
+            className="w-full"
+          >
+            {t("browse.view_team")}
+          </LocalizedButtonLink>
         </div>
       </CardContent>
     </Card>

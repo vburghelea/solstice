@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import {
   CampaignListItem,
   CampaignWithDetails,
@@ -44,7 +45,8 @@ describe("CampaignCard", () => {
       },
     );
 
-    const link = screen.getByRole("link", { name: /View Campaign/i });
+    // The link should show the translation key for now
+    const link = screen.getByRole("link", { name: "View Campaign Details" });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", `/player/campaigns/${MOCK_CAMPAIGN.id}`);
   });

@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Calendar, ChevronRight, Gamepad2, PlusIcon, Users } from "lucide-react";
@@ -132,12 +133,14 @@ function CampaignsPage() {
               ))}
             </SelectContent>
           </Select>
-          <Button asChild>
-            <Link to="/player/campaigns/create">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              {t("my_campaigns.create_new_campaign")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/player/campaigns/create"
+            translationKey="links.campaign_management.create_campaign"
+            translationNamespace="navigation"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            {t("my_campaigns.create_new_campaign")}
+          </LocalizedButtonLink>
         </div>
       </div>
 
@@ -151,12 +154,14 @@ function CampaignsPage() {
             <p className="text-muted-foreground mb-4 text-center">
               {t("my_campaigns.no_campaigns_subtitle")}
             </p>
-            <Button asChild>
-              <Link to="/player/campaigns/create">
-                <PlusIcon className="mr-2 h-4 w-4" />
-                {t("my_campaigns.create_new_campaign")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/player/campaigns/create"
+              translationKey="links.campaign_management.create_campaign"
+              translationNamespace="navigation"
+            >
+              <PlusIcon className="mr-2 h-4 w-4" />
+              {t("my_campaigns.create_new_campaign")}
+            </LocalizedButtonLink>
           </CardContent>
         </Card>
       ) : (
@@ -191,14 +196,17 @@ function CampaignsPage() {
                         {t("my_campaigns.participants")}
                       </div>
                     </div>
-                    <Link
+                    <LocalizedLink
                       to="/player/campaigns/$campaignId"
                       params={{ campaignId: c.id }}
                       className="text-primary inline-flex shrink-0 items-center gap-1 text-sm font-medium hover:underline"
+                      translationKey="links.common.view_details"
+                      translationNamespace="navigation"
+                      ariaLabelTranslationKey="links.accessibility.link_aria_label.campaign_page"
                     >
                       {t("campaigns.buttons.view_campaign")}
                       <ChevronRight className="h-4 w-4" />
-                    </Link>
+                    </LocalizedLink>
                   </div>
                 </List.Item>
               ))}

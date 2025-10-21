@@ -2,9 +2,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { TypedLink as Link } from "~/components/ui/TypedLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -121,12 +120,14 @@ function TeamsIndexPage() {
           </div>
           <p className="text-muted-foreground">{t("my_teams.subtitle")}</p>
         </div>
-        <Button asChild>
-          <Link to="/player/teams/create">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            {t("my_teams.create_team")}
-          </Link>
-        </Button>
+        <LocalizedButtonLink
+          to="/player/teams/create"
+          translationKey="links.team_management.create_team"
+          translationNamespace="navigation"
+        >
+          <PlusIcon className="mr-2 h-4 w-4" />
+          {t("my_teams.create_team")}
+        </LocalizedButtonLink>
       </div>
 
       <div className="space-y-6">
@@ -149,24 +150,36 @@ function TeamsIndexPage() {
                 {t("my_teams.no_teams_subtitle")}
               </p>
               <div className="flex gap-4">
-                <Button asChild variant="outline">
-                  <Link to="/player/teams/browse">{t("my_teams.browse_teams")}</Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/player/teams/create">
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    {t("my_teams.create_team")}
-                  </Link>
-                </Button>
+                <LocalizedButtonLink
+                  to="/player/teams/browse"
+                  variant="outline"
+                  translationKey="links.team_management.browse_teams"
+                  translationNamespace="navigation"
+                >
+                  {t("my_teams.browse_teams")}
+                </LocalizedButtonLink>
+                <LocalizedButtonLink
+                  to="/player/teams/create"
+                  translationKey="links.team_management.create_team"
+                  translationNamespace="navigation"
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  {t("my_teams.create_team")}
+                </LocalizedButtonLink>
               </div>
             </CardContent>
           </Card>
         ) : (
           <>
             <div className="mb-4 flex justify-end">
-              <Button asChild variant="outline">
-                <Link to="/player/teams/browse">{t("my_teams.browse_all_teams")}</Link>
-              </Button>
+              <LocalizedButtonLink
+                to="/player/teams/browse"
+                variant="outline"
+                translationKey="links.team_management.browse_teams"
+                translationNamespace="navigation"
+              >
+                {t("my_teams.browse_all_teams")}
+              </LocalizedButtonLink>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {userTeams.map((userTeam) => (
@@ -232,17 +245,30 @@ function TeamCard({ userTeam }: { userTeam: UserTeam }) {
           )}
         </div>
         <div className="mt-4 flex gap-2">
-          <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link to="/player/teams/$teamId" params={{ teamId: team.id }}>
-              {t("team_card.view_team")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/player/teams/$teamId"
+            params={{ teamId: team.id }}
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            translationKey="links.common.view_details"
+            translationNamespace="navigation"
+            ariaLabelTranslationKey="links.accessibility.link_aria_label.team_page"
+          >
+            {t("team_card.view_team")}
+          </LocalizedButtonLink>
           {["captain", "coach"].includes(membership.role) && (
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link to="/player/teams/$teamId/manage" params={{ teamId: team.id }}>
-                {t("team_card.manage")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/player/teams/$teamId/manage"
+              params={{ teamId: team.id }}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              translationKey="links.actions.manage"
+              translationNamespace="navigation"
+            >
+              {t("team_card.manage")}
+            </LocalizedButtonLink>
           )}
         </div>
       </CardContent>

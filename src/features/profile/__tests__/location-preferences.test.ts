@@ -26,9 +26,9 @@ const MOCK_GROUPS: CountryLocationGroup[] = [
     ],
   },
   {
-    country: "Canada",
+    country: "Germany",
     totalUsers: 2,
-    cities: [{ city: "Toronto", userCount: 2 }],
+    cities: [{ city: "Berlin", userCount: 2 }],
   },
 ];
 
@@ -40,8 +40,8 @@ const MOCK_EVENTS = [
   },
   {
     id: "2",
-    city: "Toronto",
-    country: "Canada",
+    city: "Berlin",
+    country: "Germany",
   },
 ] as unknown as EventWithDetails[];
 
@@ -55,7 +55,7 @@ const MOCK_GAMES = [
   {
     id: "g-2",
     location: {
-      address: "456 High St, Toronto, Canada",
+      address: "Yorckstr. 15, 10965 Berlin, Germany",
     },
   },
 ] as unknown as GameListItem[];
@@ -109,7 +109,7 @@ describe("city preference helpers", () => {
   });
 
   it("detects when a selection exists in the location options", () => {
-    expect(cityOptionExists({ city: "Toronto", country: "Canada" }, MOCK_GROUPS)).toBe(
+    expect(cityOptionExists({ city: "Berlin", country: "Germany" }, MOCK_GROUPS)).toBe(
       true,
     );
     expect(cityOptionExists({ city: "London", country: "Canada" }, MOCK_GROUPS)).toBe(
@@ -119,8 +119,8 @@ describe("city preference helpers", () => {
 
   it("filters events by the active selection", () => {
     const filtered = filterEventsBySelection(MOCK_EVENTS, {
-      city: "Toronto",
-      country: "Canada",
+      city: "Berlin",
+      country: "Germany",
     });
     expect(filtered).toHaveLength(1);
     expect(filtered[0]?.id).toBe("2");

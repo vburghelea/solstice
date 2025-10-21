@@ -23,6 +23,12 @@
     "login": "Anmelden",
     "signup": "Registrieren"
   },
+  "auth": {
+    "forgot_password": "Passwort vergessen",
+    "reset_password": "Passwort zurücksetzen",
+    "email_verification": "E-Mail überprüfen",
+    "resend_verification": "Verifizierung erneut senden"
+  },
   "actions": {
     "create": "Erstellen",
     "new": "Neu",
@@ -98,15 +104,207 @@
     "terms": "Nutzungsbedingungen",
     "privacy": "Datenschutzerklärung",
     "cookies": "Cookie-Richtlinie",
-    "copyright": "© {{year}} Roundup Games. Alle Rechte vorbehalten.",
-    "plan_your_visit": "Besuch planen",
-    "event_calendar": "Event-Kalender",
-    "find_game_night": "Spielabend finden",
-    "browse_systems": "Systeme durchsuchen",
-    "stay_in_touch": "Bleiben Sie in Kontakt",
     "resources": "Ressourcen",
-    "about_roundup": "Über Roundup",
-    "contact_email": "hello@roundup.games"
+    "teams": "Teams",
+    "systems": "Spielsysteme"
+  },
+  "links": {
+    "common": {
+      "learn_more": "Mehr erfahren",
+      "read_more": "Weiterlesen",
+      "view_details": "Details anzeigen",
+      "show_more": "Mehr anzeigen",
+      "show_less": "Weniger anzeigen",
+      "back_to_top": "Nach oben",
+      "continue_reading": "Weiterlesen",
+      "get_started": "Loslegen",
+      "view_all": "Alle anzeigen",
+      "see_all": "Alle sehen",
+      "explore": "Erkunden",
+      "discover": "Entdecken"
+    },
+    "actions": {
+      "join": "Teilnehmen",
+      "apply": "Bewerben",
+      "register": "Registrieren",
+      "sign_up": "Registrieren",
+      "signup": "Registrieren",
+      "log_in": "Anmelden",
+      "login": "Anmelden",
+      "logout": "Abmelden",
+      "create_account": "Konto erstellen",
+      "view_profile": "Profil anzeigen",
+      "edit_profile": "Profil bearbeiten",
+      "manage_settings": "Einstellungen verwalten",
+      "contact_support": "Support kontaktieren",
+      "get_help": "Hilfe erhalten",
+      "feedback": "Feedback",
+      "report_issue": "Problem melden"
+    },
+    "navigation": {
+      "go_home": "Zur Startseite",
+      "go_back": "Zurück",
+      "back_to_games": "Zurück zu den Spielen",
+      "back_to_events": "Zurück zu den Events",
+      "next_page": "Nächste Seite",
+      "previous_page": "Vorherige Seite",
+      "skip_to_content": "Zum Inhalt springen",
+      "main_navigation": "Hauptnavigation",
+      "breadcrumb_navigation": "Breadcrumb-Navigation",
+      "view_public_page": "Öffentliche Seite anzeigen"
+    },
+    "external": {
+      "opens_in_new_tab": "Öffnet in einem neuen Tab",
+      "external_link": "Externer Link",
+      "leave_site": "Sie verlassen unsere Website",
+      "continue_to_site": "Zur Website fortfahren"
+    },
+    "accessibility": {
+      "link_aria_label": {
+        "user_profile": "Benutzerprofil anzeigen",
+        "game_details": "Spieldetails anzeigen",
+        "event_details": "Eventdetails anzeigen",
+        "team_page": "Teamseite besuchen",
+        "campaign_page": "Kampagnenseite besuchen",
+        "game_system_details": "Details zum Spielsystem anzeigen",
+        "settings_page": "Zu den Einstellungen gehen",
+        "help_page": "Hilfe und Support erhalten",
+        "about_page": "Über unsere Plattform erfahren",
+        "contact_page": "Kontaktieren Sie uns",
+        "campaign_workspace": "Kampagnen-Workspace besuchen",
+        "game_management": "Spielsitzungen verwalten",
+        "pipeline_review": "Business-Pipeline überprüfen"
+      }
+    },
+    "game_management": {
+      "create_game": "Neues Spiel erstellen",
+      "create_gm_game": "Spielsitzung erstellen",
+      "manage_games": "Spiele verwalten",
+      "my_games": "Meine Spiele",
+      "find_games": "Spiele finden",
+      "browse_games": "Spiele durchsuchen",
+      "game_library": "Spielebibliothek",
+      "create_session": "Sitzung erstellen",
+      "join_session": "Sitzung beitreten",
+      "view_game_details": "Spieldetails anzeigen"
+    },
+    "event_management": {
+      "create_event": "Event erstellen",
+      "create_ops_event": "Event erstellen",
+      "manage_events": "Events verwalten",
+      "my_events": "Meine Events",
+      "find_events": "Events finden",
+      "browse_events": "Events durchsuchen",
+      "event_calendar": "Event-Kalender",
+      "register_for_event": "Für Event anmelden",
+      "cancel_registration": "Anmeldung stornieren",
+      "view_event_details": "Eventdetails anzeigen"
+    },
+    "team_management": {
+      "create_team": "Team erstellen",
+      "manage_teams": "Teams verwalten",
+      "my_teams": "Meine Teams",
+      "find_teams": "Teams finden",
+      "browse_teams": "Teams durchsuchen",
+      "team_directory": "Team-Verzeichnis",
+      "join_team": "Team beitreten",
+      "invite_members": "Mitglieder einladen",
+      "back_to_teams": "Zurück zu den Teams",
+      "manage_members": "Mitglieder verwalten"
+    },
+    "system_management": {
+      "view_system_details": "Systemdetails anzeigen",
+      "explore_system": "System erkunden",
+      "system_profile": "Systemprofil"
+    },
+    "membership": {
+      "manage_membership": "Mitgliedschaft verwalten",
+      "view_membership": "Mitgliedschaft anzeigen",
+      "membership_status": "Mitgliedschaftsstatus",
+      "upgrade_membership": "Mitgliedschaft aktualisieren",
+      "membership_benefits": "Mitgliedschaftsvorteile",
+      "billing_history": "Abrechnungsverlauf"
+    },
+    "campaign_management": {
+      "create_campaign": "Kampagne erstellen",
+      "create_gm_campaign": "Kampagne erstellen",
+      "manage_campaigns": "Kampagnen verwalten",
+      "my_campaigns": "Meine Kampagnen",
+      "browse_campaigns": "Kampagnen durchsuchen",
+      "campaign_details": "Kampagnendetails",
+      "join_campaign": "Kampagne beitreten",
+      "leave_campaign": "Kampagne verlassen",
+      "view_campaign_details": "Kampagnendetails anzeigen"
+    },
+    "workspace": {
+      "manage_sessions": "Sitzungen verwalten",
+      "campaign_workspace": "Kampagnen-Workspace anzeigen",
+      "review_pipeline": "Pipeline überprüfen",
+      "manage_campaigns": "Kampagnen verwalten",
+      "manage_games": "Spiele verwalten",
+      "manage_feedback": "Feedback verwalten",
+      "view_analytics": "Analytik anzeigen",
+      "analytics_dashboard": "Analytik-Dashboard",
+      "security_oversight": "Sicherheitsüberwachung",
+      "upcoming_events": "Kommende Events",
+      "manage_event": "Event verwalten",
+      "events_review": "Event-Überprüfung"
+    },
+    "admin": {
+      "admin_dashboard": "Admin-Dashboard",
+      "user_management": "Benutzerverwaltung",
+      "system_management": "Systemverwaltung",
+      "analytics": "Analytik",
+      "reports": "Berichte",
+      "moderation": "Moderation",
+      "site_settings": "Website-Einstellungen"
+    },
+    "event_registration": {
+      "back_to_events": "Zurück zu den Events",
+      "view_event_details": "Eventdetails anzeigen",
+      "back_to_event_details": "Zurück zu den Eventdetails",
+      "return_to_dashboard": "Zurück zum Dashboard",
+      "join_create_team": "Team beitreten oder erstellen"
+    },
+    "dev": {
+      "email": {
+        "welcome-email": "Willkommens-E-Mail",
+        "membership-receipt": "Mitgliedschaftsbeleg",
+        "game-invitation": "Spieleinladung",
+        "campaign-invitation": "Kampagneneinladung",
+        "game-invite-response": "Spieleinladungsantwort",
+        "game-status-update": "Spielstatus-Update",
+        "game-reminder": "Spielerinnerung",
+        "campaign-invite-response": "Kampagneneinladungsantwort",
+        "campaign-session-update": "Kampagnensitzungs-Update",
+        "campaign-digest": "Kampagnen-Zusammenfassung",
+        "review-reminder": "Überprüfungs-Erinnerung",
+        "email-verification": "E-Mail-Verifizierung",
+        "email-verification-otp": "E-Mail-Verifizierung (OTP)",
+        "password-reset": "Passwort zurücksetzen",
+        "password-reset-otp": "Passwort zurücksetzen (OTP)",
+        "sign-in-otp": "Anmelde-OTP",
+        "team-invitation": "Teameinladung",
+        "team-request-decision": "Team-Antragsentscheidung"
+      }
+    },
+    "errors": {
+      "page_not_found": "Seite nicht gefunden",
+      "access_denied": "Zugriff verweigert",
+      "server_error": "Serverfehler",
+      "back_to_safety": "Zurück zur Sicherheit",
+      "go_home": "Zur Startseite",
+      "browse_events": "Events durchsuchen"
+    },
+    "help": {
+      "help_center": "Hilfezentrum",
+      "documentation": "Dokumentation",
+      "tutorials": "Tutorials",
+      "guides": "Leitfäden",
+      "faq": "Häufig gestellte Fragen",
+      "contact_support": "Support kontaktieren",
+      "community_forum": "Community-Forum"
+    }
   },
   "tabs": {
     "overview": "Übersicht",
@@ -384,6 +582,87 @@
         "staff_on_duty": "Personal im Dienst",
         "venue_utilization": "Auslastung der Veranstaltungsorte"
       }
+    }
+  },
+  "brand": {
+    "home": "Startseite",
+    "name": "Roundup Games",
+    "slogan": "Gemeinsam spielen. Überall."
+  },
+  "resources": {
+    "sections": {
+      "club_toolkit": {
+        "actions": {
+          "download_toolkit": "Toolkit herunterladen",
+          "view_charter": "Charta anzeigen"
+        }
+      },
+      "training": {
+        "actions": {
+          "browse_plans": "Pläne durchsuchen",
+          "watch_clinics": "Kliniken ansehen"
+        }
+      },
+      "safe_sport": {
+        "actions": {
+          "download_policies": "Richtlinien herunterladen",
+          "report_concern": "Bedenken melden"
+        }
+      }
+    },
+    "certification": {
+      "tracks": {
+        "gm_pathway": {
+          "title": "Game-Master-Pfad",
+          "description": "Lerne fesselnde Spiele zu leiten und Communities aufzubauen",
+          "cta": "Pfad starten"
+        },
+        "host_pathway": {
+          "title": "Community-Host-Pfad",
+          "description": "Organisiere Events und baue lokale Gaming-Communities auf",
+          "cta": "Pfad starten"
+        },
+        "operations_pathway": {
+          "title": "Event-Operations-Pfad",
+          "description": "Unterstütze Events und sorge für außergewöhnliche Spielerlebnisse",
+          "cta": "Pfad starten"
+        }
+      }
+    },
+    "consultation": {
+      "actions": {
+        "connect_hubs": "Teams finden",
+        "schedule_meeting": "Beratung vereinbaren"
+      }
+    }
+  },
+  "operations": {
+    "mission_control": "Mission Control",
+    "open_legacy_playbook": "Legacy-Playbook öffnen",
+    "review_submission_history": "Einreichungsverlauf überprüfen",
+    "preview_event": "Event-Vorschau",
+    "manage_event": "Event verwalten",
+    "view_event": "Event anzeigen",
+    "view_tasks_notes": "Aufgaben/Notizen anzeigen",
+    "adjust_event": "Event anpassen",
+    "legacy_dashboard": "Legacy-Dashboard",
+    "launch_event": "Event starten",
+    "focus_action": "Fokussieren"
+  },
+  "collaboration": {
+    "review_threads": "Threads überprüfen",
+    "open_reporting": "Berichterstattung öffnen"
+  },
+  "game_systems": {
+    "edit_system": "System bearbeiten",
+    "view_system": "System anzeigen"
+  },
+  "common": {
+    "take_action": "Aktion ausführen"
+  },
+  "admin": {
+    "dashboard_sections": {
+      "navigation": "Navigation"
     }
   }
 }

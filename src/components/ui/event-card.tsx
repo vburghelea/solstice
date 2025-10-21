@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { Badge } from "~/components/ui/badge";
 import { CalendarIcon, MapPinIcon } from "~/components/ui/icons";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import type { EventWithDetails } from "~/features/events/events.types";
 import { CloudinaryImage } from "~/shared/components/cloudinary-image";
 import { getCloudinaryAssetUrl } from "~/shared/lib/cloudinary-assets";
@@ -65,7 +65,12 @@ export function EventCard({
       : undefined;
 
   return (
-    <Link to={to} className="group block h-full">
+    <LocalizedLink
+      to={to}
+      className="group block h-full"
+      ariaLabelTranslationKey="links.accessibility.link_aria_label.event_details"
+      translationValues={{ eventName: eventTitle }}
+    >
       <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-[color:color-mix(in_oklab,var(--primary-soft)_32%,transparent)] bg-[color:color-mix(in_oklab,var(--primary-soft)_12%,white)]/90 shadow-sm transition-all duration-300 hover:border-[color:color-mix(in_oklab,var(--primary-soft)_52%,transparent)] hover:shadow-lg dark:border-gray-700 dark:bg-gray-900/70">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           <CloudinaryImage
@@ -117,7 +122,7 @@ export function EventCard({
           </div>
         </div>
       </article>
-    </Link>
+    </LocalizedLink>
   );
 }
 

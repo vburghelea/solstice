@@ -14,7 +14,7 @@ import {
   Users2Icon,
 } from "lucide-react";
 import { useCallback, useMemo, useState, type ReactNode } from "react";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { SupportedLanguage } from "~/lib/i18n/config";
 import { formatDistanceToNowLocalized } from "~/lib/i18n/utils";
 
@@ -288,9 +288,13 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-2">
           <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
-            <Link to="/ops" className="hover:text-foreground">
-              {t("ui.ops_mission_control")}
-            </Link>
+            <LocalizedLink
+              to="/ops"
+              translationKey="operations.mission_control"
+              translationNamespace="navigation"
+              fallbackText={t("ui.ops_mission_control")}
+              className="hover:text-foreground"
+            />
             <span aria-hidden="true">/</span>
             <span className="text-foreground">{event.name}</span>
           </div>
@@ -322,16 +326,21 @@ export function OpsEventDetail({ eventId }: OpsEventDetailProps) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline">
-            <Link to="/ops/events/$eventId/manage" params={{ eventId: event.id }}>
-              Open legacy playbook
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link to="/admin/events-review" search={{ focus: event.id }}>
-              Review submission history
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to="/ops/events/$eventId/manage"
+            params={{ eventId: event.id }}
+            translationKey="operations.open_legacy_playbook"
+            translationNamespace="navigation"
+            fallbackText="Open legacy playbook"
+            variant="outline"
+          />
+          <LocalizedButtonLink
+            to="/admin/events-review"
+            search={{ focus: event.id }}
+            translationKey="operations.review_submission_history"
+            translationNamespace="navigation"
+            fallbackText="Review submission history"
+          />
         </div>
       </header>
 

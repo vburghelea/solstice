@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import { HeroSection } from "~/components/ui/hero-section";
 import { CalendarIcon, Trophy, UsersIcon } from "~/components/ui/icons";
-import { SafeLink } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import { VisitorShell } from "~/features/layouts/visitor-shell";
 import { useResourcesTranslation } from "~/hooks/useTypedTranslation";
 import { RESOURCES_HERO_IMAGE } from "~/shared/lib/cloudinary-assets";
@@ -148,14 +148,14 @@ function ResourcesIndexPage() {
                       </Button>
                     </a>
                   ) : (
-                    <Button
+                    <LocalizedButtonLink
                       key={action.label}
                       className="btn-brand-primary"
                       variant="outline"
-                      asChild
-                    >
-                      <SafeLink to={action.href}>{action.label}</SafeLink>
-                    </Button>
+                      to={action.href}
+                      translationKey={`resources.sections.${section.id}.actions.${action.label.toLowerCase().replace(/\s+/g, "_")}`}
+                      fallbackText={action.label}
+                    />
                   );
                 })}
               </div>
@@ -197,12 +197,14 @@ function ResourcesIndexPage() {
                     {track.cta.label} →
                   </a>
                 ) : (
-                  <SafeLink
+                  <LocalizedLink
                     className="text-brand-red mt-4 inline-block text-sm font-semibold hover:underline"
                     to={track.cta.href}
+                    translationKey={`resources.certification.tracks.${track.title.toLowerCase().replace(/\s+/g, "_")}.cta`}
+                    fallbackText={track.cta.label}
                   >
                     {track.cta.label} →
-                  </SafeLink>
+                  </LocalizedLink>
                 )}
               </div>
             ))}
@@ -228,14 +230,15 @@ function ResourcesIndexPage() {
                   {t("consultation.actions.schedule_meeting")}
                 </Button>
               </a>
-              <Link to="/teams">
-                <Button
-                  variant="outline"
-                  className="text-brand-red border-brand-red hover:bg-brand-red/10"
-                >
-                  {t("consultation.actions.connect_hubs")}
-                </Button>
-              </Link>
+              <LocalizedButtonLink
+                to="/teams"
+                translationKey="team_management.find_teams"
+                translationNamespace="navigation"
+                variant="outline"
+                className="text-brand-red border-brand-red hover:bg-brand-red/10"
+              >
+                {t("consultation.actions.connect_hubs")}
+              </LocalizedButtonLink>
             </div>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-900/70">

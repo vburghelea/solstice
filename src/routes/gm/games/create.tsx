@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import {
   Card,
   CardContent,
@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { ArrowLeftIcon } from "~/components/ui/icons";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
 import {
   Select,
   SelectContent,
@@ -161,12 +160,16 @@ export function GameCreateView({
     <div className="space-y-6">
       {backLinkTo ? (
         <div className="flex items-center justify-between">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to={backLinkTo}>
-              <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              {t("create.back_to_games")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to={backLinkTo}
+            translationKey="links.navigation.back_to_games"
+            translationNamespace="navigation"
+            variant="ghost"
+            size="sm"
+          >
+            <ArrowLeftIcon className="mr-2 h-4 w-4" />
+            {t("create.back_to_games")}
+          </LocalizedButtonLink>
         </div>
       ) : null}
 
@@ -292,7 +295,7 @@ export function GameSessionTipsCard() {
 }
 
 function CreateGamePage() {
-  const { campaignId } = useSearch({ from: Route.id });
+  const { campaignId } = Route.useSearch();
   return (
     <GameCreateView
       basePath="/gm/games"

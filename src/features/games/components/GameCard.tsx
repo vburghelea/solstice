@@ -11,8 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { RoleBadge } from "~/components/ui/RoleBadge";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
 import type { gameStatusEnum } from "~/db/schema/games.schema";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGamesTranslation } from "~/hooks/useTypedTranslation";
@@ -24,9 +24,11 @@ type LinkPrimitive = string | number | boolean;
 export type GameCardLinkConfig = {
   readonly to: string;
   readonly params?: Record<string, LinkPrimitive>;
-  readonly search?: Record<string, LinkPrimitive | undefined>;
+  readonly search?: Record<string, LinkPrimitive>;
   readonly from?: string;
   readonly label?: string;
+  readonly translationKey?: string;
+  readonly translationNamespace?: string;
 };
 
 interface GameCardProps {
@@ -54,9 +56,17 @@ export function GameCard({
   const resolvedLink: GameCardLinkConfig = {
     to: viewLink?.to ?? "/player/games/$gameId",
     params: viewLink?.params ?? { gameId: game.id },
-    from: viewLink?.from ?? "/player/games",
-    label: viewLink?.label ?? t("buttons.view_game"),
-    ...(viewLink?.search ? { search: viewLink.search } : {}),
+    ...(viewLink?.from ? { from: viewLink.from } : {}),
+    ...(viewLink?.label ? { label: viewLink.label } : {}),
+    translationKey: viewLink?.translationKey ?? "links.game_management.view_game_details",
+    translationNamespace: viewLink?.translationNamespace ?? "navigation",
+    ...(viewLink?.search
+      ? {
+          search: Object.fromEntries(
+            Object.entries(viewLink.search).filter(([, value]) => value !== undefined),
+          ) as Record<string, LinkPrimitive>,
+        }
+      : {}),
   };
 
   return (
@@ -134,16 +144,17 @@ export function GameCard({
           </div>
         </div>
         <div className="mt-4 flex gap-2">
-          <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link
-              to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-            >
-              {resolvedLink.label ?? t("buttons.view_game")}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to={resolvedLink.to}
+            params={resolvedLink.params}
+            search={resolvedLink.search}
+            translationKey={resolvedLink.translationKey}
+            translationNamespace={resolvedLink.translationNamespace}
+            {...(resolvedLink.label ? { fallbackText: resolvedLink.label } : {})}
+            variant="outline"
+            size="sm"
+            className="flex-1"
+          />
         </div>
       </CardContent>
       {isActionable && onUpdateStatus && (

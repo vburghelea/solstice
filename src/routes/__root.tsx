@@ -21,7 +21,6 @@ import appCss from "~/styles.css?url";
 type RootRouteContext = {
   readonly user: AuthUser | null;
   readonly language: SupportedLanguage;
-  readonly i18nRequestKey: string | null;
 };
 
 // Lazy load devtools to avoid hydration issues
@@ -43,7 +42,6 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   user: AuthUser | null;
   language: SupportedLanguage;
-  i18nRequestKey: string | null;
 }>()({
   beforeLoad: async ({ location }) => {
     const detectedLanguage =
@@ -62,24 +60,22 @@ export const Route = createRootRouteWithContext<{
         });
       }
 
-      let i18nRequestKey: string | null = null;
-
       if (typeof window === "undefined") {
+        // Create isolated i18n instance for this server-side request
         const { createRequestScopedI18n } = await import(
           "~/lib/i18n/request-instance.server"
         );
-        const { key } = await createRequestScopedI18n(detectedLanguage);
-        i18nRequestKey = key;
+        await createRequestScopedI18n(detectedLanguage);
       } else if (i18n.language !== detectedLanguage) {
         // On the client we can safely reuse the singleton instance
         await i18n.changeLanguage(detectedLanguage);
       }
 
       const user = await getCurrentUser();
-      return { user, language: detectedLanguage, i18nRequestKey };
+      return { user, language: detectedLanguage };
     } catch (error) {
       console.error("Error loading user:", error);
-      return { user: null, language: detectedLanguage, i18nRequestKey: null };
+      return { user: null, language: detectedLanguage };
     }
   },
   head: () => ({
@@ -105,14 +101,11 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
-  const { user, language, i18nRequestKey } = Route.useRouteContext() as RootRouteContext;
+  const { user, language } = Route.useRouteContext() as RootRouteContext;
 
-  const serverI18n =
-    typeof window === "undefined" && i18nRequestKey
-      ? consumeRequestScopedI18n(i18nRequestKey)
-      : null;
-
-  const activeI18n = serverI18n ?? i18n;
+  // For now, just use the singleton i18n instance
+  // The request-scoped isolation will be handled at the server function level
+  const activeI18n = i18n;
 
   useEffect(() => {
     let cancelled = false;
@@ -165,28 +158,6 @@ function RootComponent() {
       </I18nextProvider>
     </RootDocument>
   );
-}
-
-function consumeRequestScopedI18n(key: string) {
-  if (typeof window !== "undefined") {
-    return null;
-  }
-
-  const registry = globalThis.__solsticeRequestI18nRegistry;
-  if (!registry) {
-    return null;
-  }
-
-  const instance = registry.get(key) ?? null;
-  if (instance) {
-    registry.delete(key);
-  }
-
-  return instance;
-}
-
-declare global {
-  var __solsticeRequestI18nRegistry: Map<string, import("i18next").i18n> | undefined;
 }
 
 function RootDocument({

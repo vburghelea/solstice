@@ -72,7 +72,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "@vercel/postgres": "^0.10.0",
-    "better-auth": "^1.3.8",
+    "better-auth": "^1.3.26",
     "c15t": "^1.6.0",
     "cheerio": "1.0.0-rc.12",
     "class-variance-authority": "^0.7.1",
@@ -104,7 +104,7 @@
     "sonner": "^2.0.7",
     "square": "^43.0.2",
     "tailwind-merge": "^3.3.1",
-    "vite": "^7.1.4",
+    "vite": "^7.1.11",
     "zod": "^3.25.76"
   },
   "lint-staged": {

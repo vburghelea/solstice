@@ -34,7 +34,7 @@ const gmReviewInputSchema = (input: unknown) => {
 
 // Follow a user
 export const followUser = createServerFn({ method: "POST" })
-  .validator(followInputSchema)
+  .inputValidator(followInputSchema)
   .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
     try {
       const [{ getCurrentUser }, { invalidateRelationshipCache }] = await Promise.all([
@@ -85,7 +85,7 @@ export const followUser = createServerFn({ method: "POST" })
 
 // Unfollow a user
 export const unfollowUser = createServerFn({ method: "POST" })
-  .validator(followInputSchema)
+  .inputValidator(followInputSchema)
   .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
     try {
       const [{ getCurrentUser }, { invalidateRelationshipCache }] = await Promise.all([
@@ -128,7 +128,7 @@ export const unfollowUser = createServerFn({ method: "POST" })
 
 // Submit GM review
 export const submitGMReview = createServerFn({ method: "POST" })
-  .validator(gmReviewInputSchema)
+  .inputValidator(gmReviewInputSchema)
   .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
     try {
       const { getCurrentUser } = await import("~/features/auth/auth.queries");
@@ -235,7 +235,7 @@ export const submitGMReview = createServerFn({ method: "POST" })
 
 // Delete GM review
 export const deleteGMReview = createServerFn({ method: "POST" })
-  .validator((input: unknown) => z.object({ reviewId: z.string() }).parse(input))
+  .inputValidator((input: unknown) => z.object({ reviewId: z.string() }).parse(input))
   .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
     try {
       const { getCurrentUser } = await import("~/features/auth/auth.queries");

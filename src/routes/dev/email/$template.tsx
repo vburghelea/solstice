@@ -1,11 +1,10 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { serverOnly } from "@tanstack/react-start";
 import { templateNames, type TemplateName } from "~/lib/email/templates";
 import { buildCampaignDigestItemsHtml } from "~/shared/lib/campaign-digest";
 
-const getRenderers = serverOnly(async () => {
+const getRenderers = async () => {
   return await import("~/shared/email-templates");
-});
+};
 
 export const Route = createFileRoute("/dev/email/$template")({
   loader: async ({ params }) => {

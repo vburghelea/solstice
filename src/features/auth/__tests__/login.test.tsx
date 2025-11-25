@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Setup mocks before imports
-const mockNavigate = vi.fn();
+import { localizedLinkMock, mockNavigate, tanStackRouterMock } from "~/tests/mocks";
 const mockInvalidateQueries = vi.fn();
 
 // Mock auth client
@@ -33,43 +33,13 @@ vi.mock("~/lib/auth-client", () => ({
 
 // Mock TanStack Router
 vi.mock("@tanstack/react-router", () => ({
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useNavigate: () => mockNavigate,
+  ...tanStackRouterMock,
   // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
   useRouteContext: () => ({ redirectUrl: "/player" }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useRouterState: () => ({ location: { pathname: "/auth/login" } }),
-  // eslint-disable-next-line @eslint-react/hooks-extra/no-unnecessary-use-prefix
-  useRouter: () => ({ invalidate: vi.fn() }),
-  Link: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
 }));
 
-// Mock SafeLink
-vi.mock("~/components/ui/SafeLink", () => ({
-  SafeLink: ({
-    to,
-    children,
-    ...props
-  }: {
-    to: string;
-    children: React.ReactNode;
-  } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+// Mock LocalizedLink
+vi.mock("~/components/ui/LocalizedLink", () => localizedLinkMock);
 
 vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>();

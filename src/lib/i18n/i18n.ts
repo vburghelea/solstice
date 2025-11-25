@@ -33,15 +33,12 @@ if (!i18n.isInitialized) {
   const resources = JSON.parse(JSON.stringify(bundledResources)) as Resource;
 
   if (isServer) {
-    const [{ default: FsBackend }, pathModule, fs] = await Promise.all([
+    // Server-only imports - dynamically imported to avoid client bundle inclusion
+    const [{ default: FsBackend }, { resolve, join }, { readFile }] = await Promise.all([
       import("i18next-fs-backend"),
       import("node:path"),
       import("node:fs/promises"),
     ]);
-    const { resolve, join } = pathModule as {
-      resolve: (...args: string[]) => string;
-      join: (...args: string[]) => string;
-    };
 
     i18n.use(FsBackend);
     backendConfig = {
@@ -63,7 +60,7 @@ if (!i18n.isInitialized) {
         if ((resources[language] as ResourceLanguage)[namespace]) continue;
         const filePath = join(localesRoot, language, `${namespace}.json`);
         try {
-          const content = await fs.readFile(filePath, "utf-8");
+          const content = await readFile(filePath, "utf-8");
           (resources[language] as ResourceLanguage)[namespace] = JSON.parse(content);
         } catch (error) {
           if (i18nConfig.debug) {
@@ -82,57 +79,63 @@ if (!i18n.isInitialized) {
     i18n.use(HttpBackend);
   }
 
+  const initOptions: Record<string, unknown> = {
+    initImmediate: !isServer,
+
+    // Fallback configuration
+    fallbackLng: i18nConfig.fallbackLanguage,
+
+    // Default namespace
+    defaultNS: "common",
+
+    // Available namespaces
+    ns: i18nConfig.namespaces,
+
+    // Debug in development
+    debug: i18nConfig.debug,
+
+    // Interpolation configuration
+    interpolation: i18nConfig.interpolation,
+
+    // React configuration
+    react: i18nConfig.react,
+
+    backend: backendConfig,
+
+    // Performance optimizations
+    load: "languageOnly", // Only load 'en', 'de', 'pl' (not 'en-US', 'de-DE', etc.)
+    lowerCaseLng: true, // Convert language codes to lowercase
+    supportedLngs: i18nConfig.supportedLanguages,
+
+    // Error handling
+    missingKeyHandler: (lngs: readonly string[], ns: string, key: string) => {
+      if (i18nConfig.debug) {
+        console.warn(
+          `Missing translation key: ${key} for languages: ${lngs.join(", ")}, namespace: ${ns}`,
+        );
+      }
+    },
+
+    // Save missing keys (useful for development)
+    saveMissing: i18nConfig.debug,
+
+    // Use fallback resources
+    resources,
+  };
+
+  // Server-specific configuration
+  if (isServer) {
+    initOptions["preload"] = i18nConfig.supportedLanguages;
+    initOptions["detection"] = i18nConfig.detection;
+    i18n.use(LanguageDetector);
+  } else {
+    // Client: Start with fallback language, will be updated from route context
+    initOptions["lng"] = i18nConfig.fallbackLanguage;
+  }
+
   await i18n
-    .use(LanguageDetector) // Detect user language
     .use(initReactI18next) // Pass i18n instance to react-i18next
-    .init({
-      initImmediate: !isServer,
-
-      // Fallback configuration
-      fallbackLng: i18nConfig.fallbackLanguage,
-
-      // Default namespace
-      defaultNS: "common",
-
-      // Available namespaces
-      ns: i18nConfig.namespaces,
-
-      // Debug in development
-      debug: i18nConfig.debug,
-
-      // Options for language detector
-      detection: i18nConfig.detection,
-
-      // Interpolation configuration
-      interpolation: i18nConfig.interpolation,
-
-      // React configuration
-      react: i18nConfig.react,
-
-      backend: backendConfig,
-
-      ...(isServer && { preload: i18nConfig.supportedLanguages }),
-
-      // Performance optimizations
-      load: "languageOnly", // Only load 'en', 'de', 'pl' (not 'en-US', 'de-DE', etc.)
-      lowerCaseLng: true, // Convert language codes to lowercase
-      supportedLngs: i18nConfig.supportedLanguages,
-
-      // Error handling
-      missingKeyHandler: (lngs: readonly string[], ns: string, key: string) => {
-        if (i18nConfig.debug) {
-          console.warn(
-            `Missing translation key: ${key} for languages: ${lngs.join(", ")}, namespace: ${ns}`,
-          );
-        }
-      },
-
-      // Save missing keys (useful for development)
-      saveMissing: i18nConfig.debug,
-
-      // Use fallback resources
-      resources,
-    });
+    .init(initOptions);
 
   if (isServer) {
     await i18n.loadLanguages(i18nConfig.supportedLanguages);

@@ -6,7 +6,7 @@ import { getBlocklistInputSchema, relationshipInputSchema } from "./social.schem
 import type { BlocklistItem, RelationshipSnapshot } from "./social.types";
 
 export const getRelationshipSnapshot = createServerFn({ method: "GET" })
-  .validator(relationshipInputSchema.parse)
+  .inputValidator(relationshipInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<RelationshipSnapshot>> => {
     try {
       const [{ getCurrentUser }, { getDb }, { getRelationship }] = await Promise.all([
@@ -71,7 +71,7 @@ export const getRelationshipSnapshot = createServerFn({ method: "GET" })
   });
 
 export const getBlocklist = createServerFn({ method: "GET" })
-  .validator((input: unknown) => getBlocklistInputSchema.parse(input))
+  .inputValidator((input: unknown) => getBlocklistInputSchema.parse(input))
   .handler(
     async ({
       data,
@@ -139,7 +139,7 @@ export const getBlocklist = createServerFn({ method: "GET" })
 
 // GM Reviews functionality moved from reviews namespace
 export const listPendingGMReviews = createServerFn({ method: "GET" })
-  .validator(
+  .inputValidator(
     z.object({ days: z.number().int().min(1).max(365).optional() }).optional().parse,
   )
   .handler(async ({ data }) => {

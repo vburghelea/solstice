@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@tanstack/react-start", () => ({
   __esModule: true,
   createServerFn: () => ({
-    validator: () => ({ handler: (handler: unknown) => handler }),
+    inputValidator: () => ({ handler: (handler: unknown) => handler }),
   }),
-  serverOnly: (fn: unknown) => fn,
+  createServerOnlyFn: (fn: () => unknown) => fn(),
 }));
 
 import type { CampaignQueryDependencies } from "../campaigns.queries";

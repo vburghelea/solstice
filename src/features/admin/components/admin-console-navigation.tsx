@@ -1,7 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import { FlagIcon, LineChartIcon, ShieldAlertIcon, UsersIcon } from "lucide-react";
 
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { useAdminTranslation } from "~/hooks/useTypedTranslation";
 import { cn } from "~/shared/lib/utils";
 
@@ -55,9 +55,12 @@ export function AdminConsoleNavigation() {
         const Icon = item.icon;
         const isActive = location.startsWith(item.to);
         return (
-          <Link
+          <LocalizedLink
             key={item.to}
             to={item.to}
+            translationKey="admin.dashboard_sections.navigation"
+            translationNamespace="navigation"
+            fallbackText={item.label}
             className={cn(
               "hover:border-primary/50 hover:bg-primary/5 rounded-xl border p-4 text-left transition",
               isActive
@@ -70,7 +73,7 @@ export function AdminConsoleNavigation() {
               <span className="text-body-sm font-semibold">{item.label}</span>
             </div>
             <p className="text-body-xs text-muted-foreground">{item.description}</p>
-          </Link>
+          </LocalizedLink>
         );
       })}
     </nav>

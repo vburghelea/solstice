@@ -19,11 +19,13 @@ type LoaderData = { system: AdminGameSystemDetail };
 
 export const Route = createFileRoute("/admin/systems/$systemId")({
   validateSearch: systemEditorSearchSchema.parse,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     await requireRole({
       user: context.user,
       requiredRoles: ["Platform Admin", "Roundup Games Admin", "Super Admin"],
       redirectTo: "/admin",
+      language: context.language,
+      currentPath: location.pathname,
     });
   },
   loader: async ({ params }) => {

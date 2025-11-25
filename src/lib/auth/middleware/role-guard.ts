@@ -1,6 +1,8 @@
 import { redirect } from "@tanstack/react-router";
 import type { User } from "~/lib/auth/types";
 import { isAdminClient } from "~/lib/auth/utils/admin-check";
+import type { SupportedLanguage } from "~/lib/i18n/config";
+import { resolveLocalizedPath } from "~/lib/i18n/redirects";
 
 interface RoleGuardOptions {
   user: User | null;
@@ -8,6 +10,8 @@ interface RoleGuardOptions {
   teamId?: string;
   eventId?: string;
   redirectTo?: string;
+  language?: SupportedLanguage | null | undefined;
+  currentPath?: string | undefined;
 }
 
 function hasClientAccess({
@@ -60,9 +64,16 @@ export async function requireRole({
   teamId,
   eventId,
   redirectTo = "/player",
+  language,
+  currentPath,
 }: RoleGuardOptions) {
   if (!user) {
-    throw redirect({ to: "/auth/login" } as never);
+    const localizedLoginPath = resolveLocalizedPath({
+      targetPath: "/auth/login",
+      language,
+      currentPath,
+    });
+    throw redirect({ to: localizedLoginPath } as never);
   }
 
   if (!requiredRoles || requiredRoles.length === 0) {
@@ -78,7 +89,12 @@ export async function requireRole({
     };
 
     if (!hasClientAccess(clientAccessArgs)) {
-      throw redirect({ to: redirectTo } as never);
+      const localizedRedirect = resolveLocalizedPath({
+        targetPath: redirectTo,
+        language,
+        currentPath,
+      });
+      throw redirect({ to: localizedRedirect } as never);
     }
     return;
   }
@@ -108,18 +124,42 @@ export async function requireRole({
   }
 
   if (!hasAccess) {
-    throw redirect({ to: redirectTo } as never);
+    const localizedRedirect = resolveLocalizedPath({
+      targetPath: redirectTo,
+      language,
+      currentPath,
+    });
+    throw redirect({ to: localizedRedirect } as never);
   }
 }
 
-export async function requireGlobalAdmin(user: User | null, redirectTo = "/player") {
+export async function requireGlobalAdmin(
+  user: User | null,
+  redirectTo = "/player",
+  options?: {
+    language?: SupportedLanguage | null | undefined;
+    currentPath?: string | undefined;
+  },
+) {
+  const { language, currentPath } = options ?? {};
+
   if (!user) {
-    throw redirect({ to: "/auth/login" } as never);
+    const localizedLoginPath = resolveLocalizedPath({
+      targetPath: "/auth/login",
+      language,
+      currentPath,
+    });
+    throw redirect({ to: localizedLoginPath } as never);
   }
 
   if (typeof window !== "undefined") {
     if (!isAdminClient(user)) {
-      throw redirect({ to: redirectTo } as never);
+      const localizedRedirect = resolveLocalizedPath({
+        targetPath: redirectTo,
+        language,
+        currentPath,
+      });
+      throw redirect({ to: localizedRedirect } as never);
     }
     return;
   }
@@ -127,6 +167,11 @@ export async function requireGlobalAdmin(user: User | null, redirectTo = "/playe
   const { PermissionService } = await import("~/features/roles/permission.service");
   const isAdmin = await PermissionService.isGlobalAdmin(user.id);
   if (!isAdmin) {
-    throw redirect({ to: redirectTo } as never);
+    const localizedRedirect = resolveLocalizedPath({
+      targetPath: redirectTo,
+      language,
+      currentPath,
+    });
+    throw redirect({ to: localizedRedirect } as never);
   }
 }

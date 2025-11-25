@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/shared/lib/utils";
 
@@ -232,9 +232,14 @@ export function CrossPersonaCollaborationWorkspace(
             {disableInboxLink ? (
               <span>{t("sections.metrics.review_threads")}</span>
             ) : (
-              <Link to={inboxPathOverride ?? `/${activePersona}/inbox`}>
+              <LocalizedButtonLink
+                to={inboxPathOverride ?? `/${activePersona}/inbox`}
+                translationKey="collaboration.review_threads"
+                translationNamespace="navigation"
+                fallbackText={t("sections.metrics.review_threads")}
+              >
                 {t("sections.metrics.review_threads")}
-              </Link>
+              </LocalizedButtonLink>
             )}
           </Button>
         </div>

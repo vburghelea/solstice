@@ -379,7 +379,7 @@ const listAdminGameSystemsHandler = async ({
 };
 
 export const listAdminGameSystems = createServerFn({ method: "POST" })
-  .validator(listAdminGameSystemsSchema.parse)
+  .inputValidator(listAdminGameSystemsSchema.parse)
   .handler(listAdminGameSystemsHandler);
 
 const CRAWL_EVENT_LIMIT = 10;
@@ -629,5 +629,5 @@ const getAdminGameSystemHandler = async ({
 };
 
 export const getAdminGameSystem = createServerFn({ method: "POST" })
-  .validator(getAdminGameSystemSchema.parse)
+  .inputValidator(getAdminGameSystemSchema.parse)
   .handler(getAdminGameSystemHandler);

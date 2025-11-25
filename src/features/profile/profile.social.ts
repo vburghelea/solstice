@@ -84,7 +84,7 @@ export const getFollowing = createServerFn({ method: "GET" }).handler(
 );
 
 export const getGMReviews = createServerFn({ method: "GET" })
-  .validator((input: unknown) => {
+  .inputValidator((input: unknown) => {
     if (
       !input ||
       typeof input !== "object" ||
@@ -145,7 +145,7 @@ export const getGMReviews = createServerFn({ method: "GET" })
 
 // Check if current user has a GM review for a specific game
 export const getMyGMReviewForGame = createServerFn({ method: "GET" })
-  .validator((input: unknown) => {
+  .inputValidator((input: unknown) => {
     if (
       !input ||
       typeof input !== "object" ||

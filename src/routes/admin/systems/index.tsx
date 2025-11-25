@@ -9,11 +9,13 @@ import { requireRole } from "~/lib/auth/middleware/role-guard";
 
 export const Route = createFileRoute("/admin/systems/")({
   validateSearch: adminSystemsSearchSchema.parse,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     await requireRole({
       user: context.user,
       requiredRoles: ["Platform Admin", "Roundup Games Admin", "Super Admin"],
       redirectTo: "/admin",
+      language: context.language,
+      currentPath: location.pathname,
     });
   },
   component: AdminSystemsRoute,

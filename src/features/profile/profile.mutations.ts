@@ -84,7 +84,7 @@ function mapDbUserToProfile(
 
 export const updateUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(partialProfileInputSchema))
+  .inputValidator(zod$(partialProfileInputSchema))
   .handler(async ({ data: inputData }): Promise<ProfileOperationResult> => {
     // Now inputData contains the actual profile data
     try {
@@ -98,7 +98,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
         };
       }
 
-      // Input is already validated by .validator(), just check if it's empty
+      // Input is already validated by .inputValidator(), just check if it's empty
       if (!inputData || Object.keys(inputData).length === 0) {
         return {
           success: false,
@@ -271,7 +271,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
 
 export const completeUserProfile = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(completeProfileInputSchema))
+  .inputValidator(zod$(completeProfileInputSchema))
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);
@@ -287,7 +287,7 @@ export const completeUserProfile = createServerFn({ method: "POST" })
         };
       }
 
-      // Input is already validated by .validator()
+      // Input is already validated by .inputValidator()
 
       // Import database dependencies inside handler
       const { and, eq, ne, sql } = await import("drizzle-orm");
@@ -406,7 +406,7 @@ const uploadAvatarInputSchema = z.object({
 });
 
 export const uploadAvatar = createServerFn({ method: "POST" })
-  .validator((data: unknown) => uploadAvatarInputSchema.parse(data))
+  .inputValidator((data: unknown) => uploadAvatarInputSchema.parse(data))
   .handler(async ({ data }) => {
     const [{ getCurrentUser }, { getDb }] = await Promise.all([
       import("~/features/auth/auth.queries"),
@@ -510,7 +510,7 @@ export const removeUploadedAvatar = createServerFn({ method: "POST" }).handler(
 
 export const updatePrivacySettings = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(privacySettingsSchema))
+  .inputValidator(zod$(privacySettingsSchema))
   .handler(async ({ data }): Promise<ProfileOperationResult> => {
     try {
       const [{ getDb }] = await Promise.all([import("~/db/server-helpers")]);

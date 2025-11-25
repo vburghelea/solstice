@@ -1,5 +1,5 @@
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -23,7 +23,7 @@ let sqlInstance: ReturnType<typeof postgres> | null = null;
  * - Short-lived queries
  * - High-concurrency scenarios
  */
-export const pooledDb = serverOnly(async () => {
+export const pooledDb = createServerOnlyFn(async () => {
   // Return existing instance if available
   if (pooledInstance) {
     return pooledInstance;
@@ -62,7 +62,7 @@ export const pooledDb = serverOnly(async () => {
  * - Batch imports/exports
  * - Operations requiring session-level features
  */
-export const unpooledDb = serverOnly(async () => {
+export const unpooledDb = createServerOnlyFn(async () => {
   // Return existing instance if available
   if (unpooledInstance) {
     return unpooledInstance;
@@ -96,7 +96,7 @@ export const unpooledDb = serverOnly(async () => {
  * This is the recommended export for most use cases as it automatically
  * selects the optimal connection type.
  */
-export const getDb = serverOnly(async () => {
+export const getDb = createServerOnlyFn(async () => {
   const { isServerless } = await import("../lib/env.server");
   if (isServerless()) {
     console.log("Using pooled connection for serverless environment");
@@ -111,7 +111,7 @@ export const getDb = serverOnly(async () => {
  * Cleanup function to close all database connections
  * Should be called when shutting down the server
  */
-export const closeConnections = serverOnly(async () => {
+export const closeConnections = createServerOnlyFn(async () => {
   const promises: Promise<void>[] = [];
 
   if (poolInstance) {

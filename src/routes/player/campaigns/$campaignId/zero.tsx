@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "~/components/ui/button";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import {
   Card,
   CardContent,
@@ -77,9 +77,13 @@ function SessionZeroPage() {
       <div className="container mx-auto max-w-4xl space-y-6 p-6">
         <h1 className="text-destructive text-2xl font-bold">Access Denied</h1>
         <p>You do not have permission to view this page.</p>
-        <Link to="/player/campaigns">
-          <Button variant="outline">Back to Campaigns</Button>
-        </Link>
+        <LocalizedButtonLink
+          to="/player/campaigns"
+          translationKey="links.campaign_management.my_campaigns"
+          variant="outline"
+        >
+          Back to Campaigns
+        </LocalizedButtonLink>
       </div>
     );
   }
@@ -89,12 +93,15 @@ function SessionZeroPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Session Zero for {campaign.name}</CardTitle>
-          <Link to="/player/campaigns/$campaignId" params={{ campaignId: campaign.id }}>
-            <Button variant="outline">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Campaign
-            </Button>
-          </Link>
+          <LocalizedButtonLink
+            to="/player/campaigns/$campaignId"
+            params={{ campaignId: campaign.id }}
+            translationKey="links.campaign_management.view_campaign_details"
+            variant="outline"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Campaign
+          </LocalizedButtonLink>
         </CardHeader>
         <CardContent className="space-y-4">
           <CardDescription>

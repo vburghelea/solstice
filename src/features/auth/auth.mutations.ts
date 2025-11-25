@@ -3,14 +3,14 @@ import { OperationResult } from "~/shared/types/common";
 import { passwordResetRequestSchema, resetPasswordSchema } from "./auth.schemas";
 
 export const requestPasswordReset = createServerFn({ method: "POST" })
-  .validator(passwordResetRequestSchema.parse)
+  .inputValidator(passwordResetRequestSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getAuth } = await import("~/lib/auth/server-helpers");
       const auth = await getAuth();
 
       console.log("Attempting to send password reset email for:", data.email);
-      await auth.api.forgetPassword({ body: { email: data.email } });
+      await auth.api.requestPasswordReset({ body: { email: data.email } });
 
       return { success: true, data: true };
     } catch (error) {
@@ -28,7 +28,7 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
   });
 
 export const resetPassword = createServerFn({ method: "POST" })
-  .validator(resetPasswordSchema.parse)
+  .inputValidator(resetPasswordSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<boolean>> => {
     try {
       const { getAuth } = await import("~/lib/auth/server-helpers");

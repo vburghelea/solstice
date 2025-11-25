@@ -9,7 +9,7 @@ import { detectLanguageFromPath, getLocalizedUrl } from "~/lib/i18n/detector";
 import { applyLanguageRouting } from "~/lib/i18n/language-routing";
 import { routeTree as generatedRouteTree } from "./routeTree.gen";
 
-export function createRouter() {
+export function getRouter() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -27,7 +27,6 @@ export function createRouter() {
       queryClient,
       user: null,
       language: i18nConfig.defaultLanguage,
-      i18nRequestKey: null,
     },
     defaultPreload: "intent",
     // react-query will handle data fetching & caching
@@ -107,10 +106,16 @@ export function createRouter() {
       const targetLanguage =
         preferredLanguage ?? explicitLanguage ?? detectedLanguage ?? currentLanguage;
 
+      // Only skip localization if:
+      // 1. No target language, OR
+      // 2. The path already has the correct language, OR
+      // 3. We're on default language path AND trying to navigate to default language AND the current path doesn't have a language prefix
       if (
         !targetLanguage ||
-        targetLanguage === i18nConfig.defaultLanguage ||
-        detectedLanguage
+        (detectedLanguage && detectedLanguage === targetLanguage) ||
+        (targetLanguage === i18nConfig.defaultLanguage &&
+          currentLanguage === i18nConfig.defaultLanguage &&
+          !detectLanguageFromPath(router.latestLocation?.pathname ?? ""))
       ) {
         return location;
       }
@@ -137,6 +142,6 @@ export function createRouter() {
 
 declare module "@tanstack/react-router" {
   interface Register {
-    router: ReturnType<typeof createRouter>;
+    router: ReturnType<typeof getRouter>;
   }
 }

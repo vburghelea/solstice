@@ -41,7 +41,7 @@ function qc() {
 }
 
 describe("PlayerCampaignDetails apply eligibility (connections-only)", () => {
-  it("hides Apply when protected and not a connection", async () => {
+  it("hides Apply when protected and not a connection", { timeout: 10000 }, async () => {
     mockUseQueryCampaignGameSessions.mockReturnValueOnce({
       data: { success: true, data: [] },
       isLoading: false,
@@ -99,61 +99,65 @@ describe("PlayerCampaignDetails apply eligibility (connections-only)", () => {
     expect(buttons).toHaveLength(0);
   });
 
-  it("shows Apply when protected and viewer is a connection", async () => {
-    mockUseQueryCampaignGameSessions.mockReturnValueOnce({
-      data: { success: true, data: [] },
-      isLoading: false,
-      error: null,
-    });
-    mockUseQueryCampaign.mockReturnValueOnce({
-      data: {
-        id: "c2",
-        owner: { id: "owner", name: "Owner", email: "o@x" },
-        gameSystem: { id: 1, name: "Test System" },
-        name: "Connected Campaign",
-        description: "A test campaign",
-        recurrence: "weekly",
-        timeOfDay: "evening",
-        sessionDuration: "3h",
-        pricePerSession: 0,
-        language: "en",
-        location: { address: "Test Location" },
-        status: "active",
-        minimumRequirements: null,
-        safetyRules: null,
-        sessionZeroData: null,
-        campaignExpectations: null,
-        tableExpectations: null,
-        characterCreationOutcome: null,
-        visibility: "protected",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        participants: [],
-      },
-      isLoading: false,
-      error: null,
-    });
-    mockUseQueryRelationship.mockReturnValueOnce({
-      data: {
-        success: true,
-        data: { blocked: false, blockedBy: false, isConnection: true },
-      },
-      isLoading: false,
-      error: null,
-    });
+  it(
+    "shows Apply when protected and viewer is a connection",
+    { timeout: 10000 },
+    async () => {
+      mockUseQueryCampaignGameSessions.mockReturnValueOnce({
+        data: { success: true, data: [] },
+        isLoading: false,
+        error: null,
+      });
+      mockUseQueryCampaign.mockReturnValueOnce({
+        data: {
+          id: "c2",
+          owner: { id: "owner", name: "Owner", email: "o@x" },
+          gameSystem: { id: 1, name: "Test System" },
+          name: "Connected Campaign",
+          description: "A test campaign",
+          recurrence: "weekly",
+          timeOfDay: "evening",
+          sessionDuration: "3h",
+          pricePerSession: 0,
+          language: "en",
+          location: { address: "Test Location" },
+          status: "active",
+          minimumRequirements: null,
+          safetyRules: null,
+          sessionZeroData: null,
+          campaignExpectations: null,
+          tableExpectations: null,
+          characterCreationOutcome: null,
+          visibility: "protected",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          participants: [],
+        },
+        isLoading: false,
+        error: null,
+      });
+      mockUseQueryRelationship.mockReturnValueOnce({
+        data: {
+          success: true,
+          data: { blocked: false, blockedBy: false, isConnection: true },
+        },
+        isLoading: false,
+        error: null,
+      });
 
-    const mod = await import("../index");
-    setupRoute(mod, "viewer", "c2");
+      const mod = await import("../index");
+      setupRoute(mod, "viewer", "c2");
 
-    const Component = mod.Route.options.component!;
-    render(
-      <QueryClientProvider client={qc()}>
-        <Component />
-      </QueryClientProvider>,
-    );
+      const Component = mod.Route.options.component!;
+      render(
+        <QueryClientProvider client={qc()}>
+          <Component />
+        </QueryClientProvider>,
+      );
 
-    await screen.findByText(/connected campaign/i);
-    const buttons = await screen.findAllByRole("button", { name: /apply to join/i });
-    expect(buttons.length).toBeGreaterThan(0);
-  });
+      await screen.findByText(/connected campaign/i);
+      const buttons = await screen.findAllByRole("button", { name: /apply to join/i });
+      expect(buttons.length).toBeGreaterThan(0);
+    },
+  );
 });

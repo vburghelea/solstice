@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { LogoIcon } from "~/components/ui/icons";
+import { LocalizedLink } from "~/components/ui/LocalizedLink";
 import { requestPasswordReset } from "~/features/auth/auth.mutations";
 import { useAuthTranslation } from "~/hooks/useTypedTranslation";
 import { useAppForm } from "~/lib/hooks/useAppForm";
@@ -40,9 +41,14 @@ function ForgotPasswordForm() {
       <div className="flex flex-col items-center gap-6 text-center">
         <h1 className="text-xl font-bold">{t("forgot_password.success.title")}</h1>
         <p className="text-muted-foreground">{t("forgot_password.success.message")}</p>
-        <Link to="/auth/login" className="text-sm underline underline-offset-4">
+        <LocalizedLink
+          to="/auth/login"
+          translationKey="user.login"
+          translationNamespace="navigation"
+          className="text-sm underline underline-offset-4"
+        >
           {t("forgot_password.actions.back_to_login")}
-        </Link>
+        </LocalizedLink>
       </div>
     );
   }
@@ -94,9 +100,14 @@ function ForgotPasswordForm() {
       </form>
       <div className="text-center text-sm">
         {t("forgot_password.actions.remembered_password")}{" "}
-        <Link to="/auth/login" className="underline underline-offset-4">
+        <LocalizedLink
+          to="/auth/login"
+          translationKey="user.login"
+          translationNamespace="navigation"
+          className="underline underline-offset-4"
+        >
           {t("forgot_password.actions.back_to_login")}
-        </Link>
+        </LocalizedLink>
       </div>
     </div>
   );

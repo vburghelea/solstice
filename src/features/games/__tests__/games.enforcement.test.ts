@@ -75,11 +75,11 @@ vi.mock("~/lib/env.server", () => ({
 vi.mock("@tanstack/react-start", () => ({
   __esModule: true,
   createServerFn: () => ({
-    validator: () => ({
+    inputValidator: () => ({
       handler: (h: unknown) => h,
     }),
   }),
-  serverOnly: (fn: unknown) => fn,
+  createServerOnlyFn: (fn: () => unknown) => fn(),
 }));
 
 describe("games social enforcement", () => {

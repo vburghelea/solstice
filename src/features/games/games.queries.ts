@@ -1,4 +1,4 @@
-import { createServerFn, serverOnly } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import {
   getGameApplicationForUserInputSchema,
   getGameSchema,
@@ -32,7 +32,7 @@ import type {
   user as userTable,
 } from "~/db/schema";
 
-const getServerDeps = serverOnly(async () => {
+const getServerDeps = createServerOnlyFn(async () => {
   const [drizzle, schema, serverHelpers, authQueries, gameRepo] = await Promise.all([
     import("drizzle-orm"),
     import("~/db/schema"),
@@ -426,7 +426,7 @@ function buildGameListQuery(
  * Search game systems by name
  */
 export const searchGameSystems = createServerFn({ method: "POST" })
-  .validator(searchGameSystemsSchema.parse)
+  .inputValidator(searchGameSystemsSchema.parse)
   .handler(
     async ({
       data,
@@ -475,7 +475,7 @@ export const searchGameSystems = createServerFn({ method: "POST" })
  * Get a single game by ID with all details
  */
 export const getGame = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
+  .inputValidator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameWithDetails | null>> => {
     try {
       // Simple UUID validation
@@ -549,7 +549,7 @@ export async function listGamesImpl(
 }
 
 export const listGames = createServerFn({ method: "POST" })
-  .validator(listGamesSchema.parse)
+  .inputValidator(listGamesSchema.parse)
   .handler(async ({ data = {} }): Promise<OperationResult<GameListItem[]>> => {
     const { getDb, getCurrentUser } = await getServerDeps();
     const db = await getDb();
@@ -558,7 +558,7 @@ export const listGames = createServerFn({ method: "POST" })
   });
 
 export const listGamesWithCount = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     z.object({
       // Accept filters without relying on transformed schema shape
       filters: z.any().optional(),
@@ -659,7 +659,7 @@ export async function searchGamesImpl(
 }
 
 export const searchGames = createServerFn({ method: "POST" })
-  .validator(searchGamesSchema.parse)
+  .inputValidator(searchGamesSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
     const { getDb, getCurrentUser } = await getServerDeps();
     const db = await getDb();
@@ -671,7 +671,7 @@ export const searchGames = createServerFn({ method: "POST" })
  * Search users for invitation by name or email
  */
 export const searchUsersForInvitation = createServerFn({ method: "POST" })
-  .validator(searchUsersForInvitationSchema.parse)
+  .inputValidator(searchUsersForInvitationSchema.parse)
   .handler(
     async ({
       data,
@@ -767,7 +767,7 @@ export const searchUsersForInvitation = createServerFn({ method: "POST" })
  * List game sessions by campaign ID
  */
 export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
-  .validator(listGameSessionsByCampaignIdSchema.parse)
+  .inputValidator(listGameSessionsByCampaignIdSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameListItem[]>> => {
     try {
       const {
@@ -864,7 +864,7 @@ export const listGameSessionsByCampaignId = createServerFn({ method: "POST" })
  * Get pending applications for a specific game
  */
 export const getGameApplications = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
+  .inputValidator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameApplication[]>> => {
     try {
       const { getCurrentUser, findGameById, findPendingGameApplicationsByGameId } =
@@ -908,7 +908,7 @@ export const getGameApplications = createServerFn({ method: "POST" })
  * Get a single game application for a specific user
  */
 export const getGameApplicationForUser = createServerFn({ method: "POST" })
-  .validator(getGameApplicationForUserInputSchema.parse)
+  .inputValidator(getGameApplicationForUserInputSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameApplication | null>> => {
     try {
       const { getDb, and, eq, gameApplications } = await getServerDeps();
@@ -940,7 +940,7 @@ export const getGameApplicationForUser = createServerFn({ method: "POST" })
  * Get participants for a specific game
  */
 export const getGameParticipants = createServerFn({ method: "POST" })
-  .validator(getGameSchema.parse)
+  .inputValidator(getGameSchema.parse)
   .handler(async ({ data }): Promise<OperationResult<GameParticipant[]>> => {
     try {
       const { findGameParticipantsByGameId } = await getServerDeps();

@@ -45,7 +45,7 @@ const getSquarePaymentService = async () => {
  */
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(purchaseMembershipSchema.omit({ autoRenew: true })))
+  .inputValidator(zod$(purchaseMembershipSchema.omit({ autoRenew: true })))
   .handler(
     async ({
       data,
@@ -170,7 +170,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
  */
 export const confirmMembershipPurchase = createServerFn({ method: "POST" })
   .middleware(getAuthMiddleware())
-  .validator(zod$(confirmMembershipPurchaseSchema))
+  .inputValidator(zod$(confirmMembershipPurchaseSchema))
   .handler(async ({ data, context }): Promise<MembershipOperationResult<Membership>> => {
     try {
       // Import server-only modules inside the handler

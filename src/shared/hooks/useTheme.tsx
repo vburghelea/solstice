@@ -46,20 +46,44 @@ function detectSystemTheme(): "light" | "dark" {
 }
 
 export function ThemeProvider({ children }: { readonly children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => readStoredTheme());
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(() =>
-    detectSystemTheme(),
-  );
+  const [state, setState] = useState({
+    theme: "system" as Theme,
+    systemTheme: "light" as "light" | "dark",
+    isHydrated: false,
+  });
+
+  const { theme, systemTheme, isHydrated } = state;
+
+  const setTheme = (newTheme: Theme) => {
+    setState((prev) => ({ ...prev, theme: newTheme }));
+  };
+
+  const setSystemTheme = (newSystemTheme: "light" | "dark") => {
+    setState((prev) => ({ ...prev, systemTheme: newSystemTheme }));
+  };
+
+  // Read stored theme after hydration to prevent SSR mismatch
+  useEffect(() => {
+    const storedTheme = readStoredTheme();
+    const detectedSystemTheme = detectSystemTheme();
+
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    setState((prev) => ({
+      theme: prev.isHydrated ? prev.theme : storedTheme,
+      systemTheme: prev.isHydrated ? prev.systemTheme : detectedSystemTheme,
+      isHydrated: true,
+    }));
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !isHydrated) return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (event: MediaQueryListEvent) => {
       setSystemTheme(event.matches ? "dark" : "light");
     };
     media.addEventListener("change", handleChange);
     return () => media.removeEventListener("change", handleChange);
-  }, []);
+  }, [isHydrated]);
 
   const resolvedTheme = theme === "system" ? systemTheme : theme;
 
@@ -74,26 +98,37 @@ export function ThemeProvider({ children }: { readonly children: ReactNode }) {
   }, [resolvedTheme]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !isHydrated) return;
     try {
       window.localStorage.setItem("theme", theme);
     } catch {
       // Ignore storage errors
     }
-  }, [theme]);
+  }, [theme, isHydrated]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      if (prev === "light") return "dark";
-      if (prev === "dark") return "light";
+    const currentTheme = state.theme;
+    let newTheme: Theme;
+
+    if (currentTheme === "light") {
+      newTheme = "dark";
+    } else if (currentTheme === "dark") {
+      newTheme = "light";
+    } else {
       const prefersDark = detectSystemTheme() === "dark";
-      return prefersDark ? "light" : "dark";
-    });
+      newTheme = prefersDark ? "light" : "dark";
+    }
+
+    setTheme(newTheme);
+  }, [state.theme]);
+
+  const contextSetTheme = useCallback((newTheme: Theme) => {
+    setTheme(newTheme);
   }, []);
 
   const value = useMemo(
-    () => ({ theme, resolvedTheme, setTheme, toggleTheme }),
-    [theme, resolvedTheme, toggleTheme],
+    () => ({ theme, resolvedTheme, setTheme: contextSetTheme, toggleTheme }),
+    [theme, resolvedTheme, toggleTheme, contextSetTheme],
   ) as ThemeContextValue;
 
   return <ThemeContext value={value}>{children}</ThemeContext>;

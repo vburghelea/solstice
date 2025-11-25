@@ -1,8 +1,7 @@
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 import { HeroBackgroundImage } from "~/shared/components/hero-background-image";
 import type { CloudinaryResponsiveImageSet } from "~/shared/lib/cloudinary-assets";
 import { cn } from "~/shared/lib/utils";
-import { Button } from "./button";
 
 interface HeroSectionProps {
   eyebrow?: string;
@@ -104,18 +103,20 @@ export function HeroSection({
           {(ctaText || secondaryCta) && (
             <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:justify-center">
               {ctaText && (
-                <Link to={ctaLink}>
-                  <Button className="btn-brand-primary rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base">
-                    {ctaText}
-                  </Button>
-                </Link>
+                <LocalizedButtonLink
+                  to={ctaLink}
+                  className="btn-brand-primary rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base"
+                >
+                  {ctaText}
+                </LocalizedButtonLink>
               )}
               {secondaryCta && (
-                <Link to={secondaryCta.link}>
-                  <Button className="btn-brand-secondary rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base">
-                    {secondaryCta.text}
-                  </Button>
-                </Link>
+                <LocalizedButtonLink
+                  to={secondaryCta.link}
+                  className="btn-brand-secondary rounded-lg px-6 py-2.5 text-sm font-bold shadow-lg sm:px-8 sm:py-3 sm:text-base"
+                >
+                  {secondaryCta.text}
+                </LocalizedButtonLink>
               )}
             </div>
           )}

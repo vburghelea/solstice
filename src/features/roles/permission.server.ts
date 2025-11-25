@@ -1,4 +1,4 @@
-import { serverOnly } from "@tanstack/react-start";
+import { createServerOnlyFn } from "@tanstack/react-start";
 import { and, eq, inArray } from "drizzle-orm";
 
 import { roles, userRoles } from "~/db/schema";
@@ -16,7 +16,7 @@ export class PermissionService {
   /**
    * Check if a user has global admin permissions
    */
-  static isGlobalAdmin = serverOnly(async (userId: string): Promise<boolean> => {
+  static isGlobalAdmin = createServerOnlyFn(async (userId: string): Promise<boolean> => {
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
 
@@ -38,7 +38,7 @@ export class PermissionService {
   /**
    * Check if a user can manage a specific team
    */
-  static canManageTeam = serverOnly(
+  static canManageTeam = createServerOnlyFn(
     async (userId: string, teamId: string): Promise<boolean> => {
       // Global admins can manage any team
       if (await PermissionService.isGlobalAdmin(userId)) return true;
@@ -67,7 +67,7 @@ export class PermissionService {
   /**
    * Check if a user can manage a specific event
    */
-  static canManageEvent = serverOnly(
+  static canManageEvent = createServerOnlyFn(
     async (userId: string, eventId: string): Promise<boolean> => {
       // Global admins can manage any event
       if (await PermissionService.isGlobalAdmin(userId)) return true;
@@ -96,7 +96,7 @@ export class PermissionService {
   /**
    * Get all roles for a user including scope information
    */
-  static getUserRoles = serverOnly(async (userId: string) => {
+  static getUserRoles = createServerOnlyFn(async (userId: string) => {
     const { getDb } = await import("~/db/server-helpers");
     const db = await getDb();
 
@@ -125,7 +125,7 @@ export class PermissionService {
     return userRolesList;
   });
 
-  static resolvePersonaResolution = serverOnly(
+  static resolvePersonaResolution = createServerOnlyFn(
     async (
       userId?: string | null,
       options: ResolvePersonaResolutionOptions = {},

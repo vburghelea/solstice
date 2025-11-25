@@ -231,6 +231,7 @@
     "no_results": "Brak wyników",
     "no_data": "Brak dostępnych danych",
     "select_option": "Wybierz opcję",
+    "no_safety_rules_specified": "Nie określono zasad bezpieczeństwa",
     "welcome_back": "Witaj ponownie"
   },
   "links": {
@@ -240,7 +241,8 @@
     "show_more": "Pokaż więcej",
     "show_less": "Pokaż mniej",
     "expand": "Rozwiń",
-    "collapse": "Zwiń"
+    "collapse": "Zwiń",
+    "open_in_google_maps": "Otwórz w Mapach Google"
   },
   "dividers": {
     "or": "Lub"
@@ -295,6 +297,10 @@
     "cover_art_alt": "Okładka {{name}}"
   },
   "showing_results": "Pokazywanie {{count}} {{itemType}}",
+  "filters": {
+    "quick_filters_label": "Szybkie filtry:",
+    "clear_filters": "Wyczyść filtry"
+  },
   "clear_all": "Wyczyść wszystko",
   "navigation": {
     "home": "Strona główna",

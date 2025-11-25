@@ -34,7 +34,7 @@ function normalizeNotes(notes?: string) {
 }
 
 export const assignRoleToUser = createServerFn({ method: "POST" })
-  .validator(zod$(assignRoleSchema))
+  .inputValidator(zod$(assignRoleSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleAssignmentRow>> => {
     try {
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -43,8 +43,8 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {
@@ -287,7 +287,7 @@ export const assignRoleToUser = createServerFn({ method: "POST" })
   });
 
 export const removeRoleAssignment = createServerFn({ method: "POST" })
-  .validator(zod$(removeRoleSchema))
+  .inputValidator(zod$(removeRoleSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleAssignmentRow>> => {
     try {
       const [{ getDb }, { getAuth }] = await Promise.all([
@@ -296,8 +296,8 @@ export const removeRoleAssignment = createServerFn({ method: "POST" })
       ]);
 
       const auth = await getAuth();
-      const { getWebRequest } = await import("@tanstack/react-start/server");
-      const { headers } = getWebRequest();
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { headers } = getRequest();
       const session = await auth.api.getSession({ headers });
 
       if (!session?.user?.id) {

@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import {
   Select,
   SelectContent,
@@ -31,9 +31,11 @@ type LinkPrimitive = string | number | boolean;
 type LinkConfig = {
   readonly to: string;
   readonly params?: Record<string, LinkPrimitive>;
-  readonly search?: Record<string, LinkPrimitive | undefined>;
+  readonly search?: Record<string, LinkPrimitive>;
   readonly from?: string;
   readonly label?: string;
+  readonly translationKey?: string;
+  readonly translationNamespace?: string;
 };
 
 interface EventListProps {
@@ -380,7 +382,16 @@ function EventCard({
     to: builderLink?.to ?? "/events/$slug",
     params: builderLink?.params ?? { slug: event.slug },
     label: linkLabel,
-    ...(builderLink?.search ? { search: builderLink.search } : {}),
+    translationKey:
+      builderLink?.translationKey ?? "links.event_management.view_event_details",
+    translationNamespace: builderLink?.translationNamespace ?? "navigation",
+    ...(builderLink?.search
+      ? {
+          search: Object.fromEntries(
+            Object.entries(builderLink.search).filter(([, value]) => value !== undefined),
+          ) as Record<string, LinkPrimitive>,
+        }
+      : {}),
     ...(builderLink?.from ? { from: builderLink.from } : {}),
   };
 
@@ -389,18 +400,20 @@ function EventCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <Link
+            <LocalizedLink
               to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
+              params={resolvedLink.params}
+              search={resolvedLink.search}
+              translationKey={resolvedLink.translationKey}
+              translationNamespace={resolvedLink.translationNamespace}
+              fallbackText={linkLabel}
               className="group-hover:underline"
             >
               <CardTitle className="line-clamp-2">
                 <span className="mr-2">{typeIcon}</span>
                 {event.name}
               </CardTitle>
-            </Link>
+            </LocalizedLink>
           </div>
           <Badge
             variant={badgeAppearance.variant}
@@ -465,16 +478,16 @@ function EventCard({
         </div>
 
         <div className="pt-2">
-          <Button asChild className="w-full" size="sm">
-            <Link
-              to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-            >
-              {linkLabel}
-            </Link>
-          </Button>
+          <LocalizedButtonLink
+            to={resolvedLink.to}
+            params={resolvedLink.params}
+            search={resolvedLink.search}
+            translationKey={resolvedLink.translationKey}
+            translationNamespace={resolvedLink.translationNamespace}
+            fallbackText={linkLabel}
+            className="w-full"
+            size="sm"
+          />
         </div>
       </CardContent>
     </Card>

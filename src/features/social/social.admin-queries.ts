@@ -44,7 +44,7 @@ export type SocialAuditRow = {
 };
 
 export const getSocialAudits = createServerFn({ method: "GET" })
-  .validator((input: unknown) => getSocialAuditsSchema.parse(input))
+  .inputValidator((input: unknown) => getSocialAuditsSchema.parse(input))
   .handler(
     async ({
       data,

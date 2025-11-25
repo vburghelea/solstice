@@ -1,8 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink } from "~/components/ui/LocalizedLink";
 
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -85,11 +84,16 @@ function SystemDetailPage() {
 
         <section className="container mx-auto space-y-10 px-4 pt-6 pb-10 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <Button asChild variant="outline" size="sm">
-              <Link to="/systems">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" /> {t("detail.back_to_browse")}
-              </Link>
-            </Button>
+            <LocalizedButtonLink
+              to="/systems"
+              variant="outline"
+              size="sm"
+              translationKey="system_management.back_to_systems"
+              translationNamespace="navigation"
+              fallbackText={t("detail.back_to_browse")}
+            >
+              <ArrowLeftIcon className="mr-2 h-4 w-4" /> {t("detail.back_to_browse")}
+            </LocalizedButtonLink>
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary">
                 <UsersIcon className="mr-1 h-3.5 w-3.5" /> {playersLabel}

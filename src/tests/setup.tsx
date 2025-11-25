@@ -140,6 +140,20 @@ vi.mock("sonner", async (importOriginal) => {
   };
 });
 
+// Import the mock function directly at module level
+import { LocalizedLinkMock } from "~/tests/mocks/localized-link";
+
+// Use the comprehensive LocalizedLink mock from the mocks directory
+vi.mock("~/components/ui/LocalizedLink", () => ({
+  LocalizedLink: LocalizedLinkMock,
+  LocalizedNavLink: LocalizedLinkMock,
+  LocalizedButtonLink: LocalizedLinkMock,
+  LocalizedSubtleLink: LocalizedLinkMock,
+  LocalizedExternalLink: (props: { to: string } & Record<string, unknown>) => (
+    <LocalizedLinkMock {...props} external={true} />
+  ),
+}));
+
 // Mock PostHog to avoid gzip compression issues in tests
 vi.mock("posthog-node", () => ({
   PostHog: vi.fn().mockImplementation(() => ({
@@ -181,6 +195,30 @@ if (typeof window !== "undefined") {
   Object.defineProperty(window.HTMLElement.prototype, "scrollIntoView", {
     value: vi.fn(),
     configurable: true,
+  });
+}
+
+// Mock localStorage only when window is available (jsdom environment)
+if (typeof window !== "undefined") {
+  const localStorageMock = (() => {
+    let store: Record<string, string> = {};
+    return {
+      getItem: vi.fn((key: string) => store[key] || null),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = value;
+      }),
+      removeItem: vi.fn((key: string) => {
+        delete store[key];
+      }),
+      clear: vi.fn(() => {
+        store = {};
+      }),
+    };
+  })();
+
+  Object.defineProperty(window, "localStorage", {
+    value: localStorageMock,
+    writable: true,
   });
 }
 

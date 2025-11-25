@@ -231,6 +231,7 @@
     "no_results": "Keine Ergebnisse gefunden",
     "no_data": "Keine Daten verfügbar",
     "select_option": "Bitte wähle eine Option",
+    "no_safety_rules_specified": "Keine Sicherheitsregeln angegeben",
     "welcome_back": "Willkommen zurück"
   },
   "links": {
@@ -240,7 +241,8 @@
     "show_more": "Mehr anzeigen",
     "show_less": "Weniger anzeigen",
     "expand": "Erweitern",
-    "collapse": "Zuklappen"
+    "collapse": "Zuklappen",
+    "open_in_google_maps": "In Google Maps öffnen"
   },
   "dividers": {
     "or": "Oder"
@@ -295,6 +297,10 @@
     "cover_art_alt": "{{name}} Cover-Art"
   },
   "showing_results": "{{count}} {{itemType}} anzeigen",
+  "filters": {
+    "quick_filters_label": "Schnellfilter:",
+    "clear_filters": "Filter zurücksetzen"
+  },
   "clear_all": "Alle löschen",
   "navigation": {
     "home": "Startseite",

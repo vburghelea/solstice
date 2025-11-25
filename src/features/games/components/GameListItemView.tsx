@@ -10,8 +10,7 @@ import {
 import type { ComponentType, ReactNode } from "react";
 import { LanguageTag } from "~/components/LanguageTag";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { SafeLink as Link } from "~/components/ui/SafeLink";
+import { LocalizedButtonLink, LocalizedLink } from "~/components/ui/LocalizedLink";
 import type { GameListItem } from "~/features/games/games.types";
 import { useGamesTranslation } from "~/hooks/useTypedTranslation";
 import { formatDateAndTime } from "~/shared/lib/datetime";
@@ -151,17 +150,29 @@ export function GameShowcaseCard({
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h3 className="text-foreground text-lg font-semibold sm:text-xl dark:text-gray-50">
-                <Link
-                  to={resolvedLink.to}
-                  {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-                  {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-                  {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-                  className="flex items-center"
-                >
+              <LocalizedLink
+                to={resolvedLink.to}
+                {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+                {...(resolvedLink.search
+                  ? {
+                      search: Object.fromEntries(
+                        Object.entries(resolvedLink.search)
+                          .filter(([, v]) => v !== undefined)
+                          .map(([k, v]) => [k, v as string | number | boolean]),
+                      ),
+                    }
+                  : {})}
+                {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
+                className="group hover:text-primary focus-visible:ring-primary ml-0 block transform rounded pl-0 transition-all duration-300 ease-in-out hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                translationKey="links.system_management.view_system_details"
+                translationNamespace="navigation"
+                fallbackText={game.name}
+              >
+                <h3 className="text-foreground text-l ml-0 truncate pl-0 leading-tight font-bold sm:text-xl lg:text-2xl dark:text-gray-50">
                   {game.name}
-                </Link>
-              </h3>
+                </h3>
+              </LocalizedLink>
+
               {game.description ? (
                 <p className="text-muted-foreground mt-2 line-clamp-3 text-sm dark:text-gray-300">
                   {game.description}
@@ -214,23 +225,30 @@ export function GameShowcaseCard({
               ? t("list_item.hosted_by", { name: game.owner?.name ?? game.owner?.email })
               : t("list_item.hosted_by_community")}
           </span>
-          <Button
-            asChild
+          <LocalizedButtonLink
+            to={resolvedLink.to}
+            {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
+            {...(resolvedLink.search
+              ? {
+                  search: Object.fromEntries(
+                    Object.entries(resolvedLink.search)
+                      .filter(([, v]) => v !== undefined)
+                      .map(([k, v]) => [k, v as string | number | boolean]),
+                  ),
+                }
+              : {})}
+            {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
             variant="outline"
             size="sm"
-            className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 shrink-0 gap-1.5 rounded-full"
+            className="dark:border-primary/40 dark:text-primary-100 dark:hover:bg-primary/20 flex shrink-0 items-center gap-1.5 rounded-full"
+            translationKey="links.system_management.view_system_details"
+            translationNamespace="navigation"
+            fallbackText={t("list_item.view_details")}
+            ariaLabelTranslationKey="links.system_management.view_system_details"
           >
-            <Link
-              to={resolvedLink.to}
-              {...(resolvedLink.params ? { params: resolvedLink.params } : {})}
-              {...(resolvedLink.search ? { search: resolvedLink.search } : {})}
-              {...(resolvedLink.from ? { from: resolvedLink.from } : {})}
-              className="flex items-center"
-            >
-              {t("list_item.view_details")}
-              <ChevronRight className="ml-1 size-4" />
-            </Link>
-          </Button>
+            {t("list_item.view_details")}
+            <ChevronRight className="ml-1 size-4" />
+          </LocalizedButtonLink>
         </div>
       </div>
     </article>

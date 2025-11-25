@@ -1,11 +1,15 @@
+import { useCommonTranslation } from "~/hooks/useTypedTranslation";
 import type { SafetyRules } from "~/shared/utils/safety-rules";
 import { formatSafetyRules } from "~/shared/utils/safety-rules";
 
 export function SafetyRulesView({ safetyRules }: { safetyRules: SafetyRules }) {
+  const { t } = useCommonTranslation();
   const groups = formatSafetyRules(safetyRules);
 
   if (!groups.length) {
-    return <p className="text-muted-foreground">No safety rules specified</p>;
+    return (
+      <p className="text-muted-foreground">{t("messages.no_safety_rules_specified")}</p>
+    );
   }
 
   return (

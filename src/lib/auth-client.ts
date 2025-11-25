@@ -40,7 +40,7 @@ export const auth = {
     return getAuthClient().deleteUser;
   },
   get forgetPassword() {
-    return getAuthClient().forgetPassword;
+    return getAuthClient().requestPasswordReset;
   },
   get resetPassword() {
     return getAuthClient().resetPassword;

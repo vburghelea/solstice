@@ -10,7 +10,7 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
       const auth = await getAuth();
 
       console.log("Attempting to send password reset email for:", data.email);
-      await auth.api.forgetPassword({ body: { email: data.email } });
+      await auth.api.requestPasswordReset({ body: { email: data.email } });
 
       return { success: true, data: true };
     } catch (error) {

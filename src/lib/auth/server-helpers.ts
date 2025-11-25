@@ -6,7 +6,7 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { emailOTP } from "better-auth/plugins";
-import { reactStartCookies } from "better-auth/react-start";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { sendEmailVerificationOTP, sendSignInOTP } from "~/lib/email/otp-emails";
 import {
   sendEmailVerification,
@@ -127,7 +127,7 @@ const createAuth = async () => {
           ? {
               mapProfileToUser: (profile: {
                 email?: string | null;
-                hd?: string | null;
+                hd?: string | undefined;
               }) => {
                 const email = profile.email?.toLowerCase();
                 const domain = email?.split("@")[1];
@@ -315,7 +315,7 @@ const createAuth = async () => {
           }
         },
       }) as any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Better Auth plugin type compatibility with TanStack Start
-      reactStartCookies() as any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Better Auth plugin type compatibility with TanStack Start
+      tanstackStartCookies() as any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Better Auth plugin type compatibility with TanStack Start
     ],
   });
 };

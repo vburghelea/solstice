@@ -30,7 +30,13 @@ export const myServerFn = createServerFn({ method: "POST" })
 - NEVER use as first solution
 - Try Zod validation first
 - Create proper type definitions
-- See [TanStack Start Best Practices](./docs/TANSTACK-START-BEST-PRACTICES.md) for details
+- See [TanStack Start 2025 Updates](./docs/TANSTACK-START-2025-UPDATES.md) for comprehensive guide
+
+### TanStack Start v1 RC (November 2025)
+
+- **Package renamed**: Use `@tanstack/react-start` (not `@tanstack/start`)
+- **Netlify**: Official deployment partner with first-class support
+- **RSC**: Coming as non-breaking v1.x addition (not yet supported)
 
 ### Square Payments Checklist
 
@@ -326,7 +332,9 @@ The project includes automated documentation generation:
 
 ### TanStack Start Server Functions
 
-Server functions are defined using `createServerFn()` and called from React components:
+Server functions are defined using `createServerFn()` from `@tanstack/react-start` and called from React components.
+
+> **Note**: As of v1 RC (November 2025), the package is `@tanstack/react-start`, not `@tanstack/start`.
 
 1. **Best Practice - Use Zod Validation** (ALWAYS PREFER THIS):
 
@@ -447,6 +455,195 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
      return squarePaymentService.createCheckoutSession(...);
    });
    ```
+
+8. **Error Handling & Redirects**:
+
+   ```typescript
+   import { redirect, notFound } from "@tanstack/react-router";
+
+   export const protectedAction = createServerFn({ method: "POST" })
+     .validator(schema.parse)
+     .handler(async ({ data }) => {
+       const user = await getCurrentUser();
+       if (!user) {
+         throw redirect({ to: "/login" });
+       }
+       const item = await db.items.find(data.id);
+       if (!item) {
+         throw notFound();
+       }
+       return item;
+     });
+   ```
+
+### TanStack Start Middleware
+
+Middleware customizes behavior for server routes and server functions. Use `createMiddleware()` from `@tanstack/react-start`.
+
+1. **Basic Middleware Pattern**:
+
+```typescript
+import { createMiddleware } from "@tanstack/react-start";
+
+// Request middleware (applies to all server requests)
+const loggingMiddleware = createMiddleware().server(
+  async ({ next, context, request }) => {
+    console.log(`Request: ${request.method} ${request.url}`);
+    return next();
+  },
+);
+
+// Server function middleware (with client-side support)
+const authMiddleware = createMiddleware({ type: "function" })
+  .client(async ({ next }) => {
+    // Runs on client before RPC call
+    return next();
+  })
+  .server(async ({ next, context }) => {
+    const user = await getSession();
+    if (!user) {
+      throw redirect({ to: "/login" });
+    }
+    // Pass user to downstream handlers via context
+    return next({ context: { user } });
+  });
+```
+
+2. **Using Middleware with Server Functions**:
+
+```typescript
+export const sensitiveAction = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    // context.user is available from middleware
+    if (!context.user.isAdmin) {
+      throw new Error("Forbidden");
+    }
+    return performAction();
+  });
+```
+
+3. **Global Middleware** (define in `src/start.ts`):
+
+```typescript
+import { createStart } from "@tanstack/react-start";
+
+export const startInstance = createStart(() => ({
+  requestMiddleware: [securityMiddleware, loggingMiddleware],
+  functionMiddleware: [authMiddleware],
+}));
+```
+
+4. **Client-to-Server Context**: Client context is NOT auto-sent. Use `sendContext`:
+
+```typescript
+const trackingMiddleware = createMiddleware({ type: "function" })
+  .client(async ({ next }) => {
+    return next({
+      sendContext: { clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    });
+  })
+  .server(async ({ next, context }) => {
+    console.log("Client timezone:", context.clientTimezone);
+    return next();
+  });
+```
+
+### TanStack Start Server Routes
+
+Server routes enable API endpoints alongside application routes. Define them in `src/routes/`.
+
+```typescript
+// src/routes/api/users.ts
+import { createFileRoute, json } from "@tanstack/react-start";
+
+export const Route = createFileRoute("/api/users")({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        const users = await db.users.findMany();
+        return json(users);
+      },
+      POST: async ({ request }) => {
+        const body = await request.json();
+        const user = await db.users.create(body);
+        return json(user, { status: 201 });
+      },
+    },
+  },
+});
+```
+
+**File naming conventions**:
+
+- `/routes/api/users.ts` → `/api/users`
+- `/routes/api/users/$id.ts` → `/api/users/:id`
+- `/routes/api/files/$.ts` → `/api/files/*` (wildcard)
+
+### Data Loading Patterns
+
+1. **Route Loaders** (runs on server for SSR, client for navigation):
+
+```typescript
+export const Route = createFileRoute("/users")({
+  loader: async () => getUsers(),
+  component: UsersPage,
+});
+
+function UsersPage() {
+  const users = Route.useLoaderData();
+  return <UserList users={users} />;
+}
+```
+
+2. **Preloading** (enabled by default on link hover):
+
+```typescript
+<Link to="/users" preload="intent">View Users</Link>
+
+// Configure stale time (default 30s)
+export const Route = createFileRoute("/users")({
+  preloadStaleTime: 30_000,
+  loader: async () => getUsers(),
+});
+```
+
+3. **With TanStack Query** (for fine-grained caching):
+
+```typescript
+import { queryOptions } from "@tanstack/react-query";
+
+const usersQueryOptions = queryOptions({
+  queryKey: ["users"],
+  queryFn: () => getUsers(),
+});
+
+export const Route = createFileRoute("/users")({
+  loader: async ({ context }) => {
+    // Prefetch for SSR
+    await context.queryClient.ensureQueryData(usersQueryOptions);
+  },
+  component: UsersPage,
+});
+
+function UsersPage() {
+  const { data: users } = useSuspenseQuery(usersQueryOptions);
+  return <UserList users={users} />;
+}
+```
+
+4. **Parallel Loading** (avoid waterfalls):
+
+```typescript
+export const Route = createFileRoute("/dashboard")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(usersQueryOptions),
+      context.queryClient.ensureQueryData(statsQueryOptions),
+    ]);
+  },
+});
+```
 
 ### Best Practices for Type Safety
 
@@ -800,3 +997,5 @@ Read /docs/quadball-plan/* as appropriate
 ## Development Roadmap
 See /docs/development-backlog.md for prioritized feature implementation tickets
 ```
+
+- Remember the best practices

@@ -134,9 +134,9 @@ const createUserSchema = z.object({
   age: z.number().min(0).optional(),
 });
 
-// Use .validator() with schema
+// Use .inputValidator() with schema
 export const createUser = createServerFn({ method: "POST" })
-  .validator(createUserSchema.parse)
+  .inputValidator(createUserSchema.parse)
   .handler(async ({ data }) => {
     // data is fully typed from schema
     const user = await db.users.create(data);
@@ -157,7 +157,7 @@ export const getUsers = createServerFn().handler(async () => {
 
 // Mutation (explicit POST)
 export const deleteUser = createServerFn({ method: "POST" })
-  .validator(z.object({ id: z.string() }).parse)
+  .inputValidator(z.object({ id: z.string() }).parse)
   .handler(async ({ data }) => {
     await db.users.delete(data.id);
   });
@@ -167,7 +167,7 @@ export const deleteUser = createServerFn({ method: "POST" })
 
 ```typescript
 export const submitForm = createServerFn({ method: "POST" })
-  .validator((data) => {
+  .inputValidator((data) => {
     if (!(data instanceof FormData)) {
       throw new Error("Expected FormData");
     }
@@ -188,7 +188,7 @@ export const submitForm = createServerFn({ method: "POST" })
 import { redirect, notFound } from "@tanstack/react-router";
 
 export const protectedAction = createServerFn({ method: "POST" })
-  .validator(schema.parse)
+  .inputValidator(schema.parse)
   .handler(async ({ data }) => {
     const user = await getCurrentUser();
 
@@ -372,7 +372,7 @@ export const startInstance = createStart(() => ({
 import { zodValidator } from "@tanstack/zod-adapter";
 
 const validatedMiddleware = createMiddleware({ type: "function" })
-  .validator(zodValidator(mySchema))
+  .inputValidator(zodValidator(mySchema))
   .server(async ({ next, data }) => {
     // data is validated and typed
     return next();

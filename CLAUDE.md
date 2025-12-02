@@ -17,9 +17,9 @@ const mySchema = z.object({
   /* ... */
 });
 
-// 2. Use .validator(schema.parse)
+// 2. Use .inputValidator(schema.parse)
 export const myServerFn = createServerFn({ method: "POST" })
-  .validator(mySchema.parse)
+  .inputValidator(mySchema.parse)
   .handler(async ({ data }) => {
     /* ... */
   });
@@ -348,9 +348,9 @@ const myInputSchema = z.object({
   email: z.string().email(),
 });
 
-// Use .validator() with schema.parse
+// Use .inputValidator() with schema.parse
 export const myServerFn = createServerFn({ method: "POST" })
-  .validator(myInputSchema.parse)
+  .inputValidator(myInputSchema.parse)
   .handler(async ({ data }) => {
     // data is now properly typed from the schema
     // Server-side implementation
@@ -462,7 +462,7 @@ export const myServerFn = createServerFn({ method: "POST" }).handler(
    import { redirect, notFound } from "@tanstack/react-router";
 
    export const protectedAction = createServerFn({ method: "POST" })
-     .validator(schema.parse)
+     .inputValidator(schema.parse)
      .handler(async ({ data }) => {
        const user = await getCurrentUser();
        if (!user) {
@@ -654,7 +654,7 @@ export const Route = createFileRoute("/dashboard")({
 
 2. **Server Function Type Safety Checklist**:
    - ✅ Create Zod schema for input validation
-   - ✅ Use `.validator(schema.parse)` on server functions
+   - ✅ Use `.inputValidator(schema.parse)` on server functions
    - ✅ Define return types explicitly
    - ✅ Create type definitions for complex database fields
    - ✅ Use type overrides for jsonb fields instead of `any`
@@ -757,7 +757,7 @@ export const Route = createFileRoute("/dashboard")({
 - **Update documentation**: Run `pnpm docs:all` after significant changes
 - **Add a new server function**:
   1. Create schema in `[feature].schemas.ts`
-  2. Use `.validator(schema.parse)` in the server function
+  2. Use `.inputValidator(schema.parse)` in the server function
   3. Define proper return types
   4. Handle errors with typed error responses
 - **Add E2E tests for new features**:

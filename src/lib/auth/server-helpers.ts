@@ -4,7 +4,7 @@
  */
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { reactStartCookies } from "better-auth/react-start";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
 
 // Lazy-loaded auth instance
 let authInstance: ReturnType<typeof betterAuth> | undefined;
@@ -77,10 +77,10 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     session: {
       expiresIn: 60 * 60 * 24 * 30, // 30 days
       updateAge: 60 * 60 * 24, // 1 day
-      cookieCache: {
-        enabled: true,
-        maxAge: 60 * 5, // 5 minutes
-      },
+      // NOTE: cookieCache is disabled due to a known bug with tanstackStartCookies
+      // that prevents session_token cookie from being set. See:
+      // https://github.com/better-auth/better-auth/issues/5639
+      // Re-enable once the upstream fix is released.
     },
 
     // Secure cookie configuration
@@ -111,8 +111,8 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
         ...(allowedOAuthDomains.length > 0
           ? {
               mapProfileToUser: (profile: {
-                email?: string | null;
-                hd?: string | null;
+                email?: string | null | undefined;
+                hd?: string | undefined;
               }) => {
                 const email = profile.email?.toLowerCase();
                 const domain = email?.split("@")[1];
@@ -154,7 +154,7 @@ const createAuth = async (): Promise<ReturnType<typeof betterAuth>> => {
     },
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
-    plugins: [reactStartCookies()], // MUST be the last plugin
+    plugins: [tanstackStartCookies()], // MUST be the last plugin
   });
 };
 

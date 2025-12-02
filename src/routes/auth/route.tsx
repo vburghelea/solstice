@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { PublicLayout } from "~/features/layouts/public-layout";
+import { PublicFooter } from "~/components/ui/public-footer";
 import { redirectIfAuthenticated } from "~/lib/auth/guards/route-guards";
 
 export const Route = createFileRoute("/auth")({
@@ -11,12 +11,13 @@ export const Route = createFileRoute("/auth")({
 
 function RouteComponent() {
   return (
-    <PublicLayout>
-      <div className="bg-background flex min-h-[calc(100vh-theme(space.32))] flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="bg-background flex min-h-screen flex-col">
+      <main className="flex flex-1 flex-col items-center justify-center gap-6 p-6 md:p-10">
         <div className="w-full max-w-sm">
           <Outlet />
         </div>
-      </div>
-    </PublicLayout>
+      </main>
+      <PublicFooter />
+    </div>
   );
 }

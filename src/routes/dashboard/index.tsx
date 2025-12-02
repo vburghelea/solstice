@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { SafeLink as Link } from "~/components/ui/SafeLink";
 import { Button } from "~/components/ui/button";
@@ -22,39 +21,34 @@ import {
   XCircle,
 } from "~/components/ui/icons";
 import { getUserMembershipStatus } from "~/features/membership/membership.queries";
-import { getUserTeams } from "~/features/teams/teams.queries";
+import type { MembershipStatus } from "~/features/membership/membership.types";
+import { getUserTeams, type UserTeam } from "~/features/teams/teams.queries";
 
 export const Route = createFileRoute("/dashboard/")({
+  loader: async () => {
+    // Load data in parallel on the server
+    const [membershipResult, userTeams] = await Promise.all([
+      getUserMembershipStatus(),
+      getUserTeams({ data: {} }),
+    ]);
+
+    const membershipStatus: MembershipStatus | null = membershipResult.success
+      ? (membershipResult.data ?? null)
+      : null;
+
+    return {
+      membershipStatus,
+      userTeams: userTeams || [],
+    };
+  },
   component: DashboardIndex,
 });
 
 function DashboardIndex() {
   const { user } = Route.useRouteContext();
+  const { membershipStatus, userTeams } = Route.useLoaderData();
 
-  // Fetch membership status
-  const { data: membershipStatus } = useQuery({
-    queryKey: ["membership-status"],
-    queryFn: async () => {
-      const result = await getUserMembershipStatus();
-      if (!result.success) {
-        throw new Error(
-          result.errors?.[0]?.message || "Failed to fetch membership status",
-        );
-      }
-      return result.data || null;
-    },
-  });
-
-  // Fetch user's teams
-  const { data: userTeams = [] } = useQuery({
-    queryKey: ["userTeams"],
-    queryFn: async () => {
-      const result = await getUserTeams({ data: {} });
-      return result || [];
-    },
-  });
-
-  const teamCount = userTeams.length;
+  const teamCount = (userTeams as UserTeam[]).length;
   const upcomingEventsCount = 0;
 
   return (

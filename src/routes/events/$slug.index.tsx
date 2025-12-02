@@ -79,7 +79,7 @@ function EventDetailPage() {
           </AlertDescription>
         </Alert>
         <Button asChild className="mt-4">
-          <Link to="/dashboard/events">
+          <Link to={user ? "/dashboard/events" : "/events"}>
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
             Back to Events
           </Link>
@@ -121,7 +121,7 @@ function EventDetailPage() {
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/dashboard/events">
+          <Link to={user ? "/dashboard/events" : "/events"}>
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
             Back to Events
           </Link>

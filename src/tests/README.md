@@ -52,20 +52,51 @@ import { createAuthMocks } from "~/tests/mocks/auth";
 const { mockUser, mockSession } = createAuthMocks();
 ```
 
-### Server Function Tests
+### Server Function Tests (TanStack Start)
 
-Test server-side logic in isolation:
+Server functions created with `createServerFn` are automatically mocked in the test environment.
+The mock bypasses the 'use server' pragma check and runs validation + handler logic directly.
 
 ```ts
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { myServerFn } from "~/features/example/example.queries";
 
 describe("Server Function", () => {
-  it("processes data correctly", () => {
-    const result = myServerFunction(input);
-    expect(result).toEqual(expected);
+  it("returns data for valid input", async () => {
+    // Mock any dependencies the handler uses
+    vi.mock("~/db/server-helpers", () => ({
+      getDb: vi.fn().mockResolvedValue({
+        select: vi.fn().mockReturnThis(),
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([{ id: "1", name: "Test" }]),
+      }),
+    }));
+
+    // Call the server function like a regular async function
+    const result = await myServerFn({ data: { id: "123" } });
+
+    expect(result).toMatchObject({
+      success: true,
+      data: expect.any(Object),
+    });
+  });
+
+  it("validates input with Zod schema", async () => {
+    // Invalid input should throw validation error
+    await expect(
+      myServerFn({ data: { id: "" } }), // Empty ID fails validation
+    ).rejects.toThrow();
   });
 });
 ```
+
+**Key points:**
+
+- Import server functions directly - the mock handles the rest
+- Validation runs automatically if `.inputValidator()` was used
+- Mock database/auth dependencies inside the test
+- The mock provides an empty `context` object (middleware is skipped)
 
 ## Test Environment
 

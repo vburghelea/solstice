@@ -119,7 +119,7 @@ export const getRoleManagementData = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export const searchRoleEligibleUsers = createServerFn({ method: "POST" })
+export const searchRoleEligibleUsers = createServerFn({ method: "GET" })
   .inputValidator(zod$(searchUsersSchema))
   .handler(async ({ data }): Promise<RoleOperationResult<RoleUserSearchResult[]>> => {
     try {

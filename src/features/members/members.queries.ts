@@ -60,7 +60,7 @@ function parsePrivacySettings(
   }
 }
 
-export const listMembers = createServerFn({ method: "POST" })
+export const listMembers = createServerFn({ method: "GET" })
   .inputValidator(zod$(listMembersSchema))
   .handler(async ({ data }): Promise<ListMembersResult> => {
     try {

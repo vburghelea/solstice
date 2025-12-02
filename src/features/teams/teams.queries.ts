@@ -12,7 +12,7 @@ import {
 /**
  * Get a team by ID with member count
  */
-export const getTeam = createServerFn({ method: "POST" })
+export const getTeam = createServerFn({ method: "GET" })
   .inputValidator(zod$(getTeamSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
@@ -42,7 +42,7 @@ export const getTeam = createServerFn({ method: "POST" })
 /**
  * Get a team by slug
  */
-export const getTeamBySlug = createServerFn({ method: "POST" })
+export const getTeamBySlug = createServerFn({ method: "GET" })
   .inputValidator(zod$(getTeamBySlugSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
@@ -72,7 +72,7 @@ export const getTeamBySlug = createServerFn({ method: "POST" })
 /**
  * List all active teams
  */
-export const listTeams = createServerFn({ method: "POST" })
+export const listTeams = createServerFn({ method: "GET" })
   .inputValidator(zod$(listTeamsSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
@@ -110,7 +110,7 @@ export const listTeams = createServerFn({ method: "POST" })
 /**
  * Get teams for the current user
  */
-export const getUserTeams = createServerFn({ method: "POST" })
+export const getUserTeams = createServerFn({ method: "GET" })
   .inputValidator(zod$(listTeamsSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
@@ -167,7 +167,7 @@ export const getUserTeams = createServerFn({ method: "POST" })
 /**
  * Get team members
  */
-export const getTeamMembers = createServerFn({ method: "POST" })
+export const getTeamMembers = createServerFn({ method: "GET" })
   .inputValidator(zod$(getTeamMembersSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
@@ -228,7 +228,7 @@ export const getTeamMembers = createServerFn({ method: "POST" })
     return result;
   });
 
-export const getPendingTeamInvites = createServerFn({ method: "POST" }).handler(
+export const getPendingTeamInvites = createServerFn({ method: "GET" }).handler(
   async () => {
     const [{ getCurrentUser }, { getDb }, { and, eq, sql }] = await Promise.all([
       import("~/features/auth/auth.queries"),
@@ -280,7 +280,7 @@ export const getPendingTeamInvites = createServerFn({ method: "POST" }).handler(
 /**
  * Check if a user is a member of a team
  */
-export const isTeamMember = createServerFn({ method: "POST" })
+export const isTeamMember = createServerFn({ method: "GET" })
   .inputValidator(zod$(isTeamMemberSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler
@@ -309,7 +309,7 @@ export const isTeamMember = createServerFn({ method: "POST" })
 /**
  * Search teams by name or city
  */
-export const searchTeams = createServerFn({ method: "POST" })
+export const searchTeams = createServerFn({ method: "GET" })
   .inputValidator(zod$(searchTeamsSchema))
   .handler(async ({ data }) => {
     // Import server-only modules inside the handler

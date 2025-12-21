@@ -138,20 +138,14 @@ export const getProfileCompletionStatus = createServerFn({ method: "GET" }).hand
 
       const missingFields: string[] = [];
 
+      // Required fields for profile completion
       if (!dbUser.dateOfBirth) {
         missingFields.push("dateOfBirth");
       }
 
-      const emergencyContact = parseJsonField<EmergencyContact>(dbUser.emergencyContact);
-      if (!emergencyContact?.name) {
-        missingFields.push("emergencyContact.name");
-      }
-      if (!emergencyContact?.relationship) {
-        missingFields.push("emergencyContact.relationship");
-      }
-      if (!emergencyContact?.phone && !emergencyContact?.email) {
-        missingFields.push("emergencyContact.contact");
-      }
+      // Note: Emergency contact is optional but recommended
+      // It is NOT included in missingFields to maintain consistency
+      // with the UI which marks it as "optional but recommended"
 
       return {
         complete: dbUser.profileComplete,

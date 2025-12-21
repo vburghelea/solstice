@@ -16,7 +16,7 @@ export type EventRegistrationWithRoster = Omit<
   "roster" | "paymentMetadata"
 > & {
   roster: EventRegistrationRoster;
-  paymentMetadata: EventPaymentMetadata;
+  paymentMetadata: EventPaymentMetadata | null;
 };
 
 export function castEventJsonbFields(event: DbEvent): EventWithDetails {
@@ -37,6 +37,8 @@ export function castRegistrationJsonbFields(
   return {
     ...registration,
     roster: (registration.roster || {}) as EventRegistrationRoster,
-    paymentMetadata: (registration.paymentMetadata ?? {}) as EventPaymentMetadata,
+    paymentMetadata: registration.paymentMetadata
+      ? (registration.paymentMetadata as EventPaymentMetadata)
+      : null,
   };
 }

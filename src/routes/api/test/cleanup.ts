@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { debugGuard } from "~/lib/server/debug-guard";
 
 const cleanupSchema = z.object({
   action: z.enum([
@@ -18,19 +19,11 @@ export const Route = createFileRoute("/api/test/cleanup")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Only allow in non-production environments
-        // The server seems to be setting NODE_ENV=production even in test runs
-        const isProduction =
-          process.env["NODE_ENV"] === "production" &&
-          !process.env["E2E_TEST_EMAIL"] &&
-          !process.env["SKIP_ENV_VALIDATION"];
-
-        if (isProduction) {
-          return new Response(
-            JSON.stringify({ error: "Test endpoints are not available in production" }),
-            { status: 403 },
-          );
-        }
+        // Block access in production builds - returns 404
+        // Uses import.meta.env.PROD which is a compile-time constant
+        // and cannot be bypassed via environment variables
+        const guardResponse = debugGuard();
+        if (guardResponse) return guardResponse;
 
         try {
           const body = await request.json();

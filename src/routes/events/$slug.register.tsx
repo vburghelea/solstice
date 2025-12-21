@@ -88,6 +88,7 @@ function EventRegistrationPage() {
   const [registrationType, setRegistrationType] = useState<"team" | "individual">(
     "individual",
   );
+
   const [selectedTeamId, setSelectedTeamId] = useState<string>("");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [emergencyContact, setEmergencyContact] = useState<EmergencyContact>({
@@ -112,15 +113,25 @@ function EventRegistrationPage() {
 
   const eventData = eventResult?.success ? eventResult.data : null;
 
+  // Compute effective registration type based on event's allowed types
+  // This prevents wrong fee calculation for team-only or individual-only events
+  const effectiveRegistrationType = useMemo(() => {
+    if (!eventData) return registrationType;
+    if (eventData.registrationType === "team") return "team";
+    if (eventData.registrationType === "individual") return "individual";
+    return registrationType; // "both" - user choice
+  }, [eventData, registrationType]);
+
   const { data: registrationStatus, isLoading: registrationLoading } = useQuery<
     { isRegistered: boolean } | undefined,
     Error
   >({
+    // Include user.id in key for cache invalidation when user changes
     queryKey: ["event-registration", eventData?.id, user?.id],
     queryFn: () =>
       callServerFn(checkEventRegistration, {
         eventId: eventData!.id,
-        userId: user?.id,
+        // userId is now inferred from session on server
       }),
     enabled: Boolean(eventData?.id && user?.id),
   });
@@ -130,7 +141,7 @@ function EventRegistrationPage() {
   const { data: userTeams } = useQuery<UserTeamEntry[] | undefined, Error>({
     queryKey: ["user-teams", user?.id],
     queryFn: () => callServerFn(getUserTeams, { includeInactive: false }),
-    enabled: Boolean(user?.id && registrationType === "team"),
+    enabled: Boolean(user?.id && effectiveRegistrationType === "team"),
   });
 
   const registrationMutation = useMutation<
@@ -188,8 +199,9 @@ function EventRegistrationPage() {
       };
     }
 
+    // Use effectiveRegistrationType to calculate correct fee for team-only/individual-only events
     const baseFeeCents =
-      registrationType === "team"
+      effectiveRegistrationType === "team"
         ? (eventData.teamRegistrationFee ?? 0)
         : (eventData.individualRegistrationFee ?? 0);
 
@@ -214,7 +226,7 @@ function EventRegistrationPage() {
       hasDiscount: false,
       discountPercentage: 0,
     };
-  }, [eventData, registrationType]);
+  }, [eventData, effectiveRegistrationType]);
 
   const requiresPayment = fee.discounted > 0;
 
@@ -258,7 +270,7 @@ function EventRegistrationPage() {
       return;
     }
 
-    if (registrationType === "team" && !selectedTeamId) {
+    if (effectiveRegistrationType === "team" && !selectedTeamId) {
       toast.error("Please select a team");
       return;
     }
@@ -274,7 +286,7 @@ function EventRegistrationPage() {
       paymentMethod: effectivePaymentMethod,
     };
 
-    if (registrationType === "team" && selectedTeamId) {
+    if (effectiveRegistrationType === "team" && selectedTeamId) {
       payload.teamId = selectedTeamId;
     }
 
@@ -339,7 +351,7 @@ function EventRegistrationPage() {
                 <div className="space-y-3">
                   <Label>Registration Type</Label>
                   <RadioGroup
-                    value={registrationType}
+                    value={effectiveRegistrationType}
                     onValueChange={(value) =>
                       setRegistrationType(value as "team" | "individual")
                     }
@@ -392,7 +404,7 @@ function EventRegistrationPage() {
                 </div>
               )}
 
-              {registrationType === "team" && (
+              {effectiveRegistrationType === "team" && (
                 <div className="space-y-3">
                   <Label>Select Team</Label>
                   {userTeams && userTeams.length > 0 ? (

@@ -4,10 +4,8 @@
  */
 
 import { createId } from "@paralleldrive/cuid2";
-import { eq } from "drizzle-orm";
 import type { Square } from "square";
 import { SquareClient, SquareEnvironment, SquareError, WebhooksHelper } from "square";
-import { membershipPaymentSessions, memberships } from "~/db/schema";
 
 // This module should only be imported in server-side code
 
@@ -34,6 +32,27 @@ export interface PaymentResult {
   status?: string | null;
   amount?: number | null;
   currency?: string | null;
+}
+
+/**
+ * Normalized webhook event structure
+ * Provider-agnostic format for business logic to consume
+ */
+export interface NormalizedWebhookEvent {
+  type: "payment.success" | "payment.failed" | "payment.cancelled" | "refund" | "unknown";
+  rawType: string;
+  paymentId?: string | undefined;
+  orderId?: string | undefined;
+  refundId?: string | undefined;
+  status?: string | undefined;
+  amount?: number | undefined;
+  currency?: string | undefined;
+}
+
+export interface WebhookVerificationResult {
+  valid: boolean;
+  event?: NormalizedWebhookEvent;
+  error?: string;
 }
 
 /**
@@ -378,22 +397,25 @@ export class SquarePaymentService {
   }
 
   /**
-   * Process a webhook from Square
-   * @param payload - Webhook payload
+   * Verify and parse a webhook from Square
+   * Only performs signature verification and event normalization.
+   * All business logic (DB updates, emails) is handled by the route handler.
+   *
+   * @param payload - Webhook payload (already parsed JSON)
    * @param signature - Webhook signature for verification
-   * @returns Processing result
+   * @returns Verification result with normalized event
    */
-  async processWebhook(
+  async verifyAndParseWebhook(
     payload: unknown,
     signature: string,
-  ): Promise<{ processed: boolean; error?: string }> {
+  ): Promise<WebhookVerificationResult> {
     try {
       const webhookSignatureKey = process.env["SQUARE_WEBHOOK_SIGNATURE_KEY"];
 
       if (!webhookSignatureKey) {
         console.error("SQUARE_WEBHOOK_SIGNATURE_KEY not configured");
         return {
-          processed: false,
+          valid: false,
           error: "Webhook signature key not configured",
         };
       }
@@ -408,179 +430,89 @@ export class SquarePaymentService {
 
       if (!isValid && process.env["NODE_ENV"] !== "development") {
         return {
-          processed: false,
+          valid: false,
           error: "Invalid webhook signature",
         };
       }
 
-      // Process webhook based on type
-      const event = payload as { type: string; data: unknown };
-      const eventType = event.type;
-      const eventTimestamp = new Date().toISOString();
+      // Parse and normalize the event
+      const rawEvent = payload as { type: string; data: unknown };
+      const rawType = rawEvent.type;
+      const eventData = rawEvent.data as Record<string, unknown> | undefined;
 
-      switch (eventType) {
-        case "payment.created":
-        case "payment.updated":
-          // Handle payment events
-          {
-            const eventData = event.data as Record<string, unknown> | undefined;
-            const paymentObj = eventData?.["object"] as
-              | Record<string, unknown>
-              | undefined;
-            const payment = paymentObj?.["payment"] as
-              | Record<string, unknown>
-              | undefined;
+      // Normalize based on event type
+      let normalized: NormalizedWebhookEvent;
 
-            if (!payment) break;
+      if (rawType === "payment.created" || rawType === "payment.updated") {
+        const paymentObj = eventData?.["object"] as Record<string, unknown> | undefined;
+        const payment = paymentObj?.["payment"] as Record<string, unknown> | undefined;
 
-            const paymentId = payment["id"] as string | undefined;
-            const orderId = payment["order_id"] as string | undefined;
-            const status = (payment["status"] as string | undefined)?.toUpperCase();
+        if (!payment) {
+          return {
+            valid: true,
+            event: { type: "unknown", rawType },
+          };
+        }
 
-            try {
-              const { getDb } = await import("~/db/server-helpers");
-              const db = await getDb();
+        const status = ((payment["status"] as string) ?? "").toUpperCase();
+        const amountMoney = payment["amount_money"] as
+          | Record<string, unknown>
+          | undefined;
 
-              let session: typeof membershipPaymentSessions.$inferSelect | null = null;
+        // Map Square status to normalized type
+        let type: NormalizedWebhookEvent["type"] = "unknown";
+        if (status === "COMPLETED" || status === "APPROVED") {
+          type = "payment.success";
+        } else if (status === "FAILED") {
+          type = "payment.failed";
+        } else if (status === "CANCELED" || status === "CANCELED_BY_CUSTOMER") {
+          type = "payment.cancelled";
+        }
 
-              if (paymentId) {
-                const [foundByPayment] = await db
-                  .select()
-                  .from(membershipPaymentSessions)
-                  .where(eq(membershipPaymentSessions.squarePaymentId, paymentId))
-                  .limit(1);
+        normalized = {
+          type,
+          rawType,
+          paymentId: payment["id"] as string | undefined,
+          orderId: payment["order_id"] as string | undefined,
+          status,
+          amount: amountMoney?.["amount"] as number | undefined,
+          currency: amountMoney?.["currency"] as string | undefined,
+        };
+      } else if (rawType === "refund.created" || rawType === "refund.updated") {
+        const refundObj = eventData?.["object"] as Record<string, unknown> | undefined;
+        const refund = refundObj?.["refund"] as Record<string, unknown> | undefined;
 
-                session = foundByPayment ?? null;
-              }
+        if (!refund) {
+          return {
+            valid: true,
+            event: { type: "unknown", rawType },
+          };
+        }
 
-              if (!session && orderId) {
-                const [foundByOrder] = await db
-                  .select()
-                  .from(membershipPaymentSessions)
-                  .where(eq(membershipPaymentSessions.squareOrderId, orderId))
-                  .limit(1);
+        const amountMoney = refund["amount_money"] as Record<string, unknown> | undefined;
 
-                session = foundByOrder ?? null;
-              }
-
-              if (session) {
-                const statusMap: Record<string, typeof session.status> = {
-                  COMPLETED: "completed",
-                  APPROVED: "completed",
-                  FAILED: "failed",
-                  CANCELED: "cancelled",
-                  CANCELED_BY_CUSTOMER: "cancelled",
-                };
-
-                const nextStatus = statusMap[status ?? ""] ?? session.status;
-                const nextPaymentId = paymentId ?? session.squarePaymentId ?? undefined;
-
-                await db
-                  .update(membershipPaymentSessions)
-                  .set({
-                    status: nextStatus,
-                    squarePaymentId: nextPaymentId ?? session.squarePaymentId,
-                    squareOrderId: orderId ?? session.squareOrderId,
-                    metadata: {
-                      ...(session.metadata ?? {}),
-                      lastWebhookEvent: eventType,
-                      lastWebhookAt: eventTimestamp,
-                      squarePaymentStatus: status,
-                    },
-                    updatedAt: new Date(),
-                  })
-                  .where(eq(membershipPaymentSessions.id, session.id));
-              }
-            } catch (dbError) {
-              console.error("Failed to update payment session from webhook:", dbError);
-            }
-          }
-          break;
-
-        case "refund.created":
-        case "refund.updated":
-          // Handle refund events
-          {
-            const eventData = event.data as Record<string, unknown> | undefined;
-            const refundObj = eventData?.["object"] as
-              | Record<string, unknown>
-              | undefined;
-            const refund = refundObj?.["refund"] as Record<string, unknown> | undefined;
-            if (!refund) break;
-
-            const refundId = refund["id"] as string | undefined;
-            const paymentId = refund["payment_id"] as string | undefined;
-            const status = (refund["status"] as string | undefined)?.toUpperCase();
-
-            if (!paymentId) break;
-
-            try {
-              const { getDb } = await import("~/db/server-helpers");
-              const db = await getDb();
-
-              const [session] = await db
-                .select()
-                .from(membershipPaymentSessions)
-                .where(eq(membershipPaymentSessions.squarePaymentId, paymentId))
-                .limit(1);
-
-              if (session) {
-                await db
-                  .update(membershipPaymentSessions)
-                  .set({
-                    metadata: {
-                      ...(session.metadata ?? {}),
-                      lastRefundStatus: status,
-                      lastRefundId: refundId,
-                      lastRefundAt: eventTimestamp,
-                    },
-                    updatedAt: new Date(),
-                  })
-                  .where(eq(membershipPaymentSessions.id, session.id));
-              }
-
-              const [membershipRecord] = await db
-                .select()
-                .from(memberships)
-                .where(eq(memberships.paymentId, paymentId))
-                .limit(1);
-
-              if (membershipRecord) {
-                const targetStatus =
-                  status === "COMPLETED" ? "cancelled" : membershipRecord.status;
-
-                await db
-                  .update(memberships)
-                  .set({
-                    status: targetStatus,
-                    metadata: {
-                      ...(membershipRecord.metadata ?? {}),
-                      refundId,
-                      refundStatus: status,
-                      refundUpdatedAt: eventTimestamp,
-                    },
-                    updatedAt: new Date(),
-                  })
-                  .where(eq(memberships.id, membershipRecord.id));
-              }
-            } catch (dbError) {
-              console.error("Failed to update records from refund webhook:", dbError);
-            }
-          }
-          break;
-
-        default:
-          console.log("Unknown webhook event type:", eventType);
+        normalized = {
+          type: "refund",
+          rawType,
+          refundId: refund["id"] as string | undefined,
+          paymentId: refund["payment_id"] as string | undefined,
+          status: ((refund["status"] as string) ?? "").toUpperCase(),
+          amount: amountMoney?.["amount"] as number | undefined,
+          currency: amountMoney?.["currency"] as string | undefined,
+        };
+      } else {
+        normalized = { type: "unknown", rawType };
       }
 
       return {
-        processed: true,
+        valid: true,
+        event: normalized,
       };
     } catch (error) {
-      console.error("Webhook processing error:", error);
+      console.error("Webhook verification error:", error);
 
       return {
-        processed: false,
+        valid: false,
         error: error instanceof Error ? error.message : "Unknown error",
       };
     }

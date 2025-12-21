@@ -69,7 +69,7 @@ export interface EventWithDetails
 export interface EventRegistrationWithDetails
   extends Omit<EventRegistration, "roster" | "paymentMetadata"> {
   roster: EventRegistrationRoster;
-  paymentMetadata: EventPaymentMetadata;
+  paymentMetadata: EventPaymentMetadata | null;
   event: EventWithDetails;
   team?: {
     id: string;

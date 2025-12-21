@@ -16,17 +16,22 @@ import {
 } from "~/features/auth/auth.queries";
 import appCss from "~/styles.css?url";
 
-// Lazy load devtools to avoid hydration issues
-const ReactQueryDevtools = lazy(() =>
-  import("@tanstack/react-query-devtools").then((mod) => ({
-    default: mod.ReactQueryDevtools,
-  })),
-);
-const TanStackRouterDevtools = lazy(() =>
-  import("@tanstack/react-router-devtools").then((mod) => ({
-    default: mod.TanStackRouterDevtools,
-  })),
-);
+// Lazy load devtools only in development to exclude from production bundles
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-query-devtools").then((mod) => ({
+        default: mod.ReactQueryDevtools,
+      })),
+    )
+  : null;
+
+const TanStackRouterDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-router-devtools").then((mod) => ({
+        default: mod.TanStackRouterDevtools,
+      })),
+    )
+  : null;
 
 // Lazy load Toaster to avoid SSR issues
 const Toaster = lazy(() => import("sonner").then((mod) => ({ default: mod.Toaster })));
@@ -96,11 +101,11 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
             // Minimal process shim for TanStack server functions
             if (typeof globalThis.process === 'undefined') {
               globalThis.process = {
-                env: { NODE_ENV: 'development' },
-                versions: { node: '20.0.0' }
+                env: { NODE_ENV: '${import.meta.env.PROD ? "production" : "development"}' },
+                versions: { node: '22.0.0' }
               };
             }
-            
+
             // Theme toggle
             document.documentElement.classList.toggle(
               'dark',
@@ -114,10 +119,12 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         <Suspense fallback={null}>
           <Toaster richColors closeButton />
         </Suspense>
-        <Suspense fallback={null}>
-          <ReactQueryDevtools buttonPosition="bottom-left" />
-          <TanStackRouterDevtools position="bottom-right" />
-        </Suspense>
+        {import.meta.env.DEV && ReactQueryDevtools && TanStackRouterDevtools && (
+          <Suspense fallback={null}>
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+            <TanStackRouterDevtools position="bottom-right" />
+          </Suspense>
+        )}
 
         <Scripts />
       </body>

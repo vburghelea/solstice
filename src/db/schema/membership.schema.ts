@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import { sql } from "drizzle-orm";
 import {
   date,
   index,
@@ -65,6 +66,11 @@ export const memberships = pgTable(
     index("memberships_status_idx").on(table.status),
     index("memberships_end_date_idx").on(table.endDate),
     index("memberships_payment_id_idx").on(table.paymentId),
+    // Prevent duplicate payments - unique on (provider, paymentId) when paymentId exists
+    // This allows multiple NULL paymentIds but prevents replay attacks
+    uniqueIndex("memberships_payment_provider_id_unique")
+      .on(table.paymentProvider, table.paymentId)
+      .where(sql`${table.paymentId} IS NOT NULL`),
   ],
 );
 

@@ -4,6 +4,10 @@
  */
 
 import { createId } from "@paralleldrive/cuid2";
+import type { NormalizedWebhookEvent, WebhookVerificationResult } from "./square-real";
+
+// Re-export types for consumers
+export type { NormalizedWebhookEvent, WebhookVerificationResult };
 
 // This module should only be imported in server-side code
 
@@ -137,21 +141,28 @@ export class MockSquarePaymentService {
   }
 
   /**
-   * Process a webhook from Square
+   * Verify and parse a webhook from Square (mock)
    * @param payload - Webhook payload
    * @param signature - Webhook signature for verification
-   * @returns Processing result
+   * @returns Verification result with normalized event
    */
-  async processWebhook(
+  async verifyAndParseWebhook(
     payload: unknown,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     signature: string,
-  ): Promise<{ processed: boolean; error?: string }> {
-    // Mock implementation - not used in development
+  ): Promise<WebhookVerificationResult> {
+    // Mock implementation - always accepts and parses basic event
+    console.log("Mock webhook received:", { payload });
 
-    console.log("Mock webhook received:", { payload, signature });
+    const rawEvent = payload as { type?: string } | undefined;
+    const rawType = rawEvent?.type ?? "unknown";
 
     return {
-      processed: true,
+      valid: true,
+      event: {
+        type: "unknown",
+        rawType,
+      },
     };
   }
 
@@ -255,11 +266,11 @@ export const squarePaymentService = {
     const service = await getSquarePaymentService();
     return service.verifyPayment(...args);
   },
-  processWebhook: async (
-    ...args: Parameters<ISquarePaymentService["processWebhook"]>
+  verifyAndParseWebhook: async (
+    ...args: Parameters<ISquarePaymentService["verifyAndParseWebhook"]>
   ) => {
     const service = await getSquarePaymentService();
-    return service.processWebhook(...args);
+    return service.verifyAndParseWebhook(...args);
   },
   getPaymentDetails: async (
     ...args: Parameters<ISquarePaymentService["getPaymentDetails"]>

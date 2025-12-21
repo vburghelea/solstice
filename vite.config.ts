@@ -99,29 +99,32 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          // Don't precache HTML - always fetch fresh from network
+          navigateFallback: null,
           runtimeCaching: [
+            // Documents (HTML) - always fetch from network, never cache
+            // This prevents stale authenticated content after logout
             {
               urlPattern: ({ request }) => request.destination === "document",
-              handler: "NetworkFirst",
-              options: {
-                cacheName: "qc-pages",
-                expiration: { maxEntries: 20, maxAgeSeconds: 60 * 30 },
-              },
+              handler: "NetworkOnly",
             },
-            {
-              urlPattern: ({ url }) => url.pathname.startsWith("/events"),
-              handler: "NetworkFirst",
-              options: {
-                cacheName: "qc-events",
-                expiration: { maxEntries: 60, maxAgeSeconds: 60 * 30 },
-              },
-            },
+            // Static images - cache aggressively
             {
               urlPattern: ({ request }) => request.destination === "image",
               handler: "CacheFirst",
               options: {
                 cacheName: "qc-images",
                 expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              },
+            },
+            // Static assets (JS, CSS) - cache with network fallback
+            {
+              urlPattern: ({ request }) =>
+                request.destination === "script" || request.destination === "style",
+              handler: "StaleWhileRevalidate",
+              options: {
+                cacheName: "qc-assets",
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
               },
             },
           ],

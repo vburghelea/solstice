@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { debugGuard } from "~/lib/server/debug-guard";
 
 export const Route = createFileRoute("/api/test-square")({
   server: {
     handlers: {
       GET: async () => {
+        // Block access in production - returns 404
+        const guardResponse = debugGuard();
+        if (guardResponse) return guardResponse;
+
         const hasAccessToken = !!process.env["SQUARE_ACCESS_TOKEN"];
         const hasLocationId = !!process.env["SQUARE_LOCATION_ID"];
         const locationId = process.env["SQUARE_LOCATION_ID"];

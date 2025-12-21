@@ -16,8 +16,10 @@ export interface Membership {
   id: string;
   userId: string;
   membershipTypeId: string;
-  startDate: string | Date;
-  endDate: string | Date;
+  /** ISO date string (YYYY-MM-DD) from database date column */
+  startDate: string;
+  /** ISO date string (YYYY-MM-DD) from database date column */
+  endDate: string;
   status: "active" | "cancelled" | "expired";
   paymentId: string | null;
   metadata: MembershipMetadata | null;

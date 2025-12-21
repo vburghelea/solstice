@@ -54,6 +54,16 @@ export const registrationTypeEnum = pgEnum("registration_type", [
 ]);
 
 /**
+ * Event review status enum - for admin approval workflow
+ */
+export const eventReviewStatusEnum = pgEnum("event_review_status", [
+  "pending", // Awaiting admin review
+  "approved", // Admin approved, can be published
+  "rejected", // Admin rejected
+  "not_required", // Review not required (e.g., admin-created events)
+]);
+
+/**
  * Main events table
  */
 export const events = pgTable("events", {
@@ -119,6 +129,12 @@ export const events = pgTable("events", {
   // Visibility
   isPublic: boolean("is_public").notNull().default(false),
   isFeatured: boolean("is_featured").notNull().default(false),
+
+  // Review/Approval workflow
+  reviewStatus: eventReviewStatusEnum("review_status").notNull().default("not_required"),
+  reviewNotes: text("review_notes"),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: text("reviewed_by").references(() => user.id),
 
   // Metadata
   metadata: jsonb("metadata"), // Flexible field for additional data
@@ -235,6 +251,10 @@ export const eventAnnouncements = pgTable("event_announcements", {
 export const eventsRelations = relations(events, ({ one, many }) => ({
   organizer: one(user, {
     fields: [events.organizerId],
+    references: [user.id],
+  }),
+  reviewer: one(user, {
+    fields: [events.reviewedBy],
     references: [user.id],
   }),
   registrations: many(eventRegistrations),

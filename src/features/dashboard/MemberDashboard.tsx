@@ -374,16 +374,19 @@ function MembershipCard({ status }: { status: MembershipStatus | null }) {
                     day: "numeric",
                   })}
                 </p>
-                {status.daysRemaining && status.daysRemaining < 60 && (
-                  <p className="mt-1 text-sm text-yellow-700">
-                    {status.daysRemaining} days remaining
-                  </p>
-                )}
+                {typeof status.daysRemaining === "number" &&
+                  status.daysRemaining < 60 && (
+                    <p className="mt-1 text-sm text-yellow-700">
+                      {status.daysRemaining <= 0
+                        ? "Expires today"
+                        : `${status.daysRemaining} days remaining`}
+                    </p>
+                  )}
               </div>
             )}
             <Button asChild variant="outline" className="w-full">
               <Link to="/dashboard/membership">
-                {status.daysRemaining && status.daysRemaining < 30
+                {typeof status.daysRemaining === "number" && status.daysRemaining < 30
                   ? "Renew Now"
                   : "View Details"}
               </Link>

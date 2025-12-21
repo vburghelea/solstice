@@ -7,7 +7,10 @@ let authClientInstance: ReturnType<typeof createAuthClient> | null = null;
 function getAuthClient() {
   if (!authClientInstance) {
     const baseURL = getBaseUrl();
-    console.log("Auth client created with baseURL:", baseURL);
+    // Only log in development to avoid noisy production logs
+    if (import.meta.env.DEV) {
+      console.log("Auth client created with baseURL:", baseURL);
+    }
     authClientInstance = createAuthClient({ baseURL });
   }
   return authClientInstance;

@@ -31,9 +31,12 @@ export const ValidatedCheckbox: React.FC<ValidatedCheckboxProps> = (props) => {
           disabled={disabled || field.form.state.isSubmitting}
           aria-invalid={!!meta.errors.length}
           aria-describedby={
-            meta.errors.length || description
-              ? `${inputId}-description ${inputId}-errors`
-              : undefined
+            [
+              description ? `${inputId}-description` : null,
+              meta.isTouched && meta.errors.length ? `${inputId}-errors` : null,
+            ]
+              .filter(Boolean)
+              .join(" ") || undefined
           }
         />
         <Label

@@ -70,14 +70,14 @@
 
 ### Code Issues Found During Testing
 
-1. **Event Detail Page - Wrong Back Link for Public Users**
-   - **File**: `src/routes/events/$slug.index.tsx:124`
+1. ~~**Event Detail Page - Wrong Back Link for Public Users**~~ ✅ **FIXED (2025-12-02)**
+   - **File**: `src/routes/events/$slug.index.tsx:82,124`
    - **Issue**: Back button links to `/dashboard/events` but public (unauthenticated) users should go to `/events`
-   - **Fix**: Conditionally render back link based on `user` context:
+   - **Fix Applied**: Conditionally render back link based on `user` context:
      ```tsx
      <Link to={user ? "/dashboard/events" : "/events"}>
      ```
-   - **Priority**: Low (UX improvement)
+   - Fixed in both error state (line 82) and main view (line 124)
 
 ---
 

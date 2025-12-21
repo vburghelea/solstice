@@ -27,11 +27,11 @@ export const env = createEnv({
     NETLIFY_DATABASE_URL: z.url().optional(),
     NETLIFY_DATABASE_URL_UNPOOLED: z.url().optional(),
 
-    // Auth
+    // Auth - Secret must be set explicitly, no fallbacks
+    // Generate with: node scripts/generate-auth-secret.js
     BETTER_AUTH_SECRET: z
       .string()
-      .min(1, "BETTER_AUTH_SECRET must be set")
-      .prefault("dev-secret-change-in-production"),
+      .min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     OAUTH_ALLOWED_DOMAINS: z

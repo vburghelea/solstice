@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import {
   ArrowLeftIcon,
   CalendarIcon,
@@ -12,6 +12,7 @@ import {
   UsersIcon,
   XCircleIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -54,12 +55,13 @@ function EventDetailPage() {
     { isRegistered: boolean } | undefined,
     Error
   >({
+    // Include user.id in key for cache invalidation when user changes
     queryKey: ["event-registration", eventData?.id, user?.id],
     queryFn: () =>
       checkEventRegistration({
         data: {
           eventId: eventData!.id,
-          userId: user?.id,
+          // userId is now inferred from session on server
         },
       }),
     enabled: Boolean(eventData?.id && user?.id),
@@ -163,7 +165,7 @@ function EventDetailPage() {
                     <CalendarIcon className="text-muted-foreground h-4 w-4" />
                     <span>
                       {format(new Date(event.startDate), "EEEE, MMMM d, yyyy")}
-                      {event.endDate !== event.startDate &&
+                      {!isSameDay(new Date(event.startDate), new Date(event.endDate)) &&
                         ` - ${format(new Date(event.endDate), "EEEE, MMMM d, yyyy")}`}
                     </span>
                   </div>
@@ -488,9 +490,13 @@ function EventDetailPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  // You could add a toast notification here
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    toast.success("Link copied to clipboard");
+                  } catch {
+                    toast.error("Failed to copy link");
+                  }
                 }}
               >
                 Copy Link

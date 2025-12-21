@@ -136,10 +136,9 @@ describe("Events Schemas", () => {
     });
 
     describe("checkEventRegistrationSchema", () => {
-      it("validates with event and user ID", () => {
+      it("validates with event ID only", () => {
         const result = checkEventRegistrationSchema.safeParse({
           eventId: "event-123",
-          userId: "user-456",
         });
         expect(result.success).toBe(true);
       });
@@ -152,26 +151,15 @@ describe("Events Schemas", () => {
         expect(result.success).toBe(true);
       });
 
-      it("validates with all IDs", () => {
-        const result = checkEventRegistrationSchema.safeParse({
-          eventId: "event-123",
-          userId: "user-456",
-          teamId: "team-789",
-        });
-        expect(result.success).toBe(true);
-      });
-
-      it("validates with only event ID", () => {
-        const result = checkEventRegistrationSchema.safeParse({
-          eventId: "event-123",
-        });
-        expect(result.success).toBe(true);
-      });
-
       it("fails without event ID", () => {
         const result = checkEventRegistrationSchema.safeParse({
-          userId: "user-456",
+          teamId: "team-789",
         });
+        expect(result.success).toBe(false);
+      });
+
+      it("fails with empty object", () => {
+        const result = checkEventRegistrationSchema.safeParse({});
         expect(result.success).toBe(false);
       });
     });

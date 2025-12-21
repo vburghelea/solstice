@@ -5,27 +5,35 @@
 
 [build.environment]
   NODE_ENV = "production"
+  NODE_VERSION = "22.12.0"
+  PNPM_VERSION = "10.12.4"
 
 # Production context: Deploys from the production branch (main/master)
 [context.production]
   command = "pnpm build"
-  
+
 [context.production.environment]
   NODE_ENV = "production"
+  NODE_VERSION = "22.12.0"
+  PNPM_VERSION = "10.12.4"
 
 # Deploy Preview context: Pull requests and preview deploys
 [context.deploy-preview]
   command = "pnpm build"
-  
+
 [context.deploy-preview.environment]
   NODE_ENV = "test"
+  NODE_VERSION = "22.12.0"
+  PNPM_VERSION = "10.12.4"
 
 # Branch Deploy context: Deploys from branches (not main/master)
 [context.branch-deploy]
   command = "pnpm build"
-  
+
 [context.branch-deploy.environment]
   NODE_ENV = "test"
+  NODE_VERSION = "22.12.0"
+  PNPM_VERSION = "10.12.4"
 
 [dev]
   targetPort = 5173
@@ -49,3 +57,53 @@
     X-XSS-Protection = "1; mode=block"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Prevent caching of authenticated routes - always fetch fresh
+[[headers]]
+  for = "/dashboard"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/dashboard/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/onboarding"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/onboarding/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/auth/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/login"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/signup"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"

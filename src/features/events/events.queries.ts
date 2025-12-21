@@ -3,13 +3,14 @@ import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { EventRegistration } from "~/db/schema";
 import { eventRegistrations, events, teams, user } from "~/db/schema";
+import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
+import { forbidden } from "~/lib/server/errors";
 import { zod$ } from "~/lib/server/fn-utils";
 import type {
   EventAmenities,
   EventDivisions,
   EventMetadata,
   EventPaymentMetadata,
-  EventRegistrationRoster,
   EventRequirements,
   EventRules,
   EventSchedule,
@@ -27,28 +28,7 @@ import type {
   EventPaymentStatus,
   EventWithDetails,
 } from "./events.types";
-
-// Type for EventRegistration with properly typed roster + metadata
-type EventRegistrationWithRoster = Omit<
-  EventRegistration,
-  "roster" | "paymentMetadata"
-> & {
-  roster: EventRegistrationRoster;
-  paymentMetadata: EventPaymentMetadata | null;
-};
-
-// Helper to cast registration jsonb fields
-function castRegistrationJsonbFields(
-  registration: EventRegistration,
-): EventRegistrationWithRoster {
-  return {
-    ...registration,
-    roster: (registration.roster || {}) as EventRegistrationRoster,
-    paymentMetadata: registration.paymentMetadata
-      ? (registration.paymentMetadata as EventPaymentMetadata)
-      : null,
-  };
-}
+import { castRegistrationJsonbFields, type EventRegistrationWithRoster } from "./utils";
 
 export type EventRegistrationSummary = {
   id: string;
@@ -132,6 +112,15 @@ export const listEvents = createServerFn({ method: "GET" })
 
     if (filters.featured === true) {
       conditions.push(eq(events.isFeatured, true));
+    }
+
+    if (filters.reviewStatus) {
+      const statuses = Array.isArray(filters.reviewStatus)
+        ? filters.reviewStatus
+        : [filters.reviewStatus];
+      conditions.push(
+        inArray(events.reviewStatus, statuses as (typeof events.reviewStatus._.data)[]),
+      );
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -359,13 +348,33 @@ export const getUpcomingEvents = createServerFn({ method: "GET" })
   });
 
 /**
- * Get all registrations for an event (organizer only)
+ * Get all registrations for an event (organizer or admin only)
+ * Returns user emails and payment data - must be protected
  */
 export const getEventRegistrations = createServerFn({ method: "GET" })
+  .middleware(getAuthMiddleware())
   .inputValidator(z.object({ eventId: z.uuid() }).parse)
-  .handler(async ({ data }): Promise<EventRegistrationSummary[]> => {
+  .handler(async ({ data, context }): Promise<EventRegistrationSummary[]> => {
+    const authUser = requireUser(context);
     const { getDb } = await import("~/db/server-helpers");
+    const { isAdmin } = await import("~/lib/auth/utils/admin-check");
     const db = await getDb();
+
+    // Check if user is organizer or admin
+    const [event] = await db
+      .select({ organizerId: events.organizerId })
+      .from(events)
+      .where(eq(events.id, data.eventId))
+      .limit(1);
+
+    if (!event) {
+      throw forbidden("Event not found");
+    }
+
+    const userIsAdmin = await isAdmin(authUser.id);
+    if (event.organizerId !== authUser.id && !userIsAdmin) {
+      throw forbidden("Only event organizers or admins can view registrations");
+    }
 
     const registrations = await db
       .select({
@@ -416,7 +425,15 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
       isRegistered: boolean;
       registration?: EventRegistrationWithRoster;
     }> => {
-      if (!data.userId && !data.teamId) {
+      // Get user from session - not from client input
+      const { getRequest } = await import("@tanstack/react-start/server");
+      const { getAuth } = await import("~/lib/auth/server-helpers");
+      const auth = await getAuth();
+      const { headers } = getRequest();
+      const session = await auth.api.getSession({ headers });
+      const userId = session?.user?.id;
+
+      if (!userId && !data.teamId) {
         return { isRegistered: false };
       }
 
@@ -429,8 +446,8 @@ export const checkEventRegistration = createServerFn({ method: "GET" })
         eq(eventRegistrations.status, "confirmed"),
       ];
 
-      if (data.userId) {
-        conditions.push(eq(eventRegistrations.userId, data.userId));
+      if (userId) {
+        conditions.push(eq(eventRegistrations.userId, userId));
       }
 
       if (data.teamId) {

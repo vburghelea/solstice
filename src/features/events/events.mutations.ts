@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import type { EventRegistration } from "~/db/schema";
 import {
   eventPaymentSessions,
@@ -8,6 +8,7 @@ import {
   teamMembers,
 } from "~/db/schema";
 import { createEventInputSchema } from "~/db/schema/events.schema";
+import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { EventPaymentMetadata } from "./events.db-types";
@@ -94,19 +95,16 @@ export const cancelEvent = createServerFn({ method: "POST" })
           };
         }
 
-        const updatedEventMetadata = {
-          ...(eventRecord.metadata ?? {}),
-          cancelledAt: nowIso,
-          cancelledBy: user.id,
-          cancellationReason: data.reason ?? null,
-        } as Record<string, unknown>;
-
         await db
           .update(events)
           .set({
             status: "cancelled",
             updatedAt: now,
-            metadata: updatedEventMetadata,
+            metadata: atomicJsonbMerge(events.metadata, {
+              cancelledAt: nowIso,
+              cancelledBy: user.id,
+              cancellationReason: data.reason ?? null,
+            }),
           })
           .where(eq(events.id, data.eventId));
 
@@ -236,12 +234,11 @@ export const cancelEvent = createServerFn({ method: "POST" })
                         .update(eventPaymentSessions)
                         .set({
                           status: "refunded",
-                          metadata: {
-                            ...(session.metadata ?? {}),
+                          metadata: atomicJsonbMerge(eventPaymentSessions.metadata, {
                             refundedAt: nowIso,
                             refundId: refund.refundId ?? null,
                             cancelledBy: user.id,
-                          },
+                          }),
                           updatedAt: now,
                         })
                         .where(eq(eventPaymentSessions.id, session.id));
@@ -294,11 +291,10 @@ export const cancelEvent = createServerFn({ method: "POST" })
               .update(eventPaymentSessions)
               .set({
                 status: "cancelled",
-                metadata: {
-                  ...(session.metadata ?? {}),
+                metadata: atomicJsonbMerge(eventPaymentSessions.metadata, {
                   cancelledAt: nowIso,
                   cancelledBy: user.id,
-                },
+                }),
                 updatedAt: now,
               })
               .where(eq(eventPaymentSessions.id, session.id));
@@ -404,7 +400,11 @@ export const createEvent = createServerFn({ method: "POST" })
         };
       }
 
-      // Create event
+      // Check if user is admin - admin-created events don't need review
+      const { isAdmin } = await import("~/lib/auth/utils/admin-check");
+      const userIsAdmin = await isAdmin(user.id);
+
+      // Create event - non-admin events start as "pending" for review
       const [newEvent] = await db
         .insert(events)
         .values({
@@ -412,6 +412,7 @@ export const createEvent = createServerFn({ method: "POST" })
           organizerId: user.id,
           startDate: data.startDate,
           endDate: data.endDate,
+          reviewStatus: userIsAdmin ? "not_required" : "pending",
         })
         .returning();
 
@@ -466,16 +467,33 @@ export const updateEvent = createServerFn({ method: "POST" })
         };
       }
 
-      if (existingEvent.organizerId !== user.id) {
+      // Check if user is organizer or admin
+      const { isAdmin } = await import("~/lib/auth/utils/admin-check");
+      const userIsAdmin = await isAdmin(user.id);
+
+      if (existingEvent.organizerId !== user.id && !userIsAdmin) {
         return {
           success: false,
           errors: [
             {
               code: "FORBIDDEN",
-              message: "Only the event organizer can update this event",
+              message: "Only the event organizer or an admin can update this event",
             },
           ],
         };
+      }
+
+      // Only admins can modify review-related fields
+      if (!userIsAdmin) {
+        // Strip review fields from non-admin updates
+        delete (data.data as Record<string, unknown>)["reviewStatus"];
+        delete (data.data as Record<string, unknown>)["reviewNotes"];
+        delete (data.data as Record<string, unknown>)["reviewedBy"];
+        delete (data.data as Record<string, unknown>)["reviewedAt"];
+      } else if (data.data.reviewStatus) {
+        // Admin is updating review fields - set reviewedBy and reviewedAt
+        (data.data as Record<string, unknown>)["reviewedBy"] = user.id;
+        (data.data as Record<string, unknown>)["reviewedAt"] = new Date();
       }
 
       // Check for duplicate slug if updating
@@ -675,6 +693,8 @@ export const registerForEvent = createServerFn({ method: "POST" })
           };
         }
 
+        // Check for existing registration with any active status (pending, confirmed, waitlisted)
+        // This prevents duplicate registrations and checkout sessions
         const existingRegistration = await db
           .select()
           .from(eventRegistrations)
@@ -685,18 +705,23 @@ export const registerForEvent = createServerFn({ method: "POST" })
                 eq(eventRegistrations.userId, user.id),
                 data.teamId ? eq(eventRegistrations.teamId, data.teamId) : undefined,
               ),
-              eq(eventRegistrations.status, "confirmed"),
+              inArray(eventRegistrations.status, ["pending", "confirmed", "waitlisted"]),
             ),
           )
           .limit(1);
 
         if (existingRegistration.length > 0) {
+          const status = existingRegistration[0].status;
+          const message =
+            status === "pending"
+              ? "You have a pending registration. Please complete payment or cancel it first."
+              : "You or your team are already registered for this event";
           return {
             success: false,
             errors: [
               {
                 code: "ALREADY_REGISTERED",
-                message: "You or your team are already registered for this event",
+                message,
               },
             ],
           };
@@ -820,7 +845,13 @@ export const registerForEvent = createServerFn({ method: "POST" })
             registrationType,
             division: data.division,
             notes: data.notes,
-            roster: data.roster ? JSON.stringify(data.roster) : null,
+            // Store directly as JSONB - Drizzle handles serialization
+            // Normalize to object format if array is passed
+            roster: data.roster
+              ? Array.isArray(data.roster)
+                ? { players: data.roster }
+                : data.roster
+              : null,
             status: amountDueCents === 0 ? "confirmed" : "pending",
             paymentStatus,
             paymentMethod,

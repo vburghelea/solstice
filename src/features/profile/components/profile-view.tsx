@@ -18,9 +18,9 @@ import {
 import { Label } from "~/components/ui/label";
 import { Separator } from "~/components/ui/separator";
 import { updateUserProfile } from "../profile.mutations";
-import type { ProfileOperationResult } from "../profile.types";
 import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
+import type { ProfileOperationResult } from "../profile.types";
 
 function calculateAge(dateOfBirth: Date | undefined): number | null {
   if (!dateOfBirth) return null;
@@ -130,9 +130,9 @@ export function ProfileView() {
         console.log("Sending to server function:", JSON.stringify(dataToSubmit, null, 2));
         console.log("Data type:", typeof dataToSubmit);
 
-        const result = await updateUserProfile({
-          data: dataToSubmit as PartialProfileInputType
-        }) as ProfileOperationResult;
+        const result = (await updateUserProfile({
+          data: dataToSubmit as PartialProfileInputType,
+        })) as ProfileOperationResult;
 
         if (result.success) {
           toast.success("Profile updated successfully");
@@ -341,10 +341,12 @@ export function ProfileView() {
                   validators={{
                     onChange: ({ value }) => {
                       if (value) {
+                        // Value is a YYYY-MM-DD string from ValidatedDatePicker
+                        const birthDate = new Date(value);
                         const today = new Date();
-                        let age = today.getFullYear() - value.getFullYear();
-                        const m = today.getMonth() - value.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < value.getDate())) {
+                        let age = today.getFullYear() - birthDate.getFullYear();
+                        const m = today.getMonth() - birthDate.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
                           age--;
                         }
                         if (age < 13 || age > 120) {

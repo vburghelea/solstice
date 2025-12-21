@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { membershipPaymentSessions, memberships, membershipTypes } from "~/db/schema";
+import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { getAuthMiddleware, requireUser } from "~/lib/server/auth";
 import { zod$ } from "~/lib/server/fn-utils";
 import type { MembershipMetadata } from "./membership.db-types";
@@ -83,11 +84,18 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           };
         }
 
-        // Check if user already has an active membership
+        // Check if user already has an active, unexpired membership
+        // Must check both status AND date to allow renewal of expired memberships
         const [existingMembership] = await db
           .select()
           .from(memberships)
-          .where(and(eq(memberships.userId, user.id), eq(memberships.status, "active")))
+          .where(
+            and(
+              eq(memberships.userId, user.id),
+              eq(memberships.status, "active"),
+              gte(memberships.endDate, sql`CURRENT_DATE`),
+            ),
+          )
           .limit(1);
 
         if (existingMembership) {
@@ -289,12 +297,11 @@ export const confirmMembershipPurchase = createServerFn({ method: "POST" })
           .update(membershipPaymentSessions)
           .set({
             status: paymentSession.status === "completed" ? "completed" : "failed",
-            metadata: {
-              ...(paymentSession.metadata ?? {}),
+            metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
               lastError: paymentResult.error || "Payment verification failed",
               lastErrorAt: now.toISOString(),
               retryAttempts,
-            },
+            }),
             updatedAt: now,
           })
           .where(eq(membershipPaymentSessions.id, paymentSession.id));

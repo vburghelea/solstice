@@ -64,7 +64,7 @@ function EventsReviewPage() {
     action: "approve" | "reject";
   }>({ isOpen: false, eventId: "", eventName: "", action: "approve" });
 
-  // Fetch pending events (drafts that want to be public)
+  // Fetch pending events (those awaiting review)
   const { data: pendingEvents, isLoading: pendingLoading } = useQuery<
     EventListResult,
     Error
@@ -74,7 +74,7 @@ function EventsReviewPage() {
       listEvents({
         data: {
           filters: {
-            status: "draft",
+            reviewStatus: "pending",
             publicOnly: false,
           },
           pageSize: 50,
@@ -82,7 +82,7 @@ function EventsReviewPage() {
       }),
   });
 
-  // Fetch recently reviewed events
+  // Fetch recently reviewed events (approved or rejected)
   const { data: reviewedEvents, isLoading: reviewedLoading } = useQuery<
     EventListResult,
     Error
@@ -92,7 +92,7 @@ function EventsReviewPage() {
       listEvents({
         data: {
           filters: {
-            status: ["published", "registration_open"],
+            reviewStatus: ["approved", "rejected"],
             publicOnly: false,
           },
           pageSize: 20,
@@ -102,7 +102,7 @@ function EventsReviewPage() {
       }),
   });
 
-  // Approve event mutation
+  // Approve/reject event mutation
   const approveMutation = useMutation<
     EventOperationResult<EventWithDetails>,
     Error,
@@ -116,6 +116,7 @@ function EventsReviewPage() {
             data: {
               isPublic: approve,
               status: approve ? "published" : "draft",
+              reviewStatus: approve ? "approved" : "rejected",
             },
           },
         }),
@@ -156,7 +157,7 @@ function EventsReviewPage() {
     return <ReviewSkeleton />;
   }
 
-  const pendingList = pendingEvents?.events.filter((e) => !e.isPublic) || [];
+  const pendingList = pendingEvents?.events || [];
   const approvedList = reviewedEvents?.events || [];
 
   return (

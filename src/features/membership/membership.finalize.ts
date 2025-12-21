@@ -6,6 +6,7 @@ import type {
 } from "~/db/schema/membership.schema";
 import { membershipPaymentSessions, memberships } from "~/db/schema/membership.schema";
 import type { getDb } from "~/db/server-helpers";
+import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 
 export type MembershipPaymentSessionRow = MembershipPaymentSession;
 export type MembershipTypeRow = MembershipType;
@@ -54,13 +55,12 @@ export async function finalizeMembershipForSession({
           status: "completed",
           squarePaymentId: paymentId,
           squareOrderId: resolvedOrderId,
-          metadata: {
-            ...(paymentSession.metadata ?? {}),
+          metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
             membershipId: existingMembershipByPayment.id,
             paymentConfirmedAt: nowIso,
             squareOrderId: resolvedOrderId,
             squareTransactionId: paymentId,
-          },
+          }),
           updatedAt: now,
         })
         .where(eq(membershipPaymentSessions.id, paymentSession.id));
@@ -106,13 +106,12 @@ export async function finalizeMembershipForSession({
         status: "completed",
         squarePaymentId: paymentId,
         squareOrderId: resolvedOrderId,
-        metadata: {
-          ...(paymentSession.metadata ?? {}),
+        metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
           membershipId: newMembership.id,
           paymentConfirmedAt: nowIso,
           squareOrderId: resolvedOrderId,
           squareTransactionId: paymentId,
-        },
+        }),
         updatedAt: now,
       })
       .where(eq(membershipPaymentSessions.id, paymentSession.id));

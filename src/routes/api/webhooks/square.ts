@@ -10,18 +10,8 @@ import {
   memberships,
 } from "~/db/schema";
 import { user } from "~/db/schema/auth.schema";
+import { atomicJsonbMerge } from "~/lib/db/jsonb-utils";
 import { getSquarePaymentService } from "~/lib/payments/square";
-
-const PAYMENT_SUCCESS_STATUSES = new Set(["COMPLETED", "APPROVED"]);
-const PAYMENT_CANCELLED_STATUSES = new Set([
-  "CANCELED",
-  "CANCELED_BY_CUSTOMER",
-  "FAILED",
-]);
-
-function normalizeSquareStatus(status: string | undefined | null) {
-  return (status ?? "").toUpperCase();
-}
 
 async function finalizeMembershipFromWebhook({
   paymentId,
@@ -89,24 +79,27 @@ async function finalizeMembershipFromWebhook({
     return;
   }
 
+  // Ensure we have a valid payment ID before finalizing
+  const resolvedPaymentId = paymentId ?? session.squarePaymentId;
+  if (!resolvedPaymentId) {
+    console.warn("[Square webhook] Skipping finalize - missing paymentId", {
+      orderId,
+      sessionId: session.id,
+      eventType,
+    });
+    return;
+  }
+
   const now = new Date();
   const finalizeResult = await finalizeMembershipForSession({
     db,
     paymentSession: session,
     membershipType,
-    paymentId: paymentId ?? session.squarePaymentId ?? "",
+    paymentId: resolvedPaymentId,
     orderId: orderId ?? session.squareOrderId ?? null,
     sessionId: session.squareCheckoutId,
     now,
   });
-
-  const [freshSession] = await db
-    .select()
-    .from(membershipPaymentSessions)
-    .where(eq(membershipPaymentSessions.id, session.id))
-    .limit(1);
-
-  const sessionMetadata = freshSession?.metadata ?? session.metadata ?? {};
 
   const [{ sendMembershipPurchaseReceipt }] = await Promise.all([
     import("~/lib/email/sendgrid"),
@@ -147,12 +140,11 @@ async function finalizeMembershipFromWebhook({
   await db
     .update(membershipPaymentSessions)
     .set({
-      metadata: {
-        ...sessionMetadata,
+      metadata: atomicJsonbMerge(membershipPaymentSessions.metadata, {
         membershipId: finalizeResult.membership.id,
         lastWebhookFinalizeAt: now.toISOString(),
         lastWebhookEvent: eventType,
-      },
+      }),
       updatedAt: now,
     })
     .where(eq(membershipPaymentSessions.id, session.id));
@@ -231,19 +223,13 @@ async function finalizeEventRegistrationFromWebhook({
     .set({
       status: "completed",
       squarePaymentId: paymentIdentifier,
-      metadata: {
-        ...(session.metadata ?? {}),
+      metadata: atomicJsonbMerge(eventPaymentSessions.metadata, {
         lastWebhookFinalizeAt: nowIso,
         lastWebhookEvent: eventType,
-      },
+      }),
       updatedAt: now,
     })
     .where(eq(eventPaymentSessions.id, session.id));
-
-  const existingMetadata = (registration.paymentMetadata ?? {}) as Record<
-    string,
-    unknown
-  >;
 
   await db
     .update(eventRegistrations)
@@ -253,12 +239,11 @@ async function finalizeEventRegistrationFromWebhook({
       paymentCompletedAt: now,
       paymentId: paymentIdentifier,
       amountPaidCents: resolvedAmount,
-      paymentMetadata: {
-        ...existingMetadata,
+      paymentMetadata: atomicJsonbMerge(eventRegistrations.paymentMetadata, {
         squareTransactionId: paymentIdentifier,
         lastWebhookFinalizeAt: nowIso,
         lastWebhookEvent: eventType,
-      },
+      }),
       updatedAt: now,
     })
     .where(eq(eventRegistrations.id, registration.id));
@@ -311,12 +296,11 @@ async function handleRefundEvent({
     .update(memberships)
     .set({
       status: "cancelled",
-      metadata: {
-        ...(membershipRecord.metadata ?? {}),
+      metadata: atomicJsonbMerge(memberships.metadata, {
         lastRefundStatus: status,
         lastRefundId: refundId,
         lastRefundedAt: nowIso,
-      },
+      }),
       updatedAt: now,
     })
     .where(eq(memberships.id, membershipRecord.id));
@@ -360,7 +344,6 @@ export const __squareWebhookTestUtils = {
   finalizeMembershipFromWebhook,
   finalizeEventRegistrationFromWebhook,
   handleRefundEvent,
-  normalizeSquareStatus,
 };
 
 export const Route = createFileRoute("/api/webhooks/square")({
@@ -388,111 +371,77 @@ export const Route = createFileRoute("/api/webhooks/square")({
             return json({ error: "Invalid payload" }, { status: 400 });
           }
 
-          // Get the payment service
+          // Get the payment service and verify the webhook
           const paymentService = await getSquarePaymentService();
+          const { valid, event, error } = await paymentService.verifyAndParseWebhook(
+            payload,
+            signature,
+          );
 
-          // Process the webhook
-          const result = await paymentService.processWebhook(payload, signature);
-
-          if (!result.processed) {
-            console.error("Failed to process webhook:", result.error);
-            return json({ error: result.error || "Processing failed" }, { status: 400 });
+          if (!valid) {
+            console.error("Webhook verification failed:", error);
+            return json({ error: error || "Verification failed" }, { status: 401 });
           }
 
-          // Handle specific event types
-          const event = payload as { type: string; data: unknown };
-          const eventType = event.type;
-          const eventData = event.data as Record<string, unknown>;
+          if (!event) {
+            console.error("No event parsed from webhook");
+            return json({ error: "No event parsed" }, { status: 400 });
+          }
 
-          switch (eventType) {
-            case "payment.created":
-            case "payment.updated": {
-              // Extract payment information
-              const paymentObj = eventData?.["object"] as
-                | Record<string, unknown>
-                | undefined;
-              const payment = paymentObj?.["payment"] as
-                | Record<string, unknown>
-                | undefined;
-              if (!payment) break;
-
-              const orderId = payment["order_id"] as string | undefined;
-              const paymentId = payment["id"] as string | undefined;
-              const statusRaw = payment["status"] as string | undefined;
-              const status = normalizeSquareStatus(statusRaw);
-              const amountMoney = payment["amount_money"] as
-                | Record<string, unknown>
-                | undefined;
-              const amount = amountMoney?.["amount"] as number | undefined;
-
-              console.log("Payment webhook received:", {
-                orderId,
-                paymentId,
-                status,
-                amount,
+          // Handle normalized event types
+          switch (event.type) {
+            case "payment.success": {
+              console.log("[Square webhook] Payment success:", {
+                paymentId: event.paymentId,
+                orderId: event.orderId,
+                amount: event.amount,
               });
 
-              if (PAYMENT_SUCCESS_STATUSES.has(status)) {
-                await finalizeMembershipFromWebhook({
-                  paymentId,
-                  orderId,
-                  eventType,
-                });
-                await finalizeEventRegistrationFromWebhook({
-                  paymentId,
-                  orderId,
-                  eventType,
-                  amount,
-                });
-              } else if (PAYMENT_CANCELLED_STATUSES.has(status)) {
-                console.warn("[Square webhook] Payment moved to cancelled state", {
-                  paymentId,
-                  orderId,
-                  status,
-                });
-              }
-
+              await finalizeMembershipFromWebhook({
+                paymentId: event.paymentId,
+                orderId: event.orderId,
+                eventType: event.rawType,
+              });
+              await finalizeEventRegistrationFromWebhook({
+                paymentId: event.paymentId,
+                orderId: event.orderId,
+                eventType: event.rawType,
+                amount: event.amount,
+              });
               break;
             }
 
-            case "refund.created":
-            case "refund.updated": {
-              // Handle refund events
-              const refundObj = eventData?.["object"] as
-                | Record<string, unknown>
-                | undefined;
-              const refund = refundObj?.["refund"] as Record<string, unknown> | undefined;
-              if (!refund) break;
+            case "payment.failed":
+            case "payment.cancelled": {
+              console.warn("[Square webhook] Payment not successful:", {
+                type: event.type,
+                paymentId: event.paymentId,
+                orderId: event.orderId,
+                status: event.status,
+              });
+              break;
+            }
 
-              const refundId = refund["id"] as string | undefined;
-              const paymentId = refund["payment_id"] as string | undefined;
-              const status = normalizeSquareStatus(
-                refund["status"] as string | undefined,
-              );
-              const amountMoney = refund["amount_money"] as
-                | Record<string, unknown>
-                | undefined;
-              const amount = amountMoney?.["amount"] as number | undefined;
-
-              console.log("Refund webhook received:", {
-                refundId,
-                paymentId,
-                status,
-                amount,
+            case "refund": {
+              console.log("[Square webhook] Refund received:", {
+                refundId: event.refundId,
+                paymentId: event.paymentId,
+                status: event.status,
+                amount: event.amount,
               });
 
               await handleRefundEvent({
-                paymentId,
-                refundId,
-                status,
-                eventType,
+                paymentId: event.paymentId,
+                refundId: event.refundId,
+                status: event.status,
+                eventType: event.rawType,
               });
-
               break;
             }
 
+            case "unknown":
             default:
-              console.log("Unhandled webhook event type:", eventType);
+              console.log("[Square webhook] Unhandled event type:", event.rawType);
           }
 
           // Return success

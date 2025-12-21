@@ -221,7 +221,9 @@ export function CompleteProfileForm() {
                   validators={{
                     onChange: ({ value }) => {
                       if (!value) return "Date of birth is required";
-                      const age = new Date().getFullYear() - value.getFullYear();
+                      // Value is a YYYY-MM-DD string from ValidatedDatePicker
+                      const birthDate = new Date(value);
+                      const age = new Date().getFullYear() - birthDate.getFullYear();
                       if (age < 13 || age > 120) {
                         return "Age must be between 13 and 120 years";
                       }

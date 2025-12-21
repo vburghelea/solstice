@@ -35,7 +35,7 @@ test.describe("Events flow", () => {
     const startDate = isoDateDaysFromNow(30);
     const endDate = isoDateDaysFromNow(31);
 
-    await test.step("Admin creates a public event", async () => {
+    await test.step("Admin creates an event", async () => {
       await clearAuthState(page);
       await gotoWithAuth(page, "/dashboard/events/create", {
         email: adminEmail,
@@ -68,7 +68,7 @@ test.describe("Events flow", () => {
       await expect(page.getByText("Event created successfully!")).toBeVisible({
         timeout: 10000,
       });
-      await page.waitForURL(new RegExp(`/events/${eventSlug}$`), {
+      await page.waitForURL(new RegExp(`/dashboard/events/${eventSlug}$`), {
         timeout: 10000,
       });
       await expect(
@@ -78,7 +78,7 @@ test.describe("Events flow", () => {
 
     await test.step("Member registers for the new event", async () => {
       await clearAuthState(page);
-      await gotoWithAuth(page, `/events/${eventSlug}/register`, {
+      await gotoWithAuth(page, `/dashboard/events/${eventSlug}/register`, {
         email: memberEmail,
         password: memberPassword,
       });
@@ -105,20 +105,14 @@ test.describe("Events flow", () => {
       await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
     });
 
-    await test.step("Admin reviews and manages the registration", async () => {
+    await test.step("Admin manages the registration", async () => {
       await clearAuthState(page);
-      await gotoWithAuth(page, "/admin/events-review", {
+      await gotoWithAuth(page, `/dashboard/events/${eventSlug}`, {
         email: adminEmail,
         password: adminPassword,
       });
 
-      await page.getByRole("tab", { name: "Recently Reviewed" }).click();
-
-      const reviewedRow = page
-        .getByRole("row", { name: new RegExp(eventName, "i") })
-        .first();
-      await expect(reviewedRow).toBeVisible({ timeout: 10000 });
-      await reviewedRow.getByRole("link", { name: "Manage" }).click();
+      await page.getByRole("link", { name: "Manage Event" }).click();
 
       await page.waitForURL(/\/dashboard\/events\/.+\/manage$/, { timeout: 10000 });
       await expect(page.getByRole("heading", { name: "Manage Event" })).toBeVisible();

@@ -10,7 +10,6 @@ const LABEL_OVERRIDES: Record<string, string> = {
   profile: "Profile",
   settings: "Settings",
   reports: "Reports",
-  "events-review": "Event Review",
   roles: "Roles",
   forbidden: "Forbidden",
   manage: "Manage",

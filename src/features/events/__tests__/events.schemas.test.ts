@@ -22,8 +22,6 @@ describe("Events Schemas", () => {
             startDateTo: new Date("2025-12-31"),
             city: "Toronto",
             province: "ON",
-            featured: true,
-            publicOnly: true,
           },
           page: 1,
           pageSize: 20,

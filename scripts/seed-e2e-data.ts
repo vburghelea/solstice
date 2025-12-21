@@ -524,8 +524,6 @@ async function seed() {
         organizerId: adminUserId,
         contactEmail: "events@quadballcanada.com",
         contactPhone: "+1 (555) 987-0001",
-        isPublic: true,
-        isFeatured: false,
         allowEtransfer: true,
         etransferRecipient: "payments@quadballcanada.com",
         etransferInstructions:
@@ -536,7 +534,7 @@ async function seed() {
         id: teamEventId,
         name: "E2E Invitational Cup",
         slug: "e2e-invitational-cup",
-        shortDescription: "Draft event used to exercise admin approval flows",
+        shortDescription: "Draft event used to exercise team registration flows",
         type: "tournament",
         status: "draft",
         city: "Ottawa",
@@ -553,8 +551,6 @@ async function seed() {
         organizerId: teamCreatorUserId,
         contactEmail: "teams@quadballcanada.com",
         contactPhone: "+1 (555) 987-0002",
-        isPublic: false,
-        isFeatured: false,
         metadata: { seeded: true, category: "team" },
       },
     ];

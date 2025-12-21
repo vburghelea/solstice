@@ -17,8 +17,6 @@ export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 
 export type UpdateEventInput = Partial<CreateEventInput> & {
   status?: EventStatus;
-  isPublic?: boolean;
-  isFeatured?: boolean;
 };
 
 export type EventFilters = {
@@ -29,8 +27,6 @@ export type EventFilters = {
   startDateTo?: Date;
   city?: string;
   province?: string;
-  featured?: boolean;
-  publicOnly?: boolean;
 };
 
 export type EventRegistrationInput = {

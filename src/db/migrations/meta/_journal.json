@@ -57,6 +57,13 @@
       "when": 1766304186248,
       "tag": "0007_magical_firebird",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1766345466324,
+      "tag": "0008_demonic_groot",
+      "breakpoints": true
     }
   ]
 }

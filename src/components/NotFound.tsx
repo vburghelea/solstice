@@ -41,7 +41,7 @@ export function NotFound() {
             variant="outline"
             className="border-white/40 text-white hover:bg-white/10"
           >
-            <Link to="/events">Browse events</Link>
+            <Link to="/">Visit the portal</Link>
           </Button>
         </div>
         <p className="mt-8 text-xs tracking-[0.3em] text-gray-300 uppercase">

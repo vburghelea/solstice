@@ -338,7 +338,7 @@ function EventCard({ event }: { event: EventWithDetails }) {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <Link
-              to="/events/$slug"
+              to="/dashboard/events/$slug"
               params={{ slug: event.slug }}
               className="group-hover:underline"
             >
@@ -406,7 +406,7 @@ function EventCard({ event }: { event: EventWithDetails }) {
 
         <div className="pt-2">
           <Button asChild className="w-full" size="sm">
-            <Link to="/events/$slug" params={{ slug: event.slug }}>
+            <Link to="/dashboard/events/$slug" params={{ slug: event.slug }}>
               View Details
             </Link>
           </Button>

@@ -2,7 +2,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   BarChart3,
   Calendar,
-  CheckSquare,
   Home,
   Settings,
   ShieldCheck,
@@ -25,12 +24,6 @@ export const ADMIN_PRIMARY_NAV: AdminNavItem[] = [
   { icon: Users, label: "Teams", to: "/dashboard/teams" },
   { icon: Calendar, label: "Events", to: "/dashboard/events" },
   { icon: UserCheck, label: "Members", to: "/dashboard/members" },
-  {
-    icon: CheckSquare,
-    label: "Event Review",
-    to: "/dashboard/admin/events-review",
-    roles: GLOBAL_ADMIN_ROLE_NAMES,
-  },
   {
     icon: BarChart3,
     label: "Reports",

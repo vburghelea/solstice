@@ -21,24 +21,6 @@ describe("Event Base Schemas", () => {
         maxTeams: 16,
         teamRegistrationFee: 20000, // $200 in cents
         individualRegistrationFee: 5000,
-        registrationOpensAt: "2025-06-01T00:00:00Z",
-        registrationClosesAt: "2025-07-10T23:59:59Z",
-        status: "draft",
-        visibility: "public",
-        rules: {
-          format: "Swiss rounds followed by knockout",
-          divisions: ["competitive", "recreational"],
-        },
-        schedule: {
-          day1: "Registration and opening ceremony",
-          day2: "Pool play",
-          day3: "Playoffs and finals",
-        },
-        amenities: {
-          parking: true,
-          foodAvailable: true,
-          livestream: false,
-        },
         allowEtransfer: true,
         etransferRecipient: "payments@example.com",
         etransferInstructions: "Send with answer 'quadball'.",

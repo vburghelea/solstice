@@ -422,7 +422,7 @@ function UpcomingEventsCard({ events }: { events: UpcomingEvent[] }) {
             Upcoming Events
           </CardTitle>
           <Button asChild variant="ghost" size="sm">
-            <Link to="/events">View all</Link>
+            <Link to="/dashboard/events">View all</Link>
           </Button>
         </div>
       </CardHeader>
@@ -436,7 +436,7 @@ function UpcomingEventsCard({ events }: { events: UpcomingEvent[] }) {
             {events.slice(0, 5).map((event) => (
               <li key={event.id}>
                 <Link
-                  to="/events/$slug"
+                  to="/dashboard/events/$slug"
                   params={{ slug: event.slug }}
                   className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
                 >
@@ -491,7 +491,7 @@ function AdminToolsCard() {
             <Link to="/dashboard/admin/roles">Roles</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/dashboard/admin/events-review">Events</Link>
+            <Link to="/dashboard/events">Events</Link>
           </Button>
           <Button asChild variant="outline">
             <Link to="/dashboard/reports">Reports</Link>

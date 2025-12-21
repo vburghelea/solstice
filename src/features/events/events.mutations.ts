@@ -400,11 +400,6 @@ export const createEvent = createServerFn({ method: "POST" })
         };
       }
 
-      // Check if user is admin - admin-created events don't need review
-      const { isAdmin } = await import("~/lib/auth/utils/admin-check");
-      const userIsAdmin = await isAdmin(user.id);
-
-      // Create event - non-admin events start as "pending" for review
       const [newEvent] = await db
         .insert(events)
         .values({
@@ -412,7 +407,6 @@ export const createEvent = createServerFn({ method: "POST" })
           organizerId: user.id,
           startDate: data.startDate,
           endDate: data.endDate,
-          reviewStatus: userIsAdmin ? "not_required" : "pending",
         })
         .returning();
 
@@ -481,19 +475,6 @@ export const updateEvent = createServerFn({ method: "POST" })
             },
           ],
         };
-      }
-
-      // Only admins can modify review-related fields
-      if (!userIsAdmin) {
-        // Strip review fields from non-admin updates
-        delete (data.data as Record<string, unknown>)["reviewStatus"];
-        delete (data.data as Record<string, unknown>)["reviewNotes"];
-        delete (data.data as Record<string, unknown>)["reviewedBy"];
-        delete (data.data as Record<string, unknown>)["reviewedAt"];
-      } else if (data.data.reviewStatus) {
-        // Admin is updating review fields - set reviewedBy and reviewedAt
-        (data.data as Record<string, unknown>)["reviewedBy"] = user.id;
-        (data.data as Record<string, unknown>)["reviewedAt"] = new Date();
       }
 
       // Check for duplicate slug if updating

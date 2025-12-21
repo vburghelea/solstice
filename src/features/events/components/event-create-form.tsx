@@ -1,15 +1,14 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate, useRouteContext } from "@tanstack/react-router";
-import { AlertCircle, ArrowLeft, ArrowRight, InfoIcon } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { FormSubmitButton } from "~/components/form-fields/FormSubmitButton";
 import { ValidatedCheckbox } from "~/components/form-fields/ValidatedCheckbox";
 import { ValidatedInput } from "~/components/form-fields/ValidatedInput";
 import { ValidatedSelect } from "~/components/form-fields/ValidatedSelect";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -20,7 +19,6 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { createEvent } from "../events.mutations";
 import type { EventOperationResult, EventWithDetails } from "../events.types";
 
@@ -100,8 +98,6 @@ const eventFormSchema = z
     contactEmail: z.email().optional(),
     contactPhone: z.string().optional(),
     websiteUrl: z.url().optional().or(z.literal("")),
-    isPublic: z.boolean().prefault(true),
-    isFeatured: z.boolean().prefault(false),
     allowWaitlist: z.boolean().prefault(false),
     requireMembership: z.boolean().prefault(false),
     allowEtransfer: z.boolean().prefault(false),
@@ -128,8 +124,6 @@ type EventFormData = z.infer<typeof eventFormSchema>;
 
 export function EventCreateForm() {
   const navigate = useNavigate();
-  const { user } = useRouteContext({ from: "/dashboard/events/create" });
-  const isAdminUser = useMemo(() => isAdminClient(user), [user]);
   const [currentStep, setCurrentStep] = useState(0);
   const slugManuallyEditedRef = useRef(false);
 
@@ -162,8 +156,6 @@ export function EventCreateForm() {
     contactEmail: "",
     contactPhone: "",
     websiteUrl: "",
-    isPublic: true,
-    isFeatured: false,
     allowWaitlist: false,
     requireMembership: false,
     allowEtransfer: false,
@@ -208,9 +200,7 @@ export function EventCreateForm() {
         maxParticipants: parsed.maxParticipants,
         minPlayersPerTeam: parsed.minPlayersPerTeam,
         maxPlayersPerTeam: parsed.maxPlayersPerTeam,
-        isPublic: isAdminUser ? parsed.isPublic : false,
-        isFeatured: isAdminUser ? parsed.isFeatured : false,
-        status: !isAdminUser && parsed.isPublic ? "draft" : parsed.status,
+        status: parsed.status,
         allowEtransfer: parsed.allowEtransfer ?? false,
         etransferRecipient: parsed.etransferRecipient?.trim()
           ? parsed.etransferRecipient.trim()
@@ -253,15 +243,9 @@ export function EventCreateForm() {
         return;
       }
 
-      if (!isAdminUser && formState.values.isPublic) {
-        toast.success(
-          "Event created! It will be reviewed by an admin before becoming public.",
-        );
-      } else {
-        toast.success("Event created successfully!");
-      }
+      toast.success("Event created successfully!");
 
-      navigate({ to: "/events/$slug", params: { slug: result.data.slug } });
+      navigate({ to: "/dashboard/events/$slug", params: { slug: result.data.slug } });
     },
     onError: (error) => {
       toast.error("An error occurred while creating the event");
@@ -833,61 +817,6 @@ export function EventCreateForm() {
                   )}
                 </form.Field>
               </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Visibility Settings</h3>
-
-                {!isAdminUser && (
-                  <Alert>
-                    <InfoIcon className="h-4 w-4" />
-                    <AlertTitle>Admin Approval Required</AlertTitle>
-                    <AlertDescription>
-                      Your event will be created as a draft and will require admin
-                      approval before it becomes publicly visible. You can still manage
-                      and edit your event while it's pending approval.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <form.Field name="isPublic">
-                  {(field) => (
-                    <ValidatedCheckbox
-                      field={field}
-                      label="Public Event"
-                      description={
-                        isAdminUser
-                          ? "Make this event visible to everyone"
-                          : "Request public visibility (requires admin approval)"
-                      }
-                      disabled={!isAdminUser}
-                    />
-                  )}
-                </form.Field>
-
-                <form.Field name="isFeatured">
-                  {(field) => (
-                    <ValidatedCheckbox
-                      field={field}
-                      label="Featured Event"
-                      description="Highlight this event on the homepage and in search results"
-                      disabled={!isAdminUser}
-                    />
-                  )}
-                </form.Field>
-              </div>
-
-              {!isAdminUser && (
-                <Alert className="border-amber-200 bg-amber-50 text-amber-900">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
-                  <AlertDescription>
-                    After creating your event, an administrator will review it and approve
-                    it for public visibility. You'll be notified once your event is
-                    approved.
-                  </AlertDescription>
-                </Alert>
-              )}
             </div>
           )}
 

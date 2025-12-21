@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { PublicFooter } from "~/components/ui/public-footer";
 import { redirectIfAuthenticated } from "~/lib/auth/guards/route-guards";
 
 export const Route = createFileRoute("/auth")({
@@ -17,7 +16,6 @@ function RouteComponent() {
           <Outlet />
         </div>
       </main>
-      <PublicFooter />
     </div>
   );
 }

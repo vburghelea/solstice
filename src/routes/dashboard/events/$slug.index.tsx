@@ -30,15 +30,16 @@ import type {
   EventOperationResult,
   EventWithDetails,
 } from "~/features/events/events.types";
+import { isAdminClient } from "~/lib/auth/utils/admin-check";
 import { cn } from "~/shared/lib/utils";
 
-export const Route = createFileRoute("/events/$slug/")({
+export const Route = createFileRoute("/dashboard/events/$slug/")({
   component: EventDetailPage,
 });
 
 function EventDetailPage() {
   const { slug } = Route.useParams();
-  const { user } = useRouteContext({ from: "/events/$slug" });
+  const { user } = useRouteContext({ from: "/dashboard/events/$slug" });
 
   const {
     data: eventResult,
@@ -81,7 +82,7 @@ function EventDetailPage() {
           </AlertDescription>
         </Alert>
         <Button asChild className="mt-4">
-          <Link to={user ? "/dashboard/events" : "/events"}>
+          <Link to="/dashboard/events">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
             Back to Events
           </Link>
@@ -118,18 +119,27 @@ function EventDetailPage() {
   const registrationCapacitySuffix = registrationCapacityParts.length
     ? ` / ${registrationCapacityParts.join(" / ")}`
     : "";
+  const canManageEvent = user
+    ? user.id === event.organizer.id || isAdminClient(user)
+    : false;
 
   return (
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link to={user ? "/dashboard/events" : "/events"}>
+          <Link to="/dashboard/events">
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
             Back to Events
           </Link>
         </Button>
+        {canManageEvent && (
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/events/$eventId/manage" params={{ eventId: event.id }}>
+              Manage Event
+            </Link>
+          </Button>
+        )}
       </div>
-
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           {/* Header */}
@@ -424,20 +434,12 @@ function EventDetailPage() {
                 </Alert>
               ) : (
                 <>
-                  {!user ? (
-                    <Alert>
-                      <InfoIcon className="h-4 w-4" />
-                      <AlertDescription>
-                        Please{" "}
-                        <Link to="/auth/login" className="underline">
-                          sign in
-                        </Link>{" "}
-                        to register for this event.
-                      </AlertDescription>
-                    </Alert>
-                  ) : isRegistrationOpen && hasSpots ? (
+                  {isRegistrationOpen && hasSpots ? (
                     <Button asChild className="w-full">
-                      <Link to="/events/$slug/register" params={{ slug: event.slug }}>
+                      <Link
+                        to="/dashboard/events/$slug/register"
+                        params={{ slug: event.slug }}
+                      >
                         Register Now
                       </Link>
                     </Button>

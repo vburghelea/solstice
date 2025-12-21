@@ -292,8 +292,9 @@ function ManageTeamPage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will deactivate your team and hide it from public view. You can
-                      reactivate it later, but all members will need to rejoin.
+                      This will deactivate your team and hide it from the member
+                      directory. You can reactivate it later, but all members will need to
+                      rejoin.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

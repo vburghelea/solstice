@@ -320,7 +320,7 @@ function EventManagementPage() {
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline">
-            <Link to="/events/$slug" params={{ slug: event.slug }}>
+            <Link to="/dashboard/events/$slug" params={{ slug: event.slug }}>
               View Public Page
             </Link>
           </Button>
@@ -740,37 +740,6 @@ function EventManagementPage() {
                   >
                     Registration Closed
                   </Button>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Visibility Settings */}
-              <div className="space-y-2">
-                <Label>Visibility</Label>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Public Event</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateMutation.mutate({ isPublic: !event.isPublic })}
-                    >
-                      {event.isPublic ? "Make Private" : "Make Public"}
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Featured Event</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        updateMutation.mutate({ isFeatured: !event.isFeatured })
-                      }
-                    >
-                      {event.isFeatured ? "Remove Feature" : "Feature Event"}
-                    </Button>
-                  </div>
                 </div>
               </div>
 

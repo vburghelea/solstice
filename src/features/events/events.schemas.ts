@@ -8,14 +8,11 @@ export const listEventsSchema = z
       .object({
         status: z.union([z.string(), z.array(z.string())]).optional(),
         type: z.union([z.string(), z.array(z.string())]).optional(),
-        reviewStatus: z.union([z.string(), z.array(z.string())]).optional(),
         organizerId: z.string().optional(),
         startDateFrom: z.date().optional(),
         startDateTo: z.date().optional(),
         city: z.string().optional(),
         province: z.string().optional(),
-        featured: z.boolean().optional(),
-        publicOnly: z.boolean().optional(),
       })
       .optional(),
     page: z.int().positive().optional(),
@@ -66,8 +63,6 @@ export const updateEventSchema = z.object({
         "cancelled",
       ])
       .optional(),
-    reviewStatus: z.enum(["pending", "approved", "rejected", "not_required"]).optional(),
-    reviewNotes: z.string().optional(),
   }),
 });
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;

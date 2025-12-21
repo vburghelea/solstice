@@ -69,7 +69,7 @@ type UserTeamEntry = {
   memberCount: number;
 };
 
-export const Route = createFileRoute("/events/$slug/register")({
+export const Route = createFileRoute("/dashboard/events/$slug/register")({
   beforeLoad: async ({ context, location }) => {
     if (!context.user) {
       throw redirect({
@@ -83,7 +83,7 @@ export const Route = createFileRoute("/events/$slug/register")({
 
 function EventRegistrationPage() {
   const { slug } = Route.useParams();
-  const { user } = useRouteContext({ from: "/events/$slug/register" });
+  const { user } = useRouteContext({ from: "/dashboard/events/$slug/register" });
   const navigate = useNavigate();
   const [registrationType, setRegistrationType] = useState<"team" | "individual">(
     "individual",
@@ -312,7 +312,7 @@ function EventRegistrationPage() {
         </Alert>
         <div className="mt-4 flex gap-2">
           <Button asChild>
-            <Link to="/events/$slug" params={{ slug }}>
+            <Link to="/dashboard/events/$slug" params={{ slug }}>
               View Event Details
             </Link>
           </Button>
@@ -328,7 +328,7 @@ function EventRegistrationPage() {
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/events/$slug" params={{ slug }}>
+          <Link to="/dashboard/events/$slug" params={{ slug }}>
             <ArrowLeftIcon className="mr-2 h-4 w-4" />
             Back to Event Details
           </Link>

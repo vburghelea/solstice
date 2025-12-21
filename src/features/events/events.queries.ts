@@ -70,10 +70,6 @@ export const listEvents = createServerFn({ method: "GET" })
     // Build filter conditions
     const conditions: ReturnType<typeof eq>[] = [];
 
-    if (filters.publicOnly !== false) {
-      conditions.push(eq(events.isPublic, true));
-    }
-
     if (filters.status) {
       const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
       conditions.push(
@@ -108,19 +104,6 @@ export const listEvents = createServerFn({ method: "GET" })
 
     if (filters.province) {
       conditions.push(eq(events.province, filters.province));
-    }
-
-    if (filters.featured === true) {
-      conditions.push(eq(events.isFeatured, true));
-    }
-
-    if (filters.reviewStatus) {
-      const statuses = Array.isArray(filters.reviewStatus)
-        ? filters.reviewStatus
-        : [filters.reviewStatus];
-      conditions.push(
-        inArray(events.reviewStatus, statuses as (typeof events.reviewStatus._.data)[]),
-      );
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -324,7 +307,7 @@ export const getEvent = createServerFn({ method: "GET" })
   });
 
 /**
- * Get upcoming events (public endpoint for homepage)
+ * Get upcoming events for the dashboard
  */
 export const getUpcomingEvents = createServerFn({ method: "GET" })
   .inputValidator(zod$(getUpcomingEventsSchema))
@@ -335,7 +318,6 @@ export const getUpcomingEvents = createServerFn({ method: "GET" })
       data: {
         filters: {
           status: ["published", "registration_open"],
-          publicOnly: true,
           startDateFrom: new Date(),
         },
         pageSize: limit,

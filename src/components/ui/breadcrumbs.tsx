@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 const LABEL_OVERRIDES: Record<string, string> = {
   dashboard: "Dashboard",
@@ -25,7 +25,7 @@ function formatSegment(segment: string): string {
 }
 
 export function Breadcrumbs() {
-  const location = useRouterState({ select: (state) => state.location });
+  const location = useLocation();
   const segments = location.pathname.split("/").filter(Boolean);
 
   if (segments.length <= 1) {

@@ -5,8 +5,8 @@
 
 [build.environment]
   NODE_ENV = "production"
-  NODE_VERSION = "22.12.0"
-  PNPM_VERSION = "10.12.4"
+  NODE_VERSION = "24.12.0"
+  PNPM_VERSION = "10.26.1"
 
 # Production context: Deploys from the production branch (main/master)
 [context.production]
@@ -14,8 +14,8 @@
 
 [context.production.environment]
   NODE_ENV = "production"
-  NODE_VERSION = "22.12.0"
-  PNPM_VERSION = "10.12.4"
+  NODE_VERSION = "24.12.0"
+  PNPM_VERSION = "10.26.1"
 
 # Deploy Preview context: Pull requests and preview deploys
 [context.deploy-preview]
@@ -23,8 +23,8 @@
 
 [context.deploy-preview.environment]
   NODE_ENV = "test"
-  NODE_VERSION = "22.12.0"
-  PNPM_VERSION = "10.12.4"
+  NODE_VERSION = "24.12.0"
+  PNPM_VERSION = "10.26.1"
 
 # Branch Deploy context: Deploys from branches (not main/master)
 [context.branch-deploy]
@@ -32,8 +32,8 @@
 
 [context.branch-deploy.environment]
   NODE_ENV = "test"
-  NODE_VERSION = "22.12.0"
-  PNPM_VERSION = "10.12.4"
+  NODE_VERSION = "24.12.0"
+  PNPM_VERSION = "10.26.1"
 
 [dev]
   targetPort = 5173

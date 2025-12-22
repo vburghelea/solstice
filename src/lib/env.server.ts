@@ -73,6 +73,11 @@ export const env = createEnv({
     NETLIFY: z.string().optional(),
     VERCEL_ENV: z.string().optional(),
 
+    // SST/AWS Lambda
+    SST_STAGE: z.string().optional(),
+    AWS_LAMBDA_FUNCTION_NAME: z.string().optional(),
+    AWS_EXECUTION_ENV: z.string().optional(),
+
     // Client vars are also available on server
     // In production, Netlify provides URL env var
     VITE_BASE_URL: z.url().optional(),
@@ -126,4 +131,16 @@ export const isProduction = () => env.NODE_ENV === "production";
 export const isDevelopment = () => env.NODE_ENV === "development";
 export const isTest = () => env.NODE_ENV === "test";
 export const isServerless = () =>
-  !!(env.NETLIFY || env.VERCEL_ENV || process.env["VERCEL"] === "1");
+  !!(
+    env.NETLIFY ||
+    env.VERCEL_ENV ||
+    process.env["VERCEL"] === "1" ||
+    // AWS Lambda detection
+    process.env["AWS_LAMBDA_FUNCTION_NAME"] ||
+    process.env["AWS_EXECUTION_ENV"]
+  );
+
+export const isAWSLambda = () =>
+  !!(process.env["AWS_LAMBDA_FUNCTION_NAME"] || process.env["AWS_EXECUTION_ENV"]);
+
+export const getSSTStage = () => process.env["SST_STAGE"];

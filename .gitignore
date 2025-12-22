@@ -20,6 +20,7 @@ package-lock.json
 .wrangler
 .netlify
 .sst
+sst-env.d.ts
 dist
 dev-dist
 /build/

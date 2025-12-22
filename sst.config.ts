@@ -15,8 +15,8 @@ export default $config({
   app(input) {
     return {
       name: "solstice",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage ?? ""),
+      removal: "remove", // Temporarily set for teardown
+      protect: false, // Temporarily disabled for teardown
       home: "aws",
       providers: {
         aws: {

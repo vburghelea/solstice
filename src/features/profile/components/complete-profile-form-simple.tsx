@@ -48,9 +48,14 @@ export function CompleteProfileForm() {
   const [currentStep, setCurrentStep] = useState<StepId>("personal");
   const [error, setError] = useState<string | null>(null);
 
+  // Default to 20 years ago for date of birth
+  const defaultDob = new Date();
+  defaultDob.setFullYear(defaultDob.getFullYear() - 20);
+  const defaultDobString = defaultDob.toISOString().split("T")[0];
+
   const form = useForm({
     defaultValues: {
-      dateOfBirth: undefined as Date | string | undefined,
+      dateOfBirth: defaultDobString as Date | string | undefined,
       gender: undefined as string | undefined,
       pronouns: "",
       phone: "",

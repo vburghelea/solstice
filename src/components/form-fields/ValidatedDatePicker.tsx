@@ -66,9 +66,6 @@ export const ValidatedDatePicker: React.FC<ValidatedDatePickerProps> = (props) =
         aria-invalid={!!meta.errors.length}
         aria-describedby={meta.errors.length ? `${inputId}-errors` : undefined}
       />
-      <p className="text-muted-foreground text-sm">
-        You must be between {minAge} and {maxAge} years old
-      </p>
       {meta.isTouched && meta.errors.length > 0 && (
         <div id={`${inputId}-errors`} className="text-destructive text-sm font-medium">
           {meta.errors.join(", ")}

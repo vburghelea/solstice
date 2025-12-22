@@ -1,0 +1,102 @@
+# viaSport Strength in Numbers (SIN) System Requirements
+
+> Source: viaSport BC RFP - B.C. Amateur Sport Information Management System Replacement (December 2025)
+
+## Overview
+
+viaSport BC is seeking a technology partner to design, implement, and support a modern, secure, and scalable information management system that will replace legacy systems (BC Activity Reporter and BC Sport Information System).
+
+**Key Context:**
+
+- Historical data: 20+ million rows, growing ~1M rows/year
+- Object storage: Hundreds of documents per year
+- Target: Cloud-hosted, modular, scalable SaaS/platform solution
+- Compliance: Canadian privacy statutes (PIPA/PIPEDA), SOC II / ISO 27001
+
+---
+
+## 2.1 DATA MANAGEMENT
+
+| Req. ID        | Title                               | Description                                                                                                                                                                                                                  | Acceptance Criteria                                                                                                      |
+| -------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **DM-AGG-001** | Data Collection & Submission        | The system shall enable customizable form building, support flexible data entry through variable formats (forms, file uploads), with capabilities for real-time submission tracking, editing, and historical data migration. | Users and System Admin can successfully submit, track, and edit data                                                     |
+| **DM-AGG-002** | Data Processing & Integration       | The system shall enable standardization of data formatting, logging of transformation processes, and integration with external platforms through API (optional), and data import/export mechanisms.                          | Incoming data is processed uniformly, logged for traceability, and exchanged with external platforms                     |
+| **DM-AGG-003** | Data Governance & Access Control    | The system shall enforce role-based access to data and provide administrators with secure database access, along with data cataloging and indexing capabilities for discoverability.                                         | Users can only access data based on permission                                                                           |
+| **DM-AGG-004** | Data Quality & Integrity            | The system shall ensure relational integrity and continuously monitor data quality using validation rules and automated checks.                                                                                              | Submitted data meets validation rules                                                                                    |
+| **DM-AGG-005** | Data Storage & Retention            | The system shall support regular backups, disaster recovery mechanisms, data archiving, and secure cloud hosting aligned with retention policies.                                                                            | Data is backed up, archived as scheduled, and securely hosted in the cloud                                               |
+| **DM-AGG-006** | Legacy Data Migration & Bulk Import | The system shall provide tooling and configurable mapping templates to import historical data from CSV/Excel, legacy databases, or APIs, including validation, error-handling, and rollback.                                 | Administrators can map legacy fields to system fields, preview results, and execute import; import logs stored for audit |
+
+---
+
+## 2.2 REPORTING
+
+| Req. ID        | Title                                | Description                                                                                                                                                                                            | Acceptance Criteria                                                                                         |
+| -------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| **RP-AGG-001** | Data Validation & Submission Rules   | The system shall validate submissions to ensure they are complete, clean, use the correct file types, and contain valid data fields such as dates and contact information.                             | Submissions that fail validation are rejected with appropriate error messages                               |
+| **RP-AGG-002** | Reporting Information Management     | The system shall manage metadata related to reporting including but not limited to contribution agreements, NCCP, contact details, fiscal periods, organization profiles, and delegated access rights. | Users can update relevant metadata and access reporting features accordingly                                |
+| **RP-AGG-003** | Reporting Flow & Support             | The system shall support automated reporting reminders, allow users to track data resubmissions, and visualize submitted data through dashboards.                                                      | Users are reminded, track changes, and view data in a dashboard format                                      |
+| **RP-AGG-004** | Reporting Configuration & Collection | The system shall allow system administrators to configure customizable reporting forms, define required fields, display files for users to read, edit, delete, and download.                           | System admin can configure reporting information and forms                                                  |
+| **RP-AGG-005** | Self-Service Analytics & Data Export | Enable authorized users to build ad-hoc charts, pivot tables, and export raw or aggregated datasets in CSV, Excel, or JSON (optional) without developer intervention.                                  | User builds a custom chart and exports underlying dataset to CSVs; export respects field-level access rules |
+
+---
+
+## 2.3 SECURITY
+
+| Req. ID         | Title                           | Description                                                                                                                                                                                              | Acceptance Criteria                                                                                                        |
+| --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **SEC-AGG-001** | Authentication & Access Control | The system shall enforce multi-factor authentication, support secure password recovery, restrict access based on user roles and affiliations, and allow organizational leaders to manage user admission. | Users log in securely; only authorized individuals gain access based on role and affiliation                               |
+| **SEC-AGG-002** | Monitoring & Threat Detection   | The system shall detect and flag suspicious activities such as unusual login patterns or behavior anomalies and automatically lock accounts where appropriate.                                           | Security anomalies are flagged, logged, and result in appropriate account safeguards                                       |
+| **SEC-AGG-003** | Privacy & Regulatory Compliance | The system shall comply with relevant data protection laws (e.g., PIPEDA) to ensure secure handling, storage, and access to personal information.                                                        | All sensitive data is encrypted and stored securely                                                                        |
+| **SEC-AGG-004** | Audit Trail & Data Lineage      | The system shall maintain an immutable audit log of user actions, data changes, authentication events, and administrative configurations, supporting forensic review and regulatory reporting.           | Auditors can filter logs by user or record ID and export results; tamper-evident hashing verifies integrity of log entries |
+
+---
+
+## 2.4 TRAINING & ONBOARDING
+
+| Req. ID        | Title                          | Description                                                                                                                                                           | Acceptance Criteria                                                                       |
+| -------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **TO-AGG-001** | Template Support & Integration | The system shall provide a centralized templates tab and offer contextual template access directly from each data entry item to guide users through required formats. | Users can easily locate and access the correct template when needed                       |
+| **TO-AGG-002** | Guided Learning & Walkthroughs | The system shall offer onboarding and data upload tutorials to help users navigate key processes, especially during their first-time use.                             | Users can complete tasks independently with support from walkthroughs                     |
+| **TO-AGG-003** | Reference Materials & Support  | The system shall provide categorized guides and a frequently asked questions (FAQ) section to help users resolve issues and understand system functionality.          | Users can find accurate answers and instructional material without needing direct support |
+
+---
+
+## 2.5 USER INTERFACE
+
+| Req. ID        | Title                                         | Description                                                                                                                                                                                   | Acceptance Criteria                                                     |
+| -------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **UI-AGG-001** | User Access & Account Control                 | The system shall support secure login/logout (MFA), individual and organizational account registration, account recovery, and system administrator account management with role-based access. | Users and system admin can perform account-related tasks securely       |
+| **UI-AGG-002** | Personalized Dashboard                        | The system shall provide the capability to create personalized dashboard for each user role, summarizing relevant data, actions, and reporting progress.                                      | Users can view personalized dashboards based on their roles             |
+| **UI-AGG-003** | Responsive and Inclusive Design               | The system shall provide a responsive interface across devices and include accessibility features such as screen reader compatibility, color contrast tools, and etc.                         | System is functional on all devices and meets accessibility compliance  |
+| **UI-AGG-004** | Communication: Task & Notification Management | The system shall enable automated and customizable notification messages and task reminders that alert users of pending actions and updates, both on the platform and via email.              | Users receive timely and relevant notifications and reminders           |
+| **UI-AGG-005** | Content Navigation & Interaction              | The system shall allow users to efficiently locate and interact with information using robust categorization, search and filtering capabilities.                                              | Users can retrieve accurate results through search and filter functions |
+| **UI-AGG-006** | User Support & Feedback Mechanism             | The system shall enable users to submit support inquiries and feedback and allow administrators to respond through a managed interface.                                                       | Users can submit and receive responses to inquiries within the system   |
+| **UI-AGG-007** | Consistent Visual Language & Branding         | The system shall maintain a consistent design style, color scheme, and branding across all modules.                                                                                           | All UI components follow a standardized visual style                    |
+
+---
+
+## Scope of Services
+
+The selected vendor will perform the following services:
+
+1. **Data Submission and Reporting Web Portal** - Develop, configure and implement a secure, robust and UX-driven reporting and data submission website portal.
+
+2. **Data Warehousing** - Provide data storage/warehousing for viaSport's historical and ongoing data collection, reporting and analytics efforts.
+
+3. **Data Migration** - Map, import, and validate historical data from legacy systems.
+
+4. **Platform Design and Customization** - Provision cloud environment, security and access model, system architecture, and process automations.
+
+5. **Testing & Quality Assurance** - Conduct system security and user acceptance testing; resolve defects.
+
+6. **Training and Onboarding** - Deliver training and onboarding resources to the sector and administrator operational hand-off.
+
+---
+
+## Expertise Required
+
+- Demonstrated delivery of large-scale SaaS information management platforms
+- Proven security and technical expertise in alignment with Canadian privacy statutes (PIPA/PIPEDA and SOC II / ISO 27001 or equivalent)
+- Experience migrating legacy data sets and implementing role-based governance
+- Experience providing services to B.C. amateur sport sector, Provincial Sport Organizations, or similar non-profit or public organizations
+- Familiarity with amateur-sport, non-profit, or public-sector reporting environments (desirable)

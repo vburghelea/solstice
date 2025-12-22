@@ -266,6 +266,27 @@ The app uses Neon with proper connection pooling:
 
 See `docs/database-connections.md` for detailed usage guide.
 
+#### Direct Database Access (for debugging)
+
+To query the production database directly with psql, extract credentials from `.env` and use explicit flags (the connection string format doesn't work reliably with psql):
+
+```bash
+# Get credentials from .env
+grep DATABASE_URL .env
+
+# Query using explicit parameters (example - update with actual values from .env)
+PGPASSWORD="<password>" psql -h <host> -U <user> -d <dbname> -c "SELECT * FROM events LIMIT 5"
+
+# Example with Neon pooler:
+PGPASSWORD="npg_xxxxx" psql -h ep-xxx-pooler.us-east-2.aws.neon.tech -U neondb_owner -d neondb -c "\d events"
+```
+
+Common debugging queries:
+
+- `\d <table>` - Show table schema
+- `\dt` - List all tables
+- `SELECT column_name FROM information_schema.columns WHERE table_name = 'events'` - List columns
+
 ### Security Features
 
 - **CSP Headers**: Content Security Policy with nonce-based script validation
@@ -288,6 +309,19 @@ See `docs/database-connections.md` for detailed usage guide.
 - **Netlify Deploy Previews**: Automatic preview deployments for PRs
 - **Pre-commit Hooks**: Husky + lint-staged for code quality
 - **Multi-version Testing**: Tests run on Node.js 18 and 20
+
+#### Debugging Deployments with CLI Tools
+
+```bash
+# GitHub Actions CI status
+gh run list --limit 5
+
+# Netlify deploy history (site_id: c06791db-dd70-43de-a581-e92ae4232c1f)
+netlify api listSiteDeploys --data '{"site_id": "c06791db-dd70-43de-a581-e92ae4232c1f"}' | jq '.[] | {state, title, error_message}' | head -30
+
+# Check if code is actually deployed
+curl -s "https://snazzy-twilight-39e1e9.netlify.app/assets/main-<hash>.js" | grep -o "search_term"
+```
 
 ### Code Organization Patterns
 

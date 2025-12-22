@@ -50,8 +50,8 @@ export function CompleteProfileForm() {
 
   const form = useForm({
     defaultValues: {
-      dateOfBirth: new Date(),
-      gender: "",
+      dateOfBirth: undefined as Date | string | undefined,
+      gender: undefined as string | undefined,
       pronouns: "",
       phone: "",
       emergencyContact: {
@@ -68,11 +68,6 @@ export function CompleteProfileForm() {
       },
     } as ProfileInputType,
     onSubmit: async ({ value }) => {
-      if (currentStepIndex < STEPS.length - 1) {
-        goToNextStep();
-        return;
-      }
-
       setError(null);
 
       try {
@@ -413,7 +408,8 @@ export function CompleteProfileForm() {
                 </FormSubmitButton>
               ) : (
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={goToNextStep}
                   className="text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
                 >
                   Next

@@ -38,17 +38,21 @@ export const ValidatedSelect: React.FC<ValidatedSelectProps> = (props) => {
   const normalizedOptions = options.map((option) =>
     option.value === "" ? { ...option, value: EMPTY_OPTION_VALUE } : option,
   );
-  const selectValue = placeholderOption
-    ? field.state.value === "" || field.state.value === undefined
-      ? EMPTY_OPTION_VALUE
-      : (field.state.value as string)
-    : ((field.state.value as string | undefined) ?? undefined);
+  // Always compute a value for controlled behavior
+  // If no value is set and no placeholder option exists, use empty string to keep it controlled
+  const currentValue = field.state.value as string | undefined;
+  const selectValue =
+    currentValue === "" || currentValue === undefined
+      ? placeholderOption
+        ? EMPTY_OPTION_VALUE
+        : ""
+      : currentValue;
 
   return (
     <div className={cn("space-y-2", className)}>
       <Label htmlFor={selectId}>{label}</Label>
       <Select
-        {...(selectValue !== undefined ? { value: selectValue } : {})}
+        value={selectValue}
         onValueChange={(value) => {
           const normalizedValue =
             placeholderOption && value === EMPTY_OPTION_VALUE ? "" : value;

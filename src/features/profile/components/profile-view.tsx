@@ -22,16 +22,37 @@ import { getUserProfile } from "../profile.queries";
 import type { PartialProfileInputType } from "../profile.schemas";
 import type { ProfileOperationResult } from "../profile.types";
 
-function calculateAge(dateOfBirth: Date | undefined): number | null {
-  if (!dateOfBirth) return null;
+function toUtcDate(value: Date | string | undefined): Date | null {
+  if (!value) return null;
+  if (typeof value === "string") {
+    const isoValue = value.includes("T") ? value : `${value}T00:00:00.000Z`;
+    const parsed = new Date(isoValue);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return isNaN(value.getTime()) ? null : value;
+}
+
+function calculateAgeUtc(value: Date | string | undefined): number | null {
+  const birthDate = toUtcDate(value);
+  if (!birthDate) return null;
   const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  let age = today.getUTCFullYear() - birthDate.getUTCFullYear();
+  const monthDiff = today.getUTCMonth() - birthDate.getUTCMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getUTCDate() < birthDate.getUTCDate())) {
     age--;
   }
   return age;
+}
+
+function formatDateOnly(value: Date | string | undefined): string | null {
+  const date = toUtcDate(value);
+  if (!date) return null;
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }
 
 export function ProfileView() {
@@ -180,12 +201,10 @@ export function ProfileView() {
 
     // Set field values from profile
     if (profile.dateOfBirth) {
-      // Ensure dateOfBirth is a proper Date object
-      const date =
-        typeof profile.dateOfBirth === "string"
-          ? new Date(profile.dateOfBirth)
-          : profile.dateOfBirth;
-      form.setFieldValue("dateOfBirth", date);
+      const date = toUtcDate(profile.dateOfBirth);
+      if (date) {
+        form.setFieldValue("dateOfBirth", date);
+      }
     }
     if (profile.gender) {
       form.setFieldValue("gender", profile.gender);
@@ -255,7 +274,8 @@ export function ProfileView() {
     );
   }
 
-  const age = calculateAge(profile.dateOfBirth);
+  const age = calculateAgeUtc(profile.dateOfBirth);
+  const formattedDob = formatDateOnly(profile.dateOfBirth);
 
   return (
     <div className="space-y-6">
@@ -341,15 +361,11 @@ export function ProfileView() {
                   validators={{
                     onChange: ({ value }) => {
                       if (value) {
-                        // Value is a YYYY-MM-DD string from ValidatedDatePicker
-                        const birthDate = new Date(value);
-                        const today = new Date();
-                        let age = today.getFullYear() - birthDate.getFullYear();
-                        const m = today.getMonth() - birthDate.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                          age--;
-                        }
-                        if (age < 13 || age > 120) {
+                        const computedAge = calculateAgeUtc(value);
+                        if (
+                          computedAge !== null &&
+                          (computedAge < 13 || computedAge > 120)
+                        ) {
                           return "You must be between 13 and 120 years old";
                         }
                       }
@@ -370,8 +386,8 @@ export function ProfileView() {
                 <>
                   <Label>Date of Birth</Label>
                   <p className="text-base">
-                    {profile.dateOfBirth
-                      ? `${new Date(profile.dateOfBirth).toLocaleDateString()} (Age: ${age})`
+                    {formattedDob
+                      ? `${formattedDob}${age !== null ? ` (Age: ${age})` : ""}`
                       : "Not set"}
                   </p>
                 </>

@@ -122,6 +122,18 @@ function EventDetailPage() {
   const canManageEvent = user
     ? user.id === event.organizer.id || isAdminClient(user)
     : false;
+  const hasLocationAddress = Boolean(
+    event.venueName ||
+      event.venueAddress ||
+      event.city ||
+      event.province ||
+      event.postalCode,
+  );
+  const hasLocationDetails = hasLocationAddress || Boolean(event.locationNotes);
+  const locationLine = [event.city, event.province].filter(Boolean).join(", ");
+  const locationWithPostal = event.postalCode
+    ? `${locationLine}${locationLine ? " " : ""}${event.postalCode}`
+    : locationLine;
 
   return (
     <div className="container mx-auto space-y-6 p-6">
@@ -210,19 +222,19 @@ function EventDetailPage() {
                 <div className="space-y-3">
                   <h3 className="font-semibold">Location</h3>
 
-                  {event.venueName && (
+                  {!hasLocationDetails && (
+                    <p className="text-muted-foreground text-sm">Location TBD</p>
+                  )}
+
+                  {hasLocationAddress && (
                     <div className="flex items-start gap-2 text-sm">
                       <MapPinIcon className="text-muted-foreground mt-0.5 h-4 w-4" />
                       <div>
-                        <div className="font-medium">{event.venueName}</div>
-                        {event.venueAddress && <div>{event.venueAddress}</div>}
-                        {event.city && (
-                          <div>
-                            {event.city}
-                            {event.province && `, ${event.province}`}
-                            {event.postalCode && ` ${event.postalCode}`}
-                          </div>
+                        {event.venueName && (
+                          <div className="font-medium">{event.venueName}</div>
                         )}
+                        {event.venueAddress && <div>{event.venueAddress}</div>}
+                        {locationWithPostal && <div>{locationWithPostal}</div>}
                       </div>
                     </div>
                   )}

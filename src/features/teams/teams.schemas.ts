@@ -33,7 +33,7 @@ export const isTeamMemberSchema = z.object({
 export type IsTeamMemberInput = z.infer<typeof isTeamMemberSchema>;
 
 export const searchTeamsSchema = z.object({
-  query: z.string().min(1),
+  query: z.string().trim().min(1),
 });
 export type SearchTeamsInput = z.infer<typeof searchTeamsSchema>;
 

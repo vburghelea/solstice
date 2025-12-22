@@ -277,6 +277,18 @@ export function SettingsView() {
                     changePasswordForm.handleSubmit();
                   }}
                 >
+                  {accountOverview?.user.email ? (
+                    <input
+                      type="email"
+                      name="username"
+                      autoComplete="username"
+                      value={accountOverview.user.email}
+                      readOnly
+                      tabIndex={-1}
+                      className="sr-only"
+                    />
+                  ) : null}
+
                   <changePasswordForm.Field name="currentPassword">
                     {(field) => (
                       <ValidatedInput

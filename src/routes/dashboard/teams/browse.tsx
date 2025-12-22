@@ -28,6 +28,7 @@ export const Route = createFileRoute("/dashboard/teams/browse")({
 function BrowseTeamsPage() {
   const { teams: initialTeams } = Route.useLoaderData();
   const [searchQuery, setSearchQuery] = useState("");
+  const trimmedQuery = searchQuery.trim();
 
   const { data: allTeams, isFetching: isFetchingAll } = useSuspenseQuery({
     queryKey: ["allTeams"],
@@ -41,19 +42,19 @@ function BrowseTeamsPage() {
     isError: searchErrored,
     refetch: retrySearch,
   } = useQuery({
-    queryKey: ["searchTeams", searchQuery],
+    queryKey: ["searchTeams", trimmedQuery],
     queryFn: async () =>
-      searchQuery ? searchTeams({ data: { query: searchQuery } }) : [],
-    enabled: searchQuery.length > 0,
-    initialData: [],
+      trimmedQuery ? searchTeams({ data: { query: trimmedQuery } }) : [],
+    enabled: trimmedQuery.length > 0,
+    placeholderData: [],
   });
 
-  const teams = searchQuery
+  const teams = trimmedQuery
     ? searchResults.map((item) => ({ ...item, creator: null }))
     : allTeams;
 
   const showSkeletons =
-    (searchQuery ? isSearching : isFetchingAll) && (teams?.length ?? 0) === 0;
+    (trimmedQuery ? isSearching : isFetchingAll) && (teams?.length ?? 0) === 0;
   const skeletonKeys = ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot"];
 
   return (
@@ -85,7 +86,7 @@ function BrowseTeamsPage() {
         </div>
       </div>
 
-      {searchQuery && searchErrored ? (
+      {trimmedQuery && searchErrored ? (
         <DataErrorState
           title="We couldn’t find teams matching that search"
           description="Please try again or adjust your search filters."
@@ -103,7 +104,7 @@ function BrowseTeamsPage() {
             <UsersIcon className="text-muted-foreground mb-4 h-12 w-12" />
             <h3 className="mb-2 text-lg font-semibold">No teams found</h3>
             <p className="text-muted-foreground text-center">
-              {searchQuery
+              {trimmedQuery
                 ? "Try a different search term"
                 : "No teams available to browse"}
             </p>

@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -21,11 +22,11 @@ import {
   confirmMembershipPurchase,
   createCheckoutSession,
 } from "~/features/membership/membership.mutations";
-import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 import {
   getUserMembershipStatus,
   listMembershipTypes,
 } from "~/features/membership/membership.queries";
+import { unwrapServerFnResult } from "~/lib/server/fn-utils";
 
 export const Route = createFileRoute("/dashboard/membership")({
   component: MembershipPage,
@@ -62,6 +63,23 @@ function MembershipPage() {
       }
       return result.data || [];
     },
+  });
+
+  const squareStatusQuery = useQuery({
+    queryKey: ["square-status"],
+    queryFn: async () => {
+      const response = await fetch("/api/health");
+      if (!response.ok) {
+        throw new Error("Failed to load payment status");
+      }
+      const data = (await response.json()) as {
+        services?: { square?: { environment?: string } };
+      };
+      return data.services?.square ?? null;
+    },
+    staleTime: 60_000,
+    retry: false,
+    enabled: typeof window !== "undefined",
   });
 
   const confirmPurchase = useCallback(
@@ -202,6 +220,7 @@ function MembershipPage() {
 
   const membershipStatus = membershipStatusQuery.data;
   const membershipTypes = membershipTypesQuery.data || [];
+  const isSandbox = squareStatusQuery.data?.environment === "sandbox";
 
   if (processingPayment) {
     return (
@@ -224,6 +243,16 @@ function MembershipPage() {
       <p className="text-muted-foreground mb-6">
         Join Quadball Canada and access exclusive member benefits
       </p>
+
+      {isSandbox ? (
+        <Alert className="mb-6 border-amber-200 bg-amber-50 text-amber-900">
+          <AlertCircle className="text-amber-700" />
+          <AlertTitle>Sandbox payments enabled</AlertTitle>
+          <AlertDescription>
+            Purchases are running in Square sandbox mode. Use test credentials only.
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       {/* Current Membership Status */}
       <Card className="mb-8">

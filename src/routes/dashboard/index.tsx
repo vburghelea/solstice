@@ -181,8 +181,8 @@ function DashboardIndex() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="outline" disabled>
-                Coming Soon
+              <Button asChild className="w-full" variant="outline">
+                <Link to="/dashboard/teams/browse">Browse Teams</Link>
               </Button>
             </CardContent>
           </Card>

@@ -115,9 +115,26 @@ describe("Teams Schemas", () => {
         expect(result.success).toBe(true);
       });
 
+      it("trims whitespace from the query", () => {
+        const result = searchTeamsSchema.safeParse({
+          query: "  Toronto  ",
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect(result.data.query).toBe("Toronto");
+        }
+      });
+
       it("fails with empty query", () => {
         const result = searchTeamsSchema.safeParse({
           query: "",
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it("fails with whitespace-only query", () => {
+        const result = searchTeamsSchema.safeParse({
+          query: "   ",
         });
         expect(result.success).toBe(false);
       });

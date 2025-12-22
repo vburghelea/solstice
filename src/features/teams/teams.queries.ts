@@ -319,6 +319,9 @@ export const searchTeams = createServerFn({ method: "GET" })
 
     const db = await getDb();
     const searchTerm = `%${data.query}%`;
+    const cityProvince = sql`
+      coalesce(${teams.city}, '') || ', ' || coalesce(${teams.province}, '')
+    `;
 
     const result = await db
       .select({
@@ -335,7 +338,9 @@ export const searchTeams = createServerFn({ method: "GET" })
           eq(teams.isActive, "true"),
           sql`(
             ${teams.name} ILIKE ${searchTerm} OR
-            ${teams.city} ILIKE ${searchTerm}
+            ${teams.city} ILIKE ${searchTerm} OR
+            ${teams.province} ILIKE ${searchTerm} OR
+            ${cityProvince} ILIKE ${searchTerm}
           )`,
         ),
       )

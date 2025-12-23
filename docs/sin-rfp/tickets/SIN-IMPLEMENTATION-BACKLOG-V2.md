@@ -55,11 +55,6 @@ Lock Architecture → Organization Tenancy → Audit Logging → Notifications �
 - No Netlify for production (edge compute has no residency guarantees)
 - All sub-processors must have Canadian data processing or explicit DPAs
 
-**Verification Required:**
-
-- [ ] Confirm viaSport accepts AWS Canada as compliant
-- [ ] Confirm no requirement for on-premise or government cloud
-
 ---
 
 ### ADR-002: Tenancy Model
@@ -226,67 +221,67 @@ All tenant-owned entities have organization_id FK
 
 #### P0-001: Reference Architecture Document
 
-**Deliverable:** `docs/sin-rfp/architecture-reference.md`
+**Deliverable:** `docs/sin-rfp/phase-0/architecture-reference.md`
 
 Contents:
 
-- [ ] Architecture diagram (CloudFront → Lambda → RDS → S3)
-- [ ] Data flow diagram (user → system → storage)
-- [ ] Network diagram (VPC, subnets, security groups)
-- [ ] Component descriptions
+- [x] Architecture diagram (CloudFront → Lambda → RDS → S3)
+- [x] Data flow diagram (user → system → storage)
+- [x] Network diagram (VPC, subnets, security groups)
+- [x] Component descriptions
 
 ---
 
 #### P0-002: Data Residency Statement
 
-**Deliverable:** `docs/sin-rfp/data-residency.md`
+**Deliverable:** `docs/sin-rfp/phase-0/data-residency.md`
 
 Contents:
 
-- [ ] Explicit statement: "All production data stored in AWS ca-central-1"
-- [ ] Sub-processor list with regions
-- [ ] Data classification (PII, sensitive PII, operational)
-- [ ] Cross-border data transfer policy (none for PII)
+- [x] Explicit statement: "All production data stored in AWS ca-central-1"
+- [x] Sub-processor list with regions
+- [x] Data classification (PII, sensitive PII, operational)
+- [x] Cross-border data transfer policy (none for PII)
 
 ---
 
 #### P0-003: Security Controls Overview
 
-**Deliverable:** `docs/sin-rfp/security-controls.md`
+**Deliverable:** `docs/sin-rfp/phase-0/security-controls.md`
 
 Contents:
 
-- [ ] Authentication controls (MFA, session management)
-- [ ] Authorization controls (RBAC, org scoping)
-- [ ] Encryption (at rest: KMS, in transit: TLS 1.3)
-- [ ] Logging and monitoring
-- [ ] Incident response (outline)
+- [x] Authentication controls (MFA, session management)
+- [x] Authorization controls (RBAC, org scoping)
+- [x] Encryption (at rest: KMS, in transit: TLS 1.3)
+- [x] Logging and monitoring
+- [x] Incident response (outline)
 
 ---
 
 #### P0-004: Backup & DR Plan
 
-**Deliverable:** `docs/sin-rfp/backup-dr-plan.md`
+**Deliverable:** `docs/sin-rfp/phase-0/backup-dr-plan.md`
 
 Contents:
 
-- [ ] RPO/RTO targets
-- [ ] Backup mechanisms and schedules
-- [ ] Restore procedures (step-by-step)
-- [ ] DR testing schedule and evidence
+- [x] RPO/RTO targets
+- [x] Backup mechanisms and schedules
+- [x] Restore procedures (step-by-step)
+- [x] DR testing schedule and evidence
 
 ---
 
 #### P0-005: Audit & Retention Policy
 
-**Deliverable:** `docs/sin-rfp/audit-retention-policy.md`
+**Deliverable:** `docs/sin-rfp/phase-0/audit-retention-policy.md`
 
 Contents:
 
-- [ ] What is logged (per action type)
-- [ ] Retention periods by data type
-- [ ] Archive and purge procedures
-- [ ] Legal hold capability
+- [x] What is logged (per action type)
+- [x] Retention periods by data type
+- [x] Archive and purge procedures
+- [x] Legal hold capability
 
 ---
 

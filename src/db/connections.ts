@@ -1,24 +1,89 @@
-import { Pool, neonConfig } from "@neondatabase/serverless";
 import { createServerOnlyFn } from "@tanstack/react-start";
-import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
-import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import type { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
+import type postgres from "postgres";
 import * as schema from "./schema";
 
+type DrizzleInstance = ReturnType<typeof drizzlePostgres>;
+type SqlInstance = ReturnType<typeof postgres>;
+
+type LinkedDatabase = {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+};
+
 // Singleton instances
-let pooledInstance: ReturnType<typeof drizzleNeon> | null = null;
-let unpooledInstance: ReturnType<typeof drizzlePostgres> | null = null;
-let poolInstance: Pool | null = null;
-let sqlInstance: ReturnType<typeof postgres> | null = null;
+let pooledInstance: DrizzleInstance | null = null;
+let unpooledInstance: DrizzleInstance | null = null;
+let pooledSql: SqlInstance | null = null;
+let unpooledSql: SqlInstance | null = null;
+
+const getLinkedDatabase = async (): Promise<LinkedDatabase | undefined> => {
+  try {
+    const { Resource } = await import("sst");
+    const resource = Resource as typeof Resource & { Database?: LinkedDatabase };
+    return resource.Database;
+  } catch {
+    return undefined;
+  }
+};
+
+const buildConnectionString = (config: LinkedDatabase): string => {
+  const username = encodeURIComponent(config.username);
+  const password = encodeURIComponent(config.password);
+  return `postgres://${username}:${password}@${config.host}:${config.port}/${config.database}`;
+};
+
+const shouldRequireSsl = (connectionString: string): boolean => {
+  try {
+    const { hostname } = new URL(connectionString);
+    return !["localhost", "127.0.0.1"].includes(hostname);
+  } catch {
+    return true;
+  }
+};
+
+const getConnectionString = async (mode: "pooled" | "unpooled"): Promise<string> => {
+  const linked = await getLinkedDatabase();
+  if (linked) {
+    return buildConnectionString(linked);
+  }
+
+  const { getPooledDbUrl, getUnpooledDbUrl } = await import("../lib/env.server");
+  return mode === "pooled" ? getPooledDbUrl() : getUnpooledDbUrl();
+};
+
+const createSqlClient = async (
+  connectionString: string,
+  options: { max: number; idle_timeout: number; connect_timeout: number },
+): Promise<SqlInstance> => {
+  const ssl = shouldRequireSsl(connectionString) ? "require" : undefined;
+  const { default: postgres } = await import("postgres");
+
+  return postgres(connectionString, {
+    ...options,
+    ...(ssl ? { ssl } : {}),
+  });
+};
+
+const createDrizzle = async (sql: SqlInstance): Promise<DrizzleInstance> => {
+  const { drizzle } = await import("drizzle-orm/postgres-js");
+  return drizzle(sql, {
+    schema,
+    casing: "snake_case",
+  });
+};
 
 /**
- * Pooled database connection using Neon's serverless driver.
+ * Pooled database connection using RDS Proxy where available.
  *
- * Uses DATABASE_URL for Lambda functions. This connection goes through
- * Neon's connection pooler for efficient concurrent request handling.
+ * Uses SST linked resource credentials when present, otherwise falls back to
+ * DATABASE_URL or provider-specific env vars.
  *
  * Use this for:
- * - API routes and Lambda functions
+ * - API routes and serverless functions
  * - Short-lived queries
  * - High-concurrency scenarios
  */
@@ -28,22 +93,13 @@ export const pooledDb = createServerOnlyFn(async () => {
     return pooledInstance;
   }
 
-  const { getPooledDbUrl, isServerless } = await import("../lib/env.server");
-
-  // Configure Neon for serverless environments
-  if (isServerless()) {
-    neonConfig.useSecureWebSocket = true;
-    neonConfig.poolQueryViaFetch = true;
-  }
-
-  const connectionString = getPooledDbUrl();
-
-  poolInstance = new Pool({ connectionString });
-  pooledInstance = drizzleNeon({
-    client: poolInstance,
-    schema,
-    casing: "snake_case",
+  const connectionString = await getConnectionString("pooled");
+  pooledSql = await createSqlClient(connectionString, {
+    max: 10,
+    idle_timeout: 20,
+    connect_timeout: 10,
   });
+  pooledInstance = await createDrizzle(pooledSql);
 
   return pooledInstance;
 });
@@ -51,9 +107,8 @@ export const pooledDb = createServerOnlyFn(async () => {
 /**
  * Unpooled (direct) database connection using standard postgres driver.
  *
- * Uses DATABASE_URL_UNPOOLED for migrations and long operations.
- * This creates a direct connection to the database without going
- * through the pooler.
+ * Uses SST linked resource credentials when present, otherwise falls back to
+ * DATABASE_URL_UNPOOLED or DATABASE_URL.
  *
  * Use this for:
  * - Database migrations
@@ -67,21 +122,13 @@ export const unpooledDb = createServerOnlyFn(async () => {
     return unpooledInstance;
   }
 
-  const { getUnpooledDbUrl } = await import("../lib/env.server");
-  const connectionString = getUnpooledDbUrl();
-
-  // Set a reasonable connection pool size
-  sqlInstance = postgres(connectionString, {
-    max: 10, // Maximum number of connections in the pool
-    idle_timeout: 20, // Close idle connections after 20 seconds
-    connect_timeout: 10, // Connection timeout
+  const connectionString = await getConnectionString("unpooled");
+  unpooledSql = await createSqlClient(connectionString, {
+    max: 1,
+    idle_timeout: 0,
+    connect_timeout: 30,
   });
-
-  unpooledInstance = drizzlePostgres({
-    client: sqlInstance,
-    schema,
-    casing: "snake_case",
-  });
+  unpooledInstance = await createDrizzle(unpooledSql);
 
   return unpooledInstance;
 });
@@ -89,8 +136,8 @@ export const unpooledDb = createServerOnlyFn(async () => {
 /**
  * Returns the appropriate database connection based on the environment.
  *
- * - In AWS Lambda: Uses pooled connection
- * - In development: Uses unpooled connection
+ * - In serverless environments: Uses pooled connection
+ * - In development or traditional servers: Uses unpooled connection
  *
  * This is the recommended export for most use cases as it automatically
  * selects the optimal connection type.
@@ -98,10 +145,10 @@ export const unpooledDb = createServerOnlyFn(async () => {
 export const getDb = createServerOnlyFn(async () => {
   const { isServerless } = await import("../lib/env.server");
   if (isServerless()) {
-    console.log("Using pooled connection for Lambda");
+    console.log("Using pooled connection for serverless environment");
     return await pooledDb();
   } else {
-    console.log("Using unpooled connection for local dev");
+    console.log("Using unpooled connection for traditional environment");
     return await unpooledDb();
   }
 });
@@ -113,15 +160,15 @@ export const getDb = createServerOnlyFn(async () => {
 export const closeConnections = createServerOnlyFn(async () => {
   const promises: Promise<void>[] = [];
 
-  if (poolInstance) {
-    promises.push(poolInstance.end());
-    poolInstance = null;
+  if (pooledSql) {
+    promises.push(pooledSql.end({ timeout: 3 }));
+    pooledSql = null;
     pooledInstance = null;
   }
 
-  if (sqlInstance) {
-    promises.push(sqlInstance.end({ timeout: 3 }));
-    sqlInstance = null;
+  if (unpooledSql) {
+    promises.push(unpooledSql.end({ timeout: 3 }));
+    unpooledSql = null;
     unpooledInstance = null;
   }
 

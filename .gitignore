@@ -55,3 +55,6 @@ stitch/
 # Repomix generated outputs
 repomix-configs/outputs/
 repomix-output.xml
+
+# Confidential RFP documents
+docs/sin-rfp/example-rfp-real.*

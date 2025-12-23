@@ -1,166 +1,197 @@
 # Database Connection Guide
 
-This guide explains how to use Neon database connections with proper pooling in Solstice.
+This guide explains how to use database connections with proper pooling in Solstice.
 
 ## Overview
 
-Solstice uses [Neon](https://neon.tech) for PostgreSQL hosting and provides two types of database connections:
+Solstice uses AWS RDS PostgreSQL for production (deployed via SST) and provides two types of database connections:
 
-1. **Pooled Connection** - For serverless functions and API routes
+1. **Pooled Connection** - For serverless functions and API routes (via RDS Proxy)
 2. **Unpooled Connection** - For migrations and long-running operations
 
 ## Connection Types
 
 ### Pooled Connection (via `pooledDb`)
 
-The pooled connection uses Neon's connection pooler to efficiently handle concurrent requests in serverless environments.
+The pooled connection uses RDS Proxy to efficiently handle concurrent requests in serverless environments.
 
 **When to use:**
 
 - API routes and serverless functions
-- Short-lived queries (< 30 seconds)
+- Short-lived queries
 - High-concurrency scenarios
-- Netlify Functions or Vercel Edge Functions
+- Lambda functions
 
 **Example:**
 
 ```typescript
-import { pooledDb } from "@/db";
+import { pooledDb } from "~/db/connections";
 
 export async function loader() {
-  const users = await pooledDb.select().from(users);
+  const db = await pooledDb();
+  const users = await db.select().from(users);
   return { users };
 }
 ```
 
 ### Unpooled Connection (via `unpooledDb`)
 
-The unpooled connection creates a direct connection to the database, bypassing the pooler.
+The unpooled connection creates a direct connection to the database, bypassing the proxy.
 
 **When to use:**
 
 - Database migrations
 - Batch import/export operations
-- Long-running queries (> 30 seconds)
+- Long-running queries
 - Operations requiring session-level features (prepared statements, advisory locks)
 - Development and debugging
 
 **Example:**
 
 ```typescript
-import { unpooledDb } from "@/db";
+import { unpooledDb } from "~/db/connections";
 
 // In a migration script
 export async function runMigration() {
-  await unpooledDb.transaction(async (tx) => {
+  const db = await unpooledDb();
+  await db.transaction(async (tx) => {
     // Long-running migration logic
   });
 }
 ```
 
-### Automatic Connection Selection (via `db`)
+### Automatic Connection Selection (via `getDb`)
 
-The default `db` export automatically selects the appropriate connection type based on your environment:
+The `getDb` export automatically selects the appropriate connection type based on your environment:
 
 ```typescript
-import { db } from "@/db";
+import { getDb } from "~/db/connections";
 
+const db = await getDb();
 // Automatically uses:
-// - Pooled connection in serverless environments (Netlify/Vercel)
+// - Pooled connection in serverless environments (Lambda)
 // - Unpooled connection in development or traditional servers
 ```
 
-## Environment Variables
+## Connection Resolution
 
-### Option 1: Netlify Automatic Setup
+### SST Linked Resources (Production)
 
-When you connect a Neon database through Netlify's dashboard, it automatically sets:
+When deployed via SST, the database credentials are automatically linked:
 
-- `NETLIFY_DATABASE_URL` - Pooled connection URL
-- `NETLIFY_DATABASE_URL_UNPOOLED` - Direct connection URL
+```typescript
+// SST injects Resource.Database with:
+// - host, port, username, password, database
+// Connection string is built automatically
+```
 
-### Option 2: Manual Configuration
+### Environment Variables (Local Development)
 
-For manual setup, configure these environment variables:
+For local development, configure these environment variables:
 
 ```bash
-# Primary database URL (used as fallback for both types)
+# Primary database URL (used as fallback)
 DATABASE_URL="postgresql://user:pass@host/db"
 
 # Direct connection for migrations (optional)
 DATABASE_URL_UNPOOLED="postgresql://user:pass@direct.host/db"
 ```
 
-### Option 3: Custom Override
-
-You can override the connection URLs with custom values:
-
-```bash
-# Override pooled connection
-DATABASE_POOLED_URL="postgresql://user:pass@pooler.host/db"
-
-# Override unpooled connection
-DATABASE_UNPOOLED_URL="postgresql://user:pass@direct.host/db"
-```
-
-## Priority Order
-
-The connection URLs are resolved in this priority order:
+### Priority Order
 
 **For Pooled Connections:**
 
-1. `DATABASE_POOLED_URL` (explicit override)
-2. `NETLIFY_DATABASE_URL` (Netlify's automatic setup)
-3. `DATABASE_URL` (fallback)
+1. SST linked `Resource.Database` (production)
+2. `DATABASE_POOLED_URL` (explicit override)
+3. `NETLIFY_DATABASE_URL` (legacy)
+4. `DATABASE_URL` (fallback)
 
 **For Unpooled Connections:**
 
-1. `DATABASE_UNPOOLED_URL` (explicit override)
-2. `DATABASE_URL_UNPOOLED` (manual setup)
-3. `NETLIFY_DATABASE_URL_UNPOOLED` (Netlify's automatic setup)
-4. `DATABASE_URL` (fallback)
+1. SST linked `Resource.Database` (production)
+2. `DATABASE_UNPOOLED_URL` (explicit override)
+3. `DATABASE_URL_UNPOOLED` (manual setup)
+4. `NETLIFY_DATABASE_URL_UNPOOLED` (legacy)
+5. `DATABASE_URL` (fallback)
+
+## Running Migrations
+
+### Via SST Tunnel (Production)
+
+```bash
+# Open tunnel to RDS via bastion host
+AWS_PROFILE=techprod npx sst tunnel --stage production
+
+# In another terminal, run migrations
+DATABASE_URL="postgres://..." pnpm db migrate
+```
+
+### Via SST Shell
+
+```bash
+# Run drizzle-kit with SST context
+AWS_PROFILE=techprod npx sst shell --stage production -- pnpm db migrate
+```
+
+### Local Development
+
+```bash
+# Set DATABASE_URL in .env, then:
+pnpm db migrate
+```
 
 ## Best Practices
 
-1. **Use the default `db` export** for most cases - it automatically selects the right connection type
+1. **Use the default `getDb` export** for most cases - it automatically selects the right connection type
 
 2. **Explicitly use `pooledDb`** when you know you're in a serverless function:
 
    ```typescript
-   import { pooledDb } from "@/db";
+   import { pooledDb } from "~/db/connections";
 
-   export async function apiHandler() {
+   export const myServerFn = createServerFn().handler(async () => {
+     const db = await pooledDb();
      // API route logic
-   }
+   });
    ```
 
-3. **Explicitly use `unpooledDb`** for migrations and maintenance:
+3. **Explicitly use `unpooledDb`** for migrations and maintenance scripts
 
-   ```typescript
-   import { unpooledDb } from "@/db";
+4. **Monitor connection usage** - RDS Proxy has connection limits based on instance size
 
-   export async function migrate() {
-     // Migration logic
-   }
-   ```
-
-4. **Monitor connection usage** - Pooled connections have limits on concurrent connections
-
-5. **Close connections properly** - The Drizzle ORM handles this automatically in most cases
+5. **Use transactions appropriately** - RDS Proxy pins connections during transactions
 
 ## Troubleshooting
 
 ### "Too many connections" error
 
-- You're likely using unpooled connections in a serverless environment
-- Switch to `pooledDb` or the automatic `db` export
+- You're likely hitting RDS Proxy or instance limits
+- Check CloudWatch metrics for connection counts
+- Ensure idle connections are released
 
 ### "Connection timeout" in migrations
 
 - Migrations should use `unpooledDb` for longer timeouts
-- Pooled connections have a 30-second timeout
+- Check security groups allow access from your IP/bastion
+- Verify VPC configuration
 
 ### Different behavior between environments
 
-- Check which connection type is being used with the console logs
-- Verify your environment variables are set correctly
+- Check which connection type is being used (console logs show this)
+- Verify SST linked resources are properly configured
+- Check environment variables in Lambda console
+
+## Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Lambda         │────▶│  RDS Proxy      │────▶│  RDS PostgreSQL │
+│  Functions      │     │  (Connection    │     │  (Multi-AZ in   │
+│                 │     │   Pooling)      │     │   Production)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                        │
+┌─────────────────┐     ┌─────────────────┐            │
+│  Bastion Host   │────▶│  Direct         │────────────┘
+│  (Migrations)   │     │  Connection     │
+└─────────────────┘     └─────────────────┘
+```

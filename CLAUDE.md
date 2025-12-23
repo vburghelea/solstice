@@ -266,34 +266,90 @@ Required SST secrets:
 
 ### Database Connections
 
-The app uses Neon with proper connection pooling:
+The app uses AWS RDS PostgreSQL (deployed via SST) with RDS Proxy for connection pooling:
 
-- **Pooled connections** (`pooledDb`): For API routes and serverless functions
+- **Pooled connections** (`pooledDb`): For API routes and serverless functions (via RDS Proxy)
 - **Unpooled connections** (`unpooledDb`): For migrations and long operations
-- **Auto-detection** (`db`): Automatically selects based on environment
+- **Auto-detection** (`getDb`): Automatically selects based on environment
 
 See `docs/database-connections.md` for detailed usage guide.
 
-#### Direct Database Access (for debugging)
+#### SST Tunnel Setup (Required for Dev/Prod Database Access)
 
-To query the production database directly with psql, extract credentials from `.env` and use explicit flags (the connection string format doesn't work reliably with psql):
+The RDS databases are in a private VPC. To access them locally, you need the SST tunnel:
 
 ```bash
-# Get credentials from .env
-grep DATABASE_URL .env
+# One-time installation (requires sudo)
+sudo npx sst tunnel install
 
-# Query using explicit parameters (example - update with actual values from .env)
-PGPASSWORD="<password>" psql -h <host> -U <user> -d <dbname> -c "SELECT * FROM events LIMIT 5"
+# Start tunnel to dev database (keep running in a terminal)
+AWS_PROFILE=techdev npx sst tunnel --stage dev
 
-# Example with Neon pooler:
-PGPASSWORD="npg_xxxxx" psql -h ep-xxx-pooler.us-east-2.aws.neon.tech -U neondb_owner -d neondb -c "\d events"
+# Start tunnel to production database
+AWS_PROFILE=techprod npx sst tunnel --stage production
 ```
 
-Common debugging queries:
+#### Accessing the Dev Database
 
-- `\d <table>` - Show table schema
-- `\dt` - List all tables
-- `SELECT column_name FROM information_schema.columns WHERE table_name = 'events'` - List columns
+With the tunnel running, you can:
+
+1. **Get connection details** from SST:
+
+   ```bash
+   AWS_PROFILE=techdev npx sst shell --stage dev -- printenv | grep SST_RESOURCE_Database
+   ```
+
+2. **Connect via psql**:
+
+   ```bash
+   PGPASSWORD="<password>" psql -h solstice-dev-databaseproxy-<id>.proxy-<region>.rds.amazonaws.com -U postgres -d solstice
+   ```
+
+3. **Push schema changes**:
+
+   ```bash
+   AWS_PROFILE=techdev npx sst shell --stage dev -- npx drizzle-kit push --force
+   ```
+
+4. **Run seed scripts**:
+   ```bash
+   # Update .env and .env.e2e with dev database URL first, then:
+   npx tsx scripts/seed-e2e-data.ts
+   ```
+
+#### Local Development with Dev Database
+
+To use the dev RDS database for local development:
+
+1. Start the SST tunnel (keep running):
+
+   ```bash
+   AWS_PROFILE=techdev npx sst tunnel --stage dev
+   ```
+
+2. Update `.env` and `.env.e2e` with the dev database URL:
+
+   ```
+   DATABASE_URL="postgresql://postgres:<password>@solstice-dev-databaseproxy-<id>.proxy-cx20ui4g0b7v.ca-central-1.rds.amazonaws.com:5432/solstice?sslmode=require"
+   ```
+
+3. Run local dev server:
+   ```bash
+   pnpm dev
+   ```
+
+#### Common Database Commands
+
+```bash
+# List tables
+PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "\dt"
+
+# Show table schema
+PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "\d events"
+
+# List columns for a table
+PGPASSWORD="<pass>" psql -h <host> -U postgres -d solstice -c "SELECT column_name FROM information_schema.columns WHERE table_name = 'events'"
+```
 
 ### Security Features
 
@@ -316,6 +372,10 @@ Common debugging queries:
 
 - **GitHub Actions**: Automated testing, linting, and type checking
 - **SST Deployments**: Deploy via `npx sst deploy --stage <stage>`
+- **AWS Profiles**: `techdev` for `dev`/`perf` (synthetic data), `techprod` for `production`
+- **SSO Login Required**: Run `aws sso login --profile techdev` or
+  `aws sso login --profile techprod` before deploying
+- **Cost Control**: Any `perf` or `production` deploy requires explicit double-approval
 - **Pre-commit Hooks**: Husky + lint-staged for code quality
 - **Multi-version Testing**: Tests run on Node.js 18 and 20
 

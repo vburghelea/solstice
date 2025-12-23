@@ -29,6 +29,38 @@ export default $config({
     };
   },
   async run() {
+    const stage = $app.stage ?? "dev";
+    const isProd = stage === "production";
+    const isPerf = stage === "perf";
+
+    const dbVersion = "16.11";
+    const dbConfig = isProd
+      ? {
+          instance: "t4g.large",
+          storage: "200 GB",
+          multiAz: true,
+          backupRetentionDays: 35,
+          deletionProtection: true,
+          forceSsl: true,
+        }
+      : isPerf
+        ? {
+            instance: "t4g.large",
+            storage: "200 GB",
+            multiAz: false,
+            backupRetentionDays: 7,
+            deletionProtection: false,
+            forceSsl: true,
+          }
+        : {
+            instance: "t4g.micro",
+            storage: "50 GB",
+            multiAz: false,
+            backupRetentionDays: 7,
+            deletionProtection: false,
+            forceSsl: true,
+          };
+
     // Workaround for Lambda Function URL invoke permissions
     // See: https://github.com/sst/sst/issues/6198
     // Documented fix from sst-migration-plan.md
@@ -41,10 +73,44 @@ export default $config({
       });
     });
 
+    const vpc = new sst.aws.Vpc("Vpc", {
+      bastion: true,
+      nat: "ec2",
+    });
+
+    const database = new sst.aws.Postgres("Database", {
+      vpc,
+      version: dbVersion,
+      instance: dbConfig.instance,
+      storage: dbConfig.storage,
+      multiAz: dbConfig.multiAz,
+      proxy: true,
+      transform: {
+        parameterGroup: (args) => ({
+          ...args,
+          parameters: [
+            {
+              name: "rds.force_ssl",
+              value: dbConfig.forceSsl ? "1" : "0",
+            },
+            {
+              name: "rds.logical_replication",
+              value: "1",
+              applyMethod: "pending-reboot",
+            },
+          ],
+        }),
+        instance: (args) => ({
+          ...args,
+          backupRetentionPeriod: dbConfig.backupRetentionDays,
+          deletionProtection: dbConfig.deletionProtection,
+        }),
+      },
+    });
+
     // Define secrets - set via: npx sst secret set <NAME> <value> --stage production
     const secrets = {
       baseUrl: new sst.Secret("BaseUrl"), // CloudFront URL
-      databaseUrl: new sst.Secret("DatabaseUrl"),
       betterAuthSecret: new sst.Secret("BetterAuthSecret"),
       googleClientId: new sst.Secret("GoogleClientId"),
       googleClientSecret: new sst.Secret("GoogleClientSecret"),
@@ -53,8 +119,6 @@ export default $config({
       squareAccessToken: new sst.Secret("SquareAccessToken"),
       squareLocationId: new sst.Secret("SquareLocationId"),
       squareWebhookSignatureKey: new sst.Secret("SquareWebhookSignatureKey"),
-      sendgridApiKey: new sst.Secret("SendgridApiKey"),
-      sendgridFromEmail: new sst.Secret("SendgridFromEmail"),
     };
 
     // Deploy TanStack Start app
@@ -63,15 +127,15 @@ export default $config({
       dev: {
         command: "pnpm dev",
       },
-      link: Object.values(secrets),
+      link: [database, ...Object.values(secrets)],
+      vpc,
       environment: {
         // Runtime environment detection
-        SST_STAGE: $app.stage,
-        NODE_ENV: "production",
+        SST_STAGE: stage,
+        NODE_ENV: isProd || isPerf ? "production" : "development",
         // Base URL for auth callbacks
         VITE_BASE_URL: secrets.baseUrl.value,
         // Map SST secrets to expected env var names
-        DATABASE_URL: secrets.databaseUrl.value,
         BETTER_AUTH_SECRET: secrets.betterAuthSecret.value,
         GOOGLE_CLIENT_ID: secrets.googleClientId.value,
         GOOGLE_CLIENT_SECRET: secrets.googleClientSecret.value,
@@ -80,8 +144,6 @@ export default $config({
         SQUARE_ACCESS_TOKEN: secrets.squareAccessToken.value,
         SQUARE_LOCATION_ID: secrets.squareLocationId.value,
         SQUARE_WEBHOOK_SIGNATURE_KEY: secrets.squareWebhookSignatureKey.value,
-        SENDGRID_API_KEY: secrets.sendgridApiKey.value,
-        SENDGRID_FROM_EMAIL: secrets.sendgridFromEmail.value,
       },
     });
 

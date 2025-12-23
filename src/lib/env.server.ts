@@ -20,8 +20,12 @@ import { parseOAuthAllowedDomains } from "./env/oauth-domain";
 export const env = createEnv({
   server: {
     // Database
-    DATABASE_URL: z.url(),
+    DATABASE_URL: z.url().optional(),
     DATABASE_URL_UNPOOLED: z.url().optional(),
+    DATABASE_POOLED_URL: z.url().optional(),
+    DATABASE_UNPOOLED_URL: z.url().optional(),
+    NETLIFY_DATABASE_URL: z.url().optional(),
+    NETLIFY_DATABASE_URL_UNPOOLED: z.url().optional(),
 
     // Auth - Secret must be set explicitly, no fallbacks
     // Generate with: node scripts/generate-auth-secret.js
@@ -80,12 +84,30 @@ export const env = createEnv({
   emptyStringAsUndefined: true,
 });
 
+const requireDbUrl = (value: string | undefined, label: string) => {
+  if (!value) {
+    throw new Error(`Missing database URL configuration for ${label}.`);
+  }
+  return value;
+};
+
 // Helper functions
-export const getDbUrl = () => env.DATABASE_URL;
+export const getDbUrl = () => requireDbUrl(env.DATABASE_URL, "DATABASE_URL");
 
-export const getPooledDbUrl = () => env.DATABASE_URL;
+export const getPooledDbUrl = () =>
+  requireDbUrl(
+    env.DATABASE_POOLED_URL || env.NETLIFY_DATABASE_URL || env.DATABASE_URL,
+    "DATABASE_POOLED_URL or DATABASE_URL",
+  );
 
-export const getUnpooledDbUrl = () => env.DATABASE_URL_UNPOOLED || env.DATABASE_URL;
+export const getUnpooledDbUrl = () =>
+  requireDbUrl(
+    env.DATABASE_UNPOOLED_URL ||
+      env.DATABASE_URL_UNPOOLED ||
+      env.NETLIFY_DATABASE_URL_UNPOOLED ||
+      env.DATABASE_URL,
+    "DATABASE_UNPOOLED_URL or DATABASE_URL",
+  );
 
 export const getBaseUrl = () => {
   // SST sets BASE_URL via secrets in production
@@ -109,8 +131,16 @@ export const isProduction = () => env.NODE_ENV === "production";
 export const isDevelopment = () => env.NODE_ENV === "development";
 export const isTest = () => env.NODE_ENV === "test";
 
-export const isServerless = () =>
-  !!(process.env["AWS_LAMBDA_FUNCTION_NAME"] || process.env["AWS_EXECUTION_ENV"]);
+export const isServerless = () => {
+  const awsEnv =
+    process.env["AWS_LAMBDA_FUNCTION_NAME"] ||
+    process.env["AWS_EXECUTION_ENV"]?.includes("AWS_Lambda");
+  const sstEnv = process.env["SST_STAGE"] || process.env["SST_DEV"] === "true";
+  const netlifyEnv = process.env["NETLIFY"] === "true";
+  const vercelEnv = process.env["VERCEL"] === "1" || process.env["VERCEL_ENV"];
+
+  return !!(awsEnv || sstEnv || netlifyEnv || vercelEnv);
+};
 
 export const isAWSLambda = () =>
   !!(process.env["AWS_LAMBDA_FUNCTION_NAME"] || process.env["AWS_EXECUTION_ENV"]);

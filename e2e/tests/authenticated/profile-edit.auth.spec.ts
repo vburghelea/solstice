@@ -40,7 +40,7 @@ test.describe("Profile Edit", () => {
     await expect(page.getByRole("button", { name: /Cancel/i })).toBeVisible();
 
     // Check that input fields are visible - use more specific selectors
-    await expect(page.getByLabel("Date of Birth")).toBeVisible();
+    await expect(page.getByRole("group", { name: "Date of Birth" })).toBeVisible();
     await expect(page.getByRole("textbox", { name: "Phone Number" })).toBeVisible();
     await expect(page.getByLabel("Gender")).toBeVisible();
     await expect(page.getByLabel("Pronouns")).toBeVisible();
@@ -168,8 +168,10 @@ test.describe("Profile Edit", () => {
     await page.waitForTimeout(1000);
 
     // Verify that existing data is loaded (date of birth should be populated)
-    const dateInput = page.getByLabel("Date of Birth");
-    await expect(dateInput).toHaveValue(/\d{4}-\d{2}-\d{2}/);
+    const dateGroup = page.getByRole("group", { name: "Date of Birth" });
+    await expect(dateGroup.getByLabel("Year")).toHaveValue(/\d{4}/);
+    await expect(dateGroup.getByLabel("Month")).toHaveValue(/\d{2}/);
+    await expect(dateGroup.getByLabel("Day")).toHaveValue(/\d{2}/);
 
     // Since we're just updating privacy settings, we only need to toggle the checkboxes
     // The test user already has a complete profile from the seed data
